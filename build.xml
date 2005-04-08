@@ -38,7 +38,7 @@
 
     </target>
 
-    <target name="test" description="Run the projects tests.">
+    <target name="test" description="Run the project's tests.">
         <mkdir dir="build/test/report"/>
         <junit forkmode="once">
             <classpath>
