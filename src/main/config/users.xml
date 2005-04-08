@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<users>
+    <user login="jsankey">
+        <name>Jason Sankey</name>
+        <contact-points>
+            <email name="Gmail">
+                <address>jason.sankey@sensorynetworks.com</address>
+            </email>
+        </contact-points>
+        <subscriptions>
+            <subscription project="test-project" contact-point="Gmail"/>
+        </subscriptions>
+    </user>
+</users>

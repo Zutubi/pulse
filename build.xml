@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Cinnamon Bob" default="default" basedir=".">
+
+    <property file="build.properties"/>
+
+    <path id="cp">
+        <fileset dir="lib">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean" description="Clean up after myself.">
+        <delete dir="build"/>
+    </target>
+
+    <target name="build" description="Compile all of the java source.">
+        <mkdir dir="build/java/classes"/>
+        <javac srcdir="src/main/java" destdir="build/java/classes" classpathref="cp" debug="on"/>
+
+        <copy todir="build/java/classes">
+            <fileset dir="src/main/java">
+                <include name="**/*.properties"/>
+            </fileset>
+        </copy>
+
+        <mkdir dir="build/test/classes"/>
+        <javac srcdir="src/test/java" destdir="build/test/classes" debug="on">
+            <classpath refid="cp"/>
+            <classpath location="build/java/classes"/>
+        </javac>
+
+        <copy todir="build/test/classes">
+            <fileset dir="src/test/java">
+                <include name="**/*.properties"/>
+                <include name="**/*.png"/>
+            </fileset>
+        </copy>
+
+    </target>
+
+    <target name="test" description="Run the projects tests.">
+        <mkdir dir="build/test/report"/>
+        <junit forkmode="once">
+            <classpath>
+                <path refid="cp"/>
+                <pathelement location="build/java/classes"/>
+                <pathelement location="build/test/classes"/>
+            </classpath>
+            <sysproperty key="tests.data.dir" value="src/test/data"/>
+
+            <batchtest fork="true" todir="build/test/report">
+                <fileset dir="src/test/java" includes="**/*Test.java"/>
+                <formatter type="xml"/>
+                <formatter type="plain"/>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="default" depends="clean, build, test" description="Run a clean build by default."/>
+
+    <target name="jar" depends="build">
+        <jar file="build/bob.jar" basedir="build/java/classes"/>
+    </target>
+
+    <target name="pkg" depends="jar">
+        <property name="zip.root" value="bob-dev"/>
+        <zip destfile="build/bob.zip">
+            <zipfileset dir="src/bin" prefix="${zip.root}/bin"/>
+            <zipfileset dir="build" includes="bob.jar" fullpath="${zip.root}/lib/bob.jar"/>
+<!--            <zipfileset dir="src/bin" prefix="bin"/>-->
+<!--            <zipfileset dir="." includes="ChangeLog27.txt" fullpath="docs/ChangeLog.txt"/>-->
+<!--            <zipfileset src="examples.zip" includes="**/*.html" prefix="docs/examples"/>-->
+        </zip>
+    </target>
+
+    <target name="deploy">
+        <delete dir="deploy/bob-dev"/>
+        <mkdir dir="deploy"/>
+        <unzip src="build/bob.zip" dest="deploy"/>
+    </target>
+
+
+    <target name="bob.start" depends="default">
+        <copy todir="build/root/config">
+            <fileset dir="src/config">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+        <mkdir dir="build/root/log"/>
+        <java classname="com.cinnamonbob.command.Bootstrap" fork="true" spawn="true">
+            <classpath refid="cp"/>
+            <classpath location="build/java/classes"/>
+            <classpath location="src/main/templates"/>
+            <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
+            <sysproperty key="root.dir" value="build/root"/>
+            <arg value="--start"/>
+        </java>
+    </target>
+
+    <target name="bob.run" depends="default">
+        <copy todir="build/root/config">
+            <fileset dir="src/config">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+        <mkdir dir="build/root/log"/>
+        <java classname="com.cinnamonbob.command.Bootstrap" fork="true">
+            <classpath refid="cp"/>
+            <classpath location="build/java/classes"/>
+            <classpath location="src/main/templates"/>
+            <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
+            <sysproperty key="root.dir" value="build/root"/>
+            <arg value="--start"/>
+        </java>
+    </target>
+
+    <target name="bob.stop">
+        <java classname="com.cinnamonbob.command.Bootstrap" fork="true">
+            <classpath refid="cp"/>
+            <classpath location="build/java/classes"/>
+            <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
+            <arg value="--stop"/>
+        </java>
+    </target>
+
+    <target name="bob.build">
+        <java classname="com.cinnamonbob.command.Bootstrap" fork="true">
+            <classpath refid="cp"/>
+            <classpath location="build/java/classes"/>
+            <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
+            <arg value="--build=projectName"/>
+        </java>
+    </target>
+    <target name="bob.usage">
+        <java classname="com.cinnamonbob.command.Bootstrap" fork="true">
+            <classpath refid="cp"/>
+            <classpath location="build/java/classes"/>
+            <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
+            <arg value="--usage"/>
+        </java>
+    </target>
+    <target name="bob.help">
+        <java classname="com.cinnamonbob.command.Bootstrap" fork="true">
+            <classpath refid="cp"/>
+            <classpath location="build/java/classes"/>
+            <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
+            <arg value="--help"/>
+        </java>
+    </target>
+
+</project>

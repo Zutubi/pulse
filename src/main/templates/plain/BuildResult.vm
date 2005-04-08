@@ -1,0 +1,23 @@
+Overview
+--------
+Project  : $result.ProjectName
+Build    : $result.Id
+Commenced: $result.Stamps.PrettyStartTime
+Completed: $result.Stamps.PrettyEndTime
+Elapsed  : $result.Stamps.PrettyElapsed
+Result   :#if($result.succeeded()) Success #else Failure #end
+
+
+Details
+-------
+#foreach($commandResult in $result.iterator())
+Command  : $commandResult.CommandName
+Commenced: $commandResult.Stamps.PrettyStartTime
+Completed: $commandResult.Stamps.PrettyEndTime
+Elapsed  : $commandResult.Stamps.PrettyElapsed
+Result   :#if($commandResult.Result.succeeded()) Success #else Failure #end
+
+Details  :
+#parse($renderer.findTemplate($type, $commandResult.Result))
+
+#end

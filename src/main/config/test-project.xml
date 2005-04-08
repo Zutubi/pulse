@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<project>
+    <description>Wow, a project!</description>
+    <recipe>
+        <command name="sync">
+            <executable exe="sleep" args="1" working-dir="/home/jsankey"/>
+        </command>
+        <command name="build">
+            <executable exe="ls" args="-l -a" working-dir="/home/jsankey/bob"/>
+        </command>
+    </recipe>
+</project>
+
