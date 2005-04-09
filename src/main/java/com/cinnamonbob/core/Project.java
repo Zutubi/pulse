@@ -18,6 +18,8 @@ import java.util.logging.Logger;
  */
 public class Project
 {
+    private static final Logger LOG = Logger.getLogger(Project.class.getName());
+    
     private static final String CONFIG_ELEMENT_DESCRIPTION = "description";
     private static final String CONFIG_ELEMENT_RECIPE      = "recipe";
     private static final String DIR_BUILDS                 = "builds";
@@ -50,18 +52,17 @@ public class Project
     private File projectDir;
     private File buildsDir;
     private int nextBuild;
-    private Logger rootLogger;
     
     
     public Project(Bob theBuilder, String name, String filename) throws ConfigException
     {
         this.theBuilder = theBuilder;
         this.name = name;
-        this.rootLogger = theBuilder.getRootLogger();
         this.subscriptions = new LinkedList<ContactPoint>();
         loadConfig(filename);
         this.projectDir = new File(theBuilder.getProjectRoot(), name);
         this.buildsDir = new File(projectDir, DIR_BUILDS);
+
         // FIXME
         if(buildsDir.isDirectory())
         {
@@ -206,12 +207,12 @@ public class Project
     {
         InternalBuildFailureException e = result.getInternalFailure();
         
-        rootLogger.severe("Project '" + name + "' build " + Integer.toString(result.getId()) + ": Internal build failure:");
-        rootLogger.severe(e.getMessage());
+        LOG.severe("Project '" + name + "' build " + Integer.toString(result.getId()) + ": Internal build failure:");
+        LOG.severe(e.getMessage());
         
         if(e.getCause() != null)
         {
-            rootLogger.severe("Cause: " + e.getCause().getMessage());
+            LOG.severe("Cause: " + e.getCause().getMessage());
         }
     }
 

@@ -4,28 +4,19 @@ import nu.xom.Document;
 import nu.xom.Element;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 /**
  * Bob.  The Builder.
  */
 public class Bob
 {
-    private static final String LOG_DIR_NAME                = "log";
-    private static final String LOG_CONFIG_FILE_NAME        = "logging.properties";
-    private static final String LOG_ROOT_LOGGER_NAME        = "net.anyhews.cib";
-    private static final String LOG_FILE_NAME               = "bob.log";
+    private static final Logger LOG = Logger.getLogger(Bob.class.getName());
+    
     private static final String CONFIG_DIR_NAME             = "config";
     private static final String CONFIG_FILE_NAME            = "bob.xml";
     private static final String CONFIG_EXTENSION            = ".xml";
@@ -38,10 +29,6 @@ public class Bob
      * The root for all of bob's internal config and output..
      */
     private File rootDir;
-    /**
-     * The directory to store log files in.
-     */
-    private File logDir;
     /**
      * The location of configuration files.
      */
@@ -59,10 +46,6 @@ public class Bob
      */
     private UserManager userManager;
     /**
-     * The top-level logger.
-     */
-    private Logger rootLogger;
-    /**
      * Factory for churning out commands based on configuration.
      */
     private CommandFactory commandFactory;
@@ -71,77 +54,6 @@ public class Bob
     //=======================================================================
     // Implementation
     //=======================================================================
-
-    private void startupMessage(String message)
-    {
-        System.out.println(message);
-    }
-
-
-    private void reportFatalError(Exception e)
-    {
-        System.err.println("Fatal error prior to loading logging configuration:");
-        System.err.println(e.getMessage());
-        e.printStackTrace(System.err);
-    }
-
-
-    private boolean setupDefaultLogging()
-    {
-        rootLogger.setLevel(Level.CONFIG);
-
-        try
-        {
-            FileHandler handler = new FileHandler(new File(logDir, LOG_FILE_NAME).getAbsolutePath());
-            handler.setFormatter(new SimpleFormatter());
-            rootLogger.addHandler(handler);
-        }
-        catch(IOException e)
-        {
-            // Nowhere to log this to!
-            reportFatalError(e);
-            return false;
-        }
-
-        return true;
-    }
-
-
-    private boolean loadLogging()
-    {
-        rootLogger = Logger.getLogger(LOG_ROOT_LOGGER_NAME);
-        rootLogger.setUseParentHandlers(false);
-
-        File            logPropertiesFile = new File(configDir, LOG_CONFIG_FILE_NAME);
-        FileInputStream stream;
-
-        try
-        {
-            stream = new FileInputStream(logPropertiesFile);
-            startupMessage("Loading logging properties from '" + logPropertiesFile.getAbsolutePath() + "'");
-
-            try
-            {
-                LogManager.getLogManager().readConfiguration(stream);
-            }
-            catch(IOException e)
-            {
-                // Busted, don't try to recover.
-                reportFatalError(e);
-                return false;
-            }
-        }
-        catch(FileNotFoundException e)
-        {
-            // Just use the default
-            startupMessage("Logging properties file '" + logPropertiesFile.getAbsolutePath() + "' not found.");
-            startupMessage("Using default logging configuration.");
-            return setupDefaultLogging();
-        }
-
-        return true;
-    }
-
 
     private void loadConfig() throws ConfigException
     {
@@ -152,10 +64,10 @@ public class Bob
 
         String filename = configDir.getAbsolutePath() + File.separator + CONFIG_FILE_NAME;
 
-        rootLogger.config("Loading configuration from file '" + filename + "'");
+        LOG.config("Loading configuration from file '" + filename + "'");
         Document doc = XMLConfigUtils.loadFile(filename);
         loadElements(filename, doc.getRootElement());
-        rootLogger.config("Configuration loaded.");
+        LOG.config("Configuration loaded.");
     }
 
 
@@ -194,7 +106,7 @@ public class Bob
         }
 
         projectRoot = rootFile;
-        rootLogger.config("Project root set to '" + projectRoot.getAbsolutePath() + "'.");
+        LOG.config("Project root set to '" + projectRoot.getAbsolutePath() + "'.");
     }
 
 
@@ -230,9 +142,9 @@ public class Bob
             throw new ConfigException(projectFilename, "Configuration file '" + projectFilename + "' for project '" + projectName + "' does not exist.");
         }
 
-        rootLogger.config("Loading project '" + projectName + "' from file '" + projectFilename + "'");
+        LOG.config("Loading project '" + projectName + "' from file '" + projectFilename + "'");
         Project project = new Project(this, projectName, projectFilename);
-        rootLogger.config("Project '" + projectName + "' loaded.");
+        LOG.config("Project '" + projectName + "' loaded.");
         projects.put(projectName, project);
     }
 
@@ -241,9 +153,9 @@ public class Bob
     {
         for(Project project: projects.values())
         {
-            rootLogger.info("Building project '" + project.getName() + "'");
+            LOG.info("Building project '" + project.getName() + "'");
             project.build(projectRoot);
-            rootLogger.info("Build complete.");
+            LOG.info("Build complete.");
         }
     }
 
@@ -253,19 +165,8 @@ public class Bob
 
     public Bob(String rootDir) throws ConfigException
     {
-        startupMessage("Bootstrapping with root '" + rootDir +"'...");
-
         this.rootDir   = new File(rootDir);
         this.configDir = new File(this.rootDir, CONFIG_DIR_NAME);
-        this.logDir    = new File(this.rootDir, LOG_DIR_NAME);
-
-        if(!loadLogging())
-        {
-            startupMessage("Logging initialisation failed.  Exiting.");
-            return;
-        }
-
-        startupMessage("Bootstrap complete.  Switching to logging.");
 
         projects = new TreeMap<String, Project>();
         commandFactory = new CommandFactory();
@@ -310,11 +211,6 @@ public class Bob
         return projectRoot;
     }
 
-
-    public Logger getRootLogger()
-    {
-        return rootLogger;
-    }
 
     /**
      * @return Returns the command factory.
