@@ -12,13 +12,15 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * A point for contacting a user via email.
  */
 public class EmailContactPoint implements ContactPoint
 {
+    private static final Logger LOG = Logger.getLogger(EmailContactPoint.class.getName());
+    
     private static final String CONFIG_ELEMENT_ADDRESS = "address";
     
     private Bob             theBuilder;
@@ -47,8 +49,8 @@ public class EmailContactPoint implements ContactPoint
     public void notify(BuildResult result)
     {
         String subject = "[CiB] " + result.getProjectName() + ": Build " + Integer.toString(result.getId()) + (result.succeeded() ? " succeeded" : " failed");
-        System.out.println(renderResult(result));
-        //sendMail("smtp.swiftdsl.com.au", subject, renderResult(result));
+//        System.out.println(renderResult(result));
+        sendMail(subject, renderResult(result));
     }
 
     
@@ -61,33 +63,29 @@ public class EmailContactPoint implements ContactPoint
         return  w.toString();
     }
     
-    private void sendMail(String smtpServer, String subject, String body)
+    private void sendMail(String subject, String body)
     {
+        SMTPService smtp = (SMTPService)theBuilder.lookupService(SMTPService.SERVICE_NAME);
+        
+        if(smtp == null)
+        {
+            // TODO detect this badness in config somehow
+            LOG.warning("Could not locate SMTP service to send email notifications.");
+            return;
+        }
+        
         try
         {
-            Properties props = System.getProperties();
+            Session session = smtp.getSession();
             
-            // -- Attaching to default Session, or we could start a new one --
-            
-            props.put("mail.smtp.host", smtpServer);
-            Session session = Session.getDefaultInstance(props, null);
-            
-            // -- Create a new message --
             Message msg = new MimeMessage(session);
-            
-            // -- Set the FROM and TO fields --
-            msg.setFrom(new InternetAddress("jsankey@swiftdsl.com.au"));
+            msg.setFrom(smtp.getFromAddress());
             msg.setRecipient(Message.RecipientType.TO, address);
-                        
-            // -- Set the subject and body text --
             msg.setSubject(subject);
             msg.setText(body);
-            
-            // -- Set some other header information --
             msg.setHeader("X-Mailer", "Project-Cinnamon");
             msg.setSentDate(new Date());
             
-            // -- Send the message --
             Transport.send(msg);
             
             System.out.println("Message sent OK.");

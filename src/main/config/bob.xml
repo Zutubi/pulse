@@ -4,4 +4,10 @@
     <projects>
         <project name="test-project"/>
     </projects>
+    <services>
+        <smtp>
+            <host>smtp.swiftdsl.com.au</host>
+            <from-address>jsankey@swiftdsl.com.au</from-address>
+        </smtp>
+    </services>
 </bob>

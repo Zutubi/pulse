@@ -75,6 +75,29 @@ public class XMLConfigUtils
     }
     
     
+    public static int getElementInt(String filename, Element element, int min, int max) throws ConfigException
+    {
+        String text = getElementText(filename, element);
+        int result;
+        
+        try
+        {
+            result = Integer.parseInt(text);
+        }
+        catch(NumberFormatException e)
+        {
+            throw new ConfigException(filename, "Element '" + element.getLocalName() + "' requires an integer as content (found '" + text + "')");
+        }
+        
+        if(result < min || result > max)
+        {
+            throw new ConfigException(filename, "Element '" + element.getLocalName() + "' requires an integer in the range [" + Integer.toString(min) + "," + Integer.toString(max) + "] (found " + text + ")");
+        }
+        
+        return result;
+    }
+    
+    
     public static List<Element> getElements(String filename, Element parent)
     {
         LinkedList<Element> results = new LinkedList<Element>();

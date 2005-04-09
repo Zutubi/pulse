@@ -23,7 +23,9 @@ public class Bob
     private static final String CONFIG_ELEMENT_PROJECT_ROOT = "project-root";
     private static final String CONFIG_ELEMENT_PROJECTS     = "projects";
     private static final String CONFIG_ELEMENT_PROJECT      = "project";
-    private static final String CONFIG_PROJECT_NAME         = "name";
+    private static final String CONFIG_ATTR_NAME            = "name";
+    private static final String CONFIG_ELEMENT_SERVICES     = "services";
+    private static final String CONFIG_ELEMENT_SERVICE      = "service";
 
     /**
      * The root for all of bob's internal config and output..
@@ -49,7 +51,14 @@ public class Bob
      * Factory for churning out commands based on configuration.
      */
     private CommandFactory commandFactory;
-    
+    /**
+     * Factory for creating generic named services based on configuration.
+     */
+    private ServiceFactory serviceFactory;
+    /**
+     * Map from service name to service.
+     */
+    private Map<String, Service> services;
     
     //=======================================================================
     // Implementation
@@ -73,7 +82,7 @@ public class Bob
 
     private void loadElements(String filename, Element root) throws ConfigException
     {
-        List<Element> elements = XMLConfigUtils.getElements(filename, root, Arrays.asList(CONFIG_ELEMENT_PROJECT_ROOT, CONFIG_ELEMENT_PROJECTS));
+        List<Element> elements = XMLConfigUtils.getElements(filename, root, Arrays.asList(CONFIG_ELEMENT_PROJECT_ROOT, CONFIG_ELEMENT_PROJECTS, CONFIG_ELEMENT_SERVICES));
 
         for(Element current: elements)
         {
@@ -86,6 +95,10 @@ public class Bob
             else if(elementName.equals(CONFIG_ELEMENT_PROJECTS))
             {
                 loadProjects(filename, current);
+            }
+            else if(elementName.equals(CONFIG_ELEMENT_SERVICES))
+            {
+                loadServices(filename, current);
             }
             else
             {
@@ -123,11 +136,11 @@ public class Bob
 
     private void loadProject(String filename, Element element) throws ConfigException
     {
-        String projectName = element.getAttributeValue(CONFIG_PROJECT_NAME);
+        String projectName = element.getAttributeValue(CONFIG_ATTR_NAME);
 
         if(projectName == null)
         {
-            throw new ConfigException(filename, "Project element must have '" + CONFIG_PROJECT_NAME + "' attribute.");
+            throw new ConfigException(filename, "Project element must have '" + CONFIG_ATTR_NAME + "' attribute.");
         }
 
         if(projects.containsKey(projectName))
@@ -146,6 +159,18 @@ public class Bob
         Project project = new Project(this, projectName, projectFilename);
         LOG.config("Project '" + projectName + "' loaded.");
         projects.put(projectName, project);
+    }
+
+
+    private void loadServices(String filename, Element current) throws ConfigException
+    {
+        List<Element> elements = XMLConfigUtils.getElements(filename, current);
+        
+        for(Element e: elements)
+        {
+            Service service = serviceFactory.createService(e.getLocalName(), filename, e);
+            services.put(service.getServiceName(), service);
+        }
     }
 
 
@@ -169,8 +194,12 @@ public class Bob
         this.configDir = new File(this.rootDir, CONFIG_DIR_NAME);
 
         projects = new TreeMap<String, Project>();
+        services = new TreeMap<String, Service>();
         commandFactory = new CommandFactory();
         commandFactory.registerType("executable", ExecutableCommand.class);
+        serviceFactory = new ServiceFactory();
+        serviceFactory.registerType("smtp", SMTPService.class);
+        
         loadConfig();
         userManager = new UserManager(this);
 
@@ -229,6 +258,12 @@ public class Bob
         return rootDir;
     }
     
+
+    public Service lookupService(String name)
+    {
+        return services.get(name);
+    }
+
     //=======================================================================
     // Entry point
     //=======================================================================
