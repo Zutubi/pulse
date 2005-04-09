@@ -1,4 +1,4 @@
-package com.cinnamonbob.core;
+package com.cinnamonbob.util;
 
 /**
  * 
