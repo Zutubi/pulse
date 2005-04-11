@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 /**
@@ -20,13 +22,14 @@ public class Project
 {
     private static final Logger LOG = Logger.getLogger(Project.class.getName());
     
-    private static final String CONFIG_ELEMENT_DESCRIPTION = "description";
-    private static final String CONFIG_ELEMENT_RECIPE      = "recipe";
-    private static final String DIR_BUILDS                 = "builds";
-    private static final String DIR_IN_PROGRESS            = "in-progress";
-    private static final String STAMPS_FILE_NAME           = "stamps.xml";
-    private static final String INTERNAL_FAILURE_FILE_NAME = "internal-failure.xml";
-    private static final String RESULT_FILE_NAME           = "result.xml";
+    private static final String CONFIG_ELEMENT_DESCRIPTION    = "description";
+    private static final String CONFIG_ELEMENT_POST_PROCESSOR = "post-processor";
+    private static final String CONFIG_ELEMENT_RECIPE         = "recipe";
+    private static final String DIR_BUILDS                    = "builds";
+    private static final String DIR_IN_PROGRESS               = "in-progress";
+    private static final String STAMPS_FILE_NAME              = "stamps.xml";
+    private static final String INTERNAL_FAILURE_FILE_NAME    = "internal-failure.xml";
+    private static final String RESULT_FILE_NAME              = "result.xml";
     
     /**
      * The name of this project, which must be unique amongst all projects.
@@ -36,6 +39,14 @@ public class Project
      * A human-readable description of this project.
      */
     private String description;
+    /**
+     * Registry of known feature categories.
+     */
+    FeatureCategoryRegistry categoryRegistry;
+    /**
+     * Post-processors defined for this project.
+     */
+    private Map<String, PostProcessorCommon> postProcessors;
     /**
      * A description of how this project is built.
      */
@@ -56,12 +67,16 @@ public class Project
     
     public Project(Bob theBuilder, String name, String filename) throws ConfigException
     {
-        this.theBuilder = theBuilder;
-        this.name = name;
-        this.subscriptions = new LinkedList<ContactPoint>();
+        this.theBuilder       = theBuilder;
+        this.name             = name;
+        this.postProcessors   = new TreeMap<String, PostProcessorCommon>();
+        this.subscriptions    = new LinkedList<ContactPoint>();
+        this.categoryRegistry = new FeatureCategoryRegistry();
+            
         loadConfig(filename);
+        
         this.projectDir = new File(theBuilder.getProjectRoot(), name);
-        this.buildsDir = new File(projectDir, DIR_BUILDS);
+        this.buildsDir  = new File(projectDir, DIR_BUILDS);
 
         // FIXME
         if(buildsDir.isDirectory())
@@ -99,7 +114,7 @@ public class Project
     private void loadConfig(String filename) throws ConfigException
     {
         Document      doc      = XMLConfigUtils.loadFile(filename);
-        List<Element> elements = XMLConfigUtils.getElements(filename, doc.getRootElement(), Arrays.asList(CONFIG_ELEMENT_DESCRIPTION, CONFIG_ELEMENT_RECIPE));
+        List<Element> elements = XMLConfigUtils.getElements(filename, doc.getRootElement(), Arrays.asList(CONFIG_ELEMENT_DESCRIPTION, CONFIG_ELEMENT_POST_PROCESSOR, CONFIG_ELEMENT_RECIPE));
         
         for(Element current: elements)
         {
@@ -108,6 +123,10 @@ public class Project
             if(elementName.equals(CONFIG_ELEMENT_DESCRIPTION))
             {
                 loadDescription(filename, current);
+            }
+            else if(elementName.equals(CONFIG_ELEMENT_POST_PROCESSOR))
+            {
+                loadPostProcessor(filename, current);
             }
             else if(elementName.equals(CONFIG_ELEMENT_RECIPE))
             {
@@ -126,10 +145,23 @@ public class Project
         description = XMLConfigUtils.getElementText(filename, element);
     }
 
+
+    private void loadPostProcessor(String filename, Element element) throws ConfigException
+    {
+        PostProcessorCommon post = new PostProcessorCommon(filename, element, theBuilder.getPostProcessorFactory(), this);
+        
+        if(postProcessors.containsKey(post.getName()))
+        {
+            throw new ConfigException(filename, "Project '" + name + "' already contains a post-processor named '" + post.getName() + "'");
+        }
+        
+        postProcessors.put(post.getName(), post);
+    }
+
     
     private void loadRecipe(String filename, Element element) throws ConfigException
     {
-        recipe = new Recipe(filename, element, theBuilder.getCommandFactory());
+        recipe = new Recipe(filename, element, theBuilder.getCommandFactory(), this);
     }
 
 
@@ -164,7 +196,7 @@ public class Project
     private BuildResult executeBuild(File outputDir)
     {
         // Allocate the result with a unique id.
-        BuildResult result = new BuildResult(name, nextBuild++);
+        BuildResult result = new BuildResult(name, nextBuild++, categoryRegistry);
         long startTime = System.currentTimeMillis();
         File buildDir = null;
         
@@ -299,5 +331,23 @@ public class Project
         }
         
         return commandOutputDir;
+    }
+
+
+    public boolean hasPostProcessor(String name)
+    {
+        return postProcessors.containsKey(name);
+    }
+    
+    
+    public PostProcessorCommon getPostProcessor(String name)
+    {
+        return postProcessors.get(name);
+    }
+    
+    
+    public FeatureCategoryRegistry getCategoryRegistry()
+    {
+        return categoryRegistry;
     }
 }

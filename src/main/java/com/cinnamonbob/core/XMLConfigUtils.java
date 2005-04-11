@@ -153,4 +153,16 @@ public class XMLConfigUtils
         
         return value;
     }
+    
+    
+    public static String getAttributeValue(Element element, String name, String defaultValue)
+    {
+        String value = element.getAttributeValue(name);
+        if(value == null)
+        {
+            value = defaultValue;
+        }
+        
+        return value;        
+    }
 }

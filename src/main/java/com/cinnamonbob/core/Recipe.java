@@ -18,20 +18,20 @@ public class Recipe implements Iterable<CommandCommon>
     private List<CommandCommon> commands;
     
 
-    public Recipe(String filename, Element element, CommandFactory commandFactory) throws ConfigException
+    public Recipe(String filename, Element element, CommandFactory commandFactory, Project project) throws ConfigException
     {
         commands = new LinkedList<CommandCommon>();
-        loadCommands(filename, element, commandFactory);
+        loadCommands(filename, element, commandFactory, project);
     }
 
 
-    private void loadCommands(String filename, Element element, CommandFactory commandFactory) throws ConfigException
+    private void loadCommands(String filename, Element element, CommandFactory commandFactory, Project project) throws ConfigException
     {
         List<Element> elements = XMLConfigUtils.getElements(filename, element, Arrays.asList("command"));
         
         for(Element current: elements)
         {
-            CommandCommon command = new CommandCommon(filename, current, commandFactory);
+            CommandCommon command = new CommandCommon(filename, current, commandFactory, project);
             commands.add(command);
         }
     }

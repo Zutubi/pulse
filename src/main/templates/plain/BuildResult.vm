@@ -1,5 +1,6 @@
+=====================================================================
 Overview
---------
+=====================================================================
 Project  : $result.ProjectName
 Build    : $result.Id
 Commenced: $result.Stamps.PrettyStartTime
@@ -8,16 +9,36 @@ Elapsed  : $result.Stamps.PrettyElapsed
 Result   :#if($result.succeeded()) Success #else Failure #end
 
 
-Details
--------
+=====================================================================
+Log
+=====================================================================
 #foreach($commandResult in $result.iterator())
-Command  : $commandResult.CommandName
+---------------------------------------------------------------------
+Command '$commandResult.CommandName'
+---------------------------------------------------------------------
+*Brief*
 Commenced: $commandResult.Stamps.PrettyStartTime
 Completed: $commandResult.Stamps.PrettyEndTime
 Elapsed  : $commandResult.Stamps.PrettyElapsed
 Result   :#if($commandResult.Result.succeeded()) Success #else Failure #end
 
-Details  :
+
+*Details*
 #parse($renderer.findTemplate($type, $commandResult.Result))
+
+*Artifacts*
+#foreach($artifact in $commandResult.Artifacts)
+$artifact.Title
+#if($artifact.hasFeatures())
+#foreach($category in $artifact.Categories)
+  $result.getFeatureCategory($category).Title
+#foreach($feature in $artifact.getFeatures($category))
+    - $feature.Summary
+#end
+#end
+#else
+  <No features>
+#end
+#end
 
 #end

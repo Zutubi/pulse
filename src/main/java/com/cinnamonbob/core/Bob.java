@@ -52,6 +52,10 @@ public class Bob
      */
     private CommandFactory commandFactory;
     /**
+     * Factory for creating post-processors.
+     */
+    private PostProcessorFactory postProcessorFactory;
+    /**
      * Factory for creating generic named services based on configuration.
      */
     private ServiceFactory serviceFactory;
@@ -195,8 +199,13 @@ public class Bob
 
         projects = new TreeMap<String, Project>();
         services = new TreeMap<String, Service>();
+        
         commandFactory = new CommandFactory();
         commandFactory.registerType("executable", ExecutableCommand.class);
+        
+        postProcessorFactory = new PostProcessorFactory();
+        postProcessorFactory.registerType("regex", RegexPostProcessor.class);
+        
         serviceFactory = new ServiceFactory();
         serviceFactory.registerType("smtp", SMTPService.class);
         
@@ -249,6 +258,14 @@ public class Bob
         return commandFactory;
     }
 
+
+    /**
+     * @return Returns the post-processor factory.
+     */
+    public PostProcessorFactory getPostProcessorFactory()
+    {
+        return postProcessorFactory;
+    }
 
     /**
      * @return Returns the rootDir.

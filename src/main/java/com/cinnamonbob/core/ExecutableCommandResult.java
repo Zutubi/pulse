@@ -11,15 +11,19 @@ public class ExecutableCommandResult implements CommandResult
 {
     private static final int EXIT_SUCCESS = 0;
     
+    private String commandLine;
+    private String workingDir;
     private int exitCode;
     
     
-    public ExecutableCommandResult(int exitCode)
+    public ExecutableCommandResult(String commandLine, String workingDir, int exitCode)
     {
-        this.exitCode = exitCode;
+        this.commandLine = commandLine;
+        this.workingDir = workingDir;
+        this.exitCode   = exitCode;
     }
     
-    /* (non-Javadoc)
+    /**
      * @see com.cinnamonbob.core.CommandResult#succeeded()
      */
     public boolean succeeded()
@@ -27,7 +31,7 @@ public class ExecutableCommandResult implements CommandResult
         return exitCode == EXIT_SUCCESS;
     }
 
-    /* (non-Javadoc)
+    /**
      * @see com.cinnamonbob.core.CommandResult#getSummary()
      */
     public String getSummary()
@@ -36,11 +40,26 @@ public class ExecutableCommandResult implements CommandResult
     }
 
     /**
+     * @return Returns the command line that was run.
+     */
+    public String getCommandLine()
+    {
+        return commandLine;
+    }
+    
+    /**
+     * @return Returns the working directory the command was executed in.
+     */
+    public String getWorkingDir()
+    {
+        return workingDir;
+    }
+    
+    /**
      * @return Returns the exitCode.
      */
     public int getExitCode()
     {
         return exitCode;
     }
-    
 }

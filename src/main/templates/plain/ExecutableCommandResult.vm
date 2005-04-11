@@ -1,1 +1,3 @@
-  Exit Code: $commandResult.Result.ExitCode
+Command Line: $commandResult.Result.CommandLine
+Working Dir : $commandResult.Result.WorkingDir
+Exit Code   : $commandResult.Result.ExitCode

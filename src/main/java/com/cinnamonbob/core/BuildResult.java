@@ -16,6 +16,7 @@ public class BuildResult implements Iterable<CommandResultCommon>
     private transient int id;
     private transient List<CommandResultCommon> commandResults;
     
+    private FeatureCategoryRegistry categoryRegistry;
     private TimeStamps stamps;
     /**
      * If non-null, contains the details of something very nasty that stopped
@@ -27,11 +28,12 @@ public class BuildResult implements Iterable<CommandResultCommon>
     /**
      * Creates a new build result for the given project.
      */
-    public BuildResult(String projectName, int id)
+    public BuildResult(String projectName, int id, FeatureCategoryRegistry categoryRegistry)
     {
         this.projectName = projectName;
         this.id = id;
         this.commandResults = new LinkedList<CommandResultCommon>();
+        this.categoryRegistry = categoryRegistry;
     }
     
     
@@ -122,5 +124,11 @@ public class BuildResult implements Iterable<CommandResultCommon>
     public Iterator<CommandResultCommon> iterator()
     {
         return commandResults.iterator();
+    }
+    
+    
+    public FeatureCategory getFeatureCategory(String name)
+    {
+        return categoryRegistry.getFeatureCategory(name);
     }
 }

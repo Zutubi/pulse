@@ -1,5 +1,9 @@
 package com.cinnamonbob.core;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
+
 
 
 /**
@@ -10,6 +14,7 @@ public class CommandResultCommon
     private String        commandName;
     private TimeStamps    stamps;
     private CommandResult result;
+    private Map<String, Artifact> artifacts;
     
     
     public CommandResultCommon(String commandName, CommandResult result, TimeStamps stamps)
@@ -17,6 +22,7 @@ public class CommandResultCommon
         this.commandName = commandName;
         this.result = result;
         this.stamps = stamps;
+        artifacts = new TreeMap<String, Artifact>();
     }
     
     
@@ -48,5 +54,34 @@ public class CommandResultCommon
     public TimeStamps getStamps()
     {
         return stamps;
+    }
+    
+    
+    /**
+     * Adds the given artifact to this result.
+     * 
+     * @param artifact the artifact to add
+     */
+    public void addArtifact(Artifact artifact)
+    {
+        artifacts.put(artifact.getName(), artifact);
+    }
+
+
+    public boolean hasArtifact(String name)
+    {
+        return artifacts.containsKey(name);
+    }
+    
+    
+    public Artifact getArtifact(String name)
+    {
+        return artifacts.get(name);
+    }
+    
+    
+    public Collection<Artifact> getArtifacts()
+    {
+        return artifacts.values();
     }
 }

@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.cinnamonbob.util.IOHelper;
+
 /**
  * A command that involves running an executable.
  */
@@ -21,19 +23,13 @@ public class ExecutableCommand implements Command
     private static final String CONFIG_ATTR_EXECUTABLE        = "exe";
     private static final String CONFIG_ATTR_ARGUMENTS         = "args";
     private static final String CONFIG_ATTR_WORKING_DIRECTORY = "working-dir";
+    private static final String OUTPUT_FILENAME               = "output.txt";
     
     private CommandCommon common;
     private String        executable;
     private String[]      arguments;
     private File          workingDirectory;
     
-    
-    public ExecutableCommand(String filename, Element element, CommandCommon common) throws ConfigException
-    {
-        this.common = common;
-        loadConfig(filename, element);        
-    }
-
     
     private void loadConfig(String filename, Element element) throws ConfigException
     {
@@ -50,33 +46,6 @@ public class ExecutableCommand implements Command
     }
 
 
-    public ExecutableCommandResult execute(File outputDir) throws InternalBuildFailureException
-    {
-        List<String> command = new LinkedList<String>(Arrays.asList(arguments));
-        command.add(0, executable);
-        
-        ProcessBuilder builder = new ProcessBuilder(command);
-        builder.directory(workingDirectory);
-        builder.redirectErrorStream(true);
-
-        File             outputFile = new File(outputDir, "output.txt");
-        FileOutputStream outputStream;
-        int              result = -1;
-        
-        try
-        {
-            outputStream = new FileOutputStream(outputFile);
-            result = runChild(builder, outputStream);
-        }
-        catch(FileNotFoundException e)
-        {
-            throw new InternalBuildFailureException("Could not create command output file '" + outputFile.getAbsolutePath() + "'", e);
-        }
-        
-        return new ExecutableCommandResult(result);
-    }
-    
-    
     private int runChild(ProcessBuilder builder, OutputStream outputStream) throws InternalBuildFailureException
     {
         try
@@ -86,7 +55,7 @@ public class ExecutableCommand implements Command
             
             try
             {
-                joinStreams(childOutput, outputStream);
+                IOHelper.joinStreams(childOutput, outputStream);
             }
             catch(IOException e)
             {
@@ -108,16 +77,74 @@ public class ExecutableCommand implements Command
         
         return -1;
     }
-
-
-    private void joinStreams(InputStream input, OutputStream output) throws IOException
+    
+    
+    private String constructCommandLine(List<String> command)
     {
-        byte[] buffer = new byte[1024];
-        int    n;
+        StringBuffer result = new StringBuffer();
         
-        while((n = input.read(buffer)) > 0)
+        for(String part: command)
         {
-            output.write(buffer, 0, n);
+            boolean containsSpaces = part.indexOf(' ') != -1;
+            
+            if(containsSpaces)
+            {
+                result.append('"');
+            }
+
+            result.append(part);
+            
+            if(containsSpaces)
+            {
+                result.append('"');
+            }
+            result.append(' ');
         }
+        
+        return result.toString();
+    }
+
+
+    public ExecutableCommand(String filename, Element element, CommandCommon common) throws ConfigException
+    {
+        this.common = common;
+        loadConfig(filename, element);        
+    }
+
+    
+    public ExecutableCommandResult execute(File outputDir) throws InternalBuildFailureException
+    {
+        List<String> command = new LinkedList<String>(Arrays.asList(arguments));
+        command.add(0, executable);
+        
+        ProcessBuilder builder = new ProcessBuilder(command);
+        builder.directory(workingDirectory);
+        builder.redirectErrorStream(true);
+
+        File             outputFile = new File(outputDir, OUTPUT_FILENAME);
+        FileOutputStream outputStream;
+        int              result = -1;
+        
+        try
+        {
+            outputStream = new FileOutputStream(outputFile);
+            result = runChild(builder, outputStream);
+        }
+        catch(FileNotFoundException e)
+        {
+            throw new InternalBuildFailureException("Could not create command output file '" + outputFile.getAbsolutePath() + "'", e);
+        }
+        
+        return new ExecutableCommandResult(constructCommandLine(command), workingDirectory.getAbsolutePath(), result);
+    }
+    
+    
+    public List<ArtifactSpec> getArtifacts()
+    {
+        List<ArtifactSpec> list = new LinkedList<ArtifactSpec>();
+        
+        list.add(new ArtifactSpec("output", "Command Output", Artifact.TYPE_PLAIN, new File(OUTPUT_FILENAME)));
+        
+        return list;
     }
 }

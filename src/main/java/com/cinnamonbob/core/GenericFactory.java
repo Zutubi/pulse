@@ -29,6 +29,7 @@ public class GenericFactory<T>
     
     public boolean registerType(String name, Class clazz)
     {
+        // TODO more informative errors needed for user extension
         if(!returnedType.isAssignableFrom(clazz))
         {
             return false;
@@ -90,14 +91,14 @@ public class GenericFactory<T>
             }
             catch(InvocationTargetException e)
             {
-                Throwable cause = e.getCause();
+                Throwable cause = e.getTargetException();
                 if(cause instanceof ConfigException)
                 {
                     throw (ConfigException)cause;
                 }
                 else
                 {
-                    throw new ConfigException(filename, "Could not instantiate " + returnedType.getSimpleName() + " from class '" + name + "': " + e.getMessage());
+                    throw new ConfigException(filename, "Could not instantiate " + returnedType.getSimpleName() + " from class '" + name + "': " + cause.getMessage());
                 }
             }
         }
