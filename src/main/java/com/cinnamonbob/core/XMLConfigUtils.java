@@ -11,12 +11,186 @@ import java.io.IOException;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A utility class to help parse XML configuration files.
  */
 public class XMLConfigUtils
 {
+    private enum TokenType
+    {
+        TEXT,
+        VARIABLE_REFERENCE
+    }
+    
+    
+    private enum LexerState
+    {
+        INITIAL,
+        ESCAPED,
+        DOLLAR,
+        VARIABLE
+    }
+    
+    private static class Token
+    {
+        public TokenType type;
+        public String    value;
+        
+        public Token(TokenType type, String value)
+        {
+            this.type  = type;
+            this.value = value;
+        }
+    }
+    
+    
+    private static List<Token> tokenise(String filename, String input) throws ConfigException
+    {
+        List<Token>   result  = new LinkedList<Token>();
+        LexerState    state   = LexerState.INITIAL;
+        StringBuilder current = new StringBuilder();
+        
+        for(int i = 0; i < input.length(); i++)
+        {
+            char inputChar = input.charAt(i);
+            
+            switch(state)
+            {
+                case INITIAL:
+                {
+                    switch(inputChar)
+                    {
+                        case '\\':
+                        {
+                            state = LexerState.ESCAPED;
+                            break;
+                        }
+                        case '$':
+                        {
+                            state = LexerState.DOLLAR;
+                            result.add(new Token(TokenType.TEXT, current.toString()));
+                            current = new StringBuilder();
+                            break;
+                        }
+                        default:
+                        {
+                            current.append(inputChar);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case ESCAPED:
+                {
+                    current.append(inputChar);
+                    state = LexerState.INITIAL;
+                    break;
+                }
+                case DOLLAR:
+                {
+                    switch(inputChar)
+                    {
+                        case '{':
+                        {
+                            state = LexerState.VARIABLE;
+                            break;
+                        }
+                        default:
+                        {
+                            // TODO give more context
+                            throw new ConfigException(filename, "Syntax error: expecting '{', got '" + inputChar + "'");
+                        }
+                    }
+                    break;
+                }
+                case VARIABLE:
+                {
+                    switch(inputChar)
+                    {
+                        case '}':
+                        {
+                            if(current.length() == 0)
+                            {
+                                throw new ConfigException(filename, "Syntax error: empty variable reference");
+                            }
+                            
+                            result.add(new Token(TokenType.VARIABLE_REFERENCE, current.toString()));
+                            state = LexerState.INITIAL;
+                            current = new StringBuilder();
+                            break;
+                        }
+                        default:
+                        {
+                            current.append(inputChar);
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        
+        switch(state)
+        {
+            case INITIAL:
+            {
+                result.add(new Token(TokenType.TEXT, current.toString()));                
+                break;
+            }
+            case ESCAPED:
+            {
+                throw new ConfigException(filename, "Syntax error: unexpected end of input in escape sequence (\\)");
+            }
+            case DOLLAR:
+            {
+                throw new ConfigException(filename, "Syntax error: unexpected end of input looking for '{'");
+            }
+            case VARIABLE:
+            {
+                throw new ConfigException(filename, "Syntax error: unexpected end of input looking for '}'");
+            }
+        }
+
+        return result;
+    }
+    
+    
+    public static String replaceVariables(String filename, Map<String, String> variables, String input) throws ConfigException
+    {
+        StringBuilder result = new StringBuilder();
+        
+        List<Token> tokens = tokenise(filename, input);
+        
+        for(Token token: tokens)
+        {
+            switch(token.type)
+            {
+                case TEXT:
+                {
+                    result.append(token.value);
+                    break;
+                }
+                case VARIABLE_REFERENCE:
+                {
+                    if(variables.containsKey(token.value))
+                    {
+                        result.append(variables.get(token.value));
+                    }
+                    else
+                    {
+                        throw new ConfigException(filename, "Reference to unknown variable '" + token.value + "'");
+                    }
+                    break;
+                }
+            }
+        }
+        
+        return result.toString();
+    }
+
+    
     public static Document loadFile(String filename) throws ConfigException
     {
         try
@@ -164,5 +338,5 @@ public class XMLConfigUtils
         }
         
         return value;        
-    }
+    }    
 }

@@ -90,7 +90,7 @@
 
     <target name="bob.start" depends="default">
         <copy todir="build/root/config">
-            <fileset dir="src/config">
+            <fileset dir="src/main/config">
                 <include name="**/*"/>
             </fileset>
         </copy>
@@ -107,7 +107,12 @@
 
     <target name="bob.run" depends="default">
         <copy todir="build/root/config">
-            <fileset dir="src/config">
+            <fileset dir="src/main/config">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+        <copy todir="build/root/templates">
+            <fileset dir="src/main/templates">
                 <include name="**/*"/>
             </fileset>
         </copy>
