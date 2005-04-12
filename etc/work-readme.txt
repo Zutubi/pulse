@@ -1,0 +1,1 @@
+readme.txt explaining the purpose of the BOB_HOME/work directory and that it should exist.

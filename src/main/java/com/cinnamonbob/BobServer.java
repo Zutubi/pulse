@@ -38,8 +38,9 @@ public class BobServer
     {
         LOG.info("build");
         // execute a build...
+        
         try {
-            new Bob(System.getProperty("root.dir"));
+            new Bob(System.getProperty("bob.home"));
         } catch (ConfigException e) {
             e.printStackTrace();
         }

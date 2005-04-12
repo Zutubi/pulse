@@ -16,16 +16,16 @@ import java.util.logging.Logger;
 public class Bob
 {
     private static final Logger LOG = Logger.getLogger(Bob.class.getName());
-    
-    private static final String CONFIG_DIR_NAME             = "config";
-    private static final String CONFIG_FILE_NAME            = "bob.xml";
-    private static final String CONFIG_EXTENSION            = ".xml";
+
+    private static final String CONFIG_DIR_NAME = "config";
+    private static final String CONFIG_FILE_NAME = "bob.xml";
+    private static final String CONFIG_EXTENSION = ".xml";
     private static final String CONFIG_ELEMENT_PROJECT_ROOT = "project-root";
-    private static final String CONFIG_ELEMENT_PROJECTS     = "projects";
-    private static final String CONFIG_ELEMENT_PROJECT      = "project";
-    private static final String CONFIG_ATTR_NAME            = "name";
-    private static final String CONFIG_ELEMENT_SERVICES     = "services";
-    private static final String CONFIG_ELEMENT_SERVICE      = "service";
+    private static final String CONFIG_ELEMENT_PROJECTS = "projects";
+    private static final String CONFIG_ELEMENT_PROJECT = "project";
+    private static final String CONFIG_ATTR_NAME = "name";
+    private static final String CONFIG_ELEMENT_SERVICES = "services";
+    private static final String CONFIG_ELEMENT_SERVICE = "service";
 
     /**
      * The root for all of bob's internal config and output..
@@ -70,7 +70,7 @@ public class Bob
 
     private void loadConfig() throws ConfigException
     {
-        if(!this.configDir.isDirectory())
+        if (!this.configDir.isDirectory())
         {
             throw new ConfigException(configDir.getPath(), "The configuration directory does not exist.");
         }
@@ -88,23 +88,20 @@ public class Bob
     {
         List<Element> elements = XMLConfigUtils.getElements(filename, root, Arrays.asList(CONFIG_ELEMENT_PROJECT_ROOT, CONFIG_ELEMENT_PROJECTS, CONFIG_ELEMENT_SERVICES));
 
-        for(Element current: elements)
+        for (Element current : elements)
         {
-            String  elementName = current.getLocalName();
+            String elementName = current.getLocalName();
 
-            if(elementName.equals(CONFIG_ELEMENT_PROJECT_ROOT))
+            if (elementName.equals(CONFIG_ELEMENT_PROJECT_ROOT))
             {
                 loadProjectRoot(filename, current);
-            }
-            else if(elementName.equals(CONFIG_ELEMENT_PROJECTS))
+            } else if (elementName.equals(CONFIG_ELEMENT_PROJECTS))
             {
                 loadProjects(filename, current);
-            }
-            else if(elementName.equals(CONFIG_ELEMENT_SERVICES))
+            } else if (elementName.equals(CONFIG_ELEMENT_SERVICES))
             {
                 loadServices(filename, current);
-            }
-            else
+            } else
             {
                 assert(false);
             }
@@ -112,14 +109,20 @@ public class Bob
     }
 
 
-    private void loadProjectRoot(String filename, Element element)  throws ConfigException
+    private void loadProjectRoot(String filename, Element element) throws ConfigException
     {
         String root = XMLConfigUtils.getElementText(filename, element);
-        File   rootFile = new File(root);
 
-        if(!rootFile.isDirectory())
+        // The project root can be either relative to bob.home or absolute.
+        File rootFile = new File(root);
+        if (!rootFile.isDirectory())
         {
-            throw new ConfigException(filename, "The specified project root '" + root + "' does not exist or is not a directory.");
+            rootFile = new File(new File(System.getProperty("bob.home")), root);
+            if (!rootFile.isDirectory())
+            {
+                LOG.warning("specified root '" + rootFile.getAbsolutePath() + "' is not a directory.");
+                throw new ConfigException(filename, "The specified project root '" + root + "' does not exist or is not a directory.");
+            }
         }
 
         projectRoot = rootFile;
@@ -131,7 +134,7 @@ public class Bob
     {
         List<Element> elements = XMLConfigUtils.getElements(filename, element, Arrays.asList(CONFIG_ELEMENT_PROJECT));
 
-        for(Element current: elements)
+        for (Element current : elements)
         {
             loadProject(filename, current);
         }
@@ -142,19 +145,19 @@ public class Bob
     {
         String projectName = element.getAttributeValue(CONFIG_ATTR_NAME);
 
-        if(projectName == null)
+        if (projectName == null)
         {
             throw new ConfigException(filename, "Project element must have '" + CONFIG_ATTR_NAME + "' attribute.");
         }
 
-        if(projects.containsKey(projectName))
+        if (projects.containsKey(projectName))
         {
             throw new ConfigException(filename, "Duplicate project name '" + projectName + "' specified.");
         }
 
         String projectFilename = configDir.getAbsolutePath() + File.separator + projectName + CONFIG_EXTENSION;
         File projectFile = new File(projectFilename);
-        if(!projectFile.isFile())
+        if (!projectFile.isFile())
         {
             throw new ConfigException(projectFilename, "Configuration file '" + projectFilename + "' for project '" + projectName + "' does not exist.");
         }
@@ -169,8 +172,8 @@ public class Bob
     private void loadServices(String filename, Element current) throws ConfigException
     {
         List<Element> elements = XMLConfigUtils.getElements(filename, current);
-        
-        for(Element e: elements)
+
+        for (Element e : elements)
         {
             Service service = serviceFactory.createService(e.getLocalName(), filename, e);
             services.put(service.getServiceName(), service);
@@ -180,7 +183,7 @@ public class Bob
 
     private void crazyBuildLoop()
     {
-        for(Project project: projects.values())
+        for (Project project : projects.values())
         {
             LOG.info("Building project '" + project.getName() + "'");
             project.build(projectRoot);
@@ -194,21 +197,21 @@ public class Bob
 
     public Bob(String rootDir) throws ConfigException
     {
-        this.rootDir   = new File(rootDir);
+        this.rootDir = new File(rootDir);
         this.configDir = new File(this.rootDir, CONFIG_DIR_NAME);
 
         projects = new TreeMap<String, Project>();
         services = new TreeMap<String, Service>();
-        
+
         commandFactory = new CommandFactory();
         commandFactory.registerType("executable", ExecutableCommand.class);
-        
+
         postProcessorFactory = new PostProcessorFactory();
         postProcessorFactory.registerType("regex", RegexPostProcessor.class);
-        
+
         serviceFactory = new ServiceFactory();
         serviceFactory.registerType("smtp", SMTPService.class);
-        
+
         loadConfig();
         userManager = new UserManager(this);
 
@@ -274,7 +277,7 @@ public class Bob
     {
         return rootDir;
     }
-    
+
 
     public Service lookupService(String name)
     {
@@ -290,8 +293,7 @@ public class Bob
         try
         {
             Bob bob = new Bob(argv[0]);
-        }
-        catch(ConfigException e)
+        } catch (ConfigException e)
         {
             System.err.println(e);
             e.printStackTrace();

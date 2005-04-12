@@ -28,9 +28,11 @@ if $cygwin; then
 fi
 
 # Construct the runtime classpath.
-CLASSPATH="$CLASSPATH":"$BOB_HOME"/lib/bob.jar:"$BOB_HOME"/lib/te-common.jar
+for i in "$BOB_HOME"/lib/*.jar; do
+  CLASSPATH="$CLASSPATH":"$i"
+done
 
-# For Cygwin, switch paths to Windows format before running java
+# For Cygwin, switch paths to Windows format before running java                                  
 if $cygwin; then
   JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
   BOB_HOME=`cygpath --path --windows "$BOB_HOME"`
@@ -60,4 +62,4 @@ if [ ! -x "$JAVACMD" ] ; then
   exit 1
 fi
 
-exec "$JAVACMD" -classpath "$CLASSPATH" -Djava.awt.headless=true com.cinnamonbob.command.Bootstrap --start
+exec "$JAVACMD" -classpath "$CLASSPATH" -Dbob.home="$BOB_HOME" -Djava.awt.headless=true com.cinnamonbob.command.Bootstrap --start
