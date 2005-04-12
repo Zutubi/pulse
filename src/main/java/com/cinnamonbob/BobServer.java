@@ -15,6 +15,9 @@ public class BobServer
 
     private AdminService adminService = null;
 
+    private BuildQueue buildQueue = null;
+    private Bob core = null;
+
     private int adminPort;
 
     public BobServer(int port) {
@@ -26,6 +29,17 @@ public class BobServer
         LOG.info("start");
         adminService = new AdminService(adminPort, this);
         adminService.start();
+
+        core = new Bob(System.getProperty("bob.home"));
+
+        buildQueue = new BuildQueue();
+        buildQueue.setDispatcher(new BuildDispatcher()
+        {
+            public void dispatch(BuildRequest request)
+            {
+                core.build(request.getProjectName());
+            }
+        });
     }
 
     public void stop()
@@ -34,15 +48,11 @@ public class BobServer
         adminService.stop();
     }
 
-    public void build()
+    public void build(String projectName)
     {
         LOG.info("build");
-        // execute a build...
-        
-        try {
-            new Bob(System.getProperty("bob.home"));
-        } catch (ConfigException e) {
-            e.printStackTrace();
-        }
+
+        // request a build.
+        buildQueue.enqueue(new BuildRequest(projectName));
     }
 }

@@ -142,7 +142,7 @@
             <classpath location="build/java/classes"/>
             <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
             <sysproperty key="root.dir" value="./deploy/bob-dev"/>
-            <arg value="--build=projectName"/>
+            <arg value="--build=test-project"/>
         </java>
     </target>
     <target name="bob.usage">

@@ -180,7 +180,9 @@ public class Bob
         }
     }
 
-
+    /**
+     * @deprecated
+     */
     private void crazyBuildLoop()
     {
         for (Project project : projects.values())
@@ -215,7 +217,6 @@ public class Bob
         loadConfig();
         userManager = new UserManager(this);
 
-        crazyBuildLoop();
     }
     
     //=======================================================================
@@ -293,10 +294,21 @@ public class Bob
         try
         {
             Bob bob = new Bob(argv[0]);
+            bob.crazyBuildLoop();
         } catch (ConfigException e)
         {
             System.err.println(e);
             e.printStackTrace();
         }
+    }
+
+    public void build(String projectName)
+    {
+        if (!projects.containsKey(projectName)) {
+            LOG.severe("Failed to build unknown project '"+projectName+"'");
+            return;
+        }
+        Project project = projects.get(projectName);
+        project.build(projectRoot);
     }
 }

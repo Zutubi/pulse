@@ -149,9 +149,9 @@ public class AdminService
             if (Command.SHUTDOWN.equals(cmd))
             {
                 processShutdown();
-            } else if (Command.BUILD.equals(cmd))
+            } else if (cmd.startsWith(Command.BUILD))
             {
-                processBuild();
+                processBuild(cmd.substring(Command.BUILD.length() + 1));
             }
         } finally
         {
@@ -167,9 +167,9 @@ public class AdminService
 
     }
 
-    private void processBuild()
+    private void processBuild(String projectName)
     {
-        bobServer.build();
+        bobServer.build(projectName);
     }
 
 }

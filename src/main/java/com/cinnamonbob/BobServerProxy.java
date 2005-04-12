@@ -61,6 +61,8 @@ public class BobServerProxy
             // send the shutdown command.
             OutputStream out = socket.getOutputStream();
             out.write(AdminService.Command.BUILD.getBytes());
+            out.write(":".getBytes());
+            out.write(projectName.getBytes());
             out.close();
 
         } catch (IOException e) {

@@ -1,1 +1,2 @@
-readme.txt explaining the purpose of the BOB_HOME/work directory and that it should exist.
+This is the default working directory for bob. This property can be configured
+in the config/bob.xml file.
