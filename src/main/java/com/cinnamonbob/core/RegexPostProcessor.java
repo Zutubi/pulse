@@ -28,14 +28,15 @@ public class RegexPostProcessor implements PostProcessor
     private PostProcessorCommon common;
     private Project project;
     
-    private void loadPattern(String filename, Element element) throws ConfigException
+    
+    private void loadPattern(ConfigContext context, Element element) throws ConfigException
     {
-        String category   = XMLConfigUtils.getAttributeValue(filename, element, CONFIG_ATTR_CATEGORY);
-        String expression = XMLConfigUtils.getAttributeValue(filename, element, CONFIG_ATTR_EXPRESSION);
+        String category   = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_CATEGORY);
+        String expression = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_EXPRESSION);
         
         if(!project.getCategoryRegistry().hasCategory(category))
         {
-            throw new ConfigException(filename, "Post processor '" + common.getName() + "' refers to unknown category '" + category +"'");
+            throw new ConfigException(context.getFilename(), "Post processor '" + common.getName() + "' refers to unknown category '" + category +"'");
         }
         
         try
@@ -45,7 +46,7 @@ public class RegexPostProcessor implements PostProcessor
         }
         catch(PatternSyntaxException e)
         {
-            throw new ConfigException(filename, "Post processor '" + common.getName() + "' contains invalid expression: " + e.getMessage());
+            throw new ConfigException(context.getFilename(), "Post processor '" + common.getName() + "' contains invalid expression: " + e.getMessage());
         }
     }
 
@@ -63,17 +64,17 @@ public class RegexPostProcessor implements PostProcessor
     }
 
     
-    public RegexPostProcessor(String filename, Element element, PostProcessorCommon common, Project project) throws ConfigException
+    public RegexPostProcessor(ConfigContext context, Element element, PostProcessorCommon common, Project project) throws ConfigException
     {
         this.common  = common;
         this.project = project;
         patterns     = new LinkedList<Pair<String, Pattern>>();
         
-        List<Element> elements = XMLConfigUtils.getElements(filename, element, Arrays.asList(CONFIG_ELEMENT_PATTERN));
+        List<Element> elements = XMLConfigUtils.getElements(context, element, Arrays.asList(CONFIG_ELEMENT_PATTERN));
         
         for(Element current: elements)
         {
-            loadPattern(filename, current);
+            loadPattern(context, current);
         }
     }
     

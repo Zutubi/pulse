@@ -24,32 +24,32 @@ public class SMTPService implements Service
     private InternetAddress fromAddress;
     private Properties properties;
     
-    public SMTPService(String filename, Element element) throws ConfigException
+    public SMTPService(ConfigContext context, Element element) throws ConfigException
     {
-        loadConfig(filename, element);
+        loadConfig(context, element);
         properties = System.getProperties();
         properties.put("mail.smtp.host", host);
     }
 
 
-    private void loadConfig(String filename, Element element) throws ConfigException
+    private void loadConfig(ConfigContext context, Element element) throws ConfigException
     {
-        List<Element> elements = XMLConfigUtils.getElements(filename, element, Arrays.asList(CONFIG_ELEMENT_HOST, CONFIG_ELEMENT_PORT, CONFIG_ELEMENT_FROM_ADDRESS));
+        List<Element> elements = XMLConfigUtils.getElements(context, element, Arrays.asList(CONFIG_ELEMENT_HOST, CONFIG_ELEMENT_PORT, CONFIG_ELEMENT_FROM_ADDRESS));
         for(Element e: elements)
         {
             String elementName = e.getLocalName();
             
             if(elementName.equals(CONFIG_ELEMENT_HOST))
             {
-                loadHost(filename, e);
+                loadHost(context, e);
             }
             else if(elementName.equals(CONFIG_ELEMENT_PORT))
             {
-                loadPort(filename, e);
+                loadPort(context, e);
             }
             else if(elementName.equals(CONFIG_ELEMENT_FROM_ADDRESS))
             {
-                loadFromAddress(filename, e);
+                loadFromAddress(context, e);
             }
             else
             {
@@ -59,22 +59,22 @@ public class SMTPService implements Service
     }
     
     
-    private void loadHost(String filename, Element element) throws ConfigException
+    private void loadHost(ConfigContext context, Element element) throws ConfigException
     {
-        host = XMLConfigUtils.getElementText(filename, element);
+        host = XMLConfigUtils.getElementText(context, element);
     }
 
 
-    private void loadPort(String filename, Element element) throws ConfigException
+    private void loadPort(ConfigContext context, Element element) throws ConfigException
     {
         // TODO port not yet specified
-        port = XMLConfigUtils.getElementInt(filename, element, 1, Integer.MAX_VALUE);
+        port = XMLConfigUtils.getElementInt(context, element, 1, Integer.MAX_VALUE);
     }
 
 
-    private void loadFromAddress(String filename, Element element) throws ConfigException
+    private void loadFromAddress(ConfigContext context, Element element) throws ConfigException
     {
-        String text = XMLConfigUtils.getElementText(filename, element);
+        String text = XMLConfigUtils.getElementText(context, element);
         
         try
         {
@@ -82,7 +82,7 @@ public class SMTPService implements Service
         }
         catch(AddressException e)
         {
-            throw new ConfigException(filename, "Invalid email address specified for SMTP service: " + e.getMessage());
+            throw new ConfigException(context.getFilename(), "Invalid email address specified for SMTP service: " + e.getMessage());
         }
     }
 

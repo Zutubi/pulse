@@ -114,7 +114,10 @@ public class Project
     private void loadConfig(String filename) throws ConfigException
     {
         Document      doc      = XMLConfigUtils.loadFile(filename);
-        List<Element> elements = XMLConfigUtils.getElements(filename, doc.getRootElement(), Arrays.asList(CONFIG_ELEMENT_DESCRIPTION, CONFIG_ELEMENT_POST_PROCESSOR, CONFIG_ELEMENT_RECIPE));
+        ConfigContext context  = new ConfigContext(filename);
+        List<Element> elements = XMLConfigUtils.getElements(context, doc.getRootElement(), Arrays.asList(XMLConfigUtils.CONFIG_ELEMENT_PROPERTY, CONFIG_ELEMENT_DESCRIPTION, CONFIG_ELEMENT_POST_PROCESSOR, CONFIG_ELEMENT_RECIPE));
+        
+        XMLConfigUtils.extractProperties(context, elements);
         
         for(Element current: elements)
         {
@@ -122,15 +125,15 @@ public class Project
                 
             if(elementName.equals(CONFIG_ELEMENT_DESCRIPTION))
             {
-                loadDescription(filename, current);
+                loadDescription(context, current);
             }
             else if(elementName.equals(CONFIG_ELEMENT_POST_PROCESSOR))
             {
-                loadPostProcessor(filename, current);
+                loadPostProcessor(context, current);
             }
             else if(elementName.equals(CONFIG_ELEMENT_RECIPE))
             {
-                loadRecipe(filename, current);
+                loadRecipe(context, current);
             }
             else
             {
@@ -140,28 +143,28 @@ public class Project
     }
 
 
-    private void loadDescription(String filename, Element element) throws ConfigException
+    private void loadDescription(ConfigContext context, Element element) throws ConfigException
     {
-        description = XMLConfigUtils.getElementText(filename, element);
+        description = XMLConfigUtils.getElementText(context, element);
     }
 
 
-    private void loadPostProcessor(String filename, Element element) throws ConfigException
+    private void loadPostProcessor(ConfigContext context, Element element) throws ConfigException
     {
-        PostProcessorCommon post = new PostProcessorCommon(filename, element, theBuilder.getPostProcessorFactory(), this);
+        PostProcessorCommon post = new PostProcessorCommon(context, element, theBuilder.getPostProcessorFactory(), this);
         
         if(postProcessors.containsKey(post.getName()))
         {
-            throw new ConfigException(filename, "Project '" + name + "' already contains a post-processor named '" + post.getName() + "'");
+            throw new ConfigException(context.getFilename(), "Project '" + name + "' already contains a post-processor named '" + post.getName() + "'");
         }
         
         postProcessors.put(post.getName(), post);
     }
 
     
-    private void loadRecipe(String filename, Element element) throws ConfigException
+    private void loadRecipe(ConfigContext context, Element element) throws ConfigException
     {
-        recipe = new Recipe(filename, element, theBuilder.getCommandFactory(), this);
+        recipe = new Recipe(context, element, theBuilder.getCommandFactory(), this);
     }
 
 

@@ -31,18 +31,18 @@ public class ExecutableCommand implements Command
     private File          workingDirectory;
     
     
-    private void loadConfig(String filename, Element element) throws ConfigException
+    private void loadConfig(ConfigContext context, Element element) throws ConfigException
     {
         String working;
         
-        executable = XMLConfigUtils.getAttributeValue(filename, element, CONFIG_ATTR_EXECUTABLE);
-        working = element.getAttributeValue(CONFIG_ATTR_WORKING_DIRECTORY);
+        executable = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_EXECUTABLE);
+        working = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_WORKING_DIRECTORY, null);
         if(working != null)
         {
             workingDirectory = new File(working);
         }
         
-        arguments = XMLConfigUtils.getAttributeValue(filename, element, CONFIG_ATTR_ARGUMENTS).split(" ");
+        arguments = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_ARGUMENTS).split(" ");
     }
 
 
@@ -105,10 +105,10 @@ public class ExecutableCommand implements Command
     }
 
 
-    public ExecutableCommand(String filename, Element element, CommandCommon common) throws ConfigException
+    public ExecutableCommand(ConfigContext context, Element element, CommandCommon common) throws ConfigException
     {
         this.common = common;
-        loadConfig(filename, element);        
+        loadConfig(context, element);        
     }
 
     

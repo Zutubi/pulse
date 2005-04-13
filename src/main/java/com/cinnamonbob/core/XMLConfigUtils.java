@@ -9,15 +9,21 @@ import nu.xom.Text;
 
 import java.io.IOException;
 import java.io.File;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A utility class to help parse XML configuration files.
  */
 public class XMLConfigUtils
 {
+    public static final String CONFIG_ELEMENT_PROPERTY = "property";
+    
+    private static final String CONFIG_ATTR_NAME        = "name";
+    private static final String CONFIG_ATTR_VALUE       = "value";
+
+
     private enum TokenType
     {
         TEXT,
@@ -46,7 +52,7 @@ public class XMLConfigUtils
     }
     
     
-    private static List<Token> tokenise(String filename, String input) throws ConfigException
+    private static List<Token> tokenise(ConfigContext context, String input) throws ConfigException
     {
         List<Token>   result  = new LinkedList<Token>();
         LexerState    state   = LexerState.INITIAL;
@@ -100,7 +106,7 @@ public class XMLConfigUtils
                         default:
                         {
                             // TODO give more context
-                            throw new ConfigException(filename, "Syntax error: expecting '{', got '" + inputChar + "'");
+                            throw new ConfigException(context.getFilename(), "Syntax error: expecting '{', got '" + inputChar + "'");
                         }
                     }
                     break;
@@ -113,7 +119,7 @@ public class XMLConfigUtils
                         {
                             if(current.length() == 0)
                             {
-                                throw new ConfigException(filename, "Syntax error: empty variable reference");
+                                throw new ConfigException(context.getFilename(), "Syntax error: empty variable reference");
                             }
                             
                             result.add(new Token(TokenType.VARIABLE_REFERENCE, current.toString()));
@@ -141,15 +147,15 @@ public class XMLConfigUtils
             }
             case ESCAPED:
             {
-                throw new ConfigException(filename, "Syntax error: unexpected end of input in escape sequence (\\)");
+                throw new ConfigException(context.getFilename(), "Syntax error: unexpected end of input in escape sequence (\\)");
             }
             case DOLLAR:
             {
-                throw new ConfigException(filename, "Syntax error: unexpected end of input looking for '{'");
+                throw new ConfigException(context.getFilename(), "Syntax error: unexpected end of input looking for '{'");
             }
             case VARIABLE:
             {
-                throw new ConfigException(filename, "Syntax error: unexpected end of input looking for '}'");
+                throw new ConfigException(context.getFilename(), "Syntax error: unexpected end of input looking for '}'");
             }
         }
 
@@ -157,11 +163,11 @@ public class XMLConfigUtils
     }
     
     
-    public static String replaceVariables(String filename, Map<String, String> variables, String input) throws ConfigException
+    public static String replaceVariables(ConfigContext context, String input) throws ConfigException
     {
         StringBuilder result = new StringBuilder();
         
-        List<Token> tokens = tokenise(filename, input);
+        List<Token> tokens = tokenise(context, input);
         
         for(Token token: tokens)
         {
@@ -174,13 +180,13 @@ public class XMLConfigUtils
                 }
                 case VARIABLE_REFERENCE:
                 {
-                    if(variables.containsKey(token.value))
+                    if(context.hasVariable(token.value))
                     {
-                        result.append(variables.get(token.value));
+                        result.append(context.getVariableValue(token.value));
                     }
                     else
                     {
-                        throw new ConfigException(filename, "Reference to unknown variable '" + token.value + "'");
+                        throw new ConfigException(context.getFilename(), "Reference to unknown variable '" + token.value + "'");
                     }
                     break;
                 }
@@ -190,6 +196,23 @@ public class XMLConfigUtils
         return result.toString();
     }
 
+    
+    public static void extractProperties(ConfigContext context, List<Element> elements) throws ConfigException
+    {
+        for(Iterator<Element> it = elements.iterator(); it.hasNext(); )
+        {
+            Element element = it.next();
+            
+            if(element.getLocalName().equals(CONFIG_ELEMENT_PROPERTY))
+            {
+                String name  = getAttributeValue(context, element, CONFIG_ATTR_NAME);
+                String value = getAttributeValue(context, element, CONFIG_ATTR_VALUE);
+                
+                context.setVariable(name, value);
+                it.remove();
+            }
+        }
+    }
     
     public static Document loadFile(String filename) throws ConfigException
     {
@@ -202,7 +225,6 @@ public class XMLConfigUtils
         }
         catch(ParsingException e)
         {
-            e.printStackTrace();
             throw new ConfigException(filename, e.getLineNumber(), e.getColumnNumber(), e.getMessage());
         }
         catch(IOException e)
@@ -212,7 +234,7 @@ public class XMLConfigUtils
     }
     
     
-    public static String getElementText(String filename, Element element, boolean trim) throws ConfigException
+    public static String getElementText(ConfigContext context, Element element, boolean trim) throws ConfigException
     {
         String result = "";
         
@@ -225,9 +247,11 @@ public class XMLConfigUtils
             }
             else if(current instanceof Element)
             {
-                throw new ConfigException(filename, "Unexpected child element '" + ((Element)current).getLocalName() + "' nested in element '" + element.getLocalName() + "'");
+                throw new ConfigException(context.getFilename(), "Unexpected child element '" + ((Element)current).getLocalName() + "' nested in element '" + element.getLocalName() + "'");
             }
         }
+        
+        result = replaceVariables(context, result);
         
         if(trim)
         {
@@ -236,22 +260,22 @@ public class XMLConfigUtils
         
         if(result.length() == 0)
         {
-            throw new ConfigException(filename, "Element '" + element.getLocalName() + "' requires text content");
+            throw new ConfigException(context.getFilename(), "Element '" + element.getLocalName() + "' requires text content");
         }
         
         return result;
     }
     
     
-    public static String getElementText(String filename, Element element) throws ConfigException
+    public static String getElementText(ConfigContext context, Element element) throws ConfigException
     {
-        return getElementText(filename, element, true);
+        return getElementText(context, element, true);
     }
     
     
-    public static int getElementInt(String filename, Element element, int min, int max) throws ConfigException
+    public static int getElementInt(ConfigContext context, Element element, int min, int max) throws ConfigException
     {
-        String text = getElementText(filename, element);
+        String text = getElementText(context, element);
         int result;
         
         try
@@ -260,19 +284,19 @@ public class XMLConfigUtils
         }
         catch(NumberFormatException e)
         {
-            throw new ConfigException(filename, "Element '" + element.getLocalName() + "' requires an integer as content (found '" + text + "')");
+            throw new ConfigException(context.getFilename(), "Element '" + element.getLocalName() + "' requires an integer as content (found '" + text + "')");
         }
         
         if(result < min || result > max)
         {
-            throw new ConfigException(filename, "Element '" + element.getLocalName() + "' requires an integer in the range [" + Integer.toString(min) + "," + Integer.toString(max) + "] (found " + text + ")");
+            throw new ConfigException(context.getFilename(), "Element '" + element.getLocalName() + "' requires an integer in the range [" + Integer.toString(min) + "," + Integer.toString(max) + "] (found " + text + ")");
         }
         
         return result;
     }
     
     
-    public static List<Element> getElements(String filename, Element parent)
+    public static List<Element> getElements(ConfigContext context, Element parent)
     {
         LinkedList<Element> results = new LinkedList<Element>();
         
@@ -290,7 +314,7 @@ public class XMLConfigUtils
     }
     
     
-    public static List<Element> getElements(String filename, Element parent, List<String> expectedNames) throws ConfigException
+    public static List<Element> getElements(ConfigContext context, Element parent, List<String> expectedNames) throws ConfigException
     {
         LinkedList<Element> results = new LinkedList<Element>();
         
@@ -308,7 +332,7 @@ public class XMLConfigUtils
                 }
                 else
                 {
-                    throw new ConfigException(filename, "Unexpected child element '" + currentElement.getLocalName() + "' nested in element '" + parent.getLocalName() + "'");
+                    throw new ConfigException(context.getFilename(), "Unexpected child element '" + currentElement.getLocalName() + "' nested in element '" + parent.getLocalName() + "'");
                 }
             }
         }
@@ -317,24 +341,28 @@ public class XMLConfigUtils
     }
 
 
-    public static String getAttributeValue(String filename, Element element, String name) throws ConfigException
+    public static String getAttributeValue(ConfigContext context, Element element, String name) throws ConfigException
     {
         String value = element.getAttributeValue(name);
         if(value == null)
         {
-            throw new ConfigException(filename, "Element '" + element.getLocalName() + "' missing required attribute '" + name + "'");
+            throw new ConfigException(context.getFilename(), "Element '" + element.getLocalName() + "' missing required attribute '" + name + "'");
         }
         
-        return value;
+        return replaceVariables(context, value);
     }
     
     
-    public static String getAttributeValue(Element element, String name, String defaultValue)
+    public static String getAttributeValue(ConfigContext context, Element element, String name, String defaultValue) throws ConfigException
     {
         String value = element.getAttributeValue(name);
         if(value == null)
         {
             value = defaultValue;
+        }
+        else
+        {
+            value = replaceVariables(context, value);
         }
         
         return value;        

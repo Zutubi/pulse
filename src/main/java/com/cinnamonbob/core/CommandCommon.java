@@ -29,21 +29,21 @@ public class CommandCommon
     private List<ProcessSpec> processors;
     
     
-    private void loadArtifact(String filename, Element element) throws ConfigException
+    private void loadArtifact(ConfigContext context, Element element) throws ConfigException
     {
-        ArtifactSpec spec = new ArtifactSpec(filename, element);
+        ArtifactSpec spec = new ArtifactSpec(context, element);
 
         if(artifacts.containsKey(spec.getName()))
         {
-            throw new ConfigException(filename, "Command '" + name + "' already contains an artifact named '" + spec.getName() +"'");
+            throw new ConfigException(context.getFilename(), "Command '" + name + "' already contains an artifact named '" + spec.getName() +"'");
         }
         artifacts.put(spec.getName(), spec);
     }
 
     
-    private void loadProcess(String filename, Element element, Project project) throws ConfigException
+    private void loadProcess(ConfigContext context, Element element, Project project) throws ConfigException
     {
-        processors.add(new ProcessSpec(filename, element, project, this));
+        processors.add(new ProcessSpec(context, element, project, this));
     }
 
 
@@ -104,30 +104,23 @@ public class CommandCommon
             }
         }
     }
-
     
-    /**
-     * @param filename
-     * @param element
-     * @param commandFactory
-     * @param project
-     * @throws ConfigException
-     */
-    public CommandCommon(String filename, Element element, CommandFactory commandFactory, Project project) throws ConfigException
+
+    public CommandCommon(ConfigContext context, Element element, CommandFactory commandFactory, Project project) throws ConfigException
     {
-        name       = XMLConfigUtils.getAttributeValue(filename, element, CONFIG_ATTR_NAME);
+        name       = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_NAME);
         artifacts  = new TreeMap<String, ArtifactSpec>();
         processors = new LinkedList<ProcessSpec>();
         
-        List<Element> childElements = XMLConfigUtils.getElements(filename, element);
+        List<Element> childElements = XMLConfigUtils.getElements(context, element);
         
         if(childElements.size() == 0)
         {
-            throw new ConfigException(filename, "Command '" + name + "' contains no child elements.");
+            throw new ConfigException(context.getFilename(), "Command '" + name + "' contains no child elements.");
         }
         
         // The first child is the specific command element
-        command = commandFactory.createCommand(childElements.get(0).getLocalName(), filename, childElements.get(0), this);
+        command = commandFactory.createCommand(childElements.get(0).getLocalName(), context, childElements.get(0), this);
         
         for(ArtifactSpec artifactSpec: command.getArtifacts())
         {
@@ -141,15 +134,15 @@ public class CommandCommon
             
             if(childName.equals(CONFIG_ELEMENT_ARTIFACT))
             {
-                loadArtifact(filename, child);
+                loadArtifact(context, child);
             }
             else if(childName.equals(CONFIG_ELEMENT_PROCESS))
             {
-                loadProcess(filename, child, project);
+                loadProcess(context, child, project);
             }
             else
             {
-                throw new ConfigException(filename, "Command element includes unrecognised element '" + childName + "'");
+                throw new ConfigException(context.getFilename(), "Command element includes unrecognised element '" + childName + "'");
             }
         }
     }

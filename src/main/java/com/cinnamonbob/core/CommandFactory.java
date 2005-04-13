@@ -13,8 +13,8 @@ public class CommandFactory extends GenericFactory<Command>
         super(Command.class, CommandCommon.class);
     }
     
-    public Command createCommand(String name, String filename, Element element, CommandCommon common) throws ConfigException
+    public Command createCommand(String name, ConfigContext context, Element element, CommandCommon common) throws ConfigException
     {
-        return (Command)super.create(name, filename, element, common);
+        return (Command)super.create(name, context, element, common);
     }
 }

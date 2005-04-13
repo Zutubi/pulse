@@ -1,23 +1,20 @@
 package com.cinnamonbob.core;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import junit.framework.TestCase;
 
 public class XMLConfigUtilsTest extends TestCase
 {
     private static final String FAKE_FILENAME = "filename.fake";
     
-    private Map<String, String> variables;
+    private ConfigContext context;
     
     
     public void setUp()
     {
-        variables = new TreeMap<String, String>();
-        variables.put("foo", "foo");
-        variables.put("bar", "baz");
-        variables.put("a\\b", "slashed");
+        context = new ConfigContext(FAKE_FILENAME);
+        context.setVariable("foo", "foo");
+        context.setVariable("bar", "baz");
+        context.setVariable("a\\b", "slashed");
     }
     
     private void errorTest(String input, String expectedError)
@@ -26,7 +23,7 @@ public class XMLConfigUtilsTest extends TestCase
         
         try
         {
-            result = XMLConfigUtils.replaceVariables(FAKE_FILENAME, variables, input);
+            result = XMLConfigUtils.replaceVariables(context, input);
         }
         catch(ConfigException e)
         {
@@ -39,7 +36,7 @@ public class XMLConfigUtilsTest extends TestCase
     
     private void successTest(String in, String out) throws ConfigException
     {
-        String result = XMLConfigUtils.replaceVariables(FAKE_FILENAME, variables, in);
+        String result = XMLConfigUtils.replaceVariables(context, in);
         assertEquals(out, result);
     }
     

@@ -28,11 +28,11 @@ public class EmailContactPoint implements ContactPoint
     private InternetAddress address;
     
     
-    public EmailContactPoint(Bob theBuilder, String name, String filename, Element element) throws ConfigException
+    public EmailContactPoint(Bob theBuilder, String name, ConfigContext context, Element element) throws ConfigException
     {
         this.theBuilder = theBuilder;
         this.name = name;
-        loadConfig(filename, element);
+        loadConfig(context, element);
     }
 
     /* (non-Javadoc)
@@ -97,9 +97,9 @@ public class EmailContactPoint implements ContactPoint
     }
     
     
-    private void loadConfig(String filename, Element element) throws ConfigException
+    private void loadConfig(ConfigContext context, Element element) throws ConfigException
     {
-        List<Element> elements = XMLConfigUtils.getElements(filename, element, Arrays.asList(CONFIG_ELEMENT_ADDRESS));
+        List<Element> elements = XMLConfigUtils.getElements(context, element, Arrays.asList(CONFIG_ELEMENT_ADDRESS));
         
         for(Element current: elements)
         {
@@ -107,7 +107,7 @@ public class EmailContactPoint implements ContactPoint
                 
             if(elementName.equals(CONFIG_ELEMENT_ADDRESS))
             {
-                loadAddress(filename, current);
+                loadAddress(context, current);
             }
             else
             {
@@ -117,9 +117,9 @@ public class EmailContactPoint implements ContactPoint
     }
 
     
-    private void loadAddress(String filename, Element element) throws ConfigException
+    private void loadAddress(ConfigContext context, Element element) throws ConfigException
     {
-        String addressString = XMLConfigUtils.getElementText(filename, element);
+        String addressString = XMLConfigUtils.getElementText(context, element);
         
         try
         {
@@ -127,7 +127,7 @@ public class EmailContactPoint implements ContactPoint
         }
         catch(AddressException e)
         {
-            throw new ConfigException(filename, "Email contact point '" + name + "' has invalid address '" + addressString + "': " + e.getMessage());
+            throw new ConfigException(context.getFilename(), "Email contact point '" + name + "' has invalid address '" + addressString + "': " + e.getMessage());
         }
     }
 }

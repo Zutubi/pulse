@@ -26,27 +26,23 @@ public class ArtifactSpec
     private File toFile;
     
     
-    private void loadConfig(String filename, Element element) throws ConfigException
+    private void loadConfig(ConfigContext context, Element element) throws ConfigException
     {
-        name  = XMLConfigUtils.getAttributeValue(filename, element, CONFIG_ATTR_NAME);
-        title = XMLConfigUtils.getAttributeValue(element, CONFIG_ATTR_TITLE, name);
-        type  = XMLConfigUtils.getAttributeValue(filename, element, CONFIG_ATTR_TYPE);
+        name  = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_NAME);
+        // FIXME
+        title = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_TITLE, name);
+        type  = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_TYPE);
         
-        fromFile = new File(XMLConfigUtils.getAttributeValue(filename, element, CONFIG_ATTR_FROM_FILE));
+        fromFile = new File(XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_FROM_FILE));
         
-        String toFileName = element.getAttributeValue(CONFIG_ATTR_TO_FILE);
-        if(toFileName == null)
-        {
-            toFileName = fromFile.getName();
-        }
-
+        String toFileName = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_TO_FILE, fromFile.getName());
         toFile = new File(toFileName);
     }
 
     
-    public ArtifactSpec(String filename, Element element) throws ConfigException
+    public ArtifactSpec(ConfigContext context, Element element) throws ConfigException
     {
-        loadConfig(filename, element);
+        loadConfig(context, element);
     }
     
     /**

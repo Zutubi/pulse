@@ -33,14 +33,15 @@ public class UserManager
     {
         String filename = theBuilder.getConfigDir().getAbsolutePath() + File.separator + CONFIG_FILENAME;
         
-        Document doc = XMLConfigUtils.loadFile(filename);
-        loadElements(filename, doc.getRootElement());
+        Document      doc     = XMLConfigUtils.loadFile(filename);
+        ConfigContext context = new ConfigContext(filename);
+        loadElements(context, doc.getRootElement());
     }
     
     
-    private void loadElements(String filename, Element root) throws ConfigException
+    private void loadElements(ConfigContext context, Element root) throws ConfigException
     {
-        List<Element> elements = XMLConfigUtils.getElements(filename, root, Arrays.asList(CONFIG_ELEMENT_USER));
+        List<Element> elements = XMLConfigUtils.getElements(context, root, Arrays.asList(CONFIG_ELEMENT_USER));
         
         for(Element current: elements)
         {
@@ -48,7 +49,7 @@ public class UserManager
                 
             if(elementName.equals(CONFIG_ELEMENT_USER))
             {
-                loadUser(filename, current);
+                loadUser(context, current);
             }
             else
             {
@@ -57,16 +58,16 @@ public class UserManager
         }
     }
 
-    private void loadUser(String filename, Element element) throws ConfigException
+    private void loadUser(ConfigContext context, Element element) throws ConfigException
     {
-        String login = XMLConfigUtils.getAttributeValue(filename, element, CONFIG_USER_LOGIN);
+        String login = XMLConfigUtils.getAttributeValue(context, element, CONFIG_USER_LOGIN);
                 
         if(users.containsKey(login))
         {
-            throw new ConfigException(filename, "Duplicate user name '" + login + "' specified.");
+            throw new ConfigException(context.getFilename(), "Duplicate user name '" + login + "' specified.");
         }
         
-        User user = new User(theBuilder, login, filename, element);
+        User user = new User(theBuilder, login, context, element);
         users.put(login, user);
     }
 

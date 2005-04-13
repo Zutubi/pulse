@@ -78,15 +78,16 @@ public class Bob
         String filename = configDir.getAbsolutePath() + File.separator + CONFIG_FILE_NAME;
 
         LOG.config("Loading configuration from file '" + filename + "'");
-        Document doc = XMLConfigUtils.loadFile(filename);
-        loadElements(filename, doc.getRootElement());
+        Document      doc     = XMLConfigUtils.loadFile(filename);
+        ConfigContext context = new ConfigContext(filename);
+        loadElements(context, doc.getRootElement());
         LOG.config("Configuration loaded.");
     }
 
 
-    private void loadElements(String filename, Element root) throws ConfigException
+    private void loadElements(ConfigContext context, Element root) throws ConfigException
     {
-        List<Element> elements = XMLConfigUtils.getElements(filename, root, Arrays.asList(CONFIG_ELEMENT_PROJECT_ROOT, CONFIG_ELEMENT_PROJECTS, CONFIG_ELEMENT_SERVICES));
+        List<Element> elements = XMLConfigUtils.getElements(context, root, Arrays.asList(CONFIG_ELEMENT_PROJECT_ROOT, CONFIG_ELEMENT_PROJECTS, CONFIG_ELEMENT_SERVICES));
 
         for (Element current : elements)
         {
@@ -94,13 +95,13 @@ public class Bob
 
             if (elementName.equals(CONFIG_ELEMENT_PROJECT_ROOT))
             {
-                loadProjectRoot(filename, current);
+                loadProjectRoot(context, current);
             } else if (elementName.equals(CONFIG_ELEMENT_PROJECTS))
             {
-                loadProjects(filename, current);
+                loadProjects(context, current);
             } else if (elementName.equals(CONFIG_ELEMENT_SERVICES))
             {
-                loadServices(filename, current);
+                loadServices(context, current);
             } else
             {
                 assert(false);
@@ -109,9 +110,9 @@ public class Bob
     }
 
 
-    private void loadProjectRoot(String filename, Element element) throws ConfigException
+    private void loadProjectRoot(ConfigContext context, Element element) throws ConfigException
     {
-        String root = XMLConfigUtils.getElementText(filename, element);
+        String root = XMLConfigUtils.getElementText(context, element);
 
         // The project root can be either relative to bob.home or absolute.
         File rootFile = new File(root);
@@ -121,7 +122,7 @@ public class Bob
             if (!rootFile.isDirectory())
             {
                 LOG.warning("specified root '" + rootFile.getAbsolutePath() + "' is not a directory.");
-                throw new ConfigException(filename, "The specified project root '" + root + "' does not exist or is not a directory.");
+                throw new ConfigException(context.getFilename(), "The specified project root '" + root + "' does not exist or is not a directory.");
             }
         }
 
@@ -130,29 +131,24 @@ public class Bob
     }
 
 
-    private void loadProjects(String filename, Element element) throws ConfigException
+    private void loadProjects(ConfigContext context, Element element) throws ConfigException
     {
-        List<Element> elements = XMLConfigUtils.getElements(filename, element, Arrays.asList(CONFIG_ELEMENT_PROJECT));
+        List<Element> elements = XMLConfigUtils.getElements(context, element, Arrays.asList(CONFIG_ELEMENT_PROJECT));
 
         for (Element current : elements)
         {
-            loadProject(filename, current);
+            loadProject(context, current);
         }
     }
 
 
-    private void loadProject(String filename, Element element) throws ConfigException
+    private void loadProject(ConfigContext context, Element element) throws ConfigException
     {
-        String projectName = element.getAttributeValue(CONFIG_ATTR_NAME);
-
-        if (projectName == null)
-        {
-            throw new ConfigException(filename, "Project element must have '" + CONFIG_ATTR_NAME + "' attribute.");
-        }
+        String projectName = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_NAME);
 
         if (projects.containsKey(projectName))
         {
-            throw new ConfigException(filename, "Duplicate project name '" + projectName + "' specified.");
+            throw new ConfigException(context.getFilename(), "Duplicate project name '" + projectName + "' specified.");
         }
 
         String projectFilename = configDir.getAbsolutePath() + File.separator + projectName + CONFIG_EXTENSION;
@@ -169,13 +165,13 @@ public class Bob
     }
 
 
-    private void loadServices(String filename, Element current) throws ConfigException
+    private void loadServices(ConfigContext context, Element current) throws ConfigException
     {
-        List<Element> elements = XMLConfigUtils.getElements(filename, current);
+        List<Element> elements = XMLConfigUtils.getElements(context, current);
 
         for (Element e : elements)
         {
-            Service service = serviceFactory.createService(e.getLocalName(), filename, e);
+            Service service = serviceFactory.createService(e.getLocalName(), context, e);
             services.put(service.getServiceName(), service);
         }
     }

@@ -38,18 +38,18 @@ public class User
     private Map<String, ContactPoint> contactPoints;
 
     
-    public User(Bob theBuilder, String login, String filename, Element element) throws ConfigException
+    public User(Bob theBuilder, String login, ConfigContext context, Element element) throws ConfigException
     {
         this.theBuilder = theBuilder;
         this.login = login;
         this.contactPoints = new TreeMap<String, ContactPoint>();
-        loadConfig(filename, element);
+        loadConfig(context, element);
     }
 
 
-    private void loadConfig(String filename, Element element) throws ConfigException
+    private void loadConfig(ConfigContext context, Element element) throws ConfigException
     {
-        List<Element> elements = XMLConfigUtils.getElements(filename, element, Arrays.asList(CONFIG_ELEMENT_NAME, CONFIG_ELEMENT_CONTACT_POINTS, CONFIG_ELEMENT_SUBSCRIPTIONS));
+        List<Element> elements = XMLConfigUtils.getElements(context, element, Arrays.asList(CONFIG_ELEMENT_NAME, CONFIG_ELEMENT_CONTACT_POINTS, CONFIG_ELEMENT_SUBSCRIPTIONS));
         
         for(Element current: elements)
         {
@@ -57,15 +57,15 @@ public class User
                 
             if(elementName.equals(CONFIG_ELEMENT_NAME))
             {
-                loadName(filename, current);
+                loadName(context, current);
             }
             else if(elementName.equals(CONFIG_ELEMENT_CONTACT_POINTS))
             {
-                loadContactPoints(filename, current);
+                loadContactPoints(context, current);
             }
             else if(elementName.equals(CONFIG_ELEMENT_SUBSCRIPTIONS))
             {
-                loadSubscriptions(filename, current);
+                loadSubscriptions(context, current);
             }
             else
             {
@@ -75,9 +75,9 @@ public class User
     }
 
 
-    private void loadSubscriptions(String filename, Element element) throws ConfigException
+    private void loadSubscriptions(ConfigContext context, Element element) throws ConfigException
     {
-        List<Element> elements = XMLConfigUtils.getElements(filename, element, Arrays.asList(CONFIG_ELEMENT_SUBSCRIPTION));
+        List<Element> elements = XMLConfigUtils.getElements(context, element, Arrays.asList(CONFIG_ELEMENT_SUBSCRIPTION));
         
         for(Element current: elements)
         {
@@ -85,7 +85,7 @@ public class User
                 
             if(elementName.equals(CONFIG_ELEMENT_SUBSCRIPTION))
             {
-                loadSubscription(filename, current);
+                loadSubscription(context, current);
             }
             else
             {
@@ -95,46 +95,46 @@ public class User
     }
     
     
-    private void loadSubscription(String filename, Element element) throws ConfigException
+    private void loadSubscription(ConfigContext context, Element element) throws ConfigException
     {
-        String projectName = XMLConfigUtils.getAttributeValue(filename, element, CONFIG_SUBSCRIPTION_PROJECT);
-        String contactName = XMLConfigUtils.getAttributeValue(filename, element, CONFIG_SUBSCRIPTION_CONTACT_POINT);
+        String projectName = XMLConfigUtils.getAttributeValue(context, element, CONFIG_SUBSCRIPTION_PROJECT);
+        String contactName = XMLConfigUtils.getAttributeValue(context, element, CONFIG_SUBSCRIPTION_CONTACT_POINT);
         
         if(!theBuilder.hasProject(projectName))
         {
-            throw new ConfigException(filename, "Subscription refers to unknown project '" + projectName + "'.");
+            throw new ConfigException(context.getFilename(), "Subscription refers to unknown project '" + projectName + "'.");
         }
         
         if(!contactPoints.containsKey(contactName))
         {
-            throw new ConfigException(filename, "Subscription refers to unknown contact point '" + contactName + "'.");
+            throw new ConfigException(context.getFilename(), "Subscription refers to unknown contact point '" + contactName + "'.");
         }
         
         theBuilder.getProject(projectName).addSubscription(contactPoints.get(contactName));
     }
 
 
-    private void loadContactPoints(String filename, Element element) throws ConfigException
+    private void loadContactPoints(ConfigContext context, Element element) throws ConfigException
     {
-        List<Element> elements = XMLConfigUtils.getElements(filename, element, Arrays.asList("email"));
+        List<Element> elements = XMLConfigUtils.getElements(context, element, Arrays.asList("email"));
         
         for(Element current: elements)
         {
-            String name = XMLConfigUtils.getAttributeValue(filename, current, CONFIG_CONTACT_POINT_NAME);
+            String name = XMLConfigUtils.getAttributeValue(context, current, CONFIG_CONTACT_POINT_NAME);
             
             if(contactPoints.containsKey(name))
             {
-                throw new ConfigException(filename, "Duplicate contact point name '" + name + "' specified.");
+                throw new ConfigException(context.getFilename(), "Duplicate contact point name '" + name + "' specified.");
             }
             
-            ContactPoint point = new EmailContactPoint(theBuilder, name, filename, current);
+            ContactPoint point = new EmailContactPoint(theBuilder, name, context, current);
             contactPoints.put(name, point);
         }
     }
 
 
-    private void loadName(String filename, Element element) throws ConfigException
+    private void loadName(ConfigContext context, Element element) throws ConfigException
     {
-        name = XMLConfigUtils.getElementText(filename, element);
+        name = XMLConfigUtils.getElementText(context, element);
     }
 }

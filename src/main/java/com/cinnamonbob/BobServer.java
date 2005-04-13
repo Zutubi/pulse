@@ -1,7 +1,6 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.core.Bob;
-import com.cinnamonbob.core.ConfigException;
 
 import java.util.logging.Logger;
 

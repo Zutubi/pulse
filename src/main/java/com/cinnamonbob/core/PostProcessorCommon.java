@@ -17,19 +17,19 @@ public class PostProcessorCommon
     private PostProcessor postProcessor;
     
     
-    public PostProcessorCommon(String filename, Element element, PostProcessorFactory factory, Project project) throws ConfigException
+    public PostProcessorCommon(ConfigContext context, Element element, PostProcessorFactory factory, Project project) throws ConfigException
     {
-        name = XMLConfigUtils.getAttributeValue(filename, element, CONFIG_ATTR_NAME);
+        name = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_NAME);
 
-        List<Element> childElements = XMLConfigUtils.getElements(filename, element);
+        List<Element> childElements = XMLConfigUtils.getElements(context, element);
         
         if(childElements.size() == 0)
         {
-            throw new ConfigException(filename, "Post processor '" + name + "' contains no child elements.");
+            throw new ConfigException(context.getFilename(), "Post processor '" + name + "' contains no child elements.");
         }
         
         // The first child is the specific command element
-        postProcessor = factory.createPostProcessor(childElements.get(0).getLocalName(), filename, childElements.get(0), this, project);
+        postProcessor = factory.createPostProcessor(childElements.get(0).getLocalName(), context, childElements.get(0), this, project);
     }
     
     

@@ -11,10 +11,10 @@ public class ProcessSpec
     private ArtifactSpec        artifact;
     
     
-    public ProcessSpec(String filename, Element element, Project project, CommandCommon command) throws ConfigException
+    public ProcessSpec(ConfigContext context, Element element, Project project, CommandCommon command) throws ConfigException
     {
-        String processorName = XMLConfigUtils.getAttributeValue(filename, element, CONFIG_ATTR_PROCESSOR);
-        String artifactName  = XMLConfigUtils.getAttributeValue(filename, element, CONFIG_ATTR_ARTIFACT);
+        String processorName = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_PROCESSOR);
+        String artifactName  = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_ARTIFACT);
         
         if(project.hasPostProcessor(processorName))
         {
@@ -22,7 +22,7 @@ public class ProcessSpec
         }
         else
         {
-            throw new ConfigException(filename, "Command '" + command.getName() + "' process directive refers to unknown post-processor '" + processorName + "'");
+            throw new ConfigException(context.getFilename(), "Command '" + command.getName() + "' process directive refers to unknown post-processor '" + processorName + "'");
         }
         
         if(command.hasArtifact(artifactName))
@@ -31,7 +31,7 @@ public class ProcessSpec
         }
         else
         {
-            throw new ConfigException(filename, "Command '" + command.getName() + "' process directive refers to unknown artifact '" + artifactName + "'");            
+            throw new ConfigException(context.getFilename(), "Command '" + command.getName() + "' process directive refers to unknown artifact '" + artifactName + "'");            
         }
     }
 

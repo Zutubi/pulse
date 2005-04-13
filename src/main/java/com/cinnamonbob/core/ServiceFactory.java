@@ -9,8 +9,8 @@ public class ServiceFactory extends GenericFactory<Service>
         super(Service.class);
     }
     
-    public Service createService(String name, String filename, Element element) throws ConfigException
+    public Service createService(String name, ConfigContext context, Element element) throws ConfigException
     {
-        return (Service)super.create(name, filename, element);
+        return (Service)super.create(name, context, element);
     }
 }
