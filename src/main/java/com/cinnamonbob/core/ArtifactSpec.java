@@ -18,18 +18,46 @@ public class ArtifactSpec
     private static final String CONFIG_ATTR_FROM_FILE = "from-file";
     private static final String CONFIG_ATTR_TO_FILE   = "to-file";
     
-    
+    /**
+     * The name of the artifact, unique in the command.
+     */
     private String name;
+    /**
+     * The artifact title, used when displaying information about the artifact.
+     */
     private String title;
+    /**
+     * The type of artifact, which loosely determines what can be done with
+     * it (for example which post-processors may be applied to it).
+     */
     private String type;
+    /**
+     * The source file for the artifact, or null if it is not collected from
+     * elsewhere (i.e. it is already in the build directory).
+     */
     private File fromFile;
+    /**
+     * The destination file to copy the artifact to.  Relative to the build
+     * directory.
+     */
     private File toFile;
     
-    
-    private void loadConfig(ConfigContext context, Element element) throws ConfigException
+    //=======================================================================
+    // Construction
+    //=======================================================================
+
+    /**
+     * Constructs an ArtifactSpec from the given XML fragment.
+     * 
+     * @param context
+     *        context information about configuration loading
+     * @param element
+     *        the &lt;artifact&gt; element to load from
+     * @throws ConfigException
+     */
+    public ArtifactSpec(ConfigContext context, Element element) throws ConfigException
     {
         name  = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_NAME);
-        // FIXME
         title = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_TITLE, name);
         type  = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_TYPE);
         
@@ -37,12 +65,6 @@ public class ArtifactSpec
         
         String toFileName = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_TO_FILE, fromFile.getName());
         toFile = new File(toFileName);
-    }
-
-    
-    public ArtifactSpec(ConfigContext context, Element element) throws ConfigException
-    {
-        loadConfig(context, element);
     }
     
     /**
@@ -77,37 +99,57 @@ public class ArtifactSpec
         this.toFile = toFile;
     }
 
+    //=======================================================================
+    // Interface
+    //=======================================================================
 
+    /**
+     * @return the artifact name
+     */
     public String getName()
     {
         return name;
     }
 
-    
+    /**
+     * @return the artifact title
+     */
     public String getTitle()
     {
         return title;
     }
-    
 
+    /**
+     * @return the source file for the artifact
+     */
     public File getFromFile()
     {
         return fromFile;
     }
     
-    
+    /**
+     * @return the destination file for the artifact
+     */
     public File getToFile()
     {
         return toFile;
     }
 
-
+    /**
+     * @return the artifact type
+     */
     public String getType()
     {
         return type;
     }
     
-    
+    /**
+     * Indicates if the artifact needs to be copied from source to destination
+     * file.
+     * 
+     * @return true iff the artifact needs to be copied (collected) from a
+     *         source file
+     */
     public boolean requiresCollection()
     {
         return fromFile != null;
