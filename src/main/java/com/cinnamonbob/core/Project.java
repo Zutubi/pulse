@@ -1,5 +1,6 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.util.FileSystemUtils;
 import com.thoughtworks.xstream.XStream;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -26,10 +27,12 @@ public class Project
     private static final String CONFIG_ELEMENT_POST_PROCESSOR = "post-processor";
     private static final String CONFIG_ELEMENT_RECIPE         = "recipe";
     private static final String DIR_BUILDS                    = "builds";
+    private static final String DIR_WORK                      = "work";
     private static final String DIR_IN_PROGRESS               = "in-progress";
     private static final String STAMPS_FILE_NAME              = "stamps.xml";
     private static final String INTERNAL_FAILURE_FILE_NAME    = "internal-failure.xml";
     private static final String RESULT_FILE_NAME              = "result.xml";
+    private static final String VARIABLE_WORK_DIR             = "work.dir";
     
     /**
      * The name of this project, which must be unique amongst all projects.
@@ -62,8 +65,15 @@ public class Project
     private Bob  theBuilder;
     private File projectDir;
     private File buildsDir;
+    private File workDir;
     private int nextBuild;
+
     
+    private void addBuiltinVariables(ConfigContext context)
+    {
+        context.setVariable(VARIABLE_WORK_DIR, workDir.getAbsolutePath());
+    }
+
     
     public Project(Bob theBuilder, String name, String filename) throws ConfigException
     {
@@ -72,12 +82,12 @@ public class Project
         this.postProcessors   = new TreeMap<String, PostProcessorCommon>();
         this.subscriptions    = new LinkedList<ContactPoint>();
         this.categoryRegistry = new FeatureCategoryRegistry();
-            
+        this.projectDir       = new File(theBuilder.getProjectRoot(), name);
+        this.buildsDir        = new File(projectDir, DIR_BUILDS);
+        this.workDir          = new File(projectDir, DIR_WORK);
+        
         loadConfig(filename);
         
-        this.projectDir = new File(theBuilder.getProjectRoot(), name);
-        this.buildsDir  = new File(projectDir, DIR_BUILDS);
-
         // FIXME
         if(buildsDir.isDirectory())
         {
@@ -115,6 +125,9 @@ public class Project
     {
         Document      doc      = XMLConfigUtils.loadFile(filename);
         ConfigContext context  = new ConfigContext(filename);
+
+        addBuiltinVariables(context);
+        
         List<Element> elements = XMLConfigUtils.getElements(context, doc.getRootElement(), Arrays.asList(XMLConfigUtils.CONFIG_ELEMENT_PROPERTY, CONFIG_ELEMENT_DESCRIPTION, CONFIG_ELEMENT_POST_PROCESSOR, CONFIG_ELEMENT_RECIPE));
         
         XMLConfigUtils.extractProperties(context, elements);
@@ -205,6 +218,7 @@ public class Project
         
         try
         {
+            cleanWorkDir();
             buildDir = createBuildDir(buildsDir, result);            
         }
         catch(InternalBuildFailureException e)
@@ -238,6 +252,23 @@ public class Project
     }
 
     
+    private void cleanWorkDir() throws InternalBuildFailureException
+    {
+        if(workDir.exists())
+        {
+            if(!FileSystemUtils.removeDirectory(workDir))
+            {
+                throw new InternalBuildFailureException("Could not clean work directory '" + workDir.getAbsolutePath() + '"');
+            }
+        }
+        
+        if(!workDir.mkdir())
+        {
+            throw new InternalBuildFailureException("Could not create work directory '" + workDir.getAbsolutePath() + "'");
+        }
+    }
+
+
     private void logInternalBuildFailure(BuildResult result)
     {
         InternalBuildFailureException e = result.getInternalFailure();

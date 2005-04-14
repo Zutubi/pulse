@@ -19,17 +19,19 @@ import com.cinnamonbob.util.IOHelper;
  */
 public class ExecutableCommand implements Command
 {
-    private static final String CONFIG_NAME                   = "name";
     private static final String CONFIG_ATTR_EXECUTABLE        = "exe";
     private static final String CONFIG_ATTR_ARGUMENTS         = "args";
     private static final String CONFIG_ATTR_WORKING_DIRECTORY = "working-dir";
     private static final String OUTPUT_FILENAME               = "output.txt";
+    private static final String CONFIG_ELEMENT_ENVIRONMENT    = "environment";
+    private static final String CONFIG_ATTR_NAME              = "name";
+    private static final String CONFIG_ATTR_VALUE             = "value";
     
-    private CommandCommon common;
-    private String        executable;
-    private String[]      arguments;
-    private File          workingDirectory;
-    
+    private CommandCommon  common;
+    private String         executable;
+    private String[]       arguments;
+    private File           workingDirectory;
+    private ProcessBuilder builder;
     
     private void loadConfig(ConfigContext context, Element element) throws ConfigException
     {
@@ -37,16 +39,56 @@ public class ExecutableCommand implements Command
         
         executable = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_EXECUTABLE);
         working = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_WORKING_DIRECTORY, null);
-        if(working != null)
+        if(working == null)
+        {
+            workingDirectory = new File(".");
+        }
+        else
         {
             workingDirectory = new File(working);
         }
         
-        arguments = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_ARGUMENTS).split(" ");
+        String argumentString = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_ARGUMENTS, null);
+        List<String> command;
+
+        if(argumentString == null)
+        {
+            command = new LinkedList<String>();
+        }
+        else
+        {
+            arguments = argumentString.split(" ");
+            command = new LinkedList<String>(Arrays.asList(arguments));
+        }
+
+        command.add(0, executable);
+        builder = new ProcessBuilder(command);
+
+        loadChildElements(context, element);
+    }
+
+    
+    private void loadChildElements(ConfigContext context, Element element) throws ConfigException
+    {
+        List<Element> elements = XMLConfigUtils.getElements(context, element, Arrays.asList(CONFIG_ELEMENT_ENVIRONMENT));
+        
+        for(Element current: elements)
+        {
+            loadEnvironment(context, current);
+        }        
+    }
+
+    
+    private void loadEnvironment(ConfigContext context, Element element) throws ConfigException
+    {
+        String name  = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_NAME);
+        String value = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_VALUE);
+        
+        builder.environment().put(name, value);
     }
 
 
-    private int runChild(ProcessBuilder builder, OutputStream outputStream) throws InternalBuildFailureException
+    private int runChild(OutputStream outputStream) throws InternalBuildFailureException
     {
         try
         {
@@ -79,11 +121,11 @@ public class ExecutableCommand implements Command
     }
     
     
-    private String constructCommandLine(List<String> command)
+    private String constructCommandLine()
     {
         StringBuffer result = new StringBuffer();
         
-        for(String part: command)
+        for(String part: builder.command())
         {
             boolean containsSpaces = part.indexOf(' ') != -1;
             
@@ -114,10 +156,6 @@ public class ExecutableCommand implements Command
     
     public ExecutableCommandResult execute(File outputDir) throws InternalBuildFailureException
     {
-        List<String> command = new LinkedList<String>(Arrays.asList(arguments));
-        command.add(0, executable);
-        
-        ProcessBuilder builder = new ProcessBuilder(command);
         builder.directory(workingDirectory);
         builder.redirectErrorStream(true);
 
@@ -128,14 +166,14 @@ public class ExecutableCommand implements Command
         try
         {
             outputStream = new FileOutputStream(outputFile);
-            result = runChild(builder, outputStream);
+            result = runChild(outputStream);
         }
         catch(FileNotFoundException e)
         {
             throw new InternalBuildFailureException("Could not create command output file '" + outputFile.getAbsolutePath() + "'", e);
         }
         
-        return new ExecutableCommandResult(constructCommandLine(command), workingDirectory.getAbsolutePath(), result);
+        return new ExecutableCommandResult(constructCommandLine(), workingDirectory.getAbsolutePath(), result);
     }
     
     
