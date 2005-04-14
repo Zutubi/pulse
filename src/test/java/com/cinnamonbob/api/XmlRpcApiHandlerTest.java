@@ -32,11 +32,11 @@ public class XmlRpcApiHandlerTest extends TestCase
         server.addHandler("$default", handler);
 
         InetAddress localhost = InetAddress.getLocalHost();
-        webServer = new WebServer(2345, localhost);
+        webServer = new WebServer(5445, localhost);
         webServer.addHandler("$default", handler);
         webServer.start();
 
-        client = new XmlRpcClient(localhost.getHostName(), 2345);
+        client = new XmlRpcClient(localhost.getHostName(), 5445);
     }
 
     public void tearDown() throws Exception
