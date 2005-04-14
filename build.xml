@@ -69,12 +69,25 @@
         <jar file="build/bob.jar" basedir="build/java/classes"/>
     </target>
 
-    <target name="pkg" depends="jar">
+    <target name="war">
+        <war destfile="build/bob.war" webxml="src/www/WEB-INF/web.xml">
+            <fileset dir="src/www">
+                <exclude name="WEB-INF/web.xml"/>
+            </fileset>
+            <lib dir="lib">
+                <include name="**/*.jar"/>
+            </lib>
+        </war>
+    </target>
+
+    <target name="pkg" depends="jar, war">
         <property name="zip.root" value="bob-dev"/>
         <zip destfile="build/bob.zip">
             <zipfileset dir="src/bin" prefix="${zip.root}/bin"/>
             <zipfileset dir="build" includes="bob.jar" fullpath="${zip.root}/lib/bob.jar"/>
+            <zipfileset dir="build" includes="bob.war" fullpath="${zip.root}/lib/bob.war"/>
             <zipfileset dir="lib" includes="*.jar" prefix="${zip.root}/lib"/>
+            <zipfileset dir="lib/jetty-5.1.2" includes="*.jar" prefix="${zip.root}/lib"/>
             <zipfileset dir="src/main/config" includes="*.xml" prefix="${zip.root}/config"/>
             <zipfileset dir="src/main/templates" includes="**/*.vm" prefix="${zip.root}/templates"/>
             <zipfileset dir="etc" includes="work-readme.txt" fullpath="${zip.root}/work/readme.txt"/>

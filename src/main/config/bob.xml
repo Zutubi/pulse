@@ -1,13 +1,14 @@
 <?xml version="1.0"?>
 <bob>
-    <project-root>/home/jsankey/bob/projects</project-root>
+    <!--Specify either a relative (to $BOB_HOME) or absolute path -->
+    <project-root>work</project-root>
     <projects>
         <project name="test-project"/>
     </projects>
     <services>
         <smtp>
-            <host>smtp.swiftdsl.com.au</host>
-            <from-address>jsankey@swiftdsl.com.au</from-address>
+            <host>localhost</host>
+            <from-address>bob@localhost</from-address>
         </smtp>
     </services>
 </bob>

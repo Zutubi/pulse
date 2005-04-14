@@ -9,6 +9,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * <p>The BuildQueue instantiates a Thread to handle the dispatching of build
  * requests. When a BuildQueue is no longer needed, invoke {@link #stop()} to
  * stop the internal Thread.
+ * <p>The build queue supports multiple dispatch algorithms via the implementation
+ * of the BuildDispatcher interface.
  *
  * @author Daniel Ostermeier
  */

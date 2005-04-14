@@ -10,7 +10,11 @@ import com.townleyenterprises.command.DefaultCommandListener;
  */
 public class Bootstrap
 {
-    private CommandParser parser;
+    //TODO: support command the form ... options COMMAND command-options ARGUMENTS
+
+    // server connection details.
+    private int port = 2345;
+    private String host = "localhost";
 
     private CommandOption start = new CommandOption("start",
             's', false, null,
@@ -18,7 +22,7 @@ public class Bootstrap
     {
         public void execute() throws Exception
         {
-            BobServerProxy server = new BobServerProxy();
+            BobServerProxy server = new BobServerProxy(host, port);
             server.start();
         }
     };
@@ -31,7 +35,7 @@ public class Bootstrap
     {
         public void execute() throws Exception
         {
-            BobServerProxy server = new BobServerProxy();
+            BobServerProxy server = new BobServerProxy(host, port);
             server.stop();
         }
     };
@@ -44,14 +48,14 @@ public class Bootstrap
     {
         public void execute() throws Exception
         {
-            BobServerProxy server = new BobServerProxy();
+            BobServerProxy server = new BobServerProxy(host, port);
             server.build(getArg());
         }
     };
 
     public void parse(String args[]) throws Exception
     {
-        parser = new CommandParser("bob");
+        CommandParser parser = new CommandParser("bob");
         parser.addCommandListener(new DefaultCommandListener("Start options", new CommandOption[]{start}));
         parser.addCommandListener(new DefaultCommandListener("Stop options", new CommandOption[]{stop}));
         parser.addCommandListener(new DefaultCommandListener("Build options", new CommandOption[]{build}));

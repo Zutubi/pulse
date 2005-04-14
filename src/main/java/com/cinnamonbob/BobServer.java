@@ -13,6 +13,7 @@ public class BobServer
     private static final Logger LOG = Logger.getLogger(BobServer.class.getName());
 
     private AdminService adminService = null;
+    private HttpService httpService = null;
 
     private BuildQueue buildQueue = null;
     private Bob core = null;
@@ -26,6 +27,7 @@ public class BobServer
     public void start() throws Exception
     {
         LOG.info("start");
+        
         adminService = new AdminService(adminPort, this);
         adminService.start();
 
@@ -39,12 +41,16 @@ public class BobServer
                 core.build(request.getProjectName());
             }
         });
+
+        httpService = new HttpService(8080);
+        httpService.start();
     }
 
     public void stop()
     {
         LOG.info("stop");
         adminService.stop();
+        httpService.stop();
     }
 
     public void build(String projectName)
