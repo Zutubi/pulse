@@ -3,17 +3,7 @@
 <web-app>
 
     <display-name>CinnamonBob</display-name>
-
-    <servlet>
-        <servlet-name>XmlRpcApiServlet</servlet-name>
-        <servlet-class>com.cinnamonbob.api.XmlRpcApiServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>XmlRpcApiServlet</servlet-name>
-        <url-pattern>/api/xmlrpc/*</url-pattern>
-    </servlet-mapping>
+    <description>Continuous Integration Web UI</description>
 
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>

@@ -52,7 +52,7 @@ public class BobServer
         httpService.start();
 
         // initialise Spring.
-
+        
     }
 
     public void stop()

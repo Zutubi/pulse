@@ -3,6 +3,9 @@ package com.cinnamonbob.api;
 import com.cinnamonbob.BuildRequest;
 import com.cinnamonbob.BobServer;
 
+import java.util.List;
+import java.util.Collections;
+
 /**
  * A simple java object that defines the XmlRpc interface API.
  *
@@ -21,6 +24,16 @@ public class XmlRpcApiHandler
         BuildRequest request = new BuildRequest(projectName);
         BobServer.build(projectName);
         return true;
+    }
+
+    /**
+     * Retrieve a list of the projects in the system.
+     *
+     * @return
+     */
+    public List getProjects()
+    {
+        return Collections.EMPTY_LIST;
     }
 
 }

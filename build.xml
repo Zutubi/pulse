@@ -97,6 +97,7 @@
             <zipfileset dir="src/main/config" includes="*.xml" prefix="${zip.root}/config"/>
             <zipfileset dir="src/main/templates" includes="**/*.vm" prefix="${zip.root}/templates"/>
             <zipfileset dir="etc" includes="delete-me.txt" fullpath="${zip.root}/work/delete-me.txt"/>
+            <zipfileset dir="etc" includes="delete-me.txt" fullpath="${zip.root}/content/delete-me.txt"/>
         </zip>
     </target>
 

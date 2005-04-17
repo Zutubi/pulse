@@ -2,6 +2,8 @@ package com.cinnamonbob;
 
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.servlet.ServletHttpContext;
+import com.cinnamonbob.api.XmlRpcApiServlet;
 
 /**
  *
@@ -26,7 +28,13 @@ public class HttpService {
         listener.setPort(port);
         server.addListener(listener);
         //TODO: retrieve the bob.home directory from Bob
-        server.addWebApplication("/", System.getProperty("bob.home")+"/lib/bob.war");
+
+        // dynamically deploy a servlet..
+        ServletHttpContext context = (ServletHttpContext)
+        server.getContext("/");
+        context.addServlet("XmlRpcApiServlet","/api/xmlrpc/*", XmlRpcApiServlet.class.getName());
+
+        server.addWebApplication("/", System.getProperty("bob.home")+"/content");
         server.start();
 
     }
