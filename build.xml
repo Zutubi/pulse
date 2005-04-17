@@ -18,6 +18,11 @@
         <delete dir="build"/>
     </target>
 
+    <target name="prepare" description="Prepares build directory.">
+        <tstamp/>
+        <mkdir dir="build"/>
+    </target>
+
     <target name="build" description="Compile all of the java source.">
 
         <mkdir dir="build/java/classes"/>
@@ -87,10 +92,9 @@
             <zipfileset dir="build" includes="bob.jar" fullpath="${zip.root}/lib/bob.jar"/>
             <zipfileset dir="build" includes="bob.war" fullpath="${zip.root}/lib/bob.war"/>
             <zipfileset dir="lib" includes="*.jar" prefix="${zip.root}/lib"/>
-            <zipfileset dir="lib/jetty-5.1.2" includes="*.jar" prefix="${zip.root}/lib"/>
             <zipfileset dir="src/main/config" includes="*.xml" prefix="${zip.root}/config"/>
             <zipfileset dir="src/main/templates" includes="**/*.vm" prefix="${zip.root}/templates"/>
-            <zipfileset dir="etc" includes="work-readme.txt" fullpath="${zip.root}/work/readme.txt"/>
+            <zipfileset dir="etc" includes="delete-me.txt" fullpath="${zip.root}/work/delete-me.txt"/>
         </zip>
     </target>
 
