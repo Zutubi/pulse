@@ -14,7 +14,7 @@ if [ -z "$BOB_HOME" -o ! -d "$BOB_HOME" ] ; then
   BOB_HOME=`cd "$BOB_HOME" && pwd`
 fi
 
-if [ ! -f "$BOB_HOME/lib/bob.jar" ] ; then
+if [ ! -f "$BOB_HOME"/lib/bob-*.jar ] ; then
   echo "Error: BOB_HOME is not defined correctly."
   echo "  We cannot find $BOB_HOME/lib/bob.jar"
   exit 1
@@ -32,7 +32,7 @@ for i in "$BOB_HOME"/lib/*.jar; do
   CLASSPATH="$CLASSPATH":"$i"
 done
 
-# For Cygwin, switch paths to Windows format before running java                                  
+# For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
   JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
   BOB_HOME=`cygpath --path --windows "$BOB_HOME"`
