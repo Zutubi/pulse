@@ -25,6 +25,7 @@ public class HttpService {
         SocketListener listener = new SocketListener();
         listener.setPort(port);
         server.addListener(listener);
+        //TODO: retrieve the bob.home directory from Bob
         server.addWebApplication("/", System.getProperty("bob.home")+"/lib/bob.war");
         server.start();
 

@@ -1,6 +1,7 @@
 package com.cinnamonbob.api;
 
 import com.cinnamonbob.BuildRequest;
+import com.cinnamonbob.BobServer;
 
 /**
  * A simple java object that defines the XmlRpc interface API.
@@ -18,7 +19,7 @@ public class XmlRpcApiHandler
     {
         // check if the projectName is valid.
         BuildRequest request = new BuildRequest(projectName);
-        System.out.println("XmlRpcApiHandler.build("+projectName+")");
+        BobServer.build(projectName);
         return true;
     }
 

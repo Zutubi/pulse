@@ -3,6 +3,8 @@
 
     <property file="build.properties"/>
 
+    <property name="version" value="dev"/>
+
     <path id="lib.path">
         <fileset dir="lib">
             <include name="**/*.jar"/>
@@ -71,7 +73,7 @@
     <target name="default" depends="clean, build, test" description="Run a clean build by default."/>
 
     <target name="jar" depends="build">
-        <jar file="build/bob.jar" basedir="build/java/classes"/>
+        <jar file="build/bob-${version}.jar" basedir="build/java/classes"/>
     </target>
 
     <target name="war">
@@ -86,10 +88,10 @@
     </target>
 
     <target name="pkg" depends="jar, war">
-        <property name="zip.root" value="bob-dev"/>
+        <property name="zip.root" value="bob-${version}"/>
         <zip destfile="build/bob.zip">
             <zipfileset dir="src/bin" prefix="${zip.root}/bin"/>
-            <zipfileset dir="build" includes="bob.jar" fullpath="${zip.root}/lib/bob.jar"/>
+            <zipfileset dir="build" includes="bob-${version}.jar" fullpath="${zip.root}/lib/bob-${version}.jar"/>
             <zipfileset dir="build" includes="bob.war" fullpath="${zip.root}/lib/bob.war"/>
             <zipfileset dir="lib" includes="*.jar" prefix="${zip.root}/lib"/>
             <zipfileset dir="src/main/config" includes="*.xml" prefix="${zip.root}/config"/>

@@ -63,7 +63,7 @@ public class Bob
      * Map from service name to service.
      */
     private Map<String, Service> services;
-    
+
     //=======================================================================
     // Implementation
     //=======================================================================
@@ -116,9 +116,16 @@ public class Bob
 
         // The project root can be either relative to bob.home or absolute.
         File rootFile = new File(root);
-        if (!rootFile.isDirectory())
+        if (rootFile.isAbsolute())
         {
-            rootFile = new File(new File(System.getProperty("bob.home")), root);
+            if (!rootFile.isDirectory()){
+                LOG.warning("specified root '" + rootFile.getAbsolutePath() + "' is not a directory.");
+                throw new ConfigException(context.getFilename(), "The specified project root '" + root + "' does not exist or is not a directory.");
+            }
+        } else
+        {
+            // the root value is relative to bob.home.
+            rootFile = new File(getRootDir(), root);
             if (!rootFile.isDirectory())
             {
                 LOG.warning("specified root '" + rootFile.getAbsolutePath() + "' is not a directory.");
@@ -129,7 +136,6 @@ public class Bob
         projectRoot = rootFile;
         LOG.config("Project root set to '" + projectRoot.getAbsolutePath() + "'.");
     }
-
 
     private void loadProjects(ConfigContext context, Element element) throws ConfigException
     {
@@ -214,7 +220,7 @@ public class Bob
         userManager = new UserManager(this);
 
     }
-    
+
     //=======================================================================
     // Interface
     //=======================================================================
@@ -284,7 +290,7 @@ public class Bob
     //=======================================================================
     // Entry point
     //=======================================================================
-    
+
     public static void main(String argv[])
     {
         try

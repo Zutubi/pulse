@@ -63,7 +63,7 @@ public class XmlRpcApiHandlerTest extends TestCase
 
     public void testBuildRpcViaHttpRequest() throws Exception
     {
-        Vector params = new Vector();
+        Vector<String> params = new Vector<String>();
         params.add("testProject");
         client.execute("build", params);
     }

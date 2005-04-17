@@ -45,7 +45,7 @@ public class BobServerProxy
 
             // send the shutdown command.
             OutputStream out = socket.getOutputStream();
-            out.write(AdminService.Command.SHUTDOWN.getBytes());
+            out.write(ShutdownService.Command.SHUTDOWN.getBytes());
             out.close();
 
         } catch (IOException e) {
@@ -60,8 +60,8 @@ public class BobServerProxy
     public void build(String projectName) throws Exception
     {
         XmlRpcClient client = new XmlRpcClient("http://localhost:8080/api/xmlrpc");
-        Vector params = new Vector();
-        params.add("testProject");
+        Vector<String> params = new Vector<String>();
+        params.add(projectName);
         client.execute("build", params);
     }
 
