@@ -76,28 +76,17 @@
         <jar file="build/bob-${version}.jar" basedir="build/java/classes"/>
     </target>
 
-    <target name="war">
-        <war destfile="build/bob.war" webxml="src/www/WEB-INF/web.xml">
-            <fileset dir="src/www">
-                <exclude name="WEB-INF/web.xml"/>
-            </fileset>
-            <lib dir="lib">
-                <include name="**/*.jar"/>
-            </lib>
-        </war>
-    </target>
-
-    <target name="pkg" depends="jar, war">
+    <target name="pkg" depends="jar">
         <property name="zip.root" value="bob-${version}"/>
         <zip destfile="build/bob.zip">
             <zipfileset dir="src/bin" prefix="${zip.root}/bin"/>
             <zipfileset dir="build" includes="bob-${version}.jar" fullpath="${zip.root}/lib/bob-${version}.jar"/>
             <zipfileset dir="build" includes="bob.war" fullpath="${zip.root}/lib/bob.war"/>
-            <zipfileset dir="lib" includes="*.jar" prefix="${zip.root}/lib"/>
+            <zipfileset dir="lib" includes="*.jar" excludes="junit*.jar" prefix="${zip.root}/lib"/>
             <zipfileset dir="src/main/config" includes="*.xml" prefix="${zip.root}/config"/>
             <zipfileset dir="src/main/templates" includes="**/*.vm" prefix="${zip.root}/templates"/>
             <zipfileset dir="etc" includes="delete-me.txt" fullpath="${zip.root}/work/delete-me.txt"/>
-            <zipfileset dir="etc" includes="delete-me.txt" fullpath="${zip.root}/content/delete-me.txt"/>
+            <zipfileset dir="src/www" includes="**/*" prefix="${zip.root}/content"/>
         </zip>
     </target>
 
@@ -106,7 +95,6 @@
         <mkdir dir="deploy"/>
         <unzip src="build/bob.zip" dest="deploy"/>
     </target>
-
 
     <target name="bob.start" depends="default">
         <copy todir="build/root/config">
@@ -125,37 +113,6 @@
         </java>
     </target>
 
-    <target name="bob.run" depends="default">
-        <copy todir="build/root/config">
-            <fileset dir="src/main/config">
-                <include name="**/*"/>
-            </fileset>
-        </copy>
-        <copy todir="build/root/templates">
-            <fileset dir="src/main/templates">
-                <include name="**/*"/>
-            </fileset>
-        </copy>
-        <mkdir dir="build/root/log"/>
-        <java classname="com.cinnamonbob.command.Bootstrap" fork="true">
-            <classpath refid="lib.path"/>
-            <classpath location="build/java/classes"/>
-            <classpath location="src/main/templates"/>
-            <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
-            <sysproperty key="root.dir" value="build/root"/>
-            <arg value="--start"/>
-        </java>
-    </target>
-
-    <target name="bob.stop">
-        <java classname="com.cinnamonbob.command.Bootstrap" fork="true">
-            <classpath refid="lib.path"/>
-            <classpath location="build/java/classes"/>
-            <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
-            <arg value="--stop"/>
-        </java>
-    </target>
-
     <target name="bob.build">
         <java classname="com.cinnamonbob.command.Bootstrap" fork="true">
             <classpath refid="lib.path"/>
@@ -163,22 +120,6 @@
             <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
             <sysproperty key="root.dir" value="./deploy/bob-dev"/>
             <arg value="--build=test-project"/>
-        </java>
-    </target>
-    <target name="bob.usage">
-        <java classname="com.cinnamonbob.command.Bootstrap" fork="true">
-            <classpath refid="lib.path"/>
-            <classpath location="build/java/classes"/>
-            <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
-            <arg value="--usage"/>
-        </java>
-    </target>
-    <target name="bob.help">
-        <java classname="com.cinnamonbob.command.Bootstrap" fork="true">
-            <classpath refid="lib.path"/>
-            <classpath location="build/java/classes"/>
-            <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
-            <arg value="--help"/>
         </java>
     </target>
 
