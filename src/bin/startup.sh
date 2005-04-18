@@ -62,4 +62,4 @@ if [ ! -x "$JAVACMD" ] ; then
   exit 1
 fi
 
-exec "$JAVACMD" -classpath "$CLASSPATH" -Dbob.home="$BOB_HOME" -Djava.awt.headless=true com.cinnamonbob.command.Bootstrap --start
+exec "$JAVACMD" -classpath "$CLASSPATH" -Dbob.home="$BOB_HOME" -Djava.awt.headless=true com.cinnamonbob.command.Bootstrap start

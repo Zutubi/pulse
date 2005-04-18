@@ -14,6 +14,7 @@
     <patternset id="resources">
         <include name="**/*.properties"/>
         <include name="**/*.png"/>
+        <include name="**/*.xml"/>
     </patternset>
 
     <target name="clean" description="Clean up after myself.">
@@ -77,17 +78,53 @@
     </target>
 
     <target name="pkg" depends="jar">
-        <property name="zip.root" value="bob-${version}"/>
-        <zip destfile="build/bob.zip">
-            <zipfileset dir="src/bin" prefix="${zip.root}/bin"/>
-            <zipfileset dir="build" includes="bob-${version}.jar" fullpath="${zip.root}/lib/bob-${version}.jar"/>
-            <zipfileset dir="build" includes="bob.war" fullpath="${zip.root}/lib/bob.war"/>
-            <zipfileset dir="lib" includes="*.jar" excludes="junit*.jar" prefix="${zip.root}/lib"/>
-            <zipfileset dir="src/main/config" includes="*.xml" prefix="${zip.root}/config"/>
-            <zipfileset dir="src/main/templates" includes="**/*.vm" prefix="${zip.root}/templates"/>
-            <zipfileset dir="etc" includes="delete-me.txt" fullpath="${zip.root}/work/delete-me.txt"/>
-            <zipfileset dir="src/www" includes="**/*" prefix="${zip.root}/content"/>
-        </zip>
+        <mkdir dir="build/package"/>
+        <property name="package.root" value="build/package/bob-${version}"/>
+
+        <copy todir="${package.root}/bin">
+            <fileset dir="src/bin">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+
+        <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+
+        <copy todir="${package.root}/lib">
+            <fileset dir="lib">
+                <include name="**/*.jar"/>
+                <exclude name="junit*.jar"/>
+            </fileset>
+            <fileset dir="build">
+                <include name="bob-${version}.jar"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${package.root}/config">
+            <fileset dir="src/main/config">
+                <include name="**/*.xml"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${package.root}/templates">
+            <fileset dir="src/main/templates">
+                <include name="**/*.vm"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${package.root}/work">
+            <fileset dir="etc">
+                <include name="delete-me.txt"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${package.root}/content">
+            <fileset dir="src/www">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+
+        <zip destfile="build/bob.zip" basedir="build/package"/>
+
     </target>
 
     <target name="deploy">
@@ -109,7 +146,7 @@
             <classpath location="src/main/templates"/>
             <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
             <sysproperty key="root.dir" value="build/root"/>
-            <arg value="--start"/>
+            <arg value="start"/>
         </java>
     </target>
 
@@ -119,7 +156,7 @@
             <classpath location="build/java/classes"/>
             <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
             <sysproperty key="root.dir" value="./deploy/bob-dev"/>
-            <arg value="--build=test-project"/>
+            <arg value="build=test-project"/>
         </java>
     </target>
 
