@@ -72,9 +72,9 @@ public class StartupManager
         try
         {
             homeDirectory = homeDir.getCanonicalPath();
-            configDirectory = configDirectory + File.separatorChar + CONFIG_ROOT;
-            contentDirectory = contentDirectory + File.separatorChar + CONTENT_ROOT;
-            projectDirectory = projectDirectory + File.separatorChar + PROJECT_ROOT;
+            configDirectory = homeDirectory + File.separatorChar + CONFIG_ROOT;
+            contentDirectory = homeDirectory + File.separatorChar + CONTENT_ROOT;
+            projectDirectory = homeDirectory + File.separatorChar + PROJECT_ROOT;
         } catch (IOException e)
         {
             throw new RuntimeException(e);
