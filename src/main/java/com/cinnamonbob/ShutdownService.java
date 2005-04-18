@@ -35,9 +35,9 @@ public class ShutdownService
     /**
      *
      */
-    static interface Command
+    public static interface Command
     {
-        final String SHUTDOWN = "shutdown";
+        public static final String SHUTDOWN = "shutdown";
     }
 
     /**

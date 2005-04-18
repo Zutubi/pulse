@@ -1,18 +1,16 @@
 package com.cinnamonbob.command;
 
-import com.cinnamonbob.BobServerProxy;
 import com.cinnamonbob.BobServer;
 import com.cinnamonbob.ShutdownService;
 import com.cinnamonbob.util.IOHelper;
+import org.apache.xmlrpc.XmlRpcClient;
 
-import java.net.Socket;
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Vector;
-
-import org.apache.xmlrpc.XmlRpcClient;
 
 /**
  * @author Daniel Ostermeier

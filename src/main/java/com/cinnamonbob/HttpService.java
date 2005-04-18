@@ -4,21 +4,27 @@ import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.ServletHttpContext;
 import com.cinnamonbob.api.XmlRpcApiServlet;
+import com.cinnamonbob.setup.StartupManager;
+
+import java.io.File;
 
 /**
  *
  */
-public class HttpService {
+public class HttpService
+{
 
     private int port = -1;
 
     private Server server = null;
 
-    public HttpService(int port) {
+    public HttpService(int port)
+    {
         this.port = port;
     }
 
-    public void start() throws Exception {
+    public void start() throws Exception
+    {
 
         // Create the server
         server = new Server();
@@ -27,23 +33,27 @@ public class HttpService {
         SocketListener listener = new SocketListener();
         listener.setPort(port);
         server.addListener(listener);
-        //TODO: retrieve the bob.home directory from Bob
 
-        // dynamically deploy a servlet..
-        ServletHttpContext context = (ServletHttpContext)
-        server.getContext("/");
-        context.addServlet("XmlRpcApiServlet","/api/xmlrpc/*", XmlRpcApiServlet.class.getName());
+        // dynamically deploy a servlet.., TODO: support enable/disable of the remote APIs.
+        ServletHttpContext context = (ServletHttpContext) server.getContext("/");
+        context.addServlet("XmlRpcApiServlet", "/api/xmlrpc/*", XmlRpcApiServlet.class.getName());
 
-        server.addWebApplication("/", System.getProperty("bob.home")+"/content");
+        String wwwRoot = StartupManager.getInstance().getContentRoot();
+
+        server.addWebApplication("/", wwwRoot);
         server.start();
-
     }
 
-    public void stop() {
-        if (server != null) {
-            try {
+
+    public void stop()
+    {
+        if (server != null)
+        {
+            try
+            {
                 server.stop();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException e)
+            {
                 // nop
             }
         }
