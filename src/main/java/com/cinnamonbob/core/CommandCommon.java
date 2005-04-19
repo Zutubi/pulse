@@ -20,15 +20,35 @@ public class CommandCommon
     private static final Logger LOG = Logger.getLogger(CommandCommon.class.getName());
     
     private static final String CONFIG_ATTR_NAME        = "name";
+    private static final String CONFIG_ATTR_FORCE       = "force";
     private static final String CONFIG_ELEMENT_ARTIFACT = "artifact";
     private static final String CONFIG_ELEMENT_PROCESS  = "process";
     
+    /**
+     * Decriptive name for the command.
+     */
     private String name;
+    /**
+     * The command itself, to which execution is delegated.
+     */
     private Command command;
+    /**
+     * Map from artifact name to specification for the artifact.
+     */
     private Map<String, ArtifactSpec> artifacts;
+    /**
+     * Specifications for post-processors.
+     */
     private List<ProcessSpec> processors;
+    /**
+     * If true, execute this command despite an earlier failure in the build.
+     */
+    private boolean force;
     
-    
+    //=======================================================================
+    // Implementation
+    //=======================================================================
+
     private void loadArtifact(ConfigContext context, Element element) throws ConfigException
     {
         ArtifactSpec spec = new ArtifactSpec(context, element);
@@ -105,12 +125,38 @@ public class CommandCommon
         }
     }
     
+    //=======================================================================
+    // Construction
+    //=======================================================================
 
+    /**
+     * Constructs a new command by loading from the given element.
+     * 
+     * @param context
+     *        configuration context used during loading
+     * @param element
+     *        root element of the command configuration
+     * @param commandFactory
+     *        factory used for creating the core command
+     * @param project
+     *        the project this command belongs to
+     * @throws ConfigException
+     *         if there is an error in the configuration
+     */
     public CommandCommon(ConfigContext context, Element element, CommandFactory commandFactory, Project project) throws ConfigException
     {
         name       = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_NAME);
         artifacts  = new TreeMap<String, ArtifactSpec>();
         processors = new LinkedList<ProcessSpec>();
+        
+        if(element.getAttributeValue(CONFIG_ATTR_FORCE) == null)
+        {
+            force = false;
+        }
+        else
+        {
+            force = true;
+        }
         
         List<Element> childElements = XMLConfigUtils.getElements(context, element);
         
@@ -147,10 +193,11 @@ public class CommandCommon
         }
     }
     
+    //=======================================================================
+    // Interface
+    //=======================================================================
 
     /**
-     * Returns the name of this command.
-     * 
      * @return the name of this command
      */
     public String getName()
@@ -158,19 +205,49 @@ public class CommandCommon
         return name;
     }
     
-    
+    /**
+     * Returns true if this command has a specification for the given artifact.
+     * 
+     * @param name
+     *        the name to test for
+     * @return true iff this command has an artifact of the given name
+     */
     public boolean hasArtifact(String name)
     {
         return artifacts.containsKey(name);
     }
     
-    
+    /**
+     * Returns a specification for the artifact of the given name.
+     * 
+     * @param name
+     *        the name of the artifact to retrieve the specification for
+     * @return the specification for the artifact of the given name, or null
+     *         if there is none
+     */
     public ArtifactSpec getArtifact(String name)
     {
         return artifacts.get(name);
     }
 
+    /**
+     * @return true iff this command should be executed despite an earlier
+     *         failure
+     */
+    public boolean getForce()
+    {
+        return force;
+    }
     
+    /**
+     * Executes this command, returning the result.
+     * 
+     * @param outputDir
+     *        directory to store output produced by the command
+     * @return the result of the command execution
+     * @throws InternalBuildFailureException
+     *         if an unexpected error occurs during execution
+     */
     public CommandResultCommon execute(File outputDir) throws InternalBuildFailureException
     {
         long                startTime     = System.currentTimeMillis();

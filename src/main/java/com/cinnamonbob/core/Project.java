@@ -88,8 +88,7 @@ public class Project
      * Used for (de)serialisation.
      */
     private XStream xstream;
-    
-    
+        
     //=======================================================================
     // Implementation
     //=======================================================================
@@ -186,15 +185,25 @@ public class Project
         try
         {
             int i = 0;
+            boolean failed = false;
             
             for(CommandCommon command: recipe)
             {
-                File                commandOutputDir = createCommandOutputDir(buildDir, command, i);
-                CommandResultCommon commandResult    = command.execute(commandOutputDir);
+                File commandOutputDir = createCommandOutputDir(buildDir, command, i);
                 
-                result.addCommandResult(commandResult);
-                saveCommandResult(commandOutputDir, commandResult);
-                i++;
+                if(!failed || command.getForce())
+                {
+                    CommandResultCommon commandResult = command.execute(commandOutputDir);
+                
+                    result.addCommandResult(commandResult);
+                    saveCommandResult(commandOutputDir, commandResult);
+                    i++;
+                    
+                    if(!commandResult.getResult().succeeded())
+                    {
+                        failed = true;
+                    }
+                }
             }
         }
         catch(InternalBuildFailureException e)
