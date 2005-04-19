@@ -44,6 +44,9 @@ public class Bootstrap
         } else if ("build".equals(command))
         {
             build(args[1]);
+        } else
+        {
+            LOG.warning("Unrecognised command '" + command + "'");
         }
     }
 
