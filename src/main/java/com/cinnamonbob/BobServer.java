@@ -52,7 +52,7 @@ public class BobServer
 
         // initialise jetty
         httpService = new HttpService(8080);
-        httpService.start();
+        httpService.start(core);
 
         // initialise Spring.
         ApplicationContext ctx = StartupManager.getInstance().getAppContext();
@@ -68,7 +68,7 @@ public class BobServer
 
     public static void build(String projectName)
     {
-        LOG.info("build");
+        LOG.info("build '" + projectName + "'");
 
         // request a build.
         buildQueue.enqueue(new BuildRequest(projectName));

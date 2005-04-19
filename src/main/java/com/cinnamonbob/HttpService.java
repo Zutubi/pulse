@@ -3,10 +3,11 @@ package com.cinnamonbob;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.ServletHttpContext;
-import com.cinnamonbob.api.XmlRpcApiServlet;
-import com.cinnamonbob.setup.StartupManager;
+import org.mortbay.jetty.servlet.WebApplicationContext;
 
-import java.io.File;
+import com.cinnamonbob.api.XmlRpcApiServlet;
+import com.cinnamonbob.core.Bob;
+import com.cinnamonbob.setup.StartupManager;
 
 /**
  *
@@ -23,9 +24,8 @@ public class HttpService
         this.port = port;
     }
 
-    public void start() throws Exception
+    public void start(Bob theBuilder) throws Exception
     {
-
         // Create the server
         server = new Server();
 
@@ -40,7 +40,8 @@ public class HttpService
 
         String wwwRoot = StartupManager.getInstance().getContentRoot();
 
-        server.addWebApplication("/", wwwRoot);
+        WebApplicationContext appContext = server.addWebApplication("/", wwwRoot);
+        appContext.setAttribute("bob", theBuilder);
         server.start();
     }
 

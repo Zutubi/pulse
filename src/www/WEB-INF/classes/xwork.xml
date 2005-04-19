@@ -1,0 +1,13 @@
+<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.0//EN" 
+"http://www.opensymphony.com/xwork/xwork-1.0.dtd">
+
+<xwork>
+	<include file="webwork-default.xml" />
+	<package name="default" extends="webwork-default">
+		<default-interceptor-ref name="defaultStack" /> 
+		
+		<action name="viewProjects" class="com.cinnamonbob.web.ViewProjectsAction"> 
+			<result name="success" type="velocity">view-projects.vm</result> 
+		</action> 
+	</package>
+</xwork>

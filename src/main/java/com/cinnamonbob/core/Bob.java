@@ -5,6 +5,7 @@ import nu.xom.Element;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -190,7 +191,7 @@ public class Bob
         for (Project project : projects.values())
         {
             LOG.info("Building project '" + project.getName() + "'");
-            project.build(projectRoot);
+            project.build();
             LOG.info("Build complete.");
         }
     }
@@ -246,6 +247,10 @@ public class Bob
         return projects.get(name);
     }
 
+	public Collection<Project> getProjects()
+	{
+		return projects.values();
+	}
 
     /**
      * @return Returns the projectRoot.
@@ -311,6 +316,6 @@ public class Bob
             return;
         }
         Project project = projects.get(projectName);
-        project.build(projectRoot);
+        project.build();
     }
 }

@@ -1,14 +1,19 @@
 package com.cinnamonbob.core;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
+
 
 /**
  * Contains the results for a project build.
  */
 public class BuildResult implements Iterable<CommandResultCommon>
 {
+    private static final Logger LOG = Logger.getLogger(BuildResult.class.getName());
+    
     /*
      * This information is transient as it is stored externally.
      */
@@ -24,7 +29,7 @@ public class BuildResult implements Iterable<CommandResultCommon>
      */
     private InternalBuildFailureException internalFailure;
     
-
+    
     /**
      * Creates a new build result for the given project.
      */
@@ -35,7 +40,6 @@ public class BuildResult implements Iterable<CommandResultCommon>
         this.commandResults = new LinkedList<CommandResultCommon>();
         this.categoryRegistry = categoryRegistry;
     }
-    
     
     /**
      * True iff the build was successful.
@@ -131,4 +135,12 @@ public class BuildResult implements Iterable<CommandResultCommon>
     {
         return categoryRegistry.getFeatureCategory(name);
     }
+
+    
+    public void load(String projectName, int id, File buildDir)
+    {
+        this.projectName = projectName;
+        this.id = id;
+        this.commandResults = new LinkedList<CommandResultCommon>();
+    }    
 }

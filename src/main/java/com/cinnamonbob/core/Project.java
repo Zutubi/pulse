@@ -6,6 +6,8 @@ import nu.xom.Document;
 import nu.xom.Element;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
@@ -45,7 +47,7 @@ public class Project
     /**
      * Registry of known feature categories.
      */
-    FeatureCategoryRegistry categoryRegistry;
+    private FeatureCategoryRegistry categoryRegistry;
     /**
      * Post-processors defined for this project.
      */
@@ -59,160 +61,49 @@ public class Project
      */
     //private Schedule schedule;
     /**
-     * The users involved in this project.
+     * Subscriptions to events on this project.
      */
     private List<ContactPoint> subscriptions;
-    private Bob  theBuilder;
+    /**
+     * Directory for storing all project state.
+     */
     private File projectDir;
+    /**
+     * Directory for storing build results.
+     */
     private File buildsDir;
+    /**
+     * Directory used as a work area for the project.
+     */
     private File workDir;
+    /**
+     * Identifier for the next build.
+     */
     private int nextBuild;
-
+    /**
+     * Reference back to the boss.
+     */
+    private Bob theBuilder;
+    /**
+     * Used for (de)serialisation.
+     */
+    private XStream xstream;
     
+    
+    //=======================================================================
+    // Implementation
+    //=======================================================================
+
     private void addBuiltinVariables(ConfigContext context)
     {
         context.setVariable(VARIABLE_WORK_DIR, workDir.getAbsolutePath());
     }
-
+	
     
-    public Project(Bob theBuilder, String name, String filename) throws ConfigException
-    {
-        this.theBuilder       = theBuilder;
-        this.name             = name;
-        this.postProcessors   = new TreeMap<String, PostProcessorCommon>();
-        this.subscriptions    = new LinkedList<ContactPoint>();
-        this.categoryRegistry = new FeatureCategoryRegistry();
-        this.projectDir       = new File(theBuilder.getProjectRoot(), name);
-        this.buildsDir        = new File(projectDir, DIR_BUILDS);
-        this.workDir          = new File(projectDir, DIR_WORK);
-        
-        loadConfig(filename);
-        
-        // FIXME
-        if(buildsDir.isDirectory())
-        {
-            String files[] = buildsDir.list();
-            int    max     = -1;
-            
-            for(int i = 0; i < files.length; i++)
-            {
-                try
-                {
-                    int buildNumber = Integer.parseInt(files[i]);
-                    
-                    if(buildNumber > max)
-                    {
-                        max = buildNumber;
-                    }
-                }
-                catch(NumberFormatException e)
-                {
-                    // Oh well, not a build dir
-                }                
-            }
-            
-            this.nextBuild = max + 1;
-        }
-        else
-        {
-            this.buildsDir.mkdirs();
-            this.nextBuild = 0;
-        }
-    }
-
-
-    private void loadConfig(String filename) throws ConfigException
-    {
-        Document      doc      = XMLConfigUtils.loadFile(filename);
-        ConfigContext context  = new ConfigContext(filename);
-
-        addBuiltinVariables(context);
-        
-        List<Element> elements = XMLConfigUtils.getElements(context, doc.getRootElement(), Arrays.asList(XMLConfigUtils.CONFIG_ELEMENT_PROPERTY, CONFIG_ELEMENT_DESCRIPTION, CONFIG_ELEMENT_POST_PROCESSOR, CONFIG_ELEMENT_RECIPE));
-        
-        XMLConfigUtils.extractProperties(context, elements);
-        
-        for(Element current: elements)
-        {
-            String  elementName = current.getLocalName();
-                
-            if(elementName.equals(CONFIG_ELEMENT_DESCRIPTION))
-            {
-                loadDescription(context, current);
-            }
-            else if(elementName.equals(CONFIG_ELEMENT_POST_PROCESSOR))
-            {
-                loadPostProcessor(context, current);
-            }
-            else if(elementName.equals(CONFIG_ELEMENT_RECIPE))
-            {
-                loadRecipe(context, current);
-            }
-            else
-            {
-                assert(false);
-            }
-        }
-    }
-
-
-    private void loadDescription(ConfigContext context, Element element) throws ConfigException
-    {
-        description = XMLConfigUtils.getElementText(context, element);
-    }
-
-
-    private void loadPostProcessor(ConfigContext context, Element element) throws ConfigException
-    {
-        PostProcessorCommon post = new PostProcessorCommon(context, element, theBuilder.getPostProcessorFactory(), this);
-        
-        if(postProcessors.containsKey(post.getName()))
-        {
-            throw new ConfigException(context.getFilename(), "Project '" + name + "' already contains a post-processor named '" + post.getName() + "'");
-        }
-        
-        postProcessors.put(post.getName(), post);
-    }
-
-    
-    private void loadRecipe(ConfigContext context, Element element) throws ConfigException
-    {
-        recipe = new Recipe(context, element, theBuilder.getCommandFactory(), this);
-    }
-
-
-    public void addSubscription(ContactPoint point)
-    {
-        subscriptions.add(point);
-    }
-
-
-    /**
-     * @return Returns the name of this project.
-     */
-    public String getName()
-    {
-        return name;
-    }
-    
-    
-    public BuildResult build(File outputDir)
-    {
-        BuildResult result = executeBuild(outputDir);
-        
-        for(ContactPoint contact: subscriptions)
-        {
-            contact.notify(result);
-        }
-        
-        return result;
-    }
-
-    
-    private BuildResult executeBuild(File outputDir)
+    private BuildResult executeBuild()
     {
         // Allocate the result with a unique id.
-        BuildResult result = new BuildResult(name, nextBuild++, categoryRegistry);
+        BuildResult result = new BuildResult(name, nextBuild, categoryRegistry);
         long startTime = System.currentTimeMillis();
         File buildDir = null;
         
@@ -246,6 +137,13 @@ public class Project
                 result.setInternalFailure(e);
                 logInternalBuildFailure(result);
             }
+        }
+        
+        // Don't increment nextBuild until we have finished the build, this
+        // way the build won't be picked up by getHistory until complete.
+        synchronized(this)
+        {
+            nextBuild++;
         }
         
         return result;
@@ -288,7 +186,6 @@ public class Project
         try
         {
             int i = 0;
-            XStream xstream = new XStream();
             
             for(CommandCommon command: recipe)
             {
@@ -310,7 +207,6 @@ public class Project
 
     private void saveBuildResult(File buildDir, BuildResult result) throws InternalBuildFailureException
     {
-        XStream xstream = new XStream();
         File resultFile = new File(buildDir, RESULT_FILE_NAME);
         
         try
@@ -326,7 +222,6 @@ public class Project
 
     private void saveCommandResult(File commandOutputDir, CommandResultCommon commandResult) throws InternalBuildFailureException
     {
-        XStream xstream = new XStream();
         File resultFile = new File(commandOutputDir, RESULT_FILE_NAME);
         
         try
@@ -339,11 +234,10 @@ public class Project
         }
     }
 
-
+    
     private File createBuildDir(File outputDir, BuildResult buildResult) throws InternalBuildFailureException
     {
-        String dirName = String.format("%08d", new Integer(buildResult.getId()));
-        File buildDir = new File(outputDir, dirName);
+        File buildDir = getBuildDir(outputDir, buildResult.getId());
         
         if(!buildDir.mkdir())
         {
@@ -367,21 +261,275 @@ public class Project
         return commandOutputDir;
     }
 
+    
+    private File getBuildDir(File outputDir, int buildId)
+	{
+        String dirName = String.format("%08d", new Integer(buildId));
+        return new File(outputDir, dirName);
+	}
 
+    
+    private void loadCommandResults(File buildDir, BuildResult result)
+    {
+        if(buildDir.isDirectory())
+        {
+            String files[] = buildDir.list();
+            Arrays.sort(files);
+            
+            for(String dirName: files)
+            {
+                File dir = new File(buildDir, dirName);
+                
+                if(dir.isDirectory())
+                {
+                    File resultFile = new File(dir, "result.xml");
+                    
+                    try
+                    {
+                        CommandResultCommon commandResult = (CommandResultCommon)xstream.fromXML(new FileReader(resultFile));
+                        result.addCommandResult(commandResult);
+                    }
+                    catch(FileNotFoundException e)
+                    {
+                        LOG.warning("I/O error loading command result from file '" + resultFile.getAbsolutePath() + "': " + e.getMessage());
+                    }                    
+                }
+            }
+        }
+    }
+
+   
+	private BuildResult loadBuild(int buildId)
+	{
+		File        buildDir   = getBuildDir(buildsDir, buildId);
+        File        resultFile = new File(buildDir, RESULT_FILE_NAME);
+        BuildResult result     = null;
+        
+        try
+        {
+            result = (BuildResult)xstream.fromXML(new FileReader(resultFile));
+            result.load(name, buildId, buildDir);            
+            loadCommandResults(buildDir, result);
+        }
+        catch(IOException e)
+        {
+            LOG.warning("I/O error loading build result from file '" + resultFile.getAbsolutePath() + "'");
+        }
+        
+        return result;
+	}
+
+	
+    private void loadDescription(ConfigContext context, Element element) throws ConfigException
+    {
+        description = XMLConfigUtils.getElementText(context, element);
+    }
+
+
+    private void loadPostProcessor(ConfigContext context, Element element) throws ConfigException
+    {
+        PostProcessorCommon post = new PostProcessorCommon(context, element, theBuilder.getPostProcessorFactory(), this);
+        
+        if(postProcessors.containsKey(post.getName()))
+        {
+            throw new ConfigException(context.getFilename(), "Project '" + name + "' already contains a post-processor named '" + post.getName() + "'");
+        }
+        
+        postProcessors.put(post.getName(), post);
+    }
+
+    
+    private void loadRecipe(ConfigContext context, Element element) throws ConfigException
+    {
+        recipe = new Recipe(context, element, theBuilder.getCommandFactory(), this);
+    }
+
+    
+    private void loadConfig(String filename) throws ConfigException
+    {
+        Document      doc      = XMLConfigUtils.loadFile(filename);
+        ConfigContext context  = new ConfigContext(filename);
+
+        addBuiltinVariables(context);
+        
+        List<Element> elements = XMLConfigUtils.getElements(context, doc.getRootElement(), Arrays.asList(XMLConfigUtils.CONFIG_ELEMENT_PROPERTY, CONFIG_ELEMENT_DESCRIPTION, CONFIG_ELEMENT_POST_PROCESSOR, CONFIG_ELEMENT_RECIPE));
+        
+        XMLConfigUtils.extractProperties(context, elements);
+        
+        for(Element current: elements)
+        {
+            String  elementName = current.getLocalName();
+                
+            if(elementName.equals(CONFIG_ELEMENT_DESCRIPTION))
+            {
+                loadDescription(context, current);
+            }
+            else if(elementName.equals(CONFIG_ELEMENT_POST_PROCESSOR))
+            {
+                loadPostProcessor(context, current);
+            }
+            else if(elementName.equals(CONFIG_ELEMENT_RECIPE))
+            {
+                loadRecipe(context, current);
+            }
+            else
+            {
+                assert(false);
+            }
+        }
+    }
+    
+    //=======================================================================
+    // Construction
+    //=======================================================================
+
+    public Project(Bob theBuilder, String name, String filename) throws ConfigException
+    {
+        this.theBuilder       = theBuilder;
+        this.name             = name;
+        this.postProcessors   = new TreeMap<String, PostProcessorCommon>();
+        this.subscriptions    = new LinkedList<ContactPoint>();
+        this.categoryRegistry = new FeatureCategoryRegistry();
+        this.projectDir       = new File(theBuilder.getProjectRoot(), name);
+        this.buildsDir        = new File(projectDir, DIR_BUILDS);
+        this.workDir          = new File(projectDir, DIR_WORK);
+        this.xstream          = new XStream();
+        
+        loadConfig(filename);
+        
+        // Determine next build id
+        if(buildsDir.isDirectory())
+        {
+            String files[] = buildsDir.list();
+            int    max     = -1;
+            
+            for(int i = 0; i < files.length; i++)
+            {
+                try
+                {
+                    int buildNumber = Integer.parseInt(files[i]);
+                    
+                    if(buildNumber > max)
+                    {
+                        max = buildNumber;
+                    }
+                }
+                catch(NumberFormatException e)
+                {
+                    // Oh well, not a build dir
+                }                
+            }
+            
+            this.nextBuild = max + 1;
+        }
+        else
+        {
+            this.buildsDir.mkdirs();
+            this.nextBuild = 0;
+        }
+    }
+
+    //=======================================================================
+    // Interface
+    //=======================================================================
+
+    /**
+     * Adds a subscription to events on this project.
+     * 
+     * @param point
+     *        the contact point to notify on project events
+     */
+    public void addSubscription(ContactPoint point)
+    {
+        subscriptions.add(point);
+    }
+
+    /**
+     * @return the name of this project
+     */
+    public String getName()
+    {
+        return name;
+    }
+    
+    /**
+     * Executes a build of this project.
+     * 
+     * @return the result of the build
+     */
+    public BuildResult build()
+    {
+        BuildResult result = executeBuild();
+        
+        for(ContactPoint contact: subscriptions)
+        {
+            contact.notify(result);
+        }
+        
+        return result;
+    }
+
+    /**
+     * Tests if this project has a post-processor of the given name.
+     * 
+     * @param name
+     *        the name to test for
+     * @return true iff this project has a post-processor of the given name
+     */
     public boolean hasPostProcessor(String name)
     {
         return postProcessors.containsKey(name);
     }
     
-    
+    /**
+     * Returns the post-processor of the given name.
+     * 
+     * @param name
+     *        the name of the post-processor to retrieve
+     * @return the post-processor of the given name, or null if there is no
+     *         post-processor by that name
+     */
     public PostProcessorCommon getPostProcessor(String name)
     {
         return postProcessors.get(name);
     }
     
-    
+    /**
+     * @return the registry of categories configured for this project
+     */
     public FeatureCategoryRegistry getCategoryRegistry()
     {
         return categoryRegistry;
     }
+	
+	/**
+	 * Retrieves a history of recent builds of this project.  The history may
+	 * be shorter than requested (even empty) if there have not been enough
+	 * previous builds.
+	 * 
+	 * @param maxBuilds
+	 *        the maximum number of results to return
+	 * @return a list of recent build results, most recent first
+	 */
+	public List<BuildResult> getHistory(int maxBuilds)
+	{
+		int latestBuild;
+		List<BuildResult> history = new LinkedList<BuildResult>();
+
+		synchronized(this)
+		{
+			latestBuild = nextBuild - 1;
+		}
+		
+		for(int i = latestBuild; i >= 0 && history.size() < maxBuilds; i--)
+		{
+			BuildResult result = loadBuild(i);
+			if(result != null)
+			{
+				history.add(result);
+			}
+		}
+		
+		return history;
+	}
 }

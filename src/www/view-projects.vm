@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <title>All Projects</title>
+  </head>
+  <body>
+    <h1>All Projects</h1>
+    <table border="1">
+      <tr><th>Project</th><th>Last Build</th><th>Result</th></tr>
+#foreach($project in $projects)
+#set($history = $project.getHistory(1))
+#if($history.size() > 0)
+  #set($lastBuild = $history.get(0).Id)
+  #if($history.get(0).succeeded())
+    #set($success = "Success")
+  #else
+    #set($success = "Failure")
+  #end
+#else
+  #set($lastBuild = "No Builds Found")
+  #set($success = "n/a")
+#end
+      <tr><td>$project.name</td><td>$lastBuild</td><td>$success</td></tr>
+#end
+    </table>
+  </body>
+</html>
