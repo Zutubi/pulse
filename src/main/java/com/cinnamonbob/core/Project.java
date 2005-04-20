@@ -64,271 +64,22 @@ public class Project
      * Subscriptions to events on this project.
      */
     private List<ContactPoint> subscriptions;
-    /**
-     * Directory for storing all project state.
-     */
-    private File projectDir;
-    /**
-     * Directory for storing build results.
-     */
-    private File buildsDir;
-    /**
-     * Directory used as a work area for the project.
-     */
-    private File workDir;
-    /**
-     * Identifier for the next build.
-     */
-    private int nextBuild;
+
     /**
      * Reference back to the boss.
      */
     private Bob theBuilder;
-    /**
-     * Used for (de)serialisation.
-     */
-    private XStream xstream;
-        
+
     //=======================================================================
     // Implementation
     //=======================================================================
 
     private void addBuiltinVariables(ConfigContext context)
     {
-        context.setVariable(VARIABLE_WORK_DIR, workDir.getAbsolutePath());
-    }
-	
-    
-    private BuildResult executeBuild()
-    {
-        // Allocate the result with a unique id.
-        BuildResult result = new BuildResult(name, nextBuild, categoryRegistry);
-        long startTime = System.currentTimeMillis();
-        File buildDir = null;
-        
-        try
-        {
-            cleanWorkDir();
-            buildDir = createBuildDir(buildsDir, result);            
-        }
-        catch(InternalBuildFailureException e)
-        {
-            // Not even able to create the build directory: bad news.
-            result.setInternalFailure(e);
-            logInternalBuildFailure(result);
-            return result;
-        }
-        
-        // May record internal failures too.
-        executeCommands(result, buildDir);
-        result.stamp(new TimeStamps(startTime, System.currentTimeMillis()));
-        
-        try
-        {
-            saveBuildResult(buildDir, result);
-        }
-        catch(InternalBuildFailureException e)
-        {
-            // We basically can't save anything about this, so bail out.
-            // Don't clobber earlier failure...
-            if(result.getInternalFailure() == null)
-            {
-                result.setInternalFailure(e);
-                logInternalBuildFailure(result);
-            }
-        }
-        
-        // Don't increment nextBuild until we have finished the build, this
-        // way the build won't be picked up by getHistory until complete.
-        synchronized(this)
-        {
-            nextBuild++;
-        }
-        
-        return result;
+        context.setVariable(VARIABLE_WORK_DIR, BuildManager.getInstance().getWorkRoot().getAbsolutePath());
     }
 
     
-    private void cleanWorkDir() throws InternalBuildFailureException
-    {
-        if(workDir.exists())
-        {
-            if(!FileSystemUtils.removeDirectory(workDir))
-            {
-                throw new InternalBuildFailureException("Could not clean work directory '" + workDir.getAbsolutePath() + '"');
-            }
-        }
-        
-        if(!workDir.mkdir())
-        {
-            throw new InternalBuildFailureException("Could not create work directory '" + workDir.getAbsolutePath() + "'");
-        }
-    }
-
-
-    private void logInternalBuildFailure(BuildResult result)
-    {
-        InternalBuildFailureException e = result.getInternalFailure();
-        
-        LOG.severe("Project '" + name + "' build " + Integer.toString(result.getId()) + ": Internal build failure:");
-        LOG.severe(e.getMessage());
-        
-        if(e.getCause() != null)
-        {
-            LOG.severe("Cause: " + e.getCause().getMessage());
-        }
-    }
-
-
-    private void executeCommands(BuildResult result, File buildDir)
-    {
-        try
-        {
-            int i = 0;
-            boolean failed = false;
-            
-            for(CommandCommon command: recipe)
-            {
-                File commandOutputDir = createCommandOutputDir(buildDir, command, i);
-                
-                if(!failed || command.getForce())
-                {
-                    CommandResultCommon commandResult = command.execute(commandOutputDir);
-                
-                    result.addCommandResult(commandResult);
-                    saveCommandResult(commandOutputDir, commandResult);
-                    i++;
-                    
-                    if(!commandResult.getResult().succeeded())
-                    {
-                        failed = true;
-                    }
-                }
-            }
-        }
-        catch(InternalBuildFailureException e)
-        {
-            result.setInternalFailure(e);
-            logInternalBuildFailure(result);
-        }
-    }
-
-
-    private void saveBuildResult(File buildDir, BuildResult result) throws InternalBuildFailureException
-    {
-        File resultFile = new File(buildDir, RESULT_FILE_NAME);
-        
-        try
-        {
-            xstream.toXML(result, new FileWriter(resultFile));
-        }
-        catch(IOException e)
-        {
-            throw new InternalBuildFailureException("Could not save build result to file '" + resultFile.getAbsolutePath() + "'", e);
-        }
-    }
-
-
-    private void saveCommandResult(File commandOutputDir, CommandResultCommon commandResult) throws InternalBuildFailureException
-    {
-        File resultFile = new File(commandOutputDir, RESULT_FILE_NAME);
-        
-        try
-        {
-            xstream.toXML(commandResult, new FileWriter(resultFile));
-        }
-        catch(IOException e)
-        {
-            throw new InternalBuildFailureException("Could not save command result to file '" + resultFile.getAbsolutePath() + "'", e);
-        }
-    }
-
-    
-    private File createBuildDir(File outputDir, BuildResult buildResult) throws InternalBuildFailureException
-    {
-        File buildDir = getBuildDir(outputDir, buildResult.getId());
-        
-        if(!buildDir.mkdir())
-        {
-            throw new InternalBuildFailureException("Could not create build directory '" + buildDir.getAbsolutePath() + "'");
-        }
-        
-        return buildDir;
-    }
-
-
-    private File createCommandOutputDir(File buildDir, CommandCommon command, int index) throws InternalBuildFailureException
-    {
-        String dirName        = String.format("%08d-%s", index, command.getName());
-        File commandOutputDir = new File(buildDir, dirName);
-        
-        if(!commandOutputDir.mkdir())
-        {
-            throw new InternalBuildFailureException("Could not create command output directory '" + commandOutputDir.getAbsolutePath() + "'");
-        }
-        
-        return commandOutputDir;
-    }
-
-    
-    private File getBuildDir(File outputDir, int buildId)
-	{
-        String dirName = String.format("%08d", new Integer(buildId));
-        return new File(outputDir, dirName);
-	}
-
-    
-    private void loadCommandResults(File buildDir, BuildResult result)
-    {
-        if(buildDir.isDirectory())
-        {
-            String files[] = buildDir.list();
-            Arrays.sort(files);
-            
-            for(String dirName: files)
-            {
-                File dir = new File(buildDir, dirName);
-                
-                if(dir.isDirectory())
-                {
-                    File resultFile = new File(dir, "result.xml");
-                    
-                    try
-                    {
-                        CommandResultCommon commandResult = (CommandResultCommon)xstream.fromXML(new FileReader(resultFile));
-                        result.addCommandResult(commandResult);
-                    }
-                    catch(FileNotFoundException e)
-                    {
-                        LOG.warning("I/O error loading command result from file '" + resultFile.getAbsolutePath() + "': " + e.getMessage());
-                    }                    
-                }
-            }
-        }
-    }
-
-   
-	private BuildResult loadBuild(int buildId)
-	{
-		File        buildDir   = getBuildDir(buildsDir, buildId);
-        File        resultFile = new File(buildDir, RESULT_FILE_NAME);
-        BuildResult result     = null;
-        
-        try
-        {
-            result = (BuildResult)xstream.fromXML(new FileReader(resultFile));
-            result.load(name, buildId, buildDir);            
-            loadCommandResults(buildDir, result);
-        }
-        catch(IOException e)
-        {
-            LOG.warning("I/O error loading build result from file '" + resultFile.getAbsolutePath() + "'");
-        }
-        
-        return result;
-	}
-
-	
     private void loadDescription(ConfigContext context, Element element) throws ConfigException
     {
         description = XMLConfigUtils.getElementText(context, element);
@@ -346,7 +97,6 @@ public class Project
         
         postProcessors.put(post.getName(), post);
     }
-
     
     private void loadRecipe(ConfigContext context, Element element) throws ConfigException
     {
@@ -399,43 +149,9 @@ public class Project
         this.postProcessors   = new TreeMap<String, PostProcessorCommon>();
         this.subscriptions    = new LinkedList<ContactPoint>();
         this.categoryRegistry = new FeatureCategoryRegistry();
-        this.projectDir       = new File(theBuilder.getProjectRoot(), name);
-        this.buildsDir        = new File(projectDir, DIR_BUILDS);
-        this.workDir          = new File(projectDir, DIR_WORK);
-        this.xstream          = new XStream();
-        
+
         loadConfig(filename);
         
-        // Determine next build id
-        if(buildsDir.isDirectory())
-        {
-            String files[] = buildsDir.list();
-            int    max     = -1;
-            
-            for(int i = 0; i < files.length; i++)
-            {
-                try
-                {
-                    int buildNumber = Integer.parseInt(files[i]);
-                    
-                    if(buildNumber > max)
-                    {
-                        max = buildNumber;
-                    }
-                }
-                catch(NumberFormatException e)
-                {
-                    // Oh well, not a build dir
-                }                
-            }
-            
-            this.nextBuild = max + 1;
-        }
-        else
-        {
-            this.buildsDir.mkdirs();
-            this.nextBuild = 0;
-        }
     }
 
     //=======================================================================
@@ -468,7 +184,7 @@ public class Project
      */
     public BuildResult build()
     {
-        BuildResult result = executeBuild();
+        BuildResult result = BuildManager.getInstance().executeBuild(this);
         
         for(ContactPoint contact: subscriptions)
         {
@@ -522,23 +238,14 @@ public class Project
 	 */
 	public List<BuildResult> getHistory(int maxBuilds)
 	{
-		int latestBuild;
-		List<BuildResult> history = new LinkedList<BuildResult>();
-
-		synchronized(this)
-		{
-			latestBuild = nextBuild - 1;
-		}
-		
-		for(int i = latestBuild; i >= 0 && history.size() < maxBuilds; i--)
-		{
-			BuildResult result = loadBuild(i);
-			if(result != null)
-			{
-				history.add(result);
-			}
-		}
-		
-		return history;
+        return BuildManager.getInstance().getHistory(this, maxBuilds);
 	}
+
+    /**
+     * @return the build recipe associated with this project.
+     */
+    public Recipe getRecipe()
+    {
+        return recipe;
+    }
 }

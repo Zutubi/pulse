@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
+
+    <bean id="spring-object-factory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
+
+    <bean name="viewProjectsAction" class="com.cinnamonbob.web.ViewProjectsAction" singleton="false">
+    </bean>
+
+
+
 </beans>

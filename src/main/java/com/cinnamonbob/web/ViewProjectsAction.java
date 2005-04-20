@@ -2,6 +2,7 @@ package com.cinnamonbob.web;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Collections;
 
 import com.cinnamonbob.core.Bob;
 import com.cinnamonbob.core.Project;
@@ -19,7 +20,7 @@ public class ViewProjectsAction extends ActionSupport
      * Collection of all projects in the server.
      */
 	private Collection<Project> projects;
-	
+
 	/**
      * Populates the action.
 	 */
