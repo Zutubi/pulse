@@ -6,8 +6,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.io.File;
 import java.io.IOException;
 
-import com.opensymphony.xwork.ObjectFactory;
-
 /**
  * Handle the systems initialisation.
  *

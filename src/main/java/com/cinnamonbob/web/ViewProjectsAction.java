@@ -2,7 +2,6 @@ package com.cinnamonbob.web;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Collections;
 
 import com.cinnamonbob.core.Bob;
 import com.cinnamonbob.core.Project;
