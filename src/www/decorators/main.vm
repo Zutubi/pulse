@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<title>#if ($title) $title #else Default Title #end</title>
+		<link href="$base/decorators/main.css" rel="stylesheet" type="text/css">
+		$head
+	</head>
+
+	<body>
+		<table width="100%" height="100%">
+			<tr>
+				<td valign="top">
+                    #parse("/decorators/panel.vm")
+				</td>
+				<td width="100%">
+					<table width="100%" height="100%">
+						<tr>
+							<td id="pageTitle">
+								$title
+							</td>
+						</tr>
+						<tr>
+							<td valign="top" height="100%">
+								$body
+							</td>
+						</tr>
+						<tr>
+							<td id="footer">
+								<b>Disclaimer:</b>
+								This site is blah
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+
+	</body>
+</html>

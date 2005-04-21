@@ -55,7 +55,7 @@
 
     <target name="test" description="Run the project's tests.">
         <mkdir dir="build/test/report"/>
-        <junit forkmode="once">
+        <junit forkmode="once" haltonfailure="true">
             <classpath>
                 <path refid="lib.path"/>
                 <pathelement location="build/java/classes"/>
