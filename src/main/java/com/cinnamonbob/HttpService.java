@@ -8,6 +8,10 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
 import com.cinnamonbob.api.XmlRpcApiServlet;
 import com.cinnamonbob.core.Bob;
 import com.cinnamonbob.setup.StartupManager;
+import com.cinnamonbob.bootstrap.BootstrapManager;
+import com.cinnamonbob.bootstrap.BootstrapUtils;
+
+import java.io.File;
 
 /**
  *
@@ -38,9 +42,9 @@ public class HttpService
         ServletHttpContext context = (ServletHttpContext) server.getContext("/");
         context.addServlet("XmlRpcApiServlet", "/api/xmlrpc/*", XmlRpcApiServlet.class.getName());
 
-        String wwwRoot = StartupManager.getInstance().getContentRoot();
+        File wwwRoot = BootstrapUtils.getManager().getApplicationPaths().getContentRoot();
 
-        WebApplicationContext appContext = server.addWebApplication("/", wwwRoot);
+        WebApplicationContext appContext = server.addWebApplication("/", wwwRoot.getAbsolutePath());
         appContext.setAttribute("bob", theBuilder);
         server.start();
     }

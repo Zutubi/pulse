@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--
+This is the test bootstrap context. For testing, ensure that this context is at the
+head of the classpath so that it overrides the default bootstrapContext.xml
+-->
+<beans>
+    <!-- bind a simple object to the context as a way of checking that this version
+         of the bootstrapContext.xml has been loaded. -->
+    <bean id="testBean" class="java.lang.Object"/>
+
+    <bean id="bootstrapManager" class="com.cinnamonbob.bootstrap.TestBootstrapManager"/>
+
+
+</beans>

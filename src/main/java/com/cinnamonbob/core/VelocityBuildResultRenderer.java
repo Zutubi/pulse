@@ -1,13 +1,16 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.setup.StartupManager;
+import com.cinnamonbob.bootstrap.velocity.VelocityManager;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
+import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 
 import java.io.File;
 import java.io.Writer;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -16,29 +19,13 @@ import java.io.Writer;
  */
 public class VelocityBuildResultRenderer implements BuildResultRenderer
 {
-    private static final String TEMPLATE_DIR = "templates";    
-    
-    private Bob theBuilder;
-    
-    
+
+    private static final Logger LOG = Logger.getLogger(VelocityBuildResultRenderer.class.getName());
+
     public VelocityBuildResultRenderer(Bob theBuilder)
     {
-        this.theBuilder = theBuilder;
-        
-        try
-        {
-            File templateDir = new File(theBuilder.getRootDir(), TEMPLATE_DIR);
-            
-            Velocity.setProperty("file.resource.loader.path", templateDir.getAbsolutePath());
-            Velocity.init();
-        }
-        catch(Exception e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+
     }
-    
     
     public void render(BuildResult result, String type, Writer writer)
     {
@@ -50,7 +37,8 @@ public class VelocityBuildResultRenderer implements BuildResultRenderer
 
         try
         {
-            Velocity.mergeTemplate(type + "/BuildResult.vm", "utf-8", context, writer);
+            VelocityEngine engine = VelocityManager.getEngine();
+            engine.mergeTemplate(type + File.separatorChar + "BuildResult.vm", "utf-8", context, writer);
         }
         catch(ResourceNotFoundException e)
         {

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <bean id="velocityEngine" class="com.cinnamonbob.bootstrap.velocity.VelocityEngineFactoryBean"/>
+
+    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.ConfigurationManager">
+        <property name="bootstrapManager"><ref bean="bootstrapManager"/></property>
+    </bean>
+
+    <bean name="jettyManager" class="com.cinnamonbob.bootstrap.jetty.JettyManager">
+        <property name="configurationManager"><ref bean="configurationManager"/></property>
+    </bean>
+
+</beans>

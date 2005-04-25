@@ -2,6 +2,8 @@ package com.cinnamonbob.core;
 
 import com.cinnamonbob.setup.StartupManager;
 import com.cinnamonbob.util.FileSystemUtils;
+import com.cinnamonbob.bootstrap.BootstrapManager;
+import com.cinnamonbob.bootstrap.BootstrapUtils;
 import com.thoughtworks.xstream.XStream;
 
 import java.io.*;
@@ -53,7 +55,7 @@ public class BuildManager
      */
     private void init()
     {
-        File projectRoot = new File(StartupManager.getInstance().getProjectRoot());
+        File projectRoot = getProjectRoot();
         buildDirectory = new File(projectRoot, BUILD_ROOT).getAbsolutePath();
         workDirectory = new File(projectRoot, WORK_ROOT).getAbsolutePath();
 
@@ -97,7 +99,7 @@ public class BuildManager
 
     public File getProjectRoot()
     {
-        return new File(StartupManager.getInstance().getProjectRoot());
+        return new File(BootstrapUtils.getManager().getApplicationPaths().getApplicationRoot(), "work");
     }
 
     private int determineNextAvailableBuildId()

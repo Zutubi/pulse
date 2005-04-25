@@ -1,7 +1,8 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.core.Bob;
-import com.cinnamonbob.setup.StartupManager;
+import com.cinnamonbob.bootstrap.StartupManager;
+import com.cinnamonbob.bootstrap.BootstrapUtils;
 
 import java.util.logging.Logger;
 
@@ -33,12 +34,15 @@ public class BobServer
     {
         LOG.info("start");
 
+        StartupManager.startupSystem();
+
         // initialise the shutdown service to allow this server
         // to be shutdown.
         shutdownService = new ShutdownService(adminPort, this);
         shutdownService.start();
 
-        core = new Bob(StartupManager.getInstance().getHome());
+
+        core = new Bob(BootstrapUtils.getManager().getApplicationPaths().getApplicationRoot().getAbsolutePath());
 
         // initialise the build queue.
         buildQueue = new BuildQueue();
@@ -54,8 +58,6 @@ public class BobServer
         httpService = new HttpService(8080);
         httpService.start(core);
 
-        // initialise Spring.
-        ApplicationContext ctx = StartupManager.getInstance().getAppContext();
     }
 
     public void stop()
