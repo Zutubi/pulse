@@ -29,5 +29,8 @@ public interface ApplicationPaths
      */
     File getTemplateRoot();
 
+    /**
+     * @deprecated remove.
+     */
     File getApplicationRoot();
 }

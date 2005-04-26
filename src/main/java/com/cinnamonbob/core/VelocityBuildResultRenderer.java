@@ -1,6 +1,5 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.setup.StartupManager;
 import com.cinnamonbob.bootstrap.velocity.VelocityManager;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;

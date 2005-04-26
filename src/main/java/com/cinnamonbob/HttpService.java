@@ -7,8 +7,6 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
 
 import com.cinnamonbob.api.XmlRpcApiServlet;
 import com.cinnamonbob.core.Bob;
-import com.cinnamonbob.setup.StartupManager;
-import com.cinnamonbob.bootstrap.BootstrapManager;
 import com.cinnamonbob.bootstrap.BootstrapUtils;
 
 import java.io.File;

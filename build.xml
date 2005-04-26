@@ -58,10 +58,10 @@
         <junit forkmode="once" haltonfailure="true">
             <classpath>
                 <path refid="lib.path"/>
-                <pathelement location="build/java/classes"/>
                 <pathelement location="build/test/classes"/>
+                <pathelement location="build/java/classes"/>
             </classpath>
-            <sysproperty key="tests.data.dir" value="src/test/data"/>
+            <sysproperty key="bob.home" value="."/>
 
             <batchtest fork="true" todir="build/test/report">
                 <fileset dir="src/test/java" includes="**/*Test.java"/>

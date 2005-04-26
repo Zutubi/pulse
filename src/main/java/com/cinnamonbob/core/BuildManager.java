@@ -1,16 +1,14 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.setup.StartupManager;
-import com.cinnamonbob.util.FileSystemUtils;
-import com.cinnamonbob.bootstrap.BootstrapManager;
 import com.cinnamonbob.bootstrap.BootstrapUtils;
+import com.cinnamonbob.util.FileSystemUtils;
 import com.thoughtworks.xstream.XStream;
 
 import java.io.*;
-import java.util.logging.Logger;
 import java.util.Arrays;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * 

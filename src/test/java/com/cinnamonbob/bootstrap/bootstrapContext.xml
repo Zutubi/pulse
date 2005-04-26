@@ -9,7 +9,7 @@ head of the classpath so that it overrides the default bootstrapContext.xml
          of the bootstrapContext.xml has been loaded. -->
     <bean id="testBean" class="java.lang.Object"/>
 
-    <bean id="bootstrapManager" class="com.cinnamonbob.bootstrap.TestBootstrapManager"/>
+    <bean id="bootstrapManager" class="com.cinnamonbob.bootstrap.TestBootstrapManager" init-method="init"/>
 
 
 </beans>
