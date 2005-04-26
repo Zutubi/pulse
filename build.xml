@@ -113,7 +113,7 @@
         </copy>
 
         <copy todir="${package.root}/system/templates">
-            <fileset dir="src/main/templates" includes="**/*.vm"/>
+            <fileset dir="src/templates" includes="**/*.vm"/>
         </copy>
 
         <copy todir="${package.root}/work">
