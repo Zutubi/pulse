@@ -109,7 +109,7 @@
         </copy>
 
         <copy todir="${package.root}/docs">
-            <fileset dir="etc" includes="delete-me.txt"/>
+            <fileset dir="src/etc" includes="delete-me.txt"/>
         </copy>
 
         <copy todir="${package.root}/system/templates">
@@ -117,7 +117,7 @@
         </copy>
 
         <copy todir="${package.root}/work">
-            <fileset dir="etc" includes="delete-me.txt"/>
+            <fileset dir="src/etc" includes="delete-me.txt"/>
         </copy>
 
         <copy todir="${package.root}/system/www">
@@ -125,8 +125,7 @@
         </copy>
 
         <copy todir="${package.root}/system/config">
-            <fileset dir="etc" includes="logging.properties"/>
-            <fileset dir="etc" includes="velocity.properties"/>
+            <fileset dir="src/etc" includes="logging.properties"/>
         </copy>
 
         <zip destfile="build/bob-${version}.zip" basedir="build/package"/>
