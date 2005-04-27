@@ -14,8 +14,8 @@ h2.command-info, h2.command-success, h2.command-failure
 
 h2.command-info
 {
-      border-color: #0000c0;
-      background-color: #ddddff;
+      border-color: #b0b0f0;
+      background-color: #eeeeff;
 }
 
 h2.command-success
