@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <bob>
-    <project-root>work</project-root>
+    <project-root>/home/jsankey/bob/projects</project-root>
     <projects>
         <project name="test-project"/>
+        <project name="bob-project"/>
     </projects>
     <services>
         <smtp>

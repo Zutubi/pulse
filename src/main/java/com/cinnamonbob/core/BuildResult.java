@@ -142,5 +142,19 @@ public class BuildResult implements Iterable<CommandResultCommon>
         this.projectName = projectName;
         this.id = id;
         this.commandResults = new LinkedList<CommandResultCommon>();
+    }
+
+    
+    public CommandResultCommon getCommandResult(String commandName)
+    {
+        for(CommandResultCommon result: commandResults)
+        {
+            if(result.getCommandName().equals(commandName))
+            {
+                return result;
+            }
+        }
+        
+        return null;
     }    
 }

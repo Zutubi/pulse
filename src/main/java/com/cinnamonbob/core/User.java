@@ -20,6 +20,7 @@ public class User
     private static final String CONFIG_CONTACT_POINT_NAME         = "name";
     private static final String CONFIG_SUBSCRIPTION_PROJECT       = "project";
     private static final String CONFIG_SUBSCRIPTION_CONTACT_POINT = "contact-point";
+    private static final String CONFIG_SUBSCRIPTION_FAILED        = "failed-only";
     
     
     private Bob theBuilder;
@@ -99,6 +100,7 @@ public class User
     {
         String projectName = XMLConfigUtils.getAttributeValue(context, element, CONFIG_SUBSCRIPTION_PROJECT);
         String contactName = XMLConfigUtils.getAttributeValue(context, element, CONFIG_SUBSCRIPTION_CONTACT_POINT);
+        String failed      = element.getAttributeValue(CONFIG_SUBSCRIPTION_FAILED);
         
         if(!theBuilder.hasProject(projectName))
         {
@@ -110,7 +112,14 @@ public class User
             throw new ConfigException(context.getFilename(), "Subscription refers to unknown contact point '" + contactName + "'.");
         }
         
-        theBuilder.getProject(projectName).addSubscription(contactPoints.get(contactName));
+        Project.Event event = Project.Event.BUILD_COMPLETE;
+        
+        if(failed != null)
+        {
+            event = Project.Event.BUILD_FAILED;
+        }
+        
+        theBuilder.getProject(projectName).addSubscription(event, contactPoints.get(contactName));
     }
 
 

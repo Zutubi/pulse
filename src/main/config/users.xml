@@ -3,12 +3,13 @@
     <user login="jsankey">
         <name>Jason Sankey</name>
         <contact-points>
-            <email name="Gmail">
+            <email name="work-email">
                 <address>jason.sankey@sensorynetworks.com</address>
             </email>
         </contact-points>
         <subscriptions>
-            <subscription project="test-project" contact-point="Gmail"/>
+            <subscription project="bob-project" contact-point="work-email" failed-only="true"/>
+            <subscription project="test-project" contact-point="work-email"/>
         </subscriptions>
     </user>
 </users>

@@ -58,7 +58,7 @@ public class EmailContactPoint implements ContactPoint
     {
         StringWriter w = new StringWriter();
         // TODO renderer should come from elsewhere
-        VelocityBuildResultRenderer renderer = new VelocityBuildResultRenderer(theBuilder);
+        VelocityBuildResultRenderer renderer = new VelocityBuildResultRenderer();
         renderer.render(result, BuildResultRenderer.TYPE_PLAIN, w);
         return  w.toString();
     }

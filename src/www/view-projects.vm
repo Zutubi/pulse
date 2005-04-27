@@ -1,26 +1,47 @@
 <html>
   <head>
-    <title>All Projects</title>
+    <title>[CiB] all projects</title>
+    <link href="build.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <h1>All Projects</h1>
-    <table border="1">
-      <tr><th>Project</th><th>Last Build</th><th>Result</th></tr>
+    <h1 class="build-log">:: all projects ::</h1>
+    <h2 class="command-info">builds</h2>
+    <div class="command-content">
+    <table>
+      <tr>
+        <th class="command-detail">Project</th>
+        <th class="command-detail">Last Built</th>
+        <th class="command-detail">Build ID</th>
+        <th class="command-detail">Elapsed</th>
+        <th class="command-detail">Result</th>
+      </tr>
 #foreach($project in $projects)
 #set($history = $project.getHistory(1))
 #if($history.size() > 0)
-  #set($lastBuild = $history.get(0).Id)
-  #if($history.get(0).succeeded())
-    #set($success = "Success")
+  #set($lastResult = $history.get(0))
+  #set($built = $lastResult.Stamps.PrettyStartTime) 
+  #set($id = $lastResult.Id)
+  #set($elapsed = $lastResult.Stamps.PrettyElapsed)
+  #if($lastResult.succeeded())
+    #set($success = "success")
   #else
-    #set($success = "Failure")
+    #set($success = "failure")
   #end
 #else
-  #set($lastBuild = "No Builds Found")
+  #set($built = "Never")
+  #set($id = "n/a")
+  #set($elapsed = "n/a")
   #set($success = "n/a")
 #end
-      <tr><td>$project.name</td><td>$lastBuild</td><td>$success</td></tr>
+      <tr>
+        <td class="build-$success"><a href="viewProject.action?name=$project.Name">$project.Name</a></td>
+        <td class="build-$success">$built</td>
+        <td class="build-$success">$id</td>
+        <td class="build-$success">$elapsed</td>
+        <td class="build-$success">$success</td>
+      </tr>
 #end
     </table>
+    </div>
   </body>
 </html>

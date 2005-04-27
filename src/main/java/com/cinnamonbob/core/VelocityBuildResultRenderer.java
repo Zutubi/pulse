@@ -21,10 +21,6 @@ public class VelocityBuildResultRenderer implements BuildResultRenderer
 
     private static final Logger LOG = Logger.getLogger(VelocityBuildResultRenderer.class.getName());
 
-    public VelocityBuildResultRenderer(Bob theBuilder)
-    {
-
-    }
     
     public void render(BuildResult result, String type, Writer writer)
     {

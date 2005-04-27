@@ -238,11 +238,10 @@ public class BuildManager
 
             for(CommandCommon command: project.getRecipe())
             {
-                File commandOutputDir = createCommandOutputDir(buildDir, command, i);
-
                 if(!failed || command.getForce())
                 {
-                    CommandResultCommon commandResult = command.execute(commandOutputDir);
+                    File                commandOutputDir = createCommandOutputDir(buildDir, command, i);
+                    CommandResultCommon commandResult    = command.execute(commandOutputDir);
 
                     result.addCommandResult(commandResult);
                     saveCommandResult(commandOutputDir, commandResult);
@@ -382,5 +381,10 @@ public class BuildManager
         }
 
         return result;
+    }
+
+    public BuildResult getBuildResult(Project project, int id)
+    {
+        return loadBuild(project, id);
     }
 }

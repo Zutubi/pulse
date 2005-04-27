@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <title>[CiB] $name</title>
+    <link href="build.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h1 class="build-log">:: $name ::</h1>
+    <h2 class="command-info">description</h2>
+    <div class="command-content">
+        $project.Description
+    </div>
+    <h2 class="command-info">history</h2>
+    <div class="command-content">
+    <table>
+      <tr>
+        <th class="command-detail">Build ID</th>
+        <th class="command-detail">When</th>
+        <th class="command-detail">Elapsed</th>
+        <th class="command-detail">Result</th>
+      </tr>
+#set($history = $project.getHistory(10))
+#foreach($result in $history)
+  #set($id = $result.Id)
+  #set($built = $result.Stamps.PrettyStartTime) 
+  #set($elapsed = $result.Stamps.PrettyElapsed)
+  #if($result.succeeded())
+    #set($success = "success")
+  #else
+    #set($success = "failure")
+  #end
+      <tr>
+        <td class="build-$success"><a href="viewBuild.action?project=$project.Name&id=$id">Build $id</a></td>
+        <td class="build-$success">$built</td>
+        <td class="build-$success">$elapsed</td>
+        <td class="build-$success">$success</td>
+      </tr>
+#end
+    </table>
+    </div>
+  </body>
+</html>

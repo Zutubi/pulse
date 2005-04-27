@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<title>Velocity Decorator - $title</title>
-		<link href="$base/decorators/main.css" rel="stylesheet" type="text/css">
+		<link href="$base/main.css" rel="stylesheet" type="text/css">
 	    $head
 	</head>
 	

@@ -21,24 +21,21 @@ body, td, p {
 }
 
 #pageTitle {
-	background-color: #003399;
-	color:#eeeeee;
-	font-weight: bold;
-	font-size: large;
-	border-color: #3366ff #000033 #000033 #3366ff;
-	border-width: 1;
+	color:#c0c0c0;
+	font-size: xx-small;
+	border-color: #c0c0c0;
+	border-width: 0px 0px 1px 0px;
 	border-style: solid;
 	padding: 1;
 	text-align: center;
 }
 
 #footer {
-	background-color:#999999;
+	color:#c0c0c0;
 	font-size: xx-small;	
 	text-align: center;
-	color: white;
-	border-color: #666666 #cccccc #cccccc #666666;
-	border-width: 1;
+	border-color: #c0c0c0;
+	border-width: 1px 0px 0px 0px;
 	border-style: solid;
 	padding: 1;
 }

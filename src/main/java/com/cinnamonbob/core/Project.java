@@ -56,13 +56,23 @@ public class Project
     /**
      * Subscriptions to events on this project.
      */
-    private List<ContactPoint> subscriptions;
+    private List<Subscription> subscriptions;
 
     /**
      * Reference back to the boss.
      */
     private Bob theBuilder;
 
+    //=======================================================================
+    // Types
+    //=======================================================================
+
+    public enum Event
+    {
+        BUILD_COMPLETE,
+        BUILD_FAILED
+    }
+    
     //=======================================================================
     // Implementation
     //=======================================================================
@@ -140,7 +150,7 @@ public class Project
         this.theBuilder       = theBuilder;
         this.name             = name;
         this.postProcessors   = new TreeMap<String, PostProcessorCommon>();
-        this.subscriptions    = new LinkedList<ContactPoint>();
+        this.subscriptions    = new LinkedList<Subscription>();
         this.categoryRegistry = new FeatureCategoryRegistry();
 
         loadConfig(filename);
@@ -154,12 +164,14 @@ public class Project
     /**
      * Adds a subscription to events on this project.
      * 
+     * @param event
+     *        the event to subscribe to
      * @param point
      *        the contact point to notify on project events
      */
-    public void addSubscription(ContactPoint point)
+    public void addSubscription(Event event, ContactPoint point)
     {
-        subscriptions.add(point);
+        subscriptions.add(new Subscription(event, point));
     }
 
     /**
@@ -171,6 +183,14 @@ public class Project
     }
     
     /**
+     * @return the description of this project
+     */
+    public String getDescription()
+    {
+        return description;
+    }
+
+    /**
      * Executes a build of this project.
      * 
      * @return the result of the build
@@ -179,9 +199,23 @@ public class Project
     {
         BuildResult result = BuildManager.getInstance().executeBuild(this);
         
-        for(ContactPoint contact: subscriptions)
+        for(Subscription subscription: subscriptions)
         {
-            contact.notify(result);
+            boolean notify;
+            
+            if(result.succeeded())
+            {
+                notify = subscription.getEventType() == Event.BUILD_COMPLETE;
+            }
+            else
+            {
+                notify = true;
+            }
+            
+            if(notify)
+            {
+                subscription.getContactPoint().notify(result);
+            }
         }
         
         return result;
@@ -240,5 +274,17 @@ public class Project
     public Recipe getRecipe()
     {
         return recipe;
+    }
+
+    /**
+     * Retrieves the result of the build with the given ID.
+     * 
+     * @param id
+     *        id of the build result to load
+     * @return the result of the build, or null if not found
+     */
+    public BuildResult getBuildResult(int id)
+    {
+        return BuildManager.getInstance().getBuildResult(this, id);
     }
 }

@@ -16,7 +16,7 @@ public class TimeStamps
     private long endTime;
     
     
-    TimeStamps(long startTime, long endTime)
+    public TimeStamps(long startTime, long endTime)
     {
         this.startTime = startTime;
         this.endTime = endTime;

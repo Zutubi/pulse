@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<title>#if ($title) $title #else Default Title #end</title>
-		<link href="$base/decorators/main.css" rel="stylesheet" type="text/css">
+		<link href="$base/main.css" rel="stylesheet" type="text/css">
 		$head
 	</head>
 
@@ -9,7 +9,10 @@
 		<table width="100%" height="100%">
 			<tr>
 				<td valign="top">
-                    Left nav.
+				     <table>
+                       <tr><th>Nav Bar</th></tr>
+                       <tr><td><a href="viewProjects.action">all&nbsp;projects</a></td></tr>
+                     </table>
 				</td>
 				<td width="100%">
 					<table width="100%" height="100%">
@@ -25,8 +28,8 @@
 						</tr>
 						<tr>
 							<td id="footer">
-								<b>Disclaimer:</b>
-								This site is blah
+								<b>:: project cinnamon bob ::</b>
+								Copyright &copy; 2005 Daniel Ostermeier and Jason Sankey
 							</td>
 						</tr>
 					</table>

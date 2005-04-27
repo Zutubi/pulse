@@ -1,0 +1,69 @@
+#macro(detailrow $header $content)
+  <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
+#end
+<html>
+  <head>
+    <title>[CiB] $name build $id</title>
+    <link href="build.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h1 class="build-log">:: brief ::</h1>
+
+#if($result.succeeded())
+  #set($success = "success")
+#else
+  #set($success = "failure")
+#end
+
+    <h2 class="command-$success">$name build $id</h1>
+    <div class="command-content">
+      <table>
+        #detailrow("Commenced" $result.Stamps.PrettyStartTime)
+        #detailrow("Completed" $result.Stamps.PrettyEndTime)
+        #detailrow("Elapsed"   $result.Stamps.PrettyElapsed)
+        #detailrow("Result"    $success)
+      </table>
+    </div>
+
+    <h1 class="build-log">:: command log ::</h1>
+
+#foreach($commandResult in $result.iterator())
+  #if($commandResult.Result.succeeded())
+    #set($success = "success")
+  #else
+    #set($success = "failure")
+  #end
+    <h2 class="command-$success">$commandResult.CommandName</h2>
+    <div class="command-content">
+      <table>
+        #detailrow("Commenced" $commandResult.Stamps.PrettyStartTime)
+        #detailrow("Completed" $commandResult.Stamps.PrettyEndTime)
+        #detailrow("Elapsed"   $commandResult.Stamps.PrettyElapsed)
+        #detailrow("Result"    $success)
+      </table>
+      <h2 class="command-element">Details</h2>
+      #parse("commands/${commandResult.Result.Class.SimpleName}.vm")
+      <h2 class="command-element">Artifacts</h2>
+      #foreach($artifact in $commandResult.Artifacts)
+        <h3>$artifact.Title (<a href="viewArtifact.action?project=$name&id=$id&command=$commandResult.CommandName&artifact=$artifact.name">view</a>)</h3>
+        <div class="artifact">
+        #if($artifact.hasFeatures())
+          #foreach($category in $artifact.Categories)
+          <div class="$result.getFeatureCategory($category).Level.name().toLowerCase()">
+            <b>$result.getFeatureCategory($category).Title</b>
+            <ul class="feature">
+            #foreach($feature in $artifact.getFeatures($category))
+              <li>$feature.Summary</li>
+            #end
+            </ul>
+          </div>
+          #end
+        #else
+          &lt;No features&gt;
+        #end
+        </div>
+  #end
+    </div>
+#end
+  </body>
+</html>

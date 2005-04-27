@@ -9,5 +9,20 @@
 		<action name="viewProjects" class="viewProjectsAction">
 			<result name="success" type="velocity">view-projects.vm</result> 
 		</action> 
+
+		<action name="viewProject" class="viewProjectAction">
+			<result name="success" type="velocity">view-project.vm</result> 
+			<result name="error" type="velocity">generic-error.vm</result> 
+		</action> 
+
+		<action name="viewBuild" class="viewBuildAction">
+			<result name="success" type="velocity">view-build.vm</result> 
+			<result name="error" type="velocity">generic-error.vm</result> 
+		</action> 
+
+		<action name="viewArtifact" class="viewArtifactAction">
+			<result name="success" type="stream"/>
+			<result name="error" type="velocity">generic-error.vm</result> 
+		</action> 
 	</package>
 </xwork>
