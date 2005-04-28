@@ -6,8 +6,6 @@ import com.cinnamonbob.bootstrap.BootstrapUtils;
 
 import java.util.logging.Logger;
 
-import org.springframework.context.ApplicationContext;
-
 /**
  * The BobServer handles the system initialisation / component
  * bootstrapping.

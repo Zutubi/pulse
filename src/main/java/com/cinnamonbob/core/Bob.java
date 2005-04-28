@@ -64,6 +64,10 @@ public class Bob
      * Map from service name to service.
      */
     private Map<String, Service> services;
+    /**
+     * Manages execution of project builds.
+     */
+    private BuildManager buildManager;
 
     //=======================================================================
     // Implementation
@@ -82,7 +86,15 @@ public class Bob
         Document      doc     = XMLConfigUtils.loadFile(filename);
         ConfigContext context = new ConfigContext(filename);
         loadElements(context, doc.getRootElement());
-        LOG.config("Configuration loaded.");
+        LOG.config("Bob configuration loaded.");
+        
+        buildManager = new BuildManager(projectRoot);
+        
+        // Stage 2 project intialisation
+        for(String projectName: projects.keySet())
+        {
+            loadProject(context, projectName);
+        }
     }
 
 
@@ -90,20 +102,23 @@ public class Bob
     {
         List<Element> elements = XMLConfigUtils.getElements(context, root, Arrays.asList(CONFIG_ELEMENT_PROJECT_ROOT, CONFIG_ELEMENT_PROJECTS, CONFIG_ELEMENT_SERVICES));
 
-        for (Element current : elements)
+        for(Element current : elements)
         {
             String elementName = current.getLocalName();
 
-            if (elementName.equals(CONFIG_ELEMENT_PROJECT_ROOT))
+            if(elementName.equals(CONFIG_ELEMENT_PROJECT_ROOT))
             {
                 loadProjectRoot(context, current);
-            } else if (elementName.equals(CONFIG_ELEMENT_PROJECTS))
+            }
+            else if(elementName.equals(CONFIG_ELEMENT_PROJECTS))
             {
                 loadProjects(context, current);
-            } else if (elementName.equals(CONFIG_ELEMENT_SERVICES))
+            }
+            else if(elementName.equals(CONFIG_ELEMENT_SERVICES))
             {
                 loadServices(context, current);
-            } else
+            }
+            else
             {
                 assert(false);
             }
@@ -117,17 +132,19 @@ public class Bob
 
         // The project root can be either relative to bob.home or absolute.
         File rootFile = new File(root);
-        if (rootFile.isAbsolute())
+        if(rootFile.isAbsolute())
         {
-            if (!rootFile.isDirectory()){
+            if(!rootFile.isDirectory())
+            {
                 LOG.warning("specified root '" + rootFile.getAbsolutePath() + "' is not a directory.");
                 throw new ConfigException(context.getFilename(), "The specified project root '" + root + "' does not exist or is not a directory.");
             }
-        } else
+        }
+        else
         {
             // the root value is relative to bob.home.
             rootFile = new File(getRootDir(), root);
-            if (!rootFile.isDirectory())
+            if(!rootFile.isDirectory())
             {
                 LOG.warning("specified root '" + rootFile.getAbsolutePath() + "' is not a directory.");
                 throw new ConfigException(context.getFilename(), "The specified project root '" + root + "' does not exist or is not a directory.");
@@ -138,29 +155,31 @@ public class Bob
         LOG.config("Project root set to '" + projectRoot.getAbsolutePath() + "'.");
     }
 
+    
     private void loadProjects(ConfigContext context, Element element) throws ConfigException
     {
         List<Element> elements = XMLConfigUtils.getElements(context, element, Arrays.asList(CONFIG_ELEMENT_PROJECT));
 
-        for (Element current : elements)
+        for(Element current : elements)
         {
-            loadProject(context, current);
+            String projectName = XMLConfigUtils.getAttributeValue(context, current, CONFIG_ATTR_NAME);
+
+            if(projects.containsKey(projectName))
+            {
+                throw new ConfigException(context.getFilename(), "Duplicate project name '" + projectName + "' specified.");
+            }
+            
+            projects.put(projectName, null);
         }
     }
 
 
-    private void loadProject(ConfigContext context, Element element) throws ConfigException
+    private void loadProject(ConfigContext context, String projectName) throws ConfigException
     {
-        String projectName = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_NAME);
-
-        if (projects.containsKey(projectName))
-        {
-            throw new ConfigException(context.getFilename(), "Duplicate project name '" + projectName + "' specified.");
-        }
-
         String projectFilename = configDir.getAbsolutePath() + File.separator + projectName + CONFIG_EXTENSION;
-        File projectFile = new File(projectFilename);
-        if (!projectFile.isFile())
+        File projectFile       = new File(projectFilename);
+        
+        if(!projectFile.isFile())
         {
             throw new ConfigException(projectFilename, "Configuration file '" + projectFilename + "' for project '" + projectName + "' does not exist.");
         }
@@ -219,7 +238,6 @@ public class Bob
 
         loadConfig();
         userManager = new UserManager(this);
-
     }
 
     //=======================================================================
@@ -286,7 +304,14 @@ public class Bob
         return rootDir;
     }
 
-
+    /**
+     * @return the build execution manager
+     */
+    public BuildManager getBuildManager()
+    {
+        return buildManager;
+    }
+    
     public Service lookupService(String name)
     {
         return services.get(name);
@@ -318,4 +343,5 @@ public class Bob
         Project project = projects.get(projectName);
         project.build();
     }
+    
 }

@@ -57,12 +57,15 @@ public class Project
      * Subscriptions to events on this project.
      */
     private List<Subscription> subscriptions;
-
     /**
      * Reference back to the boss.
      */
     private Bob theBuilder;
-
+    /**
+     * The next availabel build id.
+     */
+    private int nextBuild;
+    
     //=======================================================================
     // Types
     //=======================================================================
@@ -79,7 +82,7 @@ public class Project
 
     private void addBuiltinVariables(ConfigContext context)
     {
-        context.setVariable(VARIABLE_WORK_DIR, BuildManager.getInstance().getWorkRoot().getAbsolutePath());
+        context.setVariable(VARIABLE_WORK_DIR, theBuilder.getBuildManager().getWorkRoot(this).getAbsolutePath());
     }
 
     
@@ -152,15 +155,15 @@ public class Project
         this.postProcessors   = new TreeMap<String, PostProcessorCommon>();
         this.subscriptions    = new LinkedList<Subscription>();
         this.categoryRegistry = new FeatureCategoryRegistry();
+        this.nextBuild        = theBuilder.getBuildManager().determineNextAvailableBuildId(this);        
 
         loadConfig(filename);
-        
     }
 
     //=======================================================================
     // Interface
     //=======================================================================
-
+    
     /**
      * Adds a subscription to events on this project.
      * 
@@ -197,8 +200,15 @@ public class Project
      */
     public BuildResult build()
     {
-        BuildResult result = BuildManager.getInstance().executeBuild(this);
+        BuildResult result = theBuilder.getBuildManager().executeBuild(this, nextBuild);
         
+        // Don't increment nextBuild until we have finished the build, this
+        // way the build won't be picked up by getHistory until complete.
+        synchronized (this)
+        {
+            nextBuild++;
+        }
+
         for(Subscription subscription: subscriptions)
         {
             boolean notify;
@@ -265,7 +275,14 @@ public class Project
 	 */
 	public List<BuildResult> getHistory(int maxBuilds)
 	{
-        return BuildManager.getInstance().getHistory(this, maxBuilds);
+        int latestBuild;
+        
+        synchronized(this)
+        {
+            latestBuild = nextBuild - 1;
+        }
+
+        return theBuilder.getBuildManager().getHistory(this, latestBuild, maxBuilds);
 	}
 
     /**
@@ -285,6 +302,6 @@ public class Project
      */
     public BuildResult getBuildResult(int id)
     {
-        return BuildManager.getInstance().getBuildResult(this, id);
+        return theBuilder.getBuildManager().getBuildResult(this, id);
     }
 }

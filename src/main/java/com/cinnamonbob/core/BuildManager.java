@@ -1,6 +1,5 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.bootstrap.BootstrapUtils;
 import com.cinnamonbob.util.FileSystemUtils;
 import com.thoughtworks.xstream.XStream;
 
@@ -35,116 +34,84 @@ public class BuildManager
      */
     private XStream xstream;
 
-    private String buildDirectory;
-    private String workDirectory;
+    private File projectRoot;
 
-    private int nextBuild = 0;
-
-    private static BuildManager INSTANCE;
-    private static Object lock = new Object();
-
-    private BuildManager()
-    {
-        init();
-    }
 
     /**
      * Initialise this manager.
      */
-    private void init()
+    public BuildManager(File projectRoot)
     {
-        File projectRoot = getProjectRoot();
-        buildDirectory = new File(projectRoot, BUILD_ROOT).getAbsolutePath();
-        workDirectory = new File(projectRoot, WORK_ROOT).getAbsolutePath();
-
-        nextBuild = determineNextAvailableBuildId();
-        if (nextBuild == 0)
-        {
-            getBuildRoot().mkdirs();
-        }
+        this.projectRoot = projectRoot;
         xstream = new XStream();
     }
 
-    /**
-         * Get the singleton instance of this BuildManager.
-         *
-         * @return
-         */
-    public static final BuildManager getInstance()
+    
+    public File getProjectRoot(Project project)
     {
-        if (INSTANCE == null)
-        {
-            synchronized (lock)
-            {
-                if (INSTANCE == null)
-                {
-                    INSTANCE = new BuildManager();
-                }
-            }
-        }
-        return INSTANCE;
+        return new File(projectRoot, project.getName());        
+    }
+    
+
+    public File getBuildRoot(Project project)
+    {
+        return new File(getProjectRoot(project), BUILD_ROOT);
     }
 
-    public File getBuildRoot()
+    
+    public File getWorkRoot(Project project)
     {
-        return new File(buildDirectory);
+        return new File(getProjectRoot(project), WORK_ROOT);
     }
 
-    public File getWorkRoot()
+    
+    public int determineNextAvailableBuildId(Project project)
     {
-        return new File(workDirectory);
-    }
+        File buildsDir = getBuildRoot(project);
 
-    public File getProjectRoot()
-    {
-        return new File(BootstrapUtils.getManager().getApplicationPaths().getApplicationRoot(), "work");
-    }
-
-    private int determineNextAvailableBuildId()
-    {
-        // Determine next build id
-        File buildsDir = getBuildRoot();
-
-        if (buildsDir.isDirectory())
+        if(buildsDir.isDirectory())
         {
             String files[] = buildsDir.list();
             int max = -1;
 
-            for (int i = 0; i < files.length; i++)
+            for(int i = 0; i < files.length; i++)
             {
                 try
                 {
                     int buildNumber = Integer.parseInt(files[i]);
 
-                    if (buildNumber > max)
+                    if(buildNumber > max)
                     {
                         max = buildNumber;
                     }
-                } catch (NumberFormatException e)
+                }
+                catch (NumberFormatException e)
                 {
                     // Oh well, not a build dir
                 }
             }
 
             return max + 1;
-        } else
+        }
+        else
         {
             return 0;
         }
     }
 
-    public BuildResult executeBuild(Project project)
+    public BuildResult executeBuild(Project project, int id)
     {
         // Allocate the result with a unique id.
-        BuildResult result = new BuildResult(project.getName(), nextBuild, project.getCategoryRegistry());
+        BuildResult result = new BuildResult(project.getName(), id, project.getCategoryRegistry());
         long startTime = System.currentTimeMillis();
         File buildDir = null;
 
         try
         {
-            cleanWorkDir();
-            buildDir = createBuildDir(getBuildRoot(), result);
-        } catch (InternalBuildFailureException e)
+            cleanWorkDir(project);
+            buildDir = createBuildDir(getBuildRoot(project), result);
+        }
+        catch(InternalBuildFailureException e)
         {
             // Not even able to create the build directory: bad news.
             result.setInternalFailure(e);
@@ -159,23 +126,18 @@ public class BuildManager
         try
         {
             saveBuildResult(buildDir, result);
-        } catch (InternalBuildFailureException e)
+        }
+        catch(InternalBuildFailureException e)
         {
             // We basically can't save anything about this, so bail out.
             // Don't clobber earlier failure...
-            if (result.getInternalFailure() == null)
+            if(result.getInternalFailure() == null)
             {
                 result.setInternalFailure(e);
                 logInternalBuildFailure(result);
             }
         }
 
-        // Don't increment nextBuild until we have finished the build, this
-        // way the build won't be picked up by getHistory until complete.
-        synchronized (this)
-        {
-            nextBuild++;
-        }
 
         return result;
     }
@@ -184,7 +146,7 @@ public class BuildManager
     {
         File buildDir = getBuildDir(outputDir, buildResult.getId());
 
-        if(!buildDir.mkdir())
+        if(!buildDir.mkdirs())
         {
             throw new InternalBuildFailureException("Could not create build directory '" + buildDir.getAbsolutePath() + "'");
         }
@@ -212,9 +174,10 @@ public class BuildManager
         }
     }
 
-    private void cleanWorkDir() throws InternalBuildFailureException
+    private void cleanWorkDir(Project project) throws InternalBuildFailureException
     {
-        File workDir = getWorkRoot();
+        File workDir = getWorkRoot(project);
+        
         if(workDir.exists())
         {
             if(!FileSystemUtils.removeDirectory(workDir))
@@ -339,17 +302,13 @@ public class BuildManager
 	 *
 	 * @param maxBuilds
 	 *        the maximum number of results to return
+     * @param latestBuild
+     *        id of the most recent build
 	 * @return a list of recent build results, most recent first
 	 */
-	public List<BuildResult> getHistory(Project project, int maxBuilds)
+	public List<BuildResult> getHistory(Project project, int latestBuild, int maxBuilds)
 	{
-		int latestBuild;
 		List<BuildResult> history = new LinkedList<BuildResult>();
-
-		synchronized(this)
-		{
-			latestBuild = nextBuild - 1;
-		}
 
 		for(int i = latestBuild; i >= 0 && history.size() < maxBuilds; i--)
 		{
@@ -365,7 +324,7 @@ public class BuildManager
 
     private BuildResult loadBuild(Project project, int buildId)
     {
-        File        buildDir   = getBuildDir(getBuildRoot(), buildId);
+        File        buildDir   = getBuildDir(getBuildRoot(project), buildId);
         File        resultFile = new File(buildDir, RESULT_FILE_NAME);
         BuildResult result     = null;
 
