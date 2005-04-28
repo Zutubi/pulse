@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
 <project>
     <description>Wow, a project!</description>
-    <property name="home.dir" value="/home/jsankey"/>
+    <property name="home.dir" value="/home/daniel"/>
     <post-processor name="mepp">
         <regex>
             <pattern category="error" expression=".*[Ee]rror.*"/>
         </regex>
     </post-processor>
+    <schedule frequency="0 0/2 * * * ?"/>
     <recipe>
         <command name="sync">
             <executable exe="cp" args="${home.dir}/.bash_profile ${work.dir}"/>

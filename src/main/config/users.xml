@@ -12,4 +12,16 @@
             <subscription project="test-project" contact-point="work-email"/>
         </subscriptions>
     </user>
+    <user login="daniel">
+        <name>Daniel Ostermeier</name>
+        <contact-points>
+            <email name="gmail">
+                <address>daniel.ostermeier@gmail.com</address>
+            </email>
+        </contact-points>
+        <subscriptions>
+            <subscription project="bob-project" contact-point="gmail" failed-only="true"/>
+            <subscription project="test-project" contact-point="gmail"/>
+        </subscriptions>
+    </user>
 </users>

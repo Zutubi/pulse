@@ -40,8 +40,6 @@ public class BobServer
         shutdownService.start();
 
 
-        core = new Bob(BootstrapUtils.getManager().getApplicationPaths().getApplicationRoot().getAbsolutePath());
-
         // initialise the build queue.
         buildQueue = new BuildQueue();
         buildQueue.setDispatcher(new BuildDispatcher()
@@ -52,10 +50,11 @@ public class BobServer
             }
         });
 
+        core = new Bob(BootstrapUtils.getManager().getApplicationPaths().getApplicationRoot().getAbsolutePath());
+
         // initialise jetty
         httpService = new HttpService(8080);
         httpService.start(core);
-
     }
 
     public void stop()

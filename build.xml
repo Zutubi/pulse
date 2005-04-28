@@ -162,7 +162,7 @@
             <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
             <sysproperty key="root.dir" value="./deploy/bob-dev"/>
             <arg value="build"/>
-            <arg value="test-project"/>
+            <arg value="bob-project"/>
         </java>
     </target>
 

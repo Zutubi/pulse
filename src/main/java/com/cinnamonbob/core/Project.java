@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+import java.text.ParseException;
+
+import com.cinnamonbob.bootstrap.quartz.QuartzManager;
+import org.quartz.*;
 
 /**
  * A project describes a set of components and a recipe to "build" those
@@ -21,6 +25,8 @@ public class Project
     private static final String CONFIG_ELEMENT_DESCRIPTION    = "description";
     private static final String CONFIG_ELEMENT_POST_PROCESSOR = "post-processor";
     private static final String CONFIG_ELEMENT_RECIPE         = "recipe";
+    private static final String CONFIG_ELEMENT_SCHEDULE       = "schedule";
+
     private static final String DIR_BUILDS                    = "builds";
     private static final String DIR_WORK                      = "work";
     private static final String DIR_IN_PROGRESS               = "in-progress";
@@ -28,7 +34,7 @@ public class Project
     private static final String INTERNAL_FAILURE_FILE_NAME    = "internal-failure.xml";
     private static final String RESULT_FILE_NAME              = "result.xml";
     private static final String VARIABLE_WORK_DIR             = "work.dir";
-    
+
     /**
      * The name of this project, which must be unique amongst all projects.
      */
@@ -66,6 +72,8 @@ public class Project
      */
     private int nextBuild;
     
+    private Schedule schedule;
+
     //=======================================================================
     // Types
     //=======================================================================
@@ -109,7 +117,34 @@ public class Project
         recipe = new Recipe(context, element, theBuilder.getCommandFactory(), this);
     }
 
-    
+    /**
+     *
+     * @param context
+     * @param element
+     * @throws ConfigException
+     */
+    private void loadSchedule(ConfigContext context, Element element) throws ConfigException
+    {
+        schedule = new Schedule(context, element, this);
+
+        // schedule job.
+        Scheduler scheduler = QuartzManager.getScheduler();
+        try
+        {
+            CronTrigger trigger = new CronTrigger(getName() + " Trigger.", Scheduler.DEFAULT_GROUP, schedule.getCronSchedule());
+            JobDetail job = new JobDetail("build projects", Scheduler.DEFAULT_GROUP, BuildProject.class);
+            job.getJobDataMap().put("project", this);
+            scheduler.scheduleJob(job, trigger);
+        }
+        catch (SchedulerException e)
+        {
+            throw new ConfigException("", "Error scheduling job build.");
+        } catch (ParseException e)
+        {
+            throw new ConfigException(context.getFilename(), "Invalid cron expression: " + schedule.getCronSchedule());
+        }
+    }
+
     private void loadConfig(String filename) throws ConfigException
     {
         Document      doc      = XMLConfigUtils.loadFile(filename);
@@ -117,7 +152,7 @@ public class Project
 
         addBuiltinVariables(context);
         
-        List<Element> elements = XMLConfigUtils.getElements(context, doc.getRootElement(), Arrays.asList(XMLConfigUtils.CONFIG_ELEMENT_PROPERTY, CONFIG_ELEMENT_DESCRIPTION, CONFIG_ELEMENT_POST_PROCESSOR, CONFIG_ELEMENT_RECIPE));
+        List<Element> elements = XMLConfigUtils.getElements(context, doc.getRootElement(), Arrays.asList(XMLConfigUtils.CONFIG_ELEMENT_PROPERTY, CONFIG_ELEMENT_DESCRIPTION, CONFIG_ELEMENT_POST_PROCESSOR, CONFIG_ELEMENT_RECIPE, CONFIG_ELEMENT_SCHEDULE));
         
         XMLConfigUtils.extractProperties(context, elements);
         
@@ -136,6 +171,10 @@ public class Project
             else if(elementName.equals(CONFIG_ELEMENT_RECIPE))
             {
                 loadRecipe(context, current);
+            }
+            else if (elementName.equals(CONFIG_ELEMENT_SCHEDULE))
+            {
+                loadSchedule(context, current);
             }
             else
             {
