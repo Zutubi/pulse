@@ -1,10 +1,9 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.core.Bob;
-import com.cinnamonbob.bootstrap.StartupManager;
 import com.cinnamonbob.bootstrap.BootstrapUtils;
-import com.cinnamonbob.bootstrap.StartupException;
+import com.cinnamonbob.bootstrap.StartupManager;
 import com.cinnamonbob.bootstrap.jetty.JettyManager;
+import com.cinnamonbob.core.Bob;
 
 import java.util.logging.Logger;
 
@@ -15,18 +14,17 @@ import java.util.logging.Logger;
  */
 public class BobServer
 {
-
     private static final Logger LOG = Logger.getLogger(BobServer.class.getName());
 
     private ShutdownService shutdownService = null;
-    private HttpService httpService = null;
 
     private static BuildQueue buildQueue = null;
     private Bob core = null;
 
     private int adminPort;
 
-    public BobServer(int port) {
+    public BobServer(int port)
+    {
         adminPort = port;
     }
 
@@ -66,7 +64,7 @@ public class BobServer
     {
         LOG.info("stop");
         shutdownService.stop();
-//        httpService.stop();
+        //        httpService.stop();
         buildQueue.stop();
     }
 

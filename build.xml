@@ -125,7 +125,7 @@
         </copy>
 
         <copy todir="${package.root}/system/config">
-            <fileset dir="src/etc" includes="logging.properties"/>
+            <fileset dir="src/etc" includes="*.properties"/>
         </copy>
 
         <zip destfile="build/bob-${version}.zip" basedir="build/package"/>
