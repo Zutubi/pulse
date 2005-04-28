@@ -4,12 +4,7 @@ package com.cinnamonbob.bootstrap;
  * 
  *
  */
-public class ConfigurationManager
+public interface ConfigurationManager
 {
-    private BootstrapManager bootstrapManager;
-    
-    public void setBootstrapManager(BootstrapManager bootstrapManager)
-    {
-        this.bootstrapManager = bootstrapManager;
-    }
+    Config getAppConfig();
 }

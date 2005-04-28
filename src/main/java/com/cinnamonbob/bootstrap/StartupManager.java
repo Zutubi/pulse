@@ -3,6 +3,7 @@ package com.cinnamonbob.bootstrap;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.beans.BeansException;
+import com.cinnamonbob.bootstrap.jetty.JettyManager;
 
 /**
  * 
@@ -37,6 +38,7 @@ public class StartupManager
             // rest of the system during initialisation.
             manager.applicationContext = new ClassPathXmlApplicationContext(bootstrapConfigLocations);
             manager.applicationContext = new ClassPathXmlApplicationContext(configLocations, manager.applicationContext);
+
         }
         catch (BeansException b)
         {
@@ -64,5 +66,10 @@ public class StartupManager
     public boolean isSystemStarted()
     {
         return systemStarted;
+    }
+
+    public static Object getBean(String name)
+    {
+        return getInstance().getApplicationContext().getBean(name);
     }
 }

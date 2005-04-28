@@ -3,6 +3,8 @@ package com.cinnamonbob;
 import com.cinnamonbob.core.Bob;
 import com.cinnamonbob.bootstrap.StartupManager;
 import com.cinnamonbob.bootstrap.BootstrapUtils;
+import com.cinnamonbob.bootstrap.StartupException;
+import com.cinnamonbob.bootstrap.jetty.JettyManager;
 
 import java.util.logging.Logger;
 
@@ -53,15 +55,18 @@ public class BobServer
         core = new Bob(BootstrapUtils.getManager().getApplicationPaths().getApplicationRoot().getAbsolutePath());
 
         // initialise jetty
-        httpService = new HttpService(8080);
-        httpService.start(core);
+
+
+        JettyManager jettyManager = JettyManager.getInstance();
+        jettyManager.deployWebapp();
+        jettyManager.deployInWebApplicationContext("bob", core);
     }
 
     public void stop()
     {
         LOG.info("stop");
         shutdownService.stop();
-        httpService.stop();
+//        httpService.stop();
         buildQueue.stop();
     }
 

@@ -10,15 +10,24 @@
         </property>
     </bean>
 
-    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.ConfigurationManager">
+    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.DefaultConfigurationManager">
         <property name="bootstrapManager">
             <ref bean="bootstrapManager"/>
         </property>
     </bean>
 
-    <bean name="jettyManager" class="com.cinnamonbob.bootstrap.jetty.JettyManager">
+    <bean id="jettyServer" class="com.cinnamonbob.bootstrap.jetty.JettyServerFactoryBean" destroy-method="shutdown">
         <property name="configurationManager">
             <ref bean="configurationManager"/>
+        </property>
+    </bean>
+
+    <bean id="jettyManager" class="com.cinnamonbob.bootstrap.jetty.JettyManager">
+        <property name="jettyServer">
+            <ref bean="jettyServer"/>
+        </property>
+        <property name="bootstrapManager">
+            <ref bean="bootstrapManager"/>
         </property>
     </bean>
 

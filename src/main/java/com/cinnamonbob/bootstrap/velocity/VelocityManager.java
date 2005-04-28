@@ -9,8 +9,10 @@ import com.cinnamonbob.bootstrap.StartupManager;
  */
 public class VelocityManager
 {
+    private static final String BEAN_NAME = "velocityEngine";
+
     public static VelocityEngine getEngine()
     {
-        return (VelocityEngine) StartupManager.getInstance().getApplicationContext().getBean("velocityEngine");
+        return (VelocityEngine) StartupManager.getBean(BEAN_NAME);
     }
 }
