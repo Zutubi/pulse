@@ -1,6 +1,7 @@
 package com.cinnamonbob.util;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Miscellaneous utilities for manipulating the file system.
@@ -25,8 +26,20 @@ public class FileSystemUtils
         for(String child: contents)
         {
             File file = new File(dir, child);
-            
-            if(file.isDirectory())
+            String canonical;
+      
+            // The canonical path lets us distinguish symlinks from actual
+            // directories.
+            try
+            {
+                canonical = file.getCanonicalPath();
+            }
+            catch(IOException e)
+            {
+                return false;
+            }
+                  
+            if(file.isDirectory() && canonical.equals(file.getAbsolutePath()))
             {
                 if(!removeDirectory(file))
                 {
