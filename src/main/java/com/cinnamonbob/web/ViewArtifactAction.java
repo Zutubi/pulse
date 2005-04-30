@@ -201,4 +201,12 @@ public class ViewArtifactAction extends ActionSupport
     {
         return inputStream;
     }
+    
+    /**
+     * @return the content type of the artifact being viewed
+     */
+    public String getContentType()
+    {
+        return artifact.getType();
+    }
 }

@@ -10,7 +10,7 @@ import java.util.TreeMap;
 
 public class Artifact
 {
-    public static final String TYPE_PLAIN = "plain";
+    public static final String TYPE_PLAIN = "text/plain";
     
     private String name;
     private String title;
@@ -89,5 +89,11 @@ public class Artifact
         {
             return null;
         }
+    }
+
+
+    public String getType()
+    {
+        return type;
     }
 }

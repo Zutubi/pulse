@@ -21,7 +21,9 @@
 		</action> 
 
 		<action name="viewArtifact" class="viewArtifactAction">
-			<result name="success" type="stream"/>
+			<result name="success" type="stream">
+			    <param name="contentType">${contentType}</param>
+			</result>
 			<result name="error" type="velocity">generic-error.vm</result> 
 		</action> 
 	</package>

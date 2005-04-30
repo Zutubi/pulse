@@ -43,4 +43,10 @@ public class PostProcessorCommon
     {
         postProcessor.process(artifact);
     }
+
+
+    public PostProcessor getProcessor()
+    {
+        return postProcessor;
+    }
 }

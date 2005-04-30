@@ -28,6 +28,10 @@ public class ProcessSpec
         if(command.hasArtifact(artifactName))
         {
             artifact = command.getArtifact(artifactName);
+            if(!processor.getProcessor().understandsType(artifact.getType()))
+            {
+                throw new ConfigException(context.getFilename(), "Command '" + command.getName() + "': post-processor '" + processorName + "' does not understand type of artifact '" + artifactName + "' (" + artifact.getType() + ")");
+            }
         }
         else
         {
