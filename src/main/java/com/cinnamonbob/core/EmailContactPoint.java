@@ -49,7 +49,6 @@ public class EmailContactPoint implements ContactPoint
     public void notify(BuildResult result)
     {
         String subject = "[CiB] " + result.getProjectName() + ": Build " + Integer.toString(result.getId()) + (result.succeeded() ? " succeeded" : " failed");
-//        System.out.println(renderResult(result));
         sendMail(subject, renderResult(result));
     }
 
@@ -87,8 +86,6 @@ public class EmailContactPoint implements ContactPoint
             msg.setSentDate(new Date());
             
             Transport.send(msg);
-            
-            System.out.println("Message sent OK.");
         }
         catch (Exception e)
         {
