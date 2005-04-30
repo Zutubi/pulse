@@ -132,13 +132,13 @@ public class Project
         try
         {
             CronTrigger trigger = new CronTrigger(getName() + " Trigger.", Scheduler.DEFAULT_GROUP, schedule.getCronSchedule());
-            JobDetail job = new JobDetail("build projects", Scheduler.DEFAULT_GROUP, BuildProject.class);
+            JobDetail job = new JobDetail("build project " + name, Scheduler.DEFAULT_GROUP, BuildProject.class);
             job.getJobDataMap().put("project", this);
             scheduler.scheduleJob(job, trigger);
         }
         catch (SchedulerException e)
         {
-            throw new ConfigException("", "Error scheduling job build.");
+            throw new ConfigException("", "Error scheduling job build: " + e.getMessage());
         } catch (ParseException e)
         {
             throw new ConfigException(context.getFilename(), "Invalid cron expression: " + schedule.getCronSchedule());
@@ -182,6 +182,9 @@ public class Project
             }
         }
     }
+    
+    // TODO create work path
+    // TODO internal failure loading
     
     //=======================================================================
     // Construction
