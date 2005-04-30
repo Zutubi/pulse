@@ -186,7 +186,7 @@ public class BuildManager
             }
         }
 
-        if(!workDir.mkdir())
+        if(!workDir.mkdirs())
         {
             throw new InternalBuildFailureException("Could not create work directory '" + workDir.getAbsolutePath() + "'");
         }
