@@ -13,11 +13,13 @@ public interface Command
      * 
      * @param outputDir
      *        the directory in which to store command output
+     * @param previousBuild
+     *        result of the previous build, or null if not available
      * @return the result of executing the command
      * @throws InternalBuildFailureException
      *         if something catastrophic prevents normal operation
      */
-    public CommandResult execute(File outputDir) throws InternalBuildFailureException;
+    public CommandResult execute(File outputDir, BuildResult previousBuild) throws InternalBuildFailureException;
     
     /**
      * Indicates the artifacts that will be produced by this command during

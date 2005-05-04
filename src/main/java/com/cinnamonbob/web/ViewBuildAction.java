@@ -4,10 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.velocity.app.VelocityEngine;
+
 import com.cinnamonbob.core.Bob;
 import com.cinnamonbob.core.BuildResult;
 import com.cinnamonbob.core.Project;
 import com.opensymphony.webwork.ServletActionContext;
+import com.opensymphony.webwork.views.velocity.VelocityManager;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ActionSupport;
 
@@ -129,5 +132,13 @@ public class ViewBuildAction extends ActionSupport
     public List<String> getGenericErrors()
     {
         return errors;
+    }
+    
+    /**
+     * @return the velocity engine used for rendering
+     */
+    public VelocityEngine getEngine()
+    {
+        return VelocityManager.getInstance().getVelocityEngine();
     }
 }

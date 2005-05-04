@@ -38,15 +38,8 @@ public class ExecutableCommand implements Command
         String working;
         
         executable = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_EXECUTABLE);
-        working = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_WORKING_DIRECTORY, null);
-        if(working == null)
-        {
-            workingDirectory = new File(".");
-        }
-        else
-        {
-            workingDirectory = new File(working);
-        }
+        working = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_WORKING_DIRECTORY, ".");
+        workingDirectory = new File(working);
         
         String argumentString = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_ARGUMENTS, null);
         List<String> command;
@@ -154,7 +147,7 @@ public class ExecutableCommand implements Command
     }
 
     
-    public ExecutableCommandResult execute(File outputDir) throws InternalBuildFailureException
+    public ExecutableCommandResult execute(File outputDir, BuildResult previousBuild) throws InternalBuildFailureException
     {
         builder.directory(workingDirectory);
         builder.redirectErrorStream(true);

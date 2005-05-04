@@ -194,6 +194,14 @@ public class BuildManager
 
     private void executeCommands(Project project, BuildResult result, File buildDir)
     {
+        List<BuildResult> history       = project.getHistory(1);
+        BuildResult       previousBuild = null;
+        
+        if(history.size() > 0)
+        {
+            previousBuild = history.get(0);
+        }
+        
         try
         {
             int i = 0;
@@ -204,7 +212,7 @@ public class BuildManager
                 if(!failed || command.getForce())
                 {
                     File                commandOutputDir = createCommandOutputDir(buildDir, command, i);
-                    CommandResultCommon commandResult    = command.execute(commandOutputDir);
+                    CommandResultCommon commandResult    = command.execute(commandOutputDir, previousBuild);
 
                     result.addCommandResult(commandResult);
                     saveCommandResult(commandOutputDir, commandResult);

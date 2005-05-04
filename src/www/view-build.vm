@@ -42,7 +42,11 @@
         #detailrow("Result"    $success)
       </table>
       <h2 class="command-element">Details</h2>
-      #parse("commands/${commandResult.Result.Class.SimpleName}.vm")
+#set($templateName = "commands/${commandResult.Result.Class.SimpleName}.vm")
+#if(!$engine.templateExists($templateName))
+  #set($templateName = "commands/CommandResult.vm")
+#end
+      #parse("$templateName")
       <h2 class="command-element">Artifacts</h2>
       #foreach($artifact in $commandResult.Artifacts)
         <h3>$artifact.Title (<a href="viewArtifact.action?project=$name&id=$id&command=$commandResult.CommandName&artifact=$artifact.name">view</a>)</h3>

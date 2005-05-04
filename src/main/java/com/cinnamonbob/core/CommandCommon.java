@@ -244,14 +244,16 @@ public class CommandCommon
      * 
      * @param outputDir
      *        directory to store output produced by the command
+     * @param previousBuild
+     *        result of previous build or null if not available
      * @return the result of the command execution
      * @throws InternalBuildFailureException
      *         if an unexpected error occurs during execution
      */
-    public CommandResultCommon execute(File outputDir) throws InternalBuildFailureException
+    public CommandResultCommon execute(File outputDir, BuildResult previousBuild) throws InternalBuildFailureException
     {
         long                startTime     = System.currentTimeMillis();
-        CommandResult       commandResult = command.execute(outputDir);
+        CommandResult       commandResult = command.execute(outputDir, previousBuild);
         CommandResultCommon commonResult  = new CommandResultCommon(name, commandResult, new TimeStamps(startTime, System.currentTimeMillis()));
         
         collectArtifacts(commonResult, outputDir);

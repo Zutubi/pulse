@@ -60,6 +60,13 @@ public class VelocityBuildResultRenderer implements BuildResultRenderer
     
     public String findTemplate(String type, CommandResult result)
     {
-        return type + "/" + result.getClass().getSimpleName() + ".vm";
+        String templateName = type + "/" + result.getClass().getSimpleName() + ".vm";
+        
+        if(!VelocityManager.getEngine().templateExists(templateName))
+        {
+            templateName = type + "/CommandResult.vm";
+        }
+        
+        return templateName;
     }
 }

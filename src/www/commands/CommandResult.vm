@@ -1,0 +1,4 @@
+#set($dq='"')
+<table>
+  #detailrow("Summary" $commandResult.Result.Summary)
+</table>

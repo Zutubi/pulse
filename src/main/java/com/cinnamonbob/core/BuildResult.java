@@ -145,6 +145,14 @@ public class BuildResult implements Iterable<CommandResultCommon>
     }
 
     
+    /**
+     * Locates and returns the result for the command of the given name, if
+     * available.
+     * 
+     * @param commandName
+     *        the name of the command to tfind the result for
+     * @return the result of the command, or null if not found
+     */
     public CommandResultCommon getCommandResult(String commandName)
     {
         for(CommandResultCommon result: commandResults)

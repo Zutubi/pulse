@@ -355,6 +355,19 @@ public class XMLConfigUtils
     
     public static String getAttributeValue(ConfigContext context, Element element, String name, String defaultValue) throws ConfigException
     {
+        if(defaultValue == null)
+        {
+            return getAttributeValue(context, element, name);
+        }
+        else
+        {
+            return getOptionalAttributeValue(context, element, name, defaultValue);
+        }
+    }    
+
+    
+    public static String getOptionalAttributeValue(ConfigContext context, Element element, String name, String defaultValue) throws ConfigException
+    {
         String value = element.getAttributeValue(name);
         if(value == null)
         {
@@ -364,7 +377,7 @@ public class XMLConfigUtils
         {
             value = replaceVariables(context, value);
         }
-        
-        return value;        
+                
+        return value;
     }    
 }
