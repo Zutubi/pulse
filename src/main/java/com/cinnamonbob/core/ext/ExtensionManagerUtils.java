@@ -29,4 +29,10 @@ public class ExtensionManagerUtils
     {
         return getManager().createPostProcessor(name, context, element, common, project);
     }
+    
+    public static Service createService(String name, ConfigContext context, Element element) 
+            throws ConfigException
+    {
+        return getManager().createService(name, context, element);
+    }
 }

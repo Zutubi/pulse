@@ -1,16 +1,15 @@
 package com.cinnamonbob.core.ext;
 
 import com.cinnamonbob.core.*;
-
-import java.io.InputStream;
-import java.io.IOException;
-import java.util.Properties;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.logging.Logger;
-
 import nu.xom.Element;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -26,12 +25,15 @@ public class DefaultExtensionManager implements ExtensionManager
     private Map<String, Class> postProcessorDefinitions = new HashMap<String, Class>();
     private PostProcessorFactory postProcessorFactory = new PostProcessorFactory();
 
+    private Map<String, Class> serviceDefinitions = new HashMap<String, Class>();
+    private ServiceFactory serviceFactory = new ServiceFactory();
 
 
     public void init() throws IOException
     {
         initType("commands.properties", commandDefinitions, commandFactory);
         initType("postprocessors.properties", postProcessorDefinitions, postProcessorFactory);
+        initType("services.properties", serviceDefinitions, serviceFactory);
     }
 
     private void initType(String propertyFileName, Map<String, Class> definitions, GenericFactory factory) throws IOException
@@ -79,5 +81,15 @@ public class DefaultExtensionManager implements ExtensionManager
             throws ConfigException
     {
         return postProcessorFactory.createPostProcessor(name, context, element, common, project);
+    }
+
+    public Class getServiceDefinition(String name)
+    {
+        return serviceDefinitions.get(name);
+    }
+
+    public Service createService(String name, ConfigContext context, Element element) throws ConfigException
+    {
+        return serviceFactory.createService(name, context, element);
     }
 }

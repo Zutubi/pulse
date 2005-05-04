@@ -29,8 +29,27 @@ public interface ExtensionManager
     Command createCommand(String name, ConfigContext context, Element element, CommandCommon common)
             throws ConfigException;
 
+    /**
+     * 
+     * @param name
+     * @return
+     */ 
     Class getPostProcessorDefinition(String name);
 
+    /**
+     * 
+     * @param name
+     * @param context
+     * @param element
+     * @param common
+     * @param project
+     * @return
+     * @throws ConfigException
+     */ 
     PostProcessor createPostProcessor(String name, ConfigContext context, Element element, PostProcessorCommon common, Project project)
             throws ConfigException;
+
+    Class getServiceDefinition(String name);
+    
+    Service createService(String name, ConfigContext context, Element element) throws ConfigException;
 }

@@ -2,6 +2,7 @@ package com.cinnamonbob.core;
 
 import com.cinnamonbob.bootstrap.ApplicationPaths;
 import com.cinnamonbob.bootstrap.BootstrapUtils;
+import com.cinnamonbob.core.ext.ExtensionManagerUtils;
 import nu.xom.Document;
 import nu.xom.Element;
 
@@ -24,7 +25,6 @@ public class Bob
     private static final String CONFIG_ELEMENT_PROJECT = "project";
     private static final String CONFIG_ATTR_NAME = "name";
     private static final String CONFIG_ELEMENT_SERVICES = "services";
-    private static final String CONFIG_ELEMENT_SERVICE = "service";
 
     /**
      * The root for all of bob's internal config and output..
@@ -47,10 +47,6 @@ public class Bob
      */
     private UserManager userManager;
 
-    /**
-     * Factory for creating generic named services based on configuration.
-     */
-    private ServiceFactory serviceFactory;
     /**
      * Map from service name to service.
      */
@@ -188,21 +184,8 @@ public class Bob
 
         for (Element e : elements)
         {
-            Service service = serviceFactory.createService(e.getLocalName(), context, e);
+            Service service = ExtensionManagerUtils.createService(e.getLocalName(), context, e);
             services.put(service.getServiceName(), service);
-        }
-    }
-
-    /**
-     * @deprecated
-     */
-    private void crazyBuildLoop()
-    {
-        for (Project project : projects.values())
-        {
-            LOG.info("Building project '" + project.getName() + "'");
-            project.build();
-            LOG.info("Build complete.");
         }
     }
 
@@ -218,9 +201,6 @@ public class Bob
 
         projects = new TreeMap<String, Project>();
         services = new TreeMap<String, Service>();
-
-        serviceFactory = new ServiceFactory();
-        serviceFactory.registerType("smtp", SMTPService.class);
 
         loadConfig();
         userManager = new UserManager(this);
