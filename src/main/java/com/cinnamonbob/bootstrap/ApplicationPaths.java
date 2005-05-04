@@ -33,4 +33,6 @@ public interface ApplicationPaths
      * @deprecated remove.
      */
     File getApplicationRoot();
+
+    File getUserConfigRoot();
 }

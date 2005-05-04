@@ -1,14 +1,12 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.bootstrap.ApplicationPaths;
+import com.cinnamonbob.bootstrap.BootstrapUtils;
 import nu.xom.Document;
 import nu.xom.Element;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -48,14 +46,7 @@ public class Bob
      * Handles the users of this system.
      */
     private UserManager userManager;
-    /**
-     * Factory for churning out commands based on configuration.
-     */
-    private CommandFactory commandFactory;
-    /**
-     * Factory for creating post-processors.
-     */
-    private PostProcessorFactory postProcessorFactory;
+
     /**
      * Factory for creating generic named services based on configuration.
      */
@@ -219,19 +210,14 @@ public class Bob
     // Construction
     //=======================================================================
 
-    public Bob(String rootDir) throws ConfigException
+    public Bob() throws ConfigException
     {
-        this.rootDir = new File(rootDir);
+        ApplicationPaths paths = BootstrapUtils.getManager().getApplicationPaths();
+        this.rootDir = paths.getApplicationRoot();
         this.configDir = new File(this.rootDir, CONFIG_DIR_NAME);
 
         projects = new TreeMap<String, Project>();
         services = new TreeMap<String, Service>();
-
-        commandFactory = new CommandFactory();
-        commandFactory.registerType("executable", ExecutableCommand.class);
-
-        postProcessorFactory = new PostProcessorFactory();
-        postProcessorFactory.registerType("regex", RegexPostProcessor.class);
 
         serviceFactory = new ServiceFactory();
         serviceFactory.registerType("smtp", SMTPService.class);
@@ -243,15 +229,6 @@ public class Bob
     //=======================================================================
     // Interface
     //=======================================================================
-
-    /**
-     * @return Returns the configDir.
-     */
-    public File getConfigDir()
-    {
-        return configDir;
-    }
-
 
     public boolean hasProject(String name)
     {
@@ -278,28 +255,10 @@ public class Bob
         return projectRoot;
     }
 
-
-    /**
-     * @return Returns the command factory.
-     */
-    public CommandFactory getCommandFactory()
-    {
-        return commandFactory;
-    }
-
-
-    /**
-     * @return Returns the post-processor factory.
-     */
-    public PostProcessorFactory getPostProcessorFactory()
-    {
-        return postProcessorFactory;
-    }
-
     /**
      * @return Returns the rootDir.
      */
-    public File getRootDir()
+    private File getRootDir()
     {
         return rootDir;
     }
@@ -320,19 +279,6 @@ public class Bob
     //=======================================================================
     // Entry point
     //=======================================================================
-
-    public static void main(String argv[])
-    {
-        try
-        {
-            Bob bob = new Bob(argv[0]);
-            bob.crazyBuildLoop();
-        } catch (ConfigException e)
-        {
-            System.err.println(e);
-            e.printStackTrace();
-        }
-    }
 
     public void build(String projectName)
     {

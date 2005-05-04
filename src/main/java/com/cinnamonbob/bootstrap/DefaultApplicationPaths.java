@@ -14,6 +14,7 @@ public class DefaultApplicationPaths implements ApplicationPaths
     private File contentRoot;
     private File configRoot;
     private File templateRoot;
+    private File userConfigRoot;
 
     public DefaultApplicationPaths(File bobHome)
     {
@@ -50,5 +51,14 @@ public class DefaultApplicationPaths implements ApplicationPaths
             templateRoot = new File(bobHome, "system" + File.separatorChar + "templates");
         }
         return templateRoot;
+    }
+
+    public File getUserConfigRoot()
+    {
+        if (userConfigRoot == null)
+        {
+            userConfigRoot = new File(bobHome, "config");
+        }
+        return userConfigRoot;
     }
 }

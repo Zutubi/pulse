@@ -50,7 +50,7 @@ public class BobServer
             }
         });
 
-        core = new Bob(BootstrapUtils.getManager().getApplicationPaths().getApplicationRoot().getAbsolutePath());
+        core = new Bob();
 
         // initialise jetty
 

@@ -23,12 +23,17 @@ public class TestApplicationPaths implements ApplicationPaths
 
     public File getConfigRoot()
     {
-        return new File(bobRoot, "src" + File.separatorChar + "main" + File.separatorChar + "config");
+        return new File(bobRoot, "src" + File.separatorChar + "etc");
     }
 
     public File getTemplateRoot()
     {
         return new File(bobRoot, "src" + File.separatorChar + "templates");
+    }
+
+    public File getUserConfigRoot()
+    {
+        return new File(bobRoot, "src" + File.separatorChar + "main" + File.separatorChar + "config");
     }
 
     public File getApplicationRoot()

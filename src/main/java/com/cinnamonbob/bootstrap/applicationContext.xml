@@ -31,4 +31,6 @@
         </property>
     </bean>
 
+    <bean id="extensionManager" class="com.cinnamonbob.core.ext.DefaultExtensionManager" init-method="init"/>
+
 </beans>

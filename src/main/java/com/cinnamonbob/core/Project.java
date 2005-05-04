@@ -21,7 +21,7 @@ import org.quartz.*;
 public class Project
 {
     private static final Logger LOG = Logger.getLogger(Project.class.getName());
-    
+
     private static final String CONFIG_ELEMENT_DESCRIPTION    = "description";
     private static final String CONFIG_ELEMENT_POST_PROCESSOR = "post-processor";
     private static final String CONFIG_ELEMENT_RECIPE         = "recipe";
@@ -93,7 +93,7 @@ public class Project
         context.setVariable(VARIABLE_WORK_DIR, theBuilder.getBuildManager().getWorkRoot(this).getAbsolutePath());
     }
 
-    
+
     private void loadDescription(ConfigContext context, Element element) throws ConfigException
     {
         description = XMLConfigUtils.getElementText(context, element);
@@ -102,19 +102,19 @@ public class Project
 
     private void loadPostProcessor(ConfigContext context, Element element) throws ConfigException
     {
-        PostProcessorCommon post = new PostProcessorCommon(context, element, theBuilder.getPostProcessorFactory(), this);
-        
+        PostProcessorCommon post = new PostProcessorCommon(context, element, this);
+
         if(postProcessors.containsKey(post.getName()))
         {
             throw new ConfigException(context.getFilename(), "Project '" + name + "' already contains a post-processor named '" + post.getName() + "'");
         }
-        
+
         postProcessors.put(post.getName(), post);
     }
-    
+
     private void loadRecipe(ConfigContext context, Element element) throws ConfigException
     {
-        recipe = new Recipe(context, element, theBuilder.getCommandFactory(), this);
+        recipe = new Recipe(context, element, this);
     }
 
     /**
@@ -151,15 +151,15 @@ public class Project
         ConfigContext context  = new ConfigContext(filename);
 
         addBuiltinVariables(context);
-        
+
         List<Element> elements = XMLConfigUtils.getElements(context, doc.getRootElement(), Arrays.asList(XMLConfigUtils.CONFIG_ELEMENT_PROPERTY, CONFIG_ELEMENT_DESCRIPTION, CONFIG_ELEMENT_POST_PROCESSOR, CONFIG_ELEMENT_RECIPE, CONFIG_ELEMENT_SCHEDULE));
-        
+
         XMLConfigUtils.extractProperties(context, elements);
-        
+
         for(Element current: elements)
         {
             String  elementName = current.getLocalName();
-                
+
             if(elementName.equals(CONFIG_ELEMENT_DESCRIPTION))
             {
                 loadDescription(context, current);
@@ -182,7 +182,7 @@ public class Project
             }
         }
     }
-    
+
     //=======================================================================
     // Construction
     //=======================================================================

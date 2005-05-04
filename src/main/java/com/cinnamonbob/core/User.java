@@ -146,4 +146,33 @@ public class User
     {
         name = XMLConfigUtils.getElementText(context, element);
     }
+
+    /**
+     * The users login.
+     * @return
+     */
+    public String getLogin()
+    {
+        return login;
+    }
+
+    void setLogin(String login)
+    {
+        this.login = login;
+    }
+
+    /**
+     * The users name.
+     * @return
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    void setName(String name)
+    {
+        this.name = name;
+    }
+
 }

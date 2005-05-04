@@ -1,5 +1,7 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.bootstrap.ApplicationPaths;
+import com.cinnamonbob.bootstrap.BootstrapUtils;
 import nu.xom.Document;
 import nu.xom.Element;
 
@@ -17,11 +19,11 @@ public class UserManager
     private static final String CONFIG_FILENAME     = "users.xml";
     private static final String CONFIG_ELEMENT_USER = "user";
     private static final String CONFIG_USER_LOGIN   = "login";
-    
+
     private Bob               theBuilder;
     private Map<String, User> users;
-    
-    
+
+
     public UserManager(Bob theBuilder) throws ConfigException
     {
         this.theBuilder = theBuilder;
@@ -31,7 +33,9 @@ public class UserManager
     
     private void loadConfig() throws ConfigException
     {
-        String filename = theBuilder.getConfigDir().getAbsolutePath() + File.separator + CONFIG_FILENAME;
+        ApplicationPaths paths = BootstrapUtils.getManager().getApplicationPaths();
+
+        String filename = paths.getUserConfigRoot().getAbsolutePath() + File.separator + CONFIG_FILENAME;
         
         Document      doc     = XMLConfigUtils.loadFile(filename);
         ConfigContext context = new ConfigContext(filename);

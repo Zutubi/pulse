@@ -11,6 +11,8 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import com.cinnamonbob.util.IOHelper;
+import com.cinnamonbob.core.ext.ExtensionManager;
+import com.cinnamonbob.core.ext.ExtensionManagerUtils;
 
 /**
  * @author jsankey
@@ -136,14 +138,12 @@ public class CommandCommon
      *        configuration context used during loading
      * @param element
      *        root element of the command configuration
-     * @param commandFactory
-     *        factory used for creating the core command
      * @param project
      *        the project this command belongs to
      * @throws ConfigException
      *         if there is an error in the configuration
      */
-    public CommandCommon(ConfigContext context, Element element, CommandFactory commandFactory, Project project) throws ConfigException
+    public CommandCommon(ConfigContext context, Element element, Project project) throws ConfigException
     {
         name       = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_NAME);
         artifacts  = new TreeMap<String, ArtifactSpec>();
@@ -166,7 +166,7 @@ public class CommandCommon
         }
         
         // The first child is the specific command element
-        command = commandFactory.createCommand(childElements.get(0).getLocalName(), context, childElements.get(0), this);
+        command = ExtensionManagerUtils.createCommand(childElements.get(0).getLocalName(), context, childElements.get(0), this);
         
         for(ArtifactSpec artifactSpec: command.getArtifacts())
         {
