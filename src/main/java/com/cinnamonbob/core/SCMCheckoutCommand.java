@@ -79,7 +79,7 @@ public abstract class SCMCheckoutCommand implements Command
         }
     }
 
-    private CommandResult doCheckout(File outputDir, Revision previousRevision, SCMServer server) throws SCMException, InternalBuildFailureException
+    private SCMCheckoutCommandResult doCheckout(File outputDir, Revision previousRevision, SCMServer server) throws SCMException, InternalBuildFailureException
     {
         LinkedList<Change> changes  = new LinkedList<Change>();
         Revision           revision = server.checkout(getPath(), null, changes);
@@ -110,22 +110,35 @@ public abstract class SCMCheckoutCommand implements Command
 
     protected abstract File getPath();
     protected abstract SCMServer createServer() throws SCMException;
-
+    protected abstract void destroyServer(SCMServer server);
+    
     //=======================================================================
     // Command interface
     //=======================================================================
 
     public CommandResult execute(File outputDir, BuildResult previousBuild) throws InternalBuildFailureException
     {
+        SCMServer                server = null;
+        SCMCheckoutCommandResult result;
+        
         try
         {
-            SCMServer server = createServer();
-            return doCheckout(outputDir, getPreviousRevision(previousBuild), server);
+            server = createServer();
+            result = doCheckout(outputDir, getPreviousRevision(previousBuild), server);
         }
         catch(SCMException e)
         {
-            return new SCMCheckoutCommandResult(e);
+            result = new SCMCheckoutCommandResult(e);
         }
+        finally
+        {
+            if(server != null)
+            {
+                destroyServer(server);
+            }
+        }
+        
+        return result;
     }
 
     public List<ArtifactSpec> getArtifacts()

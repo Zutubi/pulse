@@ -76,4 +76,10 @@ public class SVNCheckoutCommand extends SCMCheckoutCommand
             }
         }
     }
+    
+    @Override
+    protected void destroyServer(SCMServer server)
+    {
+        // Nothing to do
+    }
 }

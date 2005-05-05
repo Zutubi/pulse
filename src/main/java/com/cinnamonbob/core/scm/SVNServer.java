@@ -29,6 +29,8 @@ import com.cinnamonbob.core.scm.Change.Action;
  */
 public class SVNServer implements SCMServer
 {
+    private static final int CHECKOUT_RETRIES = 1;
+
     private SVNRepositoryLocation location;
     private SVNRepository repository;
     private ISVNCredentialsProvider credentials;
@@ -220,11 +222,34 @@ public class SVNServer implements SCMServer
         try
         {
             ChangeAccumulator accumulator = new ChangeAccumulator(changes);
-            
-            workspace = SVNWorkspaceManager.createWorkspace("file", toDirectory.getAbsolutePath());
-            workspace.setCredentials(credentials);
-            workspace.addWorkspaceListener(accumulator);
-            revisionNumber = workspace.checkout(location, svnRevision.getRevisionNumber(), false);
+            int               retries     = 0;
+                        
+            // Workaround for an issue in javasvn: can disconnect a session
+            // and then try to resuse it without connecting again.  Second
+            // time around a new session is created and all is well.
+            while(true)
+            {
+                workspace = SVNWorkspaceManager.createWorkspace("file", toDirectory.getAbsolutePath());
+                workspace.setCredentials(credentials);
+                workspace.addWorkspaceListener(accumulator);
+
+                try
+                {
+                    revisionNumber = workspace.checkout(location, svnRevision.getRevisionNumber(), false);
+                    break;
+                }
+                catch(SVNException e)
+                {
+                    if(retries++ < CHECKOUT_RETRIES)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        throw convertException(e);
+                    }
+                }
+            }
         }
         catch(SVNException e)
         {
@@ -272,7 +297,7 @@ public class SVNServer implements SCMServer
         
         return result;
     }
-    
+
     //=======================================================================
     // Testing use only
     //=======================================================================
