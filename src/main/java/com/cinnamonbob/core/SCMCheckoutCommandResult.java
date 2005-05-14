@@ -54,4 +54,9 @@ public class SCMCheckoutCommandResult implements CommandResult
     {
         return changes;
     }
+    
+    public SCMException getException()
+    {
+        return exception;
+    }
 }

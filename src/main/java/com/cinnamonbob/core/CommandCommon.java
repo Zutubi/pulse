@@ -11,7 +11,6 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import com.cinnamonbob.util.IOHelper;
-import com.cinnamonbob.core.ext.ExtensionManager;
 import com.cinnamonbob.core.ext.ExtensionManagerUtils;
 
 /**

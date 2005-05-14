@@ -17,6 +17,10 @@ public interface Change
          */
         ADD,
         /**
+         * The file was branched somewhere.
+         */
+        BRANCH,
+        /**
          * The file was deleted from source control.
          */
         DELETE,
@@ -24,6 +28,14 @@ public interface Change
          * The file contents were edited.
          */
         EDIT,
+        /**
+         * Perforce-specific: the file was integrated.
+         */
+        INTEGRATE,
+        /**
+         * The file was merged with another.
+         */
+        MERGE,
         /**
          * The file was moved.
          */

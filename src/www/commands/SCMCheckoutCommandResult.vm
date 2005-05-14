@@ -1,14 +1,18 @@
+#if($commandResult.Result.succeeded())
 Checked out revision <b>$commandResult.Result.Revision</b>.
-#if($commandResult.Result.Changes)
+  #if($commandResult.Result.Changes)
 <h3>Changes Since Last Build</h3>
-#foreach($change in $commandResult.Result.Changes)
+    #foreach($change in $commandResult.Result.Changes)
 <div class="info">
   <b>Revision $change.Revision</b> $change.User@$change.Date: $change.Comment</li>
   <ul>
-  #foreach($file in $change.Changes)
+      #foreach($file in $change.Changes)
     <li><span class="filename">$file.Filename#$file.Revision: $file.Action</span></li>
-  #end
+      #end
   </ul>
 </div>
-#end
+    #end
+  #end
+#else
+Checkout failed: $commandResult.Result.Exception.Message
 #end

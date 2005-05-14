@@ -93,6 +93,16 @@ public class IOHelper
         }
     }
 
+    public static void joinReaderToWriter(Reader reader, Writer writer) throws IOException
+    {
+        char[] buffer = new char[1024];
+        int n;
+
+        while ((n = reader.read(buffer)) > 0)
+        {
+            writer.write(buffer, 0, n);
+        }
+    }
 
     public static void copyFile(File fromFile, File toFile) throws IOException
     {

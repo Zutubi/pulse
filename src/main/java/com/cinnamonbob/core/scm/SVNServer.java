@@ -61,7 +61,7 @@ public class SVNServer implements SCMServer
      */
     private long convertRevision(Revision revision)
     {
-        return ((SVNRevision)revision).getRevisionNumber();
+        return ((NumericalRevision)revision).getRevisionNumber();
     }
         
     /**
@@ -126,7 +126,7 @@ public class SVNServer implements SCMServer
         
         public void updated(String path, int contentsStatus, int propertiesStatus, long revision)
         {
-            changes.add(new SimpleChange(path, new SVNRevision(revision), Change.Action.ADD));
+            changes.add(new SimpleChange(path, new NumericalRevision(revision), Change.Action.ADD));
         }
 
         public void committed(String path, int kind) {}
@@ -206,17 +206,17 @@ public class SVNServer implements SCMServer
      */
     public Revision checkout(File toDirectory, Revision revision, List<Change> changes) throws SCMException
     {
-        SVNRevision   svnRevision;
+        NumericalRevision   svnRevision;
         ISVNWorkspace workspace;
         long          revisionNumber;
         
         if(revision == null)
         {
-            svnRevision = new SVNRevision(ISVNWorkspace.HEAD);
+            svnRevision = new NumericalRevision(ISVNWorkspace.HEAD);
         }
         else
         {
-            svnRevision = (SVNRevision)revision;
+            svnRevision = (NumericalRevision)revision;
         }
         
         try
@@ -256,7 +256,7 @@ public class SVNServer implements SCMServer
             throw convertException(e);
         }
         
-        return new SVNRevision(revisionNumber);
+        return new NumericalRevision(revisionNumber);
     }
 
     /**
@@ -277,7 +277,7 @@ public class SVNServer implements SCMServer
                 repository.log(paths, logs, fromNumber, toNumber, true, true);
                 for(SVNLogEntry entry: logs)
                 {
-                    SimpleChangelist list  = new SimpleChangelist(new SVNRevision(entry.getRevision()), entry.getDate(), entry.getAuthor(), entry.getMessage());
+                    SimpleChangelist list  = new SimpleChangelist(new NumericalRevision(entry.getRevision()), entry.getDate(), entry.getAuthor(), entry.getMessage());
                     Map              files = entry.getChangedPaths();
                     
                     for(Object value: files.values())
@@ -308,7 +308,7 @@ public class SVNServer implements SCMServer
         {
             SVNServer server = new SVNServer("svn+ssh://jason@www.anyhews.net/usr/local/svn-repo/bob/trunk", argv[0], argv[1]);
             //server.checkout(new File("/home/jsankey/svntest"), new SVNRevision(ISVNWorkspace.HEAD));
-            List<Changelist> cls = server.getChanges(new SVNRevision(47), new SVNRevision(ISVNWorkspace.HEAD), "");
+            List<Changelist> cls = server.getChanges(new NumericalRevision(47), new NumericalRevision(ISVNWorkspace.HEAD), "");
             
             for(Changelist l: cls)
             {

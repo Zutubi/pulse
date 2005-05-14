@@ -5,12 +5,12 @@ package com.cinnamonbob.core.scm;
  * 
  * @author jsankey
  */
-public class SVNRevision implements Revision
+public class NumericalRevision implements Revision
 {
     private long revisionNumber;
     
     
-    public SVNRevision(long revisionNumber)
+    public NumericalRevision(long revisionNumber)
     {
         this.revisionNumber = revisionNumber;
     }
