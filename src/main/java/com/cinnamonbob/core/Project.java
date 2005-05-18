@@ -73,16 +73,6 @@ public class Project
     private int nextBuild;
     
     private Schedule schedule;
-
-    //=======================================================================
-    // Types
-    //=======================================================================
-
-    public enum Event
-    {
-        BUILD_COMPLETE,
-        BUILD_FAILED
-    }
     
     //=======================================================================
     // Implementation
@@ -206,14 +196,12 @@ public class Project
     /**
      * Adds a subscription to events on this project.
      * 
-     * @param event
-     *        the event to subscribe to
-     * @param point
-     *        the contact point to notify on project events
+     * @param subscription
+     *        the subscription to add
      */
-    public void addSubscription(Event event, ContactPoint point)
+    public void addSubscription(Subscription subscription)
     {
-        subscriptions.add(new Subscription(event, point));
+        subscriptions.add(subscription);
     }
 
     /**
@@ -250,18 +238,7 @@ public class Project
 
         for(Subscription subscription: subscriptions)
         {
-            boolean notify;
-            
-            if(result.succeeded())
-            {
-                notify = subscription.getEventType() == Event.BUILD_COMPLETE;
-            }
-            else
-            {
-                notify = true;
-            }
-            
-            if(notify)
+            if(subscription.conditionsSatisfied(result))
             {
                 subscription.getContactPoint().notify(result);
             }

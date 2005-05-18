@@ -44,6 +44,23 @@ public class SCMCheckoutCommandResult implements CommandResult
             return exception.toString();
         }
     }
+    
+    /**
+     * @see com.cinnamonbob.core.CommandResult#changedBy(java.lang.String)
+     */
+    public boolean changedBy(String login)
+    {
+        for(Changelist list: changes)
+        {
+            if(list.getUser().equals(login))
+            {
+                return true;
+            }
+        }
+        
+        System.out.println("not changed by " + login);
+        return false;
+    }
 
     public Revision getRevision()
     {

@@ -38,6 +38,14 @@ public class ExecutableCommandResult implements CommandResult
     {
         return "Child exited with code " + Integer.toString(exitCode) + ".";
     }
+    
+    /**
+     * @see com.cinnamonbob.core.CommandResult#changedBy(java.lang.String)
+     */
+    public boolean changedBy(String login)
+    {
+        return false;
+    }
 
     /**
      * @return Returns the command line that was run.

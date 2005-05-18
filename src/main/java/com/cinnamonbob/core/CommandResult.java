@@ -20,9 +20,7 @@ public interface CommandResult
     public String getSummary();
 
     /**
-     * Returns the full command output.
-     * 
-     * @return the full command output
+     * @see BuildResult#changedBy(String)
      */
-    //public String getOutput();
+    public boolean changedBy(String login);
 }

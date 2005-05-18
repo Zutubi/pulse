@@ -164,5 +164,25 @@ public class BuildResult implements Iterable<CommandResultCommon>
         }
         
         return null;
+    }
+
+    /**
+     * Returns true if any commands in the build detected changes by the
+     * given login.
+     * 
+     * @param login
+     *        the login to test for changes by
+     * @return true iff a change was detected by the given user
+     */
+    public boolean changedBy(String login)
+    {
+        for(CommandResultCommon result: commandResults)
+        {
+            if(result.getResult().changedBy(login))
+            {
+                return true;
+            }
+        }
+        return false;
     }    
 }

@@ -1,5 +1,8 @@
 package com.cinnamonbob.core;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * A subscription is a mapping from a project event to a contact point.  When
  * the event occurs, notifiaction is sent to the contact point.
@@ -9,13 +12,13 @@ package com.cinnamonbob.core;
 public class Subscription
 {
     /**
-     * The type of event to notify on.
-     */
-    private Project.Event eventType;
-    /**
      * The contact point to notify.
      */
     private ContactPoint contactPoint;
+    /**
+     * Conditions to be satisfied before notifying.
+     */
+    private List<NotifyCondition> conditions;
     
     //=======================================================================
     // Construction
@@ -25,16 +28,18 @@ public class Subscription
      * Constructs a new subscription connection the given event with the given
      * contact point.
      * 
-     * @param eventType
-     *        the type of event being subscribed to
      * @param contactPoint
      *        the contact point to notify on the event
      */
-    public Subscription(Project.Event eventType, ContactPoint contactPoint)
+    public Subscription(ContactPoint contactPoint)
     {
-        this.eventType    = eventType;
         this.contactPoint = contactPoint;
+        this.conditions   = new LinkedList<NotifyCondition>();
     }
+
+    //=======================================================================
+    // Interface
+    //=======================================================================
 
     /**
      * @return the contact point to notify
@@ -45,12 +50,35 @@ public class Subscription
     }
     
     /**
-     * @return the type of event subscribed to
+     * Indicates if the conditions for notifying the contact point are
+     * satisfied by the given build result.
+     * 
+     * @param result
+     *        the build result to test the properties of
+     * @return true iff the contact point should be notified for this result
      */
-    public Project.Event getEventType()
+    public boolean conditionsSatisfied(BuildResult result)
     {
-        return eventType;
+        for(NotifyCondition condition: conditions)
+        {
+            if(!condition.satisfied(result))
+            {
+                return false;
+            }
+        }
+        
+        return true;
     }
     
-    
+    /**
+     * Adds the given condition to those that must be satisfied before the
+     * contact point should be notified.
+     * 
+     * @param condition
+     *        the condition to add
+     */
+    public void addCondition(NotifyCondition condition)
+    {
+        conditions.add(condition);
+    }
 }
