@@ -41,7 +41,7 @@ public class ExecutableCommand implements Command
         working = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_WORKING_DIRECTORY, ".");
         workingDirectory = new File(working);
         
-        String argumentString = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_ARGUMENTS, null);
+        String argumentString = XMLConfigUtils.getOptionalAttributeValue(context, element, CONFIG_ATTR_ARGUMENTS, null);
         List<String> command;
 
         if(argumentString == null)
