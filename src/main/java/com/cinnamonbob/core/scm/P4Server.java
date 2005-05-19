@@ -39,6 +39,8 @@ public class P4Server implements SCMServer
     private static final String ASCII_CHARSET    = "US-ASCII";
     
     private ProcessBuilder p4Builder;
+    private Pattern changesPattern;
+    private File clientRoot;
     
     private class P4Result
     {
@@ -135,16 +137,13 @@ public class P4Server implements SCMServer
         
         clientSpec = clientSpec.replaceAll("\nRoot:.*", "\nRoot: " + toDirectory.getAbsolutePath());
         runP4(clientSpec, P4_COMMAND, COMMAND_CLIENT, FLAG_INPUT);
+        clientRoot = toDirectory;
     }
 
     private NumericalRevision getLatestRevision() throws SCMException
     {
-        P4Result result = runP4(null, P4_COMMAND, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, FLAG_MAXIMUM, "1");
-        
-        // Output of p4 changes -s submitted -m 1:
-        //   Change <number> on <date> by <user>@<client>
-        Pattern changePattern = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.+)'$", Pattern.MULTILINE);
-        Matcher matcher       = changePattern.matcher(result.stdout);
+        P4Result result  = runP4(null, P4_COMMAND, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, FLAG_MAXIMUM, "1");        
+        Matcher  matcher = changesPattern.matcher(result.stdout);
         
         if(matcher.find())
         {
@@ -321,6 +320,9 @@ public class P4Server implements SCMServer
     public P4Server(String port, String user, String password, String client)
     {
         p4Builder = new ProcessBuilder();
+        // Output of p4 changes -s submitted -m 1:
+        //   Change <number> on <date> by <user>@<client>
+        changesPattern = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.+)'$", Pattern.MULTILINE);
         
         setEnv(ENV_PORT, port);
         setEnv(ENV_USER, user);
@@ -349,17 +351,22 @@ public class P4Server implements SCMServer
     {
         List<Changelist> result = new LinkedList<Changelist>();
         
-        long start = ((NumericalRevision)from).getRevisionNumber();
+        long start = ((NumericalRevision)from).getRevisionNumber() + 1;
         long end   = ((NumericalRevision)to).getRevisionNumber();
-        long i;
-        
-        for(i = start + 1; i <= end; i++)
+
+        if(start <= end)
         {
-            Changelist list = getChangelist(i);
+            P4Result p4Result = runP4(null, P4_COMMAND, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, clientRoot.getAbsoluteFile() + "/...@" + Long.toString(start) + "," + Long.toString(end));
+            Matcher  matcher  = changesPattern.matcher(p4Result.stdout);
             
-            if(list != null)
+            while(matcher.find())
             {
-                result.add(list);
+                Changelist list = getChangelist(Long.parseLong(matcher.group(1)));
+                
+                if(list != null)
+                {
+                    result.add(list);
+                }
             }
         }
         

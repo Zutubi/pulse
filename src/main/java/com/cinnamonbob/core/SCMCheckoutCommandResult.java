@@ -50,15 +50,18 @@ public class SCMCheckoutCommandResult implements CommandResult
      */
     public boolean changedBy(String login)
     {
-        for(Changelist list: changes)
+        // Double-check as changes will not be there on failure
+        if(changes != null)
         {
-            if(list.getUser().equals(login))
+            for(Changelist list: changes)
             {
-                return true;
+                if(list.getUser().equals(login))
+                {
+                    return true;
+                }
             }
         }
-        
-        System.out.println("not changed by " + login);
+
         return false;
     }
 
