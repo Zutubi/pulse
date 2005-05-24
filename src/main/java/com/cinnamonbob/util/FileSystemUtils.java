@@ -19,6 +19,15 @@ public class FileSystemUtils
      */
     public static boolean removeDirectory(File dir)
     {
+        if (!dir.exists())
+        {
+            return true;
+        }
+        if (!dir.isDirectory())
+        {
+            return false;
+        }
+
         String[] contents = dir.list();
 
         assert(contents != null);
@@ -38,7 +47,9 @@ public class FileSystemUtils
             {
                 return false;
             }
-                  
+            
+            //TODO: Fix the following condition - fails in windows since its case insensitive... just ignore case?...
+            // do not follow symlinks when deleting directories.            
             if(file.isDirectory() && canonical.equals(file.getAbsolutePath()))
             {
                 if(!removeDirectory(file))
