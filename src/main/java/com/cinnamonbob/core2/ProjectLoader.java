@@ -1,8 +1,8 @@
 package com.cinnamonbob.core2;
 
+import com.cinnamonbob.core2.schedule.Trigger;
 import com.cinnamonbob.core2.task.Task;
 import com.cinnamonbob.core2.type.Type;
-import com.cinnamonbob.core2.schedule.Scheduler;
 import nu.xom.*;
 
 import java.io.File;
@@ -28,14 +28,14 @@ public class ProjectLoader
      */ 
     private Map<String, Class> taskDefinitions = new HashMap<String, Class>();
     
-    private Map<String, Class> schedulerDefinitions = new HashMap<String, Class>();
+    private Map<String, Class> triggerDefinitions = new HashMap<String, Class>();
 
     
     public ProjectLoader() throws Exception
     {
         initialise("/com/cinnamonbob/core2/type/defaults.properties", typeDefinitions);
         initialise("/com/cinnamonbob/core2/task/defaults.properties", taskDefinitions);
-        initialise("/com/cinnamonbob/core2/schedule/defaults.properties", schedulerDefinitions);
+        initialise("/com/cinnamonbob/core2/schedule/defaults.properties", triggerDefinitions);
     }
 
     public Project load(File file)
@@ -130,29 +130,29 @@ public class ProjectLoader
             Node child = scheduleElement.getChild(j);
             if (child instanceof Element)
             {
-                Element schedulerElement = (Element) child;
-                String schedulerName = schedulerElement.getLocalName();
-                Class schedulerClass = schedulerDefinitions.get(schedulerName);
-                Scheduler schedulerInstance;
+                Element triggerElement = (Element) child;
+                String triggerName = triggerElement.getLocalName();
+                Class triggerClass = triggerDefinitions.get(triggerName);
+                Trigger triggerInstance;
                 try
                 {
-                    schedulerInstance = (Scheduler) schedulerClass.newInstance();
+                    triggerInstance = (Trigger) triggerClass.newInstance();
                 } catch (IllegalAccessException e)
                 {
                     throw new ParseException("Failed to instantiate '" +
-                            schedulerName + "'", e, schedulerElement);
+                            triggerName + "'", e, triggerElement);
                 }
                 catch (InstantiationException e)
                 {
                     throw new ParseException("Failed to instantiate '" +
-                            schedulerName + "'", e, schedulerElement);
+                            triggerName + "'", e, triggerElement);
                 }
 
-                setAttributes(schedulerElement, schedulerInstance, project);
-                schedule.addScheduler(schedulerInstance);
+                setAttributes(triggerElement, triggerInstance, project);
+                schedule.addTrigger(triggerInstance);
 
                 // need to check for nesting.
-                loadNested(schedulerElement, project, schedulerInstance);
+                loadNested(triggerElement, project, triggerInstance);
             }
         }
 

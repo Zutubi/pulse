@@ -1,16 +1,13 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.scm.*;
+import com.cinnamonbob.util.IOHelper;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
-import com.cinnamonbob.core.scm.Change;
-import com.cinnamonbob.core.scm.Changelist;
-import com.cinnamonbob.core.scm.Revision;
-import com.cinnamonbob.core.scm.SCMException;
-import com.cinnamonbob.core.scm.SCMServer;
 
 public abstract class SCMCheckoutCommand implements Command
 {
@@ -65,17 +62,7 @@ public abstract class SCMCheckoutCommand implements Command
         }
         finally
         {
-            if(writer != null)
-            {
-                try
-                {
-                    writer.close();
-                }
-                catch(IOException e)
-                {
-                    // ignore
-                }
-            }
+            IOHelper.close(writer);
         }
     }
 

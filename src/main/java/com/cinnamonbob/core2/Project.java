@@ -146,4 +146,64 @@ public class Project
     {
         schedules.add(schedule);
     }
+
+    public List<Schedule> getSchedules()
+    {
+        return Collections.unmodifiableList(schedules); 
+    }
+    
+    /**
+     * Build the named recipe
+     * 
+     * @param recipeName
+     */ 
+    public void build(String recipeName)
+    {
+        for (Recipe recipe : recipes)
+        {
+            if (recipe.getName().equals(recipeName))
+            {
+                recipe.execute();
+            }
+        }
+    }
+
+    private String defaultRecipe;
+    
+    public void build()
+    {
+        build(getDefaultRecipe());
+    }
+
+    public String getDefaultRecipe()
+    {
+        return defaultRecipe;
+    }
+
+    public void setDefaultRecipe(String defaultRecipe)
+    {
+        this.defaultRecipe = defaultRecipe;
+    }
+    
+    /**
+     * Schedule the project for building.
+     */ 
+    public void schedule()
+    {
+        // loop through configured schedules and activate them.
+        for (Schedule schedule : schedules)
+        {
+            schedule.schedule();
+        }
+    }
+    
+    public void reschedule()
+    {
+        // clear any existing schedules... delete trigger group?
+        ScheduleManager sm = new ScheduleManager();
+        sm.clearTriggers(getName());
+        
+        // reschedule.
+        schedule();
+    }    
 }

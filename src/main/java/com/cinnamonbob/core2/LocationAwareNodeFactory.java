@@ -58,7 +58,6 @@ public class LocationAwareNodeFactory extends NodeFactory
         if (locator != null)
         {
             lastLocation  = new Location(locator);
-            System.out.println("" + lastLocation);
         }
     }
 

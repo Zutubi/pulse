@@ -79,9 +79,38 @@ public class IOHelper
         {
             // nop
         }
-
     }
 
+    public static void close(OutputStream outStream)
+    {
+        try
+        {
+            if (outStream != null)
+            {
+                outStream.close();
+            }
+        } 
+        catch (IOException e)
+        {
+            //noop    
+        }
+    }
+    
+    public static void close(Writer w)
+    {
+        try
+        {
+            if (w != null)
+            {
+                w.close();
+            }
+        } 
+        catch (IOException e)
+        {
+            //noop    
+        }
+    }
+    
     public static void joinStreams(InputStream input, OutputStream output) throws IOException
     {
         byte[] buffer = new byte[1024];
@@ -114,17 +143,11 @@ public class IOHelper
             inStream = new FileInputStream(fromFile);
             outStream = new FileOutputStream(toFile);
             joinStreams(inStream, outStream);
-        } finally
+        } 
+        finally
         {
-            if (inStream != null)
-            {
-                inStream.close();
-            }
-
-            if (outStream != null)
-            {
-                outStream.close();
-            }
+            IOHelper.close(inStream);
+            IOHelper.close(outStream);
         }
     }
 }
