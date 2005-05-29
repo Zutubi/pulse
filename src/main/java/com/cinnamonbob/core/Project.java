@@ -71,7 +71,7 @@ public class Project
      */
     private int nextBuild;
     
-    private Schedule schedule;
+    private List<Schedule> schedules = new LinkedList<Schedule>();
     
     //=======================================================================
     // Implementation
@@ -114,24 +114,7 @@ public class Project
      */
     private void loadSchedule(ConfigContext context, Element element) throws ConfigException
     {
-        schedule = new Schedule(context, element, this);
-
-        // schedule job.
-        Scheduler scheduler = QuartzManager.getScheduler();
-        try
-        {
-            CronTrigger trigger = new CronTrigger(getName() + " Trigger.", Scheduler.DEFAULT_GROUP, schedule.getCronSchedule());
-            JobDetail job = new JobDetail("build project " + name, Scheduler.DEFAULT_GROUP, BuildProject.class);
-            job.getJobDataMap().put("project", this);
-            scheduler.scheduleJob(job, trigger);
-        }
-        catch (SchedulerException e)
-        {
-            throw new ConfigException("", "Error scheduling job build: " + e.getMessage());
-        } catch (ParseException e)
-        {
-            throw new ConfigException(context.getFilename(), "Invalid cron expression: " + schedule.getCronSchedule());
-        }
+        schedules.add(new Schedule(context, element, this));
     }
 
     private void loadConfig(String filename) throws ConfigException
@@ -168,6 +151,35 @@ public class Project
             else
             {
                 assert(false);
+            }
+        }
+        
+        schedule();
+    }
+
+    private void schedule()
+    {
+        // schedule job.
+        int i = 0;
+        for (Schedule schedule : schedules)
+        {
+            i++;
+            Scheduler scheduler = QuartzManager.getScheduler();
+            try
+            {
+                CronTrigger trigger = new CronTrigger(getName() + " Trigger." + i, Scheduler.DEFAULT_GROUP, schedule.getCronSchedule());
+                JobDetail job = new JobDetail("build project " + name, Scheduler.DEFAULT_GROUP, BuildProject.class);
+                job.getJobDataMap().put("project", this);
+                scheduler.scheduleJob(job, trigger);
+            }
+            //TODO: review the following exceptions, they should not be RuntimeExceptions...
+            catch (SchedulerException e)
+            {
+                throw new RuntimeException("Error scheduling job build: " + e.getMessage(), e);
+            }
+            catch (ParseException e)
+            {
+                throw new RuntimeException("Invalid cron expression: " + schedule.getCronSchedule(), e);
             }
         }
     }
