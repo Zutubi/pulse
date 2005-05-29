@@ -9,7 +9,7 @@ package com.cinnamonbob.core;
  * 
  * @author jsankey
  */
-public class InternalBuildFailureException extends Exception
+public class InternalBuildFailureException extends RuntimeException
 {
     private static final long serialVersionUID = 3257005458144178485L;
     

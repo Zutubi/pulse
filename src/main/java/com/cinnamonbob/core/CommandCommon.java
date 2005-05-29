@@ -1,5 +1,7 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.ext.ExtensionManagerUtils;
+import com.cinnamonbob.util.IOHelper;
 import nu.xom.Element;
 
 import java.io.File;
@@ -9,9 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
-
-import com.cinnamonbob.util.IOHelper;
-import com.cinnamonbob.core.ext.ExtensionManagerUtils;
 
 /**
  * @author jsankey
@@ -42,7 +41,7 @@ public class CommandCommon
      */
     private List<ProcessSpec> processors;
     /**
-     * If true, execute this command despite an earlier failure in the build.
+     * If true, initialise this command despite an earlier failure in the build.
      */
     private boolean force;
     

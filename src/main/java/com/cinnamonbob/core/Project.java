@@ -1,18 +1,16 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.bootstrap.quartz.QuartzManager;
 import nu.xom.Document;
 import nu.xom.Element;
+import org.quartz.CronTrigger;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.logging.Logger;
 import java.text.ParseException;
-
-import com.cinnamonbob.bootstrap.quartz.QuartzManager;
-import org.quartz.*;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * A project describes a set of components and a recipe to "build" those
@@ -55,6 +53,10 @@ public class Project
      * A description of how this project is built.
      */
     private Recipe recipe;
+    
+    private List<Recipe> recipes = new LinkedList<Recipe>();
+    private String defaultRecipe = "";
+    
     /**
      * A description of when this project is built.
      */
@@ -306,9 +308,21 @@ public class Project
      */
     public Recipe getRecipe()
     {
-        return recipe;
+        return getRecipe(defaultRecipe);
     }
 
+    public Recipe getRecipe(String recipeName)
+    {
+        for (Recipe recipe: recipes)
+        {
+            if (recipe.getName().equals(recipeName))
+            {
+                return recipe;
+            }
+        }
+        return null;
+    }
+    
     /**
      * Retrieves the result of the build with the given ID.
      * 

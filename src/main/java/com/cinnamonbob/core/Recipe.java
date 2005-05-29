@@ -17,7 +17,18 @@ public class Recipe implements Iterable<CommandCommon>
      */
     private List<CommandCommon> commands;
     
-
+    private String name = "";
+    
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+    
+    public String getName()
+    {
+        return this.name;
+    }
+    
     public Recipe(ConfigContext context, Element element, Project project) throws ConfigException
     {
         commands = new LinkedList<CommandCommon>();
