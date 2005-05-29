@@ -49,12 +49,9 @@ public class Project
      * Post-processors defined for this project.
      */
     private Map<String, PostProcessorCommon> postProcessors;
-    /**
-     * A description of how this project is built.
-     */
-    private Recipe recipe;
     
     private List<Recipe> recipes = new LinkedList<Recipe>();
+    
     private String defaultRecipe = "";
     
     /**
@@ -106,7 +103,7 @@ public class Project
 
     private void loadRecipe(ConfigContext context, Element element) throws ConfigException
     {
-        recipe = new Recipe(context, element, this);
+        recipes.add(new Recipe(context, element, this));
     }
 
     /**
