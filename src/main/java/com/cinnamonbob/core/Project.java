@@ -62,10 +62,7 @@ public class Project
      * Subscriptions to events on this project.
      */
     private List<Subscription> subscriptions;
-    /**
-     * Reference back to the boss.
-     */
-    private Bob theBuilder;
+
     /**
      * The next availabel build id.
      */
@@ -79,7 +76,7 @@ public class Project
 
     private void addBuiltinVariables(ConfigContext context)
     {
-        context.setVariable(VARIABLE_WORK_DIR, theBuilder.getBuildManager().getWorkRoot(this).getAbsolutePath());
+        context.setVariable(VARIABLE_WORK_DIR, getBuildManager().getWorkRoot(this).getAbsolutePath());
     }
 
 
@@ -188,14 +185,13 @@ public class Project
     // Construction
     //=======================================================================
 
-    public Project(Bob theBuilder, String name, String filename) throws ConfigException
+    public Project(String name, String filename) throws ConfigException
     {
-        this.theBuilder       = theBuilder;
         this.name             = name;
         this.postProcessors   = new TreeMap<String, PostProcessorCommon>();
         this.subscriptions    = new LinkedList<Subscription>();
         this.categoryRegistry = new FeatureCategoryRegistry();
-        this.nextBuild        = theBuilder.getBuildManager().determineNextAvailableBuildId(this);        
+        this.nextBuild        = getBuildManager().determineNextAvailableBuildId(this);        
 
         loadConfig(filename);
     }
@@ -238,7 +234,7 @@ public class Project
      */
     public BuildResult build()
     {
-        BuildResult result = theBuilder.getBuildManager().executeBuild(this, nextBuild);
+        BuildResult result = getBuildManager().executeBuild(this, nextBuild);
         
         // Don't increment nextBuild until we have finished the build, this
         // way the build won't be picked up by getHistory until complete.
@@ -309,7 +305,7 @@ public class Project
             latestBuild = nextBuild - 1;
         }
 
-        return theBuilder.getBuildManager().getHistory(this, latestBuild, maxBuilds);
+        return getBuildManager().getHistory(this, latestBuild, maxBuilds);
 	}
 
     /**
@@ -341,6 +337,11 @@ public class Project
      */
     public BuildResult getBuildResult(int id)
     {
-        return theBuilder.getBuildManager().getBuildResult(this, id);
+        return getBuildManager().getBuildResult(this, id);
+    }
+    
+    private BuildManager getBuildManager()
+    {
+        return BuildManager.getInstance();
     }
 }

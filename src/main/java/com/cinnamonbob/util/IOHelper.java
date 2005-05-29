@@ -26,19 +26,23 @@ public class IOHelper
 
     public static Properties read(File f) throws IOException
     {
-        Properties properties = new Properties();
-        FileInputStream input = new FileInputStream(f);
+        return read(new FileInputStream(f));
+    }
+
+    public static Properties read(InputStream input) throws IOException
+    {
         try
         {
+            Properties properties = new Properties();
             properties.load(input);
-        } finally
+            return properties;
+        } 
+        finally
         {
             IOHelper.close(input);
         }
-
-        return properties;
     }
-
+    
     public static void close(InputStream i)
     {
         try

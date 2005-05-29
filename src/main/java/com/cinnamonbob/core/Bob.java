@@ -34,10 +34,7 @@ public class Bob
      * The location of configuration files.
      */
     private File configDir;
-    /**
-     * The project root.  All project building output ends up in here.
-     */
-    private File projectRoot;
+
     /**
      * A mapping from project name to project.
      */
@@ -51,10 +48,6 @@ public class Bob
      * Map from service name to service.
      */
     private Map<String, Service> services;
-    /**
-     * Manages execution of project builds.
-     */
-    private BuildManager buildManager;
 
     //=======================================================================
     // Implementation
@@ -75,15 +68,12 @@ public class Bob
         loadElements(context, doc.getRootElement());
         LOG.config("Bob configuration loaded.");
         
-        buildManager = new BuildManager(projectRoot);
-        
         // Stage 2 project intialisation
         for(String projectName: projects.keySet())
         {
             loadProject(context, projectName);
         }
     }
-
 
     private void loadElements(ConfigContext context, Element root) throws ConfigException
     {
@@ -138,8 +128,8 @@ public class Bob
             }
         }
 
-        projectRoot = rootFile;
-        LOG.config("Project root set to '" + projectRoot.getAbsolutePath() + "'.");
+        getBuildManager().setAllProjectRoot(rootFile);
+        LOG.config("Project root set to '" + rootFile.getAbsolutePath() + "'.");
     }
 
     
@@ -172,7 +162,7 @@ public class Bob
         }
 
         LOG.config("Loading project '" + projectName + "' from file '" + projectFilename + "'");
-        Project project = new Project(this, projectName, projectFilename);
+        Project project = new Project(projectName, projectFilename);
         LOG.config("Project '" + projectName + "' loaded.");
         projects.put(projectName, project);
     }
@@ -232,7 +222,7 @@ public class Bob
      */
     public File getProjectRoot()
     {
-        return projectRoot;
+        return getBuildManager().getAllProjectRoot();
     }
 
     /**
@@ -248,7 +238,7 @@ public class Bob
      */
     public BuildManager getBuildManager()
     {
-        return buildManager;
+        return BuildManager.getInstance();
     }
     
     public Service lookupService(String name)

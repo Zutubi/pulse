@@ -33,4 +33,6 @@
 
     <bean id="extensionManager" class="com.cinnamonbob.core.ext.DefaultExtensionManager" init-method="init"/>
 
+    <bean id="buildManager" class="com.cinnamonbob.core.BuildManager"/>
+    
 </beans>

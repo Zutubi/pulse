@@ -1,5 +1,6 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.bootstrap.StartupManager;
 import com.cinnamonbob.util.FileSystemUtils;
 import com.thoughtworks.xstream.XStream;
 
@@ -32,7 +33,7 @@ public class BuildManager
     /**
      * Used for (de)serialisation.
      */
-    private XStream xstream;
+    private XStream xstream = new XStream();
 
     private File projectRoot;
 
@@ -40,12 +41,24 @@ public class BuildManager
     /**
      * Initialise this manager.
      */
-    public BuildManager(File projectRoot)
+    public BuildManager()
     {
-        this.projectRoot = projectRoot;
-        xstream = new XStream();
     }
 
+    public void setAllProjectRoot(File f)
+    {
+        this.projectRoot = f;
+    }
+    
+    public File getAllProjectRoot()
+    {
+        return this.projectRoot;
+    }
+    
+    public static BuildManager getInstance()
+    {
+        return (BuildManager) StartupManager.getBean("buildManager");        
+    }
     
     public File getProjectRoot(Project project)
     {
