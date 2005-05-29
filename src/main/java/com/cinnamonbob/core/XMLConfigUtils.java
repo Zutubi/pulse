@@ -1,11 +1,6 @@
 package com.cinnamonbob.core;
 
-import nu.xom.Builder;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Node;
-import nu.xom.ParsingException;
-import nu.xom.Text;
+import nu.xom.*;
 
 import java.io.IOException;
 import java.io.File;
@@ -218,7 +213,7 @@ public class XMLConfigUtils
     {
         try
         {
-            Builder builder = new Builder();
+            Builder builder = new Builder(new NodeFactory());
             Document doc = builder.build(new File(filename));
             
             return doc;

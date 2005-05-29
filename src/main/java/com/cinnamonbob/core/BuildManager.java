@@ -112,12 +112,18 @@ public class BuildManager
         }
     }
 
+    /**
+     * Execute the default build for the specified project.
+     * @param project
+     * @param id
+     * @return
+     */ 
     public BuildResult executeBuild(Project project, int id)
     {
         // Allocate the result with a unique id.
         BuildResult result = new BuildResult(project.getName(), id, project.getCategoryRegistry());
         long startTime = System.currentTimeMillis();
-        File buildDir = null;
+        File buildDir;
 
         try
         {
