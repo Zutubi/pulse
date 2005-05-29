@@ -47,6 +47,7 @@ public class BuildManager
 
     public void setAllProjectRoot(File f)
     {
+        System.out.println("BuildManager.setAllProjectRoot("+f+")");
         this.projectRoot = f;
     }
     
@@ -63,8 +64,7 @@ public class BuildManager
     public File getProjectRoot(Project project)
     {
         return new File(projectRoot, project.getName());        
-    }
-    
+    }    
 
     public File getBuildRoot(Project project)
     {

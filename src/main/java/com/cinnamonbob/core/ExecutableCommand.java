@@ -1,31 +1,18 @@
 package com.cinnamonbob.core;
 
-import nu.xom.Element;
+import com.cinnamonbob.util.IOHelper;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
+import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
-
-import com.cinnamonbob.util.IOHelper;
 
 /**
  * A command that involves running an executable.
  */
 public class ExecutableCommand implements Command
 {
-    private static final String CONFIG_ATTR_EXECUTABLE        = "exe";
-    private static final String CONFIG_ATTR_ARGUMENTS         = "args";
-    private static final String CONFIG_ATTR_WORKING_DIRECTORY = "working-dir";
-    private static final String OUTPUT_FILENAME               = "output.txt";
-    private static final String CONFIG_ELEMENT_ENVIRONMENT    = "environment";
-    private static final String CONFIG_ATTR_NAME              = "name";
-    private static final String CONFIG_ATTR_VALUE             = "value";
+
+    private static final String EXE_OUTPUT_FILENAME               = "output.txt";
     
     private CommandCommon  common;
     private String         executable;
@@ -33,53 +20,10 @@ public class ExecutableCommand implements Command
     private File           workingDirectory;
     private ProcessBuilder builder;
     
-    private void loadConfig(ConfigContext context, Element element) throws ConfigException
+    public void setCommand(List<String> command)
     {
-        String working;
-        
-        executable = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_EXECUTABLE);
-        working = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_WORKING_DIRECTORY, ".");
-        workingDirectory = new File(working);
-        
-        String argumentString = XMLConfigUtils.getOptionalAttributeValue(context, element, CONFIG_ATTR_ARGUMENTS, null);
-        List<String> command;
-
-        if(argumentString == null)
-        {
-            command = new LinkedList<String>();
-        }
-        else
-        {
-            arguments = argumentString.split(" ");
-            command = new LinkedList<String>(Arrays.asList(arguments));
-        }
-
-        command.add(0, executable);
         builder = new ProcessBuilder(command);
-
-        loadChildElements(context, element);
     }
-
-    
-    private void loadChildElements(ConfigContext context, Element element) throws ConfigException
-    {
-        List<Element> elements = XMLConfigUtils.getElements(context, element, Arrays.asList(CONFIG_ELEMENT_ENVIRONMENT));
-        
-        for(Element current: elements)
-        {
-            loadEnvironment(context, current);
-        }        
-    }
-
-    
-    private void loadEnvironment(ConfigContext context, Element element) throws ConfigException
-    {
-        String name  = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_NAME);
-        String value = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_VALUE);
-        
-        builder.environment().put(name, value);
-    }
-
 
     private int runChild(OutputStream outputStream) throws InternalBuildFailureException
     {
@@ -140,19 +84,16 @@ public class ExecutableCommand implements Command
     }
 
 
-    public ExecutableCommand(ConfigContext context, Element element, CommandCommon common) throws ConfigException
+    public ExecutableCommand()
     {
-        this.common = common;
-        loadConfig(context, element);        
     }
-
     
     public ExecutableCommandResult execute(File outputDir, BuildResult previousBuild) throws InternalBuildFailureException
     {
-        builder.directory(workingDirectory);
+        builder.directory(getWorkingDirectory());
         builder.redirectErrorStream(true);
 
-        File             outputFile = new File(outputDir, OUTPUT_FILENAME);
+        File             outputFile = new File(outputDir, EXE_OUTPUT_FILENAME);
         FileOutputStream outputStream;
         int              result = -1;
         
@@ -166,7 +107,7 @@ public class ExecutableCommand implements Command
             throw new InternalBuildFailureException("Could not create command output file '" + outputFile.getAbsolutePath() + "'", e);
         }
         
-        return new ExecutableCommandResult(constructCommandLine(), workingDirectory.getAbsolutePath(), result);
+        return new ExecutableCommandResult(constructCommandLine(), getWorkingDirectory().getAbsolutePath(), result);
     }
     
     
@@ -174,8 +115,48 @@ public class ExecutableCommand implements Command
     {
         List<ArtifactSpec> list = new LinkedList<ArtifactSpec>();
         
-        list.add(new ArtifactSpec("output", "Command Output", Artifact.TYPE_PLAIN, new File(OUTPUT_FILENAME)));
+        list.add(new ArtifactSpec("output", "Command Output", Artifact.TYPE_PLAIN, new File(EXE_OUTPUT_FILENAME)));
         
         return list;
+    }
+
+    public String getExecutable()
+    {
+        return executable;
+    }
+
+    public void setExecutable(String executable)
+    {
+        this.executable = executable;
+    }
+
+    public String[] getArguments()
+    {
+        return arguments;
+    }
+
+    public void setArguments(String[] arguments)
+    {
+        this.arguments = arguments;
+    }
+
+    public File getWorkingDirectory()
+    {
+        return workingDirectory;
+    }
+
+    public void setWorkingDirectory(File workingDirectory)
+    {
+        this.workingDirectory = workingDirectory;
+    }
+
+    public void setCommandCommon(CommandCommon common)
+    {
+        this.common = common;
+    }
+
+    public void addEnv(String name, String value)
+    {
+        builder.environment().put(name, value);
     }
 }

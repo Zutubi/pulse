@@ -1,56 +1,24 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.util.Pair;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-import com.cinnamonbob.util.Pair;
-
-import nu.xom.Element;
 
 public class RegexPostProcessor implements PostProcessor
 {
     private static final Logger LOG = Logger.getLogger(RegexPostProcessor.class.getName());
     
-    private static final String CONFIG_ELEMENT_PATTERN = "pattern";
-    private static final String CONFIG_ATTR_CATEGORY   = "category";
-    private static final String CONFIG_ATTR_EXPRESSION = "expression";
-       
-    private List<Pair<String, Pattern>> patterns;
-    private PostProcessorCommon common;
-    private Project project;
-    
-    
-    private void loadPattern(ConfigContext context, Element element) throws ConfigException
-    {
-        String category   = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_CATEGORY);
-        String expression = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_EXPRESSION);
+    public final List<Pair<String, Pattern>> patterns = new LinkedList<Pair<String, Pattern>>();
+    public PostProcessorCommon common;
         
-        if(!project.getCategoryRegistry().hasCategory(category))
-        {
-            throw new ConfigException(context.getFilename(), "Post processor '" + common.getName() + "' refers to unknown category '" + category +"'");
-        }
-        
-        try
-        {
-            Pattern pattern = Pattern.compile(expression);
-            patterns.add(new Pair<String, Pattern>(category, pattern));
-        }
-        catch(PatternSyntaxException e)
-        {
-            throw new ConfigException(context.getFilename(), "Post processor '" + common.getName() + "' contains invalid expression: " + e.getMessage());
-        }
-    }
-
-
     private void processLine(Artifact artifact, String line, long lineNumber)
     {
         for(Pair<String, Pattern> pair: patterns)
@@ -64,20 +32,14 @@ public class RegexPostProcessor implements PostProcessor
     }
 
     
-    public RegexPostProcessor(ConfigContext context, Element element, PostProcessorCommon common, Project project) throws ConfigException
+    public RegexPostProcessor() 
     {
-        this.common  = common;
-        this.project = project;
-        patterns     = new LinkedList<Pair<String, Pattern>>();
-        
-        List<Element> elements = XMLConfigUtils.getElements(context, element, Arrays.asList(CONFIG_ELEMENT_PATTERN));
-        
-        for(Element current: elements)
-        {
-            loadPattern(context, current);
-        }
     }
     
+    public void setPostProcessorCommon(PostProcessorCommon c)
+    {
+        this.common = c;
+    }
     
     public void process(Artifact artifact)
     {

@@ -1,8 +1,6 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.bootstrap.quartz.QuartzManager;
-import nu.xom.Document;
-import nu.xom.Element;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -20,13 +18,6 @@ public class Project
 {
     private static final Logger LOG = Logger.getLogger(Project.class.getName());
 
-    private static final String CONFIG_ELEMENT_DESCRIPTION    = "description";
-    private static final String CONFIG_ELEMENT_POST_PROCESSOR = "post-processor";
-    private static final String CONFIG_ELEMENT_RECIPE         = "recipe";
-    private static final String CONFIG_ELEMENT_SCHEDULE       = "schedule";
-
-    private static final String VARIABLE_WORK_DIR             = "work.dir";
-
     /**
      * The name of this project, which must be unique amongst all projects.
      */
@@ -40,17 +31,17 @@ public class Project
     /**
      * Registry of known feature categories.
      */
-    private FeatureCategoryRegistry categoryRegistry;
+    public FeatureCategoryRegistry categoryRegistry;
     
     /**
      * Post-processors defined for this project.
      */
-    private Map<String, PostProcessorCommon> postProcessors;
+    public Map<String, PostProcessorCommon> postProcessors;
 
     /**
      * The recipes associated with this project.
      */ 
-    private List<Recipe> recipes = new LinkedList<Recipe>();
+    public List<Recipe> recipes = new LinkedList<Recipe>();
 
     /**
      * The name of the default recipe, ie: the default set of commands.
@@ -60,17 +51,17 @@ public class Project
     /**
      * Subscriptions to events on this project.
      */
-    private List<Subscription> subscriptions;
+    public List<Subscription> subscriptions;
 
     /**
      * The next availabel build id.
      */
-    private int nextBuild;
+    public int nextBuild;
 
     /**
      * The list of schedules configured for this project.
      */ 
-    private List<Schedule> schedules = new LinkedList<Schedule>();
+    public List<Schedule> schedules = new LinkedList<Schedule>();
     
     private Properties properties = new Properties();
     private Map<String, Object> references = new HashMap<String, Object>();
@@ -79,35 +70,19 @@ public class Project
     // Implementation
     //=======================================================================
 
-    private void addBuiltinVariables(ConfigContext context)
-    {
-        context.setVariable(VARIABLE_WORK_DIR, getBuildManager().getWorkRoot(this).getAbsolutePath());
-    }
-
-
 
     //=======================================================================
     // Construction
     //=======================================================================
-
-    public Project(String name, String filename) throws ConfigException
-    {
-        setName(name);
-        
-        this.postProcessors   = new TreeMap<String, PostProcessorCommon>();
-        this.subscriptions    = new LinkedList<Subscription>();
-        this.categoryRegistry = new FeatureCategoryRegistry();
-        this.nextBuild        = getBuildManager().determineNextAvailableBuildId(this);        
-
-        loadConfig(filename);
-    }
 
     /**
      * No argument constructor required by xml loading process.
      */ 
     public Project()
     {
-        
+        this.postProcessors   = new TreeMap<String, PostProcessorCommon>();
+        this.subscriptions    = new LinkedList<Subscription>();
+        this.categoryRegistry = new FeatureCategoryRegistry();
     }
     
     //=======================================================================
@@ -277,81 +252,7 @@ public class Project
     // Old configuration implementation.
     //=======================================================================
 
-    private void loadDescription(ConfigContext context, Element element) throws ConfigException
-    {
-        description = XMLConfigUtils.getElementText(context, element);
-    }
-
-
-    private void loadPostProcessor(ConfigContext context, Element element) throws ConfigException
-    {
-        PostProcessorCommon post = new PostProcessorCommon(context, element, this);
-
-        if(postProcessors.containsKey(post.getName()))
-        {
-            throw new ConfigException(context.getFilename(), "Project '" + name + "' already contains a post-processor named '" + post.getName() + "'");
-        }
-
-        postProcessors.put(post.getName(), post);
-    }
-
-    private void loadRecipe(ConfigContext context, Element element) throws ConfigException
-    {
-        recipes.add(new Recipe(context, element, this));
-    }
-
-    /**
-     *
-     * @param context
-     * @param element
-     * @throws ConfigException
-     */
-    private void loadSchedule(ConfigContext context, Element element) throws ConfigException
-    {
-        schedules.add(new Schedule(context, element, this));
-    }
-
-    private void loadConfig(String filename) throws ConfigException
-    {
-        Document      doc      = XMLConfigUtils.loadFile(filename);
-        ConfigContext context  = new ConfigContext(filename);
-
-        addBuiltinVariables(context);
-
-        List<Element> elements = XMLConfigUtils.getElements(context, doc.getRootElement(), Arrays.asList(XMLConfigUtils.CONFIG_ELEMENT_PROPERTY, CONFIG_ELEMENT_DESCRIPTION, CONFIG_ELEMENT_POST_PROCESSOR, CONFIG_ELEMENT_RECIPE, CONFIG_ELEMENT_SCHEDULE));
-
-        XMLConfigUtils.extractProperties(context, elements);
-
-        for(Element current: elements)
-        {
-            String  elementName = current.getLocalName();
-
-            if(elementName.equals(CONFIG_ELEMENT_DESCRIPTION))
-            {
-                loadDescription(context, current);
-            }
-            else if(elementName.equals(CONFIG_ELEMENT_POST_PROCESSOR))
-            {
-                loadPostProcessor(context, current);
-            }
-            else if(elementName.equals(CONFIG_ELEMENT_RECIPE))
-            {
-                loadRecipe(context, current);
-            }
-            else if (elementName.equals(CONFIG_ELEMENT_SCHEDULE))
-            {
-                loadSchedule(context, current);
-            }
-            else
-            {
-                assert(false);
-            }
-        }
-        
-        schedule();
-    }
-
-    private void schedule()
+    public void schedule()
     {
         // schedule job.
         int i = 0;
@@ -361,7 +262,7 @@ public class Project
             Scheduler scheduler = QuartzManager.getScheduler();
             try
             {
-                CronTrigger trigger = new CronTrigger(getName() + " Trigger." + i, Scheduler.DEFAULT_GROUP, schedule.getCronSchedule());
+                CronTrigger trigger = new CronTrigger(getName() + " Trigger." + i, Scheduler.DEFAULT_GROUP, schedule.getFrequency());
                 JobDetail job = new JobDetail("build project " + name, Scheduler.DEFAULT_GROUP, BuildProject.class);
                 job.getJobDataMap().put("project", this);
                 scheduler.scheduleJob(job, trigger);
@@ -373,8 +274,13 @@ public class Project
             }
             catch (ParseException e)
             {
-                throw new RuntimeException("Invalid cron expression: " + schedule.getCronSchedule(), e);
+                throw new RuntimeException("Invalid cron expression: " + schedule.getFrequency(), e);
             }
         }
+    }
+
+    public void setNextBuildId(int i)
+    {
+        nextBuild = i;
     }
 }

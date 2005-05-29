@@ -1,23 +1,25 @@
 package com.cinnamonbob.core;
 
-import nu.xom.Element;
-
 /**
  * 
  *
  */
 public class Schedule
 {
-    private String cronSchedule;
+    private String frequency;
 
-    public Schedule(ConfigContext context, Element element, Project parent) throws ConfigException
-    {
-        cronSchedule = XMLConfigUtils.getAttributeValue(context, element, "frequency");
+    public Schedule()
+    {        
     }
-
-    public String getCronSchedule()
+    
+    public void setFrequency(String s)
     {
-        return cronSchedule;
+        this.frequency = s;
+    }
+    
+    public String getFrequency()
+    {
+        return frequency;
     }
 
 }

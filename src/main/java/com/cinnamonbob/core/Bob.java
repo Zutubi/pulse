@@ -161,8 +161,10 @@ public class Bob
             throw new ConfigException(projectFilename, "Configuration file '" + projectFilename + "' for project '" + projectName + "' does not exist.");
         }
 
+        ProjectLoader loader = new ProjectLoader();
+        
         LOG.config("Loading project '" + projectName + "' from file '" + projectFilename + "'");
-        Project project = new Project(projectName, projectFilename);
+        Project project = loader.loadProject(projectName, projectFilename);
         LOG.config("Project '" + projectName + "' loaded.");
         projects.put(projectName, project);
     }

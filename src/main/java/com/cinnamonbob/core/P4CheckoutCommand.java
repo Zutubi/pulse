@@ -1,12 +1,11 @@
 package com.cinnamonbob.core;
 
-import java.io.File;
-
 import com.cinnamonbob.core.scm.P4Server;
 import com.cinnamonbob.core.scm.SCMException;
 import com.cinnamonbob.core.scm.SCMServer;
-
 import nu.xom.Element;
+
+import java.io.File;
 
 /**
  * A command for checking out code from a Subversion repository.
@@ -63,5 +62,27 @@ public class P4CheckoutCommand extends SCMCheckoutCommand
     protected void destroyServer(SCMServer server)
     {
         // Nothing to do
+    }
+    
+    public void setPort(String port)
+    {
+        this.port = port;
+    }
+    
+    public void setUser(String user)
+    {
+        this.user = user;
+    }
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
+    public void setClient(String client)
+    {
+        this.client = client;
+    }
+    public void setPath(File path)
+    {
+        this.path = path;
     }
 }

@@ -6,7 +6,7 @@ import nu.xom.Element;
 /**
  * @author jsankey
  */
-public class PostProcessorFactory extends GenericFactory<PostProcessor>
+public @Deprecated class PostProcessorFactory extends GenericFactory<PostProcessor>
 {
     public PostProcessorFactory()
     {

@@ -2,8 +2,6 @@ package com.cinnamonbob.core;
 
 import java.io.File;
 
-import nu.xom.Element;
-
 /**
  * Specification for a command artifact.  Describes both the artifact and how
  * to collect it (if necessary).
@@ -12,12 +10,6 @@ import nu.xom.Element;
  */
 public class ArtifactSpec
 {
-    private static final String CONFIG_ATTR_NAME      = "name";
-    private static final String CONFIG_ATTR_TITLE     = "title";
-    private static final String CONFIG_ATTR_TYPE      = "type";
-    private static final String CONFIG_ATTR_FROM_FILE = "from-file";
-    private static final String CONFIG_ATTR_TO_FILE   = "to-file";
-    
     /**
      * The name of the artifact, unique in the command.
      */
@@ -46,25 +38,8 @@ public class ArtifactSpec
     // Construction
     //=======================================================================
 
-    /**
-     * Constructs an ArtifactSpec from the given XML fragment.
-     * 
-     * @param context
-     *        context information about configuration loading
-     * @param element
-     *        the &lt;artifact&gt; element to load from
-     * @throws ConfigException
-     */
-    public ArtifactSpec(ConfigContext context, Element element) throws ConfigException
+    public ArtifactSpec() 
     {
-        name  = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_NAME);
-        title = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_TITLE, name);
-        type  = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_TYPE);
-        
-        fromFile = new File(XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_FROM_FILE));
-        
-        String toFileName = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_TO_FILE, fromFile.getName());
-        toFile = new File(toFileName);
     }
     
     /**
@@ -111,6 +86,11 @@ public class ArtifactSpec
         return name;
     }
 
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+    
     /**
      * @return the artifact title
      */
@@ -119,12 +99,22 @@ public class ArtifactSpec
         return title;
     }
 
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
+    
     /**
      * @return the source file for the artifact
      */
     public File getFromFile()
     {
         return fromFile;
+    }
+    
+    public void setFromFile(File f)
+    {
+        this.fromFile = f;
     }
     
     /**
@@ -135,12 +125,22 @@ public class ArtifactSpec
         return toFile;
     }
 
+    public void setToFile(File f)
+    {
+        this.toFile = f;
+    }
+    
     /**
      * @return the artifact type
      */
     public String getType()
     {
         return type;
+    }
+    
+    public void setType(String type)
+    {
+        this.type = type;
     }
     
     /**

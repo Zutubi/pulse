@@ -1,8 +1,6 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.core.ext.ExtensionManagerUtils;
 import com.cinnamonbob.util.IOHelper;
-import nu.xom.Element;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,11 +17,6 @@ public class CommandCommon
 {
     private static final Logger LOG = Logger.getLogger(CommandCommon.class.getName());
     
-    private static final String CONFIG_ATTR_NAME        = "name";
-    private static final String CONFIG_ATTR_FORCE       = "force";
-    private static final String CONFIG_ELEMENT_ARTIFACT = "artifact";
-    private static final String CONFIG_ELEMENT_PROCESS  = "process";
-    
     /**
      * Decriptive name for the command.
      */
@@ -35,11 +28,11 @@ public class CommandCommon
     /**
      * Map from artifact name to specification for the artifact.
      */
-    private Map<String, ArtifactSpec> artifacts;
+    private Map<String, ArtifactSpec> artifacts= new TreeMap<String, ArtifactSpec>();;
     /**
      * Specifications for post-processors.
      */
-    private List<ProcessSpec> processors;
+    private List<ProcessSpec> processors = new LinkedList<ProcessSpec>();;
     /**
      * If true, initialise this command despite an earlier failure in the build.
      */
@@ -48,24 +41,6 @@ public class CommandCommon
     //=======================================================================
     // Implementation
     //=======================================================================
-
-    private void loadArtifact(ConfigContext context, Element element) throws ConfigException
-    {
-        ArtifactSpec spec = new ArtifactSpec(context, element);
-
-        if(artifacts.containsKey(spec.getName()))
-        {
-            throw new ConfigException(context.getFilename(), "Command '" + name + "' already contains an artifact named '" + spec.getName() +"'");
-        }
-        artifacts.put(spec.getName(), spec);
-    }
-
-    
-    private void loadProcess(ConfigContext context, Element element, Project project) throws ConfigException
-    {
-        processors.add(new ProcessSpec(context, element, project, this));
-    }
-
 
     private void collectArtifacts(CommandResultCommon commonResult, File outputDir)
     {
@@ -129,66 +104,32 @@ public class CommandCommon
     // Construction
     //=======================================================================
 
-    /**
-     * Constructs a new command by loading from the given element.
-     * 
-     * @param context
-     *        configuration context used during loading
-     * @param element
-     *        root element of the command configuration
-     * @param project
-     *        the project this command belongs to
-     * @throws ConfigException
-     *         if there is an error in the configuration
-     */
-    public CommandCommon(ConfigContext context, Element element, Project project) throws ConfigException
+    public CommandCommon()
+    {        
+    }
+    
+    public void setCommand(Command c)
     {
-        name       = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_NAME);
-        artifacts  = new TreeMap<String, ArtifactSpec>();
-        processors = new LinkedList<ProcessSpec>();
-        
-        if(element.getAttributeValue(CONFIG_ATTR_FORCE) == null)
+        this.command = c;
+    }
+    
+    public void addArtifactSpec(ArtifactSpec spec)
+    {
+        if(artifacts.containsKey(spec.getName()))
         {
-            force = false;
+            throw new IllegalArgumentException("Artifact " + spec.getName() + " already exists.");
         }
-        else
-        {
-            force = true;
-        }
-        
-        List<Element> childElements = XMLConfigUtils.getElements(context, element);
-        
-        if(childElements.size() == 0)
-        {
-            throw new ConfigException(context.getFilename(), "Command '" + name + "' contains no child elements.");
-        }
-        
-        // The first child is the specific command element
-        command = ExtensionManagerUtils.createCommand(childElements.get(0).getLocalName(), context, childElements.get(0), this);
-        
-        for(ArtifactSpec artifactSpec: command.getArtifacts())
-        {
-            artifacts.put(artifactSpec.getName(), artifactSpec);
-        }
-        
-        for(int i = 1; i < childElements.size(); i++)
-        {
-            Element child     = childElements.get(i);
-            String  childName = child.getLocalName();
-            
-            if(childName.equals(CONFIG_ELEMENT_ARTIFACT))
-            {
-                loadArtifact(context, child);
-            }
-            else if(childName.equals(CONFIG_ELEMENT_PROCESS))
-            {
-                loadProcess(context, child, project);
-            }
-            else
-            {
-                throw new ConfigException(context.getFilename(), "Command element includes unrecognised element '" + childName + "'");
-            }
-        }
+        artifacts.put(spec.getName(), spec);
+    }
+    
+    public void addProcessSpec(ProcessSpec spec)
+    {
+        processors.add(spec);
+    }
+    
+    public void setForce(boolean b)
+    {
+        this.force = b;
     }
     
     //=======================================================================
@@ -201,6 +142,11 @@ public class CommandCommon
     public String getName()
     {
         return name;
+    }
+    
+    public void setName(String name)
+    {
+        this.name = name;
     }
     
     /**

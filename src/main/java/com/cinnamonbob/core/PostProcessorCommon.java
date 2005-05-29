@@ -1,10 +1,5 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.core.ext.ExtensionManagerUtils;
-import nu.xom.Element;
-
-import java.util.List;
-
 /**
  * Contains the common part of a post processor.
  * 
@@ -12,34 +7,28 @@ import java.util.List;
  */
 public class PostProcessorCommon
 {
-    private static final String CONFIG_ATTR_NAME = "name";
-    
     private String name;
     private PostProcessor postProcessor;
-    
-    
-    public PostProcessorCommon(ConfigContext context, Element element, Project project) throws ConfigException
+        
+    public PostProcessorCommon() 
     {
-        name = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_NAME);
-
-        List<Element> childElements = XMLConfigUtils.getElements(context, element);
-        
-        if(childElements.size() == 0)
-        {
-            throw new ConfigException(context.getFilename(), "Post processor '" + name + "' contains no child elements.");
-        }
-        
-        // The first child is the specific command element
-        postProcessor = ExtensionManagerUtils.createPostProcessor(childElements.get(0).getLocalName(), context, childElements.get(0), this, project);
-    }
-    
+    }    
     
     public String getName()
     {
         return name;
     }
 
-
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+    
+    public void setPostProcessor(PostProcessor p)
+    {
+        this.postProcessor = p;
+    }
+    
     public void process(Artifact artifact)
     {
         postProcessor.process(artifact);

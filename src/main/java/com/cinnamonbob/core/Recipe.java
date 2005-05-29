@@ -1,8 +1,5 @@
 package com.cinnamonbob.core;
 
-import nu.xom.Element;
-
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +12,7 @@ public class Recipe implements Iterable<CommandCommon>
     /**
      * The sequence of commands required to build the recipe.
      */
-    private List<CommandCommon> commands;
+    private List<CommandCommon> commands = new LinkedList<CommandCommon>();
     
     private String name = "";
     
@@ -29,25 +26,15 @@ public class Recipe implements Iterable<CommandCommon>
         return this.name;
     }
     
-    public Recipe(ConfigContext context, Element element, Project project) throws ConfigException
+    public Recipe()
     {
-        commands = new LinkedList<CommandCommon>();
-        loadCommands(context, element, project);
     }
 
-
-    private void loadCommands(ConfigContext context, Element element, Project project) throws ConfigException
+    public void addCommand(CommandCommon c)
     {
-        List<Element> elements = XMLConfigUtils.getElements(context, element, Arrays.asList("command"));
-        
-        for(Element current: elements)
-        {
-            CommandCommon command = new CommandCommon(context, current, project);
-            commands.add(command);
-        }
+        commands.add(c);
     }
-
-
+    
     /**
      * Returns an iterator of the commands in this recipe.
      */
