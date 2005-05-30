@@ -51,6 +51,28 @@ public class ProjectLoader
     private static final String REGEX_CONFIG_ATTR_CATEGORY   = "category";
     private static final String REGEX_CONFIG_ATTR_EXPRESSION = "expression";
        
+    private static final String P4_CONFIG_ATTR_PORT       = "port";
+    private static final String P4_CONFIG_ATTR_USER       = "user";
+    private static final String P4_CONFIG_ATTR_PASSWORD   = "password";
+    private static final String P4_CONFIG_ATTR_CLIENT     = "client";
+    private static final String P4_CONFIG_ATTR_PATH       = "path";
+    private static final String P4_VARIABLE_PORT          = "p4.port";
+    private static final String P4_VARIABLE_USER          = "p4.user";
+    private static final String P4_VARIABLE_PASSWORD      = "p4.password";
+    private static final String P4_VARIABLE_CLIENT        = "p4.client";
+
+    private static final String SVN_CONFIG_ATTR_USER       = "user";
+    private static final String SVN_CONFIG_ATTR_PASSWORD   = "password";
+    private static final String SVN_CONFIG_ATTR_KEY_FILE   = "key-file";
+    private static final String SVN_CONFIG_ATTR_PASSPHRASE = "passphrase";
+    private static final String SVN_CONFIG_ATTR_URL        = "url";
+    private static final String SVN_CONFIG_ATTR_PATH       = "path";
+    private static final String SVN_VARIABLE_USER          = "svn.user";
+    private static final String SVN_VARIABLE_PASSWORD      = "svn.password";
+    private static final String SVN_VARIABLE_KEY_FILE      = "svn.keyfile";
+    private static final String SVN_VARIABLE_PASSPHRASE    = "svn.passphrase";
+    private static final String SVN_VARIABLE_URL           = "svn.url";
+
     public Project loadProject(String name, String filename) throws ConfigException
     {
         Project project = new Project();
@@ -178,11 +200,11 @@ public class ProjectLoader
         }
         else if (elementName.equals("p4-checkout"))
         {
-            command = new P4CheckoutCommand(context, childElements.get(0), commandCommon);
+            command = loadP4CheckoutCommand(context, childElements.get(0), commandCommon);            
         }
         else if (elementName.equals("svn-checkout"))
         {
-            command = new SVNCheckoutCommand(context, childElements.get(0), commandCommon);
+            command = loadSVNCheckoutCommand(context, childElements.get(0), commandCommon);
         }
         commandCommon.setCommand(command);
         
@@ -208,6 +230,29 @@ public class ProjectLoader
             }
         }
         return commandCommon;
+    }
+
+    private Command loadSVNCheckoutCommand(ConfigContext context, Element element, CommandCommon commandCommon) throws ConfigException
+    {
+        SVNCheckoutCommand command = new SVNCheckoutCommand(commandCommon);
+        command.setUser(XMLConfigUtils.getAttributeValue(context, element, SVN_CONFIG_ATTR_USER, context.getVariableValue(SVN_VARIABLE_USER)));
+        command.setPassword(XMLConfigUtils.getAttributeValue(context, element, SVN_CONFIG_ATTR_PASSWORD, context.getVariableValue(SVN_VARIABLE_PASSWORD)));
+        command.setKeyFile(XMLConfigUtils.getOptionalAttributeValue(context, element, SVN_CONFIG_ATTR_KEY_FILE, context.getVariableValue(SVN_VARIABLE_KEY_FILE)));
+        command.setPassphrase(XMLConfigUtils.getOptionalAttributeValue(context, element, SVN_CONFIG_ATTR_PASSPHRASE, context.getVariableValue(SVN_VARIABLE_PASSPHRASE)));
+        command.setUrl(XMLConfigUtils.getAttributeValue(context, element, SVN_CONFIG_ATTR_URL, context.getVariableValue(SVN_VARIABLE_URL)));
+        command.setPath(new File(XMLConfigUtils.getAttributeValue(context, element, SVN_CONFIG_ATTR_PATH)));
+        return command;
+    }
+
+    private Command loadP4CheckoutCommand(ConfigContext context, Element element, CommandCommon commandCommon) throws ConfigException
+    {
+        P4CheckoutCommand command = new P4CheckoutCommand(commandCommon);        
+        command.setPort(XMLConfigUtils.getOptionalAttributeValue(context, element, P4_CONFIG_ATTR_PORT, context.getVariableValue(P4_VARIABLE_PORT)));
+        command.setUser(XMLConfigUtils.getOptionalAttributeValue(context, element, P4_CONFIG_ATTR_USER, context.getVariableValue(P4_VARIABLE_USER)));
+        command.setPassword(XMLConfigUtils.getOptionalAttributeValue(context, element, P4_CONFIG_ATTR_PASSWORD, context.getVariableValue(P4_VARIABLE_PASSWORD)));
+        command.setClient(XMLConfigUtils.getOptionalAttributeValue(context, element, P4_CONFIG_ATTR_CLIENT, context.getVariableValue(P4_VARIABLE_CLIENT)));
+        command.setPath(new File(XMLConfigUtils.getAttributeValue(context, element, P4_CONFIG_ATTR_PATH)));        
+        return command;
     }
 
     private void loadArtifact(CommandCommon command, ConfigContext context, Element element) throws ConfigException

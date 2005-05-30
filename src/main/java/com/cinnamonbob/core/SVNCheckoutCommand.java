@@ -1,12 +1,10 @@
 package com.cinnamonbob.core;
 
-import java.io.File;
-
 import com.cinnamonbob.core.scm.SCMException;
 import com.cinnamonbob.core.scm.SCMServer;
 import com.cinnamonbob.core.scm.SVNServer;
 
-import nu.xom.Element;
+import java.io.File;
 
 /**
  * A command for checking out code from a Subversion repository.
@@ -15,17 +13,6 @@ import nu.xom.Element;
  */
 public class SVNCheckoutCommand extends SCMCheckoutCommand
 {
-    private static final String CONFIG_ATTR_USER       = "user";
-    private static final String CONFIG_ATTR_PASSWORD   = "password";
-    private static final String CONFIG_ATTR_KEY_FILE   = "key-file";
-    private static final String CONFIG_ATTR_PASSPHRASE = "passphrase";
-    private static final String CONFIG_ATTR_URL        = "url";
-    private static final String CONFIG_ATTR_PATH       = "path";
-    private static final String VARIABLE_USER          = "svn.user";
-    private static final String VARIABLE_PASSWORD      = "svn.password";
-    private static final String VARIABLE_KEY_FILE      = "svn.keyfile";
-    private static final String VARIABLE_PASSPHRASE    = "svn.passphrase";
-    private static final String VARIABLE_URL           = "svn.url";
 
     private String user;
     private String password;
@@ -34,23 +21,11 @@ public class SVNCheckoutCommand extends SCMCheckoutCommand
     private String url;
     private File   path;
     
-    
-    private void loadConfig(ConfigContext context, Element element) throws ConfigException
-    {
-        user       = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_USER, context.getVariableValue(VARIABLE_USER));
-        password   = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_PASSWORD, context.getVariableValue(VARIABLE_PASSWORD));
-        keyFile    = XMLConfigUtils.getOptionalAttributeValue(context, element, CONFIG_ATTR_KEY_FILE, context.getVariableValue(VARIABLE_KEY_FILE));
-        passphrase = XMLConfigUtils.getOptionalAttributeValue(context, element, CONFIG_ATTR_PASSPHRASE, context.getVariableValue(VARIABLE_PASSPHRASE));
-        url        = XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_URL, context.getVariableValue(VARIABLE_URL));
-        path       = new File(XMLConfigUtils.getAttributeValue(context, element, CONFIG_ATTR_PATH));
-    }
-    
-    public SVNCheckoutCommand(ConfigContext context, Element element, CommandCommon common) throws ConfigException
+    public SVNCheckoutCommand(CommandCommon common)
     {
         super(common);
-        loadConfig(context, element);        
-    }
-
+    }    
+    
     @Override
     protected File getPath()
     {
@@ -81,5 +56,35 @@ public class SVNCheckoutCommand extends SCMCheckoutCommand
     protected void destroyServer(SCMServer server)
     {
         // Nothing to do
+    }
+
+    public void setUser(String user)
+    {
+        this.user = user;
+    }
+
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
+
+    public void setKeyFile(String keyFile)
+    {
+        this.keyFile = keyFile;
+    }
+
+    public void setPassphrase(String passphrase)
+    {
+        this.passphrase = passphrase;
+    }
+
+    public void setUrl(String url)
+    {
+        this.url = url;
+    }
+
+    public void setPath(File path)
+    {
+        this.path = path;
     }
 }
