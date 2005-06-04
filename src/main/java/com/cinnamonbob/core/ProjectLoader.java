@@ -1,6 +1,5 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.util.Pair;
 import nu.xom.Document;
 import nu.xom.Element;
 
@@ -139,17 +138,17 @@ public class ProjectLoader
         
         if(!project.getCategoryRegistry().hasCategory(category))
         {
-            throw new ConfigException(context.getFilename(), "Post processor '" + regex.common.getName() + "' refers to unknown category '" + category +"'");
+            throw new ConfigException(context.getFilename(), "Post processor '" + regex.getName() + "' refers to unknown category '" + category +"'");
         }
         
         try
         {
             Pattern pattern = Pattern.compile(expression);
-            regex.patterns.add(new Pair<String, Pattern>(category, pattern));
+            regex.addPattern(category, pattern);
         }
         catch(PatternSyntaxException e)
         {
-            throw new ConfigException(context.getFilename(), "Post processor '" + regex.common.getName() + "' contains invalid expression: " + e.getMessage());
+            throw new ConfigException(context.getFilename(), "Post processor '" + regex.getName() + "' contains invalid expression: " + e.getMessage());
         }
         
     }
@@ -158,7 +157,7 @@ public class ProjectLoader
     {
         Recipe recipe = new Recipe();
         loadCommands(project, recipe, context, element);
-        project.recipes.add(recipe);
+        project.addRecipe(recipe);
     }
 
     private void loadCommands(Project project, Recipe recipe, ConfigContext context, Element element) throws ConfigException

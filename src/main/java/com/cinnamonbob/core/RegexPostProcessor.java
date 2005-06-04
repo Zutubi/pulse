@@ -16,8 +16,8 @@ public class RegexPostProcessor implements PostProcessor
 {
     private static final Logger LOG = Logger.getLogger(RegexPostProcessor.class.getName());
     
-    public final List<Pair<String, Pattern>> patterns = new LinkedList<Pair<String, Pattern>>();
-    public PostProcessorCommon common;
+    private final List<Pair<String, Pattern>> patterns = new LinkedList<Pair<String, Pattern>>();
+    private PostProcessorCommon common;
         
     private void processLine(Artifact artifact, String line, long lineNumber)
     {
@@ -34,6 +34,16 @@ public class RegexPostProcessor implements PostProcessor
     
     public RegexPostProcessor() 
     {
+    }
+    
+    public String getName()
+    {
+        return common.getName();
+    }
+    
+    public void addPattern(String category, Pattern regex)
+    {
+        patterns.add(new Pair<String, Pattern>(category, regex));
     }
     
     public void setPostProcessorCommon(PostProcessorCommon c)

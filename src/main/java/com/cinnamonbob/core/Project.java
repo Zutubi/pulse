@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * A project describes a set of components and a recipe to "build" those
+ * A project describes a set of components and recipes to "build" those
  * components.
  */
 public class Project
@@ -41,10 +41,11 @@ public class Project
     /**
      * The recipes associated with this project.
      */ 
-    public List<Recipe> recipes = new LinkedList<Recipe>();
+    private List<Recipe> recipes = new LinkedList<Recipe>();
 
     /**
-     * The name of the default recipe, ie: the default set of commands.
+     * The name of the default recipe, ie: the recipe that will be built if
+     * no recipe is specified.
      */ 
     private String defaultRecipe = "";
     
@@ -67,11 +68,6 @@ public class Project
     private Map<String, Object> references = new HashMap<String, Object>();
     
     //=======================================================================
-    // Implementation
-    //=======================================================================
-
-
-    //=======================================================================
     // Construction
     //=======================================================================
 
@@ -85,6 +81,11 @@ public class Project
         this.categoryRegistry = new FeatureCategoryRegistry();
     }
     
+    //=======================================================================
+    // Implementation
+    //=======================================================================
+
+
     //=======================================================================
     // Interface
     //=======================================================================
@@ -101,13 +102,16 @@ public class Project
     }
 
     /**
-     * @return the name of this project
+     * @return the name of this project.
      */
     public String getName()
     {
         return name;
     }
-    
+
+    /**
+     * @param name of this project.
+     */ 
     public void setName(String name)
     {
         this.name = name;
@@ -121,9 +125,22 @@ public class Project
         return description;
     }
 
+    /**
+     * @param desc of this project
+     */ 
     public void setDescription(String desc)
     {
         this.description = desc;
+    }
+    
+    public void setDefaultRecipe(String defaultRecipe)
+    {
+        this.defaultRecipe = defaultRecipe;
+    }
+    
+    public String getDefaultRecipe()
+    {
+        return this.defaultRecipe;
     }
     
     /**
@@ -230,6 +247,30 @@ public class Project
         }
         return null;
     }
+
+    /**
+     * Get the list of recipes associated with this project.
+     * @return
+     */ 
+    public List<Recipe> getRecipes()
+    {
+        return Collections.unmodifiableList(recipes);
+    }
+
+    /**
+     * Add a new recipe to this project.
+     * @param recipe
+     */ 
+    public void addRecipe(Recipe recipe)
+    {
+        if (getRecipe(recipe.getName()) != null)
+        {
+            // recipe name must be unique within a project.
+            throw new IllegalArgumentException("The recipe name '"+recipe.getName()+"' already exists. " +
+                    "The recipe name must be unique within a project.");
+        }
+        recipes.add(recipe);
+    }
     
     /**
      * Retrieves the result of the build with the given ID.
@@ -279,7 +320,7 @@ public class Project
         }
     }
 
-    public void setNextBuildId(int i)
+    void setNextBuildId(int i)
     {
         nextBuild = i;
     }
