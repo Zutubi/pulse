@@ -304,7 +304,7 @@ public class ProjectLoader
             throw new ConfigException(context.getFilename(), "Command '" + command.getName() + "' process directive refers to unknown artifact '" + artifactName + "'");            
         }
 
-        return null;
+        return spec;
     }
 
     /**
