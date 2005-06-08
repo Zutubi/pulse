@@ -3,6 +3,7 @@ package com.cinnamonbob.core;
 import nu.xom.Element;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -20,8 +21,11 @@ public class User
     private static final String CONFIG_CONTACT_POINT_NAME         = "name";
     private static final String CONFIG_SUBSCRIPTION_PROJECT       = "project";
     private static final String CONFIG_SUBSCRIPTION_CONTACT_POINT = "contact-point";
-    private static final String CONFIG_SUBSCRIPTION_FAILED        = "failed-only";
-    private static final String CONFIG_SUBSCRIPTION_CHANGED       = "changed-only";
+    private static final String CONFIG_SUBSCRIPTION_CONDITION     = "condition";
+    private static final String CONFIG_SUBSCRIPTION_AND           = "and";
+    private static final String CONFIG_SUBSCRIPTION_OR            = "or";
+    private static final String CONFIG_SUBSCRIPTION_FAILED        = "failed";
+    private static final String CONFIG_SUBSCRIPTION_CHANGED       = "changed";
     
     private Bob theBuilder;
     /**
@@ -100,9 +104,7 @@ public class User
     {
         String projectName = XMLConfigUtils.getAttributeValue(context, element, CONFIG_SUBSCRIPTION_PROJECT);
         String contactName = XMLConfigUtils.getAttributeValue(context, element, CONFIG_SUBSCRIPTION_CONTACT_POINT);
-        String failed      = XMLConfigUtils.getOptionalAttributeValue(context, element, CONFIG_SUBSCRIPTION_FAILED, null);
-        String changed     = XMLConfigUtils.getOptionalAttributeValue(context, element, CONFIG_SUBSCRIPTION_CHANGED, null);
-        
+
         if(!theBuilder.hasProject(projectName))
         {
             throw new ConfigException(context.getFilename(), "Subscription refers to unknown project '" + projectName + "'.");
@@ -112,20 +114,61 @@ public class User
         {
             throw new ConfigException(context.getFilename(), "Subscription refers to unknown contact point '" + contactName + "'.");
         }
+
+        List<Element> elements     = XMLConfigUtils.getElements(context, element, Arrays.asList(CONFIG_SUBSCRIPTION_CONDITION));
+        Subscription  subscription = new Subscription(contactPoints.get(contactName));
         
-        Subscription subscription = new Subscription(contactPoints.get(contactName));
-        
-        if(failed != null)
+        if(elements.size() == 1)
         {
-            subscription.addCondition(new FailedNotifyCondition());
+            List<NotifyCondition> conditions = loadConditions(context, elements.get(0), projectName);
+            // By default, conditions are AND'ed together
+            subscription.setCondition(new CompoundNotifyCondition(conditions, false));
         }
-        
-        if(changed != null)
+        else if(elements.size() > 1)
         {
-            subscription.addCondition(new ChangedNotifyCondition(this));
+            throw new ConfigException(context.getFilename(), "Subscription to project'" + projectName + "' contains multiple conditions (one expected).");
         }
-        
+      
         theBuilder.getProject(projectName).addSubscription(subscription);
+    }
+
+
+    private List<NotifyCondition> loadConditions(ConfigContext context, Element element, String projectName) throws ConfigException
+    {
+        List<Element> elements = XMLConfigUtils.getElements(context, element, Arrays.asList(CONFIG_SUBSCRIPTION_AND, CONFIG_SUBSCRIPTION_CHANGED, CONFIG_SUBSCRIPTION_FAILED, CONFIG_SUBSCRIPTION_OR));
+        
+        if(elements.size() == 0)
+        {
+            throw new ConfigException(context.getFilename(), "Subscription to project '" + projectName + "' includes empty condition.");
+        }
+
+        List<NotifyCondition> result = new LinkedList<NotifyCondition>();
+        
+        for(Element child: elements)
+        {
+            if(child.getLocalName().equals(CONFIG_SUBSCRIPTION_AND))
+            {
+                result.add(new CompoundNotifyCondition(loadConditions(context, child, projectName), false));
+            }
+            else if(child.getLocalName().equals(CONFIG_SUBSCRIPTION_CHANGED))
+            {
+                result.add(new ChangedNotifyCondition(this));
+            }
+            else if(child.getLocalName().equals(CONFIG_SUBSCRIPTION_FAILED))
+            {
+                result.add(new FailedNotifyCondition());
+            }
+            else if(child.getLocalName().equals(CONFIG_SUBSCRIPTION_OR))
+            {
+                result.add(new CompoundNotifyCondition(loadConditions(context, child, projectName), true));
+            }
+            else
+            {
+                assert(false);
+            }
+        }
+        
+        return result;
     }
 
 

@@ -161,7 +161,7 @@ public class Project
 
         for(Subscription subscription: subscriptions)
         {
-            if(subscription.conditionsSatisfied(result))
+            if(subscription.conditionSatisfied(result))
             {
                 subscription.getContactPoint().notify(result);
             }

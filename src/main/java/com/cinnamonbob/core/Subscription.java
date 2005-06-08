@@ -16,9 +16,9 @@ public class Subscription
      */
     private ContactPoint contactPoint;
     /**
-     * Conditions to be satisfied before notifying.
+     * Condition to be satisfied before notifying.
      */
-    private List<NotifyCondition> conditions;
+    private NotifyCondition condition;
     
     //=======================================================================
     // Construction
@@ -34,7 +34,7 @@ public class Subscription
     public Subscription(ContactPoint contactPoint)
     {
         this.contactPoint = contactPoint;
-        this.conditions   = new LinkedList<NotifyCondition>();
+        this.condition = new TrueNotifyCondition();
     }
 
     //=======================================================================
@@ -57,28 +57,20 @@ public class Subscription
      *        the build result to test the properties of
      * @return true iff the contact point should be notified for this result
      */
-    public boolean conditionsSatisfied(BuildResult result)
+    public boolean conditionSatisfied(BuildResult result)
     {
-        for(NotifyCondition condition: conditions)
-        {
-            if(!condition.satisfied(result))
-            {
-                return false;
-            }
-        }
-        
-        return true;
+        return condition.satisfied(result);
     }
     
     /**
-     * Adds the given condition to those that must be satisfied before the
+     * Sets the given condition as that which must be satisfied before the
      * contact point should be notified.
      * 
      * @param condition
-     *        the condition to add
+     *        the condition to set
      */
-    public void addCondition(NotifyCondition condition)
+    public void setCondition(NotifyCondition condition)
     {
-        conditions.add(condition);
+        this.condition = condition;
     }
 }
