@@ -87,7 +87,7 @@ th.command-detail
       border-color: #ddddee;
 }
 
-td.command-detail, td.build-success, td.build-failure
+td.command-detail, td.build-info, td.build-success, td.build-failure
 {
       background-color: #ffffff;
       border-style: solid;
@@ -95,6 +95,12 @@ td.command-detail, td.build-success, td.build-failure
       border-color: #ddddee;
       padding-left: 0.3em;
       padding-right: 0.3em;
+}
+
+td.build-info
+{
+      border-color: #b0b0f0;
+      background-color: #eeeeff;
 }
 
 td.build-success

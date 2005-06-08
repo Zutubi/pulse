@@ -10,7 +10,8 @@
 			<tr>
 				<td valign="top">
 				     <table>
-                       <tr><th>Nav Bar</th></tr>
+                       <tr><th>navigate</th></tr>
+                       <tr><td><a href="serverStatus.action">server&nbsp;status</a></td></tr>
                        <tr><td><a href="viewProjects.action">all&nbsp;projects</a></td></tr>
                      </table>
 				</td>

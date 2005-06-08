@@ -6,6 +6,10 @@
 	<package name="default" extends="webwork-default">
 		<default-interceptor-ref name="defaultStack" /> 
 		
+		<action name="serverStatus" class="serverStatusAction">
+			<result name="success" type="velocity">server-status.vm</result> 
+		</action> 
+
 		<action name="viewProjects" class="viewProjectsAction">
 			<result name="success" type="velocity">view-projects.vm</result> 
 		</action> 

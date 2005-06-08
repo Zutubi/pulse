@@ -3,6 +3,7 @@
 <beans>
     <bean id="spring-object-factory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 
+    <bean name="serverStatusAction" class="com.cinnamonbob.web.ServerStatusAction" singleton="false"/>
     <bean name="viewProjectsAction" class="com.cinnamonbob.web.ViewProjectsAction" singleton="false"/>
     <bean name="viewProjectAction" class="com.cinnamonbob.web.ViewProjectAction" singleton="false"/>
     <bean name="viewBuildAction" class="com.cinnamonbob.web.ViewBuildAction" singleton="false"/>

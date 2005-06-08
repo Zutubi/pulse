@@ -58,6 +58,7 @@ public class BobServer
         JettyManager jettyManager = JettyManager.getInstance();
         jettyManager.deployWebapp();
         jettyManager.deployInWebApplicationContext("bob", core);
+        jettyManager.deployInWebApplicationContext("server", this);
     }
 
     public void stop()
@@ -74,5 +75,10 @@ public class BobServer
 
         // request a build.
         buildQueue.enqueue(new BuildRequest(projectName));
+    }
+    
+    public BuildQueue getBuildQueue()
+    {
+        return buildQueue;
     }
 }

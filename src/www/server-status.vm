@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>[CiB] server status</title>
+    <link href="build.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h1 class="build-log">:: server status ::</h1>
+    <h2 class="command-info">build queue</h2>
+    <div class="command-content">
+      <table>
+        <tr><th class="command-detail">project</th><th class="command-detail">requested</th></tr>
+#foreach($buildRequest in $server.BuildQueue.iterator())
+        <tr><td class="build-info"><a href="viewProject.action?name=$buildRequest.ProjectName">$buildRequest.ProjectName</a></td><td class="build-info">$buildRequest.When</td>
+#end
+      </table>
+    </div>
+  </body>
+</html>

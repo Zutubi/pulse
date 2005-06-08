@@ -1,5 +1,6 @@
 package com.cinnamonbob;
 
+import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -14,7 +15,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  * @author Daniel Ostermeier
  */
-public class BuildQueue implements Runnable
+public class BuildQueue implements Runnable, Iterable<BuildRequest>
 {
 
     private final LinkedBlockingQueue<BuildRequest> queue = new LinkedBlockingQueue<BuildRequest>();
@@ -106,5 +107,11 @@ public class BuildQueue implements Runnable
     public int getDispatchedCount()
     {
         return requestsDispatched;
+    }
+
+    
+    public Iterator<BuildRequest> iterator()
+    {
+        return queue.iterator();
     }
 }

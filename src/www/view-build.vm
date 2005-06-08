@@ -15,7 +15,7 @@
   #set($success = "failure")
 #end
 
-    <h2 class="command-$success">$name build $id</h1>
+    <h2 class="command-$success">$name build $id</h2>
     <div class="command-content">
       <table>
         #detailrow("Commenced" $result.Stamps.PrettyStartTime)
