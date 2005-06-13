@@ -1,7 +1,5 @@
 package com.cinnamonbob.core;
 
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A subscription is a mapping from a project event to a contact point.  When

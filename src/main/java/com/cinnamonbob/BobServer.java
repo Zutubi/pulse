@@ -1,6 +1,5 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.bootstrap.BootstrapUtils;
 import com.cinnamonbob.bootstrap.StartupManager;
 import com.cinnamonbob.bootstrap.jetty.JettyManager;
 import com.cinnamonbob.core.Bob;

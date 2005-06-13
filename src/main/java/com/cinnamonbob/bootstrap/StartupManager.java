@@ -3,7 +3,6 @@ package com.cinnamonbob.bootstrap;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.beans.BeansException;
-import com.cinnamonbob.bootstrap.jetty.JettyManager;
 
 /**
  * 
