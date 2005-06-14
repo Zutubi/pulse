@@ -24,6 +24,11 @@
 			<result name="error" type="velocity">generic-error.vm</result> 
 		</action> 
 
+		<action name="scheduleBuild" class="scheduleBuildAction">
+			<result name="success" type="velocity">build-scheduled.vm</result>
+			<result name="error" type="velocity">generic-error.vm</result>
+		</action> 
+
 		<action name="viewArtifact" class="viewArtifactAction">
 			<result name="success" type="stream">
 			    <param name="contentType">${contentType}</param>

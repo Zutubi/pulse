@@ -5,9 +5,6 @@ import org.apache.xmlrpc.WebServer;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcServer;
 
-import java.io.ByteArrayInputStream;
-import java.net.InetAddress;
-import java.util.Vector;
 
 /**
  * XmlRpcServer

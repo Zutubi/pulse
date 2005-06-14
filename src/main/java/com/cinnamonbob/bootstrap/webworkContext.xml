@@ -6,6 +6,7 @@
     <bean name="serverStatusAction" class="com.cinnamonbob.web.ServerStatusAction" singleton="false"/>
     <bean name="viewProjectsAction" class="com.cinnamonbob.web.ViewProjectsAction" singleton="false"/>
     <bean name="viewProjectAction" class="com.cinnamonbob.web.ViewProjectAction" singleton="false"/>
+    <bean name="scheduleBuildAction" class="com.cinnamonbob.web.ScheduleBuildAction" singleton="false"/>
     <bean name="viewBuildAction" class="com.cinnamonbob.web.ViewBuildAction" singleton="false"/>
     <bean name="viewArtifactAction" class="com.cinnamonbob.web.ViewArtifactAction" singleton="false"/>
 

@@ -1,5 +1,42 @@
-body, td, p {
+body, td, p
+{
 	font: normal x-small verdana, arial, helvetica, sans-serif;
+}
+
+td.navbar-border { 
+	border-color: #c0c0c0;
+	border-width: 1px 0 1px 0;
+	border-style: solid;
+}
+
+td.navbar, td.navbar-active
+{ 
+    margin: 0 0 0 0;
+    font-weight: bold;
+    padding: 0.2em 0.5em 0.2em 0.5em;
+}
+
+td.navbar
+{
+    color: #909090;
+}
+
+td.navbar-active
+{
+  color: #ffffff;
+  background-color: #c0c0c0;
+}
+
+.navbar a
+{
+    color: #909090;
+    text-decoration: none;
+}
+
+.navbar-active a
+{
+    color: #ffffff;
+    text-decoration: none;
 }
 
 .panelTitle {
@@ -23,9 +60,6 @@ body, td, p {
 #pageTitle {
 	color:#c0c0c0;
 	font-size: xx-small;
-	border-color: #c0c0c0;
-	border-width: 0px 0px 1px 0px;
-	border-style: solid;
 	padding: 1;
 	text-align: center;
 }

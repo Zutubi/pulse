@@ -73,7 +73,7 @@ public class ViewProjectAction extends ActionSupport
 	{
 		return project;
 	}
-
+    
     /**
      * @return a list of errors detected during execution
      */
