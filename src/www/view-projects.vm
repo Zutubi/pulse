@@ -10,6 +10,7 @@
     <table>
       <tr>
         <th class="command-detail">project</th>
+        <th class="command-detail">state</th>
         <th class="command-detail">last built</th>
         <th class="command-detail">build id</th>
         <th class="command-detail">elapsed</th>
@@ -35,6 +36,7 @@
 #end
       <tr>
         <td class="build-$success"><a href="viewProject.action?name=$project.Name">$project.Name</a></td>
+        <td class="build-$success">$project.State.toString().toLowerCase()</td>
         <td class="build-$success">$built</td>
         <td class="build-$success">$id</td>
         <td class="build-$success">$elapsed</td>

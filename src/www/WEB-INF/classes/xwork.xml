@@ -19,6 +19,11 @@
 			<result name="error" type="velocity">generic-error.vm</result> 
 		</action> 
 
+		<action name="updateProject" class="updateProjectAction">
+			<result name="success" type="redirect">viewProject.action?name=${project.Name}</result> 
+			<result name="error" type="velocity">generic-error.vm</result> 
+		</action> 
+
 		<action name="viewBuild" class="viewBuildAction">
 			<result name="success" type="velocity">view-build.vm</result> 
 			<result name="error" type="velocity">generic-error.vm</result> 

@@ -137,6 +137,7 @@ ul.feature
 td.action
 {
     font-weight: bold;
+    white-space: nowrap;
 }
 
 h3.side-title
@@ -147,6 +148,7 @@ h3.side-title
     margin-bottom: 0;
     background-color: #90b0c0;
     color: #ffffff;
+    white-space: nowrap;
 }
 
 div.side-content
@@ -157,4 +159,16 @@ div.side-content
     border-width: 1px;
     border-color: #90b0c0;
     margin-bottom: 3px;
+}
+
+td.health-ok
+{
+    color: #00c000;
+    font-weight: bold;
+}
+
+td.health-failed
+{
+    color: #c00000;
+    font-weight: bold;
 }

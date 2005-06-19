@@ -6,6 +6,8 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 
+import sun.security.krb5.internal.crypto.s;
+
 import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -16,12 +18,37 @@ import java.util.logging.Logger;
  */
 public class Project
 {
+    //=======================================================================
+    // Constants
+    //=======================================================================
+
     private static final Logger LOG = Logger.getLogger(Project.class.getName());
+
+    //=======================================================================
+    // Types
+    //=======================================================================
+
+    public enum State
+    {
+        BUILDING,
+        IDLE,
+        PAUSED,
+        PAUSING
+    }
+    
+    //=======================================================================
+    // Fields
+    //=======================================================================
 
     /**
      * The name of this project, which must be unique amongst all projects.
      */
     private String name;
+    
+    /**
+     * The project's current state.
+     */
+    private State state;
     
     /**
      * A human-readable description of this project.
@@ -79,12 +106,42 @@ public class Project
         this.postProcessors   = new TreeMap<String, PostProcessorCommon>();
         this.subscriptions    = new LinkedList<Subscription>();
         this.categoryRegistry = new FeatureCategoryRegistry();
+        this.state            = State.IDLE;
     }
     
     //=======================================================================
     // Implementation
     //=======================================================================
 
+    private synchronized boolean initiateBuild()
+    {
+        if(state != State.PAUSED && state != State.PAUSING)
+        {
+            state = State.BUILDING;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+    private synchronized void buildComplete()
+    {
+        if(state == State.PAUSING)
+        {
+            state = State.PAUSED;
+        }
+        else
+        {
+            state = State.IDLE;
+        }
+    }
+    
+    private BuildManager getBuildManager()
+    {
+        return BuildManager.getInstance();
+    }    
 
     //=======================================================================
     // Interface
@@ -133,6 +190,14 @@ public class Project
         this.description = desc;
     }
     
+    /**
+     * @return the current state of the project
+     */
+    public State getState()
+    {
+        return state;
+    }
+    
     public void setDefaultRecipe(String defaultRecipe)
     {
         this.defaultRecipe = defaultRecipe;
@@ -148,26 +213,29 @@ public class Project
      * 
      * @return the result of the build
      */
-    public BuildResult build()
+    public void build()
     {
-        BuildResult result = getBuildManager().executeBuild(this, nextBuild);
-        
-        // Don't increment nextBuild until we have finished the build, this
-        // way the build won't be picked up by getHistory until complete.
-        synchronized (this)
-        {
-            nextBuild++;
-        }
-
-        for(Subscription subscription: subscriptions)
-        {
-            if(subscription.conditionSatisfied(result))
+        if(initiateBuild())
+        {            
+            BuildResult result = getBuildManager().executeBuild(this, nextBuild);
+            
+            // Don't increment nextBuild until we have finished the build, this
+            // way the build won't be picked up by getHistory until complete.
+            synchronized (this)
             {
-                subscription.getContactPoint().notify(result);
+                nextBuild++;
             }
-        }
-        
-        return result;
+    
+            for(Subscription subscription: subscriptions)
+            {
+                if(subscription.conditionSatisfied(result))
+                {
+                    subscription.getContactPoint().notify(result);
+                }
+            }
+            
+            buildComplete();
+        }        
     }
 
     /**
@@ -284,11 +352,35 @@ public class Project
         return getBuildManager().getBuildResult(this, id);
     }
     
-    private BuildManager getBuildManager()
+    public boolean running()
     {
-        return BuildManager.getInstance();
-    }    
+        return state == State.IDLE || state == State.BUILDING;
+    }
     
+    public synchronized void pause()
+    {
+        if(state == State.BUILDING)
+        {
+            state = State.PAUSING;
+        }
+        else if(state == State.IDLE)
+        {
+            state = State.PAUSED;
+        }
+    }
+    
+    public synchronized void resume()
+    {
+        if(state == State.PAUSING)
+        {
+            state = State.BUILDING;
+        }
+        else if(state == State.PAUSED)
+        {
+            state = State.IDLE;
+        }
+    }
+
     //=======================================================================
     // Old configuration implementation.
     //=======================================================================

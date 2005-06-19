@@ -3,23 +3,60 @@
     <title>[CiB] $name</title>
     <link href="build.css" rel="stylesheet" type="text/css">
   </head>
+
+  #set($history = $project.getHistory(10))
+  #if($history.size() > 0)
+    #set($healthy = $history.get(0).succeeded())
+  #else
+    #set($healthy = true)
+  #end
+  
   <body>
     <h1 class="build-log">:: $name ::</h1>
     <table height="100%" width="100%" cellspacing="6px">
       <tr>
+
+<!-- Side bar, with status, actions etc -->
+
         <td height="100%" valign="top">
-          <h3 class="side-title">project&nbsp;actions</h2>
+          <h3 class="side-title">project status</h2>
 	      <div class="side-content">
 	        <table>
               <tr>
-	            <td class="action">pause&nbsp;project</td>
+	            <td class="action">health:</td>
+	            #if($healthy)
+	              <td class="health-ok">ok</td>
+	            #else
+	              <td class="health-failed">failed</td>
+	            #end
               </tr>
               <tr>
-	            <td class="action"><a href="scheduleBuild.action?project=$project.Name">schedule&nbsp;build</a></td>
+	            <td class="action">state:</td><td>$project.State.toString().toLowerCase()</td>
+              </tr>
+	        </table>
+	      </div>
+
+          <h3 class="side-title">project actions</h2>
+	      <div class="side-content">
+	        <table>
+              <tr>
+	            <td class="action">
+	            #if($project.running())
+	              <a href="updateProject.action?project=$project.Name&action=pause">pause project</a>
+	            #else
+	              <a href="updateProject.action?project=$project.Name&action=resume">resume project</a>
+	            #end
+	            </td>
+              </tr>
+              <tr>
+	            <td class="action"><a href="scheduleBuild.action?project=$project.Name">schedule build</a></td>
               </tr>
 	        </table>
 	      </div>
         </td>
+        
+<!-- Main body -->
+
         <td width="100%" height="100%" valign="top">
           <h2 class="command-info">description</h2>
           <div class="command-content">
@@ -34,7 +71,6 @@
               <th class="command-detail">elapsed</th>
               <th class="command-detail">result</th>
             </tr>
-      #set($history = $project.getHistory(10))
       #foreach($result in $history)
         #set($id = $result.Id)
         #set($built = $result.Stamps.PrettyStartTime) 
