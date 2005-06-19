@@ -9,11 +9,11 @@
     <div class="command-content">
     <table>
       <tr>
-        <th class="command-detail">Project</th>
-        <th class="command-detail">Last Built</th>
-        <th class="command-detail">Build ID</th>
-        <th class="command-detail">Elapsed</th>
-        <th class="command-detail">Result</th>
+        <th class="command-detail">project</th>
+        <th class="command-detail">last built</th>
+        <th class="command-detail">build id</th>
+        <th class="command-detail">elapsed</th>
+        <th class="command-detail">result</th>
       </tr>
 #foreach($project in $projects)
 #set($history = $project.getHistory(1))

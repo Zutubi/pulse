@@ -1,156 +1,160 @@
 h1.build-log
 {
-      margin-top: 0.3em;
-      color: #a0a0a0;
+    font-size: x-large;
+    margin-top: 0.3em;
+    color: #a0a0a0;
 }
 
 h2.command-info, h2.command-success, h2.command-failure
 {
-      border-style: solid;
-      border-width: 1px;
-      margin-top: 0;
-      margin-bottom: 0;
-      padding: 0.2em;
+    font-size: large;
+    border-style: solid;
+    border-width: 1px;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0.2em;
 }
 
 h2.command-info
 {
-      border-color: #b0b0f0;
-      background-color: #eeeeff;
+    border-color: #b0b0f0;
+    background-color: #eeeeff;
 }
 
 h2.command-success
 {
-      border-color: #00c000;
-      background-color: #ddffdd;
+    border-color: #00c000;
+    background-color: #ddffdd;
 }
 
 h2.command-failure
 {
-      border-color: #c00000;
-      background-color: #ffdddd;
+    border-color: #c00000;
+    background-color: #ffdddd;
 }
 
 h2.command-element
 {
-      border-width: 0px 0px 1px 1px;
-      border-style: solid;
-      border-color: #e0e0e0;
-      padding-left: 0.2em
+    border-width: 0px 0px 1px 1px;
+    border-style: solid;
+    border-color: #e0e0e0;
+    padding-left: 0.2em
 }
 
 div.command-content
 {
-      padding: 0.5em;
-      background-color: #f4f4f4;
-      border-style: solid;
-      border-width: 1px;
-      border-color: #c0c0c0;
-      margin-top: 3px;
-      margin-bottom: 15px;
+    padding: 0.5em;
+    background-color: #f4f4f4;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #c0c0c0;
+    margin-top: 3px;
+    margin-bottom: 15px;
 }
 
 div.error, div.warning, div.info
 {
-      border-style: solid;
-      border-width: 1px;
-      padding-left: 0.3em;
-      margin-top: 3px;
-      margin-bottom: 3px;
+    border-style: solid;
+    border-width: 1px;
+    padding-left: 0.3em;
+    margin-top: 3px;
+    margin-bottom: 3px;
 }
 
 div.error
 {
-      border-color: #c00000;
-      background-color: #ffe0e0;
+    border-color: #c00000;
+    background-color: #ffe0e0;
 }
 
 div.warning
 {
-      border-color: #f0f000;
-      background-color: #f0f0d0;
+    border-color: #f0f000;
+    background-color: #f0f0d0;
 }
 
 div.info
 {
-      border-color: #b0b0f0;
-      background-color: #eeeeff;
+    border-color: #b0b0f0;
+    background-color: #eeeeff;
 }
 
 th.command-detail
 {
-      background-color: #ffffff;
-      text-align: left;
-      padding-left: 0.3em;
-      padding-right: 0.3em;
-      border-style: solid;
-      border-width: 1px;
-      border-color: #ddddee;
+    background-color: #ffffff;
+    text-align: left;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ddddee;
 }
 
 td.command-detail, td.build-info, td.build-success, td.build-failure
 {
-      background-color: #ffffff;
-      border-style: solid;
-      border-width: 1px;
-      border-color: #ddddee;
-      padding-left: 0.3em;
-      padding-right: 0.3em;
+    font-size: small;
+    background-color: #ffffff;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ddddee;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
 }
 
 td.build-info
 {
-      border-color: #b0b0f0;
-      background-color: #eeeeff;
+    border-color: #b0b0f0;
+    background-color: #eeeeff;
 }
 
 td.build-success
 {
-      border-color: #00c000;
-      background-color: #ddffdd;
+    border-color: #00c000;
+    background-color: #ddffdd;
 }
 
 td.build-failure
 {
-      border-color: #c00000;
-      background-color: #ffdddd;
+    border-color: #c00000;
+    background-color: #ffdddd;
 }
 
 .filename
 {
-      font-family: "Lucida Console" monospace;
+    font-family: "Lucida Console" monospace;
 }
 
 div.artifact
 {
-      margin-left: 20px;
+    margin-left: 20px;
 }
 
 ul.feature
 {
-      margin: 0.2em 0.5em 0.2em 0;
+    margin: 0.2em 0.5em 0.2em 0;
 }
 
-.action
+td.action
 {
-      font-weight: bold;
+    font-weight: bold;
 }
 
 h3.side-title
-{ 
-      padding: 0.2em;
-      margin-top: 0;
-      margin-bottom: 0;
-      background-color: #90b0c0;
-      color: #ffffff;
+{
+    font-size: medium; 
+    padding: 0.3em;
+    margin-top: 0;
+    margin-bottom: 0;
+    background-color: #90b0c0;
+    color: #ffffff;
 }
 
 div.side-content
 {
-      background-color: #f0f0ff;
-      padding: 0.5em;
-      border-style: solid;
-      border-width: 1px;
-      border-color: #90b0c0;
-      margin-bottom: 3px;
+    background-color: #f0f0ff;
+    padding: 0.2em;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #90b0c0;
+    margin-bottom: 3px;
 }
