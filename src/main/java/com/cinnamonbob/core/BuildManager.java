@@ -118,11 +118,9 @@ public class BuildManager
      * @param id
      * @return
      */ 
-    public BuildResult executeBuild(Project project, int id)
+    public void executeBuild(Project project, BuildResult result)
     {
         // Allocate the result with a unique id.
-        BuildResult result = new BuildResult(project.getName(), id, project.getCategoryRegistry());
-        long startTime = System.currentTimeMillis();
         File buildDir;
 
         try
@@ -135,12 +133,12 @@ public class BuildManager
             // Not even able to create the build directory: bad news.
             result.setInternalFailure(e);
             logInternalBuildFailure(result);
-            return result;
+            return;
         }
 
         // May record internal failures too.
         executeCommands(project, result, buildDir);
-        result.stamp(new TimeStamps(startTime, System.currentTimeMillis()));
+        result.finalise();
 
         try
         {
@@ -156,9 +154,6 @@ public class BuildManager
                 logInternalBuildFailure(result);
             }
         }
-
-
-        return result;
     }
 
     private File createBuildDir(File outputDir, BuildResult buildResult) throws InternalBuildFailureException
@@ -230,10 +225,12 @@ public class BuildManager
             {
                 if(!failed || command.getForce())
                 {
+                    result.commandCommenced(command.getName());
+                    
                     File                commandOutputDir = createCommandOutputDir(buildDir, command, i);
                     CommandResultCommon commandResult    = command.execute(commandOutputDir, previousBuild);
 
-                    result.addCommandResult(commandResult);
+                    result.commandCompleted(commandResult);
                     saveCommandResult(commandOutputDir, commandResult);
                     i++;
 
@@ -311,7 +308,7 @@ public class BuildManager
                     try
                     {
                         CommandResultCommon commandResult = (CommandResultCommon)xstream.fromXML(new FileReader(resultFile));
-                        result.addCommandResult(commandResult);
+                        result.commandCompleted(commandResult);
                     }
                     catch(FileNotFoundException e)
                     {

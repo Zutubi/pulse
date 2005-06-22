@@ -15,6 +15,12 @@ public class BuildResult implements Iterable<CommandResultCommon>
     private static final Logger LOG = Logger.getLogger(BuildResult.class.getName());
     
     /*
+     * Truly transient.
+     */
+    private transient boolean completed;
+    private transient String  currentCommand;
+    
+    /*
      * This information is transient as it is stored externally.
      */
     private transient String projectName;
@@ -35,10 +41,12 @@ public class BuildResult implements Iterable<CommandResultCommon>
      */
     public BuildResult(String projectName, int id, FeatureCategoryRegistry categoryRegistry)
     {
+        this.completed = false;
         this.projectName = projectName;
         this.id = id;
         this.commandResults = new LinkedList<CommandResultCommon>();
         this.categoryRegistry = categoryRegistry;
+        this.stamps = new TimeStamps();
     }
     
     /**
@@ -94,16 +102,22 @@ public class BuildResult implements Iterable<CommandResultCommon>
         return id;
     }
     
+    public synchronized void commandCommenced(String name)
+    {
+        currentCommand = name;
+    }
     
-    public void addCommandResult(CommandResultCommon commandResult)
+    public synchronized void commandCompleted(CommandResultCommon commandResult)
     {
         commandResults.add(commandResult);
+        currentCommand = null;
     }
 
     
-    public void stamp(TimeStamps stamps)
+    public void finalise()
     {
-        this.stamps = stamps;
+        stamps.finalise();
+        completed = true;
     }
     
     
@@ -139,11 +153,16 @@ public class BuildResult implements Iterable<CommandResultCommon>
     
     public void load(String projectName, int id, File buildDir)
     {
+        this.completed = true;
         this.projectName = projectName;
         this.id = id;
         this.commandResults = new LinkedList<CommandResultCommon>();
     }
 
+    public boolean getCompleted()
+    {
+        return completed;
+    }
     
     /**
      * Locates and returns the result for the command of the given name, if
@@ -184,5 +203,10 @@ public class BuildResult implements Iterable<CommandResultCommon>
             }
         }
         return false;
-    }    
+    }
+
+    public synchronized BuildSnapshot takeSnapshot()
+    {
+        return new BuildSnapshot(id, completed, stamps, currentCommand, commandResults);
+    }
 }

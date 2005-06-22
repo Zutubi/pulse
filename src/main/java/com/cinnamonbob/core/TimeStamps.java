@@ -16,12 +16,24 @@ public class TimeStamps
     private long endTime;
     
     
+    public TimeStamps()
+    {
+        startTime = System.currentTimeMillis();
+        endTime = -1;
+    }
+    
+    
     public TimeStamps(long startTime, long endTime)
     {
         this.startTime = startTime;
         this.endTime = endTime;
     }
 
+    
+    public void finalise()
+    {
+        endTime = System.currentTimeMillis();
+    }
 
     /**
      * @return Returns the endTime.
@@ -43,7 +55,14 @@ public class TimeStamps
     
     public long getElapsed()
     {
-        return endTime - startTime;
+        if(endTime > 0)
+        {
+            return endTime - startTime;
+        }
+        else
+        {
+            return System.currentTimeMillis() - startTime;
+        }
     }
     
     

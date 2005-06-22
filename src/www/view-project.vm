@@ -1,3 +1,7 @@
+#macro(detailrow $header $content)
+  <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
+#end
+
 <html>
   <head>
     <title>[CiB] $name</title>
@@ -62,6 +66,55 @@
           <div class="command-content">
               $project.Description
           </div>
+          #if($project.CurrentBuild)
+            #set($current = $project.CurrentBuild.takeSnapshot())
+            #if($current.completed)
+              #set($status = "complete")
+            #else
+              #set($status = "in progress")
+            #end
+          <h2 class="command-info">current build [$current.Id]</h2>
+          <div class="command-content">
+          <table>          
+            #detailrow("commenced" $current.Stamps.PrettyStartTime)
+            #detailrow("elapsed"   $current.Stamps.PrettyElapsed)
+            #detailrow("status"    $status)
+          </table>
+          <h2 class="command-element">command log</h2>
+          <table>
+            <tr>
+              <th class="command-detail">command</th>
+              <th class="command-detail">when</th>
+              <th class="command-detail">elapsed</th>
+              <th class="command-detail">result</th>
+            </tr>
+      #foreach($result in $current.CompletedCommands)
+        #set($name = $result.Name)
+        #set($built = $result.Stamps.PrettyStartTime) 
+        #set($elapsed = $result.Stamps.PrettyElapsed)
+        #if($result.succeeded())
+          #set($success = "success")
+        #else
+          #set($success = "failure")
+        #end
+            <tr>
+              <td class="build-$success">$name</a></td>
+              <td class="build-$success">$built</td>
+              <td class="build-$success">$elapsed</td>
+              <td class="build-$success">$success</td>
+            </tr>
+      #end
+      #if($current.CurrentCommand)
+            <tr>
+              <td class="build-info">$current.CurrentCommand</a></td>
+              <td class="build-info">n/a</td>
+              <td class="build-info">n/a</td>
+              <td class="build-info">in progress</td>
+            </tr>
+      #end
+          </table>
+          </div>
+          #end
           <h2 class="command-info">history</h2>
           <div class="command-content">
           <table>

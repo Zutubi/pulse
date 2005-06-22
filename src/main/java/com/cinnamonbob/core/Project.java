@@ -6,8 +6,6 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 
-import sun.security.krb5.internal.crypto.s;
-
 import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -79,12 +77,17 @@ public class Project
     /**
      * Subscriptions to events on this project.
      */
-    public List<Subscription> subscriptions;
+    private List<Subscription> subscriptions;
 
     /**
-     * The next availabel build id.
+     * The result of the currently running or last completed build (if any).
      */
-    public int nextBuild;
+    private BuildResult currentBuild;
+    
+    /**
+     * The next available build id.
+     */
+    private int nextBuild;
 
     /**
      * The list of schedules configured for this project.
@@ -216,8 +219,9 @@ public class Project
     public void build()
     {
         if(initiateBuild())
-        {            
-            BuildResult result = getBuildManager().executeBuild(this, nextBuild);
+        {
+            currentBuild = new BuildResult(name, nextBuild, categoryRegistry);
+            getBuildManager().executeBuild(this, currentBuild);
             
             // Don't increment nextBuild until we have finished the build, this
             // way the build won't be picked up by getHistory until complete.
@@ -228,9 +232,9 @@ public class Project
     
             for(Subscription subscription: subscriptions)
             {
-                if(subscription.conditionSatisfied(result))
+                if(subscription.conditionSatisfied(currentBuild))
                 {
-                    subscription.getContactPoint().notify(result);
+                    subscription.getContactPoint().notify(currentBuild);
                 }
             }
             
@@ -269,6 +273,15 @@ public class Project
     public FeatureCategoryRegistry getCategoryRegistry()
     {
         return categoryRegistry;
+    }
+    
+    /**
+     * @return the result of the current running or last completed build (if no build 
+     * is running).
+     */
+    public BuildResult getCurrentBuild()
+    {
+        return currentBuild;
     }
 	
 	/**
@@ -415,5 +428,10 @@ public class Project
     void setNextBuildId(int i)
     {
         nextBuild = i;
+        List<BuildResult> history = getHistory(1);
+        if(history.size() > 0)
+        {
+            currentBuild = history.get(0);
+        }
     }
 }
