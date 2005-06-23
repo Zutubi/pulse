@@ -66,6 +66,8 @@
           <div class="command-content">
               $project.Description
           </div>
+          
+  <!-- Current build -->
           #if($project.CurrentBuild)
             #set($current = $project.CurrentBuild.takeSnapshot())
             #if($current.completed)
@@ -115,6 +117,9 @@
           </table>
           </div>
           #end
+          
+   <!-- History -->
+   
           <h2 class="command-info">history</h2>
           <div class="command-content">
           <table>
@@ -141,6 +146,11 @@
             </tr>
       #end
           </table>
+          <p>
+            <form action="viewBuild.action" method="get">
+              jump to build:&nbsp;<input name="id" size="5"/>&nbsp;<input type="hidden" name="project" value="$project.Name"/><input type="submit" value="Go!"/>
+            </form>
+          </p>
           </div>
         </td>
       </tr>
