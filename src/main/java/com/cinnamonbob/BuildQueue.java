@@ -73,7 +73,7 @@ public class BuildQueue implements Runnable, Iterable<BuildRequest>
                 {
                     break;
                 }
-                dispatch((BuildRequest) queue.take());
+                dispatch(queue.take());
             }
         } catch (InterruptedException e)
         {

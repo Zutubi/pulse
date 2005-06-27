@@ -1,6 +1,10 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.bootstrap.quartz.QuartzManager;
+import com.cinnamonbob.core.config.Schedule;
+import com.cinnamonbob.core.config.Reference;
+import com.cinnamonbob.core.config.VariableHelper;
+import com.cinnamonbob.BobException;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -94,8 +98,8 @@ public class Project
      */ 
     public List<Schedule> schedules = new LinkedList<Schedule>();
     
-    private Properties properties = new Properties();
-    private Map<String, Object> references = new HashMap<String, Object>();
+    private Map<String, String> properties = new HashMap<String, String>();
+    private Map<String, Reference> references = new HashMap<String, Reference>();
     
     //=======================================================================
     // Construction
@@ -214,7 +218,6 @@ public class Project
     /**
      * Executes a build of this project.
      * 
-     * @return the result of the build
      */
     public void build()
     {
@@ -353,6 +356,52 @@ public class Project
         recipes.add(recipe);
     }
     
+    public void setReference(String name, Reference r)
+    {
+        references.put(name, r);
+    }
+    
+    public Reference getReference(String name)
+    {
+        return references.get(name);
+    }
+    
+    public void setProperty(String name, String value)
+    {
+        properties.put(name, value);
+    }
+    
+    public String getProperty(String name)
+    {
+        return properties.get(name);
+    }
+    
+    public String getProperty(String name, String defaultValue)
+    {
+        if (properties.containsKey(name))
+        {
+            return properties.get(name);
+        }
+        return defaultValue;
+    }
+    
+    public Schedule getSchedule(String name)
+    {
+        for (Schedule s: schedules)
+        {
+            if (s.getName().equals(name))
+            {
+                return s;
+            }
+        }
+        return null;
+    }
+    
+    public void addSchedule(Schedule schedule)
+    {
+        schedules.add(schedule);
+    }
+    
     /**
      * Retrieves the result of the build with the given ID.
      * 
@@ -408,7 +457,7 @@ public class Project
             Scheduler scheduler = QuartzManager.getScheduler();
             try
             {
-                CronTrigger trigger = new CronTrigger(getName() + " Trigger." + i, Scheduler.DEFAULT_GROUP, schedule.getFrequency());
+                CronTrigger trigger = new CronTrigger(getName() + " Trigger." + i, Scheduler.DEFAULT_GROUP, "0 0 12 ? * *");
                 JobDetail job = new JobDetail("build project " + name, Scheduler.DEFAULT_GROUP, BuildProject.class);
                 job.getJobDataMap().put("project", this);
                 scheduler.scheduleJob(job, trigger);
@@ -420,7 +469,7 @@ public class Project
             }
             catch (ParseException e)
             {
-                throw new RuntimeException("Invalid cron expression: " + schedule.getFrequency(), e);
+                throw new RuntimeException("Invalid cron expression:", e);
             }
         }
     }
@@ -433,5 +482,10 @@ public class Project
         {
             currentBuild = history.get(0);
         }
+    }
+
+    public String replaceVariables(String input) throws BobException
+    {
+        return VariableHelper.replaceVariables(input, properties);
     }
 }

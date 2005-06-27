@@ -1,5 +1,7 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.config.Reference;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,7 +9,7 @@ import java.util.List;
 /**
  * A Recipe is a sequence of commands that may be used to build a project.
  */
-public class Recipe implements Iterable<CommandCommon>
+public class Recipe implements Iterable<CommandCommon>, Reference
 {
     /**
      * The sequence of commands required to build the recipe.

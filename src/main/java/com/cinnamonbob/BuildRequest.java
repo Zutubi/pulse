@@ -11,6 +11,7 @@ public class BuildRequest
 {
     private Date   when;
     private String projectName;
+    private String recipeName;
 
     /**
      * @param projectName
@@ -36,5 +37,14 @@ public class BuildRequest
     public String getProjectName()
     {
         return projectName;
+    }
+
+    /**
+     * The name of the recipe to be built.
+     * @return
+     */ 
+    public String getRecipeName()
+    {
+        return recipeName;
     }
 }

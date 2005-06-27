@@ -314,9 +314,10 @@ public class ProjectLoader
      */
     private void loadSchedule(Project project, ConfigContext context, Element element) throws ConfigException
     {
-        Schedule s = new Schedule();
-        s.setFrequency(XMLConfigUtils.getAttributeValue(context, element, "frequency"));
-        project.schedules.add(s);
+        // schedule is no longer supported in this format.
+//        Schedule s = new Schedule();
+//        s.setFrequency(XMLConfigUtils.getAttributeValue(context, element, "frequency"));
+//        project.schedules.add(s);
     }
 
     private void addBuiltinVariables(Project project, ConfigContext context)

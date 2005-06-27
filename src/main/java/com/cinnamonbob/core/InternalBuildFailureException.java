@@ -1,5 +1,7 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.BobRuntimeException;
+
 /**
  * An InternalBuildFailureException is raised when something catastrophic
  * happens during a project build.  It is "normal" for builds to fail, this
@@ -9,7 +11,7 @@ package com.cinnamonbob.core;
  * 
  * @author jsankey
  */
-public class InternalBuildFailureException extends RuntimeException
+public class InternalBuildFailureException extends BobRuntimeException
 {
     private static final long serialVersionUID = 3257005458144178485L;
     

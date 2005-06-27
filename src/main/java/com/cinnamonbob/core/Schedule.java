@@ -4,7 +4,7 @@ package com.cinnamonbob.core;
  * 
  *
  */
-public class Schedule
+public @Deprecated class Schedule 
 {
     private String frequency;
 
