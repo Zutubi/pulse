@@ -1,11 +1,11 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
+import com.cinnamonbob.bootstrap.DBBootstrap;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.persistence.UserDao;
 import junit.framework.TestCase;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -35,9 +35,8 @@ public class HibernateUserDaoTest extends TestCase
         context = new ClassPathXmlApplicationContext(configLocations);
         userDao = (UserDao) context.getBean("userDao");
         
-        LocalSessionFactoryBean factoryBean = (LocalSessionFactoryBean)context.getBean("&sessionFactory");
-        factoryBean.dropDatabaseSchema();        
-        factoryBean.createDatabaseSchema();
+        DBBootstrap dbBootstrap = new DBBootstrap(context);
+        dbBootstrap.initialiseDatabase();
 
         transactionManager = (PlatformTransactionManager)context.getBean("transactionManager");
         transactionDefinition = new DefaultTransactionDefinition(DefaultTransactionDefinition.PROPAGATION_REQUIRED);
