@@ -38,7 +38,7 @@ public class EmailContactPoint implements ContactPoint
      */
     public void notify(BuildResult result)
     {
-        String subject = "[CiB] " + result.getProjectName() + ": Build " + Integer.toString(result.getId()) + (result.succeeded() ? " succeeded" : " failed");
+        String subject = "[CiB] " + result.getProjectName() + ": Build " + Long.toString(result.getId()) + (result.succeeded() ? " succeeded" : " failed");
         sendMail(subject, renderResult(result));
     }
     

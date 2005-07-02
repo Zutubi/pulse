@@ -1,6 +1,8 @@
 package com.cinnamonbob.core2;
 
 import com.cinnamonbob.core2.config.CommandResult;
+import com.cinnamonbob.model.Entity;
+import com.cinnamonbob.util.TimeStamps;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,11 +11,11 @@ import java.util.List;
  * 
  *
  */
-public class BuildResult
+public class BuildResult extends Entity
 {
     private boolean succeeded;
     private String projectName;
-    private int id;
+    private TimeStamps stamps;
     
     private List<CommandResult> results = new LinkedList<CommandResult>();
     
@@ -29,6 +31,14 @@ public class BuildResult
     public boolean succeeded()
     {
         return succeeded;
+    }
+    
+    /*
+     * This should keep hibernate happy.
+     */
+    private boolean isSucceeded()
+    {
+        return succeeded();
     }
 
     public void add(CommandResult result)
@@ -52,13 +62,13 @@ public class BuildResult
         this.projectName = projectName;
     }
 
-    public int getId()
+    public TimeStamps getStamps()
     {
-        return id;
+        return stamps;
     }
-
-    public void setId(int id)
+    
+    public void setStamps(TimeStamps stamps)
     {
-        this.id = id;
+        this.stamps = stamps;
     }
 }

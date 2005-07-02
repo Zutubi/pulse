@@ -30,7 +30,14 @@ public class TimeStamps
     }
 
     
-    public void finalise()
+    public TimeStamps(TimeStamps other)
+    {
+        this.startTime = other.startTime;
+        this.endTime = other.endTime;
+    }
+
+    
+    public void end()
     {
         endTime = System.currentTimeMillis();
     }
@@ -98,6 +105,18 @@ public class TimeStamps
         return result.toString();
     }
 
+    
+    public boolean equals(Object other)
+    {
+        if(!(other instanceof TimeStamps))
+        {
+            return false;
+        }
+        
+        TimeStamps otherStamps = (TimeStamps)other;
+        return startTime == otherStamps.startTime && endTime == otherStamps.endTime;
+    }
+    
     
     private long addElapsedPart(long elapsed, long millisPerPart, String partName, StringBuffer result)
     {
