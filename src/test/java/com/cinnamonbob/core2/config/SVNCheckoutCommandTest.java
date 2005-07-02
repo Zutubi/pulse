@@ -4,6 +4,7 @@ import com.cinnamonbob.util.FileSystemUtils;
 import junit.framework.TestCase;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * 
@@ -38,10 +39,14 @@ public class SVNCheckoutCommandTest extends TestCase
         svn.setPassword("4edueWX7");
         svn.setPath(workDir);
         svn.setUrl("svn+ssh://cinnamonbob.com/usr/local/svn-repo/bob/trunk/src/bin");        
-        svn.execute(outputDir);
+        
+        CommandResult result = svn.execute(outputDir);
+        assertTrue(result.succeeded());
         
         File[] files = workDir.listFiles();
         assertNotNull(files);
         assertTrue(files.length > 0);
+        List<Artifact> artifacts = result.getArtifacts();
+        assertNotNull(artifacts.get(0));
     }
 }

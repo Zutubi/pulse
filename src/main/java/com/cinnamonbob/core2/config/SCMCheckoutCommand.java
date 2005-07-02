@@ -43,7 +43,7 @@ public abstract class SCMCheckoutCommand implements Command
         return null;
     }
 
-    private void saveChanges(File outputDir, LinkedList<Change> changes) throws InternalBuildFailureException
+    private Artifact saveChanges(File outputDir, LinkedList<Change> changes) throws InternalBuildFailureException
     {
         File       output = new File(outputDir, OUTPUT_FILENAME);
         FileWriter writer = null;
@@ -56,6 +56,7 @@ public abstract class SCMCheckoutCommand implements Command
             {
                 writer.write(change.getFilename() + "#" + change.getRevision() + "\n");
             }
+            return new FileArtifact("changes", output);
         }
         catch(IOException e)
         {
@@ -73,14 +74,16 @@ public abstract class SCMCheckoutCommand implements Command
         Revision           revision = server.checkout(getPath(), null, changes);
         List<Changelist>   lists    = null;
         
-        saveChanges(outputDir, changes);
+        Artifact changesArtifact = saveChanges(outputDir, changes);
         // It would be perverse to get two types of revisions, but not impossible...
         if(previousRevision != null && revision.getClass().equals(previousRevision.getClass()))
         {
             lists = server.getChanges(previousRevision, revision, "");
         }
         
-        return new SCMCheckoutCommandResult(revision, lists);
+        SCMCheckoutCommandResult result = new SCMCheckoutCommandResult(revision, lists);
+        result.add(changesArtifact);
+        return result;
     }
 
     //=======================================================================

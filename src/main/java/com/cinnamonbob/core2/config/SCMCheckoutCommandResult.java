@@ -4,16 +4,16 @@ import com.cinnamonbob.scm.Changelist;
 import com.cinnamonbob.scm.Revision;
 import com.cinnamonbob.scm.SCMException;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Collections;
 
 
 public class SCMCheckoutCommandResult implements CommandResult
 {
     private Revision revision;
     private List<Changelist> changes;
-    private SCMException exception;
-    
+    private SCMException exception;    
+    private List<Artifact> artifacts = new ArrayList<Artifact>();
     
     public SCMCheckoutCommandResult(Revision revision, List<Changelist> changes)
     {
@@ -83,6 +83,11 @@ public class SCMCheckoutCommandResult implements CommandResult
 
     public List<Artifact> getArtifacts()
     {
-        return Collections.EMPTY_LIST;  
+        return artifacts;  
+    }
+    
+    void add(Artifact a)
+    {
+        artifacts.add(a);
     }
 }
