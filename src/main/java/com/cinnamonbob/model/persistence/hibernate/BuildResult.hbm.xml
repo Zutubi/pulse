@@ -5,7 +5,7 @@
     <class name="com.cinnamonbob.core2.BuildResult" table="BuildResult">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
-            <generator class="hilo"/>
+            <generator class="assigned"/>
         </id>
 
         <property name="succeeded" column="SUCCEEDED" type="boolean" not-null="false"/>
@@ -13,10 +13,12 @@
         <property name="projectName" column="PROJECT_NAME" type="string" not-null="false" length="255"/>
 
         <property name="stamps" type="com.cinnamonbob.util.TimeStampsType">
-            <column name="first_string"/>
-            <column name="second_string"/>
+            <column name="start" sql-type="BIGINT"/>
+            <column name="end"  sql-type="BIGINT"/>
         </property>
-
+        
+        <property name="stateName" column="STATE" type="string" length="127"/>
+        
     </class>
 
 </hibernate-mapping>

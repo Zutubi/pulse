@@ -68,4 +68,22 @@ public class FileSystemUtils
 
         return dir.delete();
     }
+    
+    public static final File createTmpDirectory(String prefix, String suffix) throws IOException
+    {
+        File file = File.createTempFile(prefix, suffix);
+        if (!file.exists())
+        {
+            throw new IOException();
+        }
+        if (!file.delete())
+        {
+            throw new IOException();
+        }
+        if (!file.mkdirs())
+        {
+            throw new IOException();
+        }
+        return file;
+    }
 }

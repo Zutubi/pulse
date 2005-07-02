@@ -59,6 +59,15 @@ public class TimeStamps
         return startTime;
     }
     
+    public void setStartTime(long t)
+    {
+        startTime = t;
+    }
+    
+    public void setEndTime(long t)
+    {
+        endTime = t;
+    }
     
     public long getElapsed()
     {

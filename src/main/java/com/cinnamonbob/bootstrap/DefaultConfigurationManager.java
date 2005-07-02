@@ -51,6 +51,16 @@ public class DefaultConfigurationManager implements ConfigurationManager
                 }
                 return 8080;
             }
+
+            public File getProjectRoot()
+            {
+                if (properties.contains("project.root"))
+                {
+                    return new File(properties.getProperty("project.root"));
+                }
+                
+                return new File(bootstrapManager.getApplicationPaths().getUserConfigRoot(), "projects");
+            }
         };
     }
 }

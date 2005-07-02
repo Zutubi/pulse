@@ -13,6 +13,14 @@ import java.util.List;
  */
 public class BuildResult extends Entity
 {
+    public enum BuildState 
+    {
+        BUILD_ID_ALLOCATED,
+        BUILDING,
+        COMPLETED
+    }
+    
+    private BuildState state;
     private boolean succeeded;
     private String projectName;
     private TimeStamps stamps;
@@ -70,5 +78,36 @@ public class BuildResult extends Entity
     public void setStamps(TimeStamps stamps)
     {
         this.stamps = stamps;
+    }
+         
+    public void building()
+    {
+        state = BuildState.BUILDING;
+        stamps = new TimeStamps();
+    }
+    public void completed()
+    {
+        state = BuildState.COMPLETED;
+        stamps.end();
+    }
+
+    public BuildState getState()
+    {
+        return state;
+    }
+
+    private void setState(BuildState state)
+    {
+        this.state = state;
+    }
+    
+    private String getStateName()
+    {
+        return state.name();
+    }
+    
+    private void setStateName(String name)
+    {
+        state = BuildState.valueOf(name);
     }
 }

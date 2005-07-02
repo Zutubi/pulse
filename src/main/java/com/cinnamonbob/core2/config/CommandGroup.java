@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.HashMap;
+import java.io.File;
 
 /**
  * 
@@ -52,9 +53,9 @@ public class CommandGroup implements Command
         return customArtifact;
     }
     
-    public CommandResult execute() throws CommandException
+    public CommandResult execute(File outputDir) throws CommandException
     {        
-        CommandResult result = cmd.execute();
+        CommandResult result = cmd.execute(outputDir);
         
         Map<String, Artifact> artifacts = new HashMap<String, Artifact>();
         for (Artifact a : result.getArtifacts())

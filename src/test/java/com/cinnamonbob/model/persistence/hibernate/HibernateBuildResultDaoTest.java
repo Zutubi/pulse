@@ -56,6 +56,7 @@ public class HibernateBuildResultDaoTest extends TestCase
         buildResult.setProjectName("project");
         buildResult.setSucceeded(true);
         buildResult.setStamps(new TimeStamps(1, 2));
+        buildResult.building();
         buildResultDao.save(buildResult);
         commitAndRefreshTransaction();
         
@@ -67,6 +68,7 @@ public class HibernateBuildResultDaoTest extends TestCase
         assertEquals(buildResult.getProjectName(), anotherBuildResult.getProjectName());
         assertEquals(buildResult.succeeded(), anotherBuildResult.succeeded());
         assertEquals(buildResult.getStamps(), anotherBuildResult.getStamps());
+        assertEquals(BuildResult.BuildState.BUILDING, buildResult.getState());
     }
     
     protected void commitAndRefreshTransaction()

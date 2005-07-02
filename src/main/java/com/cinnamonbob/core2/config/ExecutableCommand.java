@@ -5,10 +5,7 @@ import com.cinnamonbob.util.IOHelper;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Collections;
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.File;
+import java.io.*;
 
 /**
  * 
@@ -22,7 +19,7 @@ public class ExecutableCommand implements Command
     
     private List<Environment> env = new LinkedList<Environment>();
     
-    public CommandResult execute() throws CommandException
+    public CommandResult execute(File outputDir) throws CommandException
     {
         List<String> command = new LinkedList<String>();
         command.add(exe);
@@ -51,17 +48,17 @@ public class ExecutableCommand implements Command
         try 
         {            
             Process child = builder.start();
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            File outputFile = new File(outputDir, "output.txt");
+            FileOutputStream output = new FileOutputStream(outputFile);
             InputStream input = child.getInputStream();
             
             IOHelper.joinStreams(input, output);            
             final int result = child.waitFor();
             
-            // stdout is the output artifact.
-            String stdout = output.toString();
+            output.close();
             
             ExecutableCommandResult cmdResult = new ExecutableCommandResult(result == 0);
-            cmdResult.addArtifact(new StringArtifact("output", stdout));
+            cmdResult.addArtifact(new FileArtifact("output", outputFile));
             return cmdResult;
         }
         catch (IOException e)

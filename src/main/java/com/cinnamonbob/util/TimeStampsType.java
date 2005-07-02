@@ -1,100 +1,132 @@
 package com.cinnamonbob.util;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Hibernate;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.type.Type;
+import org.hibernate.usertype.CompositeUserType;
+import org.hsqldb.Types;
+
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.hibernate.HibernateException;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.type.Type;
-import org.hibernate.usertype.CompositeUserType;
-
 public class TimeStampsType implements CompositeUserType
 {
+    private static final int[] TYPES = new int[]{Types.BIGINT, Types.BIGINT};
 
-    public String[] getPropertyNames()
+    public int[] sqlTypes()
     {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Type[] getPropertyTypes()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Object getPropertyValue(Object arg0, int arg1) throws HibernateException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void setPropertyValue(Object arg0, int arg1, Object arg2) throws HibernateException
-    {
-        // TODO Auto-generated method stub
-        
+        return TYPES;
     }
 
     public Class returnedClass()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return TimeStamps.class;
     }
 
-    public boolean equals(Object arg0, Object arg1) throws HibernateException
+    public boolean equals(Object x, Object y)
     {
-        // TODO Auto-generated method stub
-        return false;
+        if (x == y) return true;
+        if (x == null || y == null) return false;
+
+        return x.equals(y);
     }
 
-    public int hashCode(Object arg0) throws HibernateException
+    public Object deepCopy(Object x)
     {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public Object nullSafeGet(ResultSet arg0, String[] arg1, SessionImplementor arg2, Object arg3) throws HibernateException, SQLException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void nullSafeSet(PreparedStatement arg0, Object arg1, int arg2, SessionImplementor arg3) throws HibernateException, SQLException
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public Object deepCopy(Object arg0) throws HibernateException
-    {
-        // TODO Auto-generated method stub
-        return null;
+        if (x == null) return null;
+        if (!(x instanceof TimeStamps)) return null;
+        TimeStamps result = new TimeStamps((TimeStamps) x);
+        return result;
     }
 
     public boolean isMutable()
     {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
-    public Serializable disassemble(Object arg0, SessionImplementor arg1) throws HibernateException
+    public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session,    Object owner)
+            throws HibernateException, SQLException
     {
-        // TODO Auto-generated method stub
-        return null;
+
+        Long startTime = (Long) Hibernate.LONG.nullSafeGet(rs, names[0]);
+        Long endTime = (Long) Hibernate.LONG.nullSafeGet(rs, names[1]);
+
+        return new TimeStamps((startTime != null) ? startTime : -1, (endTime != null) ? endTime : -1);
     }
 
-    public Object assemble(Serializable arg0, SessionImplementor arg1, Object arg2) throws HibernateException
+    public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor session)
+            throws HibernateException, SQLException
     {
-        // TODO Auto-generated method stub
-        return null;
+
+        TimeStamps stamps = (TimeStamps) value;
+
+        Hibernate.LONG.nullSafeSet(st, stamps.getStartTime(), index);
+        Hibernate.LONG.nullSafeSet(st, stamps.getEndTime(), index + 1);
     }
 
-    public Object replace(Object arg0, Object arg1, SessionImplementor arg2, Object arg3) throws HibernateException
+    public String[] getPropertyNames()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return new String[]{"startTime", "endTime"};
     }
 
+    public Type[] getPropertyTypes()
+    {
+        return new Type[]{Hibernate.LONG, Hibernate.LONG};
+    }
+
+    public Object getPropertyValue(Object component, int property)
+    {
+        TimeStamps stamps = (TimeStamps) component;
+        if (property == 0)
+        {
+            return stamps.getStartTime();
+        }
+        else
+        {
+            return stamps.getEndTime();
+        }
+    }
+
+    public void setPropertyValue(
+            Object component,
+            int property,
+            Object value)
+    {
+        TimeStamps stamps = (TimeStamps) component;
+        if (property == 0)
+        {
+            stamps.setStartTime((Long)value);
+        }
+        else
+        {
+            stamps.setEndTime((Long)value);
+        }
+    }
+
+    public Object assemble(
+            Serializable cached,
+            SessionImplementor session,
+            Object owner)
+    {
+
+        return deepCopy(cached);
+    }
+
+    public Serializable disassemble(Object value, SessionImplementor session)
+    {
+        return (Serializable) deepCopy(value);
+    }
+
+    public int hashCode(Object x) throws HibernateException
+    {
+        return x.hashCode();
+    }
+
+    public Object replace(Object original, Object target, SessionImplementor session, Object owner) throws HibernateException
+    {
+        return new TimeStamps((TimeStamps)original);
+    }
 }

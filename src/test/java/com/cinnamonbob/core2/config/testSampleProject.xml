@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <project name="sampleProject" defaultRecipe="default">
-    
+
     <description>Self-hosting magic</description>
-    
+
     <property name="home.dir" value="/home/daniel"/>
     <property name="home.dir" value="E:/tmp/bob-build"/>
-    <property name="ant.bin"  value="E:/opt/ant/apache-ant-1.6.2/bin/ant"/>
-    
+    <property name="ant.bin" value="E:/opt/ant/apache-ant-1.6.2/bin/ant"/>
+
     <post-processor name="generic.pp">
         <regex>
             <pattern category="error" expression=".*[Ee]rror.*"/>
@@ -29,7 +29,7 @@
         </regex>
     </post-processor>
 
-    
+
     <schedule recipe="fullBuild">
         <!-- Run a nightly build. -->
         <cron schedule="0 0 12 ? * *"/>
@@ -56,6 +56,14 @@
             <process artifact="output" processor="ant.pp"/>
             <process artifact="output" processor="generic.pp"/>
             <process artifact="junit" processor="junit.pp"/>
+        </command>
+    </recipe>
+
+    <recipe name="scm">
+        <command name="svn">
+            <svn-checkout user="jason" password="jason"
+                          url="svn+ssh://jason@www.anyhews.net/usr/local/svn-repo/bob/trunk"
+                          path="${work.dir}"/>
         </command>
     </recipe>
 </project>

@@ -27,7 +27,6 @@ public class DBBootstrap
     {
         if (!schemaExists())
         {
-            System.out.println("creating database.");
             LocalSessionFactoryBean factoryBean = (LocalSessionFactoryBean) context.getBean("&sessionFactory");
             factoryBean.createDatabaseSchema();
         }

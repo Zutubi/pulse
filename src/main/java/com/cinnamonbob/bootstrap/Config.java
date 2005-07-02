@@ -1,5 +1,7 @@
 package com.cinnamonbob.bootstrap;
 
+import java.io.File;
+
 /**
  * 
  *
@@ -7,4 +9,5 @@ package com.cinnamonbob.bootstrap;
 public interface Config
 {
     int getServerPort();
+    File getProjectRoot();
 }
