@@ -1,0 +1,22 @@
+This file is an attempt to keep track of some of the dependancies within bob.
+
+Database
+--------
+* hibernate-3.0.5.jar 
++ dom4j-1.6.jar (used for parsing xml hbm files)
++ commons-pool-1.2.jar 
++ commons-dbcp-1.2.1.jar (default connection pooling)
++ ehcache-1.1.jar
++ antlr-2.7.5H3.jar
++ cglib-nodep-2.1.jar
++ jta-1.0.1b.jar (transaction management)
+- does not support hsqldb-1.8.x
+
+* hsqldb-1.7.3.3.jar
+
+CVS
+----
+* org-netbeans-lib-cvsclient-4.0.jar
+
+* j2ssh-common-0.2.7.jar (used for ssh connection to cvs server)
+* j2ssh-core-0.2.7.jar

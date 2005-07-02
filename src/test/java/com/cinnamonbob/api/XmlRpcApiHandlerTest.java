@@ -5,7 +5,6 @@ import org.apache.xmlrpc.WebServer;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcServer;
 
-
 /**
  * XmlRpcServer
  */
@@ -51,7 +50,7 @@ public class XmlRpcApiHandlerTest extends TestCase
 //        "   </params>\n" +
 //        "</methodCall>\n";
 //
-//        String response = new String(server.execute(new ByteArrayInputStream(rpc.getBytes())));
+//        String response = new String(server.initialise(new ByteArrayInputStream(rpc.getBytes())));
 //
 //        // check that a build request has been generated for the
 //        // appropriate project.
@@ -62,6 +61,6 @@ public class XmlRpcApiHandlerTest extends TestCase
     {
 //        Vector<String> params = new Vector<String>();
 //        params.add("testProject");
-//        client.execute("build", params);
+//        client.initialise("build", params);
     }
 }

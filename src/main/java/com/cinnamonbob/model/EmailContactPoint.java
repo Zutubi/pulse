@@ -1,15 +1,12 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.core2.BuildResult;
+import com.cinnamonbob.core2.renderer.BuildResultRenderer;
+import com.cinnamonbob.core2.renderer.VelocityBuildResultRenderer;
 
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.Session;
-import javax.mail.Message;
-import javax.mail.Transport;
-import java.util.logging.Logger;
-import java.util.Date;
 import java.io.StringWriter;
+import java.util.logging.Logger;
 
 /**
  * 

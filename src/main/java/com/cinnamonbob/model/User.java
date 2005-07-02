@@ -7,10 +7,11 @@ import java.util.HashMap;
  * 
  *
  */
-public class User
+public class User extends Entity
 {
     private String login;
     private String name;
+    
     private Map<String, ContactPoint> contactPoints = new HashMap<String, ContactPoint>();
 
     public String getLogin()

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<project name="project">
+
+    <schedule name="a">
+        <simpleTrigger name="b" value="c"/>
+    </schedule>
+
+</project>
