@@ -23,8 +23,8 @@ public class SVNCheckoutCommandTest extends TestCase
     
     public void tearDown() throws Exception
     {
-        FileSystemUtils.removeDirectory(workDir);
-        FileSystemUtils.removeDirectory(outputDir);
+        assertTrue(FileSystemUtils.removeDirectory(workDir));
+        assertTrue(FileSystemUtils.removeDirectory(outputDir));
     }
     
     //NOTE: This is not a very good unit test, most of the functionality is 
