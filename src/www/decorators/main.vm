@@ -4,9 +4,9 @@
 		<link href="$base/main.css" rel="stylesheet" type="text/css">
 		$head
 	</head>
-
-	<body>
-		<table width="100%" height="100%">
+        
+    <body>
+        <table width="100%" height="100%">
 			<tr>
 				<td width="100%">
 					<table width="100%" height="100%">
@@ -17,10 +17,20 @@
 						</tr>
                         <tr>
                             <td class="navbar-border">
-                                <table>
+                                <table>                                    
                                     <tr>
-                                        <td class="navbar-active">:: navigate ::</td>
-                                        <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="serverStatus.action">server&nbsp;status</a></td>
+                                        <!-- page properties are specified using <content tag="selectedTab">navigate</content> -->
+                                        #set ($selectedTab = $page.getProperty("page.selectedTab"))
+                                        #if ($selectedTab == "navigate")
+                                            <td class="navbar-active">:: navigate ::</td>
+                                        #else
+                                            <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="/">navigate</a></td>
+                                        #end
+                                        #if ($selectedTab == "server-status")
+                                            <td class="navbar-active">:: server status ::</td>
+                                        #else
+                                            <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="serverStatus.action">server&nbsp;status</a></td>
+                                        #end                                        
                                         <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="viewProjects.action">all&nbsp;projects</a></td>
                                     </tr>
                                 </table>

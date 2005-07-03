@@ -3,6 +3,9 @@
     <title>[CiB] server status</title>
     <link href="build.css" rel="stylesheet" type="text/css">
   </head>
+
+  <content tag="selectedTab">server-status</content>
+      
   <body>
     <h1 class="build-log">:: server status ::</h1>
     <h2 class="command-info">build queue</h2>
