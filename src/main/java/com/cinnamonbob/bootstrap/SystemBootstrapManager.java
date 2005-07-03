@@ -11,7 +11,7 @@ public class SystemBootstrapManager
 
     private static final String DEFAULT_BOOTSTRAP_CONTEXT = "com/cinnamonbob/bootstrap/bootstrapContext.xml";
 
-    private static final String BOOTSTRAP_CONTEXT_PROPERTY = "bootstrap";
+    public static final String BOOTSTRAP_CONTEXT_PROPERTY = "bootstrap";
 
     public void bootstrapSystem()
     {

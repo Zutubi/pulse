@@ -5,6 +5,8 @@
 
     <property name="version" value="dev"/>
 
+    <property name="bob.jar" value="bob-${version}.jar"/>
+    
     <path id="lib.path">
         <fileset dir="lib">
             <include name="**/*.jar"/>
@@ -74,7 +76,7 @@
     <target name="default" depends="clean, build, test" description="Run a clean build by default."/>
 
     <target name="jar" depends="build">
-        <jar file="build/bob-${version}.jar" basedir="build/java/classes"/>
+        <jar file="build/${bob.jar}" basedir="build/java/classes"/>
     </target>
 
     <target name="package" depends="jar">
@@ -98,7 +100,7 @@
                 <exclude name="junit*.jar"/>
             </fileset>
             <fileset dir="build">
-                <include name="bob-${version}.jar"/>
+                <include name="${bob.jar}"/>
             </fileset>
         </copy>
 
@@ -114,6 +116,10 @@
 
         <copy todir="${package.root}/system/templates">
             <fileset dir="src/templates" includes="**/*.vm"/>
+        </copy>
+
+        <copy todir="${package.root}/system/database">
+            <fileset dir="src/etc" includes="delete-me.txt"/>
         </copy>
 
         <copy todir="${package.root}/work">
@@ -136,34 +142,6 @@
         <delete dir="deploy"/>
         <mkdir dir="deploy"/>
         <unzip src="build/bob-${version}.zip" dest="deploy"/>
-    </target>
-
-    <target name="bob.start">
-        <copy todir="build/root/config">
-            <fileset dir="src/main/config">
-                <include name="**/*"/>
-            </fileset>
-        </copy>
-        <mkdir dir="build/root/log"/>
-        <java classname="com.cinnamonbob.command.Bootstrap" fork="true" spawn="true">
-            <classpath refid="lib.path"/>
-            <classpath location="build/java/classes"/>
-            <classpath location="src/main/templates"/>
-            <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
-            <sysproperty key="root.dir" value="build/root"/>
-            <arg value="start"/>
-        </java>
-    </target>
-
-    <target name="bob.build">
-        <java classname="com.cinnamonbob.command.Bootstrap" fork="true">
-            <classpath refid="lib.path"/>
-            <classpath location="build/java/classes"/>
-            <sysproperty key="java.util.logging.config.file" value="./etc/logging.properties"/>
-            <sysproperty key="root.dir" value="./deploy/bob-dev"/>
-            <arg value="build"/>
-            <arg value="bob-project"/>
-        </java>
     </target>
 
     <target name="pkg" depends="package" description="The 'pkg' target has been renamed to 'package'."/>
