@@ -61,9 +61,10 @@ public class JettyServerFactoryBean implements FactoryBean
         try
         {
             SERVER.stop();
-        } catch (InterruptedException e)
+        } 
+        catch (InterruptedException e)
         {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
     }
 }

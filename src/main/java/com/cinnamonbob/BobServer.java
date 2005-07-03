@@ -1,7 +1,7 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.bootstrap.StartupManager;
-import com.cinnamonbob.bootstrap.jetty.JettyManager;
+import com.cinnamonbob.bootstrap.ConfigUtils;
+import com.cinnamonbob.bootstrap.SystemBootstrapManager;
 import com.cinnamonbob.core.Bob;
 
 import java.util.logging.Logger;
@@ -20,24 +20,22 @@ public class BobServer
     private static BuildQueue buildQueue = null;
     private Bob core = null;
 
-    private int adminPort;
-
-    public BobServer(int port)
+    public BobServer()
     {
-        adminPort = port;
     }
 
     public void start() throws Exception
     {
         LOG.info("start");
 
-        StartupManager.startupSystem();
-
+        SystemBootstrapManager bootstrap = new SystemBootstrapManager();
+        bootstrap.bootstrapSystem();
+        
+        int adminPort = ConfigUtils.getManager().getAppConfig().getAdminPort();        
         // initialise the shutdown service to allow this server
         // to be shutdown.
         shutdownService = new ShutdownService(adminPort, this);
         shutdownService.start();
-
 
         // initialise the build queue.
         buildQueue = new BuildQueue();
@@ -49,15 +47,15 @@ public class BobServer
             }
         });
 
-        core = new Bob();
-
-        // initialise jetty
-
-
-        JettyManager jettyManager = JettyManager.getInstance();
-        jettyManager.deployWebapp();
-        jettyManager.deployInWebApplicationContext("bob", core);
-        jettyManager.deployInWebApplicationContext("server", this);
+//        core = new Bob();
+//
+//        // initialise jetty
+//
+//
+//        JettyManager jettyManager = JettyManager.getInstance();
+//        jettyManager.deployWebapp();
+//        jettyManager.deployInWebApplicationContext("bob", core);
+//        jettyManager.deployInWebApplicationContext("server", this);
     }
 
     public void stop()

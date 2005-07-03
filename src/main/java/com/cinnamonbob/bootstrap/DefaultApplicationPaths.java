@@ -8,7 +8,6 @@ import java.io.File;
  */
 public class DefaultApplicationPaths implements ApplicationPaths
 {
-
     private final File bobHome;
 
     private File contentRoot;

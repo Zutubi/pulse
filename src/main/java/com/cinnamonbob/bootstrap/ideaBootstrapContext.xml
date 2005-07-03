@@ -9,7 +9,7 @@
                 <value>com/cinnamonbob/bootstrap/databaseContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/webworkContext.xml</value>
             </list>
-        </property>  
+        </property>        
     </bean>    
     
     <bean id="configurationManager" class="com.cinnamonbob.bootstrap.DefaultConfigurationManager" init-method="init">
@@ -17,6 +17,14 @@
             <props>
                 <prop key="name">value</prop>
             </props>
+        </property>
+        <property name="applicationPaths">
+            <bean class="com.cinnamonbob.bootstrap.ConfigurableApplicationPaths">
+                <property name="contentRoot"><value>src/www</value></property>
+                <property name="configRoot"><value>src/etc</value></property>
+                <property name="templateRoot"><value>src/templates</value></property>
+                <property name="userConfigRoot"><value>src/main/etc</value></property>
+            </bean>
         </property>
     </bean>
     

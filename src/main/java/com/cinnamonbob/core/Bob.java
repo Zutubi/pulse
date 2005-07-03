@@ -1,7 +1,7 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.bootstrap.ApplicationPaths;
-import com.cinnamonbob.bootstrap.BootstrapUtils;
+import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.core.ext.ExtensionManagerUtils;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -187,7 +187,7 @@ public class Bob
 
     public Bob() throws ConfigException
     {
-        ApplicationPaths paths = BootstrapUtils.getManager().getApplicationPaths();
+        ApplicationPaths paths = ConfigUtils.getManager().getApplicationPaths();
         this.rootDir = paths.getApplicationRoot();
         this.configDir = new File(this.rootDir, CONFIG_DIR_NAME);
 

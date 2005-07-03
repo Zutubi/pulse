@@ -1,7 +1,7 @@
 package com.cinnamonbob.bootstrap.velocity;
 
 import com.cinnamonbob.bootstrap.ApplicationPaths;
-import com.cinnamonbob.bootstrap.BootstrapUtils;
+import com.cinnamonbob.bootstrap.ConfigUtils;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.runtime.resource.loader.FileResourceLoader;
 
@@ -18,7 +18,7 @@ public class BobTemplateVelocityResourceLoader extends FileResourceLoader
 
     public static String getFullTemplatePath()
     {
-        ApplicationPaths paths = BootstrapUtils.getManager().getApplicationPaths();
+        ApplicationPaths paths = ConfigUtils.getManager().getApplicationPaths();
         return paths.getTemplateRoot().getAbsolutePath();
     }
 

@@ -1,10 +1,12 @@
 package com.cinnamonbob.bootstrap;
 
+import com.cinnamonbob.BobRuntimeException;
+
 /**
  * 
  *
  */
-public class StartupException extends RuntimeException
+public class StartupException extends BobRuntimeException
 {
     public StartupException()
     {

@@ -1,6 +1,6 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.bootstrap.DBBootstrap;
+import com.cinnamonbob.bootstrap.DatabaseBootstrap;
 import com.cinnamonbob.core2.BuildResult;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 import com.cinnamonbob.util.TimeStamps;
@@ -36,7 +36,7 @@ public class HibernateBuildResultDaoTest extends TestCase
         context = new ClassPathXmlApplicationContext(configLocations);
         buildResultDao = (BuildResultDao) context.getBean("buildResultDao");
         
-        DBBootstrap dbBootstrap = new DBBootstrap(context);
+        DatabaseBootstrap dbBootstrap = new DatabaseBootstrap(context);
         dbBootstrap.initialiseDatabase();
 
         transactionManager = (PlatformTransactionManager)context.getBean("transactionManager");

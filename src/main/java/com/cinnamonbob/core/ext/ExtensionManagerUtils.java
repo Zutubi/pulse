@@ -1,6 +1,6 @@
 package com.cinnamonbob.core.ext;
 
-import com.cinnamonbob.bootstrap.StartupManager;
+import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.core.*;
 import nu.xom.Element;
 
@@ -15,7 +15,7 @@ public class ExtensionManagerUtils
 
     public static ExtensionManager getManager()
     {
-        return (ExtensionManager) StartupManager.getBean(BEAN_NAME);
+        return (ExtensionManager) ComponentContext.getBean(BEAN_NAME);
     }
 
     public static Command createCommand(String name, ConfigContext context, Element element, CommandCommon common)

@@ -10,6 +10,6 @@ public class ConfigUtils
 
     public static final ConfigurationManager getManager()
     {
-        return (ConfigurationManager) StartupManager.getBean(BEAN_NAME);
+        return (ConfigurationManager) ComponentContext.getBean(BEAN_NAME);
     }
 }

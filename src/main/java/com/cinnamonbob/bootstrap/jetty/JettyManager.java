@@ -1,7 +1,7 @@
 package com.cinnamonbob.bootstrap.jetty;
 
-import com.cinnamonbob.bootstrap.StartupManager;
-import com.cinnamonbob.bootstrap.BootstrapManager;
+import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 
@@ -16,7 +16,7 @@ public class JettyManager
     private static final String BEAN_NAME = "jettyManager";
 
     private Server server;
-    private BootstrapManager bootstrapManager;
+    private ConfigurationManager configurationManager;
     private WebApplicationContext appContext;
 
     public void setJettyServer(Server server)
@@ -24,14 +24,14 @@ public class JettyManager
         this.server = server;
     }
 
-    public void setBootstrapManager(BootstrapManager bootstrapManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
-        this.bootstrapManager = bootstrapManager;
+        this.configurationManager = configurationManager;
     }
 
     public void deployWebapp() throws Exception
     {
-        File wwwRoot = bootstrapManager.getApplicationPaths().getContentRoot();
+        File wwwRoot = configurationManager.getApplicationPaths().getContentRoot();
 
         appContext = server.addWebApplication("/", wwwRoot.getAbsolutePath());
 
@@ -48,6 +48,6 @@ public class JettyManager
 
     public static JettyManager getInstance()
     {
-        return (JettyManager) StartupManager.getBean(BEAN_NAME);
+        return (JettyManager) ComponentContext.getBean(BEAN_NAME);
     }
 }

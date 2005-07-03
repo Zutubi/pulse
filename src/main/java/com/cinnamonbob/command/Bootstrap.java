@@ -17,13 +17,11 @@ import java.util.logging.Logger;
  */
 public class Bootstrap
 {
-
     private static final Logger LOG = Logger.getLogger(Bootstrap.class.getName());
 
     //TODO: support command the form ... options COMMAND command-options ARGUMENTS
 
     // server connection details.
-    private int port = 2345;
     private String host = "localhost";
 
     public void parse(String args[]) throws Exception
@@ -57,7 +55,7 @@ public class Bootstrap
 
     public void start() throws Exception
     {
-        BobServer server = new BobServer(port);
+        BobServer server = new BobServer();
         server.start();
     }
 
@@ -66,7 +64,7 @@ public class Bootstrap
         // connect to the admin port and send the shutdown command...
         Socket socket = null;
         try {
-            socket = new Socket(host, port);
+            socket = new Socket(host, 8081);
 
             // send the shutdown command.
             OutputStream out = socket.getOutputStream();

@@ -1,7 +1,7 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.bootstrap.ApplicationPaths;
-import com.cinnamonbob.bootstrap.BootstrapUtils;
+import com.cinnamonbob.bootstrap.ConfigUtils;
 import nu.xom.Document;
 import nu.xom.Element;
 
@@ -33,7 +33,7 @@ public class UserManager
     
     private void loadConfig() throws ConfigException
     {
-        ApplicationPaths paths = BootstrapUtils.getManager().getApplicationPaths();
+        ApplicationPaths paths = ConfigUtils.getManager().getApplicationPaths();
 
         String filename = paths.getUserConfigRoot().getAbsolutePath() + File.separator + CONFIG_FILENAME;
         

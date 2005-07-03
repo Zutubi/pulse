@@ -1,6 +1,7 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.bootstrap.StartupManager;
+import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.util.FileSystemUtils;
 import com.thoughtworks.xstream.XStream;
 
@@ -58,7 +59,7 @@ public class BuildManager
     
     public static BuildManager getInstance()
     {
-        return (BuildManager) StartupManager.getBean("buildManager");        
+        return (BuildManager) ComponentContext.getBean("buildManager");        
     }
     
     public File getProjectRoot(Project project)

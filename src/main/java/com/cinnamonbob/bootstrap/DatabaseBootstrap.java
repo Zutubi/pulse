@@ -12,13 +12,13 @@ import java.sql.SQLException;
  * Hibernate specific bootstrap support that creates the database scheme
  * if it does not already exist in the configured database.
  */
-public class DBBootstrap
+public class DatabaseBootstrap
 {
     public static final String SCHEMA_TEST_TABLE = "User";
     
     private ApplicationContext context;
 
-    public DBBootstrap(ApplicationContext context)
+    public DatabaseBootstrap(ApplicationContext context)
     {
         this.context = context;
     }

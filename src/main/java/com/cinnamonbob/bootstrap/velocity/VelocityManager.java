@@ -1,7 +1,7 @@
 package com.cinnamonbob.bootstrap.velocity;
 
+import com.cinnamonbob.bootstrap.ComponentContext;
 import org.apache.velocity.app.VelocityEngine;
-import com.cinnamonbob.bootstrap.StartupManager;
 
 /**
  * 
@@ -13,6 +13,6 @@ public class VelocityManager
 
     public static VelocityEngine getEngine()
     {
-        return (VelocityEngine) StartupManager.getBean(BEAN_NAME);
+        return (VelocityEngine) ComponentContext.getBean(BEAN_NAME);
     }
 }

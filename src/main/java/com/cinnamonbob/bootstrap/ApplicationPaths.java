@@ -24,15 +24,21 @@ public interface ApplicationPaths
     File getConfigRoot();
 
     /**
-     *
+     * The template root directory.
+     * 
      * @return
      */
     File getTemplateRoot();
 
     /**
+     * The user configuration directory.
+     * 
+     * @return
+     */
+    File getUserConfigRoot();
+    
+    /**
      * @deprecated remove.
      */
     File getApplicationRoot();
-
-    File getUserConfigRoot();
 }

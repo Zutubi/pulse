@@ -3,6 +3,7 @@ package com.cinnamonbob.core2;
 import com.cinnamonbob.core2.config.*;
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.StartupManager;
+import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 
 import java.io.File;
@@ -17,7 +18,7 @@ public class BuildProcessor
     {
         Project project = lookupProject(request.getProjectName());
         
-        BuildResultDao brdao = (BuildResultDao) StartupManager.getBean("buildResultDao");
+        BuildResultDao brdao = (BuildResultDao) ComponentContext.getBean("buildResultDao");
         
         // allocate a build result to this request.
         BuildResult buildResult = new BuildResult();

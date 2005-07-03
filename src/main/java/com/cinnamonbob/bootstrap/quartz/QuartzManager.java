@@ -1,6 +1,7 @@
 package com.cinnamonbob.bootstrap.quartz;
 
 import com.cinnamonbob.bootstrap.StartupManager;
+import com.cinnamonbob.bootstrap.ComponentContext;
 import org.quartz.Scheduler;
 
 /**
@@ -18,6 +19,6 @@ public class QuartzManager
      */
     public static Scheduler getScheduler()
     {
-        return (Scheduler) StartupManager.getBean(BEAN_NAME);
+        return (Scheduler) ComponentContext.getBean(BEAN_NAME);
     }
 }

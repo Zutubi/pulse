@@ -138,7 +138,7 @@
         <unzip src="build/bob-${version}.zip" dest="deploy"/>
     </target>
 
-    <target name="bob.start" depends="default">
+    <target name="bob.start">
         <copy todir="build/root/config">
             <fileset dir="src/main/config">
                 <include name="**/*"/>

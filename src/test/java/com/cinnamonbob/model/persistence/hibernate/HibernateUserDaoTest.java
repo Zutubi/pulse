@@ -1,6 +1,6 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.bootstrap.DBBootstrap;
+import com.cinnamonbob.bootstrap.DatabaseBootstrap;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.persistence.UserDao;
 import junit.framework.TestCase;
@@ -35,7 +35,7 @@ public class HibernateUserDaoTest extends TestCase
         context = new ClassPathXmlApplicationContext(configLocations);
         userDao = (UserDao) context.getBean("userDao");
         
-        DBBootstrap dbBootstrap = new DBBootstrap(context);
+        DatabaseBootstrap dbBootstrap = new DatabaseBootstrap(context);
         dbBootstrap.initialiseDatabase();
 
         transactionManager = (PlatformTransactionManager)context.getBean("transactionManager");
