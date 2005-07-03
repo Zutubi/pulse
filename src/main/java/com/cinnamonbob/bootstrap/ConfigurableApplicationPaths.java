@@ -12,6 +12,8 @@ public class ConfigurableApplicationPaths implements ApplicationPaths
     private File configRoot;
     private File templateRoot;
     private File userConfigRoot;
+    private File databaseRoot;
+    
     /**
      * @deprecated 
      */
@@ -68,5 +70,15 @@ public class ConfigurableApplicationPaths implements ApplicationPaths
     public void setApplicationRoot(File applicationRoot)
     {
         this.applicationRoot = applicationRoot;
+    }
+
+    public File getDatabaseRoot()
+    {
+        return databaseRoot;
+    }
+
+    public void setDatabaseRoot(File databaseRoot)
+    {
+        this.databaseRoot = databaseRoot;
     }
 }

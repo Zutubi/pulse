@@ -1,9 +1,9 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
+import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.DatabaseBootstrap;
 import junit.framework.TestCase;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -42,9 +42,11 @@ public abstract class PersistenceTestCase extends TestCase
             "com/cinnamonbob/bootstrap/testBootstrapContext.xml",
             "com/cinnamonbob/bootstrap/testApplicationContext.xml"
         };
-        context = new ClassPathXmlApplicationContext(configLocations);
-
-        DatabaseBootstrap dbBootstrap = new DatabaseBootstrap(context);
+        
+        ComponentContext.addClassPathContextDefinitions(configLocations);
+        context = ComponentContext.getContext();
+        
+        DatabaseBootstrap dbBootstrap = new DatabaseBootstrap();
         dbBootstrap.initialiseDatabase();
 
         transactionManager = (PlatformTransactionManager)context.getBean("transactionManager");

@@ -27,7 +27,7 @@ public class StartupManager
             
             // run the various bootstrap/system startup tasks.
             // initialise database.
-            DatabaseBootstrap databaseBootstrap = new DatabaseBootstrap(ComponentContext.getContext());
+            DatabaseBootstrap databaseBootstrap = new DatabaseBootstrap();
             databaseBootstrap.initialiseDatabase();
             
             // initialise jetty.

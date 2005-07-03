@@ -26,6 +26,7 @@ public class SystemBootstrapManager
         {
             ComponentContext.addClassPathContextDefinitions(new String[]{contextName});
         }        
+
         ((StartupManager)ComponentContext.getBean("startupManager")).init();
     }
 

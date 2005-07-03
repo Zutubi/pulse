@@ -14,7 +14,8 @@ public class DefaultApplicationPaths implements ApplicationPaths
     private File configRoot;
     private File templateRoot;
     private File userConfigRoot;
-
+    private File databaseRoot;
+    
     public DefaultApplicationPaths(File bobHome)
     {
         this.bobHome = bobHome;
@@ -23,6 +24,15 @@ public class DefaultApplicationPaths implements ApplicationPaths
     public File getApplicationRoot()
     {
         return bobHome;
+    }
+
+    public File getDatabaseRoot()
+    {
+        if (databaseRoot == null)
+        {
+             databaseRoot = new File(bobHome, "system" + File.separatorChar + "database");   
+        }
+        return databaseRoot;
     }
 
     public File getContentRoot()

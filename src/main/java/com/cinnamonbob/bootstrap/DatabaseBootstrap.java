@@ -15,41 +15,43 @@ import java.sql.SQLException;
 public class DatabaseBootstrap
 {
     public static final String SCHEMA_TEST_TABLE = "User";
-    
-    private ApplicationContext context;
 
-    public DatabaseBootstrap(ApplicationContext context)
+    public DatabaseBootstrap()
     {
-        this.context = context;
     }
 
+    private ApplicationContext getContext()
+    {
+        return ComponentContext.getContext();        
+    }
+    
     public void initialiseDatabase()
     {
         if (!schemaExists())
         {
-            LocalSessionFactoryBean factoryBean = (LocalSessionFactoryBean) context.getBean("&sessionFactory");
+            LocalSessionFactoryBean factoryBean = (LocalSessionFactoryBean) getContext().getBean("&sessionFactory");
             factoryBean.createDatabaseSchema();
         }
     }
 
-    
+
     private boolean schemaExists()
     {
         // does the schema exist?
-        try 
+        try
         {
-            DataSource dataSource = (DataSource) context.getBean("dataSource");
+            DataSource dataSource = (DataSource) getContext().getBean("dataSource");
             Connection con = dataSource.getConnection();
             CallableStatement stmt = con.prepareCall("SELECT COUNT(*) FROM " + SCHEMA_TEST_TABLE);
             stmt.execute();
             return true;
-        } 
+        }
         catch (SQLException e)
         {
             return false;
-        }        
+        }
     }
-    
+
 /*
     private boolean schemaExists() throws SQLException
     {

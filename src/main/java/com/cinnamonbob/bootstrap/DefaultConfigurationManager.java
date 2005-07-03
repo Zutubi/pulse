@@ -27,22 +27,22 @@ public class DefaultConfigurationManager implements ConfigurationManager
     
     public void init() throws StartupException
     {
-        String bobHome = System.getProperty("bob.home");
-        if (bobHome == null || bobHome.length() == 0)
-        {
-            // fatal error, BOB_HOME property needs to exist.
-            throw new StartupException();
-        }
-
-        bobRoot = new File(bobHome);
-        if (!bobRoot.exists() || !bobRoot.isDirectory())
-        {
-            // fatal error, BOB_HOME property needs to reference bobs home directory
-            throw new StartupException();
-        }
 
         if (paths == null)
         {
+            String bobHome = System.getProperty("bob.home");
+            if (bobHome == null || bobHome.length() == 0)
+            {
+                // fatal error, BOB_HOME property needs to exist.
+                throw new StartupException();
+            }
+
+            bobRoot = new File(bobHome);
+            if (!bobRoot.exists() || !bobRoot.isDirectory())
+            {
+                // fatal error, BOB_HOME property needs to reference bobs home directory
+                throw new StartupException();
+            }
             // initialise applicationPaths based on bob.home.        
             paths = new DefaultApplicationPaths(bobRoot);
         }
@@ -133,7 +133,7 @@ public class DefaultConfigurationManager implements ConfigurationManager
     
     /**
      * 
-     * @return
+     * @return application paths
      */
     public ApplicationPaths getApplicationPaths()
     {
