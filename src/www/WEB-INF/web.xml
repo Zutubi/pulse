@@ -18,6 +18,11 @@
     <servlet>
         <servlet-name>sitemesh-velocity</servlet-name>
         <servlet-class>com.opensymphony.module.sitemesh.velocity.VelocityDecoratorServlet</servlet-class>
+        <init-param>
+            <param-name>org.apache.velocity.properties</param-name>
+            <param-value>/WEB-INF/velocity.properties</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup> 
     </servlet>
 
     <servlet>
@@ -53,16 +58,7 @@
 	
 	<taglib>
 		<taglib-uri>webwork</taglib-uri>
-		<taglib-location>/WEB-INF/lib/webwork-2.1.1.jar</taglib-location>
+		<taglib-location>/WEB-INF/lib/webwork-2.1.7.jar</taglib-location>
 	</taglib>
-	
-    <!--<error-page>-->
-        <!--<error-code>404</error-code>-->
-        <!--<location>/404.jsp</location>-->
-    <!--</error-page>-->
-    <!--<error-page>-->
-        <!--<error-code>500</error-code>-->
-        <!--<location>/500.jsp</location>-->
-    <!--</error-page>-->
 
 </web-app>

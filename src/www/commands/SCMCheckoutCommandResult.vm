@@ -4,7 +4,7 @@ Checked out revision <b>$commandResult.Result.Revision</b>.
 <h3>Changes Since Last Build</h3>
     #foreach($change in $commandResult.Result.Changes)
 <div class="info">
-  <b>Revision $change.Revision</b> $change.User@$change.Date: $change.Comment</li>
+  <b>Revision $change.Revision</b> $change.User@$change.Date: $change.Comment
   <ul>
       #foreach($file in $change.Changes)
     <li><span class="filename">$file.Filename#$file.Revision: $file.Action</span></li>

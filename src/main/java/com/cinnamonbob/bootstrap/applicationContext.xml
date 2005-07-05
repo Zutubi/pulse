@@ -27,4 +27,6 @@
 
     <bean id="buildManager" class="com.cinnamonbob.core.BuildManager"/>
 
+    <bean id="userManager" class="com.cinnamonbob.model.DefaultUserManager" autowire="byName"/>
+    
 </beans>

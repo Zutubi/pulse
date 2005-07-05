@@ -1,0 +1,11 @@
+#set ($actionErrors = $stack.findValue("actionErrors"))
+#if($actionErrors && $actionErrors.size() > 0)
+    <div class="errorBox">
+    <span class="errorMessage">$action.getText("errors.occurred")</span>
+    <ul>
+        #foreach($error in $actionErrors)
+        <li>$error</li>
+        #end
+    </ul>
+    </div>
+#end

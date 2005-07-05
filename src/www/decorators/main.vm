@@ -32,6 +32,11 @@
                                             <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="serverStatus.action">server&nbsp;status</a></td>
                                         #end                                        
                                         <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="viewProjects.action">all&nbsp;projects</a></td>
+                                        #if ($selectedTab == "create-user")
+                                            <td class="navbar-active">:: create user ::</td>
+                                        #else
+                                            <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="createUser!default.action">create&nbsp;user</a></td>
+                                        #end                                        
                                     </tr>
                                 </table>
                             </td>

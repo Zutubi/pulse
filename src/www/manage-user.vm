@@ -1,0 +1,9 @@
+<html>
+<head>
+    <title>[CiB] manage users</title>
+    <link href="build.css" rel="stylesheet" type="text/css">
+</head>    
+<body>
+    <a href="createUser!default.action">create user</a>
+</body>
+</html>

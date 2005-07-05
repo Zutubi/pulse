@@ -1,5 +1,6 @@
 package com.cinnamonbob.bootstrap.velocity;
 
+import com.cinnamonbob.bootstrap.StartupException;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.FactoryBean;
 
@@ -7,15 +8,12 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.cinnamonbob.bootstrap.StartupException;
-
 /**
  * 
  *
  */
 public class VelocityEngineFactoryBean implements FactoryBean
 {
-
     private static final Logger LOG = Logger.getLogger(VelocityEngineFactoryBean.class.getName());
 
     private static VelocityEngine VELOCITY_ENGINE;

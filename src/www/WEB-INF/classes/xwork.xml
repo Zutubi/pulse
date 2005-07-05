@@ -3,8 +3,9 @@
 
 <xwork>
 	<include file="webwork-default.xml" />
-	<package name="default" extends="webwork-default">
-		<default-interceptor-ref name="defaultStack" /> 
+	
+    <package name="default" extends="webwork-default">
+		<default-interceptor-ref name="completeStack" /> 
 		
 		<action name="serverStatus" class="serverStatusAction">
 			<result name="success" type="velocity">server-status.vm</result> 
@@ -40,5 +41,25 @@
 			</result>
 			<result name="error" type="velocity">generic-error.vm</result> 
 		</action> 
-	</package>
+        
+        <action name="manageUsers!default" class="com.opensymphony.xwork.ActionSupport">
+            <result name="success" type="velocity">manage-user.vm</result>
+        </action>
+        
+        <action name="createUser!default" class="createUserAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">create-user.vm</result>
+        </action>
+        
+        <action name="createUser" class="createUserAction">
+            <result name="input" type="velocity">create-user.vm</result>
+            <result name="error" type="velocity">create-user.vm</result>
+            <result name="success" type="velocity">manage-user.vm</result>
+        </action>
+        
+        <action name="index!default" class="com.opensymphony.xwork.ActionSupport">            
+            <result name="success" type="velocity">index.vm</result>
+        </action>
+        
+    </package>
 </xwork>

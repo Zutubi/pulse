@@ -1,0 +1,3 @@
+#macro( link )
+     <a href=""></a>
+#end

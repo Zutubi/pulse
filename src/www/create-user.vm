@@ -1,0 +1,18 @@
+<html>
+<head>
+    <title>create-user</title>
+</head>
+<content tag="selectedTab">create-user</content>
+<body>
+
+#parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='createUser.action'" "method='post'")     
+    #tag (TextField "name='user.login'" "label='user.login'")
+    #tag (TextField "name='user.name'" "label='user.name'")
+    #tag (Submit "value='Submit'" ) 
+    #tag (Submit "value='Cancel'" )        
+#end 
+
+</body>
+</html>
