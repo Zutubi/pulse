@@ -1,0 +1,139 @@
+form {
+    margin-top: 1.5em;
+}
+
+fieldset {
+    border: 0 none transparent;
+    border: 1px solid #CCCCCC;
+    padding: 0.5em 0 0.5em 0;
+    background-color: #EEEEEE;
+}
+
+fieldset.alt {
+    background-color: transparent;
+}
+
+fieldset.submit {
+    padding-top: 1em;
+    border-top-color: #BBBBBB;
+    border-bottom: 1px solid #BBBBBB;
+    background-color: #DDDDDD;
+    text-align: center;
+}
+
+fieldset h3 {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 1em;
+    font-size: 100%;
+    color: #4C4C4C;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+label {
+    clear: both;
+    float: left;
+    width: auto;
+    display: block;
+    padding: 0.5em 0 0.5em 0;
+    
+    text-align: left;
+    margin: 5px 5px 5px 5px;
+}
+
+label.error {
+    background-color: #FFCCCC;
+    padding-bottom: 1.5em;
+    border: 1px solid #CC0000;
+    width: 97%;
+}
+
+label span {
+    float: left;
+    margin-left: 0.5em;
+    width: 10em;
+    font-weight: bold;
+}
+
+label span.error {
+    float: none;
+    display: block;
+    width: auto;
+    margin-bottom: 0.5em;
+    color: #CC0000;
+}
+
+#downloadForm label span {
+    width: 14em;
+}
+
+#downloadForm label span.error {
+    width: auto;
+}
+
+label.checkbox span {
+    float: none;
+    width: auto;
+    margin-left: 2.5em;
+    font-weight: normal;
+}
+
+#downloadForm label.checkbox span {
+    width: auto;
+}
+
+label span strong {
+    display: block;
+    font-size: 85%;
+    font-weight: normal;
+}
+
+input.checkbox {
+    float: left;
+    margin-left: 0.5em;
+}
+
+input.radio {
+    float: left;
+    margin-left: 0.5em;
+}
+
+input.submit {
+    width: 10em;
+    padding: 0.25em;
+    font-size: 90%;
+    font-weight: bold;
+}
+
+input.text {
+    width: 13em;
+    display: block;
+    margin-left: 11em;
+}
+
+#downloadForm input.text {
+    margin-left: 15em;
+}
+
+select {
+    display: block;
+    margin-left: 11em;
+    width: 10em;
+}
+
+#downloadForm select {
+    margin-left: 15em;
+}
+
+textarea {
+    width: 18em;
+    height: 8em;
+    display: block;
+    margin-left: 11em;
+    font-size: 110%;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+.required {
+    color: #CC0000;
+}

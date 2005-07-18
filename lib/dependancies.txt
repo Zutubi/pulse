@@ -20,3 +20,9 @@ CVS
 
 * j2ssh-common-0.2.7.jar (used for ssh connection to cvs server)
 * j2ssh-core-0.2.7.jar
+
+commons-lang-2.0.jar
+- required by displaytag-1.0.jar
+
+-commons-beanutils-1.7.0.jar
+- required by displaytag-1.0.jar

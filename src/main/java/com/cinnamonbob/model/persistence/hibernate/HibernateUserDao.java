@@ -7,9 +7,11 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.sql.SQLException;
 
 /**
  * 
@@ -30,10 +32,13 @@ public class HibernateUserDao extends HibernateEntityDao implements UserDao
             public Object doInHibernate(Session session) throws HibernateException {
                 Query queryObject = session.createQuery("from User user where user.login = :login");
                 queryObject.setParameter("login", login, Hibernate.STRING);
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
                 return queryObject.list();
             }
         });
-        
+
         if (users.size() > 1)
         {
             LOG.warning("findByLogin has returned " + users.size() +
@@ -44,5 +49,20 @@ public class HibernateUserDao extends HibernateEntityDao implements UserDao
             return (User) users.get(0);
         }
         return null;
+    }
+
+    public List findByLikeLogin(final String login)
+    {
+        return (List)getHibernateTemplate().execute(new HibernateCallback(){
+            public Object doInHibernate(Session session) throws HibernateException, SQLException
+            {
+                Query queryObject = session.createQuery("from User user where user.login like :login");
+                queryObject.setParameter("login", login, Hibernate.STRING);
+                
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                
+                return queryObject.list();
+            }
+        });
     }
 }

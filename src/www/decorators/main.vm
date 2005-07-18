@@ -1,61 +1,44 @@
 <html>
 	<head>
 		<title>#if ($title) $title #else [CiB] #end</title>
-		<link href="$base/main.css" rel="stylesheet" type="text/css">
+		<link href="$base/main.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="$base/form.css" rel="stylesheet" type="text/css" media="screen">
 		$head
 	</head>
         
     <body>
-        <table width="100%" height="100%">
-			<tr>
-				<td width="100%">
-					<table width="100%" height="100%">
-						<tr>
-							<td id="pageTitle">
-								$title
-							</td>
-						</tr>
-                        <tr>
-                            <td class="navbar-border">
-                                <table>                                    
-                                    <tr>
+    <div id="container">    
+        <div id="header">this is the header</div>
+        <div id="navbar">
+            <ul>
+                <li><a href="/">:: navigate ::</a></li>
+                <li><a href="serverStatus.action">server&nbsp;status</a></li>
+                <li><a href="viewProjects.action">all&nbsp;projects</a></li>
+                <li><a href="createUser!default.action">create&nbsp;user</a></li>
+            </ul>
+        </div>
                                         <!-- page properties are specified using <content tag="selectedTab">navigate</content> -->
-                                        #set ($selectedTab = $page.getProperty("page.selectedTab"))
-                                        #if ($selectedTab == "navigate")
-                                            <td class="navbar-active">:: navigate ::</td>
-                                        #else
-                                            <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="/">navigate</a></td>
-                                        #end
-                                        #if ($selectedTab == "server-status")
-                                            <td class="navbar-active">:: server status ::</td>
-                                        #else
-                                            <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="serverStatus.action">server&nbsp;status</a></td>
-                                        #end                                        
-                                        <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="viewProjects.action">all&nbsp;projects</a></td>
-                                        #if ($selectedTab == "create-user")
-                                            <td class="navbar-active">:: create user ::</td>
-                                        #else
-                                            <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="createUser!default.action">create&nbsp;user</a></td>
-                                        #end                                        
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-						<tr>
-							<td valign="top" height="100%">
-								$body
-							</td>
-						</tr>
-						<tr>
-							<td id="footer">
-								<b>:: project cinnamon bob ::</b>
-								Copyright &copy; 2005 Daniel Ostermeier and Jason Sankey
-							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
+                                        <!-- #set ($selectedTab = $page.getProperty("page.selectedTab"))-->
+                                        <!-- #if ($selectedTab == "navigate")-->
+                                        <!--    <td class="navbar-active">:: navigate ::</td>-->
+                                        <!--#else-->
+                                        <!--    <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="/">navigate</a></td>-->
+                                        <!--#end-->
 
-	</body>
+        <div id="left">
+                <!-- left navigation goes here -->
+        </div>
+        <div id="right">
+                <!-- right navigation goes here -->
+        </div>
+        <div id="content">
+		    $body
+        </div>
+        <div id="footer">
+            <b>:: project cinnamon bob ::</b>
+            Copyright &copy; 2005 Daniel Ostermeier and Jason Sankey
+        </div>        
+    </div>
+    </body>        
+        
 </html>

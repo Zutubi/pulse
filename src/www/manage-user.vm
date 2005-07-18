@@ -2,8 +2,30 @@
 <head>
     <title>[CiB] manage users</title>
     <link href="build.css" rel="stylesheet" type="text/css">
-</head>    
-<body>
-    <a href="createUser!default.action">create user</a>
-</body>
+</head>
+    <body>
+
+        <div class="form">
+            #bodytag (Form "action='findUsers.action'" "method='post'")
+                <fieldset>
+                    <label>user.login:</label>#tag (TextField "cssClass='text'" "name='login'")
+                </fieldset>
+                #tag (Submit "cssClass='submit'" "value='Submit'" )
+            #end
+        </div>
+            
+        #if ($results.size() > 0)
+            $req.setAttribute('results', $results)        
+        #end
+        
+        <br></br>
+
+        <div class="results">
+            #bodytag( Table "class=simple" "name=results" "pagesize=5" "sort=list")
+                #tag( Column "property=login" "title=Login" "href=viewUser.action" "paramId=id" "paramProperty=id")
+                #tag( Column "property=name" "title=Name" "sortable=true")
+            #end
+        </div>
+            
+    </body>
 </html>

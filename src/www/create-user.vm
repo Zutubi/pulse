@@ -5,14 +5,20 @@
 <content tag="selectedTab">create-user</content>
 <body>
 
-#parse("/template/includes/actionerrors.vm")
+    #parse("/template/includes/actionerrors.vm")
+    
+#bodytag (Form "action='createUser.action'" "method='post'")  
+    
+    <fieldset>
+        #tag (TextField "template='text'" "theme='css'" "name='user.login'")
+        #tag (TextField "template='text'" "theme='css'" "name='user.name'")        
+    </fieldset>
+        
+    <fieldset class="submit">
+        <input class="submit" type="submit" value="Start download"/>
+    </fieldset>
 
-#bodytag (Form "action='createUser.action'" "method='post'")     
-    #tag (TextField "name='user.login'" "label='user.login'")
-    #tag (TextField "name='user.name'" "label='user.name'")
-    #tag (Submit "value='Submit'" ) 
-    #tag (Submit "value='Cancel'" )        
-#end 
+ #end 
 
 </body>
 </html>

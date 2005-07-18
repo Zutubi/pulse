@@ -43,6 +43,12 @@
 		</action> 
         
         <action name="manageUsers!default" class="com.opensymphony.xwork.ActionSupport">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">manage-user.vm</result>
+        </action>
+        
+        <action name="findUsers" class="com.cinnamonbob.web.FindUsersAction">
+            <result name="input" type="velocity">manage-user.vm</result>
             <result name="success" type="velocity">manage-user.vm</result>
         </action>
         
@@ -54,7 +60,11 @@
         <action name="createUser" class="createUserAction">
             <result name="input" type="velocity">create-user.vm</result>
             <result name="error" type="velocity">create-user.vm</result>
-            <result name="success" type="velocity">manage-user.vm</result>
+            <result name="success" type="velocity">view-user.vm</result>
+        </action>
+        
+        <action name="viewUser" class="com.cinnamonbob.web.LoadUserAction">
+            <result name="success" type="velocity">view-user.vm</result>
         </action>
         
         <action name="index!default" class="com.opensymphony.xwork.ActionSupport">            

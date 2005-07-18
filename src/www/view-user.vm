@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <title>view user</title>    
+    </head>
+    <body>
+    
+        <p>User profile:</p>
+        <div>
+            <div>Login: $user.login</div>
+            <div>Name: $user.name</div>
+        </div>
+        
+        <div>
+            Contact points:
+            ....
+        </div>
+    
+    </body>
+</html>
