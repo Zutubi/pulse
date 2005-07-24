@@ -71,5 +71,29 @@
             <result name="success" type="velocity">index.vm</result>
         </action>
         
+        <action name="createProject!default" class="com.cinnamonbob.web.CreateProjectAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">create-project.vm</result>
+        </action>
+        
+        <action name="createProject" class="com.cinnamonbob.web.CreateProjectAction">
+            <result name="input" type="velocity">create-project.vm</result>
+            <result name="success" type="redirect">/manageProject.action?id=${project.id}</result>
+        </action>
+        
+        <action name="manageProject" class="com.cinnamonbob.web.ManageProjectAction">
+            <result name="success" type="velocity">manage-project.vm</result>
+        </action>
+        
+        <action name="createScm!default" class="com.cinnamonbob.web.CreateScmAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">create-scm.vm</result>
+        </action>
+        
+        <action name="createScm" class="com.cinnamonbob.web.CreateScmAction">
+            <result name="input" type="velocity">create-scm.vm</result>
+            <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+        </action>
+        
     </package>
 </xwork>

@@ -27,6 +27,15 @@
 
         <div id="left">
                 <!-- left navigation goes here -->
+            <div class="menu">
+                <h3>blah</h3>
+                <p>
+                    <ul><li>link to s</li></ul>
+                    <ul><li>link to t</li></ul>
+                    <ul><li>link to u</li></ul>
+                    
+                </p>
+                </div>
         </div>
         <div id="right">
                 <!-- right navigation goes here -->

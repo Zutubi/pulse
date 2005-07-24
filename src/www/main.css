@@ -7,8 +7,10 @@ body {
 
 #container {
     width:100%;
-    margin: 1em auto;
+    margin: 0em auto;
     min-width:600px;
+    height:100%;
+    position:relative;
 }
 
 #header {
@@ -137,7 +139,6 @@ body {
     padding-bottom: 1em;
     margin-top:1em;
     margin-bottom:1em;
-    min-height:20em;
 }
 
 #footer {
@@ -149,9 +150,13 @@ body {
     font-size: small;
     padding: 1;
     text-align: center;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
 }
 
-#content .form { /* Note: this is the form div in the content body, not the form tag... */
+
+#content .form{ /* Note: this is the form div in the content body, not the form tag... */
     width:70%;
     margin:0em auto;
     border: 1px solid #999;

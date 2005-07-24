@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <title>view project</title>    
+    </head>
+    <body>
+    
+        <p>Project:</p>
+        <div>
+            <div>Name: $project.name</div>
+            <div>Description: $project.description</div>
+        </div>
+        
+        <div>
+            Scm details: (<a href="createScm!default.action?id=$project.id">add</a>)
+
+            <br></br>
+            
+            #set($scms = $project.scms)
+            #if ($scms.size() == 1)
+                Hooray!
+            #elseif ($scms.size() > 1)
+                $req.setAttribute('scms', $scms)        
+                <div class="results">
+                     #bodytag( Table "class=simple" "name=scms" "pagesize=5" "sort=list" "decorator=com.cinnamonbob.util.ScmTypeDecorator")
+                        #tag( Column "property=name" "title=Name" "sortable=true")
+                        #tag( Column "property=type" "title=Type")
+                    #end
+                </div>
+            #end
+        
+
+        </div>
+    
+    </body>
+</html>

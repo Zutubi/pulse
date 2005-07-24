@@ -24,7 +24,7 @@ public abstract class HibernateEntityDao extends HibernateDaoSupport implements 
     
     public void save(Entity entity)
     {
-        getHibernateTemplate().save(entity);
+        getHibernateTemplate().saveOrUpdate(entity);
     }
     
     public abstract Class persistentClass();

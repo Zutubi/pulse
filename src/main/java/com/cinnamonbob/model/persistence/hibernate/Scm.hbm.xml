@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+<hibernate-mapping>
+
+    <class name="com.cinnamonbob.model.Scm" table="Scm" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+        
+        <discriminator column="SCMTYPE" type="string" length="255"/>
+        
+        <many-to-one name="project" column="PROJECTID" class="com.cinnamonbob.model.Project" insert="true"/>
+        
+        <property name="name" column="NAME" type="string" length="255"/>
+        
+        <property name="properties" column="PROPERTIES" type="string" length="4096"/>
+        
+        <subclass name="com.cinnamonbob.model.Svn" discriminator-value="SVN" dynamic-update="false">
+
+        </subclass>
+        
+    </class>
+
+</hibernate-mapping>

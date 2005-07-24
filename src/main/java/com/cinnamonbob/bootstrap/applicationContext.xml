@@ -29,4 +29,6 @@
 
     <bean id="userManager" class="com.cinnamonbob.model.DefaultUserManager" autowire="byName"/>
     
+    <bean id="projectManager" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
+    
 </beans>

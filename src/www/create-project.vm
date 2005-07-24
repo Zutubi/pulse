@@ -1,0 +1,25 @@
+<html>
+<head>
+    <title>create-project</title>
+</head>
+<content tag="selectedTab">create-project</content>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+    
+#bodytag (Form "action='createProject.action'" "method='post'")  
+    
+    <fieldset>
+        #tag (TextField "template='text'" "theme='css'" "label='project.name'" "name='project.name'")
+        #tag (TextField "template='text'" "theme='css'" "label='project.description'" "name='project.description'")        
+    </fieldset>
+        
+    <fieldset class="submit">
+        <input class="submit" type="submit" name="save" value="Save"/>
+        <input class="submit" type="submit" name="cancel" value="Cancel"/>
+    </fieldset>
+
+ #end 
+
+</body>
+</html>
