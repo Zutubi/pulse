@@ -10,13 +10,13 @@
 #bodytag (Form "action='createProject.action'" "method='post'")  
     
     <fieldset>
-        #tag (TextField "theme='css'" "name='project.name'")
-        #tag (TextField "theme='css'" "name='project.description'")        
+        #tag (TextField "name='project.name'")
+        #tag (TextField "name='project.description'")        
     </fieldset>
         
     <fieldset class="submit">
-        #tag (Submit "value=getText('cancel.name')" "theme='css'" "name='cancel'")
-        #tag (Submit "value=getText('save.name')" "theme='css'" "name='save'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'")
+        #tag (Submit "value=getText('save.name')" "name='save'")
     </fieldset>
 
 #end 

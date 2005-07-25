@@ -12,18 +12,18 @@
     #tag (Hidden "name='id'")
         
     <fieldset>
-        #tag (TextField "template='text'" "theme='css'" "label='svn.name'" "name='svn.name'")
-        #tag (TextField "template='text'" "theme='css'" "label='svn.username'" "name='svn.username'")
-        #tag (TextField "template='text'" "theme='css'" "label='svn.password'" "name='svn.password'")
-        #tag (TextField "template='text'" "theme='css'" "label='svn.url'" "name='svn.url'")
-        #tag (TextField "template='text'" "theme='css'" "label='svn.path'" "name='svn.path'")
-        #tag (TextField "template='text'" "theme='css'" "label='svn.keyfile'" "name='svn.keyfile'")
-        #tag (TextField "template='text'" "theme='css'" "label='svn.passphrase'" "name='svn.passphrase'")
+        #tag (TextField "name='svn.name'")
+        #tag (TextField "name='svn.username'")
+        #tag (TextField "name='svn.password'")
+        #tag (TextField "name='svn.url'")
+        #tag (TextField "name='svn.path'")
+        #tag (TextField "name='svn.keyfile'")
+        #tag (TextField "name='svn.passphrase'")
     </fieldset>
         
     <fieldset class="submit">
-        <input class="submit" type="submit" name="cancel" value="Cancel"/>
-        <input class="submit" type="submit" name="save" value="Save"/>
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'")
+        #tag (Submit "value=getText('save.name')" "name='save'")
     </fieldset>
 
  #end 
