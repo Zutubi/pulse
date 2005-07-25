@@ -10,15 +10,15 @@
 #bodytag (Form "action='createUser.action'" "method='post'")  
     
     <fieldset>
-        #tag (TextField "template='text'" "theme='css'" "name='user.login'")
-        #tag (TextField "template='text'" "theme='css'" "name='user.name'")        
+        #tag (TextField "theme='css'" "name='user.login'")
+        #tag (TextField "theme='css'" "name='user.name'")        
     </fieldset>
         
     <fieldset class="submit">
-        <input class="submit" type="submit" value="Start download"/>
+        #tag (Submit "value=getText('cancel.name')" "theme='css'" "name='cancel'")
+        #tag (Submit "value=getText('save.name')" "theme='css'" "name='save'")
     </fieldset>
-
- #end 
+#end 
 
 </body>
 </html>

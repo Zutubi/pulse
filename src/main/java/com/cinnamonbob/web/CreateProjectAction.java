@@ -3,13 +3,16 @@ package com.cinnamonbob.web;
 import com.opensymphony.xwork.ActionSupport;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.ProjectManager;
+import com.cinnamonbob.xwork.interceptor.Cancelable;
 
 /**
  * 
  *
  */
-public class CreateProjectAction extends ActionSupport
+public class CreateProjectAction extends ActionSupport implements Cancelable
 {
+    private String cancel = null;
+    
     private Project project = new Project();
 
     private ProjectManager projectManager;
@@ -17,6 +20,16 @@ public class CreateProjectAction extends ActionSupport
     public void setProjectManager(ProjectManager manager)
     {
         projectManager = manager;
+    }
+
+    public void setCancel(String name)
+    {
+        cancel = name;
+    }
+
+    public boolean isCancelled()
+    {
+        return cancel != null;
     }
 
     public Project getProject()
@@ -39,7 +52,7 @@ public class CreateProjectAction extends ActionSupport
             addFieldError("project.name", "Project name " + project.getName() + " is already being used.");
         }
     }
-    
+
     public String execute()
     {
         projectManager.save(project);

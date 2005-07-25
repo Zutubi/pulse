@@ -1,0 +1,5 @@
+##
+#if( !$parameters.cssClass )
+  $!parameters.put('cssClass', 'submit')
+#end
+#parse("/template/simple/submit.vm")

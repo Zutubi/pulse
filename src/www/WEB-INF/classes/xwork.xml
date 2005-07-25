@@ -2,10 +2,10 @@
 "http://www.opensymphony.com/xwork/xwork-1.0.dtd">
 
 <xwork>
-	<include file="webwork-default.xml" />
+	<include file="webwork-default-package.xml" />
 	
-    <package name="default" extends="webwork-default">
-		<default-interceptor-ref name="completeStack" /> 
+    <package name="default" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack" /> 
 		
 		<action name="serverStatus" class="serverStatusAction">
 			<result name="success" type="velocity">server-status.vm</result> 
@@ -59,6 +59,7 @@
         
         <action name="createUser" class="createUserAction">
             <result name="input" type="velocity">create-user.vm</result>
+            <result name="cancel" type="velocity">undefined.vm</result>
             <result name="error" type="velocity">create-user.vm</result>
             <result name="success" type="velocity">view-user.vm</result>
         </action>
@@ -78,6 +79,7 @@
         
         <action name="createProject" class="com.cinnamonbob.web.CreateProjectAction">
             <result name="input" type="velocity">create-project.vm</result>
+            <result name="cancel" type="velocity">undefined.vm</result>
             <result name="success" type="redirect">/manageProject.action?id=${project.id}</result>
         </action>
         
@@ -92,6 +94,7 @@
         
         <action name="createScm" class="com.cinnamonbob.web.CreateScmAction">
             <result name="input" type="velocity">create-scm.vm</result>
+            <result name="cancel" type="velocity">undefined.vm</result>
             <result name="success" type="redirect">/manageProject.action?id=${id}</result>
         </action>
         

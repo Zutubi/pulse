@@ -1,7 +1,7 @@
 <!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.0//EN" "http://www.opensymphony.com/xwork/xwork-1.0.dtd">
 
 <xwork>
-    <package name="webwork-default">
+    <package name="webwork-default-package">
         <result-types>
             <result-type name="dispatcher" class="com.opensymphony.webwork.dispatcher.ServletDispatcherResult" default="true"/>
             <result-type name="redirect" class="com.opensymphony.webwork.dispatcher.ServletRedirectResult"/>
@@ -31,6 +31,7 @@
             <interceptor name="conversionError" class="com.opensymphony.webwork.interceptor.WebWorkConversionErrorInterceptor"/>
             <interceptor name="fileUpload" class="com.opensymphony.webwork.interceptor.FileUploadInterceptor"/>
             <interceptor name="execAndWait" class="com.opensymphony.webwork.interceptor.ExecuteAndWaitInterceptor"/>
+            <interceptor name="cancelWorkflow" class="com.cinnamonbob.xwork.interceptor.CancelWorkflowInterceptor"/>
 
             <!-- Basic stack -->
             <interceptor-stack name="defaultStack">
@@ -44,6 +45,7 @@
             <!-- Sample validation and workflow stack -->
             <interceptor-stack name="validationWorkflowStack">
                 <interceptor-ref name="defaultStack"/>
+                <interceptor-ref name="cancelWorkflow"/>
                 <interceptor-ref name="validation"/>
                 <interceptor-ref name="workflow"/>
             </interceptor-stack>
@@ -95,6 +97,7 @@
                 <interceptor-ref name="fileUpload"/>
                 <interceptor-ref name="static-params"/>
                 <interceptor-ref name="params"/>
+                <interceptor-ref name="cancelWorkflow"/>
                 <interceptor-ref name="conversionError"/>
                 <interceptor-ref name="validation"/>
                 <interceptor-ref name="workflow"/>

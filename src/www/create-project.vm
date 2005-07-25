@@ -10,16 +10,16 @@
 #bodytag (Form "action='createProject.action'" "method='post'")  
     
     <fieldset>
-        #tag (TextField "template='text'" "theme='css'" "name='project.name'")
-        #tag (TextField "template='text'" "theme='css'" "name='project.description'")        
+        #tag (TextField "theme='css'" "name='project.name'")
+        #tag (TextField "theme='css'" "name='project.description'")        
     </fieldset>
         
     <fieldset class="submit">
-        <input class="submit" type="submit" name="save" value="Save"/>
-        <input class="submit" type="submit" name="cancel" value="Cancel"/>
+        #tag (Submit "value=getText('cancel.name')" "theme='css'" "name='cancel'")
+        #tag (Submit "value=getText('save.name')" "theme='css'" "name='save'")
     </fieldset>
 
- #end 
+#end 
 
 </body>
 </html>
