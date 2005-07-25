@@ -10,8 +10,8 @@
 #bodytag (Form "action='createProject.action'" "method='post'")  
     
     <fieldset>
-        #tag (TextField "template='text'" "theme='css'" "label='project.name'" "name='project.name'")
-        #tag (TextField "template='text'" "theme='css'" "label='project.description'" "name='project.description'")        
+        #tag (TextField "template='text'" "theme='css'" "name='project.name'")
+        #tag (TextField "template='text'" "theme='css'" "name='project.description'")        
     </fieldset>
         
     <fieldset class="submit">
