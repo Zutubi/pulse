@@ -155,9 +155,14 @@ public class TransactionInterceptor implements Interceptor
         if (methodName == null)
             methodName = "execute";
 
-        String fullClazzName = proxy.getConfig().getClassName();
-        String actionClazz = fullClazzName.substring(fullClazzName.lastIndexOf('.'));
-
+        String actionClazz = proxy.getConfig().getClassName();
+        
+        int dotIndex = actionClazz.lastIndexOf('.');
+        if (dotIndex >= 0)
+        {
+            actionClazz = actionClazz.substring(dotIndex);
+        }
+        
         return proxy.getNamespace() + "/" + proxy.getActionName() + ".action (" + actionClazz + "." + methodName + "())";
     }
 
