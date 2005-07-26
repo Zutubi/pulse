@@ -9,11 +9,27 @@
             <div>Login: $user.login</div>
             <div>Name: $user.name</div>
         </div>
-        
+        <p>Contact points:</p>
         <div>
-            Contact points:
-            ....
+            <ul>
+            #foreach ($contact in $user.contacts)
+                <li>$conact.email</li>
+            #end
+            </ul>
         </div>
-    
+
+        <p>Add new email contact point</p>
+        #bodytag (Form "action='createContactPoint.action'" "method='post'")
+
+            <fieldset>
+                #tag (TextField "name='contact.email'")
+            </fieldset>
+
+            <fieldset class="submit">
+                #tag (Submit "value=getText('cancel.name')" "name='cancel'")
+                #tag (Submit "value=getText('save.name')" "name='save'")
+            </fieldset>
+        #end
+
     </body>
 </html>

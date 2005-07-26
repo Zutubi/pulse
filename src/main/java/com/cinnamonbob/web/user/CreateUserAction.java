@@ -1,14 +1,15 @@
-package com.cinnamonbob.web;
+package com.cinnamonbob.web.user;
 
 import com.opensymphony.xwork.ActionSupport;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.UserManager;
+import com.cinnamonbob.web.BaseActionSupport;
 
 /**
  * 
  *
  */
-public class CreateUserAction extends ActionSupport
+public class CreateUserAction extends BaseActionSupport
 {
     private User user = new User();
 
@@ -18,7 +19,7 @@ public class CreateUserAction extends ActionSupport
     {
         this.userManager = userManager;
     }
-    
+
     public User getUser()
     {
         return user;
@@ -39,12 +40,12 @@ public class CreateUserAction extends ActionSupport
             addFieldError("user.login", "Login name " + user.getLogin() + " is already being used.");
         }
     }
-    
+
     public String execute()
-    {        
+    {
         // store user.
         userManager.createNewUser(user);
-        
+
         return SUCCESS;
     }
 

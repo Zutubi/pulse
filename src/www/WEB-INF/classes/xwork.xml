@@ -47,24 +47,24 @@
             <result name="success" type="velocity">manage-user.vm</result>
         </action>
         
-        <action name="findUsers" class="com.cinnamonbob.web.FindUsersAction">
+        <action name="findUsers" class="com.cinnamonbob.web.user.FindUsersAction">
             <result name="input" type="velocity">manage-user.vm</result>
             <result name="success" type="velocity">manage-user.vm</result>
         </action>
         
-        <action name="createUser!default" class="createUserAction" method="doDefault">
+        <action name="createUser!default" class="com.cinnamonbob.web.user.CreateUserAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-user.vm</result>
         </action>
         
-        <action name="createUser" class="createUserAction">
+        <action name="createUser" class="com.cinnamonbob.web.user.CreateUserAction">
             <result name="input" type="velocity">create-user.vm</result>
             <result name="cancel" type="velocity">undefined.vm</result>
             <result name="error" type="velocity">create-user.vm</result>
             <result name="success" type="velocity">view-user.vm</result>
         </action>
         
-        <action name="viewUser" class="com.cinnamonbob.web.LoadUserAction">
+        <action name="viewUser" class="com.cinnamonbob.web.user.LoadUserAction">
             <result name="success" type="velocity">view-user.vm</result>
         </action>
         

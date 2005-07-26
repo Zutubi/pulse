@@ -5,15 +5,15 @@
 </head>
     <body>
 
-        <div class="form">
-            #bodytag (Form "action='findUsers.action'" "method='post'")
-                <fieldset>
-                    <label>user.login:</label>#tag (TextField "cssClass='text'" "name='login'")
-                </fieldset>
-                #tag (Submit "cssClass='submit'" "value='Submit'" )
-            #end
-        </div>
-            
+        #bodytag (Form "action='findUsers.action'" "method='post'")
+            <fieldset>
+                #tag (TextField "name='login'")
+            </fieldset>
+            <fieldset class="submit">
+                #tag (Submit "value=getText('search.name')" "name='search'")
+            </fieldset>
+        #end
+
         #if ($results.size() > 0)
             $req.setAttribute('results', $results)        
         #end

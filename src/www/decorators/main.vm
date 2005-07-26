@@ -14,7 +14,6 @@
                 <li><a href="/">:: navigate ::</a></li>
                 <li><a href="serverStatus.action">server&nbsp;status</a></li>
                 <li><a href="viewProjects.action">all&nbsp;projects</a></li>
-                <li><a href="createUser!default.action">create&nbsp;user</a></li>
             </ul>
         </div>
                                         <!-- page properties are specified using <content tag="selectedTab">navigate</content> -->
@@ -26,16 +25,25 @@
                                         <!--#end-->
 
         <div id="left">
-                <!-- left navigation goes here -->
+            <!-- left navigation goes here -->
             <div class="menu">
-                <h3>blah</h3>
+                <h3>User</h3>
                 <p>
-                    <ul><li>link to s</li></ul>
-                    <ul><li>link to t</li></ul>
-                    <ul><li>link to u</li></ul>
-                    
+                    <ul>
+                        <li> <a href="manageUsers!default.action">find</a> </li>
+                        <li> <a href="createUser!default.action">create</a></li>
+                    </ul>
                 </p>
-                </div>
+            </div>
+            <div class="menu">
+                <h3>Project</h3>
+                <p>
+                    <ul>
+                        <li> <a href="/">find</a> </li>
+                        <li> <a href="createProject!default.action">create</a></li>
+                    </ul>
+                </p>
+            </div>
         </div>
         <div id="right">
                 <!-- right navigation goes here -->
