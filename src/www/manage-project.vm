@@ -4,7 +4,7 @@
     </head>
     <body>
     
-        <p>Project:</p>
+        <p>Project: (<a href="editProject!default.action?id=$project.id">edit</a>)</p>
         <div>
             <div>Name: $project.name</div>
             <div>Description: $project.description</div>

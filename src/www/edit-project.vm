@@ -1,0 +1,27 @@
+<html>
+<head>
+    <title>edit-project</title>
+</head>
+<content tag="selectedTab">edit-project</content>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+    
+#bodytag (Form "action='editProject.action'" "method='post'")  
+    
+        #tag (Hidden "name='id'")
+        
+    <fieldset>
+        #tag (TextField "name='project.name'")
+        #tag (TextField "name='project.description'")        
+    </fieldset>
+        
+    <fieldset class="submit">
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'")
+        #tag (Submit "value=getText('save.name')" "name='save'")
+    </fieldset>
+
+#end 
+
+</body>
+</html>
