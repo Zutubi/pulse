@@ -10,6 +10,5 @@
     <bean name="scheduleBuildAction" class="com.cinnamonbob.web.ScheduleBuildAction" singleton="false"/>
     <bean name="viewBuildAction" class="com.cinnamonbob.web.ViewBuildAction" singleton="false"/>
     <bean name="viewArtifactAction" class="com.cinnamonbob.web.ViewArtifactAction" singleton="false"/>
-    <bean name="createUserAction" class="com.cinnamonbob.web.CreateUserAction" singleton="false" autowire="byName"/>   
 
 </beans>
