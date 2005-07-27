@@ -11,7 +11,7 @@
     
     <fieldset>
         #tag (TextField "name='project.name'")
-        #tag (TextField "name='project.description'")        
+        #tag (TextField "name='project.description'")
     </fieldset>
         
     <fieldset class="submit">

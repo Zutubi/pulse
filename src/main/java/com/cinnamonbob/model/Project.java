@@ -11,7 +11,7 @@ public class Project extends Entity
 {
     private String name;
     private String description;
-    private List scms;
+    private List<Scm> scms;
 
     public Project()
     {
@@ -44,11 +44,11 @@ public class Project extends Entity
         this.description = description;
     }
 
-    public List getScms()
+    public List<Scm> getScms()
     {
         if(scms == null)
         {
-            scms = new LinkedList();
+            scms = new LinkedList<Scm>();
         }
         
         return scms;
@@ -60,8 +60,30 @@ public class Project extends Entity
         scm.setProject(this);
     }
 
-    private void setScms(List scms)
+    private void setScms(List<Scm> scms)
     {
         this.scms = scms;
+    }
+
+    public Scm getScm(String name)
+    {
+        for (Scm scm : scms)
+        {
+            if (scm.getName().compareToIgnoreCase(name) == 0)
+            {
+                return scm;
+            }
+        }
+        return null;
+    }
+
+    public boolean remove(Scm scm)
+    {
+        if (scms.remove(scm))
+        {
+            scm.setProject(null);
+            return true;
+        }
+        return false;
     }
 }

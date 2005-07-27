@@ -12,10 +12,10 @@
     #tag (Hidden "name='id'")
         
     <fieldset>
-        #tag (TextField "name='svn.name'")
-        #tag (TextField "name='svn.username'")
-        #tag (TextField "name='svn.password'")
-        #tag (TextField "name='svn.url'")
+        #tag (TextField "required='true'" "name='svn.name'")
+        #tag (TextField "required='true'" "name='svn.username'")
+        #tag (Password "name='svn.password'")
+        #tag (TextField "required='true'" "name='svn.url'")
         #tag (TextField "name='svn.path'")
         #tag (TextField "name='svn.keyfile'")
         #tag (TextField "name='svn.passphrase'")

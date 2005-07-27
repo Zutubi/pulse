@@ -14,7 +14,7 @@
         
         <property name="name" column="NAME" type="string" length="255"/>
         
-        <property name="properties" column="PROPERTIES" type="string" length="4096"/>
+        <property name="properties" column="PROPERTIES" type="com.cinnamonbob.util.PropertiesType" length="4096"/>
         
         <subclass name="com.cinnamonbob.model.Svn" discriminator-value="SVN" dynamic-update="false">
 

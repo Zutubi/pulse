@@ -1,6 +1,6 @@
 package com.cinnamonbob.web.user;
 
-import com.cinnamonbob.web.BaseActionSupport;
+import com.cinnamonbob.web.ActionSupport;
 import com.cinnamonbob.model.EmailContactPoint;
 import com.cinnamonbob.model.ContactPoint;
 import com.cinnamonbob.model.UserManager;
@@ -10,7 +10,7 @@ import com.cinnamonbob.model.User;
  *
  *
  */
-public class CreateContactPointAction extends BaseActionSupport
+public class CreateContactPointAction extends ActionSupport
 {
     private long id;
     private EmailContactPoint contact = new EmailContactPoint();
@@ -49,6 +49,11 @@ public class CreateContactPointAction extends BaseActionSupport
     public void setId(long id)
     {
         this.id = id;
+    }
+
+    public User getUser()
+    {
+        return userManager.getUser(id);
     }
 
     public ContactPoint getContact()

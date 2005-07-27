@@ -1,8 +1,7 @@
 package com.cinnamonbob.web.user;
 
 import com.cinnamonbob.model.UserManager;
-import com.cinnamonbob.web.BaseActionSupport;
-import com.opensymphony.xwork.ActionSupport;
+import com.cinnamonbob.web.ActionSupport;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.List;
  * 
  *
  */
-public class FindUsersAction extends BaseActionSupport
+public class FindUsersAction extends ActionSupport
 {
     private UserManager userManager;
     private String login;

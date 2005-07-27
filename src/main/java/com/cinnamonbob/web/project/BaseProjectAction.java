@@ -1,14 +1,14 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.ProjectManager;
-import com.cinnamonbob.web.BaseActionSupport;
+import com.cinnamonbob.web.ActionSupport;
 import com.cinnamonbob.xwork.interceptor.Cancelable;
 
 /**
  * 
  *
  */
-public class BaseProjectAction extends BaseActionSupport implements Cancelable
+public class BaseProjectAction extends ActionSupport implements Cancelable
 {
     private String cancel;
 

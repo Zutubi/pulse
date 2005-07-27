@@ -42,14 +42,14 @@
 			<result name="error" type="velocity">generic-error.vm</result> 
 		</action> 
         
-        <action name="manageUsers!default" class="com.opensymphony.xwork.ActionSupport">
+        <action name="findUsers!default" class="com.opensymphony.xwork.ActionSupport">
             <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">manage-user.vm</result>
+            <result name="success" type="velocity">find-user.vm</result>
         </action>
         
         <action name="findUsers" class="com.cinnamonbob.web.user.FindUsersAction">
-            <result name="input" type="velocity">manage-user.vm</result>
-            <result name="success" type="velocity">manage-user.vm</result>
+            <result name="input" type="velocity">find-user.vm</result>
+            <result name="success" type="velocity">find-user.vm</result>
         </action>
         
         <action name="createUser!default" class="com.cinnamonbob.web.user.CreateUserAction" method="doDefault">
@@ -82,7 +82,7 @@
             <result name="success" type="velocity">view-user.vm</result>
         </action>
         
-        <action name="index!default" class="com.opensymphony.xwork.ActionSupport">            
+        <action name="index!default" class="com.cinnamonbob.web.ActionSupport">
             <result name="success" type="velocity">index.vm</result>
         </action>
         
@@ -96,7 +96,17 @@
             <result name="cancel" type="velocity">undefined.vm</result>
             <result name="success" type="redirect">/manageProject.action?id=${id}</result>
         </action>
-        
+
+        <action name="findProjects!default" class="com.cinnamonbob.web.ActionSupport">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">find-project.vm</result>
+        </action>
+
+        <action name="findProjects" class="com.cinnamonbob.web.project.FindProjectsAction">
+            <result name="input" type="velocity">find-project.vm</result>
+            <result name="success" type="velocity">find-project.vm</result>
+        </action>
+
         <action name="editProject!default" class="com.cinnamonbob.web.project.EditProjectAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">edit-project.vm</result>
@@ -108,20 +118,27 @@
             <result name="success" type="redirect">/manageProject.action?id=${id}</result>
         </action>
                 
-        <action name="manageProject" class="com.cinnamonbob.web.ManageProjectAction">
+        <action name="manageProject" class="com.cinnamonbob.web.project.ManageProjectAction">
             <result name="success" type="velocity">manage-project.vm</result>
         </action>
         
-        <action name="createScm!default" class="com.cinnamonbob.web.CreateScmAction" method="doDefault">
+        <action name="createScm!default" class="com.cinnamonbob.web.project.CreateScmAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-scm.vm</result>
         </action>
         
-        <action name="createScm" class="com.cinnamonbob.web.CreateScmAction">
+        <action name="createScm" class="com.cinnamonbob.web.project.CreateScmAction">
             <result name="input" type="velocity">create-scm.vm</result>
             <result name="cancel" type="velocity">undefined.vm</result>
             <result name="success" type="redirect">/manageProject.action?id=${id}</result>
         </action>
         
+        <action name="deleteScm" class="com.cinnamonbob.web.project.DeleteScmAction">
+            <result name="input" type="velocity">view-project.vm</result>
+            <result name="cancel" type="velocity">view-project.vm</result>
+            <result name="error" type="velocity">view-project.vm</result>
+            <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+        </action>
+
     </package>
 </xwork>

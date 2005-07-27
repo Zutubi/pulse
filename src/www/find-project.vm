@@ -1,0 +1,32 @@
+<html>
+<head>
+    <title>[CiB] find projects</title>
+    <link href="build.css" rel="stylesheet" type="text/css">
+</head>
+    <body>
+
+        #bodytag (Form "action='findProjects.action'" "method='post'")
+            <fieldset>
+                #tag (TextField "name='name'")
+            </fieldset>
+            <fieldset class="submit">
+                #tag (Submit "value=getText('search.name')" "name='search'")
+            </fieldset>
+        #end
+
+        #if ($results)
+            #if ($results.size() > 0)
+                $req.setAttribute('results', $results)
+            #end
+
+            <br></br>
+
+            <div class="results">
+                #bodytag( Table "class=simple" "name=results" "pagesize=5" "sort=list")
+                    #tag( Column "property=name" "title=Name" "href=manageProject.action" "paramId=id" "paramProperty=id")
+                #end
+            </div>
+        #end
+
+    </body>
+</html>

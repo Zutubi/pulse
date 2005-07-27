@@ -1,41 +1,33 @@
-package com.cinnamonbob.web;
+package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.model.Svn;
-import com.cinnamonbob.model.ProjectManager;
 import com.cinnamonbob.model.Project;
-import com.opensymphony.xwork.ActionSupport;
+import com.cinnamonbob.model.ProjectManager;
+import com.cinnamonbob.model.Svn;
 
 /**
  * 
  *
  */
-public class CreateScmAction extends ActionSupport
+public class CreateScmAction extends BaseProjectAction
 {
     private long id;
     private Svn scm = new Svn();
-
-    private ProjectManager projectManager;
-
-    public void setProjectManager(ProjectManager manager)
-    {
-        projectManager = manager;
-    }
 
     public Svn getSvn()
     {
         return scm;
     }
-    
+
     public void setId(long id)
     {
         this.id = id;
     }
-    
-    public long getId() 
+
+    public long getId()
     {
         return id;
     }
-    
+
     public void validate()
     {
         if (hasErrors())
@@ -45,20 +37,20 @@ public class CreateScmAction extends ActionSupport
             return;
         }
 
-        if (projectManager.getProject(id) == null)
+        if (getProjectManager().getProject(id) == null)
         {
             addActionError("No project with id '" + Long.toString(id) + "'");
         }
     }
-    
+
     public String execute()
     {
-        Project project = projectManager.getProject(id);
+        Project project = getProjectManager().getProject(id);
         project.addScm(scm);
-        projectManager.save(project);
+        getProjectManager().save(project);
         return SUCCESS;
     }
-    
+
     public String doDefault()
     {
         return SUCCESS;

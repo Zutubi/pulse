@@ -1,6 +1,6 @@
 package com.cinnamonbob.web.user;
 
-import com.cinnamonbob.web.BaseActionSupport;
+import com.cinnamonbob.web.ActionSupport;
 import com.cinnamonbob.model.UserManager;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.AbstractContactPoint;
@@ -9,7 +9,7 @@ import com.cinnamonbob.model.AbstractContactPoint;
  *
  *
  */
-public class DeleteContactPointAction extends BaseActionSupport
+public class DeleteContactPointAction extends ActionSupport
 {
     private long id;
     private String name;

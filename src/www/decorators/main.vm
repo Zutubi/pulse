@@ -30,7 +30,7 @@
                 <h3>User</h3>
                 <p>
                     <ul>
-                        <li> <a href="manageUsers!default.action">find</a> </li>
+                        <li> <a href="findUsers!default.action">find</a></li>
                         <li> <a href="createUser!default.action">create</a></li>
                     </ul>
                 </p>
@@ -39,7 +39,7 @@
                 <h3>Project</h3>
                 <p>
                     <ul>
-                        <li> <a href="/">find</a> </li>
+                        <li> <a href="findProjects!default.action">find</a></li>
                         <li> <a href="createProject!default.action">create</a></li>
                     </ul>
                 </p>

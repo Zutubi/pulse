@@ -15,7 +15,7 @@
         #else
             <ul>
             #foreach ($contact in $user.contactPoints)
-                <li>$contact.name: $contact.uid (<a href="deleteContactPoint.action?id=$user.id&name=$contact.name">delete</a>)</li>
+                <li>#contactPointIcon($contact) $contact.name: $contact.uid (<a href="deleteContactPoint.action?id=$user.id&name=$contact.name">delete</a>)</li>
             #end
             </ul>
         #end
@@ -25,7 +25,7 @@
             #tag (Hidden "name='id'" "value=user.id")
             <fieldset>
                 #tag (TextField "name='contact.name'")
-                #tag (TextField "label='contact.email'" "name='contact.uid'")
+                #tag (TextField "label='contact.email'" "name='contact.email'")
             </fieldset>
 
             <fieldset class="submit">

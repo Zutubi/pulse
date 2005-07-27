@@ -2,6 +2,8 @@ package com.cinnamonbob.model;
 
 import com.cinnamonbob.model.persistence.ProjectDao;
 
+import java.util.List;
+
 /**
  * 
  *
@@ -14,7 +16,7 @@ public class DefaultProjectManager implements ProjectManager
     {
         projectDao = dao;
     }
-    
+
     public void save(Project project)
     {
         projectDao.save(project);
@@ -28,5 +30,10 @@ public class DefaultProjectManager implements ProjectManager
     public Project getProject(long id)
     {
         return (Project) projectDao.findById(id);
+    }
+
+    public List getProjectsWithNameLike(String name)
+    {
+        return projectDao.findByLikeName(name);
     }
 }

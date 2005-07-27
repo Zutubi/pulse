@@ -1,27 +1,18 @@
-package com.cinnamonbob.web;
+package com.cinnamonbob.web.project;
 
-import com.opensymphony.xwork.ActionSupport;
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.ProjectManager;
 
 /**
  * 
  *
  */
-public class ManageProjectAction extends ActionSupport
+public class ManageProjectAction extends BaseProjectAction
 {
 
     private long id;
 
     private Project project;
 
-    private ProjectManager projectManager;
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
-    }
-    
     public long getId()
     {
         return id;
@@ -44,7 +35,7 @@ public class ManageProjectAction extends ActionSupport
     
     public String execute()
     {
-        project = projectManager.getProject(id);
+        project = getProjectManager().getProject(id);
         return SUCCESS;
     }
 }

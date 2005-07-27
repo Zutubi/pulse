@@ -1,15 +1,14 @@
 package com.cinnamonbob.web.user;
 
-import com.opensymphony.xwork.ActionSupport;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.UserManager;
-import com.cinnamonbob.web.BaseActionSupport;
+import com.cinnamonbob.web.ActionSupport;
 
 /**
  * 
  *
  */
-public class CreateUserAction extends BaseActionSupport
+public class CreateUserAction extends ActionSupport
 {
     private User user = new User();
 

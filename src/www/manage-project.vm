@@ -11,23 +11,17 @@
         </div>
         
         <div>
-            Scm details: (<a href="createScm!default.action?id=$project.id">add</a>)
-
-            <br></br>
-            
+            <p>Scm details: (<a href="createScm!default.action?id=$project.id">add</a>)</p>
             #set($scms = $project.scms)
-            #if ($scms.size() == 1)
-                Hooray!
-            #elseif ($scms.size() > 1)
-                $req.setAttribute('scms', $scms)        
-                <div class="results">
-                     #bodytag( Table "class=simple" "name=scms" "pagesize=5" "sort=list" "decorator=com.cinnamonbob.util.ScmTypeDecorator")
-                        #tag( Column "property=name" "title=Name" "sortable=true")
-                        #tag( Column "property=type" "title=Type")
-                    #end
-                </div>
+            #if ($scms.size() == 0)
+                No SCMs configured
+            #else
+                <ul>
+                #foreach ($scm in $scms)
+                    <li>#scmIcon($scm) $scm.name (<a href="editScm!default.action?id=$scm.id">edit</a>|<a href="deleteScm.action?id=$project.id&name=$scm.name">delete</a>)</li>
+                #end
+                </ul>
             #end
-        
 
         </div>
     
