@@ -24,7 +24,21 @@ public class CreateContactPointAction extends BaseActionSupport
 
     public void validate()
     {
+        if (hasErrors())
+        {
+            return;
+        }
 
+        User user = userManager.getUser(id);
+        if (user == null)
+        {
+            addFieldError("id", "Unknown user["+id+"]");
+        }
+
+        if (user.getContactPoint(contact.getName()) != null)
+        {
+            addFieldError("contact.name", "Name is already in use.");
+        }
     }
 
     public long getId()
@@ -46,7 +60,7 @@ public class CreateContactPointAction extends BaseActionSupport
     {
         User user = userManager.getUser(id);
         user.add(contact);
-        
+
         return SUCCESS;
     }
 }

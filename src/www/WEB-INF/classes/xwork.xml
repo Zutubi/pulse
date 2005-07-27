@@ -71,6 +71,13 @@
             <result name="success" type="redirect">/viewUser.action?id=${id}</result>
         </action>
 
+        <action name="deleteContactPoint" class="com.cinnamonbob.web.user.DeleteContactPointAction">
+            <result name="input" type="velocity">view-user.vm</result>
+            <result name="cancel" type="velocity">view-user.vm</result>
+            <result name="error" type="velocity">view-user.vm</result>
+            <result name="success" type="redirect">/viewUser.action?id=${id}</result>
+        </action>
+
         <action name="viewUser" class="com.cinnamonbob.web.user.LoadUserAction">
             <result name="success" type="velocity">view-user.vm</result>
         </action>

@@ -10,13 +10,15 @@
             <div>Name: $user.name</div>
         </div>
         <p>Contact points:</p>
-        <div>
+        #if ($user.contactPoints.size() == 0)
+            No contact points configured
+        #else
             <ul>
             #foreach ($contact in $user.contactPoints)
-                <li>$contact.name: $contact.uid</li>
+                <li>$contact.name: $contact.uid (<a href="deleteContactPoint.action?id=$user.id&name=$contact.name">delete</a>)</li>
             #end
             </ul>
-        </div>
+        #end
 
         <p>Add new email contact point</p>
         #bodytag (Form "action='createContactPoint.action'" "method='post'")

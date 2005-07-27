@@ -41,6 +41,16 @@ public class User extends Entity
         point.setUser(this);
     }
 
+    public boolean remove(AbstractContactPoint point)
+    {
+        if (contactPoints.remove(point))
+        {
+            point.setUser(null);
+            return true;
+        }
+        return false;
+    }
+
     private void setContactPoints(List<ContactPoint> l)
     {
         this.contactPoints = l;
@@ -56,7 +66,7 @@ public class User extends Entity
     }
 
     //TODO: may want to look into using hibernate to store a map of
-    //TODO: name -> contactpoint. 
+    //TODO: name -> contactpoint.
     public ContactPoint getContactPoint(String name)
     {
         for (ContactPoint cp: contactPoints)
