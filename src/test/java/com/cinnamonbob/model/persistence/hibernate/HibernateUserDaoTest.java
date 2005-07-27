@@ -1,6 +1,7 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.model.User;
+import com.cinnamonbob.model.EmailContactPoint;
 import com.cinnamonbob.model.persistence.UserDao;
 
 import java.util.List;
@@ -51,5 +52,24 @@ public class HibernateUserDaoTest extends PersistenceTestCase
         List users = userDao.findAll();
         assertNotNull(users);
         assertEquals(1, users.size());
+    }
+
+    public void testUserContactPoints()
+    {
+        User user = new User();
+        userDao.save(user);
+        EmailContactPoint email = new EmailContactPoint();
+        email.setName("home");
+        email.setEmail("daniel@home.com");
+        user.add(email);
+        userDao.save(user);
+        commitAndRefreshTransaction();
+
+        user = (User) userDao.findById(user.getId());
+        assertEquals(1, user.getContactPoints().size());
+        EmailContactPoint otherEmail = (EmailContactPoint) user.getContactPoints().get(0);
+        assertEquals(email.getName(), otherEmail.getName());
+        assertEquals(email.getEmail(), otherEmail.getEmail());
+        assertEquals(user, otherEmail.getUser());
     }
 }

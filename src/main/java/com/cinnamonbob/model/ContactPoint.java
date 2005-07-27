@@ -13,7 +13,9 @@ public interface ContactPoint
      * @return the name of this contact point.
      */
     public String getName();
-    
+
+    public String getUid();
+
     public void notify(BuildResult result);
 }
 

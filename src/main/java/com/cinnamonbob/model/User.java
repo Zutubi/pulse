@@ -1,7 +1,7 @@
 package com.cinnamonbob.model;
 
-import java.util.Map;
-import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
@@ -11,8 +11,9 @@ public class User extends Entity
 {
     private String login;
     private String name;
-    
-    private Map<String, ContactPoint> contactPoints = new HashMap<String, ContactPoint>();
+
+//    private Map<String, ContactPoint> contactPoints = new HashMap<String, ContactPoint>();
+    private List<ContactPoint> contactPoints;
 
     public String getLogin()
     {
@@ -33,9 +34,38 @@ public class User extends Entity
     {
         this.name = name;
     }
-    
-    public void add(String name, ContactPoint point)
+
+    public void add(AbstractContactPoint point)
     {
-        contactPoints.put(name, point);
+        contactPoints.add(point);
+        point.setUser(this);
+    }
+
+    private void setContactPoints(List<ContactPoint> l)
+    {
+        this.contactPoints = l;
+    }
+
+    public List<ContactPoint> getContactPoints()
+    {
+        if (contactPoints == null)
+        {
+            contactPoints = new LinkedList<ContactPoint>();
+        }
+        return contactPoints;
+    }
+
+    //TODO: may want to look into using hibernate to store a map of
+    //TODO: name -> contactpoint. 
+    public ContactPoint getContactPoint(String name)
+    {
+        for (ContactPoint cp: contactPoints)
+        {
+            if (cp.getName().compareTo(name) == 0)
+            {
+                return cp;
+            }
+        }
+        return null;
     }
 }

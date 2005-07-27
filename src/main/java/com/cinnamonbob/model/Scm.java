@@ -7,11 +7,11 @@ import java.io.*;
  * 
  *
  */
-public abstract  class Scm extends Entity
+public abstract class Scm extends Entity
 {
     private String name;
     private Project project;
-    protected Properties properties = new Properties();
+    private Properties properties;
 
     public String getName()
     {
@@ -33,31 +33,18 @@ public abstract  class Scm extends Entity
         this.project = project;
     }
 
-    private String getProperties()
+    protected Properties getProperties()
     {
-        try
+        if (properties == null)
         {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            properties.store(baos, "");
-            return baos.toString();
+            properties = new Properties();
         }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            return null;
-        }
+        return properties;
     }
     
-    private void setProperties(String data)
+    private void setProperties(Properties properties)
     {
-        try
-        {
-            properties.load(new ByteArrayInputStream(data.getBytes()));
-        } 
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        this.properties = properties;
     }
 
 }

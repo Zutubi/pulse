@@ -12,17 +12,18 @@
         <p>Contact points:</p>
         <div>
             <ul>
-            #foreach ($contact in $user.contacts)
-                <li>$conact.email</li>
+            #foreach ($contact in $user.contactPoints)
+                <li>$contact.name: $contact.uid</li>
             #end
             </ul>
         </div>
 
         <p>Add new email contact point</p>
         #bodytag (Form "action='createContactPoint.action'" "method='post'")
-
+            #tag (Hidden "name='id'" "value=user.id")
             <fieldset>
-                #tag (TextField "name='contact.email'")
+                #tag (TextField "name='contact.name'")
+                #tag (TextField "label='contact.email'" "name='contact.uid'")
             </fieldset>
 
             <fieldset class="submit">

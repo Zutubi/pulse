@@ -5,8 +5,7 @@ package com.cinnamonbob.model;
  *
  */
 public class Svn extends Scm
-{
-    
+{    
     private final String URL = "svn.url";
     private final String USERNAME = "svn.username";
     private final String PASSWORD = "svn.password";
@@ -16,61 +15,61 @@ public class Svn extends Scm
     
     public String getUrl()
     {
-        return (String) properties.get(URL);
+        return (String) getProperties().get(URL);
     }
     
     public void setUrl(String url)
     {
-        properties.put(URL, url);
+        getProperties().put(URL, url);
     }
 
     public String getUsername()
     {
-        return (String) properties.get(USERNAME);
+        return (String) getProperties().get(USERNAME);
     }
 
     public void setUsername(String username)
     {
-        properties.put(USERNAME, username);
+        getProperties().put(USERNAME, username);
     }
 
     public String getPassword()
     {
-        return (String) properties.get(PASSWORD);
+        return (String) getProperties().get(PASSWORD);
     }
 
     public void setPassword(String password)
     {
-        properties.put(PASSWORD, password);
+        getProperties().put(PASSWORD, password);
     }
 
     public String getKeyfile()
     {
-        return (String) properties.get(KEYFILE);
+        return (String) getProperties().get(KEYFILE);
     }
 
     public void setKeyfile(String keyfile)
     {
-        properties.put(KEYFILE, keyfile);
+        getProperties().put(KEYFILE, keyfile);
     }
 
     public String getPassphrase()
     {
-        return (String) properties.get(PASSPHRASE);
+        return (String) getProperties().get(PASSPHRASE);
     }
 
     public void setPassphrase(String passphrase)
     {
-        properties.put(PASSPHRASE, passphrase);
+        getProperties().put(PASSPHRASE, passphrase);
     }
 
     public String getPath()
     {
-        return (String) properties.get(PATH);
+        return (String) getProperties().get(PATH);
     }
 
     public void setPath(String path)
     {
-        properties.put(PATH, path);
+        getProperties().put(PATH, path);
     }
 }

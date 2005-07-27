@@ -4,7 +4,6 @@ import com.cinnamonbob.core2.BuildResult;
 import com.cinnamonbob.core2.renderer.BuildResultRenderer;
 import com.cinnamonbob.core2.renderer.VelocityBuildResultRenderer;
 
-import javax.mail.internet.InternetAddress;
 import java.io.StringWriter;
 import java.util.logging.Logger;
 
@@ -12,30 +11,27 @@ import java.util.logging.Logger;
  * 
  *
  */
-public class EmailContactPoint implements ContactPoint
+public class EmailContactPoint extends AbstractContactPoint
 {
     private static final Logger LOG = Logger.getLogger(EmailContactPoint.class.getName());
-    
-    private String          name;
-    private InternetAddress address;
-    
-    
-    public EmailContactPoint(String name)
+
+    public EmailContactPoint()
     {
-        this.name = name;
+    }
+
+    public String getEmail()
+    {
+        return getUid();
+    }
+
+    public void setEmail(String email)
+    {
+        setUid(email);
     }
 
     /* (non-Javadoc)
-     * @see com.cinnamonbob.core.ContactPoint#getName()
-     */
-    public String getName()
-    {
-        return name;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cinnamonbob.core.ContactPoint#notify(com.cinnamonbob.core.BuildResult)
-     */
+    * @see com.cinnamonbob.core.ContactPoint#notify(com.cinnamonbob.core.BuildResult)
+    */
     public void notify(BuildResult result)
     {
         String subject = "[CiB] " + result.getProjectName() + ": Build " + Long.toString(result.getId()) + (result.succeeded() ? " succeeded" : " failed");
