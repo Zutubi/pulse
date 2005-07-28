@@ -1,6 +1,8 @@
 package com.cinnamonbob.model.persistence;
 
-public interface BuildResultDao extends EntityDao
+import com.cinnamonbob.core2.BuildResult;
+
+public interface BuildResultDao extends EntityDao<BuildResult>
 {
 
 }

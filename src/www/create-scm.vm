@@ -6,27 +6,17 @@
 <body>
 
     #parse("/template/includes/actionerrors.vm")
-    
-#bodytag (Form "action='createScm.action'" "method='post'")  
-    
+
+#bodytag (Form "action='createScm.action'" "method='post'")
     #tag (Hidden "name='id'")
-        
     <fieldset>
-        #tag (TextField "required='true'" "name='svn.name'")
-        #tag (TextField "required='true'" "name='svn.username'")
-        #tag (Password "name='svn.password'")
-        #tag (TextField "required='true'" "name='svn.url'")
-        #tag (TextField "name='svn.path'")
-        #tag (TextField "name='svn.keyfile'")
-        #tag (TextField "name='svn.passphrase'")
+        #tag (Select "list=types" "name='type'")
     </fieldset>
         
     <fieldset class="submit">
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'")
-        #tag (Submit "value=getText('save.name')" "name='save'")
+        #tag (Submit "value=getText('next.name')" "name='next'")
     </fieldset>
-
- #end 
+ #end
 
 </body>
 </html>

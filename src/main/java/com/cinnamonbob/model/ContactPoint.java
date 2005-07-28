@@ -2,20 +2,61 @@ package com.cinnamonbob.model;
 
 import com.cinnamonbob.core2.BuildResult;
 
+import java.util.Properties;
+
 /**
  * A contact point defines a means of contacting a user.
  */
-public interface ContactPoint
+public abstract class ContactPoint extends Entity
 {
-    /**
-     * Returns the name of this contact point.
-     * 
-     * @return the name of this contact point.
-     */
-    public String getName();
+    private String name;
 
-    public String getUid();
+    private Properties properties;
 
-    public void notify(BuildResult result);
+    private String uid;
+
+    private User user;
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getName()
+    {
+        return this.name;
+    }
+
+    private void setProperties(Properties properties)
+    {
+        this.properties = properties;
+    }
+
+    protected Properties getProperties()
+    {
+        if (properties == null)
+        {
+            properties = new Properties();
+        }
+        return this.properties;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public abstract void notify(BuildResult result);
 }
 

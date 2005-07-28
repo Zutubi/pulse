@@ -10,19 +10,19 @@ import java.util.List;
  * 
  *
  */
-public abstract class HibernateEntityDao extends HibernateDaoSupport implements EntityDao
+public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoSupport implements EntityDao<T>
 {
-    public Entity findById(long id)
+    public T findById(long id)
     {
-        return (Entity) getHibernateTemplate().load(persistentClass(), Long.valueOf(id));
+        return (T) getHibernateTemplate().load(persistentClass(), Long.valueOf(id));
     }
 
-    public List findAll()
+    public List<T> findAll()
     {
-        return getHibernateTemplate().find("from " + persistentClass().getName());
+        return (List<T>)getHibernateTemplate().find("from " + persistentClass().getName());
     }
     
-    public void save(Entity entity)
+    public void save(T entity)
     {
         getHibernateTemplate().saveOrUpdate(entity);
     }

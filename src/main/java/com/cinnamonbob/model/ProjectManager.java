@@ -6,12 +6,10 @@ import java.util.List;
  * 
  *
  */
-public interface ProjectManager
+public interface ProjectManager extends EntityManager<Project>
 {
-    void save(Project project);
-
     Project getProject(String name);
     Project getProject(long id);
 
-    List getProjectsWithNameLike(String s);
+    List<Project> getProjectsWithNameLike(String s);
 }

@@ -17,7 +17,7 @@ import java.sql.SQLException;
  * 
  *
  */
-public class HibernateProjectDao extends HibernateEntityDao implements ProjectDao
+public class HibernateProjectDao extends HibernateEntityDao<Project> implements ProjectDao
 {
     private static final Logger LOG = Logger.getLogger(HibernateEntityDao.class.getName());
 
@@ -51,10 +51,10 @@ public class HibernateProjectDao extends HibernateEntityDao implements ProjectDa
         return null;
     }
 
-    public List findByLikeName(final String name)
+    public List<Project> findByLikeName(final String name)
     {
-        return (List)getHibernateTemplate().execute(new HibernateCallback(){
-            public Object doInHibernate(Session session) throws HibernateException, SQLException
+        return (List<Project>)getHibernateTemplate().execute(new HibernateCallback(){
+            public Object doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from Project project where project.name like :name");
                 queryObject.setParameter("name", name, Hibernate.STRING);

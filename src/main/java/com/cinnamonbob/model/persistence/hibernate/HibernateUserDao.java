@@ -17,7 +17,7 @@ import java.sql.SQLException;
  * 
  *
  */
-public class HibernateUserDao extends HibernateEntityDao implements UserDao
+public class HibernateUserDao extends HibernateEntityDao<User> implements UserDao
 {
     private static final Logger LOG = Logger.getLogger(HibernateEntityDao.class.getName());
 

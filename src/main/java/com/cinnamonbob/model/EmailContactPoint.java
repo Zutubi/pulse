@@ -11,7 +11,7 @@ import java.util.logging.Logger;
  * 
  *
  */
-public class EmailContactPoint extends AbstractContactPoint
+public class EmailContactPoint extends ContactPoint
 {
     private static final Logger LOG = Logger.getLogger(EmailContactPoint.class.getName());
 

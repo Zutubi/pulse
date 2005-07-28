@@ -35,13 +35,13 @@ public class User extends Entity
         this.name = name;
     }
 
-    public void add(AbstractContactPoint point)
+    public void add(ContactPoint point)
     {
         contactPoints.add(point);
         point.setUser(this);
     }
 
-    public boolean remove(AbstractContactPoint point)
+    public boolean remove(ContactPoint point)
     {
         if (contactPoints.remove(point))
         {

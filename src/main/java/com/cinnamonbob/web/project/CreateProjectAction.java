@@ -8,7 +8,6 @@ import com.cinnamonbob.model.Project;
  */
 public class CreateProjectAction extends BaseProjectAction
 {
-   
     private Project project = new Project();
 
     public Project getProject()

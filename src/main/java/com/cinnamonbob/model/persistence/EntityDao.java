@@ -8,11 +8,11 @@ import java.util.List;
  * 
  *
  */
-public interface EntityDao
+public interface EntityDao<T extends Entity>
 {
-    Entity findById(long id);
+    T findById(long id);
     
-    List findAll();
+    List<T> findAll();
     
-    void save(Entity entity);
+    void save(T entity);
 }

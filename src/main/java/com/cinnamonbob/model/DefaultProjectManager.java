@@ -32,7 +32,7 @@ public class DefaultProjectManager implements ProjectManager
         return (Project) projectDao.findById(id);
     }
 
-    public List getProjectsWithNameLike(String name)
+    public List<Project> getProjectsWithNameLike(String name)
     {
         return projectDao.findByLikeName(name);
     }

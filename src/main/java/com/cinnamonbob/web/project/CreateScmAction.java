@@ -1,8 +1,7 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.ProjectManager;
-import com.cinnamonbob.model.Svn;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 
@@ -11,16 +10,40 @@ import com.cinnamonbob.model.Svn;
 public class CreateScmAction extends BaseProjectAction
 {
     private long id;
-    private Svn scm = new Svn();
+    private String type;
 
-    public Svn getSvn()
+    private Map<String, String> types;
+
+    public String getType()
     {
-        return scm;
+        return type;
     }
 
-    public void setId(long id)
+    public void setType(String type)
     {
-        this.id = id;
+        this.type = type;
+    }
+
+    public Map getTypes()
+    {
+        if (types == null)
+        {
+            types = new HashMap<String, String>();
+            types.put("svn", "Subversion");
+            types.put("p4", "Perforce");
+            types.put("cvs", "CVS");
+        }
+        return types;
+    }
+
+    public String doDefault()
+    {
+        return SUCCESS;
+    }
+
+    public String execute()
+    {
+        return SUCCESS;
     }
 
     public long getId()
@@ -28,31 +51,8 @@ public class CreateScmAction extends BaseProjectAction
         return id;
     }
 
-    public void validate()
+    public void setId(long id)
     {
-        if (hasErrors())
-        {
-            // do not attempt to validate unless all other validation rules have 
-            // completed successfully.
-            return;
-        }
-
-        if (getProjectManager().getProject(id) == null)
-        {
-            addActionError("No project with id '" + Long.toString(id) + "'");
-        }
-    }
-
-    public String execute()
-    {
-        Project project = getProjectManager().getProject(id);
-        project.addScm(scm);
-        getProjectManager().save(project);
-        return SUCCESS;
-    }
-
-    public String doDefault()
-    {
-        return SUCCESS;
+        this.id = id;
     }
 }

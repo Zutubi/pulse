@@ -18,12 +18,15 @@
             #else
                 <ul>
                 #foreach ($scm in $scms)
-                    <li>#scmIcon($scm) $scm.name (<a href="editScm!default.action?id=$scm.id">edit</a>|<a href="deleteScm.action?id=$project.id&name=$scm.name">delete</a>)</li>
+                    <li>#scmIcon($scm) $scm.name (<a href="">edit</a>|<a href="deleteScm.action?id=$project.id&name=$scm.name">delete</a>)</li>
                 #end
                 </ul>
             #end
-
         </div>
-    
+
+        <div>
+            <p>Schedule...</p>
+        </div>
+
     </body>
 </html>

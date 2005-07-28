@@ -34,7 +34,7 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         buildResultDao.save(buildResult);
         commitAndRefreshTransaction();
         
-        BuildResult anotherBuildResult = (BuildResult) buildResultDao.findById(buildResult.getId());
+        BuildResult anotherBuildResult = buildResultDao.findById(buildResult.getId());
         
         // want to ensure that a new object has been created by hibernate and
         // that the old one is not just returned to us.

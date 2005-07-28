@@ -8,7 +8,7 @@ import java.util.List;
  * 
  *
  */
-public interface ProjectDao extends EntityDao
+public interface ProjectDao extends EntityDao<Project>
 {
     Project findByName(String name);
     List findByLikeName(String name);

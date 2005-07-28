@@ -129,10 +129,21 @@
         
         <action name="createScm" class="com.cinnamonbob.web.project.CreateScmAction">
             <result name="input" type="velocity">create-scm.vm</result>
-            <result name="cancel" type="velocity">undefined.vm</result>
+            <result name="success" type="velocity">create-scm-${type}.vm</result>
+        </action>
+
+        <action name="createSvn" class="com.cinnamonbob.web.project.CreateSvnAction">
+            <result name="input" type="velocity">create-scm-svn.vm</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${id}</result>
             <result name="success" type="redirect">/manageProject.action?id=${id}</result>
         </action>
-        
+
+        <action name="editSvn" class="com.cinnamonbob.web.project.EditSvnAction">
+            <result name="input" type="velocity">edit-scm-svn.vm</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${id}</result>
+            <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+        </action>
+
         <action name="deleteScm" class="com.cinnamonbob.web.project.DeleteScmAction">
             <result name="input" type="velocity">view-project.vm</result>
             <result name="cancel" type="velocity">view-project.vm</result>

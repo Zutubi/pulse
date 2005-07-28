@@ -1,7 +1,6 @@
 package com.cinnamonbob.model;
 
 import java.util.Properties;
-import java.io.*;
 
 /**
  * 
@@ -46,5 +45,4 @@ public abstract class Scm extends Entity
     {
         this.properties = properties;
     }
-
 }

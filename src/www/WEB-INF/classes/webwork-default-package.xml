@@ -12,6 +12,7 @@
             <result-type name="freemarker" class="com.opensymphony.webwork.views.freemarker.FreemarkerResult"/>
             <result-type name="httpheader" class="com.opensymphony.webwork.dispatcher.HttpHeaderResult"/>
             <result-type name="stream" class="com.opensymphony.webwork.dispatcher.StreamResult"/>
+            <result-type name="velocity-xml" class="com.cinnamonbob.xwork.dispatcher.VelocityXmlResult"/>
         </result-types>
 
         <interceptors>

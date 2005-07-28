@@ -33,6 +33,7 @@ public class CreateContactPointAction extends ActionSupport
         if (user == null)
         {
             addFieldError("id", "Unknown user["+id+"]");
+            return;
         }
 
         if (user.getContactPoint(contact.getName()) != null)

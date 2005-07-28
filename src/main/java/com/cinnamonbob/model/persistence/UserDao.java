@@ -8,7 +8,7 @@ import java.util.List;
  * 
  *
  */
-public interface UserDao extends EntityDao
+public interface UserDao extends EntityDao<User>
 {
     User findByLogin(String login);
 
