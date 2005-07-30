@@ -14,7 +14,7 @@
 
         <bag name="contactPoints" inverse="true" cascade="all">
             <key column="USERID"/>
-            <one-to-many class="com.cinnamonbob.model.AbstractContactPoint"/>
+            <one-to-many class="com.cinnamonbob.model.ContactPoint"/>
         </bag>
 
     </class>
