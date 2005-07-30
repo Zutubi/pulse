@@ -10,17 +10,10 @@ import com.cinnamonbob.model.User;
  *
  *
  */
-public class CreateContactPointAction extends ActionSupport
+public class CreateContactPointAction extends UserActionSupport
 {
     private long id;
     private EmailContactPoint contact = new EmailContactPoint();
-
-    private UserManager userManager;
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
-    }
 
     public void validate()
     {
@@ -29,7 +22,7 @@ public class CreateContactPointAction extends ActionSupport
             return;
         }
 
-        User user = userManager.getUser(id);
+        User user = getUser();
         if (user == null)
         {
             addFieldError("id", "Unknown user["+id+"]");
@@ -54,7 +47,7 @@ public class CreateContactPointAction extends ActionSupport
 
     public User getUser()
     {
-        return userManager.getUser(id);
+        return getUserManager().getUser(id);
     }
 
     public ContactPoint getContact()
@@ -64,7 +57,7 @@ public class CreateContactPointAction extends ActionSupport
 
     public String execute()
     {
-        User user = userManager.getUser(id);
+        User user = getUser();
         user.add(contact);
 
         return SUCCESS;

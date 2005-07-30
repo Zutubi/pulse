@@ -12,16 +12,10 @@ import java.util.List;
  * 
  *
  */
-public class FindUsersAction extends ActionSupport
+public class FindUsersAction extends UserActionSupport
 {
-    private UserManager userManager;
     private String login;
     private List results = Collections.EMPTY_LIST;
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
-    }
 
     public void setLogin(String login)
     {
@@ -44,7 +38,7 @@ public class FindUsersAction extends ActionSupport
             login = "";
 
         // for now, make use of the databases wildcard matching
-        results = userManager.getUsersWithLoginLike(login.replace('*', '%'));
+        results = getUserManager().getUsersWithLoginLike(login.replace('*', '%'));
 
         return SUCCESS;
     }

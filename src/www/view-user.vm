@@ -1,6 +1,7 @@
 <html>
     <head>
         <title>view user</title>    
+        <content tag="action">user.view</content>
     </head>
     <body>
     
@@ -9,8 +10,12 @@
             <div>Login: $user.login</div>
             <div>Name: $user.name</div>
         </div>
+        <p>Subscriptions:</p>
+        <p><a href="createSubscription!default.action?user=$user.login">create</a></p>
+        <p>No subscriptions registered..</p>
+
         <p>Contact points:</p>
-        #if ($user.contactPoints.size() == 0)
+        <p>#if ($user.contactPoints.size() == 0)
             No contact points configured
         #else
             <ul>
@@ -18,7 +23,7 @@
                 <li>#contactPointIcon($contact) $contact.name: $contact.uid (<a href="deleteContactPoint.action?id=$user.id&name=$contact.name">delete</a>)</li>
             #end
             </ul>
-        #end
+        #end</p>
 
         <p>Add new email contact point</p>
         #bodytag (Form "action='createContactPoint.action'" "method='post'")

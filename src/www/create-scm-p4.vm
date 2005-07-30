@@ -1,5 +1,6 @@
 <html>
 <head></head>
+<content tag="action">scm.p4.create</content>
 <body>
 create p4 scm.
 </body>

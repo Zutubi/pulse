@@ -7,7 +7,7 @@ import com.cinnamonbob.model.Scm;
  *
  *
  */
-public class DeleteScmAction extends BaseProjectAction
+public class DeleteScmAction extends ProjectActionSupport
 {
     private long id;
     private String name;

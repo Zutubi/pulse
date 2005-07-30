@@ -2,7 +2,7 @@
 <head>
     <title>create-user</title>
 </head>
-<content tag="selectedTab">create-user</content>
+<content tag="action">user.create</content>
 <body>
 
     #parse("/template/includes/actionerrors.vm")
@@ -10,13 +10,13 @@
 #bodytag (Form "action='createUser.action'" "method='post'")  
     
     <fieldset>
-        #tag (TextField "name='user.login'")
-        #tag (TextField "name='user.name'")        
+        #tag (TextField "name='user.login'" "tabindex='1'")
+        #tag (TextField "name='user.name'" "tabindex='2'")
     </fieldset>
         
     <fieldset class="submit">
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'")
-        #tag (Submit "value=getText('save.name')" "name='save'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
     </fieldset>
 #end 
 

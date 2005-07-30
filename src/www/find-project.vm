@@ -2,15 +2,16 @@
 <head>
     <title>[CiB] find projects</title>
     <link href="build.css" rel="stylesheet" type="text/css">
+    <content tag="action">project.search</content>
 </head>
     <body>
 
         #bodytag (Form "action='findProjects.action'" "method='post'")
             <fieldset>
-                #tag (TextField "name='name'")
+                #tag (TextField "name='name'" "tabindex='1'")
             </fieldset>
             <fieldset class="submit">
-                #tag (Submit "value=getText('search.name')" "name='search'")
+                #tag (Submit "value=getText('search.name')" "name='search'" "tabindex='2'")
             </fieldset>
         #end
 

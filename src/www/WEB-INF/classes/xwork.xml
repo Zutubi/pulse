@@ -61,7 +61,7 @@
             <result name="input" type="velocity">create-user.vm</result>
             <result name="cancel" type="velocity">undefined.vm</result>
             <result name="error" type="velocity">create-user.vm</result>
-            <result name="success" type="velocity">view-user.vm</result>
+            <result name="success" type="redirect">/viewUser.action?id=${user.id}</result>
         </action>
 
         <action name="createContactPoint" class="com.cinnamonbob.web.user.CreateContactPointAction">
@@ -78,7 +78,7 @@
             <result name="success" type="redirect">/viewUser.action?id=${id}</result>
         </action>
 
-        <action name="viewUser" class="com.cinnamonbob.web.user.LoadUserAction">
+        <action name="viewUser" class="com.cinnamonbob.web.user.ViewUserAction">
             <result name="success" type="velocity">view-user.vm</result>
         </action>
         
@@ -149,6 +149,17 @@
             <result name="cancel" type="velocity">view-project.vm</result>
             <result name="error" type="velocity">view-project.vm</result>
             <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+        </action>
+
+        <action name="createSubscription!default" class="com.cinnamonbob.web.user.CreateSubscriptionAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">create-subscription.vm</result>
+        </action>
+
+        <action name="createSubscription" class="com.cinnamonbob.web.user.CreateSubscriptionAction">
+            <result name="input" type="velocity">create-subscription.vm</result>
+            <result name="cancel" type="redirect">/</result>
+            <result name="success" type="redirect">/viewUser.action?login=${user}</result>
         </action>
 
     </package>

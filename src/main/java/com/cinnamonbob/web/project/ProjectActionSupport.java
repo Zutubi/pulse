@@ -8,7 +8,7 @@ import com.cinnamonbob.xwork.interceptor.Cancelable;
  * 
  *
  */
-public class BaseProjectAction extends ActionSupport implements Cancelable
+public class ProjectActionSupport extends ActionSupport implements Cancelable
 {
     private String cancel;
 

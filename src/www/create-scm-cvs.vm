@@ -1,5 +1,6 @@
 <html>
 <head></head>
+<content tag="action">scm.cvs.create</content>
 <body>
 create cvs scm.
 </body>

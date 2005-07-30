@@ -2,15 +2,16 @@
 <head>
     <title>[CiB] find users</title>
     <link href="build.css" rel="stylesheet" type="text/css">
+    <content tag="action">user.search</content>
 </head>
     <body>
 
         #bodytag (Form "action='findUsers.action'" "method='post'")
             <fieldset>
-                #tag (TextField "name='login'")
+                #tag (TextField "name='login'" "tabindex='1'")
             </fieldset>
             <fieldset class="submit">
-                #tag (Submit "value=getText('search.name')" "name='search'")
+                #tag (Submit "value=getText('search.name')" "name='search'" "tabindex='2'")
             </fieldset>
         #end
 

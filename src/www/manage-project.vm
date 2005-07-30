@@ -1,6 +1,7 @@
 <html>
     <head>
         <title>view project</title>    
+        <content tag="action">project.view</content>
     </head>
     <body>
     
@@ -26,6 +27,10 @@
 
         <div>
             <p>Schedule...</p>
+        </div>
+
+        <div>
+            <p>Subscription: <a href="createSubscription!default.action?project=$project.name">create</a></p>
         </div>
 
     </body>

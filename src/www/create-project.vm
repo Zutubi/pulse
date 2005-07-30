@@ -2,7 +2,7 @@
 <head>
     <title>create-project</title>
 </head>
-<content tag="selectedTab">create-project</content>
+<content tag="action">project.create</content>
 <body>
 
     #parse("/template/includes/actionerrors.vm")
@@ -10,13 +10,13 @@
 #bodytag (Form "action='createProject.action'" "method='post'")  
     
     <fieldset>
-        #tag (TextField "name='project.name'")
-        #tag (TextField "name='project.description'")
+        #tag (TextField "name='project.name'" "tabindex='1'")
+        #tag (TextField "name='project.description'" "tabindex='2'")
     </fieldset>
         
     <fieldset class="submit">
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'")
-        #tag (Submit "value=getText('save.name')" "name='save'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
     </fieldset>
 
 #end 

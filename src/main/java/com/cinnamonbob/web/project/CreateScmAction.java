@@ -7,7 +7,7 @@ import java.util.Map;
  * 
  *
  */
-public class CreateScmAction extends BaseProjectAction
+public class CreateScmAction extends ProjectActionSupport
 {
     private long id;
     private String type;

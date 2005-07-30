@@ -7,7 +7,7 @@ import java.util.List;
  *
  *
  */
-public class FindProjectsAction extends BaseProjectAction
+public class FindProjectsAction extends ProjectActionSupport
 {
     private String name;
     private List results = Collections.EMPTY_LIST;

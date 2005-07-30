@@ -6,7 +6,7 @@ import com.cinnamonbob.model.Svn;
  *
  *
  */
-public class EditSvnAction extends BaseProjectAction
+public class EditSvnAction extends ProjectActionSupport
 {
 
     private long id;

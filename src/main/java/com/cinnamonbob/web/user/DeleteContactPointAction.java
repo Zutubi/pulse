@@ -9,16 +9,10 @@ import com.cinnamonbob.web.ActionSupport;
  *
  *
  */
-public class DeleteContactPointAction extends ActionSupport
+public class DeleteContactPointAction extends UserActionSupport
 {
     private long id;
     private String name;
-    private UserManager userManager;
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
-    }
 
     public void setId(long id)
     {
@@ -42,7 +36,7 @@ public class DeleteContactPointAction extends ActionSupport
 
     public String execute()
     {
-        User user = userManager.getUser(id);
+        User user = getUserManager().getUser(id);
         if (user == null)
         {
             return INPUT;

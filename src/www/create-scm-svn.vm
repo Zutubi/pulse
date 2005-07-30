@@ -2,7 +2,7 @@
 <head>
     <title>create-scm</title>
 </head>
-<content tag="selectedTab">create-scm</content>
+<content tag="action">scm.svn.create</content>
 <body>
 
     #parse("/template/includes/actionerrors.vm")
@@ -12,18 +12,18 @@
     #tag (Hidden "name='id'")
 
     <fieldset>
-        #tag (TextField "required='true'" "name='svn.name'")
-        #tag (TextField "required='true'" "name='svn.username'")
-        #tag (Password "name='svn.password'")
-        #tag (TextField "required='true'" "name='svn.url'")
-        #tag (TextField "name='svn.path'")
-        #tag (TextField "name='svn.keyfile'")
-        #tag (Password "name='svn.passphrase'")
+        #tag (TextField "required='true'" "name='svn.name'" "tabindex='1'")
+        #tag (TextField "required='true'" "name='svn.username'" "tabindex='2'")
+        #tag (Password "name='svn.password'" "tabindex='3'")
+        #tag (TextField "required='true'" "name='svn.url'" "tabindex='4'")
+        #tag (TextField "name='svn.path'" "tabindex='5'")
+        #tag (TextField "name='svn.keyfile'" "tabindex='6'")
+        #tag (Password "name='svn.passphrase'" "tabindex='7'")
     </fieldset>
 
     <fieldset class="submit">
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'")
-        #tag (Submit "value=getText('save.name')" "name='save'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='9'")
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='8'")
     </fieldset>
 
  #end

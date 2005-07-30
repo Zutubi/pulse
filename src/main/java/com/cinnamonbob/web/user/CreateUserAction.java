@@ -8,16 +8,9 @@ import com.cinnamonbob.web.ActionSupport;
  * 
  *
  */
-public class CreateUserAction extends ActionSupport
+public class CreateUserAction extends UserActionSupport
 {
     private User user = new User();
-
-    private UserManager userManager;
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
-    }
 
     public User getUser()
     {
@@ -33,7 +26,7 @@ public class CreateUserAction extends ActionSupport
             return;
         }
 
-        if (userManager.getUser(user.getLogin()) != null)
+        if (getUserManager().getUser(user.getLogin()) != null)
         {
             // login name already in use.
             addFieldError("user.login", "Login name " + user.getLogin() + " is already being used.");
@@ -43,7 +36,7 @@ public class CreateUserAction extends ActionSupport
     public String execute()
     {
         // store user.
-        userManager.createNewUser(user);
+        getUserManager().createNewUser(user);
 
         return SUCCESS;
     }

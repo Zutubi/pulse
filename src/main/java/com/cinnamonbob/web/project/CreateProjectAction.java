@@ -6,7 +6,7 @@ import com.cinnamonbob.model.Project;
  * 
  *
  */
-public class CreateProjectAction extends BaseProjectAction
+public class CreateProjectAction extends ProjectActionSupport
 {
     private Project project = new Project();
 

@@ -7,7 +7,7 @@ import com.cinnamonbob.model.Project;
  *
  *
  */
-public class CreateSvnAction extends BaseProjectAction
+public class CreateSvnAction extends ProjectActionSupport
 {
     private long id;
     private Svn svn = new Svn();
