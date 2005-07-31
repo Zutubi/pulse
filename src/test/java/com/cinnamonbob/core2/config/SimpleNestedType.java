@@ -7,19 +7,19 @@ import java.util.LinkedList;
  * 
  *
  */
-public class SimpleNestedType implements ProjectComponent, Reference
+public class SimpleNestedType implements BobFileComponent, Reference
 {
-    private Project project;
+    private BobFile project;
     private String name;
     
     private List<SimpleNestedType> nestedTypes = new LinkedList<SimpleNestedType>();
         
-    public void setProject(Project project)
+    public void setBobFile(BobFile project)
     {
         this.project = project;
     }
 
-    public Project getProject()
+    public BobFile getProject()
     {
         return project;
     }

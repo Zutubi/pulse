@@ -1,5 +1,8 @@
 package com.cinnamonbob.core2.config;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import junit.framework.TestCase;
 
 /**
@@ -9,7 +12,7 @@ import junit.framework.TestCase;
 public class ProjectConfigurationLoaderTest extends TestCase
 {
     
-    private ProjectConfigurationLoader loader;
+    private BobFileLoader loader;
     
     public ProjectConfigurationLoaderTest(String testName)
     {
@@ -20,7 +23,7 @@ public class ProjectConfigurationLoaderTest extends TestCase
     {
         super.setUp();
         
-        loader = new ProjectConfigurationLoader();
+        loader = new BobFileLoader();
         
         // initialise the loader some test objects.
         loader.register("simpleTrigger", SimpleTrigger.class);
@@ -31,7 +34,6 @@ public class ProjectConfigurationLoaderTest extends TestCase
         
         // initialise the loader with some real objects.
         loader.register("property", Property.class);
-        loader.register("description", Description.class);
         loader.register("recipe", Recipe.class);
         loader.register("schedule", Schedule.class);
         loader.register("def", ComponentDefinition.class);
@@ -49,7 +51,7 @@ public class ProjectConfigurationLoaderTest extends TestCase
     
     public void testSimpleReference() throws Exception
     {
-        Project project = loader.load(getClass().getResourceAsStream("testSimpleReference.xml"));
+        BobFile project = loader.load(getClass().getResourceAsStream("testSimpleReference.xml"));
         assertNotNull(project);
         
         Object o = project.getReference("a");
@@ -63,7 +65,7 @@ public class ProjectConfigurationLoaderTest extends TestCase
     
     public void testResolveReference() throws Exception
     {
-        Project project = loader.load(getClass().getResourceAsStream("testResolveReference.xml"));
+        BobFile project = loader.load(getClass().getResourceAsStream("testResolveReference.xml"));
         assertNotNull(project);
         
         Object a = project.getReference("a");
@@ -80,7 +82,7 @@ public class ProjectConfigurationLoaderTest extends TestCase
     
     public void testNestedType() throws Exception
     {
-        Project project = loader.load(getClass().getResourceAsStream("testNestedType.xml"));
+        BobFile project = loader.load(getClass().getResourceAsStream("testNestedType.xml"));
         assertNotNull(project);
 
         assertNotNull(project.getReference("a"));
@@ -97,7 +99,7 @@ public class ProjectConfigurationLoaderTest extends TestCase
     
     public void testInitComponent() throws Exception
     {
-        Project project = loader.load(getClass().getResourceAsStream("testInitComponent.xml"));
+        BobFile project = loader.load(getClass().getResourceAsStream("testInitComponent.xml"));
         assertNotNull(project);
         
         assertEquals("valueA", project.getProperty("a"));        
@@ -106,7 +108,7 @@ public class ProjectConfigurationLoaderTest extends TestCase
  
     public void testNonBeanName() throws Exception
     {
-        Project project = loader.load(getClass().getResourceAsStream("testNonBeanName.xml"));
+        BobFile project = loader.load(getClass().getResourceAsStream("testNonBeanName.xml"));
         assertNotNull(project);
         
         Object a = project.getReference("a");
@@ -116,35 +118,18 @@ public class ProjectConfigurationLoaderTest extends TestCase
         
     }
     
-    public void testSchedule() throws Exception
-    {
-        Project project = loader.load(getClass().getResourceAsStream("testSchedule.xml"));
-        assertNotNull(project);
-        
-        Schedule a = project.getSchedule("a");
-        assertNotNull(a);
-        assertNotNull(a.getTriggers());
-        assertEquals(1, a.getTriggers().size());
-        
-        Object o = a.getTriggers().get(0);
-        assertTrue(o instanceof SimpleTrigger);
-        assertEquals("b", ((SimpleTrigger)o).getName());
-        assertEquals("c", ((SimpleTrigger)o).getValue());
-    }
-    
     public void testCreateProject() throws Exception
     {
-        Project project = loader.load(getClass().getResourceAsStream("testCreateProject.xml"));
+        BobFile project = loader.load(getClass().getResourceAsStream("testCreateProject.xml"));
         assertNotNull(project);
-        
-        assertEquals("projectName", project.getName());
     }
     
     public void testSampleProject() throws Exception
     {
-        Project project = loader.load(getClass().getResourceAsStream("testSampleProject.xml"));
-        assertNotNull(project);
+        Map<String, String> properties = new TreeMap<String, String>();
+        properties.put("work.dir", ".");
         
-        assertEquals("sampleProject", project.getName());
+        BobFile project = loader.load(getClass().getResourceAsStream("testSampleProject.xml"), properties);
+        assertNotNull(project);
     }
 }

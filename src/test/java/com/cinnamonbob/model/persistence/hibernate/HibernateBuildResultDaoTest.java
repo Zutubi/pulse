@@ -26,8 +26,7 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
     
     public void testSaveAndLoad()
     {
-        BuildResult buildResult = new BuildResult();
-        buildResult.setProjectName("project");
+        BuildResult buildResult = new BuildResult("project");
         buildResult.setSucceeded(true);
         buildResult.setStamps(new TimeStamps(1, 2));
         buildResult.building();

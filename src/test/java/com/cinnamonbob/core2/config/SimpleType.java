@@ -4,18 +4,18 @@ package com.cinnamonbob.core2.config;
  * 
  *
  */
-public class SimpleType implements ProjectComponent
+public class SimpleType implements BobFileComponent
 {
-    private Project project;
+    private BobFile project;
     private String name;
     private String value;
     
-    public Project getProject()
+    public BobFile getProject()
     {
         return project;
     }
 
-    public void setProject(Project project)
+    public void setBobFile(BobFile project)
     {
         this.project = project;
     }

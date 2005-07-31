@@ -4,10 +4,10 @@ package com.cinnamonbob.core2.config;
  * 
  *
  */
-public class SomeReference implements ProjectComponent, Reference
+public class SomeReference implements BobFileComponent, Reference
 {
     private String name;
-    private Project project;
+    private BobFile project;
     private String someValue;
 
     public String getName()
@@ -20,12 +20,12 @@ public class SomeReference implements ProjectComponent, Reference
         this.name = name;
     }
 
-    public Project getProject()
+    public BobFile getProject()
     {
         return project;
     }
 
-    public void setProject(Project project)
+    public void setBobFile(BobFile project)
     {
         this.project = project;
     }

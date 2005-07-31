@@ -4,9 +4,9 @@ package com.cinnamonbob.core2.config;
  * 
  *
  */
-public class SimpleTrigger implements Trigger, ProjectComponent
+public class SimpleTrigger implements Trigger, BobFileComponent
 {
-    private Project project;
+    private BobFile project;
     private String name;
     private String value;
 
@@ -30,12 +30,12 @@ public class SimpleTrigger implements Trigger, ProjectComponent
         this.value = value;
     }
 
-    public Project getProject()
+    public BobFile getProject()
     {
         return project;
     }
 
-    public void setProject(Project project)
+    public void setBobFile(BobFile project)
     {
         this.project = project;
     }
