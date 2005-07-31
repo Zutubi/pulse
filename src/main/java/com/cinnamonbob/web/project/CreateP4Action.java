@@ -1,24 +1,25 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.model.Svn;
+import com.cinnamonbob.model.P4;
 import com.cinnamonbob.model.Project;
 
 /**
  *
  *
  */
-public class CreateSvnAction extends ScmActionSupport
+public class CreateP4Action extends ScmActionSupport
 {
     private long id;
-    private Svn svn = new Svn();
+    private P4 p4 = new P4();
 
-    public Svn getSvn()
+    public P4 getP4()
     {
-        return svn;
+        return p4;
     }
 
     public void setId(long id)
     {
+        // TODO: move up the inheritance chain somewhere
         this.id = id;
     }
 
@@ -44,9 +45,9 @@ public class CreateSvnAction extends ScmActionSupport
 
     public String execute()
     {
-        setCommonFields(svn);
+        setCommonFields(p4);
         Project project = getProjectManager().getProject(id);
-        project.addScm(svn);
+        project.addScm(p4);
         getProjectManager().save(project);
         return SUCCESS;
     }

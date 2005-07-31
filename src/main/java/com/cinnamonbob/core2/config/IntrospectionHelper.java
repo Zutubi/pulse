@@ -170,7 +170,7 @@ public class IntrospectionHelper
      */ 
     private interface AttributeSetter
     {
-        void set(Object parent, String value, Project project)
+        void set(Object parent, String value, BobFile project)
                 throws InvocationTargetException, IllegalAccessException;
     }
 
@@ -213,7 +213,7 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, Project project)
+                public void set(Object parent, String value, BobFile project)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     method.invoke(parent, value);
@@ -226,7 +226,7 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, Project project)
+                public void set(Object parent, String value, BobFile project)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     method.invoke(parent, toBoolean(value));
@@ -240,7 +240,7 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, Project project)
+                public void set(Object parent, String value, BobFile project)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     if (value.length() == 0)
@@ -257,7 +257,7 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, Project project)
+                public void set(Object parent, String value, BobFile project)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     try
@@ -274,7 +274,7 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, Project project) 
+                public void set(Object parent, String value, BobFile project) 
                         throws InvocationTargetException, IllegalAccessException
                 {
                     // lookup the type object within the projects references.
@@ -296,7 +296,7 @@ public class IntrospectionHelper
 
                 return new AttributeSetter()
                 {
-                    public void set(Object parent, String value, Project project) throws InvocationTargetException, IllegalAccessException
+                    public void set(Object parent, String value, BobFile project) throws InvocationTargetException, IllegalAccessException
                     {
                         try
                         {
@@ -355,7 +355,7 @@ public class IntrospectionHelper
         return nestedCreators.get(name).create(parent);
     }
 
-    public void set(String name, Object parent, String value, Project project) 
+    public void set(String name, Object parent, String value, BobFile project) 
             throws IllegalAccessException, InvocationTargetException
     {
         AttributeSetter setter = attributeSetters.get(name);

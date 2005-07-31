@@ -25,7 +25,7 @@
         </property>
     </bean>
 
-    <bean id="buildManager" class="com.cinnamonbob.core.BuildManager"/>
+    <bean id="buildManager" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"/>
 
     <bean id="userManager" class="com.cinnamonbob.model.DefaultUserManager" autowire="byName"/>
     

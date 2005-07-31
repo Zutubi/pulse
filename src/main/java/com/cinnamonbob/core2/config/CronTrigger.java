@@ -87,7 +87,8 @@ public class CronTrigger extends AbstractTrigger
     
     private String getGroupName()
     {
-        return schedule.getProject().getName();
+        // FIXME oh dear
+        return "this is the dawning of the age of core2rius"; //schedule.getProject().getName();
     }
 }
 

@@ -61,10 +61,18 @@ public class TimeStampsType implements CompositeUserType
             throws HibernateException, SQLException
     {
 
-        TimeStamps stamps = (TimeStamps) value;
+        if(value != null)
+        {
+            TimeStamps stamps = (TimeStamps)value;
 
-        Hibernate.LONG.nullSafeSet(st, stamps.getStartTime(), index);
-        Hibernate.LONG.nullSafeSet(st, stamps.getEndTime(), index + 1);
+            Hibernate.LONG.nullSafeSet(st, stamps.getStartTime(), index);
+            Hibernate.LONG.nullSafeSet(st, stamps.getEndTime(), index + 1);
+        }
+        else
+        {
+            Hibernate.LONG.nullSafeSet(st, null, index);
+            Hibernate.LONG.nullSafeSet(st, null, index + 1);
+        }
     }
 
     public String[] getPropertyNames()

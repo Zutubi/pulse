@@ -1,6 +1,6 @@
 package com.cinnamonbob.web.project;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Map;
 
 /**
@@ -10,8 +10,10 @@ import java.util.Map;
 public class CreateScmAction extends ProjectActionSupport
 {
     private long id;
+    private String name;
     private String type;
-
+    private String path;
+    
     private Map<String, String> types;
 
     public String getType()
@@ -28,7 +30,7 @@ public class CreateScmAction extends ProjectActionSupport
     {
         if (types == null)
         {
-            types = new HashMap<String, String>();
+            types = new TreeMap<String, String>();
             types.put("svn", "Subversion");
             types.put("p4", "Perforce");
             types.put("cvs", "CVS");
@@ -54,5 +56,25 @@ public class CreateScmAction extends ProjectActionSupport
     public void setId(long id)
     {
         this.id = id;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getPath()
+    {
+        return path;
+    }
+
+    public void setPath(String path)
+    {
+        this.path = path;
     }
 }

@@ -10,20 +10,20 @@
 #bodytag (Form "action='createSvn.action'" "method='post'")
 
     #tag (Hidden "name='id'")
+    #tag (Hidden "name='name'")
+    #tag (Hidden "name='path'")
 
     <fieldset>
-        #tag (TextField "required='true'" "name='svn.name'" "tabindex='1'")
-        #tag (TextField "required='true'" "name='svn.username'" "tabindex='2'")
-        #tag (Password "name='svn.password'" "tabindex='3'")
-        #tag (TextField "required='true'" "name='svn.url'" "tabindex='4'")
-        #tag (TextField "name='svn.path'" "tabindex='5'")
-        #tag (TextField "name='svn.keyfile'" "tabindex='6'")
-        #tag (Password "name='svn.passphrase'" "tabindex='7'")
+        #tag (TextField "required='true'" "name='svn.username'" "tabindex='1'")
+        #tag (Password "name='svn.password'" "tabindex='2'")
+        #tag (TextField "required='true'" "name='svn.url'" "tabindex='3'")
+        #tag (TextField "name='svn.keyfile'" "tabindex='4'")
+        #tag (Password "name='svn.passphrase'" "tabindex='5'")
     </fieldset>
 
     <fieldset class="submit">
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='9'")
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='8'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='7'")
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='6'")
     </fieldset>
 
  #end

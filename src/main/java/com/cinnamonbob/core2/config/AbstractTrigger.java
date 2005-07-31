@@ -5,17 +5,17 @@ package com.cinnamonbob.core2.config;
  * 
  *
  */
-public abstract class AbstractTrigger implements Trigger, ProjectComponent
+public abstract class AbstractTrigger implements Trigger, BobFileComponent
 {
-    protected Project project;
+    protected BobFile project;
     protected Schedule schedule;
     
-    public void setProject(Project project)
+    public void setBobFile(BobFile project)
     {
         this.project = project;
     }
 
-    public Project getProject()
+    public BobFile getProject()
     {
         return project;
     }

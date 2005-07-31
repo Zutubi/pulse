@@ -18,15 +18,15 @@ import java.util.Map;
  * 
  *
  */
-public class ProjectConfigurationLoader
+public class BobFileLoader
 {
     private final Map<String, Class> typeDefinitions = new HashMap<String, Class>();
 
-    private Project project = null;
+    private BobFile bobFile = null;
 
     private List<InitComponent> requireInitialisation = new LinkedList<InitComponent>();
 
-    public ProjectConfigurationLoader()
+    public BobFileLoader()
     {
     }
 
@@ -60,12 +60,17 @@ public class ProjectConfigurationLoader
 //        return data;
 //    }
 
-    public Project load(File file) throws BobException, IOException, IllegalAccessException, InvocationTargetException
+    public BobFile load(File file) throws BobException, IOException, IllegalAccessException, InvocationTargetException
     {
         return load(new FileInputStream(file));
     }
 
-    public Project load(InputStream input) throws BobException, IOException, IllegalAccessException, InvocationTargetException
+    public BobFile load(InputStream input) throws BobException, IOException, IllegalAccessException, InvocationTargetException
+    {
+        return load(input, null);
+    }
+
+    public BobFile load(InputStream input, Map<String, String> properties) throws BobException, IOException, IllegalAccessException, InvocationTargetException
     {
         try
         {
@@ -82,14 +87,16 @@ public class ProjectConfigurationLoader
             }
 
             Element rootElement = doc.getRootElement();
-            project = new Project();
+            bobFile = new BobFile();
+            
+            if(properties != null)
+            {
+                bobFile.addProperties(properties);
+            }
 
-            //TODO: FIX THIS.
-            project.setProperty("work.dir", ".");
-
-            // brief bootstraping of the loading process - can not treat project like a type since
+            // brief bootstraping of the loading process - can not treat bobfile like a type since
             // it does not have a parent... it is the root afterall.
-            mapAttributesToProperties(rootElement, project);
+            mapAttributesToProperties(rootElement, bobFile);
 
             for (int index = 0; index < rootElement.getChildCount(); index++)
             {
@@ -98,10 +105,10 @@ public class ProjectConfigurationLoader
                 {
                     continue;
                 }
-                loadType((Element) node, project);
+                loadType((Element) node, bobFile);
             }
 
-            return project;
+            return bobFile;
         }
         finally
         {
@@ -139,13 +146,13 @@ public class ProjectConfigurationLoader
             String referenceName = ((Reference) type).getName();
             if (referenceName != null && referenceName.length() > 0)
             {
-                project.setReference(referenceName, (Reference) type);
+                bobFile.setReference(referenceName, (Reference) type);
             }
         }
 
-        if (ProjectComponent.class.isAssignableFrom(type.getClass()))
+        if (BobFileComponent.class.isAssignableFrom(type.getClass()))
         {
-            ((ProjectComponent) type).setProject(project);
+            ((BobFileComponent) type).setBobFile(bobFile);
         }
 
         // initialise sub-elements.
@@ -227,7 +234,7 @@ public class ProjectConfigurationLoader
             try
             {
                 String propertyName = convertLocalNameToPropertyName(a.getLocalName());
-                helper.set(propertyName, target, project.replaceVariables(a.getValue()), project);
+                helper.set(propertyName, target, bobFile.replaceVariables(a.getValue()), bobFile);
             }
             catch (Exception e)
             {

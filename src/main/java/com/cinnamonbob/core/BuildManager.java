@@ -1,6 +1,5 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.bootstrap.StartupManager;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.util.FileSystemUtils;
 import com.thoughtworks.xstream.XStream;

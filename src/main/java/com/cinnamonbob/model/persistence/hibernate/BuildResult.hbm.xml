@@ -5,7 +5,7 @@
     <class name="com.cinnamonbob.core2.BuildResult" table="BuildResult">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
-            <generator class="assigned"/>
+            <generator class="hilo"/>
         </id>
 
         <property name="succeeded" column="SUCCEEDED" type="boolean" not-null="false"/>

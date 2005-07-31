@@ -10,9 +10,9 @@ public class PropertyTest extends TestCase
 {
     public void testSetProperty()
     {
-        Project project = new Project();
+        BobFile project = new BobFile();
         Property property = new Property();
-        property.setProject(project);
+        property.setBobFile(project);
         property.setName("name");
         property.setValue("value");
         property.init();

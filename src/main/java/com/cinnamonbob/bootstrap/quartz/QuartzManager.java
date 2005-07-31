@@ -1,6 +1,5 @@
 package com.cinnamonbob.bootstrap.quartz;
 
-import com.cinnamonbob.bootstrap.StartupManager;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import org.quartz.Scheduler;
 

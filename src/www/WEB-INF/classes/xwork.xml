@@ -132,6 +132,12 @@
             <result name="success" type="velocity">create-scm-${type}.vm</result>
         </action>
 
+        <action name="createP4" class="com.cinnamonbob.web.project.CreateP4Action">
+            <result name="input" type="velocity">create-scm-p4.vm</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${id}</result>
+            <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+        </action>
+
         <action name="createSvn" class="com.cinnamonbob.web.project.CreateSvnAction">
             <result name="input" type="velocity">create-scm-svn.vm</result>
             <result name="cancel" type="redirect">/manageProject.action?id=${id}</result>

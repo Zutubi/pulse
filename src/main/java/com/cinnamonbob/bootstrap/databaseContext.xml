@@ -15,6 +15,8 @@
             <props>
                 <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
                 <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.jdbc.batch_size">0</prop>
+                <prop key="hibernate.jdbc.use_scrollable_resultsets">false</prop>
             </props>
         </property>
         <property name="dataSource">

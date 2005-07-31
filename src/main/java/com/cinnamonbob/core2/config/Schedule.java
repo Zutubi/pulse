@@ -7,20 +7,20 @@ import java.util.LinkedList;
  * 
  *
  */
-public class Schedule implements ProjectComponent
+public class Schedule implements BobFileComponent
 {
     private String recipe;
     private String name;
-    private Project project;
+    private BobFile project;
     
     private List<Trigger> triggers = new LinkedList<Trigger>();
 
-    public void setProject(Project project)
+    public void setBobFile(BobFile project)
     {
         this.project = project;
     }
 
-    public Project getProject()
+    public BobFile getProject()
     {
         return project;
     }

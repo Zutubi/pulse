@@ -1,8 +1,5 @@
 package com.cinnamonbob.web.user;
 
-import com.cinnamonbob.model.UserManager;
-import com.cinnamonbob.web.ActionSupport;
-
 import java.util.Collections;
 import java.util.List;
 

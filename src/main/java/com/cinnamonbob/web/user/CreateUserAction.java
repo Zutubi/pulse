@@ -1,8 +1,6 @@
 package com.cinnamonbob.web.user;
 
 import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.UserManager;
-import com.cinnamonbob.web.ActionSupport;
 
 /**
  * 

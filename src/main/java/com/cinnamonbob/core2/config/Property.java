@@ -5,9 +5,9 @@ package com.cinnamonbob.core2.config;
  * 
  *
  */
-public class Property implements InitComponent, ProjectComponent
+public class Property implements InitComponent, BobFileComponent
 {
-    private Project project;
+    private BobFile project;
     private String name;
     private String value;
     
@@ -16,7 +16,7 @@ public class Property implements InitComponent, ProjectComponent
         project.setProperty(name, value);
     }
 
-    public void setProject(Project project)
+    public void setBobFile(BobFile project)
     {
         this.project = project;
     }

@@ -2,8 +2,10 @@ package com.cinnamonbob;
 
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.SystemBootstrapManager;
-import com.cinnamonbob.core.Bob;
+import com.cinnamonbob.core2.BuildProcessor;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.logging.Logger;
 
 /**
@@ -18,7 +20,7 @@ public class BobServer
     private ShutdownService shutdownService = null;
 
     private static BuildQueue buildQueue = null;
-    private Bob core = null;
+    private BuildProcessor buildProcessor = null;
 
     public BobServer()
     {
@@ -37,13 +39,15 @@ public class BobServer
         shutdownService = new ShutdownService(adminPort, this);
         shutdownService.start();
 
+        buildProcessor = new BuildProcessor();
+
         // initialise the build queue.
         buildQueue = new BuildQueue();
         buildQueue.setDispatcher(new BuildDispatcher()
         {
             public void dispatch(BuildRequest request)
             {
-                core.build(request.getProjectName());
+                buildProcessor.execute(request);
             }
         });
 
@@ -77,5 +81,22 @@ public class BobServer
     public BuildQueue getBuildQueue()
     {
         return buildQueue;
+    }
+    
+    public String getHostURL()
+    {
+        InetAddress address;
+        try
+        {
+            address = InetAddress.getLocalHost();
+            return address.getHostName();
+        }
+        catch(UnknownHostException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        return null;
     }
 }

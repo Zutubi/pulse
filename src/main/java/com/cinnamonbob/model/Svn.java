@@ -1,5 +1,9 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.scm.SCMException;
+import com.cinnamonbob.scm.SCMServer;
+import com.cinnamonbob.scm.SVNServer;
+
 /**
  * 
  *
@@ -11,8 +15,27 @@ public class Svn extends Scm
     private final String PASSWORD = "svn.password";
     private final String KEYFILE = "svn.keyfile";
     private final String PASSPHRASE = "svn.passphrase";
-    private final String PATH = "svn.path";
     
+    @Override
+    public SCMServer createServer() throws SCMException
+    {
+        if(getKeyfile() == null || getKeyfile().length() == 0)
+        {
+            return new SVNServer(getUrl(), getUsername(), getPassword());
+        }
+        else
+        {
+            if(getPassphrase() == null || getPassphrase().length() == 0)
+            {
+                return new SVNServer(getUrl(), getUsername(), getPassword(), getKeyfile());
+            }
+            else
+            {
+                return new SVNServer(getUrl(), getUsername(), getPassword(), getKeyfile(), getPassphrase());
+            }
+        }
+    }
+
     public String getUrl()
     {
         return (String) getProperties().get(URL);
@@ -61,15 +84,5 @@ public class Svn extends Scm
     public void setPassphrase(String passphrase)
     {
         getProperties().put(PASSPHRASE, passphrase);
-    }
-
-    public String getPath()
-    {
-        return (String) getProperties().get(PATH);
-    }
-
-    public void setPath(String path)
-    {
-        getProperties().put(PATH, path);
     }
 }

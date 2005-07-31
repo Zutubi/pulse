@@ -15,7 +15,7 @@ public class BuildResult extends Entity
 {
     public enum BuildState 
     {
-        BUILD_ID_ALLOCATED,
+        INITIAL,
         BUILDING,
         COMPLETED
     }
@@ -29,6 +29,12 @@ public class BuildResult extends Entity
     
     public BuildResult()
     {
+    }
+    
+    public BuildResult(String projectName)
+    {
+        this.projectName = projectName;
+        state = BuildState.INITIAL;
     }
     
     public void setSucceeded(boolean b)
@@ -65,7 +71,7 @@ public class BuildResult extends Entity
         return projectName;
     }
 
-    public void setProjectName(String projectName)
+    private void setProjectName(String projectName)
     {
         this.projectName = projectName;
     }

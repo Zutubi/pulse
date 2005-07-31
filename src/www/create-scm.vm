@@ -10,11 +10,13 @@
 #bodytag (Form "action='createScm.action'" "method='post'")
     #tag (Hidden "name='id'")
     <fieldset>
-        #tag (Select "list=types" "name='type'" "tabindex='1'")
+        #tag (TextField "required='true'" "name='name'" "label='scm.name'" "tabindex='1'")
+        #tag (Select "list=types" "name='type'" "label='scm.type'" "tabindex='2'")
+        #tag (TextField "name='path'" "label='scm.path'" "tabindex='3'")
     </fieldset>
         
     <fieldset class="submit">
-        #tag (Submit "value=getText('next.name')" "name='next'" "tabindex='2'")
+        #tag (Submit "value=getText('next.name')" "name='next'" "tabindex='1'")
     </fieldset>
  #end
 
