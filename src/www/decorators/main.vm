@@ -7,13 +7,14 @@
 	</head>
         
     <body>
-    <div id="container">    
-        <div id="header">this is the header</div>
+    <div id="container">
+        <div id="header">$title</div>
         <div id="navbar">
             <ul>
                 <li><a href="/">:: navigate ::</a></li>
-                <li><a href="serverStatus.action">server&nbsp;status</a></li>
-                <li><a href="viewProjects.action">all&nbsp;projects</a></li>
+                <li><a href="serverStatus.action">server status</a></li>
+                <li><a href="viewProjects.action">all projects</a></li>
+                <li><a href="viewUsers.action">all users</a></li>
             </ul>
         </div>
                                         <!-- page properties are specified using <content tag="selectedTab">navigate</content> -->
@@ -23,10 +24,9 @@
                                         <!--#else-->
                                         <!--    <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="/">navigate</a></td>-->
                                         <!--#end-->
-
-        <div id="left">
+<!--        <div id="left"> -->
             <!-- left navigation goes here -->
-            <div class="menu">
+<!--            <div class="menu">
                 <h3>User</h3>
                 <p>
                     <ul>
@@ -44,7 +44,7 @@
                 </p>
             </div>
             <div class="menu">
-                <h3>Project</h3>
+                <h3>Project $request.project.name</h3>
                 <p>
                     <ul>
                         <li> <a href="findProjects!default.action">find</a></li>
@@ -53,9 +53,10 @@
                 </p>
             </div>
         </div>
+
         <div id="right">
                 <!-- right navigation goes here -->
-        </div>
+<!--        </div> -->
         <div id="content">
 		    $body
         </div>
@@ -64,6 +65,5 @@
             Copyright &copy; 2005 Daniel Ostermeier and Jason Sankey
         </div>        
     </div>
-    </body>        
-        
+    </body>
 </html>

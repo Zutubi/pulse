@@ -1,6 +1,6 @@
 package com.cinnamonbob.core2;
 
-import com.cinnamonbob.core2.config.CommandResult;
+import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.model.Entity;
 import com.cinnamonbob.util.TimeStamps;
 
@@ -21,20 +21,24 @@ public class BuildResult extends Entity
     }
     
     private BuildState state;
+    private long number;
     private boolean succeeded;
     private String projectName;
+    private String revision;
     private TimeStamps stamps;
     
-    private List<CommandResult> results = new LinkedList<CommandResult>();
+    private List<CommandResult> results;
     
     public BuildResult()
     {
     }
     
-    public BuildResult(String projectName)
+    public BuildResult(String projectName, long number)
     {
+        this.number = number;
         this.projectName = projectName;
         state = BuildState.INITIAL;
+        results = new LinkedList<CommandResult>();
     }
     
     public void setSucceeded(boolean b)
@@ -65,7 +69,11 @@ public class BuildResult extends Entity
         return results;
     }
 
-
+    private void setCommandResults(List<CommandResult> results)
+    {
+        this.results = results;
+    }
+    
     public String getProjectName()
     {
         return projectName;
@@ -115,5 +123,25 @@ public class BuildResult extends Entity
     private void setStateName(String name)
     {
         state = BuildState.valueOf(name);
+    }
+
+    public String getRevision()
+    {
+        return revision;
+    }
+
+    public void setRevision(String revision)
+    {
+        this.revision = revision;
+    }
+
+    public long getNumber()
+    {
+        return number;
+    }
+
+    public void setNumber(long number)
+    {
+        this.number = number;
     }
 }

@@ -6,6 +6,11 @@ import java.util.regex.Matcher;
 import java.util.logging.Logger;
 import java.io.*;
 
+import com.cinnamonbob.model.Feature;
+import com.cinnamonbob.model.PlainFeature;
+import com.cinnamonbob.model.StoredArtifact;
+
+
 /**
  * 
  *
@@ -18,11 +23,11 @@ public class RegexPostProcessor implements PostProcessor
     
     private List<RegexPattern> patterns = new LinkedList<RegexPattern>();
     
-    public void process(Artifact artifact)
+    public void process(StoredArtifact artifact)
     {
         try
         {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(artifact.getContent()));
+            BufferedReader reader = new BufferedReader(new FileReader(artifact.getFile()));
             String line;
             long lineNumber = 0;
             
@@ -34,19 +39,20 @@ public class RegexPostProcessor implements PostProcessor
         }
         catch(IOException e)
         {
-            LOG.warning("I/O error post-processing artifact '" + artifact.getContentName() + "': " + e.getMessage());
+            LOG.warning("I/O error post-processing artifact '" + artifact.getName() + "': " + e.getMessage());
         }
         
     }
 
-    private void processLine(Artifact artifact, String line, long lineNumber)
+    private void processLine(StoredArtifact artifact, String line, long lineNumber)
     {
         for(RegexPattern p: patterns)
         {
             Matcher matcher = p.getPattern().matcher(line);
             if(matcher.matches())
             {
-                artifact.addFeature(new PlainFeature(p.getCategory(), line, lineNumber));
+                // FIXME valueOf not safe
+                artifact.addFeature(new PlainFeature(Feature.Level.valueOf(p.getCategory().toUpperCase()), line, lineNumber));
             }
         }
     }

@@ -28,12 +28,14 @@ public class BuildProcessor
 
     private ProjectManager projectManager;
     private BuildManager   buildManager;
+    private UserManager    userManager;
     
     public BuildProcessor()
     {
         // TODO make this a singleton managed by Spring??
         projectManager = (ProjectManager)ComponentContext.getBean("projectManager");
         buildManager = (BuildManager)ComponentContext.getBean("buildManager");
+        userManager = (UserManager)ComponentContext.getBean("userManager");
     }
     
     public BuildResult execute(BuildRequest request)
@@ -47,9 +49,16 @@ public class BuildProcessor
         }
         
         // allocate a build result to this request.
-        BuildResult buildResult = new BuildResult(project.getName());
+        long              number = 1;
+        List<BuildResult> builds = buildManager.getLatestBuildResultsForProject(project.getName(), 1);
+        
+        if(builds.size() > 0)
+        {
+            number = builds.get(0).getNumber() + 1;
+        }
+
+        BuildResult buildResult = new BuildResult(project.getName(), number);
         buildManager.save(buildResult);
-        System.out.println("******* BUILD HAS ID " + Long.toString(buildResult.getId()));
         buildResult.building();
 
         try
@@ -59,7 +68,7 @@ public class BuildProcessor
     
             File workDir  = cleanWorkDir(projectDir);
             File buildDir = createBuildResultDir(projectDir, buildResult);
-            File scmDir   = bootstrapBuild(project, workDir, buildDir);
+            File scmDir   = bootstrapBuild(project, buildResult, workDir, buildDir);
             
             BobFile bobFile = loadBobFile(scmDir);
             
@@ -80,6 +89,16 @@ public class BuildProcessor
         {
             buildResult.completed();
             buildManager.save(buildResult);
+        }
+        
+        // FIXME what a hack!
+        for(Object o: userManager.getUsersWithLoginLike("%"))
+        {
+            User u = (User)o;
+            for(ContactPoint c: u.getContactPoints())
+            {
+                c.notify(project, buildResult);
+            }
         }
         
         return buildResult;
@@ -135,7 +154,7 @@ public class BuildProcessor
         }
     }
 
-    private File bootstrapBuild(Project project, File workDir, File resultDir) throws BuildException
+    private File bootstrapBuild(Project project, BuildResult result, File workDir, File resultDir) throws BuildException
     {
         List<Scm> scms = project.getScms();
         
@@ -154,6 +173,7 @@ public class BuildProcessor
             LinkedList<Change> changes  = new LinkedList<Change>();
             Revision           revision = server.checkout(scmDir, null, changes);
             
+            result.setRevision(revision.toString());
             saveChanges(resultDir, changes);
         }
         catch(SCMException e)

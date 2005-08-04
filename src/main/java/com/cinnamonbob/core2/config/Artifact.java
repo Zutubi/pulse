@@ -3,6 +3,8 @@ package com.cinnamonbob.core2.config;
 import java.io.InputStream;
 import java.util.List;
 
+import com.cinnamonbob.model.Feature;
+
 /**
  * 
  *

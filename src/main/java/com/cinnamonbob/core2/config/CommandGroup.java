@@ -2,9 +2,17 @@ package com.cinnamonbob.core2.config;
 
 import java.util.List;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.HashMap;
 import java.io.File;
+import java.io.IOException;
+
+import com.cinnamonbob.core.Artifact;
+import com.cinnamonbob.core.ArtifactSpec;
+import com.cinnamonbob.core.CommandResultCommon;
+import com.cinnamonbob.model.CommandResult;
+import com.cinnamonbob.model.StoredArtifact;
+import com.cinnamonbob.util.IOHelper;
+import com.cinnamonbob.util.TimeStamps;
+
 
 /**
  * 
@@ -18,7 +26,7 @@ public class CommandGroup implements Command
     
     private List<ProcessArtifactMapping> mappings = new LinkedList<ProcessArtifactMapping>();
     
-    private List<Artifact> artifacts = new LinkedList<Artifact>();
+    private List<FileArtifact> artifacts = new LinkedList<FileArtifact>();
     
     public void add(Command cmd)
     {
@@ -46,7 +54,7 @@ public class CommandGroup implements Command
         return mapping;
     }
     
-    public Artifact createArtifact()
+    public FileArtifact createArtifact()
     {
         FileArtifact customArtifact = new FileArtifact();
         artifacts.add(customArtifact);
@@ -54,26 +62,34 @@ public class CommandGroup implements Command
     }
     
     public CommandResult execute(File outputDir) throws CommandException
-    {        
+    {
+        TimeStamps    stamps = new TimeStamps();
         CommandResult result = cmd.execute(outputDir);
         
-        Map<String, Artifact> artifacts = new HashMap<String, Artifact>();
-        for (Artifact a : result.getArtifacts())
-        {
-            artifacts.put(a.getContentName(), a);
-        }
+        stamps.end();
+        result.setCommandName(name);
+        result.setStamps(stamps);
+
+        collectArtifacts(result, outputDir);
         
-        for (Artifact a : this.artifacts)
-        {
-            artifacts.put(a.getContentName(), a);
-        }
-           
+//        Map<String, FileArtifact> artifacts = new HashMap<String, FileArtifact>();
+//        for (FileArtifact a : result.getArtifacts())
+//        {
+//            artifacts.put(a.getContentName(), a);
+//        }
+//        
+//        for (FileArtifact a : this.artifacts)
+//        {
+//            artifacts.put(a.getContentName(), a);
+//        }
+//           
         for (ProcessArtifactMapping m : mappings)
         {
-            if (artifacts.containsKey(m.getArtifact()))
+            StoredArtifact a = result.getArtifact(m.getArtifact());
+            
+            if(a != null)
             {
-                Artifact artifact = artifacts.get(m.getArtifact());
-                m.getProcessor().process(artifact);
+                m.getProcessor().process(a);
             }
             else
             {
@@ -81,7 +97,39 @@ public class CommandGroup implements Command
             }
         }                
         return result;
-    }    
+    }
+    
+    private void collectArtifacts(CommandResult result, File outputDir)
+    {
+        for(FileArtifact artifact: artifacts)
+        {
+            File toFile = artifact.getToFile();
+            
+            if(toFile == null)
+            {
+                toFile = new File(artifact.getFile().getName());
+            }
+            
+            if(!toFile.isAbsolute())
+            {
+                // Then it is relative to the output path.
+                toFile = new File(outputDir, toFile.getName());
+            }
+
+            File fromFile = artifact.getFile();
+                   
+            try
+            {
+                IOHelper.copyFile(fromFile, toFile);
+                result.addArtifact(new StoredArtifact(artifact, toFile.getAbsolutePath()));
+            }
+            catch(IOException e)
+            {
+                // TODO handle copy error
+                e.printStackTrace();
+            }
+        }
+    }
     
     /**
      * 

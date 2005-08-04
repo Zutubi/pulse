@@ -14,7 +14,7 @@ body {
 }
 
 #header {
-    height:4em;
+    /*height:4em;*/
     font-size: small;
     font-weight: bold;
     color:#c0c0c0;
@@ -131,7 +131,7 @@ body {
     margin: 0px auto;
 }
 
-#content {
+/*#content {
     margin-left:11em;
     margin-right:11em;
     padding-left:1em;
@@ -139,7 +139,7 @@ body {
     padding-bottom: 1em;
     margin-top:1em;
     margin-bottom:1em;
-}
+}*/
 
 #footer {
     clear: both;
@@ -150,7 +150,7 @@ body {
     font-size: small;
     padding: 1;
     text-align: center;
-    position: absolute;
+
     bottom: 0;
     width: 100%;
 }

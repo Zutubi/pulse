@@ -1,0 +1,23 @@
+<html>
+<head>
+    <title>create-contact</title>
+</head>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+    
+    #bodytag (Form "action='createContactPoint.action'" "method='post'")
+        #tag (Hidden "name='id'")
+        <fieldset>
+            #tag (TextField "name='contact.name'")
+            #tag (TextField "label='contact.email'" "name='contact.email'")
+        </fieldset>
+
+        <fieldset class="submit">
+            #tag (Submit "value=getText('cancel.name')" "name='cancel'")
+            #tag (Submit "value=getText('save.name')" "name='save'")
+        </fieldset>
+    #end
+
+</body>
+</html>

@@ -1,13 +1,14 @@
 <html>
   <head>
-    <title>[CiB] $project scheduled</title>
+    <title>[CiB] $project.name scheduled</title>
     <link href="build.css" rel="stylesheet" type="text/css">
   </head>
   <body>
+    <p></p>
     <h2 class="command-success">build scheduled</h2>
     <div class="command-content">
-        <p>A build of project $project has been scheduled.</p>
-        <p>Return to <a href ="viewProject.action?name=$project">$project</a>.</p>
+        <p>A build of project $project.name has been scheduled.</p>
+        <p>Return to <a href ="manageProject.action?id=$id">$project.name</a>.</p>
         <p>Jump to <a href="serverStatus.action">server status</a>.</p>
     </div>
   </body>

@@ -1,18 +1,19 @@
 <html>
     <head>
-        <title>view project</title>    
+        <link href="build.css" rel="stylesheet" type="text/css">
+        <title>[CiB] $project.name</title>
         <content tag="action">project.view</content>
     </head>
     <body>
-    
-        <p>Project: (<a href="editProject!default.action?id=$project.id">edit</a>)</p>
-        <div>
-            <div>Name: $project.name</div>
-            <div>Description: $project.description</div>
+        <h1 class="build-log">:: $project.name ::</h1>
+        
+        <h2 class="command-info">description (<a href="editProject!default.action?id=$project.id">edit</a>)</h2>
+        <div class="command-content">
+            $project.description
         </div>
         
-        <div>
-            <p>Scm details: (<a href="createScm!default.action?id=$project.id">add</a>)</p>
+        <h2 class="command-info">scm details (<a href="createScm!default.action?id=$project.id">add</a>)</h2>
+        <div class="command-content">
             #set($scms = $project.scms)
             #if ($scms.size() == 0)
                 No SCMs configured
@@ -24,7 +25,7 @@
                 </ul>
             #end
         </div>
-
+<!--
         <div>
             <p>Schedule...</p>
         </div>
@@ -32,6 +33,32 @@
         <div>
             <p>Subscription: <a href="createSubscription!default.action?project=$project.name">create</a></p>
         </div>
-
+-->
+        <h2 class="command-info">history (<a href="scheduleBuild.action?id=$id">build</a>)</h2>
+        <div class="command-content">
+        <table>
+            <tr>
+                <th class="command-detail">build id</th>
+                <th class="command-detail">when</th>
+                <th class="command-detail">elapsed</th>
+                <th class="command-detail">result</th>
+            </tr>
+            #foreach($result in $history)
+                #set($id = $result.id)
+                #set($built = $result.stamps.prettyStartTime) 
+                #set($elapsed = $result.stamps.prettyElapsed)
+                #if($result.succeeded())
+                    #set($success = "success")
+                #else
+                    #set($success = "failure")
+                #end
+            <tr>
+                <td class="build-$success"><a href="viewBuild.action?id=$project.id&buildId=$id">build $result.number</a></td>
+                <td class="build-$success">$built</td>
+                <td class="build-$success">$elapsed</td>
+                <td class="build-$success">$success</td>
+            </tr>
+            #end
+        </table>
     </body>
 </html>

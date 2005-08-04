@@ -10,19 +10,19 @@
     <table>
       <tr>
         <th class="command-detail">project</th>
-        <th class="command-detail">state</th>
+        <!--<th class="command-detail">state</th>-->
         <th class="command-detail">last built</th>
         <th class="command-detail">build id</th>
         <th class="command-detail">elapsed</th>
         <th class="command-detail">result</th>
       </tr>
 #foreach($project in $projects)
-#set($history = $project.getHistory(1))
-#if($history.size() > 0)
-  #set($lastResult = $history.get(0))
-  #set($built = $lastResult.Stamps.PrettyStartTime) 
-  #set($id = $lastResult.Id)
-  #set($elapsed = $lastResult.Stamps.PrettyElapsed)
+  #set($index = $velocityCount - 1)
+  #set($lastResult = $latestBuilds.get($index))
+#if($latestBuilds.get($index))
+  #set($built = $lastResult.stamps.prettyStartTime) 
+  #set($id = $lastResult.number)
+  #set($elapsed = $lastResult.stamps.prettyElapsed)
   #if($lastResult.succeeded())
     #set($success = "success")
   #else
@@ -35,14 +35,17 @@
   #set($success = "n/a")
 #end
       <tr>
-        <td class="build-$success"><a href="viewProject.action?name=$project.Name">$project.Name</a></td>
-        <td class="build-$success">$project.State.toString().toLowerCase()</td>
+        <td class="build-$success"><a href="manageProject.action?id=$project.id">$project.name</a></td>
+        <!--<td class="build-$success">$project.State.toString().toLowerCase()</td>-->
         <td class="build-$success">$built</td>
         <td class="build-$success">$id</td>
         <td class="build-$success">$elapsed</td>
         <td class="build-$success">$success</td>
       </tr>
 #end
+      <tr>
+        <td class="command-detail" colspan="5"><b>+</b> <a href="createProject!default.action">add new project</a></td>
+      </tr>
     </table>
     </div>
   </body>

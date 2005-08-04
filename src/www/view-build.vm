@@ -3,7 +3,7 @@
 #end
 <html>
   <head>
-    <title>[CiB] $name build $id</title>
+    <title>[CiB] $project.name build $result.number</title>
     <link href="build.css" rel="stylesheet" type="text/css">
   </head>
   <body>
@@ -15,49 +15,67 @@
   #set($success = "failure")
 #end
 
-    <h2 class="command-$success">$name build $id</h2>
+    <h2 class="command-$success">$project.name build $result.number</h2>
     <div class="command-content">
       <table>
-        #detailrow("Commenced" $result.Stamps.PrettyStartTime)
-        #detailrow("Completed" $result.Stamps.PrettyEndTime)
-        #detailrow("Elapsed"   $result.Stamps.PrettyElapsed)
-        #detailrow("Result"    $success)
+        #detailrow("commenced" $result.stamps.prettyStartTime)
+        #detailrow("completed" $result.stamps.prettyEndTime)
+        #detailrow("elapsed"   $result.stamps.prettyElapsed)
+        #detailrow("result"    $success)
       </table>
+    </div>
+
+    <h2 class="command-$success">changes</h2>
+    <div class="command-content">
+      Checked out revision <b>$result.revision</b>.
+      #if($changes)
+        <h3>changes since last build</h3>
+        #foreach($change in $changes)
+          <div class="info">
+          <b>revision $change.revision</b> $change.user@$change.date: $change.comment
+          <ul>
+            #foreach($file in $change.changes)
+              <li><span class="filename">$file.filename#$file.revision: $file.action</span></li>
+            #end
+          </ul>
+          </div>
+        #end
+      #end
     </div>
 
     <h1 class="build-log">:: command log ::</h1>
 
-#foreach($commandResult in $result.iterator())
-  #if($commandResult.Result.succeeded())
+#foreach($commandResult in $result.getCommandResults())
+  #if($commandResult.succeeded())
     #set($success = "success")
   #else
     #set($success = "failure")
   #end
-    <h2 class="command-$success">$commandResult.CommandName</h2>
+    <h2 class="command-$success">$commandResult.commandName</h2>
     <div class="command-content">
       <table>
-        #detailrow("Commenced" $commandResult.Stamps.PrettyStartTime)
-        #detailrow("Completed" $commandResult.Stamps.PrettyEndTime)
-        #detailrow("Elapsed"   $commandResult.Stamps.PrettyElapsed)
-        #detailrow("Result"    $success)
+        #detailrow("commenced" $commandResult.stamps.prettyStartTime)
+        #detailrow("completed" $commandResult.stamps.prettyEndTime)
+        #detailrow("elapsed"   $commandResult.stamps.prettyElapsed)
+        #detailrow("result"    $success)
       </table>
-      <h2 class="command-element">Details</h2>
-#set($templateName = "commands/${commandResult.Result.Class.SimpleName}.vm")
-#if(!$engine.templateExists($templateName))
-  #set($templateName = "commands/CommandResult.vm")
-#end
-      #parse("$templateName")
-      <h2 class="command-element">Artifacts</h2>
-      #foreach($artifact in $commandResult.Artifacts)
-        <h3>$artifact.Title (<a href="viewArtifact.action?project=$name&id=$id&command=$commandResult.CommandName&artifact=$artifact.name">view</a>)</h3>
+      <h2 class="command-element">details</h2>
+      <table>
+        #foreach($key in $commandResult.properties.keySet())
+          #detailrow($key $commandResult.properties.get($key))
+        #end
+      </table>
+      <h2 class="command-element">artifacts</h2>
+      #foreach($artifact in $commandResult.artifacts)
+        <h3>$artifact.title (<a href="viewArtifact.action?id=$artifact.id">view</a>)</h3>
         <div class="artifact">
         #if($artifact.hasFeatures())
-          #foreach($category in $artifact.Categories)
-          <div class="$result.getFeatureCategory($category).Level.name().toLowerCase()">
-            <b>$result.getFeatureCategory($category).Title</b>
+          #foreach($level in $artifact.levels)
+          <div class="$level.toString().toLowerCase()">
+            <b>$level.toString().toLowerCase() features</b>
             <ul class="feature">
-            #foreach($feature in $artifact.getFeatures($category))
-              <li>$feature.Summary</li>
+            #foreach($feature in $artifact.getFeatures($level))
+              <li>$feature.summary</li>
             #end
             </ul>
           </div>

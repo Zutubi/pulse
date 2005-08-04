@@ -136,6 +136,19 @@ public class P4Server implements SCMServer
         clientRoot = toDirectory;
     }
 
+    private void getClientRoot() throws SCMException
+    {
+        P4Result result     = runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_OUTPUT);
+        String   clientSpec = result.stdout.toString();
+        Pattern  re         = Pattern.compile("^Root:(.*)", Pattern.MULTILINE);
+        Matcher  matcher    = re.matcher(clientSpec);
+        
+        if(matcher.find())
+        {
+            clientRoot = new File(matcher.group(1).trim());
+        }
+    }
+    
     private NumericalRevision getLatestRevision() throws SCMException
     {
         P4Result result  = runP4(null, P4_COMMAND, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, FLAG_MAXIMUM, "1");        
@@ -350,6 +363,13 @@ public class P4Server implements SCMServer
         long start = ((NumericalRevision)from).getRevisionNumber() + 1;
         long end   = ((NumericalRevision)to).getRevisionNumber();
 
+        // TODO: improve this?
+        getClientRoot();
+        if(clientRoot == null)
+        {
+            throw new SCMException("Unable to retrieve client root.");
+        }
+        
         if(start <= end)
         {
             P4Result p4Result = runP4(null, P4_COMMAND, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, clientRoot.getAbsoluteFile() + "/...@" + Long.toString(start) + "," + Long.toString(end));

@@ -1,5 +1,6 @@
 package com.cinnamonbob.core2.config;
 
+import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.util.FileSystemUtils;
 import junit.framework.TestCase;
 

@@ -6,10 +6,11 @@ import java.io.*;
  * 
  *
  */
-public class FileArtifact extends AbstractArtifact
+public class FileArtifact
 {
     private File file;
-    
+    private File toFile;
+    private String name;
     private String title;
     private String type;
     
@@ -65,5 +66,35 @@ public class FileArtifact extends AbstractArtifact
     public void setFromFile(File f)
     {
         setFile(f);
+    }
+
+    public File getToFile()
+    {
+        return toFile;
+    }
+    
+    public void setToFile(File f)
+    {
+        toFile = f;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public String getTitle()
+    {
+        return title;
+    }
+
+    public String getType()
+    {
+        return type;
+    }
+
+    public File getFile()
+    {
+        return file;
     }
 }

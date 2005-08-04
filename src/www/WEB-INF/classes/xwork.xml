@@ -11,7 +11,7 @@
 			<result name="success" type="velocity">server-status.vm</result> 
 		</action> 
 
-		<action name="viewProjects" class="viewProjectsAction">
+		<action name="viewProjects" class="com.cinnamonbob.web.project.ViewProjectsAction">
 			<result name="success" type="velocity">view-projects.vm</result> 
 		</action> 
 
@@ -25,23 +25,26 @@
 			<result name="error" type="velocity">generic-error.vm</result> 
 		</action> 
 
-		<action name="viewBuild" class="viewBuildAction">
+		<action name="viewBuild" class="com.cinnamonbob.web.project.ViewBuildAction">
 			<result name="success" type="velocity">view-build.vm</result> 
 			<result name="error" type="velocity">generic-error.vm</result> 
 		</action> 
 
-		<action name="scheduleBuild" class="scheduleBuildAction">
+		<action name="scheduleBuild" class="com.cinnamonbob.web.project.ScheduleBuildAction">
 			<result name="success" type="velocity">build-scheduled.vm</result>
 			<result name="error" type="velocity">generic-error.vm</result>
 		</action> 
 
-		<action name="viewArtifact" class="viewArtifactAction">
+		<action name="viewArtifact" class="com.cinnamonbob.web.project.ViewArtifactAction">
 			<result name="success" type="stream">
 			    <param name="contentType">${contentType}</param>
 			</result>
-			<result name="error" type="velocity">generic-error.vm</result> 
 		</action> 
         
+		<action name="viewUsers" class="com.cinnamonbob.web.user.ViewUsersAction">
+			<result name="success" type="velocity">view-users.vm</result> 
+		</action> 
+
         <action name="findUsers!default" class="com.opensymphony.xwork.ActionSupport">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">find-user.vm</result>
@@ -64,10 +67,15 @@
             <result name="success" type="redirect">/viewUser.action?id=${user.id}</result>
         </action>
 
+        <action name="createContactPoint!default" class="com.cinnamonbob.web.user.CreateContactPointAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">create-contact.vm</result>
+        </action>
+
         <action name="createContactPoint" class="com.cinnamonbob.web.user.CreateContactPointAction">
-            <result name="input" type="velocity">view-user.vm</result>
+            <result name="input" type="velocity">create-contact.vm</result>
             <result name="cancel" type="velocity">view-user.vm</result>
-            <result name="error" type="velocity">view-user.vm</result>
+            <result name="error" type="velocity">create-contact.vm</result>
             <result name="success" type="redirect">/viewUser.action?id=${id}</result>
         </action>
 

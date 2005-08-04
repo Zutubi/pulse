@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>[CiB] all users</title>
+    <link href="build.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h1 class="build-log">:: all users ::</h1>
+    <h2 class="command-info">details</h2>
+    <div class="command-content">
+    <table>
+      <tr>
+        <th class="command-detail">login</th>
+        <th class="command-detail">full name</th>
+      </tr>
+    #foreach($user in $users)
+      <tr>
+        <td class="command-detail"><a href="viewUser.action?id=$user.id">$user.login</a></td>
+        <td class="command-detail">$user.name</td>
+      </tr>
+#end
+      <tr>
+        <td class="command-detail" colspan="2"><b>+</b> <a href="createUser!default.action">add new user</a></td>
+      </tr>
+    </table>
+    </div>
+  </body>
+</html>

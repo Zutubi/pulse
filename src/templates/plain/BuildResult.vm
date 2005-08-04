@@ -1,44 +1,48 @@
-=====================================================================
-Overview
-=====================================================================
-Project  : $result.ProjectName
-Build    : $result.Id
-Commenced: $result.Stamps.PrettyStartTime
-Completed: $result.Stamps.PrettyEndTime
-Elapsed  : $result.Stamps.PrettyElapsed
-Result   :#if($result.succeeded()) Success #else Failure #end
+#if($result.succeeded())
+  #set($success = "succeeded")
+#else
+  #set($success = "failed")
+#end
+Build $result.number of project '$project.name' has $success.
+You can view the full build result at:
+
+http://localhost:8080/viewBuild.action?id=$project.id&buildId=$result.id
+
+A brief command log is given below.
 
 
 =====================================================================
-Log
+:: command log ::
 =====================================================================
-#foreach($commandResult in $result.iterator())
+#foreach($commandResult in $result.commandResults)
 ---------------------------------------------------------------------
-Command '$commandResult.CommandName'
+command '$commandResult.commandName'
 ---------------------------------------------------------------------
-*Brief*
-Commenced: $commandResult.Stamps.PrettyStartTime
-Completed: $commandResult.Stamps.PrettyEndTime
-Elapsed  : $commandResult.Stamps.PrettyElapsed
-Result   :#if($commandResult.Result.succeeded()) Success #else Failure #end
+*brief*
+commenced: $commandResult.stamps.prettyStartTime
+completed: $commandResult.stamps.prettyEndTime
+elapsed  : $commandResult.stamps.prettyElapsed
+#if($commandResult.succeeded())
+  #set($success = "success")
+#else
+  #set($success = "failure")
+#end
+result   : $success
 
-
-*Details*
-#parse($renderer.findTemplate($type, $commandResult.Result))
-
-*Artifacts*
-#foreach($artifact in $commandResult.Artifacts)
-$artifact.Title
+*artifacts*
+#foreach($artifact in $commandResult.artifacts)
+$artifact.title
 #if($artifact.hasFeatures())
-#foreach($category in $artifact.Categories)
-  $result.getFeatureCategory($category).Title
-#foreach($feature in $artifact.getFeatures($category))
-    - $feature.Summary
+#foreach($level in $artifact.levels)
+   + $level.toString().toLowerCase() features
+#foreach($feature in $artifact.getFeatures($level))
+      * $feature.summary
 #end
 #end
 #else
   <No features>
 #end
+
 #end
 
 #end

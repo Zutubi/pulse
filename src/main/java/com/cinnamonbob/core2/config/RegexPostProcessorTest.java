@@ -6,6 +6,9 @@ import java.io.*;
 import java.util.List;
 import java.util.LinkedList;
 
+import com.cinnamonbob.model.Feature;
+
+
 /**
  * 
  *
@@ -22,7 +25,8 @@ public class RegexPostProcessorTest extends TestCase
         MockArtifact artifact = new MockArtifact("Warning, line one should be returned\n" +
                 "Line two should not.\n" +
                 "warning line three should...");
-        pp.process(artifact);
+        // FIXME
+        //pp.process(artifact);
         
         List<Feature> features = artifact.getFeatures();
         assertEquals(2, features.size());        

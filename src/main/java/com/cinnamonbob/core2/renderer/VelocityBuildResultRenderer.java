@@ -2,7 +2,9 @@ package com.cinnamonbob.core2.renderer;
 
 import com.cinnamonbob.bootstrap.velocity.VelocityManager;
 import com.cinnamonbob.core2.BuildResult;
-import com.cinnamonbob.core2.config.CommandResult;
+import com.cinnamonbob.model.CommandResult;
+import com.cinnamonbob.model.Project;
+
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
@@ -23,12 +25,13 @@ public class VelocityBuildResultRenderer implements BuildResultRenderer
 
     private static final Logger LOG = Logger.getLogger(VelocityBuildResultRenderer.class.getName());
     
-    public void render(BuildResult result, String type, Writer writer)
+    public void render(Project project, BuildResult result, String type, Writer writer)
     {
         VelocityContext context = new VelocityContext();
 
         context.put("renderer", this);
         context.put("type", type);
+        context.put("project", project);
         context.put("result", result);
 
         try
@@ -61,6 +64,7 @@ public class VelocityBuildResultRenderer implements BuildResultRenderer
     
     public String findTemplate(String type, CommandResult result)
     {
+        // TODO only one command result now...
         String templateName = type + "/" + result.getClass().getSimpleName() + ".vm";
         
         if(!VelocityManager.getEngine().templateExists(templateName))

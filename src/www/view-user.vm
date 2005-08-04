@@ -1,43 +1,42 @@
+#macro(detailrow $header $content)
+  <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
+#end
 <html>
     <head>
-        <title>view user</title>    
+        <title>[CiB] $user.name</title>
+        <link href="build.css" rel="stylesheet" type="text/css">
         <content tag="action">user.view</content>
     </head>
-    <body>
-    
-        <p>User profile:</p>
-        <div>
-            <div>Login: $user.login</div>
-            <div>Name: $user.name</div>
+    <body>    
+        <h1 class="build-log">:: $user.name ::</h1>
+        
+        <h2 class="command-info">basics</h2>
+        <div class="command-content">
+            <table>
+                #detailrow("login" $user.login)
+                #detailrow("full name" $user.name)
+            </table>
         </div>
-        <p>Subscriptions:</p>
-        <p><a href="createSubscription!default.action?user=$user.login">create</a></p>
-        <p>No subscriptions registered..</p>
-
-        <p>Contact points:</p>
-        <p>#if ($user.contactPoints.size() == 0)
-            No contact points configured
-        #else
-            <ul>
+        
+        <h2 class="command-info">contact points</h2>
+        <div class="command-content">
+            <table>
+                <tr>
+                    <th class="command-detail">name</th>
+                    <th class="command-detail">email address</th>
+                    <th class="command-detail">actions</th>
+                </tr>
             #foreach ($contact in $user.contactPoints)
-                <li>#contactPointIcon($contact) $contact.name: $contact.uid (<a href="deleteContactPoint.action?id=$user.id&name=$contact.name">delete</a>)</li>
+                <tr>
+                    <td class="command-detail">$contact.name</td>
+                    <td class="command-detail">#contactPointIcon($contact) $contact.uid</td>
+                    <td class="command-detail"><a href="deleteContactPoint.action?id=$user.id&name=$contact.name">delete</a></td>
+                </tr>
             #end
-            </ul>
-        #end</p>
-
-        <p>Add new email contact point</p>
-        #bodytag (Form "action='createContactPoint.action'" "method='post'")
-            #tag (Hidden "name='id'" "value=user.id")
-            <fieldset>
-                #tag (TextField "name='contact.name'")
-                #tag (TextField "label='contact.email'" "name='contact.email'")
-            </fieldset>
-
-            <fieldset class="submit">
-                #tag (Submit "value=getText('cancel.name')" "name='cancel'")
-                #tag (Submit "value=getText('save.name')" "name='save'")
-            </fieldset>
-        #end
-
+                <tr>
+                    <td class="command-detail" colspan="3"><b>+</b> <a href="createContactPoint!default.action?id=$user.id">add new contact point</a></td>
+                </tr>
+            </table>
+        </div>
     </body>
 </html>

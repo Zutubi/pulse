@@ -2,6 +2,8 @@ package com.cinnamonbob.core2.config;
 
 import java.io.File;
 
+import com.cinnamonbob.model.CommandResult;
+
 /**
  * 
  *

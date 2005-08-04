@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+<hibernate-mapping>
+
+    <class name="com.cinnamonbob.model.CommandResult" table="CommandResult" lazy="false">
+
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+        
+        <property name="commandName" column="COMMAND_NAME" type="string" not-null="true" length="255"/>
+
+        <property name="stamps" type="com.cinnamonbob.util.TimeStampsType">
+            <column name="start" sql-type="BIGINT"/>
+            <column name="end"  sql-type="BIGINT"/>
+        </property>
+        
+        <property name="succeeded" type="boolean" not-null="true"/>
+        
+        <property name="properties" column="PROPERTIES" type="com.cinnamonbob.util.PropertiesType" length="4096"/>
+        
+        <list name="artifacts" cascade="all-delete-orphan">
+            <key column="COMMAND_RESULT_ID"/>
+            <index column="POSITION"/>
+            <one-to-many class="com.cinnamonbob.model.StoredArtifact"/>
+        </list>
+        
+    </class>
+
+</hibernate-mapping>

@@ -12,4 +12,5 @@ public interface ProjectDao extends EntityDao<Project>
 {
     Project findByName(String name);
     List findByLikeName(String name);
+    List getAll();
 }

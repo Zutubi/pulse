@@ -1,10 +1,11 @@
 package com.cinnamonbob.core2.config;
 
+import com.cinnamonbob.model.CommandResult;
+import com.cinnamonbob.model.StoredArtifact;
 import com.cinnamonbob.util.IOHelper;
 
 import java.util.List;
 import java.util.LinkedList;
-import java.util.Collections;
 import java.io.*;
 
 /**
@@ -57,8 +58,18 @@ public class ExecutableCommand implements Command
             
             output.close();
             
-            ExecutableCommandResult cmdResult = new ExecutableCommandResult(result == 0);
-            cmdResult.addArtifact(new FileArtifact("output", outputFile));
+            CommandResult cmdResult = new CommandResult();
+            cmdResult.setSucceeded(result == 0);
+            cmdResult.getProperties().put("exit code", Integer.toString(result));
+            cmdResult.getProperties().put("command line", constructCommandLine(builder));
+            cmdResult.getProperties().put("working directory", builder.directory().getAbsolutePath());
+            
+            // TODO awkward to add this stored artifact to the result...
+            FileArtifact outputArtifact = new FileArtifact("output", outputFile);
+            outputArtifact.setTitle("Command Output");
+            outputArtifact.setType("text/plain");
+            cmdResult.addArtifact(new StoredArtifact(outputArtifact, outputFile.getAbsolutePath()));
+            
             return cmdResult;
         }
         catch (IOException e)
@@ -93,6 +104,31 @@ public class ExecutableCommand implements Command
         return setting;
     }
     
+    private String constructCommandLine(ProcessBuilder builder)
+    {
+        StringBuffer result = new StringBuffer();
+        
+        for(String part: builder.command())
+        {
+            boolean containsSpaces = part.indexOf(' ') != -1;
+            
+            if(containsSpaces)
+            {
+                result.append('"');
+            }
+
+            result.append(part);
+            
+            if(containsSpaces)
+            {
+                result.append('"');
+            }
+            result.append(' ');
+        }
+        
+        return result.toString();
+    }
+    
     /**
      * 
      */ 
@@ -119,33 +155,6 @@ public class ExecutableCommand implements Command
         public void setValue(String value)
         {
             this.value = value;
-        }
-    }
-    
-    public class ExecutableCommandResult extends AbstractCommandResult
-    {
-        private boolean success;
-        
-        private List<Artifact> artifacts = new LinkedList<Artifact>();
-        
-        public ExecutableCommandResult(boolean succeeded)
-        {
-            this.success = succeeded;
-        }
-        
-        public void addArtifact(Artifact artifact)
-        {
-            artifacts.add(artifact);
-        }
-        
-        public boolean succeeded()
-        {
-            return success;
-        }
-
-        public List<Artifact> getArtifacts()
-        {
-            return Collections.unmodifiableList(artifacts);
         }
     }
 }

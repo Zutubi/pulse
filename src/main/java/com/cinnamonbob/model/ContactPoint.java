@@ -57,6 +57,6 @@ public abstract class ContactPoint extends Entity
         this.user = user;
     }
 
-    public abstract void notify(BuildResult result);
+    public abstract void notify(Project project, BuildResult result);
 }
 

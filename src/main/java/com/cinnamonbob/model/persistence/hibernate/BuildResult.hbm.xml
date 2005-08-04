@@ -2,13 +2,15 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.cinnamonbob.core2.BuildResult" table="BuildResult">
+    <class name="com.cinnamonbob.core2.BuildResult" table="BuildResult" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
 
         <property name="succeeded" column="SUCCEEDED" type="boolean" not-null="false"/>
+
+        <property name="number" column="NUMBER" type="long" not-null="true"/>
 
         <property name="projectName" column="PROJECT_NAME" type="string" not-null="false" length="255"/>
 
@@ -18,6 +20,14 @@
         </property>
         
         <property name="stateName" column="STATE" type="string" length="127"/>
+ 
+        <property name="revision" column="REVISION" type="string" length="127"/>
+
+        <list name="commandResults" cascade="all-delete-orphan">
+            <key column="BUILD_RESULT_ID"/>
+            <index column="POSITION"/>
+            <one-to-many class="com.cinnamonbob.model.CommandResult"/>
+        </list>
         
     </class>
 
