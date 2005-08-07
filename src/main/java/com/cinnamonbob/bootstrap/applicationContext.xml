@@ -31,5 +31,5 @@
     
     <bean id="projectManager" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
 
-    <bean id="eventManager" class="com.cinnamonbob.event.DefaultEventManager" autowire="byName"/>
+    <!--<bean id="eventManager" class="com.cinnamonbob.event.DefaultEventManager" autowire="byName"/>-->
 </beans>

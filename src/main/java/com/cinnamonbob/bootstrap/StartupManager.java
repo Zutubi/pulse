@@ -26,10 +26,10 @@ public class StartupManager
         {
             ComponentContext.addClassPathContextDefinitions(contexts.toArray(new String[contexts.size()]));
             
-//            // run the various bootstrap/system startup tasks.
-//            // initialise database.
-//            DatabaseBootstrap databaseBootstrap = new DatabaseBootstrap();
-//            databaseBootstrap.initialiseDatabase();
+            // run the various bootstrap/system startup tasks.
+            // initialise database.
+            DatabaseBootstrap databaseBootstrap = new DatabaseBootstrap();
+            databaseBootstrap.initialiseDatabase();
             
             // initialise jetty.
             JettyManager jettyManager = JettyManager.getInstance();
