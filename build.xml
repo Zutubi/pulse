@@ -10,6 +10,7 @@
     <path id="lib.path">
         <fileset dir="lib">
             <include name="**/*.jar"/>
+            <exclude name="**/webwork-2.1.7.jar"/> <!-- use patched version, fixes incompatibility between displaytag and webwork -->
         </fileset>
     </path>
 

@@ -176,5 +176,13 @@
             <result name="success" type="redirect">/viewUser.action?login=${user}</result>
         </action>
 
+        <action name="viewSystemInfo" class="com.cinnamonbob.web.console.SystemInfoAction">
+            <result name="success" type="velocity">view-systeminfo.vm</result>
+        </action>
+
+        <action name="garbageCollect" class="com.cinnamonbob.web.console.GarbageCollectAction">
+            <result name="success" type="redirect">/viewSystemInfo.action</result>
+        </action>
+
     </package>
 </xwork>

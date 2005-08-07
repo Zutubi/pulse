@@ -13,6 +13,7 @@ public class StartupManager
     private List<String> contexts;
 
     private boolean systemStarted;
+    private long startTime;
 
     public void init() throws StartupException
     {
@@ -25,10 +26,10 @@ public class StartupManager
         {
             ComponentContext.addClassPathContextDefinitions(contexts.toArray(new String[contexts.size()]));
             
-            // run the various bootstrap/system startup tasks.
-            // initialise database.
-            DatabaseBootstrap databaseBootstrap = new DatabaseBootstrap();
-            databaseBootstrap.initialiseDatabase();
+//            // run the various bootstrap/system startup tasks.
+//            // initialise database.
+//            DatabaseBootstrap databaseBootstrap = new DatabaseBootstrap();
+//            databaseBootstrap.initialiseDatabase();
             
             // initialise jetty.
             JettyManager jettyManager = JettyManager.getInstance();
@@ -45,6 +46,10 @@ public class StartupManager
     private void setSystemStarted(boolean b)
     {
         systemStarted = b;
+        if (systemStarted)
+        {
+            startTime = System.currentTimeMillis();
+        }
     }
 
     public boolean isSystemStarted()
@@ -55,5 +60,10 @@ public class StartupManager
     public void setSystemContexts(List<String> contexts)
     {
         this.contexts = contexts;
-    }    
+    }
+
+    public long getUptime()
+    {
+        return System.currentTimeMillis() - startTime;
+    }
 }

@@ -33,7 +33,7 @@
             <interceptor name="fileUpload" class="com.opensymphony.webwork.interceptor.FileUploadInterceptor"/>
             <interceptor name="execAndWait" class="com.opensymphony.webwork.interceptor.ExecuteAndWaitInterceptor"/>
             <interceptor name="cancel" class="com.cinnamonbob.xwork.interceptor.CancelWorkflowInterceptor"/>
-            <interceptor name="transaction" class="com.cinnamonbob.xwork.interceptor.TransactionInterceptor"/>
+<!--            <interceptor name="transaction" class="com.cinnamonbob.xwork.interceptor.TransactionInterceptor"/>-->
 
             <!-- Basic stack -->
             <interceptor-stack name="defaultStack">
