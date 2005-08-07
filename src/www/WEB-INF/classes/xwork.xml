@@ -7,7 +7,7 @@
     <package name="default" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack" /> 
 		
-		<action name="serverStatus" class="serverStatusAction">
+		<action name="serverStatus" class="com.cinnamonbob.web.ServerStatusAction">
 			<result name="success" type="velocity">server-status.vm</result> 
 		</action> 
 
@@ -15,12 +15,12 @@
 			<result name="success" type="velocity">view-projects.vm</result> 
 		</action> 
 
-		<action name="viewProject" class="viewProjectAction">
+		<action name="viewProject" class="com.cinnamonbob.web.project.ViewProjectsAction">
 			<result name="success" type="velocity">view-project.vm</result> 
 			<result name="error" type="velocity">generic-error.vm</result> 
 		</action> 
 
-		<action name="updateProject" class="updateProjectAction">
+		<action name="updateProject" class="com.cinnamonbob.web.UpdateProjectAction">
 			<result name="success" type="redirect">viewProject.action?name=${project.Name}</result> 
 			<result name="error" type="velocity">generic-error.vm</result> 
 		</action> 
