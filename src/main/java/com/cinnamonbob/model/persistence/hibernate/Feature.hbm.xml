@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.cinnamonbob.model.Feature" table="Feature" lazy="false">
+    <class name="com.cinnamonbob.model.Feature" table="FEATURE" lazy="false">
 
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>

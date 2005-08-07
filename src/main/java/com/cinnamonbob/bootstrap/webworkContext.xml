@@ -2,11 +2,4 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
     <bean id="spring-object-factory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
-
-<!-- not required.
-    <bean name="serverStatusAction" class="com.cinnamonbob.web.ServerStatusAction" singleton="false"/>
-    <bean name="viewProjectAction" class="com.cinnamonbob.web.ViewProjectAction" singleton="false"/>
-    <bean name="updateProjectAction" class="com.cinnamonbob.web.UpdateProjectAction" singleton="false"/>
--->
-
 </beans>
