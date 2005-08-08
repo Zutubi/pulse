@@ -14,7 +14,7 @@ import java.sql.SQLException;
  */
 public class DatabaseBootstrap
 {
-    public static final String SCHEMA_TEST_TABLE = "User";
+    public static final String SCHEMA_TEST_TABLE = "USER";
 
     public DatabaseBootstrap()
     {
