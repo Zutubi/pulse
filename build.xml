@@ -127,7 +127,7 @@
             <fileset dir="src/etc" includes="delete-me.txt"/>
         </copy>
 
-        <copy todir="${package.root}/system/log">
+        <copy todir="${package.root}/system/logs">
             <fileset dir="src/etc" includes="delete-me.txt"/>
         </copy>
 
