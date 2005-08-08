@@ -6,4 +6,5 @@
 #macro( scmIcon $scm)
     #if ($scm.class.name == 'com.cinnamonbob.model.Svn')<img src="/images/svn_16.png"/>#end
     #if ($scm.class.name == 'com.cinnamonbob.model.Cvs')<img src="/images/cvs_16.png"/>#end
+    #if ($scm.class.name == 'com.cinnamonbob.model.P4')<img src="/images/p4_16.png"/>#end
 #end
