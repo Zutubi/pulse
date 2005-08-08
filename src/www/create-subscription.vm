@@ -8,6 +8,7 @@
     #parse("/template/includes/actionerrors.vm")
 
 #bodytag (Form "action='createSubscription.action'" "method='post'")
+    <h3>Create subscription</h3>
     <fieldset>
         #tag (TextField "name='user'" "required='true'" "tabindex='1'")
         #tag (TextField "name='project'" "required='true'" "tabindex='2'")

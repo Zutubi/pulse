@@ -1,1 +1,5 @@
+##
+#if( !$parameters.cssClass )
+  $!parameters.put('cssClass', 'text')
+#end
 #parse("/template/css/controlheader.vm")#parse("/template/simple/text.vm")#parse("/template/css/controlfooter.vm")

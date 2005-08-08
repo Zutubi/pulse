@@ -8,7 +8,7 @@
     #parse("/template/includes/actionerrors.vm")
     
 #bodytag (Form "action='createUser.action'" "method='post'")  
-    
+    <h3>Create user</h3>    
     <fieldset>
         #tag (TextField "name='user.login'" "tabindex='1'")
         #tag (TextField "name='user.name'" "tabindex='2'")

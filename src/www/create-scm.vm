@@ -9,6 +9,7 @@
 
 #bodytag (Form "action='createScm.action'" "method='post'")
     #tag (Hidden "name='id'")
+    <h3>Create scm: step 1</h3>
     <fieldset>
         #tag (TextField "required='true'" "name='name'" "label='scm.name'" "tabindex='1'")
         #tag (Select "list=types" "name='type'" "label='scm.type'" "tabindex='2'")

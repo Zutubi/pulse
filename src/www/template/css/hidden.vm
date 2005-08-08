@@ -1,1 +1,5 @@
+##
+#if( !$parameters.cssClass )
+  $!parameters.put('cssClass', 'hidden')
+#end
 #parse("/template/simple/hidden.vm")

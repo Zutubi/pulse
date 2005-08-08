@@ -8,7 +8,7 @@
     #parse("/template/includes/actionerrors.vm")
     
 #bodytag (Form "action='createProject.action'" "method='post'")  
-    
+    <h3>Create project</h3>
     <fieldset>
         #tag (TextField "name='project.name'" "tabindex='1'")
         #tag (TextField "name='project.description'" "tabindex='2'")

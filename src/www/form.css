@@ -5,8 +5,8 @@ form {
 fieldset {
     border: 0 none transparent;
     border: 1px solid #CCCCCC;
-    padding: 0.5em 0 0.5em 0;
-    background-color: #EEEEEE;
+    background-color: #f4f4f4;
+    margin-top: 3px;
 }
 
 fieldset.alt {
@@ -14,19 +14,9 @@ fieldset.alt {
 }
 
 fieldset.submit {
-    padding-top: 1em;
     border-top-color: #BBBBBB;
     border-bottom: 1px solid #BBBBBB;
-    background-color: #DDDDDD;
     text-align: center;
-}
-
-fieldset h3 {
-    margin-top: 0;
-    margin-bottom: 0;
-    padding-top: 1em;
-    font-size: 100%;
-    color: #4C4C4C;
 }
 
 label {
@@ -34,10 +24,8 @@ label {
     float: left;
     width: auto;
     display: block;
-    padding: 0.5em 0 0.5em 0;
-    
     text-align: left;
-    margin: 5px 5px 5px 5px;
+    margin: 3px 3px 3px 3px;
 }
 
 label.error {
@@ -90,13 +78,22 @@ input.submit {
     padding: 0.25em;
     font-size: 90%;
     font-weight: bold;
+    outline: none;
+    border:solid 0 #fff
 }
 
 input.text {
-    width: 13em;
+    width: 18em;
     display: block;
     margin-left: 11em;
+    background-color: #ffffff;
+    color: #102132;
+    border: 1px solid #b0b0f0;
 }
+
+/*input.text:hover, input.text:focus  {*/
+    /*border: 1px solid #b0b0f0;  /* #eeeeff; #b0b0f0;*/
+/*}*/
 
 select {
     display: block;
@@ -114,4 +111,15 @@ textarea {
 
 .required {
     color: #CC0000;
+}
+
+form h3
+{
+    font-size: large;
+    border-style: solid;
+    border-width: 1px;
+    margin: 2px;
+    padding: 0.2em;
+    border-color: #b0b0f0;
+    background-color: #eeeeff;
 }
