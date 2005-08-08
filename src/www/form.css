@@ -27,7 +27,6 @@ fieldset h3 {
     padding-top: 1em;
     font-size: 100%;
     color: #4C4C4C;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
 label {
@@ -63,23 +62,11 @@ label span.error {
     color: #CC0000;
 }
 
-#downloadForm label span {
-    width: 14em;
-}
-
-#downloadForm label span.error {
-    width: auto;
-}
-
 label.checkbox span {
     float: none;
     width: auto;
     margin-left: 2.5em;
     font-weight: normal;
-}
-
-#downloadForm label.checkbox span {
-    width: auto;
 }
 
 label span strong {
@@ -111,18 +98,10 @@ input.text {
     margin-left: 11em;
 }
 
-#downloadForm input.text {
-    margin-left: 15em;
-}
-
 select {
     display: block;
     margin-left: 11em;
     width: 10em;
-}
-
-#downloadForm select {
-    margin-left: 15em;
 }
 
 textarea {
@@ -131,7 +110,6 @@ textarea {
     display: block;
     margin-left: 11em;
     font-size: 110%;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
 .required {

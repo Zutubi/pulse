@@ -14,8 +14,8 @@
     </fieldset>
 
     <fieldset class="submit">
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
         #tag (Submit "value=getText('create.name')" "name='create'" "tabindex='3'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
     </fieldset>
  #end
 

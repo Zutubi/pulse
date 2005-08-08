@@ -155,46 +155,6 @@ body {
     width: 100%;
 }
 
-
-#content .form{ /* Note: this is the form div in the content body, not the form tag... */
-    width:70%;
-    margin:0em auto;
-    border: 1px solid #999;
-    background-color: #eee;
-}
-
-form {
-    padding:1em;
-}
-
-fieldset {
-    border:none;
-    margin:0px auto;
-    padding:0px; /*border: 1px solid rgb(99, 7, 239); /* debugging... */
-}
-
-label {
-    width:50%;
-    text-align:right;
-    float:left;
-}
-
-input {
-    width:40%; /*border: 1px solid rgb(99, 7, 239); /* debugging... */
-}
-
-input.text {
-    float:left;
-    text-align:left;
-}
-
-input.submit {
-    float:right;
-    width:20%;
-    background-color: transparent;
-    text-align: center;
-}
-
 div.spacer {
     height: 1em;
 }

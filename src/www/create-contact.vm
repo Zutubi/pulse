@@ -9,13 +9,13 @@
     #bodytag (Form "action='createContactPoint.action'" "method='post'")
         #tag (Hidden "name='id'")
         <fieldset>
-            #tag (TextField "name='contact.name'")
-            #tag (TextField "label='contact.email'" "name='contact.email'")
+            #tag (TextField "name='contact.name'" "tabindex='1'")
+            #tag (TextField "label='contact.email'" "name='contact.email'" "tabindex='2'")
         </fieldset>
 
         <fieldset class="submit">
-            #tag (Submit "value=getText('cancel.name')" "name='cancel'")
-            #tag (Submit "value=getText('save.name')" "name='save'")
+            #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
+            #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
         </fieldset>
     #end
 

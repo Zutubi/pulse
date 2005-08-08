@@ -23,7 +23,7 @@
 <!-- Side bar, with status, actions etc -->
 
         <td height="100%" valign="top">
-          <h3 class="side-title">project status</h2>
+          <h3 class="side-title">project status</h3>
 	      <div class="side-content">
 	        <table>
               <tr>
@@ -40,7 +40,7 @@
 	        </table>
 	      </div>
 
-          <h3 class="side-title">project actions</h2>
+          <h3 class="side-title">project actions</h3>
 	      <div class="side-content">
 	        <table>
               <tr>
@@ -100,7 +100,7 @@
           #set($success = "failure")
         #end
             <tr>
-              <td class="build-$success">$name</a></td>
+              <td class="build-$success"><a href="">$name</a></td>
               <td class="build-$success">$built</td>
               <td class="build-$success">$elapsed</td>
               <td class="build-$success">$success</td>
@@ -108,7 +108,7 @@
       #end
       #if($current.CurrentCommand)
             <tr>
-              <td class="build-info">$current.CurrentCommand</a></td>
+              <td class="build-info"><a href="">$current.CurrentCommand</a></td>
               <td class="build-info">n/a</td>
               <td class="build-info">n/a</td>
               <td class="build-info">in progress</td>
