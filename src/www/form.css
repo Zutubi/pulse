@@ -82,7 +82,7 @@ input.submit {
     border:solid 0 #fff
 }
 
-input.text {
+input.text, input.password {
     width: 18em;
     display: block;
     margin-left: 11em;
