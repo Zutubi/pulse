@@ -67,6 +67,18 @@
             <result name="success" type="redirect">/viewUser.action?id=${user.id}</result>
         </action>
 
+        <action name="editUser!default" class="com.cinnamonbob.web.user.EditUserAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">edit-user.vm</result>
+        </action>
+
+        <action name="editUser" class="com.cinnamonbob.web.user.EditUserAction">
+            <result name="input" type="velocity">edit-user.vm</result>
+            <result name="cancel" type="velocity">undefined.vm</result>
+            <result name="error" type="velocity">edit-user.vm</result>
+            <result name="success" type="redirect">/viewUser.action?id=${id}</result>
+        </action>
+
         <action name="createContactPoint!default" class="com.cinnamonbob.web.user.CreateContactPointAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-contact.vm</result>
