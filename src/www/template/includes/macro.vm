@@ -1,9 +1,9 @@
 #macro( contactPointIcon $contact)
-    #if ($contact.class.name == 'com.cinnamonbob.model.EmailContactPoint')<img src="/images/email_16.gif"/>#end
-    #if ($contact.class.name == 'com.cinnamonbob.model.YahooContactPoint')<img src="/images/yahoo_16.gif"/>#end
+    #if ($contact.class.name == 'com.cinnamonbob.model.EmailContactPoint')<img src="/images/email_16.png"/>#end
+    #if ($contact.class.name == 'com.cinnamonbob.model.YahooContactPoint')<img src="/images/yahoo_16.png"/>#end
 #end
 
 #macro( scmIcon $scm)
-    #if ($scm.class.name == 'com.cinnamonbob.model.Svn')<img src="/images/svn_16.gif"/>#end
-    #if ($scm.class.name == 'com.cinnamonbob.model.Cvs')<img src="/images/cvs_16.gif"/>#end
+    #if ($scm.class.name == 'com.cinnamonbob.model.Svn')<img src="/images/svn_16.png"/>#end
+    #if ($scm.class.name == 'com.cinnamonbob.model.Cvs')<img src="/images/cvs_16.png"/>#end
 #end
