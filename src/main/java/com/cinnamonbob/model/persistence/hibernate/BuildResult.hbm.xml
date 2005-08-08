@@ -23,7 +23,7 @@
  
         <property name="revision" column="REVISION" type="string" length="127"/>
 
-        <list name="commandResults" cascade="all-delete-orphan">
+        <list name="commandResults" cascade="all-delete-orphan" lazy="false">
             <key column="BUILD_RESULT_ID"/>
             <index column="POSITION"/>
             <one-to-many class="com.cinnamonbob.model.CommandResult"/>

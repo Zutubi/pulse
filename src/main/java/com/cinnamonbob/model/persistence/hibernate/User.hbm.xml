@@ -12,7 +12,7 @@
 
         <property name="name" column="NAME" type="string" not-null="false" length="255"/>
 
-        <bag name="contactPoints" inverse="true" cascade="all">
+        <bag name="contactPoints" inverse="true" cascade="all" lazy="false">
             <key column="USERID"/>
             <one-to-many class="com.cinnamonbob.model.ContactPoint"/>
         </bag>
@@ -20,7 +20,7 @@
     </class>
 
     <!-- Contact points. -->
-    <class name="com.cinnamonbob.model.ContactPoint" table="CONTACT_POINT">
+    <class name="com.cinnamonbob.model.ContactPoint" table="CONTACT_POINT" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -32,7 +32,7 @@
         <property name="uid" column="UID" type="string" not-null="false" length="255"/>
         <property name="properties" column="PROPERTIES" type="com.cinnamonbob.util.PropertiesType" not-null="false" length="4095"/>
 
-        <many-to-one name="user" column="USERID" class="com.cinnamonbob.model.User" insert="true"/>
+        <many-to-one name="user" column="USERID" class="com.cinnamonbob.model.User" insert="true" lazy="false"/>
 
         <subclass name="com.cinnamonbob.model.EmailContactPoint" discriminator-value="EMAIL">
 
