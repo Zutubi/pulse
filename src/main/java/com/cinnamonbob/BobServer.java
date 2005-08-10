@@ -50,26 +50,15 @@ public class BobServer
                 buildProcessor.execute(request);
             }
         });
-
-//        core = new Bob();
-//
-//        // initialise jetty
-//
-//
-//        JettyManager jettyManager = JettyManager.getInstance();
-//        jettyManager.deployWebapp();
-//        jettyManager.deployInWebApplicationContext("bob", core);
-//        jettyManager.deployInWebApplicationContext("server", this);
     }
 
     public void stop()
     {
         LOG.info("stop");
         shutdownService.stop();
-        //        httpService.stop();
         buildQueue.stop();
     }
-
+    
     public static void build(String projectName)
     {
         LOG.info("build '" + projectName + "'");

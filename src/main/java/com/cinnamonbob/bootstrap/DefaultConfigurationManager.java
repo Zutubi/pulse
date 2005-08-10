@@ -111,24 +111,24 @@ public class DefaultConfigurationManager implements ConfigurationManager
         this.defaultProperties = properties;
     }
     
-    private String lookupProperty(String key)
+    public String lookupProperty(String key)
     {
-        if (System.getProperties().contains(key))
+        if (System.getProperties().containsKey(key))
         {
             return System.getProperty(key);
         }
-        else if (userProperties.contains(key))
+        else if (userProperties.containsKey(key))
         {
             return userProperties.getProperty(key);
         }
         return defaultProperties.getProperty(key);
     }
 
-    private boolean hasProperty(String key)
+    public boolean hasProperty(String key)
     {
         return System.getProperties().contains(key) || 
-                userProperties.contains(key) || 
-                defaultProperties.contains(key);
+                userProperties.containsKey(key) || 
+                defaultProperties.containsKey(key);
     }
     
     /**

@@ -1,5 +1,7 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.bootstrap.ConfigUtils;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.BuildResult;
 import com.cinnamonbob.core.renderer.BuildResultRenderer;
 import com.cinnamonbob.core.renderer.VelocityBuildResultRenderer;
@@ -23,6 +25,9 @@ public class EmailContactPoint extends ContactPoint
 {
     private static final Logger LOG = Logger.getLogger(EmailContactPoint.class.getName());
 
+    private static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
+    private static final String SMTP_FROM_PROPERTY = "mail.smtp.from";
+    
     public EmailContactPoint()
     {
     }
@@ -57,15 +62,29 @@ public class EmailContactPoint extends ContactPoint
     
     private void sendMail(String subject, String body)
     {
-        // FIXME HAAAAAAAAAAAACCCCCCCCKKKK!!!
-        Properties properties = System.getProperties();
-        properties.put("mail.smtp.host", "smtp.people.net.au");
+        ConfigurationManager config     = ConfigUtils.getManager();
+        Properties           properties = System.getProperties();
+        
+        if(!config.hasProperty(SMTP_HOST_PROPERTY))
+        {
+            LOG.severe("Unable to deliver mail to contact point: SMTP host not configured.");
+            return;
+        }
+        
+        properties.put(SMTP_HOST_PROPERTY, config.lookupProperty(SMTP_HOST_PROPERTY));
         
         Session session = Session.getDefaultInstance(properties, null);
+        
         try
         {
             Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress("jason.sankey@sensorynetworks.com"));
+            
+            if(config.hasProperty(SMTP_FROM_PROPERTY))
+            {
+                String fromAddress = config.lookupProperty(SMTP_FROM_PROPERTY);
+                msg.setFrom(new InternetAddress(fromAddress));
+            }
+            
             msg.setRecipient(Message.RecipientType.TO, new InternetAddress(getEmail()));
             msg.setSubject(subject);
             msg.setText(body);
@@ -76,36 +95,9 @@ public class EmailContactPoint extends ContactPoint
         }
         catch (Exception e)
         {
+            // TODO: report
             e.printStackTrace();
         }
-
-//        SMTPService smtp = (SMTPService)theBuilder.lookupService(SMTPService.SERVICE_NAME);
-//        
-//        if(smtp == null)
-//        {
-//            // TODO detect this badness in config somehow
-//            LOG.warning("Could not locate SMTP service to send email notifications.");
-//            return;
-//        }
-//        
-//        try
-//        {
-//            Session session = smtp.getSession();
-//            
-//            Message msg = new MimeMessage(session);
-//            msg.setFrom(smtp.getFromAddress());
-//            msg.setRecipient(Message.RecipientType.TO, address);
-//            msg.setSubject(subject);
-//            msg.setText(body);
-//            msg.setHeader("X-Mailer", "Project-Cinnamon");
-//            msg.setSentDate(new Date());
-//            
-//            Transport.send(msg);
-//        }
-//        catch (Exception e)
-//        {
-//            e.printStackTrace();
-//        }
     }
     
     

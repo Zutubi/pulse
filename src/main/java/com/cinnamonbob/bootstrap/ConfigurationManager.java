@@ -12,6 +12,10 @@ public interface ConfigurationManager
      */
     Config getAppConfig();
 
+    public boolean hasProperty(String key);
+    public String lookupProperty(String key);
+    
+    
     /**
      * 
      * @return application paths.
