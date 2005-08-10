@@ -15,16 +15,6 @@
 			<result name="success" type="velocity">view-projects.vm</result> 
 		</action> 
 
-		<action name="viewProject" class="com.cinnamonbob.web.project.ViewProjectsAction">
-			<result name="success" type="velocity">view-project.vm</result> 
-			<result name="error" type="velocity">generic-error.vm</result> 
-		</action> 
-
-		<action name="updateProject" class="com.cinnamonbob.web.UpdateProjectAction">
-			<result name="success" type="redirect">viewProject.action?name=${project.Name}</result> 
-			<result name="error" type="velocity">generic-error.vm</result> 
-		</action> 
-
 		<action name="viewBuild" class="com.cinnamonbob.web.project.ViewBuildAction">
 			<result name="success" type="velocity">view-build.vm</result> 
 			<result name="error" type="velocity">generic-error.vm</result> 

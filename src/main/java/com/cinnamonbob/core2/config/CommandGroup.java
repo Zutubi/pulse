@@ -5,9 +5,6 @@ import java.util.LinkedList;
 import java.io.File;
 import java.io.IOException;
 
-import com.cinnamonbob.core.Artifact;
-import com.cinnamonbob.core.ArtifactSpec;
-import com.cinnamonbob.core.CommandResultCommon;
 import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.model.StoredArtifact;
 import com.cinnamonbob.util.IOHelper;

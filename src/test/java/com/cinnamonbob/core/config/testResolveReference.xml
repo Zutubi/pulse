@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<project name="project">
-    
-    <reference name="a"/>    
-    <reference name="b" ref="a"/>
-    
-</project>
