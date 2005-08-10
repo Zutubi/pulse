@@ -1,8 +1,8 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.core2.BuildResult;
-import com.cinnamonbob.core2.renderer.BuildResultRenderer;
-import com.cinnamonbob.core2.renderer.VelocityBuildResultRenderer;
+import com.cinnamonbob.core.BuildResult;
+import com.cinnamonbob.core.renderer.BuildResultRenderer;
+import com.cinnamonbob.core.renderer.VelocityBuildResultRenderer;
 
 import java.io.StringWriter;
 import java.util.Date;

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.cinnamonbob.core2.config.FileArtifact;
+import com.cinnamonbob.core.config.FileArtifact;
 
 public class StoredArtifact extends Entity
 {

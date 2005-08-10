@@ -3,7 +3,7 @@ package com.cinnamonbob.web.project;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.cinnamonbob.core2.BuildResult;
+import com.cinnamonbob.core.BuildResult;
 import com.cinnamonbob.model.Project;
 
 /**

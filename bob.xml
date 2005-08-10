@@ -21,7 +21,7 @@
         <command name="test">
             <executable exe="ant" args="test" working-dir="${work.dir}"/>
             <artifact name="junit" title="Test Report" type="text/plain"
-                      from-file="${work.dir}/build/test/report/TEST-com.cinnamonbob.core2.XMLConfigUtilsTest.txt"/>
+                      from-file="${work.dir}/build/test/report/TEST-com.cinnamonbob.core.XMLConfigUtilsTest.txt"/>
             <process artifact="output" processor="ant.pp"/>
             <process artifact="output" processor="generic.pp"/>
         </command>

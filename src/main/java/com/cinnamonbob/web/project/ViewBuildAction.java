@@ -6,7 +6,7 @@ import java.util.List;
 import com.cinnamonbob.scm.Changelist;
 import com.cinnamonbob.scm.NumericalRevision;
 import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.core2.BuildResult;
+import com.cinnamonbob.core.BuildResult;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.model.StoredArtifact;

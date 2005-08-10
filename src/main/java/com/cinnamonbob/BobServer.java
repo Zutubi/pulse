@@ -2,7 +2,7 @@ package com.cinnamonbob;
 
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.SystemBootstrapManager;
-import com.cinnamonbob.core2.BuildProcessor;
+import com.cinnamonbob.core.BuildProcessor;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

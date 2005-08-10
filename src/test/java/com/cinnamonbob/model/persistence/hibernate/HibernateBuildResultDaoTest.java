@@ -2,8 +2,8 @@ package com.cinnamonbob.model.persistence.hibernate;
 
 import java.io.File;
 
-import com.cinnamonbob.core2.BuildResult;
-import com.cinnamonbob.core2.config.FileArtifact;
+import com.cinnamonbob.core.BuildResult;
+import com.cinnamonbob.core.config.FileArtifact;
 import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.model.Feature;
 import com.cinnamonbob.model.PlainFeature;

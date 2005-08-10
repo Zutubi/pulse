@@ -11,7 +11,7 @@ import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
-import com.cinnamonbob.core2.BuildResult;
+import com.cinnamonbob.core.BuildResult;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 
