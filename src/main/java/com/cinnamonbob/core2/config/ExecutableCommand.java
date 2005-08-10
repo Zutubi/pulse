@@ -62,6 +62,7 @@ public class ExecutableCommand implements Command
             cmdResult.setSucceeded(result == 0);
             cmdResult.getProperties().put("exit code", Integer.toString(result));
             cmdResult.getProperties().put("command line", constructCommandLine(builder));
+            // TODO not always there
             cmdResult.getProperties().put("working directory", builder.directory().getAbsolutePath());
             
             // TODO awkward to add this stored artifact to the result...

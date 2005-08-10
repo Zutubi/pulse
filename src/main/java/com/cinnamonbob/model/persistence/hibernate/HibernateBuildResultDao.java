@@ -30,7 +30,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return (List)getHibernateTemplate().execute(new HibernateCallback(){
             public Object doInHibernate(Session session) throws HibernateException, SQLException
             {
-                Query queryObject = session.createQuery("from BuildResult result where result.projectName = :project order by id desc");
+                Query queryObject = session.createQuery("from BuildResult result where result.projectName = :project and result.stateName = 'COMPLETED' order by id desc");
                 queryObject.setParameter("project", project, Hibernate.STRING);
                 queryObject.setMaxResults(max);
                 

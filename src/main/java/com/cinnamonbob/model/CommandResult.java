@@ -16,7 +16,7 @@ public class CommandResult extends Entity
     private TimeStamps stamps;
     private boolean succeeded;
     private Properties properties;
-    private List<StoredArtifact> artifacts =  new LinkedList<StoredArtifact>();;
+    private List<StoredArtifact> artifacts =  new LinkedList<StoredArtifact>();
 
     public CommandResult()
     {
