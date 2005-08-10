@@ -9,4 +9,5 @@
 	<validator name="url" class="com.opensymphony.xwork.validator.validators.URLValidator"/> 
 	<validator name="visitor" class="com.opensymphony.xwork.validator.validators.VisitorFieldValidator"/> 
 	<validator name="conversion" class="com.opensymphony.xwork.validator.validators.ConversionErrorFieldValidator"/> 
+	<validator name="cvsroot" class="com.cinnamonbob.xwork.validator.validators.CvsRootValidator"/>
 </validators>

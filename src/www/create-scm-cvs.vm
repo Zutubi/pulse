@@ -2,6 +2,25 @@
 <head></head>
 <content tag="action">scm.cvs.create</content>
 <body>
-create cvs scm.
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='createCvs.action'" "method='post'")
+
+    #tag (Hidden "name='id'")
+    #tag (Hidden "name='name'")
+    #tag (Hidden "name='path'")
+    <h3>Create scm: step 2</h3>
+
+    <fieldset>
+        #tag (TextField "required='true'" "name='cvs.root'" "tabindex='1'")
+        #tag (Password "name='cvs.password'" "tabindex='2'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='5'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='6'")
+    </fieldset>
+
+ #end
 </body>
 </html>

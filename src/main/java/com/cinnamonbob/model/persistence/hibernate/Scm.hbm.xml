@@ -23,7 +23,10 @@
         
         <subclass name="com.cinnamonbob.model.Svn" discriminator-value="SVN" dynamic-update="false">
         </subclass>
-        
+
+        <subclass name="com.cinnamonbob.model.Cvs" discriminator-value="CVS" dynamic-update="false">
+        </subclass>
+
     </class>
 
 </hibernate-mapping>

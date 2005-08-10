@@ -2,6 +2,7 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.Scm;
+import com.cinnamonbob.model.ScmManager;
 
 /**
  *
@@ -11,6 +12,13 @@ public class DeleteScmAction extends ProjectActionSupport
 {
     private long id;
     private String name;
+
+    private ScmManager scmManager;
+
+    public void setScmManager(ScmManager scmManager)
+    {
+        this.scmManager = scmManager;
+    }
 
     public long getId()
     {
@@ -49,6 +57,9 @@ public class DeleteScmAction extends ProjectActionSupport
         {
             project.remove(scm);
         }
+
+        scmManager.delete(scm);
+
         return SUCCESS;
     }
 }
