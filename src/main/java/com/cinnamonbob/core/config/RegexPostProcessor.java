@@ -51,8 +51,7 @@ public class RegexPostProcessor implements PostProcessor
             Matcher matcher = p.getPattern().matcher(line);
             if(matcher.matches())
             {
-                // FIXME valueOf not safe
-                artifact.addFeature(new PlainFeature(Feature.Level.valueOf(p.getCategory().toUpperCase()), line, lineNumber));
+                artifact.addFeature(new PlainFeature(p.getCategory(), line, lineNumber));
             }
         }
     }

@@ -1,6 +1,9 @@
 package com.cinnamonbob.core.config;
 
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import com.cinnamonbob.model.Feature;
 
 /**
  * 
@@ -8,19 +11,26 @@ import java.util.regex.Pattern;
  */
 public class RegexPattern
 {
-    private String category;
+    private Feature.Level category;
     private String expression;
 
     private Pattern pattern;
 
-    public String getCategory()
+    public Feature.Level getCategory()
     {
         return category;
     }
 
-    public void setCategory(String category)
+    public void setCategory(String category) throws ParseException
     {
-        this.category = category;
+        try
+        {
+            this.category = Feature.Level.valueOf(category.toUpperCase());
+        }
+        catch(IllegalArgumentException e)
+        {
+            throw new ParseException("Unrecognised regex category '" + category + "'");
+        }
     }
 
     public String getExpression()
@@ -28,17 +38,21 @@ public class RegexPattern
         return expression;
     }
 
-    public void setExpression(String expression)
+    public void setExpression(String expression) throws ParseException
     {
-        this.expression = expression;
+        try
+        {
+            pattern = Pattern.compile(expression);
+            this.expression = expression;
+        }
+        catch(PatternSyntaxException e)
+        {
+            throw new ParseException(e);
+        }
     }
 
     public Pattern getPattern()
     {
-        if (pattern == null && expression != null)
-        {
-            pattern = Pattern.compile(expression);
-        }
         return pattern;
     }
 

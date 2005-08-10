@@ -76,12 +76,12 @@ public class BuildProcessor
         }
         catch(BuildException e)
         {
-            // TODO: store details???
+            e.printStackTrace();
             buildResult.setSucceeded(false);
         }
         catch(InternalBuildFailureException e)
         {
-            // TODO: store details???
+            e.printStackTrace();
             LOG.severe(e.toString());
             buildResult.setSucceeded(false);
         }
