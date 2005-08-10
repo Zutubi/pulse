@@ -27,13 +27,18 @@ public class DefaultUserManager implements UserManager
         return userDao.findByLogin(login);
     }
 
-    public List getUsersWithLoginLike(String login)
-    {
-        return userDao.findByLikeLogin(login);
-    }
-
     public User getUser(long id)
     {
         return (User) userDao.findById(id);
+    }
+
+    public List<User> getAllUsers()
+    {
+        return userDao.findAll();
+    }
+
+    public List<User> getUsersWithLoginLike(String login)
+    {
+        return userDao.findByLikeLogin(login);
     }
 }

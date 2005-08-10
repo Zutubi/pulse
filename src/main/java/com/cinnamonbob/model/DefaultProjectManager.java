@@ -34,7 +34,7 @@ public class DefaultProjectManager implements ProjectManager
 
     public List<Project> getAllProjects()
     {
-        return projectDao.getAll();
+        return projectDao.findAll();
     }
 
     public List<Project> getProjectsWithNameLike(String name)

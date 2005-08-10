@@ -15,8 +15,7 @@ public class ViewUsersAction extends UserActionSupport
     
     public String execute()
     {
-        // FIXME add a proper get all users query
-        users = getUserManager().getUsersWithLoginLike("%");
+        users = getUserManager().getAllUsers();
         return SUCCESS;
     }
 }

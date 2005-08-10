@@ -11,8 +11,8 @@ public interface UserManager
     void createNewUser(User user);
 
     User getUser(String login);
-
-    List getUsersWithLoginLike(String name);
-
     User getUser(long id);
+    
+    List<User> getAllUsers();
+    List<User> getUsersWithLoginLike(String name);
 }

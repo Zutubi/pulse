@@ -64,17 +64,4 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
             }
         });
     }
-
-    public List getAll()
-    {
-        return (List)getHibernateTemplate().execute(new HibernateCallback(){
-            public Object doInHibernate(Session session) throws HibernateException
-            {
-                Query queryObject = session.createQuery("from Project");
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
-                return queryObject.list();
-            }
-        });
-    }}
+}
