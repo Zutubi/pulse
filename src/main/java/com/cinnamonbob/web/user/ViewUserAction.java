@@ -44,6 +44,21 @@ public class ViewUserAction extends UserActionSupport
         {
             addActionError("Please specify a user to view.");
         }
+        if (hasErrors())
+        {
+            return;
+        }
+        if (id != 0)
+        {
+            if (getUserManager().getUser(id) == null)
+            {
+                addFieldError("id", "Unknown user with id '"+id+"'");
+            }
+        }
+        else if (getUserManager().getUser(login) == null)
+        {
+            addFieldError("login", "Unknown user with login '"+login+"'");
+        }
     }
 
     public String execute()

@@ -78,4 +78,14 @@ public class User extends Entity
         }
         return null;
     }
+
+    public List<Subscription> getSubscriptions()
+    {
+        List<Subscription> subscriptions = new LinkedList<Subscription>();
+        for (ContactPoint cp: contactPoints)
+        {
+            subscriptions.addAll(cp.getSubscriptions());
+        }
+        return subscriptions;
+    }
 }

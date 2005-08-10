@@ -29,7 +29,7 @@ public class DefaultProjectManager implements ProjectManager
 
     public Project getProject(long id)
     {
-        return (Project) projectDao.findById(id);
+        return projectDao.findById(id);
     }
 
     public List<Project> getAllProjects()
@@ -40,5 +40,10 @@ public class DefaultProjectManager implements ProjectManager
     public List<Project> getProjectsWithNameLike(String name)
     {
         return projectDao.findByLikeName(name);
+    }
+
+    public void delete(Project entity)
+    {
+        projectDao.delete(entity);
     }
 }

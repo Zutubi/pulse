@@ -8,7 +8,7 @@ import com.cinnamonbob.core.BuildResult;
  * 
  * @author jsankey
  */
-public class Subscription
+public class Subscription extends Entity
 {
     /**
      * The contact point to notify.
@@ -18,10 +18,20 @@ public class Subscription
      * Condition to be satisfied before notifying.
      */
     private NotifyCondition condition;
-    
+
+    private Project project;
+
     //=======================================================================
     // Construction
     //=======================================================================
+
+    /**
+     * Constructor to be used by hibernate only.
+     */
+    private Subscription()
+    {
+
+    }
 
     /**
      * Constructs a new subscription connection the given event with the given
@@ -30,10 +40,13 @@ public class Subscription
      * @param contactPoint
      *        the contact point to notify on the event
      */
-    public Subscription(ContactPoint contactPoint)
+    public Subscription(Project project, ContactPoint contactPoint)
     {
+        this.project = project;
         this.contactPoint = contactPoint;
         this.condition = new TrueNotifyCondition();
+
+        this.contactPoint.add(this);
     }
 
     //=======================================================================
@@ -47,7 +60,26 @@ public class Subscription
     {
         return contactPoint;
     }
-    
+
+    /**
+     *
+     * @param contactPoint
+     */
+    public void setContactPoint(ContactPoint contactPoint)
+    {
+        this.contactPoint = contactPoint;
+    }
+
+    public Project getProject()
+    {
+        return project;
+    }
+
+    private void setProject(Project project)
+    {
+        this.project = project;
+    }
+
     /**
      * Indicates if the conditions for notifying the contact point are
      * satisfied by the given build result.

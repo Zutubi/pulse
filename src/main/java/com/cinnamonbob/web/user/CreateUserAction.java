@@ -34,7 +34,7 @@ public class CreateUserAction extends UserActionSupport
     public String execute()
     {
         // store user.
-        getUserManager().createNewUser(user);
+        getUserManager().save(user);
 
         return SUCCESS;
     }

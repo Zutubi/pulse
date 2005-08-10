@@ -1,8 +1,9 @@
+<html>
+    <head>
+<!-- custom macro. //-->
 #macro(detailrow $header $content)
   <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
 #end
-<html>
-    <head>
         <title>[CiB] $user.name</title>
         <link href="build.css" rel="stylesheet" type="text/css">
         <content tag="action">user.view</content>
@@ -38,5 +39,29 @@
                 </tr>
             </table>
         </div>
+
+        <h2 class="command-info">subscriptions</h2>
+        <div class="command-content">
+            <table>
+                <tr>
+                    <th class="command-detail">project</th>
+                    <th class="command-detail">contactpoint</th>
+                    <th class="command-detail">actions</th>
+                </tr>
+            #foreach ($subscription in $user.subscriptions)
+                #set($contact = $subscription.contactPoint)
+                #set($project = $subscription.project)
+                <tr>
+                    <td class="command-detail">$project.name</td>
+                    <td class="command-detail">#contactPointIcon($contact) $contact.uid</td>
+                    <td class="command-detail"><a href="deleteSubscription.action?id=$subscription.id&login=$user.login&project=$project.name">delete</a></td>
+                </tr>
+            #end
+                <tr>
+                    <td class="command-detail" colspan="3"><b>+</b> <a href="createSubscription!default.action?user=$user.login">add new subscription</a></td>
+                </tr>
+            </table>
+        </div>
+
     </body>
 </html>

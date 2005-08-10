@@ -26,6 +26,16 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
     {
         getHibernateTemplate().saveOrUpdate(entity);
     }
-    
+
+    public void delete(T entity)
+    {
+        getHibernateTemplate().delete(entity);
+    }
+
+    public void refresh(T entity)
+    {
+        getHibernateTemplate().refresh(entity);
+    }
+
     public abstract Class persistentClass();
 }

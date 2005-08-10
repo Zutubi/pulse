@@ -51,10 +51,10 @@ public class HibernateUserDao extends HibernateEntityDao<User> implements UserDa
         return null;
     }
 
-    public List findByLikeLogin(final String login)
+    public List<User> findByLikeLogin(final String login)
     {
-        return (List)getHibernateTemplate().execute(new HibernateCallback(){
-            public Object doInHibernate(Session session) throws HibernateException, SQLException
+        return (List<User>) getHibernateTemplate().execute(new HibernateCallback(){
+            public Object doInHibernate(Session session) throws HibernateException 
             {
                 Query queryObject = session.createQuery("from User user where user.login like :login");
                 queryObject.setParameter("login", login, Hibernate.STRING);

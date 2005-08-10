@@ -113,6 +113,26 @@
         </property>
     </bean>
 
+    <bean id="subscriptionDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateSubscriptionDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="subscriptionDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="subscriptionDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
     <bean id="userDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateUserDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>

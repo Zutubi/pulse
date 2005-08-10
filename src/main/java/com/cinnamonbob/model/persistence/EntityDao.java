@@ -15,4 +15,6 @@ public interface EntityDao<T extends Entity>
     List<T> findAll();
     
     void save(T entity);
+    void delete(T entity);
+    void refresh(T entity);
 }

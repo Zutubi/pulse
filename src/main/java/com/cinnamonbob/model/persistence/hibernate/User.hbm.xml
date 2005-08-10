@@ -30,13 +30,31 @@
 
         <property name="name" column="NAME" type="string" not-null="false" length="255"/>
         <property name="uid" column="UID" type="string" not-null="false" length="255"/>
+
         <property name="properties" column="PROPERTIES" type="com.cinnamonbob.util.PropertiesType" not-null="false" length="4095"/>
 
         <many-to-one name="user" column="USERID" class="com.cinnamonbob.model.User" insert="true" lazy="false"/>
 
+        <bag name="subscriptions" inverse="true" cascade="all" lazy="false">
+            <key column="CONTACTID"/>
+            <one-to-many class="com.cinnamonbob.model.Subscription"/>
+        </bag>
+
         <subclass name="com.cinnamonbob.model.EmailContactPoint" discriminator-value="EMAIL">
 
         </subclass>
+
+    </class>
+
+    <!-- Subscription. -->
+    <class name="com.cinnamonbob.model.Subscription" table="SUBSCRIPTION" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <many-to-one name="project" column="PROJECTID" class="com.cinnamonbob.model.Project" insert="true" lazy="false"/>
+        <many-to-one name="contactPoint" column="CONTACTID" class="com.cinnamonbob.model.ContactPoint" insert="true" lazy="false"/>
 
     </class>
 

@@ -6,13 +6,10 @@ import java.util.List;
  * 
  *
  */
-public interface UserManager
+public interface UserManager extends EntityManager<User>
 {
-    void createNewUser(User user);
-
     User getUser(String login);
     User getUser(long id);
-    
-    List<User> getAllUsers();
     List<User> getUsersWithLoginLike(String name);
+    List<User> getAllUsers();
 }

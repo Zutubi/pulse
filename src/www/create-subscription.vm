@@ -5,7 +5,7 @@
 <content tag="action">subscription.create</content>
 <body>
 
-    #parse("/template/includes/actionerrors.vm")
+#parse("/template/includes/actionerrors.vm")
 
 #bodytag (Form "action='createSubscription.action'" "method='post'")
     <h3>Create subscription</h3>
@@ -18,7 +18,7 @@
         #tag (Submit "value=getText('create.name')" "name='create'" "tabindex='3'")
         #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
     </fieldset>
- #end
+#end
 
 </body>
 </html>

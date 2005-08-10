@@ -1,8 +1,6 @@
 package com.cinnamonbob.web.user;
 
-import com.cinnamonbob.model.ProjectManager;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.User;
+import com.cinnamonbob.model.*;
 
 /**
  *
@@ -85,8 +83,11 @@ public class CreateSubscriptionAction extends UserActionSupport
     {
         Project project = getProjectManager().getProject(projectName);
         User user = getUserManager().getUser(userName);
+        ContactPoint contactPoint = user.getContactPoints().get(0);
 
-        
+        Subscription subscription = new Subscription(project, contactPoint);
+        getSubscriptionManager().save(subscription);
+
         return SUCCESS;
     }
 

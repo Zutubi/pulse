@@ -78,8 +78,8 @@ input.submit {
     padding: 0.25em;
     font-size: 90%;
     font-weight: bold;
-    outline: none;
-    border:solid 0 #fff
+    /*outline: none;*/
+    /*border:solid 0 #fff*/
 }
 
 input.text, input.password {

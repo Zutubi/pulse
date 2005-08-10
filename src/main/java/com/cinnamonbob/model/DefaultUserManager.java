@@ -17,7 +17,7 @@ public class DefaultUserManager implements UserManager
         this.userDao = userDao;
     }
 
-    public void createNewUser(User user)
+    public void save(User user)
     {
         userDao.save(user);
     }
@@ -29,7 +29,12 @@ public class DefaultUserManager implements UserManager
 
     public User getUser(long id)
     {
-        return (User) userDao.findById(id);
+        return userDao.findById(id);
+    }
+
+    public List<User> getUsersWithLoginLike(String login)
+    {
+        return userDao.findByLikeLogin(login);
     }
 
     public List<User> getAllUsers()
@@ -37,8 +42,8 @@ public class DefaultUserManager implements UserManager
         return userDao.findAll();
     }
 
-    public List<User> getUsersWithLoginLike(String login)
+    public void delete(User user)
     {
-        return userDao.findByLikeLogin(login);
+        userDao.delete(user);
     }
 }
