@@ -9,7 +9,6 @@ import com.cinnamonbob.model.Feature;
 import com.cinnamonbob.model.PlainFeature;
 import com.cinnamonbob.model.StoredArtifact;
 import com.cinnamonbob.model.persistence.BuildResultDao;
-import com.cinnamonbob.util.TimeStamps;
 
 
 /**
@@ -39,8 +38,8 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         
         CommandResult result = new CommandResult();
         result.setCommandName("command name");
-        result.setStamps(new TimeStamps(3, 4));
-        result.setSucceeded(true);
+        result.commence();
+        result.success();
         StoredArtifact artifact = new StoredArtifact(fa, "to file");
         PlainFeature feature = new PlainFeature(Feature.Level.ERROR, "summary here", 7);
         
@@ -48,9 +47,8 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         result.addArtifact(artifact);
         
         BuildResult buildResult = new BuildResult("project", 11);
-        buildResult.setSucceeded(true);
-        buildResult.setStamps(new TimeStamps(1, 2));
-        buildResult.building();
+        buildResult.commence();
+        buildResult.complete();
         buildResult.setRevision("42");
         buildResult.add(result);
         
@@ -64,17 +62,16 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         assertFalse(buildResult == anotherBuildResult); 
         assertEquals(buildResult.getNumber(), anotherBuildResult.getNumber());
         assertEquals(buildResult.getProjectName(), anotherBuildResult.getProjectName());
-        assertEquals(buildResult.succeeded(), anotherBuildResult.succeeded());
+        assertEquals(buildResult.getState(), anotherBuildResult.getState());
         assertEquals(buildResult.getStamps(), anotherBuildResult.getStamps());
         assertEquals(buildResult.getRevision(), anotherBuildResult.getRevision());
-        assertEquals(BuildResult.BuildState.BUILDING, buildResult.getState());
         assertEquals(anotherBuildResult.getCommandResults().size(), 1);
         
         // TODO seems kinda lame not to use equals() on the objects?
         CommandResult anotherResult = anotherBuildResult.getCommandResults().get(0);
         assertEquals(result.getCommandName(), anotherResult.getCommandName());
         assertEquals(result.getStamps(), anotherResult.getStamps());
-        assertEquals(result.succeeded(), anotherResult.succeeded());
+        assertEquals(result.getState(), anotherResult.getState());
         assertEquals(anotherResult.getArtifacts().size(), 1);
         
         StoredArtifact anotherArtifact = anotherResult.getArtifacts().get(0);
