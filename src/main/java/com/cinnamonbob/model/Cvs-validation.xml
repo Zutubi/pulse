@@ -2,8 +2,8 @@
         "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
 <validators>
     <field name="root">
-        <field-validator type="requiredstring">
-            <message>Cvs root is required.</message>
+        <field-validator type="cvsroot">
+            <message>Valid cvs root is required.</message>
         </field-validator>
     </field>
 </validators>

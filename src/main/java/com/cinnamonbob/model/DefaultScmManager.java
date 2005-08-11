@@ -24,4 +24,9 @@ public class DefaultScmManager implements ScmManager
     {
         scmDao.delete(entity);
     }
+
+    public Scm getScm(long id)
+    {
+        return scmDao.findById(id);
+    }
 }

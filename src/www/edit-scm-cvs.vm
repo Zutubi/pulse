@@ -1,0 +1,28 @@
+<html>
+<head></head>
+<content tag="action">scm.cvs.edit</content>
+<body>
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='editCvs.action'" "method='post'")
+
+    #tag (Hidden "name='id'")
+    #tag (Hidden "name='project'")
+
+    <h3>Edit scm</h3>
+
+    <fieldset>
+        #tag (TextField "required='true'" "name='scm.name'" "label='scm.name'" "tabindex='1'")
+        #tag (TextField "name='scm.path'" "label='scm.path'" "tabindex='2'")
+        #tag (TextField "required='true'" "name='scm.root'" "tabindex='3'")
+        #tag (Password "name='scm.password'" "tabindex='4'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='4'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
+    </fieldset>
+
+ #end
+</body>
+</html>

@@ -29,8 +29,6 @@ public class CreateCvsAction extends ScmActionSupport
 
     public String execute()
     {
-        setCommonFields(cvs);
-
         Project project = getProjectManager().getProject(id);
         project.addScm(cvs);
         getProjectManager().save(project);

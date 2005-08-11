@@ -11,13 +11,11 @@
     #tag (Hidden "name='id'")
     <h3>Create scm: step 1</h3>
     <fieldset>
-        #tag (TextField "required='true'" "name='name'" "label='scm.name'" "tabindex='1'")
-        #tag (Select "list=types" "name='type'" "label='scm.type'" "tabindex='2'")
-        #tag (TextField "name='path'" "label='scm.path'" "tabindex='3'")
+        #tag (Select "list=types" "name='type'" "label='scm.type'" "tabindex='1'")
     </fieldset>
         
     <fieldset class="submit">
-        #tag (Submit "value=getText('next.name')" "name='next'" "tabindex='4'")
+        #tag (Submit "value=getText('next.name')" "name='next'" "tabindex='2'")
     </fieldset>
  #end
 

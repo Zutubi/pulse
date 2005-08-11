@@ -3,4 +3,5 @@
 #if ($parameters.nameValue)  value="$!webwork.htmlEncode($parameters.nameValue)"     #end
 #if ($parameters.cssClass)   class="$!webwork.htmlEncode($parameters.cssClass)"      #end
 #if ($parameters.cssStyle)   style="$!webwork.htmlEncode($parameters.cssStyle)"      #end
+#parse("/template/simple/scripting-events.vm")
 />

@@ -2,6 +2,7 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.BuildManager;
 import com.cinnamonbob.model.ProjectManager;
+import com.cinnamonbob.model.ScmManager;
 import com.cinnamonbob.web.ActionSupport;
 import com.cinnamonbob.xwork.interceptor.Cancelable;
 
@@ -14,6 +15,7 @@ public class ProjectActionSupport extends ActionSupport implements Cancelable
     private String cancel;
     private ProjectManager projectManager;
     private BuildManager buildManager;
+    private ScmManager scmManager;
 
     public boolean isCancelled()
     {
@@ -43,5 +45,15 @@ public class ProjectActionSupport extends ActionSupport implements Cancelable
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setScmManager(ScmManager scmManager)
+    {
+        this.scmManager = scmManager;
+    }
+
+    public ScmManager getScmManager()
+    {
+        return scmManager;
     }
 }

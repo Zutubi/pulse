@@ -161,10 +161,26 @@
             <result name="success" type="redirect">/manageProject.action?id=${id}</result>
         </action>
 
+        <action name="editScm!default" class="com.cinnamonbob.web.project.EditScmAction" method="doDefault">
+            <result name="success" type="velocity">edit-scm-${type}.vm</result>
+        </action>
+
         <action name="editSvn" class="com.cinnamonbob.web.project.EditSvnAction">
             <result name="input" type="velocity">edit-scm-svn.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${id}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${project}</result>
+            <result name="success" type="redirect">/manageProject.action?id=${project}</result>
+        </action>
+
+        <action name="editCvs" class="com.cinnamonbob.web.project.EditCvsAction">
+            <result name="input" type="velocity">edit-scm-cvs.vm</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${project}</result>
+            <result name="success" type="redirect">/manageProject.action?id=${project}</result>
+        </action>
+
+        <action name="editP4" class="com.cinnamonbob.web.project.EditP4Action">
+            <result name="input" type="velocity">edit-scm-p4.vm</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${project}</result>
+            <result name="success" type="redirect">/manageProject.action?id=${project}</result>
         </action>
 
         <action name="deleteScm" class="com.cinnamonbob.web.project.DeleteScmAction">

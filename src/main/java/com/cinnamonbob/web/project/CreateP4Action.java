@@ -45,7 +45,6 @@ public class CreateP4Action extends ScmActionSupport
 
     public String execute()
     {
-        setCommonFields(p4);
         Project project = getProjectManager().getProject(id);
         project.addScm(p4);
         getProjectManager().save(project);

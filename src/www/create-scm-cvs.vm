@@ -7,18 +7,19 @@
 #bodytag (Form "action='createCvs.action'" "method='post'")
 
     #tag (Hidden "name='id'")
-    #tag (Hidden "name='name'")
-    #tag (Hidden "name='path'")
     <h3>Create scm: step 2</h3>
 
     <fieldset>
-        #tag (TextField "required='true'" "name='cvs.root'" "tabindex='1'")
-        #tag (Password "name='cvs.password'" "tabindex='2'")
+        #tag (TextField "required='true'" "name='cvs.name'" "label='scm.name'" "tabindex='1'")
+        #tag (TextField "name='cvs.path'" "label='scm.path'" "tabindex='2'")
+        #tag (TextField "required='true'" "name='cvs.root'" "tabindex='3'")
+        #tag (Password "name='cvs.password'" "tabindex='4'")
     </fieldset>
 
     <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='5'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='6'")
+        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='3'" "onclick='history.back();return false;'")
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='4'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
     </fieldset>
 
  #end

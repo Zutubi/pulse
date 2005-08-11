@@ -44,7 +44,6 @@ public class CreateSvnAction extends ScmActionSupport
 
     public String execute()
     {
-        setCommonFields(svn);
         Project project = getProjectManager().getProject(id);
         project.addScm(svn);
         getProjectManager().save(project);
