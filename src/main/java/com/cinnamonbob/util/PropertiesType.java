@@ -1,6 +1,7 @@
 package com.cinnamonbob.util;
 
-import org.hibernate.type.ImmutableType;
+import org.hibernate.HibernateException;
+import org.hibernate.type.MutableType;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,29 +16,36 @@ import java.util.Properties;
  *
  *
  */
-public class PropertiesType extends ImmutableType {
+public class PropertiesType extends MutableType
+{
 
-    public Object get(ResultSet rs, String name) throws SQLException {
+    public Object get(ResultSet rs, String name) throws SQLException
+    {
         return fromStringValue(rs.getString(name));
     }
 
-    public Class getReturnedClass() {
+    public Class getReturnedClass()
+    {
         return Properties.class;
     }
 
-    public void set(PreparedStatement st, Object value, int index) throws SQLException {
+    public void set(PreparedStatement st, Object value, int index) throws SQLException
+    {
         st.setString(index, toString(value));
     }
 
-    public int sqlType() {
+    public int sqlType()
+    {
         return Types.VARCHAR;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return "properties";
     }
 
-    public String toString(Object value) {
+    public String toString(Object value)
+    {
         if (value != null)
         {
             Properties properties = (Properties) value;
@@ -55,7 +63,8 @@ public class PropertiesType extends ImmutableType {
         return null;
     }
 
-    public Object fromStringValue(String xml) {
+    public Object fromStringValue(String xml)
+    {
         if (xml != null)
         {
             Properties properties = new Properties();
@@ -72,4 +81,11 @@ public class PropertiesType extends ImmutableType {
         return null;
     }
 
+    protected Object deepCopyNotNull(Object value) throws HibernateException
+    {
+        Properties original = (Properties) value;
+        Properties copy = new Properties();
+        copy.putAll(original);
+        return copy;
+    }
 }

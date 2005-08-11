@@ -1,16 +1,14 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Svn;
+import com.cinnamonbob.model.Cvs;
 
 /**
  *
  *
  */
-public class EditSvnAction extends ProjectActionSupport
+public class EditSvnAction extends AbstractEditScmAction
 {
-    private long id;
-    private long project;
-
     private Svn scm = new Svn();
 
     public Svn getScm()
@@ -18,36 +16,35 @@ public class EditSvnAction extends ProjectActionSupport
         return scm;
     }
 
-    public void setId(long id)
+    public String getScmProperty()
     {
-        this.id = id;
+        return "svn";
     }
 
-    public long getId()
+    public Svn getSvn()
     {
-        return this.id;
+        return getScm();
+    }
+
+    public String doDefault()
+    {
+        scm = (Svn) getScmManager().getScm(getId());
+        return SUCCESS;
     }
 
     public String execute()
     {
-        Svn persistentSvn = (Svn) getScmManager().getScm(id);
+        Svn persistentSvn = (Svn) getScmManager().getScm(getId());
+        persistentSvn.setName(scm.getName());
         persistentSvn.setKeyfile(scm.getKeyfile());
         persistentSvn.setPassphrase(scm.getPassphrase());
         persistentSvn.setPassword(scm.getPassword());
         persistentSvn.setPath(scm.getPath());
         persistentSvn.setUrl(scm.getUrl());
         persistentSvn.setUsername(scm.getUsername());
+        // tell hibernate to save the changes since it can not detect changes to the properties objects contents by itself...
+        getScmManager().save(persistentSvn);
 
         return SUCCESS;
-    }
-
-    public long getProject()
-    {
-        return project;
-    }
-
-    public void setProject(long project)
-    {
-        this.project = project;
     }
 }

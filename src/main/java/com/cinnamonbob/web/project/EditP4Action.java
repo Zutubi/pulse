@@ -6,11 +6,8 @@ import com.cinnamonbob.model.P4;
  *
  *
  */
-public class EditP4Action extends ProjectActionSupport
+public class EditP4Action extends AbstractEditScmAction
 {
-    private long id;
-    private long project;
-
     private P4 scm = new P4();
 
     public P4 getScm()
@@ -18,36 +15,33 @@ public class EditP4Action extends ProjectActionSupport
         return scm;
     }
 
-    public void setId(long id)
+    public String getScmProperty()
     {
-        this.id = id;
+        return "p4";
     }
 
-    public long getId()
+    public P4 getP4()
     {
-        return this.id;
+        return getScm();
+    }
+
+    public String doDefault()
+    {
+        scm = (P4) getScmManager().getScm(getId());
+        return SUCCESS;
     }
 
     public String execute()
     {
-        P4 persistentP4 = (P4) getScmManager().getScm(id);
+        P4 persistentP4 = (P4) getScmManager().getScm(getId());
+        persistentP4.setName(scm.getName());
         persistentP4.setPassword(scm.getPassword());
         persistentP4.setPath(scm.getPath());
         persistentP4.setClient(scm.getClient());
         persistentP4.setPort(scm.getPort());
         persistentP4.setUser(scm.getUser());
-
+        // tell hibernate to save the changes since it can not detect changes to the properties objects contents by itself...
+        getScmManager().save(persistentP4);
         return SUCCESS;
-    }
-
-
-    public long getProject()
-    {
-        return project;
-    }
-
-    public void setProject(long project)
-    {
-        this.project = project;
     }
 }

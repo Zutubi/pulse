@@ -162,7 +162,14 @@
         </action>
 
         <action name="editScm!default" class="com.cinnamonbob.web.project.EditScmAction" method="doDefault">
-            <result name="success" type="velocity">edit-scm-${type}.vm</result>
+            <result name="svn" type="chain">editSvn!default</result>
+            <result name="cvs" type="chain">editCvs!default</result>
+            <result name="p4" type="chain">editP4!default</result>
+        </action>
+
+        <action name="editSvn!default" class="com.cinnamonbob.web.project.EditSvnAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">edit-scm-svn.vm</result>
         </action>
 
         <action name="editSvn" class="com.cinnamonbob.web.project.EditSvnAction">
@@ -171,10 +178,20 @@
             <result name="success" type="redirect">/manageProject.action?id=${project}</result>
         </action>
 
+        <action name="editCvs!default" class="com.cinnamonbob.web.project.EditCvsAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">edit-scm-cvs.vm</result>
+        </action>
+
         <action name="editCvs" class="com.cinnamonbob.web.project.EditCvsAction">
             <result name="input" type="velocity">edit-scm-cvs.vm</result>
             <result name="cancel" type="redirect">/manageProject.action?id=${project}</result>
             <result name="success" type="redirect">/manageProject.action?id=${project}</result>
+        </action>
+
+        <action name="editP4!default" class="com.cinnamonbob.web.project.EditP4Action" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">edit-scm-p4.vm</result>
         </action>
 
         <action name="editP4" class="com.cinnamonbob.web.project.EditP4Action">

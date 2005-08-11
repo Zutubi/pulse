@@ -6,10 +6,8 @@ import com.cinnamonbob.model.Cvs;
  *
  *
  */
-public class EditCvsAction extends ProjectActionSupport
+public class EditCvsAction extends AbstractEditScmAction
 {
-    private long id;
-    private long project;
 
     private Cvs scm = new Cvs();
 
@@ -18,33 +16,31 @@ public class EditCvsAction extends ProjectActionSupport
         return scm;
     }
 
-    public void setId(long id)
+    public String getScmProperty()
     {
-        this.id = id;
+        return "cvs";
     }
 
-    public long getId()
+    public Cvs getCvs()
     {
-        return this.id;
+        return getScm();
+    }
+
+    public String doDefault()
+    {
+        scm = (Cvs) getScmManager().getScm(getId());
+        return SUCCESS;
     }
 
     public String execute()
     {
-        Cvs persistentCvs = (Cvs) getScmManager().getScm(id);
+        Cvs persistentCvs = (Cvs) getScmManager().getScm(getId());
+        persistentCvs.setName(scm.getName());
         persistentCvs.setPassword(scm.getPassword());
         persistentCvs.setPath(scm.getPath());
         persistentCvs.setRoot(scm.getRoot());
-
+        // tell hibernate to save the changes since it can not detect changes to the properties objects contents by itself...
+        getScmManager().save(persistentCvs);
         return SUCCESS;
-    }
-
-    public long getProject()
-    {
-        return project;
-    }
-
-    public void setProject(long project)
-    {
-        this.project = project;
     }
 }

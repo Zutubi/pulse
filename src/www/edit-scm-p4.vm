@@ -12,12 +12,12 @@
     <h3>Edit scm</h3>
 
     <fieldset>
-        #tag (TextField "required='true'" "name='scm.name'" "label='scm.name'" "tabindex='1'")
-        #tag (TextField "name='scm.path'" "label='scm.path'" "tabindex='2'")
-        #tag (TextField "required='true'" "name='scm.port'" "tabindex='3'")
-        #tag (TextField "required='true'" "name='scm.user'" "tabindex='2'")
-        #tag (Password "name='scm.password'" "tabindex='5'")
-        #tag (TextField "required='true'" "name='scm.client'" "tabindex='6'")
+        #tag (TextField "required='true'" "name='p4.name'" "label='scm.name'" "tabindex='1'")
+        #tag (TextField "name='p4.path'" "label='scm.path'" "tabindex='2'")
+        #tag (TextField "required='true'" "name='p4.port'" "tabindex='3'")
+        #tag (TextField "required='true'" "name='p4.user'" "tabindex='2'")
+        #tag (Password "name='p4.password'" "tabindex='5'")
+        #tag (TextField "required='true'" "name='p4.client'" "tabindex='6'")
     </fieldset>
 
     <fieldset class="submit">

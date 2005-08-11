@@ -12,13 +12,13 @@
     <h3>Edit scm</h3>
 
     <fieldset>
-        #tag (TextField "required='true'" "name='scm.name'" "label='scm.name'" "tabindex='1'")
-        #tag (TextField "name='scm.path'" "label='scm.path'" "tabindex='2'")
-        #tag (TextField "required='true'" "name='scm.username'" "tabindex='3'")
-        #tag (Password "name='scm.password'" "tabindex='4'")
-        #tag (TextField "required='true'" "name='scm.url'" "tabindex='5'")
-        #tag (TextField "name='scm.keyfile'" "tabindex='6'")
-        #tag (Password "name='scm.passphrase'" "tabindex='7'")
+        #tag (TextField "required='true'" "name='svn.name'" "label='scm.name'" "tabindex='1'")
+        #tag (TextField "name='svn.path'" "label='scm.path'" "tabindex='2'")
+        #tag (TextField "required='true'" "name='svn.username'" "tabindex='3'")
+        #tag (Password "name='svn.password'" "tabindex='4'")
+        #tag (TextField "required='true'" "name='svn.url'" "tabindex='5'")
+        #tag (TextField "name='svn.keyfile'" "tabindex='6'")
+        #tag (Password "name='svn.passphrase'" "tabindex='7'")
     </fieldset>
 
     <fieldset class="submit">
