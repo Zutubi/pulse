@@ -5,7 +5,6 @@ import com.cinnamonbob.bootstrap.StartupManager;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.text.NumberFormat;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Map;

@@ -1,12 +1,12 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.BobException;
+import com.cinnamonbob.BobRuntimeException;
 
 /**
  * 
  *
  */
-public class BuildException extends BobException
+public class BuildException extends BobRuntimeException
 {
     /**
      * @param errorMessage

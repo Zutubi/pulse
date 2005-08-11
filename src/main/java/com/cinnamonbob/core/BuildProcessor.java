@@ -3,7 +3,6 @@ package com.cinnamonbob.core;
 import com.cinnamonbob.BuildRequest;
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.core.InternalBuildFailureException;
 import com.cinnamonbob.core.config.*;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.scm.*;
@@ -59,7 +58,7 @@ public class BuildProcessor
 
         BuildResult buildResult = new BuildResult(project.getName(), number);
         buildManager.save(buildResult);
-        buildResult.building();
+        buildResult.commence();
 
         try
         {    
@@ -72,22 +71,15 @@ public class BuildProcessor
             
             BobFile bobFile = loadBobFile(scmDir);
             
-            build(bobFile, request.getRecipeName(), buildResult, buildDir);
+            build(project, bobFile, request.getRecipeName(), buildResult, buildDir);
         }
         catch(BuildException e)
         {
-            e.printStackTrace();
-            buildResult.setSucceeded(false);
-        }
-        catch(InternalBuildFailureException e)
-        {
-            e.printStackTrace();
-            LOG.severe(e.toString());
-            buildResult.setSucceeded(false);
+            buildResult.error(e);
         }
         finally
         {
-            buildResult.completed();
+            buildResult.complete();
             buildManager.save(buildResult);
         }
         
@@ -104,7 +96,7 @@ public class BuildProcessor
         return buildResult;
     }
         
-    public void build(BobFile bobFile, String recipeName, BuildResult buildResult, File outputDir) throws BuildException
+    public void build(Project project, BobFile bobFile, String recipeName, BuildResult buildResult, File outputDir) throws BuildException
     {
         Recipe recipe;
         
@@ -116,41 +108,49 @@ public class BuildProcessor
         recipe = bobFile.getRecipe(recipeName);
         if (recipe == null)
         {
-            // TODO problematic to report: no name atm
-            throw new BuildException("Undefined recipe " + recipeName);
+            throw new BuildException("Undefined recipe '" + recipeName + "' for project '" + project.getName() + "'");
         }
         
-        try 
+        // TODO: support continuing build when errors occur. Take care: exceptions.
+        // FIXME: record exception traces
+        // FIXME: all commands need names, set on result immediately
+        for (Command command : recipe.getCommands())
         {
-            //TODO: support continuing build when errors occur.
-            int i = 0;
-            for (Command command : recipe.getCommands())
+            CommandResult result = new CommandResult();
+            
+            result.commence();
+            buildResult.add(result);
+            buildManager.save(buildResult);
+            
+            try
             {
-                //TODO: should name these directory a little better. ie: if we
-                //TODO: are dealing with a named command, then include the name.
-                //TODO: should all commands be named?
-                File commandOutput = new File(outputDir, String.format("%08d", i++));
+                File commandOutput = new File(outputDir, Long.toString(result.getId()));
                 
                 if(!commandOutput.mkdir())
                 {
-                    throw new InternalBuildFailureException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
+                    throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
                 }
-                //TODO: need to associate this command result with the id 'i' so that we
-                //TODO: have a name to uniquely identify a particular command result from within
-                //TODO: a build result.
-                CommandResult result = command.execute(commandOutput);
-                buildResult.add(result);
-                if (!result.succeeded())
-                {
-                    buildResult.setSucceeded(false);
-                    return;
-                }
+                
+                command.execute(commandOutput, result);
             }
-            buildResult.setSucceeded(true);
-        }
-        catch (CommandException e)
-        {
-            throw new BuildException(e);
+            catch(BuildException e)
+            {
+                result.error(e);
+            }
+            finally
+            {
+                result.complete();
+            }
+            
+            switch(result.getState())
+            {
+                case FAILURE:
+                    buildResult.failure();
+                    return;
+                case ERROR:
+                    buildResult.commandError();
+                    return;
+            }
         }
     }
 
@@ -161,7 +161,7 @@ public class BuildProcessor
         if(scms.size() != 1)
         {
             // TODO: handle 0 and multi scm
-            throw new InternalBuildFailureException("I don't support that yet!");
+            throw new BuildException("Multiple SCMs not yet supported!");
         }
         
         Scm  scm    = scms.get(0);
@@ -184,7 +184,7 @@ public class BuildProcessor
         return scmDir;
     }
     
-    private void saveChanges(File outputDir, LinkedList<Change> changes) throws InternalBuildFailureException
+    private void saveChanges(File outputDir, LinkedList<Change> changes)
     {
         // TODO: name needs to change for multi-scm
         File       output = new File(outputDir, "changes");
@@ -201,7 +201,7 @@ public class BuildProcessor
         }
         catch(IOException e)
         {
-            throw new InternalBuildFailureException("Could not create output file '" + output.getAbsolutePath() + "'", e);
+            throw new BuildException("Could not create output file '" + output.getAbsolutePath() + "'", e);
         }
         finally
         {
@@ -217,13 +217,13 @@ public class BuildProcessor
         {
             if(!FileSystemUtils.removeDirectory(workDir))
             {
-                throw new InternalBuildFailureException("Could not clean work directory '" + workDir.getAbsolutePath() + '"');
+                throw new BuildException("Could not clean work directory '" + workDir.getAbsolutePath() + '"');
             }
         }
 
         if(!workDir.mkdirs())
         {
-            throw new InternalBuildFailureException("Could not create work directory '" + workDir.getAbsolutePath() + "'");
+            throw new BuildException("Could not create work directory '" + workDir.getAbsolutePath() + "'");
         }
 
         return workDir;
@@ -237,7 +237,7 @@ public class BuildProcessor
         File resultRootDir = new File(buildsDir, String.format("%08d", Long.valueOf(result.getId())));
         if (!resultRootDir.mkdirs())
         {
-            throw new InternalBuildFailureException("Unable to create output directory");    
+            throw new BuildException("Unable to create build directory '" + resultRootDir.getAbsolutePath() + "'");    
         }
         return resultRootDir;
     }

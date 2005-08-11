@@ -1,6 +1,8 @@
 package com.cinnamonbob.core.config;
 
+import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.model.CommandResult;
+import com.cinnamonbob.model.ResultState;
 import com.cinnamonbob.util.FileSystemUtils;
 import junit.framework.TestCase;
 
@@ -32,8 +34,9 @@ public class ExecutableCommandTest extends TestCase
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("dir");
         command.setArgs(".");
-        CommandResult result = command.execute(outputDirectory);
-        assertTrue(result.succeeded());        
+        CommandResult result = new CommandResult();
+        command.execute(outputDirectory, result);
+        assertEquals(result.getState(), ResultState.SUCCESS);        
     }
     
     public void testExecuteFailureExpected() throws Exception
@@ -41,16 +44,18 @@ public class ExecutableCommandTest extends TestCase
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("dir");
         command.setArgs("w");
-        CommandResult result = command.execute(outputDirectory);
-        assertFalse(result.succeeded());        
+        CommandResult result = new CommandResult();
+        command.execute(outputDirectory, result);
+        assertEquals(result.getState(), ResultState.FAILURE);        
     }
 
     public void testExecuteSuccessExpectedNoArg() throws Exception
     {
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("netstat");
-        CommandResult result = command.execute(outputDirectory);
-        assertTrue(result.succeeded());        
+        CommandResult result = new CommandResult();
+        command.execute(outputDirectory, result);
+        assertEquals(result.getState(), ResultState.SUCCESS);        
     }
     
     public void testExecuteExceptionExpected() throws Exception
@@ -60,9 +65,9 @@ public class ExecutableCommandTest extends TestCase
         command.setArgs("command");
         try 
         {
-            command.execute(outputDirectory);
+            command.execute(outputDirectory, new CommandResult());
             assertTrue(false);
-        } catch (CommandException e)
+        } catch (BuildException e)
         {
             // noop            
         }

@@ -1,5 +1,6 @@
 package com.cinnamonbob.core.config;
 
+import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.model.StoredArtifact;
 import com.cinnamonbob.util.IOHelper;
@@ -20,7 +21,7 @@ public class ExecutableCommand implements Command
     
     private List<Environment> env = new LinkedList<Environment>();
     
-    public CommandResult execute(File outputDir) throws CommandException
+    public void execute(File outputDir, CommandResult cmdResult)
     {
         List<String> command = new LinkedList<String>();
         command.add(exe);
@@ -57,9 +58,16 @@ public class ExecutableCommand implements Command
             final int result = child.waitFor();
             
             output.close();
+
+            if(result == 0)
+            {
+                cmdResult.success();
+            }
+            else
+            {
+                cmdResult.failure();
+            }
             
-            CommandResult cmdResult = new CommandResult();
-            cmdResult.setSucceeded(result == 0);
             cmdResult.getProperties().put("exit code", Integer.toString(result));
             cmdResult.getProperties().put("command line", constructCommandLine(builder));
             // TODO not always there
@@ -70,16 +78,14 @@ public class ExecutableCommand implements Command
             outputArtifact.setTitle("Command Output");
             outputArtifact.setType("text/plain");
             cmdResult.addArtifact(new StoredArtifact(outputArtifact, outputFile.getAbsolutePath()));
-            
-            return cmdResult;
         }
         catch (IOException e)
         {
-            throw new CommandException(e);
+            throw new BuildException(e);
         } 
         catch (InterruptedException e)
         {
-            throw new CommandException(e);
+            throw new BuildException(e);
         }        
     }
 

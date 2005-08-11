@@ -47,7 +47,7 @@
                 #set($id = $result.id)
                 #set($built = $result.stamps.prettyStartTime) 
                 #set($elapsed = $result.stamps.prettyElapsed)
-                #if($result.succeeded())
+                #if($result.state.toString() == "SUCCESS")
                     #set($success = "success")
                 #else
                     #set($success = "failure")
@@ -56,7 +56,7 @@
                 <td class="build-$success"><a href="viewBuild.action?id=$project.id&buildId=$id">build $result.number</a></td>
                 <td class="build-$success">$built</td>
                 <td class="build-$success">$elapsed</td>
-                <td class="build-$success">$success</td>
+                <td class="build-$success">$result.state.toString().toLowerCase()</td>
             </tr>
             #end
         </table>

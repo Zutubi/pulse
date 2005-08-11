@@ -8,15 +8,17 @@
             <generator class="hilo"/>
         </id>
         
-        <property name="commandName" column="COMMAND_NAME" type="string" not-null="true" length="255"/>
+        <property name="commandName" column="COMMAND_NAME" type="string" length="255"/>
 
         <property name="stamps" type="com.cinnamonbob.util.TimeStampsType">
             <column name="start" sql-type="BIGINT"/>
             <column name="end"  sql-type="BIGINT"/>
         </property>
         
-        <property name="succeeded" type="boolean" not-null="true"/>
+        <property name="stateName" type="string" length="31" not-null="true"/>
         
+        <property name="errorMessage" type="string" length="1023"/>
+
         <property name="properties" column="PROPERTIES" type="com.cinnamonbob.util.PropertiesType" length="4096"/>
         
         <list name="artifacts" cascade="all-delete-orphan">

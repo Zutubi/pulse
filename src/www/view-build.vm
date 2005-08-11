@@ -9,7 +9,7 @@
   <body>
     <h1 class="build-log">:: brief ::</h1>
 
-#if($result.succeeded())
+#if($result.state.toString() == "SUCCESS")
   #set($success = "success")
 #else
   #set($success = "failure")
@@ -21,7 +21,7 @@
         #detailrow("commenced" $result.stamps.prettyStartTime)
         #detailrow("completed" $result.stamps.prettyEndTime)
         #detailrow("elapsed"   $result.stamps.prettyElapsed)
-        #detailrow("result"    $success)
+        #detailrow("result"    $result.state.toString().toLowerCase())
       </table>
     </div>
 
@@ -46,7 +46,7 @@
     <h1 class="build-log">:: command log ::</h1>
 
 #foreach($commandResult in $result.getCommandResults())
-  #if($commandResult.succeeded())
+  #if($commandResult.state.toString() == "SUCCESS")
     #set($success = "success")
   #else
     #set($success = "failure")
@@ -57,9 +57,14 @@
         #detailrow("commenced" $commandResult.stamps.prettyStartTime)
         #detailrow("completed" $commandResult.stamps.prettyEndTime)
         #detailrow("elapsed"   $commandResult.stamps.prettyElapsed)
-        #detailrow("result"    $success)
+        #detailrow("result"    $commandResult.state.toString().toLowerCase())
       </table>
       <h2 class="command-element">details</h2>
+      #if($commandResult.errorMessage)
+        <div class="error">
+          $commandResult.errorMessage
+        </div>
+      #end
       <table>
         #foreach($key in $commandResult.properties.keySet())
           #detailrow($key $commandResult.properties.get($key))

@@ -6,7 +6,6 @@ import java.util.regex.Matcher;
 import java.util.logging.Logger;
 import java.io.*;
 
-import com.cinnamonbob.model.Feature;
 import com.cinnamonbob.model.PlainFeature;
 import com.cinnamonbob.model.StoredArtifact;
 

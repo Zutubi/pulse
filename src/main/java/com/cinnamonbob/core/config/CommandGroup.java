@@ -8,7 +8,6 @@ import java.io.IOException;
 import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.model.StoredArtifact;
 import com.cinnamonbob.util.IOHelper;
-import com.cinnamonbob.util.TimeStamps;
 
 
 /**
@@ -58,28 +57,12 @@ public class CommandGroup implements Command
         return customArtifact;
     }
     
-    public CommandResult execute(File outputDir) throws CommandException
+    public void execute(File outputDir, CommandResult result)
     {
-        TimeStamps    stamps = new TimeStamps();
-        CommandResult result = cmd.execute(outputDir);
-        
-        stamps.end();
+        cmd.execute(outputDir, result);
         result.setCommandName(name);
-        result.setStamps(stamps);
-
         collectArtifacts(result, outputDir);
         
-//        Map<String, FileArtifact> artifacts = new HashMap<String, FileArtifact>();
-//        for (FileArtifact a : result.getArtifacts())
-//        {
-//            artifacts.put(a.getContentName(), a);
-//        }
-//        
-//        for (FileArtifact a : this.artifacts)
-//        {
-//            artifacts.put(a.getContentName(), a);
-//        }
-//           
         for (ProcessArtifactMapping m : mappings)
         {
             StoredArtifact a = result.getArtifact(m.getArtifact());
@@ -90,10 +73,9 @@ public class CommandGroup implements Command
             }
             else
             {
-                // unknown artifact.
+                // TODO unknown artifact
             }
-        }                
-        return result;
+        }
     }
     
     private void collectArtifacts(CommandResult result, File outputDir)

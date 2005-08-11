@@ -8,8 +8,6 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="succeeded" column="SUCCEEDED" type="boolean" not-null="false"/>
-
         <property name="number" column="NUMBER" type="long" not-null="true"/>
 
         <property name="projectName" column="PROJECT_NAME" type="string" not-null="false" length="255"/>
@@ -21,6 +19,8 @@
         
         <property name="stateName" column="STATE" type="string" length="127"/>
  
+        <property name="errorMessage" type="string" length="1023"/>
+
         <property name="revision" column="REVISION" type="string" length="127"/>
 
         <list name="commandResults" cascade="all-delete-orphan" lazy="false">
