@@ -40,8 +40,7 @@ public class EditP4Action extends AbstractEditScmAction
         persistentP4.setClient(scm.getClient());
         persistentP4.setPort(scm.getPort());
         persistentP4.setUser(scm.getUser());
-        // tell hibernate to save the changes since it can not detect changes to the properties objects contents by itself...
-        getScmManager().save(persistentP4);
+
         return SUCCESS;
     }
 }

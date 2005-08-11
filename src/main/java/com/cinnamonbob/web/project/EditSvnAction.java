@@ -42,8 +42,6 @@ public class EditSvnAction extends AbstractEditScmAction
         persistentSvn.setPath(scm.getPath());
         persistentSvn.setUrl(scm.getUrl());
         persistentSvn.setUsername(scm.getUsername());
-        // tell hibernate to save the changes since it can not detect changes to the properties objects contents by itself...
-        getScmManager().save(persistentSvn);
 
         return SUCCESS;
     }

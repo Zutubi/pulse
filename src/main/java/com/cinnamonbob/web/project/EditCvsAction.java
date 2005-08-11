@@ -39,8 +39,6 @@ public class EditCvsAction extends AbstractEditScmAction
         persistentCvs.setPassword(scm.getPassword());
         persistentCvs.setPath(scm.getPath());
         persistentCvs.setRoot(scm.getRoot());
-        // tell hibernate to save the changes since it can not detect changes to the properties objects contents by itself...
-        getScmManager().save(persistentCvs);
         return SUCCESS;
     }
 }
