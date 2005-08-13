@@ -3,7 +3,7 @@
 <validators>
     <field name="name">
         <field-validator type="requiredstring">
-            <message>$action.getText("scm.name") is required.</message>
+            <message>Name is required.</message>
         </field-validator>
     </field>
 </validators>

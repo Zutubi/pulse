@@ -2,8 +2,11 @@
         "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
 <validators>
     <field name="port">
-        <field-validator type="requiredstring">
+        <field-validator type="required">
             <message>P4PORT is required.</message>
+        </field-validator>
+        <field-validator type="integral">
+            <message>P4PORT should be a valid integer.</message>
         </field-validator>
     </field>
     <field name="user">

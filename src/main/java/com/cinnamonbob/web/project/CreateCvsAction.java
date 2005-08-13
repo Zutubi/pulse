@@ -1,43 +1,28 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Cvs;
-import com.cinnamonbob.model.Project;
+import com.cinnamonbob.model.Scm;
 
 /**
  *
  *
  */
-public class CreateCvsAction extends ScmActionSupport
+public class CreateCvsAction extends AbstractCreateScmAction
 {
     private Cvs cvs = new Cvs();
-    private long id;
 
     public Cvs getCvs()
     {
         return cvs;
     }
 
-    public long getId()
+    public Scm getScm()
     {
-        return id;
+        return getCvs();
     }
 
-    public void setId(long id)
+    public String getScmProperty()
     {
-        this.id = id;
-    }
-
-    public String execute()
-    {
-        Project project = getProjectManager().getProject(id);
-        project.addScm(cvs);
-        getProjectManager().save(project);
-        return SUCCESS;
-
-    }
-
-    public String doDefault()
-    {
-        return SUCCESS;
+        return "cvs";
     }
 }

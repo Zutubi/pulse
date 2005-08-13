@@ -145,20 +145,20 @@
 
         <action name="createP4" class="com.cinnamonbob.web.project.CreateP4Action">
             <result name="input" type="velocity">create-scm-p4.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${id}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${project}</result>
+            <result name="success" type="redirect">/manageProject.action?id=${project}</result>
         </action>
 
         <action name="createSvn" class="com.cinnamonbob.web.project.CreateSvnAction">
             <result name="input" type="velocity">create-scm-svn.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${id}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${project}</result>
+            <result name="success" type="redirect">/manageProject.action?id=${project}</result>
         </action>
 
         <action name="createCvs" class="com.cinnamonbob.web.project.CreateCvsAction">
             <result name="input" type="velocity">create-scm-cvs.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${id}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${project}</result>
+            <result name="success" type="redirect">/manageProject.action?id=${project}</result>
         </action>
 
         <action name="editScm!default" class="com.cinnamonbob.web.project.EditScmAction" method="doDefault">

@@ -9,7 +9,7 @@
 
 #bodytag (Form "action='createSvn.action'" "method='post'")
 
-    #tag (Hidden "name='id'")
+    #tag (Hidden "name='project'")
     <h3>Create scm: step 2</h3>
     <fieldset>
         #tag (TextField "required='true'" "name='svn.name'" "label='scm.name'" "tabindex='1'")

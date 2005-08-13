@@ -1,15 +1,15 @@
 package com.cinnamonbob.web.project;
 
+import com.cinnamonbob.model.Scm;
 import com.cinnamonbob.model.Svn;
-import com.cinnamonbob.model.Project;
 
 /**
  *
  *
  */
-public class CreateSvnAction extends ScmActionSupport
+public class CreateSvnAction extends AbstractCreateScmAction
 {
-    private long id;
+
     private Svn svn = new Svn();
 
     public Svn getSvn()
@@ -17,42 +17,15 @@ public class CreateSvnAction extends ScmActionSupport
         return svn;
     }
 
-    public void setId(long id)
+    public Scm getScm()
     {
-        this.id = id;
+        return getSvn();
     }
 
-    public long getId()
+    public String getScmProperty()
     {
-        return id;
+        return "svn";
     }
 
-    public void validate()
-    {
-        if (hasErrors())
-        {
-            // do not attempt to validate unless all other validation rules have
-            // completed successfully.
-            return;
-        }
-
-        if (getProjectManager().getProject(id) == null)
-        {
-            addActionError("No project with id '" + Long.toString(id) + "'");
-        }
-    }
-
-    public String execute()
-    {
-        Project project = getProjectManager().getProject(id);
-        project.addScm(svn);
-        getProjectManager().save(project);
-        return SUCCESS;
-    }
-
-    public String doDefault()
-    {
-        return SUCCESS;
-    }
 }
 

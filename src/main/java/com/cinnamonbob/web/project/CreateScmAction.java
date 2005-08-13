@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class CreateScmAction extends ProjectActionSupport
 {
-    private long id;
+    private long project;
     private String type;
 
     private Map<String, String> types;
@@ -46,13 +46,13 @@ public class CreateScmAction extends ProjectActionSupport
         return SUCCESS;
     }
 
-    public long getId()
+    public long getProject()
     {
-        return id;
+        return project;
     }
 
-    public void setId(long id)
+    public void setProject(long project)
     {
-        this.id = id;
+        this.project = project;
     }
 }

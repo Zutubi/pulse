@@ -12,7 +12,7 @@
             $project.description
         </div>
         
-        <h2 class="command-info">scm details (<a href="createScm!default.action?id=$project.id">add</a>)</h2>
+        <h2 class="command-info">scm details (<a href="createScm!default.action?project=$project.id">add</a>)</h2>
         <div class="command-content">
             #set($scms = $project.scms)
             #if ($scms.size() == 0)

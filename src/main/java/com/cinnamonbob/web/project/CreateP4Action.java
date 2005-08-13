@@ -1,15 +1,14 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.P4;
-import com.cinnamonbob.model.Project;
+import com.cinnamonbob.model.Scm;
 
 /**
  *
  *
  */
-public class CreateP4Action extends ScmActionSupport
+public class CreateP4Action extends AbstractCreateScmAction
 {
-    private long id;
     private P4 p4 = new P4();
 
     public P4 getP4()
@@ -17,43 +16,14 @@ public class CreateP4Action extends ScmActionSupport
         return p4;
     }
 
-    public void setId(long id)
+    public Scm getScm()
     {
-        // TODO: move up the inheritance chain somewhere
-        this.id = id;
+        return getP4();
     }
 
-    public long getId()
+    public String getScmProperty()
     {
-        return id;
-    }
-
-    public void validate()
-    {
-        if (hasErrors())
-        {
-            // do not attempt to validate unless all other validation rules have
-            // completed successfully.
-            return;
-        }
-
-        if (getProjectManager().getProject(id) == null)
-        {
-            addActionError("No project with id '" + Long.toString(id) + "'");
-        }
-    }
-
-    public String execute()
-    {
-        Project project = getProjectManager().getProject(id);
-        project.addScm(p4);
-        getProjectManager().save(project);
-        return SUCCESS;
-    }
-
-    public String doDefault()
-    {
-        return SUCCESS;
+        return "p4";
     }
 }
 

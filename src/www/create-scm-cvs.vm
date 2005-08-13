@@ -6,7 +6,7 @@
 
 #bodytag (Form "action='createCvs.action'" "method='post'")
 
-    #tag (Hidden "name='id'")
+    #tag (Hidden "name='project'")
     <h3>Create scm: step 2</h3>
 
     <fieldset>
