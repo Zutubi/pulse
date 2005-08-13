@@ -10,7 +10,7 @@ import com.cinnamonbob.model.User;
 public class DeleteContactPointAction extends UserActionSupport
 {
     private long id;
-    private String name;
+    private long user;
 
     public void setId(long id)
     {
@@ -22,29 +22,26 @@ public class DeleteContactPointAction extends UserActionSupport
         return this.id;
     }
 
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
     public String execute()
     {
-        User user = getUserManager().getUser(id);
-        if (user == null)
-        {
-            return INPUT;
-        }
 
-        ContactPoint contactPoint = user.getContactPoint(name);
+        ContactPoint contactPoint = getUserManager().getContactPoint(id);
         if (contactPoint != null)
         {
-            user.remove(contactPoint);
+            contactPoint.getUser().remove(contactPoint);
+            getUserManager().delete(contactPoint);
         }
+
         return SUCCESS;
+    }
+
+    public void setUser(long user)
+    {
+        this.user = user;
+    }
+
+    public long getUser()
+    {
+        return user;
     }
 }

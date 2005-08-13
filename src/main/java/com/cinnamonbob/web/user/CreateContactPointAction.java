@@ -1,8 +1,7 @@
 package com.cinnamonbob.web.user;
 
-import com.cinnamonbob.model.EmailContactPoint;
-import com.cinnamonbob.model.ContactPoint;
-import com.cinnamonbob.model.User;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -10,54 +9,40 @@ import com.cinnamonbob.model.User;
  */
 public class CreateContactPointAction extends UserActionSupport
 {
-    private long id;
-    private EmailContactPoint contact = new EmailContactPoint();
+    private Map types;
 
-    public void validate()
+    private String type;
+
+    private long user;
+
+    public Map getTypes()
     {
-        if (hasErrors())
+        if (types == null)
         {
-            return;
+            types = new HashMap();
+            types.put("email", "Email");
+            types.put("yahoo", "Yahoo Messenger");
         }
-
-        User user = getUser();
-        if (user == null)
-        {
-            addFieldError("id", "Unknown user["+id+"]");
-            return;
-        }
-
-        if (user.getContactPoint(contact.getName()) != null)
-        {
-            addFieldError("contact.name", "Name is already in use.");
-        }
+        return types;
     }
 
-    public long getId()
+    public void setType(String type)
     {
-        return id;
+        this.type = type;
     }
 
-    public void setId(long id)
+    public String getType()
     {
-        this.id = id;
+        return this.type;
     }
 
-    public User getUser()
+    public long getUser()
     {
-        return getUserManager().getUser(id);
+        return this.user;
     }
 
-    public ContactPoint getContact()
+    public void setUser(long user)
     {
-        return contact;
-    }
-
-    public String execute()
-    {
-        User user = getUser();
-        user.add(contact);
-
-        return SUCCESS;
+        this.user = user;
     }
 }

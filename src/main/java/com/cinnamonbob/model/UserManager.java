@@ -12,4 +12,8 @@ public interface UserManager extends EntityManager<User>
     User getUser(long id);
     List<User> getUsersWithLoginLike(String name);
     List<User> getAllUsers();
+
+    
+    ContactPoint getContactPoint(long id);
+    void delete(ContactPoint contact);
 }

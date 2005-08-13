@@ -19,28 +19,32 @@
             </table>
         </div>
         
-        <h2 class="command-info">contact points</h2>
+        <h2 class="command-info">contact points ($user.contactPoints.size()) </h2>
         <div class="command-content">
             <table>
                 <tr>
                     <th class="command-detail">name</th>
-                    <th class="command-detail">email address</th>
+                    <th class="command-detail">uid</th>
                     <th class="command-detail">actions</th>
                 </tr>
             #foreach ($contact in $user.contactPoints)
                 <tr>
                     <td class="command-detail">$contact.name</td>
                     <td class="command-detail">#contactPointIcon($contact) $contact.uid</td>
-                    <td class="command-detail"><a href="deleteContactPoint.action?id=$user.id&name=$contact.name">delete</a> | <a href="">edit</a> | <a href="">test</a></td>
+                    <td class="command-detail">
+                        <a href="deleteContactPoint.action?id=$contact.id&user=$user.id">delete</a> |
+                        <a href="editContactPoint!default.action?id=$contact.id&user=$user.id">edit</a> |
+                        <a href="">test</a>
+                    </td>
                 </tr>
             #end
                 <tr>
-                    <td class="command-detail" colspan="3"><b>+</b> <a href="createContactPoint!default.action?id=$user.id">add new contact point</a></td>
+                    <td class="command-detail" colspan="3"><b>+</b> <a href="createContactPoint!default.action?user=$user.id">add new contact point</a></td>
                 </tr>
             </table>
         </div>
 
-        <h2 class="command-info">subscriptions</h2>
+        <h2 class="command-info">subscriptions ($user.subscriptions.size())</h2>
         <div class="command-content">
             <table>
                 <tr>

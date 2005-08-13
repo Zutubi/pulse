@@ -76,16 +76,50 @@
 
         <action name="createContactPoint" class="com.cinnamonbob.web.user.CreateContactPointAction">
             <result name="input" type="velocity">create-contact.vm</result>
-            <result name="cancel" type="velocity">view-user.vm</result>
-            <result name="error" type="velocity">create-contact.vm</result>
-            <result name="success" type="redirect">/viewUser.action?id=${id}</result>
+            <result name="success" type="velocity">create-contact-${type}.vm</result>
+        </action>
+
+        <action name="createEmailContactPoint" class="com.cinnamonbob.web.user.CreateEmailContactPointAction">
+            <result name="input" type="velocity">create-contact-email.vm</result>
+            <result name="cancel" type="redirect">/viewUser.action?id=${user}</result>
+            <result name="success" type="redirect">/viewUser.action?id=${user}</result>
+        </action>
+
+        <action name="createYahooContactPoint" class="com.cinnamonbob.web.user.CreateYahooContactPointAction">
+            <result name="input" type="velocity">create-contact-yahoo.vm</result>
+            <result name="cancel" type="redirect">/viewUser.action?id=${user}</result>
+            <result name="success" type="redirect">/viewUser.action?id=${user}</result>
+        </action>
+
+        <action name="editContactPoint!default" class="com.cinnamonbob.web.user.EditContactPointAction" method="doDefault">
+            <result name="email" type="chain">editEmailContactPoint!default</result>
+            <result name="yahoo" type="chain">editYahooContactPoint!default</result>
+        </action>
+
+        <action name="editEmailContactPoint!default" class="com.cinnamonbob.web.user.EditEmailContactPointAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">edit-contact-email.vm</result>
+        </action>
+
+        <action name="editEmailContactPoint" class="com.cinnamonbob.web.user.EditEmailContactPointAction">
+            <result name="input" type="velocity">edit-contact-email.vm</result>
+            <result name="cancel" type="redirect">/viewUser.action?id=${user}</result>
+            <result name="success" type="redirect">/viewUser.action?id=${user}</result>
+        </action>
+
+        <action name="editYahooContactPoint!default" class="com.cinnamonbob.web.user.EditYahooContactPointAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">edit-contact-yahoo.vm</result>
+        </action>
+
+        <action name="editYahooContactPoint" class="com.cinnamonbob.web.user.EditYahooContactPointAction">
+            <result name="input" type="velocity">edit-contact-yahoo.vm</result>
+            <result name="cancel" type="redirect">/viewUser.action?id=${user}</result>
+            <result name="success" type="redirect">/viewUser.action?id=${user}</result>
         </action>
 
         <action name="deleteContactPoint" class="com.cinnamonbob.web.user.DeleteContactPointAction">
-            <result name="input" type="velocity">view-user.vm</result>
-            <result name="cancel" type="velocity">view-user.vm</result>
-            <result name="error" type="velocity">view-user.vm</result>
-            <result name="success" type="redirect">/viewUser.action?id=${id}</result>
+            <result name="success" type="redirect">/viewUser.action?id=${user}</result>
         </action>
 
         <action name="viewUser" class="com.cinnamonbob.web.user.ViewUserAction">

@@ -7,16 +7,14 @@
     #parse("/template/includes/actionerrors.vm")
     
     #bodytag (Form "action='createContactPoint.action'" "method='post'")
-        #tag (Hidden "name='id'")
+        #tag (Hidden "name='user'")
         <h3>Create contact</h3>
         <fieldset>
-            #tag (TextField "name='contact.name'" "tabindex='1'")
-            #tag (TextField "label='contact.email'" "name='contact.email'" "tabindex='2'")
+            #tag (Select "list=types" "name='type'" "tabindex='1'")
         </fieldset>
 
         <fieldset class="submit">
-            #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
-            #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
+            #tag (Submit "value=getText('next.name')" "name='next'" "tabindex='2'")
         </fieldset>
     #end
 
