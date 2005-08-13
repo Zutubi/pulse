@@ -5,51 +5,24 @@ import com.cinnamonbob.model.EmailContactPoint;
 /**
  *
  */
-public class EditEmailContactPointAction extends UserActionSupport
+public class EditEmailContactPointAction extends AbstractEditContactPointAction
 {
-    private long id;
-    private long user;
     private EmailContactPoint contact = new EmailContactPoint();
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
-    public long getId()
-    {
-        return this.id;
-    }
-
-    public long getUser()
-    {
-        return user;
-    }
-
-    public void setUser(long user)
-    {
-        this.user = user;
-    }
 
     public EmailContactPoint getContact()
     {
         return contact;
     }
 
-    public void validate()
-    {
-
-    }
-
     public String doDefault()
     {
-        contact = (EmailContactPoint) getUserManager().getContactPoint(id);
+        contact = (EmailContactPoint) getUserManager().getContactPoint(getId());
         return SUCCESS;
     }
 
     public String execute()
     {
-        EmailContactPoint persistentContact = (EmailContactPoint) getUserManager().getContactPoint(id);
+        EmailContactPoint persistentContact = (EmailContactPoint) getUserManager().getContactPoint(getId());
         persistentContact.setEmail(contact.getEmail());
         persistentContact.setName(contact.getName());
         return SUCCESS;

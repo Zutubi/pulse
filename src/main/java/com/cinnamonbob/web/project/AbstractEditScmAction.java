@@ -4,11 +4,8 @@ import com.cinnamonbob.model.Scm;
 import com.cinnamonbob.model.Project;
 
 /**
- * Created by IntelliJ IDEA.
- * User: daniel
- * Date: 12/08/2005
- * Time: 02:17:23
- * To change this template use File | Settings | File Templates.
+ *
+ *
  */
 public abstract class AbstractEditScmAction extends ProjectActionSupport
 {

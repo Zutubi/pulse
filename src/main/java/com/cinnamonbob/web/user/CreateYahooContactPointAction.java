@@ -7,35 +7,18 @@ import com.cinnamonbob.model.User;
  *
  *
  */
-public class CreateYahooContactPointAction extends UserActionSupport
+public class CreateYahooContactPointAction extends AbstractCreateContactPointAction
 {
-    private long user;
-
     private YahooContactPoint contact = new YahooContactPoint();
-
-    public long getUser()
-    {
-        return user;
-    }
-
-    public void setUser(long user)
-    {
-        this.user = user;
-    }
 
     public YahooContactPoint getContact()
     {
         return contact;
     }
 
-    public void validate()
-    {
-
-    }
-
     public String execute()
     {
-        User user = getUserManager().getUser(this.user);
+        User user = getUserManager().getUser(getUser());
         user.add(contact);
 
         return SUCCESS;

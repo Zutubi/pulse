@@ -6,54 +6,26 @@ import com.cinnamonbob.model.YahooContactPoint;
  *
  *
  */
-public class EditYahooContactPointAction extends UserActionSupport
+public class EditYahooContactPointAction extends AbstractEditContactPointAction
 {
-    private long id;
-    private long user;
     private YahooContactPoint contact = new YahooContactPoint();
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
-    public long getId()
-    {
-        return this.id;
-    }
-
-    public long getUser()
-    {
-        return user;
-    }
-
-    public void setUser(long user)
-    {
-        this.user = user;
-    }
 
     public YahooContactPoint getContact()
     {
         return contact;
     }
 
-    public void validate()
-    {
-
-    }
-
     public String doDefault()
     {
-        contact = (YahooContactPoint) getUserManager().getContactPoint(id);
+        contact = (YahooContactPoint) getUserManager().getContactPoint(getId());
         return SUCCESS;
     }
 
     public String execute()
     {
-        YahooContactPoint persistentContact = (YahooContactPoint) getUserManager().getContactPoint(id);
+        YahooContactPoint persistentContact = (YahooContactPoint) getUserManager().getContactPoint(getId());
         persistentContact.setYahooId(contact.getYahooId());
         persistentContact.setName(contact.getName());
         return SUCCESS;
     }
-
 }
