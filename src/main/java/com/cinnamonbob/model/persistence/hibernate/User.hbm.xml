@@ -44,6 +44,10 @@
 
         </subclass>
 
+        <subclass name="com.cinnamonbob.model.YahooContactPoint" discriminator-value="YAHOO">
+
+        </subclass>
+
     </class>
 
     <!-- Subscription. -->
