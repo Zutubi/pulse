@@ -1,8 +1,10 @@
 package com.cinnamonbob.core.config;
 
 import com.cinnamonbob.BobException;
+import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.core.validation.CommandValidationManager;
 import com.cinnamonbob.util.IOHelper;
+import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.opensymphony.xwork.validator.ValidationException;
 import nu.xom.*;
 
@@ -12,8 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,10 +26,20 @@ public class BobFileLoader
 
     private BobFile bobFile = null;
 
-    private List<InitComponent> requireInitialisation = new LinkedList<InitComponent>();
+    private SpringObjectFactory springFactory;
 
     public BobFileLoader()
     {
+    }
+
+    private SpringObjectFactory getSpringFactory()
+    {
+        if (springFactory == null)
+        {
+            springFactory = new SpringObjectFactory();
+            springFactory.setApplicationContext(ComponentContext.getContext());
+        }
+        return springFactory;
     }
 
 //    private Map<String, Class> loadConfig(String resourceName)
@@ -138,7 +148,9 @@ public class BobFileLoader
             type = create(name);
         }
 
-        //TODO: autowire the type objects using spring...
+        // autowire the object using the springs autowire. This provides full access to the systems
+        // resources from within the type instances.
+        getSpringFactory().autoWireBean(type);
 
         IntrospectionHelper typeHelper = IntrospectionHelper.getHelper(type.getClass());
 
