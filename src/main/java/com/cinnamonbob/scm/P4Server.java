@@ -1,9 +1,8 @@
 package com.cinnamonbob.scm;
 
-import com.cinnamonbob.scm.Change.Action;
 import com.cinnamonbob.util.IOHelper;
-import com.cinnamonbob.model.SimpleChange;
-import com.cinnamonbob.model.SimpleChangelist;
+import com.cinnamonbob.model.Change;
+import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.model.NumericalRevision;
 import com.cinnamonbob.model.Revision;
 
@@ -182,7 +181,7 @@ public class P4Server implements SCMServer
         
         while(matcher.find())
         {
-            changes.add(new SimpleChange(matcher.group(1), matcher.group(2), Change.Action.ADD));
+            changes.add(new Change(matcher.group(1), matcher.group(2), Change.Action.ADD));
         }
     }
 
@@ -249,7 +248,7 @@ public class P4Server implements SCMServer
         }
         
         String           comment    = getChangelistComment(lines, affectedFilesIndex);
-        SimpleChangelist changelist = new SimpleChangelist(new NumericalRevision(number), date, user, comment);
+        Changelist changelist = new Changelist(new NumericalRevision(number), date, user, comment);
         
         for(int i = affectedFilesIndex + 2; i < lines.length; i++)
         {
@@ -267,7 +266,7 @@ public class P4Server implements SCMServer
         
         if(matcher.matches())
         {
-            return new SimpleChange(matcher.group(1), matcher.group(2), decodeAction(matcher.group(3)));
+            return new Change(matcher.group(1), matcher.group(2), decodeAction(matcher.group(3)));
         }
         else
         {
@@ -275,7 +274,7 @@ public class P4Server implements SCMServer
         }
     }
 
-    private Action decodeAction(String action)
+    private Change.Action decodeAction(String action)
     {
         if(action.equals("add"))
         {

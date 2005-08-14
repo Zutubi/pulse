@@ -1,10 +1,8 @@
 package com.cinnamonbob.scm.cvs;
 
-import com.cinnamonbob.scm.Change;
-import com.cinnamonbob.scm.Changelist;
-import com.cinnamonbob.model.SimpleChange;
-import com.cinnamonbob.model.CvsRevision;
 import com.cinnamonbob.util.FileSystemUtils;
+import com.cinnamonbob.model.Changelist;
+import com.cinnamonbob.model.Change;
 import junit.framework.TestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.util.Logger;
@@ -120,9 +118,8 @@ public class CVSServerTest extends TestCase
         
         for (Change change: changes)
         {
-            SimpleChange simpleChange = (SimpleChange) change;
-            assertFalse(filenames.containsKey(simpleChange.getFilename()));
-            filenames.put(simpleChange.getFilename(), simpleChange.getFilename());
+            assertFalse(filenames.containsKey(change.getFilename()));
+            filenames.put(change.getFilename(), change.getFilename());
 
             // TODO fix for new revision types
             //CvsRevision revision = (CvsRevision)simpleChange.getRevision();

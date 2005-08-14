@@ -1,12 +1,9 @@
 package com.cinnamonbob.web.project;
 
+import com.cinnamonbob.model.*;
+
 import java.util.Iterator;
 import java.util.List;
-
-import com.cinnamonbob.scm.Changelist;
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.*;
 
 /**
  * 
@@ -72,34 +69,9 @@ public class ViewBuildAction extends ProjectActionSupport
             }
         }
 
-        if(result.getNumber() > 1)
-        {
-            BuildResult previousResult = getBuildManager().getByProjectNameAndNumber(project.getName(), result.getNumber() - 1);
-
-            if(previousResult != null)
-            {
-                getChanges(previousResult);
-            }
-        }
+        changes = result.getChangelists();
 
         return SUCCESS;
-    }
-
-    private void getChanges(BuildResult previousResult)
-    {
-        // FIXME oh how it assumes...
-        NumericalRevision previousRevision = new NumericalRevision(Long.parseLong(previousResult.getRevision()));
-        NumericalRevision buildRevision    = new NumericalRevision(Long.parseLong(result.getRevision()));
-
-        try
-        {
-            changes = project.getScms().get(0).createServer().getChanges(previousRevision, buildRevision, "");
-        }
-        catch(SCMException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     public List<Changelist> getChanges()

@@ -1,8 +1,7 @@
 package com.cinnamonbob.scm;
 
-import com.cinnamonbob.scm.Change.Action;
-import com.cinnamonbob.model.SimpleChange;
-import com.cinnamonbob.model.SimpleChangelist;
+import com.cinnamonbob.model.Change;
+import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.model.NumericalRevision;
 import com.cinnamonbob.model.Revision;
 import org.tmatesoft.svn.core.ISVNWorkspace;
@@ -67,7 +66,7 @@ public class SVNServer implements SCMServer
      *        the action type as returned by the server
      * @return the corresponding Action valuie
      */
-    private Action decodeAction(char type)
+    private Change.Action decodeAction(char type)
     {
         switch(type)
         {
@@ -122,7 +121,7 @@ public class SVNServer implements SCMServer
         
         public void updated(String path, int contentsStatus, int propertiesStatus, long revision)
         {
-            changes.add(new SimpleChange(path, Long.toString(revision), Change.Action.ADD));
+            changes.add(new Change(path, Long.toString(revision), Change.Action.ADD));
         }
 
         public void committed(String path, int kind) {}
@@ -273,13 +272,13 @@ public class SVNServer implements SCMServer
                 repository.log(paths, logs, fromNumber, toNumber, true, true);
                 for(SVNLogEntry entry: logs)
                 {
-                    SimpleChangelist list  = new SimpleChangelist(new NumericalRevision(entry.getRevision()), entry.getDate(), entry.getAuthor(), entry.getMessage());
+                    Changelist list  = new Changelist(new NumericalRevision(entry.getRevision()), entry.getDate(), entry.getAuthor(), entry.getMessage());
                     Map              files = entry.getChangedPaths();
                     
                     for(Object value: files.values())
                     {
                         SVNLogEntryPath entryPath = (SVNLogEntryPath)value;
-                        list.addChange(new SimpleChange(entryPath.getPath(), list.getRevision().toString(), decodeAction(entryPath.getType())));
+                        list.addChange(new Change(entryPath.getPath(), list.getRevision().toString(), decodeAction(entryPath.getType())));
                     }
                     
                     result.add(list);

@@ -5,8 +5,8 @@ import com.cinnamonbob.scm.cvs.client.BuilderAdapter;
 import com.cinnamonbob.scm.cvs.client.ConnectionFactory;
 import com.cinnamonbob.scm.cvs.client.HistoryBuilder;
 import com.cinnamonbob.scm.cvs.client.HistoryInformation;
-import com.cinnamonbob.model.SimpleChange;
-import com.cinnamonbob.model.SimpleChangelist;
+import com.cinnamonbob.model.Change;
+import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.model.CvsRevision;
 import com.cinnamonbob.model.Revision;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -179,7 +179,7 @@ public class CVSServer
         Map<String, LogInformation> modifiedFileInfo = getLogInfo(new LinkedList<String>(modifiedFiles));
 
         // extract the revisions associated with the history data.
-        List<SimpleChange> simpleChanges = new LinkedList<SimpleChange>();
+        List<Change> simpleChanges = new LinkedList<Change>();
         for (HistoryInformation info : h)
         {
             if (!info.isCommit())
@@ -199,15 +199,15 @@ public class CVSServer
             LogInformation.Revision rev = logInfo.getRevision(revision);
 
             CvsRevision cvsrevision = new CvsRevision(rev.getAuthor(), logInfo.getBranch(), rev.getMessage(), rev.getDate());
-            SimpleChange change = new SimpleChange(fullPath, cvsrevision.toString(), info.getAction());
+            Change change = new Change(fullPath, cvsrevision.toString(), info.getAction());
             simpleChanges.add(change);
         }
 
         // group by author, branch, sort by date. this will have the affect of grouping
         // all of the changes in a single changeset together, ordered by date.
-        Collections.sort(simpleChanges, new Comparator<SimpleChange>()
+        Collections.sort(simpleChanges, new Comparator<Change>()
         {
-            public int compare(SimpleChange changeA, SimpleChange changeB)
+            public int compare(Change changeA, Change changeB)
             {
                 CvsRevision revisionA = null;//(CvsRevision) changeA.getRevision();
                 CvsRevision revisionB = null;//(CvsRevision) changeB.getRevision();
@@ -230,7 +230,7 @@ public class CVSServer
         // all of the changes made by a particular author.
         List<ChangeSet> changeSets = new LinkedList<ChangeSet>();
         ChangeSet changeSet = null;
-        for (SimpleChange change : simpleChanges)
+        for (Change change : simpleChanges)
         {
             if (changeSet == null)
             {
@@ -266,16 +266,16 @@ public class CVSServer
         for (ChangeSet set : refinedSets)
         {
             // convert the changeset into a list of changes.
-            List<SimpleChange> changes = new LinkedList<SimpleChange>();
-            for (SimpleChange c : set.getChanges())
+            List<Change> changes = new LinkedList<Change>();
+            for (Change c : set.getChanges())
             {
                 changes.add(c);
             }
 
 
             CvsRevision firstRevision = null;//(CvsRevision) changes.get(0).getRevision();
-            SimpleChangelist changelist = new SimpleChangelist(firstRevision, firstRevision.getDate(), firstRevision.getAuthor(), firstRevision.getComment());
-            for (SimpleChange change : changes)
+            Changelist changelist = new Changelist(firstRevision, firstRevision.getDate(), firstRevision.getAuthor(), firstRevision.getComment());
+            for (Change change : changes)
             {
                 changelist.addChange(change);
             }
@@ -410,22 +410,22 @@ public class CVSServer
 
     class ChangeSet
     {
-        private final List<SimpleChange> changes = new LinkedList<SimpleChange>();
+        private final List<Change> changes = new LinkedList<Change>();
 
-        ChangeSet(SimpleChange c)
+        ChangeSet(Change c)
         {
             changes.add(c);
         }
 
-        void add(SimpleChange c)
+        void add(Change c)
         {
             changes.add(c);
         }
 
-        boolean belongsTo(SimpleChange other)
+        boolean belongsTo(Change other)
         {
             CvsRevision otherRevision = null;//(CvsRevision) other.getRevision();
-            SimpleChange previousCommit = changes.get(0);
+            Change previousCommit = changes.get(0);
             CvsRevision revision = null;//(CvsRevision) previousCommit.getRevision();
             return revision.getAuthor().equals(otherRevision.getAuthor()) &&
                     revision.getBranch().equals(otherRevision.getBranch()) &&
@@ -439,7 +439,7 @@ public class CVSServer
 
             ChangeSet changeSet = null;
             String message = null;
-            for (SimpleChange c : changes)
+            for (Change c : changes)
             {
                 CvsRevision r = null;//(CvsRevision) c.getRevision();
                 if (filenames.containsKey(c.getFilename()))
@@ -485,7 +485,7 @@ public class CVSServer
             return changesets;
         }
 
-        public List<SimpleChange> getChanges()
+        public List<Change> getChanges()
         {
             return changes;
         }

@@ -1,7 +1,7 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.model.persistence.ChangelistDao;
-import com.cinnamonbob.model.SimpleChangelist;
+import com.cinnamonbob.model.Changelist;
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,10 +10,10 @@ import com.cinnamonbob.model.SimpleChangelist;
  * Time: 15:27:02
  * To change this template use File | Settings | File Templates.
  */
-public class HibernateChangelistDao extends HibernateEntityDao<SimpleChangelist> implements ChangelistDao
+public class HibernateChangelistDao extends HibernateEntityDao<Changelist> implements ChangelistDao
 {
     public Class persistentClass()
     {
-        return SimpleChangelist.class;
+        return Changelist.class;
     }
 }

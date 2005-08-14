@@ -1,10 +1,7 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.model.CommandResult;
-import com.cinnamonbob.model.Entity;
-import com.cinnamonbob.model.ResultState;
-import com.cinnamonbob.util.TimeStamps;
 import com.cinnamonbob.core.BuildException;
+import com.cinnamonbob.util.TimeStamps;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,11 +18,12 @@ public class BuildResult extends Entity
     private String errorMessage;
     private long number;
     private String projectName;
-    private String revision;
+    private Revision revision;
     private TimeStamps stamps;
     
     private List<CommandResult> results;
-    
+    private List<Changelist> changelists;
+
     public BuildResult()
     {
     }
@@ -141,12 +139,12 @@ public class BuildResult extends Entity
         errorMessage = message;
     }
 
-    public String getRevision()
+    public Revision getRevision()
     {
         return revision;
     }
 
-    public void setRevision(String revision)
+    public void setRevision(Revision revision)
     {
         this.revision = revision;
     }
@@ -159,5 +157,24 @@ public class BuildResult extends Entity
     public void setNumber(long number)
     {
         this.number = number;
+    }
+
+    public void add(Changelist changelist)
+    {
+        getChangelists().add(changelist);
+    }
+
+    public List<Changelist> getChangelists()
+    {
+        if (changelists == null)
+        {
+            changelists = new LinkedList<Changelist>();
+        }
+        return changelists;
+    }
+
+    public void setChangelists(List<Changelist> changelists)
+    {
+        this.changelists = changelists;
     }
 }

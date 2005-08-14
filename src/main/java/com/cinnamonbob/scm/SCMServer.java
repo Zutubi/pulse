@@ -25,7 +25,7 @@ public interface SCMServer
      * @return the revision actually checked out
      * @throws SCMException if an error occurs communicating with the server
      */
-    public Revision checkout(File toDirectory, Revision revision, List<Change> changes) throws SCMException;
+    public Revision checkout(File toDirectory, Revision revision, List<com.cinnamonbob.model.Change> changes) throws SCMException;
     
     /**
      * Returns a list of changelists occuring in between the given revisions.
@@ -43,5 +43,5 @@ public interface SCMServer
      * @return a list of changelists that occured between the two revisions
      * @throws SCMException if an error occurs talking to the server
      */
-    public List<Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException;
+    public List<com.cinnamonbob.model.Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException;
 }

@@ -1,10 +1,9 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.model.CvsRevision;
-import com.cinnamonbob.model.SimpleChange;
-import com.cinnamonbob.model.SimpleChangelist;
+import com.cinnamonbob.model.Change;
+import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.model.persistence.ChangelistDao;
-import com.cinnamonbob.scm.Change;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -34,15 +33,15 @@ public class HibernateChangelistDaoTest extends PersistenceTestCase
         try {
             Date date = Calendar.getInstance().getTime();
             CvsRevision revision = new CvsRevision("bob", "MAIN", "test changelist", date);
-            SimpleChangelist list = new SimpleChangelist(revision, date, "bob", "wow, this is teh r0x0rz");
-            SimpleChange change = new SimpleChange("some/random/file", "23", Change.Action.EDIT);
+            Changelist list = new Changelist(revision, date, "bob", "wow, this is teh r0x0rz");
+            Change change = new Change("some/random/file", "23", Change.Action.EDIT);
 
             list.addChange(change);
             changelistDao.save(list);
 
             commitAndRefreshTransaction();
 
-            SimpleChangelist otherList = changelistDao.findById(list.getId());
+            Changelist otherList = changelistDao.findById(list.getId());
             assertEquals(list.getUser(), otherList.getUser());
             assertEquals(list.getDate(), otherList.getDate());
             assertEquals(list.getComment(), otherList.getComment());
@@ -54,7 +53,7 @@ public class HibernateChangelistDaoTest extends PersistenceTestCase
             assertEquals(revision.getComment(), otherRevision.getComment());
             assertEquals(revision.getDate(), otherRevision.getDate());
 
-            SimpleChange otherChange = (SimpleChange)otherList.getChanges().get(0);
+            Change otherChange = (Change)otherList.getChanges().get(0);
             assertEquals(change.getAction(), otherChange.getAction());
             assertEquals(change.getFilename(), otherChange.getFilename());
             assertEquals(change.getRevision(), otherChange.getRevision());

@@ -1,10 +1,10 @@
 package com.cinnamonbob.scm.cvs.client;
 
-import com.cinnamonbob.scm.Change;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import com.cinnamonbob.model.Change;
 
 /**
  * The HistoryInformation object represents a single line from the history output.
