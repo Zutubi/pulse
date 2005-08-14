@@ -55,7 +55,7 @@ public interface Change
      * @return the revision number of the change, which will be a file revision
      *         if applicable or the change list revision otherwise
      */
-    Revision getRevision();
+    String getRevision();
     
     /**
      * @return the action performed on the file

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <class name="com.cinnamonbob.model.SimpleChangelist" table="CHANGELIST">
+
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <many-to-one name="revision" class="com.cinnamonbob.model.Revision" column="REVISION_ID" cascade="all" unique="true"/>
+
+        <property name="user" type="string" length="255"/>
+
+        <property name="date" type="timestamp"/>
+
+        <property name="comment" type="string" length="4095"/>
+
+        <list name="changes" cascade="all-delete-orphan" lazy="false">
+            <key column="CHANGELIST_ID"/>
+            <index column="POSITION"/>
+            <one-to-many class="com.cinnamonbob.model.SimpleChange"/>
+        </list>
+    </class>
+
+    <class name="com.cinnamonbob.model.SimpleChange" table="CHANGE" lazy="false">
+
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+        
+        <property name="actionName" column="ACTION" type="string" length="63"/>
+        
+        <property name="filename" column="FILENAME" type="string" length="4095"/>
+
+        <property name="revision" column="REVISION" type="string" length="63"/>
+
+    </class>
+
+</hibernate-mapping>

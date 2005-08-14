@@ -4,6 +4,8 @@ import com.cinnamonbob.scm.Change.Action;
 import com.cinnamonbob.util.IOHelper;
 import com.cinnamonbob.model.SimpleChange;
 import com.cinnamonbob.model.SimpleChangelist;
+import com.cinnamonbob.model.NumericalRevision;
+import com.cinnamonbob.model.Revision;
 
 import java.io.*;
 import java.text.ParseException;
@@ -180,8 +182,7 @@ public class P4Server implements SCMServer
         
         while(matcher.find())
         {
-            NumericalRevision revision = new NumericalRevision(Long.parseLong(matcher.group(2)));
-            changes.add(new SimpleChange(matcher.group(1), revision, Change.Action.ADD));
+            changes.add(new SimpleChange(matcher.group(1), matcher.group(2), Change.Action.ADD));
         }
     }
 
@@ -266,9 +267,7 @@ public class P4Server implements SCMServer
         
         if(matcher.matches())
         {
-            long number = Long.parseLong(matcher.group(2));
-            
-            return new SimpleChange(matcher.group(1), new NumericalRevision(number), decodeAction(matcher.group(3)));
+            return new SimpleChange(matcher.group(1), matcher.group(2), decodeAction(matcher.group(3)));
         }
         else
         {

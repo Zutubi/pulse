@@ -1,7 +1,6 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.scm.Changelist;
-import com.cinnamonbob.scm.Revision;
 import com.cinnamonbob.scm.Change;
 
 import java.util.Date;
@@ -13,7 +12,7 @@ import java.util.List;
  * 
  * @author jsankey
  */
-public class SimpleChangelist implements Changelist
+public class SimpleChangelist extends Entity implements Changelist
 {
     private Revision revision;
     private Date date;
@@ -21,7 +20,11 @@ public class SimpleChangelist implements Changelist
     private String comment;
     private List<Change> changes;
     
-    
+    protected SimpleChangelist()
+    {
+
+    }
+
     public SimpleChangelist(Revision revision, Date date, String user, String comment)
     {
         this.revision = revision;
@@ -61,4 +64,28 @@ public class SimpleChangelist implements Changelist
         return changes;
     }
 
+    private void setChanges(List<Change> changes)
+    {
+        this.changes = changes;
+    }
+
+    private void setComment(String comment)
+    {
+        this.comment = comment;
+    }
+
+    private void setDate(Date date)
+    {
+        this.date = date;
+    }
+
+    private void setRevision(Revision revision)
+    {
+        this.revision = revision;
+    }
+
+    private void setUser(String user)
+    {
+        this.user = user;
+    }
 }

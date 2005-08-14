@@ -3,6 +3,8 @@ package com.cinnamonbob.scm;
 import com.cinnamonbob.scm.Change.Action;
 import com.cinnamonbob.model.SimpleChange;
 import com.cinnamonbob.model.SimpleChangelist;
+import com.cinnamonbob.model.NumericalRevision;
+import com.cinnamonbob.model.Revision;
 import org.tmatesoft.svn.core.ISVNWorkspace;
 import org.tmatesoft.svn.core.ISVNWorkspaceListener;
 import org.tmatesoft.svn.core.SVNWorkspaceManager;
@@ -120,7 +122,7 @@ public class SVNServer implements SCMServer
         
         public void updated(String path, int contentsStatus, int propertiesStatus, long revision)
         {
-            changes.add(new SimpleChange(path, new NumericalRevision(revision), Change.Action.ADD));
+            changes.add(new SimpleChange(path, Long.toString(revision), Change.Action.ADD));
         }
 
         public void committed(String path, int kind) {}
@@ -277,7 +279,7 @@ public class SVNServer implements SCMServer
                     for(Object value: files.values())
                     {
                         SVNLogEntryPath entryPath = (SVNLogEntryPath)value;
-                        list.addChange(new SimpleChange(entryPath.getPath(), list.getRevision(), decodeAction(entryPath.getType())));
+                        list.addChange(new SimpleChange(entryPath.getPath(), list.getRevision().toString(), decodeAction(entryPath.getType())));
                     }
                     
                     result.add(list);

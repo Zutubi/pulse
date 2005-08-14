@@ -7,6 +7,8 @@ import com.cinnamonbob.scm.cvs.client.HistoryBuilder;
 import com.cinnamonbob.scm.cvs.client.HistoryInformation;
 import com.cinnamonbob.model.SimpleChange;
 import com.cinnamonbob.model.SimpleChangelist;
+import com.cinnamonbob.model.CvsRevision;
+import com.cinnamonbob.model.Revision;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
 import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
@@ -110,15 +112,15 @@ public class CVSServer
 
 
     /**
-     * @see SCMServer#getChanges(com.cinnamonbob.scm.Revision, com.cinnamonbob.scm.Revision, String...)
+     * @see SCMServer#getChanges(Revision, Revision, String...)
      */
     public List<Changelist> getChanges(Revision from, Revision to, String ...paths)
             throws SCMException
     {
-        return getChanges((CVSRevision) from, (CVSRevision) to, paths);
+        return getChanges((CvsRevision) from, (CvsRevision) to, paths);
     }
 
-    public List<Changelist> getChanges(CVSRevision from, CVSRevision to, String ...paths)
+    public List<Changelist> getChanges(CvsRevision from, CvsRevision to, String ...paths)
             throws SCMException
     {
 
@@ -196,8 +198,8 @@ public class CVSServer
             assert(logInfo != null);
             LogInformation.Revision rev = logInfo.getRevision(revision);
 
-            CVSRevision cvsrevision = new CVSRevision(rev.getAuthor(), logInfo.getBranch(), rev.getMessage(), rev.getDate());
-            SimpleChange change = new SimpleChange(fullPath, cvsrevision, info.getAction());
+            CvsRevision cvsrevision = new CvsRevision(rev.getAuthor(), logInfo.getBranch(), rev.getMessage(), rev.getDate());
+            SimpleChange change = new SimpleChange(fullPath, cvsrevision.toString(), info.getAction());
             simpleChanges.add(change);
         }
 
@@ -207,8 +209,8 @@ public class CVSServer
         {
             public int compare(SimpleChange changeA, SimpleChange changeB)
             {
-                CVSRevision revisionA = (CVSRevision) changeA.getRevision();
-                CVSRevision revisionB = (CVSRevision) changeB.getRevision();
+                CvsRevision revisionA = null;//(CvsRevision) changeA.getRevision();
+                CvsRevision revisionB = null;//(CvsRevision) changeB.getRevision();
 
                 int comparison = revisionA.getAuthor().compareTo(revisionB.getAuthor());
                 if (comparison != 0)
@@ -271,7 +273,7 @@ public class CVSServer
             }
 
 
-            CVSRevision firstRevision = (CVSRevision) changes.get(0).getRevision();
+            CvsRevision firstRevision = null;//(CvsRevision) changes.get(0).getRevision();
             SimpleChangelist changelist = new SimpleChangelist(firstRevision, firstRevision.getDate(), firstRevision.getAuthor(), firstRevision.getComment());
             for (SimpleChange change : changes)
             {
@@ -422,9 +424,9 @@ public class CVSServer
 
         boolean belongsTo(SimpleChange other)
         {
-            CVSRevision otherRevision = (CVSRevision) other.getRevision();
+            CvsRevision otherRevision = null;//(CvsRevision) other.getRevision();
             SimpleChange previousCommit = changes.get(0);
-            CVSRevision revision = (CVSRevision) previousCommit.getRevision();
+            CvsRevision revision = null;//(CvsRevision) previousCommit.getRevision();
             return revision.getAuthor().equals(otherRevision.getAuthor()) &&
                     revision.getBranch().equals(otherRevision.getBranch()) &&
                     revision.getComment().equals(otherRevision.getComment());
@@ -439,7 +441,7 @@ public class CVSServer
             String message = null;
             for (SimpleChange c : changes)
             {
-                CVSRevision r = (CVSRevision) c.getRevision();
+                CvsRevision r = null;//(CvsRevision) c.getRevision();
                 if (filenames.containsKey(c.getFilename()))
                 {
                     // time for a new changeset.

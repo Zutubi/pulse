@@ -1,5 +1,7 @@
 package com.cinnamonbob.model.persistence;
 
+import com.cinnamonbob.model.SimpleChangelist;
+
 /**
  * Created by IntelliJ IDEA.
  * User: daniel
@@ -7,6 +9,6 @@ package com.cinnamonbob.model.persistence;
  * Time: 12:58:49
  * To change this template use File | Settings | File Templates.
  */
-public interface ChangelistDao
+public interface ChangelistDao extends EntityDao<SimpleChangelist>
 {
 }

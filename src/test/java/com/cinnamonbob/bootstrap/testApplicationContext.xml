@@ -6,9 +6,11 @@
         <property name="mappingResources">
             <list>
                 <value>com/cinnamonbob/model/persistence/hibernate/BuildResult.hbm.xml</value>
+                <value>com/cinnamonbob/model/persistence/hibernate/Changelist.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/CommandResult.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Feature.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Project.hbm.xml</value>
+                <value>com/cinnamonbob/model/persistence/hibernate/Revision.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Scm.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/User.hbm.xml</value>
@@ -125,6 +127,26 @@
         </property>
         <property name="target">
             <ref bean="scmDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="changelistDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateChangelistDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="changelistDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="changelistDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>

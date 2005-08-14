@@ -172,7 +172,7 @@ public class BuildProcessor
         {
             SCMServer          server   = scm.createServer();
             LinkedList<Change> changes  = new LinkedList<Change>();
-            Revision           revision = server.checkout(scmDir, null, changes);
+            Revision        revision = server.checkout(scmDir, null, changes);
             
             result.setRevision(revision.toString());
             saveChanges(resultDir, changes);

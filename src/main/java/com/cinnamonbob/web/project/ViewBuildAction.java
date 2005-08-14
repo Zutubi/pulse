@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.cinnamonbob.scm.Changelist;
-import com.cinnamonbob.scm.NumericalRevision;
+import com.cinnamonbob.model.NumericalRevision;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.core.BuildResult;
 import com.cinnamonbob.model.Project;

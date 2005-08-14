@@ -1,5 +1,7 @@
 package com.cinnamonbob.scm;
 
+import com.cinnamonbob.model.Revision;
+
 import java.util.Date;
 import java.util.List;
 
