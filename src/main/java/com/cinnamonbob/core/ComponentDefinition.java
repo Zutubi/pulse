@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.config;
+package com.cinnamonbob.core;
 
 /**
  * Used internally by the ProjectConfigurationLoader to dynamically

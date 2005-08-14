@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.config;
+package com.cinnamonbob.core;
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;

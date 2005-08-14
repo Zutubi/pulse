@@ -5,7 +5,6 @@ import com.cinnamonbob.scm.SCMServer;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.core.config.*;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.util.FileSystemUtils;
 import com.cinnamonbob.util.IOHelper;

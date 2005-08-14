@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.config;
+package com.cinnamonbob.core;
 
 import org.quartz.*;
 import com.cinnamonbob.bootstrap.quartz.QuartzManager;

@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.config;
+package com.cinnamonbob.core;
 
 import java.util.List;
 import java.util.LinkedList;

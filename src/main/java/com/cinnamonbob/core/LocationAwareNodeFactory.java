@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.config;
+package com.cinnamonbob.core;
 
 import nu.xom.NodeFactory;
 import nu.xom.Element;
@@ -6,7 +6,7 @@ import nu.xom.Document;
 import nu.xom.Nodes;
 import org.xml.sax.Locator;
 
-import com.cinnamonbob.core.config.LocationAwareElement;
+import com.cinnamonbob.core.LocationAwareElement;
 
 /**
  * NodeFactory extension that creates LocationAwareElements. These elements

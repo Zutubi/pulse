@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.config;
+package com.cinnamonbob.core;
 
 import com.cinnamonbob.BobException;
 import junit.framework.TestCase;
