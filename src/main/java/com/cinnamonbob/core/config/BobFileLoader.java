@@ -42,36 +42,6 @@ public class BobFileLoader
         return springFactory;
     }
 
-//    private Map<String, Class> loadConfig(String resourceName)
-//            throws IOException
-//    {
-//        Map<String, Class> data = new HashMap<String, Class>();
-//        InputStream resource = getClass().getResourceAsStream(resourceName);
-//        if (resource == null)
-//        {
-//            // could not locate config file... skip.
-//            return new HashMap<String, Class>(0);
-//        }
-//        Properties types = IOHelper.read(resource);
-//        Enumeration names = types.propertyNames();
-//        while (names.hasMoreElements())
-//        {
-//            try
-//            {
-//                String name = (String) names.nextElement();
-//                String className = types.getProperty(name);
-//                Class clz = Class.forName(className);
-//                data.put(name, clz);
-//            }
-//            catch (ClassNotFoundException e)
-//            {
-//                // unknown class referenced in properties file, skip.
-//                e.printStackTrace();
-//            }
-//        }
-//        return data;
-//    }
-
     public BobFile load(File file) throws BobException, IOException, IllegalAccessException, InvocationTargetException
     {
         return load(new FileInputStream(file));
