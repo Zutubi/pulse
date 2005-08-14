@@ -1,14 +1,15 @@
 package com.cinnamonbob.core.config;
 
 import com.cinnamonbob.BobException;
+import com.cinnamonbob.core.validation.CommandValidationManager;
 import com.cinnamonbob.util.IOHelper;
 import com.opensymphony.xwork.validator.ValidationException;
 import nu.xom.*;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -130,11 +131,14 @@ public class BobFileLoader
         {
             // we expect this type to have been added to its parent during creation.
             type = parentHelper.create(propertyName, parent);
-        } else
+        }
+        else
         {
             // this one we still need to add to its parent when its initialisation is completed.
             type = create(name);
         }
+
+        //TODO: autowire the type objects using spring...
 
         IntrospectionHelper typeHelper = IntrospectionHelper.getHelper(type.getClass());
 
@@ -190,13 +194,17 @@ public class BobFileLoader
             ((InitComponent) type).init();
         }
 
+        // okay, so we validate the type field... so how do we propogate the
+        // error? and where does it go?
         try
         {
-            CommandValidationManager.validate(type);
+            CommandValidationManager.validate(type, name);
         }
         catch (ValidationException e1)
         {
-            e1.printStackTrace();
+            // TODO: provide a better error message - one that contains details. Need to extract the details
+            // TODO: from the validation manager somehow.
+            throw new ParseException("Validation failed for '" + name + "'");
         }
     }
 
