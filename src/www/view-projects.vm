@@ -23,7 +23,7 @@
   #set($built = $lastResult.stamps.prettyStartTime) 
   #set($id = $lastResult.number)
   #set($elapsed = $lastResult.stamps.prettyElapsed)
-  #if($lastResult.succeeded())
+  #if($result.succeeded())
     #set($success = "success")
   #else
     #set($success = "failure")
@@ -40,7 +40,7 @@
         <td class="build-$success">$built</td>
         <td class="build-$success">$id</td>
         <td class="build-$success">$elapsed</td>
-        <td class="build-$success">$success</td>
+        <td class="build-$success">$result.state.toString().toLowerCase()</td>
       </tr>
 #end
       <tr>

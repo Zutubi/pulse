@@ -47,7 +47,7 @@
                 #set($id = $result.id)
                 #set($built = $result.stamps.prettyStartTime) 
                 #set($elapsed = $result.stamps.prettyElapsed)
-                #if($result.state.toString() == "SUCCESS")
+                #if($result.succeeded())
                     #set($success = "success")
                 #else
                     #set($success = "failure")

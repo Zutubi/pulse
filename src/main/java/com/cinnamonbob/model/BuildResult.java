@@ -177,4 +177,19 @@ public class BuildResult extends Entity
     {
         this.changelists = changelists;
     }
+
+    public boolean succeeded()
+    {
+        return ResultState.SUCCESS == getState();
+    }
+
+    public boolean failed()
+    {
+        return ResultState.FAILURE == getState();
+    }
+
+    public boolean errored()
+    {
+        return ResultState.ERROR == getState();
+    }
 }
