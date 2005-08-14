@@ -1,8 +1,8 @@
-package com.cinnamonbob.core.config;
+package com.cinnamonbob.core;
 
-import com.cinnamonbob.core.config.BobFile;
-import com.cinnamonbob.core.config.BobFileComponent;
-import com.cinnamonbob.core.config.Reference;
+import com.cinnamonbob.core.BobFile;
+import com.cinnamonbob.core.BobFileComponent;
+import com.cinnamonbob.core.Reference;
 
 /**
  * 

@@ -1,19 +1,19 @@
-package com.cinnamonbob.core.config;
+package com.cinnamonbob.core;
 
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.cinnamonbob.core.config.BobFile;
-import com.cinnamonbob.core.config.BobFileLoader;
-import com.cinnamonbob.core.config.CommandGroup;
-import com.cinnamonbob.core.config.ComponentDefinition;
-import com.cinnamonbob.core.config.CronTrigger;
-import com.cinnamonbob.core.config.ExecutableCommand;
-import com.cinnamonbob.core.config.PostProcessorGroup;
-import com.cinnamonbob.core.config.Property;
-import com.cinnamonbob.core.config.Recipe;
-import com.cinnamonbob.core.config.RegexPostProcessor;
-import com.cinnamonbob.core.config.Schedule;
+import com.cinnamonbob.core.BobFile;
+import com.cinnamonbob.core.BobFileLoader;
+import com.cinnamonbob.core.CommandGroup;
+import com.cinnamonbob.core.ComponentDefinition;
+import com.cinnamonbob.core.CronTrigger;
+import com.cinnamonbob.core.ExecutableCommand;
+import com.cinnamonbob.core.PostProcessorGroup;
+import com.cinnamonbob.core.Property;
+import com.cinnamonbob.core.Recipe;
+import com.cinnamonbob.core.RegexPostProcessor;
+import com.cinnamonbob.core.Schedule;
 
 import junit.framework.TestCase;
 
