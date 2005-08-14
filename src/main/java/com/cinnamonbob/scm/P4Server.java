@@ -2,6 +2,8 @@ package com.cinnamonbob.scm;
 
 import com.cinnamonbob.scm.Change.Action;
 import com.cinnamonbob.util.IOHelper;
+import com.cinnamonbob.model.SimpleChange;
+import com.cinnamonbob.model.SimpleChangelist;
 
 import java.io.*;
 import java.text.ParseException;
@@ -131,7 +133,8 @@ public class P4Server implements SCMServer
         P4Result result     = runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_OUTPUT);
         String   clientSpec = result.stdout.toString();
         
-        clientSpec = clientSpec.replaceAll("\nRoot:.*", "\nRoot: " + toDirectory.getAbsolutePath());
+        clientSpec = clientSpec.replaceAll("\nRoot:.*", Matcher.quoteReplacement("\nRoot: " + toDirectory.getAbsolutePath()));
+
         runP4(clientSpec, P4_COMMAND, COMMAND_CLIENT, FLAG_INPUT);
         clientRoot = toDirectory;
     }

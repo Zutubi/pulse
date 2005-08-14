@@ -75,6 +75,7 @@ public class BuildProcessor
         }
         catch(BuildException e)
         {
+            e.printStackTrace();
             buildResult.error(e);
         }
         finally

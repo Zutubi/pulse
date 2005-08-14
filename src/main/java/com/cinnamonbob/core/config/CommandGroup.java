@@ -8,6 +8,7 @@ import java.io.IOException;
 import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.model.StoredArtifact;
 import com.cinnamonbob.util.IOHelper;
+import com.opensymphony.util.TextUtils;
 
 
 /**
@@ -17,56 +18,61 @@ import com.cinnamonbob.util.IOHelper;
 public class CommandGroup implements Command
 {
     private String name;
-    
+
     private Command cmd = null;
-    
+
     private List<ProcessArtifactMapping> mappings = new LinkedList<ProcessArtifactMapping>();
-    
+
     private List<FileArtifact> artifacts = new LinkedList<FileArtifact>();
-    
+
     public void add(Command cmd)
     {
         if (this.cmd != null)
         {
-            throw new IllegalArgumentException("CommandGroup only supports a single command instance.");   
-        }            
+            throw new IllegalArgumentException("CommandGroup only supports a single command instance.");
+        }
         this.cmd = cmd;
+
+        if (!TextUtils.stringSet(this.cmd.getName()))
+        {
+            this.cmd.setName(name);
+        }
     }
-    
+
     public void setName(String name)
     {
         this.name = name;
     }
-    
+
     public String getName()
     {
         return name;
     }
-    
+
     public ProcessArtifactMapping createProcess()
     {
         ProcessArtifactMapping mapping = new ProcessArtifactMapping();
         mappings.add(mapping);
         return mapping;
     }
-    
+
     public FileArtifact createArtifact()
     {
         FileArtifact customArtifact = new FileArtifact();
         artifacts.add(customArtifact);
         return customArtifact;
     }
-    
+
     public void execute(File outputDir, CommandResult result)
     {
         cmd.execute(outputDir, result);
         result.setCommandName(name);
         collectArtifacts(result, outputDir);
-        
+
         for (ProcessArtifactMapping m : mappings)
         {
             StoredArtifact a = result.getArtifact(m.getArtifact());
-            
+
             if(a != null)
             {
                 m.getProcessor().process(a);
@@ -77,18 +83,18 @@ public class CommandGroup implements Command
             }
         }
     }
-    
+
     private void collectArtifacts(CommandResult result, File outputDir)
     {
         for(FileArtifact artifact: artifacts)
         {
             File toFile = artifact.getToFile();
-            
+
             if(toFile == null)
             {
                 toFile = new File(artifact.getFile().getName());
             }
-            
+
             if(!toFile.isAbsolute())
             {
                 // Then it is relative to the output path.
@@ -96,7 +102,7 @@ public class CommandGroup implements Command
             }
 
             File fromFile = artifact.getFile();
-                   
+
             try
             {
                 IOHelper.copyFile(fromFile, toFile);
@@ -109,10 +115,10 @@ public class CommandGroup implements Command
             }
         }
     }
-    
+
     /**
      * 
-     */ 
+     */
     private class ProcessArtifactMapping
     {
         private String artifact;

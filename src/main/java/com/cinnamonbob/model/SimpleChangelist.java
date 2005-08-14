@@ -1,4 +1,8 @@
-package com.cinnamonbob.scm;
+package com.cinnamonbob.model;
+
+import com.cinnamonbob.scm.Changelist;
+import com.cinnamonbob.scm.Revision;
+import com.cinnamonbob.scm.Change;
 
 import java.util.Date;
 import java.util.LinkedList;

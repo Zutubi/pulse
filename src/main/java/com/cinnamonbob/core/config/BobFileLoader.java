@@ -2,6 +2,7 @@ package com.cinnamonbob.core.config;
 
 import com.cinnamonbob.BobException;
 import com.cinnamonbob.util.IOHelper;
+import com.opensymphony.xwork.validator.ValidationException;
 import nu.xom.*;
 
 import java.io.IOException;
@@ -188,6 +189,15 @@ public class BobFileLoader
         {
             ((InitComponent) type).init();
         }
+
+        try
+        {
+            CommandValidationManager.validate(type);
+        }
+        catch (ValidationException e1)
+        {
+            e1.printStackTrace();
+        }
     }
 
     private Object create(String name) throws ParseException
@@ -211,7 +221,6 @@ public class BobFileLoader
      * upper case the following letter.
      *
      * @param name
-     * @return
      */
     private String convertLocalNameToPropertyName(String name)
     {

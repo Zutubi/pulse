@@ -2,7 +2,7 @@ package com.cinnamonbob.scm.cvs;
 
 import com.cinnamonbob.scm.Change;
 import com.cinnamonbob.scm.Changelist;
-import com.cinnamonbob.scm.SimpleChange;
+import com.cinnamonbob.model.SimpleChange;
 import com.cinnamonbob.util.FileSystemUtils;
 import junit.framework.TestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;

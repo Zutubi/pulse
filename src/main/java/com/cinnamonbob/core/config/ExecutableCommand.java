@@ -18,7 +18,9 @@ public class ExecutableCommand implements Command
     private String exe;
     private String args;
     private File workingDir;
-    
+
+    private String name;
+
     private List<Environment> env = new LinkedList<Environment>();
     
     public void execute(File outputDir, CommandResult cmdResult)
@@ -135,10 +137,20 @@ public class ExecutableCommand implements Command
         
         return result.toString();
     }
-    
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
     /**
      * 
-     */ 
+     */
     public class Environment
     {
         private String name;

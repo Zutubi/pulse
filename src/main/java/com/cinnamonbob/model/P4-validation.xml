@@ -5,9 +5,6 @@
         <field-validator type="required">
             <message>P4PORT is required.</message>
         </field-validator>
-        <field-validator type="integral">
-            <message>P4PORT should be a valid integer.</message>
-        </field-validator>
     </field>
     <field name="user">
         <field-validator type="requiredstring">

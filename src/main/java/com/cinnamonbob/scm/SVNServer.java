@@ -1,6 +1,8 @@
 package com.cinnamonbob.scm;
 
 import com.cinnamonbob.scm.Change.Action;
+import com.cinnamonbob.model.SimpleChange;
+import com.cinnamonbob.model.SimpleChangelist;
 import org.tmatesoft.svn.core.ISVNWorkspace;
 import org.tmatesoft.svn.core.ISVNWorkspaceListener;
 import org.tmatesoft.svn.core.SVNWorkspaceManager;

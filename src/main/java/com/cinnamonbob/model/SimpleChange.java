@@ -1,4 +1,7 @@
-package com.cinnamonbob.scm;
+package com.cinnamonbob.model;
+
+import com.cinnamonbob.scm.Change;
+import com.cinnamonbob.scm.Revision;
 
 /**
  * A trivial implementation of the Change interface.
@@ -10,15 +13,15 @@ public class SimpleChange implements Change
     private String filename;
     private Revision revision;
     private Action action;
-    
-    
+
+
     public SimpleChange(String filename, Revision revision, Action action)
     {
         this.filename = filename;
         this.revision = revision;
         this.action = action;
     }
-    
+
     public String getFilename()
     {
         return filename;

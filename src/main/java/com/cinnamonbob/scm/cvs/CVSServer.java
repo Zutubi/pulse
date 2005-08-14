@@ -5,6 +5,8 @@ import com.cinnamonbob.scm.cvs.client.BuilderAdapter;
 import com.cinnamonbob.scm.cvs.client.ConnectionFactory;
 import com.cinnamonbob.scm.cvs.client.HistoryBuilder;
 import com.cinnamonbob.scm.cvs.client.HistoryInformation;
+import com.cinnamonbob.model.SimpleChange;
+import com.cinnamonbob.model.SimpleChangelist;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
 import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
