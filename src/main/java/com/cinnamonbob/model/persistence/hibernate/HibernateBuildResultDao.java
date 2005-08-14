@@ -11,7 +11,7 @@ import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
-import com.cinnamonbob.core.BuildResult;
+import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 
 public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> implements BuildResultDao
@@ -23,7 +23,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     {
         return BuildResult.class;
     }
-    
+
     public List findLatestByProjectName(final String project, final int max)
     {
         return (List)getHibernateTemplate().execute(new HibernateCallback(){
@@ -33,9 +33,9 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 Query queryObject = session.createQuery("from BuildResult result where result.projectName = :project order by id desc");
                 queryObject.setParameter("project", project, Hibernate.STRING);
                 queryObject.setMaxResults(max);
-                
+
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                
+
                 return queryObject.list();
             }
         });
@@ -49,13 +49,13 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 Query queryObject = session.createQuery("from BuildResult result where result.projectName = :project and result.number = :number");
                 queryObject.setParameter("project", project, Hibernate.STRING);
                 queryObject.setParameter("number", number, Hibernate.LONG);
-                
+
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                
+
                 return queryObject.list();
             }
         });
-        
+
         if(results.size() > 1)
         {
             LOG.warning("findByProjectNameAndNumber has returned " + results.size() +

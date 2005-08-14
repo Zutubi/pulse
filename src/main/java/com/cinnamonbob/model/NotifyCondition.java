@@ -1,7 +1,5 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.core.BuildResult;
-
 /**
  * Describes an interface for making notifications conditional based on
  * properties of the build result (e.g. only notify on build failed).

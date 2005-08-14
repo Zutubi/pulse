@@ -1,6 +1,6 @@
 package com.cinnamonbob.core.renderer;
 
-import com.cinnamonbob.core.BuildResult;
+import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
 
 import java.io.Writer;

@@ -2,7 +2,6 @@ package com.cinnamonbob.model;
 
 import java.util.List;
 
-import com.cinnamonbob.core.BuildResult;
 import com.cinnamonbob.model.persistence.ArtifactDao;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 

@@ -1,7 +1,5 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.core.BuildResult;
-
 import java.util.List;
 
 public class CompoundNotifyCondition implements NotifyCondition

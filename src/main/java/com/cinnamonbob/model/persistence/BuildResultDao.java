@@ -2,7 +2,7 @@ package com.cinnamonbob.model.persistence;
 
 import java.util.List;
 
-import com.cinnamonbob.core.BuildResult;
+import com.cinnamonbob.model.BuildResult;
 
 public interface BuildResultDao extends EntityDao<BuildResult>
 {

@@ -3,7 +3,7 @@ package com.cinnamonbob.web.project;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.cinnamonbob.core.BuildResult;
+import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
 
 /**
@@ -19,7 +19,7 @@ public class ViewProjectsAction extends ProjectActionSupport
     {
         return projects;
     }
-    
+
     public List<BuildResult> getLatestBuilds()
     {
         return latestBuilds;
@@ -27,14 +27,14 @@ public class ViewProjectsAction extends ProjectActionSupport
 
     public void validate()
     {
-        
+
     }
-    
+
     public String execute()
     {
         projects = getProjectManager().getAllProjects();
         latestBuilds = new LinkedList<BuildResult>();
-        
+
         for(Project p: projects)
         {
             List<BuildResult> build = getBuildManager().getLatestBuildResultsForProject(p.getName(), 1);

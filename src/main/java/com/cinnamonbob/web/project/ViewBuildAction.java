@@ -4,13 +4,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.cinnamonbob.scm.Changelist;
-import com.cinnamonbob.model.NumericalRevision;
 import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.core.BuildResult;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.CommandResult;
-import com.cinnamonbob.model.StoredArtifact;
-import com.cinnamonbob.model.Feature;
+import com.cinnamonbob.model.BuildResult;
+import com.cinnamonbob.model.*;
 
 /**
  * 
@@ -56,14 +52,14 @@ public class ViewBuildAction extends ProjectActionSupport
 
     public void validate()
     {
-        
+
     }
-    
+
     public String execute()
     {
         project = getProjectManager().getProject(id);
         result = getBuildManager().getBuildResult(buildId);
-        
+
         for(CommandResult r: result.getCommandResults())
         {
             for(StoredArtifact a: r.getArtifacts())
@@ -75,11 +71,11 @@ public class ViewBuildAction extends ProjectActionSupport
                 }
             }
         }
-        
+
         if(result.getNumber() > 1)
         {
             BuildResult previousResult = getBuildManager().getByProjectNameAndNumber(project.getName(), result.getNumber() - 1);
-            
+
             if(previousResult != null)
             {
                 getChanges(previousResult);
@@ -94,7 +90,7 @@ public class ViewBuildAction extends ProjectActionSupport
         // FIXME oh how it assumes...
         NumericalRevision previousRevision = new NumericalRevision(Long.parseLong(previousResult.getRevision()));
         NumericalRevision buildRevision    = new NumericalRevision(Long.parseLong(result.getRevision()));
-        
+
         try
         {
             changes = project.getScms().get(0).createServer().getChanges(previousRevision, buildRevision, "");
@@ -114,5 +110,5 @@ public class ViewBuildAction extends ProjectActionSupport
     public void setChanges(List<Changelist> changes)
     {
         this.changes = changes;
-    }    
+    }
 }

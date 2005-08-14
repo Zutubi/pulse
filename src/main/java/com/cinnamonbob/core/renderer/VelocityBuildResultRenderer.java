@@ -1,7 +1,7 @@
 package com.cinnamonbob.core.renderer;
 
 import com.cinnamonbob.bootstrap.velocity.VelocityManager;
-import com.cinnamonbob.core.BuildResult;
+import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.model.Project;
 

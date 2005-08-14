@@ -2,7 +2,6 @@ package com.cinnamonbob.model;
 
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.BuildResult;
 import com.cinnamonbob.core.renderer.BuildResultRenderer;
 import com.cinnamonbob.core.renderer.VelocityBuildResultRenderer;
 
@@ -43,7 +42,7 @@ public class EmailContactPoint extends ContactPoint
     }
 
     /* (non-Javadoc)
-    * @see com.cinnamonbob.core.ContactPoint#notify(com.cinnamonbob.core.BuildResult)
+    * @see com.cinnamonbob.core.ContactPoint#notify(com.cinnamonbob.model.BuildResult)
     */
     public void notify(Project project, BuildResult result)
     {

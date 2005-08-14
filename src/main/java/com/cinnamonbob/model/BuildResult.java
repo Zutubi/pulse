@@ -1,9 +1,10 @@
-package com.cinnamonbob.core;
+package com.cinnamonbob.model;
 
 import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.model.Entity;
 import com.cinnamonbob.model.ResultState;
 import com.cinnamonbob.util.TimeStamps;
+import com.cinnamonbob.core.BuildException;
 
 import java.util.LinkedList;
 import java.util.List;
