@@ -90,7 +90,7 @@ public abstract class ContactPoint extends Entity
      * Used by hibernate only.
      * @param subscriptions
      */
-    private void setSubscriptions(List subscriptions)
+    private void setSubscriptions(List<Subscription> subscriptions)
     {
         this.subscriptions = subscriptions;
     }
