@@ -16,7 +16,7 @@ public class HistoryBuilderTest extends TestCase
         builder.parseLine(checkout, false);
 
         assertEquals(1, builder.getHistoryInfo().size());
-        HistoryInformation information = builder.getHistoryInfo().get(0);
+        HistoryInfo information = builder.getHistoryInfo().get(0);
 
         assertNotNull(information);
         assertTrue(information.isCheckout());
@@ -31,7 +31,7 @@ public class HistoryBuilderTest extends TestCase
         builder.parseLine(commit, false);
 
         assertEquals(1, builder.getHistoryInfo().size());
-        HistoryInformation information = builder.getHistoryInfo().get(0);
+        HistoryInfo information = builder.getHistoryInfo().get(0);
 
         assertNotNull(information);
         assertTrue(information.isCommit());

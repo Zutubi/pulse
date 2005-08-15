@@ -3,13 +3,16 @@ package com.cinnamonbob.scm.cvs.client;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.StringTokenizer;
+import java.util.List;
+import java.util.ArrayList;
 
 import com.cinnamonbob.model.Change;
 
 /**
- * The HistoryInformation object represents a single line from the history output.
+ * The HistoryInfo object represents a single line from the history output.
  */
-public class HistoryInformation
+public class HistoryInfo
 {
     private String code;
     private String pathInRepository;
@@ -23,9 +26,35 @@ public class HistoryInformation
 
     static final SimpleDateFormat LOGDATE = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z");
 
-    public HistoryInformation()
+    public HistoryInfo(String data)
     {
+        StringTokenizer tokenizer = new StringTokenizer(data, " ", false);
+        List<String> tokens = new ArrayList<String>();
+        while (tokenizer.hasMoreTokens())
+        {
+            tokens.add(tokenizer.nextToken());
+        }
 
+        this.code = (tokens.get(0));
+        this.date = (tokens.get(1)); // date
+        this.time = (tokens.get(2)); // time
+        this.timezone = (tokens.get(3)); // timezone
+        this.user = (tokens.get(4));
+
+        if (isUpdate() || isCommit())
+        {
+            this.revision = (tokens.get(5)); // file version
+            this.file = (tokens.get(6)); // file name
+            this.pathInRepository = (tokens.get(7)); // path in repository
+            tokens.get(8); // ==
+            this.workingpath = (tokens.get(9)); // working path
+        }
+        else
+        {
+            this.file = (tokens.get(5)); // file
+            this.pathInRepository = (tokens.get(6).substring(1, tokens.get(6).length() - 1)); // =path in repository=
+            this.workingpath = (tokens.get(7)); // working path
+        }
     }
 
     public boolean isCheckout()
@@ -106,39 +135,9 @@ public class HistoryInformation
         return code;
     }
 
-    public void setCode(String code)
-    {
-        this.code = code;
-    }
-
-    public void setPathInRepository(String pathInRepository)
-    {
-        this.pathInRepository = pathInRepository;
-    }
-
-    public void setUser(String user)
-    {
-        this.user = user;
-    }
-
-    public void setFile(String file)
-    {
-        this.file = file;
-    }
-
-    public void setRevision(String revision)
-    {
-        this.revision = revision;
-    }
-
     public String getDate()
     {
         return date;
-    }
-
-    public void setDate(String date)
-    {
-        this.date = date;
     }
 
     public String getTime()
@@ -146,29 +145,14 @@ public class HistoryInformation
         return time;
     }
 
-    public void setTime(String time)
-    {
-        this.time = time;
-    }
-
     public String getTimezone()
     {
         return timezone;
     }
 
-    public void setTimezone(String timezone)
-    {
-        this.timezone = timezone;
-    }
-
     public String getWorkingpath()
     {
         return workingpath;
-    }
-
-    public void setWorkingpath(String workingpath)
-    {
-        this.workingpath = workingpath;
     }
 
     public Date getInfoDate()

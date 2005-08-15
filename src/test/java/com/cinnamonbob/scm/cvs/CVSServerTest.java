@@ -1,8 +1,8 @@
 package com.cinnamonbob.scm.cvs;
 
-import com.cinnamonbob.util.FileSystemUtils;
-import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.model.Change;
+import com.cinnamonbob.model.Changelist;
+import com.cinnamonbob.util.FileSystemUtils;
 import junit.framework.TestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.util.Logger;
@@ -53,8 +53,9 @@ public class CvsServerTest extends TestCase
         assertTrue(!foo.exists());
                
         // checkout...
-        CvsServer cvsServer = new CvsServer(cvsRoot);
-        cvsServer.checkout(workdir, "project");
+        CvsClient cvs = new CvsClient(cvsRoot);
+        cvs.setLocalPath(workdir);
+        cvs.checkout("project");
         
         assertTrue(foo.exists());
     }
@@ -62,8 +63,8 @@ public class CvsServerTest extends TestCase
     public void testGetChanges() throws Exception
     {
         // get changes since the start.
-        CvsServer cvsServer = new CvsServer(cvsRoot);
-        List<Changelist> changes = cvsServer.getChanges(workdir, null);
+        CvsClient cvs = new CvsClient(cvsRoot);
+        List<Changelist> changes = cvs.getChangeLists(null);
         assertNotNull(changes);
         assertTrue(changes.size() == 9);        
         assertEquals(2, changes.get(0).getChanges().size());
@@ -79,7 +80,7 @@ public class CvsServerTest extends TestCase
         // get changes since x where x is the date of one of the changes.
         
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        changes = cvsServer.getChanges(workdir, dateFormat.parse("2005-05-10"));
+        changes = cvs.getChangeLists(dateFormat.parse("2005-05-10"));
         assertNotNull(changes);
         assertTrue(changes.size() == 4);
     }
@@ -89,8 +90,8 @@ public class CvsServerTest extends TestCase
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         CVSRoot root = CVSRoot.parse(":ext:dostermeier:4edueWX7@cvs.atlassian.com:/cvsroot/atlassian");
-        CvsServer cvsServer = new CvsServer(root);
-        List<Changelist> changes = cvsServer.getChanges(null, dateFormat.parse("2005-08-05"));
+        CvsClient cvs = new CvsClient(root);
+        List<Changelist> changes = cvs.getChangeLists(dateFormat.parse("2005-08-05"));
         System.out.println("changes:" + changes.size());
     }
     
@@ -113,29 +114,14 @@ public class CvsServerTest extends TestCase
     {
         List<Change> changes = changelist.getChanges();
         Map<String, String> filenames = new HashMap<String, String>();
-        String message = null;
-        String author = null;
-        
+
         for (Change change: changes)
         {
             assertFalse(filenames.containsKey(change.getFilename()));
             filenames.put(change.getFilename(), change.getFilename());
 
-            // TODO fix for new revision types
-            //CvsRevision revision = (CvsRevision)simpleChange.getRevision();
-//            String currentComment = revision.getComment();
-//            if (message == null)
-//            {
-//                message = currentComment;
-//            }
-//            assertEquals(message, currentComment);
-//
-//            String currentAuthor = revision.getAuthor();
-//            if (author == null)
-//            {
-//                author = currentAuthor;
-//            }
-//            assertEquals(author, currentAuthor);
+            assertNotNull(change.getRevision());
+            assertNotNull(change.getAction());
         }
     }
 }
