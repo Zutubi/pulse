@@ -272,7 +272,13 @@ public class SVNServer implements SCMServer
                 repository.log(paths, logs, fromNumber, toNumber, true, true);
                 for(SVNLogEntry entry: logs)
                 {
-                    Changelist list  = new Changelist(new NumericalRevision(entry.getRevision()), entry.getDate(), entry.getAuthor(), entry.getMessage());
+                    NumericalRevision revision = new NumericalRevision(entry.getRevision());
+                    revision.setAuthor(entry.getAuthor());
+                    revision.setComment(entry.getMessage());
+                    revision.setDate(entry.getDate());
+                    // branch??
+
+                    Changelist list  = new Changelist(revision);
                     Map              files = entry.getChangedPaths();
                     
                     for(Object value: files.values())

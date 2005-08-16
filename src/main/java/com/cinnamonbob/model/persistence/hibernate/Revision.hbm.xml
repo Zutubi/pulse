@@ -10,8 +10,12 @@
         
         <discriminator column="REVISIONTYPE" type="string" length="255"/>
         
-        <property name="properties" column="PROPERTIES" type="com.cinnamonbob.util.PropertiesType" length="4096"/>
-        
+        <property name="author" column="AUTHOR" type="string" length="255"/>
+        <property name="comment" column="COMMENT" type="string" length="4096"/>
+        <property name="time" column="DATE" type="long"/>
+        <property name="branch" column="BRANCH" type="string" length="255"/>
+        <property name="revisionString" column="REVISIONSTRING" type="string" length="255"/>
+
         <subclass name="com.cinnamonbob.model.NumericalRevision" discriminator-value="NUMERICAL" dynamic-update="false">
         </subclass>
         

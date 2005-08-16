@@ -8,13 +8,8 @@
             <generator class="hilo"/>
         </id>
 
+        <!-- the local side of a one-one...  -->
         <many-to-one name="revision" class="com.cinnamonbob.model.Revision" column="REVISION_ID" cascade="all" unique="true"/>
-
-        <property name="user" type="string" length="255"/>
-
-        <property name="date" type="timestamp"/>
-
-        <property name="comment" type="string" length="4095"/>
 
         <list name="changes" cascade="all-delete-orphan" lazy="false">
             <key column="CHANGELIST_ID"/>

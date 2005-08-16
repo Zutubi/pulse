@@ -12,9 +12,6 @@ import java.util.List;
 public class Changelist extends Entity
 {
     private Revision revision;
-    private Date date;
-    private String user;
-    private String comment;
     private List<Change> changes;
     
     protected Changelist()
@@ -22,12 +19,9 @@ public class Changelist extends Entity
 
     }
 
-    public Changelist(Revision revision, Date date, String user, String comment)
+    public Changelist(Revision revision)
     {
         this.revision = revision;
-        this.date = date;
-        this.user = user;
-        this.comment = comment;
         this.changes = new LinkedList<Change>();
     }
     
@@ -43,17 +37,17 @@ public class Changelist extends Entity
     
     public Date getDate()
     {
-        return date;
+        return getRevision().getDate();
     }
 
     public String getUser()
     {
-        return user;
+        return getRevision().getAuthor();
     }
 
     public String getComment()
     {
-        return comment;
+        return getRevision().getComment();
     }
 
     public List<Change> getChanges()
@@ -66,23 +60,8 @@ public class Changelist extends Entity
         this.changes = changes;
     }
 
-    private void setComment(String comment)
-    {
-        this.comment = comment;
-    }
-
-    private void setDate(Date date)
-    {
-        this.date = date;
-    }
-
     private void setRevision(Revision revision)
     {
         this.revision = revision;
-    }
-
-    private void setUser(String user)
-    {
-        this.user = user;
     }
 }

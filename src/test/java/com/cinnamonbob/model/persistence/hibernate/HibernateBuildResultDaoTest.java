@@ -57,7 +57,11 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         buildResult.add(result);
 
         Revision revision = new NumericalRevision(12345);
-        Changelist changes = new Changelist(revision, Calendar.getInstance().getTime(), "user", "i like fruit");
+        revision.setDate(Calendar.getInstance().getTime());
+        revision.setAuthor("user");
+        revision.setComment("i like fruit");
+        
+        Changelist changes = new Changelist(revision);
         changes.addChange(new Change("/filename.1", "1.0", Change.Action.ADD));
         changes.addChange(new Change("/filename.2", "2.0", Change.Action.DELETE));
         changes.addChange(new Change("/filename.3", "3.0", Change.Action.EDIT));

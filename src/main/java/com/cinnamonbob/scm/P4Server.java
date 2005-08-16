@@ -248,7 +248,14 @@ public class P4Server implements SCMServer
         }
         
         String           comment    = getChangelistComment(lines, affectedFilesIndex);
-        Changelist changelist = new Changelist(new NumericalRevision(number), date, user, comment);
+
+        NumericalRevision revision = new NumericalRevision(number);
+        revision.setDate(date);
+        revision.setAuthor(user);
+        revision.setComment(comment);
+        // branch??
+
+        Changelist changelist = new Changelist(revision);
         
         for(int i = affectedFilesIndex + 2; i < lines.length; i++)
         {

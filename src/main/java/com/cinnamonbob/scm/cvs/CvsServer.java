@@ -32,6 +32,9 @@ public class CvsServer implements SCMServer
         // can not checkout a revision since cvs does not support repository wide revisions.
         // can however checkout a tag / branch...?
 
+        CvsRevision cvsRevision = (CvsRevision) revision;
+        
+
         // what about the changes? what do these represent?
         CvsClient client = new CvsClient(cvsRoot);
         client.setLocalPath(toDirectory);

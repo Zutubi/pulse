@@ -1,34 +1,114 @@
 package com.cinnamonbob.model;
 
-import java.util.Properties;
+import java.util.Date;
 
 /**
- * Created by IntelliJ IDEA.
- * User: daniel
- * Date: 14/08/2005
- * Time: 13:48:33
- * To change this template use File | Settings | File Templates.
+ *
+ *
  */
 public class Revision extends Entity
 {
-    private Properties properties;
+    private String author;
+    private String comment;
+    private String branch;
+    private long time;
+    private String revisionString;
 
-    protected Revision()
+    /**
+     * The author of change
+     *
+     */
+    public String getAuthor()
     {
-
+        return author;
     }
 
-    protected Properties getProperties()
+    public void setAuthor(String author)
     {
-        if(properties == null)
+        this.author = author;
+    }
+
+    /**
+     * The comment associated with this change.
+     *
+     */
+    public String getComment()
+    {
+        return comment;
+    }
+
+    public void setComment(String comment)
+    {
+        this.comment = comment;
+    }
+
+    /**
+     * The branch on which this change was made.
+     *
+     */
+    public String getBranch()
+    {
+        return branch;
+    }
+
+    public void setBranch(String branch)
+    {
+        this.branch = branch;
+    }
+
+    /**
+     * The date of this change.
+     *
+     */
+    public Date getDate()
+    {
+        if (time > 0)
         {
-            properties = new Properties();
+            return new Date(time);
         }
-        return properties;
+        return null;
     }
 
-    private void setProperties(Properties properties)
+    public void setDate(Date date)
     {
-        this.properties = properties;
+        if (date != null)
+        {
+            this.time = date.getTime();
+        }
+        else
+        {
+            this.time = -1;
+        }
+    }
+
+    public String getRevisionString()
+    {
+        return revisionString;
+    }
+
+    public void setRevisionString(String revisionString)
+    {
+        this.revisionString = revisionString;
+    }
+
+    public String toString()
+    {
+        return getRevisionString();
+    }
+
+    /**
+     * Used by hibernate to persist the time.
+     */
+    private long getTime()
+    {
+        return time;
+    }
+
+    /**
+     * Used by hibernate to persist the time.
+     */
+    private void setTime(long time)
+    {
+        this.time = time;
     }
 }

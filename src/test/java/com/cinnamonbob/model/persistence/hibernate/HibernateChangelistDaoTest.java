@@ -33,7 +33,7 @@ public class HibernateChangelistDaoTest extends PersistenceTestCase
         try {
             Date date = Calendar.getInstance().getTime();
             CvsRevision revision = new CvsRevision("bob", "MAIN", "test changelist", date);
-            Changelist list = new Changelist(revision, date, "bob", "wow, this is teh r0x0rz");
+            Changelist list = new Changelist(revision);
             Change change = new Change("some/random/file", "23", Change.Action.EDIT);
 
             list.addChange(change);

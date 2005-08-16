@@ -1,6 +1,8 @@
 package com.cinnamonbob.model;
 
 import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * The cvs revision is a composite of information used to identify a
@@ -9,10 +11,7 @@ import java.util.Date;
  */
 public class CvsRevision extends Revision
 {
-    private static final String AUTHOR = "author";
-    private static final String BRANCH = "branch";
-    private static final String COMMENT = "comment";
-    private static final String DATE = "date";
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
 
     protected CvsRevision()
     {
@@ -25,85 +24,14 @@ public class CvsRevision extends Revision
         setBranch((branch != null) ? branch : "");
         setComment(comment);
         setDate(date);
-    }
 
-    /**
-     * The author of change
-     *
-     */
-    public String getAuthor()
-    {
-        return getProperties().getProperty(AUTHOR);
-    }
-
-    /**
-     * The branch on which this change was made.
-     *
-     */
-    public String getBranch()
-    {
-        return getProperties().getProperty(BRANCH);
-    }
-
-    /**
-     * The comment associated with this change.
-     *
-     */
-    public String getComment()
-    {
-        return getProperties().getProperty(COMMENT);
-    }
-
-    /**
-     * The date of this change.
-     *
-     */
-    public Date getDate()
-    {
-        String milliStr = getProperties().getProperty(DATE);
-        Date date = null;
-
-        try
-        {
-            date = new Date(Long.parseLong(milliStr));
-        }
-        catch(NumberFormatException e)
-        {
-            // Daniel promises this will never happen.
-        }
-
-        return date;
-    }
-
-    public String toString()
-    {
+        // construct the revision string.
         StringBuffer buffer = new StringBuffer();
         buffer.append(getAuthor());
         buffer.append(":");
         buffer.append(getBranch());
         buffer.append(":");
-        buffer.append(getComment());
-        return buffer.toString();
-    }
-
-    private void setAuthor(String author)
-    {
-        getProperties().put(AUTHOR, author);
-    }
-
-    private void setBranch(String branch)
-    {
-        getProperties().put(BRANCH, branch);
-    }
-
-    private void setComment(String comment)
-    {
-        getProperties().put(COMMENT, comment);
-    }
-
-    private void setDate(Date date)
-    {
-        long millis = date.getTime();
-        getProperties().setProperty(DATE, Long.toString(millis));
+        buffer.append(DATE_FORMAT.format(date));
+        setRevisionString(buffer.toString());
     }
 }

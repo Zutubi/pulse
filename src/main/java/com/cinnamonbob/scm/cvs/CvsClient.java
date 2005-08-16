@@ -349,7 +349,7 @@ public class CvsClient
         {
             LocalChange aChange = set.getChanges().get(0);
             CvsRevision revision = new CvsRevision(aChange.getAuthor(), aChange.getBranch(), aChange.getMessage(), aChange.getDate());
-            Changelist changelist = new Changelist(revision, aChange.getDate(), aChange.getAuthor(), aChange.getMessage());
+            Changelist changelist = new Changelist(revision);
             for (LocalChange change : set.getChanges())
             {
                 changelist.addChange(new Change(change.getFilename(), change.getRevision(), change.getAction()));
