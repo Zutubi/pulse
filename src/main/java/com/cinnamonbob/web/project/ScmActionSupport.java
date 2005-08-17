@@ -1,7 +1,5 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.model.Scm;
-
 public class ScmActionSupport extends ProjectActionSupport
 {
 //    private String name;

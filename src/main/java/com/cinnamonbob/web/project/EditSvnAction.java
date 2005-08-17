@@ -1,7 +1,6 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Svn;
-import com.cinnamonbob.model.Cvs;
 
 /**
  *

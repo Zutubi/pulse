@@ -14,7 +14,7 @@
         <th class="command-detail">last built</th>
         <th class="command-detail">build id</th>
         <th class="command-detail">elapsed</th>
-        <th class="command-detail">result</th>
+        <th class="command-detail">status</th>
       </tr>
 #foreach($project in $projects)
   #set($index = $velocityCount - 1)
@@ -23,10 +23,12 @@
   #set($built = $lastResult.stamps.prettyStartTime) 
   #set($id = $lastResult.number)
   #set($elapsed = $lastResult.stamps.prettyElapsed)
-  #if($result.succeeded())
-    #set($success = "success")
+  #if($lastResult.inProgress())
+    #set($class = "info")
+  #elseif($lastResult.succeeded())
+    #set($class = "success")
   #else
-    #set($success = "failure")
+    #set($class = "failure")
   #end
 #else
   #set($built = "Never")
@@ -35,12 +37,12 @@
   #set($success = "n/a")
 #end
       <tr>
-        <td class="build-$success"><a href="manageProject.action?id=$project.id">$project.name</a></td>
+        <td class="build-$class"><a href="manageProject.action?id=$project.id">$project.name</a></td>
         <!--<td class="build-$success">$project.State.toString().toLowerCase()</td>-->
-        <td class="build-$success">$built</td>
-        <td class="build-$success">$id</td>
-        <td class="build-$success">$elapsed</td>
-        <td class="build-$success">$result.state.toString().toLowerCase()</td>
+        <td class="build-$class">$built</td>
+        <td class="build-$class">$id</td>
+        <td class="build-$class">$elapsed</td>
+        <td class="build-$class">$lastResult.state.prettyString</td>
       </tr>
 #end
       <tr>

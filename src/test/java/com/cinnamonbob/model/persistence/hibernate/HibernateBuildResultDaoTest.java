@@ -42,7 +42,7 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
 
         CommandResult result = new CommandResult();
         result.setCommandName("command name");
-        result.commence();
+        result.commence(new File("/tmp/commandout"));
         result.success();
         StoredArtifact artifact = new StoredArtifact(fa, "to file");
         PlainFeature feature = new PlainFeature(Feature.Level.ERROR, "summary here", 7);
@@ -51,7 +51,7 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         result.addArtifact(artifact);
 
         BuildResult buildResult = new BuildResult("project", 11);
-        buildResult.commence();
+        buildResult.commence(new File("/tmp/buildout"));
         buildResult.complete();
         buildResult.setRevision(new NumericalRevision(42));
         buildResult.add(result);

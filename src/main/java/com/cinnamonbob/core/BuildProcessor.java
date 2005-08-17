@@ -29,6 +29,21 @@ public class BuildProcessor
     private ProjectManager projectManager;
     private BuildManager   buildManager;
     private UserManager    userManager;
+    
+    public static String getBuildDirName(BuildResult result)
+    {
+        return String.format("%08d", Long.valueOf(result.getId()));
+    }
+    
+    public static String getCommandDirName(CommandResult result)
+    {
+        return Long.toString(result.getId());
+    }
+
+    public static String getProjectDirName(Project project)
+    {
+        return Long.toString(project.getId());
+    }
 
     public BuildProcessor()
     {
@@ -61,15 +76,18 @@ public class BuildProcessor
 
         BuildResult buildResult = new BuildResult(project.getName(), number);
         buildManager.save(buildResult);
-        buildResult.commence();
+        
+        File rootBuildDir = ConfigUtils.getManager().getAppConfig().getProjectRoot();
+        File projectDir = new File(rootBuildDir, getProjectDirName(project));
+        File buildsDir = new File(projectDir, "builds");
+        File buildDir = new File(buildsDir, getBuildDirName(buildResult));
+        
+        buildResult.commence(buildDir);
 
         try
         {
-            File rootBuildDir = ConfigUtils.getManager().getAppConfig().getProjectRoot();
-            File projectDir = new File(rootBuildDir, buildResult.getProjectName());
-
-            File workDir  = cleanWorkDir(projectDir);
-            File buildDir = createBuildResultDir(projectDir, buildResult);
+            File workDir = cleanWorkDir(projectDir);
+            createBuildResultDir(buildDir);
             File scmDir   = bootstrapBuild(project, previousBuildResult, buildResult, workDir, buildDir);
 
             BobFile bobFile = loadBobFile(scmDir);
@@ -116,20 +134,20 @@ public class BuildProcessor
         }
 
         // TODO: support continuing build when errors occur. Take care: exceptions.
-        // FIXME: record exception traces
         // FIXME: all commands need names, set on result immediately
         for (Command command : recipe.getCommands())
         {
             CommandResult result = new CommandResult();
 
-            result.commence();
             buildResult.add(result);
             buildManager.save(buildResult);
 
+            File commandOutput = new File(outputDir, getCommandDirName(result));
+            result.commence(commandOutput);
+            buildManager.save(buildResult);
+            
             try
             {
-                File commandOutput = new File(outputDir, Long.toString(result.getId()));
-
                 if(!commandOutput.mkdir())
                 {
                     throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
@@ -141,9 +159,15 @@ public class BuildProcessor
             {
                 result.error(e);
             }
+            catch(Exception e)
+            {
+                LOG.log(Level.SEVERE, "Unhandled exception during build", e);
+                result.error(new BuildException(e));
+            }
             finally
             {
                 result.complete();
+                buildManager.save(buildResult);
             }
 
             switch(result.getState())
@@ -190,7 +214,8 @@ public class BuildProcessor
             }
             catch (SCMException e)
             {
-                // need to report this failure to the user. However,
+                // TODO: need to report this failure to the user. However,
+                // this is not fatal to the current build
                 LOG.log(Level.WARNING, "Unable to retrieve changelist details from Scm server. ", e);
             }
         }
@@ -247,17 +272,12 @@ public class BuildProcessor
         return workDir;
     }
 
-    private File createBuildResultDir(File projectDir, BuildResult result)
+    private void createBuildResultDir(File buildDir)
     {
-        // root/<projectName>/builds/<buildId>        
-        File buildsDir = new File(projectDir, "builds");
-
-        File resultRootDir = new File(buildsDir, String.format("%08d", Long.valueOf(result.getId())));
-        if (!resultRootDir.mkdirs())
+        if (!buildDir.mkdirs())
         {
-            throw new BuildException("Unable to create build directory '" + resultRootDir.getAbsolutePath() + "'");
+            throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
         }
-        return resultRootDir;
     }
 
     private BobFile loadBobFile(File scmDir) throws BuildException

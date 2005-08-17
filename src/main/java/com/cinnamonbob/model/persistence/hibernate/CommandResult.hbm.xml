@@ -17,6 +17,8 @@
         
         <property name="stateName" type="string" length="31" not-null="true"/>
         
+        <property name="outputDir" type="string" length="1023"/>
+
         <property name="errorMessage" type="string" length="1023"/>
 
         <property name="properties" column="PROPERTIES" type="com.cinnamonbob.util.PropertiesType" length="4096"/>

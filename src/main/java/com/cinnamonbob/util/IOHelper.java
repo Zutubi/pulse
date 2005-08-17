@@ -154,4 +154,13 @@ public class IOHelper
             IOHelper.close(outStream);
         }
     }
+    
+    public static String fileToString(File file) throws IOException
+    {
+        FileInputStream is = new FileInputStream(file);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        IOHelper.joinStreams(is, os);
+        return os.toString();
+    }
 }

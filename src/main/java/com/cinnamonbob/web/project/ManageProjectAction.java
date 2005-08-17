@@ -13,6 +13,7 @@ public class ManageProjectAction extends ProjectActionSupport
 {
     private long id;
     private Project project;
+    private BuildResult currentBuild;
     private List<BuildResult> history;
 
     public long getId()
@@ -38,10 +39,20 @@ public class ManageProjectAction extends ProjectActionSupport
     public String execute()
     {
         project = getProjectManager().getProject(id);
-        history = getBuildManager().getLatestBuildResultsForProject(project.getName(), 10);
+        history = getBuildManager().getLatestBuildResultsForProject(project.getName(), 11);
+        if(history.size() > 0)
+        {
+            currentBuild = history.remove(0);
+        }
+        
         return SUCCESS;
     }
 
+    public BuildResult getCurrentBuild()
+    {
+        return currentBuild;
+    }
+    
     public List<BuildResult> getHistory()
     {
         return history;

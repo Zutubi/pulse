@@ -1,19 +1,26 @@
 package com.cinnamonbob.model;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
 import com.cinnamonbob.core.BuildException;
+import com.cinnamonbob.util.IOHelper;
 import com.cinnamonbob.util.TimeStamps;
 
 /**
  * 
  *
  */
-public class CommandResult extends Entity
+public class CommandResult extends Result
 {
     private static final int MAX_MESSAGE_LENGTH = 1023;
+    private static final String EXCEPTION_FILE = "exception";
     
     private String commandName;
     private TimeStamps stamps;
@@ -21,6 +28,7 @@ public class CommandResult extends Entity
     private String errorMessage;
     private Properties properties;
     private List<StoredArtifact> artifacts =  new LinkedList<StoredArtifact>();
+    private File outputDir;
 
     public CommandResult()
     {
@@ -52,8 +60,9 @@ public class CommandResult extends Entity
         return state;
     }
 
-    public void commence()
+    public void commence(File outputDir)
     {
+        this.outputDir = outputDir;
         state = ResultState.IN_PROGRESS;
         stamps = new TimeStamps();
     }
@@ -81,6 +90,15 @@ public class CommandResult extends Entity
         if(errorMessage.length() > MAX_MESSAGE_LENGTH)
         {
             errorMessage = errorMessage.substring(0, MAX_MESSAGE_LENGTH);
+        }
+        
+        try
+        {
+            e.printStackTrace(new PrintStream(new FileOutputStream(new File(outputDir, EXCEPTION_FILE)), true));
+        }
+        catch(FileNotFoundException ignored)
+        {
+            // no need to handle this, we did our level best
         }
     }
 
@@ -144,5 +162,44 @@ public class CommandResult extends Entity
     private void setProperties(Properties properties)
     {
         this.properties = properties;
+    }
+
+    private String getOutputDir()
+    {
+        if(outputDir == null)
+        {
+            return null;
+        }
+        else
+        {
+            return outputDir.getAbsolutePath();
+        }    }
+
+    private void setOutputDir(String dir)
+    {
+        if(dir == null)
+        {
+            outputDir = null;
+        }
+        else
+        {
+            outputDir = new File(dir);
+        }
+    }
+    
+    public String getExceptionTrace()
+    {
+        File exceptionFile = new File(outputDir, EXCEPTION_FILE);
+        String result = null;
+        
+        try
+        {
+            result = IOHelper.fileToString(exceptionFile);
+        }
+        catch(IOException e)
+        {
+        }
+        
+        return result;
     }
 }

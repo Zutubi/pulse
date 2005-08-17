@@ -12,6 +12,7 @@ import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import com.cinnamonbob.model.BuildResult;
+import com.cinnamonbob.model.ResultState;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 
 public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> implements BuildResultDao
@@ -29,9 +30,9 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return (List)getHibernateTemplate().execute(new HibernateCallback(){
             public Object doInHibernate(Session session) throws HibernateException, SQLException
             {
-                // FIXME: returns non-completed results
-                Query queryObject = session.createQuery("from BuildResult result where result.projectName = :project order by id desc");
+                Query queryObject = session.createQuery("from BuildResult result where result.projectName = :project and result.stateName != :initial order by id desc");
                 queryObject.setParameter("project", project, Hibernate.STRING);
+                queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
                 queryObject.setMaxResults(max);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());

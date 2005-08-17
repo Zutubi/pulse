@@ -1,6 +1,28 @@
 #macro(detailrow $header $content)
   <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
 #end
+
+#macro(errordetails $result)
+  #if($result.errorMessage)
+    <h2 class="command-element">error details</h2>
+    #set($trace = $result.exceptionTrace)
+    <div class="error">
+    #if($result.errorMessage)
+      <b>Message</b>
+      <pre>
+        $result.errorMessage
+      </pre>
+    #end
+    #if($trace)
+      <b>Full Trace</b>
+      <pre>
+        $trace
+      </pre>
+    #end
+    </div>
+  #end      
+#end
+
 <html>
   <head>
     <title>[CiB] $project.name build $result.number</title>
@@ -8,89 +30,98 @@
   </head>
   <body>
     <h1 class="build-log">:: brief ::</h1>
-
-#if($result.succeeded())
-  #set($success = "success")
+#if($result.inProgress())
+  #set($class = "info")
+#elseif($result.succeeded())
+  #set($class = "success")
 #else
-  #set($success = "failure")
+  #set($class = "failure")
 #end
 
-    <h2 class="command-$success">$project.name build $result.number</h2>
+    <h2 class="command-$class">$project.name build $result.number</h2>
     <div class="command-content">
       <table>
         #detailrow("commenced" $result.stamps.prettyStartTime)
         #detailrow("completed" $result.stamps.prettyEndTime)
         #detailrow("elapsed"   $result.stamps.prettyElapsed)
-        #detailrow("result"    $result.state.toString().toLowerCase())
+        #detailrow("status"    $result.state.prettyString)
       </table>
+      #errordetails($result)
     </div>
 
-    <h2 class="command-$success">changes</h2>
-    <div class="command-content">
-      Checked out revision <b>$result.revision</b>.
-      #if($changes)
-        <h3>changes since last build</h3>
-        #foreach($change in $changes)
-          <div class="info">
-          <b>revision $change.revision</b> $change.user@$change.date: $change.comment
-          <ul>
+    #if($result.revision)
+      <h2 class="command-info">changes</h2>
+      <div class="command-content">
+        Checked out revision <b>$result.revision</b>.
+	    #if($changes.size() > 0)
+          <h3>changes since last build</h3>
+          #foreach($change in $changes)
+            <div class="info">
+            <b>revision $change.revision</b> $change.user@$change.date: $change.comment
+            <ul>
             #foreach($file in $change.changes)
               <li><span class="filename">$file.filename#$file.revision: $file.action</span></li>
             #end
-          </ul>
-          </div>
-        #end
-      #end
-    </div>
-
+            </ul>
+            </div>
+	      #end
+	    #else
+	      <div>No changes since last build.</div>
+	    #end
+	  </div>
+    #end
+    
+    #if($result.commandResults.size() > 0)
     <h1 class="build-log">:: command log ::</h1>
 
-#foreach($commandResult in $result.getCommandResults())
-  #if($commandResult.state.toString() == "SUCCESS")
-    #set($success = "success")
+#foreach($commandResult in $result.commandResults)
+  #if($commandResult.inProgress())
+    #set($class = "info")
+  #elseif($commandResult.succeeded())
+    #set($class = "success")
   #else
-    #set($success = "failure")
+    #set($class = "failure")
   #end
-    <h2 class="command-$success">$commandResult.commandName</h2>
+    <h2 class="command-$class">$commandResult.commandName</h2>
     <div class="command-content">
       <table>
         #detailrow("commenced" $commandResult.stamps.prettyStartTime)
         #detailrow("completed" $commandResult.stamps.prettyEndTime)
         #detailrow("elapsed"   $commandResult.stamps.prettyElapsed)
-        #detailrow("result"    $commandResult.state.toString().toLowerCase())
+        #detailrow("status"    $commandResult.state.prettyString)
       </table>
-      <h2 class="command-element">details</h2>
       #if($commandResult.errorMessage)
-        <div class="error">
-          $commandResult.errorMessage
-        </div>
-      #end
-      <table>
-        #foreach($key in $commandResult.properties.keySet())
-          #detailrow($key $commandResult.properties.get($key))
-        #end
-      </table>
-      <h2 class="command-element">artifacts</h2>
-      #foreach($artifact in $commandResult.artifacts)
-        <h3>$artifact.title (<a href="viewArtifact.action?id=$artifact.id">view</a>)</h3>
-        <div class="artifact">
-        #if($artifact.hasFeatures())
-          #foreach($level in $artifact.levels)
-          <div class="$level.toString().toLowerCase()">
-            <b>$level.toString().toLowerCase() features</b>
-            <ul class="feature">
-            #foreach($feature in $artifact.getFeatures($level))
-              <li>$feature.summary</li>
-            #end
-            </ul>
-          </div>
+        #errordetails($commandResult)
+      #else
+        <h2 class="command-element">details</h2>
+        <table>
+          #foreach($key in $commandResult.properties.keySet())
+            #detailrow($key $commandResult.properties.get($key))
           #end
-        #else
-          &lt;No features&gt;
+        </table>
+        <h2 class="command-element">artifacts</h2>
+        #foreach($artifact in $commandResult.artifacts)
+          <h3>$artifact.title (<a href="viewArtifact.action?id=$artifact.id">view</a>)</h3>
+          <div class="artifact">
+          #if($artifact.hasFeatures())
+            #foreach($level in $artifact.levels)
+            <div class="$level.toString().toLowerCase()">
+              <b>$level.toString().toLowerCase() features</b>
+              <ul class="feature">
+              #foreach($feature in $artifact.getFeatures($level))
+                <li>$feature.summary</li>
+              #end
+              </ul>
+            </div>
+            #end
+          #else
+            &lt;No features&gt;
+          #end
+          </div>
         #end
-        </div>
-  #end
+      #end
     </div>
+#end
 #end
   </body>
 </html>

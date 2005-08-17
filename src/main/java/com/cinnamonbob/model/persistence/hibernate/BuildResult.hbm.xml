@@ -19,6 +19,8 @@
         
         <property name="stateName" column="STATE" type="string" length="127"/>
  
+        <property name="outputDir" type="string" length="1023"/>
+
         <property name="errorMessage" type="string" length="1023"/>
 
         <many-to-one name="revision" class="com.cinnamonbob.model.Revision" column="REVISION_ID" cascade="all" unique="true"/>
