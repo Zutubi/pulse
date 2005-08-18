@@ -1,11 +1,13 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.bootstrap.ConfigUtils;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.bootstrap.SystemBootstrapManager;
 import com.cinnamonbob.core.BuildProcessor;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -16,6 +18,7 @@ import java.util.logging.Logger;
 public class BobServer
 {
     private static final Logger LOG = Logger.getLogger(BobServer.class.getName());
+    private static final String HOST_NAME_PROPERTY = "host.name";
 
     private ShutdownService shutdownService = null;
 
@@ -72,20 +75,29 @@ public class BobServer
         return buildQueue;
     }
     
-    public String getHostURL()
+    public static String getHostURL()
     {
-        InetAddress address;
-        try
+        ConfigurationManager config = ConfigUtils.getManager();
+        if(config.hasProperty(HOST_NAME_PROPERTY))
         {
-            address = InetAddress.getLocalHost();
-            return address.getHostName();
+            return config.lookupProperty(HOST_NAME_PROPERTY);
         }
-        catch(UnknownHostException e)
+        else
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+            InetAddress address;
+            String result = null;
+            
+            try
+            {
+                address = InetAddress.getLocalHost();
+                result = address.getCanonicalHostName();
+            }
+            catch(UnknownHostException e)
+            {
+                LOG.log(Level.WARNING, "Could not obtain local host name", e);
+            }
         
-        return null;
+            return result;
+        }
     }
 }

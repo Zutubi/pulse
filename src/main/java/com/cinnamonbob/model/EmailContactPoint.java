@@ -46,7 +46,7 @@ public class EmailContactPoint extends ContactPoint
     */
     public void notify(Project project, BuildResult result)
     {
-        String subject = "[CiB] " + result.getProjectName() + ": build " + Long.toString(result.getNumber()) + ": " + result.getStateName();
+        String subject = "[CiB] " + result.getProjectName() + ": build " + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
         sendMail(subject, renderResult(project, result));
     }
     

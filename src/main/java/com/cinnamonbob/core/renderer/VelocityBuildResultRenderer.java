@@ -1,5 +1,6 @@
 package com.cinnamonbob.core.renderer;
 
+import com.cinnamonbob.BobServer;
 import com.cinnamonbob.bootstrap.velocity.VelocityManager;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.CommandResult;
@@ -33,6 +34,7 @@ public class VelocityBuildResultRenderer implements BuildResultRenderer
         context.put("type", type);
         context.put("project", project);
         context.put("result", result);
+        context.put("hostname", BobServer.getHostURL());
 
         try
         {

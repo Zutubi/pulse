@@ -1,12 +1,17 @@
-#if($result.succeeded())
-  #set($success = "succeeded")
-#else
-  #set($success = "failed")
-#end
-Build $result.number of project '$project.name' has $success.
+=====================================================================
+:: $project.name ::
+=====================================================================
+Build $result.number has completed with status '$result.state.prettyString'.
+
 You can view the full build result at:
 
-http://localhost:8080/viewBuild.action?id=$project.id&buildId=$result.id
+http://$hostname/viewBuild.action?id=$project.id&buildId=$result.id
+#if($result.errorMessage)
+
+*error message*
+$result.errorMessage
+#end
+#if($result.commandResults.size() > 0)
 
 A brief command log is given below.
 
@@ -22,13 +27,13 @@ command '$commandResult.commandName'
 commenced: $commandResult.stamps.prettyStartTime
 completed: $commandResult.stamps.prettyEndTime
 elapsed  : $commandResult.stamps.prettyElapsed
-#if($commandResult.succeeded())
-  #set($success = "success")
-#else
-  #set($success = "failure")
-#end
-result   : $success
+status   : $commandResult.state.prettyString
 
+#if($commandResult.errorMessage)
+*error message*
+$commandResult.errorMessage
+
+#end
 *artifacts*
 #foreach($artifact in $commandResult.artifacts)
 $artifact.title
@@ -45,4 +50,5 @@ $artifact.title
 
 #end
 
+#end
 #end
