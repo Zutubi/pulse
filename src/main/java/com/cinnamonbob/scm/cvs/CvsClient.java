@@ -11,6 +11,7 @@ import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
 import org.netbeans.lib.cvsclient.command.CommandAbortedException;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.GlobalOptions;
+import org.netbeans.lib.cvsclient.command.tag.RtagCommand;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
@@ -31,7 +32,10 @@ import java.util.*;
  */
 public class CvsClient
 {
-    private static final DateFormat CVS_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final DateFormat HISTORY_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z");
+
 
     private CVSRoot root;
 
@@ -159,8 +163,49 @@ public class CvsClient
         throw new UnsupportedOperationException();
     }
 
-    public void tag()
+    public void tag(String tag, Date date) throws SCMException
     {
+        Connection connection = null;
+        try
+        {
+            GlobalOptions globalOptions = new GlobalOptions();
+            globalOptions.setCVSRoot(root.toString());
+
+            connection = ConnectionFactory.getConnection(root);
+            connection.open();
+
+            Client client = new Client(connection, new StandardAdminHandler());
+
+            HistoryBuilder builder = new HistoryBuilder();
+            client.getEventManager().addCVSListener(new BuilderAdapter(builder));
+
+            RtagCommand rtag = new RtagCommand();
+            rtag.setTag(tag);
+            rtag.setOverrideExistingTag(true);
+            if (date != null)
+            {
+                rtag.setTagByDate(DATE_FORMAT.format(date));
+            }
+
+            client.executeCommand(rtag, globalOptions);
+
+        }
+        catch (AuthenticationException ae)
+        {
+            throw new SCMException(ae);
+        }
+        catch (CommandAbortedException cae)
+        {
+            throw new SCMException(cae);
+        }
+        catch (CommandException ce)
+        {
+            throw new SCMException(ce);
+        }
+        finally
+        {
+            CvsHelper.close(connection);
+        }
         throw new UnsupportedOperationException();
     }
 
@@ -185,7 +230,7 @@ public class CvsClient
             history.setForAllUsers(true);
             if (since != null)
             {
-                history.setSinceDate(CVS_DATE_FORMAT.format(since));
+                history.setSinceDate(DATE_FORMAT.format(since));
             }
             client.executeCommand(history, globalOptions);
 
