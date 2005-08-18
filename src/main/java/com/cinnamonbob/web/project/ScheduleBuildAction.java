@@ -36,6 +36,14 @@ public class ScheduleBuildAction extends ProjectActionSupport
     {
         project = getProjectManager().getProject(id);
         BobServer.build(project.getName());
+        try
+        {
+            // Pause for dramatic effect
+            Thread.sleep(1000);
+        }
+        catch(InterruptedException e)
+        {
+        }
         return SUCCESS;
     }
 }
