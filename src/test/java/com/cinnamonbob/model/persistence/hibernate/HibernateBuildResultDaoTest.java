@@ -40,8 +40,7 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         fa.setTitle("title");
         fa.setType("type");
 
-        CommandResult result = new CommandResult();
-        result.setCommandName("command name");
+        CommandResult result = new CommandResult("command name");
         result.commence(new File("/tmp/commandout"));
         result.success();
         StoredArtifact artifact = new StoredArtifact(fa, "to file");
@@ -83,7 +82,6 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         assertEquals(buildResult.getRevision(), anotherBuildResult.getRevision());
         assertEquals(anotherBuildResult.getCommandResults().size(), 1);
 
-        // TODO seems kinda lame not to use equals() on the objects?
         CommandResult anotherResult = anotherBuildResult.getCommandResults().get(0);
         assertEquals(result.getCommandName(), anotherResult.getCommandName());
         assertEquals(result.getStamps(), anotherResult.getStamps());
