@@ -134,10 +134,9 @@ public class BuildProcessor
         }
 
         // TODO: support continuing build when errors occur. Take care: exceptions.
-        // FIXME: all commands need names, set on result immediately
         for (Command command : recipe.getCommands())
         {
-            CommandResult result = new CommandResult();
+            CommandResult result = new CommandResult(command.getName());
 
             buildResult.add(result);
             buildManager.save(buildResult);

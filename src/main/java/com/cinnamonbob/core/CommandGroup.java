@@ -66,7 +66,6 @@ public class CommandGroup implements Command
     public void execute(File outputDir, CommandResult result)
     {
         cmd.execute(outputDir, result);
-        result.setCommandName(name);
         collectArtifacts(result, outputDir);
 
         for (ProcessArtifactMapping m : mappings)

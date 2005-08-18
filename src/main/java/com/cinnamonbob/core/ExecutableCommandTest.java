@@ -34,7 +34,7 @@ public class ExecutableCommandTest extends TestCase
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("dir");
         command.setArgs(".");
-        CommandResult result = new CommandResult();
+        CommandResult result = new CommandResult("success");
         command.execute(outputDirectory, result);
         assertEquals(result.getState(), ResultState.SUCCESS);        
     }
@@ -44,7 +44,7 @@ public class ExecutableCommandTest extends TestCase
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("dir");
         command.setArgs("w");
-        CommandResult result = new CommandResult();
+        CommandResult result = new CommandResult("failure");
         command.execute(outputDirectory, result);
         assertEquals(result.getState(), ResultState.FAILURE);        
     }
@@ -53,7 +53,7 @@ public class ExecutableCommandTest extends TestCase
     {
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("netstat");
-        CommandResult result = new CommandResult();
+        CommandResult result = new CommandResult("no arg");
         command.execute(outputDirectory, result);
         assertEquals(result.getState(), ResultState.SUCCESS);        
     }
@@ -65,7 +65,7 @@ public class ExecutableCommandTest extends TestCase
         command.setArgs("command");
         try 
         {
-            command.execute(outputDirectory, new CommandResult());
+            command.execute(outputDirectory, new CommandResult("exception"));
             assertTrue(false);
         } catch (BuildException e)
         {

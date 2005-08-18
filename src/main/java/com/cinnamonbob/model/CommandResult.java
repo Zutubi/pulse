@@ -30,8 +30,14 @@ public class CommandResult extends Result
     private List<StoredArtifact> artifacts =  new LinkedList<StoredArtifact>();
     private File outputDir;
 
-    public CommandResult()
+    protected CommandResult()
     {
+        
+    }
+    
+    public CommandResult(String name)
+    {
+        commandName = name;
         state = ResultState.INITIAL;
     }
         
@@ -40,7 +46,7 @@ public class CommandResult extends Result
         return commandName;
     }
 
-    public void setCommandName(String name)
+    private void setCommandName(String name)
     {
         this.commandName = name;
     }
