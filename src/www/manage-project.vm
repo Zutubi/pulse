@@ -53,32 +53,41 @@
                 #detailrow("elapsed"   $currentBuild.stamps.prettyElapsed)
                 #detailrow("status"    $currentBuild.state.prettyString)
             </table>
-            <h2 class="command-element">command log</h2>
-            <table>
-                <tr>
-                    <th class="command-detail">command</th>
-                    <th class="command-detail">when</th>
-                    <th class="command-detail">elapsed</th>
-                    <th class="command-detail">status</th>
-                </tr>
-                #foreach($result in $currentBuild.commandResults)
-                    #if($result.commenced())
-                        #if($result.succeeded())
-                            #set($class = "success")
-                        #elseif($result.inProgress())
-                            #set($class = "info")
-                        #else
-                            #set($class = "failure")
+            #if($currentBuild.errorMessage)
+                <h2 class="command-element">error details</h2>    
+                <div class="error">
+                <b>message</b>
+                <pre>$currentBuild.errorMessage</pre>
+                </div>
+            #end  
+            #if($currentBuild.commandResults.size() > 0)
+                <h2 class="command-element">command log</h2>
+                <table>
+                   <tr>
+                        <th class="command-detail">command</th>
+                        <th class="command-detail">when</th>
+                        <th class="command-detail">elapsed</th>
+                        <th class="command-detail">status</th>
+                    </tr>
+                    #foreach($result in $currentBuild.commandResults)
+                        #if($result.commenced())
+                            #if($result.succeeded())
+                                #set($class = "success")
+                            #elseif($result.inProgress())
+                                #set($class = "info")
+                            #else
+                                #set($class = "failure")
+                            #end
+                            <tr>
+                                <td class="build-$class"><a href="">$result.commandName</a></td>
+                                <td class="build-$class">$result.stamps.prettyStartTime</td>
+                                <td class="build-$class">$result.stamps.prettyElapsed</td>
+                                <td class="build-$class">$result.state.prettyString</td>
+                            </tr>
                         #end
-                        <tr>
-                            <td class="build-$class"><a href="">$result.commandName</a></td>
-                            <td class="build-$class">$result.stamps.prettyStartTime</td>
-                            <td class="build-$class">$result.stamps.prettyElapsed</td>
-                            <td class="build-$class">$result.state.prettyString</td>
-                        </tr>
                     #end
-                #end
-            </table>
+                </table>
+            #end
         </div>
       #end
 

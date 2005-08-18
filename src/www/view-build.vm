@@ -8,16 +8,12 @@
     #set($trace = $result.exceptionTrace)
     <div class="error">
     #if($result.errorMessage)
-      <b>Message</b>
-      <pre>
-        $result.errorMessage
-      </pre>
+      <h3>message</h3>
+      <pre>$result.errorMessage</pre>
     #end
     #if($trace)
-      <b>Full Trace</b>
-      <pre>
-        $trace
-      </pre>
+      <h3>full trace</h3>
+      <pre>$trace</pre>
     #end
     </div>
   #end      
