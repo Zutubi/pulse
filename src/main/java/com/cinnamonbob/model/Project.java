@@ -11,11 +11,12 @@ public class Project extends Entity
 {
     private String name;
     private String description;
+    private String bobFile;
     private List<Scm> scms;
 
     public Project()
     {
-
+        bobFile = "bob.xml";
     }
 
     public Project(String name, String description)
@@ -85,5 +86,15 @@ public class Project extends Entity
             return true;
         }
         return false;
+    }
+
+    public String getBobFile()
+    {
+        return bobFile;
+    }
+
+    public void setBobFile(String bobFile)
+    {
+        this.bobFile = bobFile;
     }
 }

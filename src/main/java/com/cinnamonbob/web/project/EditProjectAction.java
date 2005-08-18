@@ -50,6 +50,7 @@ public class EditProjectAction extends ProjectActionSupport
     {
         Project persistentProject = getProjectManager().getProject(getId());
         persistentProject.setName(project.getName());
+        persistentProject.setBobFile(project.getBobFile());
         persistentProject.setDescription(project.getDescription());
         
         return SUCCESS;

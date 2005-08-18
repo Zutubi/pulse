@@ -10,6 +10,7 @@
                 
         <property name="name" column="NAME" type="string" length="255"/>            
         <property name="description" column="DESCRIPTION" type="string" length="4096"/>            
+        <property name="bobFile" column="BOB_FILE" type="string" length="511"/>            
 
         <bag name="scms" inverse="true" cascade="all" lazy="false">
             <key column="PROJECTID"/>

@@ -11,9 +11,13 @@
     <body>
         <h1 class="build-log">:: $project.name ::</h1>
         
-        <h2 class="command-info">description (<a href="editProject!default.action?id=$project.id">edit</a>)</h2>
+        <h2 class="command-info">basic details (<a href="editProject!default.action?id=$project.id">edit</a>)</h2>
         <div class="command-content">
-            $project.description
+            <table>
+                #detailrow("name" $project.name)
+                #detailrow("description" $project.description)
+                #detailrow("bob file" $project.bobFile)
+            </table>
         </div>
         
         <h2 class="command-info">scm details (<a href="createScm!default.action?project=$project.id">add</a>)</h2>

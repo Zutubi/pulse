@@ -88,9 +88,9 @@ public class BuildProcessor
         {
             File workDir = cleanWorkDir(projectDir);
             createBuildResultDir(buildDir);
-            File scmDir   = bootstrapBuild(project, previousBuildResult, buildResult, workDir, buildDir);
+            bootstrapBuild(project, previousBuildResult, buildResult, workDir, buildDir);
 
-            BobFile bobFile = loadBobFile(scmDir);
+            BobFile bobFile = loadBobFile(workDir, project);
 
             build(project, bobFile, request.getRecipeName(), buildResult, buildDir);
         }
@@ -279,7 +279,7 @@ public class BuildProcessor
         }
     }
 
-    private BobFile loadBobFile(File scmDir) throws BuildException
+    private BobFile loadBobFile(File workDir, Project project) throws BuildException
     {
         // TODO: move config into file.
         BobFileLoader loader = new BobFileLoader();
@@ -295,11 +295,11 @@ public class BuildProcessor
 
         Map<String, String> properties = new TreeMap<String, String>();
 
-        properties.put("work.dir", scmDir.getAbsolutePath());
+        properties.put("work.dir", workDir.getAbsolutePath());
 
         try
         {
-            File            bob    = new File(scmDir, "bob.xml");
+            File            bob    = new File(workDir, project.getBobFile());
             FileInputStream stream = new FileInputStream(bob);
 
             return loader.load(stream, properties);
