@@ -2,6 +2,8 @@ package com.cinnamonbob.model;
 
 import com.cinnamonbob.model.persistence.SubscriptionDao;
 
+import java.util.List;
+
 /**
  *
  *
@@ -30,5 +32,10 @@ public class DefaultSubscriptionManager implements SubscriptionManager
     public Subscription getSubscription(long id)
     {
         return subscriptionDao.findById(id);
+    }
+
+    public List<Subscription> getSubscriptions(Project project)
+    {
+        return subscriptionDao.findByProject(project);
     }
 }

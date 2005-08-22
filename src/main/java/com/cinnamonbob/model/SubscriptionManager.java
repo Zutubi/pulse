@@ -1,5 +1,7 @@
 package com.cinnamonbob.model;
 
+import java.util.List;
+
 /**
  *
  *
@@ -7,4 +9,6 @@ package com.cinnamonbob.model;
 public interface SubscriptionManager extends EntityManager<Subscription>
 {
     public Subscription getSubscription(long id);
+
+    public List<Subscription> getSubscriptions(Project project);
 }

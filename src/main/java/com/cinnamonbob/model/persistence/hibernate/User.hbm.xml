@@ -62,5 +62,9 @@
 
     </class>
 
+    <query name="subscription.findByProject"><![CDATA[
+        from Subscription s
+        where s.project = :project
+    ]]></query>
 
 </hibernate-mapping>

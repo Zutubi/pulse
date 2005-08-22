@@ -4,7 +4,7 @@ package com.cinnamonbob.model;
  * 
  *
  */
-public class ChangedNotifyCondition
+public class ChangedNotifyCondition implements NotifyCondition
 {
     /**
      * The user to test for changes by.
@@ -23,10 +23,18 @@ public class ChangedNotifyCondition
     }
     
     /**
-     * @see com.cinnamonbob.core.NotifyCondition#satisfied(com.cinnamonbob.model.BuildResult)
+     * @see NotifyCondition#satisfied(com.cinnamonbob.model.BuildResult)
      */
     public boolean satisfied(BuildResult result)
     {
-        return false;//result.changedBy(user.getLogin());
+        // look for a change.
+        for (Changelist changelist : result.getChangelists())
+        {
+            if (changelist.getChanges().size() > 0)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

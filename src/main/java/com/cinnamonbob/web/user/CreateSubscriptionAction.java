@@ -2,16 +2,47 @@ package com.cinnamonbob.web.user;
 
 import com.cinnamonbob.model.*;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 /**
  *
  *
  */
 public class CreateSubscriptionAction extends UserActionSupport
 {
+    private ProjectManager projectManager;
+
     private String projectName;
     private String userName;
 
-    private ProjectManager projectManager;
+    private String condition;
+
+    private Map<String, String> conditions;
+
+
+    public String getCondition()
+    {
+        return condition;
+    }
+
+    public void setCondition(String condition)
+    {
+        this.condition = condition;
+    }
+
+    public Map getConditions()
+    {
+        if (conditions == null)
+        {
+            conditions = new TreeMap<String, String>();
+            conditions.put("a", "All builds");
+            conditions.put("b", "All changed builds");
+            conditions.put("c", "All failed builds");
+            conditions.put("d", "All changed or failed builds");
+        }
+        return conditions;
+    }
 
     public void setProjectManager(ProjectManager projectManager)
     {
@@ -86,6 +117,23 @@ public class CreateSubscriptionAction extends UserActionSupport
         ContactPoint contactPoint = user.getContactPoints().get(0);
 
         Subscription subscription = new Subscription(project, contactPoint);
+        // which notification condition do we want?
+        if ("a".equals(condition))
+        {
+
+        }
+        else if ("b".equals(condition))
+        {
+
+        }
+        else if ("c".equals(condition))
+        {
+
+        }
+        else if ("d".equals(condition))
+        {
+
+        }
         getSubscriptionManager().save(subscription);
 
         return SUCCESS;

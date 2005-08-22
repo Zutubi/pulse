@@ -3,7 +3,8 @@ package com.cinnamonbob.bootstrap.yahoo;
 import ymsg.network.event.*;
 
 /**
- *
+ * An implementation of the SessionListener interface that will allow subclasses to implement
+ * only that portion of the interface they are interested in.
  * 
  */
 public class SessionAdapter implements SessionListener

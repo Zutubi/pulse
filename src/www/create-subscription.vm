@@ -12,11 +12,12 @@
     <fieldset>
         #tag (TextField "name='user'" "required='true'" "tabindex='1'")
         #tag (TextField "name='project'" "required='true'" "tabindex='2'")
+        #tag (Select "list=conditions" "name='condition'" "label='Notification Condition'" "tabindex='3'")
     </fieldset>
 
     <fieldset class="submit">
-        #tag (Submit "value=getText('create.name')" "name='create'" "tabindex='3'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
+        #tag (Submit "value=getText('create.name')" "name='create'" "tabindex='4'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
     </fieldset>
 #end
 

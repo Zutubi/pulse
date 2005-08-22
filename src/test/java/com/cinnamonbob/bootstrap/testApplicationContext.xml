@@ -35,18 +35,18 @@
         </property>
     </bean>
 
-    <bean id="userDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateUserDao">
+    <bean id="artifactDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateArtifactDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
     </bean>
 
-    <bean id="userDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <bean id="artifactDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <ref bean="userDaoTarget"/>
+            <ref bean="artifactDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -75,18 +75,38 @@
         </property>
     </bean>
 
-    <bean id="artifactDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateArtifactDao">
+    <bean id="changelistDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateChangelistDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
     </bean>
 
-    <bean id="artifactDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <bean id="changelistDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <ref bean="artifactDaoTarget"/>
+            <ref bean="changelistDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="contactPointDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateContactPointDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="contactPointDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="contactPointDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -135,18 +155,38 @@
         </property>
     </bean>
 
-    <bean id="changelistDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateChangelistDao">
+    <bean id="subscriptionDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateSubscriptionDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
     </bean>
 
-    <bean id="changelistDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <bean id="subscriptionDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <ref bean="changelistDaoTarget"/>
+            <ref bean="subscriptionDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="userDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateUserDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="userDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="userDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>

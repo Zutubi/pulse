@@ -1,11 +1,11 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.BuildRequest;
-import com.cinnamonbob.scm.SCMServer;
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.model.*;
+import com.cinnamonbob.scm.SCMException;
+import com.cinnamonbob.scm.SCMServer;
 import com.cinnamonbob.util.FileSystemUtils;
 import com.cinnamonbob.util.IOHelper;
 
@@ -17,8 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  */
@@ -29,7 +29,8 @@ public class BuildProcessor
     private ProjectManager projectManager;
     private BuildManager   buildManager;
     private UserManager    userManager;
-    
+    private SubscriptionManager subscriptionManager;
+
     public static String getBuildDirName(BuildResult result)
     {
         return String.format("%08d", Long.valueOf(result.getId()));
@@ -51,12 +52,12 @@ public class BuildProcessor
         projectManager = (ProjectManager)ComponentContext.getBean("projectManager");
         buildManager = (BuildManager)ComponentContext.getBean("buildManager");
         userManager = (UserManager)ComponentContext.getBean("userManager");
+        subscriptionManager = (SubscriptionManager)ComponentContext.getBean("subscriptionManager");
     }
 
     public BuildResult execute(BuildRequest request)
     {
         Project project = projectManager.getProject(request.getProjectName());
-
         if(project == null)
         {
             LOG.warning("Build request for unknown project '" + request.getProjectName() + "'");
@@ -105,13 +106,13 @@ public class BuildProcessor
             buildManager.save(buildResult);
         }
 
-        // FIXME what a hack!
-        for(Object o: userManager.getUsersWithLoginLike("%"))
+        // sort out notifications.
+        List<Subscription> subscriptions = subscriptionManager.getSubscriptions(project);
+        for(Subscription subscription : subscriptions)
         {
-            User u = (User)o;
-            for(ContactPoint c: u.getContactPoints())
+            if (subscription.conditionSatisfied(buildResult))
             {
-                c.notify(project, buildResult);
+                subscription.getContactPoint().notify(project, buildResult);
             }
         }
 

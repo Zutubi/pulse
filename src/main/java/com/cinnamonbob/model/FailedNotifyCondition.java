@@ -8,6 +8,6 @@ public class FailedNotifyCondition implements NotifyCondition
 {
     public boolean satisfied(BuildResult result)
     {
-        return false;
+        return result.getState() != ResultState.SUCCESS;
     }
 }

@@ -12,6 +12,7 @@ public class Subscription extends Entity
      * The contact point to notify.
      */
     private ContactPoint contactPoint;
+
     /**
      * Condition to be satisfied before notifying.
      */
@@ -102,4 +103,5 @@ public class Subscription extends Entity
     {
         this.condition = condition;
     }
+
 }
