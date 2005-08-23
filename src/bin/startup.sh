@@ -31,6 +31,9 @@ fi
 for i in "$BOB_HOME"/lib/*.jar; do
   CLASSPATH="$CLASSPATH":"$i"
 done
+for i in "$BOB_HOME"/lib/*.xml; do
+  CLASSPATH="$CLASSPATH":"$i"
+done
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then

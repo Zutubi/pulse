@@ -103,6 +103,9 @@
             <fileset dir="build">
                 <include name="${bob.jar}"/>
             </fileset>
+            <fileset dir="src/etc">
+                <include name="validators.xml"/>
+            </fileset>
         </copy>
 
         <copy todir="${package.root}/config">
