@@ -39,7 +39,7 @@ public class CreateSubscriptionAction extends UserActionSupport
             conditions.put(NotifyConditionFactory.ALL_BUILDS, "All builds");
             conditions.put(NotifyConditionFactory.ALL_CHANGED, "All changed builds");
             conditions.put(NotifyConditionFactory.ALL_FAILED, "All failed builds");
-            conditions.put(NotifyConditionFactory.ALL_CHANGED_AND_FAILED, "All changed or failed builds");
+            conditions.put(NotifyConditionFactory.ALL_CHANGED_OR_FAILED, "All changed or failed builds");
         }
         return conditions;
     }
