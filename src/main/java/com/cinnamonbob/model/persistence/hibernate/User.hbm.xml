@@ -57,6 +57,8 @@
             <generator class="hilo"/>
         </id>
 
+        <property name="condition" column="CONDITION" type="string" length="255"/>
+
         <many-to-one name="project" column="PROJECTID" class="com.cinnamonbob.model.Project" insert="true" lazy="false"/>
         <many-to-one name="contactPoint" column="CONTACTID" class="com.cinnamonbob.model.ContactPoint" insert="true" lazy="false"/>
 

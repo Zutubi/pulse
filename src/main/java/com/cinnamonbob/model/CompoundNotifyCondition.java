@@ -1,11 +1,20 @@
 package com.cinnamonbob.model;
 
 import java.util.List;
+import java.util.LinkedList;
 
 public class CompoundNotifyCondition implements NotifyCondition
 {
     private List<NotifyCondition> children;
     private boolean disjunctive;
+
+    public CompoundNotifyCondition(NotifyCondition a, NotifyCondition b, boolean disjunctive)
+    {
+        children = new LinkedList<NotifyCondition>();
+        children.add(a);
+        children.add(b);
+        this.disjunctive = disjunctive;
+    }
 
     public CompoundNotifyCondition(List<NotifyCondition> children, boolean disjunctive)
     {

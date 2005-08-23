@@ -10,14 +10,15 @@
 #bodytag (Form "action='createSubscription.action'" "method='post'")
     <h3>Create subscription</h3>
     <fieldset>
-        #tag (TextField "name='user'" "required='true'" "tabindex='1'")
-        #tag (TextField "name='project'" "required='true'" "tabindex='2'")
-        #tag (Select "list=conditions" "name='condition'" "label='Notification Condition'" "tabindex='3'")
+        #tag (TextField "name='user'" "required='true'" "label='User'" "tabindex='1'")
+        #tag (TextField "name='project'" "required='true'" "label='Project'" "tabindex='2'")
+        #tag (TextField "name='contactPoint'" "label='Contact Point'" "tabindex='3'")
+        #tag (Select "list=conditions" "name='condition'" "label='Notification Condition'" "tabindex='4'")
     </fieldset>
 
     <fieldset class="submit">
-        #tag (Submit "value=getText('create.name')" "name='create'" "tabindex='4'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
+        #tag (Submit "value=getText('create.name')" "name='create'" "tabindex='5'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='6'")
     </fieldset>
 #end
 

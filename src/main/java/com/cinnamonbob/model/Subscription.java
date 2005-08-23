@@ -16,7 +16,7 @@ public class Subscription extends Entity
     /**
      * Condition to be satisfied before notifying.
      */
-    private NotifyCondition condition;
+    private String condition;
 
     private Project project;
 
@@ -43,7 +43,7 @@ public class Subscription extends Entity
     {
         this.project = project;
         this.contactPoint = contactPoint;
-        this.condition = new TrueNotifyCondition();
+        this.condition = NotifyConditionFactory.ALL_BUILDS;
 
         this.contactPoint.add(this);
     }
@@ -89,7 +89,8 @@ public class Subscription extends Entity
      */
     public boolean conditionSatisfied(BuildResult result)
     {
-        return condition.satisfied(result);
+        NotifyCondition nc = NotifyConditionFactory.getInstance(condition);
+        return nc.satisfied(result);
     }
     
     /**
@@ -99,9 +100,13 @@ public class Subscription extends Entity
      * @param condition
      *        the condition to set
      */
-    public void setCondition(NotifyCondition condition)
+    public void setCondition(String condition)
     {
         this.condition = condition;
     }
 
+    private String getCondition()
+    {
+        return this.condition;
+    }
 }

@@ -6,20 +6,13 @@ package com.cinnamonbob.model;
  */
 public class ChangedNotifyCondition implements NotifyCondition
 {
+
     /**
-     * The user to test for changes by.
-     */
-    private User user;
-    
-    /**
-     * Create a new condition based on the given user.
+     * Create a new condition
      * 
-     * @param user
-     *        the user to test for changes by
      */
-    public ChangedNotifyCondition(User user)
+    public ChangedNotifyCondition()
     {
-        this.user = user;
     }
     
     /**

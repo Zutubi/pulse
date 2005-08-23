@@ -9,4 +9,6 @@ package com.cinnamonbob.model;
 public interface NotifyCondition
 {
     public boolean satisfied(BuildResult result);
+
+    
 }

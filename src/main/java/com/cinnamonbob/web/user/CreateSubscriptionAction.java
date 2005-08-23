@@ -1,6 +1,7 @@
 package com.cinnamonbob.web.user;
 
 import com.cinnamonbob.model.*;
+import com.opensymphony.util.TextUtils;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -15,7 +16,7 @@ public class CreateSubscriptionAction extends UserActionSupport
 
     private String projectName;
     private String userName;
-
+    private String contactPoint;
     private String condition;
 
     private Map<String, String> conditions;
@@ -36,10 +37,10 @@ public class CreateSubscriptionAction extends UserActionSupport
         if (conditions == null)
         {
             conditions = new TreeMap<String, String>();
-            conditions.put("a", "All builds");
-            conditions.put("b", "All changed builds");
-            conditions.put("c", "All failed builds");
-            conditions.put("d", "All changed or failed builds");
+            conditions.put(NotifyConditionFactory.ALL_BUILDS, "All builds");
+            conditions.put(NotifyConditionFactory.ALL_CHANGED, "All changed builds");
+            conditions.put(NotifyConditionFactory.ALL_FAILED, "All failed builds");
+            conditions.put(NotifyConditionFactory.ALL_CHANGED_AND_FAILED, "All changed or failed builds");
         }
         return conditions;
     }
@@ -74,6 +75,16 @@ public class CreateSubscriptionAction extends UserActionSupport
         this.userName = user;
     }
 
+    public String getContactPoint()
+    {
+        return contactPoint;
+    }
+
+    public void setContactPoint(String str)
+    {
+        this.contactPoint = str;
+    }
+
     public void validate()
     {
         if (hasErrors())
@@ -102,6 +113,13 @@ public class CreateSubscriptionAction extends UserActionSupport
         {
             addFieldError("user", "This user does not have any contact points available. " +
                     "Please configure contact points before creating a subscription.");
+            return;
+        }
+
+        if (TextUtils.stringSet(contactPoint) && user.getContactPoint(contactPoint) == null)
+        {
+            addFieldError("contactPoint", "The contact point you have specified does not exist for this user. " +
+                    "Please specify another contact point.");
         }
     }
 
@@ -114,26 +132,20 @@ public class CreateSubscriptionAction extends UserActionSupport
     {
         Project project = getProjectManager().getProject(projectName);
         User user = getUserManager().getUser(userName);
-        ContactPoint contactPoint = user.getContactPoints().get(0);
 
-        Subscription subscription = new Subscription(project, contactPoint);
-        // which notification condition do we want?
-        if ("a".equals(condition))
+        ContactPoint cp = null;
+        if (TextUtils.stringSet(contactPoint))
         {
-
+            cp = user.getContactPoint(contactPoint);
         }
-        else if ("b".equals(condition))
+        else
         {
-
+            cp = user.getContactPoints().get(0);
         }
-        else if ("c".equals(condition))
-        {
 
-        }
-        else if ("d".equals(condition))
-        {
+        Subscription subscription = new Subscription(project, cp);
+        subscription.setCondition(condition);
 
-        }
         getSubscriptionManager().save(subscription);
 
         return SUCCESS;
