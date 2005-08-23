@@ -33,11 +33,35 @@
                 </ul>
             #end
         </div>
-<!--
-        <div>
-            <p>Schedule...</p>
-        </div>
 
+        <h2 class="command-info">schedules</h2>
+        <div class="command-content">
+            #set($schedules = $project.schedules)
+            <table>
+                <tr>
+                    <th class="command-detail">name</th>
+                    <th class="command-detail">recipe</th>
+                    <th colspan="2" class="command-detail">actions</th>
+                </tr>
+            #foreach ($schedule in $schedules)
+                #if($schedule.recipe)
+                    #set($recipe = $schedule.recipe)
+                #else
+                    #set($recipe = "[default]")
+                #end
+                <tr>
+                    <td class="command-detail">$schedule.name</td>
+                    <td class="command-detail">$recipe</td>
+                    <td class="command-detail"><a href="manageSchedule.action?name=$schedule.name&projectId=$project.id">manage</a></td>
+                    <td class="command-detail"><a href="deleteSchedule.action?id=$schedule.id">delete</a></td>
+                </tr>
+            #end
+                <tr>
+                    <td colspan="4" class="command-detail"><b>+</b> <a href="createSchedule!default.action?project=$project.id">add new schedule</a></td>
+                </tr>
+            </table>
+        </div>
+<!--
         <div>
             <p>Subscription: <a href="createSubscription!default.action?project=$project.name">create</a></p>
         </div>

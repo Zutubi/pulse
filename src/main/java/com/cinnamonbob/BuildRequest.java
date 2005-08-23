@@ -20,6 +20,14 @@ public class BuildRequest
     {
         this.when = new Date(System.currentTimeMillis());
         this.projectName = projectName;
+        this.recipeName = null;        
+    }
+    
+    public BuildRequest(String projectName, String recipeName)
+    {
+        this.when = new Date(System.currentTimeMillis());
+        this.projectName = projectName;
+        this.recipeName = recipeName;
     }
 
     /**

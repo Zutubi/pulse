@@ -11,6 +11,7 @@
                 <value>com/cinnamonbob/model/persistence/hibernate/Feature.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Project.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Revision.hbm.xml</value>
+                <value>com/cinnamonbob/model/persistence/hibernate/Schedule.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Scm.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/User.hbm.xml</value>
@@ -127,6 +128,26 @@
         </property>
         <property name="target">
             <ref bean="projectDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="scheduleDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateScheduleDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="scheduleDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="scheduleDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>

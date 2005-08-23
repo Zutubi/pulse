@@ -7,13 +7,11 @@ import com.cinnamonbob.core.BobFile;
 import com.cinnamonbob.core.BobFileLoader;
 import com.cinnamonbob.core.CommandGroup;
 import com.cinnamonbob.core.ComponentDefinition;
-import com.cinnamonbob.core.CronTrigger;
 import com.cinnamonbob.core.ExecutableCommand;
 import com.cinnamonbob.core.PostProcessorGroup;
 import com.cinnamonbob.core.Property;
 import com.cinnamonbob.core.Recipe;
 import com.cinnamonbob.core.RegexPostProcessor;
-import com.cinnamonbob.core.Schedule;
 
 import junit.framework.TestCase;
 
@@ -47,11 +45,9 @@ public class ProjectConfigurationLoaderTest extends TestCase
         // initialise the loader with some real objects.
         loader.register("property", Property.class);
         loader.register("recipe", Recipe.class);
-        loader.register("schedule", Schedule.class);
         loader.register("def", ComponentDefinition.class);
         loader.register("post-processor", PostProcessorGroup.class);
         loader.register("command", CommandGroup.class);
-        loader.register("cron", CronTrigger.class);
         loader.register("regex", RegexPostProcessor.class);
         loader.register("executable", ExecutableCommand.class);
     }

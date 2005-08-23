@@ -290,7 +290,6 @@ public class BuildProcessor
         loader.register("def", ComponentDefinition.class);
         loader.register("post-processor", PostProcessorGroup.class);
         loader.register("command", CommandGroup.class);
-        loader.register("cron", CronTrigger.class);
         loader.register("regex", RegexPostProcessor.class);
         loader.register("executable", ExecutableCommand.class);
 

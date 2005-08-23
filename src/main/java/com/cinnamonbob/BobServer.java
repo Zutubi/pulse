@@ -1,9 +1,11 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.bootstrap.SystemBootstrapManager;
 import com.cinnamonbob.core.BuildProcessor;
+import com.cinnamonbob.model.ProjectManager;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -53,6 +55,9 @@ public class BobServer
                 buildProcessor.execute(request);
             }
         });
+        
+        ProjectManager projectManager = (ProjectManager)ComponentContext.getBean("projectManager");
+        projectManager.initialise();
     }
 
     public void stop()
@@ -65,9 +70,13 @@ public class BobServer
     public static void build(String projectName)
     {
         LOG.info("build '" + projectName + "'");
-
-        // request a build.
         buildQueue.enqueue(new BuildRequest(projectName));
+    }
+    
+    public static void build(String projectName, String recipeName)
+    {
+        LOG.info("build '" + projectName + ":" + recipeName + "'");
+        buildQueue.enqueue(new BuildRequest(projectName, recipeName));
     }
     
     public BuildQueue getBuildQueue()

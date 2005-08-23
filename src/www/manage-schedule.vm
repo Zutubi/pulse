@@ -1,0 +1,49 @@
+#macro(detailrow $header $content)
+    <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
+#end
+
+<html>
+    <head>
+        <link href="build.css" rel="stylesheet" type="text/css">
+        <title>[CiB] schedule $schedule.name</title>
+        <content tag="action">schedule.view</content>
+    </head>
+    <body>
+        <h1 class="build-log">:: schedule $schedule.name ::</h1>
+        
+        <h2 class="command-info">basic details</h2>
+        <div class="command-content">
+            #if($schedule.recipe)
+                #set($recipe = $schedule.recipe)
+            #else
+                #set($recipe = "[default]")
+            #end
+            <table>
+                #detailrow("name" $schedule.name)
+                #detailrow("recipe" $recipe)
+            </table>
+        </div>
+        
+        <h2 class="command-info">triggers</h2>
+        <div class="command-content">
+            #set($triggers = $schedule.triggers)
+            <table>
+                <tr>
+                    <th class="command-detail">type</th>
+                    <th class="command-detail">summary</th>
+                    <th class="command-detail">actions</th>
+                </tr>
+            #foreach ($trigger in $triggers)
+                <tr>
+                    <td class="command-detail">$trigger.type</td>
+                    <td class="command-detail">$trigger.summary</td>
+                    <td class="command-detail"><a href="deleteTrigger.action?scheduleId=$schedule.id&id=$trigger.id">delete</a></td>
+                </tr>
+            #end
+                <tr>
+                    <td colspan="3" class="command-detail"><b>+</b> <a href="createTrigger!default.action?projectId=$project.id&name=$schedule.name">add new trigger</a></td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>

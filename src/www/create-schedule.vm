@@ -1,0 +1,28 @@
+<html>
+<head>
+    <title>create schedule</title>
+</head>
+<content tag="action">schedule.create</content>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='createSchedule.action'" "method='post'")
+
+    #tag (Hidden "name='project'")
+    <h3>Create schedule</h3>
+
+    <fieldset>
+        #tag (TextField "required='true'" "name='schedule.name'" "tabindex='1'")
+        #tag (TextField "name='schedule.recipe'" "tabindex='2'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
+    </fieldset>
+
+ #end
+
+</body>
+</html>

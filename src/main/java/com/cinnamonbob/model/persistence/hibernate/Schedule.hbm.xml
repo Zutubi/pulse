@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <class name="com.cinnamonbob.model.Schedule" table="SCHEDULE" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="name" column="NAME" type="string" not-null="true" length="255"/>
+
+        <property name="recipe" column="RECIPE" type="string" not-null="false" length="255"/>
+
+        <many-to-one name="project" class="com.cinnamonbob.model.Project" column="PROJECTID"/>
+        
+        <bag name="triggers" inverse="true" cascade="all-delete-orphan" lazy="false">
+            <key column="SCHEDULEID"/>
+            <one-to-many class="com.cinnamonbob.model.AbstractTrigger"/>
+        </bag>
+
+    </class>
+
+    <class name="com.cinnamonbob.model.AbstractTrigger" table="TRIGGER">
+        
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="SCHEDULE_TYPE" type="string"/>
+        
+        <many-to-one name="schedule" class="com.cinnamonbob.model.Schedule" column="SCHEDULEID"/>
+        
+        <subclass name="com.cinnamonbob.model.CronTrigger" discriminator-value="CRON">
+        
+            <property name="cronExpression" column="CRON_EXPRESSION" type="string" length="255"/>
+            
+        </subclass>
+        
+    </class>
+    
+    <query name="schedule.findByProject"><![CDATA[
+        from Schedule s
+        where s.project = :project
+    ]]></query>
+    
+</hibernate-mapping>

@@ -23,26 +23,29 @@
   #set($built = $lastResult.stamps.prettyStartTime) 
   #set($id = $lastResult.number)
   #set($elapsed = $lastResult.stamps.prettyElapsed)
+  #set($status = $lastResult.state.prettyString)
   #if($lastResult.inProgress())
     #set($class = "info")
   #elseif($lastResult.succeeded())
-    #set($class = "success")
+    #set($class = "build-success")
   #else
-    #set($class = "failure")
+    #set($class = "build-failure")
   #end
 #else
-  #set($built = "Never")
+  #set($built = "never")
   #set($id = "n/a")
   #set($elapsed = "n/a")
-  #set($success = "n/a")
+  #set($success = "n/a")  
+  #set($status = "n/a")
+  #set($class = "command-detail")
 #end
       <tr>
-        <td class="build-$class"><a href="manageProject.action?id=$project.id">$project.name</a></td>
+        <td class="$class"><a href="manageProject.action?id=$project.id">$project.name</a></td>
         <!--<td class="build-$success">$project.State.toString().toLowerCase()</td>-->
-        <td class="build-$class">$built</td>
-        <td class="build-$class">$id</td>
-        <td class="build-$class">$elapsed</td>
-        <td class="build-$class">$lastResult.state.prettyString</td>
+        <td class="$class">$built</td>
+        <td class="$class">$id</td>
+        <td class="$class">$elapsed</td>
+        <td class="$class">$status</td>
       </tr>
 #end
       <tr>

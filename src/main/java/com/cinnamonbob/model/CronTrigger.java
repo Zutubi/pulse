@@ -1,4 +1,4 @@
-package com.cinnamonbob.core;
+package com.cinnamonbob.model;
 
 import org.quartz.*;
 import com.cinnamonbob.bootstrap.quartz.QuartzManager;
@@ -12,13 +12,28 @@ import java.util.Map;
  */
 public class CronTrigger extends AbstractTrigger
 {
-    private String cronSchedule;
-    
     private static final String NAME_PREFIX = "cron";
+
+    private String cronExpression;
     
-    public void setSchedule(String cronSchedule)
+    public CronTrigger()
     {
-        this.cronSchedule = cronSchedule;    
+    
+    }
+    
+    public CronTrigger(String expression)
+    {
+        cronExpression = expression;
+    }
+    
+    public String getCronExpression()
+    {
+        return cronExpression;
+    }
+
+    public void setCronExpression(String cronSchedule)
+    {
+        this.cronExpression = cronSchedule;
     }
     
     public void trigger()
@@ -36,7 +51,7 @@ public class CronTrigger extends AbstractTrigger
         {
             String groupName = getGroupName();
             
-            org.quartz.CronTrigger trigger = new org.quartz.CronTrigger(NAME_PREFIX + ".trigger", groupName, cronSchedule);
+            org.quartz.CronTrigger trigger = new org.quartz.CronTrigger(NAME_PREFIX + ".trigger", groupName, cronExpression);
             JobDetail job = new JobDetail(NAME_PREFIX + ".job", groupName, CallbackJob.class);
             job.getJobDataMap().put("self", this);
             scheduler.scheduleJob(job, trigger);
@@ -85,23 +100,19 @@ public class CronTrigger extends AbstractTrigger
         return false;
     }
     
+    public String getType()
+    {
+        return "cron";
+    }
+    
+    public String getSummary()
+    {
+        return cronExpression;
+    }
+    
     private String getGroupName()
     {
-        // FIXME oh dear
-        return "this is the dawning of the age of core2rius"; //schedule.getProject().getName();
-    }
-}
-
-/**
- * Simple request to build a job.
- */
-class CallbackJob implements Job
-{
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException
-    {
-        Map dataMap = jobExecutionContext.getJobDetail().getJobDataMap();
-        Trigger callback = (Trigger) dataMap.get("self");
-        callback.trigger();
+        return Long.toString(getId());
     }
 }
 

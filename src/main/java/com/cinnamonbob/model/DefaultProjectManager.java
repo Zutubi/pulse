@@ -46,4 +46,18 @@ public class DefaultProjectManager implements ProjectManager
     {
         projectDao.delete(entity);
     }
+    
+    public void initialise()
+    {
+        for(Project p: getAllProjects())
+        {
+            for(Schedule s: p.getSchedules())
+            {
+                for(Trigger t: s.getTriggers())
+                {
+                    t.enable();
+                }
+            }
+        }
+    }
 }

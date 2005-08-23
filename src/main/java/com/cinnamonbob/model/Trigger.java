@@ -1,4 +1,4 @@
-package com.cinnamonbob.core;
+package com.cinnamonbob.model;
 
 /**
  * 
@@ -6,8 +6,12 @@ package com.cinnamonbob.core;
  */
 public interface Trigger
 {
+    long getId();
     void setSchedule(Schedule schedule);
     void trigger();
     void enable();
     void disable();
-    boolean isEnabled();}
+    boolean isEnabled();
+    String getType();
+    String getSummary();
+}

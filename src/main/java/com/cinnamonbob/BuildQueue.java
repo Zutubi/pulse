@@ -38,6 +38,14 @@ public class BuildQueue implements Runnable, Iterable<BuildRequest>
     public void stop()
     {
         t.interrupt();
+        
+        try
+        {
+            t.join();
+        }
+        catch(InterruptedException e)
+        {
+        }
     }
 
     /**

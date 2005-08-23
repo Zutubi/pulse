@@ -13,6 +13,7 @@ public class Project extends Entity
     private String description;
     private String bobFile;
     private List<Scm> scms;
+    private List<Schedule> schedules;
 
     public Project()
     {
@@ -83,6 +84,49 @@ public class Project extends Entity
         if (scms.remove(scm))
         {
             scm.setProject(null);
+            return true;
+        }
+        return false;
+    }
+
+    public List<Schedule> getSchedules()
+    {
+        if(schedules == null)
+        {
+            schedules = new LinkedList<Schedule>();
+        }
+        
+        return schedules;
+    }
+
+    public void addSchedule(Schedule schedule)
+    {
+        getSchedules().add(schedule);
+        schedule.setProject(this);
+    }
+
+    private void setSchedules(List<Schedule> schecules)
+    {
+        this.schedules = schecules;
+    }
+
+    public Schedule getSchedule(String name)
+    {
+        for (Schedule schedule : schedules)
+        {
+            if (schedule.getName().compareToIgnoreCase(name) == 0)
+            {
+                return schedule;
+            }
+        }
+        return null;
+    }
+
+    public boolean remove(Schedule schedule)
+    {
+        if (schedules.remove(schedule))
+        {
+            schedule.setProject(null);
             return true;
         }
         return false;

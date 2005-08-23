@@ -1,30 +1,44 @@
-package com.cinnamonbob.core;
+package com.cinnamonbob.model;
 
 import java.util.List;
 import java.util.LinkedList;
+
+import com.cinnamonbob.BobServer;
 
 /**
  * 
  *
  */
-public class Schedule implements BobFileComponent
+public class Schedule extends Entity
 {
-    private String recipe;
     private String name;
-    private BobFile project;
+    private Project project;
+    private String recipe;
     
     private List<Trigger> triggers = new LinkedList<Trigger>();
 
-    public void setBobFile(BobFile project)
+    public Schedule()
     {
-        this.project = project;
+        
     }
-
-    public BobFile getProject()
+    
+    public Schedule(String name, Project project, String recipe)
+    {
+        this.name = name;
+        this.project = project;
+        this.recipe = recipe;
+    }
+    
+    public Project getProject()
     {
         return project;
     }
     
+    public void setProject(Project project)
+    {
+        this.project = project;
+    }
+
     public void setRecipe(String recipe)
     {
         this.recipe = recipe;
@@ -33,6 +47,16 @@ public class Schedule implements BobFileComponent
     public String getRecipe()
     {
         return this.recipe;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     /**
@@ -51,9 +75,7 @@ public class Schedule implements BobFileComponent
      */ 
     public void triggered()
     {
-        // generate a build request for this project -> recipe.
-        // project.getName();
-        // project.getRecipe(recipe);       
+        BobServer.build(project.getName(), recipe);       
     }
     
     public void activate()
@@ -78,20 +100,28 @@ public class Schedule implements BobFileComponent
         }
         
     }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
     
     public List<Trigger> getTriggers()
     {
         return triggers;
     }
 
+    private void setTriggers(List<Trigger> triggers)
+    {
+        this.triggers = triggers;
+    }
+
+    public void remove(long id)
+    {
+        int i;
+        
+        for(i = 0; i < triggers.size(); i++)
+        {
+            if(triggers.get(i).getId() == id)
+            {
+                triggers.remove(i);
+                return;
+            }
+        }
+    }
 }

@@ -2,8 +2,8 @@ package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.BobFile;
 import com.cinnamonbob.core.BobFileComponent;
-import com.cinnamonbob.core.Schedule;
-import com.cinnamonbob.core.Trigger;
+import com.cinnamonbob.model.Schedule;
+import com.cinnamonbob.model.Trigger;
 
 /**
  * 
@@ -15,6 +15,11 @@ public class SimpleTrigger implements Trigger, BobFileComponent
     private String name;
     private String value;
 
+    public long getId()
+    {
+        return 0;
+    }
+    
     public String getName()
     {
         return name;
@@ -68,5 +73,15 @@ public class SimpleTrigger implements Trigger, BobFileComponent
     public boolean isEnabled()
     {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+    
+    public String getType()
+    {
+        return "simple";
+    }
+    
+    public String getSummary()
+    {
+        return "real simple";
     }
 }
