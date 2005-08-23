@@ -288,6 +288,17 @@
             <result name="success" type="redirect">/viewUser.action?login=${login}</result>
         </action>
 
+        <action name="editSubscription!default" class="com.cinnamonbob.web.user.EditSubscriptionAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">edit-subscription.vm</result>
+        </action>
+
+        <action name="editSubscription" class="com.cinnamonbob.web.user.EditSubscriptionAction">
+            <result name="input" type="velocity">edit-subscription.vm</result>
+            <result name="cancel" type="redirect">/viewUser.action?login=${login}</result>
+            <result name="success" type="redirect">/viewUser.action?login=${login}</result>
+        </action>
+
         <action name="viewSystemInfo" class="com.cinnamonbob.web.console.SystemInfoAction">
             <result name="success" type="velocity">view-systeminfo.vm</result>
         </action>

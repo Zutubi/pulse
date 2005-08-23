@@ -21,7 +21,6 @@ public class CreateSubscriptionAction extends UserActionSupport
 
     private Map<String, String> conditions;
 
-
     public String getCondition()
     {
         return condition;

@@ -27,7 +27,7 @@ public class Subscription extends Entity
     /**
      * Constructor to be used by hibernate only.
      */
-    private Subscription()
+    public Subscription()
     {
 
     }
@@ -105,7 +105,7 @@ public class Subscription extends Entity
         this.condition = condition;
     }
 
-    private String getCondition()
+    public String getCondition()
     {
         return this.condition;
     }

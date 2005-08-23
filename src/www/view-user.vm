@@ -32,8 +32,8 @@
                     <td class="command-detail">$contact.name</td>
                     <td class="command-detail">#contactPointIcon($contact) $contact.uid</td>
                     <td class="command-detail">
-                        <a href="deleteContactPoint.action?id=$contact.id&user=$user.id">delete</a> |
                         <a href="editContactPoint!default.action?id=$contact.id&user=$user.id">edit</a> |
+                        <a href="deleteContactPoint.action?id=$contact.id&user=$user.id">delete</a> |
                         <a href="">test</a>
                     </td>
                 </tr>
@@ -58,7 +58,10 @@
                 <tr>
                     <td class="command-detail">$project.name</td>
                     <td class="command-detail">#contactPointIcon($contact) $contact.uid</td>
-                    <td class="command-detail"><a href="deleteSubscription.action?id=$subscription.id&login=$user.login&project=$project.name">delete</a></td>
+                    <td class="command-detail">
+                        <a href="editSubscription!default.action?id=$subscription.id&login=$user.login">edit</a> |
+                        <a href="deleteSubscription.action?id=$subscription.id&login=$user.login">delete</a>
+                    </td>
                 </tr>
             #end
                 <tr>
