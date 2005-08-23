@@ -107,7 +107,7 @@
                                 #set($class = "failure")
                             #end
                             <tr>
-                                <td class="build-$class"><a href="">$result.commandName</a></td>
+                                <td class="build-$class">$result.commandName</td>
                                 <td class="build-$class">$result.stamps.prettyStartTime</td>
                                 <td class="build-$class">$result.stamps.prettyElapsed</td>
                                 <td class="build-$class">$result.state.prettyString</td>
