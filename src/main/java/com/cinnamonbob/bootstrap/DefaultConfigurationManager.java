@@ -1,6 +1,6 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.util.IOHelper;
+import com.cinnamonbob.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class DefaultConfigurationManager implements ConfigurationManager
         {
             try
             {
-                userProperties.putAll(IOHelper.read(propertiesFile));
+                userProperties.putAll(IOUtils.read(propertiesFile));
             } catch (IOException e)
             {
                 LOG.log(Level.SEVERE, "Failed to load "+PROPERTIES_FILENAME+".", e);

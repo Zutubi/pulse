@@ -8,7 +8,7 @@ import java.util.Properties;
 /**
  * @author Daniel Ostermeier
  */
-public class IOHelper
+public class IOUtils
 {
     public static void close(Socket s)
     {
@@ -39,7 +39,7 @@ public class IOHelper
         } 
         finally
         {
-            IOHelper.close(input);
+            IOUtils.close(input);
         }
     }
     
@@ -150,8 +150,8 @@ public class IOHelper
         } 
         finally
         {
-            IOHelper.close(inStream);
-            IOHelper.close(outStream);
+            IOUtils.close(inStream);
+            IOUtils.close(outStream);
         }
     }
     
@@ -160,7 +160,7 @@ public class IOHelper
         FileInputStream is = new FileInputStream(file);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        IOHelper.joinStreams(is, os);
+        IOUtils.joinStreams(is, os);
         return os.toString();
     }
 }

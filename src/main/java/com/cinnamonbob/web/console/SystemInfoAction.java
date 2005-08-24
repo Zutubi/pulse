@@ -2,6 +2,7 @@ package com.cinnamonbob.web.console;
 
 import com.cinnamonbob.web.ActionSupport;
 import com.cinnamonbob.bootstrap.StartupManager;
+import com.cinnamonbob.util.Constants;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,13 +25,6 @@ public class SystemInfoAction extends ActionSupport
 
     private DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
     private DateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
-
-    private static final long MEGABYTE = 1048576;
-
-    private static final long SECOND = 1000;
-    private static final long MINUTE = 60 * SECOND;
-    private static final long HOUR = 60 * MINUTE;
-    private static final long DAY = 24 * HOUR;
 
     public void setStartupManager(StartupManager startupManager)
     {
@@ -74,7 +68,7 @@ public class SystemInfoAction extends ActionSupport
      */
     public long getTotalMemory()
     {
-        return runtime.totalMemory() / MEGABYTE;
+        return runtime.totalMemory() / Constants.MEGABYTE;
     }
 
     /**
@@ -84,7 +78,7 @@ public class SystemInfoAction extends ActionSupport
      */
     public long getFreeMemory()
     {
-        return runtime.freeMemory() / MEGABYTE;
+        return runtime.freeMemory() / Constants.MEGABYTE;
     }
 
     /**
@@ -108,15 +102,15 @@ public class SystemInfoAction extends ActionSupport
     {
         StringBuffer buffer = new StringBuffer();
         String sep = "";
-        long days = uptime / DAY;
+        long days = uptime / Constants.DAY;
         if (days > 0)
         {
             buffer.append(sep + days + " day" + ((days != 1) ? "s" : ""));
             sep = " ";
         }
-        long hours = uptime % DAY / HOUR;
-        long minutes = uptime % DAY % HOUR / MINUTE;
-        long seconds = uptime % DAY % HOUR % MINUTE / SECOND;
+        long hours = uptime % Constants.DAY / Constants.HOUR;
+        long minutes = uptime % Constants.DAY % Constants.HOUR / Constants.MINUTE;
+        long seconds = uptime % Constants.DAY % Constants.HOUR % Constants.MINUTE / Constants.SECOND;
         buffer.append(sep + MessageFormat.format("{0,number,00}:{1,number,00}:{2,number,00}", hours, minutes, seconds));
         return buffer.toString();
     }

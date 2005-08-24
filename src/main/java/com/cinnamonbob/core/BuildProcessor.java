@@ -7,7 +7,7 @@ import com.cinnamonbob.model.*;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
 import com.cinnamonbob.util.FileSystemUtils;
-import com.cinnamonbob.util.IOHelper;
+import com.cinnamonbob.util.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -248,7 +248,7 @@ public class BuildProcessor
         }
         finally
         {
-            IOHelper.close(writer);
+            IOUtils.close(writer);
         }
     }
 

@@ -1,6 +1,6 @@
 package com.cinnamonbob.scm;
 
-import com.cinnamonbob.util.IOHelper;
+import com.cinnamonbob.util.IOUtils;
 import com.cinnamonbob.model.Change;
 import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.model.NumericalRevision;
@@ -94,8 +94,8 @@ public class P4Server implements SCMServer
             StringWriter      stdoutWriter = new StringWriter();
             StringWriter      stderrWriter = new StringWriter();
             
-            IOHelper.joinReaderToWriter(stdoutReader, stdoutWriter);
-            IOHelper.joinReaderToWriter(stderrReader, stderrWriter);
+            IOUtils.joinReaderToWriter(stdoutReader, stdoutWriter);
+            IOUtils.joinReaderToWriter(stderrReader, stderrWriter);
 
             result.exitCode = child.waitFor();
             result.stdout = stdoutWriter.getBuffer();

@@ -3,7 +3,7 @@ package com.cinnamonbob.core;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.model.StoredArtifact;
-import com.cinnamonbob.util.IOHelper;
+import com.cinnamonbob.util.IOUtils;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -56,7 +56,7 @@ public class ExecutableCommand implements Command
             FileOutputStream output = new FileOutputStream(outputFile);
             InputStream input = child.getInputStream();
             
-            IOHelper.joinStreams(input, output);            
+            IOUtils.joinStreams(input, output);
             final int result = child.waitFor();
             
             output.close();

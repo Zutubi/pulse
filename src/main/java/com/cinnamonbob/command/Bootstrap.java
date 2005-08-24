@@ -2,7 +2,7 @@ package com.cinnamonbob.command;
 
 import com.cinnamonbob.BobServer;
 import com.cinnamonbob.ShutdownService;
-import com.cinnamonbob.util.IOHelper;
+import com.cinnamonbob.util.IOUtils;
 import org.apache.xmlrpc.XmlRpcClient;
 
 import java.io.IOException;
@@ -75,7 +75,7 @@ public class Bootstrap
             LOG.log(Level.WARNING, "Unable to send shutdown request", e);
 
         } finally {
-            IOHelper.close(socket);
+            IOUtils.close(socket);
         }
 
     }

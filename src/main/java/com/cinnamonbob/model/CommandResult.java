@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Properties;
 
 import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.util.IOHelper;
+import com.cinnamonbob.util.IOUtils;
 import com.cinnamonbob.util.TimeStamps;
 
 /**
@@ -200,7 +200,7 @@ public class CommandResult extends Result
         
         try
         {
-            result = IOHelper.fileToString(exceptionFile);
+            result = IOUtils.fileToString(exceptionFile);
         }
         catch(IOException e)
         {

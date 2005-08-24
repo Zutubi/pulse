@@ -1,7 +1,7 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.util.IOHelper;
+import com.cinnamonbob.util.IOUtils;
 import com.cinnamonbob.util.TimeStamps;
 
 import java.io.File;
@@ -205,7 +205,7 @@ public class BuildResult extends Result
         
         try
         {
-            result = IOHelper.fileToString(exceptionFile);
+            result = IOUtils.fileToString(exceptionFile);
         }
         catch(IOException e)
         {

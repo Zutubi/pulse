@@ -1,6 +1,6 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.util.IOHelper;
+import com.cinnamonbob.util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -105,12 +105,12 @@ public class ShutdownService
                     e.printStackTrace();
                 }
                 
-                IOHelper.close(s);
+                IOUtils.close(s);
             }
         } catch (IOException e)
         {
             LOG.log(Level.SEVERE, "Error in socketServer, shutting down service.", e);
-            IOHelper.close(socketServer);
+            IOUtils.close(socketServer);
         }
 
     }
@@ -136,7 +136,7 @@ public class ShutdownService
             }
         } finally
         {
-            IOHelper.close(reader);
+            IOUtils.close(reader);
         }
     }
 

@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.model.StoredArtifact;
-import com.cinnamonbob.util.IOHelper;
+import com.cinnamonbob.util.IOUtils;
 import com.opensymphony.util.TextUtils;
 
 
@@ -104,7 +104,7 @@ public class CommandGroup implements Command
 
             try
             {
-                IOHelper.copyFile(fromFile, toFile);
+                IOUtils.copyFile(fromFile, toFile);
                 result.addArtifact(new StoredArtifact(artifact, toFile.getAbsolutePath()));
             }
             catch(IOException e)

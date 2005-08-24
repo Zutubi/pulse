@@ -3,7 +3,7 @@ package com.cinnamonbob.core;
 import com.cinnamonbob.BobException;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.core.validation.CommandValidationManager;
-import com.cinnamonbob.util.IOHelper;
+import com.cinnamonbob.util.IOUtils;
 import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.opensymphony.xwork.validator.ValidationException;
 import nu.xom.*;
@@ -94,7 +94,7 @@ public class BobFileLoader
         }
         finally
         {
-            IOHelper.close(input);
+            IOUtils.close(input);
         }
     }
 
