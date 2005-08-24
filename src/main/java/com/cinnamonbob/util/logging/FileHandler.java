@@ -1,4 +1,4 @@
-package com.cinnamonbob.util;
+package com.cinnamonbob.util.logging;
 
 import java.io.IOException;
 
