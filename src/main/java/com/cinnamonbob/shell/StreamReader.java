@@ -55,7 +55,7 @@ public class StreamReader extends Thread
         }
         finally
         {
-            IOUtils.close(input);
+//            IOUtils.close(input);
         }
     }
 

@@ -23,10 +23,10 @@ public abstract class Shell
     private boolean isOpen;
 
     // Line separator string.  This is the value of the line.separator
-    // property at the moment that the ShellOutputReader was created.
+    // property at the moment that the StdOutErrReader was created.
     private final String lineSeparator = (String) java.security.AccessController.doPrivileged(new sun.security.action.GetPropertyAction("line.separator"));
 
-    private ShellOutputReader reader;
+    private StdOutErrReader reader;
 
     private PrintWriter writer;
 
@@ -41,7 +41,8 @@ public abstract class Shell
 
     private File directory;
 
-    private InputStream input;
+    private PipedInputStream input;
+    private PipedOutputStream output;
 
     public Shell()
     {
@@ -118,9 +119,9 @@ public abstract class Shell
             process = builder.start();
 
             input = new PipedInputStream();
-            OutputStream output = new PipedOutputStream((PipedInputStream)input);
+            output = new PipedOutputStream(input);
 
-            reader = new ShellOutputReader(process.getInputStream(), output);
+            reader = new StdOutErrReader(process.getInputStream(), output);
             reader.setLineSeparator(lineSeparator);
             reader.start();
 
@@ -242,9 +243,9 @@ public abstract class Shell
                 reader = null;
             }
         }
-        if (input != null)
+        if (output != null)
         {
-            IOUtils.close(input);
+            IOUtils.close(output);
         }
     }
 

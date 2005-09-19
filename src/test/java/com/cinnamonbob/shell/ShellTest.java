@@ -50,14 +50,18 @@ public class ShellTest extends TestCase
         try
         {
             shell.open();
+            StreamReader reader = new StreamReader(shell.getInput(), System.out);
+            reader.start();
 
             assertEquals(0, shell.execute("dir"));
             assertEquals(0, shell.execute("dir"));
             assertFalse(shell.execute("badCommand") == 0);
+
+            shell.close();
+            reader.join();
         }
         finally
         {
-            shell.close();
         }
     }
 

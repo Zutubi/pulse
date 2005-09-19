@@ -7,9 +7,9 @@ import java.util.logging.Logger;
 /**
  *
  */
-class ShellOutputReader extends Thread
+class StdOutErrReader extends Thread
 {
-    private static final Logger LOG = Logger.getLogger(ShellOutputReader.class.getName());
+    private static final Logger LOG = Logger.getLogger(StdOutErrReader.class.getName());
 
     private final InputStream input;
     private final OutputStream output;
@@ -25,7 +25,7 @@ class ShellOutputReader extends Thread
      * @param input
      * @param output
      */
-    protected ShellOutputReader(InputStream input, OutputStream output)
+    protected StdOutErrReader(InputStream input, OutputStream output)
     {
         this.input = input;
         this.output = output;
