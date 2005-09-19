@@ -98,6 +98,7 @@ class ShellOutputReader extends Thread
                     }
                     else
                     {
+
                         // legit output.
                         writer.write(line);
                         writer.write(lineSeparator);
