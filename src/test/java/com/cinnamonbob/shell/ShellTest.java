@@ -5,8 +5,6 @@ package com.cinnamonbob.shell;
 
 import junit.framework.*;
 
-import java.io.*;
-
 public class ShellTest extends TestCase
 {
 
@@ -31,12 +29,14 @@ public class ShellTest extends TestCase
 
     public void testEmptyEnvironment() throws Exception
     {
-        Shell shell = ShellFactory.createShell();
+        Shell shell = new Shell();
         try
         {
             shell.getEnvironment().clear();
             shell.open();
-            assertTrue(shell.execute("java") != 0);
+            shell.execute("java");
+            shell.waitFor();
+            assertTrue(shell.getExitStatus() != 0);
         }
         finally
         {
@@ -46,16 +46,25 @@ public class ShellTest extends TestCase
 
     public void testExecute() throws Exception
     {
-        Shell shell = ShellFactory.createShell();
+        Shell shell = new Shell();
         try
         {
             shell.open();
             StreamReader reader = new StreamReader(shell.getInput(), System.out);
             reader.start();
 
-            assertEquals(0, shell.execute("dir"));
-            assertEquals(0, shell.execute("dir"));
-            assertFalse(shell.execute("badCommand") == 0);
+            shell.execute("dir");
+            shell.waitFor();
+            assertEquals(0, shell.getExitStatus());
+
+            shell.execute("dir");
+            shell.waitFor();
+            assertEquals(0, shell.getExitStatus());
+
+            shell.execute("badCommand");
+            shell.waitFor();
+            assertTrue(shell.getExitStatus() != 0);
+            assertTrue(shell.getExitStatus() != Shell.EXIT_STATUS_UNKNOWN);
 
             shell.close();
             reader.join();
@@ -67,14 +76,16 @@ public class ShellTest extends TestCase
 
     public void testInputStream() throws Exception
     {
-        Shell shell = ShellFactory.createShell();
+        Shell shell = new Shell();
         try
         {
             shell.open();
             StreamReader reader = new StreamReader(shell.getInput(), System.out);
             reader.start();
 
-            assertEquals(0, shell.execute("dir"));
+            shell.execute("dir");
+            shell.waitFor();
+            assertEquals(0, shell.getExitStatus());
 
             shell.close();
 

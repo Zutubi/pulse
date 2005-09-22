@@ -9,12 +9,23 @@ import java.util.logging.Logger;
  */
 class StdOutErrReader extends Thread
 {
+    /**
+     *
+     */
     private static final Logger LOG = Logger.getLogger(StdOutErrReader.class.getName());
 
+    /**
+     * The standard out / standard error stream from the shell process.
+     */
     private final InputStream input;
+
+    /**
+     * The output stream to which this reader writes data it receives from the shell process.
+     */
     private final OutputStream output;
 
     private String lineSeparator = null;
+
     private String commandTerminationString = null;
 
     private boolean commandComplete;
@@ -40,6 +51,7 @@ class StdOutErrReader extends Thread
     {
         commandTerminationString = str;
         commandComplete = false;
+        commandExitStatus = Shell.EXIT_STATUS_UNKNOWN;
     }
 
     protected synchronized void waitFor()
@@ -75,42 +87,40 @@ class StdOutErrReader extends Thread
                 {
                     if (line.startsWith(commandTerminationString))
                     {
-                        synchronized(this)
-                        {
-                            commandComplete = true;
-                            String exitStatus = line.substring(commandTerminationString.length() + 1);
-                            try
-                            {
-                                commandExitStatus = Integer.parseInt(exitStatus);
-                            }
-                            catch (NumberFormatException e)
-                            {
-                                commandExitStatus = Shell.EXIT_STATUS_UNKNOWN;
-                            }
-                            writer.flush();
-                            notifyAll();
-                        }
+                        synchronized (this)
+                                {
+                                    commandComplete = true;
+                                    String exitStatus = line.substring(commandTerminationString.length() + 1);
+                                    try
+                                    {
+                                        commandExitStatus = Integer.parseInt(exitStatus);
+                                    }
+                                    catch (NumberFormatException e)
+                                    {
+                                        commandExitStatus = Shell.EXIT_STATUS_UNKNOWN;
+                                    }
+                                    writer.flush();
+                                    notifyAll();
+                                }
                     }
                     // hack to make the out put a little cleaner..
                     else if (line.contains("echo " + commandTerminationString))
                     {
                         // ignore it, its just windows echoing the 'echo' command.
-                    }
-                    else
+                    } else
                     {
-
                         // legit output.
                         writer.write(line);
                         writer.write(lineSeparator);
                     }
-                }
-                else
+                } else
                 {
                     writer.write(line);
                     writer.write(lineSeparator);
                 }
             }
             writer.flush();
+            writer.close();
         }
         catch (IOException e)
         {
@@ -118,13 +128,31 @@ class StdOutErrReader extends Thread
         }
         finally
         {
-
+            // make sure that we notify any threads currently waiting.
+            synchronized (this)
+                    {
+                        commandComplete = true;
+                        commandExitStatus = Shell.EXIT_STATUS_UNKNOWN;
+                        notifyAll();
+                    }
         }
     }
 
     public int getExitStatus()
     {
         return commandExitStatus;
+    }
+
+    public synchronized void waitFor(long millis)
+    {
+        try
+        {
+            wait(millis);
+        }
+        catch (InterruptedException e)
+        {
+            // noop.
+        }
     }
 }
 
