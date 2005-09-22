@@ -62,7 +62,7 @@ public class NativeShellConfiguration
             props = new Properties();
             try
             {
-                props.load(getClass().getResourceAsStream(os.replace(' ', '.') + ".properties"));
+                props.load(getClass().getResourceAsStream(os.replace(' ', '.').replace("/", "") + ".properties"));
             }
             catch (IOException e)
             {
