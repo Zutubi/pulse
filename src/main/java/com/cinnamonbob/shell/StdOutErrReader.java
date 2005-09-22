@@ -99,6 +99,7 @@ class StdOutErrReader extends Thread
                                     {
                                         commandExitStatus = Shell.EXIT_STATUS_UNKNOWN;
                                     }
+                                    writer.write(Shell.END_OF_COMMAND);
                                     writer.flush();
                                     notifyAll();
                                 }

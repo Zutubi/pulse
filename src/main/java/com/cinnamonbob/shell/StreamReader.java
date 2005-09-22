@@ -39,9 +39,21 @@ public class StreamReader extends Thread
         {
             OutputStreamWriter writer = new OutputStreamWriter(output);
             BufferedReader br = new BufferedReader(new InputStreamReader(input));
-            String line = null;
+            String line;
             while ((line = br.readLine()) != null)
             {
+                // examine the last char of the data.
+                if (line.length() > 0)
+                {
+                    char lastChar = line.charAt(line.length() - 1);
+                    if (lastChar == Shell.END_OF_COMMAND)
+                    {
+                        writer.write("END OF COMMAND REACHED.");
+                        writer.write(lineSeparator);
+                        writer.flush();
+                        continue;
+                    }
+                }
                 writer.write(line);
                 writer.write(lineSeparator);
                 writer.flush();
@@ -50,10 +62,6 @@ public class StreamReader extends Thread
         catch (IOException e)
         {
             LOG.log(Level.SEVERE, "Error reading input.", e);
-        }
-        finally
-        {
-//            IOUtils.close(input);
         }
     }
 

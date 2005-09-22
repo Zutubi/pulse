@@ -16,6 +16,9 @@ public class Shell
      */
     public static final int EXIT_STATUS_UNKNOWN = Integer.MIN_VALUE;
 
+    public static final char END_OF_COMMAND = '\u0003';
+    public static final char EOC = END_OF_COMMAND;
+
     /**
      * Indicates the shells open status.
      */
