@@ -29,7 +29,7 @@ public class DefaultEventManagerTest extends TestCase
         super.setUp();
         
         evtManager = new DefaultEventManager(new SynchronousDispatcher());
-        listener = new RecordingEventListener();
+        listener = new RecordingEventListener(new Class[]{Event.class});
     }
 
     public void tearDown() throws Exception
@@ -66,7 +66,7 @@ public class DefaultEventManagerTest extends TestCase
 
     public void testListenerRegisteredInCallbackDoesNotReceiveEvent()
     {
-        evtManager.register(new EventListener()
+        evtManager.register(new MockEventListener(new Class[]{Event.class})
         {
             public void handleEvent(Event evt)
             {
@@ -79,7 +79,7 @@ public class DefaultEventManagerTest extends TestCase
 
     public void testListenerUnregisteredInCallbackStillReceivesEvent()
     {
-        evtManager.register(new EventListener()
+        evtManager.register(new MockEventListener(new Class[]{Event.class})
         {
             public void handleEvent(Event evt)
             {
@@ -94,10 +94,81 @@ public class DefaultEventManagerTest extends TestCase
         assertEquals(1, listener.getEventsReceived().size());
     }
 
-    private class RecordingEventListener implements EventListener
+    public void testPublishSuperClassOfRequestedEvent()
+    {
+        RecordingEventListener listener = new RecordingEventListener(new Class[]{TestEvent.class});
+
+        evtManager.register(listener);
+        evtManager.publish(new Event(this));
+        assertEquals(0, listener.getReceivedCount());
+        evtManager.publish(new TestEvent(this));
+        assertEquals(1, listener.getReceivedCount());
+
+        listener.reset();
+        evtManager.unregister(listener);
+        evtManager.publish(new Event(this));
+        evtManager.publish(new TestEvent(this));
+        assertEquals(0, listener.getReceivedCount());
+    }
+
+    public void testPublishSubClassOfRequestedEvent()
+    {
+        RecordingEventListener listener = new RecordingEventListener(new Class[]{Event.class});
+
+        evtManager.register(listener);
+        evtManager.publish(new Event(this));
+        assertEquals(1, listener.getReceivedCount());
+        evtManager.publish(new TestEvent(this));
+        assertEquals(2, listener.getReceivedCount());
+
+        listener.reset();
+        evtManager.unregister(listener);
+        evtManager.publish(new Event(this));
+        evtManager.publish(new TestEvent(this));
+        assertEquals(0, listener.getReceivedCount());
+    }
+
+    public void testReceiveAllEventsByDefault()
+    {
+        RecordingEventListener listener = new RecordingEventListener(new Class[]{});
+
+        evtManager.register(listener);
+        evtManager.publish(new Event(this));
+        assertEquals(1, listener.getReceivedCount());
+        evtManager.publish(new TestEvent(this));
+        assertEquals(2, listener.getReceivedCount());
+
+    }
+
+    private class MockEventListener implements EventListener
+    {
+        private final Class[] handledEvents;
+
+        public MockEventListener(Class[] handledEvents)
+        {
+            this.handledEvents = handledEvents;
+        }
+
+        public Class[] getHandledEvents()
+        {
+            return handledEvents;
+        }
+
+        public void handleEvent(Event evt)
+        {
+
+        }
+    }
+
+    private class RecordingEventListener extends MockEventListener
     {
 
         private final List<Event> events = new LinkedList<Event>();
+
+        public RecordingEventListener(Class[] handledEvents)
+        {
+            super(handledEvents);
+        }
 
         public void handleEvent(Event evt)
         {
@@ -107,6 +178,24 @@ public class DefaultEventManagerTest extends TestCase
         public List<Event> getEventsReceived()
         {
             return events;
+        }
+
+        public int getReceivedCount()
+        {
+            return getEventsReceived().size();
+        }
+
+        public void reset()
+        {
+            getEventsReceived().clear();
+        }
+    }
+
+    private class TestEvent extends Event
+    {
+        public TestEvent(Object source)
+        {
+            super(source);
         }
     }
 
