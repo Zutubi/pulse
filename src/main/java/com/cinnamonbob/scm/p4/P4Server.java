@@ -1,10 +1,12 @@
-package com.cinnamonbob.scm;
+package com.cinnamonbob.scm.p4;
 
 import com.cinnamonbob.util.IOUtils;
 import com.cinnamonbob.model.Change;
 import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.model.NumericalRevision;
 import com.cinnamonbob.model.Revision;
+import com.cinnamonbob.scm.SCMServer;
+import com.cinnamonbob.scm.SCMException;
 
 import java.io.*;
 import java.text.ParseException;

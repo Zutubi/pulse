@@ -1,4 +1,4 @@
-package com.cinnamonbob.scm;
+package com.cinnamonbob.scm.svn;
 
 import junit.framework.TestCase;
 

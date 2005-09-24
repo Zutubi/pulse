@@ -2,20 +2,20 @@ package com.cinnamonbob.model;
 
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
-import com.cinnamonbob.scm.SVNServer;
+import com.cinnamonbob.scm.svn.SVNServer;
 
 /**
  * 
  *
  */
 public class Svn extends Scm
-{    
+{
     private final String URL = "svn.url";
     private final String USERNAME = "svn.username";
     private final String PASSWORD = "svn.password";
     private final String KEYFILE = "svn.keyfile";
     private final String PASSPHRASE = "svn.passphrase";
-    
+
     @Override
     public SCMServer createServer() throws SCMException
     {
@@ -40,7 +40,7 @@ public class Svn extends Scm
     {
         return (String) getProperties().get(URL);
     }
-    
+
     public void setUrl(String url)
     {
         getProperties().put(URL, url);
