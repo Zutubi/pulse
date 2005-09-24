@@ -262,6 +262,7 @@
         
         <action name="createTrigger" class="com.cinnamonbob.web.project.CreateTriggerAction">
             <result name="input" type="velocity">create-trigger.vm</result>
+            <result name="cancel" type="redirect">/manageSchedule.action?projectId=${project.id}&amp;name=${schedule.name}</result>
             <result name="success" type="redirect">/manageSchedule.action?projectId=${project.id}&amp;name=${schedule.name}</result>
         </action>
 

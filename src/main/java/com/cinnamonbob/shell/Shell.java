@@ -1,10 +1,13 @@
 package com.cinnamonbob.shell;
 
 import com.cinnamonbob.util.RandomUtils;
+import com.cinnamonbob.util.Constants;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * The Shell provides a native command execution environment.
@@ -24,11 +27,7 @@ public class Shell
      */
     private boolean isOpen;
 
-    // Line separator string.  This is the value of the line.separator
-    // property at the moment that the StdOutErrReader was created.
-    private final String lineSeparator = (String) java.security.AccessController.doPrivileged(new sun.security.action.GetPropertyAction("line.separator"));
-
-    private StdOutErrReader stdOutReader;
+    private StdOutErrParser stdOutReader;
 
     private PrintWriter writer;
 
@@ -122,11 +121,10 @@ public class Shell
             process = builder.start();
 
             input = new PipedInputStream();
-            // will be cleaned up by the StdOutErrReader during its cleanup.
+            // will be cleaned up by the StdOutErrParser during its cleanup.
             PipedOutputStream output = new PipedOutputStream(input);
 
-            stdOutReader = new StdOutErrReader(process.getInputStream(), output);
-            stdOutReader.setLineSeparator(lineSeparator);
+            stdOutReader = new StdOutErrParser(process.getInputStream(), output);
             stdOutReader.start();
 
             writer = new PrintWriter(new OutputStreamWriter(process.getOutputStream()));
@@ -203,7 +201,7 @@ public class Shell
 
     private void internalExecute(String command)
     {
-        writer.write(command + lineSeparator);
+        writer.write(command + Constants.LINE_SEPARATOR);
         writer.flush();
     }
 
@@ -259,3 +257,159 @@ public class Shell
         return config.getExitStatusVariable();
     }
 }
+
+
+/**
+ *
+ */
+class StdOutErrParser extends Thread
+{
+    /**
+     *
+     */
+    private static final Logger LOG = Logger.getLogger(StdOutErrParser.class.getName());
+
+    /**
+     * The standard out / standard error stream from the shell process.
+     */
+    private final InputStream input;
+
+    /**
+     * The output stream to which this reader writes data it receives from the shell process.
+     */
+    private final OutputStream output;
+
+    private String commandTerminationString = null;
+
+    private boolean commandComplete;
+
+    private int commandExitStatus;
+
+    //---(  )---
+
+    public static final int IDLE = 0;
+    public static final int EXECUTING = 1;
+    public static final int COMPLETE = 2;
+
+    private int status = IDLE;
+
+    /**
+     * @param input
+     * @param output
+     */
+    protected StdOutErrParser(InputStream input, OutputStream output)
+    {
+        this.input = input;
+        this.output = output;
+    }
+
+    protected void setCommandTerminationString(String str)
+    {
+        commandTerminationString = str;
+        commandComplete = false;
+        commandExitStatus = Shell.EXIT_STATUS_UNKNOWN;
+    }
+
+    protected synchronized void waitFor()
+    {
+        while (!commandComplete)
+        {
+            try
+            {
+                wait();
+            }
+            catch (InterruptedException e)
+            {
+                // noop.
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    public void run()
+    {
+        try
+        {
+            OutputStreamWriter writer = new OutputStreamWriter(output);
+            BufferedReader br = new BufferedReader(new InputStreamReader(input));
+
+            String line;
+            while ((line = br.readLine()) != null)
+            {
+                // look for command termination string.
+                if (line.contains(commandTerminationString))
+                {
+                    if (line.startsWith(commandTerminationString))
+                    {
+                        synchronized (this)
+                                {
+                                    commandComplete = true;
+                                    String exitStatus = line.substring(commandTerminationString.length() + 1);
+                                    try
+                                    {
+                                        commandExitStatus = Integer.parseInt(exitStatus);
+                                    }
+                                    catch (NumberFormatException e)
+                                    {
+                                        commandExitStatus = Shell.EXIT_STATUS_UNKNOWN;
+                                    }
+                                    writer.write(Shell.END_OF_COMMAND);
+                                    writer.flush();
+                                    notifyAll();
+                                }
+                    }
+                    // hack to make the out put a little cleaner..
+                    else if (line.contains("echo " + commandTerminationString))
+                    {
+                        // ignore it, its just windows echoing the 'echo' command.
+                    } else
+                    {
+                        // legit output.
+                        writer.write(line);
+                        writer.write(Constants.LINE_SEPARATOR);
+                    }
+                } else
+                {
+                    writer.write(line);
+                    writer.write(Constants.LINE_SEPARATOR);
+                }
+            }
+            writer.flush();
+            writer.close();
+        }
+        catch (IOException e)
+        {
+            LOG.log(Level.SEVERE, "Error reading input.", e);
+        }
+        finally
+        {
+            // make sure that we notify any threads currently waiting.
+            synchronized (this)
+                    {
+                        commandComplete = true;
+                        commandExitStatus = Shell.EXIT_STATUS_UNKNOWN;
+                        notifyAll();
+                    }
+        }
+    }
+
+    public int getExitStatus()
+    {
+        return commandExitStatus;
+    }
+
+    public synchronized void waitFor(long millis)
+    {
+        try
+        {
+            wait(millis);
+        }
+        catch (InterruptedException e)
+        {
+            // noop.
+        }
+    }
+}
+

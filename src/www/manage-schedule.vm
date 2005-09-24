@@ -21,6 +21,9 @@
             <table>
                 #detailrow("name" $schedule.name)
                 #detailrow("recipe" $recipe)
+                <tr>
+                    <td colspan="2" class="command-detail"><b>+</b> <a href="manageProject.action?id=$project.id">back to the project</a></td>
+                </tr>
             </table>
         </div>
         
