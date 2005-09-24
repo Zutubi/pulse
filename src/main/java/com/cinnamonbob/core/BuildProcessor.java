@@ -65,15 +65,7 @@ public class BuildProcessor
         }
 
         // allocate a build result to this request.
-        long              number = 1;
-        List<BuildResult> builds = buildManager.getLatestBuildResultsForProject(project.getName(), 1);
-
-        BuildResult previousBuildResult = null;
-        if(builds.size() > 0)
-        {
-            previousBuildResult = builds.get(0);
-            number = previousBuildResult.getNumber() + 1;
-        }
+        long number = buildManager.getNextBuildNumber(project.getName());
 
         BuildResult buildResult = new BuildResult(project.getName(), number);
         buildManager.save(buildResult);
@@ -89,7 +81,7 @@ public class BuildProcessor
         {
             File workDir = cleanWorkDir(projectDir);
             createBuildResultDir(buildDir);
-            bootstrapBuild(project, previousBuildResult, buildResult, workDir, buildDir);
+            bootstrapBuild(project, buildResult, workDir, buildDir);
 
             BobFile bobFile = loadBobFile(workDir, project);
 
@@ -182,7 +174,7 @@ public class BuildProcessor
         }
     }
 
-    private File bootstrapBuild(Project project, BuildResult previousBuildResult, BuildResult result, File workDir, File resultDir) throws BuildException
+    private File bootstrapBuild(Project project, BuildResult result, File workDir, File resultDir) throws BuildException
     {
         List<Scm> scms = project.getScms();
 
@@ -200,6 +192,7 @@ public class BuildProcessor
             SCMServer          server   = scm.createServer();
             LinkedList<Change> changes  = new LinkedList<Change>();
             Revision           latestRevision = server.checkout(scmDir, null, changes);
+            BuildResult previousBuildResult = buildManager.getLatestBuildResult(project.getName());
 
             result.setRevision(latestRevision);
             saveChanges(resultDir, changes);

@@ -14,7 +14,11 @@ public interface BuildManager
 
     List<BuildResult> getLatestBuildResultsForProject(String project, int max);
 
+    BuildResult getLatestBuildResult(String project);
+
     BuildResult getByProjectNameAndNumber(final String project, final long number);
 
     StoredArtifact getArtifact(long id);
+
+    long getNextBuildNumber(String projectName);
 }

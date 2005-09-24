@@ -8,10 +8,7 @@ import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.model.CvsRevision;
 
 import java.io.File;
-import java.util.List;
-import java.util.Date;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * The Cvs Server provides all interactions with a cvs repository.
@@ -20,6 +17,8 @@ public class CvsServer implements SCMServer
 {
     private String cvsRoot;
     private String cvsModule;
+
+    private List<Changelist> EMPTY_LIST = Collections.unmodifiableList(new LinkedList<Changelist>());
 
     public CvsServer(String root, String module)
     {
@@ -33,7 +32,6 @@ public class CvsServer implements SCMServer
         // can however checkout a tag / branch...?
 
         CvsRevision cvsRevision = (CvsRevision) revision;
-        
 
         // what about the changes? what do these represent?
         CvsClient client = new CvsClient(cvsRoot);
@@ -51,7 +49,7 @@ public class CvsServer implements SCMServer
     {
         if (from == null)
         {
-            return Collections.EMPTY_LIST;
+            return EMPTY_LIST;
         }
 
         CvsRevision fromRevision = (CvsRevision) from;

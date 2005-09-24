@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.cinnamonbob.model.Change;
+import com.cinnamonbob.scm.SCMException;
 
 /**
  * The HistoryInfo object represents a single line from the history output.
@@ -24,15 +25,21 @@ public class HistoryInfo
     private String timezone;
     private String workingpath;
 
-    static final SimpleDateFormat LOGDATE = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z");
+    static final SimpleDateFormat LOGDATE = new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
 
-    public HistoryInfo(String data)
+
+    public HistoryInfo(String data) throws SCMException
     {
         StringTokenizer tokenizer = new StringTokenizer(data, " ", false);
         List<String> tokens = new ArrayList<String>();
         while (tokenizer.hasMoreTokens())
         {
             tokens.add(tokenizer.nextToken());
+        }
+
+        if (tokens.size() < 8)
+        {
+            throw new SCMException("Unable to extract history info from data: " + data);
         }
 
         this.code = (tokens.get(0));
@@ -159,7 +166,11 @@ public class HistoryInfo
     {
         try
         {
-            return LOGDATE.parse(date + " " + time + " " + timezone);
+            if (getDate() != null)
+            {
+                return LOGDATE.parse(getDate() + " " + getTime() + " " + getTimezone());
+            }
+            return null;
         }
         catch (ParseException e)
         {

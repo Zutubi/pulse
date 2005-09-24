@@ -3,11 +3,13 @@ package com.cinnamonbob.scm.cvs;
 import com.cinnamonbob.model.Change;
 import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.util.FileSystemUtils;
+import com.cinnamonbob.scm.SCMException;
 import junit.framework.TestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -24,15 +26,20 @@ public class CvsServerTest extends TestCase
      */
     //TODO: make the cvsRoot configurable.
     private CVSRoot cvsRoot = CVSRoot.parse(":local:/e/cvsroot");
-    
+    private CvsClient cvs = new CvsClient(cvsRoot);
+
     //TODO: make the workdir configurable.
     private File workdir = new File("E:/tmp/blah/blah/blah");
     
     public void setUp() throws Exception
     {
-        // cleanup the working directory.
+        // direct logging to System.err
+        // catch cvs logging.
+        PrintStream originalSystemErr = System.err;
+
         Logger.setLogging("system");
         
+        // cleanup the working directory.
         if (!FileSystemUtils.removeDirectory(workdir))
         {
             throw new RuntimeException("Failed to setup test case.");
@@ -53,17 +60,48 @@ public class CvsServerTest extends TestCase
         assertTrue(!foo.exists());
                
         // checkout...
-        CvsClient cvs = new CvsClient(cvsRoot);
         cvs.setLocalPath(workdir);
         cvs.checkout("project");
         
         assertTrue(foo.exists());
+        assertFalse(new File(workdir, "project/test/branch.only").exists());
     }
-    
+
+    public void testCheckoutBranch() throws Exception
+    {
+        // checkout...
+        cvs.setLocalPath(workdir);
+        cvs.setBranch("BRANCH");
+        cvs.checkout("project");
+
+        assertTrue(new File(workdir, "project/test/branch.only").exists());
+    }
+
+    public void testHasChangedSince() throws Exception
+    {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        assertTrue(cvs.hasChangedSince(dateFormat.parse("2005-05-10")));
+        assertFalse(cvs.hasChangedSince(dateFormat.parse("2005-10-10")));
+    }
+
+    public void testBugCheckoutHangs() throws Exception
+    {
+        // checkout...
+        cvs.setLocalPath(workdir);
+        // attempting to checkout with a leading '/' results in the CheckoutCommand hanging.
+        try
+        {
+            cvs.checkout("/e/cvsroot/project");
+            assertFalse(true);
+        } catch (SCMException e)
+        {
+            // noop.
+        }
+    }
+
     public void testGetChanges() throws Exception
     {
         // get changes since the start.
-        CvsClient cvs = new CvsClient(cvsRoot);
         List<Changelist> changes = cvs.getChangeLists(null);
         assertNotNull(changes);
         assertTrue(changes.size() == 9);        

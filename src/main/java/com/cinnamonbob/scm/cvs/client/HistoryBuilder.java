@@ -4,6 +4,8 @@ import org.netbeans.lib.cvsclient.command.Builder;
 
 import java.util.*;
 
+import com.cinnamonbob.scm.SCMException;
+
 /**
  * 
  *
@@ -12,11 +14,20 @@ public class HistoryBuilder implements Builder
 {
     private List<HistoryInfo> infos = new LinkedList<HistoryInfo>();
 
+    static final String NO_RECORDS = "No records selected.";
+
     public void parseLine(String line, boolean isErrorMessage)
     {
-        if (!isErrorMessage)
+        if (!isErrorMessage && !line.equals(NO_RECORDS))
         {
-            infos.add(parse(line));
+            try
+            {
+                infos.add(parse(line));
+            }
+            catch (SCMException e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -35,7 +46,7 @@ public class HistoryBuilder implements Builder
         return Collections.unmodifiableList(infos);
     }
 
-    private HistoryInfo parse(String data)
+    private HistoryInfo parse(String data) throws SCMException
     {
         return new HistoryInfo(data);
     }

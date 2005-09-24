@@ -1,21 +1,21 @@
 package com.cinnamonbob.scm.cvs;
 
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.cvs.client.*;
+import com.cinnamonbob.model.Change;
 import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.model.CvsRevision;
-import com.cinnamonbob.model.Change;
+import com.cinnamonbob.scm.SCMException;
+import com.cinnamonbob.scm.cvs.client.*;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
 import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
 import org.netbeans.lib.cvsclient.command.CommandAbortedException;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.GlobalOptions;
-import org.netbeans.lib.cvsclient.command.tag.RtagCommand;
-import org.netbeans.lib.cvsclient.command.log.LogInformation;
-import org.netbeans.lib.cvsclient.command.log.RlogCommand;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
 import org.netbeans.lib.cvsclient.command.history.HistoryCommand;
+import org.netbeans.lib.cvsclient.command.log.LogInformation;
+import org.netbeans.lib.cvsclient.command.log.RlogCommand;
+import org.netbeans.lib.cvsclient.command.tag.RtagCommand;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.connection.Connection;
 
@@ -35,7 +35,6 @@ public class CvsClient
     private static final DateFormat HISTORY_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z");
-
 
     private CVSRoot root;
 
@@ -76,17 +75,26 @@ public class CvsClient
      */
     public void setBranch(String branch)
     {
-        throw new UnsupportedOperationException();
+        this.branch = branch;
     }
 
     /**
      *
      */
-    //NOTE: at the moment, this method simply checks out the head revision of
-    //      the cvs repository. Branch checkout and specific revision checkout
-    //      is still to be implemented.
     public void checkout(String module) throws SCMException
     {
+        if (module == null)
+        {
+            throw new IllegalArgumentException("Command requires a module.");
+        }
+
+        // HACK: cvs client has trouble absolute references, hanging if they are invalid.
+        // Therefore, do not allow them.
+        while (module.startsWith("/"))
+        {
+            module = module.substring(1);
+        }
+
         Connection connection = null;
         try
         {
@@ -102,6 +110,10 @@ public class CvsClient
 
             CheckoutCommand checkout = new CheckoutCommand();
             checkout.setModule(module);
+            if (branch != null)
+            {
+                checkout.setCheckoutByRevision(branch);
+            }
 
             if (!client.executeCommand(checkout, globalOptions))
             {
@@ -123,9 +135,8 @@ public class CvsClient
         finally
         {
             // cleanup any resources used by this command.
-            CvsHelper.close(connection);
+            CvsUtils.close(connection);
         }
-
     }
 
     /**
@@ -188,7 +199,6 @@ public class CvsClient
             }
 
             client.executeCommand(rtag, globalOptions);
-
         }
         catch (AuthenticationException ae)
         {
@@ -204,7 +214,7 @@ public class CvsClient
         }
         finally
         {
-            CvsHelper.close(connection);
+            CvsUtils.close(connection);
         }
         throw new UnsupportedOperationException();
     }
@@ -250,7 +260,7 @@ public class CvsClient
         }
         finally
         {
-            CvsHelper.close(connection);
+            CvsUtils.close(connection);
         }
     }
 
@@ -318,7 +328,6 @@ public class CvsClient
         for (HistoryInfo histInfo : infos)
         {
             String filename = histInfo.getFile();
-            //String revision = histInfo.getRevision();
             String pathInRepo = histInfo.getPathInRepository();
 
             String fullPath = pathInRepo + fileSeparator + filename;
@@ -326,10 +335,8 @@ public class CvsClient
             // find the firstRevision -> comment, author
             LogInformation logInfo = logInfos.get(fullPath);
             assert(logInfo != null);
-            //LogInformation.Revision rev = logInfo.getRevision(revision);
 
-            //CvsRevision cvsRev = new CvsRevision(rev.getAuthor(), logInfo.getBranch(), rev.getMessage(), rev.getDate());
-            LocalChange change = new LocalChange(logInfo, histInfo);//new LocalChange(fullPath, cvsRev.toString(), histInfo.getAction());
+            LocalChange change = new LocalChange(logInfo, histInfo);
             simpleChanges.add(change);
         }
 
@@ -460,7 +467,7 @@ public class CvsClient
         finally
         {
             // cleanup any resources used by this command.
-            CvsHelper.close(connection);
+            CvsUtils.close(connection);
         }
     }
 

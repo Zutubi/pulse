@@ -38,7 +38,17 @@ public class DefaultBuildManager implements BuildManager
     {
         return buildResultDao.findLatestByProjectName(project, max);
     }
-    
+
+    public BuildResult getLatestBuildResult(String project)
+    {
+        List<BuildResult> results = getLatestBuildResultsForProject(project, 1);
+        if (results.size() > 0)
+        {
+            return results.get(0);
+        }
+        return null;
+    }
+
     public BuildResult getByProjectNameAndNumber(final String project, final long number)
     {
         return buildResultDao.findByProjectNameAndNumber(project, number);
@@ -47,6 +57,19 @@ public class DefaultBuildManager implements BuildManager
     public StoredArtifact getArtifact(long id)
     {
         return artifactDao.findById(id);
+    }
+
+    public long getNextBuildNumber(String projectName)
+    {
+        long              number = 1;
+        List<BuildResult> builds = getLatestBuildResultsForProject(projectName, 1);
+        BuildResult previousBuildResult;
+        if(builds.size() > 0)
+        {
+            previousBuildResult = builds.get(0);
+            number = previousBuildResult.getNumber() + 1;
+        }
+        return number;
     }
 
 }
