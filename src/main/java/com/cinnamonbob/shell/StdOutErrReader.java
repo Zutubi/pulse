@@ -32,6 +32,14 @@ class StdOutErrReader extends Thread
 
     private int commandExitStatus;
 
+    //---(  )---
+
+    public static final int IDLE = 0;
+    public static final int EXECUTING = 0;
+    public static final int COMPLETE = 0;
+
+    private int status = IDLE;
+
     /**
      * @param input
      * @param output
