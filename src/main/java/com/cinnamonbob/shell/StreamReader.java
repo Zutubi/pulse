@@ -1,5 +1,7 @@
 package com.cinnamonbob.shell;
 
+import com.cinnamonbob.util.Constants;
+
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,11 +15,6 @@ public class StreamReader extends Thread
 
     final InputStream input;
     final OutputStream output;
-
-    // Line separator string.  This is the value of the line.separator
-    // property at the moment that the StreamReader was created.
-    private final String lineSeparator = (String) java.security.AccessController.doPrivileged(
-               new sun.security.action.GetPropertyAction("line.separator"));
 
     /**
      *
@@ -48,14 +45,13 @@ public class StreamReader extends Thread
                     char lastChar = line.charAt(line.length() - 1);
                     if (lastChar == Shell.END_OF_COMMAND)
                     {
-                        writer.write("END OF COMMAND REACHED.");
-                        writer.write(lineSeparator);
+                        writer.write(Constants.LINE_SEPARATOR);
                         writer.flush();
                         continue;
                     }
                 }
                 writer.write(line);
-                writer.write(lineSeparator);
+                writer.write(Constants.LINE_SEPARATOR);
                 writer.flush();
             }
         }
@@ -64,7 +60,4 @@ public class StreamReader extends Thread
             LOG.log(Level.SEVERE, "Error reading input.", e);
         }
     }
-
-
-
 }

@@ -1,13 +1,25 @@
 package com.cinnamonbob.shell;
 
-import com.cinnamonbob.util.RandomUtils;
 import com.cinnamonbob.util.Constants;
+import com.cinnamonbob.util.IOUtils;
+import com.cinnamonbob.util.RandomUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Shell provides a native command execution environment.
@@ -27,7 +39,7 @@ public class Shell
      */
     private boolean isOpen;
 
-    private StdOutErrParser stdOutReader;
+    private StdOutErrParser stdOutParser;
 
     private PrintWriter writer;
 
@@ -87,6 +99,16 @@ public class Shell
         return isOpen;
     }
 
+    public boolean isExecuting()
+    {
+        return stdOutParser.isExecuting();
+    }
+
+    public boolean isIdle()
+    {
+        return stdOutParser.isIdle();
+    }
+
     /**
      * @throws IOException
      * @throws IllegalStateException if this shell is already open.
@@ -124,8 +146,8 @@ public class Shell
             // will be cleaned up by the StdOutErrParser during its cleanup.
             PipedOutputStream output = new PipedOutputStream(input);
 
-            stdOutReader = new StdOutErrParser(process.getInputStream(), output);
-            stdOutReader.start();
+            stdOutParser = new StdOutErrParser(process.getInputStream(), output);
+            stdOutParser.start();
 
             writer = new PrintWriter(new OutputStreamWriter(process.getOutputStream()));
 
@@ -150,7 +172,6 @@ public class Shell
      * This method will block until the execution of the command has been completed.
      *
      * @param cmd
-
      * @throws IllegalStateException if this shell is not open
      * @see #isOpen()
      * @see #open()
@@ -165,12 +186,12 @@ public class Shell
         // use the random string to 'tag' the end of the command, allowing us to detect
         // when a command has finished.
         String randomString = RandomUtils.randomString(10);
-        stdOutReader.setCommandTerminationString(randomString);
+        stdOutParser.addCommand(randomString);
 
         internalExecute(cmd);
 
         // determine exit status of command... this may not always be possible.
-        internalExecute("echo " + randomString + " " + getExitStatusVariable());
+        internalExecute(getEchoCommand() + " " + randomString + " " + getExitStatusVariable());
     }
 
     public InputStream getInput()
@@ -180,22 +201,23 @@ public class Shell
 
     public int getExitStatus()
     {
-        return stdOutReader.getExitStatus();
+        return stdOutParser.getExitStatus();
     }
 
     public void waitFor()
     {
-        stdOutReader.waitFor();
+        stdOutParser.waitFor();
     }
 
     public void waitFor(long millis)
     {
-        stdOutReader.waitFor(millis);
+        stdOutParser.waitFor(millis);
     }
 
     public void kill()
     {
         process.destroy();
+        stdOutParser.interrupt();
         isOpen = false;
     }
 
@@ -256,6 +278,11 @@ public class Shell
     {
         return config.getExitStatusVariable();
     }
+
+    public String getEchoCommand()
+    {
+        return config.getEchoCommand();
+    }
 }
 
 
@@ -270,28 +297,18 @@ class StdOutErrParser extends Thread
     private static final Logger LOG = Logger.getLogger(StdOutErrParser.class.getName());
 
     /**
-     * The standard out / standard error stream from the shell process.
+     *
      */
-    private final InputStream input;
+    private final BufferedReader input;
 
     /**
-     * The output stream to which this reader writes data it receives from the shell process.
+     *
      */
-    private final OutputStream output;
+    private final Writer output;
 
-    private String commandTerminationString = null;
-
-    private boolean commandComplete;
+    private LinkedList cmdEndMarkers = new LinkedList();
 
     private int commandExitStatus;
-
-    //---(  )---
-
-    public static final int IDLE = 0;
-    public static final int EXECUTING = 1;
-    public static final int COMPLETE = 2;
-
-    private int status = IDLE;
 
     /**
      * @param input
@@ -299,20 +316,24 @@ class StdOutErrParser extends Thread
      */
     protected StdOutErrParser(InputStream input, OutputStream output)
     {
-        this.input = input;
-        this.output = output;
+        this.output = new OutputStreamWriter(output);
+        this.input = new BufferedReader(new InputStreamReader(input));
     }
 
-    protected void setCommandTerminationString(String str)
+    protected void addCommand(String cmdEndMarker)
     {
-        commandTerminationString = str;
-        commandComplete = false;
+        cmdEndMarkers.addLast(cmdEndMarker);
         commandExitStatus = Shell.EXIT_STATUS_UNKNOWN;
     }
 
+    /**
+     * Wait for the currently executing command to complete. This method will
+     * block until the currently executing command is finished. If no command
+     * is executing, this method will return immediately.
+     */
     protected synchronized void waitFor()
     {
-        while (!commandComplete)
+        while (isExecuting())
         {
             try
             {
@@ -326,90 +347,153 @@ class StdOutErrParser extends Thread
     }
 
     /**
+     * Wait for the currently executing command to complete. This method will
+     * block until either the currently executing command is finished OR the
+     * specified timeout expires. If no command is executing, this method will
+     * return immediately.
+     *
+     * @param timeout
+     */
+    public synchronized void waitFor(long timeout)
+    {
+        final long finish = System.currentTimeMillis() + timeout;
+        while (isExecuting())
+        {
+            try
+            {
+                long now = System.currentTimeMillis();
+                long diff = finish - now;
+                if (diff <= 0)
+                {
+                    return;
+                }
+                wait(diff);
+            }
+            catch (InterruptedException e)
+            {
+                return;
+            }
+        }
+    }
+
+    public boolean isIdle()
+    {
+        return !isExecuting();
+    }
+
+    public boolean isExecuting()
+    {
+        return cmdEndMarkers.size() > 0;
+    }
+
+    /**
      *
      */
     public void run()
     {
         try
         {
-            OutputStreamWriter writer = new OutputStreamWriter(output);
-            BufferedReader br = new BufferedReader(new InputStreamReader(input));
-
             String line;
-            while ((line = br.readLine()) != null)
+            while ((line = input.readLine()) != null)
             {
-                // look for command termination string.
-                if (line.contains(commandTerminationString))
+                if (cmdEndMarkers.size() == 0)
                 {
-                    if (line.startsWith(commandTerminationString))
+                    writeLineToOutput(line);
+                    continue;
+                }
+
+                String nextCmdEndMarker = (String) cmdEndMarkers.getFirst();
+
+                // look for command termination string.
+                if (line.contains(nextCmdEndMarker))
+                {
+                    if (line.startsWith(nextCmdEndMarker))
                     {
-                        synchronized (this)
-                                {
-                                    commandComplete = true;
-                                    String exitStatus = line.substring(commandTerminationString.length() + 1);
-                                    try
-                                    {
-                                        commandExitStatus = Integer.parseInt(exitStatus);
-                                    }
-                                    catch (NumberFormatException e)
-                                    {
-                                        commandExitStatus = Shell.EXIT_STATUS_UNKNOWN;
-                                    }
-                                    writer.write(Shell.END_OF_COMMAND);
-                                    writer.flush();
-                                    notifyAll();
-                                }
+                        commandComplete(line);
                     }
                     // hack to make the out put a little cleaner..
-                    else if (line.contains("echo " + commandTerminationString))
+                    else if (line.contains("echo " + nextCmdEndMarker))
                     {
                         // ignore it, its just windows echoing the 'echo' command.
-                    } else
-                    {
-                        // legit output.
-                        writer.write(line);
-                        writer.write(Constants.LINE_SEPARATOR);
                     }
-                } else
+                    else
+                    {
+                        writeLineToOutput(line);
+                    }
+                }
+                else
                 {
-                    writer.write(line);
-                    writer.write(Constants.LINE_SEPARATOR);
+                    writeLineToOutput(line);
                 }
             }
-            writer.flush();
-            writer.close();
         }
         catch (IOException e)
         {
             LOG.log(Level.SEVERE, "Error reading input.", e);
+            // need to clear up the cmd end markers so that we ensure that
+            // any waiting clients will be released.
+            cmdEndMarkers.clear();
         }
         finally
         {
             // make sure that we notify any threads currently waiting.
             synchronized (this)
-                    {
-                        commandComplete = true;
-                        commandExitStatus = Shell.EXIT_STATUS_UNKNOWN;
-                        notifyAll();
-                    }
+            {
+                IOUtils.close(output);
+                if (isExecuting())
+                {
+                    LOG.severe("finalizing parser but still waiting on commands to complete???");
+                    cmdEndMarkers.clear();
+                }
+                notifyAll();
+            }
         }
     }
 
+    private synchronized void commandComplete(String line) throws IOException
+    {
+        // update the state of the parser.
+        String marker = (String) cmdEndMarkers.removeFirst();
+
+        // read the command exit status.
+        String exitStatus = line.substring(marker.length() + 1);
+        try
+        {
+            commandExitStatus = Integer.parseInt(exitStatus);
+        }
+        catch (NumberFormatException e)
+        {
+            commandExitStatus = Shell.EXIT_STATUS_UNKNOWN;
+        }
+
+        // write END OF COMMAND to output stream.
+        try
+        {
+            output.write(Shell.END_OF_COMMAND);
+            output.flush();
+        }
+        finally
+        {
+            notifyAll();
+        }
+    }
+
+    private void writeLineToOutput(String line) throws IOException
+    {
+        output.write(line);
+        output.write(Constants.LINE_SEPARATOR);
+    }
+
+    /**
+     * Get the exit status of the most recently completed command.
+     *
+     * @return
+     */
     public int getExitStatus()
     {
         return commandExitStatus;
     }
 
-    public synchronized void waitFor(long millis)
-    {
-        try
-        {
-            wait(millis);
-        }
-        catch (InterruptedException e)
-        {
-            // noop.
-        }
-    }
+
 }
 

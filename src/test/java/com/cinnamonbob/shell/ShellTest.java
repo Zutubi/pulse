@@ -74,6 +74,41 @@ public class ShellTest extends TestCase
         }
     }
 
+    public void testExecuteMultipleCommands() throws Exception
+    {
+        Shell shell = new Shell();
+        try
+        {
+            shell.open();
+            StreamReader reader = new StreamReader(shell.getInput(), System.out);
+            reader.start();
+
+            assertFalse(shell.isExecuting());
+            assertTrue(shell.isIdle());
+            shell.execute("dir");
+            assertTrue(shell.isExecuting());
+            assertFalse(shell.isIdle());
+
+            shell.execute("dir");
+            shell.execute("dir");
+
+            assertTrue(shell.isExecuting());
+            assertFalse(shell.isIdle());
+            shell.waitFor();
+            assertFalse(shell.isExecuting());
+            assertTrue(shell.isIdle());
+
+            assertEquals(0, shell.getExitStatus());
+
+            shell.close();
+            reader.join();
+        }
+        finally
+        {
+
+        }
+    }
+
     public void testInputStream() throws Exception
     {
         Shell shell = new Shell();
