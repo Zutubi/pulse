@@ -94,7 +94,7 @@ public class DefaultEventManagerTest extends TestCase
         assertEquals(1, listener.getEventsReceived().size());
     }
 
-    public void testPublishSuperClassOfRequestedEvent()
+    public void testHandleByClassPartA()
     {
         RecordingEventListener listener = new RecordingEventListener(new Class[]{TestEvent.class});
 
@@ -111,7 +111,7 @@ public class DefaultEventManagerTest extends TestCase
         assertEquals(0, listener.getReceivedCount());
     }
 
-    public void testPublishSubClassOfRequestedEvent()
+    public void testHandleByClassPartB()
     {
         RecordingEventListener listener = new RecordingEventListener(new Class[]{Event.class});
 
@@ -137,7 +137,28 @@ public class DefaultEventManagerTest extends TestCase
         assertEquals(1, listener.getReceivedCount());
         evtManager.publish(new TestEvent(this));
         assertEquals(2, listener.getReceivedCount());
+    }
 
+    public void testHandleByInterfacePartA()
+    {
+        RecordingEventListener listener = new RecordingEventListener(new Class[]{TestInterface.class});
+
+        evtManager.register(listener);
+        evtManager.publish(new TestEvent(this));
+        assertEquals(1, listener.getReceivedCount());
+        evtManager.publish(new Event(this));
+        assertEquals(1, listener.getReceivedCount());
+    }
+
+    public void testHandleByInterfacePartB()
+    {
+        RecordingEventListener listener = new RecordingEventListener(new Class[]{BaseInterface.class});
+
+        evtManager.register(listener);
+        evtManager.publish(new TestEvent(this));
+        assertEquals(1, listener.getReceivedCount());
+        evtManager.publish(new Event(this));
+        assertEquals(1, listener.getReceivedCount());
     }
 
     private class MockEventListener implements EventListener
@@ -191,7 +212,7 @@ public class DefaultEventManagerTest extends TestCase
         }
     }
 
-    private class TestEvent extends Event
+    private class TestEvent extends Event implements TestInterface
     {
         public TestEvent(Object source)
         {
@@ -199,15 +220,13 @@ public class DefaultEventManagerTest extends TestCase
         }
     }
 
-    private void pause(long millis)
+    private interface BaseInterface
     {
-        try
-        {
-            Thread.sleep(millis);
-        }
-        catch (InterruptedException e)
-        {
-            // noop
-        }
+
+    }
+
+    private interface TestInterface extends BaseInterface
+    {
+
     }
 }
