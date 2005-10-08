@@ -2,14 +2,13 @@ package com.cinnamonbob.scm.cvs;
 
 import com.cinnamonbob.model.Change;
 import com.cinnamonbob.model.Changelist;
-import com.cinnamonbob.util.FileSystemUtils;
 import com.cinnamonbob.scm.SCMException;
+import com.cinnamonbob.util.FileSystemUtils;
 import junit.framework.TestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
-import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -33,10 +32,6 @@ public class CvsServerTest extends TestCase
     
     public void setUp() throws Exception
     {
-        // direct logging to System.err
-        // catch cvs logging.
-        PrintStream originalSystemErr = System.err;
-
         Logger.setLogging("system");
         
         // cleanup the working directory.
@@ -61,7 +56,7 @@ public class CvsServerTest extends TestCase
                
         // checkout...
         cvs.setLocalPath(workdir);
-        cvs.checkout("project");
+        cvs.checkout("project", null);
         
         assertTrue(foo.exists());
         assertFalse(new File(workdir, "project/test/branch.only").exists());
@@ -72,7 +67,7 @@ public class CvsServerTest extends TestCase
         // checkout...
         cvs.setLocalPath(workdir);
         cvs.setBranch("BRANCH");
-        cvs.checkout("project");
+        cvs.checkout("project", null);
 
         assertTrue(new File(workdir, "project/test/branch.only").exists());
     }
@@ -80,8 +75,8 @@ public class CvsServerTest extends TestCase
     public void testHasChangedSince() throws Exception
     {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        assertTrue(cvs.hasChangedSince(dateFormat.parse("2005-05-10")));
-        assertFalse(cvs.hasChangedSince(dateFormat.parse("2005-10-10")));
+        assertTrue(cvs.hasChangedSince(dateFormat.parse("2005-05-10"), null));
+        assertFalse(cvs.hasChangedSince(dateFormat.parse("2005-10-10"), null));
     }
 
     public void testBugCheckoutHangs() throws Exception
@@ -91,7 +86,7 @@ public class CvsServerTest extends TestCase
         // attempting to checkout with a leading '/' results in the CheckoutCommand hanging.
         try
         {
-            cvs.checkout("/e/cvsroot/project");
+            cvs.checkout("/e/cvsroot/project", null);
             assertFalse(true);
         } catch (SCMException e)
         {
@@ -102,9 +97,9 @@ public class CvsServerTest extends TestCase
     public void testGetChanges() throws Exception
     {
         // get changes since the start.
-        List<Changelist> changes = cvs.getChangeLists(null);
+        List<Changelist> changes = cvs.getChangeLists(null, null);
         assertNotNull(changes);
-        assertTrue(changes.size() == 9);        
+        assertTrue(changes.size() == 10);
         assertEquals(2, changes.get(0).getChanges().size());
         assertEquals(1, changes.get(1).getChanges().size());
         assertEquals(2, changes.get(2).getChanges().size());
@@ -114,13 +109,14 @@ public class CvsServerTest extends TestCase
         assertEquals(1, changes.get(6).getChanges().size());
         assertEquals(1, changes.get(7).getChanges().size());
         assertEquals(2, changes.get(8).getChanges().size());
+        assertEquals(1, changes.get(9).getChanges().size());
         assertValidChangeSets(changes);
         // get changes since x where x is the date of one of the changes.
         
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        changes = cvs.getChangeLists(dateFormat.parse("2005-05-10"));
+        changes = cvs.getChangeLists(dateFormat.parse("2005-05-10"), null);
         assertNotNull(changes);
-        assertTrue(changes.size() == 4);
+        assertTrue(changes.size() == 5);
     }
 
     public void testGetChangesFromAtlassian() throws Exception
@@ -129,7 +125,7 @@ public class CvsServerTest extends TestCase
 
         CVSRoot root = CVSRoot.parse(":ext:dostermeier:4edueWX7@cvs.atlassian.com:/cvsroot/atlassian");
         CvsClient cvs = new CvsClient(root);
-        List<Changelist> changes = cvs.getChangeLists(dateFormat.parse("2005-08-05"));
+        List<Changelist> changes = cvs.getChangeLists(dateFormat.parse("2005-10-05"), null);
         System.out.println("changes:" + changes.size());
     }
     

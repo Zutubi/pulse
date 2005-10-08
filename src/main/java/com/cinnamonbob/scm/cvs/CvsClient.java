@@ -5,6 +5,7 @@ import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.model.CvsRevision;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.cvs.client.*;
+import com.opensymphony.util.TextUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
 import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
@@ -32,8 +33,6 @@ import java.util.*;
  */
 public class CvsClient
 {
-    private static final DateFormat HISTORY_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z");
 
     private CVSRoot root;
@@ -81,9 +80,9 @@ public class CvsClient
     /**
      *
      */
-    public void checkout(String module) throws SCMException
+    public void checkout(String module, Date date) throws SCMException
     {
-        if (module == null)
+        if (!TextUtils.stringSet(module))
         {
             throw new IllegalArgumentException("Command requires a module.");
         }
@@ -113,6 +112,10 @@ public class CvsClient
             if (branch != null)
             {
                 checkout.setCheckoutByRevision(branch);
+            }
+            if (date != null)
+            {
+                checkout.setCheckoutByDate(DATE_FORMAT.format(date));
             }
 
             if (!client.executeCommand(checkout, globalOptions))
@@ -147,9 +150,9 @@ public class CvsClient
      * @param since
      * @return true if the cvs repository has been updated.
      */
-    public boolean hasChangedSince(Date since) throws SCMException
+    public boolean hasChangedSince(Date since, String module) throws SCMException
     {
-        return getLastUpdate(since) != null;
+        return getLastUpdate(since, module) != null;
     }
 
     /**
@@ -158,9 +161,9 @@ public class CvsClient
      * @return null indicates no change since the specified date
      * @throws SCMException
      */
-    public Date getLastUpdate(Date since) throws SCMException
+    public Date getLastUpdate(Date since, String module) throws SCMException
     {
-        List<HistoryInfo> changes = retrieveHistoryInformation(since);
+        List<HistoryInfo> changes = retrieveHistoryInformation(since, module);
         if (changes.size() == 0)
         {
             return null;
@@ -219,7 +222,7 @@ public class CvsClient
         throw new UnsupportedOperationException();
     }
 
-    private List<HistoryInfo> retrieveHistoryInformation(Date since) throws SCMException
+    private List<HistoryInfo> retrieveHistoryInformation(Date since, String module) throws SCMException
     {
         Connection connection = null;
         try
@@ -241,6 +244,10 @@ public class CvsClient
             if (since != null)
             {
                 history.setSinceDate(DATE_FORMAT.format(since));
+            }
+            if (module != null)
+            {
+                history.setReportOnModule(new String[]{module});
             }
             client.executeCommand(history, globalOptions);
 
@@ -279,9 +286,9 @@ public class CvsClient
 
     // group by (author,branch,comment)
 
-    public List<Changelist> getChangeLists(Date since) throws SCMException
+    public List<Changelist> getChangeLists(Date since, String module) throws SCMException
     {
-        List<HistoryInfo> infos = retrieveHistoryInformation(since);
+        List<HistoryInfo> infos = retrieveHistoryInformation(since, module);
 
         // we are only interested in commits.
         Iterator<HistoryInfo> i = infos.iterator();
@@ -399,10 +406,13 @@ public class CvsClient
         List<Changelist> changelists = new LinkedList<Changelist>();
         for (LocalChangeSet set : refinedSets)
         {
-            LocalChange aChange = set.getChanges().get(0);
-            CvsRevision revision = new CvsRevision(aChange.getAuthor(), aChange.getBranch(), aChange.getMessage(), aChange.getDate());
+            List<LocalChange> localChanges = set.getChanges();
+            // we use the last change because it has the most recent date. all the other information is
+            // is common to all the changes.
+            LocalChange lastChange = localChanges.get(localChanges.size() - 1);
+            CvsRevision revision = new CvsRevision(lastChange.getAuthor(), lastChange.getBranch(), lastChange.getMessage(), lastChange.getDate());
             Changelist changelist = new Changelist(revision);
-            for (LocalChange change : set.getChanges())
+            for (LocalChange change : localChanges)
             {
                 changelist.addChange(new Change(change.getFilename(), change.getRevision(), change.getAction()));
             }
