@@ -48,9 +48,9 @@ public class FileSystemUtils
                 return false;
             }
             
-            //TODO: Fix the following condition - fails in windows since its case insensitive... just ignore case?...
+            // TODO: Fix the following condition - fails in windows since because of 8.3 file names
             // do not follow symlinks when deleting directories.            
-            if(file.isDirectory() && canonical.equals(file.getAbsolutePath()))
+            if(file.isDirectory()) // && canonical.equals(file.getAbsolutePath()))
             {
                 if(!removeDirectory(file))
                 {
@@ -69,7 +69,7 @@ public class FileSystemUtils
         return dir.delete();
     }
     
-    public static final File createTmpDirectory(String prefix, String suffix) throws IOException
+    public static File createTempDirectory(String prefix, String suffix) throws IOException
     {
         File file = File.createTempFile(prefix, suffix);
         if (!file.exists())

@@ -126,8 +126,8 @@ public class CvsServer implements SCMServer
 
     /**
      *
-     * @param checkoutDir
-     * @param revision
+     * @param checkoutDir (required)
+     * @param revision (required)
      *
      * @return
      *
@@ -136,6 +136,10 @@ public class CvsServer implements SCMServer
      */
     public Revision checkout(File checkoutDir, Revision revision) throws SCMException, IOException
     {
+        if (revision == null)
+        {
+            throw new IllegalArgumentException("Revision is a required argument.");
+        }
         if (!(revision instanceof CvsRevision))
         {
             throw new IllegalArgumentException("Unsupported revision type: " + revision.getClass() + ".");

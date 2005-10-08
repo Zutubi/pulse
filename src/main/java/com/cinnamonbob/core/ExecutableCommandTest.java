@@ -20,7 +20,7 @@ public class ExecutableCommandTest extends TestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        outputDirectory = FileSystemUtils.createTmpDirectory(ExecutableCommandTest.class.getName(), "");
+        outputDirectory = FileSystemUtils.createTempDirectory(ExecutableCommandTest.class.getName(), "");
     }
     
     public void tearDown() throws Exception

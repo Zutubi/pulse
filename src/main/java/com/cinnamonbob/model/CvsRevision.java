@@ -13,6 +13,8 @@ public class CvsRevision extends Revision
 {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
 
+    public static final CvsRevision HEAD = new CvsRevision(null, null, null, null);
+
     protected CvsRevision()
     {
 
@@ -21,17 +23,17 @@ public class CvsRevision extends Revision
     public CvsRevision(String author, String branch, String comment, Date date)
     {
         setAuthor(author);
-        setBranch((branch != null) ? branch : "");
+        setBranch(branch);
         setComment(comment);
         setDate(date);
 
         // construct the revision string.
         StringBuffer buffer = new StringBuffer();
-        buffer.append(getAuthor());
+        buffer.append(getAuthor() != null ? getAuthor() : "");
         buffer.append(":");
-        buffer.append(getBranch());
+        buffer.append(getBranch() != null ? getBranch() : "");
         buffer.append(":");
-        buffer.append(DATE_FORMAT.format(date));
+        buffer.append((date != null) ? DATE_FORMAT.format(date) : "");
         setRevisionString(buffer.toString());
     }
 }
