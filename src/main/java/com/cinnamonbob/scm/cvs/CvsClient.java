@@ -236,6 +236,7 @@ public class CvsClient
             Client client = new Client(connection, new StandardAdminHandler());
 
             HistoryBuilder builder = new HistoryBuilder();
+            builder.setModule(module);
             client.getEventManager().addCVSListener(new BuilderAdapter(builder));
 
             HistoryCommand history = new HistoryCommand();
@@ -245,10 +246,7 @@ public class CvsClient
             {
                 history.setSinceDate(DATE_FORMAT.format(since));
             }
-            if (module != null)
-            {
-                history.setReportOnModule(new String[]{module});
-            }
+
             client.executeCommand(history, globalOptions);
 
             return builder.getHistoryInfo();

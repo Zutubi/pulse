@@ -4,7 +4,6 @@ import com.cinnamonbob.model.Change;
 import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.util.FileSystemUtils;
-import com.cinnamonbob.util.IOUtils;
 import junit.framework.TestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.util.Logger;
@@ -37,7 +36,7 @@ public class CvsClientTest extends TestCase
         Logger.setLogging("system");
         
         // cleanup the working directory.
-        workdir = FileSystemUtils.createTempDirectory("", "");
+        workdir = FileSystemUtils.createTempDirectory("CvsClient", "Test");
     }
 
     public void tearDown() throws Exception
@@ -84,6 +83,14 @@ public class CvsClientTest extends TestCase
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         assertTrue(cvs.hasChangedSince(dateFormat.parse("2005-05-10"), null));
         assertFalse(cvs.hasChangedSince(dateFormat.parse("2005-10-10"), null));
+    }
+
+    public void testHasChangedSinceWithModule() throws Exception
+    {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        assertTrue(cvs.hasChangedSince(dateFormat.parse("2005-05-10"), "project"));
+        assertFalse(cvs.hasChangedSince(dateFormat.parse("2005-05-10"), "project/test/foobar"));
+        assertFalse(cvs.hasChangedSince(dateFormat.parse("2005-10-10"), "project"));
     }
 
     public void testBugCheckoutHangs() throws Exception

@@ -16,13 +16,24 @@ public class HistoryBuilder implements Builder
 
     static final String NO_RECORDS = "No records selected.";
 
+    private String module;
+
+    public void setModule(String module)
+    {
+        this.module = module;
+    }
+
     public void parseLine(String line, boolean isErrorMessage)
     {
         if (!isErrorMessage && !line.equals(NO_RECORDS))
         {
             try
             {
-                infos.add(parse(line));
+                HistoryInfo info = parse(line);
+                if (matchesRequestedModule(info))
+                {
+                    infos.add(info);
+                }
             }
             catch (SCMException e)
             {
@@ -49,5 +60,14 @@ public class HistoryBuilder implements Builder
     private HistoryInfo parse(String data) throws SCMException
     {
         return new HistoryInfo(data);
+    }
+
+    private boolean matchesRequestedModule(HistoryInfo info)
+    {
+        if (module == null)
+        {
+            return true;
+        }
+        return info.getPathInRepository().startsWith(module);
     }
 }

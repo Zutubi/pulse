@@ -5,10 +5,12 @@ package com.cinnamonbob.scm.cvs;
 
 import com.cinnamonbob.util.FileSystemUtils;
 import com.cinnamonbob.model.CvsRevision;
+import com.cinnamonbob.model.Changelist;
 import junit.framework.TestCase;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.netbeans.lib.cvsclient.util.Logger;
 
@@ -17,6 +19,8 @@ public class CvsServerTest extends TestCase
     private String cvsRoot = ":local:/e/cvsroot";
 
     private File workdir = null;
+
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public CvsServerTest(String testName)
     {
@@ -67,7 +71,6 @@ public class CvsServerTest extends TestCase
 
     public void testCheckoutByDate() throws Exception
     {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         CvsServer cvsServer = new CvsServer(cvsRoot, "project/test");
         cvsServer.checkout(workdir, new CvsRevision(null, null, null, dateFormat.parse("2005-05-08")));
@@ -78,5 +81,19 @@ public class CvsServerTest extends TestCase
         assertTrue(new File(workdir, "project/test/bar").exists());
         assertFalse(new File(workdir, "project/test/test1").exists());
         assertFalse(new File(workdir, "project/test/test2").exists());
+    }
+
+    public void testGetChanges() throws Exception
+    {
+        CvsServer cvsServer = new CvsServer(cvsRoot, "project/test");
+        CvsRevision from = new CvsRevision(null, null, null, dateFormat.parse("2005-05-01"));
+        CvsRevision to = new CvsRevision(null, null, null, dateFormat.parse("2005-05-10"));
+
+        assertEquals(5, cvsServer.getChanges(from, to));
+    }
+
+    public void testGetChangesOnBranch() throws Exception
+    {
+
     }
 }

@@ -52,8 +52,7 @@ public class CvsServer implements SCMServer
             return EMPTY_LIST;
         }
 
-        CvsRevision fromRevision = (CvsRevision) from;
-        Date since = fromRevision.getDate();
+        Date since = from.getDate();
 
         CvsClient client = new CvsClient(cvsRoot);
         List<Changelist> changelists = client.getChangeLists(since, cvsModule);
