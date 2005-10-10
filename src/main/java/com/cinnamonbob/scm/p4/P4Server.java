@@ -398,15 +398,20 @@ public class P4Server implements SCMServer
         
         return result;
     }
-    
+
+    public boolean hasChangedSince(Revision since) throws SCMException
+    {
+        throw new SCMException("Operation not supported");
+    }
+
     public static void main(String argv[])
     {
         P4Server server = new P4Server("localhost:1666", "jsankey", "", "jsankey");
-        
+
         try
         {
             List<Changelist> cls = server.getChanges(new NumericalRevision(2), new NumericalRevision(6), "");
-            
+
             for(Changelist l: cls)
             {
                 System.out.println("Changelist:");

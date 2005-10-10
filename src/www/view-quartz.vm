@@ -1,0 +1,47 @@
+<html>
+<head></head>
+
+<body>
+
+<h3>Triggers:</h3>
+<table>
+    #foreach($groupName in $scheduler.triggerGroupNames)
+        <tr>
+            <th>Name</th>
+            <th>Next Fire Time</th>
+            <th>Previous Fire Time</th>
+            <th>State</th>
+        </tr>
+        #foreach($name in $scheduler.getTriggerNames($groupName))
+            #set($trigger = $scheduler.getTrigger($name, $groupName))
+            <tr>
+                <td>$!trigger.name</td>
+                <td>$!trigger.nextFireTime</td>
+                <td>$!trigger.previousFireTime</td>
+                <td>#renderTriggerState($scheduler.getTriggerState($name, $groupName))</td>
+            </tr>
+        #end
+    #end
+</table>
+
+<h3>Jobs:</h3>
+<table>
+    #foreach($groupName in $scheduler.jobGroupNames)
+        <tr>
+            <th>Name</th>
+            <th>Group</th>
+            <th>Description</th>
+        </tr>
+        #foreach($name in $scheduler.getJobNames($groupName))
+            #set($job = $scheduler.getJobDetail($name, $groupName))
+            <tr>
+                <td>$!job.name</td>
+                <td>$!job.group</td>
+                <td>$!job.description</td>
+            </tr>
+        #end
+    #end
+</table>
+
+</body>
+</html>

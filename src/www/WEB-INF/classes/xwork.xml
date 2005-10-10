@@ -248,6 +248,7 @@
         
         <action name="createSchedule" class="com.cinnamonbob.web.project.CreateScheduleAction">
             <result name="input" type="velocity">create-schedule.vm</result>
+            <result name="cancel" type="velocity">undefined.vm</result>
             <result name="success" type="redirect">/manageProject.action?id=${project}</result>
         </action>
 
@@ -262,7 +263,7 @@
         
         <action name="createTrigger" class="com.cinnamonbob.web.project.CreateTriggerAction">
             <result name="input" type="velocity">create-trigger.vm</result>
-            <result name="cancel" type="redirect">/manageSchedule.action?projectId=${project.id}&amp;name=${schedule.name}</result>
+            <result name="cancel" type="redirect">/manageSchedule.action?projectId=${projectId}&amp;name=${name}</result>
             <result name="success" type="redirect">/manageSchedule.action?projectId=${project.id}&amp;name=${schedule.name}</result>
         </action>
 
@@ -306,6 +307,10 @@
 
         <action name="garbageCollect" class="com.cinnamonbob.web.console.GarbageCollectAction">
             <result name="success" type="redirect">/viewSystemInfo.action</result>
+        </action>
+
+        <action name="quartzSystemInfo" class="com.cinnamonbob.web.console.QuartzAdminAction">
+            <result name="success" type="velocity">view-quartz.vm</result>
         </action>
 
     </package>

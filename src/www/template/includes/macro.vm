@@ -8,3 +8,12 @@
     #if ($scm.class.name == 'com.cinnamonbob.model.Cvs')<img src="/images/cvs_16.png"/>#end
     #if ($scm.class.name == 'com.cinnamonbob.model.P4')<img src="/images/p4_16.png"/>#end
 #end
+
+#macro( renderTriggerState $state)
+    #if ($state == -1)<span style='color:black;'>None</span>#end
+    #if ($state == 0)<span style='color:blue;'>Normal</span>#end
+    #if ($state == 1)<span style='color:orange;'>Paused</span>#end
+    #if ($state == 2)<span style='color:green;'>Complete</span>#end
+    #if ($state == 3)<span style='color:red;'>Error</span>#end
+    #if ($state == 4)<span style='color:red;'>Blocked</span>#end
+#end

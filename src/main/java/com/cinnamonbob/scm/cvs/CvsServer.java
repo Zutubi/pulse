@@ -96,17 +96,14 @@ public class CvsServer implements SCMServer
         {
             client.setBranch(since.getBranch());
         }
-
         return client.hasChangedSince(since.getDate(), cvsModule);
     }
 
     /**
      * Checkout head of the specified branch to the specified directory.
      *
-     *
      * @param checkoutDir (required) if this directory does not exist, an attempt will be
      * made to create it.
-     *
      * @param branch (optional)
      *
      * @return

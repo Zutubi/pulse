@@ -10,7 +10,7 @@
             <th colspan="2" width="90%">$action.getText("system.info")</th>
         </tr>
         #foreach ($key in $properties)
-        <tr #if ($velocityCount%2 == 0) bgcolor="#f9f9f9" #end>
+        <tr #if ($velocityCount%2 == 0) bgcolor="#f9f9f9" #end >
             <td width="35%"><b>$action.getText($key)</b></td><td>$propertiesMap.get($key)</td>
         </tr>
         #end

@@ -27,7 +27,7 @@ public interface SCMServer
      * @return the revision actually checked out
      * @throws SCMException if an error occurs communicating with the server
      */
-    public Revision checkout(File toDirectory, Revision revision, List<Change> changes) throws SCMException;
+    Revision checkout(File toDirectory, Revision revision, List<Change> changes) throws SCMException;
     
     /**
      * Returns a list of changelists occuring in between the given revisions.
@@ -45,5 +45,16 @@ public interface SCMServer
      * @return a list of changelists that occured between the two revisions
      * @throws SCMException if an error occurs talking to the server
      */
-    public List<Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException;
+    List<Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException;
+
+    /**
+     * Returns a boolean indicated whether or not a change has occured since the specified revision. 
+     *
+     * @param since
+     *
+     * @return true if there has been a change
+     *
+     * @throws SCMException
+     */
+    boolean hasChangedSince(Revision since) throws SCMException;
 }

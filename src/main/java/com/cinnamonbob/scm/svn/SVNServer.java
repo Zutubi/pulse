@@ -4,8 +4,8 @@ import com.cinnamonbob.model.Change;
 import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.model.NumericalRevision;
 import com.cinnamonbob.model.Revision;
-import com.cinnamonbob.scm.SCMServer;
 import com.cinnamonbob.scm.SCMException;
+import com.cinnamonbob.scm.SCMServer;
 import org.tmatesoft.svn.core.ISVNWorkspace;
 import org.tmatesoft.svn.core.ISVNWorkspaceListener;
 import org.tmatesoft.svn.core.SVNWorkspaceManager;
@@ -299,6 +299,11 @@ public class SVNServer implements SCMServer
         }
         
         return result;
+    }
+
+    public boolean hasChangedSince(Revision since) throws SCMException
+    {
+        throw new SCMException("Operation not supported");
     }
 
     //=======================================================================
