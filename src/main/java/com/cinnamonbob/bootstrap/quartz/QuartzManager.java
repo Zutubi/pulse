@@ -9,7 +9,6 @@ import org.quartz.Scheduler;
  */
 public class QuartzManager
 {
-
     private static final String BEAN_NAME = "quartzScheduler";
 
     /**

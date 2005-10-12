@@ -8,13 +8,8 @@ import java.util.Date;
  */
 public class TimeStamps
 {
-    private static final long MILLIS_PER_SECOND = 1000;
-    private static final long MILLIS_PER_MINUTE = MILLIS_PER_SECOND * 60;
-    private static final long MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60;
-
     private long startTime;
-    private long endTime;
-    
+    private long endTime;    
     
     public TimeStamps()
     {
@@ -99,16 +94,16 @@ public class TimeStamps
         StringBuffer result = new StringBuffer();
         long elapsed = getElapsed();
         
-        elapsed = addElapsedPart(elapsed, MILLIS_PER_HOUR, "hour", result);
-        elapsed = addElapsedPart(elapsed, MILLIS_PER_MINUTE, "minute", result);
+        elapsed = addElapsedPart(elapsed, Constants.HOUR, "hour", result);
+        elapsed = addElapsedPart(elapsed, Constants.MINUTE, "minute", result);
         
-        if(elapsed < MILLIS_PER_SECOND && result.length() == 0)
+        if(elapsed < Constants.SECOND && result.length() == 0)
         {
             result.append("< 1 second");
         }
         else
         {
-            elapsed = addElapsedPart(elapsed, MILLIS_PER_SECOND, "second", result);
+            elapsed = addElapsedPart(elapsed, Constants.SECOND, "second", result);
         }
         
         return result.toString();
