@@ -14,7 +14,6 @@ public class QuartzManager
 
     /**
      * Convenience method for accessing the systems Quartz Scheduler resource.
-     * @return
      */
     public static Scheduler getScheduler()
     {

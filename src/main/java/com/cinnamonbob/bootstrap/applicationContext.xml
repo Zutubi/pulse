@@ -10,6 +10,12 @@
         </property>
     </bean>
 
+    <bean id="quartzJobFactory" class="com.cinnamonbob.bootstrap.quartz.SpringJobFactory" init-method="initJobFactory">
+        <property name="scheduler">
+            <ref bean="quartzScheduler"/>
+        </property>
+    </bean>
+
     <bean id="jettyServer" class="com.cinnamonbob.bootstrap.jetty.JettyServerFactoryBean" destroy-method="shutdown">
         <property name="configurationManager">
             <ref bean="configurationManager"/>
