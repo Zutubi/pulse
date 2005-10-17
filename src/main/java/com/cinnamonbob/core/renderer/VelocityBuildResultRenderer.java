@@ -3,18 +3,16 @@ package com.cinnamonbob.core.renderer;
 import com.cinnamonbob.BobServer;
 import com.cinnamonbob.bootstrap.velocity.VelocityManager;
 import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.model.Project;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.exception.MethodInvocationException;
-import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 
 import java.io.File;
 import java.io.Writer;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * 
@@ -23,9 +21,8 @@ import java.util.logging.Logger;
  */
 public class VelocityBuildResultRenderer implements BuildResultRenderer
 {
-
     private static final Logger LOG = Logger.getLogger(VelocityBuildResultRenderer.class.getName());
-    
+
     public void render(Project project, BuildResult result, String type, Writer writer)
     {
         VelocityContext context = new VelocityContext();
@@ -43,37 +40,11 @@ public class VelocityBuildResultRenderer implements BuildResultRenderer
         }
         catch(ResourceNotFoundException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch(ParseErrorException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch(MethodInvocationException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "Could not load template for type '" + type + "'", e);
         }
         catch(Exception e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "Could not apply template for type '" + type + "'", e);
         }
-    }
-
-    
-    public String findTemplate(String type, CommandResult result)
-    {
-        // TODO only one command result now...
-        String templateName = type + "/" + result.getClass().getSimpleName() + ".vm";
-        
-        if(!VelocityManager.getEngine().templateExists(templateName))
-        {
-            templateName = type + "/CommandResult.vm";
-        }
-        
-        return templateName;
     }
 }
