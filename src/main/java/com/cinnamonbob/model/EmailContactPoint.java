@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import javax.mail.Message;
 import javax.mail.Session;
@@ -26,9 +27,12 @@ public class EmailContactPoint extends ContactPoint
 
     private static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
     private static final String SMTP_FROM_PROPERTY = "mail.smtp.from";
+
+    private BuildResultRenderer renderer;
     
     public EmailContactPoint()
     {
+        renderer = new VelocityBuildResultRenderer();
     }
 
     public String getEmail()
@@ -53,8 +57,6 @@ public class EmailContactPoint extends ContactPoint
     private String renderResult(Project project, BuildResult result)
     {
         StringWriter w = new StringWriter();
-        // TODO renderer should come from elsewhere
-        VelocityBuildResultRenderer renderer = new VelocityBuildResultRenderer();
         renderer.render(project, result, BuildResultRenderer.TYPE_PLAIN, w);
         return  w.toString();
     }
@@ -94,8 +96,7 @@ public class EmailContactPoint extends ContactPoint
         }
         catch (Exception e)
         {
-            // TODO: report
-            e.printStackTrace();
+            LOG.log(Level.WARNING, "Unable to send email", e);
         }
     }
     

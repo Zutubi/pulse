@@ -371,7 +371,6 @@ public class P4Server implements SCMServer
         long start = ((NumericalRevision)from).getRevisionNumber() + 1;
         long end   = ((NumericalRevision)to).getRevisionNumber();
 
-        // TODO: improve this?
         getClientRoot();
         if(clientRoot == null)
         {
