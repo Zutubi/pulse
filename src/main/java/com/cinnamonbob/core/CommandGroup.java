@@ -78,7 +78,7 @@ public class CommandGroup implements Command
             }
             else
             {
-                // TODO unknown artifact
+                 throw new BuildException("Unable to post-process unknown artifact '" + m.getArtifact() + "'");
             }
         }
     }
@@ -109,8 +109,7 @@ public class CommandGroup implements Command
             }
             catch(IOException e)
             {
-                // TODO handle copy error
-                e.printStackTrace();
+                throw new BuildException("Unable to collect artifact '" + artifact.getName() + "'", e);
             }
         }
     }
