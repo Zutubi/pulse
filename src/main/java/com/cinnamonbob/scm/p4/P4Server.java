@@ -35,7 +35,6 @@ public class P4Server implements SCMServer
     private static final String FLAG_OUTPUT      = "-o";
     private static final String FLAG_SHORT       = "-s";
     private static final String FLAG_STATUS      = "-s";
-    private static final String FLAG_TAG         = "-Ztag";
     private static final String VALUE_SUBMITTED  = "submitted";
     private static final String ASCII_CHARSET    = "US-ASCII";
     
@@ -109,6 +108,7 @@ public class P4Server implements SCMServer
         }
         catch(InterruptedException e)
         {
+            // Do nothing
         }
 
         if(result.exitCode != 0)
@@ -209,7 +209,6 @@ public class P4Server implements SCMServer
         
         Pattern re      = Pattern.compile("Change ([0-9]+) by (.+)@(.+) on ([0-9/]+ [0-9:]+)( \\*pending\\*)?");
         Matcher matcher = re.matcher(lines[0]);
-        long    change;
         String  user;
         Date    date;
         
@@ -221,7 +220,6 @@ public class P4Server implements SCMServer
                 return null;
             }
             
-            change = Long.parseLong(matcher.group(1));
             user   = matcher.group(2);
             
             try
@@ -388,20 +386,20 @@ public class P4Server implements SCMServer
             while(matcher.find())
             {
                 Changelist list = getChangelist(Long.parseLong(matcher.group(1)));
-                
+
                 if(list != null)
                 {
                     result.add(list);
                 }
             }
         }
-        
+
         return result;
     }
 
     public boolean hasChangedSince(Revision since) throws SCMException
     {
-        throw new SCMException("Operation not supported");
+        return getLatestRevision().getRevisionNumber() != ((NumericalRevision)since).getRevisionNumber();
     }
 
     public static void main(String argv[])
