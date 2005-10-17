@@ -306,7 +306,7 @@ class StdOutErrParser extends Thread
      */
     private final Writer output;
 
-    private LinkedList cmdEndMarkers = new LinkedList();
+    private LinkedList<String> cmdEndMarkers = new LinkedList<String>();
 
     private int commandExitStatus;
 
