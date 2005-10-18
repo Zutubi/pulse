@@ -89,7 +89,7 @@ public class CvsServerTest extends TestCase
         CvsRevision from = new CvsRevision(null, null, null, dateFormat.parse("2005-05-01"));
         CvsRevision to = new CvsRevision(null, null, null, dateFormat.parse("2005-05-10"));
 
-        assertEquals(5, cvsServer.getChanges(from, to));
+        assertEquals(5, cvsServer.getChanges(from, to).size());
     }
 
     public void testGetChangesOnBranch() throws Exception

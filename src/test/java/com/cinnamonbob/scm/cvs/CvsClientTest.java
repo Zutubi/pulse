@@ -135,12 +135,12 @@ public class CvsClientTest extends TestCase
 
     public void testGetChangesFromAtlassian() throws Exception
     {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        CVSRoot root = CVSRoot.parse(":ext:dostermeier:4edueWX7@cvs.atlassian.com:/cvsroot/atlassian");
-        CvsClient cvs = new CvsClient(root);
-        List<Changelist> changes = cvs.getChangeLists(dateFormat.parse("2005-10-05"), null);
-        System.out.println("changes:" + changes.size());
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//
+//        CVSRoot root = CVSRoot.parse(":ext:dostermeier:4edueWX7@cvs.atlassian.com:/cvsroot/atlassian");
+//        CvsClient cvs = new CvsClient(root);
+//        List<Changelist> changes = cvs.getChangeLists(dateFormat.parse("2005-10-05"), null);
+//        System.out.println("changes:" + changes.size());
     }
     
     public void testUpdate() throws Exception
