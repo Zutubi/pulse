@@ -21,7 +21,7 @@ public class BuildResult extends Result
     private static final int MAX_MESSAGE_LENGTH = 1023;
     private static final String EXCEPTION_FILE = "exception";
     
-    private ResultState state;
+    private ResultState state = ResultState.INITIAL;
     private String errorMessage;
     private long number;
     private String projectName;

@@ -36,6 +36,26 @@
         </property>
     </bean>
 
+    <bean id="anyTypeDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateAnyTypeDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="anyTypeDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="anyTypeDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
     <bean id="artifactDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateArtifactDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>

@@ -20,4 +20,19 @@ public class ObjectHandle
         this.id = id;
         this.clazz = clazz;
     }
+
+    public boolean equals(Object o)
+    {
+        if ((o == null) || !(o instanceof ObjectHandle))
+        {
+            return false;
+        }
+        ObjectHandle otherHandle = (ObjectHandle) o;
+        return otherHandle.id.equals(id) && otherHandle.clazz == clazz;
+    }
+
+    public int hashCode()
+    {
+        return id.hashCode();
+    }
 }
