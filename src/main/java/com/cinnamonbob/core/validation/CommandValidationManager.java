@@ -13,7 +13,7 @@ import com.opensymphony.xwork.validator.ValidatorContext;
  */
 public class CommandValidationManager
 {
-    public static void validate(Object obj, String name) throws ValidationException
+    public static void validate(Object obj, String name) throws CommandValidationException, ValidationException
     {
         if (obj == null)
         {
@@ -30,7 +30,7 @@ public class CommandValidationManager
 
         if (validatorContext.hasErrors())
         {
-            throw new ValidationException();
+            throw new CommandValidationException(validatorContext);
         }
     }
 

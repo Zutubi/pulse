@@ -3,6 +3,7 @@ package com.cinnamonbob.core;
 import com.cinnamonbob.BobException;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.core.validation.CommandValidationManager;
+import com.cinnamonbob.core.validation.CommandValidationException;
 import com.cinnamonbob.util.IOUtils;
 import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.opensymphony.xwork.validator.ValidationException;
@@ -184,9 +185,11 @@ public class BobFileLoader
         }
         catch (ValidationException e1)
         {
-            // TODO: provide a better error message - one that contains details. Need to extract the details
-            // TODO: from the validation manager somehow.
-            throw new ParseException("Validation failed for '" + name + "'");
+            throw new ParseException("Validation failed for '" + name + "': " + e1.getMessage());
+        }
+        catch (CommandValidationException e1)
+        {
+            throw new ParseException("Validation failed for '" + name + "': " + e1.getMessage());
         }
     }
 
