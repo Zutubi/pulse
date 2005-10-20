@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * <class-comment/>
  */
-public class DefaultPager implements prototype.pagination.Pager
+public class DefaultPager implements Pager
 {
     private final List data;
 
