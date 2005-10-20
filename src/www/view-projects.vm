@@ -25,7 +25,7 @@
   #set($elapsed = $lastResult.stamps.prettyElapsed)
   #set($status = $lastResult.state.prettyString)
   #if($lastResult.inProgress())
-    #set($class = "info")
+    #set($class = "build-info")
   #elseif($lastResult.succeeded())
     #set($class = "build-success")
   #else
