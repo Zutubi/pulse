@@ -27,18 +27,7 @@ public class HibernateScheduleDao extends HibernateEntityDao<Schedule> implement
 
     public List<Schedule> findByProject(final Project project)
     {
-        return (List<Schedule>)getHibernateTemplate().execute(new HibernateCallback()
-         {
-             public Object doInHibernate(Session session) throws HibernateException
-             {
-                 Query queryObject = session.getNamedQuery("schedule.findByProject");
-                 queryObject.setParameter("project", project);
-                 queryObject.setCacheable(true);
-
-                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                 return queryObject.list();
-             }
-         });
+        return (List<Schedule>)findByNamedQuery("schedule.findByProject", "project", project);
     }
 
 }

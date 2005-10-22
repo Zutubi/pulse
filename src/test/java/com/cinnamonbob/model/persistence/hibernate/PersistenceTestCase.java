@@ -11,6 +11,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.List;
 
 /**
  * 
@@ -78,4 +79,13 @@ public abstract class PersistenceTestCase extends TestCase
         transactionManager.commit(transactionStatus);
         transactionStatus = transactionManager.getTransaction(transactionDefinition);
     }    
+
+    protected void assertEquals(List a, List b)
+    {
+        assertEquals(a.size(), b.size());
+        for (int i = 0; i < a.size(); i++)
+        {
+            assertEquals(a.get(i), b.get(i));
+        }
+    }
 }

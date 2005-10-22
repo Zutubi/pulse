@@ -10,18 +10,33 @@
 
         <property name="name" column="NAME" type="string" not-null="true" length="255"/>
 
-        <property name="recipe" column="RECIPE" type="string" not-null="false" length="255"/>
+        <many-to-one name="project"
+            column="PROJECTID"
+            class="com.cinnamonbob.model.Project"
+            not-null="true"
+            insert="true"
+            lazy="false"
+            cascade="all"/>
 
-        <many-to-one name="project" class="com.cinnamonbob.model.Project" column="PROJECTID"/>
-        
-        <bag name="triggers" inverse="true" cascade="all-delete-orphan" lazy="false">
-            <key column="SCHEDULEID"/>
-            <one-to-many class="com.cinnamonbob.model.AbstractTrigger"/>
-        </bag>
+        <many-to-one name="trigger"
+            column="TRIGGER"
+            class="com.cinnamonbob.model.Trigger"
+            not-null="true"
+            insert="true"
+            lazy="false"
+            cascade="all"/>
+
+        <many-to-one name="task"
+            column="TASK"
+            class="com.cinnamonbob.model.Task"
+            not-null="true"
+            insert="true"
+            lazy="false"
+            cascade="all"/>
 
     </class>
 
-    <class name="com.cinnamonbob.model.AbstractTrigger" table="TRIGGER">
+    <class name="com.cinnamonbob.model.Trigger" table="TRIGGER">
         
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -29,8 +44,8 @@
 
         <discriminator column="SCHEDULE_TYPE" type="string"/>
         
-        <many-to-one name="schedule" class="com.cinnamonbob.model.Schedule" column="SCHEDULEID"/>
-        
+        <many-to-one name="schedule" class="com.cinnamonbob.model.Schedule" column="SCHEDULEID" lazy="false" cascade="all"/>
+
         <subclass name="com.cinnamonbob.model.CronTrigger" discriminator-value="CRON">
         
             <property name="cronExpression" column="CRON_EXPRESSION" type="string" length="255"/>
@@ -38,7 +53,25 @@
         </subclass>
         
     </class>
-    
+
+    <class name="com.cinnamonbob.model.Task" table="TASK">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="SCHEDULE_TYPE" type="string"/>
+
+        <many-to-one name="schedule" class="com.cinnamonbob.model.Schedule" column="SCHEDULEID" lazy="false" cascade="all"/>
+
+        <subclass name="com.cinnamonbob.model.BuildTask" discriminator-value="BUILD">
+
+            <property name="recipe" column="RECIPE" type="string" length="255"/>
+
+        </subclass>
+
+    </class>
+
     <query name="schedule.findByProject"><![CDATA[
         from Schedule s
         where s.project = :project

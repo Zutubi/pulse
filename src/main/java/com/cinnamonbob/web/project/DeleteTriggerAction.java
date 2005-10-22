@@ -48,9 +48,6 @@ public class DeleteTriggerAction extends ProjectActionSupport
 
     public String execute()
     {
-        schedule.remove(id);
-        getScheduleManager().save(schedule);
-
-        return SUCCESS;
+        return ERROR;
     }
 }

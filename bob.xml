@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
 <project defaultRecipe="default">
+
+    <resource name="java" version="1.5"/>
+    <resource name="ant"/>
+    <resource name="os">windows</resource>
+
     <post-processor name="generic.pp">
         <regex>
             <pattern category="error" expression=".*[Ee]rror.*"/>
@@ -26,4 +31,5 @@
             <process artifact="output" processor="generic.pp"/>
         </command>
     </recipe>
+
 </project>

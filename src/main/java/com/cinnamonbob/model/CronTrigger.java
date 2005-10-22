@@ -13,7 +13,7 @@ import java.util.logging.Level;
  * 
  *
  */
-public class CronTrigger extends AbstractTrigger
+public class CronTrigger extends Trigger
 {
     private static final Logger LOG = Logger.getLogger(CronTrigger.class.getName());
 

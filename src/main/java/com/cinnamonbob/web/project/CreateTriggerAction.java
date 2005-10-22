@@ -87,7 +87,7 @@ public class CreateTriggerAction extends ProjectActionSupport
 
     public String execute()
     {
-        schedule.add(trigger);
+//        schedule.add(trigger);
         getProjectManager().save(project);
         trigger.enable();
         return SUCCESS;

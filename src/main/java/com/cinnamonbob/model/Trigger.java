@@ -1,17 +1,21 @@
 package com.cinnamonbob.model;
 
+
 /**
  * 
  *
  */
-public interface Trigger
+public abstract class Trigger extends Entity
 {
-    long getId();
-    void setSchedule(Schedule schedule);
-    void trigger();
-    void enable();
-    void disable();
-    boolean isEnabled();
-    String getType();
-    String getSummary();
+    protected Schedule schedule;
+    
+    public Schedule getSchedule()
+    {
+        return schedule;
+    }
+    
+    public void setSchedule(Schedule schedule)
+    {
+        this.schedule = schedule;
+    }
 }
