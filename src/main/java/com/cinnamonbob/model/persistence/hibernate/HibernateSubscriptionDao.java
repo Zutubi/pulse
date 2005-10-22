@@ -18,7 +18,6 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
  */
 public class HibernateSubscriptionDao extends HibernateEntityDao<Subscription> implements SubscriptionDao
 {
-    @Override
     public Class persistentClass()
     {
         return Subscription.class;
@@ -26,6 +25,17 @@ public class HibernateSubscriptionDao extends HibernateEntityDao<Subscription> i
 
     public List<Subscription> findByProject(final Project project)
     {
-        return (List<Subscription>)findByNamedQuery("subscription.findByProject", "project", project);
+        return (List<Subscription>)getHibernateTemplate().execute(new HibernateCallback()
+         {
+             public Object doInHibernate(Session session) throws HibernateException
+             {
+                 Query queryObject = session.getNamedQuery("subscription.findByProject");
+                 queryObject.setParameter("project", project);
+                 queryObject.setCacheable(true);
+
+                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                 return queryObject.list();
+             }
+         });
     }
 }

@@ -53,10 +53,10 @@ public class DefaultProjectManager implements ProjectManager
         {
             for(Schedule s: p.getSchedules())
             {
-//                for(Trigger t: s.getTriggers())
-//                {
-//                    t.enable();
-//                }
+                for(Trigger t: s.getTriggers())
+                {
+                    t.enable();
+                }
             }
         }
     }

@@ -6,27 +6,27 @@ import java.util.LinkedList;
 import com.cinnamonbob.BobServer;
 
 /**
- * Group of triggers.
+ * 
  *
  */
 public class Schedule extends Entity
 {
     private String name;
     private Project project;
-    private Trigger trigger;
-    private Task task;
+    private String recipe;
+    
+    private List<Trigger> triggers = new LinkedList<Trigger>();
 
     public Schedule()
     {
-        // noop
+        
     }
     
-    public Schedule(String name, Project project, Task task, Trigger trigger)
+    public Schedule(String name, Project project, String recipe)
     {
         this.name = name;
         this.project = project;
-        this.task = task;
-        this.trigger = trigger;
+        this.recipe = recipe;
     }
     
     public Project getProject()
@@ -37,6 +37,16 @@ public class Schedule extends Entity
     public void setProject(Project project)
     {
         this.project = project;
+    }
+
+    public void setRecipe(String recipe)
+    {
+        this.recipe = recipe;
+    }
+    
+    public String getRecipe()
+    {
+        return this.recipe;
     }
 
     public String getName()
@@ -50,27 +60,14 @@ public class Schedule extends Entity
     }
 
     /**
-     *
+     * Add a new trigger for this schedule.
+     * 
      * @param trigger
      */ 
-    public void setTrigger(Trigger trigger)
-    {
-        this.trigger = trigger;
-    }
-
-    public Trigger getTrigger()
-    {
-        return this.trigger;
-    }
-
-    public void setTask(Task task)
-    {
-        this.task = task;
-    }
-
-    public Task getTask()
-    {
-        return this.task;
+    public void add(Trigger trigger)
+    {        
+        trigger.setSchedule(this);
+        triggers.add(trigger);
     }
 
     /**
@@ -78,7 +75,53 @@ public class Schedule extends Entity
      */ 
     public void triggered()
     {
-        task.execute();
+        BobServer.build(project.getName(), recipe);       
+    }
+    
+    public void activate()
+    {
+        for (Trigger trigger: triggers)
+        {
+            if (!trigger.isEnabled())
+            {
+                trigger.enable();
+            }
+        }
+    }
+    
+    public void deactivate()
+    {
+        for (Trigger trigger: triggers)
+        {
+            if (trigger.isEnabled())
+            {
+                trigger.disable();
+            }
+        }
+        
+    }
+    
+    public List<Trigger> getTriggers()
+    {
+        return triggers;
     }
 
+    private void setTriggers(List<Trigger> triggers)
+    {
+        this.triggers = triggers;
+    }
+
+    public void remove(long id)
+    {
+        int i;
+        
+        for(i = 0; i < triggers.size(); i++)
+        {
+            if(triggers.get(i).getId() == id)
+            {
+                triggers.remove(i);
+                return;
+            }
+        }
+    }
 }

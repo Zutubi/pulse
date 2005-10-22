@@ -2,8 +2,6 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Schedule;
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.CronTrigger;
-import com.cinnamonbob.model.BuildTask;
 
 /**
  *
@@ -12,10 +10,7 @@ import com.cinnamonbob.model.BuildTask;
 public class CreateScheduleAction extends ProjectActionSupport
 {
     private long project;
-
-    private String name;
-    private String recipe;
-    private String cron;
+    private Schedule schedule = new Schedule();
 
     public long getProject()
     {
@@ -26,35 +21,10 @@ public class CreateScheduleAction extends ProjectActionSupport
     {
         this.project = project;
     }
-
-    public String getName()
+    
+    public Schedule getSchedule()
     {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public String getRecipe()
-    {
-        return this.recipe;
-    }
-
-    public void setRecipe(String recipe)
-    {
-        this.recipe = recipe;
-    }
-
-    public String getCron()
-    {
-        return this.cron;
-    }
-
-    public void setCron(String cron)
-    {
-        this.cron = cron;
+        return schedule;
     }
 
     public void validate()
@@ -73,22 +43,22 @@ public class CreateScheduleAction extends ProjectActionSupport
         }
 
         // ensure that the name is unique to the project.
-        Schedule projectsSchedule = project.getSchedule(getName());
+        Schedule projectsSchedule = project.getSchedule(schedule.getName());
         if (projectsSchedule != null)
         {
-            addFieldError("name", "Name already in use within this project.");
+            addFieldError("schedule.name", "Name already within this project.");
         }
     }
 
     public String execute()
     {
+        if(schedule.getRecipe().length() == 0)
+        {
+            schedule.setRecipe(null);
+        }
+        
         Project project = getProjectManager().getProject(getProject());
-
-        BuildTask task = new BuildTask(project, recipe);
-        CronTrigger trigger = new CronTrigger(cron);
-        Schedule schedule = new Schedule(name, project, task, trigger);
         project.addSchedule(schedule);
-
         getProjectManager().save(project);
         return SUCCESS;
     }

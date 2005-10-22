@@ -20,7 +20,6 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
 {
     private static final Logger LOG = Logger.getLogger(HibernateEntityDao.class.getName());
 
-    @Override
     public Class persistentClass()
     {
         return Project.class;
@@ -28,11 +27,54 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
 
     public Project findByName(final String name)
     {
-        return findUniqueByNamedQuery("project.findByName", "name", name, false);
+        List projects = (List) getHibernateTemplate().execute(new HibernateCallback() {
+            public Object doInHibernate(Session session) throws HibernateException {
+                Query queryObject = session.createQuery("from Project project where project.name = :name");
+                queryObject.setParameter("name", name, Hibernate.STRING);
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.list();
+            }
+        });
+
+        if (projects.size() > 1)
+        {
+            LOG.warning("findByName has returned " + projects.size() +
+                    " results when expecting at most one.");
+        }
+        if (projects.size() > 0)
+        {
+            return (Project) projects.get(0);
+        }
+        return null;
     }
 
-    public List<Project> findByLikeName(final String name)
+    public List findByLikeName(final String name)
     {
-        return (List<Project>)findByNamedQuery("project.findByLikeName", "name", name);
+        return (List)getHibernateTemplate().execute(new HibernateCallback(){
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from Project project where project.name like :name");
+                queryObject.setParameter("name", name, Hibernate.STRING);
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.list();
+            }
+        });
     }
-}
+
+    public List getAll()
+    {
+        return (List)getHibernateTemplate().execute(new HibernateCallback(){
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from Project");
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.list();
+            }
+        });
+    }}

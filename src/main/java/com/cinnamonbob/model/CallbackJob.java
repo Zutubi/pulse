@@ -15,6 +15,6 @@ public class CallbackJob implements Job
     {
         Map dataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         Trigger callback = (Trigger) dataMap.get("self");
-//        callback.trigger();
+        callback.trigger();
     }
 }

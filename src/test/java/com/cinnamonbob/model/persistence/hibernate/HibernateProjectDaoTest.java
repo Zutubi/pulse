@@ -34,8 +34,8 @@ public class HibernateProjectDaoTest extends PersistenceTestCase
         project.addScm(svn);
         svn.setProject(project);
         
-//        Schedule schedule = new Schedule("schedule", project, "recipe");
-//        project.addSchedule(schedule);
+        Schedule schedule = new Schedule("schedule", project, "recipe");
+        project.addSchedule(schedule);
         projectDao.save(project);
 
         commitAndRefreshTransaction();
@@ -47,26 +47,13 @@ public class HibernateProjectDaoTest extends PersistenceTestCase
         assertEquals(project.getSchedules(), otherProject.getSchedules());
     }
 
-    public void testFindByName()
+    private void assertEquals(List a, List b)
     {
-        Project project = new Project("testName", "Description");
-        projectDao.save(project);
-        commitAndRefreshTransaction();
-
-        assertNull(projectDao.findByName("someName"));
-        assertNotNull(projectDao.findByName("testName"));
-    }
-
-    public void testFindByLikeName()
-    {
-        Project project = new Project("aName", "description");
-        projectDao.save(project);
-        commitAndRefreshTransaction();
-
-        assertEquals(0, projectDao.findByLikeName("b").size());
-        assertEquals(1, projectDao.findByLikeName("%a%").size());
-        assertEquals(1, projectDao.findByLikeName("%Name%").size());
-        assertEquals(1, projectDao.findByLikeName("%N%").size());
+        assertEquals(a.size(), b.size());
+        for (int i = 0; i < a.size(); i++)
+        {
+            assertEquals(a.get(i), b.get(i));
+        }
     }
 }
 

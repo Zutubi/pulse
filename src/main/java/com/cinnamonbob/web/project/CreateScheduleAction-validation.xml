@@ -1,19 +1,9 @@
 <!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
         "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
 <validators>
-    <field name="name">
-        <field-validator type="required">
-            <message>Schedule name is required.</message>
-        </field-validator>
-    </field>
-    <field name="recipe">
-        <field-validator type="required">
-            <message>Recipe is required.</message>
-        </field-validator>
-    </field>
-    <field name="cron">
-        <field-validator type="required">
-            <message>Cron schedule is required.</message>
+    <field name="schedule">
+        <field-validator type="visitor">
+            <message>Schedule: </message>
         </field-validator>
     </field>
 </validators>

@@ -1,11 +1,12 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
+import com.cinnamonbob.core.FileArtifact;
 import com.cinnamonbob.model.*;
-import com.cinnamonbob.model.BuildTask;
 import com.cinnamonbob.model.persistence.ProjectDao;
 import com.cinnamonbob.model.persistence.ScheduleDao;
 
-import java.util.List;
+import java.io.File;
+import java.util.Calendar;
 
 
 /**
@@ -41,10 +42,10 @@ public class HibernateScheduleDaoTest extends PersistenceTestCase
         Project project = new Project();
         projectDao.save(project);
         
-        Trigger trigger = new CronTrigger("0 0 12 * * ?");
-        Task task = new BuildTask();
-        Schedule schedule = new Schedule("test", project, task, trigger);
-
+        CronTrigger trigger = new CronTrigger("0 0 12 * * ?");
+        Schedule schedule = new Schedule("test", project, "recipe");
+        schedule.add(trigger);
+        
         scheduleDao.save(schedule);
         commitAndRefreshTransaction();
 
@@ -55,24 +56,10 @@ public class HibernateScheduleDaoTest extends PersistenceTestCase
         assertFalse(schedule == anotherSchedule);
         assertEquals(schedule.getName(), anotherSchedule.getName());
         assertEquals(schedule.getProject(), anotherSchedule.getProject());
-        assertNotNull(anotherSchedule.getTrigger());
-        assertNotNull(anotherSchedule.getTask());
-    }
+        assertEquals(anotherSchedule.getTriggers().size(), 1);
 
-    public void testFindByProject()
-    {
-        Project project = new Project();
-        projectDao.save(project);
-
-        Trigger trigger = new CronTrigger("0 0 12 * * ?");
-        Task task = new BuildTask();
-        Schedule schedule = new Schedule("test", project, task, trigger);
-
-        scheduleDao.save(schedule);
-        commitAndRefreshTransaction();
-
-        List<Schedule> schedules = scheduleDao.findByProject(project);
-        assertEquals(1, schedules.size());
-        assertEquals(schedule, schedules.get(0));
+        CronTrigger anotherTrigger = (CronTrigger)anotherSchedule.getTriggers().get(0);
+        assertEquals(trigger.getSchedule(), anotherSchedule);
+        assertEquals(trigger.getCronExpression(), anotherTrigger.getCronExpression());
     }
 }

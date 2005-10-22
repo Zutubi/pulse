@@ -9,7 +9,7 @@ import com.cinnamonbob.model.Trigger;
  * 
  *
  */
-public class SimpleTrigger implements BobFileComponent
+public class SimpleTrigger implements Trigger, BobFileComponent
 {
     private BobFile project;
     private String name;
