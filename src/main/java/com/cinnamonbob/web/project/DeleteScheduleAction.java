@@ -1,6 +1,6 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.model.Schedule;
+import com.cinnamonbob.scheduling.Schedule;
 
 /**
  *
@@ -11,7 +11,7 @@ public class DeleteScheduleAction extends ProjectActionSupport
     private long id;
     private Schedule schedule;
     private long projectId;
-    
+
     public long getId()
     {
         return id;
@@ -21,7 +21,7 @@ public class DeleteScheduleAction extends ProjectActionSupport
     {
         this.id = id;
     }
-    
+
     public Schedule getSchedule()
     {
         return schedule;
@@ -31,7 +31,7 @@ public class DeleteScheduleAction extends ProjectActionSupport
     {
         return projectId;
     }
-    
+
     public void validate()
     {
         schedule = getScheduleManager().getSchedule(id);
@@ -39,7 +39,7 @@ public class DeleteScheduleAction extends ProjectActionSupport
         {
             addActionError("Unknown schedule [" + id + "]");
         }
-        
+
         projectId = schedule.getProject().getId();
     }
 

@@ -1,4 +1,4 @@
-package com.cinnamonbob.model;
+package com.cinnamonbob.scheduling;
 
 import java.util.Map;
 

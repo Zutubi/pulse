@@ -36,7 +36,6 @@
 
         <h2 class="command-info">schedules</h2>
         <div class="command-content">
-            #set($schedules = $project.schedules)
             <table>
                 <tr>
                     <th class="command-detail">name</th>
@@ -45,14 +44,13 @@
                 </tr>
             #foreach ($schedule in $schedules)
                 #if($schedule.recipe)
-                    #set($recipe = $schedule.recipe)
+                    #set($recipe = $schedule.task.recipe)
                 #else
                     #set($recipe = "[default]")
                 #end
                 <tr>
                     <td class="command-detail">$schedule.name</td>
                     <td class="command-detail">$recipe</td>
-                    <td class="command-detail"><a href="manageSchedule.action?name=$schedule.name&projectId=$project.id">manage</a></td>
                     <td class="command-detail"><a href="deleteSchedule.action?id=$schedule.id">delete</a></td>
                 </tr>
             #end

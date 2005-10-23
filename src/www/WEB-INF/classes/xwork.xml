@@ -256,25 +256,6 @@
             <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
         </action>
 
-        <action name="createTrigger!default" class="com.cinnamonbob.web.project.CreateTriggerAction" method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">create-trigger.vm</result>
-        </action>
-        
-        <action name="createTrigger" class="com.cinnamonbob.web.project.CreateTriggerAction">
-            <result name="input" type="velocity">create-trigger.vm</result>
-            <result name="cancel" type="redirect">/manageSchedule.action?projectId=${projectId}&amp;name=${name}</result>
-            <result name="success" type="redirect">/manageSchedule.action?projectId=${project.id}&amp;name=${schedule.name}</result>
-        </action>
-
-        <action name="deleteTrigger" class="com.cinnamonbob.web.project.DeleteTriggerAction">
-            <result name="success" type="redirect">/manageSchedule.action?projectId=${schedule.project.id}&amp;name=${schedule.name}</result>
-        </action>
- 
-        <action name="manageSchedule" class="com.cinnamonbob.web.project.ManageScheduleAction">
-            <result name="success" type="velocity">manage-schedule.vm</result>
-        </action>
-
         <action name="createSubscription!default" class="com.cinnamonbob.web.user.CreateSubscriptionAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-subscription.vm</result>

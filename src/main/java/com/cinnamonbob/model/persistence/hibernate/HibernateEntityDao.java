@@ -107,6 +107,16 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
 
     public final Object findUniqueByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final boolean cachable)
     {
+        return findUniqueByNamedQuery(queryName, propertyName, propertyValue, null, null, cachable);
+    }
+
+    public final Object findUniqueByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final String secondPropertyName, final Object secondPropertyValue)
+    {
+        return findUniqueByNamedQuery(queryName, propertyName, propertyValue, secondPropertyName, secondPropertyValue, false);
+    }
+
+    public final Object findUniqueByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final String secondPropertyName, final Object secondPropertyValue, final boolean cachable)
+    {
         return getHibernateTemplate().execute(new HibernateCallback()
          {
              public Object doInHibernate(Session session) throws HibernateException
@@ -115,6 +125,10 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
                  if (propertyName != null)
                  {
                      queryObject.setParameter(propertyName, propertyValue);
+                 }
+                 if (secondPropertyName != null)
+                 {
+                     queryObject.setParameter(secondPropertyName, secondPropertyValue);
                  }
                  queryObject.setCacheable(cachable);
                  SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());

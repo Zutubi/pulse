@@ -2,10 +2,8 @@ package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.model.persistence.ProjectDao;
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.Schedule;
 import com.cinnamonbob.model.Svn;
-
-import java.util.List;
+import com.cinnamonbob.scheduling.Schedule;
 
 /**
  * 
@@ -29,12 +27,12 @@ public class HibernateProjectDaoTest extends PersistenceTestCase
     public void testLoadSave()
     {
         Project project = new Project("test-project", "This is a test project");
-        
+
         Svn svn = new Svn();
         project.addScm(svn);
         svn.setProject(project);
-        
-        Schedule schedule = new Schedule("schedule", project, "recipe");
+
+        Schedule schedule = new Schedule();
         project.addSchedule(schedule);
         projectDao.save(project);
 

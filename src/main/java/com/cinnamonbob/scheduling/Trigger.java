@@ -1,13 +1,11 @@
-package com.cinnamonbob.model;
+package com.cinnamonbob.scheduling;
 
 /**
- * 
- *
+ * <class-comment/>
  */
 public interface Trigger
 {
     long getId();
-    void setSchedule(Schedule schedule);
     void trigger();
     void enable();
     void disable();

@@ -1,19 +1,20 @@
-package com.cinnamonbob.model;
+package com.cinnamonbob.scheduling;
 
+import com.cinnamonbob.model.Entity;
 import com.cinnamonbob.bootstrap.quartz.QuartzManager;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 
-import java.text.ParseException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.text.ParseException;
+
+import org.quartz.Scheduler;
+import org.quartz.JobDetail;
+import org.quartz.SchedulerException;
 
 /**
- * 
- *
+ * <class-comment/>
  */
-public class CronTrigger extends AbstractTrigger
+public class CronTrigger extends Entity implements Trigger
 {
     private static final Logger LOG = Logger.getLogger(CronTrigger.class.getName());
 
@@ -26,9 +27,9 @@ public class CronTrigger extends AbstractTrigger
 
     }
 
-    public CronTrigger(String expression)
+    public CronTrigger(String cronExpression)
     {
-        cronExpression = expression;
+        this.cronExpression = cronExpression;
     }
 
     public String getCronExpression()
@@ -36,14 +37,15 @@ public class CronTrigger extends AbstractTrigger
         return cronExpression;
     }
 
-    public void setCronExpression(String cronSchedule)
+    public void setCronExpression(String cronExpression)
     {
-        this.cronExpression = cronSchedule;
+        this.cronExpression = cronExpression;
     }
 
     public void trigger()
     {
-        schedule.triggered();
+        // TODO implement it!!!!
+//        schedule.triggered();
     }
 
     public void enable()
@@ -104,7 +106,7 @@ public class CronTrigger extends AbstractTrigger
         }
         return false;
     }
-    
+
     public String getType()
     {
         return "cron";
@@ -120,4 +122,3 @@ public class CronTrigger extends AbstractTrigger
         return Long.toString(getId());
     }
 }
-

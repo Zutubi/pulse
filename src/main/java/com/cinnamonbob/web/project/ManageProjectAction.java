@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.scheduling.Schedule;
 
 /**
  * 
@@ -15,6 +16,7 @@ public class ManageProjectAction extends ProjectActionSupport
     private Project project;
     private BuildResult currentBuild;
     private List<BuildResult> history;
+    private List<Schedule> schedules;
 
     public long getId()
     {
@@ -44,7 +46,7 @@ public class ManageProjectAction extends ProjectActionSupport
         {
             currentBuild = history.remove(0);
         }
-        
+        schedules = getScheduleManager().getSchedules(project);
         return SUCCESS;
     }
 
@@ -52,9 +54,14 @@ public class ManageProjectAction extends ProjectActionSupport
     {
         return currentBuild;
     }
-    
+
     public List<BuildResult> getHistory()
     {
         return history;
+    }
+
+    public List<Schedule> getSchedules()
+    {
+        return schedules;
     }
 }

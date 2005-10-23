@@ -36,7 +36,6 @@ public class ProjectConfigurationLoaderTest extends TestCase
         loader = new BobFileLoader();
         
         // initialise the loader some test objects.
-        loader.register("simpleTrigger", SimpleTrigger.class);
         loader.register("reference", SimpleReference.class);
         loader.register("nested", SimpleNestedType.class);
         loader.register("type", SimpleType.class);

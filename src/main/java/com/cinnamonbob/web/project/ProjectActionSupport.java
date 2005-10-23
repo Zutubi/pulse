@@ -2,7 +2,7 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.BuildManager;
 import com.cinnamonbob.model.ProjectManager;
-import com.cinnamonbob.model.ScheduleManager;
+import com.cinnamonbob.scheduling.ScheduleManager;
 import com.cinnamonbob.model.ScmManager;
 import com.cinnamonbob.web.ActionSupport;
 import com.cinnamonbob.xwork.interceptor.Cancelable;

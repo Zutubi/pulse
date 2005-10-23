@@ -1,7 +1,9 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.model.Schedule;
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.scheduling.BuildProjectTask;
+import com.cinnamonbob.scheduling.CronTrigger;
+import com.cinnamonbob.scheduling.Schedule;
 
 /**
  *
@@ -10,7 +12,9 @@ import com.cinnamonbob.model.Project;
 public class CreateScheduleAction extends ProjectActionSupport
 {
     private long project;
-    private Schedule schedule = new Schedule();
+    private String name;
+    private String recipe;
+    private String cronExpression;
 
     public long getProject()
     {
@@ -21,10 +25,35 @@ public class CreateScheduleAction extends ProjectActionSupport
     {
         this.project = project;
     }
-    
-    public Schedule getSchedule()
+
+    public String getName()
     {
-        return schedule;
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getRecipe()
+    {
+        return recipe;
+    }
+
+    public void setRecipe(String recipe)
+    {
+        this.recipe = recipe;
+    }
+
+    public String getCronExpression()
+    {
+        return cronExpression;
+    }
+
+    public void setCronExpression(String cronExpression)
+    {
+        this.cronExpression = cronExpression;
     }
 
     public void validate()
@@ -42,24 +71,23 @@ public class CreateScheduleAction extends ProjectActionSupport
             return;
         }
 
+        Schedule schedule = getScheduleManager().getSchedule(project, name);
         // ensure that the name is unique to the project.
-        Schedule projectsSchedule = project.getSchedule(schedule.getName());
-        if (projectsSchedule != null)
+        if (schedule != null)
         {
-            addFieldError("schedule.name", "Name already within this project.");
+            addFieldError("name", "Name already within this project.");
         }
     }
 
     public String execute()
     {
-        if(schedule.getRecipe().length() == 0)
-        {
-            schedule.setRecipe(null);
-        }
-        
         Project project = getProjectManager().getProject(getProject());
-        project.addSchedule(schedule);
-        getProjectManager().save(project);
+
+        CronTrigger trigger = new CronTrigger(cronExpression);
+        BuildProjectTask task = new BuildProjectTask(project, recipe);
+
+        getScheduleManager().schedule(name, project, trigger, task);
+
         return SUCCESS;
     }
 
@@ -67,5 +95,4 @@ public class CreateScheduleAction extends ProjectActionSupport
     {
         return SUCCESS;
     }
-
 }

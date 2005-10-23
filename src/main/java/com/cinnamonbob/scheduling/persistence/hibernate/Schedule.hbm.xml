@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <class name="com.cinnamonbob.scheduling.Schedule" table="SCHEDULE" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="name" column="NAME" type="string" not-null="true" length="255"/>
+
+        <many-to-one name="project" column="PROJECTID" class="com.cinnamonbob.model.Project" not-null="false" insert="true" lazy="false" cascade="none"/>
+        <many-to-one name="trigger" column="TRIGGER" class="com.cinnamonbob.scheduling.CronTrigger" not-null="true" insert="true" lazy="false" cascade="all"/>
+        <many-to-one name="task" column="TASK" class="com.cinnamonbob.scheduling.BuildProjectTask" not-null="true" insert="true" lazy="false" cascade="all-delete-orphan"/>
+
+    </class>
+
+    <class name="com.cinnamonbob.scheduling.CronTrigger" table="TRIGGER">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="cronExpression" column="CRONEXPRESSION" type="string" not-null="true" length="255"/>
+
+    </class>
+
+    <class name="com.cinnamonbob.scheduling.BuildProjectTask" table="TASK">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="recipe" column="RECIPE" type="string" not-null="true" length="255"/>
+
+        <many-to-one name="project" column="PROJECTID" class="com.cinnamonbob.model.Project" not-null="true" insert="true" lazy="false" cascade="none"/>
+
+    </class>
+
+    <query name="schedule.findByNameAndProject"><![CDATA[
+        from Schedule s
+        where s.project = :project
+        and s.name = :name
+    ]]></query>
+
+    <query name="schedule.findByProject"><![CDATA[
+        from Schedule s
+        where s.project = :project
+    ]]></query>
+
+</hibernate-mapping>

@@ -1,6 +1,7 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.model.persistence.ProjectDao;
+import com.cinnamonbob.scheduling.Schedule;
 
 import java.util.List;
 
@@ -49,15 +50,5 @@ public class DefaultProjectManager implements ProjectManager
     
     public void initialise()
     {
-        for(Project p: getAllProjects())
-        {
-            for(Schedule s: p.getSchedules())
-            {
-                for(Trigger t: s.getTriggers())
-                {
-                    t.enable();
-                }
-            }
-        }
     }
 }

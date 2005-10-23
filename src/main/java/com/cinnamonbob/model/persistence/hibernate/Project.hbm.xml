@@ -16,12 +16,6 @@
             <key column="PROJECTID"/>
             <one-to-many class="com.cinnamonbob.model.Scm"/>
         </bag>
-        
-        <bag name="schedules" inverse="true" cascade="all" lazy="false">
-            <key column="PROJECTID"/>
-            <one-to-many class="com.cinnamonbob.model.Schedule"/>
-        </bag>
-
     </class>
 
     <query name="findByLikeName"><![CDATA[
