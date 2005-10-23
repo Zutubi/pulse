@@ -28,18 +28,37 @@ public class DataSourceBeanFactory implements FactoryBean, ApplicationContextAwa
             {
                 if (dataSource == null)
                 {
-                    ConfigurationManager configManager = (ConfigurationManager) context.getBean("configurationManager");
-                    File dbRoot = configManager.getApplicationPaths().getDatabaseRoot();
-
                     dataSource = new BasicDataSource();
-                    dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-                    dataSource.setUrl("jdbc:hsqldb:" + dbRoot.getAbsolutePath() + File.separator + "db");
-                    dataSource.setUsername("sa");
-                    dataSource.setPassword("");
+                    dataSource.setDriverClassName(getDriverClassName());
+                    dataSource.setUrl(getUrl());
+                    dataSource.setUsername(getUsername());
+                    dataSource.setPassword(getPassword());
                 }
             }
         }
         return dataSource;
+    }
+
+    public String getDriverClassName()
+    {
+        return "org.hsqldb.jdbcDriver";
+    }
+
+    public String getUrl()
+    {
+        ConfigurationManager configManager = (ConfigurationManager) context.getBean("configurationManager");
+        File dbRoot = configManager.getApplicationPaths().getDatabaseRoot();
+        return "jdbc:hsqldb:" + dbRoot.getAbsolutePath() + File.separator + "db";
+    }
+
+    public String getUsername()
+    {
+        return "sa";
+    }
+
+    public String getPassword()
+    {
+        return "";
     }
 
     public Class getObjectType()

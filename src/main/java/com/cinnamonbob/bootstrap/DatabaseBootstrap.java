@@ -1,12 +1,23 @@
 package com.cinnamonbob.bootstrap;
 
+import com.cinnamonbob.util.IOUtils;
+import com.cinnamonbob.util.JDBCUtils;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Hibernate specific bootstrap support that creates the database scheme
@@ -16,24 +27,63 @@ public class DatabaseBootstrap
 {
     public static final String SCHEMA_TEST_TABLE = "USER";
 
+    private static final Logger LOG = Logger.getLogger(DatabaseBootstrap.class.getName());
+
     public DatabaseBootstrap()
     {
     }
 
     private ApplicationContext getContext()
     {
-        return ComponentContext.getContext();        
+        return ComponentContext.getContext();
     }
-    
+
     public void initialiseDatabase()
     {
         if (!schemaExists())
         {
             LocalSessionFactoryBean factoryBean = (LocalSessionFactoryBean) getContext().getBean("&sessionFactory");
             factoryBean.createDatabaseSchema();
+//            createQuartzSchema(factoryBean);
         }
     }
 
+    private void createQuartzSchema(LocalSessionFactoryBean factoryBean)
+    {
+        SessionFactory sessionFactory = (SessionFactory) factoryBean.getObject();
+
+        HibernateTemplate hibernateTemplate = new HibernateTemplate(sessionFactory);
+        hibernateTemplate.execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException, SQLException
+            {
+                Connection con = session.connection();
+
+                InputStream in = null;
+                try
+                {
+                    in = getClass().getResourceAsStream("/com/cinnamonbob/quartz/schema/tables_hsqldb.sql");
+                    if (in == null)
+                    {
+                        throw new IOException("Quartz schema creation script not found.");
+                    }
+
+                    String[] sql = JDBCUtils.loadScript(in);
+                    JDBCUtils.executeSchemaScript(con, sql);
+                    return null;
+                }
+                catch (IOException e)
+                {
+                    LOG.log(Level.WARNING, e.getMessage(), e);
+                    return null;
+                }
+                finally
+                {
+                    IOUtils.close(in);
+                }
+            }
+        });
+    }
 
     private boolean schemaExists()
     {
