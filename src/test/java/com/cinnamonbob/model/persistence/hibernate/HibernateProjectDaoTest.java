@@ -40,20 +40,28 @@ public class HibernateProjectDaoTest extends PersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        Project otherProject = (Project) projectDao.findById(project.getId());
-        assertEquals(project.getName(), otherProject.getName());
-        assertEquals(project.getDescription(), otherProject.getDescription());
-        assertEquals(project.getScms(), otherProject.getScms());
-        assertEquals(project.getSchedules(), otherProject.getSchedules());
+        Project otherProject = projectDao.findById(project.getId());
+        assertPersistentEquals(project, otherProject);
     }
 
-    private void assertEquals(List a, List b)
+    public void testFindByLikeName()
     {
-        assertEquals(a.size(), b.size());
-        for (int i = 0; i < a.size(); i++)
-        {
-            assertEquals(a.get(i), b.get(i));
-        }
+        Project projectA = new Project("nameA", "description");
+        Project projectB = new Project("nameB", "description");
+        projectDao.save(projectA);
+        projectDao.save(projectB);
+        commitAndRefreshTransaction();
+        assertEquals(2, projectDao.findByLikeName("%name%").size());
+        assertEquals(1, projectDao.findByLikeName("%A%").size());
     }
+
+    public void testFindByName()
+    {
+        Project projectA = new Project("nameA", "description");
+        projectDao.save(projectA);
+        commitAndRefreshTransaction();
+        assertNotNull(projectDao.findByName("nameA"));
+    }
+
 }
 

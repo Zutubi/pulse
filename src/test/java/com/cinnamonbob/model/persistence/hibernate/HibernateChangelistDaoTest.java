@@ -28,37 +28,25 @@ public class HibernateChangelistDaoTest extends PersistenceTestCase
         super.tearDown();
     }
 
-    public void testLoadSave()
+    public void testLoadSave() throws Exception
     {
-        try {
-            Date date = Calendar.getInstance().getTime();
-            CvsRevision revision = new CvsRevision("bob", "MAIN", "test changelist", date);
-            Changelist list = new Changelist(revision);
-            Change change = new Change("some/random/file", "23", Change.Action.EDIT);
+        Date date = Calendar.getInstance().getTime();
+        CvsRevision revision = new CvsRevision("bob", "MAIN", "test changelist", date);
+        Changelist list = new Changelist(revision);
+        Change change = new Change("some/random/file", "23", Change.Action.EDIT);
 
-            list.addChange(change);
-            changelistDao.save(list);
+        list.addChange(change);
+        changelistDao.save(list);
 
-            commitAndRefreshTransaction();
+        commitAndRefreshTransaction();
 
-            Changelist otherList = changelistDao.findById(list.getId());
-            assertEquals(list.getUser(), otherList.getUser());
-            assertEquals(list.getDate(), otherList.getDate());
-            assertEquals(list.getComment(), otherList.getComment());
-            assertEquals(list.getChanges().size(), otherList.getChanges().size());
+        Changelist otherList = changelistDao.findById(list.getId());
+        assertPersistentEquals(list, otherList);
 
-            CvsRevision otherRevision = (CvsRevision)otherList.getRevision();
-            assertEquals(revision.getAuthor(), otherRevision.getAuthor());
-            assertEquals(revision.getBranch(), otherRevision.getBranch());
-            assertEquals(revision.getComment(), otherRevision.getComment());
-            assertEquals(revision.getDate(), otherRevision.getDate());
+        CvsRevision otherRevision = (CvsRevision)otherList.getRevision();
+        assertPersistentEquals(revision, otherRevision);
 
-            Change otherChange = (Change)otherList.getChanges().get(0);
-            assertEquals(change.getAction(), otherChange.getAction());
-            assertEquals(change.getFilename(), otherChange.getFilename());
-            assertEquals(change.getRevision(), otherChange.getRevision());
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        Change otherChange = otherList.getChanges().get(0);
+        assertPersistentEquals(change, otherChange);
     }
 }

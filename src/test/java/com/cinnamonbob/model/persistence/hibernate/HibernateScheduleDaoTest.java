@@ -54,12 +54,7 @@ public class HibernateScheduleDaoTest extends PersistenceTestCase
         // want to ensure that a new object has been created by hibernate and
         // that the old one is not just returned to us.
         assertFalse(schedule == anotherSchedule);
-        assertEquals(schedule.getName(), anotherSchedule.getName());
-        assertEquals(schedule.getProject(), anotherSchedule.getProject());
-        assertEquals(anotherSchedule.getTriggers().size(), 1);
-
-        CronTrigger anotherTrigger = (CronTrigger)anotherSchedule.getTriggers().get(0);
-        assertEquals(trigger.getSchedule(), anotherSchedule);
-        assertEquals(trigger.getCronExpression(), anotherTrigger.getCronExpression());
+        assertPersistentEquals(schedule, anotherSchedule);
+        
     }
 }

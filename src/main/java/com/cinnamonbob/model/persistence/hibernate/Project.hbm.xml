@@ -24,4 +24,14 @@
 
     </class>
 
+    <query name="findByLikeName"><![CDATA[
+        from Project project
+        where project.name like :name
+    ]]></query>
+
+    <query name="findByName"><![CDATA[
+        from Project project
+        where project.name = :name
+    ]]></query>
+
 </hibernate-mapping>

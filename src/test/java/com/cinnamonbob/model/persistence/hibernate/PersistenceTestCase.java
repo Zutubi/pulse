@@ -2,6 +2,7 @@ package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.DatabaseBootstrap;
+import com.cinnamonbob.test.BobTestCase;
 import junit.framework.TestCase;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -12,6 +13,7 @@ import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.EntityMode;
 import org.hibernate.SessionFactory;
+import org.hibernate.type.Type;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -22,7 +24,7 @@ import java.util.Map;
  * 
  *
  */
-public abstract class PersistenceTestCase extends TestCase
+public abstract class PersistenceTestCase extends BobTestCase
 {
     protected ApplicationContext context = null;
 
@@ -103,24 +105,8 @@ public abstract class PersistenceTestCase extends TestCase
         {
             Object valueA = persister.getPropertyValue(a, propertyName, EntityMode.POJO);
             Object valueB = persister.getPropertyValue(b, propertyName, EntityMode.POJO);
-            assertEquals(propertyName, valueA, valueB);
+            assertObjectEquals(propertyName, valueA, valueB);
         }
     }
 
-    protected void assertEquals(Map a, Map b)
-    {
-        if (a == null)
-        {
-            assertNull(b);
-        }
-        else
-        {
-            assertNotNull(b);
-        }
-        assertEquals(a.size(), b.size());
-        for (Object key : a.keySet())
-        {
-            assertEquals(key.toString(), a.get(key), b.get(key));
-        }
-    }
 }
