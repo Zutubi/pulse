@@ -10,5 +10,6 @@
 	<validator name="visitor" class="com.opensymphony.xwork.validator.validators.VisitorFieldValidator"/> 
 	<validator name="conversion" class="com.opensymphony.xwork.validator.validators.ConversionErrorFieldValidator"/> 
 	<validator name="cvsroot" class="com.cinnamonbob.xwork.validator.validators.CvsRootValidator"/>
+	<validator name="cronexpression" class="com.cinnamonbob.xwork.validator.validators.CronExpressionValidator"/>
 	<validator name="integral" class="com.cinnamonbob.xwork.validator.validators.IntegralValidator"/>
 </validators>
