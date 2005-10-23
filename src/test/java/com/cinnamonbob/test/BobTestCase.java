@@ -2,10 +2,9 @@ package com.cinnamonbob.test;
 
 import junit.framework.TestCase;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Base class for test cases.
