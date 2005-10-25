@@ -1,13 +1,15 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.model.CommandResult;
 import com.cinnamonbob.model.StoredArtifact;
 import com.cinnamonbob.util.IOUtils;
 
-import java.util.List;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
-import java.io.*;
+import java.util.List;
 
 /**
  * 
@@ -16,7 +18,7 @@ import java.io.*;
 public class ExecutableCommand implements Command
 {
     private String exe;
-    private String args;
+    private List<Arg> args = new LinkedList<Arg>();
     private File workingDir;
 
     private String name;
@@ -30,9 +32,9 @@ public class ExecutableCommand implements Command
         
         if (args != null)
         {
-            for (String arg : args.split(" "))
+            for (Arg arg : args)
             {
-                command.add(arg);
+                command.add(arg.getText());
             }
         }
 
@@ -101,12 +103,22 @@ public class ExecutableCommand implements Command
     
     public void setArgs(String args)
     {
-        this.args = args;
+        for(String arg: args.split(" "))
+        {
+            this.args.add(new Arg(arg));
+        }
     }
 
     public void setWorkingDir(File d)
     {
         this.workingDir = d;
+    }
+
+    public Arg createArg()
+    {
+        Arg arg = new Arg();
+        args.add(arg);
+        return arg;
     }
     
     public Environment createEnvironment()
@@ -149,6 +161,38 @@ public class ExecutableCommand implements Command
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    List<Arg> getArgs()
+    {
+        return args;
+    }
+
+    /**
+     */
+    public class Arg
+    {
+        private String text;
+
+        public Arg()
+        {
+            text = "";
+        }
+
+        public Arg(String text)
+        {
+            this.text = text;
+        }
+
+        public void addText(String text)
+        {
+            this.text += text;
+        }
+
+        public String getText()
+        {
+            return text;
+        }
     }
 
     /**
