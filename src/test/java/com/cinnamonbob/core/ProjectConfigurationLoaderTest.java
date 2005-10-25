@@ -3,15 +3,7 @@ package com.cinnamonbob.core;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.cinnamonbob.core.BobFile;
-import com.cinnamonbob.core.BobFileLoader;
-import com.cinnamonbob.core.CommandGroup;
-import com.cinnamonbob.core.ComponentDefinition;
-import com.cinnamonbob.core.ExecutableCommand;
-import com.cinnamonbob.core.PostProcessorGroup;
-import com.cinnamonbob.core.Property;
-import com.cinnamonbob.core.Recipe;
-import com.cinnamonbob.core.RegexPostProcessor;
+import com.cinnamonbob.bootstrap.ComponentContext;
 
 import junit.framework.TestCase;
 
@@ -32,7 +24,13 @@ public class ProjectConfigurationLoaderTest extends TestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        
+
+        String[] configLocations = new String[] {
+            "com/cinnamonbob/bootstrap/emptyContext.xml"
+        };
+
+        ComponentContext.addClassPathContextDefinitions(configLocations);
+
         loader = new BobFileLoader();
         
         // initialise the loader some test objects.

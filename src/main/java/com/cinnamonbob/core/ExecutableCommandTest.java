@@ -15,7 +15,7 @@ import java.io.File;
 public class ExecutableCommandTest extends TestCase
 {
         
-    private File outputDirectory; 
+    private File outputDirectory;
     
     public void setUp() throws Exception
     {
