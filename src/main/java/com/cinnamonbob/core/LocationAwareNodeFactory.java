@@ -5,6 +5,7 @@ import nu.xom.Element;
 import nu.xom.Document;
 import nu.xom.Nodes;
 import org.xml.sax.Locator;
+import org.xml.sax.Attributes;
 
 import com.cinnamonbob.core.LocationAwareElement;
 
@@ -15,16 +16,23 @@ import com.cinnamonbob.core.LocationAwareElement;
  */
 public class LocationAwareNodeFactory extends NodeFactory
 {
-    private Location lastLocation;
+    private Locator locator;
+    private Location startLocation;
+    private Location endLocation;
     
+    public LocationAwareNodeFactory()
+    {
+        super();
+    }
+
     public Element startMakingElement(String name, String namespace)
     {
         LocationAwareElement newElement = new LocationAwareElement(name, namespace);
         
-        if (lastLocation != null)
+        if (startLocation != null)
         {
-            newElement.setLineNumber(lastLocation.line);
-            newElement.setColumnNumber(lastLocation.column);
+            newElement.setLineNumber(startLocation.line);
+            newElement.setColumnNumber(startLocation.column);
         }
         recordLocation();
         
@@ -33,38 +41,75 @@ public class LocationAwareNodeFactory extends NodeFactory
 
     public void finishMakingDocument(Document d)
     {
-        recordLocation();
         super.finishMakingDocument(d);
     }
     
     public Nodes finishMakingElement(Element e)
     {
-        recordLocation();
-        return super.finishMakingElement(e);  
+        return super.finishMakingElement(e);
     }
     
     public Nodes makeComment(String data)
     {
-        recordLocation();
-        return super.makeComment(data);  
+        return super.makeComment(data);
     }
     
     public Nodes makeText(String data) {
-        recordLocation();
-        return super.makeText(data);  
+        return super.makeText(data);
     }
 
     private void recordLocation()
     {
-        Locator locator = getDocumentLocator();
         if (locator != null)
         {
-            lastLocation  = new Location(locator);
+            startLocation = endLocation;
+            endLocation  = new Location(locator);
         }
     }
 
+    @Override
+    public void setDocumentLocator(Locator locator)
+    {
+        this.locator = locator;
+    }
 
-    private class Location 
+    @Override
+    public void startDocument()
+    {
+        recordLocation();
+    }
+
+    @Override
+    public void startElement(String string, String string1, String string2, Attributes attributes)
+    {
+        recordLocation();
+    }
+
+    @Override
+    public void endElement(String string, String string1, String string2)
+    {
+        recordLocation();
+    }
+
+    @Override
+    public void characters(char[] chars, int i, int i1)
+    {
+        recordLocation();
+    }
+
+    @Override
+    public void ignorableWhitespace(char[] chars, int i, int i1)
+    {
+        recordLocation();
+    }
+
+    @Override
+    public void processingInstruction(String string, String string1)
+    {
+        recordLocation();
+    }
+
+    private class Location
     {
         private int line;
         private int column;
