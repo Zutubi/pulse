@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Base class for test cases.
  */
-public class BobTestCase extends TestCase
+public abstract class BobTestCase extends TestCase
 {
     public BobTestCase()
     {

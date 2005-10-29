@@ -2,12 +2,9 @@ package com.cinnamonbob.core;
 
 import nu.xom.NodeFactory;
 import nu.xom.Element;
-import nu.xom.Document;
-import nu.xom.Nodes;
 import org.xml.sax.Locator;
 import org.xml.sax.Attributes;
 
-import com.cinnamonbob.core.LocationAwareElement;
 
 /**
  * NodeFactory extension that creates LocationAwareElements. These elements
@@ -37,25 +34,6 @@ public class LocationAwareNodeFactory extends NodeFactory
         recordLocation();
         
         return newElement;
-    }
-
-    public void finishMakingDocument(Document d)
-    {
-        super.finishMakingDocument(d);
-    }
-    
-    public Nodes finishMakingElement(Element e)
-    {
-        return super.finishMakingElement(e);
-    }
-    
-    public Nodes makeComment(String data)
-    {
-        return super.makeComment(data);
-    }
-    
-    public Nodes makeText(String data) {
-        return super.makeText(data);
     }
 
     private void recordLocation()

@@ -21,7 +21,7 @@ public class RegexPattern
         return category;
     }
 
-    public void setCategory(String category) throws ParseException
+    public void setCategory(String category) throws FileLoadException
     {
         try
         {
@@ -29,7 +29,7 @@ public class RegexPattern
         }
         catch(IllegalArgumentException e)
         {
-            throw new ParseException("Unrecognised regex category '" + category + "'");
+            throw new FileLoadException("Unrecognised regex category '" + category + "'");
         }
     }
 
@@ -38,7 +38,7 @@ public class RegexPattern
         return expression;
     }
 
-    public void setExpression(String expression) throws ParseException
+    public void setExpression(String expression) throws FileLoadException
     {
         try
         {
@@ -47,7 +47,7 @@ public class RegexPattern
         }
         catch(PatternSyntaxException e)
         {
-            throw new ParseException(e);
+            throw new FileLoadException(e);
         }
     }
 

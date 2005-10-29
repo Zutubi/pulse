@@ -19,23 +19,23 @@ public class CommandGroup implements Command
 {
     private String name;
 
-    private Command cmd = null;
+    private Command command = null;
 
     private List<ProcessArtifactMapping> mappings = new LinkedList<ProcessArtifactMapping>();
 
     private List<FileArtifact> artifacts = new LinkedList<FileArtifact>();
 
-    public void add(Command cmd)
+    public void add(Command cmd) throws FileLoadException
     {
-        if (this.cmd != null)
+        if (this.command != null)
         {
-            throw new IllegalArgumentException("CommandGroup only supports a single command instance.");
+            throw new FileLoadException("A 'command' tag may only contain a single nested command.");
         }
-        this.cmd = cmd;
+        this.command = cmd;
 
-        if (!TextUtils.stringSet(this.cmd.getName()))
+        if (!TextUtils.stringSet(this.command.getName()))
         {
-            this.cmd.setName(name);
+            this.command.setName(name);
         }
     }
 
@@ -65,7 +65,7 @@ public class CommandGroup implements Command
 
     public void execute(File outputDir, CommandResult result)
     {
-        cmd.execute(outputDir, result);
+        command.execute(outputDir, result);
         collectArtifacts(result, outputDir);
 
         for (ProcessArtifactMapping m : mappings)
@@ -114,6 +114,11 @@ public class CommandGroup implements Command
         }
     }
 
+    public Command getCommand()
+    {
+        return command;
+    }
+    
     /**
      * 
      */

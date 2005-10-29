@@ -99,101 +99,144 @@ public class BobFileLoader
         }
     }
 
-    private void loadType(Element e, Object parent) throws BobException, IllegalAccessException, InvocationTargetException
+    private void loadType(Element e, Object parent) throws BobException, IllegalAccessException
     {
-        IntrospectionHelper parentHelper = IntrospectionHelper.getHelper(parent.getClass());
+        IntrospectionHelper parentHelper = IntrospectionHelper.getHelper(parent.getClass(), typeDefinitions);
         String name = e.getLocalName();
 
         Object type;
 
-        // if create factory method, use it
-        String propertyName = convertLocalNameToPropertyName(name);
-        if (parentHelper.hasCreate(propertyName))
-        {
-            // we expect this type to have been added to its parent during creation.
-            type = parentHelper.create(propertyName, parent);
-        }
-        else
-        {
-            // this one we still need to add to its parent when its initialisation is completed.
-            type = create(name);
-        }
-
-        // autowire the object using the springs autowire. This provides full access to the systems
-        // resources from within the type instances.
-        getSpringFactory().autoWireBean(type);
-
-        IntrospectionHelper typeHelper = IntrospectionHelper.getHelper(type.getClass());
-
-        // initialise attributes
-        mapAttributesToProperties(e, type);
-
-        // interface based initialisation.
-        if (Reference.class.isAssignableFrom(type.getClass()))
-        {
-            String referenceName = ((Reference) type).getName();
-            if (referenceName != null && referenceName.length() > 0)
-            {
-                bobFile.setReference(referenceName, (Reference) type);
-            }
-        }
-
-        if (BobFileComponent.class.isAssignableFrom(type.getClass()))
-        {
-            ((BobFileComponent) type).setBobFile(bobFile);
-        }
-
-        // initialise sub-elements.
-        for (int index = 0; index < e.getChildCount(); index++)
-        {
-            Node node = e.getChild(index);
-
-            if (node instanceof Element)
-            {
-                Element element = (Element) node;
-                // process type.
-                loadType(element, type);
-
-            } else if (node instanceof Text)
-            {
-                if (typeHelper.hasAddText())
-                {
-                    typeHelper.addText(type, node.getValue());
-                }
-            }
-        }
-
-        // add to container.
-        if (parentHelper.hasAdd(propertyName))
-        {
-            parentHelper.add(propertyName, parent, type);
-        } else if (parentHelper.canAdd(type.getClass()))
-        {
-            parentHelper.add(parent, type);
-        }
-
-        if (InitComponent.class.isAssignableFrom(type.getClass()))
-        {
-            ((InitComponent) type).init();
-        }
-
-        // okay, so we validate the type field... so how do we propogate the
-        // error? and where does it go?
         try
         {
+            // if create factory method, use it
+            String propertyName = convertLocalNameToPropertyName(name);
+            if (parentHelper.hasCreate(propertyName))
+            {
+                // we expect this type to have been added to its parent during creation.
+                type = parentHelper.create(propertyName, parent);
+            }
+            else
+            {
+                // this one we still need to add to its parent when its initialisation is completed.
+                type = create(name);
+            }
+
+            // autowire the object using the springs autowire. This provides full access to the systems
+            // resources from within the type instances.
+            getSpringFactory().autoWireBean(type);
+
+            IntrospectionHelper typeHelper = IntrospectionHelper.getHelper(type.getClass(), typeDefinitions);
+
+            // initialise attributes
+            mapAttributesToProperties(e, type);
+
+            // interface based initialisation.
+            if (Reference.class.isAssignableFrom(type.getClass()))
+            {
+                String referenceName = ((Reference) type).getName();
+                if (referenceName != null && referenceName.length() > 0)
+                {
+                    if (bobFile.getReference(referenceName) != null)
+                    {
+                        throw new FileLoadException("An entity named '" + referenceName + "' already exists.");
+                    }
+
+                    bobFile.setReference(referenceName, (Reference) type);
+                }
+            }
+
+            if (BobFileComponent.class.isAssignableFrom(type.getClass()))
+            {
+                ((BobFileComponent) type).setBobFile(bobFile);
+            }
+
+            // initialise sub-elements.
+            for (int index = 0; index < e.getChildCount(); index++)
+            {
+                Node node = e.getChild(index);
+
+                if (node instanceof Element)
+                {
+                    Element element = (Element) node;
+                    // process type.
+                    loadType(element, type);
+
+                }
+                else if (node instanceof Text)
+                {
+                    if (typeHelper.hasAddText())
+                    {
+                        typeHelper.addText(type, node.getValue());
+                    }
+                }
+            }
+
+            // add to container.
+            if (parentHelper.hasAdd(propertyName))
+            {
+                parentHelper.add(propertyName, parent, type);
+            }
+            else if (parentHelper.canAdd(type.getClass()))
+            {
+                parentHelper.add(parent, type);
+            }
+
+            if (InitComponent.class.isAssignableFrom(type.getClass()))
+            {
+                ((InitComponent) type).init();
+            }
+
+            // Apply declarative validation
             CommandValidationManager.validate(type, name);
         }
-        catch (ValidationException e1)
+        catch (InvocationTargetException ex)
         {
-            throw new ParseException("Validation failed for '" + name + "': " + e1.getMessage());
+            Throwable t;
+
+            if (ex.getCause() != null)
+            {
+                t = ex.getCause();
+            }
+            else
+            {
+                t = ex;
+            }
+
+            throw new ParseException(createParseErrorMessage(name, e, t));
         }
-        catch (CommandValidationException e1)
+        catch (ValidationException ex)
         {
-            throw new ParseException("Validation failed for '" + name + "': " + e1.getMessage());
+            throw new ParseException(createParseErrorMessage(name, e, ex));
+        }
+        catch (FileLoadException ex)
+        {
+            throw new ParseException(createParseErrorMessage(name, e, ex));
         }
     }
 
-    private Object create(String name) throws ParseException
+    private String createParseErrorMessage(String name, Element element, Throwable t)
+    {
+        StringBuilder message = new StringBuilder(256);
+
+        message.append("Processing element '");
+        message.append(name);
+        message.append("': ");
+
+        if(element instanceof LocationAwareElement)
+        {
+            LocationAwareElement location = (LocationAwareElement)element;
+            message.append("starting at line ");
+            message.append(location.getLineNumber());
+            message.append(" column ");
+            message.append(location.getColumnNumber());
+            message.append(": ");
+        }
+
+        message.append(t.getMessage());
+        return message.toString();
+    }
+
+    private Object create(String name) throws FileLoadException
     {
         Class clz = typeDefinitions.get(name);
         if (clz != null)
@@ -203,10 +246,10 @@ public class BobFileLoader
                 return clz.newInstance();
             } catch (Exception e)
             {
-                throw new ParseException("Could not instantiate type '" + name + "'");
+                throw new FileLoadException("Could not instantiate type '" + name + "'");
             }
         }
-        throw new ParseException("Undefined type '" + name + "'");
+        throw new FileLoadException("Undefined type '" + name + "'");
     }
 
     /**
@@ -225,9 +268,9 @@ public class BobFileLoader
         return name;
     }
 
-    private void mapAttributesToProperties(Element source, Object target) throws ParseException
+    private void mapAttributesToProperties(Element source, Object target) throws FileLoadException
     {
-        IntrospectionHelper helper = IntrospectionHelper.getHelper(target.getClass());
+        IntrospectionHelper helper = IntrospectionHelper.getHelper(target.getClass(), typeDefinitions);
 
         for (int i = 0; i < source.getAttributeCount(); i++)
         {
@@ -240,7 +283,7 @@ public class BobFileLoader
             }
             catch (Exception e)
             {
-                throw new ParseException(e);
+                throw new FileLoadException(e.getMessage());
             }
         }
     }

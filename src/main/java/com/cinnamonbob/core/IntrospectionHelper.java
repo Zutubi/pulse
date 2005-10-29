@@ -62,16 +62,16 @@ public class IntrospectionHelper
      */ 
     private static final Map<Class, IntrospectionHelper> helpers = new HashMap<Class, IntrospectionHelper>();
     
-    public static IntrospectionHelper getHelper(Class type)
+    public static IntrospectionHelper getHelper(Class type, Map<String, Class> typeDefinitions)
     {
         if (!helpers.containsKey(type))
         {
-            helpers.put(type, new IntrospectionHelper(type));    
+            helpers.put(type, new IntrospectionHelper(type, typeDefinitions));
         }
         return helpers.get(type);
     }
 
-    private IntrospectionHelper(final Class bean)
+    private IntrospectionHelper(final Class bean, Map<String, Class> typeDefinitions)
     {
         this.bean = bean;
 
@@ -99,7 +99,7 @@ public class IntrospectionHelper
                     paramTypes.length == 1)
             {
                 String attribName = getPropertyName(name, "set");
-                AttributeSetter setter = createAttributeSetter(method, paramTypes[0]);
+                AttributeSetter setter = createAttributeSetter(method, paramTypes[0], typeDefinitions);
                 if (setter != null)
                 {
                     attributeSetters.put(attribName, setter);
@@ -132,10 +132,10 @@ public class IntrospectionHelper
                     NestedAdder adder = new NestedAdder() {
                         public void add(Object parent, Object arg) throws InvocationTargetException, IllegalAccessException
                         {
-                            method.invoke(parent, arg);     
+                            method.invoke(parent, arg);
                         }
                     };
-                    nestedTypeAdders.put(paramTypes[0], adder);                    
+                    nestedTypeAdders.put(paramTypes[0], adder);
                 }
                 else
                 {
@@ -145,8 +145,8 @@ public class IntrospectionHelper
                         {
                             method.invoke(parent, arg);
                         }
-    
-                    });                    
+
+                    });
                 }
             }
         }
@@ -171,7 +171,7 @@ public class IntrospectionHelper
     private interface AttributeSetter
     {
         void set(Object parent, String value, BobFile project)
-                throws InvocationTargetException, IllegalAccessException;
+                throws InvocationTargetException, IllegalAccessException, FileLoadException;
     }
 
     /**
@@ -201,7 +201,7 @@ public class IntrospectionHelper
      * @param arg
      * @return
      */ 
-    private AttributeSetter createAttributeSetter(final Method method, Class arg)
+    private AttributeSetter createAttributeSetter(final Method method, Class arg, final Map<String, Class> typeDefinitions)
     {
         // Simplify things by treating primities like there wrapper classes.
         // Javas introspection does not mind.
@@ -274,15 +274,54 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, BobFile project) 
-                        throws InvocationTargetException, IllegalAccessException
+                public void set(Object parent, String value, BobFile project)
+                        throws InvocationTargetException, IllegalAccessException, FileLoadException
                 {
                     // lookup the type object within the projects references.
-                    Object obj = project.getReference(value);                    
-                    if (obj != null && reflectedArg.isAssignableFrom(obj.getClass()))
+                    Reference obj = project.getReference(value);
+
+                    if (obj == null)
                     {
-                        method.invoke(parent, obj);
-                    }                    
+                        throw new FileLoadException("Reference to unknown entity '" + value + "'.");
+                    }
+
+                    if (!reflectedArg.isAssignableFrom(obj.getClass()))
+                    {
+                        List<String> expectedTypes = getAssignablesForType(typeDefinitions, reflectedArg);
+                        String gotType = getNameForType(typeDefinitions, obj.getClass());
+
+                        throw new FileLoadException("Referenced entity '" + value + "' has unexpected type (expected one of " + expectedTypes + ", got " + gotType + ").");
+                    }
+
+                    method.invoke(parent, obj);
+                }
+
+                private List<String> getAssignablesForType(Map<String, Class> typeDefinitions, Class clazz)
+                {
+                    List<String> result = new LinkedList<String>();
+
+                    for(Map.Entry<String, Class> e: typeDefinitions.entrySet())
+                    {
+                        if(clazz.isAssignableFrom(e.getValue()))
+                        {
+                            result.add(e.getKey());
+                        }
+                    }
+
+                    return result;
+                }
+
+                private String getNameForType(Map<String, Class> typeDefinitions, Class clazz)
+                {
+                    for(Map.Entry<String, Class> e: typeDefinitions.entrySet())
+                    {
+                        if(e.getValue() == clazz)
+                        {
+                            return e.getKey();
+                        }
+                    }
+
+                    return "<unknown>";
                 }
             };
         }
@@ -355,15 +394,15 @@ public class IntrospectionHelper
         return nestedCreators.get(name).create(parent);
     }
 
-    public void set(String name, Object parent, String value, BobFile project) 
-            throws IllegalAccessException, InvocationTargetException
+    public void set(String name, Object parent, String value, BobFile project)
+            throws IllegalAccessException, InvocationTargetException, FileLoadException
     {
         AttributeSetter setter = attributeSetters.get(name);
         if (setter == null)
         {
-            throw new BobRuntimeException("No setter exists on " + parent.getClass().getName() + " for property '" + name + "'.");
+            throw new FileLoadException("Unrecognised attribute '" + name + "'.");
         }
-            attributeSetters.get(name).set(parent, value, project);
+        attributeSetters.get(name).set(parent, value, project);
     }
     
     public void add(String name, Object parent, Object arg) throws IllegalAccessException, InvocationTargetException

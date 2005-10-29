@@ -193,5 +193,4 @@ public class ProjectConfigurationLoaderTest extends TestCase
         assertEquals(args.get(2).getText(), "here are some spaces");
         assertEquals(args.get(3).getText(), "and yet more spaces");
     }
-
 }

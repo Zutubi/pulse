@@ -28,7 +28,6 @@ public class BuildProcessor
 
     private ProjectManager projectManager;
     private BuildManager   buildManager;
-    private UserManager    userManager;
     private SubscriptionManager subscriptionManager;
 
     public static String getBuildDirName(BuildResult result)
@@ -51,7 +50,6 @@ public class BuildProcessor
         // TODO make this a singleton managed by Spring??
         projectManager = (ProjectManager)ComponentContext.getBean("projectManager");
         buildManager = (BuildManager)ComponentContext.getBean("buildManager");
-        userManager = (UserManager)ComponentContext.getBean("userManager");
         subscriptionManager = (SubscriptionManager)ComponentContext.getBean("subscriptionManager");
     }
 

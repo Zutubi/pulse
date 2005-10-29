@@ -58,7 +58,7 @@
 
     <target name="test" description="Run the project's tests.">
         <mkdir dir="build/test/report"/>
-        <junit forkmode="once" haltonfailure="true">
+        <junit forkmode="once" failureProperty="test.failure" printsummary="yes">
             <classpath>
                 <path refid="lib.path"/>
                 <pathelement location="build/test/classes"/>
@@ -67,11 +67,16 @@
             <sysproperty key="bob.home" value="."/>
 
             <batchtest fork="true" todir="build/test/report">
-                <fileset dir="src/test/java" includes="**/*Test.java"/>
+                <fileset dir="src/test/java" includes="**/*Test.java" excludes="**/*Cvs*Test.java"/>
                 <formatter type="xml"/>
                 <formatter type="plain"/>
             </batchtest>
         </junit>
+        <junitreport todir="build/test/report">
+            <fileset dir="build/test/report" includes="TEST-*.xml"/>
+            <report format="frames" todir="build/test/report/html"/>
+        </junitreport>
+        <fail message="JUnit tests failed" if="test.failure"/>
     </target>
 
     <target name="default" depends="clean, build, test" description="Run a clean build by default."/>

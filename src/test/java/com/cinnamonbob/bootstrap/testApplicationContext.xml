@@ -11,7 +11,7 @@
                 <value>com/cinnamonbob/model/persistence/hibernate/Feature.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Project.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Revision.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Schedule.hbm.xml</value>
+                <value>com/cinnamonbob/scheduling/persistence/hibernate/Schedule.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Scm.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/User.hbm.xml</value>
@@ -156,7 +156,7 @@
         </property>
     </bean>
 
-    <bean id="scheduleDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateScheduleDao">
+    <bean id="scheduleDaoTarget" class="com.cinnamonbob.scheduling.persistence.hibernate.HibernateScheduleDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -235,5 +235,19 @@
             </props>
         </property>
     </bean>
+
+    <bean id="buildManager" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"/>
+
+    <bean id="userManager" class="com.cinnamonbob.model.DefaultUserManager" autowire="byName"/>
+
+    <bean id="projectManager" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
+
+    <bean id="scheduleManager" class="com.cinnamonbob.scheduling.DefaultScheduleManager" autowire="byName"/>
+
+    <bean id="subscriptionManager" class="com.cinnamonbob.model.DefaultSubscriptionManager" autowire="byName"/>
+
+    <bean id="scmManager" class="com.cinnamonbob.model.DefaultScmManager" autowire="byName"/>
+
+    <bean id="eventManager" class="com.cinnamonbob.event.DefaultEventManager" autowire="byName"/>
 
 </beans>
