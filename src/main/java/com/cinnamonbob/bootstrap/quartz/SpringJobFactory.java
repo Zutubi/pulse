@@ -1,14 +1,11 @@
 package com.cinnamonbob.bootstrap.quartz;
 
-import com.cinnamonbob.spring.SpringAutowireSupport;
+import com.cinnamonbob.bootstrap.ComponentContext;
 import org.quartz.Job;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.simpl.SimpleJobFactory;
 import org.quartz.spi.TriggerFiredBundle;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import java.util.logging.Logger;
 
@@ -16,39 +13,17 @@ import java.util.logging.Logger;
  * Use spring to autowire jobs are they are created.
  *
  */
-public class SpringJobFactory extends SimpleJobFactory implements ApplicationContextAware
+public class SpringJobFactory extends SimpleJobFactory
 {
     private static final Logger LOG = Logger.getLogger(SpringJobFactory.class.getName());
-
-    private SpringAutowireSupport autowireSupport = new SpringAutowireSupport();
 
     public Job newJob(TriggerFiredBundle bundle) throws SchedulerException
     {
         Job job = super.newJob(bundle);
 
-        autowireSupport.autoWireBean(job);
+        ComponentContext.autowire(job);
 
         return job;
-    }
-
-    public void setApplicationContext(ApplicationContext context) throws BeansException
-    {
-        autowireSupport.setApplicationContext(context);
-    }
-
-    /**
-     * Sets the autowiring strategy
-     *
-     * @param autowireStrategy
-     */
-    public void setAutowireStrategy(int autowireStrategy)
-    {
-        autowireSupport.setAutowireStrategy(autowireStrategy);
-    }
-
-    public int getAutowireStrategy()
-    {
-        return autowireSupport.getAutowireStrategy();
     }
 
     // setup: install this job factory in the scheduler. Would be nice if this

@@ -3,6 +3,7 @@ package com.cinnamonbob.bootstrap;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import com.cinnamonbob.spring.SpringAutowireSupport;
 
 /**
  * The component context is the central storage location for the systems ApplicatonContext 
@@ -13,7 +14,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 public class ComponentContext
 {
     private static ApplicationContext context = null;
-    
+
     public static ApplicationContext getContext()
     {
         return context;
@@ -42,5 +43,15 @@ public class ComponentContext
             return getContext().getBean(name);
         }
         return null;
+    }
+
+    public static void autowire(Object bean)
+    {
+        if (getContext() != null)
+        {
+            SpringAutowireSupport support = new SpringAutowireSupport();
+            support.setApplicationContext(context);
+            support.autoWireBean(bean);
+        }
     }
 }
