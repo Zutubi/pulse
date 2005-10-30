@@ -34,6 +34,11 @@ public class PostProcessorGroup implements PostProcessor
         return name;
     }
 
+    public Object getValue()
+    {
+        return this;
+    }
+
     public void setName(String name)
     {
         this.name = name;

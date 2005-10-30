@@ -8,7 +8,7 @@ import java.util.Collections;
  * 
  *
  */
-public class Recipe implements Reference
+public class Recipe implements Reference, Namespace
 {
     private String name;
 
@@ -17,6 +17,11 @@ public class Recipe implements Reference
     public String getName()
     {
         return name;
+    }
+
+    public Object getValue()
+    {
+        return this;
     }
 
     public void setName(String name)

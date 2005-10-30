@@ -8,10 +8,9 @@ import com.cinnamonbob.core.Reference;
  * 
  *
  */
-public class SimpleReference implements BobFileComponent, Reference
+public class SimpleReference implements Reference
 {
     private String name;
-    private BobFile project;
     private Reference ref;
     
     public String getName()
@@ -19,19 +18,14 @@ public class SimpleReference implements BobFileComponent, Reference
         return name;
     }
 
+    public Object getValue()
+    {
+        return this;
+    }
+
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    public BobFile getProject()
-    {
-        return project;
-    }
-
-    public void setBobFile(BobFile project)
-    {
-        this.project = project;
     }
 
     public Reference getRef()

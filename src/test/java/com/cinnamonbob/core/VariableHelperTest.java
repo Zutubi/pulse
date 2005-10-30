@@ -13,14 +13,14 @@ import java.util.Map;
 public class VariableHelperTest extends TestCase
 {
  
-    private Map<String, String> properties = null;
+    private Scope scope = null;
     
-    public void setUp()
+    public void setUp() throws FileLoadException
     {
-        properties = new HashMap<String, String>();
-        properties.put("foo", "foo");
-        properties.put("bar", "baz");
-        properties.put("a\\b", "slashed");
+        scope = new Scope();
+        scope.setReference(new Property("foo", "foo"));
+        scope.setReference(new Property("bar", "baz"));
+        scope.setReference(new Property("a\\b", "slashed"));
     }
     
     private void errorTest(String input, String expectedError)
@@ -29,7 +29,7 @@ public class VariableHelperTest extends TestCase
         
         try
         {
-            result = VariableHelper.replaceVariables(input, properties);
+            result = VariableHelper.replaceVariables(input, scope);
         }
         catch (BobException e)
         {
@@ -42,7 +42,7 @@ public class VariableHelperTest extends TestCase
     
     private void successTest(String in, String out) throws Exception
     {
-        String result = VariableHelper.replaceVariables(in, properties);
+        String result = VariableHelper.replaceVariables(in, scope);
         assertEquals(out, result);
     }
     
@@ -133,19 +133,7 @@ public class VariableHelperTest extends TestCase
 
     public void testNestedVariable() throws Exception
     {
-        properties.put("a", "${foo}");
-        successTest("${a}", "foo");
-    }
-    
-    public void testCircularReference() throws Exception
-    {
-        properties.put("1", "${2}");
-        properties.put("2", "${1}");
-        errorTest("${1}", "Variable error: could not resolve variables in input.");
-        
-        properties.put("3", "${3}");
-        errorTest("${1}", "Variable error: could not resolve variables in input.");        
-    }
-    
-    
+        scope.setReference(new Property("a", "${foo}"));
+        successTest("${a}", "${foo}");
+    }    
 }

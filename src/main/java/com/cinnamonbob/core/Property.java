@@ -5,20 +5,20 @@ package com.cinnamonbob.core;
  * 
  *
  */
-public class Property implements InitComponent, BobFileComponent
+public class Property implements Reference
 {
-    private BobFile project;
     private String name;
     private String value;
-    
-    public void init()
+
+    public Property()
     {
-        project.setProperty(name, value);
+
     }
 
-    public void setBobFile(BobFile project)
+    public Property(String name, String value)
     {
-        this.project = project;
+        this.name = name;
+        this.value = value;
     }
 
     public void setName(String name)
@@ -29,5 +29,15 @@ public class Property implements InitComponent, BobFileComponent
     public void setValue(String value)
     {
         this.value = value;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public Object getValue()
+    {
+        return value;
     }
 }

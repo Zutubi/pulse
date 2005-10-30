@@ -1,7 +1,5 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.BobRuntimeException;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -170,7 +168,7 @@ public class IntrospectionHelper
      */ 
     private interface AttributeSetter
     {
-        void set(Object parent, String value, BobFile project)
+        void set(Object parent, String value, Scope scope)
                 throws InvocationTargetException, IllegalAccessException, FileLoadException;
     }
 
@@ -187,7 +185,6 @@ public class IntrospectionHelper
      * NOTE: This method does not follow the standard bean conventions.
      *
      * @param methodName
-     * @return
      */
     private String getPropertyName(String methodName, String prefix)
     {
@@ -199,8 +196,7 @@ public class IntrospectionHelper
      * 
      * @param method
      * @param arg
-     * @return
-     */ 
+     */
     private AttributeSetter createAttributeSetter(final Method method, Class arg, final Map<String, Class> typeDefinitions)
     {
         // Simplify things by treating primities like there wrapper classes.
@@ -213,10 +209,11 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, BobFile project)
-                        throws InvocationTargetException, IllegalAccessException
+                public void set(Object parent, String value, Scope scope)
+                        throws InvocationTargetException, IllegalAccessException, FileLoadException
                 {
-                    method.invoke(parent, value);
+
+                    method.invoke(parent, VariableHelper.replaceVariables(value, scope));
                 }
             };
 
@@ -226,7 +223,7 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, BobFile project)
+                public void set(Object parent, String value, Scope scope)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     method.invoke(parent, toBoolean(value));
@@ -240,7 +237,7 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, BobFile project)
+                public void set(Object parent, String value, Scope scope)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     if (value.length() == 0)
@@ -257,7 +254,7 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, BobFile project)
+                public void set(Object parent, String value, Scope scope)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     try
@@ -274,23 +271,18 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, BobFile project)
+                public void set(Object parent, String value, Scope scope)
                         throws InvocationTargetException, IllegalAccessException, FileLoadException
                 {
                     // lookup the type object within the projects references.
-                    Reference obj = project.getReference(value);
-
-                    if (obj == null)
-                    {
-                        throw new FileLoadException("Reference to unknown entity '" + value + "'.");
-                    }
+                    Object obj = VariableHelper.replaceVariable(value, scope);
 
                     if (!reflectedArg.isAssignableFrom(obj.getClass()))
                     {
                         List<String> expectedTypes = getAssignablesForType(typeDefinitions, reflectedArg);
                         String gotType = getNameForType(typeDefinitions, obj.getClass());
 
-                        throw new FileLoadException("Referenced entity '" + value + "' has unexpected type (expected one of " + expectedTypes + ", got " + gotType + ").");
+                        throw new FileLoadException("Referenced property '" + value + "' has unexpected type (expected one of " + expectedTypes + ", got " + gotType + ").");
                     }
 
                     method.invoke(parent, obj);
@@ -335,7 +327,7 @@ public class IntrospectionHelper
 
                 return new AttributeSetter()
                 {
-                    public void set(Object parent, String value, BobFile project) throws InvocationTargetException, IllegalAccessException
+                    public void set(Object parent, String value, Scope scope) throws InvocationTargetException, IllegalAccessException
                     {
                         try
                         {
@@ -394,7 +386,7 @@ public class IntrospectionHelper
         return nestedCreators.get(name).create(parent);
     }
 
-    public void set(String name, Object parent, String value, BobFile project)
+    public void set(String name, Object parent, String value, Scope scope)
             throws IllegalAccessException, InvocationTargetException, FileLoadException
     {
         AttributeSetter setter = attributeSetters.get(name);
@@ -402,7 +394,7 @@ public class IntrospectionHelper
         {
             throw new FileLoadException("Unrecognised attribute '" + name + "'.");
         }
-        attributeSetters.get(name).set(parent, value, project);
+        attributeSetters.get(name).set(parent, value, scope);
     }
     
     public void add(String name, Object parent, Object arg) throws IllegalAccessException, InvocationTargetException

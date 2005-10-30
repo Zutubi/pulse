@@ -2,6 +2,6 @@
 <project>
     
     <reference name="a"/>    
-    <reference name="b" ref="a"/>
+    <reference name="b" ref="${a}"/>
     
 </project>

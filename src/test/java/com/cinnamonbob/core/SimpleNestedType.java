@@ -33,6 +33,11 @@ public class SimpleNestedType implements BobFileComponent, Reference
         return name;
     }
 
+    public Object getValue()
+    {
+        return this;
+    }
+
     public void setName(String name)
     {
         this.name = name;

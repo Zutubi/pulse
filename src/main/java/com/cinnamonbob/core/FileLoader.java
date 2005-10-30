@@ -3,7 +3,6 @@ package com.cinnamonbob.core;
 import com.cinnamonbob.BobException;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.core.validation.CommandValidationManager;
-import com.cinnamonbob.core.validation.CommandValidationException;
 import com.cinnamonbob.util.IOUtils;
 import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.opensymphony.xwork.validator.ValidationException;
@@ -16,20 +15,19 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 /**
  * 
  *
  */
-public class BobFileLoader
+public class FileLoader
 {
     private final Map<String, Class> typeDefinitions = new HashMap<String, Class>();
 
-    private BobFile bobFile = null;
-
     private SpringObjectFactory springFactory;
 
-    public BobFileLoader()
+    public FileLoader()
     {
     }
 
@@ -43,17 +41,17 @@ public class BobFileLoader
         return springFactory;
     }
 
-    public BobFile load(File file) throws BobException, IOException, IllegalAccessException, InvocationTargetException
+    public void load(File file, Object root) throws BobException, IOException, IllegalAccessException, InvocationTargetException
     {
-        return load(new FileInputStream(file));
+        load(new FileInputStream(file), root);
     }
 
-    public BobFile load(InputStream input) throws BobException, IOException, IllegalAccessException, InvocationTargetException
+    public void load(InputStream input, Object root) throws BobException, IOException, IllegalAccessException, InvocationTargetException
     {
-        return load(input, null);
+        load(input, root, null);
     }
 
-    public BobFile load(InputStream input, Map<String, String> properties) throws BobException, IOException, IllegalAccessException, InvocationTargetException
+    public void load(InputStream input, Object root, List<Reference> references) throws BobException, IOException, IllegalAccessException, InvocationTargetException
     {
         try
         {
@@ -64,22 +62,20 @@ public class BobFileLoader
             {
                 doc = builder.build(input);
             }
-            catch (nu.xom.ParsingException pex)
+            catch (ParsingException pex)
             {
                 throw new ParseException(pex);
             }
 
-            Element rootElement = doc.getRootElement();
-            bobFile = new BobFile();
-            
-            if(properties != null)
+            Scope globalScope = new Scope();
+            if(references != null)
             {
-                bobFile.addProperties(properties);
+                globalScope.add(references);
             }
 
-            // brief bootstraping of the loading process - can not treat bobfile like a type since
-            // it does not have a parent... it is the root afterall.
-            mapAttributesToProperties(rootElement, bobFile);
+            // brief bootstraping of the loading process
+            Element rootElement = doc.getRootElement();
+            mapAttributesToProperties(rootElement, root, globalScope);
 
             for (int index = 0; index < rootElement.getChildCount(); index++)
             {
@@ -88,10 +84,8 @@ public class BobFileLoader
                 {
                     continue;
                 }
-                loadType((Element) node, bobFile);
+                loadType((Element) node, root, globalScope);
             }
-
-            return bobFile;
         }
         finally
         {
@@ -99,7 +93,7 @@ public class BobFileLoader
         }
     }
 
-    private void loadType(Element e, Object parent) throws BobException, IllegalAccessException
+    private void loadType(Element e, Object parent, Scope scope) throws BobException, IllegalAccessException
     {
         IntrospectionHelper parentHelper = IntrospectionHelper.getHelper(parent.getClass(), typeDefinitions);
         String name = e.getLocalName();
@@ -121,6 +115,7 @@ public class BobFileLoader
                 type = create(name);
             }
 
+
             // autowire the object using the springs autowire. This provides full access to the systems
             // resources from within the type instances.
             getSpringFactory().autoWireBean(type);
@@ -128,7 +123,7 @@ public class BobFileLoader
             IntrospectionHelper typeHelper = IntrospectionHelper.getHelper(type.getClass(), typeDefinitions);
 
             // initialise attributes
-            mapAttributesToProperties(e, type);
+            mapAttributesToProperties(e, type, scope);
 
             // interface based initialisation.
             if (Reference.class.isAssignableFrom(type.getClass()))
@@ -136,18 +131,13 @@ public class BobFileLoader
                 String referenceName = ((Reference) type).getName();
                 if (referenceName != null && referenceName.length() > 0)
                 {
-                    if (bobFile.getReference(referenceName) != null)
-                    {
-                        throw new FileLoadException("An entity named '" + referenceName + "' already exists.");
-                    }
-
-                    bobFile.setReference(referenceName, (Reference) type);
+                    scope.setReference((Reference)type);
                 }
             }
 
-            if (BobFileComponent.class.isAssignableFrom(type.getClass()))
+            if (Namespace.class.isAssignableFrom(type.getClass()))
             {
-                ((BobFileComponent) type).setBobFile(bobFile);
+                scope = new Scope(scope);
             }
 
             // initialise sub-elements.
@@ -159,7 +149,7 @@ public class BobFileLoader
                 {
                     Element element = (Element) node;
                     // process type.
-                    loadType(element, type);
+                    loadType(element, type, scope);
 
                 }
                 else if (node instanceof Text)
@@ -268,7 +258,7 @@ public class BobFileLoader
         return name;
     }
 
-    private void mapAttributesToProperties(Element source, Object target) throws FileLoadException
+    private void mapAttributesToProperties(Element source, Object target, Scope scope) throws FileLoadException
     {
         IntrospectionHelper helper = IntrospectionHelper.getHelper(target.getClass(), typeDefinitions);
 
@@ -279,7 +269,7 @@ public class BobFileLoader
             try
             {
                 String propertyName = convertLocalNameToPropertyName(a.getLocalName());
-                helper.set(propertyName, target, bobFile.replaceVariables(a.getValue()), bobFile);
+                helper.set(propertyName, target, a.getValue(), scope);
             }
             catch (Exception e)
             {

@@ -15,8 +15,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -274,7 +272,7 @@ public class BuildProcessor
     private BobFile loadBobFile(File workDir, Project project) throws BuildException
     {
         // TODO: move config into file.
-        BobFileLoader loader = new BobFileLoader();
+        FileLoader loader = new FileLoader();
 
         loader.register("property", Property.class);
         loader.register("recipe", Recipe.class);
@@ -284,16 +282,19 @@ public class BuildProcessor
         loader.register("regex", RegexPostProcessor.class);
         loader.register("executable", ExecutableCommand.class);
 
-        Map<String, String> properties = new TreeMap<String, String>();
+        List<Reference> properties = new LinkedList<Reference>();
 
-        properties.put("work.dir", workDir.getAbsolutePath());
+        Property property = new Property("work.dir", workDir.getAbsolutePath());
+        properties.add(property);
 
         try
         {
+            BobFile         result = new BobFile();
             File            bob    = new File(workDir, project.getBobFile());
             FileInputStream stream = new FileInputStream(bob);
 
-            return loader.load(stream, properties);
+            loader.load(stream, result, properties);
+            return result;
         }
         catch (Exception e)
         {
