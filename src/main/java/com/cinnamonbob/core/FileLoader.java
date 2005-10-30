@@ -129,6 +129,16 @@ public class FileLoader
                 scope = new Scope(scope);
             }
 
+            if (ScopeAware.class.isAssignableFrom(type.getClass()))
+            {
+                ((ScopeAware)type).setScope(scope);
+            }
+
+            if (InitComponent.class.isAssignableFrom(type.getClass()))
+            {
+                ((InitComponent) type).initBeforeChildren();
+            }
+
             // initialise sub-elements.
             for (int index = 0; index < e.getChildCount(); index++)
             {
@@ -162,7 +172,7 @@ public class FileLoader
 
             if (InitComponent.class.isAssignableFrom(type.getClass()))
             {
-                ((InitComponent) type).init();
+                ((InitComponent) type).initAfterChildren();
             }
 
             // Apply declarative validation
@@ -226,7 +236,7 @@ public class FileLoader
             }
             catch (Exception e)
             {
-                throw new FileLoadException("Could not instantiate type '" + name + "'");
+                throw new FileLoadException("Could not instantiate type '" + name + "'. Reason: " + e.getMessage());
             }
         }
         throw new FileLoadException("Undefined type '" + name + "'");

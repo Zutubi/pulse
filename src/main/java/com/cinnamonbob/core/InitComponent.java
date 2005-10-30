@@ -6,5 +6,6 @@ package com.cinnamonbob.core;
  */
 public interface InitComponent
 {
-    void init();
+    void initBeforeChildren() throws FileLoadException;
+    void initAfterChildren();    
 }
