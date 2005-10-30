@@ -47,8 +47,9 @@
 
     <bean id="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory" autowire="byName"/>
 
-    <bean id="fileLoader" class="com.cinnamonbob.core.FileLoader" autowire="byName"/>
+    <bean id="fileLoader" class="com.cinnamonbob.core.FileLoader" autowire="byName" singleton="false"/>
 
     <bean id="resourceRepository" class="com.cinnamonbob.core.ResourceRepository" autowire="byName"/>
 
+    <bean id="buildProcessor" class="com.cinnamonbob.core.BuildProcessor" autowire="byName"/>
 </beans>

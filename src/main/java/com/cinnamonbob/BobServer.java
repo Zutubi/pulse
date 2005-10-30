@@ -44,7 +44,7 @@ public class BobServer
         shutdownService = new ShutdownService(adminPort, this);
         shutdownService.start();
 
-        buildProcessor = new BuildProcessor();
+        buildProcessor = (BuildProcessor)ComponentContext.getBean("buildProcessor");
 
         // initialise the build queue.
         buildQueue = new BuildQueue();

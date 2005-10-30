@@ -20,7 +20,7 @@ public class ResourceRepositoryTest extends BobTestCase
         repo = new ResourceRepository();
         FileLoader loader = new FileLoader();
         loader.setObjectFactory(new ObjectFactory());
-        repo.setLoader(loader);
+        repo.setFileLoader(loader);
     }
 
     protected void tearDown() throws Exception

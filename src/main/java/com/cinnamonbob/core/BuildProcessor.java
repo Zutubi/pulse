@@ -1,7 +1,6 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.BuildRequest;
-import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.scm.SCMException;
@@ -27,12 +26,13 @@ public class BuildProcessor
     private ProjectManager projectManager;
     private BuildManager   buildManager;
     private SubscriptionManager subscriptionManager;
+    private FileLoader fileLoader;
 
     public static String getBuildDirName(BuildResult result)
     {
         return String.format("%08d", Long.valueOf(result.getId()));
     }
-    
+
     public static String getCommandDirName(CommandResult result)
     {
         return Long.toString(result.getId());
@@ -41,14 +41,6 @@ public class BuildProcessor
     public static String getProjectDirName(Project project)
     {
         return Long.toString(project.getId());
-    }
-
-    public BuildProcessor()
-    {
-        // TODO make this a singleton managed by Spring??
-        projectManager = (ProjectManager)ComponentContext.getBean("projectManager");
-        buildManager = (BuildManager)ComponentContext.getBean("buildManager");
-        subscriptionManager = (SubscriptionManager)ComponentContext.getBean("subscriptionManager");
     }
 
     public BuildResult execute(BuildRequest request)
@@ -65,12 +57,12 @@ public class BuildProcessor
 
         BuildResult buildResult = new BuildResult(project.getName(), number);
         buildManager.save(buildResult);
-        
+
         File rootBuildDir = ConfigUtils.getManager().getAppConfig().getProjectRoot();
         File projectDir = new File(rootBuildDir, getProjectDirName(project));
         File buildsDir = new File(projectDir, "builds");
         File buildDir = new File(buildsDir, getBuildDirName(buildResult));
-        
+
         buildResult.commence(buildDir);
 
         try
@@ -133,7 +125,7 @@ public class BuildProcessor
             File commandOutput = new File(outputDir, getCommandDirName(result));
             result.commence(commandOutput);
             buildManager.save(buildResult);
-            
+
             try
             {
                 if(!commandOutput.mkdir())
@@ -271,17 +263,6 @@ public class BuildProcessor
 
     private BobFile loadBobFile(File workDir, Project project) throws BuildException
     {
-        // TODO: move config into file.
-        FileLoader loader = new FileLoader();
-
-        loader.register("property", Property.class);
-        loader.register("recipe", Recipe.class);
-        loader.register("def", ComponentDefinition.class);
-        loader.register("post-processor", PostProcessorGroup.class);
-        loader.register("command", CommandGroup.class);
-        loader.register("regex", RegexPostProcessor.class);
-        loader.register("executable", ExecutableCommand.class);
-
         List<Reference> properties = new LinkedList<Reference>();
 
         Property property = new Property("work.dir", workDir.getAbsolutePath());
@@ -293,12 +274,41 @@ public class BuildProcessor
             File            bob    = new File(workDir, project.getBobFile());
             FileInputStream stream = new FileInputStream(bob);
 
-            loader.load(stream, result, properties);
+            fileLoader.load(stream, result, properties);
             return result;
         }
         catch (Exception e)
         {
             throw new BuildException(e);
         }
+    }
+
+    public void setFileLoader(FileLoader fileLoader)
+    {
+        this.fileLoader = fileLoader;
+
+        // TODO: move config into file.
+        fileLoader.register("property", Property.class);
+        fileLoader.register("recipe", Recipe.class);
+        fileLoader.register("def", ComponentDefinition.class);
+        fileLoader.register("post-processor", PostProcessorGroup.class);
+        fileLoader.register("command", CommandGroup.class);
+        fileLoader.register("regex", RegexPostProcessor.class);
+        fileLoader.register("executable", ExecutableCommand.class);
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
+    }
+
+    public void setSubscriptionManager(SubscriptionManager subscriptionManager)
+    {
+        this.subscriptionManager = subscriptionManager;
     }
 }

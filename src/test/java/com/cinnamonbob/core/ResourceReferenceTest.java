@@ -16,7 +16,7 @@ public class ResourceReferenceTest extends BobTestCase
         FileLoader loader = new FileLoader();
         loader.setObjectFactory(new ObjectFactory());
         repo = new ResourceRepository();
-        repo.setLoader(loader);
+        repo.setFileLoader(loader);
         ref = new ResourceReference();
         ref.setResourceRepository(repo);
     }

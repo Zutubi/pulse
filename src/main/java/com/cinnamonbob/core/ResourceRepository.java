@@ -24,14 +24,14 @@ public class ResourceRepository implements InitializingBean
 
     private Map<String, Resource> resources = new TreeMap<String, Resource>();
 
-    private FileLoader loader;
+    private FileLoader fileLoader;
 
-    private ConfigurationManager configManager;
+    private ConfigurationManager configurationManager;
 
     public void load(InputStream input) throws IllegalAccessException, IOException, InvocationTargetException, BobException
     {
         resources.clear();
-        loader.load(input, this);
+        fileLoader.load(input, this);
     }
 
     public void addResource(Resource r)
@@ -49,9 +49,9 @@ public class ResourceRepository implements InitializingBean
         return new LinkedList<String>(resources.keySet());
     }
 
-    public void setLoader(FileLoader loader)
+    public void setFileLoader(FileLoader loader)
     {
-        this.loader = loader;
+        this.fileLoader = loader;
 
         loader.register("resource", Resource.class);
         loader.register("version", ResourceVersion.class);
@@ -72,7 +72,7 @@ public class ResourceRepository implements InitializingBean
 
     public void refresh() throws IllegalAccessException, IOException, BobException, InvocationTargetException
     {
-        File configDir = configManager.getApplicationPaths().getUserConfigRoot();
+        File configDir = configurationManager.getApplicationPaths().getUserConfigRoot();
         File resourceDef = new File(configDir, "resources.xml");
         if (resourceDef.exists())
         {
@@ -93,8 +93,8 @@ public class ResourceRepository implements InitializingBean
         }
     }
 
-    public void setConfigManager(ConfigurationManager configManager)
+    public void setConfigurationManager(ConfigurationManager configManager)
     {
-        this.configManager = configManager;
+        this.configurationManager = configManager;
     }
 }
