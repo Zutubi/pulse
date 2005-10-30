@@ -1,6 +1,7 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.ObjectFactory;
+import com.cinnamonbob.test.BobTestCase;
 import junit.framework.TestCase;
 
 import java.util.LinkedList;
@@ -10,12 +11,12 @@ import java.util.List;
  * 
  *
  */
-public class ProjectConfigurationLoaderTest extends TestCase
+public class FileLoaderTest extends BobTestCase
 {
 
     private FileLoader loader;
 
-    public ProjectConfigurationLoaderTest(String testName)
+    public FileLoaderTest(String testName)
     {
         super(testName);
     }
@@ -52,7 +53,7 @@ public class ProjectConfigurationLoaderTest extends TestCase
     public void testSimpleReference() throws Exception
     {
         SimpleRoot root = new SimpleRoot();
-        loader.load(getClass().getResourceAsStream("testSimpleReference.xml"), root);
+        loader.load(getInput("testSimpleReference"), root);
 
         Object o = root.getReference("a");
         assertNotNull(o);
@@ -65,7 +66,7 @@ public class ProjectConfigurationLoaderTest extends TestCase
     public void testResolveReference() throws Exception
     {
         SimpleRoot root = new SimpleRoot();
-        loader.load(getClass().getResourceAsStream("testResolveReference.xml"), root);
+        loader.load(getInput("testResolveReference"), root);
 
         Object a = root.getReference("a");
         assertNotNull(a);
@@ -82,7 +83,7 @@ public class ProjectConfigurationLoaderTest extends TestCase
     public void testNestedType() throws Exception
     {
         SimpleRoot root = new SimpleRoot();
-        loader.load(getClass().getResourceAsStream("testNestedType.xml"), root);
+        loader.load(getInput("testNestedType"), root);
 
         assertNotNull(root.getReference("a"));
 
@@ -94,7 +95,7 @@ public class ProjectConfigurationLoaderTest extends TestCase
     public void testNonBeanName() throws Exception
     {
         SimpleRoot root = new SimpleRoot();
-        loader.load(getClass().getResourceAsStream("testNonBeanName.xml"), root);
+        loader.load(getInput("testNonBeanName"), root);
 
         Object a = root.getReference("a");
         assertNotNull(a);
@@ -110,13 +111,13 @@ public class ProjectConfigurationLoaderTest extends TestCase
         Property property = new Property("work.dir", "/whatever");
         properties.add(property);
 
-        loader.load(getClass().getResourceAsStream("testSampleProject.xml"), bf, properties);
+        loader.load(getInput("testSampleProject"), bf, properties);
     }
 
     private List<ExecutableCommand.Arg> executableArgsHelper(int commandIndex) throws Exception
     {
         BobFile bf = new BobFile();
-        loader.load(getClass().getResourceAsStream("testExecutableArgs.xml"), bf);
+        loader.load(getInput("testExecutableArgs"), bf);
 
         List<Recipe> recipes = bf.getRecipes();
         assertEquals(recipes.size(), 1);

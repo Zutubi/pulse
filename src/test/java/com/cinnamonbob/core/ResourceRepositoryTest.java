@@ -30,7 +30,7 @@ public class ResourceRepositoryTest extends BobTestCase
 
     public void testEmptyRepo() throws Exception
     {
-        repo.load(getClass().getResourceAsStream("testEmptyRepo.xml"));
+        repo.load(getInput("testEmptyRepo"));
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);
         assertEquals(0, resources.size());
@@ -38,7 +38,7 @@ public class ResourceRepositoryTest extends BobTestCase
 
     public void testResource() throws Exception
     {
-        repo.load(getClass().getResourceAsStream("testResource.xml"));
+        repo.load(getInput("testResource"));
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);
         assertEquals(1, resources.size());
@@ -52,7 +52,7 @@ public class ResourceRepositoryTest extends BobTestCase
 
     public void testResourceWithVersion() throws Exception
     {
-        repo.load(getClass().getResourceAsStream("testResourceWithVersion.xml"));
+        repo.load(getInput("testResourceWithVersion"));
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);
         assertEquals(1, resources.size());
@@ -71,7 +71,7 @@ public class ResourceRepositoryTest extends BobTestCase
 
     public void testMultipleResources() throws Exception
     {
-        repo.load(getClass().getResourceAsStream("testMultipleResources.xml"));
+        repo.load(getInput("testMultipleResources"));
 
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);

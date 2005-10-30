@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.io.InputStream;
 
 /**
  * Base class for test cases.
@@ -30,15 +31,15 @@ public abstract class BobTestCase extends TestCase
     {
         if (a instanceof Map)
         {
-            assertEquals(msg, (Map)a, (Map)b);
+            assertEquals(msg, (Map) a, (Map) b);
         }
         else if (a instanceof List)
         {
-            assertEquals(msg, (List)a, (List)b);
+            assertEquals(msg, (List) a, (List) b);
         }
         else if (a instanceof Collection)
         {
-            assertEquals(msg, (Collection)a, (Collection)b);
+            assertEquals(msg, (Collection) a, (Collection) b);
         }
         else
         {
@@ -58,7 +59,7 @@ public abstract class BobTestCase extends TestCase
         assertEquals(msg + " [size difference]: ", a.size(), b.size());
         for (Object key : a.keySet())
         {
-            assertObjectEquals(msg + " [property '"+key.toString()+"' difference]: ", a.get(key), b.get(key));
+            assertObjectEquals(msg + " [property '" + key.toString() + "' difference]: ", a.get(key), b.get(key));
         }
     }
 
@@ -88,5 +89,10 @@ public abstract class BobTestCase extends TestCase
         {
             assertTrue(msg, b.contains(aA));
         }
+    }
+
+    protected InputStream getInput(String testName)
+    {
+        return getClass().getResourceAsStream(getClass().getSimpleName() + "." + testName + ".xml");
     }
 }

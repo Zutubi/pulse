@@ -1,15 +1,12 @@
 package com.cinnamonbob.core;
 
-import junit.framework.TestCase;
-
-import java.io.InputStream;
-
 import com.cinnamonbob.ObjectFactory;
+import com.cinnamonbob.test.BobTestCase;
 
 /**
  * <class-comment/>
  */
-public class ResourceReferenceTest extends TestCase
+public class ResourceReferenceTest extends BobTestCase
 {
     private ResourceReference ref = null;
     private ResourceRepository repo = null;
@@ -46,11 +43,6 @@ public class ResourceReferenceTest extends TestCase
 
         assertFalse(scope.containsReference("1"));
         assertFalse(scope.containsReference("3"));
-    }
-
-    private InputStream getInput(String testName)
-    {
-        return getClass().getResourceAsStream(getClass().getSimpleName() + "."+testName+".xml");
     }
 }
 
