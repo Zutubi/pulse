@@ -44,4 +44,9 @@
     <bean id="scmManager" class="com.cinnamonbob.model.DefaultScmManager" autowire="byName"/>
 
     <bean id="eventManager" class="com.cinnamonbob.event.DefaultEventManager" autowire="byName"/>
+
+    <bean id="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory" autowire="byName"/>
+
+    <bean id="fileLoader" class="com.cinnamonbob.core.FileLoader" autowire="byName"/>
+    
 </beans>

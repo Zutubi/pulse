@@ -1,10 +1,9 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.BobException;
-import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.ObjectFactory;
 import com.cinnamonbob.core.validation.CommandValidationManager;
 import com.cinnamonbob.util.IOUtils;
-import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.opensymphony.xwork.validator.ValidationException;
 import nu.xom.*;
 
@@ -14,8 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -25,20 +24,15 @@ public class FileLoader
 {
     private final Map<String, Class> typeDefinitions = new HashMap<String, Class>();
 
-    private SpringObjectFactory springFactory;
+    private ObjectFactory factory;
 
     public FileLoader()
     {
     }
 
-    private SpringObjectFactory getSpringFactory()
+    public void setObjectFactory(ObjectFactory factory)
     {
-        if (springFactory == null)
-        {
-            springFactory = new SpringObjectFactory();
-            springFactory.setApplicationContext(ComponentContext.getContext());
-        }
-        return springFactory;
+        this.factory = factory;
     }
 
     public void load(File file, Object root) throws BobException, IOException, IllegalAccessException, InvocationTargetException
@@ -68,7 +62,7 @@ public class FileLoader
             }
 
             Scope globalScope = new Scope();
-            if(references != null)
+            if (references != null)
             {
                 globalScope.add(references);
             }
@@ -115,11 +109,6 @@ public class FileLoader
                 type = create(name);
             }
 
-
-            // autowire the object using the springs autowire. This provides full access to the systems
-            // resources from within the type instances.
-            getSpringFactory().autoWireBean(type);
-
             IntrospectionHelper typeHelper = IntrospectionHelper.getHelper(type.getClass(), typeDefinitions);
 
             // initialise attributes
@@ -131,7 +120,7 @@ public class FileLoader
                 String referenceName = ((Reference) type).getName();
                 if (referenceName != null && referenceName.length() > 0)
                 {
-                    scope.setReference((Reference)type);
+                    scope.setReference((Reference) type);
                 }
             }
 
@@ -212,9 +201,9 @@ public class FileLoader
         message.append(name);
         message.append("': ");
 
-        if(element instanceof LocationAwareElement)
+        if (element instanceof LocationAwareElement)
         {
-            LocationAwareElement location = (LocationAwareElement)element;
+            LocationAwareElement location = (LocationAwareElement) element;
             message.append("starting at line ");
             message.append(location.getLineNumber());
             message.append(" column ");
@@ -233,8 +222,9 @@ public class FileLoader
         {
             try
             {
-                return clz.newInstance();
-            } catch (Exception e)
+                return factory.buildBean(clz);
+            }
+            catch (Exception e)
             {
                 throw new FileLoadException("Could not instantiate type '" + name + "'");
             }

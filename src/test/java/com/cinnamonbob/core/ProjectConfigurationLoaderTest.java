@@ -1,12 +1,10 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.ObjectFactory;
 import junit.framework.TestCase;
 
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
@@ -26,13 +24,9 @@ public class ProjectConfigurationLoaderTest extends TestCase
     {
         super.setUp();
 
-        String[] configLocations = new String[] {
-            "com/cinnamonbob/bootstrap/emptyContext.xml"
-        };
-
-        ComponentContext.addClassPathContextDefinitions(configLocations);
-
+        ObjectFactory factory = new ObjectFactory();
         loader = new FileLoader();
+        loader.setObjectFactory(factory);
 
         // initialise the loader some test objects.
         loader.register("reference", SimpleReference.class);
@@ -176,5 +170,5 @@ public class ProjectConfigurationLoaderTest extends TestCase
         assertEquals(args.get(3).getText(), "and yet more spaces");
     }
 
-    
+
 }
