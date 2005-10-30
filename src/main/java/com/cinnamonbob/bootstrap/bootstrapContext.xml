@@ -2,11 +2,15 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="startupManager" class="com.cinnamonbob.bootstrap.StartupManager">        
+    <bean id="startupManager" class="com.cinnamonbob.bootstrap.StartupManager">
+        <property name="databaseContexts">
+            <list>
+                <value>com/cinnamonbob/bootstrap/databaseContext.xml</value>
+            </list>
+        </property>
         <property name="systemContexts">
             <list>
                 <value>com/cinnamonbob/bootstrap/applicationContext.xml</value>    
-                <value>com/cinnamonbob/bootstrap/databaseContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/webworkContext.xml</value>
             </list>
         </property>  

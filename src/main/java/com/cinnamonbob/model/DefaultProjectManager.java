@@ -1,7 +1,6 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.model.persistence.ProjectDao;
-import com.cinnamonbob.scheduling.Schedule;
 
 import java.util.List;
 

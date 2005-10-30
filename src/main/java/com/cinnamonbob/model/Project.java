@@ -1,6 +1,6 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.scheduling.Schedule;
+import com.cinnamonbob.schedule.Schedule;
 
 import java.util.List;
 import java.util.LinkedList;

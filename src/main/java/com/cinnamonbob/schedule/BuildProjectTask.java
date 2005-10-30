@@ -1,7 +1,7 @@
-package com.cinnamonbob.scheduling;
+package com.cinnamonbob.schedule;
 
-import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.Entity;
+import com.cinnamonbob.model.Project;
 
 /**
  * <class-comment/>
@@ -41,5 +41,10 @@ public class BuildProjectTask extends Entity implements Task
     public void setProject(Project project)
     {
         this.project = project;
+    }
+
+    public void execute()
+    {
+
     }
 }

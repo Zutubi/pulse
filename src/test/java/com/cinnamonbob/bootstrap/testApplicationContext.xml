@@ -156,7 +156,7 @@
         </property>
     </bean>
 
-    <bean id="scheduleDaoTarget" class="com.cinnamonbob.scheduling.persistence.hibernate.HibernateScheduleDao">
+    <bean id="scheduleDaoTarget" class="com.cinnamonbob.schedule.persistence.hibernate.HibernateScheduleDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -242,7 +242,7 @@
 
     <bean id="projectManager" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
 
-    <bean id="scheduleManager" class="com.cinnamonbob.scheduling.DefaultScheduleManager" autowire="byName"/>
+    <bean id="scheduleManager" class="com.cinnamonbob.schedule.DefaultScheduleManager" autowire="byName"/>
 
     <bean id="subscriptionManager" class="com.cinnamonbob.model.DefaultSubscriptionManager" autowire="byName"/>
 

@@ -3,7 +3,7 @@ package com.cinnamonbob.model.persistence.hibernate;
 import com.cinnamonbob.model.persistence.ProjectDao;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.Svn;
-import com.cinnamonbob.scheduling.Schedule;
+import com.cinnamonbob.schedule.Schedule;
 
 /**
  * 
@@ -32,8 +32,6 @@ public class HibernateProjectDaoTest extends PersistenceTestCase
         project.addScm(svn);
         svn.setProject(project);
 
-        Schedule schedule = new Schedule();
-        project.addSchedule(schedule);
         projectDao.save(project);
 
         commitAndRefreshTransaction();

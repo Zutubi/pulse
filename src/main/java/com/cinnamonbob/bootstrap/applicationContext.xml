@@ -37,7 +37,7 @@
     
     <bean id="projectManager" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
 
-    <bean id="scheduleManager" class="com.cinnamonbob.scheduling.DefaultScheduleManager" autowire="byName"/>
+    <bean id="scheduleManager" class="com.cinnamonbob.schedule.DefaultScheduleManager" autowire="byName" init-method="init"/>
 
     <bean id="subscriptionManager" class="com.cinnamonbob.model.DefaultSubscriptionManager" autowire="byName"/>
 

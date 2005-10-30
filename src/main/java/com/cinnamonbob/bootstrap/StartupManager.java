@@ -10,7 +10,8 @@ import java.util.List;
  */
 public class StartupManager
 {
-    private List<String> contexts;
+    private List<String> systemContexts;
+    private List<String> databaseContexts;
 
     private boolean systemStarted;
     private long startTime;
@@ -24,12 +25,14 @@ public class StartupManager
 
         try
         {
-            ComponentContext.addClassPathContextDefinitions(contexts.toArray(new String[contexts.size()]));
-            
+            ComponentContext.addClassPathContextDefinitions(databaseContexts.toArray(new String[databaseContexts.size()]));
+
             // run the various bootstrap/system startup tasks.
             // initialise database.
             DatabaseBootstrap databaseBootstrap = new DatabaseBootstrap();
             databaseBootstrap.initialiseDatabase();
+
+            ComponentContext.addClassPathContextDefinitions(systemContexts.toArray(new String[systemContexts.size()]));
             
             // initialise jetty.
             JettyManager jettyManager = JettyManager.getInstance();
@@ -59,11 +62,16 @@ public class StartupManager
 
     public void setSystemContexts(List<String> contexts)
     {
-        this.contexts = contexts;
+        this.systemContexts = contexts;
     }
 
     public long getUptime()
     {
         return System.currentTimeMillis() - startTime;
+    }
+
+    public void setDatabaseContexts(List<String> contexts)
+    {
+        this.databaseContexts = contexts;
     }
 }

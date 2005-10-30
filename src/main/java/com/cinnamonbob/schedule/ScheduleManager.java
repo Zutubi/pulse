@@ -1,4 +1,4 @@
-package com.cinnamonbob.scheduling;
+package com.cinnamonbob.schedule;
 
 import com.cinnamonbob.model.Project;
 
@@ -13,9 +13,10 @@ public interface ScheduleManager
 
     Schedule getSchedule(Project project, String name);
 
-    void schedule(String name, Project project, Trigger trigger, Task task);
+    void schedule(String name, Project project, Trigger trigger, Task task) throws SchedulingException;
 
     List<Schedule> getSchedules(Project project);
 
     void delete(Schedule schedule);
+
 }

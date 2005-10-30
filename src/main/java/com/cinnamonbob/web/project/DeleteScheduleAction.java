@@ -1,6 +1,6 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.scheduling.Schedule;
+import com.cinnamonbob.schedule.Schedule;
 
 /**
  *

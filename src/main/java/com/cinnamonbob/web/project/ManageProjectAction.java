@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.scheduling.Schedule;
+import com.cinnamonbob.schedule.Schedule;
 
 /**
  * 

@@ -1,9 +1,13 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.scheduling.BuildProjectTask;
-import com.cinnamonbob.scheduling.CronTrigger;
-import com.cinnamonbob.scheduling.Schedule;
+import com.cinnamonbob.schedule.BuildProjectTask;
+import com.cinnamonbob.schedule.Schedule;
+import com.cinnamonbob.schedule.QuartzCronTrigger;
+import com.cinnamonbob.schedule.SchedulingException;
+
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  *
@@ -11,6 +15,8 @@ import com.cinnamonbob.scheduling.Schedule;
  */
 public class CreateScheduleAction extends ProjectActionSupport
 {
+    private static final Logger LOG = Logger.getLogger(CreateScheduleAction.class.getName());
+
     private long project;
     private String name;
     private String recipe;
@@ -83,12 +89,20 @@ public class CreateScheduleAction extends ProjectActionSupport
     {
         Project project = getProjectManager().getProject(getProject());
 
-        CronTrigger trigger = new CronTrigger(cronExpression);
+        QuartzCronTrigger trigger = new QuartzCronTrigger(cronExpression);
         BuildProjectTask task = new BuildProjectTask(project, recipe);
 
-        getScheduleManager().schedule(name, project, trigger, task);
+        try
+        {
+            getScheduleManager().schedule(name, project, trigger, task);
+            return SUCCESS;
+        }
+        catch (SchedulingException e)
+        {
+            LOG.log(Level.SEVERE, e.getMessage(), e);
+            return ERROR;
+        }
 
-        return SUCCESS;
     }
 
     public String doDefault()

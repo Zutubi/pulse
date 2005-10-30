@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.cinnamonbob.scheduling.Schedule" table="SCHEDULE" lazy="false">
+    <class name="com.cinnamonbob.schedule.Schedule" table="SCHEDULE" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -11,12 +11,12 @@
         <property name="name" column="NAME" type="string" not-null="true" length="255"/>
 
         <many-to-one name="project" column="PROJECTID" class="com.cinnamonbob.model.Project" not-null="false" insert="true" lazy="false" cascade="none"/>
-        <many-to-one name="trigger" column="TRIGGER" class="com.cinnamonbob.scheduling.CronTrigger" not-null="true" insert="true" lazy="false" cascade="all"/>
-        <many-to-one name="task" column="TASK" class="com.cinnamonbob.scheduling.BuildProjectTask" not-null="true" insert="true" lazy="false" cascade="all-delete-orphan"/>
+        <many-to-one name="trigger" column="TRIGGER" class="com.cinnamonbob.schedule.QuartzCronTrigger" not-null="true" insert="true" lazy="false" cascade="all"/>
+        <many-to-one name="task" column="TASK" class="com.cinnamonbob.schedule.BuildProjectTask" not-null="true" insert="true" lazy="false" cascade="all-delete-orphan"/>
 
     </class>
 
-    <class name="com.cinnamonbob.scheduling.CronTrigger" table="TRIGGER">
+    <class name="com.cinnamonbob.schedule.QuartzCronTrigger" table="QUARTZ_TRIGGER">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -26,7 +26,7 @@
 
     </class>
 
-    <class name="com.cinnamonbob.scheduling.BuildProjectTask" table="TASK">
+    <class name="com.cinnamonbob.schedule.BuildProjectTask" table="TASK">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -34,7 +34,7 @@
 
         <property name="recipe" column="RECIPE" type="string" not-null="true" length="255"/>
 
-        <many-to-one name="project" column="PROJECTID" class="com.cinnamonbob.model.Project" not-null="true" insert="true" lazy="false" cascade="none"/>
+        <many-to-one name="project" column="PROJECT" class="com.cinnamonbob.model.Project" not-null="true" insert="true" lazy="false" cascade="none"/>
 
     </class>
 
@@ -47,6 +47,13 @@
     <query name="schedule.findByProject"><![CDATA[
         from Schedule s
         where s.project = :project
+    ]]></query>
+
+    <query name="schedule.findByTrigger"><![CDATA[
+        select s
+        from Schedule s, QuartzCronTrigger t
+        where s.trigger = t
+        and t.id = :id
     ]]></query>
 
 </hibernate-mapping>
