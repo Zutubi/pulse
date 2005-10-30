@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * 
+ *
  *
  */
 public class IntrospectionHelper
@@ -21,7 +21,7 @@ public class IntrospectionHelper
     {
         Class[] primitives = {Boolean.TYPE, Byte.TYPE, Character.TYPE,
                         Short.TYPE, Integer.TYPE, Long.TYPE,
-                        Float.TYPE, Double.TYPE};        
+                        Float.TYPE, Double.TYPE};
         Class[] wrappers = {Boolean.class, Byte.class, Character.class,
                         Short.class, Integer.class, Long.class,
                         Float.class, Double.class};
@@ -36,30 +36,30 @@ public class IntrospectionHelper
     private Method addText;
 
     /**
-     * 
-     */ 
+     *
+     */
     private final Map<String, NestedCreator> nestedCreators = new HashMap<String, NestedCreator>();
 
     /**
-     * 
-     */ 
+     *
+     */
     private final Map<String, NestedAdder> nestedAdders = new HashMap<String, NestedAdder>();
 
     /**
-     * 
-     */ 
+     *
+     */
     private final Map<String, AttributeSetter> attributeSetters = new HashMap<String, AttributeSetter>();
 
     /**
-     * 
-     */ 
+     *
+     */
     private final Map<Class, NestedAdder> nestedTypeAdders = new HashMap<Class, NestedAdder>();
 
     /**
-     * 
-     */ 
+     *
+     */
     private static final Map<Class, IntrospectionHelper> helpers = new HashMap<Class, IntrospectionHelper>();
-    
+
     public static IntrospectionHelper getHelper(Class type, Map<String, Class> typeDefinitions)
     {
         if (!helpers.containsKey(type))
@@ -152,20 +152,20 @@ public class IntrospectionHelper
 
     public boolean hasAddText()
     {
-        return addText != null; 
+        return addText != null;
     }
 
     /**
-     * 
-     */ 
+     *
+     */
     private interface NestedCreator
     {
         public Object create(Object parent) throws InvocationTargetException, IllegalAccessException;
     }
 
     /**
-     * 
-     */ 
+     *
+     */
     private interface AttributeSetter
     {
         void set(Object parent, String value, Scope scope)
@@ -173,8 +173,8 @@ public class IntrospectionHelper
     }
 
     /**
-     * 
-     */ 
+     *
+     */
     private interface NestedAdder
     {
         public void add(Object parent, Object arg) throws InvocationTargetException, IllegalAccessException;
@@ -193,7 +193,7 @@ public class IntrospectionHelper
     }
 
     /**
-     * 
+     *
      * @param method
      * @param arg
      */
@@ -327,11 +327,11 @@ public class IntrospectionHelper
 
                 return new AttributeSetter()
                 {
-                    public void set(Object parent, String value, Scope scope) throws InvocationTargetException, IllegalAccessException
+                    public void set(Object parent, String value, Scope scope) throws InvocationTargetException, IllegalAccessException, FileLoadException
                     {
                         try
                         {
-                            Object attribute = c.newInstance(value);
+                            Object attribute = c.newInstance(VariableHelper.replaceVariables(value, scope));
                             method.invoke(parent, attribute);
                         } catch (InstantiationException ie)
                         {
@@ -362,7 +362,7 @@ public class IntrospectionHelper
     {
         return getTypeAdders(type).size() > 0;
     }
-    
+
     private List<NestedAdder> getTypeAdders(Class type)
     {
         List<NestedAdder> availableAdders = new LinkedList<NestedAdder>();
@@ -372,17 +372,17 @@ public class IntrospectionHelper
             {
                 availableAdders.add(nestedTypeAdders.get(c));
             }
-        }        
+        }
         return availableAdders;
     }
-    
+
     public boolean hasSetter(String name)
     {
         return attributeSetters.containsKey(name);
     }
-    
+
     public Object create(String name, Object parent) throws IllegalAccessException, InvocationTargetException
-    {        
+    {
         return nestedCreators.get(name).create(parent);
     }
 
