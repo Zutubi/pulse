@@ -162,56 +162,65 @@ public class BuildProcessor
         }
     }
 
-    private File bootstrapBuild(Project project, BuildResult result, File workDir, File resultDir) throws BuildException
+    private void bootstrapBuild(Project project, BuildResult result, File workDir, File resultDir) throws BuildException
     {
         List<Scm> scms = project.getScms();
 
-        if(scms.size() != 1)
+        if(scms.size() == 0)
         {
-            // TODO: handle 0 and multi scm
-            throw new BuildException("Multiple SCMs not yet supported!");
+            throw new BuildException("Project '" + project.getName() + "' has no SCMs configured.");
         }
 
-        Scm  scm    = scms.get(0);
-        File scmDir = new File(workDir, scm.getPath());
-
-        try
+        for(Scm scm: scms)
         {
-            SCMServer          server   = scm.createServer();
-            LinkedList<Change> changes  = new LinkedList<Change>();
-            Revision           latestRevision = server.checkout(scmDir, null, changes);
-            BuildResult previousBuildResult = buildManager.getLatestBuildResult(project.getName());
-
-            result.setRevision(latestRevision);
-            saveChanges(resultDir, changes);
+            File scmDir = new File(workDir, scm.getPath());
 
             try
             {
-                Revision previousRevision = (previousBuildResult != null) ? previousBuildResult.getRevision() : null;
-                if (previousRevision != null)
+                SCMServer server = scm.createServer();
+                LinkedList<Change> changes = new LinkedList<Change>();
+                Revision latestRevision = server.checkout(scmDir, null, changes);
+
+                saveChanges(resultDir, scm, changes);
+
+                BuildScmDetails scmDetails = new BuildScmDetails();
+                result.addScmDetails(scm.getId(), scmDetails);
+                scmDetails.setRevision(latestRevision);
+
+                try
                 {
-                    result.setChangelists(server.getChanges(previousRevision, latestRevision, ""));
+                    BuildResult previousBuildResult = buildManager.getLatestBuildResult(project.getName());
+
+                    if(previousBuildResult != null)
+                    {
+                        BuildScmDetails previousScmDetails = previousBuildResult.getScmDetails(scm.getId());
+                        if(previousScmDetails != null)
+                        {
+                            Revision previousRevision = previousScmDetails.getRevision();
+                            if (previousRevision != null)
+                            {
+                                scmDetails.setChangelists(server.getChanges(previousRevision, latestRevision, ""));
+                            }
+                        }
+                    }
+                }
+                catch (SCMException e)
+                {
+                    // TODO: need to report this failure to the user. However,
+                    // this is not fatal to the current build
+                    LOG.log(Level.WARNING, "Unable to retrieve changelist details from Scm server. ", e);
                 }
             }
-            catch (SCMException e)
+            catch(SCMException e)
             {
-                // TODO: need to report this failure to the user. However,
-                // this is not fatal to the current build
-                LOG.log(Level.WARNING, "Unable to retrieve changelist details from Scm server. ", e);
+                throw new BuildException(e);
             }
         }
-        catch(SCMException e)
-        {
-            throw new BuildException(e);
-        }
-
-        return scmDir;
     }
 
-    private void saveChanges(File outputDir, LinkedList<Change> changes)
+    private void saveChanges(File outputDir, Scm scm, LinkedList<Change> changes)
     {
-        // TODO: name needs to change for multi-scm
-        File       output = new File(outputDir, "changes");
+        File       output = new File(outputDir, String.format("%d", Long.valueOf(scm.getId())) + ".changes");
         FileWriter writer = null;
 
         try

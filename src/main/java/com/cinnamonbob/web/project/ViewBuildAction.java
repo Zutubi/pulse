@@ -69,7 +69,7 @@ public class ViewBuildAction extends ProjectActionSupport
             }
         }
 
-        changes = result.getChangelists();
+        //changes = result.getChangelists();
 
         return SUCCESS;
     }

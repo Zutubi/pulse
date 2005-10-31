@@ -52,8 +52,11 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         BuildResult buildResult = new BuildResult("project", 11);
         buildResult.commence(new File("/tmp/buildout"));
         buildResult.complete();
-        buildResult.setRevision(new NumericalRevision(42));
         buildResult.add(result);
+
+        BuildScmDetails scmDetails = new BuildScmDetails();
+        buildResult.addScmDetails(1, scmDetails);
+        scmDetails.setRevision(new NumericalRevision(42));
 
         Revision revision = new NumericalRevision(12345);
         revision.setDate(Calendar.getInstance().getTime());
@@ -65,7 +68,7 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         changes.addChange(new Change("/filename.2", "2.0", Change.Action.DELETE));
         changes.addChange(new Change("/filename.3", "3.0", Change.Action.EDIT));
 
-        buildResult.add(changes);
+        scmDetails.add(changes);
 
         buildResultDao.save(buildResult);
         commitAndRefreshTransaction();
@@ -79,9 +82,17 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         assertEquals(buildResult.getProjectName(), anotherBuildResult.getProjectName());
         assertEquals(buildResult.getState(), anotherBuildResult.getState());
         assertEquals(buildResult.getStamps(), anotherBuildResult.getStamps());
-        assertEquals(buildResult.getRevision(), anotherBuildResult.getRevision());
-        assertEquals(anotherBuildResult.getCommandResults().size(), 1);
 
+        assertEquals(buildResult.getScmDetails().size(), 1);
+        BuildScmDetails anotherScmDetails = anotherBuildResult.getScmDetails(1);
+        assertNotNull(anotherScmDetails);
+        assertEquals(scmDetails.getRevision(), anotherScmDetails.getRevision());
+        assertEquals(1, anotherScmDetails.getChangelists().size());
+
+        Changelist otherChanges = anotherScmDetails.getChangelists().get(0);
+        assertEquals(3, otherChanges.getChanges().size());
+
+        assertEquals(anotherBuildResult.getCommandResults().size(), 1);
         CommandResult anotherResult = anotherBuildResult.getCommandResults().get(0);
         assertEquals(result.getCommandName(), anotherResult.getCommandName());
         assertEquals(result.getStamps(), anotherResult.getStamps());
@@ -102,9 +113,5 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         assertEquals(feature.getSummary(), otherPlain.getSummary());
         assertEquals(feature.getLineNumber(), otherPlain.getLineNumber());
 
-        assertEquals(1, anotherBuildResult.getChangelists().size());
-
-        Changelist otherChanges = anotherBuildResult.getChangelists().get(0);
-        assertEquals(3, otherChanges.getChanges().size());
     }
 }

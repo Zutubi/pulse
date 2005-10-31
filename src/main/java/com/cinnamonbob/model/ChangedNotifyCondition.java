@@ -14,18 +14,21 @@ public class ChangedNotifyCondition implements NotifyCondition
     public ChangedNotifyCondition()
     {
     }
-    
+
     /**
      * @see NotifyCondition#satisfied(com.cinnamonbob.model.BuildResult)
      */
     public boolean satisfied(BuildResult result)
     {
         // look for a change.
-        for (Changelist changelist : result.getChangelists())
+        for (BuildScmDetails scmDetails: result.getScmDetails().values())
         {
-            if (changelist.getChanges().size() > 0)
+            for (Changelist changelist : scmDetails.getChangelists())
             {
-                return true;
+                if (changelist.getChanges().size() > 0)
+                {
+                    return true;
+                }
             }
         }
         return false;
