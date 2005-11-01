@@ -53,5 +53,8 @@
 
     <bean id="buildProcessor" class="com.cinnamonbob.core.BuildProcessor" autowire="byName"/>
 
+    <bean id="serverBuildProcessor" class="com.cinnamonbob.ServerBuildProcessor" autowire="byName"/>
+
     <bean id="buildQueue" class="com.cinnamonbob.BuildQueue" autowire="byName"/>
+
 </beans>

@@ -4,7 +4,6 @@ import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.bootstrap.SystemBootstrapManager;
-import com.cinnamonbob.core.BuildProcessor;
 import com.cinnamonbob.model.ProjectManager;
 
 import java.net.InetAddress;
@@ -25,7 +24,7 @@ public class BobServer
     private ShutdownService shutdownService = null;
 
     private static BuildQueue buildQueue = null;
-    private BuildProcessor buildProcessor = null;
+    private ServerBuildProcessor serverBuildProcessor = null;
 
     public BobServer()
     {
@@ -44,7 +43,7 @@ public class BobServer
         shutdownService = new ShutdownService(adminPort, this);
         shutdownService.start();
 
-        buildProcessor = (BuildProcessor)ComponentContext.getBean("buildProcessor");
+        serverBuildProcessor = (ServerBuildProcessor)ComponentContext.getBean("serverBuildProcessor");
 
         // initialise the build queue.
         buildQueue = (BuildQueue)ComponentContext.getBean("buildQueue");
@@ -52,7 +51,7 @@ public class BobServer
         {
             public void dispatch(BuildRequest request)
             {
-                buildProcessor.execute(request);
+                serverBuildProcessor.execute(request);
             }
         });
         
