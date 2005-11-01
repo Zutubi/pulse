@@ -183,9 +183,7 @@ public class BuildProcessor
 
                 saveChanges(resultDir, scm, changes);
 
-                BuildScmDetails scmDetails = new BuildScmDetails();
-                result.addScmDetails(scm.getId(), scmDetails);
-                scmDetails.setRevision(latestRevision);
+                List<Changelist> scmChanges = null;
 
                 try
                 {
@@ -199,7 +197,7 @@ public class BuildProcessor
                             Revision previousRevision = previousScmDetails.getRevision();
                             if (previousRevision != null)
                             {
-                                scmDetails.setChangelists(server.getChanges(previousRevision, latestRevision, ""));
+                                scmChanges = server.getChanges(previousRevision, latestRevision, "");
                             }
                         }
                     }
@@ -210,6 +208,9 @@ public class BuildProcessor
                     // this is not fatal to the current build
                     LOG.log(Level.WARNING, "Unable to retrieve changelist details from Scm server. ", e);
                 }
+
+                BuildScmDetails scmDetails = new BuildScmDetails(scm.getName(), latestRevision, scmChanges);
+                result.addScmDetails(scm.getId(), scmDetails);
             }
             catch(SCMException e)
             {

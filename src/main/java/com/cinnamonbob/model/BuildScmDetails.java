@@ -9,16 +9,38 @@ import java.util.List;
  */
 public class BuildScmDetails extends Entity
 {
+    private String scmName;
     private Revision revision;
     private List<Changelist> changelists;
 
+    public BuildScmDetails()
+    {
+
+    }
+
+    public BuildScmDetails(String scmName, Revision revision, List<Changelist> changelists)
+    {
+        this.scmName = scmName;
+        this.revision = revision;
+        this.changelists = changelists;
+    }
+
+    public String getScmName()
+    {
+        return scmName;
+    }
+
+    private void setScmName(String scmName)
+    {
+        this.scmName = scmName;
+    }
 
     public Revision getRevision()
     {
         return revision;
     }
 
-    public void setRevision(Revision revision)
+    private void setRevision(Revision revision)
     {
         this.revision = revision;
     }
@@ -32,7 +54,7 @@ public class BuildScmDetails extends Entity
         return changelists;
     }
 
-    public void setChangelists(List<Changelist> changelists)
+    private void setChangelists(List<Changelist> changelists)
     {
         this.changelists = changelists;
     }

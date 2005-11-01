@@ -43,6 +43,8 @@
             <generator class="hilo"/>
         </id>
 
+        <property name="scmName" type="string" length="255"/>
+
         <many-to-one name="revision" class="com.cinnamonbob.model.Revision" column="REVISION_ID" cascade="all" unique="true"/>
 
         <list name="changelists" cascade="all-delete-orphan" lazy="false">

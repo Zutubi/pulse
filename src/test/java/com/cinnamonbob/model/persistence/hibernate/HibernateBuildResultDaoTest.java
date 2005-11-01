@@ -54,9 +54,8 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         buildResult.complete();
         buildResult.add(result);
 
-        BuildScmDetails scmDetails = new BuildScmDetails();
+        BuildScmDetails scmDetails = new BuildScmDetails("my scm", new NumericalRevision(42), null);
         buildResult.addScmDetails(1, scmDetails);
-        scmDetails.setRevision(new NumericalRevision(42));
 
         Revision revision = new NumericalRevision(12345);
         revision.setDate(Calendar.getInstance().getTime());
@@ -86,6 +85,7 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         assertEquals(buildResult.getScmDetails().size(), 1);
         BuildScmDetails anotherScmDetails = anotherBuildResult.getScmDetails(1);
         assertNotNull(anotherScmDetails);
+        assertEquals(scmDetails.getScmName(), anotherScmDetails.getScmName());
         assertEquals(scmDetails.getRevision(), anotherScmDetails.getRevision());
         assertEquals(1, anotherScmDetails.getChangelists().size());
 
