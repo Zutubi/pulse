@@ -52,4 +52,6 @@
     <bean id="resourceRepository" class="com.cinnamonbob.core.ResourceRepository" autowire="byName"/>
 
     <bean id="buildProcessor" class="com.cinnamonbob.core.BuildProcessor" autowire="byName"/>
+
+    <bean id="buildQueue" class="com.cinnamonbob.BuildQueue" autowire="byName"/>
 </beans>

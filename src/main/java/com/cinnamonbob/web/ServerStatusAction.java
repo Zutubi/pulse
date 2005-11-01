@@ -1,9 +1,6 @@
 package com.cinnamonbob.web;
 
-import java.util.Map;
-
-import com.cinnamonbob.BobServer;
-import com.opensymphony.xwork.ActionContext;
+import com.cinnamonbob.BuildQueue;
 import com.opensymphony.xwork.ActionSupport;
 
 /**
@@ -16,23 +13,23 @@ public class ServerStatusAction extends ActionSupport
     /**
      * 
      */
-	private BobServer server;
+    private BuildQueue buildQueue;
 
 	/**
      * Populates the action.
 	 */
 	public String execute()
 	{
-		Map app = (Map)ActionContext.getContext().get("application");
-		server = (BobServer)app.get("server");
 		return SUCCESS;
 	}
-	
-	/**
-     * @return a reference to the server
-	 */
-	public BobServer getServer()
-	{
-		return server;
-	}
+
+    public BuildQueue getBuildQueue()
+    {
+        return buildQueue;
+    }
+
+    public void setBuildQueue(BuildQueue buildQueue)
+    {
+        this.buildQueue = buildQueue;
+    }
 }

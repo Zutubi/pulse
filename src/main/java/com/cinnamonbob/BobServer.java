@@ -47,7 +47,7 @@ public class BobServer
         buildProcessor = (BuildProcessor)ComponentContext.getBean("buildProcessor");
 
         // initialise the build queue.
-        buildQueue = new BuildQueue();
+        buildQueue = (BuildQueue)ComponentContext.getBean("buildQueue");
         buildQueue.setDispatcher(new BuildDispatcher()
         {
             public void dispatch(BuildRequest request)

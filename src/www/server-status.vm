@@ -12,8 +12,8 @@
     <div class="command-content">
       <table>
         <tr><th class="command-detail">project</th><th class="command-detail">requested</th></tr>
-#foreach($buildRequest in $server.BuildQueue.iterator())
-        <tr><td class="build-info"><a href="viewProject.action?name=$buildRequest.ProjectName">$buildRequest.ProjectName</a></td><td class="build-info">$buildRequest.When</td></tr>
+#foreach($buildRequest in $buildQueue.iterator())
+        <tr><td class="build-info"><a href="viewProject.action?name=$buildRequest.projectName">$buildRequest.projectName</a></td><td class="build-info">$buildRequest.when</td></tr>
 #end
       </table>
     </div>
