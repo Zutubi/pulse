@@ -1,21 +1,22 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.BobServer;
+import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.core.model.BuildResult;
 import com.cinnamonbob.core.renderer.BuildResultRenderer;
-import com.cinnamonbob.core.renderer.VelocityBuildResultRenderer;
-
-import java.io.StringWriter;
-import java.util.Date;
-import java.util.Properties;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.StringWriter;
+import java.util.Date;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -28,11 +29,8 @@ public class EmailContactPoint extends ContactPoint
     private static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
     private static final String SMTP_FROM_PROPERTY = "mail.smtp.from";
 
-    private BuildResultRenderer renderer;
-    
     public EmailContactPoint()
     {
-        renderer = new VelocityBuildResultRenderer();
     }
 
     public String getEmail()
@@ -46,7 +44,7 @@ public class EmailContactPoint extends ContactPoint
     }
 
     /* (non-Javadoc)
-    * @see com.cinnamonbob.core.ContactPoint#notify(com.cinnamonbob.model.BuildResult)
+    * @see com.cinnamonbob.core.ContactPoint#notify(com.cinnamonbob.core.model.BuildResult)
     */
     public void notify(Project project, BuildResult result)
     {
@@ -57,7 +55,8 @@ public class EmailContactPoint extends ContactPoint
     private String renderResult(Project project, BuildResult result)
     {
         StringWriter w = new StringWriter();
-        renderer.render(project, result, BuildResultRenderer.TYPE_PLAIN, w);
+        BuildResultRenderer renderer = (BuildResultRenderer) ComponentContext.getBean("buildResultRenderer");
+        renderer.render(BobServer.getHostURL(), project.getName(), project.getId(), result, BuildResultRenderer.TYPE_PLAIN, w);
         return  w.toString();
     }
     
@@ -99,6 +98,6 @@ public class EmailContactPoint extends ContactPoint
             LOG.log(Level.WARNING, "Unable to send email", e);
         }
     }
-    
-    
+
+
 }

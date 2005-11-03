@@ -1,6 +1,6 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.util.IOUtils;
+import com.cinnamonbob.core.util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,8 +1,8 @@
 package com.cinnamonbob.core;
 
-import java.io.File;
+import com.cinnamonbob.core.model.CommandResult;
 
-import com.cinnamonbob.model.CommandResult;
+import java.io.File;
 
 /**
  * 

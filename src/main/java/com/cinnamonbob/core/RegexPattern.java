@@ -1,9 +1,9 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.model.Feature;
+
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import com.cinnamonbob.model.Feature;
 
 /**
  * 

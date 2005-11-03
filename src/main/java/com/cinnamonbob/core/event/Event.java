@@ -1,4 +1,4 @@
-package com.cinnamonbob.event;
+package com.cinnamonbob.core.event;
 
 /**
  * <class-comment/>

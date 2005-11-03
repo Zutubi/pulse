@@ -1,8 +1,8 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.model.CvsRevision;
-import com.cinnamonbob.model.Change;
-import com.cinnamonbob.model.Changelist;
+import com.cinnamonbob.core.model.Change;
+import com.cinnamonbob.core.model.Changelist;
+import com.cinnamonbob.core.model.CvsRevision;
 import com.cinnamonbob.model.persistence.ChangelistDao;
 
 import java.util.Calendar;

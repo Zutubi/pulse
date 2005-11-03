@@ -1,9 +1,9 @@
-package com.cinnamonbob.event;
+package com.cinnamonbob.core.event;
 
 import junit.framework.TestCase;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <class-comment/>

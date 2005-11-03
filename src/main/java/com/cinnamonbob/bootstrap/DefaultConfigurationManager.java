@@ -1,12 +1,12 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.util.IOUtils;
+import com.cinnamonbob.core.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 

@@ -1,14 +1,14 @@
 package com.cinnamonbob.core;
 
-import java.util.List;
-import java.util.LinkedList;
+import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.StoredArtifact;
+import com.cinnamonbob.core.util.IOUtils;
+import com.opensymphony.util.TextUtils;
+
 import java.io.File;
 import java.io.IOException;
-
-import com.cinnamonbob.model.CommandResult;
-import com.cinnamonbob.model.StoredArtifact;
-import com.cinnamonbob.util.IOUtils;
-import com.opensymphony.util.TextUtils;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**

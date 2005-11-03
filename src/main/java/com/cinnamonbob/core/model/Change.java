@@ -1,4 +1,4 @@
-package com.cinnamonbob.model;
+package com.cinnamonbob.core.model;
 
 /**
  * A trivial implementation of the Change interface.

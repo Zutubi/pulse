@@ -4,14 +4,15 @@ import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.core.BuildEvent;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.BuildProcessor;
-import com.cinnamonbob.event.Event;
-import com.cinnamonbob.event.EventListener;
-import com.cinnamonbob.event.EventManager;
+import com.cinnamonbob.core.event.Event;
+import com.cinnamonbob.core.event.EventListener;
+import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.core.model.*;
+import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
-import com.cinnamonbob.util.FileSystemUtils;
-import com.cinnamonbob.util.IOUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -43,7 +44,7 @@ public class ServerBuildProcessor implements EventListener
             return null;
         }
 
-        // allocate a build result to this request.
+        // allocate a build model to this request.
         long number = buildManager.getNextBuildNumber(project.getName());
 
         BuildResult buildResult = new BuildResult(project.getName(), number);

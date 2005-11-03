@@ -1,7 +1,5 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.BobException;
-
 /**
  * 
  *

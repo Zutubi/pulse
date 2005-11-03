@@ -1,4 +1,4 @@
-package com.cinnamonbob.model;
+package com.cinnamonbob.core.model;
 
 public enum ResultState
 {

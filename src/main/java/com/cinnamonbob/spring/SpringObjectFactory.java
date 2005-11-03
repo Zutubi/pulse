@@ -1,7 +1,7 @@
 package com.cinnamonbob.spring;
 
-import com.cinnamonbob.ObjectFactory;
 import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.core.ObjectFactory;
 
 /**
  * <class-comment/>

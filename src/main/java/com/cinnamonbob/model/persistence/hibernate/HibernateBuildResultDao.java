@@ -1,9 +1,8 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Logger;
-
+import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.core.model.ResultState;
+import com.cinnamonbob.model.persistence.BuildResultDao;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -11,9 +10,9 @@ import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.ResultState;
-import com.cinnamonbob.model.persistence.BuildResultDao;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Logger;
 
 public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> implements BuildResultDao
 {
@@ -30,7 +29,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return (List)getHibernateTemplate().execute(new HibernateCallback(){
             public Object doInHibernate(Session session) throws HibernateException, SQLException
             {
-                Query queryObject = session.createQuery("from BuildResult result where result.projectName = :project and result.stateName != :initial order by id desc");
+                Query queryObject = session.createQuery("from BuildResult model where model.projectName = :project and model.stateName != :initial order by id desc");
                 queryObject.setParameter("project", project, Hibernate.STRING);
                 queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
                 queryObject.setMaxResults(max);
@@ -47,7 +46,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         List results = (List)getHibernateTemplate().execute(new HibernateCallback(){
             public Object doInHibernate(Session session) throws HibernateException, SQLException
             {
-                Query queryObject = session.createQuery("from BuildResult result where result.projectName = :project and result.number = :number");
+                Query queryObject = session.createQuery("from BuildResult model where model.projectName = :project and model.number = :number");
                 queryObject.setParameter("project", project, Hibernate.STRING);
                 queryObject.setParameter("number", number, Hibernate.LONG);
 

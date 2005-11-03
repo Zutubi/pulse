@@ -1,6 +1,6 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.util.IOUtils;
+import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.util.JDBCUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;

@@ -1,6 +1,6 @@
 package com.cinnamonbob.shell;
 
-import com.cinnamonbob.util.Constants;
+import com.cinnamonbob.core.util.Constants;
 
 import java.io.*;
 import java.util.logging.Level;

@@ -3,16 +3,13 @@
  */
 package com.cinnamonbob.scm.cvs;
 
-import com.cinnamonbob.util.FileSystemUtils;
-import com.cinnamonbob.model.CvsRevision;
-import com.cinnamonbob.model.Changelist;
+import com.cinnamonbob.core.model.CvsRevision;
+import com.cinnamonbob.core.util.FileSystemUtils;
 import junit.framework.TestCase;
+import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.List;
-
-import org.netbeans.lib.cvsclient.util.Logger;
 
 public class CvsServerTest extends TestCase
 {

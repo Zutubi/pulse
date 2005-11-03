@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.cinnamonbob.model.CommandResult" table="COMMAND_RESULT" lazy="false">
+    <class name="com.cinnamonbob.core.model.CommandResult" table="COMMAND_RESULT" lazy="false">
 
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -26,7 +26,7 @@
         <list name="artifacts" cascade="all-delete-orphan">
             <key column="COMMAND_RESULT_ID"/>
             <index column="POSITION"/>
-            <one-to-many class="com.cinnamonbob.model.StoredArtifact"/>
+            <one-to-many class="com.cinnamonbob.core.model.StoredArtifact"/>
         </list>
         
     </class>

@@ -1,8 +1,8 @@
 package com.cinnamonbob.scm;
 
-import com.cinnamonbob.model.Revision;
-import com.cinnamonbob.model.Changelist;
-import com.cinnamonbob.model.Change;
+import com.cinnamonbob.core.model.Change;
+import com.cinnamonbob.core.model.Changelist;
+import com.cinnamonbob.core.model.Revision;
 
 import java.io.File;
 import java.util.List;
@@ -32,12 +32,12 @@ public interface SCMServer
     /**
      * Returns a list of changelists occuring in between the given revisions.
      * The changelist that created the from revision itself is NOT included in
-     * the result.
+     * the model.
      * 
      * @param from
-     *        the revision before the first changelist to include in the result
+     *        the revision before the first changelist to include in the model
      * @param to
-     *        the last revision to include in the result
+     *        the last revision to include in the model
      * @param paths
      *        an array of paths to restrict the query to, relative to the root
      *        of this connection to the server (a path of "" will include all

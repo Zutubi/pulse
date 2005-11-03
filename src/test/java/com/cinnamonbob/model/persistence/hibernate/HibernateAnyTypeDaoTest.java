@@ -3,15 +3,15 @@
  */
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.model.persistence.AnyTypeDao;
-import com.cinnamonbob.model.persistence.ObjectHandle;
+import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.core.model.Entity;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.Entity;
+import com.cinnamonbob.model.persistence.AnyTypeDao;
+import com.cinnamonbob.model.persistence.ObjectHandle;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 public class HibernateAnyTypeDaoTest extends PersistenceTestCase
 {

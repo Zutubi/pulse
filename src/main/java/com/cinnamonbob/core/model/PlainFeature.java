@@ -1,5 +1,4 @@
-package com.cinnamonbob.model;
-
+package com.cinnamonbob.core.model;
 
 public class PlainFeature extends Feature
 {
@@ -8,16 +7,16 @@ public class PlainFeature extends Feature
      */
     private long lineNumber;
 
-    
+
     public PlainFeature()
     {
-        
+
     }
-    
+
     public PlainFeature(Level level, String summary, long lineNumber)
     {
         super(level, summary);
-        
+
         this.lineNumber = lineNumber;
     }
 
@@ -26,7 +25,7 @@ public class PlainFeature extends Feature
     {
         return lineNumber;
     }
-    
+
     private void setLineNumber(long line)
     {
         lineNumber = line;

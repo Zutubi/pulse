@@ -1,7 +1,6 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.test.BobTestCase;
-import com.cinnamonbob.ObjectFactory;
 
 import java.util.List;
 import java.util.Map;

@@ -1,6 +1,7 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.model.*;
+import com.cinnamonbob.core.model.*;
+import com.cinnamonbob.model.Project;
 
 import java.util.Iterator;
 import java.util.List;
@@ -69,7 +70,7 @@ public class ViewBuildAction extends ProjectActionSupport
             }
         }
 
-        //changes = result.getChangelists();
+        //changes = model.getChangelists();
 
         return SUCCESS;
     }

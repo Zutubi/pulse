@@ -1,5 +1,7 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.core.model.BuildResult;
+
 /**
  *
  */

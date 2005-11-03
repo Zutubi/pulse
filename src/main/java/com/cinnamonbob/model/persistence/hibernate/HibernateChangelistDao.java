@@ -1,7 +1,7 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
+import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.model.persistence.ChangelistDao;
-import com.cinnamonbob.model.Changelist;
 
 /**
  * Created by IntelliJ IDEA.

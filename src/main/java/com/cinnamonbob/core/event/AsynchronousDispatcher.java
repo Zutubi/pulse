@@ -1,4 +1,4 @@
-package com.cinnamonbob.event;
+package com.cinnamonbob.core.event;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;

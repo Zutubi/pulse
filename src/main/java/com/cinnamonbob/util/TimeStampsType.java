@@ -1,7 +1,8 @@
 package com.cinnamonbob.util;
 
-import org.hibernate.HibernateException;
+import com.cinnamonbob.core.util.TimeStamps;
 import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.type.Type;
 import org.hibernate.usertype.CompositeUserType;

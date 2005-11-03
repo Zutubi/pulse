@@ -1,8 +1,8 @@
-package com.cinnamonbob.util;
+package com.cinnamonbob.core.util;
 
 import java.io.*;
-import java.net.Socket;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Properties;
 
 /**

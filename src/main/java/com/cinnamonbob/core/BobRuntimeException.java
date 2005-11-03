@@ -1,15 +1,15 @@
-package com.cinnamonbob;
+package com.cinnamonbob.core;
 
 /**
  * 
  *
  */
-public class BobException extends Exception
+public class BobRuntimeException extends RuntimeException
 {
     /**
      * @param errorMessage
      */
-    public BobException(String errorMessage)
+    public BobRuntimeException(String errorMessage)
     {
         super(errorMessage);
     }
@@ -17,7 +17,7 @@ public class BobException extends Exception
     /**
      * 
      */
-    public BobException()
+    public BobRuntimeException()
     {
         super();
     }
@@ -25,7 +25,7 @@ public class BobException extends Exception
     /**
      * @param cause
      */
-    public BobException(Throwable cause)
+    public BobRuntimeException(Throwable cause)
     {
         super(cause);
     }
@@ -34,9 +34,10 @@ public class BobException extends Exception
      * @param errorMessage
      * @param cause
      */
-    public BobException(String errorMessage, Throwable cause)
+    public BobRuntimeException(String errorMessage, Throwable cause)
     {
         super(errorMessage, cause);
     }
+
 
 }

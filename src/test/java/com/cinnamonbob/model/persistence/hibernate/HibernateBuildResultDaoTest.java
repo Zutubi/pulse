@@ -1,7 +1,8 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.core.FileArtifact;
-import com.cinnamonbob.model.*;
+import com.cinnamonbob.core.model.*;
+import com.cinnamonbob.model.NumericalRevision;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 
 import java.io.File;

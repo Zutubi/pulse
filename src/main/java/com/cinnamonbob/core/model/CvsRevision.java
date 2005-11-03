@@ -1,8 +1,8 @@
-package com.cinnamonbob.model;
+package com.cinnamonbob.core.model;
 
-import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * The cvs revision is a composite of information used to identify a

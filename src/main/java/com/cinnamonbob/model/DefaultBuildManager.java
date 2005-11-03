@@ -1,9 +1,11 @@
 package com.cinnamonbob.model;
 
-import java.util.List;
-
+import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.model.persistence.ArtifactDao;
 import com.cinnamonbob.model.persistence.BuildResultDao;
+
+import java.util.List;
 
 /**
  * 
@@ -18,12 +20,12 @@ public class DefaultBuildManager implements BuildManager
     {
         buildResultDao = dao;
     }
-    
+
     public void setArtifactDao(ArtifactDao dao)
     {
         artifactDao = dao;
     }
-    
+
     public void save(BuildResult BuildResult)
     {
         buildResultDao.save(BuildResult);

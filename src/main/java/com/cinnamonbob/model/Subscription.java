@@ -1,5 +1,8 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.core.model.Entity;
+
 /**
  * A subscription is a mapping from a project event to a contact point.  When
  * the event occurs, notifiaction is sent to the contact point.
@@ -81,18 +84,18 @@ public class Subscription extends Entity
 
     /**
      * Indicates if the conditions for notifying the contact point are
-     * satisfied by the given build result.
+     * satisfied by the given build model.
      * 
      * @param result
-     *        the build result to test the properties of
-     * @return true iff the contact point should be notified for this result
+     *        the build model to test the properties of
+     * @return true iff the contact point should be notified for this model
      */
     public boolean conditionSatisfied(BuildResult result)
     {
         NotifyCondition nc = NotifyConditionFactory.getInstance(condition);
         return nc.satisfied(result);
     }
-    
+
     /**
      * Sets the given condition as that which must be satisfied before the
      * contact point should be notified.

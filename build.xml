@@ -6,6 +6,8 @@
     <property name="version" value="dev"/>
 
     <property name="bob.jar" value="bob-${version}.jar"/>
+
+    <property name="core.jar" value="bob-core-${version}.jar"/>
     
     <path id="lib.path">
         <fileset dir="lib">
@@ -83,6 +85,10 @@
 
     <target name="jar" depends="build">
         <jar file="build/${bob.jar}" basedir="build/java/classes"/>
+    </target>
+
+    <target name="core-jar" depends="build">
+        <jar file="build/${core.jar}" basedir="build/java/classes" includes="com/cinnamonbob/core/"/>
     </target>
 
     <target name="package" depends="jar">

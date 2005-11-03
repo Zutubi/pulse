@@ -1,11 +1,11 @@
 package com.cinnamonbob.schedule;
 
-import org.quartz.Scheduler;
+import com.cinnamonbob.core.model.Entity;
+import static com.cinnamonbob.schedule.QuartzSupport.WRAPPER_GROUP;
+import static com.cinnamonbob.schedule.QuartzSupport.WRAPPER_NAME;
 import org.quartz.CronTrigger;
+import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import com.cinnamonbob.model.Entity;
-
-import static com.cinnamonbob.schedule.QuartzSupport.*;
 
 import java.text.ParseException;
 

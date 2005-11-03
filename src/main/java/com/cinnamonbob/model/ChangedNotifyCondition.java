@@ -1,5 +1,9 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.core.model.BuildScmDetails;
+import com.cinnamonbob.core.model.Changelist;
+
 /**
  * 
  *
@@ -16,7 +20,7 @@ public class ChangedNotifyCondition implements NotifyCondition
     }
 
     /**
-     * @see NotifyCondition#satisfied(com.cinnamonbob.model.BuildResult)
+     * @see NotifyCondition#satisfied(com.cinnamonbob.core.model.BuildResult)
      */
     public boolean satisfied(BuildResult result)
     {

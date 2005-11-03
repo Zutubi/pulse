@@ -1,9 +1,8 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.model.CommandResult;
-import com.cinnamonbob.model.ResultState;
-import com.cinnamonbob.util.FileSystemUtils;
+import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.ResultState;
+import com.cinnamonbob.core.util.FileSystemUtils;
 import junit.framework.TestCase;
 
 import java.io.File;

@@ -1,8 +1,8 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.model.CommandResult;
-import com.cinnamonbob.model.StoredArtifact;
-import com.cinnamonbob.util.IOUtils;
+import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.StoredArtifact;
+import com.cinnamonbob.core.util.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -80,7 +80,7 @@ public class ExecutableCommand implements Command
                 cmdResult.getProperties().put("working directory", builder.directory().getAbsolutePath());
             }
             
-            // TODO awkward to add this stored artifact to the result...
+            // TODO awkward to add this stored artifact to the model...
             FileArtifact outputArtifact = new FileArtifact("output", outputFile);
             outputArtifact.setTitle("Command Output");
             outputArtifact.setType("text/plain");

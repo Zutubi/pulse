@@ -1,19 +1,16 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.BobException;
-import com.cinnamonbob.util.IOUtils;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.core.util.IOUtils;
+import org.springframework.beans.factory.InitializingBean;
 
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-
-import org.springframework.beans.factory.InitializingBean;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Here be resources.  Yar.
@@ -26,7 +23,17 @@ public class ResourceRepository implements InitializingBean
 
     private FileLoader fileLoader;
 
-    private ConfigurationManager configurationManager;
+    private File resourceDef;
+
+    public ResourceRepository()
+    {
+
+    }
+
+    public ResourceRepository(File resourceDef)
+    {
+        this.resourceDef = resourceDef;
+    }
 
     public void load(InputStream input) throws IllegalAccessException, IOException, InvocationTargetException, BobException
     {
@@ -72,8 +79,6 @@ public class ResourceRepository implements InitializingBean
 
     public void refresh() throws IllegalAccessException, IOException, BobException, InvocationTargetException
     {
-        File configDir = configurationManager.getApplicationPaths().getUserConfigRoot();
-        File resourceDef = new File(configDir, "resources.xml");
         if (resourceDef.exists())
         {
             InputStream input = null;
@@ -93,8 +98,8 @@ public class ResourceRepository implements InitializingBean
         }
     }
 
-    public void setConfigurationManager(ConfigurationManager configManager)
+    public void setUserConfigRoot(File userConfigRoot)
     {
-        this.configurationManager = configManager;
+        resourceDef = new File(userConfigRoot, "resources.xml");
     }
 }

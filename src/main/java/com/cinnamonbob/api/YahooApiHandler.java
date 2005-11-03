@@ -1,7 +1,7 @@
 package com.cinnamonbob.api;
 
-import ymsg.network.event.*;
 import ymsg.network.Session;
+import ymsg.network.event.*;
 
 import java.io.IOException;
 
@@ -124,7 +124,7 @@ public class YahooApiHandler
         }
     }
 
-//    public void notify(Project project, BuildResult result)
+//    public void notify(Project project, BuildResult model)
 //    {
 //        try
 //        {

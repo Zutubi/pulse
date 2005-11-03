@@ -1,10 +1,10 @@
 package com.cinnamonbob.web.project;
 
+import com.cinnamonbob.core.model.StoredArtifact;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-
-import com.cinnamonbob.model.StoredArtifact;
 
 /**
  * 
@@ -30,12 +30,12 @@ public class ViewArtifactAction extends ProjectActionSupport
     {
         return artifact;
     }
-    
+
     public void validate()
     {
-        
+
     }
-    
+
     public String execute()
     {
         artifact = getBuildManager().getArtifact(id);
@@ -55,7 +55,7 @@ public class ViewArtifactAction extends ProjectActionSupport
     {
         return inputStream;
     }
-    
+
     /**
      * @return the content type of the artifact being viewed
      */

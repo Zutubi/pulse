@@ -2,7 +2,7 @@ package com.cinnamonbob.command;
 
 import com.cinnamonbob.BobServer;
 import com.cinnamonbob.ShutdownService;
-import com.cinnamonbob.util.IOUtils;
+import com.cinnamonbob.core.util.IOUtils;
 import org.apache.xmlrpc.XmlRpcClient;
 
 import java.io.IOException;

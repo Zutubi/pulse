@@ -1,11 +1,11 @@
 package com.cinnamonbob.scm.cvs;
 
-import com.cinnamonbob.scm.SCMServer;
+import com.cinnamonbob.core.model.Change;
+import com.cinnamonbob.core.model.Changelist;
+import com.cinnamonbob.core.model.CvsRevision;
+import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.model.Revision;
-import com.cinnamonbob.model.Change;
-import com.cinnamonbob.model.Changelist;
-import com.cinnamonbob.model.CvsRevision;
+import com.cinnamonbob.scm.SCMServer;
 import com.opensymphony.util.TextUtils;
 
 import java.io.File;

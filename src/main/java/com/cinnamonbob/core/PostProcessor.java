@@ -1,6 +1,6 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.model.StoredArtifact;
+import com.cinnamonbob.core.model.StoredArtifact;
 
 
 /**

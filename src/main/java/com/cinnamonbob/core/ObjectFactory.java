@@ -1,9 +1,9 @@
-package com.cinnamonbob;
+package com.cinnamonbob.core;
 
 import com.opensymphony.util.ClassLoaderUtil;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation adapted from com.opensymphony.xwork.ObjectFactory

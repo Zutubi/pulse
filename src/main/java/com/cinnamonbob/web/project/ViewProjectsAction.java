@@ -1,10 +1,10 @@
 package com.cinnamonbob.web.project;
 
+import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.model.Project;
+
 import java.util.LinkedList;
 import java.util.List;
-
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.Project;
 
 /**
  * 

@@ -1,12 +1,12 @@
 package com.cinnamonbob.web.console;
 
-import com.cinnamonbob.web.ActionSupport;
 import com.cinnamonbob.bootstrap.StartupManager;
-import com.cinnamonbob.util.Constants;
+import com.cinnamonbob.core.util.Constants;
+import com.cinnamonbob.web.ActionSupport;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;

@@ -1,28 +1,24 @@
-package com.cinnamonbob.model;
-
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+package com.cinnamonbob.core.model;
 
 import com.cinnamonbob.core.FileArtifact;
+
+import java.util.*;
 
 public class StoredArtifact extends Entity
 {
     public static final String TYPE_PLAIN = "text/plain";
-    
+
     private String name;
     private String title;
     private String type;
     private String file;
     private List<Feature> features;
-    
+
     public StoredArtifact()
     {
-        
+
     }
-    
+
     public StoredArtifact(FileArtifact artifact, String file)
     {
         name      = artifact.getName();
@@ -37,40 +33,40 @@ public class StoredArtifact extends Entity
     {
         return name;
     }
-    
-    
+
+
     public String getTitle()
     {
         return title;
     }
-    
+
     public String getFile()
     {
         return file;
     }
-    
+
     public void addFeature(Feature feature)
     {
         features.add(feature);
     }
-    
+
     public boolean hasFeatures()
     {
         return features.size() != 0;
     }
-    
+
     public Iterator<Feature.Level> getLevels()
     {
         Set<Feature.Level> levels = new TreeSet<Feature.Level>();
-        
+
         for(Feature f: features)
         {
             levels.add(f.getLevel());
         }
-        
+
         return levels.iterator();
     }
-    
+
     public List<Feature> getFeatures(Feature.Level level)
     {
         List<Feature> result = new LinkedList<Feature>();
@@ -81,7 +77,7 @@ public class StoredArtifact extends Entity
                 result.add(f);
             }
         }
-        
+
         return result;
     }
 
@@ -91,7 +87,7 @@ public class StoredArtifact extends Entity
     }
 
     private List<Feature> getFeatures()
-    {   
+    {
         return features;
     }
 

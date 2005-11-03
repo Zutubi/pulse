@@ -1,9 +1,9 @@
 package com.cinnamonbob.core;
 
-import java.util.List;
-import java.util.LinkedList;
+import com.cinnamonbob.core.model.StoredArtifact;
 
-import com.cinnamonbob.model.StoredArtifact;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -13,9 +13,9 @@ import com.cinnamonbob.model.StoredArtifact;
 public class PostProcessorGroup implements PostProcessor
 {
     private String name;
-    
+
     private List<PostProcessor> processors = new LinkedList<PostProcessor>();
-    
+
     public void process(StoredArtifact a)
     {
         for (PostProcessor processor: processors)
@@ -28,7 +28,7 @@ public class PostProcessorGroup implements PostProcessor
     {
         processors.add(processor);
     }
-    
+
     public String getName()
     {
         return name;

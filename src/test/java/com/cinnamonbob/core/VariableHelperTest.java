@@ -1,10 +1,6 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.BobException;
 import junit.framework.TestCase;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 
@@ -12,9 +8,9 @@ import java.util.Map;
  */
 public class VariableHelperTest extends TestCase
 {
- 
+
     private Scope scope = null;
-    
+
     public void setUp() throws FileLoadException
     {
         scope = new Scope();
@@ -22,11 +18,11 @@ public class VariableHelperTest extends TestCase
         scope.setReference(new Property("bar", "baz"));
         scope.setReference(new Property("a\\b", "slashed"));
     }
-    
+
     private void errorTest(String input, String expectedError)
     {
         String result = "";
-        
+
         try
         {
             result = VariableHelper.replaceVariables(input, scope);
@@ -36,21 +32,21 @@ public class VariableHelperTest extends TestCase
             assertEquals(expectedError, e.getMessage());
             return;
         }
-        
-        fail("Expected config exception, got '" + result + "'");        
+
+        fail("Expected config exception, got '" + result + "'");
     }
-    
+
     private void successTest(String in, String out) throws Exception
     {
         String result = VariableHelper.replaceVariables(in, scope);
         assertEquals(out, result);
     }
-    
+
     public void testDollarEOI()
     {
         errorTest("ladida $", "Syntax error: unexpected end of input looking for '{'");
     }
-    
+
     public void testDollarBraceEOI()
     {
         errorTest("ladida ${", "Syntax error: unexpected end of input looking for '}'");
@@ -60,22 +56,22 @@ public class VariableHelperTest extends TestCase
     {
         errorTest("$e", "Syntax error: expecting '{', got 'e'");
     }
-    
+
     public void testHalfEscape()
     {
         errorTest("hoorah \\", "Syntax error: unexpected end of input in escape sequence (\\)");
     }
-    
+
     public void testEmptyVariable()
     {
         errorTest("${}", "Syntax error: empty variable reference");
     }
-    
+
     public void testUnknownVariable()
     {
         errorTest("${greebo}", "Reference to unknown variable 'greebo'");
     }
-        
+
     public void testSimpleSubstitution() throws Exception
     {
         successTest("${foo}", "foo");
@@ -90,27 +86,27 @@ public class VariableHelperTest extends TestCase
     {
         successTest("leading text ${bar}", "leading text baz");
     }
-    
+
     public void testSubstitutionTrailing() throws Exception
     {
         successTest("${bar} trailing text", "baz trailing text");
     }
-    
+
     public void testSubstitutionTwice() throws Exception
     {
         successTest("${foo}${bar}", "foobaz");
     }
-    
+
     public void testSimpleEscape() throws Exception
     {
         successTest("esc\\ape", "escape");
     }
-    
+
     public void testEscapeDollar() throws Exception
     {
         successTest("\\${foo}", "${foo}");
     }
-    
+
     public void testEscapeSlash() throws Exception
     {
         successTest("\\\\", "\\");
@@ -135,5 +131,5 @@ public class VariableHelperTest extends TestCase
     {
         scope.setReference(new Property("a", "${foo}"));
         successTest("${a}", "${foo}");
-    }    
+    }
 }

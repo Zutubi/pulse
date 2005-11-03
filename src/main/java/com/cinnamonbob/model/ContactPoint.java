@@ -1,8 +1,11 @@
 package com.cinnamonbob.model;
 
-import java.util.Properties;
-import java.util.List;
+import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.core.model.Entity;
+
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * A contact point defines a means of contacting a user.

@@ -1,10 +1,10 @@
-package com.cinnamonbob.model;
+package com.cinnamonbob.core.model;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Holds build result information for single SCM, e.g. changes committed to
+ * Holds build model information for single SCM, e.g. changes committed to
  * that SCM since the last build.
  */
 public class BuildScmDetails extends Entity

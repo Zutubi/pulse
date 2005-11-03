@@ -1,6 +1,6 @@
 package com.cinnamonbob.schedule;
 
-import com.cinnamonbob.model.Entity;
+import com.cinnamonbob.core.model.Entity;
 import com.cinnamonbob.model.Project;
 
 /**

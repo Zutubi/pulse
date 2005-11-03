@@ -1,17 +1,13 @@
-package com.cinnamonbob.model;
+package com.cinnamonbob.core.model;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import com.cinnamonbob.core.BuildException;
+import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.core.util.TimeStamps;
+
+import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.util.IOUtils;
-import com.cinnamonbob.util.TimeStamps;
 
 /**
  * 

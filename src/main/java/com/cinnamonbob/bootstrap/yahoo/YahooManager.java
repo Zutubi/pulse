@@ -1,14 +1,14 @@
 package com.cinnamonbob.bootstrap.yahoo;
 
 import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.BobException;
+import com.cinnamonbob.core.BobException;
 import com.opensymphony.util.TextUtils;
-import ymsg.network.Session;
 import ymsg.network.LoginRefusedException;
+import ymsg.network.Session;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The yahoo manager handles the yahoo specific resources. 

@@ -1,5 +1,4 @@
-package com.cinnamonbob.model;
-
+package com.cinnamonbob.core.model;
 
 public class Feature extends Entity
 {
@@ -9,7 +8,7 @@ public class Feature extends Entity
         INFO,
         WARNING
     }
-    
+
     private Level level;
     /**
      * A simple textual summary of the feature for display to users.
@@ -18,7 +17,7 @@ public class Feature extends Entity
 
     public Feature()
     {
-        
+
     }
 
     public Feature(Level level, String summary)
@@ -31,22 +30,22 @@ public class Feature extends Entity
     {
         return level;
     }
-    
+
     public String getSummary()
     {
         return summary;
     }
-    
+
     private String getLevelName()
     {
         return level.name();
     }
-    
+
     private void setLevelName(String name)
     {
         level = Level.valueOf(name);
     }
-    
+
     private void setSummary(String summary)
     {
         this.summary = summary;

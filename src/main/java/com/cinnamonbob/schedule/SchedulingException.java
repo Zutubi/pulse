@@ -1,6 +1,6 @@
 package com.cinnamonbob.schedule;
 
-import com.cinnamonbob.BobException;
+import com.cinnamonbob.core.BobException;
 
 /**
  * <class-comment/>

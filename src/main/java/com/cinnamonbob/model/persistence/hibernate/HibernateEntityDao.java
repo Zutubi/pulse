@@ -1,13 +1,13 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.model.Entity;
+import com.cinnamonbob.core.model.Entity;
 import com.cinnamonbob.model.persistence.EntityDao;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.hibernate.Query;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import java.util.List;
 

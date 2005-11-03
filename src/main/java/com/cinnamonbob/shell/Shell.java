@@ -1,20 +1,10 @@
 package com.cinnamonbob.shell;
 
-import com.cinnamonbob.util.Constants;
-import com.cinnamonbob.util.IOUtils;
+import com.cinnamonbob.core.util.Constants;
+import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.util.RandomUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;

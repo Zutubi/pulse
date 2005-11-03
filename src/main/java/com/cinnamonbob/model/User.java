@@ -1,5 +1,7 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.core.model.Entity;
+
 import java.util.LinkedList;
 import java.util.List;
 

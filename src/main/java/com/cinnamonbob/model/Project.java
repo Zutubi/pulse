@@ -1,9 +1,10 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.core.model.Entity;
 import com.cinnamonbob.schedule.Schedule;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 

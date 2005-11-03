@@ -248,6 +248,6 @@
 
     <bean id="scmManager" class="com.cinnamonbob.model.DefaultScmManager" autowire="byName"/>
 
-    <bean id="eventManager" class="com.cinnamonbob.event.DefaultEventManager" autowire="byName"/>
+    <bean id="eventManager" class="com.cinnamonbob.core.event.DefaultEventManager" autowire="byName"/>
 
 </beans>

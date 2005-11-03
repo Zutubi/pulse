@@ -1,6 +1,6 @@
 package com.cinnamonbob.model.persistence;
 
-import com.cinnamonbob.model.Entity;
+import com.cinnamonbob.core.model.Entity;
 
 import java.util.List;
 

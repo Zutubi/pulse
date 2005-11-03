@@ -1,8 +1,6 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.ObjectFactory;
 import com.cinnamonbob.test.BobTestCase;
-import junit.framework.TestCase;
 
 import java.util.LinkedList;
 import java.util.List;

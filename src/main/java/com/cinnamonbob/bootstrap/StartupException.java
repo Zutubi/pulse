@@ -1,6 +1,6 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.BobRuntimeException;
+import com.cinnamonbob.core.BobRuntimeException;
 
 /**
  * 

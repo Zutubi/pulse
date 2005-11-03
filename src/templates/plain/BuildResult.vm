@@ -1,11 +1,11 @@
 =====================================================================
-:: $project.name ::
+:: $project ::
 =====================================================================
 Build $result.number has completed with status '$result.state.prettyString'.
 
 You can view the full build result at:
 
-http://$hostname/viewBuild.action?id=$project.id&buildId=$result.id
+http://$hostname/viewBuild.action?id=$projectId&buildId=$result.id
 #if($result.errorMessage)
 
 *error message*

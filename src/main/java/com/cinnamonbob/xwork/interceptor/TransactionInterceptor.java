@@ -90,23 +90,23 @@ public class TransactionInterceptor implements Interceptor
         currentTransactionStatus.set(status[0]);
 
         // Invoke the next interceptor in the chain.
-        // This will normally result in a target object being invoked.
+        // This will normally model in a target object being invoked.
         String retVal = null;
         try
         {
-            // We'll want to commit the transaction before the result is called.
+            // We'll want to commit the transaction before the model is called.
             if (status[0] != null)
                 invocation.addPreResultListener(new PreResultListener()
                 {
                     public void beforeResult(ActionInvocation actionInvocation, String s)
                     {
                         if (LOG.isLoggable(Level.INFO))
-                            LOG.info("Committing transaction for " + getDetails(invocation.getProxy()) + " before result");
+                            LOG.info("Committing transaction for " + getDetails(invocation.getProxy()) + " before model");
 
                         getTransactionManager().commit(status[0]);
 
                         if (LOG.isLoggable(Level.INFO))
-                            LOG.info("Opening new transaction for " + getDetails(invocation.getProxy()) + " result");
+                            LOG.info("Opening new transaction for " + getDetails(invocation.getProxy()) + " model");
 
                         status[0] = getTransactionManager().getTransaction(transAtt);
                     }

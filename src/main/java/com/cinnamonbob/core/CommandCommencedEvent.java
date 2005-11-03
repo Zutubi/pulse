@@ -1,6 +1,6 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.model.BuildResult;
+import com.cinnamonbob.core.model.BuildResult;
 
 /**
  */

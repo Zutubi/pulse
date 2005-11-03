@@ -1,14 +1,14 @@
 package com.cinnamonbob.scm.cvs.client;
 
+import com.cinnamonbob.core.model.Change;
+import com.cinnamonbob.scm.SCMException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.StringTokenizer;
-import java.util.List;
 import java.util.ArrayList;
-
-import com.cinnamonbob.model.Change;
-import com.cinnamonbob.scm.SCMException;
+import java.util.Date;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * The HistoryInfo object represents a single line from the history output.

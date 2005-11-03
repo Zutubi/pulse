@@ -1,4 +1,4 @@
-package com.cinnamonbob.model;
+package com.cinnamonbob.core.model;
 
 import java.util.Date;
 

@@ -1,8 +1,8 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.event.EventManager;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.CommandResult;
+import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.core.model.CommandResult;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +19,7 @@ public class BuildProcessor
     public static String getCommandDirName(int i, CommandResult result)
     {
         // Use the command name because:
-        // a) we do not have an id for the command result
+        // a) we do not have an id for the command model
         // b) for local builds, this is a lot friendlier for the developer
         return String.format("%08d-%s", i, result.getCommandName());
     }
@@ -124,6 +124,7 @@ public class BuildProcessor
         fileLoader.register("command", CommandGroup.class);
         fileLoader.register("regex", RegexPostProcessor.class);
         fileLoader.register("executable", ExecutableCommand.class);
+        fileLoader.register("resource", ResourceReference.class);
     }
 
     public void setEventManager(EventManager eventManager)

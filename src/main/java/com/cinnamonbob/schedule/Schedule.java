@@ -1,7 +1,7 @@
 package com.cinnamonbob.schedule;
 
+import com.cinnamonbob.core.model.Entity;
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.Entity;
 
 /**
  * This is an immutable object.

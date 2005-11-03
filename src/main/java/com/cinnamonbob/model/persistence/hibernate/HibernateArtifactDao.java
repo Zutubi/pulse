@@ -1,9 +1,9 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import java.util.logging.Logger;
-
-import com.cinnamonbob.model.StoredArtifact;
+import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.model.persistence.ArtifactDao;
+
+import java.util.logging.Logger;
 
 public class HibernateArtifactDao extends HibernateEntityDao<StoredArtifact> implements ArtifactDao
 {
@@ -13,5 +13,5 @@ public class HibernateArtifactDao extends HibernateEntityDao<StoredArtifact> imp
     public Class persistentClass()
     {
         return StoredArtifact.class;
-    }    
+    }
 }

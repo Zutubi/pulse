@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.cinnamonbob.model.StoredArtifact" table="ARTIFACT" lazy="false">
+    <class name="com.cinnamonbob.core.model.StoredArtifact" table="ARTIFACT" lazy="false">
 
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -18,7 +18,7 @@
         
         <bag name="features" cascade="all-delete-orphan">
             <key column="ARTIFACT_ID" not-null="true"/>
-            <one-to-many class="com.cinnamonbob.model.Feature"/>
+            <one-to-many class="com.cinnamonbob.core.model.Feature"/>
         </bag>
 		        
     </class>

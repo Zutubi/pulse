@@ -1,6 +1,5 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.ObjectFactory;
 import com.cinnamonbob.test.BobTestCase;
 
 /**

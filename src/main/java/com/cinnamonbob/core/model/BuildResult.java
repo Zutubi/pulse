@@ -1,8 +1,8 @@
-package com.cinnamonbob.model;
+package com.cinnamonbob.core.model;
 
 import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.util.IOUtils;
-import com.cinnamonbob.util.TimeStamps;
+import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.core.util.TimeStamps;
 
 import java.io.*;
 import java.util.HashMap;
