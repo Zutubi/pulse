@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<resources>
+
+    <resource name="aResource">
+        <version id="aVersion">
+            <property name="b" value="c"/>
+            <property name="d" value="e"/>
+        </version>
+    </resource>
+    <resource name="bResource">
+        <version id="aVersion">
+            <property name="b" value="c"/>
+            <property name="d" value="e"/>
+        </version>
+        <version id="bVersion">
+            <property name="1" value="2"/>
+            <property name="3" value="4"/>
+        </version>
+    </resource>
+
+</resources>

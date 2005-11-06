@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<project>
+    <recipe name="wow">
+        <executable name="test" exe="foo" args="one"/>
+
+        <executable name="test" exe="foo" args="one two"/>
+
+        <executable name="test" exe="foo">
+            <arg>here are some spaces</arg>
+        </executable>
+
+        <executable name="test" exe="foo">
+            <arg>here are some spaces</arg>
+            <arg>and yet more spaces</arg>
+        </executable>
+
+        <executable name="test" exe="foo" args="one two">
+            <arg>here are some spaces</arg>
+            <arg>and yet more spaces</arg>
+        </executable>
+    </recipe>
+</project>

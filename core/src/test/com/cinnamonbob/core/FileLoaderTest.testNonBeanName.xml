@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<project>
+
+    <some-reference name="a" some-value="a"/>
+
+</project>
