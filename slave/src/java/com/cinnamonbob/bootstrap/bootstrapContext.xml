@@ -14,7 +14,7 @@
                 <value>com/cinnamonbob/bootstrap/webworkContext.xml</value>
             </list>
         </property>
-    </bean>       
+    </bean>
 
     <bean id="configurationManager" class="com.cinnamonbob.bootstrap.DefaultConfigurationManager" init-method="init">
         <property name="defaultProperties">
@@ -23,7 +23,7 @@
             </props>
         </property>
     </bean>
-    
+
     <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
 
 </beans>

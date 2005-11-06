@@ -2,17 +2,16 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
+    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation"></bean>
+
     <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
-    
+
     <bean id="startupManager" class="com.cinnamonbob.bootstrap.StartupManager">        
-        <property name="databaseContexts">
-            <list>
-                <value>com/cinnamonbob/bootstrap/databaseContext.xml</value>
-            </list>
-        </property>
         <property name="systemContexts">
             <list>
-                <value>com/cinnamonbob/bootstrap/applicationContext.xml</value>    
+                <value>com/cinnamonbob/bootstrap/databaseBootstrapContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/databaseContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/applicationContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/webworkContext.xml</value>
             </list>
         </property>        
@@ -26,11 +25,11 @@
         </property>
         <property name="applicationPaths">
             <bean class="com.cinnamonbob.bootstrap.ConfigurableApplicationPaths">
-                <property name="contentRoot"><value>src/www</value></property>
-                <property name="configRoot"><value>src/etc</value></property>
-                <property name="templateRoot"><value>src/templates</value></property>
-                <property name="userConfigRoot"><value>src/main/etc</value></property>
-                <property name="databaseRoot"><value>database</value></property>
+                <property name="contentRoot"><value>master/src/www</value></property>
+                <property name="configRoot"><value>master/src/etc</value></property>
+                <property name="templateRoot"><value>master/src/templates</value></property>
+                <property name="userConfigRoot"><value>master/src/etc</value></property>
+                <property name="databaseRoot"><value>master/database</value></property>
             </bean>
         </property>
     </bean>

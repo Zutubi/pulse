@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <bean id="velocityEngine" class="com.cinnamonbob.bootstrap.velocity.VelocityEngineFactoryBean"/>
+
+    <bean id="jettyServer" class="com.cinnamonbob.jetty.JettyServerFactoryBean" destroy-method="shutdown">
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+    </bean>
+
+    <bean id="jettyManager" class="com.cinnamonbob.jetty.JettyManager">
+        <property name="jettyServer">
+            <ref bean="jettyServer"/>
+        </property>
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+    </bean>
+
+</beans>

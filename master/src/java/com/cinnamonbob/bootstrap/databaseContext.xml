@@ -2,29 +2,15 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-        <property name="mappingResources">
+    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation">
+        <property name="initBeans">
             <list>
-                <value>com/cinnamonbob/model/persistence/hibernate/BuildResult.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Changelist.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/CommandResult.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Feature.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Project.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Revision.hbm.xml</value>
-                <value>com/cinnamonbob/schedule/persistence/hibernate/Schedule.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Scm.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/User.hbm.xml</value>
+                <ref bean="databaseBootstrap"/>
             </list>
         </property>
-        <property name="hibernateProperties">
-            <props>
-                <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
-                <prop key="hibernate.show_sql">true</prop>
-                <prop key="hibernate.jdbc.batch_size">0</prop>
-                <prop key="hibernate.jdbc.use_scrollable_resultsets">false</prop>
-            </props>
-        </property>
+    </bean>
+
+    <bean id="databaseBootstrap" class="com.cinnamonbob.bootstrap.DatabaseBootstrap" init-method="initialiseDatabase">
         <property name="dataSource">
             <ref bean="dataSource"/>
         </property>
@@ -55,7 +41,7 @@
             </props>
         </property>
     </bean>
-       
+
     <bean id="artifactDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateArtifactDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>

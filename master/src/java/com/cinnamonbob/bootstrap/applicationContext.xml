@@ -2,6 +2,14 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
+    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation">
+        <property name="initBeans">
+            <list>
+                <ref bean="jettyManager"/>
+            </list>
+        </property>
+    </bean>
+
     <bean id="velocityEngine" class="com.cinnamonbob.bootstrap.velocity.VelocityEngineFactoryBean"/>
 
     <bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -16,13 +24,13 @@
         </property>
     </bean>
 
-    <bean id="jettyServer" class="com.cinnamonbob.bootstrap.jetty.JettyServerFactoryBean" destroy-method="shutdown">
+    <bean id="jettyServer" class="com.cinnamonbob.jetty.JettyServerFactoryBean" destroy-method="shutdown">
         <property name="configurationManager">
             <ref bean="configurationManager"/>
         </property>
     </bean>
 
-    <bean id="jettyManager" class="com.cinnamonbob.bootstrap.jetty.JettyManager">
+    <bean id="jettyManager" class="com.cinnamonbob.jetty.JettyManager" init-method="deployWebapp">
         <property name="jettyServer">
             <ref bean="jettyServer"/>
         </property>
