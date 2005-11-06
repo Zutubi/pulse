@@ -1,6 +1,8 @@
 package com.cinnamonbob.schedule;
 
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.schedule.triggers.Trigger;
+import com.cinnamonbob.schedule.tasks.Task;
 
 import java.util.List;
 
@@ -19,4 +21,5 @@ public interface ScheduleManager
 
     void delete(Schedule schedule);
 
+    void activate(long triggerId);
 }

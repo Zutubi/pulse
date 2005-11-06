@@ -1,12 +1,11 @@
-package com.cinnamonbob.schedule;
+package com.cinnamonbob.schedule.tasks;
 
-import com.cinnamonbob.core.model.Entity;
 import com.cinnamonbob.model.Project;
 
 /**
  * <class-comment/>
  */
-public class BuildProjectTask extends Entity implements Task
+public class BuildProjectTask extends Task
 {
     private String recipe;
     private Project project;

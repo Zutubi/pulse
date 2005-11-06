@@ -3,7 +3,7 @@ package com.cinnamonbob.schedule.persistence;
 import com.cinnamonbob.model.persistence.EntityDao;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.schedule.Schedule;
-import com.cinnamonbob.schedule.Trigger;
+import com.cinnamonbob.schedule.triggers.Trigger;
 
 import java.util.List;
 
@@ -19,4 +19,6 @@ public interface ScheduleDao extends EntityDao<Schedule>
     List<Trigger> findAllTriggers();
 
     Schedule findByTrigger(long id);
+
+    Trigger findTriggerById(long id);
 }

@@ -3,6 +3,9 @@ package com.cinnamonbob.schedule;
 import com.cinnamonbob.core.model.Entity;
 import com.cinnamonbob.model.Project;
 
+import com.cinnamonbob.schedule.triggers.Trigger;
+import com.cinnamonbob.schedule.tasks.Task;
+
 /**
  * This is an immutable object.
  */
@@ -100,5 +103,11 @@ public class Schedule extends Entity
     private void setTask(Task task)
     {
         this.task = task;
+    }
+
+    public void execute()
+    {
+        trigger.trigger();
+        task.execute();
     }
 }

@@ -1,13 +1,13 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.schedule.BuildProjectTask;
+import com.cinnamonbob.schedule.tasks.BuildProjectTask;
 import com.cinnamonbob.schedule.Schedule;
-import com.cinnamonbob.schedule.QuartzCronTrigger;
 import com.cinnamonbob.schedule.SchedulingException;
+import com.cinnamonbob.schedule.triggers.CronTrigger;
 
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -89,7 +89,7 @@ public class CreateScheduleAction extends ProjectActionSupport
     {
         Project project = getProjectManager().getProject(getProject());
 
-        QuartzCronTrigger trigger = new QuartzCronTrigger(cronExpression);
+        CronTrigger trigger = new CronTrigger(cronExpression);
         BuildProjectTask task = new BuildProjectTask(project, recipe);
 
         try

@@ -1,10 +1,12 @@
-package com.cinnamonbob.schedule;
+package com.cinnamonbob.schedule.triggers;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import java.util.logging.Logger;
+import com.cinnamonbob.schedule.DefaultScheduleManager;
+import com.cinnamonbob.schedule.ScheduleManager;
 
 /**
  * <class-comment/>
@@ -24,7 +26,7 @@ public class QuartzTaskWrapper implements Job
     {
         // notify schedule manager that this trigger has been activated.
         long id = (Long) context.getTrigger().getJobDataMap().get("id");
-        scheduleManager.triggerActivated(id);
+        scheduleManager.activate(id);
     }
 
 

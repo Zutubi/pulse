@@ -3,7 +3,7 @@ package com.cinnamonbob.schedule.persistence.hibernate;
 import com.cinnamonbob.model.persistence.hibernate.HibernateEntityDao;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.schedule.Schedule;
-import com.cinnamonbob.schedule.Trigger;
+import com.cinnamonbob.schedule.triggers.Trigger;
 import com.cinnamonbob.schedule.persistence.ScheduleDao;
 
 import java.util.List;
@@ -37,5 +37,10 @@ public class HibernateScheduleDao extends HibernateEntityDao<Schedule> implement
     public Schedule findByTrigger(long id)
     {
         return (Schedule) findUniqueByNamedQuery("schedule.findByTrigger", "id", id);
+    }
+
+    public Trigger findTriggerById(long id)
+    {
+        return null;
     }
 }
