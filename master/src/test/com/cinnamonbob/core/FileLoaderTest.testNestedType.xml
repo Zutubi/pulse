@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<project>
+
+    <nested name="a">
+        <nested name="b"/>
+        <createType name="c"/>
+    </nested>
+    
+</project>

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <class name="com.cinnamonbob.schedule.Schedule" table="SCHEDULE" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="name" column="NAME" type="string" not-null="true" length="255"/>
+        <many-to-one name="project" column="PROJECTID" class="com.cinnamonbob.model.Project" not-null="false" insert="true" lazy="false" cascade="none"/>
+        <many-to-one name="trigger" column="TRIGGER" class="com.cinnamonbob.schedule.triggers.Trigger" not-null="true" insert="true" lazy="false" cascade="all-delete-orphan"/>
+        <many-to-one name="task" column="TASK" class="com.cinnamonbob.schedule.tasks.Task" not-null="true" insert="true" lazy="false" cascade="all-delete-orphan"/>
+
+    </class>
+
+    <class name="com.cinnamonbob.schedule.triggers.Trigger" table="TRIGGER">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="name" column="NAME" type="string" not-null="true" length="255"/>
+        <property name="group" column="GROUP" type="string" not-null="true" length="255"/>
+
+    </class>
+
+    <class name="com.cinnamonbob.schedule.tasks.Task" table="TASK">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="name" column="NAME" type="string" not-null="true" length="255"/>
+        <property name="group" column="GROUP" type="string" not-null="true" length="255"/>
+
+    </class>
+
+    <query name="schedule.findByNameAndProject"><![CDATA[
+        from Schedule s
+        where s.project = :project
+        and s.name = :name
+    ]]></query>
+
+    <query name="schedule.findByProject"><![CDATA[
+        from Schedule s
+        where s.project = :project
+    ]]></query>
+
+    <query name="schedule.findByTrigger"><![CDATA[
+        select s
+        from Schedule s, QuartzCronTrigger t
+        where s.trigger = t
+        and t.id = :id
+    ]]></query>
+
+</hibernate-mapping>

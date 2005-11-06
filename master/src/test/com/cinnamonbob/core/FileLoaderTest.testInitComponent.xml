@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project>
+    
+    <property name="a" value="valueA"/>
+    <property name="b" value="valueB"/>
+        
+</project>
