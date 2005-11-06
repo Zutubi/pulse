@@ -1,4 +1,4 @@
-package com.cinnamonbob.bootstrap.jetty;
+package com.cinnamonbob.jetty;
 
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import org.mortbay.jetty.Server;
