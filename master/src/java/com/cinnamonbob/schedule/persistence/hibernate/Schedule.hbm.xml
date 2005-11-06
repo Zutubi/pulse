@@ -36,7 +36,7 @@
         <property name="group" column="GROUP" type="string" not-null="true" length="255"/>
 
     </class>
-
+<!--
     <query name="schedule.findByNameAndProject"><![CDATA[
         from Schedule s
         where s.project = :project
@@ -54,5 +54,5 @@
         where s.trigger = t
         and t.id = :id
     ]]></query>
-
+-->
 </hibernate-mapping>
