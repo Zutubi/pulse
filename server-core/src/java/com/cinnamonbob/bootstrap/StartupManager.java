@@ -1,7 +1,5 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.jetty.JettyManager;
-
 import java.util.List;
 
 /**
