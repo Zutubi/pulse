@@ -26,6 +26,12 @@ public class FileLoader
 
     public FileLoader()
     {
+        // For the Spring
+    }
+
+    public FileLoader(ObjectFactory factory)
+    {
+        setObjectFactory(factory);
     }
 
     public void setObjectFactory(ObjectFactory factory)

@@ -18,7 +18,12 @@ public class ResourceReference implements ScopeAware, InitComponent
 
     public void initBeforeChildren() throws FileLoadException
     {
-        Resource resource = repo.getResource(name);
+        Resource resource = null;
+
+        if(repo != null)
+        {
+            resource = repo.getResource(name);
+        }
 
         if(resource == null)
         {

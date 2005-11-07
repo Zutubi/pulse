@@ -16,6 +16,17 @@ public class BuildProcessor
     private EventManager eventManager;
     private FileLoader fileLoader;
 
+    public BuildProcessor()
+    {
+        // For use with Spring
+    }
+
+    public BuildProcessor(EventManager eventManager, FileLoader fileLoader)
+    {
+        setEventManager(eventManager);
+        setFileLoader(fileLoader);
+    }
+
     public static String getCommandDirName(int i, CommandResult result)
     {
         // Use the command name because:

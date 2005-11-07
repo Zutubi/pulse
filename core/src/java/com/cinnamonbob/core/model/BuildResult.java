@@ -178,6 +178,7 @@ public class BuildResult extends Result
         }
         catch(IOException e)
         {
+            // Empty
         }
 
         return result;
