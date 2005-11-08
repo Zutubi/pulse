@@ -1,7 +1,6 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.util.IOUtils;
-import org.springframework.beans.factory.InitializingBean;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -15,7 +14,7 @@ import java.util.logging.Logger;
 /**
  * Here be resources.  Yar.
  */
-public class ResourceRepository implements InitializingBean
+public class ResourceRepository
 {
     private static final Logger LOG = Logger.getLogger(ResourceRepository.class.getName());
 
@@ -30,12 +29,12 @@ public class ResourceRepository implements InitializingBean
 
     }
 
-    public ResourceRepository(File resourceDef)
+    public ResourceRepository(FileLoader loader)
     {
-        this.resourceDef = resourceDef;
+        setFileLoader(loader);
     }
 
-    public void load(InputStream input) throws IllegalAccessException, IOException, InvocationTargetException, BobException
+    public void load(InputStream input) throws BobException
     {
         resources.clear();
         fileLoader.load(input, this);
@@ -65,7 +64,7 @@ public class ResourceRepository implements InitializingBean
         loader.register("property", Property.class);
     }
 
-    public void afterPropertiesSet() throws Exception
+    public void initialise()
     {
         try
         {

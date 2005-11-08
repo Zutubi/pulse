@@ -53,15 +53,15 @@
 
     <bean id="eventManager" class="com.cinnamonbob.core.event.DefaultEventManager" autowire="byName"/>
 
-    <bean id="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory" autowire="byName"/>
+    <bean id="objectFactory" class="com.cinnamonbob.core.ObjectFactory" autowire="byName"/>
 
     <bean id="fileLoader" class="com.cinnamonbob.core.FileLoader" autowire="byName" singleton="false"/>
 
-    <bean id="resourceRepository" class="com.cinnamonbob.core.ResourceRepository" autowire="byName"/>
+    <bean id="resourceRepository" class="com.cinnamonbob.core.ResourceRepository" autowire="byName" init-method="initialise"/>
 
     <bean id="buildProcessor" class="com.cinnamonbob.core.BuildProcessor" autowire="byName"/>
 
-    <bean id="serverBuildProcessor" class="com.cinnamonbob.ServerBuildProcessor" autowire="byName"/>
+    <bean id="masterBuildProcessor" class="com.cinnamonbob.MasterBuildProcessor" autowire="byName"/>
 
     <bean id="buildQueue" class="com.cinnamonbob.BuildQueue" autowire="byName"/>
 

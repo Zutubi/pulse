@@ -1,9 +1,7 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.bootstrap.ConfigUtils;
-import com.cinnamonbob.core.BuildEvent;
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.BuildProcessor;
+import com.cinnamonbob.core.*;
 import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.core.event.EventManager;
@@ -25,9 +23,9 @@ import java.util.logging.Logger;
 /**
  * Processor for executing builds on the bob master.
  */
-public class ServerBuildProcessor implements EventListener
+public class MasterBuildProcessor implements EventListener
 {
-    private static final Logger LOG = Logger.getLogger(ServerBuildProcessor.class.getName());
+    private static final Logger LOG = Logger.getLogger(MasterBuildProcessor.class.getName());
 
     private BuildProcessor processor;
     private ProjectManager projectManager;
@@ -48,7 +46,7 @@ public class ServerBuildProcessor implements EventListener
         long number = buildManager.getNextBuildNumber(project.getName());
 
         BuildResult buildResult = new BuildResult(project.getName(), number);
-        buildManager.save(buildResult);
+
 
         File rootBuildDir = ConfigUtils.getManager().getAppConfig().getProjectRoot();
         File projectDir = new File(rootBuildDir, getProjectDirName(project));
@@ -56,6 +54,7 @@ public class ServerBuildProcessor implements EventListener
         File buildDir = new File(buildsDir, getBuildDirName(buildResult));
 
         buildResult.commence(buildDir);
+        eventManager.publish(new BuildCommencedEvent(this, buildResult));
 
         try
         {
@@ -67,18 +66,17 @@ public class ServerBuildProcessor implements EventListener
 
             bootstrapBuild(project, buildResult, workDir, buildDir);
 
-
             processor.build(workDir, project.getBobFile(), request.getRecipeName(), buildResult, buildDir);
         }
         catch(BuildException e)
         {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "Build error", e);
             buildResult.error(e);
         }
         finally
         {
             buildResult.complete();
-            buildManager.save(buildResult);
+            eventManager.publish(new BuildCompletedEvent(this, buildResult));
         }
 
         // sort out notifications.
@@ -101,7 +99,7 @@ public class ServerBuildProcessor implements EventListener
 
     public static String getBuildDirName(BuildResult result)
     {
-        return String.format("%08d", Long.valueOf(result.getId()));
+        return String.format("%08d", Long.valueOf(result.getNumber()));
     }
 
     private File cleanWorkDir(File projectDir)

@@ -60,32 +60,7 @@ public class BuildProcessor
             buildResult.add(result);
 
             File commandOutput = new File(outputDir, getCommandDirName(i, result));
-            result.commence(commandOutput);
-            eventManager.publish(new CommandCommencedEvent(this, buildResult));
-
-            try
-            {
-                if(!commandOutput.mkdir())
-                {
-                    throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
-                }
-
-                command.execute(commandOutput, result);
-            }
-            catch(BuildException e)
-            {
-                result.error(e);
-            }
-            catch(Exception e)
-            {
-                //LOG.log(Level.SEVERE, "Unhandled exception during build", e);
-                result.error(new BuildException(e));
-            }
-            finally
-            {
-                result.complete();
-                eventManager.publish(new CommandCompletedEvent(this, buildResult));
-            }
+            executeCommand(result, commandOutput, buildResult, command);
 
             switch(result.getState())
             {
@@ -98,6 +73,35 @@ public class BuildProcessor
             }
 
             i++;
+        }
+    }
+
+    private void executeCommand(CommandResult result, File commandOutput, BuildResult buildResult, Command command)
+    {
+        result.commence(commandOutput);
+        eventManager.publish(new CommandCommencedEvent(this, buildResult));
+
+        try
+        {
+            if(!commandOutput.mkdir())
+            {
+                throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
+            }
+
+            command.execute(commandOutput, result);
+        }
+        catch(BuildException e)
+        {
+            result.error(e);
+        }
+        catch(Exception e)
+        {
+            result.error(new BuildException(e));
+        }
+        finally
+        {
+            result.complete();
+            eventManager.publish(new CommandCompletedEvent(this, buildResult));
         }
     }
 

@@ -3,11 +3,10 @@ package com.cinnamonbob.local;
 import org.apache.commons.cli.*;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.BuildProcessor;
-import com.cinnamonbob.core.FileLoader;
-import com.cinnamonbob.core.ObjectFactory;
+import com.cinnamonbob.core.*;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.event.EventManager;
 import com.cinnamonbob.core.event.DefaultEventManager;
@@ -51,7 +50,7 @@ public class LocalBuild
 
         try
         {
-            CommandLine commandLine = parser.parse(options, argv);
+            CommandLine commandLine = parser.parse(options, argv, true);
             if(commandLine.hasOption('b'))
             {
                 bobFile = commandLine.getOptionValue('b');
@@ -73,39 +72,107 @@ public class LocalBuild
                 recipe = argv[0];
             }
 
-            runBuild(bobFile, recipe, resourcesFile, outputDir);
+            LocalBuild b = new LocalBuild();
+            b.runBuild(bobFile, recipe, resourcesFile, outputDir);
         }
-        catch (ParseException e)
+        catch (Exception e)
         {
-            e.printStackTrace();
+            fatal(e);
         }
     }
 
-    private static void runBuild(String bobFile, String recipe, String resourcesFile, String outputDir)
+    private ResourceRepository createRepository(String resourcesFile) throws BobException
     {
+        FileLoader loader = new FileLoader(new ObjectFactory(), null);
+        ResourceRepository repository = new ResourceRepository(loader);
+
+        if(resourcesFile != null)
+        {
+            try
+            {
+                FileInputStream stream = new FileInputStream(resourcesFile);
+                repository.load(stream);
+            }
+            catch (FileNotFoundException e)
+            {
+                throw new BobException("Unable to open resources file '" + resourcesFile + "'");
+            }
+        }
+
+        return repository;
+    }
+
+    private void runBuild(String bobFile, String recipe, String resourcesFile, String outputDir) throws Exception
+    {
+        printPrologue(bobFile, resourcesFile, outputDir);
+
+        EventManager manager = new DefaultEventManager();
+        manager.register(new BuildStatusPrinter());
+
+        ResourceRepository repository = createRepository(resourcesFile);
+
         File workDir = new File(System.getProperty("user.dir"));
         File output = new File(workDir, outputDir);
 
+        BuildResult result = new BuildResult(bobFile, 0);
+        result.commence(output);
+        manager.publish(new BuildCommencedEvent(this, result));
+
+        try
+        {
+            cleanOutputDir(output);
+
+            FileLoader loader = new FileLoader(new ObjectFactory(), repository);
+            BuildProcessor processor = new BuildProcessor(manager, loader);
+            processor.build(workDir, bobFile, recipe, result, output);
+        }
+        catch(BuildException e)
+        {
+            result.error(e);
+        }
+        catch(Exception e)
+        {
+            result.error(new BuildException(e));
+        }
+        finally
+        {
+            result.complete();
+            manager.publish(new BuildCompletedEvent(this, result));
+        }
+    }
+
+    private void printPrologue(String bobFile, String resourcesFile, String outputDir)
+    {
+        System.out.println("bobfile         : '" + bobFile + "'");
+        System.out.println("output directory: '" + outputDir + "'");
+
+        if(resourcesFile != null)
+        {
+            System.out.println("resources file  : '" + resourcesFile + "'");
+        }
+
+        System.out.println();
+    }
+
+    private void cleanOutputDir(File output)
+    {
         if(output.isDirectory())
         {
             if(!FileSystemUtils.removeDirectory(output))
             {
-                throw new BuildException("Unable to remove existing output directory '" + outputDir + "'");
+                throw new BuildException("Unable to remove existing output directory '" + output.getPath() + "'");
             }
         }
 
         if(!output.mkdirs())
         {
-            throw new BuildException("Unable to create output directory '" + outputDir + "'");
+            throw new BuildException("Unable to create output directory '" + output.getPath() + "'");
         }
+    }
 
-        EventManager manager = new DefaultEventManager();
-        manager.register(new BuildStatusPrinter());
-
-        FileLoader loader = new FileLoader(new ObjectFactory());
-        BuildProcessor processor = new BuildProcessor(manager, loader);
-        BuildResult result = new BuildResult("local", 0);
-
-        processor.build(workDir, bobFile, recipe, result, output);
+    private static void fatal(Throwable throwable)
+    {
+        System.err.println(throwable.getMessage());
+        System.exit(1);
     }
 }

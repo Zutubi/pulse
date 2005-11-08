@@ -23,15 +23,17 @@ public class FileLoader
     private final Map<String, Class> typeDefinitions = new HashMap<String, Class>();
 
     private ObjectFactory factory;
+    private ResourceRepository repository;
 
     public FileLoader()
     {
         // For the Spring
     }
 
-    public FileLoader(ObjectFactory factory)
+    public FileLoader(ObjectFactory factory, ResourceRepository repository)
     {
         setObjectFactory(factory);
+        setResourceRepository(repository);
     }
 
     public void setObjectFactory(ObjectFactory factory)
@@ -44,12 +46,12 @@ public class FileLoader
         load(new FileInputStream(file), root);
     }
 
-    public void load(InputStream input, Object root) throws BobException, IOException, IllegalAccessException, InvocationTargetException
+    public void load(InputStream input, Object root) throws BobException
     {
         load(input, root, null);
     }
 
-    public void load(InputStream input, Object root, List<Reference> references) throws BobException, IOException, IllegalAccessException, InvocationTargetException
+    public void load(InputStream input, Object root, List<Reference> references) throws BobException
     {
         try
         {
@@ -63,6 +65,10 @@ public class FileLoader
             catch (ParsingException pex)
             {
                 throw new ParseException(pex);
+            }
+            catch (IOException e)
+            {
+                throw new ParseException(e);
             }
 
             Scope globalScope = new Scope();
@@ -91,7 +97,7 @@ public class FileLoader
         }
     }
 
-    private void loadType(Element e, Object parent, Scope scope) throws BobException, IllegalAccessException
+    private void loadType(Element e, Object parent, Scope scope) throws BobException
     {
         IntrospectionHelper parentHelper = IntrospectionHelper.getHelper(parent.getClass(), typeDefinitions);
         String name = e.getLocalName();
@@ -136,6 +142,11 @@ public class FileLoader
             if (ScopeAware.class.isAssignableFrom(type.getClass()))
             {
                 ((ScopeAware)type).setScope(scope);
+            }
+
+            if (ResourceAware.class.isAssignableFrom(type.getClass()))
+            {
+                ((ResourceAware)type).setResourceRepository(repository);
             }
 
             if (InitComponent.class.isAssignableFrom(type.getClass()))
@@ -202,6 +213,10 @@ public class FileLoader
             throw new ParseException(createParseErrorMessage(name, e, ex));
         }
         catch (FileLoadException ex)
+        {
+            throw new ParseException(createParseErrorMessage(name, e, ex));
+        }
+        catch (IllegalAccessException ex)
         {
             throw new ParseException(createParseErrorMessage(name, e, ex));
         }
@@ -285,5 +300,10 @@ public class FileLoader
     public void register(String name, Class type)
     {
         typeDefinitions.put(name, type);
+    }
+
+    public void setResourceRepository(ResourceRepository repository)
+    {
+        this.repository = repository;
     }
 }

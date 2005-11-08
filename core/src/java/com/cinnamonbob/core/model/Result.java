@@ -3,6 +3,8 @@ package com.cinnamonbob.core.model;
 public abstract class Result extends Entity
 {
     public abstract ResultState getState();
+    public abstract String getErrorMessage();
+    public abstract String getExceptionTrace();
 
     public boolean inProgress()
     {

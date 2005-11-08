@@ -3,7 +3,7 @@ package com.cinnamonbob.core;
 /**
  * <class-comment/>
  */
-public class ResourceReference implements ScopeAware, InitComponent
+public class ResourceReference implements ResourceAware, ScopeAware, InitComponent
 {
     private String name;
     private String version;
