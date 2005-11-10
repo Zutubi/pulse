@@ -2,12 +2,11 @@ package com.cinnamonbob.local;
 
 import org.apache.commons.cli.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 
 import com.cinnamonbob.core.*;
 import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.core.event.EventManager;
 import com.cinnamonbob.core.event.DefaultEventManager;
 import com.cinnamonbob.core.model.BuildResult;
@@ -29,45 +28,45 @@ public class LocalBuild
         Options options = new Options();
 
         options.addOption(OptionBuilder.withLongOpt("bob-file")
-                              .withArgName("file")
-                              .hasArg()
-                              .withDescription("use specified bob file [default: bob.xml]")
-                              .create('b'));
+                .withArgName("file")
+                .hasArg()
+                .withDescription("use specified bob file [default: bob.xml]")
+                .create('b'));
 
         options.addOption(OptionBuilder.withLongOpt("resources-file")
-                                      .withArgName("file")
-                                      .hasArg()
-                                      .withDescription("use resources file [default: <none>]")
-                                      .create('r'));
+                .withArgName("file")
+                .hasArg()
+                .withDescription("use resources file [default: <none>]")
+                .create('r'));
 
         options.addOption(OptionBuilder.withLongOpt("output-dir")
-                                      .withArgName("dir")
-                                      .hasArg()
-                                      .withDescription("write output to specified directory [default: bob.out]")
-                                      .create('o'));
+                .withArgName("dir")
+                .hasArg()
+                .withDescription("write output to specified directory [default: bob.out]")
+                .create('o'));
 
         CommandLineParser parser = new PosixParser();
 
         try
         {
             CommandLine commandLine = parser.parse(options, argv, true);
-            if(commandLine.hasOption('b'))
+            if (commandLine.hasOption('b'))
             {
                 bobFile = commandLine.getOptionValue('b');
             }
 
-            if(commandLine.hasOption('r'))
+            if (commandLine.hasOption('r'))
             {
                 resourcesFile = commandLine.getOptionValue('r');
             }
 
-            if(commandLine.hasOption('o'))
+            if (commandLine.hasOption('o'))
             {
                 outputDir = commandLine.getOptionValue('o');
             }
 
             argv = commandLine.getArgs();
-            if(argv.length > 0)
+            if (argv.length > 0)
             {
                 recipe = argv[0];
             }
@@ -86,16 +85,22 @@ public class LocalBuild
         FileLoader loader = new FileLoader(new ObjectFactory(), null);
         ResourceRepository repository = new ResourceRepository(loader);
 
-        if(resourcesFile != null)
+        if (resourcesFile != null)
         {
+            FileInputStream stream = null;
+
             try
             {
-                FileInputStream stream = new FileInputStream(resourcesFile);
+                stream = new FileInputStream(resourcesFile);
                 repository.load(stream);
             }
             catch (FileNotFoundException e)
             {
                 throw new BobException("Unable to open resources file '" + resourcesFile + "'");
+            }
+            finally
+            {
+                IOUtils.close(stream);
             }
         }
 
@@ -111,34 +116,52 @@ public class LocalBuild
         File workDir = new File(System.getProperty("user.dir"));
         File output = new File(workDir, outputDir);
 
-        EventManager manager = new DefaultEventManager();
-        manager.register(new BuildStatusPrinter(workDir));
+        cleanOutputDir(output);
 
-        BuildResult result = new BuildResult(bobFile, 0);
-        result.commence(output);
-        manager.publish(new BuildCommencedEvent(this, result));
+        File logFile = new File(outputDir, "build.log");
+        FileOutputStream logStream = null;
 
         try
         {
-            cleanOutputDir(output);
+            logStream = new FileOutputStream(logFile);
 
-            FileLoader loader = new FileLoader(new ObjectFactory(), repository);
-            BuildProcessor processor = new BuildProcessor(manager, loader);
-            processor.build(workDir, bobFile, recipe, result, output);
+            EventManager manager = new DefaultEventManager();
+            manager.register(new BuildStatusPrinter(workDir, logStream));
+
+            BuildResult result = new BuildResult(bobFile, 0);
+            result.commence(output);
+            manager.publish(new BuildCommencedEvent(this, result));
+
+            try
+            {
+                FileLoader loader = new FileLoader(new ObjectFactory(), repository);
+                BuildProcessor processor = new BuildProcessor(manager, loader);
+                processor.build(workDir, bobFile, recipe, result, output);
+            }
+            catch (BuildException e)
+            {
+                result.error(e);
+            }
+            catch (Exception e)
+            {
+                result.error(new BuildException(e));
+            }
+            finally
+            {
+                result.complete();
+                manager.publish(new BuildCompletedEvent(this, result));
+            }
         }
-        catch(BuildException e)
+        catch (FileNotFoundException e)
         {
-            result.error(e);
-        }
-        catch(Exception e)
-        {
-            result.error(new BuildException(e));
+            fatal(e);
         }
         finally
         {
-            result.complete();
-            manager.publish(new BuildCompletedEvent(this, result));
+            IOUtils.close(logStream);
         }
+
+        printEpilogue(logFile);
     }
 
     private void printPrologue(String bobFile, String resourcesFile, String outputDir)
@@ -146,7 +169,7 @@ public class LocalBuild
         System.out.println("bobfile         : '" + bobFile + "'");
         System.out.println("output directory: '" + outputDir + "'");
 
-        if(resourcesFile != null)
+        if (resourcesFile != null)
         {
             System.out.println("resources file  : '" + resourcesFile + "'");
         }
@@ -154,17 +177,23 @@ public class LocalBuild
         System.out.println();
     }
 
+    private void printEpilogue(File logFile)
+    {
+        System.out.println();
+        System.out.println("Build report saved to '" + logFile.getPath() + "'.");
+    }
+
     private void cleanOutputDir(File output)
     {
-        if(output.isDirectory())
+        if (output.isDirectory())
         {
-            if(!FileSystemUtils.removeDirectory(output))
+            if (!FileSystemUtils.removeDirectory(output))
             {
                 throw new BuildException("Unable to remove existing output directory '" + output.getPath() + "'");
             }
         }
 
-        if(!output.mkdirs())
+        if (!output.mkdirs())
         {
             throw new BuildException("Unable to create output directory '" + output.getPath() + "'");
         }

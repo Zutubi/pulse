@@ -1,12 +1,15 @@
 package com.cinnamonbob.local;
 
-import com.cinnamonbob.core.event.EventListener;
-import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.core.*;
+import com.cinnamonbob.core.event.Event;
+import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.core.model.*;
+import com.cinnamonbob.core.util.ForkOutputStream;
 
-import java.util.List;
 import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.List;
 
 /**
  * Prints status information to standard out while doing a local build.
@@ -17,9 +20,10 @@ public class BuildStatusPrinter implements EventListener
     private String workDir;
 
 
-    public BuildStatusPrinter(File work)
+    public BuildStatusPrinter(File work, OutputStream logStream)
     {
-        indenter = new Indenter(System.out, "  ");
+        ForkOutputStream fork = new ForkOutputStream(System.out, logStream);
+        indenter = new Indenter(new PrintStream(fork), "  ");
         workDir = work.getAbsolutePath() + File.separatorChar;
     }
 
