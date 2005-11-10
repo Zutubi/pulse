@@ -14,11 +14,13 @@ import java.io.File;
 public class BuildStatusPrinter implements EventListener
 {
     private Indenter indenter;
+    private String workDir;
 
-    
-    public BuildStatusPrinter()
+
+    public BuildStatusPrinter(File work)
     {
         indenter = new Indenter(System.out, "  ");
+        workDir = work.getAbsolutePath() + File.separatorChar;
     }
 
 
@@ -109,7 +111,7 @@ public class BuildStatusPrinter implements EventListener
         for(StoredArtifact artifact: artifacts)
         {
             File file = new File(artifact.getFile());
-            indenter.println("* " + artifact.getTitle() + " (" + file.getPath() + ")");
+            indenter.println("* " + artifact.getTitle() + " (" + getFilePath(file) + ")");
 
             for(Feature.Level level: Feature.Level.values())
             {
@@ -124,6 +126,17 @@ public class BuildStatusPrinter implements EventListener
 
         }
         indenter.dedent();
+    }
+
+    private String getFilePath(File file)
+    {
+        String result = file.getPath();
+        if(result.startsWith(workDir))
+        {
+            result = result.substring(workDir.length());
+        }
+
+        return result;
     }
 
     private void showFeatures(Feature.Level level, List<Feature> features)

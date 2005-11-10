@@ -106,13 +106,13 @@ public class LocalBuild
     {
         printPrologue(bobFile, resourcesFile, outputDir);
 
-        EventManager manager = new DefaultEventManager();
-        manager.register(new BuildStatusPrinter());
-
         ResourceRepository repository = createRepository(resourcesFile);
 
         File workDir = new File(System.getProperty("user.dir"));
         File output = new File(workDir, outputDir);
+
+        EventManager manager = new DefaultEventManager();
+        manager.register(new BuildStatusPrinter(workDir));
 
         BuildResult result = new BuildResult(bobFile, 0);
         result.commence(output);
