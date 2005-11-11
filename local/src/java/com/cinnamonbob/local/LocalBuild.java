@@ -72,7 +72,8 @@ public class LocalBuild
             }
 
             LocalBuild b = new LocalBuild();
-            b.runBuild(bobFile, recipe, resourcesFile, outputDir);
+            File workDir = new File(System.getProperty("user.dir"));
+            b.runBuild(workDir, bobFile, recipe, resourcesFile, outputDir);
         }
         catch (Exception e)
         {
@@ -107,18 +108,35 @@ public class LocalBuild
         return repository;
     }
 
-    private void runBuild(String bobFile, String recipe, String resourcesFile, String outputDir) throws Exception
+    /**
+     * Executes a local build with the given inputs, using the given output
+     * directory to save results.  All paths provided must be absolute or
+     * relative to the current working directory.
+     *
+     * @param workDir
+     *        the working directory in which to execute the build
+     * @param bobFile
+     *        the name of the bobfile to load
+     * @param recipe
+     *        the recipe to execute, may be null to indicate the default
+     *        recipe in the given bobfile
+     * @param resourcesFile
+     *        the resources file to load prior to building , or null if no
+     *        resources are to be loaded
+     * @param outputDir the name of the output directory to capture output
+     *        and save results to
+     * @throws BobException
+     */
+    public void runBuild(File workDir, String bobFile, String recipe, String resourcesFile, String outputDir) throws BobException
     {
         printPrologue(bobFile, resourcesFile, outputDir);
 
         ResourceRepository repository = createRepository(resourcesFile);
 
-        File workDir = new File(System.getProperty("user.dir"));
         File output = new File(workDir, outputDir);
-
         cleanOutputDir(output);
 
-        File logFile = new File(outputDir, "build.log");
+        File logFile = new File(output, "build.log");
         FileOutputStream logStream = null;
 
         try
@@ -154,7 +172,7 @@ public class LocalBuild
         }
         catch (FileNotFoundException e)
         {
-            fatal(e);
+            throw new BobException("Unable to create log file '" + logFile.getPath() + "': " + e.getMessage());
         }
         finally
         {

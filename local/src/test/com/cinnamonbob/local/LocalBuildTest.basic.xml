@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<project defaultRecipe="my-default">
+
+    <recipe name="cool">
+        <executable name="howdy" exe="echo" args="hello world!"/>
+        <executable name="chowdy" exe="echo" args="bye now"/>
+    </recipe>
+
+    <recipe name="my-default">
+        <executable name="noice" exe="echo" args="brief intro..."/>
+        <executable name="oops" exe="echo" args="error: everything's ok"/>
+        <executable name="whoa" exe="echo" args="warning: everything's still fine"/>
+        <executable name="hey" exe="echo" args="info: informative"/>
+        <executable name="bzzzt" exe="echo" args="donskis"/>
+    </recipe>
+
+</project>

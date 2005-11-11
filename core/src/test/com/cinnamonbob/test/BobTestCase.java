@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.io.InputStream;
+import java.net.URL;
 
 /**
  * Base class for test cases.
@@ -94,5 +95,10 @@ public abstract class BobTestCase extends TestCase
     protected InputStream getInput(String testName)
     {
         return getClass().getResourceAsStream(getClass().getSimpleName() + "." + testName + ".xml");
+    }
+
+    protected URL getInputURL(String testName)
+    {
+        return getClass().getResource(getClass().getSimpleName() + "." + testName + ".xml");
     }
 }
