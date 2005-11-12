@@ -79,5 +79,10 @@
                 <include name="**/*"/>
             </fileset>
         </copy>
+        <copy todir="${publish.lib.dir}">
+            <fileset dir="etc">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
     </target>
 </project>
