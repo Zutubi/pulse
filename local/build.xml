@@ -5,11 +5,15 @@
 
     <property name="version" value="dev"/>
 
-    <property name="module.jar" value="core-${version}.jar"/>
+    <property name="module.jar" value="local-${version}.jar"/>
 
     <property name="publish.dir" value="definedByCallingBuildFile"/>
+    <property name="lib.dir" value="definedByCallingBuildFile"/>
 
     <path id="lib.path">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
         <fileset dir="lib">
             <include name="**/*.jar"/>
             <exclude name="**/webwork-2.1.7.jar"/> <!-- use patched version, fixes incompatibility between displaytag and webwork -->
@@ -61,14 +65,7 @@
     <target name="default" depends="clean, build" description="Run a clean build by default."/>
 
     <target name="jar" depends="build">
-        <jar file="build/${module.jar}">
-            <fileset dir="build/java/classes">
-                <include name="**/*"/>
-            </fileset>
-            <fileset dir="build/test/classes">
-                <include name="**/*"/>
-            </fileset>
-        </jar>
+        <jar file="build/${module.jar}" basedir="build/java/classes"/>
         <move file="build/${module.jar}" todir="${publish.dir}"/>
     </target>
 
