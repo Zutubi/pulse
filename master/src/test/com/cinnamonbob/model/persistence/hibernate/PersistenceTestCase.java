@@ -48,15 +48,15 @@ public abstract class PersistenceTestCase extends BobTestCase
     {
         super.setUp();
 
-        String[] configLocations = new String[]{
-            "com/cinnamonbob/bootstrap/testBootstrapContext.xml",
-            "com/cinnamonbob/bootstrap/testApplicationContext.xml"
-        };
+        String[] configLocations = getConfigLocations();
 
         ComponentContext.addClassPathContextDefinitions(configLocations);
         context = ComponentContext.getContext();
 
+        DataSource dataSource = (DataSource) context.getBean("dataSource");
+
         DatabaseBootstrap dbBootstrap = new DatabaseBootstrap();
+        dbBootstrap.setDataSource(dataSource);
         dbBootstrap.initialiseDatabase();
 
         transactionManager = (PlatformTransactionManager)context.getBean("transactionManager");
@@ -87,6 +87,14 @@ public abstract class PersistenceTestCase extends BobTestCase
         transactionDefinition = null;
         transactionManager = null;
         super.tearDown();
+    }
+
+    protected String[] getConfigLocations()
+    {
+        return new String[]{
+            "com/cinnamonbob/bootstrap/testBootstrapContext.xml",
+            "com/cinnamonbob/bootstrap/testApplicationContext.xml"
+        };
     }
 
     protected void commitAndRefreshTransaction()
