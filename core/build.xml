@@ -7,7 +7,8 @@
 
     <property name="module.jar" value="core-${version}.jar"/>
 
-    <property name="publish.dir" value="definedByCallingBuildFile"/>
+    <property name="publish.bin.dir" value="definedByCallingBuildFile"/>
+    <property name="publish.lib.dir" value="definedByCallingBuildFile"/>
 
     <path id="lib.path">
         <fileset dir="lib">
@@ -69,7 +70,14 @@
                 <include name="**/*"/>
             </fileset>
         </jar>
-        <move file="build/${module.jar}" todir="${publish.dir}"/>
     </target>
 
+    <target name="publish" depends="jar">
+        <move file="build/${module.jar}" todir="${publish.lib.dir}"/>
+        <copy todir="${publish.bin.dir}">
+            <fileset dir="src/bin">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+    </target>
 </project>

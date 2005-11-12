@@ -2,6 +2,7 @@
 <project name="Cinnamon Bob" default="default" basedir=".">
 
     <property name="module" value="core"/>
+    <property name="publish.dir" value="../build"/>
 
     <target name="clean">
         <delete dir="build"/>
@@ -14,17 +15,19 @@
 
     <target name="build.core" depends="_prepare">
         <ant antfile="build.xml" dir="core" target="clean"/>
-        <ant antfile="build.xml" dir="core" target="jar">
-            <property name="publish.dir" value="../build/lib"/>
+        <ant antfile="build.xml" dir="core" target="publish">
+            <property name="publish.bin.dir" value="${publish.dir}/bin"/>
+            <property name="publish.lib.dir" value="${publish.dir}/lib"/>
         </ant>
     </target>
 
     <target name="build.local" depends="build.core">
 
         <ant antfile="build.xml" dir="local" target="clean"/>
-        <ant antfile="build.xml" dir="local" target="jar">
+        <ant antfile="build.xml" dir="local" target="publish">
             <property name="lib.dir" value="../build/lib"/>
-            <property name="publish.dir" value="../build/lib"/>
+            <property name="publish.bin.dir" value="${publish.dir}/bin"/>
+            <property name="publish.lib.dir" value="${publish.dir}/lib"/>
         </ant>
 
     </target>
