@@ -1,0 +1,7 @@
+[no-such-bob.xml]
+  commenced:
+  completed:
+  elapsed  :
+  result   : error
+  message  :
+    java.io.FileNotFoundException: tmpDir/no-such-bob.xml (No such file or directory)

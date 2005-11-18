@@ -1,0 +1,51 @@
+[LocalBuildTest.basic.xml]
+  commenced:
+  [noice]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+    artifacts:
+      * Command Output (out/00000000-noice/output.txt)
+
+  [oops]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+    artifacts:
+      * Command Output (out/00000001-oops/output.txt)
+        error features:
+          * error: everything's ok
+
+  [whoa]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+    artifacts:
+      * Command Output (out/00000002-whoa/output.txt)
+        warning features:
+          * warning: everything's still fine
+
+  [hey]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+    artifacts:
+      * Command Output (out/00000003-hey/output.txt)
+        info features:
+          * info: informative
+
+  [bzzzt]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+    artifacts:
+      * Command Output (out/00000004-bzzzt/output.txt)
+
+  completed:
+  elapsed  :
+  result   : success

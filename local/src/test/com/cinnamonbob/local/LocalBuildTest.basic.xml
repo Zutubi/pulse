@@ -6,11 +6,28 @@
         <executable name="chowdy" exe="echo" args="bye now"/>
     </recipe>
 
+    <post-processor name="my-pp">
+        <regex>
+            <pattern category="info" expression="info:.*"/>
+            <pattern category="warning" expression="warning:.*"/>
+            <pattern category="error" expression="error:.*"/>
+        </regex>
+    </post-processor>
+
     <recipe name="my-default">
         <executable name="noice" exe="echo" args="brief intro..."/>
-        <executable name="oops" exe="echo" args="error: everything's ok"/>
-        <executable name="whoa" exe="echo" args="warning: everything's still fine"/>
-        <executable name="hey" exe="echo" args="info: informative"/>
+        <command name="oops">
+            <executable exe="echo" args="error: everything's ok"/>
+            <process artifact="output" processor="${my-pp}"/>
+        </command>
+        <command name="whoa">
+            <executable exe="echo" args="warning: everything's still fine"/>
+            <process artifact="output" processor="${my-pp}"/>
+        </command>
+        <command name="hey">
+            <executable exe="echo" args="info: informative"/>
+            <process artifact="output" processor="${my-pp}"/>
+        </command>
         <executable name="bzzzt" exe="echo" args="donskis"/>
     </recipe>
 

@@ -133,6 +133,11 @@ public class LocalBuild
 
         ResourceRepository repository = createRepository(resourcesFile);
 
+        if(!workDir.isDirectory())
+        {
+            throw new BobException("Working directory '" + workDir.getAbsolutePath() + "' does not exist");
+        }
+        
         File output = new File(workDir, outputDir);
         cleanOutputDir(output);
 
