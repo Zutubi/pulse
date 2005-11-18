@@ -1,1 +1,1 @@
-error: everything's ok
+error: everythings ok

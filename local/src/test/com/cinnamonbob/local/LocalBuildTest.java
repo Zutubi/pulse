@@ -35,7 +35,7 @@ public class LocalBuildTest extends BobTestCase
     private File getExpectedOutput(String name)
     {
         URL url = getClass().getResource(getClass().getSimpleName() + ".basic.xml");
-        File xmlFile = new File(url.getFile().replace("classes", "src/test"));
+        File xmlFile = new File(url.getFile());
         File dataDir = new File(xmlFile.getParentFile(), "data");
 
         return new File(dataDir, name);
@@ -61,13 +61,14 @@ public class LocalBuildTest extends BobTestCase
 
     public void testInvalidWorkDir()
     {
+        File workDir = new File("/no/such/dir");
         try
         {
-            builder.runBuild(new File("/no/such/dir"), "bob.xml", "my-default", null, "out");
+            builder.runBuild(workDir, "bob.xml", "my-default", null, "out");
         }
         catch (BobException e)
         {
-            assertEquals("Working directory '/no/such/dir' does not exist", e.getMessage());
+            assertEquals("Working directory '" + workDir.getAbsolutePath() + "' does not exist", e.getMessage());
             return;
         }
 
@@ -82,7 +83,7 @@ public class LocalBuildTest extends BobTestCase
 
         cleanBuildLog(new File(actualDir, "build.log"));
 
-        if(generateMode)
+        if (generateMode)
         {
             tmpDir.renameTo(expectedDir);
         }
@@ -113,15 +114,17 @@ public class LocalBuildTest extends BobTestCase
         try
         {
             reader = new BufferedReader(new FileReader(log));
-            writer  = new BufferedWriter(new FileWriter(output));
+            writer = new BufferedWriter(new FileWriter(output));
             String line;
 
-            while((line = reader.readLine()) != null)
+            while ((line = reader.readLine()) != null)
             {
                 line = line.replaceFirst("commenced:.*", "commenced:");
                 line = line.replaceFirst("completed:.*", "completed:");
                 line = line.replaceFirst("elapsed  :.*", "elapsed  :");
+                line = line.replaceFirst("The system cannot find the file specified", "No such file or directory");
                 line = line.replace(tmpDir.getAbsolutePath(), "tmpDir");
+                line = line.replaceAll("\\\\", "/");
                 writer.write(line);
                 writer.newLine();
             }
@@ -142,7 +145,7 @@ public class LocalBuildTest extends BobTestCase
 
         cleanBuildLog(new File(actualDir, "build.log"));
 
-        if(generateMode)
+        if (generateMode)
         {
             actualDir.renameTo(expectedDir);
         }

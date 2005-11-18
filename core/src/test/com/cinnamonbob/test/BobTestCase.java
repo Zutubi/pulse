@@ -168,32 +168,30 @@ public abstract class BobTestCase extends TestCase
 
         FileInputStream is1 = new FileInputStream(file1);
         FileInputStream is2 = new FileInputStream(file2);
-        byte buffer1[] = new byte[1024];
-        byte buffer2[] = new byte[1024];
-        int read1;
-        int read2;
 
-        while(true)
+        BufferedReader rs1 = new BufferedReader(new InputStreamReader(is1));
+        BufferedReader rs2 = new BufferedReader(new InputStreamReader(is2));
+
+        while (true)
         {
-            read1 = is1.read(buffer1);
-            read2 = is2.read(buffer2);
+            String line1 = rs1.readLine();
+            String line2 = rs2.readLine();
 
-            if(read1 != read2)
+            if (line1 == null)
             {
-                throw new AssertionFailedError("Size of '" + file1.getAbsolutePath() + "' differs from size of '" + file2.getAbsolutePath() + "'");
+                if (line2 == null)
+                {
+                    return;
+                }
+                throw new AssertionFailedError("Contents of '" + file1.getAbsolutePath() + " differs from contents of '" + file2.getAbsolutePath() + "'");
             }
-
-            if(read1 == -1)
+            else
             {
-                break;
-            }
-
-            for(int i = 0; i < read1; i++)
-            {
-                if(buffer1[i] != buffer2[i])
+                if (line2 == null)
                 {
                     throw new AssertionFailedError("Contents of '" + file1.getAbsolutePath() + " differs from contents of '" + file2.getAbsolutePath() + "'");
                 }
+                assertEquals(line1, line2);
             }
         }
     }

@@ -16,7 +16,7 @@
     artifacts:
       * Command Output (out/00000001-oops/output.txt)
         error features:
-          * error: everything's ok
+          * error: everythings ok
 
   [whoa]
     commenced:
@@ -26,7 +26,7 @@
     artifacts:
       * Command Output (out/00000002-whoa/output.txt)
         warning features:
-          * warning: everything's still fine
+          * warning: everythings still fine
 
   [hey]
     commenced:
