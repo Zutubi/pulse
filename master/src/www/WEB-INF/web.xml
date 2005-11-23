@@ -37,6 +37,25 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
+    <servlet>
+        <servlet-name>hessian</servlet-name>
+        <servlet-class>com.cinnamonbob.hessian.CustomHessianServlet</servlet-class>
+        <init-param>
+            <param-name>home-class</param-name>
+            <param-value>com.cinnamonbob.MasterServiceImpl</param-value>
+        </init-param>
+        <init-param>
+            <param-name>home-api</param-name>
+            <param-value>com.cinnamonbob.MasterService</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>hessian</servlet-name>
+        <url-pattern>/hessian</url-pattern>
+    </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>XmlRpcApiServlet</servlet-name>
         <url-pattern>/api/xmlrpc/*</url-pattern>
