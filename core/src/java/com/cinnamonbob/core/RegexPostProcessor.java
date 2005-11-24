@@ -22,7 +22,18 @@ public class RegexPostProcessor implements PostProcessor
 
     private String name;
 
-    private List<RegexPattern> patterns = new LinkedList<RegexPattern>();
+    private List<RegexPattern> patterns;
+
+    public RegexPostProcessor()
+    {
+        patterns = new LinkedList<RegexPattern>();
+    }
+
+    public RegexPostProcessor(String name)
+    {
+        this.name = name;
+        patterns = new LinkedList<RegexPattern>();
+    }
 
     public void process(StoredArtifact artifact)
     {
@@ -49,10 +60,10 @@ public class RegexPostProcessor implements PostProcessor
     {
         for(RegexPattern p: patterns)
         {
-            Matcher matcher = p.getPattern().matcher(line);
-            if(matcher.matches())
+            String summary = p.match(line);
+            if(summary != null)
             {
-                artifact.addFeature(new PlainFeature(p.getCategory(), line, lineNumber));
+                artifact.addFeature(new PlainFeature(p.getCategory(), summary, lineNumber));
             }
         }
     }
@@ -60,8 +71,14 @@ public class RegexPostProcessor implements PostProcessor
     public RegexPattern createPattern()
     {
         RegexPattern pattern = new RegexPattern();
-        patterns.add(pattern);
+        addRegexPattern(pattern);
         return pattern;
+    }
+
+    /* Hrm, if we call this addPattern it gets magically picked up by FileLoader */
+    public void addRegexPattern(RegexPattern pattern)
+    {
+        patterns.add(pattern);
     }
 
     public String getName()

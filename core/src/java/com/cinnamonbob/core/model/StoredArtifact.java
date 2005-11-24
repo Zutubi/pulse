@@ -86,7 +86,7 @@ public class StoredArtifact extends Entity
         return type;
     }
 
-    private List<Feature> getFeatures()
+    public List<Feature> getFeatures()
     {
         return features;
     }
