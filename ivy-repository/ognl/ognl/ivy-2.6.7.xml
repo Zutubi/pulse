@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="ognl" module="ognl" revision="2.6.7" status="release">
+        <license name="..." url="..."/>
+
+        <description homepage="http://www.ognl.org/">
+            OGNL stands for Object-Graph Navigation Language; it is an expression language
+            for getting and setting properties of Java objects.
+        </description>
+    </info>
+
+    <publications>
+        <artifact name="ognl" type="jar" conf="default"/>
+    </publications>
+
+</ivy-module>

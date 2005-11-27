@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="opensymphony" module="webwork" revision="2.1.7" status="release">
+        <license name="Apache" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+        <ivyauthor name="opensymphony" url="http://www.opensymphony.com/"/>
+
+        <description homepage="http://www.opensymphony.com/webwork/">
+
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="default" visibility="public"/>
+        <conf name="fileupload"/>
+        <conf name="fileupload-cos" deprecated="20050831000000"/>
+        <conf name="fileupload-pell" deprecated="20050831000000"/>
+    </configurations>
+
+    <publications>
+        <artifact name="webwork" type="jar" conf="default"/>
+    </publications>
+
+    <dependencies>
+        <dependency org="opensymphony" name="xwork" rev="1.0.5" conf="default->*"/>
+        <dependency org="apache" name="velocity" rev="1.3.1"/>
+
+        <dependency org="apache" name="commons-fileupload" rev="1.0" conf="fileupload->default"/>
+        <dependency org="cos" name="cos" rev="20021105" conf="fileupload-cos->default"/>
+        <dependency org="pell" name="multipartrequest" rev="1.19" conf="fileupload-pell->default"/>    </dependencies>
+
+</ivy-module>

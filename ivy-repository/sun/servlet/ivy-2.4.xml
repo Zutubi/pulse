@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="sun" module="servlet" revision="2.4" status="release">
+        <license name="Sun"/>
+
+        <description homepage="....">
+
+        </description>
+    </info>
+
+    <publications>
+        <artifact name="javax.servlet" type="jar"/>
+    </publications>
+
+</ivy-module>

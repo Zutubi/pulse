@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="ymsg" module="ymsg" revision="0.61" status="release">
+        <license name="GPL" url="http://www.gnu.org/copyleft/gpl.html"/>
+        <ivyauthor name="..." url="..."/>
+        <description homepage="http://jymsg9.sourceforge.net/">
+            This API provides a way for Java applications to connect and use the
+            Yahoo Instant Messenger protocol.
+            <br/>Version 0.61 is a protocol patch of 0.6.
+        </description>
+    </info>
+
+    <publications>
+        <artifact name="ymsg-network" type="jar" conf="default"/>
+        <artifact name="ymsg-support" type="jar" conf="support"/>
+    </publications>
+
+</ivy-module>

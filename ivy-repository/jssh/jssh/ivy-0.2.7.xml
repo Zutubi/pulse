@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="jssh" revision="0.2.7" module="jssh" status="release">
+
+        <license name="Apache Software License" url="..."/>
+        <license name="GPL" url="..."/>
+        <license name="LGPL" url="..."/>
+
+        <description homepage="http://sourceforge.net/projects/sshtools/">
+            Java SSH API
+        </description>
+
+    </info>
+
+    <publications>
+        <artifact name="j2ssh-common" type="jar" conf="default"/>
+        <artifact name="j2ssh-core" type="jar" conf="default"/>
+    </publications>
+
+</ivy-module>

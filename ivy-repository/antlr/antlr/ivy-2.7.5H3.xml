@@ -1,0 +1,16 @@
+<ivy-module version="1.0">
+	<info organisation="antlr" module="antlr" revision="2.7.5H3" status="release">
+        <license name="ANTLR license" url="http://www.antlr.org/license.html"/>
+        <description homepage="http://www.antlr.org/">
+            ANTLR, ANother Tool for Language Recognition, (formerly PCCTS) is a language
+            tool that provides a framework for constructing recognizers, compilers, and
+            translators from grammatical descriptions containing Java, C#, C++, or
+            Python actions.
+        </description>
+    </info>
+
+    <publications>
+        <artifact name="antlr" type="jar"/>
+    </publications>
+
+</ivy-module>

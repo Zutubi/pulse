@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.1">
+    <info organisation="sun" module="jaf" revision="1.0.2" status="release">
+        <license name="Sun"/>
+
+        <description homepage="http://java.sun.com/beans/glasgow/jaf.html">
+	        With the JavaBeans Activation Framework standard extension, developers
+            who use Java technology can take advantage of standard services to determine the
+            type of an arbitrary piece of data, encapsulate access to it, discover the
+            operations available on it, and to instantiate the appropriate bean to perform
+            said operation(s).
+        </description>
+    </info>
+
+    <publications>
+        <artifact name="activation" type="jar"/>
+    </publications>
+    
+</ivy-module>

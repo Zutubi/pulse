@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivyconf>
+
+    <conf defaultCache="${ivy.conf.dir}/.ivy-cache" defaultResolver="resolvers" checkUpToDate="true"/>
+
+    <resolvers>
+
+        <dual name="resolvers">
+            <chain name="ivy">
+                <filesystem name="ivy-repository" checkmodified="true">
+                    <ivy pattern="${ivy.conf.dir}/ivy-repository/[organisation]/[module]/ivy-[revision].xml"/>
+                </filesystem>
+            </chain>
+            <chain name="artifact">
+                <filesystem name="artifact-repository" checkmodified="true">
+                    <artifact pattern="${ivy.conf.dir}/artifact-repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
+                </filesystem>
+
+            </chain>
+        </dual>
+
+        <filesystem name="build">
+            <ivy pattern="${ivy.conf.dir}/build/repository/[module]/ivy-[revision].xml"/>
+            <artifact pattern="${ivy.conf.dir}/build/repository/[module]/[type]s/[artifact]-[revision].[type]"/>
+        </filesystem>
+
+    </resolvers>
+
+    <modules>
+        <!-- we know where all of the cinnamonbob packages are located, no
+             point searching through the others -->
+        <module organisation="cinnamonbob" name=".*" resolver="build"/>
+    </modules>
+
+</ivyconf>
+

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="apache" module="velocity-tools" revision="1.1" status="release" publication="20040517125300" resolver="contegix-ivy">
+		<license name="Apache" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+		<ivyauthor name="jayasoft" url="http://www.jayasoft.org/"/>
+
+		<description homepage="http://jakarta.apache.org/velocity/index.html">
+    	    VelocityTools is a collection of Velocity subprojects with a common goal of
+            creating tools and infrastructure for building both web and non-web applications
+            using the Velocity template engine.
+		</description>
+	</info>
+
+    <configurations>
+        <conf name="default"/>
+        <conf name="view" description="Velocity tools with no Struts dependencies." visibility="public"/>
+    </configurations>
+
+    <publications>
+        <artifact name="velocity-tools-view" type="jar" conf="view,default"/>
+    </publications>
+
+</ivy-module>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://ivyrep.jayasoft.org/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info  organisation="apache" module="commons-attributes" revision="2.1" status="release">
+		<license name="Apache" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+
+		<description homepage="http://jakarta.apache.org/commons/attributes/">
+
+		</description>
+	</info>
+
+    <configurations>
+        <conf name="default"/>
+    </configurations>
+
+    <publications>
+        <artifact name="commons-attributes-compiler" type="jar" conf="default"/>
+        <artifact name="commons-attributes-api" type="jar" conf="default"/>
+    </publications>
+
+    <dependencies>
+        <dependency name="commons-collections" rev="2.1" conf="default"/>
+    </dependencies>
+
+</ivy-module>
