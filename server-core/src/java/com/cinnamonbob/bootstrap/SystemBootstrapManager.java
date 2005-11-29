@@ -4,7 +4,6 @@ import java.io.File;
 
 /**
  * Handle the system bootstraping.
- *
  */
 public class SystemBootstrapManager
 {
@@ -25,9 +24,9 @@ public class SystemBootstrapManager
         else // look it up on the classpath.
         {
             ComponentContext.addClassPathContextDefinitions(new String[]{contextName});
-        }        
+        }
 
-        ((StartupManager)ComponentContext.getBean("startupManager")).init();
+        ((StartupManager) ComponentContext.getBean("startupManager")).init();
     }
 
     public static void main(String argv[])

@@ -10,36 +10,32 @@ public class DefaultApplicationPaths implements ApplicationPaths
 {
     private final File bobHome;
 
+    private File systemRoot;
     private File contentRoot;
     private File configRoot;
     private File templateRoot;
     private File userConfigRoot;
     private File databaseRoot;
-    
+
     public DefaultApplicationPaths(File bobHome)
     {
         this.bobHome = bobHome;
     }
 
-    public File getApplicationRoot()
+    public File getSystemRoot()
     {
-        return bobHome;
-    }
-
-    public File getDatabaseRoot()
-    {
-        if (databaseRoot == null)
+        if (systemRoot == null)
         {
-             databaseRoot = new File(bobHome, "system" + File.separatorChar + "database");   
+            systemRoot = new File(bobHome, "system");
         }
-        return databaseRoot;
+        return systemRoot;
     }
 
     public File getContentRoot()
     {
         if (contentRoot == null)
         {
-            contentRoot = new File(bobHome, "system" + File.separatorChar + "www");
+            contentRoot = new File(getSystemRoot(), "www");
         }
         return contentRoot;
     }
@@ -48,7 +44,7 @@ public class DefaultApplicationPaths implements ApplicationPaths
     {
         if (configRoot == null)
         {
-            configRoot = new File(bobHome, "system" + File.separatorChar + "config");
+            configRoot = new File(getSystemRoot(), "config");
         }
         return configRoot;
     }
@@ -57,7 +53,7 @@ public class DefaultApplicationPaths implements ApplicationPaths
     {
         if (templateRoot == null)
         {
-            templateRoot = new File(bobHome, "system" + File.separatorChar + "templates");
+            templateRoot = new File(getSystemRoot(), "templates");
         }
         return templateRoot;
     }
@@ -69,5 +65,14 @@ public class DefaultApplicationPaths implements ApplicationPaths
             userConfigRoot = new File(bobHome, "config");
         }
         return userConfigRoot;
+    }
+
+    public File getDatabaseRoot()
+    {
+        if (databaseRoot == null)
+        {
+            databaseRoot = new File(getSystemRoot(), "database");
+        }
+        return databaseRoot;
     }
 }

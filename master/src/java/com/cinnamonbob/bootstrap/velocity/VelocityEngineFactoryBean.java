@@ -6,7 +6,6 @@ import org.springframework.beans.factory.FactoryBean;
 
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /**
  * 
@@ -14,15 +13,13 @@ import java.util.logging.Logger;
  */
 public class VelocityEngineFactoryBean implements FactoryBean
 {
-    private static final Logger LOG = Logger.getLogger(VelocityEngineFactoryBean.class.getName());
-
     private static VelocityEngine VELOCITY_ENGINE;
 
     public Object getObject() throws Exception
     {
         if (VELOCITY_ENGINE == null)
         {
-            synchronized(this)
+            synchronized (this)
             {
                 if (VELOCITY_ENGINE == null)
                 {

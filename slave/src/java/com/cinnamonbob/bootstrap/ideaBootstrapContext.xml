@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation"></bean>
+
+    <bean id="startupManager" class="com.cinnamonbob.bootstrap.StartupManager">
+        <property name="systemContexts">
+            <list>
+                <value>com/cinnamonbob/bootstrap/applicationContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/webworkContext.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.DefaultConfigurationManager" init-method="init">
+        <property name="defaultProperties">
+            <props>
+                <prop key="webapp.port">8090</prop>
+                <prop key="admin.port">8091</prop>
+            </props>
+        </property>
+        <property name="applicationPaths">
+            <bean class="com.cinnamonbob.bootstrap.ConfigurableApplicationPaths">
+                <property name="systemRoot">
+                    <value>slave/system</value>
+                </property>
+                <property name="contentRoot">
+                    <value>slave/src/www</value>
+                </property>
+                <property name="configRoot">
+                    <value>slave/src/etc</value>
+                </property>
+                <property name="templateRoot">
+                    <value>slave/src/templates</value>
+                </property>
+                <property name="userConfigRoot">
+                    <value>slave/src/etc</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+</beans>

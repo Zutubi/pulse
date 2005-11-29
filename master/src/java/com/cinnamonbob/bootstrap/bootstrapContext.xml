@@ -2,6 +2,8 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
+    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation"></bean>
+
     <bean id="startupManager" class="com.cinnamonbob.bootstrap.StartupManager">
         <property name="systemContexts">
             <list>
@@ -20,7 +22,7 @@
             </props>
         </property>
     </bean>
-    
+
     <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
 
 </beans>

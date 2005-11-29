@@ -8,17 +8,18 @@ import java.io.File;
  */
 public class ConfigurableApplicationPaths implements ApplicationPaths
 {
+    private File systemRoot;
     private File contentRoot;
     private File configRoot;
     private File templateRoot;
     private File userConfigRoot;
     private File databaseRoot;
-    
-    /**
-     * @deprecated 
-     */
-    private File applicationRoot;
-    
+
+    public File getSystemRoot()
+    {
+        return systemRoot;
+    }
+
     public File getContentRoot()
     {
         return contentRoot;
@@ -39,12 +40,9 @@ public class ConfigurableApplicationPaths implements ApplicationPaths
         return userConfigRoot;
     }
 
-    /**
-     * @deprecated 
-     */
-    public File getApplicationRoot()
+    public void setSystemRoot(File systemRoot)
     {
-        return applicationRoot;
+        this.systemRoot = systemRoot;
     }
 
     public void setContentRoot(File contentRoot)
@@ -65,11 +63,6 @@ public class ConfigurableApplicationPaths implements ApplicationPaths
     public void setUserConfigRoot(File userConfigRoot)
     {
         this.userConfigRoot = userConfigRoot;
-    }
-
-    public void setApplicationRoot(File applicationRoot)
-    {
-        this.applicationRoot = applicationRoot;
     }
 
     public File getDatabaseRoot()

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+
+    <display-name>CinnamonBob Slave</display-name>
+    <description>Continuous Integration Slave Web UI</description>
+
+    <filter>
+        <filter-name>sitemesh</filter-name>
+        <filter-class>com.opensymphony.module.sitemesh.filter.PageFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>sitemesh</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <servlet>
+        <servlet-name>sitemesh-velocity</servlet-name>
+        <servlet-class>com.opensymphony.module.sitemesh.velocity.VelocityDecoratorServlet</servlet-class>
+        <init-param>
+            <param-name>org.apache.velocity.properties</param-name>
+            <param-value>/WEB-INF/velocity.properties</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>webwork</servlet-name>
+        <servlet-class>com.opensymphony.webwork.dispatcher.ServletDispatcher</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!--
+        <servlet>
+            <servlet-name>hessian</servlet-name>
+            <servlet-class>com.cinnamonbob.hessian.CustomHessianServlet</servlet-class>
+            <init-param>
+                <param-name>home-class</param-name>
+                <param-value>com.cinnamonbob.MasterServiceImpl</param-value>
+            </init-param>
+            <init-param>
+                <param-name>home-api</param-name>
+                <param-value>com.cinnamonbob.MasterService</param-value>
+            </init-param>
+            <load-on-startup>1</load-on-startup>
+        </servlet>
+
+        <servlet-mapping>
+            <servlet-name>hessian</servlet-name>
+            <url-pattern>/hessian</url-pattern>
+        </servlet-mapping>
+    -->
+
+    <servlet-mapping>
+        <servlet-name>webwork</servlet-name>
+        <url-pattern>*.action</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>sitemesh-velocity</servlet-name>
+        <url-pattern>*.vm</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <taglib>
+        <taglib-uri>webwork</taglib-uri>
+        <taglib-location>/WEB-INF/lib/webwork-2.1.7.jar</taglib-location>
+    </taglib>
+
+</web-app>

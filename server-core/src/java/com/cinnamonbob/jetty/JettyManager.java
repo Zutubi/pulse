@@ -6,6 +6,8 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -13,6 +15,7 @@ import java.io.File;
  */
 public class JettyManager
 {
+    private static final Logger LOG = Logger.getLogger(JettyManager.class.getName());
     private static final String BEAN_NAME = "jettyManager";
 
     private Server server;
@@ -49,5 +52,19 @@ public class JettyManager
     public static JettyManager getInstance()
     {
         return (JettyManager) ComponentContext.getBean(BEAN_NAME);
+    }
+
+    public void stop()
+    {
+        try
+        {
+            server.stop(true);
+            server.destroy();
+        }
+        catch (InterruptedException e)
+        {
+            // Empty
+            LOG.log(Level.SEVERE, "Error while stopping Jetty", e);
+        }
     }
 }
