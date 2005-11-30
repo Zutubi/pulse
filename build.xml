@@ -40,4 +40,12 @@
 
     </target>
 
+    <target name="build.slave">
+
+        <ant dir="core" antfile="build.xml" target="project.build"/>
+        <ant dir="server-core" antfile="build.xml" target="project.build"/>
+        <ant dir="slave" antfile="build.xml" target="project.build"/>
+
+    </target>
+
 </project>

@@ -20,7 +20,7 @@
             </chain>
         </dual>
 
-        <filesystem name="build">
+        <filesystem name="build" checkmodified="true">
             <ivy pattern="${ivy.conf.dir}/build/repository/[module]/ivy-[revision].xml"/>
             <artifact pattern="${ivy.conf.dir}/build/repository/[module]/[type]s/[artifact]-[revision].[type]"/>
         </filesystem>

@@ -100,7 +100,7 @@
     </target>
 
     <!-- -->
-    <target name="test" depends="common-init">
+    <target name="test" depends="common-init" unless="skip.tests">
 
         <mkdir dir="${report.dir}"/>
         <junit printsummary="yes" haltonfailure="false">
@@ -121,9 +121,16 @@
         </junit>
     </target>
 
+    <target name="javadoc" depends="common-init">
+        <javadoc destdir="build/docs/api" author="true" version="true" use="true">
+            <fileset dir="${src.dir}" defaultexcludes="yes"/>
+            <bottom><![CDATA[<i>Copyright &copy; 2005 Daniel Ostermeier and Jason Sankey.</i>]]></bottom>
+        </javadoc>
+    </target>
+
     <target name="package" depends="jar">
         <zip destfile="build/${module}-src.zip" basedir="${src.dir}"/>
-        <zip destfile="build/${module}-src.zip" basedir="${test.dir}"/>
+        <zip destfile="build/${module}-src-test.zip" basedir="${test.dir}"/>
     </target>
 
     <!-- resolve external dependencies for this component -->
@@ -151,7 +158,8 @@
 
     <target name="publish" depends="package">
         <dirname property="current.dir" file="ivy.xml"/>
-        <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]" srcivypattern="${current.dir}/ivy.xml"/>
+        <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"
+                     srcivypattern="${current.dir}/ivy.xml"/>
     </target>
 
 
