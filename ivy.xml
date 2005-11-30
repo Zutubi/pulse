@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="cinnamonbob" module="core" revision="0.1" status="integration">
+        <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
+        <description homepage="http://www.cinnamonbob.com/">
+            description....
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="local" description="Local package"/>
+    </configurations>
+
+    <dependencies>
+
+        <dependency org="cinnamonbob" name="local" rev="latest.integration" conf="local->release"/>
+
+    </dependencies>
+
+</ivy-module>

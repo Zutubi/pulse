@@ -1,39 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Cinnamon Bob" default="default" basedir=".">
-
-    <property name="module" value="core"/>
-    <property name="publish.dir" value="../build"/>
+<!-- -->
+<!-- -->
+<!-- -->
+<project name="Cinnamon Bob" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
 
     <target name="clean">
         <delete dir="build"/>
     </target>
 
-    <target name="_prepare">
-        <mkdir dir="build"/>
-        <mkdir dir="build/lib"/>
+    <target name="clean.all" depends="clean">
+        <ant dir="core" antfile="build.xml" target="clean"/>
+        <ant dir="server-core" antfile="build.xml" target="clean"/>
+        <ant dir="local" antfile="build.xml" target="clean"/>
+        <ant dir="master" antfile="build.xml" target="clean"/>
+        <ant dir="slave" antfile="build.xml" target="clean"/>
     </target>
 
-    <target name="build.core" depends="_prepare">
-        <ant antfile="build.xml" dir="core" target="clean"/>
-        <ant antfile="build.xml" dir="core" target="publish">
-            <property name="publish.bin.dir" value="${publish.dir}/bin"/>
-            <property name="publish.lib.dir" value="${publish.dir}/lib"/>
-        </ant>
+    <!-- resolve all of the external dependencies within the components. -->
+    <target name="resolve.external">
+        <ant dir="core" antfile="build.xml" target="resolve.external"/>
+        <ant dir="server-core" antfile="build.xml" target="resolve.external"/>
+        <ant dir="local" antfile="build.xml" target="resolve.external"/>
+        <ant dir="master" antfile="build.xml" target="resolve.external"/>
+        <!--<ant dir="slave" antfile="build.xml" target="resolve.external"/>-->
     </target>
 
-    <target name="build.local" depends="build.core">
+    <target name="build.local">
 
-        <ant antfile="build.xml" dir="local" target="clean"/>
-        <ant antfile="build.xml" dir="local" target="publish">
-            <property name="lib.dir" value="../build/lib"/>
-            <property name="publish.bin.dir" value="${publish.dir}/bin"/>
-            <property name="publish.lib.dir" value="${publish.dir}/lib"/>
-        </ant>
+        <ant dir="core" antfile="build.xml" target="project.build"/>
+        <ant dir="local" antfile="build.xml" target="project.build"/>
 
     </target>
 
+    <target name="build.master">
 
-    <target name="default">
+        <ant dir="core" antfile="build.xml" target="project.build"/>
+        <ant dir="server-core" antfile="build.xml" target="project.build"/>
+        <ant dir="master" antfile="build.xml" target="project.build"/>
 
     </target>
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="cinnamonbob" module="server-core" status="integration">
+        <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
+        <description homepage="http://www.cinnamonbob.com/">
+            description....
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="external" description="external dependencies"/>
+        <conf name="internal" description="internal dependencies"/>
+    </configurations>
+
+    <publications>
+
+    </publications>
+
+    <dependencies>
+
+        <dependency org="junit" name="junit" rev="3.8.1"/>
+
+        <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="external->external"/>
+        <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="internal->internal"/>
+
+    </dependencies>
+
+
+</ivy-module>

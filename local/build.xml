@@ -1,81 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Cinnamon Bob" default="default" basedir=".">
+<project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="local module" basedir=".">
 
-    <property file="build.properties"/>
+    <import file="../common-build.xml" />
 
-    <property name="version" value="dev"/>
+    <target name="module-init">
 
-    <property name="module.jar" value="local-${version}.jar"/>
+        <property name="module" value="local"/>
+        <property name="project.root.dir" value="../"/>
 
-    <property name="publish.bin.dir" value="definedByCallingBuildFile"/>
-    <property name="publish.lib.dir" value="definedByCallingBuildFile"/>
-    <property name="lib.dir" value="definedByCallingBuildFile"/>
-
-    <path id="lib.path">
-        <fileset dir="${lib.dir}">
-            <include name="**/*.jar"/>
-        </fileset>
-        <fileset dir="lib">
-            <include name="**/*.jar"/>
-            <exclude name="**/webwork-2.1.7.jar"/> <!-- use patched version, fixes incompatibility between displaytag and webwork -->
-        </fileset>
-    </path>
-
-    <patternset id="resources">
-        <include name="**/*.properties"/>
-        <include name="**/*.png"/>
-        <include name="**/*.xml"/>
-    </patternset>
-
-    <target name="clean" description="Clean up after myself.">
-        <delete dir="build"/>
-    </target>
-
-    <target name="prepare" description="Prepares build directory.">
-        <tstamp/>
-        <mkdir dir="build"/>
-    </target>
-
-    <target name="build" description="Compile all of the java source.">
-
-        <mkdir dir="build/java/classes"/>
-        <javac srcdir="src/java" destdir="build/java/classes" debug="on">
-            <classpath refid="lib.path"/>
-        </javac>
-
-        <copy todir="build/java/classes" overwrite="true">
-            <fileset dir="src/java">
-                <patternset refid="resources"/>
-            </fileset>
-        </copy>
-
-        <mkdir dir="build/test/classes"/>
-        <javac srcdir="src/test" destdir="build/test/classes" debug="on">
-            <classpath refid="lib.path"/>
-            <classpath location="build/java/classes"/>
-        </javac>
-
-        <copy todir="build/test/classes" overwrite="true">
-            <fileset dir="src/test">
-                <patternset refid="resources"/>
-            </fileset>
-        </copy>
-
-    </target>
-
-    <target name="default" depends="clean, build" description="Run a clean build by default."/>
-
-    <target name="jar" depends="build">
-        <jar file="build/${module.jar}" basedir="build/java/classes"/>
-    </target>
-
-    <target name="publish" depends="jar">
-        <move file="build/${module.jar}" todir="${publish.lib.dir}"/>
-        <copy todir="${publish.bin.dir}">
-            <fileset dir="src/bin">
-                <include name="**/*"/>
-            </fileset>
-        </copy>
     </target>
 
 </project>

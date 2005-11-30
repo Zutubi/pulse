@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="cinnamonbob" module="core" revision="0.1" status="integration" publication="20051130211426">
+        <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
+        <description homepage="http://www.cinnamonbob.com/">
+            description....
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="external" description="external dependencies"/>
+        <conf name="internal" description="internal dependencies"/>
+    </configurations>
+
+    <publications>
+        <artifact name="core" type="jar" conf="internal"/>
+        <artifact name="core-test" type="jar" conf="internal"/>
+    </publications>
+
+    <dependencies>
+
+        <dependency org="junit" name="junit" rev="3.8.1" conf="external->default"/>
+
+        <dependency org="apache" name="velocity" rev="1.4" conf="external->default"/>
+        <dependency org="apache" name="velocity-tools" rev="1.1" conf="external->default"/>
+
+
+        <dependency org="opensymphony" name="xwork" rev="1.0.5" conf="external->default"/>
+
+
+        <dependency org="xom" name="xom" rev="20051027" conf="external->default"/>
+
+    </dependencies>
+
+</ivy-module>

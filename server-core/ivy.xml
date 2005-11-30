@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="cinnamonbob" module="server-core" revision="20051130013325" status="integration" publication="20051130211435">
+        <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
+        <description homepage="http://www.cinnamonbob.com/">
+            description....
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="external" description="external dependencies"/>
+        <conf name="internal" description="internal dependencies"/>
+    </configurations>
+
+    <publications>
+        <artifact name="server-core" type="jar" conf="internal"/>
+        <artifact name="server-core-test" type="jar" conf="internal"/>
+    </publications>
+
+    <dependencies>
+
+        <dependency org="junit" name="junit" rev="3.8.1" conf="external->default"/>
+        <dependency org="apache" name="commons-collections" rev="3.1" conf="external->default"/>
+        <dependency org="cinnamonbob" name="core" rev="0.1" conf="external->external"/>
+        <dependency org="cinnamonbob" name="core" rev="0.1" conf="internal->internal"/>
+        <dependency org="jetty" name="org.mortbay.jetty" rev="5.1.6" conf="external->default"/>
+        <dependency org="springframework" name="spring" rev="1.2.6" conf="external->spring-aop,spring-jdbc,spring-beans,spring-context,spring-core,spring-orm,spring-hibernate3,spring-support"/>
+
+    </dependencies>
+
+
+</ivy-module>

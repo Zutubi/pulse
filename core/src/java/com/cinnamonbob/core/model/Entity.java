@@ -17,7 +17,12 @@ public class Entity
     {
         this.id = id;
     }
-    
+
+    public boolean isPersistent()
+    {
+        return this.id != 0;
+    }
+
     public boolean equals(Object other)
     {
         if (!(other instanceof Entity))
