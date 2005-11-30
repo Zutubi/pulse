@@ -13,10 +13,12 @@
 
     <configurations>
         <conf name="default" visibility="public"/>
+        <conf name="optional" visibility="public"/>
     </configurations>
 
     <publications>
         <artifact name="xwork" type="jar" conf="default"/>
+        <artifact name="xwork-optional" type="jar" conf="optional"/>
     </publications>
 
     <dependencies>

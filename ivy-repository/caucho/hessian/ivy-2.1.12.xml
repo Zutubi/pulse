@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
     <info organisation="caucho" module="hessian" revision="2.1.12" status="release">
-        <lincense name="..." url="..."/>
+        <license name="..." url="..."/>
         <description homepage="http://www.caucho.com/hessian/">
             Hessian is a lightweight, self-describing binary RPC protocol.
         </description>

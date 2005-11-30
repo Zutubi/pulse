@@ -26,9 +26,8 @@
         <dependency org="apache" name="velocity" rev="1.4" conf="external->default"/>
         <dependency org="apache" name="velocity-tools" rev="1.1" conf="external->default"/>
 
-
         <dependency org="opensymphony" name="xwork" rev="1.0.5" conf="external->default"/>
-
+        <dependency org="opensymphony" name="oscore" rev="2.2.4" conf="external->default"/>
 
         <dependency org="xom" name="xom" rev="20051027" conf="external->default"/>
 

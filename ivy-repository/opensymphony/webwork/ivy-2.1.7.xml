@@ -28,6 +28,7 @@
 
         <dependency org="apache" name="commons-fileupload" rev="1.0" conf="fileupload->default"/>
         <dependency org="cos" name="cos" rev="20021105" conf="fileupload-cos->default"/>
-        <dependency org="pell" name="multipartrequest" rev="1.19" conf="fileupload-pell->default"/>    </dependencies>
+        <dependency org="pell" name="multipartrequest" rev="1.19" conf="fileupload-pell->default"/>
+    </dependencies>
 
 </ivy-module>
