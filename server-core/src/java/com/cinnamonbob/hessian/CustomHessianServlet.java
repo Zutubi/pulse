@@ -4,6 +4,7 @@ import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
 import com.caucho.hessian.io.SerializerFactory;
 import com.caucho.hessian.server.HessianSkeleton;
+import com.cinnamonbob.spring.SpringObjectFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -41,9 +42,8 @@ public class CustomHessianServlet extends GenericServlet
         try
         {
             Class serviceClass = Class.forName(serviceName);
-            Class implClass = Class.forName(implName);
 
-            skeleton = new HessianSkeleton(implClass.newInstance(), serviceClass);
+            skeleton = new HessianSkeleton(new SpringObjectFactory().buildBean(implName), serviceClass);
         }
         catch (Exception e)
         {

@@ -1,6 +1,7 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.services.MasterService;
 
 /**
  */

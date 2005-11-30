@@ -1,55 +1,55 @@
-<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.0//EN" 
-"http://www.opensymphony.com/xwork/xwork-1.0.dtd">
+<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.0//EN"
+        "http://www.opensymphony.com/xwork/xwork-1.0.dtd">
 
 <xwork>
-	<include file="webwork-default-package.xml" />
-	
+    <include file="webwork-default-package.xml"/>
+
     <package name="default" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack" /> 
-		
-		<action name="serverStatus" class="com.cinnamonbob.web.ServerStatusAction">
-			<result name="success" type="velocity">server-status.vm</result> 
-		</action> 
+        <default-interceptor-ref name="completeStack"/>
 
-		<action name="viewProjects" class="com.cinnamonbob.web.project.ViewProjectsAction">
-			<result name="success" type="velocity">view-projects.vm</result> 
-		</action> 
+        <action name="serverStatus" class="com.cinnamonbob.web.ServerStatusAction">
+            <result name="success" type="velocity">server-status.vm</result>
+        </action>
 
-		<action name="viewBuild" class="com.cinnamonbob.web.project.ViewBuildAction">
-			<result name="success" type="velocity">view-build.vm</result> 
-			<result name="error" type="velocity">generic-error.vm</result> 
-		</action> 
+        <action name="viewProjects" class="com.cinnamonbob.web.project.ViewProjectsAction">
+            <result name="success" type="velocity">view-projects.vm</result>
+        </action>
 
-		<action name="scheduleBuild" class="com.cinnamonbob.web.project.ScheduleBuildAction">
-			<result name="success" type="redirect">manageProject.action?id=${id}</result>
-			<result name="error" type="velocity">generic-error.vm</result>
-		</action> 
+        <action name="viewBuild" class="com.cinnamonbob.web.project.ViewBuildAction">
+            <result name="success" type="velocity">view-build.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
 
-		<action name="viewArtifact" class="com.cinnamonbob.web.project.ViewArtifactAction">
-			<result name="success" type="stream">
-			    <param name="contentType">${contentType}</param>
-			</result>
-		</action> 
-        
-		<action name="viewUsers" class="com.cinnamonbob.web.user.ViewUsersAction">
-			<result name="success" type="velocity">view-users.vm</result> 
-		</action> 
+        <action name="scheduleBuild" class="com.cinnamonbob.web.project.ScheduleBuildAction">
+            <result name="success" type="redirect">manageProject.action?id=${id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewArtifact" class="com.cinnamonbob.web.project.ViewArtifactAction">
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+            </result>
+        </action>
+
+        <action name="viewUsers" class="com.cinnamonbob.web.user.ViewUsersAction">
+            <result name="success" type="velocity">view-users.vm</result>
+        </action>
 
         <action name="findUsers!default" class="com.opensymphony.xwork.ActionSupport">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">find-user.vm</result>
         </action>
-        
+
         <action name="findUsers" class="com.cinnamonbob.web.user.FindUsersAction">
             <result name="input" type="velocity">find-user.vm</result>
             <result name="success" type="velocity">find-user.vm</result>
         </action>
-        
+
         <action name="createUser!default" class="com.cinnamonbob.web.user.CreateUserAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-user.vm</result>
         </action>
-        
+
         <action name="createUser" class="com.cinnamonbob.web.user.CreateUserAction">
             <result name="input" type="velocity">create-user.vm</result>
             <result name="cancel" type="velocity">undefined.vm</result>
@@ -69,7 +69,8 @@
             <result name="success" type="redirect">/viewUser.action?id=${id}</result>
         </action>
 
-        <action name="createContactPoint!default" class="com.cinnamonbob.web.user.CreateContactPointAction" method="doDefault">
+        <action name="createContactPoint!default" class="com.cinnamonbob.web.user.CreateContactPointAction"
+                method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-contact.vm</result>
         </action>
@@ -91,12 +92,14 @@
             <result name="success" type="redirect">/viewUser.action?id=${user}</result>
         </action>
 
-        <action name="editContactPoint!default" class="com.cinnamonbob.web.user.EditContactPointAction" method="doDefault">
+        <action name="editContactPoint!default" class="com.cinnamonbob.web.user.EditContactPointAction"
+                method="doDefault">
             <result name="email" type="chain">editEmailContactPoint!default</result>
             <result name="yahoo" type="chain">editYahooContactPoint!default</result>
         </action>
 
-        <action name="editEmailContactPoint!default" class="com.cinnamonbob.web.user.EditEmailContactPointAction" method="doDefault">
+        <action name="editEmailContactPoint!default" class="com.cinnamonbob.web.user.EditEmailContactPointAction"
+                method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">edit-contact-email.vm</result>
         </action>
@@ -107,7 +110,8 @@
             <result name="success" type="redirect">/viewUser.action?id=${user}</result>
         </action>
 
-        <action name="editYahooContactPoint!default" class="com.cinnamonbob.web.user.EditYahooContactPointAction" method="doDefault">
+        <action name="editYahooContactPoint!default" class="com.cinnamonbob.web.user.EditYahooContactPointAction"
+                method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">edit-contact-yahoo.vm</result>
         </action>
@@ -126,16 +130,16 @@
             <result name="input" type="velocity">undefined.vm</result>
             <result name="success" type="velocity">view-user.vm</result>
         </action>
-        
+
         <action name="index!default" class="com.cinnamonbob.web.ActionSupport">
             <result name="success" type="velocity">index.vm</result>
         </action>
-        
+
         <action name="createProject!default" class="com.cinnamonbob.web.project.CreateProjectAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-project.vm</result>
         </action>
-        
+
         <action name="createProject" class="com.cinnamonbob.web.project.CreateProjectAction">
             <result name="input" type="velocity">create-project.vm</result>
             <result name="cancel" type="velocity">undefined.vm</result>
@@ -156,22 +160,22 @@
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">edit-project.vm</result>
         </action>
-        
+
         <action name="editProject" class="com.cinnamonbob.web.project.EditProjectAction">
             <result name="input" type="velocity">edit-project.vm</result>
             <result name="cancel" type="redirect">/manageProject.action?id=${id}</result>
             <result name="success" type="redirect">/manageProject.action?id=${id}</result>
         </action>
-                
+
         <action name="manageProject" class="com.cinnamonbob.web.project.ManageProjectAction">
             <result name="success" type="velocity">manage-project.vm</result>
         </action>
-        
+
         <action name="createScm!default" class="com.cinnamonbob.web.project.CreateScmAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-scm.vm</result>
         </action>
-        
+
         <action name="createScm" class="com.cinnamonbob.web.project.CreateScmAction">
             <result name="input" type="velocity">create-scm.vm</result>
             <result name="success" type="velocity">create-scm-${type}.vm</result>
@@ -241,11 +245,12 @@
             <result name="success" type="redirect">/manageProject.action?id=${id}</result>
         </action>
 
-        <action name="createSchedule!default" class="com.cinnamonbob.web.project.CreateScheduleAction" method="doDefault">
+        <action name="createSchedule!default" class="com.cinnamonbob.web.project.CreateScheduleAction"
+                method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-schedule.vm</result>
         </action>
-        
+
         <action name="createSchedule" class="com.cinnamonbob.web.project.CreateScheduleAction">
             <result name="input" type="velocity">create-schedule.vm</result>
             <result name="cancel" type="velocity">undefined.vm</result>
@@ -256,7 +261,8 @@
             <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
         </action>
 
-        <action name="createSubscription!default" class="com.cinnamonbob.web.user.CreateSubscriptionAction" method="doDefault">
+        <action name="createSubscription!default" class="com.cinnamonbob.web.user.CreateSubscriptionAction"
+                method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-subscription.vm</result>
         </action>
@@ -271,7 +277,8 @@
             <result name="success" type="redirect">/viewUser.action?login=${login}</result>
         </action>
 
-        <action name="editSubscription!default" class="com.cinnamonbob.web.user.EditSubscriptionAction" method="doDefault">
+        <action name="editSubscription!default" class="com.cinnamonbob.web.user.EditSubscriptionAction"
+                method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">edit-subscription.vm</result>
         </action>
@@ -292,6 +299,18 @@
 
         <action name="quartzSystemInfo" class="com.cinnamonbob.web.console.QuartzAdminAction">
             <result name="success" type="velocity">view-quartz.vm</result>
+        </action>
+
+        <action name="createSlave!default" class="com.cinnamonbob.web.CreateSlaveAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">create-slave.vm</result>
+        </action>
+
+        <action name="createSlave" class="com.cinnamonbob.web.CreateSlaveAction">
+            <result name="input" type="velocity">create-slave.vm</result>
+            <result name="cancel" type="velocity">undefined.vm</result>
+            <result name="error" type="velocity">create-slave.vm</result>
+            <result name="success" type="redirect">/serverStatus.action</result>
         </action>
 
     </package>

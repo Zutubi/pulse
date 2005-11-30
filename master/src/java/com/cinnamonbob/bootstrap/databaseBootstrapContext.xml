@@ -15,6 +15,7 @@
                 <value>com/cinnamonbob/model/persistence/hibernate/Revision.hbm.xml</value>
                 <value>com/cinnamonbob/schedule/persistence/hibernate/Schedule.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Scm.hbm.xml</value>
+                <value>com/cinnamonbob/model/persistence/hibernate/Slave.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/User.hbm.xml</value>
             </list>

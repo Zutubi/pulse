@@ -1,0 +1,24 @@
+<html>
+<head>
+    <title>create-slave</title>
+</head>
+<content tag="action">slave.create</content>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+    
+#bodytag (Form "action='createSlave.action'" "method='post'")
+    <h3>Create slave</h3>
+    <fieldset>
+        #tag (TextField "required='true'" "name='slave.name'" "tabindex='1'")
+        #tag (TextField "required='true'" "name='slave.host'" "tabindex='2'")
+    </fieldset>
+        
+    <fieldset class="submit">
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
+    </fieldset>
+#end 
+
+</body>
+</html>

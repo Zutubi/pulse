@@ -13,8 +13,30 @@
       <table>
         <tr><th class="command-detail">project</th><th class="command-detail">requested</th></tr>
 #foreach($buildRequest in $buildQueue.iterator())
-        <tr><td class="build-info"><a href="viewProject.action?name=$buildRequest.projectName">$buildRequest.projectName</a></td><td class="build-info">$buildRequest.when</td></tr>
+        <tr><td class="build-info">$buildRequest.projectName</td><td class="build-info">$buildRequest.when</td></tr>
 #end
+      </table>
+    </div>
+    <h2 class="command-info">slaves</h2>
+    <div class="command-content">
+      <table>
+        <tr>
+          <th class="command-detail">slave</th>
+          <th class="command-detail">host</th>
+          <th class="command-detail">last ping</th>
+          <th class="command-detail">status</th>
+        </tr>
+#foreach($slave in $slaves)
+        <tr>
+          <td class="build-info">$slave.name</td>
+          <td class="build-info">$slave.host</td>
+          <td class="build-info">$slave.prettyPingTime ($slave.secondsSincePing seconds ago)</td>
+          <td class="build-info">$slave.status.toString().toLowerCase()</td>
+        </tr>
+#end
+      <tr>
+        <td class="command-detail" colspan="4"><b>+</b> <a href="createSlave!default.action">add new slave</a></td>
+      </tr>
       </table>
     </div>
   </body>

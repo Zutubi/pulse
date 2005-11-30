@@ -1,10 +1,10 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.test.BobTestCase;
-import com.cinnamonbob.hessian.CustomSerialiserFactory;
-import com.cinnamonbob.core.model.BuildResult;
-import com.caucho.hessian.io.SerializerFactory;
 import com.caucho.hessian.client.HessianProxyFactory;
+import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.hessian.CustomSerialiserFactory;
+import com.cinnamonbob.services.MasterService;
+import com.cinnamonbob.test.BobTestCase;
 
 import java.net.MalformedURLException;
 

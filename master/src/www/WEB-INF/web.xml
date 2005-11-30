@@ -22,7 +22,7 @@
             <param-name>org.apache.velocity.properties</param-name>
             <param-value>/WEB-INF/velocity.properties</param-value>
         </init-param>
-        <load-on-startup>1</load-on-startup> 
+        <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet>
@@ -31,11 +31,11 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-	<servlet>
-		<servlet-name>webwork</servlet-name>
-		<servlet-class>com.opensymphony.webwork.dispatcher.ServletDispatcher</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
+    <servlet>
+        <servlet-name>webwork</servlet-name>
+        <servlet-class>com.opensymphony.webwork.dispatcher.ServletDispatcher</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
     <servlet>
         <servlet-name>hessian</servlet-name>
@@ -46,7 +46,7 @@
         </init-param>
         <init-param>
             <param-name>home-api</param-name>
-            <param-value>com.cinnamonbob.MasterService</param-value>
+            <param-value>com.cinnamonbob.services.MasterService</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
@@ -60,12 +60,12 @@
         <servlet-name>XmlRpcApiServlet</servlet-name>
         <url-pattern>/api/xmlrpc/*</url-pattern>
     </servlet-mapping>
-	
-	<servlet-mapping>
-		<servlet-name>webwork</servlet-name>
-		<url-pattern>*.action</url-pattern>
-	</servlet-mapping>
-	
+
+    <servlet-mapping>
+        <servlet-name>webwork</servlet-name>
+        <url-pattern>*.action</url-pattern>
+    </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>sitemesh-velocity</servlet-name>
         <url-pattern>*.vm</url-pattern>
@@ -74,10 +74,10 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
-	
-	<taglib>
-		<taglib-uri>webwork</taglib-uri>
-		<taglib-location>/WEB-INF/lib/webwork-2.1.7.jar</taglib-location>
-	</taglib>
+
+    <taglib>
+        <taglib-uri>webwork</taglib-uri>
+        <taglib-location>/WEB-INF/lib/webwork-2.1.7.jar</taglib-location>
+    </taglib>
 
 </web-app>

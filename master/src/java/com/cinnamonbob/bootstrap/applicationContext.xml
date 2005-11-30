@@ -42,10 +42,11 @@
     <bean id="buildManager" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"/>
 
     <bean id="userManager" class="com.cinnamonbob.model.DefaultUserManager" autowire="byName"/>
-    
+
     <bean id="projectManager" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
 
-    <bean id="scheduleManager" class="com.cinnamonbob.schedule.DefaultScheduleManager" autowire="byName" init-method="init"/>
+    <bean id="scheduleManager" class="com.cinnamonbob.schedule.DefaultScheduleManager" autowire="byName"
+          init-method="init"/>
 
     <bean id="subscriptionManager" class="com.cinnamonbob.model.DefaultSubscriptionManager" autowire="byName"/>
 
@@ -57,7 +58,8 @@
 
     <bean id="fileLoader" class="com.cinnamonbob.core.FileLoader" autowire="byName" singleton="false"/>
 
-    <bean id="resourceRepository" class="com.cinnamonbob.core.ResourceRepository" autowire="byName" init-method="initialise"/>
+    <bean id="resourceRepository" class="com.cinnamonbob.core.ResourceRepository" autowire="byName"
+          init-method="initialise"/>
 
     <bean id="buildProcessor" class="com.cinnamonbob.core.BuildProcessor" autowire="byName"/>
 
@@ -68,7 +70,17 @@
     <bean id="buildResultRenderer" class="com.cinnamonbob.core.renderer.VelocityBuildResultRenderer" autowire="byName"/>
 
     <bean id="userConfigRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName"><value>configurationManager</value></property>
-        <property name="propertyPath"><value>applicationPaths.userConfigRoot</value></property>
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>applicationPaths.userConfigRoot</value>
+        </property>
     </bean>
+
+    <bean id="customSerialiserFactory" class="com.cinnamonbob.hessian.CustomSerialiserFactory"/>
+
+    <bean id="hessianProxyFactory" class="com.cinnamonbob.hessian.CustomHessianProxyFactory" autowire="byName"/>
+
+    <bean id="slaveProxyFactory" class="com.cinnamonbob.SlaveProxyFactory" autowire="byName"/>
 </beans>
