@@ -1,6 +1,5 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.core.model.BuildResult;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.model.persistence.ArtifactDao;
 import com.cinnamonbob.model.persistence.BuildResultDao;
@@ -26,9 +25,9 @@ public class DefaultBuildManager implements BuildManager
         artifactDao = dao;
     }
 
-    public void save(BuildResult BuildResult)
+    public void save(BuildResult buildResult)
     {
-        buildResultDao.save(BuildResult);
+        buildResultDao.save(buildResult);
     }
 
     public BuildResult getBuildResult(long id)
@@ -63,10 +62,11 @@ public class DefaultBuildManager implements BuildManager
 
     public long getNextBuildNumber(String projectName)
     {
-        long              number = 1;
+        long number = 1;
         List<BuildResult> builds = getLatestBuildResultsForProject(projectName, 1);
         BuildResult previousBuildResult;
-        if(builds.size() > 0)
+
+        if (builds.size() > 0)
         {
             previousBuildResult = builds.get(0);
             number = previousBuildResult.getNumber() + 1;

@@ -1,7 +1,12 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.core.model.*;
+import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.Feature;
+import com.cinnamonbob.core.model.StoredArtifact;
+import com.cinnamonbob.model.BuildResult;
+import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.model.RecipeResultNode;
 
 import java.util.Iterator;
 import java.util.List;
@@ -58,14 +63,17 @@ public class ViewBuildAction extends ProjectActionSupport
         project = getProjectManager().getProject(id);
         result = getBuildManager().getBuildResult(buildId);
 
-        for(CommandResult r: result.getCommandResults())
+        for (RecipeResultNode node : result.getResults())
         {
-            for(StoredArtifact a: r.getArtifacts())
+            for (CommandResult r : node.getResult().getCommandResults())
             {
-                Iterator<Feature.Level> i = a.getLevels();
-                while(i.hasNext())
+                for (StoredArtifact a : r.getArtifacts())
                 {
-                    a.getFeatures(i.next()).size();
+                    Iterator<Feature.Level> i = a.getLevels();
+                    while (i.hasNext())
+                    {
+                        a.getFeatures(i.next()).size();
+                    }
                 }
             }
         }

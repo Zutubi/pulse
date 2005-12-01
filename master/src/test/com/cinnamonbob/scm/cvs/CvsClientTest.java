@@ -1,8 +1,8 @@
 package com.cinnamonbob.scm.cvs;
 
-import com.cinnamonbob.core.model.Change;
-import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.model.Change;
+import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.scm.SCMException;
 import junit.framework.TestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -28,13 +28,13 @@ public class CvsClientTest extends TestCase
     private CvsClient cvs = new CvsClient(cvsRoot);
 
     private File workdir = null;
-    
+
     public void setUp() throws Exception
     {
         super.setUp();
 
         Logger.setLogging("system");
-        
+
         // cleanup the working directory.
         workdir = FileSystemUtils.createTempDirectory("CvsClient", "Test");
     }
@@ -50,20 +50,20 @@ public class CvsClientTest extends TestCase
 
     //NOTE: when using the 'local' method, ensure that the 'cvs' command
     //      is located in your path.
-    
+
     /**
      * 
-     */ 
+     */
     public void testCheckout() throws Exception
-    {        
+    {
         // destination directory...        
-        File foo = new File(workdir, "project/test/foo");        
+        File foo = new File(workdir, "project/test/foo");
         assertTrue(!foo.exists());
-               
+
         // checkout...
         cvs.setLocalPath(workdir);
         cvs.checkout("project", null);
-        
+
         assertTrue(foo.exists());
         assertFalse(new File(workdir, "project/test/branch.only").exists());
     }
@@ -102,7 +102,8 @@ public class CvsClientTest extends TestCase
         {
             cvs.checkout("/e/cvsroot/project", null);
             assertFalse(true);
-        } catch (SCMException e)
+        }
+        catch (SCMException e)
         {
             // noop.
         }
@@ -126,7 +127,7 @@ public class CvsClientTest extends TestCase
         assertEquals(1, changes.get(9).getChanges().size());
         assertValidChangeSets(changes);
         // get changes since x where x is the date of one of the changes.
-        
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         changes = cvs.getChangeLists(dateFormat.parse("2005-05-10"), null);
         assertNotNull(changes);
@@ -142,28 +143,28 @@ public class CvsClientTest extends TestCase
 //        List<Changelist> changes = cvs.getChangeLists(dateFormat.parse("2005-10-05"), null);
 //        System.out.println("changes:" + changes.size());
     }
-    
+
     public void testUpdate() throws Exception
     {
         // check that the contents of a particular file are as 
         // expected after the update.
     }
-    
+
     // assert that files are unique.
     private void assertValidChangeSets(List<Changelist> changelists)
     {
-        for (Changelist changelist: changelists)
+        for (Changelist changelist : changelists)
         {
             assertValidChangeSet(changelist);
         }
     }
-    
+
     private void assertValidChangeSet(Changelist changelist)
     {
         List<Change> changes = changelist.getChanges();
         Map<String, String> filenames = new HashMap<String, String>();
 
-        for (Change change: changes)
+        for (Change change : changes)
         {
             assertFalse(filenames.containsKey(change.getFilename()));
             filenames.put(change.getFilename(), change.getFilename());

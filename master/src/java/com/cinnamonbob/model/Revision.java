@@ -1,4 +1,6 @@
-package com.cinnamonbob.core.model;
+package com.cinnamonbob.model;
+
+import com.cinnamonbob.core.model.Entity;
 
 import java.util.Date;
 
@@ -16,7 +18,6 @@ public class Revision extends Entity
 
     /**
      * The author of change
-     *
      */
     public String getAuthor()
     {
@@ -30,7 +31,6 @@ public class Revision extends Entity
 
     /**
      * The comment associated with this change.
-     *
      */
     public String getComment()
     {
@@ -44,7 +44,6 @@ public class Revision extends Entity
 
     /**
      * The branch on which this change was made.
-     *
      */
     public String getBranch()
     {
@@ -58,7 +57,6 @@ public class Revision extends Entity
 
     /**
      * The date of this change.
-     *
      */
     public Date getDate()
     {

@@ -1,11 +1,14 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.bootstrap.ConfigUtils;
-import com.cinnamonbob.core.*;
+import com.cinnamonbob.core.BuildException;
+import com.cinnamonbob.core.RecipeCommencedEvent;
+import com.cinnamonbob.core.RecipeCompletedEvent;
+import com.cinnamonbob.core.RecipeProcessor;
 import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.core.event.EventManager;
-import com.cinnamonbob.core.model.*;
+import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.model.*;
@@ -27,16 +30,16 @@ public class MasterBuildProcessor implements EventListener
 {
     private static final Logger LOG = Logger.getLogger(MasterBuildProcessor.class.getName());
 
-    private BuildProcessor processor;
+    private RecipeProcessor processor;
     private ProjectManager projectManager;
-    private BuildManager   buildManager;
+    private BuildManager buildManager;
     private SubscriptionManager subscriptionManager;
     private EventManager eventManager;
 
-    public BuildResult execute(BuildRequest request)
+    public RecipeResult execute(BuildRequest request)
     {
         Project project = projectManager.getProject(request.getProjectName());
-        if(project == null)
+        if (project == null)
         {
             LOG.warning("Build request for unknown project '" + request.getProjectName() + "'");
             return null;
@@ -45,16 +48,17 @@ public class MasterBuildProcessor implements EventListener
         // allocate a build model to this request.
         long number = buildManager.getNextBuildNumber(project.getName());
 
-        BuildResult buildResult = new BuildResult(project.getName(), number);
-
+        BuildResult buildResult = new BuildResult(project, number);
+        RecipeResult recipeResult = new RecipeResult(request.getRecipeName());
+        buildResult.add(new RecipeResultNode("<master>", recipeResult));
 
         File rootBuildDir = ConfigUtils.getManager().getAppConfig().getProjectRoot();
         File projectDir = new File(rootBuildDir, getProjectDirName(project));
         File buildsDir = new File(projectDir, "builds");
         File buildDir = new File(buildsDir, getBuildDirName(buildResult));
 
-        buildResult.commence(buildDir);
-        eventManager.publish(new BuildCommencedEvent(this, buildResult));
+        recipeResult.commence(buildDir);
+        eventManager.publish(new RecipeCommencedEvent(this, recipeResult));
 
         try
         {
@@ -66,22 +70,22 @@ public class MasterBuildProcessor implements EventListener
 
             bootstrapBuild(project, buildResult, workDir, buildDir);
 
-            processor.build(workDir, project.getBobFile(), request.getRecipeName(), buildResult, buildDir);
+            processor.build(workDir, project.getBobFile(), request.getRecipeName(), recipeResult, buildDir);
         }
-        catch(BuildException e)
+        catch (BuildException e)
         {
             LOG.log(Level.SEVERE, "Build error", e);
-            buildResult.error(e);
+            recipeResult.error(e);
         }
         finally
         {
-            buildResult.complete();
-            eventManager.publish(new BuildCompletedEvent(this, buildResult));
+            recipeResult.complete();
+            eventManager.publish(new RecipeCompletedEvent(this, recipeResult));
         }
 
         // sort out notifications.
         List<Subscription> subscriptions = subscriptionManager.getSubscriptions(project);
-        for(Subscription subscription : subscriptions)
+        for (Subscription subscription : subscriptions)
         {
             if (subscription.conditionSatisfied(buildResult))
             {
@@ -89,7 +93,7 @@ public class MasterBuildProcessor implements EventListener
             }
         }
 
-        return buildResult;
+        return recipeResult;
     }
 
     public static String getProjectDirName(Project project)
@@ -106,15 +110,15 @@ public class MasterBuildProcessor implements EventListener
     {
         File workDir = new File(projectDir, "work");
 
-        if(workDir.exists())
+        if (workDir.exists())
         {
-            if(!FileSystemUtils.removeDirectory(workDir))
+            if (!FileSystemUtils.removeDirectory(workDir))
             {
                 throw new BuildException("Could not clean work directory '" + workDir.getAbsolutePath() + '"');
             }
         }
 
-        if(!workDir.mkdirs())
+        if (!workDir.mkdirs())
         {
             throw new BuildException("Could not create work directory '" + workDir.getAbsolutePath() + "'");
         }
@@ -126,12 +130,12 @@ public class MasterBuildProcessor implements EventListener
     {
         List<Scm> scms = project.getScms();
 
-        if(scms.size() == 0)
+        if (scms.size() == 0)
         {
             throw new BuildException("Project '" + project.getName() + "' has no SCMs configured.");
         }
 
-        for(Scm scm: scms)
+        for (Scm scm : scms)
         {
             File scmDir = new File(workDir, scm.getPath());
 
@@ -149,10 +153,10 @@ public class MasterBuildProcessor implements EventListener
                 {
                     BuildResult previousBuildResult = buildManager.getLatestBuildResult(project.getName());
 
-                    if(previousBuildResult != null)
+                    if (previousBuildResult != null)
                     {
                         BuildScmDetails previousScmDetails = previousBuildResult.getScmDetails(scm.getId());
-                        if(previousScmDetails != null)
+                        if (previousScmDetails != null)
                         {
                             Revision previousRevision = previousScmDetails.getRevision();
                             if (previousRevision != null)
@@ -172,7 +176,7 @@ public class MasterBuildProcessor implements EventListener
                 BuildScmDetails scmDetails = new BuildScmDetails(scm.getName(), latestRevision, scmChanges);
                 result.addScmDetails(scm.getId(), scmDetails);
             }
-            catch(SCMException e)
+            catch (SCMException e)
             {
                 throw new BuildException(e);
             }
@@ -181,19 +185,19 @@ public class MasterBuildProcessor implements EventListener
 
     private void saveChanges(File outputDir, Scm scm, LinkedList<Change> changes)
     {
-        File       output = new File(outputDir, String.format("%d", Long.valueOf(scm.getId())) + ".changes");
+        File output = new File(outputDir, String.format("%d", Long.valueOf(scm.getId())) + ".changes");
         FileWriter writer = null;
 
         try
         {
             writer = new FileWriter(output);
 
-            for(Change change: changes)
+            for (Change change : changes)
             {
                 writer.write(change.getFilename() + "#" + change.getRevision() + "\n");
             }
         }
-        catch(IOException e)
+        catch (IOException e)
         {
             throw new BuildException("Could not create output file '" + output.getAbsolutePath() + "'", e);
         }
@@ -218,14 +222,14 @@ public class MasterBuildProcessor implements EventListener
         this.subscriptionManager = subscriptionManager;
     }
 
-    public void setBuildProcessor(BuildProcessor processor)
+    public void setBuildProcessor(RecipeProcessor processor)
     {
         this.processor = processor;
     }
 
     public void handleEvent(Event event)
     {
-        buildManager.save(((BuildEvent)event).getResult());
+        buildManager.save(((BuildEvent) event).getResult());
     }
 
     public Class[] getHandledEvents()

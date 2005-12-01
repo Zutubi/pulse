@@ -1,6 +1,6 @@
-package com.cinnamonbob.core;
+package com.cinnamonbob;
 
-import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.model.BuildResult;
 
 /**
  * This event is raised by the build processor when a build is completed.

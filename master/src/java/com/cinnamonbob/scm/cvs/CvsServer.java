@@ -1,9 +1,9 @@
 package com.cinnamonbob.scm.cvs;
 
-import com.cinnamonbob.core.model.Change;
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.CvsRevision;
-import com.cinnamonbob.core.model.Revision;
+import com.cinnamonbob.model.Change;
+import com.cinnamonbob.model.Changelist;
+import com.cinnamonbob.model.CvsRevision;
+import com.cinnamonbob.model.Revision;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
 import com.opensymphony.util.TextUtils;
@@ -79,9 +79,7 @@ public class CvsServer implements SCMServer
      * specified revision.
      *
      * @param since
-     *
      * @return true if a change has been detected, false otherwise.
-     *
      * @throws SCMException
      */
     public boolean hasChangedSince(Revision since) throws SCMException
@@ -103,11 +101,9 @@ public class CvsServer implements SCMServer
      * Checkout head of the specified branch to the specified directory.
      *
      * @param checkoutDir (required) if this directory does not exist, an attempt will be
-     * made to create it.
-     * @param branch (optional)
-     *
+     *                    made to create it.
+     * @param branch      (optional)
      * @return
-     *
      * @throws SCMException
      */
     public Revision checkout(File checkoutDir, String branch) throws SCMException, IOException
@@ -121,12 +117,9 @@ public class CvsServer implements SCMServer
     }
 
     /**
-     *
      * @param checkoutDir (required)
-     * @param revision (required)
-     *
+     * @param revision    (required)
      * @return
-     *
      * @throws SCMException
      * @throws IOException
      */
@@ -149,11 +142,9 @@ public class CvsServer implements SCMServer
      * Internal checkout method. This is where all the action is.
      *
      * @param checkoutDir (required)
-     *
-     * @param branch (optional)
-     * @param date (optional)
-     *
-     * @param tag (not supported)
+     * @param branch      (optional)
+     * @param date        (optional)
+     * @param tag         (not supported)
      */
     private void internalCheckout(File checkoutDir, String branch, Date date, String tag) throws IOException, SCMException
     {

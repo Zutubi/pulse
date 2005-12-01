@@ -1,7 +1,7 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.core.model.BuildResult;
 import com.cinnamonbob.core.model.ResultState;
+import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -26,7 +26,8 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public List findLatestByProjectName(final String project, final int max)
     {
-        return (List)getHibernateTemplate().execute(new HibernateCallback(){
+        return (List) getHibernateTemplate().execute(new HibernateCallback()
+        {
             public Object doInHibernate(Session session) throws HibernateException, SQLException
             {
                 Query queryObject = session.createQuery("from BuildResult model where model.projectName = :project and model.stateName != :initial order by id desc");
@@ -43,7 +44,8 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public BuildResult findByProjectNameAndNumber(final String project, final long number)
     {
-        List results = (List)getHibernateTemplate().execute(new HibernateCallback(){
+        List results = (List) getHibernateTemplate().execute(new HibernateCallback()
+        {
             public Object doInHibernate(Session session) throws HibernateException, SQLException
             {
                 Query queryObject = session.createQuery("from BuildResult model where model.projectName = :project and model.number = :number");
@@ -56,14 +58,14 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             }
         });
 
-        if(results.size() > 1)
+        if (results.size() > 1)
         {
             LOG.warning("findByProjectNameAndNumber has returned " + results.size() +
                     " results when expecting at most one.");
         }
-        if(results.size() > 0)
+        if (results.size() > 0)
         {
-            return (BuildResult)results.get(0);
+            return (BuildResult) results.get(0);
         }
         return null;
 

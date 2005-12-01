@@ -64,29 +64,29 @@
             <p>Subscription: <a href="createSubscription!default.action?project=$project.name">create</a></p>
         </div>
 -->
-        #if($currentBuild)
-            #if($currentBuild.inProgress())
+        #if($currentRecipe)
+            #if($currentRecipe.inProgress())
                 #set($class = "info")
-            #elseif($currentBuild.succeeded())
+            #elseif($currentRecipe.succeeded())
                 #set($class = "success")
             #else
               #set($class = "failure")
             #end
-            <h2 class="command-$class">current build [<a href="viewBuild.action?id=$project.id&buildId=$currentBuild.id">$currentBuild.number</a>] (<a href="scheduleBuild.action?id=$id">build</a>)</h2>
+            <h2 class="command-$class">current build [<a href="viewBuild.action?id=$project.id&buildId=$currentRecipe.id">$currentRecipe.number</a>] (<a href="scheduleBuild.action?id=$id">build</a>)</h2>
             <div class="command-content">
             <table>          
-                #detailrow("commenced" $currentBuild.stamps.prettyStartTime)
-                #detailrow("elapsed"   $currentBuild.stamps.prettyElapsed)
-                #detailrow("status"    $currentBuild.state.prettyString)
+                #detailrow("commenced" $currentRecipe.stamps.prettyStartTime)
+                #detailrow("elapsed"   $currentRecipe.stamps.prettyElapsed)
+                #detailrow("status"    $currentRecipe.state.prettyString)
             </table>
-            #if($currentBuild.errorMessage)
+            #if($currentRecipe.errorMessage)
                 <h2 class="command-element">error details</h2>    
                 <div class="error">
                 <b>message</b>
-                <pre>$currentBuild.errorMessage</pre>
+                <pre>$currentRecipe.errorMessage</pre>
                 </div>
             #end  
-            #if($currentBuild.commandResults.size() > 0)
+            #if($currentRecipe.commandResults.size() > 0)
                 <h2 class="command-element">command log</h2>
                 <table>
                    <tr>
@@ -95,7 +95,7 @@
                         <th class="command-detail">elapsed</th>
                         <th class="command-detail">status</th>
                     </tr>
-                    #foreach($result in $currentBuild.commandResults)
+                    #foreach($result in $currentRecipe.commandResults)
                         #if($result.commenced())
                             #if($result.succeeded())
                                 #set($class = "success")

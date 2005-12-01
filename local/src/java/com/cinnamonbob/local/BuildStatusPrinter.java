@@ -30,59 +30,74 @@ public class BuildStatusPrinter implements EventListener
 
     public void handleEvent(Event event)
     {
-        BuildEvent buildEvent = (BuildEvent)event;
+        RecipeEvent recipeEvent = (RecipeEvent) event;
 
-        if(buildEvent instanceof  BuildCommencedEvent)
+        if (recipeEvent instanceof RecipeCommencedEvent)
         {
-            handleBuildCommenced(buildEvent);
+            handleBuildCommenced(recipeEvent);
         }
-        else if(buildEvent instanceof CommandCommencedEvent)
+        else
         {
-            handleCommandCommenced(buildEvent);
-        }
-        else if(buildEvent instanceof CommandCompletedEvent)
-        {
-            handleCommandCompleted(buildEvent);
-        }
-        else if(buildEvent instanceof BuildCompletedEvent)
-        {
-            handleBuildCompleted(buildEvent);
+            if (recipeEvent instanceof CommandCommencedEvent)
+            {
+                handleCommandCommenced(recipeEvent);
+            }
+            else
+            {
+                if (recipeEvent instanceof CommandCompletedEvent)
+                {
+                    handleCommandCompleted(recipeEvent);
+                }
+                else
+                {
+                    if (recipeEvent instanceof RecipeCompletedEvent)
+                    {
+                        handleBuildCompleted(recipeEvent);
+                    }
+                }
+            }
         }
     }
 
-    private void handleBuildCommenced(BuildEvent buildEvent)
+    private void handleBuildCommenced(RecipeEvent recipeEvent)
     {
-        BuildResult result = buildEvent.getResult();
+        RecipeResult result = recipeEvent.getResult();
+        String recipeName = result.getRecipeName();
 
-        indenter.println("[" + result.getProjectName() + "]");
+        if (recipeName == null)
+        {
+            recipeName = "<default>";
+        }
+
+        indenter.println("[" + recipeName + "]");
         indenter.indent();
         indenter.println("commenced: " + result.getStamps().getPrettyStartTime());
     }
 
-    private void handleCommandCommenced(BuildEvent buildEvent)
+    private void handleCommandCommenced(RecipeEvent recipeEvent)
     {
-        CommandResult result = getLastCommandResult(buildEvent);
+        CommandResult result = getLastCommandResult(recipeEvent);
 
         indenter.println("[" + result.getCommandName() + "]");
         indenter.indent();
         indenter.println("commenced: " + result.getStamps().getPrettyStartTime());
     }
 
-    private void handleCommandCompleted(BuildEvent buildEvent)
+    private void handleCommandCompleted(RecipeEvent recipeEvent)
     {
-        CommandResult result = getLastCommandResult(buildEvent);
+        CommandResult result = getLastCommandResult(recipeEvent);
 
         indenter.println("completed: " + result.getStamps().getPrettyEndTime());
         indenter.println("elapsed  : " + result.getStamps().getPrettyElapsed());
         indenter.println("result   : " + result.getState().getPrettyString());
 
-        if(result.errored())
+        if (result.errored())
         {
             showErrorDetails(result);
         }
 
         List<StoredArtifact> artifacts = result.getArtifacts();
-        if(artifacts.size() > 0)
+        if (artifacts.size() > 0)
         {
             showArtifacts(artifacts);
         }
@@ -96,7 +111,7 @@ public class BuildStatusPrinter implements EventListener
         indenter.println("message  :");
         indenter.indent();
 
-        if(result.getErrorMessage() != null)
+        if (result.getErrorMessage() != null)
         {
             indenter.println(result.getErrorMessage());
         }
@@ -112,15 +127,15 @@ public class BuildStatusPrinter implements EventListener
     {
         indenter.println("artifacts:");
         indenter.indent();
-        for(StoredArtifact artifact: artifacts)
+        for (StoredArtifact artifact : artifacts)
         {
             File file = new File(artifact.getFile());
             indenter.println("* " + artifact.getTitle() + " (" + getFilePath(file) + ")");
 
-            for(Feature.Level level: Feature.Level.values())
+            for (Feature.Level level : Feature.Level.values())
             {
                 List<Feature> features = artifact.getFeatures(level);
-                if(features.size() > 0)
+                if (features.size() > 0)
                 {
                     indenter.indent();
                     showFeatures(level, features);
@@ -135,7 +150,7 @@ public class BuildStatusPrinter implements EventListener
     private String getFilePath(File file)
     {
         String result = file.getPath();
-        if(result.startsWith(workDir))
+        if (result.startsWith(workDir))
         {
             result = result.substring(workDir.length());
         }
@@ -148,7 +163,7 @@ public class BuildStatusPrinter implements EventListener
         indenter.println(level.toString().toLowerCase() + " features:");
         indenter.indent();
 
-        for(Feature f: features)
+        for (Feature f : features)
         {
             indenter.println("* " + f.getSummary());
         }
@@ -156,15 +171,15 @@ public class BuildStatusPrinter implements EventListener
         indenter.dedent();
     }
 
-    private void handleBuildCompleted(BuildEvent buildEvent)
+    private void handleBuildCompleted(RecipeEvent recipeEvent)
     {
-        BuildResult result = buildEvent.getResult();
+        RecipeResult result = recipeEvent.getResult();
 
         indenter.println("completed: " + result.getStamps().getPrettyEndTime());
         indenter.println("elapsed  : " + result.getStamps().getPrettyElapsed());
         indenter.println("result   : " + result.getState().getPrettyString());
 
-        if(result.errored())
+        if (result.errored())
         {
             showErrorDetails(result);
         }
@@ -172,15 +187,15 @@ public class BuildStatusPrinter implements EventListener
         indenter.dedent();
     }
 
-    private CommandResult getLastCommandResult(BuildEvent buildEvent)
+    private CommandResult getLastCommandResult(RecipeEvent recipeEvent)
     {
-        List<CommandResult> results = buildEvent.getResult().getCommandResults();
+        List<CommandResult> results = recipeEvent.getResult().getCommandResults();
         return results.get(results.size() - 1);
     }
 
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{ BuildEvent.class };
+        return new Class[]{RecipeEvent.class};
     }
 }

@@ -1,6 +1,6 @@
 package com.cinnamonbob.model.persistence;
 
-import com.cinnamonbob.core.model.Changelist;
+import com.cinnamonbob.model.Changelist;
 
 /**
  * Created by IntelliJ IDEA.

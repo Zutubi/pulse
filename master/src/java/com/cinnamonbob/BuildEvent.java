@@ -1,7 +1,7 @@
-package com.cinnamonbob.core;
+package com.cinnamonbob;
 
 import com.cinnamonbob.core.event.Event;
-import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.model.BuildResult;
 
 /**
  */

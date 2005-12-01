@@ -1,4 +1,6 @@
-package com.cinnamonbob.core.model;
+package com.cinnamonbob.model;
+
+import com.cinnamonbob.core.model.Entity;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +49,7 @@ public class BuildScmDetails extends Entity
 
     public List<Changelist> getChangelists()
     {
-        if(changelists == null)
+        if (changelists == null)
         {
             changelists = new LinkedList<Changelist>();
         }

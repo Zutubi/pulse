@@ -1,6 +1,6 @@
 package com.cinnamonbob.scm.cvs.client;
 
-import com.cinnamonbob.core.model.Change;
+import com.cinnamonbob.model.Change;
 import com.cinnamonbob.scm.SCMException;
 
 import java.text.ParseException;
@@ -187,13 +187,19 @@ public class HistoryInfo
             {
                 return Change.Action.ADD;
             }
-            else if (isRemoved())
+            else
             {
-                return Change.Action.DELETE;
-            }
-            else if (isModified())
-            {
-                return Change.Action.EDIT;
+                if (isRemoved())
+                {
+                    return Change.Action.DELETE;
+                }
+                else
+                {
+                    if (isModified())
+                    {
+                        return Change.Action.EDIT;
+                    }
+                }
             }
         }
         return Change.Action.UNKNOWN;

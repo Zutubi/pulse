@@ -1,8 +1,8 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.event.EventManager;
-import com.cinnamonbob.core.model.BuildResult;
 import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.RecipeResult;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,17 +11,17 @@ import java.util.List;
 
 /**
  */
-public class BuildProcessor
+public class RecipeProcessor
 {
     private EventManager eventManager;
     private FileLoader fileLoader;
 
-    public BuildProcessor()
+    public RecipeProcessor()
     {
         // For use with Spring
     }
 
-    public BuildProcessor(EventManager eventManager, FileLoader fileLoader)
+    public RecipeProcessor(EventManager eventManager, FileLoader fileLoader)
     {
         setEventManager(eventManager);
         setFileLoader(fileLoader);
@@ -35,12 +35,12 @@ public class BuildProcessor
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    public void build(File workDir, String bobFileName, String recipeName, BuildResult buildResult, File outputDir) throws BuildException
+    public void build(File workDir, String bobFileName, String recipeName, RecipeResult recipeResult, File outputDir) throws BuildException
     {
         BobFile bobFile = loadBobFile(workDir, bobFileName);
         Recipe recipe;
 
-        if(recipeName == null)
+        if (recipeName == null)
         {
             recipeName = bobFile.getDefaultRecipe();
         }
@@ -57,18 +57,18 @@ public class BuildProcessor
         {
             CommandResult result = new CommandResult(command.getName());
 
-            buildResult.add(result);
+            recipeResult.add(result);
 
             File commandOutput = new File(outputDir, getCommandDirName(i, result));
-            executeCommand(result, commandOutput, buildResult, command);
+            executeCommand(result, commandOutput, recipeResult, command);
 
-            switch(result.getState())
+            switch (result.getState())
             {
                 case FAILURE:
-                    buildResult.failure();
+                    recipeResult.failure();
                     return;
                 case ERROR:
-                    buildResult.commandError();
+                    recipeResult.commandError();
                     return;
             }
 
@@ -76,32 +76,32 @@ public class BuildProcessor
         }
     }
 
-    private void executeCommand(CommandResult result, File commandOutput, BuildResult buildResult, Command command)
+    private void executeCommand(CommandResult result, File commandOutput, RecipeResult recipeResult, Command command)
     {
         result.commence(commandOutput);
-        eventManager.publish(new CommandCommencedEvent(this, buildResult));
+        eventManager.publish(new CommandCommencedEvent(this, recipeResult));
 
         try
         {
-            if(!commandOutput.mkdir())
+            if (!commandOutput.mkdir())
             {
                 throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
             }
 
             command.execute(commandOutput, result);
         }
-        catch(BuildException e)
+        catch (BuildException e)
         {
             result.error(e);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             result.error(new BuildException(e));
         }
         finally
         {
             result.complete();
-            eventManager.publish(new CommandCompletedEvent(this, buildResult));
+            eventManager.publish(new CommandCompletedEvent(this, recipeResult));
         }
     }
 
@@ -114,8 +114,8 @@ public class BuildProcessor
 
         try
         {
-            BobFile         result = new BobFile();
-            File            bob    = new File(workDir, bobFileName);
+            BobFile result = new BobFile();
+            File bob = new File(workDir, bobFileName);
             FileInputStream stream = new FileInputStream(bob);
 
             fileLoader.load(stream, result, properties);

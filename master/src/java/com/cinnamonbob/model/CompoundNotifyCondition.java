@@ -1,7 +1,5 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.core.model.BuildResult;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,19 +21,19 @@ public class CompoundNotifyCondition implements NotifyCondition
         this.children = children;
         this.disjunctive = disjunctive;
     }
-    
+
     public boolean satisfied(BuildResult result)
     {
         boolean ret = !disjunctive;
-        
-        for(NotifyCondition child: children)
+
+        for (NotifyCondition child : children)
         {
-            if(child.satisfied(result) == disjunctive)
+            if (child.satisfied(result) == disjunctive)
             {
                 ret = disjunctive;
                 break;
             }
-        }        
+        }
         return ret;
     }
 }

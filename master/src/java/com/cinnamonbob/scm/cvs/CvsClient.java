@@ -1,8 +1,8 @@
 package com.cinnamonbob.scm.cvs;
 
-import com.cinnamonbob.core.model.Change;
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.CvsRevision;
+import com.cinnamonbob.model.Change;
+import com.cinnamonbob.model.Changelist;
+import com.cinnamonbob.model.CvsRevision;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.cvs.client.*;
 import com.opensymphony.util.TextUtils;
@@ -156,7 +156,6 @@ public class CvsClient
     }
 
     /**
-     *
      * @param since
      * @return null indicates no change since the specified date
      * @throws SCMException
@@ -308,10 +307,14 @@ public class CvsClient
             {
                 fileSeparator = "\\";
                 break;
-            } else if (pathInRepository.indexOf('/') != -1)
+            }
+            else
             {
-                fileSeparator = "/";
-                break;
+                if (pathInRepository.indexOf('/') != -1)
+                {
+                    fileSeparator = "/";
+                    break;
+                }
             }
         }
 
@@ -380,7 +383,8 @@ public class CvsClient
                 if (changeSet.belongsTo(change))
                 {
                     changeSet.add(change);
-                } else
+                }
+                else
                 {
                     changeSets.add(changeSet);
                     changeSet = new LocalChangeSet(change);
@@ -481,7 +485,6 @@ public class CvsClient
 
     /**
      * Simple value object used to help store data during the changeset analysis process.
-     *
      */
     private class LocalChange
     {

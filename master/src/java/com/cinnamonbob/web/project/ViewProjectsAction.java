@@ -1,6 +1,6 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
 
 import java.util.LinkedList;
@@ -35,10 +35,10 @@ public class ViewProjectsAction extends ProjectActionSupport
         projects = getProjectManager().getAllProjects();
         latestBuilds = new LinkedList<BuildResult>();
 
-        for(Project p: projects)
+        for (Project p : projects)
         {
             List<BuildResult> build = getBuildManager().getLatestBuildResultsForProject(p.getName(), 1);
-            if(build.size() == 0)
+            if (build.size() == 0)
             {
                 latestBuilds.add(null);
             }

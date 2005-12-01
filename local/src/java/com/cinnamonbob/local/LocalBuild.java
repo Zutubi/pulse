@@ -1,15 +1,17 @@
 package com.cinnamonbob.local;
 
-import org.apache.commons.cli.*;
-
-import java.io.*;
-
 import com.cinnamonbob.core.*;
+import com.cinnamonbob.core.event.DefaultEventManager;
+import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.core.event.EventManager;
-import com.cinnamonbob.core.event.DefaultEventManager;
-import com.cinnamonbob.core.model.BuildResult;
+import org.apache.commons.cli.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 /**
  * Entry point for executing local builds within a development tree.
@@ -113,18 +115,14 @@ public class LocalBuild
      * directory to save results.  All paths provided must be absolute or
      * relative to the current working directory.
      *
-     * @param workDir
-     *        the working directory in which to execute the build
-     * @param bobFile
-     *        the name of the bobfile to load
-     * @param recipe
-     *        the recipe to execute, may be null to indicate the default
-     *        recipe in the given bobfile
-     * @param resourcesFile
-     *        the resources file to load prior to building , or null if no
-     *        resources are to be loaded
-     * @param outputDir the name of the output directory to capture output
-     *        and save results to
+     * @param workDir       the working directory in which to execute the build
+     * @param bobFile       the name of the bobfile to load
+     * @param recipe        the recipe to execute, may be null to indicate the default
+     *                      recipe in the given bobfile
+     * @param resourcesFile the resources file to load prior to building , or null if no
+     *                      resources are to be loaded
+     * @param outputDir     the name of the output directory to capture output
+     *                      and save results to
      * @throws BobException
      */
     public void runBuild(File workDir, String bobFile, String recipe, String resourcesFile, String outputDir) throws BobException
@@ -133,11 +131,11 @@ public class LocalBuild
 
         ResourceRepository repository = createRepository(resourcesFile);
 
-        if(!workDir.isDirectory())
+        if (!workDir.isDirectory())
         {
             throw new BobException("Working directory '" + workDir.getAbsolutePath() + "' does not exist");
         }
-        
+
         File output = new File(workDir, outputDir);
         cleanOutputDir(output);
 
@@ -151,14 +149,14 @@ public class LocalBuild
             EventManager manager = new DefaultEventManager();
             manager.register(new BuildStatusPrinter(workDir, logStream));
 
-            BuildResult result = new BuildResult(bobFile, 0);
+            RecipeResult result = new RecipeResult(recipe);
             result.commence(output);
-            manager.publish(new BuildCommencedEvent(this, result));
+            manager.publish(new RecipeCommencedEvent(this, result));
 
             try
             {
                 FileLoader loader = new FileLoader(new ObjectFactory(), repository);
-                BuildProcessor processor = new BuildProcessor(manager, loader);
+                RecipeProcessor processor = new RecipeProcessor(manager, loader);
                 processor.build(workDir, bobFile, recipe, result, output);
             }
             catch (BuildException e)
@@ -172,7 +170,7 @@ public class LocalBuild
             finally
             {
                 result.complete();
-                manager.publish(new BuildCompletedEvent(this, result));
+                manager.publish(new RecipeCompletedEvent(this, result));
             }
         }
         catch (FileNotFoundException e)

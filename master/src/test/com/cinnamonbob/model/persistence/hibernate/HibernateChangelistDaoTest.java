@@ -1,8 +1,8 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.core.model.Change;
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.CvsRevision;
+import com.cinnamonbob.model.Change;
+import com.cinnamonbob.model.Changelist;
+import com.cinnamonbob.model.CvsRevision;
 import com.cinnamonbob.model.persistence.ChangelistDao;
 
 import java.util.Calendar;
@@ -43,7 +43,7 @@ public class HibernateChangelistDaoTest extends PersistenceTestCase
         Changelist otherList = changelistDao.findById(list.getId());
         assertPersistentEquals(list, otherList);
 
-        CvsRevision otherRevision = (CvsRevision)otherList.getRevision();
+        CvsRevision otherRevision = (CvsRevision) otherList.getRevision();
         assertPersistentEquals(revision, otherRevision);
 
         Change otherChange = otherList.getChanges().get(0);

@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.model;
+package com.cinnamonbob.model;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

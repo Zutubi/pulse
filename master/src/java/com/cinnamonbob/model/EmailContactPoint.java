@@ -4,7 +4,7 @@ import com.cinnamonbob.BobServer;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.renderer.BuildResultRenderer;
 
 import javax.mail.Message;
@@ -44,53 +44,54 @@ public class EmailContactPoint extends ContactPoint
     }
 
     /* (non-Javadoc)
-    * @see com.cinnamonbob.core.ContactPoint#notify(com.cinnamonbob.core.model.BuildResult)
+    * @see com.cinnamonbob.core.ContactPoint#notify(com.cinnamonbob.core.model.RecipeResult)
     */
     public void notify(Project project, BuildResult result)
     {
-        String subject = "[CiB] " + result.getProjectName() + ": build " + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
-        sendMail(subject, renderResult(project, result));
+        String subject = "[CiB] " + result.getProject().getName() + ": build " + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
+        // TODO distro
+        sendMail(subject, renderResult(project, result.getResults().get(0).getResult()));
     }
-    
-    private String renderResult(Project project, BuildResult result)
+
+    private String renderResult(Project project, RecipeResult result)
     {
         StringWriter w = new StringWriter();
         BuildResultRenderer renderer = (BuildResultRenderer) ComponentContext.getBean("buildResultRenderer");
         renderer.render(BobServer.getHostURL(), project.getName(), project.getId(), result, BuildResultRenderer.TYPE_PLAIN, w);
-        return  w.toString();
+        return w.toString();
     }
-    
+
     private void sendMail(String subject, String body)
     {
-        ConfigurationManager config     = ConfigUtils.getManager();
-        Properties           properties = System.getProperties();
-        
-        if(!config.hasProperty(SMTP_HOST_PROPERTY))
+        ConfigurationManager config = ConfigUtils.getManager();
+        Properties properties = System.getProperties();
+
+        if (!config.hasProperty(SMTP_HOST_PROPERTY))
         {
             LOG.severe("Unable to deliver mail to contact point: SMTP host not configured.");
             return;
         }
-        
+
         properties.put(SMTP_HOST_PROPERTY, config.lookupProperty(SMTP_HOST_PROPERTY));
-        
+
         Session session = Session.getDefaultInstance(properties, null);
-        
+
         try
         {
             Message msg = new MimeMessage(session);
-            
-            if(config.hasProperty(SMTP_FROM_PROPERTY))
+
+            if (config.hasProperty(SMTP_FROM_PROPERTY))
             {
                 String fromAddress = config.lookupProperty(SMTP_FROM_PROPERTY);
                 msg.setFrom(new InternetAddress(fromAddress));
             }
-            
+
             msg.setRecipient(Message.RecipientType.TO, new InternetAddress(getEmail()));
             msg.setSubject(subject);
             msg.setText(body);
             msg.setHeader("X-Mailer", "Project-Cinnamon");
             msg.setSentDate(new Date());
-              
+
             Transport.send(msg);
         }
         catch (Exception e)

@@ -3,8 +3,8 @@
  */
 package com.cinnamonbob.scm.cvs;
 
-import com.cinnamonbob.core.model.CvsRevision;
 import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.model.CvsRevision;
 import junit.framework.TestCase;
 import org.netbeans.lib.cvsclient.util.Logger;
 

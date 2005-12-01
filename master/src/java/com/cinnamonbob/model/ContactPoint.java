@@ -1,6 +1,5 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.core.model.BuildResult;
 import com.cinnamonbob.core.model.Entity;
 
 import java.util.LinkedList;
@@ -46,19 +45,23 @@ public abstract class ContactPoint extends Entity
         return this.properties;
     }
 
-    public String getUid() {
+    public String getUid()
+    {
         return uid;
     }
 
-    public void setUid(String uid) {
+    public void setUid(String uid)
+    {
         this.uid = uid;
     }
 
-    public User getUser() {
+    public User getUser()
+    {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(User user)
+    {
         this.user = user;
     }
 
@@ -91,6 +94,7 @@ public abstract class ContactPoint extends Entity
 
     /**
      * Used by hibernate only.
+     *
      * @param subscriptions
      */
     private void setSubscriptions(List<Subscription> subscriptions)

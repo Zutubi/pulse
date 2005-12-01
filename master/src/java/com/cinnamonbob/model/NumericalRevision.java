@@ -1,10 +1,8 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.core.model.Revision;
-
 /**
  * A subversion revision, which is just a revision number.
- * 
+ *
  * @author jsankey
  */
 public class NumericalRevision extends Revision

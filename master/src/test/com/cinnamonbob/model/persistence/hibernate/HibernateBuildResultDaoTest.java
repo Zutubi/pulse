@@ -2,7 +2,7 @@ package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.core.FileArtifact;
 import com.cinnamonbob.core.model.*;
-import com.cinnamonbob.model.NumericalRevision;
+import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 
 import java.io.File;
@@ -50,19 +50,18 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         artifact.addFeature(feature);
         result.addArtifact(artifact);
 
-        BuildResult buildResult = new BuildResult("project", 11);
-        buildResult.commence(new File("/tmp/buildout"));
-        buildResult.complete();
-        buildResult.add(result);
+        RecipeResult recipeResult = new RecipeResult("project");
+        recipeResult.commence(new File("/tmp/buildout"));
+        recipeResult.complete();
+        recipeResult.add(result);
 
         BuildScmDetails scmDetails = new BuildScmDetails("my scm", new NumericalRevision(42), null);
-        buildResult.addScmDetails(1, scmDetails);
 
         Revision revision = new NumericalRevision(12345);
         revision.setDate(Calendar.getInstance().getTime());
         revision.setAuthor("user");
         revision.setComment("i like fruit");
-        
+
         Changelist changes = new Changelist(revision);
         changes.addChange(new Change("/filename.1", "1.0", Change.Action.ADD));
         changes.addChange(new Change("/filename.2", "2.0", Change.Action.DELETE));
@@ -70,21 +69,30 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
 
         scmDetails.add(changes);
 
+        BuildResult buildResult = new BuildResult(new Project(), 11);
+        buildResult.commence(new File("/tmp/buildout"));
+        buildResult.addScmDetails(1, scmDetails);
+        buildResult.add(new RecipeResultNode("my node", recipeResult));
+
         buildResultDao.save(buildResult);
         commitAndRefreshTransaction();
 
         BuildResult anotherBuildResult = buildResultDao.findById(buildResult.getId());
+        assertPersistentEquals(buildResult, anotherBuildResult);
+
+/*
+        RecipeResult anotherRecipeResult =
 
         // want to ensure that a new object has been created by hibernate and
         // that the old one is not just returned to us.
-        assertFalse(buildResult == anotherBuildResult);
-        assertEquals(buildResult.getNumber(), anotherBuildResult.getNumber());
-        assertEquals(buildResult.getProjectName(), anotherBuildResult.getProjectName());
-        assertEquals(buildResult.getState(), anotherBuildResult.getState());
-        assertEquals(buildResult.getStamps(), anotherBuildResult.getStamps());
+        assertFalse(recipeResult == anotherRecipeResult);
+        assertEquals(recipeResult.getNumber(), anotherRecipeResult.getNumber());
+        assertEquals(recipeResult.getProjectName(), anotherRecipeResult.getProjectName());
+        assertEquals(recipeResult.getState(), anotherRecipeResult.getState());
+        assertEquals(recipeResult.getStamps(), anotherRecipeResult.getStamps());
 
-        assertEquals(buildResult.getScmDetails().size(), 1);
-        BuildScmDetails anotherScmDetails = anotherBuildResult.getScmDetails(1);
+        assertEquals(recipeResult.getScmDetails().size(), 1);
+        BuildScmDetails anotherScmDetails = anotherRecipeResult.getScmDetails(1);
         assertNotNull(anotherScmDetails);
         assertEquals(scmDetails.getScmName(), anotherScmDetails.getScmName());
         assertEquals(scmDetails.getRevision(), anotherScmDetails.getRevision());
@@ -93,8 +101,8 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         Changelist otherChanges = anotherScmDetails.getChangelists().get(0);
         assertEquals(3, otherChanges.getChanges().size());
 
-        assertEquals(anotherBuildResult.getCommandResults().size(), 1);
-        CommandResult anotherResult = anotherBuildResult.getCommandResults().get(0);
+        assertEquals(anotherRecipeResult.getCommandResults().size(), 1);
+        CommandResult anotherResult = anotherRecipeResult.getCommandResults().get(0);
         assertEquals(result.getCommandName(), anotherResult.getCommandName());
         assertEquals(result.getStamps(), anotherResult.getStamps());
         assertEquals(result.getState(), anotherResult.getState());
@@ -113,6 +121,7 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         assertEquals(feature.getLevel(), otherPlain.getLevel());
         assertEquals(feature.getSummary(), otherPlain.getSummary());
         assertEquals(feature.getLineNumber(), otherPlain.getLineNumber());
+*/
 
     }
 }

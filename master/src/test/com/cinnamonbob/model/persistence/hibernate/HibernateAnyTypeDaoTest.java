@@ -3,8 +3,8 @@
  */
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.core.model.BuildResult;
 import com.cinnamonbob.core.model.Entity;
+import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.persistence.AnyTypeDao;
@@ -44,8 +44,8 @@ public class HibernateAnyTypeDaoTest extends PersistenceTestCase
         entities.add(new Project());
         entities.add(new Project());
         entities.add(new User());
-        entities.add(new BuildResult());
-        entities.add(new BuildResult());
+        entities.add(new RecipeResult());
+        entities.add(new RecipeResult());
         List<ObjectHandle> expectedHandles = new LinkedList<ObjectHandle>();
         for (Entity e : entities)
         {

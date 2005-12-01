@@ -1,8 +1,10 @@
-package com.cinnamonbob.core.model;
+package com.cinnamonbob.model;
+
+import com.cinnamonbob.core.model.Entity;
 
 /**
  * A trivial implementation of the Change interface.
- * 
+ *
  * @author jsankey
  */
 public class Change extends Entity

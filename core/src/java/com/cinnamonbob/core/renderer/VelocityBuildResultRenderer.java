@@ -1,6 +1,6 @@
 package com.cinnamonbob.core.renderer;
 
-import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.core.model.RecipeResult;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.ResourceNotFoundException;
@@ -11,8 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * 
- * 
  * @author jsankey
  */
 public class VelocityBuildResultRenderer implements BuildResultRenderer
@@ -21,7 +19,7 @@ public class VelocityBuildResultRenderer implements BuildResultRenderer
 
     private VelocityEngine velocityEngine;
 
-    public void render(String hostUrl, String project, long projectId, BuildResult result, String type, Writer writer)
+    public void render(String hostUrl, String project, long projectId, RecipeResult result, String type, Writer writer)
     {
         VelocityContext context = new VelocityContext();
 
@@ -35,13 +33,13 @@ public class VelocityBuildResultRenderer implements BuildResultRenderer
 
         try
         {
-            velocityEngine.mergeTemplate(type + File.separatorChar + "BuildResult.vm", "utf-8", context, writer);
+            velocityEngine.mergeTemplate(type + File.separatorChar + "RecipeResult.vm", "utf-8", context, writer);
         }
-        catch(ResourceNotFoundException e)
+        catch (ResourceNotFoundException e)
         {
             LOG.log(Level.SEVERE, "Could not load template for type '" + type + "'", e);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             LOG.log(Level.SEVERE, "Could not apply template for type '" + type + "'", e);
         }

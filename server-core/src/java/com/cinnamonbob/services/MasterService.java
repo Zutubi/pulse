@@ -1,10 +1,10 @@
 package com.cinnamonbob.services;
 
-import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.core.model.RecipeResult;
 
 /**
  */
 public interface MasterService
 {
-    void buildComplete(BuildResult result);
+    void buildComplete(RecipeResult result);
 }
