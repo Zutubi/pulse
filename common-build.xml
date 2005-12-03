@@ -48,6 +48,10 @@
             <fileset refid="module.libs"/>
         </path>
 
+        <!-- a pattern set that defines the Test classes to ignore -->
+        <patternset id="ignore.tests">
+            <exclude name="**/*.java"/>
+        </patternset>
     </target>
 
     <target name="clean" depends="common-init">
@@ -103,7 +107,7 @@
     <target name="test" depends="common-init" unless="skip.tests">
 
         <mkdir dir="${report.dir}"/>
-        <junit printsummary="yes" haltonfailure="false">
+        <junit printsummary="yes" forkmode="once" haltonfailure="true">
             <classpath>
                 <path refid="lib.path"/>
                 <pathelement location="build/${module}.jar"/>
@@ -115,7 +119,7 @@
             <batchtest fork="yes" todir="${report.dir}">
                 <fileset dir="${test.dir}">
                     <include name="**/*Test*.java"/>
-                    <exclude name="**/BobTestCase.java"/>
+                    <patternset refid="ignore.tests"/>
                 </fileset>
             </batchtest>
         </junit>

@@ -1,13 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="master module" basedir=".">
 
-    <import file="../common-build.xml" />
+    <import file="../common-build.xml"/>
 
     <target name="module-init">
 
         <property name="module" value="master"/>
         <property name="project.root.dir" value="../"/>
 
+        <fileset id="ignore.tests" dir="src/test">
+            <exclude name="**/PersistenceTestCase.java"/>
+            <exclude name="**/MasterServiceTest.java"/>
+        </fileset>
+
+    </target>
+
+    <target name="package" depends="jar">
+        <mkdir dir="build/package"/>
+        <property name="package.root" value="build/package/bob-${version}"/>
+
+        <!--
+         copy all the files into the package.root directory, run any processing
+        -->
+
+        <!--
+         if required, then zip them up. Remember to put the delete-me.txt
+        -->
+        <!-- file into empty directories -->
+
+        <copy todir="${package.root}/bin">
+            <fileset dir="src/bin" includes="**/*"/>
+        </copy>
+        <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+
+        <copy todir="${package.root}/lib">
+            <fileset dir="lib">
+                <include name="**/*.jar"/>
+                <include name="**/*LICENSE.txt"/>
+                <exclude name="junit*.jar"/>
+            </fileset>
+            <fileset dir="build">
+                <include name="${bob.jar}"/>
+            </fileset>
+            <fileset dir="src/etc">
+                <include name="validators.xml"/>
+            </fileset>
+        </copy>
+        <copy todir="${package.root}/config">
+            <fileset dir="src/main/config">
+                <include name="**/*.xml"/>
+            </fileset>
+        </copy>
+        <copy todir="${package.root}/docs">
+            <fileset dir="src/etc" includes="delete-me.txt"/>
+        </copy>
+        <copy todir="${package.root}/system/templates">
+            <fileset dir="src/templates" includes="**/*.vm"/>
+        </copy>
+        <copy todir="${package.root}/system/database">
+            <fileset dir="src/etc" includes="delete-me.txt"/>
+        </copy>
+        <copy todir="${package.root}/work">
+            <fileset dir="src/etc" includes="delete-me.txt"/>
+        </copy>
+        <copy todir="${package.root}/system/logs">
+            <fileset dir="src/etc" includes="delete-me.txt"/>
+        </copy>
+        <copy todir="${package.root}/system/www">
+            <fileset dir="src/www" includes="**/*"/>
+        </copy>
+        <copy todir="${package.root}/system/config">
+            <fileset dir="src/etc" includes="*.properties"/>
+        </copy>
+        <zip destfile="build/bob-${version}.zip" basedir="build/package"/>
     </target>
 
 

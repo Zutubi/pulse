@@ -8,6 +8,10 @@
         <property name="module" value="core"/>
         <property name="project.root.dir" value="../"/>
 
+        <patternset id="ignore.tests">
+            <exclude name="**/BobTestCase.java"/>
+        </patternset>
+
     </target>
 
 </project>
