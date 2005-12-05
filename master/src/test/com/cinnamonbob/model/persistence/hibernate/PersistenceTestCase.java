@@ -3,22 +3,19 @@ package com.cinnamonbob.model.persistence.hibernate;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.DatabaseBootstrap;
 import com.cinnamonbob.test.BobTestCase;
-import junit.framework.TestCase;
+import org.hibernate.EntityMode;
+import org.hibernate.SessionFactory;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.persister.entity.EntityPersister;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.metadata.ClassMetadata;
-import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.EntityMode;
-import org.hibernate.SessionFactory;
-import org.hibernate.type.Type;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Statement;
-import java.util.Map;
 
 /**
  * 
@@ -70,7 +67,16 @@ public abstract class PersistenceTestCase extends BobTestCase
     {
         sessionFactory = null;
 
-        transactionManager.commit(transactionStatus);
+        try
+        {
+            transactionManager.commit(transactionStatus);
+        }
+        catch (Exception e)
+        {
+            // catch the exception and continue.
+            e.printStackTrace();
+        }
+
         Connection con = ((DataSource)context.getBean("dataSource")).getConnection();
         Statement stmt = null;
         try

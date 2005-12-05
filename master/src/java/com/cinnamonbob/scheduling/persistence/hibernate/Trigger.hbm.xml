@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <class name="com.cinnamonbob.scheduling.Trigger" table="TRIGGER">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="TRIGGER_TYPE" type="string" length="255"/>
+
+        <property name="name" column="NAME" type="string" not-null="true" length="255"/>
+
+        <property name="group" column="GROUP" type="string" not-null="true" length="255"/>
+
+        <!--<property name="taskName" column="TASK_NAME" type="string" length="255"/>-->
+
+        <!--<property name="taskGroup" column="TASK_GROUP" type="string" length="255"/>-->
+
+        <!--<property name="taskClass" column="TASK_CLASS" type="class"/>-->
+
+        <property name="triggerCount" column="COUNT" type="long"/>
+
+        <property name="previousTriggerTime" column="PREVIOUS_TRIGGER_TIME" type="timestamp"/>
+
+        <property name="dataMap" column="DATA" type="serializable"/>
+
+        <property name="triggerState" column="STATE" type="string" not-null="true"/>
+
+        <subclass name="com.cinnamonbob.scheduling.NoopTrigger" discriminator-value="NOOP" dynamic-update="false">
+        </subclass>
+
+        <!--<subclass name="com.cinnamonbob.scheduling.CronTrigger" discriminator-value="CRON" dynamic-update="false">-->
+        <!--</subclass>-->
+
+        <subclass name="com.cinnamonbob.scheduling.EventTrigger" discriminator-value="EVENT" dynamic-update="false">
+        </subclass>
+
+    </class>
+
+    <class name="com.cinnamonbob.scheduling.Task" table="TASK">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="name" column="NAME" type="string" not-null="true" length="255"/>
+
+        <property name="group" column="GROUP" type="string" not-null="true" length="255"/>
+
+        <property name="dataMap" column="DATA" type="serializable"/>
+
+    </class>
+
+    <query name="findByGroup"><![CDATA[
+        from Trigger trigger
+        where trigger.group = :group
+    ]]></query>
+
+    <query name="findByNameAndGroup"><![CDATA[
+        from Trigger trigger
+        where trigger.name = :name
+        and trigger.group = :group
+    ]]></query>
+
+</hibernate-mapping>

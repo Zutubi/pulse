@@ -1,0 +1,129 @@
+package com.cinnamonbob.scheduling.persistence.mock;
+
+import com.cinnamonbob.core.model.Entity;
+import com.cinnamonbob.model.persistence.EntityDao;
+
+import java.util.List;
+import java.util.LinkedList;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+
+/**
+ * <class-comment/>
+ */
+public abstract class MockEntityDao<T extends Entity> implements EntityDao<T>
+{
+    private long id = 1;
+
+    protected List<T> entities = new LinkedList<T>();
+
+    public void delete(T entity)
+    {
+        entities.remove(entity);
+    }
+
+    public List<T> findAll()
+    {
+        return new LinkedList<T>(entities);
+    }
+
+    public T findById(long id)
+    {
+        for (T t : entities)
+        {
+            if (t.getId() == id)
+            {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    public void refresh(T entity)
+    {
+
+    }
+
+    public void save(T entity)
+    {
+        if (entities.contains(entity))
+        {
+            // update.
+        }
+        else
+        {
+            // save.
+            setId(entity, nextId());
+            entities.add(entity);
+        }
+    }
+
+    protected List<T> findByFilter(Filter f)
+    {
+        LinkedList<T> findResults = new LinkedList<T>();
+        for (T t : entities)
+        {
+            if (f.include(t))
+            {
+                findResults.add(t);
+            }
+        }
+        return findResults;
+    }
+
+    protected T findUniqueByFilter(Filter f)
+    {
+        List<T> findResults = findByFilter(f);
+        if (findResults.size() > 1)
+        {
+            throw new RuntimeException();
+        }
+        if (findResults.size() == 1)
+        {
+            return findResults.get(0);
+        }
+        return null;
+    }
+
+    private long nextId()
+    {
+        return id++;
+    }
+
+    private void setId(Entity entity, long id)
+    {
+        Class cls = entity.getClass();
+        try
+        {
+            while (cls != null)
+            {
+                try
+                {
+
+                    Method m = cls.getDeclaredMethod("setId", long.class);
+                    m.setAccessible(true);
+                    m.invoke(entity, id);
+                    return;
+                }
+                catch (NoSuchMethodException e)
+                {
+                    cls = cls.getSuperclass();
+                }
+            }
+            throw new RuntimeException("setId not found.");
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (InvocationTargetException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected interface Filter
+    {
+        boolean include(Object o);
+    }
+}
