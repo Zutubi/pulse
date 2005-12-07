@@ -35,10 +35,10 @@ public class EventSchedulerImplTest extends SchedulerImplTest
         super.tearDown();
     }
 
-    public void testTriggerOnSpecificEvent()
+    public void testTriggerOnSpecificEvent() throws SchedulingException
     {
         EventTrigger trigger = new EventTrigger(TestEvent.class);
-        TestTask task = new TestTask();
+        TestTask task = new TestTask("testName", "testGroup");
         scheduler.schedule(trigger, task);
         assertFalse(task.isExecuted());
         eventManager.publish(new Event(this));

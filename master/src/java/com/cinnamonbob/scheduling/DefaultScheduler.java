@@ -24,27 +24,27 @@ public class DefaultScheduler
         return triggerDao.findByNameAndGroup(name, group);
     }
 
-    public void schedule(Trigger trigger, Task task)
+    public void schedule(Trigger trigger, Task task) throws SchedulingException
     {
         SchedulerImpl impl = schedulers.get(trigger.getClass());
         impl.schedule(trigger, task);
         triggerDao.save(trigger);
     }
 
-    public void unschedule(Trigger trigger)
+    public void unschedule(Trigger trigger) throws SchedulingException
     {
         SchedulerImpl impl = schedulers.get(trigger.getClass());
         impl.unschedule(trigger);
         triggerDao.delete(trigger);
     }
 
-    public void trigger(Trigger trigger, Task task)
+    public void trigger(Trigger trigger, Task task) throws SchedulingException
     {
         SchedulerImpl impl = schedulers.get(trigger.getClass());
         impl.trigger(trigger, task);
     }
 
-    public void pause(String group)
+    public void pause(String group) throws SchedulingException
     {
         for (Trigger trigger: triggerDao.findByGroup(group))
         {
@@ -52,13 +52,13 @@ public class DefaultScheduler
         }
     }
 
-    public void pause(Trigger trigger)
+    public void pause(Trigger trigger) throws SchedulingException
     {
         SchedulerImpl impl = schedulers.get(trigger.getClass());
         impl.pause(trigger);
     }
 
-    public void resume(String group)
+    public void resume(String group) throws SchedulingException
     {
         for (Trigger trigger: triggerDao.findByGroup(group))
         {
@@ -66,7 +66,7 @@ public class DefaultScheduler
         }
     }
 
-    public void resume(Trigger trigger)
+    public void resume(Trigger trigger) throws SchedulingException
     {
         SchedulerImpl impl = schedulers.get(trigger.getClass());
         impl.resume(trigger);
@@ -76,4 +76,6 @@ public class DefaultScheduler
     {
         this.triggerDao = triggerDao;
     }
+
+    
 }

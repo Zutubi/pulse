@@ -5,15 +5,15 @@ package com.cinnamonbob.scheduling;
  */
 public interface SchedulerImpl
 {
-    void schedule(Trigger trigger, Task task);
+    void schedule(Trigger trigger, Task task) throws SchedulingException;
 
-    void unschedule(Trigger trigger);
+    void unschedule(Trigger trigger) throws SchedulingException;
 
-    void trigger(Trigger trigger, Task task);
+    void trigger(Trigger trigger, Task task) throws SchedulingException;
 
-    void trigger(Trigger trigger, Task task, TaskExecutionContext context);
+    void trigger(Trigger trigger, Task task, TaskExecutionContext context) throws SchedulingException;
 
-    void pause(Trigger trigger);
+    void pause(Trigger trigger) throws SchedulingException;
 
-    void resume(Trigger trigger);
+    void resume(Trigger trigger) throws SchedulingException;
 }

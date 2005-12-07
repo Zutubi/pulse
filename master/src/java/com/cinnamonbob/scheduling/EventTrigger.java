@@ -3,13 +3,15 @@ package com.cinnamonbob.scheduling;
 import com.cinnamonbob.core.event.Event;
 
 /**
- * <class-comment/>
+ * The EventTrigger is triggered by the occurance of an event within the system.
+ * Which event will trigger the event trigger is defined by the triggerEvents property.
+ *
  */
 public class EventTrigger extends Trigger
 {
-    private static final Class[] DEFAULT_TRIGGER_EVENTS = new Class[]{Event.class};
+    private static final Class<Event>[] DEFAULT_TRIGGER_EVENTS = new Class[]{Event.class};
 
-    private Class[] triggers = DEFAULT_TRIGGER_EVENTS;
+    private Class<Event>[] triggers = DEFAULT_TRIGGER_EVENTS;
 
     public EventTrigger()
     {
@@ -23,7 +25,7 @@ public class EventTrigger extends Trigger
 
     public EventTrigger(Class trigger, String name)
     {
-        this(trigger, name, null);
+        this(trigger, name, DEFAULT_GROUP);
     }
 
     public EventTrigger(Class trigger, String name, String group)
@@ -32,7 +34,12 @@ public class EventTrigger extends Trigger
         triggers = new Class[]{trigger};
     }
 
-    public Class[] getTriggerEvents()
+    /**
+     * Get the array of Event classes that will trigger this event trigger.
+     *
+     * @return the array of event classes.
+     */
+    public Class<Event>[] getTriggerEvents()
     {
         return triggers;
     }

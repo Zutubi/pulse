@@ -32,11 +32,11 @@ public class DefaultSchedulerTest extends TestCase
         super.tearDown();
     }
 
-    public void testTaskExecutionOnTrigger()
+    public void testTaskExecutionOnTrigger() throws SchedulingException
     {
         // schedule
         ManualTrigger trigger = new ManualTrigger();
-        TestTask task = new TestTask();
+        TestTask task = new TestTask("testName", "testGroup");
         scheduler.schedule(trigger, task);
 
         // test.
@@ -54,15 +54,15 @@ public class DefaultSchedulerTest extends TestCase
         assertFalse(task.isExecuted());
     }
 
-    public void testPauseResumeGroup()
+    public void testPauseResumeGroup() throws SchedulingException
     {
         ManualTrigger triggerA = new ManualTrigger("nameA", "group");
         ManualTrigger triggerB = new ManualTrigger("nameB", "group");
         ManualTrigger triggerC = new ManualTrigger("nameC", "group");
 
-        scheduler.schedule(triggerA, new TestTask());
-        scheduler.schedule(triggerB, new TestTask());
-        scheduler.schedule(triggerC, new TestTask());
+        scheduler.schedule(triggerA, new TestTask("testName1", "testGroup"));
+        scheduler.schedule(triggerB, new TestTask("testName2", "testGroup"));
+        scheduler.schedule(triggerC, new TestTask("testName3", "testGroup"));
 
         assertEquals(TriggerState.ACTIVE, triggerA.getState());
         assertEquals(TriggerState.ACTIVE, triggerB.getState());

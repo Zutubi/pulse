@@ -26,7 +26,7 @@ public class ManualSchedulerImplTest extends SchedulerImplTest
         super.tearDown();
     }
 
-    protected void activateTrigger(Trigger trigger, Task task)
+    protected void activateTrigger(Trigger trigger, Task task) throws SchedulingException
     {
         scheduler.trigger(trigger, task);
     }

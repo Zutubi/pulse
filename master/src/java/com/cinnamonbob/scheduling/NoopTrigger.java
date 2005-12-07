@@ -12,7 +12,7 @@ public class NoopTrigger extends Trigger
 
     public NoopTrigger(String name)
     {
-        this(name, null);
+        this(name, DEFAULT_GROUP);
     }
 
     public NoopTrigger(String name, String group)

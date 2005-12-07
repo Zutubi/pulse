@@ -5,36 +5,16 @@ package com.cinnamonbob.scheduling;
  */
 public abstract class BaseSchedulerImpl implements SchedulerImpl
 {
-    public void trigger(Trigger trigger, Task task)
+    public void trigger(Trigger trigger, Task task) throws SchedulingException
     {
         TaskExecutionContext context = new TaskExecutionContext();
         trigger(trigger, task, context);
     }
 
-    public void trigger(Trigger trigger, Task task, TaskExecutionContext context)
+    public void trigger(Trigger trigger, Task task, TaskExecutionContext context) throws SchedulingException
     {
         context.setTrigger(trigger);
         trigger.trigger();
         task.execute(context);
-    }
-
-    public void schedule(Trigger trigger, Task task)
-    {
-        trigger.setState(TriggerState.ACTIVE);
-    }
-
-    public void unschedule(Trigger trigger)
-    {
-        trigger.setState(TriggerState.NONE);
-    }
-
-    public void pause(Trigger trigger)
-    {
-        trigger.setState(TriggerState.PAUSED);
-    }
-
-    public void resume(Trigger trigger)
-    {
-        trigger.setState(TriggerState.ACTIVE);
     }
 }

@@ -16,10 +16,8 @@ public class EventSchedulerImpl extends BaseSchedulerImpl
     private Map<Trigger, EventListener> triggerListenerMap = new HashMap<Trigger, EventListener>();
     private Map<Trigger, EventListener> pausedTriggerListenerMap = new HashMap<Trigger, EventListener>();
 
-    public void schedule(final Trigger trigger, final Task task)
+    public void schedule(final Trigger trigger, final Task task) throws SchedulingException
     {
-        super.schedule(trigger, task);
-
         final EventTrigger eventTrigger = (EventTrigger)trigger;
 
         EventListener eventListener = new EventListener()
@@ -33,45 +31,55 @@ public class EventSchedulerImpl extends BaseSchedulerImpl
             {
                 TaskExecutionContext context = new TaskExecutionContext();
                 context.put("event", evt);
-                trigger(trigger, task, context);
+                try
+                {
+                    trigger(trigger, task, context);
+                }
+                catch (SchedulingException e)
+                {
+                    e.printStackTrace();
+                }
             }
         };
         triggerListenerMap.put(eventTrigger, eventListener);
         eventManager.register(eventListener);
+        trigger.setState(TriggerState.ACTIVE);
     }
 
-    public void unschedule(Trigger trigger)
+    public void unschedule(Trigger trigger) throws SchedulingException
     {
-        super.unschedule(trigger);
         if (triggerListenerMap.containsKey(trigger))
         {
             EventListener listener = triggerListenerMap.remove(trigger);
             eventManager.unregister(listener);
+            trigger.setState(TriggerState.NONE);
         }
         else if (pausedTriggerListenerMap.containsKey(trigger))
         {
             pausedTriggerListenerMap.remove(trigger);
+            trigger.setState(TriggerState.NONE);
         }
     }
 
-    public void pause(Trigger trigger)
+    public void pause(Trigger trigger) throws SchedulingException
     {
-        super.pause(trigger);
         if (triggerListenerMap.containsKey(trigger))
         {
             EventListener listener = triggerListenerMap.remove(trigger);
             eventManager.unregister(listener);
             pausedTriggerListenerMap.put(trigger, listener);
+            trigger.setState(TriggerState.PAUSED);
         }
     }
 
-    public void resume(Trigger trigger)
+    public void resume(Trigger trigger) throws SchedulingException
     {
-        super.resume(trigger);
         if (pausedTriggerListenerMap.containsKey(trigger))
         {
             EventListener listener = pausedTriggerListenerMap.remove(trigger);
             eventManager.register(listener);
+            triggerListenerMap.put(trigger, listener);
+            trigger.setState(TriggerState.ACTIVE);
         }
     }
 

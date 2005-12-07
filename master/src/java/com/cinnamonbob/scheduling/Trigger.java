@@ -13,6 +13,11 @@ import java.util.HashMap;
 public abstract class Trigger extends Entity
 {
     /**
+     * The default group to be used when no group is specified.
+     */
+    public static final String DEFAULT_GROUP = "default";
+
+    /**
      * The name used to identify the trigger instance.
      */
     private String name;
@@ -44,16 +49,34 @@ public abstract class Trigger extends Entity
      */
     private Map dataMap;
 
+    /**
+     * The no argument constructor should not be used directly. It is made available so
+     * that triggers can be created via the use of newInstance(). A trigger should have
+     * at least a name.
+     *
+     */
     public Trigger()
     {
 
     }
 
+    /**
+     * Use the specified name and the default group as the identifiers for this trigger
+     * instance.
+     *
+     * @param name of this trigger instance. This value should not be null.
+     */
     public Trigger(String name)
     {
-        this(name, null);
+        this(name, DEFAULT_GROUP);
     }
 
+    /**
+     * Use the specified name and group as the identifiers for this trigger instance.
+     * 
+     * @param name of this trigger instance. This value should not be null.
+     * @param group of this trigger instance. This value should not be null.
+     */
     public Trigger(String name, String group)
     {
         this.name = name;

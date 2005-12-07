@@ -28,10 +28,10 @@ public abstract class SchedulerImplTest extends TestCase
         super.tearDown();
     }
 
-    public void testTaskExecutedOnTrigger()
+    public void testTaskExecutedOnTrigger() throws SchedulingException
     {
         Trigger trigger = createTrigger();
-        TestTask task = new TestTask();
+        TestTask task = new TestTask("testName", "testGroup");
         scheduler.schedule(trigger, task);
 
         // test.
@@ -49,11 +49,11 @@ public abstract class SchedulerImplTest extends TestCase
         assertFalse(task.isExecuted());
     }
 
-    public void testTriggerStates()
+    public void testTriggerStates() throws SchedulingException
     {
         Trigger trigger = createTrigger();
         assertEquals(TriggerState.NONE, trigger.getState());
-        TestTask task = new TestTask();
+        TestTask task = new TestTask("testName", "testGroup");
         scheduler.schedule(trigger, task);
         assertEquals(TriggerState.ACTIVE, trigger.getState());
         scheduler.pause(trigger);
@@ -64,10 +64,10 @@ public abstract class SchedulerImplTest extends TestCase
         assertEquals(TriggerState.NONE, trigger.getState());
     }
 
-    public void testPauseTrigger()
+    public void testPauseTrigger() throws SchedulingException
     {
         Trigger trigger = createTrigger();
-        TestTask task = new TestTask();
+        TestTask task = new TestTask("testName", "testGroup");
         scheduler.schedule(trigger, task);
         assertEquals(0, trigger.getTriggerCount());
         activateTrigger(trigger, task);
@@ -80,11 +80,11 @@ public abstract class SchedulerImplTest extends TestCase
         assertEquals(2, trigger.getTriggerCount());
     }
 
-    public void testTriggerCount()
+    public void testTriggerCount() throws SchedulingException
     {
         // schedule
         Trigger trigger = createTrigger();
-        TestTask task = new TestTask();
+        TestTask task = new TestTask("testName", "testGroup");
         scheduler.schedule(trigger, task);
         assertEquals(0, trigger.getTriggerCount());
         activateTrigger(trigger, task);
@@ -97,5 +97,5 @@ public abstract class SchedulerImplTest extends TestCase
     }
 
     protected abstract Trigger createTrigger();
-    protected abstract void activateTrigger(Trigger trigger, Task task);
+    protected abstract void activateTrigger(Trigger trigger, Task task) throws SchedulingException;
 }

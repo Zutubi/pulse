@@ -7,6 +7,11 @@ public class TestTask extends Task
 {
     private boolean executed = false;
 
+    public TestTask(String name, String group)
+    {
+        super(name, group);
+    }
+
     public void execute(TaskExecutionContext context)
     {
         if (context == null)

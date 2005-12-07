@@ -9,10 +9,12 @@ public class ManualTrigger extends Trigger
     {
 
     }
+    
     public ManualTrigger(String name)
     {
-        this(name, null);
+        this(name, DEFAULT_GROUP);
     }
+
     public ManualTrigger(String name, String group)
     {
         super(name, group);

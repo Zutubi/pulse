@@ -31,8 +31,8 @@
         <subclass name="com.cinnamonbob.scheduling.NoopTrigger" discriminator-value="NOOP" dynamic-update="false">
         </subclass>
 
-        <!--<subclass name="com.cinnamonbob.scheduling.CronTrigger" discriminator-value="CRON" dynamic-update="false">-->
-        <!--</subclass>-->
+        <subclass name="com.cinnamonbob.scheduling.CronTrigger" discriminator-value="CRON" dynamic-update="false">
+        </subclass>
 
         <subclass name="com.cinnamonbob.scheduling.EventTrigger" discriminator-value="EVENT" dynamic-update="false">
         </subclass>

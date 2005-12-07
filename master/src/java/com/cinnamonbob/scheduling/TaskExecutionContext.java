@@ -4,7 +4,10 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * <class-comment/>
+ * The TaskExecutionContext stored context information relating to a tasks execution
+ * environment.
+ * 
+ * It contains a reference to the Trigger that triggered the tasks execution.
  */
 public class TaskExecutionContext
 {
