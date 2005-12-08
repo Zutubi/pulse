@@ -15,4 +15,7 @@
         <artifact name="jasper-runtime" type="jar"/>
     </publications>
 
+    <dependencies>
+        <dependency org="apache" name="commons-el" rev="1.0"/>
+    </dependencies>
 </ivy-module>

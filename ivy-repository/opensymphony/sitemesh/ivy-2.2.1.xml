@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="sitemesh" revision="2.2.1" module="sitemesh" status="release">
+    <info organisation="opensymphony" revision="2.2.1" module="sitemesh" status="release">
         <license name="Apache License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
         <description homepage="http://www.opensymphony.com/sitemesh//">
             SiteMesh is a web-page layout and decoration framework and web-application

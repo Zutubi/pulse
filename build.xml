@@ -22,7 +22,7 @@
         <ant dir="server-core" antfile="build.xml" target="resolve.external"/>
         <ant dir="local" antfile="build.xml" target="resolve.external"/>
         <ant dir="master" antfile="build.xml" target="resolve.external"/>
-        <!--<ant dir="slave" antfile="build.xml" target="resolve.external"/>-->
+        <ant dir="slave" antfile="build.xml" target="resolve.external"/>
     </target>
 
     <target name="build.local">
