@@ -7,11 +7,11 @@ import com.cinnamonbob.core.event.EventManager;
 /**
  * <class-comment/>
  */
-public class EventSchedulerImplTest extends SchedulerImplTest
+public class EventSchedulerStrategyTest extends BaseSchedulerStrategyTest
 {
     private EventManager eventManager;
 
-    public EventSchedulerImplTest(String testName)
+    public EventSchedulerStrategyTest(String testName)
     {
         super(testName);
     }
@@ -21,9 +21,9 @@ public class EventSchedulerImplTest extends SchedulerImplTest
         super.setUp();
 
         // add setup code here.
-        scheduler = new EventSchedulerImpl();
+        scheduler = new EventSchedulerStrategy();
         eventManager = new DefaultEventManager();
-        ((EventSchedulerImpl)scheduler).setEventManager(eventManager);
+        ((EventSchedulerStrategy)scheduler).setEventManager(eventManager);
     }
 
     public void tearDown() throws Exception

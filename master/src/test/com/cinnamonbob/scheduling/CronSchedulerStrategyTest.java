@@ -1,9 +1,6 @@
 package com.cinnamonbob.scheduling;
 
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
-import org.quartz.Job;
+import org.quartz.*;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.impl.StdSchedulerFactory;
@@ -11,11 +8,11 @@ import org.quartz.impl.StdSchedulerFactory;
 /**
  * <class-comment/>
  */
-public class CronSchedulerImplTest extends SchedulerImplTest implements JobFactory
+public class CronSchedulerStrategyTest extends BaseSchedulerStrategyTest implements JobFactory
 {
     private Scheduler quartzScheduler = null;
 
-    public CronSchedulerImplTest(String testName)
+    public CronSchedulerStrategyTest(String testName)
     {
         super(testName);
     }
@@ -29,8 +26,8 @@ public class CronSchedulerImplTest extends SchedulerImplTest implements JobFacto
         quartzScheduler = schedFact.getScheduler();
         quartzScheduler.setJobFactory(this);
         quartzScheduler.start();
-        scheduler = new CronSchedulerImpl();
-        ((CronSchedulerImpl)scheduler).setQuartzScheduler(quartzScheduler);
+        scheduler = new CronSchedulerStrategy();
+        ((QuartzSchedulerStrategy)scheduler).setQuartzScheduler(quartzScheduler);
     }
 
     public void tearDown() throws Exception
@@ -59,25 +56,24 @@ public class CronSchedulerImplTest extends SchedulerImplTest implements JobFacto
                     return;
                 }
 
+                // we need to ensure that the quartz threads have had a chance to trigger
+                // the job, so register a callback and then yeild until it is received.
+                final boolean[] triggered = new boolean[]{false};
+                quartzScheduler.addGlobalTriggerListener(new TriggerAdapter()
+                {
+                    public void triggerComplete(org.quartz.Trigger trigger, JobExecutionContext context, int triggerInstructionCode)
+                    {
+                        triggered[0] = true;
+                    }
+                });
+
                 // manually trigger the quartz callback job.
                 quartzScheduler.triggerJob("cron.trigger.job.name", "cron.trigger.job.group");
 
-                // we need to ensure that the quartz threads have had a chance to trigger
-                // the job, so lets sleep while jobs are being executed. This while loop can
-                // also be considered as a primitive form of synchronization between the current
-                // thread and those within quartz.
-                do
+                while (!triggered[0])
                 {
-                    try
-                    {
-                        Thread.sleep(100);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        // don't care about interruptions.
-                    }
+                    Thread.yield();
                 }
-                while (quartzScheduler.getCurrentlyExecutingJobs().size() > 0);
             }
         }
         catch (SchedulerException e)
@@ -98,7 +94,35 @@ public class CronSchedulerImplTest extends SchedulerImplTest implements JobFacto
     public Job newJob(TriggerFiredBundle bundle) throws SchedulerException
     {
         QuartzTaskCallbackJob task = new QuartzTaskCallbackJob();
-        task.setScheduler((CronSchedulerImpl) scheduler);
+        task.setTriggerHandler(new DefaultTriggerHandler());
         return task;
+    }
+}
+
+class TriggerAdapter implements TriggerListener
+{
+    public String getName()
+    {
+        return "TriggerAdapter";
+    }
+
+    public void triggerComplete(org.quartz.Trigger trigger, JobExecutionContext context, int triggerInstructionCode)
+    {
+
+    }
+
+    public void triggerFired(org.quartz.Trigger trigger, JobExecutionContext context)
+    {
+
+    }
+
+    public void triggerMisfired(org.quartz.Trigger trigger)
+    {
+
+    }
+
+    public boolean vetoJobExecution(org.quartz.Trigger trigger, JobExecutionContext context)
+    {
+        return false;
     }
 }

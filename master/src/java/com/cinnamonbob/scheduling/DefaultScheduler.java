@@ -2,21 +2,21 @@ package com.cinnamonbob.scheduling;
 
 import com.cinnamonbob.scheduling.persistence.TriggerDao;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * <class-comment/>
  */
 public class DefaultScheduler
 {
-    private Map<Class, SchedulerImpl> schedulers = new HashMap<Class, SchedulerImpl>();
+    private List<SchedulerStrategy> strategies = new LinkedList<SchedulerStrategy>();
 
     private TriggerDao triggerDao;
 
-    public void register(Class triggerType, SchedulerImpl scheduler)
+    public void register(SchedulerStrategy strategy)
     {
-        schedulers.put(triggerType, scheduler);
+        strategies.add(strategy);
     }
 
     public Trigger getTrigger(String name, String group)
@@ -26,22 +26,16 @@ public class DefaultScheduler
 
     public void schedule(Trigger trigger, Task task) throws SchedulingException
     {
-        SchedulerImpl impl = schedulers.get(trigger.getClass());
+        SchedulerStrategy impl = getStrategy(trigger);
         impl.schedule(trigger, task);
         triggerDao.save(trigger);
     }
 
     public void unschedule(Trigger trigger) throws SchedulingException
     {
-        SchedulerImpl impl = schedulers.get(trigger.getClass());
+        SchedulerStrategy impl = getStrategy(trigger);
         impl.unschedule(trigger);
         triggerDao.delete(trigger);
-    }
-
-    public void trigger(Trigger trigger, Task task) throws SchedulingException
-    {
-        SchedulerImpl impl = schedulers.get(trigger.getClass());
-        impl.trigger(trigger, task);
     }
 
     public void pause(String group) throws SchedulingException
@@ -54,7 +48,7 @@ public class DefaultScheduler
 
     public void pause(Trigger trigger) throws SchedulingException
     {
-        SchedulerImpl impl = schedulers.get(trigger.getClass());
+        SchedulerStrategy impl = getStrategy(trigger);
         impl.pause(trigger);
     }
 
@@ -68,8 +62,20 @@ public class DefaultScheduler
 
     public void resume(Trigger trigger) throws SchedulingException
     {
-        SchedulerImpl impl = schedulers.get(trigger.getClass());
+        SchedulerStrategy impl = getStrategy(trigger);
         impl.resume(trigger);
+    }
+
+    private SchedulerStrategy getStrategy(Trigger trigger)
+    {
+        for (SchedulerStrategy strategy : strategies)
+        {
+            if (strategy.canHandle(trigger))
+            {
+                return strategy;
+            }
+        }
+        return null;
     }
 
     public void setTriggerDao(TriggerDao triggerDao)
@@ -77,5 +83,5 @@ public class DefaultScheduler
         this.triggerDao = triggerDao;
     }
 
-    
+
 }

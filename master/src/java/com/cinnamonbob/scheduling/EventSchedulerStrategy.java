@@ -10,11 +10,20 @@ import java.util.HashMap;
 /**
  * <class-comment/>
  */
-public class EventSchedulerImpl extends BaseSchedulerImpl
+public class EventSchedulerStrategy implements SchedulerStrategy
 {
     private EventManager eventManager;
-    private Map<Trigger, EventListener> triggerListenerMap = new HashMap<Trigger, EventListener>();
-    private Map<Trigger, EventListener> pausedTriggerListenerMap = new HashMap<Trigger, EventListener>();
+
+    private final TriggerHandler triggerHandler = new DefaultTriggerHandler();
+
+    private Map<Trigger, EventListener> activeListenerMap = new HashMap<Trigger, EventListener>();
+
+    private Map<Trigger, EventListener> pausedListenerMap = new HashMap<Trigger, EventListener>();
+
+    public boolean canHandle(Trigger trigger)
+    {
+        return trigger instanceof EventTrigger;
+    }
 
     public void schedule(final Trigger trigger, final Task task) throws SchedulingException
     {
@@ -29,11 +38,9 @@ public class EventSchedulerImpl extends BaseSchedulerImpl
 
             public void handleEvent(Event evt)
             {
-                TaskExecutionContext context = new TaskExecutionContext();
-                context.put("event", evt);
                 try
                 {
-                    trigger(trigger, task, context);
+                    triggerHandler.trigger(trigger, task);
                 }
                 catch (SchedulingException e)
                 {
@@ -41,44 +48,44 @@ public class EventSchedulerImpl extends BaseSchedulerImpl
                 }
             }
         };
-        triggerListenerMap.put(eventTrigger, eventListener);
+        activeListenerMap.put(eventTrigger, eventListener);
         eventManager.register(eventListener);
         trigger.setState(TriggerState.ACTIVE);
     }
 
     public void unschedule(Trigger trigger) throws SchedulingException
     {
-        if (triggerListenerMap.containsKey(trigger))
+        if (activeListenerMap.containsKey(trigger))
         {
-            EventListener listener = triggerListenerMap.remove(trigger);
+            EventListener listener = activeListenerMap.remove(trigger);
             eventManager.unregister(listener);
             trigger.setState(TriggerState.NONE);
         }
-        else if (pausedTriggerListenerMap.containsKey(trigger))
+        else if (pausedListenerMap.containsKey(trigger))
         {
-            pausedTriggerListenerMap.remove(trigger);
+            pausedListenerMap.remove(trigger);
             trigger.setState(TriggerState.NONE);
         }
     }
 
     public void pause(Trigger trigger) throws SchedulingException
     {
-        if (triggerListenerMap.containsKey(trigger))
+        if (activeListenerMap.containsKey(trigger))
         {
-            EventListener listener = triggerListenerMap.remove(trigger);
+            EventListener listener = activeListenerMap.remove(trigger);
             eventManager.unregister(listener);
-            pausedTriggerListenerMap.put(trigger, listener);
+            pausedListenerMap.put(trigger, listener);
             trigger.setState(TriggerState.PAUSED);
         }
     }
 
     public void resume(Trigger trigger) throws SchedulingException
     {
-        if (pausedTriggerListenerMap.containsKey(trigger))
+        if (pausedListenerMap.containsKey(trigger))
         {
-            EventListener listener = pausedTriggerListenerMap.remove(trigger);
+            EventListener listener = pausedListenerMap.remove(trigger);
             eventManager.register(listener);
-            triggerListenerMap.put(trigger, listener);
+            activeListenerMap.put(trigger, listener);
             trigger.setState(TriggerState.ACTIVE);
         }
     }

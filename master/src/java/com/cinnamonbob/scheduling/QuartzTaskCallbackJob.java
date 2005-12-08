@@ -17,12 +17,7 @@ public class QuartzTaskCallbackJob implements Job
     public static final String TRIGGER_PROP = "trigger";
     public static final String TASK_PROP = "task";
 
-    private CronSchedulerImpl scheduler;
-
-    public void setScheduler(CronSchedulerImpl scheduler)
-    {
-        this.scheduler = scheduler;
-    }
+    private TriggerHandler triggerHandler;
 
     public void execute(JobExecutionContext context) throws JobExecutionException
     {
@@ -30,7 +25,7 @@ public class QuartzTaskCallbackJob implements Job
         JobDataMap data = context.getJobDetail().getJobDataMap();
         try
         {
-            scheduler.trigger((Trigger) data.get(TRIGGER_PROP), (Task)data.get(TASK_PROP));
+            triggerHandler.trigger((Trigger)data.get(TRIGGER_PROP), (Task) data.get(TASK_PROP));
         }
         catch (SchedulingException e)
         {
@@ -39,4 +34,8 @@ public class QuartzTaskCallbackJob implements Job
     }
 
 
+    public void setTriggerHandler(TriggerHandler triggerHandler)
+    {
+        this.triggerHandler = triggerHandler;
+    }
 }

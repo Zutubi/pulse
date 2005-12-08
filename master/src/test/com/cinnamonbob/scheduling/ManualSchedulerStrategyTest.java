@@ -1,11 +1,15 @@
 package com.cinnamonbob.scheduling;
 
+import junit.framework.TestCase;
+
 /**
  * <class-comment/>
  */
-public class ManualSchedulerImplTest extends SchedulerImplTest
+public class ManualSchedulerStrategyTest extends TestCase
 {
-    public ManualSchedulerImplTest(String testName)
+    private ManualSchedulerStrategy scheduler;
+
+    public ManualSchedulerStrategyTest(String testName)
     {
         super(testName);
     }
@@ -15,7 +19,7 @@ public class ManualSchedulerImplTest extends SchedulerImplTest
         super.setUp();
 
         // add setup code here.
-        scheduler = new ManualSchedulerImpl();
+        scheduler = new ManualSchedulerStrategy();
     }
 
     public void tearDown() throws Exception
@@ -26,13 +30,9 @@ public class ManualSchedulerImplTest extends SchedulerImplTest
         super.tearDown();
     }
 
-    protected void activateTrigger(Trigger trigger, Task task) throws SchedulingException
+    public void test()
     {
-        scheduler.trigger(trigger, task);
+        
     }
 
-    protected Trigger createTrigger()
-    {
-        return new ManualTrigger();
-    }
 }

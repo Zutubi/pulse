@@ -3,7 +3,7 @@ package com.cinnamonbob.scheduling;
 /**
  * <class-comment/>
  */
-public abstract class BaseSchedulerImpl implements SchedulerImpl
+public class DefaultTriggerHandler implements TriggerHandler
 {
     public void trigger(Trigger trigger, Task task) throws SchedulingException
     {
