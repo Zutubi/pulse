@@ -44,7 +44,7 @@
                 </p>
             </div>
             <div class="menu">
-                <h3>Project $request.project.name</h3>
+                <h3>Project request.project.name</h3>
                 <p>
                     <ul>
                         <li> <a href="findProjects!default.action">find</a></li>

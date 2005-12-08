@@ -14,13 +14,13 @@ public interface BuildManager
 
     BuildResult getBuildResult(long id);
 
-    List<BuildResult> getLatestBuildResultsForProject(String project, int max);
+    List<BuildResult> getLatestBuildResultsForProject(Project project, int max);
 
-    BuildResult getLatestBuildResult(String project);
+    BuildResult getLatestBuildResult(Project project);
 
-    BuildResult getByProjectNameAndNumber(final String project, final long number);
+    BuildResult getByProjectAndNumber(final Project project, final long number);
 
     StoredArtifact getArtifact(long id);
 
-    long getNextBuildNumber(String projectName);
+    long getNextBuildNumber(Project project);
 }

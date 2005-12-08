@@ -1,8 +1,8 @@
 package com.cinnamonbob.scm;
 
-import com.cinnamonbob.model.Change;
-import com.cinnamonbob.model.Changelist;
-import com.cinnamonbob.model.Revision;
+import com.cinnamonbob.core.model.Change;
+import com.cinnamonbob.core.model.Changelist;
+import com.cinnamonbob.core.model.Revision;
 
 import java.io.File;
 import java.util.List;

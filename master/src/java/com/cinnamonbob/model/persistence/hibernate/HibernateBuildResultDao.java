@@ -2,6 +2,7 @@ package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.model.BuildResult;
+import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -24,14 +25,14 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return BuildResult.class;
     }
 
-    public List findLatestByProjectName(final String project, final int max)
+    public List findLatestByProject(final Project project, final int max)
     {
         return (List) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException, SQLException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.projectName = :project and model.stateName != :initial order by id desc");
-                queryObject.setParameter("project", project, Hibernate.STRING);
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.stateName != :initial order by id desc");
+                queryObject.setEntity("project", project);
                 queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
                 queryObject.setMaxResults(max);
 
@@ -42,14 +43,14 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public BuildResult findByProjectNameAndNumber(final String project, final long number)
+    public BuildResult findByProjectAndNumber(final Project project, final long number)
     {
         List results = (List) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException, SQLException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.projectName = :project and model.number = :number");
-                queryObject.setParameter("project", project, Hibernate.STRING);
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.number = :number");
+                queryObject.setEntity("project", project);
                 queryObject.setParameter("number", number, Hibernate.LONG);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());

@@ -44,13 +44,13 @@
 
         <property name="scmName" type="string" length="255"/>
 
-        <many-to-one name="revision" class="com.cinnamonbob.model.Revision" column="REVISION_ID" cascade="all"
+        <many-to-one name="revision" class="com.cinnamonbob.core.model.Revision" column="REVISION_ID" cascade="all"
                      unique="true"/>
 
         <list name="changelists" cascade="all-delete-orphan" lazy="false">
             <key column="BUILD_SCM_DETAILS_ID"/>
             <index column="POSITION"/>
-            <one-to-many class="com.cinnamonbob.model.Changelist"/>
+            <one-to-many class="com.cinnamonbob.core.model.Changelist"/>
         </list>
 
     </class>
@@ -62,6 +62,9 @@
         </id>
 
         <property name="host" type="string" length="255"/>
+
+        <many-to-one name="result" class="com.cinnamonbob.core.model.RecipeResult" column="RECIPE_RESULT_ID"
+                     cascade="all" unique="true"/>
 
         <list name="children" cascade="all-delete-orphan" lazy="false">
             <key column="PARENT_ID"/>

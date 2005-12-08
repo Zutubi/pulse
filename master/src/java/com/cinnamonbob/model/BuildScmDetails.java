@@ -1,6 +1,8 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.Entity;
+import com.cinnamonbob.core.model.Revision;
 
 import java.util.LinkedList;
 import java.util.List;

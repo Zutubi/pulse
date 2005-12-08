@@ -64,29 +64,30 @@
             <p>Subscription: <a href="createSubscription!default.action?project=$project.name">create</a></p>
         </div>
 -->
-        #if($currentRecipe)
-            #if($currentRecipe.inProgress())
+        #if($currentBuild)
+            #set($recipeResult = $currentBuild.results.get(0).result)
+            #if($recipeResult.inProgress())
                 #set($class = "info")
-            #elseif($currentRecipe.succeeded())
+            #elseif($recipeResult.succeeded())
                 #set($class = "success")
             #else
               #set($class = "failure")
             #end
-            <h2 class="command-$class">current build [<a href="viewBuild.action?id=$project.id&buildId=$currentRecipe.id">$currentRecipe.number</a>] (<a href="scheduleBuild.action?id=$id">build</a>)</h2>
+            <h2 class="command-$class">current build [<a href="viewBuild.action?id=$project.id&buildId=$currentBuild.id">$currentBuild.number</a>] (<a href="scheduleBuild.action?id=$id">build</a>)</h2>
             <div class="command-content">
             <table>          
-                #detailrow("commenced" $currentRecipe.stamps.prettyStartTime)
-                #detailrow("elapsed"   $currentRecipe.stamps.prettyElapsed)
-                #detailrow("status"    $currentRecipe.state.prettyString)
+                #detailrow("commenced" $recipeResult.stamps.prettyStartTime)
+                #detailrow("elapsed"   $recipeResult.stamps.prettyElapsed)
+                #detailrow("status"    $recipeResult.state.prettyString)
             </table>
-            #if($currentRecipe.errorMessage)
+            #if($recipeResult.errorMessage)
                 <h2 class="command-element">error details</h2>    
                 <div class="error">
                 <b>message</b>
-                <pre>$currentRecipe.errorMessage</pre>
+                <pre>$recipeResult.errorMessage</pre>
                 </div>
-            #end  
-            #if($currentRecipe.commandResults.size() > 0)
+            #end
+            #if($recipeResult.commandResults.size() > 0)
                 <h2 class="command-element">command log</h2>
                 <table>
                    <tr>
@@ -95,7 +96,7 @@
                         <th class="command-detail">elapsed</th>
                         <th class="command-detail">status</th>
                     </tr>
-                    #foreach($result in $currentRecipe.commandResults)
+                    #foreach($result in $recipeResult.commandResults)
                         #if($result.commenced())
                             #if($result.succeeded())
                                 #set($class = "success")
@@ -126,8 +127,9 @@
                 <th class="command-detail">elapsed</th>
                 <th class="command-detail">result</th>
             </tr>
-            #foreach($result in $history)
-                #set($id = $result.id)
+            #foreach($buildResult in $history)
+                #set($result = $buildResult.results.get(0).result)
+                #set($id = $buildResult.id)
                 #set($built = $result.stamps.prettyStartTime) 
                 #set($elapsed = $result.stamps.prettyElapsed)
                 #if($result.inProgress())
@@ -138,7 +140,7 @@
                     #set($class = "failure")
                 #end
             <tr>
-                <td class="build-$class"><a href="viewBuild.action?id=$project.id&buildId=$id">build $result.number</a></td>
+                <td class="build-$class"><a href="viewBuild.action?id=$project.id&buildId=$id">build $buildResult.number</a></td>
                 <td class="build-$class">$built</td>
                 <td class="build-$class">$elapsed</td>
                 <td class="build-$class">$result.state.prettyString</td>

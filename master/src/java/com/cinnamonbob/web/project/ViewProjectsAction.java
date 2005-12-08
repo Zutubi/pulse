@@ -37,7 +37,7 @@ public class ViewProjectsAction extends ProjectActionSupport
 
         for (Project p : projects)
         {
-            List<BuildResult> build = getBuildManager().getLatestBuildResultsForProject(p.getName(), 1);
+            List<BuildResult> build = getBuildManager().getLatestBuildResultsForProject(p, 1);
             if (build.size() == 0)
             {
                 latestBuilds.add(null);

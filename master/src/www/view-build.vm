@@ -42,7 +42,7 @@
         #detailrow("elapsed"   $result.stamps.prettyElapsed)
         #detailrow("status"    $result.state.prettyString)
       </table>
-      #errordetails($result)
+      #errordetails($result.results.get(0).result)
     </div>
 
     #if($result.hasChanges())
@@ -72,11 +72,12 @@
 	    #end
 	  </div>
     #end
-    
-    #if($result.commandResults.size() > 0)
+
+    #set($recipeResult = $result.results.get(0).result)
+    #if($recipeResult.commandResults.size() > 0)
     <h1 class="build-log">:: command log ::</h1>
 
-#foreach($commandResult in $result.commandResults)
+#foreach($commandResult in $recipeResult.commandResults)
   #if($commandResult.inProgress())
     #set($class = "info")
   #elseif($commandResult.succeeded())

@@ -35,12 +35,12 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findById(id);
     }
 
-    public List<BuildResult> getLatestBuildResultsForProject(String project, int max)
+    public List<BuildResult> getLatestBuildResultsForProject(Project project, int max)
     {
-        return buildResultDao.findLatestByProjectName(project, max);
+        return buildResultDao.findLatestByProject(project, max);
     }
 
-    public BuildResult getLatestBuildResult(String project)
+    public BuildResult getLatestBuildResult(Project project)
     {
         List<BuildResult> results = getLatestBuildResultsForProject(project, 1);
         if (results.size() > 0)
@@ -50,9 +50,9 @@ public class DefaultBuildManager implements BuildManager
         return null;
     }
 
-    public BuildResult getByProjectNameAndNumber(final String project, final long number)
+    public BuildResult getByProjectAndNumber(final Project project, final long number)
     {
-        return buildResultDao.findByProjectNameAndNumber(project, number);
+        return buildResultDao.findByProjectAndNumber(project, number);
     }
 
     public StoredArtifact getArtifact(long id)
@@ -60,10 +60,10 @@ public class DefaultBuildManager implements BuildManager
         return artifactDao.findById(id);
     }
 
-    public long getNextBuildNumber(String projectName)
+    public long getNextBuildNumber(Project project)
     {
         long number = 1;
-        List<BuildResult> builds = getLatestBuildResultsForProject(projectName, 1);
+        List<BuildResult> builds = getLatestBuildResultsForProject(project, 1);
         BuildResult previousBuildResult;
 
         if (builds.size() > 0)

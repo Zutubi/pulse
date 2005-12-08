@@ -1,8 +1,7 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.BuildResult;
+import com.cinnamonbob.model.Project;
 import com.cinnamonbob.schedule.Schedule;
 
 import java.util.List;
@@ -42,12 +41,12 @@ public class ManageProjectAction extends ProjectActionSupport
     public String execute()
     {
         project = getProjectManager().getProject(id);
-        history = getBuildManager().getLatestBuildResultsForProject(project.getName(), 11);
-        if(history.size() > 0)
+        history = getBuildManager().getLatestBuildResultsForProject(project, 11);
+        if (history.size() > 0)
         {
             currentBuild = history.remove(0);
         }
-        schedules = getScheduleManager().getSchedules(project);
+        //schedules = getScheduleManager().getSchedules(project);
         return SUCCESS;
     }
 

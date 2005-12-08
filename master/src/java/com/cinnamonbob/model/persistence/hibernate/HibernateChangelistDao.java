@@ -1,6 +1,6 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.model.Changelist;
+import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.model.persistence.ChangelistDao;
 
 /**

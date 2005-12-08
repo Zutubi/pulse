@@ -26,12 +26,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>XmlRpcApiServlet</servlet-name>
-        <servlet-class>com.cinnamonbob.api.XmlRpcApiServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet>
         <servlet-name>webwork</servlet-name>
         <servlet-class>com.opensymphony.webwork.dispatcher.ServletDispatcher</servlet-class>
         <load-on-startup>1</load-on-startup>
@@ -54,11 +48,6 @@
     <servlet-mapping>
         <servlet-name>hessian</servlet-name>
         <url-pattern>/hessian</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>XmlRpcApiServlet</servlet-name>
-        <url-pattern>/api/xmlrpc/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

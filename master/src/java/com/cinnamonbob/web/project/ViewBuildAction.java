@@ -1,10 +1,10 @@
 package com.cinnamonbob.web.project;
 
+import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.RecipeResultNode;
 

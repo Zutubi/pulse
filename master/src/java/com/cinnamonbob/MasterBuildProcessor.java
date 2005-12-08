@@ -8,7 +8,10 @@ import com.cinnamonbob.core.RecipeProcessor;
 import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.core.model.Change;
+import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.RecipeResult;
+import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.model.*;
@@ -45,8 +48,8 @@ public class MasterBuildProcessor implements EventListener
             return null;
         }
 
-        // allocate a build model to this request.
-        long number = buildManager.getNextBuildNumber(project.getName());
+        // allocate a build id to this request.
+        long number = buildManager.getNextBuildNumber(project);
 
         BuildResult buildResult = new BuildResult(project, number);
         RecipeResult recipeResult = new RecipeResult(request.getRecipeName());
@@ -57,6 +60,8 @@ public class MasterBuildProcessor implements EventListener
         File buildsDir = new File(projectDir, "builds");
         File buildDir = new File(buildsDir, getBuildDirName(buildResult));
 
+        buildResult.commence(buildDir);
+        eventManager.publish(new BuildCommencedEvent(this, buildResult));
         recipeResult.commence(buildDir);
         eventManager.publish(new RecipeCommencedEvent(this, recipeResult));
 
@@ -81,6 +86,8 @@ public class MasterBuildProcessor implements EventListener
         {
             recipeResult.complete();
             eventManager.publish(new RecipeCompletedEvent(this, recipeResult));
+            buildResult.complete();
+            eventManager.publish(new BuildCompletedEvent(this, buildResult));
         }
 
         // sort out notifications.
@@ -151,7 +158,7 @@ public class MasterBuildProcessor implements EventListener
 
                 try
                 {
-                    BuildResult previousBuildResult = buildManager.getLatestBuildResult(project.getName());
+                    BuildResult previousBuildResult = buildManager.getLatestBuildResult(project);
 
                     if (previousBuildResult != null)
                     {

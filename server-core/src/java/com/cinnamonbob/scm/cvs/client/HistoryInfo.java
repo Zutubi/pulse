@@ -1,6 +1,6 @@
 package com.cinnamonbob.scm.cvs.client;
 
-import com.cinnamonbob.model.Change;
+import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.scm.SCMException;
 
 import java.text.ParseException;

@@ -1,8 +1,8 @@
 package com.cinnamonbob.scm.cvs;
 
+import com.cinnamonbob.core.model.Change;
+import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.model.Change;
-import com.cinnamonbob.model.Changelist;
 import com.cinnamonbob.scm.SCMException;
 import junit.framework.TestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;

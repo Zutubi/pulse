@@ -1,4 +1,4 @@
-package com.cinnamonbob.model;
+package com.cinnamonbob.core.model;
 
 /**
  * A subversion revision, which is just a revision number.
