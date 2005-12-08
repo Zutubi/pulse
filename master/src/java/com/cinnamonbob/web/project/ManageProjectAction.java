@@ -1,7 +1,8 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.core.model.BuildResult;
+import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.schedule.Schedule;
 
 import java.util.List;
