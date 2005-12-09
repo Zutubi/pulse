@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 public abstract class BaseSchedulerStrategyTest extends TestCase
 {
     protected SchedulerStrategy scheduler = null;
+    protected TestTriggerHandler triggerHandler = null;
 
     public BaseSchedulerStrategyTest(String testName)
     {
@@ -17,7 +18,7 @@ public abstract class BaseSchedulerStrategyTest extends TestCase
     public void setUp() throws Exception
     {
         super.setUp();
-
+        triggerHandler = new TestTriggerHandler();
         // add setup code here.
     }
 
@@ -31,29 +32,29 @@ public abstract class BaseSchedulerStrategyTest extends TestCase
     public void testTaskExecutedOnTrigger() throws SchedulingException
     {
         Trigger trigger = createTrigger();
-        TestTask task = new TestTask("testName", "testGroup");
+        NoopTask task = new NoopTask("testName", "testGroup");
         scheduler.schedule(trigger, task);
 
         // test.
-        assertFalse(task.isExecuted());
+        assertFalse(triggerHandler.wasTriggered());
         activateTrigger(trigger, task);
-        assertTrue(task.isExecuted());
+        assertTrue(triggerHandler.wasTriggered());
 
         // unschedule
-        task.reset();
+        triggerHandler.reset();
         scheduler.unschedule(trigger);
 
         // test
-        assertFalse(task.isExecuted());
+        assertFalse(triggerHandler.wasTriggered());
         activateTrigger(trigger, task);
-        assertFalse(task.isExecuted());
+        assertFalse(triggerHandler.wasTriggered());
     }
 
     public void testTriggerStates() throws SchedulingException
     {
         Trigger trigger = createTrigger();
         assertEquals(TriggerState.NONE, trigger.getState());
-        TestTask task = new TestTask("testName", "testGroup");
+        NoopTask task = new NoopTask("testName", "testGroup");
         scheduler.schedule(trigger, task);
         assertEquals(TriggerState.ACTIVE, trigger.getState());
         scheduler.pause(trigger);
@@ -67,7 +68,7 @@ public abstract class BaseSchedulerStrategyTest extends TestCase
     public void testPauseTrigger() throws SchedulingException
     {
         Trigger trigger = createTrigger();
-        TestTask task = new TestTask("testName", "testGroup");
+        NoopTask task = new NoopTask("testName", "testGroup");
         scheduler.schedule(trigger, task);
         assertEquals(0, trigger.getTriggerCount());
         activateTrigger(trigger, task);
@@ -84,7 +85,7 @@ public abstract class BaseSchedulerStrategyTest extends TestCase
     {
         // schedule
         Trigger trigger = createTrigger();
-        TestTask task = new TestTask("testName", "testGroup");
+        NoopTask task = new NoopTask("testName", "testGroup");
         scheduler.schedule(trigger, task);
         assertEquals(0, trigger.getTriggerCount());
         activateTrigger(trigger, task);

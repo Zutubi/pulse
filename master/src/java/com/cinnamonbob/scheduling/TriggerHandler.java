@@ -5,7 +5,7 @@ package com.cinnamonbob.scheduling;
  */
 public interface TriggerHandler
 {
-    void trigger(Trigger trigger, Task task) throws SchedulingException;
+    void trigger(Trigger trigger) throws SchedulingException;
 
-    void trigger(Trigger trigger, Task task, TaskExecutionContext context) throws SchedulingException;
+    void trigger(Trigger trigger, TaskExecutionContext context) throws SchedulingException;
 }

@@ -49,6 +49,10 @@ public abstract class Trigger extends Entity
      */
     private Map dataMap;
 
+    private String taskGroup;
+
+    private String taskName;
+
     /**
      * The no argument constructor should not be used directly. It is made available so
      * that triggers can be created via the use of newInstance(). A trigger should have
@@ -161,5 +165,25 @@ public abstract class Trigger extends Entity
     private String getTriggerState()
     {
         return state.toString();
+    }
+
+    public String getTaskGroup()
+    {
+        return taskGroup;
+    }
+
+    public String getTaskName()
+    {
+        return taskName;
+    }
+
+    public void setTaskGroup(String taskGroup)
+    {
+        this.taskGroup = taskGroup;
+    }
+
+    public void setTaskName(String taskName)
+    {
+        this.taskName = taskName;
     }
 }

@@ -1,6 +1,7 @@
 package com.cinnamonbob.scheduling;
 
 import com.cinnamonbob.scheduling.persistence.TriggerDao;
+import com.cinnamonbob.scheduling.persistence.TaskDao;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -13,6 +14,7 @@ public class DefaultScheduler
     private List<SchedulerStrategy> strategies = new LinkedList<SchedulerStrategy>();
 
     private TriggerDao triggerDao;
+    private TaskDao taskDao;
 
     public void register(SchedulerStrategy strategy)
     {
@@ -26,9 +28,28 @@ public class DefaultScheduler
 
     public void schedule(Trigger trigger, Task task) throws SchedulingException
     {
+        if (triggerDao.findByNameAndGroup(trigger.getName(), trigger.getGroup()) != null)
+        {
+            throw new SchedulingException("A trigger with name " + trigger.getName() + " and group " + trigger.getGroup() + " has already been registered.");
+        }
+        if (taskDao.findByNameAndGroup(task.getName(), task.getGroup()) != null)
+        {
+            throw new SchedulingException("A task with name " + task.getName() + " and group " + task.getGroup() + " has already been registered.");
+        }
+
         SchedulerStrategy impl = getStrategy(trigger);
         impl.schedule(trigger, task);
+
+        // assosiate trigger and task so that task can be retrieved when trigger fires.
+        trigger.setTaskName(task.getName());
+        trigger.setTaskGroup(task.getGroup());
         triggerDao.save(trigger);
+        taskDao.save(task);
+    }
+
+    public void schedule(Trigger trigger)
+    {
+        // todo...
     }
 
     public void unschedule(Trigger trigger) throws SchedulingException
@@ -84,4 +105,8 @@ public class DefaultScheduler
     }
 
 
+    public void setTaskDao(TaskDao taskDao)
+    {
+        this.taskDao = taskDao;
+    }
 }

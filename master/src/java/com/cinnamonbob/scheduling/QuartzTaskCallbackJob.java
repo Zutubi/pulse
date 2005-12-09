@@ -15,7 +15,6 @@ public class QuartzTaskCallbackJob implements Job
     private static final Logger LOG = Logger.getLogger(QuartzTaskCallbackJob.class.getName());
 
     public static final String TRIGGER_PROP = "trigger";
-    public static final String TASK_PROP = "task";
 
     private TriggerHandler triggerHandler;
 
@@ -25,14 +24,13 @@ public class QuartzTaskCallbackJob implements Job
         JobDataMap data = context.getJobDetail().getJobDataMap();
         try
         {
-            triggerHandler.trigger((Trigger)data.get(TRIGGER_PROP), (Task) data.get(TASK_PROP));
+            triggerHandler.trigger((Trigger)data.get(TRIGGER_PROP));
         }
         catch (SchedulingException e)
         {
             throw new JobExecutionException(e);
         }
     }
-
 
     public void setTriggerHandler(TriggerHandler triggerHandler)
     {

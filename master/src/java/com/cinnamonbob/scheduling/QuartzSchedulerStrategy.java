@@ -15,6 +15,8 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
 
     private Scheduler quartzScheduler;
 
+    private TriggerHandler triggerHandler;
+
     public void setQuartzScheduler(Scheduler quartzScheduler)
     {
         this.quartzScheduler = quartzScheduler;
@@ -74,7 +76,6 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
             JobDetail detail = new JobDetail(CALLBACK_JOB_NAME, CALLBACK_JOB_GROUP, QuartzTaskCallbackJob.class);
             detail.setDurability(true); // will stay around after the trigger has gone.
             detail.getJobDataMap().put(QuartzTaskCallbackJob.TRIGGER_PROP, trigger);
-            detail.getJobDataMap().put(QuartzTaskCallbackJob.TASK_PROP, task);
             getQuartzScheduler().addJob(detail, true);
         }
     }
@@ -99,6 +100,11 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         {
             throw new SchedulingException(e);
         }
+    }
+
+    public void setTriggerHandler(TriggerHandler handler) throws SchedulingException
+    {
+        this.triggerHandler = handler;
     }
 
     protected abstract org.quartz.Trigger createTrigger(Trigger trigger, Task task) throws SchedulingException;

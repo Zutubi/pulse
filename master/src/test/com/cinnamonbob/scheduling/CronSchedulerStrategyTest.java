@@ -1,14 +1,12 @@
 package com.cinnamonbob.scheduling;
 
 import org.quartz.*;
-import org.quartz.spi.JobFactory;
-import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**
  * <class-comment/>
  */
-public class CronSchedulerStrategyTest extends BaseSchedulerStrategyTest implements JobFactory
+public class CronSchedulerStrategyTest extends BaseSchedulerStrategyTest
 {
     private Scheduler quartzScheduler = null;
 
@@ -24,7 +22,7 @@ public class CronSchedulerStrategyTest extends BaseSchedulerStrategyTest impleme
         // add setup code here.
         SchedulerFactory schedFact = new StdSchedulerFactory();
         quartzScheduler = schedFact.getScheduler();
-        quartzScheduler.setJobFactory(this);
+        quartzScheduler.setJobFactory(new QuartzTaskJobFactory(triggerHandler));
         quartzScheduler.start();
         scheduler = new CronSchedulerStrategy();
         ((QuartzSchedulerStrategy)scheduler).setQuartzScheduler(quartzScheduler);
@@ -89,13 +87,6 @@ public class CronSchedulerStrategyTest extends BaseSchedulerStrategyTest impleme
         // during the course of this test case since we are 'manually' handling the triggering
         // via the activateTrigger method.
         return new CronTrigger("0 0 12 ? * WED", "default");
-    }
-
-    public Job newJob(TriggerFiredBundle bundle) throws SchedulerException
-    {
-        QuartzTaskCallbackJob task = new QuartzTaskCallbackJob();
-        task.setTriggerHandler(new DefaultTriggerHandler());
-        return task;
     }
 }
 

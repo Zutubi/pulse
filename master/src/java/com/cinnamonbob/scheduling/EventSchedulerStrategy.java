@@ -14,7 +14,7 @@ public class EventSchedulerStrategy implements SchedulerStrategy
 {
     private EventManager eventManager;
 
-    private final TriggerHandler triggerHandler = new DefaultTriggerHandler();
+    private TriggerHandler triggerHandler;
 
     private Map<Trigger, EventListener> activeListenerMap = new HashMap<Trigger, EventListener>();
 
@@ -25,7 +25,7 @@ public class EventSchedulerStrategy implements SchedulerStrategy
         return trigger instanceof EventTrigger;
     }
 
-    public void schedule(final Trigger trigger, final Task task) throws SchedulingException
+    public void schedule(final Trigger trigger, Task task) throws SchedulingException
     {
         final EventTrigger eventTrigger = (EventTrigger)trigger;
 
@@ -40,7 +40,7 @@ public class EventSchedulerStrategy implements SchedulerStrategy
             {
                 try
                 {
-                    triggerHandler.trigger(trigger, task);
+                    triggerHandler.trigger(trigger);
                 }
                 catch (SchedulingException e)
                 {
@@ -93,5 +93,10 @@ public class EventSchedulerStrategy implements SchedulerStrategy
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void setTriggerHandler(TriggerHandler triggerHandler)
+    {
+        this.triggerHandler = triggerHandler;
     }
 }

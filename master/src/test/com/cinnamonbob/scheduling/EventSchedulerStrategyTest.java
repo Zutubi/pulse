@@ -24,6 +24,7 @@ public class EventSchedulerStrategyTest extends BaseSchedulerStrategyTest
         scheduler = new EventSchedulerStrategy();
         eventManager = new DefaultEventManager();
         ((EventSchedulerStrategy)scheduler).setEventManager(eventManager);
+        scheduler.setTriggerHandler(triggerHandler);
     }
 
     public void tearDown() throws Exception
@@ -38,14 +39,15 @@ public class EventSchedulerStrategyTest extends BaseSchedulerStrategyTest
     public void testTriggerOnSpecificEvent() throws SchedulingException
     {
         EventTrigger trigger = new EventTrigger(TestEvent.class);
-        TestTask task = new TestTask("testName", "testGroup");
+        NoopTask task = new NoopTask("testName", "testGroup");
         scheduler.schedule(trigger, task);
-        assertFalse(task.isExecuted());
+
+        assertFalse(triggerHandler.wasTriggered());
         eventManager.publish(new Event(this));
-        assertFalse(task.isExecuted());
+        assertFalse(triggerHandler.wasTriggered());
         assertEquals(0, trigger.getTriggerCount());
         eventManager.publish(new TestEvent(this));
-        assertTrue(task.isExecuted());
+        assertTrue(triggerHandler.wasTriggered());
         assertEquals(1, trigger.getTriggerCount());
     }
 

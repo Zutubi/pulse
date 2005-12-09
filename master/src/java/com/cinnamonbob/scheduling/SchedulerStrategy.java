@@ -23,4 +23,5 @@ public interface SchedulerStrategy
 
     void resume(Trigger trigger) throws SchedulingException;
 
+    void setTriggerHandler(TriggerHandler handler) throws SchedulingException;
 }
