@@ -79,49 +79,5 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
 
         BuildResult anotherBuildResult = buildResultDao.findById(buildResult.getId());
         assertPersistentEquals(buildResult, anotherBuildResult);
-
-/*
-        RecipeResult anotherRecipeResult =
-
-        // want to ensure that a new object has been created by hibernate and
-        // that the old one is not just returned to us.
-        assertFalse(recipeResult == anotherRecipeResult);
-        assertEquals(recipeResult.getNumber(), anotherRecipeResult.getNumber());
-        assertEquals(recipeResult.getProjectName(), anotherRecipeResult.getProjectName());
-        assertEquals(recipeResult.getState(), anotherRecipeResult.getState());
-        assertEquals(recipeResult.getStamps(), anotherRecipeResult.getStamps());
-
-        assertEquals(recipeResult.getScmDetails().size(), 1);
-        BuildScmDetails anotherScmDetails = anotherRecipeResult.getScmDetails(1);
-        assertNotNull(anotherScmDetails);
-        assertEquals(scmDetails.getScmName(), anotherScmDetails.getScmName());
-        assertEquals(scmDetails.getRevision(), anotherScmDetails.getRevision());
-        assertEquals(1, anotherScmDetails.getChangelists().size());
-
-        Changelist otherChanges = anotherScmDetails.getChangelists().get(0);
-        assertEquals(3, otherChanges.getChanges().size());
-
-        assertEquals(anotherRecipeResult.getCommandResults().size(), 1);
-        CommandResult anotherResult = anotherRecipeResult.getCommandResults().get(0);
-        assertEquals(result.getCommandName(), anotherResult.getCommandName());
-        assertEquals(result.getStamps(), anotherResult.getStamps());
-        assertEquals(result.getState(), anotherResult.getState());
-        assertEquals(anotherResult.getArtifacts().size(), 1);
-
-        StoredArtifact anotherArtifact = anotherResult.getArtifacts().get(0);
-        assertEquals(artifact.getName(), anotherArtifact.getName());
-        assertEquals(artifact.getTitle(), anotherArtifact.getTitle());
-        assertEquals(artifact.getType(), anotherArtifact.getType());
-        assertEquals(artifact.getFile(), anotherArtifact.getFile());
-        assertEquals(artifact.getFeatures(artifact.getLevels().next()).size(), 1);
-
-        Feature otherFeature = artifact.getFeatures(artifact.getLevels().next()).get(0);
-        assertTrue(otherFeature instanceof PlainFeature);
-        PlainFeature otherPlain = (PlainFeature)otherFeature;
-        assertEquals(feature.getLevel(), otherPlain.getLevel());
-        assertEquals(feature.getSummary(), otherPlain.getSummary());
-        assertEquals(feature.getLineNumber(), otherPlain.getLineNumber());
-*/
-
     }
 }

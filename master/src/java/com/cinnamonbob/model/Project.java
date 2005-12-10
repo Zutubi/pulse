@@ -17,6 +17,7 @@ public class Project extends Entity
     private String bobFile;
     private List<Scm> scms;
     private List<Schedule> schedules;
+    private List<BuildSpecification> buildSpecifications;
 
     public Project()
     {
@@ -130,6 +131,47 @@ public class Project extends Entity
         if (schedules.remove(schedule))
         {
             schedule.setProject(null);
+            return true;
+        }
+        return false;
+    }
+
+    public List<BuildSpecification> getBuildSpecifications()
+    {
+        if(buildSpecifications == null)
+        {
+            buildSpecifications = new LinkedList<BuildSpecification>();
+        }
+
+        return buildSpecifications;
+    }
+
+    public void addBuildSpecification(BuildSpecification specification)
+    {
+        getBuildSpecifications().add(specification);
+    }
+
+    private void setBuildSpecifications(List<BuildSpecification> buildSpecifications)
+    {
+        this.buildSpecifications = buildSpecifications;
+    }
+
+    public BuildSpecification getBuildSpecification(String name)
+    {
+        for (BuildSpecification spec : buildSpecifications)
+        {
+            if (spec.getName().compareToIgnoreCase(name) == 0)
+            {
+                return spec;
+            }
+        }
+        return null;
+    }
+
+    public boolean remove(BuildSpecification buildSpecification)
+    {
+        if (buildSpecifications.remove(buildSpecification))
+        {
             return true;
         }
         return false;

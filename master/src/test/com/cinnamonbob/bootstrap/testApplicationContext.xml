@@ -6,6 +6,7 @@
         <property name="mappingResources">
             <list>
                 <value>com/cinnamonbob/model/persistence/hibernate/BuildResult.hbm.xml</value>
+                <value>com/cinnamonbob/model/persistence/hibernate/BuildSpecification.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Changelist.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/CommandResult.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Feature.hbm.xml</value>
@@ -249,6 +250,26 @@
         </property>
         <property name="target">
             <ref bean="slaveDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="buildSpecificationDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateBuildSpecificationDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="buildSpecificationDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="buildSpecificationDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>

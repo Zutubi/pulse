@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <class name="com.cinnamonbob.model.BuildSpecification" table="BUILD_SPECIFICATION" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="name" column="NAME" type="string" length="255"/>
+
+        <list name="nodes" cascade="all-delete-orphan" lazy="false">
+            <key column="BUILD_SPECIFICATION_ID"/>
+            <index column="POSITION"/>
+            <one-to-many class="com.cinnamonbob.model.BuildSpecificationNode"/>
+        </list>
+    </class>
+
+    <class name="com.cinnamonbob.model.BuildSpecificationNode" table="BUILD_SPECIFICATION_NODE" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <many-to-one name="serviceResolver" class="com.cinnamonbob.model.AbstractBuildServiceResolver" column="BUILD_SERVICE_RESOLVER_ID"
+                     cascade="all" unique="true"/>
+
+        <property name="recipe" type="string" length="255"/>
+
+        <list name="children" cascade="all-delete-orphan" lazy="false">
+            <key column="PARENT_ID"/>
+            <index column="POSITION"/>
+            <one-to-many class="com.cinnamonbob.model.BuildSpecificationNode"/>
+        </list>
+
+    </class>
+
+    <class name="com.cinnamonbob.model.AbstractBuildServiceResolver" table="BUILD_SERVICE_RESOLVER" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="RESOLVER_TYPE" type="string" length="63"/>
+
+        <subclass name="com.cinnamonbob.model.MasterBuildServiceResolver" discriminator-value="MASTER">
+        </subclass>
+
+        <subclass name="com.cinnamonbob.model.SlaveBuildServiceResolver" discriminator-value="SLAVE">
+            <many-to-one name="slave" class="com.cinnamonbob.model.Slave"/>
+        </subclass>
+    </class>
+
+</hibernate-mapping>

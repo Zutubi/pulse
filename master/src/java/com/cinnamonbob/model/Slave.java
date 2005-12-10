@@ -19,7 +19,7 @@ public class Slave extends Entity
 
     private String name;
     private String host;
-    private long lastPingTime;
+    private long lastPingTime = 0;
     private Status status = Status.UNKNOWN;
 
     public Slave()
@@ -73,9 +73,21 @@ public class Slave extends Entity
         return lastPingTime;
     }
 
+    public boolean hasBeenPinged()
+    {
+        return lastPingTime != 0;
+    }
+
     public String getPrettyPingTime()
     {
-        return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date(lastPingTime));
+        if(hasBeenPinged())
+        {
+            return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date(lastPingTime));
+        }
+        else
+        {
+            return "<never>";
+        }
     }
 
     public double getSecondsSincePing()

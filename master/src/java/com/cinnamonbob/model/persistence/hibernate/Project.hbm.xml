@@ -16,6 +16,11 @@
             <key column="PROJECTID"/>
             <one-to-many class="com.cinnamonbob.model.Scm"/>
         </bag>
+
+        <bag name="buildSpecifications" cascade="all-delete-orphan" lazy="false">
+            <key column="PROJECTID"/>
+            <one-to-many class="com.cinnamonbob.model.BuildSpecification"/>
+        </bag>
     </class>
 
     <query name="findByLikeName"><![CDATA[

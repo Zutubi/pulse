@@ -56,7 +56,9 @@ public class DefaultScheduler
     {
         SchedulerStrategy impl = getStrategy(trigger);
         impl.unschedule(trigger);
+        Task task = taskDao.findByNameAndGroup(trigger.getTaskName(), trigger.getTaskGroup());
         triggerDao.delete(trigger);
+        taskDao.delete(task);
     }
 
     public void pause(String group) throws SchedulingException

@@ -132,7 +132,7 @@ public class BobServer
             {
                 try
                 {
-                    Thread.sleep(600000);
+                    Thread.sleep(30000);
                 }
                 catch (InterruptedException e)
                 {

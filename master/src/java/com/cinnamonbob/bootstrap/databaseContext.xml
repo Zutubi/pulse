@@ -222,4 +222,24 @@
         </property>
     </bean>
 
+    <bean id="buildSpecificationDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateBuildSpecificationDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="buildSpecificationDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="buildSpecificationDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
 </beans>

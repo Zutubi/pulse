@@ -27,10 +27,15 @@
           <th class="command-detail">status</th>
         </tr>
 #foreach($slave in $slaves)
+        #if($slave.hasBeenPinged())
+          #set($pingStatus = "$slave.prettyPingTime ($slave.secondsSincePing seconds ago)")
+        #else
+          #set($pingStatus = "&lt;never&gt;")
+        #end
         <tr>
           <td class="build-info">$slave.name</td>
           <td class="build-info">$slave.host</td>
-          <td class="build-info">$slave.prettyPingTime ($slave.secondsSincePing seconds ago)</td>
+          <td class="build-info">$pingStatus</td>
           <td class="build-info">$slave.status.toString().toLowerCase()</td>
         </tr>
 #end
