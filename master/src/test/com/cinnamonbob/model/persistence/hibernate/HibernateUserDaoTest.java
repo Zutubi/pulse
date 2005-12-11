@@ -39,7 +39,7 @@ public class HibernateUserDaoTest extends PersistenceTestCase
         // want to ensure that a new object has been created by hibernate and
         // that the old one is not just returned to us.
         assertFalse(user == anotherUser);
-        assertPersistentEquals(user, anotherUser);
+        assertPropertyEquals(user, anotherUser);
     }
 
     public void testFindAll()
@@ -67,6 +67,6 @@ public class HibernateUserDaoTest extends PersistenceTestCase
         user = userDao.findById(user.getId());
         assertEquals(1, user.getContactPoints().size());
         EmailContactPoint otherEmail = (EmailContactPoint) user.getContactPoints().get(0);
-        assertPersistentEquals(email, otherEmail);
+        assertPropertyEquals(email, otherEmail);
     }
 }

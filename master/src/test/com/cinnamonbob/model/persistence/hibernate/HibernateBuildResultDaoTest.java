@@ -78,6 +78,6 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         commitAndRefreshTransaction();
 
         BuildResult anotherBuildResult = buildResultDao.findById(buildResult.getId());
-        assertPersistentEquals(buildResult, anotherBuildResult);
+        assertPropertyEquals(buildResult, anotherBuildResult);
     }
 }

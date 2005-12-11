@@ -53,7 +53,7 @@ public class HibernateTriggerDaoTestCase extends PersistenceTestCase
         commitAndRefreshTransaction();
 
         Trigger anotherTrigger = dao.findByNameAndGroup("triggerName", "triggerGroup");
-        assertPersistentEquals(trigger, anotherTrigger);
+        assertPropertyEquals(trigger, anotherTrigger);
         assertEquals("value", anotherTrigger.getDataMap().get("key"));
         assertEquals(HibernateTriggerDao.class, anotherTrigger.getDataMap().get("class"));
     }

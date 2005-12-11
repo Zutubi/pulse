@@ -52,7 +52,7 @@ public class HibernateTaskDaoTestCase extends PersistenceTestCase
         commitAndRefreshTransaction();
 
         Task anotherTask = dao.findByNameAndGroup("taskName", "taskGroup");
-        assertPersistentEquals(task, anotherTask);
+        assertPropertyEquals(task, anotherTask);
         assertEquals("value", anotherTask.getDataMap().get("key"));
         assertEquals(HibernateTaskDao.class, anotherTask.getDataMap().get("class"));
     }

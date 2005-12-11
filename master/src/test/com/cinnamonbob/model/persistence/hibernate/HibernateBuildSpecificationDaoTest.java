@@ -55,6 +55,6 @@ public class HibernateBuildSpecificationDaoTest extends PersistenceTestCase
         commitAndRefreshTransaction();
 
         BuildSpecification anotherSpec = buildSpecificationDao.findById(spec.getId());
-        assertPersistentEquals(spec, anotherSpec);
+        assertPropertyEquals(spec, anotherSpec);
     }
 }

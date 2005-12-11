@@ -35,7 +35,7 @@ public class HibernateSlaveDaoTest extends PersistenceTestCase
         // want to ensure that a new object has been created by hibernate and
         // that the old one is not just returned to us.
         assertFalse(slave == anotherSlave);
-        assertPersistentEquals(slave, anotherSlave);
+        assertPropertyEquals(slave, anotherSlave);
     }
 
     public void testFindAll()

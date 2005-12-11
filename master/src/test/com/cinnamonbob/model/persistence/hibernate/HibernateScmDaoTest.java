@@ -32,6 +32,6 @@ public class HibernateScmDaoTest extends PersistenceTestCase
         commitAndRefreshTransaction();
 
         Svn otherSvn = (Svn) scmDao.findById(svn.getId());
-        assertPersistentEquals(svn, otherSvn);
+        assertPropertyEquals(svn, otherSvn);
     }
 }

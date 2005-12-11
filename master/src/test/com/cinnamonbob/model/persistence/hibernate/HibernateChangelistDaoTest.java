@@ -41,12 +41,12 @@ public class HibernateChangelistDaoTest extends PersistenceTestCase
         commitAndRefreshTransaction();
 
         Changelist otherList = changelistDao.findById(list.getId());
-        assertPersistentEquals(list, otherList);
+        assertPropertyEquals(list, otherList);
 
         CvsRevision otherRevision = (CvsRevision) otherList.getRevision();
-        assertPersistentEquals(revision, otherRevision);
+        assertPropertyEquals(revision, otherRevision);
 
         Change otherChange = otherList.getChanges().get(0);
-        assertPersistentEquals(change, otherChange);
+        assertPropertyEquals(change, otherChange);
     }
 }

@@ -16,6 +16,12 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.beans.Introspector;
+import java.beans.BeanInfo;
+import java.beans.PropertyDescriptor;
+import java.beans.IntrospectionException;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * 
@@ -123,4 +129,23 @@ public abstract class PersistenceTestCase extends BobTestCase
         }
     }
 
+    protected void assertPropertyEquals(Object a, Object b)
+    {
+        try
+        {
+            BeanInfo beanInfo = Introspector.getBeanInfo(a.getClass());
+            for (PropertyDescriptor property : beanInfo.getPropertyDescriptors())
+            {
+                Method getter = property.getReadMethod();
+                if (getter.getDeclaringClass() != Object.class)
+                {
+                    assertObjectEquals(getter.getName(), getter.invoke(a), getter.invoke(b));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 }

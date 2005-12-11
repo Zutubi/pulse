@@ -37,7 +37,7 @@ public class HibernateProjectDaoTest extends PersistenceTestCase
         commitAndRefreshTransaction();
 
         Project otherProject = projectDao.findById(project.getId());
-        assertPersistentEquals(project, otherProject);
+        assertPropertyEquals(project, otherProject);
     }
 
     public void testFindByLikeName()
