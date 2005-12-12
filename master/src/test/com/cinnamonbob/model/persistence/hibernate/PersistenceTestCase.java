@@ -3,25 +3,19 @@ package com.cinnamonbob.model.persistence.hibernate;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.DatabaseBootstrap;
 import com.cinnamonbob.test.BobTestCase;
-import org.hibernate.EntityMode;
 import org.hibernate.SessionFactory;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.metadata.ClassMetadata;
-import org.hibernate.persister.entity.EntityPersister;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.sql.DataSource;
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.Statement;
-import java.beans.Introspector;
-import java.beans.BeanInfo;
-import java.beans.PropertyDescriptor;
-import java.beans.IntrospectionException;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * 
@@ -113,20 +107,6 @@ public abstract class PersistenceTestCase extends BobTestCase
     {
         transactionManager.commit(transactionStatus);
         transactionStatus = transactionManager.getTransaction(transactionDefinition);
-    }
-
-    protected void assertPersistentEquals(Object a, Object b)
-    {
-        SessionFactoryImplementor imp = (SessionFactoryImplementor) sessionFactory;
-        ClassMetadata metadata = imp.getClassMetadata(a.getClass());
-        EntityPersister persister = imp.getEntityPersister(metadata.getEntityName());
-        String[] properties = metadata.getPropertyNames();
-        for (String propertyName : properties)
-        {
-            Object valueA = persister.getPropertyValue(a, propertyName, EntityMode.POJO);
-            Object valueB = persister.getPropertyValue(b, propertyName, EntityMode.POJO);
-            assertObjectEquals(propertyName, valueA, valueB);
-        }
     }
 
     protected void assertPropertyEquals(Object a, Object b)

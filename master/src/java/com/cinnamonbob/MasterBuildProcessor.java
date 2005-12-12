@@ -17,14 +17,13 @@ import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Processor for executing builds on the bob master.
@@ -79,7 +78,7 @@ public class MasterBuildProcessor implements EventListener
         }
         catch (BuildException e)
         {
-            LOG.log(Level.SEVERE, "Build error", e);
+            LOG.severe("Build error", e);
             recipeResult.error(e);
         }
         finally
@@ -177,7 +176,7 @@ public class MasterBuildProcessor implements EventListener
                 {
                     // TODO: need to report this failure to the user. However,
                     // this is not fatal to the current build
-                    LOG.log(Level.WARNING, "Unable to retrieve changelist details from Scm server. ", e);
+                    LOG.warning("Unable to retrieve changelist details from Scm server. ", e);
                 }
 
                 BuildScmDetails scmDetails = new BuildScmDetails(scm.getName(), latestRevision, scmChanges);

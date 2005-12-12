@@ -1,14 +1,13 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * The shutdown service provides a way for clients the to shutdown the
@@ -109,7 +108,7 @@ public class ShutdownService
             }
         } catch (IOException e)
         {
-            LOG.log(Level.SEVERE, "Error in socketServer, shutting down service.", e);
+            LOG.severe("Error in socketServer, shutting down service.", e);
             IOUtils.close(socketServer);
         }
 

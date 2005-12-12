@@ -66,7 +66,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         }
     }
 
-    protected void ensureCallbackRegistered(Trigger trigger, Task task)
+    protected void ensureCallbackRegistered(Trigger trigger)
             throws SchedulerException
     {
         JobDetail existingJob = getQuartzScheduler().getJobDetail(CALLBACK_JOB_NAME, CALLBACK_JOB_GROUP);
@@ -80,15 +80,15 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         }
     }
 
-    public void schedule(Trigger trigger, Task task) throws SchedulingException
+    public void schedule(Trigger trigger) throws SchedulingException
     {
         try
         {
             // the quartz trigger equivalent...
-            org.quartz.Trigger quartzTrigger = createTrigger(trigger, task);
+            org.quartz.Trigger quartzTrigger = createTrigger(trigger);
 
             // the callback job
-            ensureCallbackRegistered(trigger, task);
+            ensureCallbackRegistered(trigger);
             quartzTrigger.setJobName(CALLBACK_JOB_NAME);
             quartzTrigger.setJobGroup(CALLBACK_JOB_GROUP);
 
@@ -102,10 +102,10 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         }
     }
 
-    public void setTriggerHandler(TriggerHandler handler) throws SchedulingException
+    public void setTriggerHandler(TriggerHandler handler)
     {
         this.triggerHandler = handler;
     }
 
-    protected abstract org.quartz.Trigger createTrigger(Trigger trigger, Task task) throws SchedulingException;
+    protected abstract org.quartz.Trigger createTrigger(Trigger trigger) throws SchedulingException;
 }

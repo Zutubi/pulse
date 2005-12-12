@@ -2,13 +2,12 @@ package com.cinnamonbob.bootstrap.yahoo;
 
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.BobException;
+import com.cinnamonbob.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 import ymsg.network.LoginRefusedException;
 import ymsg.network.Session;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * The yahoo manager handles the yahoo specific resources. 
@@ -58,12 +57,12 @@ public class YahooManager
         }
         catch (IOException e)
         {
-            LOG.log(Level.WARNING, "Failed to log into yahoo.", e);
+            LOG.warning("Failed to log into yahoo.", e);
             problem = e;
         }
         catch (LoginRefusedException e)
         {
-            LOG.log(Level.WARNING, "Failed to log into yahoo.", e);
+            LOG.warning("Failed to log into yahoo.", e);
             problem = e;
         }
     }
@@ -81,7 +80,7 @@ public class YahooManager
         }
         catch (IOException e)
         {
-            LOG.log(Level.WARNING, "Failed to log out of yahoo.", e);
+            LOG.warning("Failed to log out of yahoo.", e);
             problem = e;
         }
     }

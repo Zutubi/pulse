@@ -7,8 +7,6 @@ import com.cinnamonbob.scheduling.persistence.TaskDao;
  */
 public class DefaultTriggerHandler implements TriggerHandler
 {
-    private TaskDao taskDao = null;
-
     public void trigger(Trigger trigger) throws SchedulingException
     {
         TaskExecutionContext context = new TaskExecutionContext();
@@ -20,12 +18,14 @@ public class DefaultTriggerHandler implements TriggerHandler
         context.setTrigger(trigger);
         trigger.trigger();
         // determine the task to be executed.
-        Task task = taskDao.findByNameAndGroup(trigger.getTaskName(), trigger.getTaskGroup());
-        task.execute(context);
-    }
-
-    public void setTaskDao(TaskDao dao)
-    {
-        this.taskDao = dao;
+        try
+        {
+            Task task = trigger.getTaskClass().newInstance();
+            task.execute(context);
+        }
+        catch (Exception e)
+        {
+            throw new SchedulingException(e);
+        }
     }
 }

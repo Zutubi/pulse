@@ -12,7 +12,7 @@ public class CronSchedulerStrategy extends QuartzSchedulerStrategy
         return trigger instanceof CronTrigger;
     }
 
-    protected org.quartz.Trigger createTrigger(Trigger trigger, Task task) throws SchedulingException
+    protected org.quartz.Trigger createTrigger(Trigger trigger) throws SchedulingException
     {
         CronTrigger cronTrigger = (CronTrigger) trigger;
         try

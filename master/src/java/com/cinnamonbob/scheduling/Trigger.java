@@ -49,9 +49,7 @@ public abstract class Trigger extends Entity
      */
     private Map dataMap;
 
-    private String taskGroup;
-
-    private String taskName;
+    private Class<? extends Task> taskClass;
 
     /**
      * The no argument constructor should not be used directly. It is made available so
@@ -167,23 +165,28 @@ public abstract class Trigger extends Entity
         return state.toString();
     }
 
-    public String getTaskGroup()
+    public void setTaskClass(Class<? extends Task> task)
     {
-        return taskGroup;
+        this.taskClass = task;
     }
 
-    public String getTaskName()
+    public Class<? extends Task> getTaskClass()
     {
-        return taskName;
+        return this.taskClass;
     }
 
-    public void setTaskGroup(String taskGroup)
+    public boolean isPaused()
     {
-        this.taskGroup = taskGroup;
+        return TriggerState.PAUSED == getState();
     }
 
-    public void setTaskName(String taskName)
+    public boolean isActive()
     {
-        this.taskName = taskName;
+        return TriggerState.ACTIVE == getState();
+    }
+
+    public boolean isScheduled()
+    {
+        return TriggerState.NONE != getState();
     }
 }

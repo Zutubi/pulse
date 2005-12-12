@@ -39,8 +39,7 @@ public class EventSchedulerStrategyTest extends BaseSchedulerStrategyTest
     public void testTriggerOnSpecificEvent() throws SchedulingException
     {
         EventTrigger trigger = new EventTrigger(TestEvent.class);
-        NoopTask task = new NoopTask("testName", "testGroup");
-        scheduler.schedule(trigger, task);
+        scheduler.schedule(trigger);
 
         assertFalse(triggerHandler.wasTriggered());
         eventManager.publish(new Event(this));
@@ -51,14 +50,16 @@ public class EventSchedulerStrategyTest extends BaseSchedulerStrategyTest
         assertEquals(1, trigger.getTriggerCount());
     }
 
-    protected void activateTrigger(Trigger trigger, Task task)
+    protected void activateTrigger(Trigger trigger)
     {
         eventManager.publish(new Event(this));
     }
 
     protected Trigger createTrigger()
     {
-        return new EventTrigger();
+        Trigger trigger = new EventTrigger();
+        trigger.setTaskClass(NoopTask.class);
+        return trigger;
     }
 
     private class TestEvent extends Event

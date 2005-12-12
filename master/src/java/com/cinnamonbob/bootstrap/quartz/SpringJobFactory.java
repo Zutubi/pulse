@@ -1,13 +1,12 @@
 package com.cinnamonbob.bootstrap.quartz;
 
 import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.util.logging.Logger;
 import org.quartz.Job;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.simpl.SimpleJobFactory;
 import org.quartz.spi.TriggerFiredBundle;
-
-import java.util.logging.Logger;
 
 /**
  * Use spring to autowire jobs are they are created.

@@ -14,11 +14,7 @@
 
         <property name="group" column="GROUP" type="string" not-null="true" length="255"/>
 
-        <property name="taskName" column="TASK_NAME" type="string" length="255"/>
-
-        <property name="taskGroup" column="TASK_GROUP" type="string" length="255"/>
-
-        <!--<property name="taskClass" column="TASK_CLASS" type="class"/>-->
+        <property name="taskClass" column="TASK_CLASS" type="class"/>
 
         <property name="triggerCount" column="COUNT" type="long"/>
 

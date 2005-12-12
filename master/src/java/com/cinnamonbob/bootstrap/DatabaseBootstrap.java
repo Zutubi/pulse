@@ -7,7 +7,8 @@ import javax.sql.DataSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Logger;
+
+import com.cinnamonbob.util.logging.Logger;
 
 /**
  * Hibernate specific bootstrap support that creates the database scheme

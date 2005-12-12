@@ -1,7 +1,5 @@
 package com.cinnamonbob.scheduling;
 
-import org.quartz.*;
-
 /**
  * <class-comment/>
  */
@@ -12,7 +10,7 @@ public class SimpleSchedulerStrategy extends QuartzSchedulerStrategy
         return trigger instanceof SimpleTrigger;
     }
 
-    protected org.quartz.Trigger createTrigger(Trigger trigger, Task task) throws SchedulingException
+    protected org.quartz.Trigger createTrigger(Trigger trigger) throws SchedulingException
     {
         return new org.quartz.SimpleTrigger(trigger.getName(), trigger.getGroup());
     }

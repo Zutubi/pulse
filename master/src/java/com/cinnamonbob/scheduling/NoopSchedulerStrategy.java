@@ -20,7 +20,7 @@ public class NoopSchedulerStrategy implements SchedulerStrategy
         trigger.setState(TriggerState.ACTIVE);
     }
 
-    public void schedule(Trigger trigger, Task task) throws SchedulingException
+    public void schedule(Trigger trigger) throws SchedulingException
     {
         trigger.setState(TriggerState.ACTIVE);
     }
@@ -30,7 +30,7 @@ public class NoopSchedulerStrategy implements SchedulerStrategy
         trigger.setState(TriggerState.NONE);
     }
 
-    public void setTriggerHandler(TriggerHandler handler) throws SchedulingException
+    public void setTriggerHandler(TriggerHandler handler)
     {
 
     }

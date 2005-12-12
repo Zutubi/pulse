@@ -8,11 +8,10 @@ import com.cinnamonbob.model.ProjectManager;
 import com.cinnamonbob.model.Slave;
 import com.cinnamonbob.model.persistence.SlaveDao;
 import com.cinnamonbob.services.SlaveService;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * The BobServer handles the system initialisation / component
@@ -108,7 +107,7 @@ public class BobServer
             }
             catch (UnknownHostException e)
             {
-                LOG.log(Level.WARNING, "Could not obtain local host name", e);
+                LOG.warning("Could not obtain local host name", e);
             }
 
             return result;
@@ -150,7 +149,7 @@ public class BobServer
                     catch (Exception e)
                     {
                         slave.lastPing(System.currentTimeMillis(), false);
-                        LOG.log(Level.SEVERE, "Unable to ping slave '" + slave.getName() + "'", e);
+                        LOG.severe("Unable to ping slave '" + slave.getName() + "'", e);
                     }
 
                     slaveDao.save(slave);

@@ -25,7 +25,7 @@ public class EventSchedulerStrategy implements SchedulerStrategy
         return trigger instanceof EventTrigger;
     }
 
-    public void schedule(final Trigger trigger, Task task) throws SchedulingException
+    public void schedule(final Trigger trigger) throws SchedulingException
     {
         final EventTrigger eventTrigger = (EventTrigger)trigger;
 

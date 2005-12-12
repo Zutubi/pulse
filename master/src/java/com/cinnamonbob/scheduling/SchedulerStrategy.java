@@ -15,7 +15,7 @@ public interface SchedulerStrategy
      */
     boolean canHandle(Trigger trigger);
 
-    void schedule(Trigger trigger, Task task) throws SchedulingException;
+    void schedule(Trigger trigger) throws SchedulingException;
 
     void unschedule(Trigger trigger) throws SchedulingException;
 
@@ -23,5 +23,5 @@ public interface SchedulerStrategy
 
     void resume(Trigger trigger) throws SchedulingException;
 
-    void setTriggerHandler(TriggerHandler handler) throws SchedulingException;
+    void setTriggerHandler(TriggerHandler handler);
 }

@@ -38,7 +38,7 @@ public class CronSchedulerStrategyTest extends BaseSchedulerStrategyTest
         super.tearDown();
     }
 
-    protected void activateTrigger(Trigger trigger, Task task) throws SchedulingException
+    protected void activateTrigger(Trigger trigger) throws SchedulingException
     {
         try
         {

@@ -33,11 +33,11 @@ public abstract class BaseSchedulerStrategyTest extends TestCase
     {
         Trigger trigger = createTrigger();
         NoopTask task = new NoopTask("testName", "testGroup");
-        scheduler.schedule(trigger, task);
+        scheduler.schedule(trigger);
 
         // test.
         assertFalse(triggerHandler.wasTriggered());
-        activateTrigger(trigger, task);
+        activateTrigger(trigger);
         assertTrue(triggerHandler.wasTriggered());
 
         // unschedule
@@ -46,7 +46,7 @@ public abstract class BaseSchedulerStrategyTest extends TestCase
 
         // test
         assertFalse(triggerHandler.wasTriggered());
-        activateTrigger(trigger, task);
+        activateTrigger(trigger);
         assertFalse(triggerHandler.wasTriggered());
     }
 
@@ -54,8 +54,7 @@ public abstract class BaseSchedulerStrategyTest extends TestCase
     {
         Trigger trigger = createTrigger();
         assertEquals(TriggerState.NONE, trigger.getState());
-        NoopTask task = new NoopTask("testName", "testGroup");
-        scheduler.schedule(trigger, task);
+        scheduler.schedule(trigger);
         assertEquals(TriggerState.ACTIVE, trigger.getState());
         scheduler.pause(trigger);
         assertEquals(TriggerState.PAUSED, trigger.getState());
@@ -68,16 +67,15 @@ public abstract class BaseSchedulerStrategyTest extends TestCase
     public void testPauseTrigger() throws SchedulingException
     {
         Trigger trigger = createTrigger();
-        NoopTask task = new NoopTask("testName", "testGroup");
-        scheduler.schedule(trigger, task);
+        scheduler.schedule(trigger);
         assertEquals(0, trigger.getTriggerCount());
-        activateTrigger(trigger, task);
+        activateTrigger(trigger);
         assertEquals(1, trigger.getTriggerCount());
         scheduler.pause(trigger);
-        activateTrigger(trigger, task);
+        activateTrigger(trigger);
         assertEquals(1, trigger.getTriggerCount());
         scheduler.resume(trigger);
-        activateTrigger(trigger, task);
+        activateTrigger(trigger);
         assertEquals(2, trigger.getTriggerCount());
     }
 
@@ -85,18 +83,17 @@ public abstract class BaseSchedulerStrategyTest extends TestCase
     {
         // schedule
         Trigger trigger = createTrigger();
-        NoopTask task = new NoopTask("testName", "testGroup");
-        scheduler.schedule(trigger, task);
+        scheduler.schedule(trigger);
         assertEquals(0, trigger.getTriggerCount());
-        activateTrigger(trigger, task);
+        activateTrigger(trigger);
         assertEquals(1, trigger.getTriggerCount());
-        activateTrigger(trigger, task);
+        activateTrigger(trigger);
         assertEquals(2, trigger.getTriggerCount());
         scheduler.unschedule(trigger);
-        activateTrigger(trigger, task);
+        activateTrigger(trigger);
         assertEquals(2, trigger.getTriggerCount());
     }
 
     protected abstract Trigger createTrigger();
-    protected abstract void activateTrigger(Trigger trigger, Task task) throws SchedulingException;
+    protected abstract void activateTrigger(Trigger trigger) throws SchedulingException;
 }

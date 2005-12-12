@@ -1,6 +1,6 @@
 package com.cinnamonbob.util;
 
-import org.springframework.jdbc.support.JdbcUtils;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,8 +8,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -45,14 +43,14 @@ public class JDBCUtils
                 {
                     for (String aSql : sql)
                     {
-                        LOG.log(Level.INFO, "Executing schema statement: " + aSql);
+                        LOG.info("Executing schema statement: " + aSql);
                         try
                         {
                             stmt.executeUpdate(aSql);
                         }
                         catch (SQLException ex)
                         {
-                            LOG.log(Level.WARNING, "Unsuccessful schema statement: " + aSql, ex);
+                            LOG.warning("Unsuccessful schema statement: " + aSql, ex);
                         }
                     }
                 }

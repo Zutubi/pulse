@@ -2,6 +2,7 @@ package com.cinnamonbob.scheduling;
 
 import com.cinnamonbob.scheduling.persistence.TriggerDao;
 import com.cinnamonbob.scheduling.persistence.TaskDao;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -11,14 +12,46 @@ import java.util.LinkedList;
  */
 public class DefaultScheduler
 {
+    private static final Logger LOG = Logger.getLogger(DefaultScheduler.class.getName());
+
     private List<SchedulerStrategy> strategies = new LinkedList<SchedulerStrategy>();
 
-    private TriggerDao triggerDao;
-    private TaskDao taskDao;
+    private TriggerHandler triggerHandler;
 
+    private TriggerDao triggerDao;
+
+    /**
+     * Register a scheduling strategy that will be used to handle a specific trigger type.
+     *
+     * @param strategy
+     */
     public void register(SchedulerStrategy strategy)
     {
+        strategy.setTriggerHandler(triggerHandler);
         strategies.add(strategy);
+    }
+
+    protected void init()
+    {
+        for (Trigger trigger : triggerDao.findAll())
+        {
+            SchedulerStrategy strategy = getStrategy(trigger);
+            try
+            {
+                strategy.schedule(trigger);
+                // TODO: there is a very brief opportunity here for a paused trigger to execute.... should close this gap..
+                if (trigger.isPaused())
+                {
+                    strategy.pause(trigger);
+                }
+            }
+            catch (SchedulingException e)
+            {
+                // not the fact that this trigger is invalid but do not prevent the rest of the triggers from
+                // being initialisd.
+                LOG.severe("failed to initialise a trigger.", e);
+            }
+        }
     }
 
     public Trigger getTrigger(String name, String group)
@@ -26,44 +59,42 @@ public class DefaultScheduler
         return triggerDao.findByNameAndGroup(name, group);
     }
 
-    public void schedule(Trigger trigger, Task task) throws SchedulingException
+    public void schedule(Trigger trigger) throws SchedulingException
     {
         if (triggerDao.findByNameAndGroup(trigger.getName(), trigger.getGroup()) != null)
         {
             throw new SchedulingException("A trigger with name " + trigger.getName() + " and group " + trigger.getGroup() + " has already been registered.");
         }
-        if (taskDao.findByNameAndGroup(task.getName(), task.getGroup()) != null)
-        {
-            throw new SchedulingException("A task with name " + task.getName() + " and group " + task.getGroup() + " has already been registered.");
-        }
 
         SchedulerStrategy impl = getStrategy(trigger);
-        impl.schedule(trigger, task);
+        impl.schedule(trigger);
 
         // assosiate trigger and task so that task can be retrieved when trigger fires.
-        trigger.setTaskName(task.getName());
-        trigger.setTaskGroup(task.getGroup());
         triggerDao.save(trigger);
-        taskDao.save(task);
     }
 
-    public void schedule(Trigger trigger)
+    public void trigger(Trigger trigger) throws SchedulingException
     {
-        // todo...
+        triggerHandler.trigger(trigger);
     }
 
+    /**
+     * Unschedule a trigger. Only scheduled triggers can be unscheduled.
+     *
+     * @param trigger
+     * @throws SchedulingException
+     */
     public void unschedule(Trigger trigger) throws SchedulingException
     {
+        assertScheduled(trigger);
         SchedulerStrategy impl = getStrategy(trigger);
         impl.unschedule(trigger);
-        Task task = taskDao.findByNameAndGroup(trigger.getTaskName(), trigger.getTaskGroup());
         triggerDao.delete(trigger);
-        taskDao.delete(task);
     }
 
     public void pause(String group) throws SchedulingException
     {
-        for (Trigger trigger: triggerDao.findByGroup(group))
+        for (Trigger trigger : triggerDao.findByGroup(group))
         {
             pause(trigger);
         }
@@ -71,13 +102,18 @@ public class DefaultScheduler
 
     public void pause(Trigger trigger) throws SchedulingException
     {
+        assertScheduled(trigger);
+        if (!trigger.isActive())
+        {
+            return;
+        }
         SchedulerStrategy impl = getStrategy(trigger);
         impl.pause(trigger);
     }
 
     public void resume(String group) throws SchedulingException
     {
-        for (Trigger trigger: triggerDao.findByGroup(group))
+        for (Trigger trigger : triggerDao.findByGroup(group))
         {
             resume(trigger);
         }
@@ -85,10 +121,21 @@ public class DefaultScheduler
 
     public void resume(Trigger trigger) throws SchedulingException
     {
+        assertScheduled(trigger);
+        if (!trigger.isPaused())
+        {
+            return;
+        }
         SchedulerStrategy impl = getStrategy(trigger);
         impl.resume(trigger);
     }
 
+    /**
+     * Retrieve the first registered strategy that is able to handle this trigger.
+     *
+     * @param trigger
+     * @return a scheduler strategy.
+     */
     private SchedulerStrategy getStrategy(Trigger trigger)
     {
         for (SchedulerStrategy strategy : strategies)
@@ -101,14 +148,26 @@ public class DefaultScheduler
         return null;
     }
 
+    private void assertScheduled(Trigger trigger) throws SchedulingException
+    {
+        if (!trigger.isScheduled())
+        {
+            throw new SchedulingException("The trigger must be scheduled first.");
+        }
+    }
+
+    /**
+     * Set a reference to the required TriggerDao resource.
+     *
+     * @param triggerDao
+     */
     public void setTriggerDao(TriggerDao triggerDao)
     {
         this.triggerDao = triggerDao;
     }
 
-
-    public void setTaskDao(TaskDao taskDao)
+    public void setTriggerHandler(TriggerHandler triggerHandler)
     {
-        this.taskDao = taskDao;
+        this.triggerHandler = triggerHandler;
     }
 }
