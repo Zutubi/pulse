@@ -5,7 +5,7 @@ import com.cinnamonbob.bootstrap.ConfigUtils;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.runtime.resource.loader.FileResourceLoader;
 
-import java.util.logging.Logger;
+import com.cinnamonbob.util.logging.Logger;
 
 /**
  * 

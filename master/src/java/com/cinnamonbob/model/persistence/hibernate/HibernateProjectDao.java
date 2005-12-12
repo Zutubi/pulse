@@ -10,7 +10,7 @@ import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import java.util.List;
-import java.util.logging.Logger;
+import com.cinnamonbob.util.logging.Logger;
 
 /**
  * 

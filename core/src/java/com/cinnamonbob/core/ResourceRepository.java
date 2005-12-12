@@ -1,6 +1,7 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -8,8 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Here be resources.  Yar.
@@ -72,7 +71,7 @@ public class ResourceRepository
         }
         catch (Exception e)
         {
-            LOG.log(Level.WARNING, e.getMessage(), e);
+            LOG.warning(e.getMessage(), e);
         }
     }
 

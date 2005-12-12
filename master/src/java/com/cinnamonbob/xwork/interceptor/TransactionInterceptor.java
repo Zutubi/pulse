@@ -10,7 +10,7 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.cinnamonbob.util.logging.Logger;
 
 /**
  * An interceptor that wraps the action execution in a single Hibernate transaction.

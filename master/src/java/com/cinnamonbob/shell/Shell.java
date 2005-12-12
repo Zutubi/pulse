@@ -3,13 +3,12 @@ package com.cinnamonbob.shell;
 import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.util.RandomUtils;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * The Shell provides a native command execution environment.
@@ -419,7 +418,7 @@ class StdOutErrParser extends Thread
         }
         catch (IOException e)
         {
-            LOG.log(Level.SEVERE, "Error reading input.", e);
+            LOG.severe("Error reading input.", e);
             // need to clear up the cmd end markers so that we ensure that
             // any waiting clients will be released.
             cmdEndMarkers.clear();

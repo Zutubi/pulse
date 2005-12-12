@@ -5,7 +5,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobDataMap;
 
-import java.util.logging.Logger;
+import com.cinnamonbob.util.logging.Logger;
 
 /**
  * <class-comment/>

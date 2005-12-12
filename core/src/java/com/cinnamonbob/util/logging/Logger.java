@@ -48,4 +48,24 @@ public class Logger
     {
         delegate.warning(msg);
     }
+
+    public void fine(String msg)
+    {
+        delegate.fine(msg);
+    }
+
+    public void finer(String msg)
+    {
+        delegate.finer(msg);
+    }
+
+    public void finest(String msg)
+    {
+        delegate.finest(msg);
+    }
+
+    public boolean isLoggable(Level level)
+    {
+        return delegate.isLoggable(level);
+    }
 }

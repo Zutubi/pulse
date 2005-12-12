@@ -13,7 +13,7 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Logger;
+import com.cinnamonbob.util.logging.Logger;
 
 public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> implements BuildResultDao
 {

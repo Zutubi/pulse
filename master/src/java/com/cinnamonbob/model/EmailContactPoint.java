@@ -1,6 +1,7 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.BobServer;
+import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
@@ -15,8 +16,6 @@ import javax.mail.internet.MimeMessage;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * 
@@ -96,7 +95,7 @@ public class EmailContactPoint extends ContactPoint
         }
         catch (Exception e)
         {
-            LOG.log(Level.WARNING, "Unable to send email", e);
+            LOG.warning("Unable to send email", e);
         }
     }
 

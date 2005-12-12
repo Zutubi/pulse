@@ -2,12 +2,11 @@ package com.cinnamonbob.jetty;
 
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.util.logging.Logger;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * 
@@ -64,7 +63,7 @@ public class JettyManager
         catch (InterruptedException e)
         {
             // Empty
-            LOG.log(Level.SEVERE, "Error while stopping Jetty", e);
+            LOG.severe("Error while stopping Jetty", e);
         }
     }
 }

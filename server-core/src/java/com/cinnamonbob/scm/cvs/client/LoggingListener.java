@@ -5,7 +5,7 @@ import org.netbeans.lib.cvsclient.event.CVSAdapter;
 import org.netbeans.lib.cvsclient.event.EnhancedMessageEvent;
 import org.netbeans.lib.cvsclient.event.MessageEvent;
 
-import java.util.logging.Logger;
+import com.cinnamonbob.util.logging.Logger;
 
 /**
  *

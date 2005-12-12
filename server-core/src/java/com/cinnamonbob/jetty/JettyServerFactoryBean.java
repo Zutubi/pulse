@@ -5,7 +5,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.http.SocketListener;
 import org.springframework.beans.factory.FactoryBean;
 
-import java.util.logging.Logger;
+import com.cinnamonbob.util.logging.Logger;
 
 /**
  * 

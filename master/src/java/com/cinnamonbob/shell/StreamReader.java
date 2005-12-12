@@ -1,10 +1,9 @@
 package com.cinnamonbob.shell;
 
 import com.cinnamonbob.core.util.Constants;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * <class-comment/>
@@ -57,7 +56,7 @@ public class StreamReader extends Thread
         }
         catch (IOException e)
         {
-            LOG.log(Level.SEVERE, "Error reading input.", e);
+            LOG.severe("Error reading input.", e);
         }
     }
 }

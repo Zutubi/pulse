@@ -2,13 +2,12 @@ package com.cinnamonbob.command;
 
 import com.cinnamonbob.BobServer;
 import com.cinnamonbob.ShutdownService;
+import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -73,7 +72,7 @@ public class Bootstrap
         }
         catch (IOException e)
         {
-            LOG.log(Level.WARNING, "Unable to send shutdown request", e);
+            LOG.warning("Unable to send shutdown request", e);
 
         }
         finally

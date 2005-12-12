@@ -4,7 +4,7 @@ import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.SystemBootstrapManager;
 import com.cinnamonbob.jetty.JettyManager;
 
-import java.util.logging.Logger;
+import com.cinnamonbob.util.logging.Logger;
 
 /**
  */

@@ -1,12 +1,11 @@
 package com.cinnamonbob.bootstrap;
 
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * 
@@ -60,7 +59,7 @@ public class DefaultConfigurationManager implements ConfigurationManager
             }
             catch (IOException e)
             {
-                LOG.log(Level.SEVERE, "Failed to load " + PROPERTIES_FILENAME + ".", e);
+                LOG.severe("Failed to load " + PROPERTIES_FILENAME + ".", e);
             }
         }
 

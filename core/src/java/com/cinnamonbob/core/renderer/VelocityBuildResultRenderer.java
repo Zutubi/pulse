@@ -1,14 +1,13 @@
 package com.cinnamonbob.core.renderer;
 
 import com.cinnamonbob.core.model.RecipeResult;
+import com.cinnamonbob.util.logging.Logger;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.ResourceNotFoundException;
 
 import java.io.File;
 import java.io.Writer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author jsankey
@@ -37,11 +36,11 @@ public class VelocityBuildResultRenderer implements BuildResultRenderer
         }
         catch (ResourceNotFoundException e)
         {
-            LOG.log(Level.SEVERE, "Could not load template for type '" + type + "'", e);
+            LOG.severe("Could not load template for type '" + type + "'", e);
         }
         catch (Exception e)
         {
-            LOG.log(Level.SEVERE, "Could not apply template for type '" + type + "'", e);
+            LOG.severe("Could not apply template for type '" + type + "'", e);
         }
     }
 

@@ -8,7 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+import com.cinnamonbob.util.logging.Logger;
 import java.util.regex.Matcher;
 
 
