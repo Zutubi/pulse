@@ -32,7 +32,6 @@ public abstract class BaseSchedulerStrategyTest extends TestCase
     public void testTaskExecutedOnTrigger() throws SchedulingException
     {
         Trigger trigger = createTrigger();
-        NoopTask task = new NoopTask("testName", "testGroup");
         scheduler.schedule(trigger);
 
         // test.

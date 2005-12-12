@@ -2,8 +2,6 @@ package com.cinnamonbob.scheduling;
 
 import junit.framework.*;
 import com.cinnamonbob.scheduling.persistence.mock.MockTriggerDao;
-import com.cinnamonbob.scheduling.persistence.mock.MockTaskDao;
-import com.cinnamonbob.scheduling.persistence.TaskDao;
 import com.cinnamonbob.scheduling.persistence.TriggerDao;
 
 /**

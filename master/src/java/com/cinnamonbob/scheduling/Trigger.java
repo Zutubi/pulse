@@ -1,12 +1,11 @@
 package com.cinnamonbob.scheduling;
 
 import com.cinnamonbob.core.model.Entity;
-import com.cinnamonbob.model.Project;
 
-import java.util.Date;
 import java.util.Calendar;
-import java.util.Map;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <class-comment/>
