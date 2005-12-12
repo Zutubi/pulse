@@ -21,6 +21,16 @@ public class HibernateTriggerDao extends HibernateEntityDao<Trigger> implements 
         return findByNamedQuery("findByGroup", "group", group);
     }
 
+    public List<Trigger> findByProject(long id)
+    {
+        return findByNamedQuery("findByProject", "project", Long.valueOf(id));
+    }
+
+    public Trigger findByProjectAndName(long id, String name)
+    {
+        return (Trigger) findUniqueByNamedQuery("findByProjectAndName", "project", Long.valueOf(id), "name", name);
+    }
+
     public Trigger findByNameAndGroup(String name, String group)
     {
         return (Trigger) findUniqueByNamedQuery("findByNameAndGroup", "name", name, "group", group);

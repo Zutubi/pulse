@@ -12,7 +12,6 @@
                 <value>com/cinnamonbob/model/persistence/hibernate/Feature.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Project.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Revision.hbm.xml</value>
-                <value>com/cinnamonbob/schedule/persistence/hibernate/Schedule.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Scm.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Slave.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
@@ -158,26 +157,6 @@
         </property>
     </bean>
 
-    <bean id="scheduleDaoTarget" class="com.cinnamonbob.schedule.persistence.hibernate.HibernateScheduleDao">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-
-    <bean id="scheduleDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="scheduleDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
     <bean id="scmDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateScmDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
@@ -283,8 +262,6 @@
     <bean id="userManager" class="com.cinnamonbob.model.DefaultUserManager" autowire="byName"/>
 
     <bean id="projectManager" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
-
-    <bean id="scheduleManager" class="com.cinnamonbob.schedule.DefaultScheduleManager" autowire="byName"/>
 
     <bean id="subscriptionManager" class="com.cinnamonbob.model.DefaultSubscriptionManager" autowire="byName"/>
 

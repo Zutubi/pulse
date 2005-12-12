@@ -36,4 +36,29 @@ public class MockTriggerDao extends MockEntityDao<Trigger> implements TriggerDao
             }
         });
     }
+
+    public List<Trigger> findByProject(final long id)
+    {
+        return findByFilter(new Filter()
+        {
+            public boolean include(Object o)
+            {
+                Trigger trigger = (Trigger) o;
+                return trigger.getProject() == id;
+            }
+        });
+    }
+
+    public Trigger findByProjectAndName(final long id, final String name)
+    {
+        return findUniqueByFilter(new Filter()
+        {
+            public boolean include(Object o)
+            {
+                Trigger trigger = (Trigger) o;
+                return name.compareTo(trigger.getName()) == 0 &&
+                        id == trigger.getProject();
+            }
+        });
+    }
 }

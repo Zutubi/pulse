@@ -1,6 +1,7 @@
 package com.cinnamonbob.scheduling;
 
 import com.cinnamonbob.core.model.Entity;
+import com.cinnamonbob.model.Project;
 
 import java.util.Date;
 import java.util.Calendar;
@@ -50,6 +51,8 @@ public abstract class Trigger extends Entity
     private Map dataMap;
 
     private Class<? extends Task> taskClass;
+
+    private long projectId;
 
     /**
      * The no argument constructor should not be used directly. It is made available so
@@ -188,5 +191,15 @@ public abstract class Trigger extends Entity
     public boolean isScheduled()
     {
         return TriggerState.NONE != getState();
+    }
+
+    public long getProject()
+    {
+        return projectId;
+    }
+
+    public void setProject(long projectId)
+    {
+        this.projectId = projectId;
     }
 }

@@ -248,11 +248,11 @@
         <action name="createSchedule!default" class="com.cinnamonbob.web.project.CreateScheduleAction"
                 method="doDefault">
             <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">create-schedule.vm</result>
+            <result name="success" type="velocity">create-trigger.vm</result>
         </action>
 
         <action name="createSchedule" class="com.cinnamonbob.web.project.CreateScheduleAction">
-            <result name="input" type="velocity">create-schedule.vm</result>
+            <result name="input" type="velocity">create-trigger.vm</result>
             <result name="cancel" type="velocity">undefined.vm</result>
             <result name="success" type="redirect">/manageProject.action?id=${project}</result>
         </action>

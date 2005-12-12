@@ -122,26 +122,6 @@
         </property>
     </bean>
 
-    <bean id="scheduleDaoTarget" class="com.cinnamonbob.schedule.persistence.hibernate.HibernateScheduleDao">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-
-    <bean id="scheduleDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="scheduleDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
     <bean id="scmDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateScmDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
@@ -174,6 +154,26 @@
         </property>
         <property name="target">
             <ref bean="subscriptionDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="triggerDaoTarget" class="com.cinnamonbob.scheduling.persistence.hibernate.HibernateTriggerDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="triggerDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="triggerDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>

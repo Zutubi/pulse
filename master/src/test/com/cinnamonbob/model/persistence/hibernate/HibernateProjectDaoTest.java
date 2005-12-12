@@ -3,7 +3,6 @@ package com.cinnamonbob.model.persistence.hibernate;
 import com.cinnamonbob.model.persistence.ProjectDao;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.Svn;
-import com.cinnamonbob.schedule.Schedule;
 
 /**
  * 

@@ -7,6 +7,8 @@ import com.cinnamonbob.core.event.Event;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.hibernate.proxy.HibernateProxy;
+
 /**
  * <class-comment/>
  */
@@ -22,7 +24,14 @@ public class EventSchedulerStrategy implements SchedulerStrategy
 
     public boolean canHandle(Trigger trigger)
     {
-        return trigger instanceof EventTrigger;
+        // its obvious that we can  not rely upon the trigger type to
+        // determine what strategy can be applied. Need to come up with
+        // a better solution.
+        if (HibernateProxy.class.isAssignableFrom(trigger.getClass()))
+        {
+            trigger = (Trigger) ((HibernateProxy)trigger).getHibernateLazyInitializer().getImplementation();
+        }
+        return EventTrigger.class.isAssignableFrom(trigger.getClass());
     }
 
     public void schedule(final Trigger trigger) throws SchedulingException

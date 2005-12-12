@@ -1,21 +1,19 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.schedule.tasks.BuildProjectTask;
-import com.cinnamonbob.schedule.Schedule;
-import com.cinnamonbob.schedule.SchedulingException;
-import com.cinnamonbob.schedule.triggers.CronTrigger;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.cinnamonbob.scheduling.Trigger;
+import com.cinnamonbob.scheduling.CronTrigger;
+import com.cinnamonbob.scheduling.SchedulingException;
+import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
+import com.cinnamonbob.util.logging.Logger;
 
 /**
  *
  *
  */
-public class CreateScheduleAction extends ProjectActionSupport
+public class CreateTriggerAction extends ProjectActionSupport
 {
-    private static final Logger LOG = Logger.getLogger(CreateScheduleAction.class.getName());
+    private static final Logger LOG = Logger.getLogger(CreateTriggerAction.class.getName());
 
     private long project;
     private String name;
@@ -77,9 +75,9 @@ public class CreateScheduleAction extends ProjectActionSupport
             return;
         }
 
-        Schedule schedule = getScheduleManager().getSchedule(project, name);
+        Trigger trigger = getScheduler().getTrigger(project.getId(), name);
         // ensure that the name is unique to the project.
-        if (schedule != null)
+        if (trigger != null)
         {
             addFieldError("name", "Name already within this project.");
         }
@@ -89,17 +87,18 @@ public class CreateScheduleAction extends ProjectActionSupport
     {
         Project project = getProjectManager().getProject(getProject());
 
-        CronTrigger trigger = new CronTrigger(cronExpression);
-        BuildProjectTask task = new BuildProjectTask(project, recipe);
+        CronTrigger trigger = new CronTrigger(cronExpression, name);
+        trigger.setProject(project.getId());
+        trigger.setTaskClass(BuildProjectTask.class);
 
         try
         {
-            getScheduleManager().schedule(name, project, trigger, task);
+            getScheduler().schedule(trigger);
             return SUCCESS;
         }
         catch (SchedulingException e)
         {
-            LOG.log(Level.SEVERE, e.getMessage(), e);
+            LOG.severe(e.getMessage(), e);
             return ERROR;
         }
 

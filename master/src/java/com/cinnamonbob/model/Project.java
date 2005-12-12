@@ -1,7 +1,6 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.core.model.Entity;
-import com.cinnamonbob.schedule.Schedule;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +15,7 @@ public class Project extends Entity
     private String description;
     private String bobFile;
     private List<Scm> scms;
-    private List<Schedule> schedules;
+
     private List<BuildSpecification> buildSpecifications;
 
     public Project()
@@ -93,49 +92,6 @@ public class Project extends Entity
         return false;
     }
 
-    public List<Schedule> getSchedules()
-    {
-        if(schedules == null)
-        {
-            schedules = new LinkedList<Schedule>();
-        }
-        
-        return schedules;
-    }
-
-    public void addSchedule(Schedule schedule)
-    {
-        getSchedules().add(schedule);
-        schedule.setProject(this);
-    }
-
-    private void setSchedules(List<Schedule> schecules)
-    {
-        this.schedules = schecules;
-    }
-
-    public Schedule getSchedule(String name)
-    {
-        for (Schedule schedule : schedules)
-        {
-            if (schedule.getName().compareToIgnoreCase(name) == 0)
-            {
-                return schedule;
-            }
-        }
-        return null;
-    }
-
-    public boolean remove(Schedule schedule)
-    {
-        if (schedules.remove(schedule))
-        {
-            schedule.setProject(null);
-            return true;
-        }
-        return false;
-    }
-
     public List<BuildSpecification> getBuildSpecifications()
     {
         if(buildSpecifications == null)
@@ -170,11 +126,7 @@ public class Project extends Entity
 
     public boolean remove(BuildSpecification buildSpecification)
     {
-        if (buildSpecifications.remove(buildSpecification))
-        {
-            return true;
-        }
-        return false;
+        return buildSpecifications.remove(buildSpecification);
     }
 
     public String getBobFile()

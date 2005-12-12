@@ -1,11 +1,10 @@
 package com.cinnamonbob.scheduling;
 
 import com.cinnamonbob.scheduling.persistence.TriggerDao;
-import com.cinnamonbob.scheduling.persistence.TaskDao;
 import com.cinnamonbob.util.logging.Logger;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <class-comment/>
@@ -31,8 +30,24 @@ public class DefaultScheduler
         strategies.add(strategy);
     }
 
+    public void setStrategies(List<SchedulerStrategy> schedulerStrategies)
+    {
+        strategies.clear();
+        for (SchedulerStrategy strategy : schedulerStrategies)
+        {
+            strategy.setTriggerHandler(triggerHandler);
+            strategies.add(strategy);
+        }
+    }
+
     protected void init()
     {
+        // ensure that the strategies are correctly configured.
+        for (SchedulerStrategy strategy : strategies)
+        {
+            strategy.setTriggerHandler(triggerHandler);
+        }
+
         for (Trigger trigger : triggerDao.findAll())
         {
             SchedulerStrategy strategy = getStrategy(trigger);
@@ -57,6 +72,21 @@ public class DefaultScheduler
     public Trigger getTrigger(String name, String group)
     {
         return triggerDao.findByNameAndGroup(name, group);
+    }
+
+    public Trigger getTrigger(long id)
+    {
+        return triggerDao.findById(id);
+    }
+
+    public List<Trigger> getTriggers(long id)
+    {
+        return triggerDao.findByProject(id);
+    }
+
+    public Trigger getTrigger(long id, String name)
+    {
+        return triggerDao.findByProjectAndName(id, name);
     }
 
     public void schedule(Trigger trigger) throws SchedulingException

@@ -16,6 +16,8 @@
 
         <property name="taskClass" column="TASK_CLASS" type="class"/>
 
+        <property name="project" column="PROJECT" type="long"/>
+
         <property name="triggerCount" column="COUNT" type="long"/>
 
         <property name="previousTriggerTime" column="PREVIOUS_TRIGGER_TIME" type="timestamp"/>
@@ -28,6 +30,7 @@
         </subclass>
 
         <subclass name="com.cinnamonbob.scheduling.CronTrigger" discriminator-value="CRON" dynamic-update="false">
+            <property name="cron" column="CRON" type="string" not-null="false"/>
         </subclass>
 
         <subclass name="com.cinnamonbob.scheduling.EventTrigger" discriminator-value="EVENT" dynamic-update="false">
@@ -38,6 +41,17 @@
     <query name="findByGroup"><![CDATA[
         from Trigger trigger
         where trigger.group = :group
+    ]]></query>
+
+    <query name="findByProject"><![CDATA[
+        from Trigger trigger
+        where trigger.project = :project
+    ]]></query>
+
+    <query name="findByProjectAndName"><![CDATA[
+        from Trigger trigger
+        where trigger.project = :project
+        and trigger.name = :name
     ]]></query>
 
     <query name="findByNameAndGroup"><![CDATA[

@@ -2,7 +2,7 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.schedule.Schedule;
+import com.cinnamonbob.scheduling.Trigger;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ public class ManageProjectAction extends ProjectActionSupport
     private Project project;
     private BuildResult currentBuild;
     private List<BuildResult> history;
-    private List<Schedule> schedules;
+    private List<Trigger> triggers;
 
     public long getId()
     {
@@ -46,7 +46,8 @@ public class ManageProjectAction extends ProjectActionSupport
         {
             currentBuild = history.remove(0);
         }
-        //schedules = getScheduleManager().getSchedules(project);
+
+        triggers = getScheduler().getTriggers(project.getId());
         return SUCCESS;
     }
 
@@ -60,8 +61,8 @@ public class ManageProjectAction extends ProjectActionSupport
         return history;
     }
 
-    public List<Schedule> getSchedules()
+    public List<Trigger> getTriggers()
     {
-        return schedules;
+        return triggers;
     }
 }

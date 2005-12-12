@@ -45,8 +45,46 @@
 
     <bean id="projectManager" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
 
-    <bean id="scheduleManager" class="com.cinnamonbob.schedule.DefaultScheduleManager" autowire="byName"
-          init-method="init"/>
+    <!--<bean id="scheduleManager" class="com.cinnamonbob.schedule.DefaultScheduleManager" autowire="byName"-->
+          <!--init-method="init"/>-->
+
+    <!-- ==================== -->
+    <!-- scheduling subsystem -->
+
+    <bean id="scheduler" class="com.cinnamonbob.scheduling.DefaultScheduler" init-method="init">
+        <property name="triggerHandler">
+            <ref bean="triggerHandler"/>
+        </property>
+        <property name="triggerDao">
+            <ref bean="triggerDao"/>
+        </property>
+        <property name="strategies">
+            <list>
+                <ref bean="cronSchedulerStrategy"/>
+                <ref bean="simpleSchedulerStrategy"/>
+                <ref bean="eventSchedulerStrategy"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="cronSchedulerStrategy" class="com.cinnamonbob.scheduling.CronSchedulerStrategy">
+        <property name="quartzScheduler">
+            <ref bean="quartzScheduler"/>
+        </property>
+    </bean>
+    <bean id="simpleSchedulerStrategy" class="com.cinnamonbob.scheduling.SimpleSchedulerStrategy">
+        <property name="quartzScheduler">
+            <ref bean="quartzScheduler"/>
+        </property>
+    </bean>
+
+    <bean id="eventSchedulerStrategy" class="com.cinnamonbob.scheduling.EventSchedulerStrategy">
+        <property name="eventManager">
+            <ref bean="eventManager"/>
+        </property>
+    </bean>
+    
+    <bean id="triggerHandler" class="com.cinnamonbob.scheduling.DefaultTriggerHandler"/>
 
     <bean id="subscriptionManager" class="com.cinnamonbob.model.DefaultSubscriptionManager" autowire="byName"/>
 

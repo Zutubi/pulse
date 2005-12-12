@@ -10,4 +10,9 @@ public class SlaveServiceImpl implements SlaveService
     {
         // Nothing to actually do!
     }
+
+    public void doBuild()
+    {
+
+    }
 }

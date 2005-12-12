@@ -1,7 +1,5 @@
 package com.cinnamonbob.scheduling;
 
-import com.cinnamonbob.scheduling.persistence.TaskDao;
-
 /**
  * <class-comment/>
  */

@@ -9,21 +9,25 @@
 
 #bodytag (Form "action='createTrigger.action'" "method='post'")
 
-    #tag (Hidden "name='projectId'")
-    #tag (Hidden "name='name'")
-    
+    #tag (Hidden "name='project'")
     <h3>Create trigger</h3>
 
     <fieldset>
-        #tag (TextField "required='true'" "name='trigger.cronExpression'" "tabindex='1'")
+        #tag (TextField "required='true'" "name='name'" "tabindex='1'")
+        #tag (TextField "name='recipe'" "tabindex='2'")
+        #tag (TextField "name='cronExpression'" "tabindex='3'")
     </fieldset>
 
     <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='2'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='3'")
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='4'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
     </fieldset>
 
  #end
+
+<p>
+    Example cron string: "0 0 12 * * ?"
+</p>
 
 </body>
 </html>
