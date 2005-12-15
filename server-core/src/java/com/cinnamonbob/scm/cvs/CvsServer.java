@@ -169,4 +169,17 @@ public class CvsServer implements SCMServer
         }
         client.checkout(cvsModule, date);
     }
+
+    public Revision getLatestRevision() throws SCMException
+    {
+        // this assumes that we are not dealing with a branch. If that were the case, then
+        // we would need to include the branch details in the revision.
+        // Question: do the other scms care about branches? SVN does not, what about P4?
+
+        // cvs is not atomic, so take the current time and restrict the checkout to 'now'
+        // to prevent problems with people checking in during the checkout.
+        
+        Date now = new Date(System.currentTimeMillis()); // this needs to be GMT 00.
+        return new CvsRevision(null, null, null, now);
+    }
 }

@@ -155,7 +155,7 @@ public class P4Server implements SCMServer
         }
     }
 
-    private NumericalRevision getLatestRevision() throws SCMException
+    public NumericalRevision getLatestRevision() throws SCMException
     {
         P4Result result = runP4(null, P4_COMMAND, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, FLAG_MAXIMUM, "1");
         Matcher matcher = changesPattern.matcher(result.stdout);

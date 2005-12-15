@@ -292,7 +292,19 @@ public class SVNServer implements SCMServer
 
     public boolean hasChangedSince(Revision since) throws SCMException
     {
-        throw new SCMException("Operation not supported");
+        return getLatestRevision().getRevisionNumber() != ((NumericalRevision) since).getRevisionNumber();
+    }
+
+    public NumericalRevision getLatestRevision() throws SCMException
+    {
+        try
+        {
+            return new NumericalRevision(repository.getLatestRevision());
+        }
+        catch (SVNException e)
+        {
+            throw new SCMException(e.getMessage(), e);
+        }
     }
 
     //=======================================================================

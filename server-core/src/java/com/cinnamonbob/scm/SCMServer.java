@@ -49,4 +49,12 @@ public interface SCMServer
      * @throws SCMException
      */
     boolean hasChangedSince(Revision since) throws SCMException;
+
+    /**
+     * Returns the latest repository revision or null if it can not be determined.
+     *
+     * @return
+     * @throws SCMException
+     */
+    Revision getLatestRevision() throws SCMException;
 }
