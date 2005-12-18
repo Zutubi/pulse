@@ -13,6 +13,11 @@ public class EventTrigger extends Trigger
 
     private Class<Event>[] triggers = DEFAULT_TRIGGER_EVENTS;
 
+    static final String TYPE = "event";
+
+    /**
+     * Default no argument constructor required by hibernate. 
+     */
     public EventTrigger()
     {
 
@@ -32,6 +37,11 @@ public class EventTrigger extends Trigger
     {
         super(name, group);
         triggers = new Class[]{trigger};
+    }
+
+    public String getType()
+    {
+        return TYPE;
     }
 
     /**

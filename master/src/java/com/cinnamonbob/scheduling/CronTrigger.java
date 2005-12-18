@@ -5,6 +5,8 @@ package com.cinnamonbob.scheduling;
  */
 public class CronTrigger extends Trigger
 {
+    protected static final String TYPE = "cron";
+
     private String cron;
 
     public CronTrigger()
@@ -15,6 +17,11 @@ public class CronTrigger extends Trigger
     public CronTrigger(String cron, String name)
     {
         this(cron, name, DEFAULT_GROUP);
+    }
+
+    public String getType()
+    {
+        return TYPE;
     }
 
     public CronTrigger(String cron, String name, String group)

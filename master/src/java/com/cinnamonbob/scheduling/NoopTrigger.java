@@ -5,6 +5,8 @@ package com.cinnamonbob.scheduling;
  */
 public class NoopTrigger extends Trigger
 {
+    protected static final String TYPE = "noop";
+
     public NoopTrigger()
     {
 
@@ -18,5 +20,10 @@ public class NoopTrigger extends Trigger
     public NoopTrigger(String name, String group)
     {
         super(name, group);
+    }
+
+    public String getType()
+    {
+        return TYPE;
     }
 }

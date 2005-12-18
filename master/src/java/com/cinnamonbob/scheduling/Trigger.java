@@ -87,6 +87,13 @@ public abstract class Trigger extends Entity
         this.group = group;
     }
 
+    /**
+     * Return the type identifier for this type of trigger. This identifier is used to
+     * locate the Scheduler Strategies available to handle this trigger.
+     *
+     */
+    public abstract String getType();
+
     public Map getDataMap()
     {
         if (dataMap == null)

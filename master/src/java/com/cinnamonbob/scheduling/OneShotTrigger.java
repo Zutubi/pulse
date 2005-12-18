@@ -5,5 +5,8 @@ package com.cinnamonbob.scheduling;
  */
 public class OneShotTrigger extends SimpleTrigger
 {
-
+    public OneShotTrigger(String name, String group)
+    {
+        super(name, group, 0, 0);
+    }
 }

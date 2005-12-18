@@ -3,8 +3,9 @@ package com.cinnamonbob.scheduling;
 import com.cinnamonbob.scheduling.persistence.TriggerDao;
 import com.cinnamonbob.util.logging.Logger;
 
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * <class-comment/>
@@ -13,7 +14,7 @@ public class DefaultScheduler
 {
     private static final Logger LOG = Logger.getLogger(DefaultScheduler.class.getName());
 
-    private List<SchedulerStrategy> strategies = new LinkedList<SchedulerStrategy>();
+    private Map<String, SchedulerStrategy> strategies = new TreeMap<String, SchedulerStrategy>();
 
     private TriggerHandler triggerHandler;
 
@@ -27,7 +28,7 @@ public class DefaultScheduler
     public void register(SchedulerStrategy strategy)
     {
         strategy.setTriggerHandler(triggerHandler);
-        strategies.add(strategy);
+        strategies.put(strategy.canHandle(), strategy);
     }
 
     public void setStrategies(List<SchedulerStrategy> schedulerStrategies)
@@ -36,14 +37,14 @@ public class DefaultScheduler
         for (SchedulerStrategy strategy : schedulerStrategies)
         {
             strategy.setTriggerHandler(triggerHandler);
-            strategies.add(strategy);
+            strategies.put(strategy.canHandle(), strategy);
         }
     }
 
     protected void init()
     {
         // ensure that the strategies are correctly configured.
-        for (SchedulerStrategy strategy : strategies)
+        for (SchedulerStrategy strategy : strategies.values())
         {
             strategy.setTriggerHandler(triggerHandler);
         }
@@ -168,14 +169,7 @@ public class DefaultScheduler
      */
     private SchedulerStrategy getStrategy(Trigger trigger)
     {
-        for (SchedulerStrategy strategy : strategies)
-        {
-            if (strategy.canHandle(trigger))
-            {
-                return strategy;
-            }
-        }
-        return null;
+        return strategies.get(trigger.getType());
     }
 
     private void assertScheduled(Trigger trigger) throws SchedulingException

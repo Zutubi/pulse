@@ -5,9 +5,9 @@ package com.cinnamonbob.scheduling;
  */
 public class NoopSchedulerStrategy implements SchedulerStrategy
 {
-    public boolean canHandle(Trigger trigger)
+    public String canHandle()
     {
-        return trigger instanceof NoopTrigger;
+        return NoopTrigger.TYPE;
     }
 
     public void pause(Trigger trigger) throws SchedulingException

@@ -3,24 +3,23 @@ package com.cinnamonbob.scm.cvs;
 import org.netbeans.lib.cvsclient.connection.Connection;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
- * 
+ * Basic utilities class.
  *
  */
 public class CvsUtils
 {
     /**
-     * Helper method to close the connection.
+     * Helper method to close the connection. 
+     *
      * @param c
      */
     public static void close(Connection c)
     {
         try
         {
-            if (c != null)
+            if (c != null && c.isOpen())
             {
                 c.close();
             }

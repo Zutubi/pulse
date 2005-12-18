@@ -9,16 +9,9 @@ import java.text.ParseException;
  */
 public class CronSchedulerStrategy extends QuartzSchedulerStrategy
 {
-    public boolean canHandle(Trigger trigger)
+    public String canHandle()
     {
-        // its obvious that we can  not rely upon the trigger type to
-        // determine what strategy can be applied. Need to come up with
-        // a better solution.
-        if (HibernateProxy.class.isAssignableFrom(trigger.getClass()))
-        {
-            trigger = (Trigger) ((HibernateProxy)trigger).getHibernateLazyInitializer().getImplementation();
-        }
-        return CronTrigger.class.isAssignableFrom(trigger.getClass());
+        return CronTrigger.TYPE;
     }
 
     protected org.quartz.Trigger createTrigger(Trigger trigger) throws SchedulingException
