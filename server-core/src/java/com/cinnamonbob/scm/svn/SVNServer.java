@@ -303,7 +303,7 @@ public class SVNServer implements SCMServer
         }
         catch (SVNException e)
         {
-            throw new SCMException(e.getMessage(), e);
+            throw convertException(e);
         }
     }
 

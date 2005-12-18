@@ -5,6 +5,7 @@
     <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation">
         <property name="initBeans">
             <list>
+                <ref bean="threadPool"/>
                 <ref bean="jettyManager"/>
             </list>
         </property>
@@ -28,6 +29,18 @@
         </property>
     </bean>
 
+    <bean id="threadPool" class="com.cinnamonbob.slave.SlaveThreadPool" autowire="byName"/>
+
+    <bean id="slaveRecipeProcessor" class="com.cinnamonbob.slave.SlaveRecipeProcessor" autowire="byName"/>
+
+    <bean id="recipeProcessor" class="com.cinnamonbob.core.RecipeProcessor" autowire="byName"/>
+
+    <bean id="eventManager" class="com.cinnamonbob.core.event.DefaultEventManager" autowire="byName"/>
+
+    <bean id="objectFactory" class="com.cinnamonbob.core.ObjectFactory" autowire="byName"/>
+
+    <bean id="fileLoader" class="com.cinnamonbob.core.FileLoader" autowire="byName" singleton="false"/>
+
     <bean id="resourceRepository" class="com.cinnamonbob.core.ResourceRepository" autowire="byName"
           init-method="initialise"/>
 
@@ -39,5 +52,14 @@
             <value>applicationPaths.userConfigRoot</value>
         </property>
     </bean>
+
+    <bean id="customSerialiserFactory" class="com.cinnamonbob.hessian.CustomSerialiserFactory"/>
+
+    <bean id="hessianProxyFactory" class="com.cinnamonbob.hessian.CustomHessianProxyFactory" autowire="byName"/>
+
+    <bean id="masterProxyFactory" class="com.cinnamonbob.slave.MasterProxyFactory" autowire="byName"/>
+
+    <bean id="recipeProcessorPaths" class="com.cinnamonbob.slave.RecipeProcessorPaths" autowire="byName"
+          init-method="init"/>
 
 </beans>

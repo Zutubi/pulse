@@ -46,7 +46,7 @@
     <bean id="projectManager" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
 
     <!--<bean id="scheduleManager" class="com.cinnamonbob.schedule.DefaultScheduleManager" autowire="byName"-->
-          <!--init-method="init"/>-->
+    <!--init-method="init"/>-->
 
     <!-- ==================== -->
     <!-- scheduling subsystem -->
@@ -83,7 +83,7 @@
             <ref bean="eventManager"/>
         </property>
     </bean>
-    
+
     <bean id="triggerHandler" class="com.cinnamonbob.scheduling.DefaultTriggerHandler"/>
 
     <bean id="subscriptionManager" class="com.cinnamonbob.model.DefaultSubscriptionManager" autowire="byName"/>
@@ -121,4 +121,9 @@
     <bean id="hessianProxyFactory" class="com.cinnamonbob.hessian.CustomHessianProxyFactory" autowire="byName"/>
 
     <bean id="slaveProxyFactory" class="com.cinnamonbob.SlaveProxyFactory" autowire="byName"/>
+
+    <bean id="fatController" class="com.cinnamonbob.FatController" autowire="byName" init-method="init"/>
+
+    <bean id="recipeQueue" class="com.cinnamonbob.RecipeQueue" autowire="byName" init-method="init"/>
+
 </beans>

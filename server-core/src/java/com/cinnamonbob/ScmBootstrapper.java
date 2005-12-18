@@ -2,9 +2,8 @@ package com.cinnamonbob;
 
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.model.Change;
-import com.cinnamonbob.core.model.Revision;
+import com.cinnamonbob.model.Scm;
 import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.SCMServer;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -16,17 +15,6 @@ import java.util.List;
  */
 public class ScmBootstrapper implements Bootstrapper
 {
-    /**
-     * Simple value type carrying details required for SCM checkout.
-     */
-    public class ScmCheckoutDetails
-    {
-        public String name;
-        public SCMServer server;
-        public Revision revision;
-        public String path;
-    }
-
     private List<ScmCheckoutDetails> checkouts;
 
     public ScmBootstrapper()
@@ -41,24 +29,14 @@ public class ScmBootstrapper implements Bootstrapper
 
     public void bootstrap(File workDir)
     {
-        // TODO this belongs one level up
-/*
-        if(workDir.exists())
-        {
-            if(!FileSystemUtils.removeDirectory(workDir))
-            {
-                throw new BuildException("Unable to remove working directory '" + workDir + "'");
-            }
-        }
-*/
-
         for (ScmCheckoutDetails details : checkouts)
         {
+            Scm scm = details.scm;
             File checkoutDir;
 
-            if (details.path != null)
+            if (scm.getPath() != null)
             {
-                checkoutDir = new File(workDir, details.path);
+                checkoutDir = new File(workDir, scm.getPath());
             }
             else
             {
@@ -68,11 +46,11 @@ public class ScmBootstrapper implements Bootstrapper
             try
             {
                 // TODO this list is not needed, perhaps make it optional in SCM interface?
-                details.server.checkout(checkoutDir, details.revision, new LinkedList<Change>());
+                details.scm.createServer().checkout(checkoutDir, details.revision, new LinkedList<Change>());
             }
             catch (SCMException e)
             {
-                throw new BuildException("Error checking out from SCM '" + details.name + "'", e);
+                throw new BuildException("Error checking out from SCM '" + scm.getName() + "'", e);
             }
         }
     }

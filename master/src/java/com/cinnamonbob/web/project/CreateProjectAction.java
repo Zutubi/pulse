@@ -1,6 +1,7 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.model.Project;
+import com.cinnamonbob.model.*;
+import com.cinnamonbob.model.persistence.SlaveDao;
 
 /**
  * 
@@ -9,6 +10,7 @@ import com.cinnamonbob.model.Project;
 public class CreateProjectAction extends ProjectActionSupport
 {
     private Project project = new Project();
+    private SlaveDao slaveDao;
 
     public Project getProject()
     {
@@ -19,7 +21,7 @@ public class CreateProjectAction extends ProjectActionSupport
     {
         return getProject().getId();
     }
-    
+
     public void validate()
     {
         if (hasErrors())
@@ -38,8 +40,17 @@ public class CreateProjectAction extends ProjectActionSupport
 
     public String execute()
     {
+        // TODO: remove once we have a GUI to add this stuff
+        Slave slave = slaveDao.findAll().get(0);
+        BuildSpecification spec = new BuildSpecification("default");
+        spec.addNode(new BuildSpecificationNode(new SlaveBuildHostRequirements(slave), null));
+        project.addBuildSpecification(spec);
         getProjectManager().save(project);
         return SUCCESS;
     }
 
+    public void setSlaveDao(SlaveDao slaveDao)
+    {
+        this.slaveDao = slaveDao;
+    }
 }

@@ -8,4 +8,6 @@ import com.cinnamonbob.BuildService;
 public interface BuildServiceResolver
 {
     BuildService resolve();
+
+    String getHostName();
 }

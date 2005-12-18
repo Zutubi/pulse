@@ -1,13 +1,7 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.core.FileArtifact;
-import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.model.*;
-import com.cinnamonbob.model.persistence.BuildResultDao;
 import com.cinnamonbob.model.persistence.SlaveDao;
-
-import java.io.File;
-import java.util.Calendar;
 
 
 /**
@@ -23,7 +17,7 @@ public class HibernateBuildSpecificationDaoTest extends PersistenceTestCase
     {
         super.setUp();
         buildSpecificationDao = (BuildSpecificationDao) context.getBean("buildSpecificationDao");
-        slaveDao = (SlaveDao)context.getBean("slaveDao");
+        slaveDao = (SlaveDao) context.getBean("slaveDao");
     }
 
     public void tearDown() throws Exception
@@ -42,13 +36,13 @@ public class HibernateBuildSpecificationDaoTest extends PersistenceTestCase
     {
         BuildSpecification spec = new BuildSpecification("test spec");
 
-        BuildSpecificationNode masterNode = new BuildSpecificationNode(new MasterBuildServiceResolver(), "recipe 1");
+        BuildSpecificationNode masterNode = new BuildSpecificationNode(new MasterBuildHostRequirements(), "recipe 1");
         spec.addNode(masterNode);
 
         Slave slave = new Slave("test slave", "test host");
         slaveDao.save(slave);
-        
-        BuildSpecificationNode slaveNode = new BuildSpecificationNode(new SlaveBuildServiceResolver(slave), "recipe 2");
+
+        BuildSpecificationNode slaveNode = new BuildSpecificationNode(new SlaveBuildHostRequirements(slave), "recipe 2");
         masterNode.addChild(slaveNode);
 
         buildSpecificationDao.save(spec);

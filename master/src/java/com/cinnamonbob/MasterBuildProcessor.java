@@ -2,8 +2,6 @@ package com.cinnamonbob;
 
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.RecipeCommencedEvent;
-import com.cinnamonbob.core.RecipeCompletedEvent;
 import com.cinnamonbob.core.RecipeProcessor;
 import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.core.event.EventListener;
@@ -14,6 +12,10 @@ import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.events.build.BuildCommencedEvent;
+import com.cinnamonbob.events.build.BuildCompletedEvent;
+import com.cinnamonbob.events.build.BuildEvent;
+import com.cinnamonbob.events.build.RecipeCompletedEvent;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
@@ -52,7 +54,7 @@ public class MasterBuildProcessor implements EventListener
 
         BuildResult buildResult = new BuildResult(project, number);
         RecipeResult recipeResult = new RecipeResult(request.getRecipeName());
-        buildResult.add(new RecipeResultNode("<master>", recipeResult));
+        buildResult.add(new RecipeResultNode(recipeResult));
 
         File rootBuildDir = ConfigUtils.getManager().getAppConfig().getProjectRoot();
         File projectDir = new File(rootBuildDir, getProjectDirName(project));
@@ -61,8 +63,6 @@ public class MasterBuildProcessor implements EventListener
 
         buildResult.commence(buildDir);
         eventManager.publish(new BuildCommencedEvent(this, buildResult));
-        recipeResult.commence(buildDir);
-        eventManager.publish(new RecipeCommencedEvent(this, recipeResult));
 
         try
         {

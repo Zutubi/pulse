@@ -1,8 +1,8 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.model.persistence.ProjectDao;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.Svn;
+import com.cinnamonbob.model.persistence.ProjectDao;
 
 /**
  * 
@@ -29,7 +29,6 @@ public class HibernateProjectDaoTest extends PersistenceTestCase
 
         Svn svn = new Svn();
         project.addScm(svn);
-        svn.setProject(project);
 
         projectDao.save(project);
 

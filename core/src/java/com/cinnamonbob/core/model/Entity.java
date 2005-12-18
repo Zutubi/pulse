@@ -13,7 +13,7 @@ public class Entity
         return id;
     }
 
-    private void setId(long id)
+    public void setId(long id)
     {
         this.id = id;
     }
@@ -36,7 +36,7 @@ public class Entity
         }
         return id == otherEntity.id;
     }
-    
+
     public int hashCode()
     {
         return Long.valueOf(id).hashCode();

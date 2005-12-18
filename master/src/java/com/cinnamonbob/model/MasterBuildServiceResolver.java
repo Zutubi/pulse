@@ -15,6 +15,11 @@ public class MasterBuildServiceResolver extends AbstractBuildServiceResolver
         return service;
     }
 
+    public String getHostName()
+    {
+        return "[master]";
+    }
+
     public void setService(MasterBuildService service)
     {
         this.service = service;

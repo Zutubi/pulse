@@ -18,9 +18,8 @@ public class RecipeResultNode extends Entity
     {
     }
 
-    public RecipeResultNode(String host, RecipeResult result)
+    public RecipeResultNode(RecipeResult result)
     {
-        this.host = host;
         this.result = result;
         children = new LinkedList<RecipeResultNode>();
     }
@@ -30,7 +29,7 @@ public class RecipeResultNode extends Entity
         return host;
     }
 
-    private void setHost(String host)
+    public void setHost(String host)
     {
         this.host = host;
     }

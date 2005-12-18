@@ -1,13 +1,17 @@
 package com.cinnamonbob.services;
 
-import com.cinnamonbob.BuildService;
+import com.cinnamonbob.RecipeRequest;
 
 /**
  */
-public interface SlaveService extends BuildService
+public interface SlaveService
 {
     /**
      * Do-nothing method just used to test communications.
      */
     void ping();
+
+    void build(String master, RecipeRequest request);
+
+    void cleanupResults(long recipeId);
 }

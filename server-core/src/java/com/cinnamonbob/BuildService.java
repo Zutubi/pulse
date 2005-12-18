@@ -1,9 +1,16 @@
 package com.cinnamonbob;
 
+import java.io.File;
+
 /**
- * <class-comment/>
  */
 public interface BuildService
 {
-    void doBuild();
+    void build(RecipeRequest request);
+
+    void collectResults(long recipeId, File dir);
+
+    void cleanupResults(long recipeId);
+
+    boolean isAvailable();
 }

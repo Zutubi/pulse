@@ -20,8 +20,8 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="scheduleBuild" class="com.cinnamonbob.web.project.ScheduleBuildAction">
-            <result name="success" type="redirect">manageProject.action?id=${id}</result>
+        <action name="triggerBuild" class="com.cinnamonbob.web.project.TriggerBuildAction">
+            <result name="success" type="redirect">manageProject.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 

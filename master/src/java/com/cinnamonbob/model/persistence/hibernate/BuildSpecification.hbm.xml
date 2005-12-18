@@ -23,7 +23,8 @@
             <generator class="hilo"/>
         </id>
 
-        <many-to-one name="serviceResolver" class="com.cinnamonbob.model.AbstractBuildServiceResolver" column="BUILD_SERVICE_RESOLVER_ID"
+        <many-to-one name="hostRequirements" class="com.cinnamonbob.model.AbstractBuildHostRequirements"
+                     column="BUILD_HOST_REQUIREMENTS_ID"
                      cascade="all" unique="true"/>
 
         <property name="recipe" type="string" length="255"/>
@@ -36,18 +37,18 @@
 
     </class>
 
-    <class name="com.cinnamonbob.model.AbstractBuildServiceResolver" table="BUILD_SERVICE_RESOLVER" lazy="false">
+    <class name="com.cinnamonbob.model.AbstractBuildHostRequirements" table="BUILD_HOST_REQUIREMENTS" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
 
-        <discriminator column="RESOLVER_TYPE" type="string" length="63"/>
+        <discriminator column="REQUIREMENTS_TYPE" type="string" length="63"/>
 
-        <subclass name="com.cinnamonbob.model.MasterBuildServiceResolver" discriminator-value="MASTER">
+        <subclass name="com.cinnamonbob.model.MasterBuildHostRequirements" discriminator-value="MASTER">
         </subclass>
 
-        <subclass name="com.cinnamonbob.model.SlaveBuildServiceResolver" discriminator-value="SLAVE">
+        <subclass name="com.cinnamonbob.model.SlaveBuildHostRequirements" discriminator-value="SLAVE">
             <many-to-one name="slave" class="com.cinnamonbob.model.Slave"/>
         </subclass>
     </class>

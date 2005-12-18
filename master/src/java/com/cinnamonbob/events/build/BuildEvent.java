@@ -1,4 +1,4 @@
-package com.cinnamonbob;
+package com.cinnamonbob.events.build;
 
 import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.model.BuildResult;

@@ -34,6 +34,27 @@
             #end
         </div>
 
+        <h2 class="command-info">build specifications</h2>
+        <div class="command-content">
+            <table>
+                <tr>
+                    <th class="command-detail">name</th>
+                    <th colspan="2" class="command-detail">actions</th>
+                </tr>
+            #foreach ($buildSpec in $project.buildSpecifications)
+                <tr>
+                    <td class="command-detail">$buildSpec.name</td>
+                    <td class="command-detail"><a href="triggerBuild.action?projectId=$project.id&id=$buildSpec.id">trigger</a></td>
+                    <td class="command-detail"><a href="deleteBuildSpecification.action?id=$buildSpec.id">delete</a></td>
+                </tr>
+            #end
+                <tr>
+                    <td colspan="3" class="command-detail"><b>+</b> <a href="createBuildSpecification!default.action?project=$project.id">add new build specification</a></td>
+                </tr>
+            </table>
+        </div>
+
+
         <h2 class="command-info">triggers</h2>
         <div class="command-content">
             <table>

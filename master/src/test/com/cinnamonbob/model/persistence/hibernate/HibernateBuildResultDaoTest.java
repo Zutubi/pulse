@@ -2,7 +2,10 @@ package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.core.FileArtifact;
 import com.cinnamonbob.core.model.*;
-import com.cinnamonbob.model.*;
+import com.cinnamonbob.model.BuildResult;
+import com.cinnamonbob.model.BuildScmDetails;
+import com.cinnamonbob.model.Project;
+import com.cinnamonbob.model.RecipeResultNode;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 
 import java.io.File;
@@ -72,7 +75,9 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         BuildResult buildResult = new BuildResult(new Project(), 11);
         buildResult.commence(new File("/tmp/buildout"));
         buildResult.addScmDetails(1, scmDetails);
-        buildResult.add(new RecipeResultNode("my node", recipeResult));
+        RecipeResultNode recipeNode = new RecipeResultNode(recipeResult);
+        recipeNode.setHost("test host");
+        buildResult.add(recipeNode);
 
         buildResultDao.save(buildResult);
         commitAndRefreshTransaction();

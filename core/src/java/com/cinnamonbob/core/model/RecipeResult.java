@@ -53,4 +53,13 @@ public class RecipeResult extends Result
         state = ResultState.ERROR;
     }
 
+    public void update(RecipeResult result)
+    {
+        // TODO this is pretty lame
+        this.recipeName = result.recipeName;
+        this.state = result.state;
+        this.stamps = result.stamps;
+        this.errorMessage = result.errorMessage;
+        this.results = result.results;
+    }
 }

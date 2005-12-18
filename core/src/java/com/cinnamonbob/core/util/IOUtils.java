@@ -18,7 +18,8 @@ public class IOUtils
             {
                 s.close();
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             // nop
         }
@@ -36,13 +37,13 @@ public class IOUtils
             Properties properties = new Properties();
             properties.load(input);
             return properties;
-        } 
+        }
         finally
         {
             IOUtils.close(input);
         }
     }
-    
+
     public static void close(InputStream i)
     {
         try
@@ -51,7 +52,8 @@ public class IOUtils
             {
                 i.close();
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             //nop
         }
@@ -65,7 +67,8 @@ public class IOUtils
             {
                 r.close();
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             // nop
         }
@@ -79,7 +82,8 @@ public class IOUtils
             {
                 s.close();
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             // nop
         }
@@ -93,13 +97,13 @@ public class IOUtils
             {
                 outStream.close();
             }
-        } 
+        }
         catch (IOException e)
         {
             //noop    
         }
     }
-    
+
     public static void close(Writer w)
     {
         try
@@ -108,13 +112,13 @@ public class IOUtils
             {
                 w.close();
             }
-        } 
+        }
         catch (IOException e)
         {
             //noop    
         }
     }
-    
+
     public static void joinStreams(InputStream input, OutputStream output) throws IOException
     {
         byte[] buffer = new byte[1024];
@@ -147,20 +151,25 @@ public class IOUtils
             inStream = new FileInputStream(fromFile);
             outStream = new FileOutputStream(toFile);
             joinStreams(inStream, outStream);
-        } 
+        }
         finally
         {
             IOUtils.close(inStream);
             IOUtils.close(outStream);
         }
     }
-    
+
+    public static String inputStreamToString(InputStream is) throws IOException
+    {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+        IOUtils.joinStreams(is, os);
+        return os.toString();
+    }
+
     public static String fileToString(File file) throws IOException
     {
         FileInputStream is = new FileInputStream(file);
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        
-        IOUtils.joinStreams(is, os);
-        return os.toString();
+        return inputStreamToString(is);
     }
 }

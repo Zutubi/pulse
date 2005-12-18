@@ -1,6 +1,7 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.BuildService;
+import com.cinnamonbob.SlaveBuildService;
 import com.cinnamonbob.SlaveProxyFactory;
 import com.cinnamonbob.core.BobRuntimeException;
 
@@ -28,7 +29,7 @@ public class SlaveBuildServiceResolver extends AbstractBuildServiceResolver
     {
         try
         {
-            return factory.createProxy(slave);
+            return new SlaveBuildService(slave, factory.createProxy(slave));
         }
         catch (MalformedURLException e)
         {
@@ -36,11 +37,16 @@ public class SlaveBuildServiceResolver extends AbstractBuildServiceResolver
         }
     }
 
+    public String getHostName()
+    {
+        return slave.getName();
+    }
+
     private Slave getSlave()
     {
         return slave;
     }
-    
+
     private void setSlave(Slave slave)
     {
         this.slave = slave;

@@ -51,18 +51,17 @@ public class Project extends Entity
 
     public List<Scm> getScms()
     {
-        if(scms == null)
+        if (scms == null)
         {
             scms = new LinkedList<Scm>();
         }
-        
+
         return scms;
     }
 
     public void addScm(Scm scm)
     {
         getScms().add(scm);
-        scm.setProject(this);
     }
 
     private void setScms(List<Scm> scms)
@@ -86,7 +85,6 @@ public class Project extends Entity
     {
         if (scms.remove(scm))
         {
-            scm.setProject(null);
             return true;
         }
         return false;
@@ -94,7 +92,7 @@ public class Project extends Entity
 
     public List<BuildSpecification> getBuildSpecifications()
     {
-        if(buildSpecifications == null)
+        if (buildSpecifications == null)
         {
             buildSpecifications = new LinkedList<BuildSpecification>();
         }

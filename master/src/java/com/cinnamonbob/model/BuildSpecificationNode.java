@@ -2,8 +2,8 @@ package com.cinnamonbob.model;
 
 import com.cinnamonbob.core.model.Entity;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A node in the BuildSpecification describes a single recipe to be executed
@@ -11,7 +11,7 @@ import java.util.LinkedList;
  */
 public class BuildSpecificationNode extends Entity
 {
-    private BuildServiceResolver serviceResolver;
+    private BuildHostRequirements hostRequirements;
     private String recipe;
     private List<BuildSpecificationNode> children = new LinkedList<BuildSpecificationNode>();
 
@@ -20,9 +20,9 @@ public class BuildSpecificationNode extends Entity
 
     }
 
-    public BuildSpecificationNode(BuildServiceResolver resolver, String recipe)
+    public BuildSpecificationNode(BuildHostRequirements resolver, String recipe)
     {
-        this.serviceResolver = resolver;
+        this.hostRequirements = resolver;
         this.recipe = recipe;
     }
 
@@ -51,13 +51,13 @@ public class BuildSpecificationNode extends Entity
         this.recipe = recipe;
     }
 
-    public BuildServiceResolver getServiceResolver()
+    public BuildHostRequirements getHostRequirements()
     {
-        return serviceResolver;
+        return hostRequirements;
     }
 
-    private void setServiceResolver(BuildServiceResolver serviceResolver)
+    private void setHostRequirements(BuildHostRequirements hostRequirements)
     {
-        this.serviceResolver = serviceResolver;
+        this.hostRequirements = hostRequirements;
     }
 }

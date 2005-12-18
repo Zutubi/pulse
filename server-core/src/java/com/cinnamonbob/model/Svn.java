@@ -19,13 +19,13 @@ public class Svn extends Scm
     @Override
     public SCMServer createServer() throws SCMException
     {
-        if(getKeyfile() == null || getKeyfile().length() == 0)
+        if (getKeyfile() == null || getKeyfile().length() == 0)
         {
             return new SVNServer(getUrl(), getUsername(), getPassword());
         }
         else
         {
-            if(getPassphrase() == null || getPassphrase().length() == 0)
+            if (getPassphrase() == null || getPassphrase().length() == 0)
             {
                 return new SVNServer(getUrl(), getUsername(), getPassword(), getKeyfile());
             }

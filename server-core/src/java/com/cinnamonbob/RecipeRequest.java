@@ -8,6 +8,10 @@ package com.cinnamonbob;
 public class RecipeRequest
 {
     /**
+     * The unique identifier for the execution of this recipe.
+     */
+    private long id;
+    /**
      * Used to bootstrap the working directory.
      */
     private Bootstrapper bootstrapper;
@@ -20,4 +24,32 @@ public class RecipeRequest
      */
     private String recipeName;
 
+
+    public RecipeRequest(long id, Bootstrapper bootstrapper, String bobFile, String recipeName)
+    {
+        this.id = id;
+        this.bootstrapper = bootstrapper;
+        this.bobFile = bobFile;
+        this.recipeName = recipeName;
+    }
+
+    public long getId()
+    {
+        return id;
+    }
+
+    public Bootstrapper getBootstrapper()
+    {
+        return bootstrapper;
+    }
+
+    public String getBobFile()
+    {
+        return bobFile;
+    }
+
+    public String getRecipeName()
+    {
+        return recipeName;
+    }
 }

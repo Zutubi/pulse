@@ -19,6 +19,7 @@ public class Slave extends Entity
 
     private String name;
     private String host;
+    private int port = 80;
     private long lastPingTime = 0;
     private Status status = Status.UNKNOWN;
 
@@ -53,6 +54,16 @@ public class Slave extends Entity
         this.host = host;
     }
 
+    public int getPort()
+    {
+        return port;
+    }
+
+    public void setPort(int port)
+    {
+        this.port = port;
+    }
+
     public Status getStatus()
     {
         return status;
@@ -80,7 +91,7 @@ public class Slave extends Entity
 
     public String getPrettyPingTime()
     {
-        if(hasBeenPinged())
+        if (hasBeenPinged())
         {
             return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date(lastPingTime));
         }
