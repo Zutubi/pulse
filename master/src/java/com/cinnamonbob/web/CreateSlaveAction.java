@@ -2,13 +2,12 @@ package com.cinnamonbob.web;
 
 import com.cinnamonbob.model.Slave;
 import com.cinnamonbob.model.persistence.SlaveDao;
-import com.cinnamonbob.web.user.UserActionSupport;
 
 /**
  * 
  *
  */
-public class CreateSlaveAction extends UserActionSupport
+public class CreateSlaveAction extends ActionSupport
 {
     private Slave slave = new Slave();
     private SlaveDao slaveDao;
@@ -27,20 +26,16 @@ public class CreateSlaveAction extends UserActionSupport
             return;
         }
 
-/*
-        if (slaveDao.getUser(slave.getName()) != null)
+        if (slaveDao.findByName(slave.getName()) != null)
         {
-            // login name already in use.
-            addFieldError("user.login", "Login name " + user.getLogin() + " is already being used.");
+            // slave name already in use.
+            addFieldError("slave.name", "A slave with name '" + slave.getName() + "' already exists.");
         }
-*/
     }
 
     public String execute()
     {
-        // store user.
         slaveDao.save(slave);
-
         return SUCCESS;
     }
 

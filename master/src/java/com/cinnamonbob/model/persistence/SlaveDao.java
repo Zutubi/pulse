@@ -6,4 +6,5 @@ import com.cinnamonbob.model.Slave;
  */
 public interface SlaveDao extends EntityDao<Slave>
 {
+    Slave findByName(String name);
 }

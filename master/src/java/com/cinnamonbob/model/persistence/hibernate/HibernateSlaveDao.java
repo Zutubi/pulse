@@ -11,4 +11,10 @@ public class HibernateSlaveDao extends HibernateEntityDao<Slave> implements Slav
     {
         return Slave.class;
     }
+
+    public Slave findByName(final String name)
+    {
+        return (Slave) findUniqueByNamedQuery("findSlaveByName", "name", name, true);
+    }
+
 }

@@ -20,4 +20,9 @@
 
     </class>
 
+    <query name="findSlaveByName"><![CDATA[
+        from Slave slave
+        where slave.name = :name
+    ]]></query>
+
 </hibernate-mapping>

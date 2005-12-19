@@ -1,0 +1,30 @@
+<html>
+<head>
+    <link href="build.css" rel="stylesheet" type="text/css">
+    <title>view build specification</title>
+</head>
+<content tag="action">build-specification.edit</content>
+<body>
+  <h1 class="build-log">:: $specification.name ::</h1>
+
+#macro(showNodes $parent $list)
+  <ul>
+    #foreach($node in $list)
+      #if($node.recipe)
+        #set($recipe = $node.recipe)
+      #else
+        #set($recipe = "[default]")
+      #end
+      <li>$node.hostRequirements.getSummary(): $recipe</li>
+      #showNodes($node $node.children)
+    #end
+    <li><a href="addBuildSpecificationNode.action?parentId=$parent.id">+ add stage</a></li>
+  </ul>
+#end
+
+  <h2 class="command-info">build stages</h2>
+  <div class="command-content">
+    #showNodes($specification.root $specification.root.children)
+  </div>
+</body>
+</html>

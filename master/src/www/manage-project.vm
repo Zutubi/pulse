@@ -43,7 +43,7 @@
                 </tr>
             #foreach ($buildSpec in $project.buildSpecifications)
                 <tr>
-                    <td class="command-detail">$buildSpec.name</td>
+                    <td class="command-detail"><a href="viewBuildSpecification.action?id=$buildSpec.id">$buildSpec.name</a></td>
                     <td class="command-detail"><a href="triggerBuild.action?projectId=$project.id&id=$buildSpec.id">trigger</a></td>
                     <td class="command-detail"><a href="deleteBuildSpecification.action?id=$buildSpec.id">delete</a></td>
                 </tr>
