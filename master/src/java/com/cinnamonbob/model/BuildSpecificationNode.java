@@ -46,7 +46,7 @@ public class BuildSpecificationNode extends Entity
         return recipe;
     }
 
-    private void setRecipe(String recipe)
+    public void setRecipe(String recipe)
     {
         this.recipe = recipe;
     }
@@ -56,7 +56,7 @@ public class BuildSpecificationNode extends Entity
         return hostRequirements;
     }
 
-    private void setHostRequirements(BuildHostRequirements hostRequirements)
+    public void setHostRequirements(BuildHostRequirements hostRequirements)
     {
         this.hostRequirements = hostRequirements;
     }

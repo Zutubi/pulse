@@ -1,6 +1,5 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.cinnamonbob.model.persistence;
 
-import com.cinnamonbob.model.persistence.EntityDao;
 import com.cinnamonbob.model.BuildSpecification;
 
 /**
@@ -8,4 +7,5 @@ import com.cinnamonbob.model.BuildSpecification;
  */
 public interface BuildSpecificationDao extends EntityDao<BuildSpecification>
 {
+    BuildSpecification findByName(String name);
 }

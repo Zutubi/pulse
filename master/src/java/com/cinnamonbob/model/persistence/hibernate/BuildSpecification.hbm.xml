@@ -10,11 +10,9 @@
 
         <property name="name" column="NAME" type="string" length="255"/>
 
-        <list name="nodes" cascade="all-delete-orphan" lazy="false">
-            <key column="BUILD_SPECIFICATION_ID"/>
-            <index column="POSITION"/>
-            <one-to-many class="com.cinnamonbob.model.BuildSpecificationNode"/>
-        </list>
+        <many-to-one name="root" class="com.cinnamonbob.model.BuildSpecificationNode"
+                     column="ROOT_ID" cascade="all-delete-orphan" lazy="false"/>
+
     </class>
 
     <class name="com.cinnamonbob.model.BuildSpecificationNode" table="BUILD_SPECIFICATION_NODE" lazy="false">
@@ -52,5 +50,10 @@
             <many-to-one name="slave" class="com.cinnamonbob.model.Slave"/>
         </subclass>
     </class>
+
+    <query name="findBuildSpecificationByName"><![CDATA[
+        from BuildSpecification spec
+        where spec.name = :name
+    ]]></query>
 
 </hibernate-mapping>

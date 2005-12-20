@@ -1,0 +1,24 @@
+<html>
+<head>
+    <title>create-build-specification</title>
+</head>
+<content tag="action">buildSpecification.create</content>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='createBuildSpecification.action'" "method='post'")
+    #tag (Hidden "name='projectId'")
+    <h3>create build specification</h3>
+    <fieldset>
+        #tag (TextField "required='true'" "name='specification.name'" "tabindex='1'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='2'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='3'")
+    </fieldset>
+#end
+
+</body>
+</html>

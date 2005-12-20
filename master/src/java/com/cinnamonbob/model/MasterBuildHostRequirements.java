@@ -12,4 +12,9 @@ public class MasterBuildHostRequirements extends AbstractBuildHostRequirements
     {
         return service instanceof MasterBuildService;
     }
+
+    public String getSummary()
+    {
+        return "[master]";
+    }
 }

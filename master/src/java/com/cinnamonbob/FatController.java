@@ -104,7 +104,7 @@ public class FatController implements EventListener
 
             ScmBootstrapper bootstrapper = createBuildBootstrapper(project);
 
-            executeNode(project, buildResult, buildSpec.getNodes().get(0), bootstrapper);
+            executeNode(project, buildResult, buildSpec.getRoot().getChildren().get(0), bootstrapper);
         }
         catch (BuildException e)
         {

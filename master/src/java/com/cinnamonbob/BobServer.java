@@ -59,9 +59,9 @@ public class BobServer
         ProjectManager projectManager = (ProjectManager) ComponentContext.getBean("projectManager");
         projectManager.initialise();
 
-        DodgyPinger pinger = new DodgyPinger((SlaveDao) ComponentContext.getBean("slaveDao"), (SlaveProxyFactory) ComponentContext.getBean("slaveProxyFactory"));
-        Thread t = new Thread(pinger);
-        t.start();
+        //DodgyPinger pinger = new DodgyPinger((SlaveDao) ComponentContext.getBean("slaveDao"), (SlaveProxyFactory) ComponentContext.getBean("slaveProxyFactory"));
+        //Thread t = new Thread(pinger);
+        //t.start();
     }
 
     public void stop()

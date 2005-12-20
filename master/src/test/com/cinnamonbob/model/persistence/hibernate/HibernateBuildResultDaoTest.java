@@ -48,7 +48,7 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         result.commence(new File("/tmp/commandout"));
         result.success();
         StoredArtifact artifact = new StoredArtifact(fa, "to file");
-        PlainFeature feature = new PlainFeature(Feature.Level.ERROR, "summary here", 7);
+        PlainFeature feature = new PlainFeature(Feature.Level.ERROR, "getSummary here", 7);
 
         artifact.addFeature(feature);
         result.addArtifact(artifact);

@@ -1,6 +1,7 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.model.*;
+import com.cinnamonbob.model.persistence.BuildSpecificationDao;
 import com.cinnamonbob.model.persistence.SlaveDao;
 
 
@@ -37,7 +38,7 @@ public class HibernateBuildSpecificationDaoTest extends PersistenceTestCase
         BuildSpecification spec = new BuildSpecification("test spec");
 
         BuildSpecificationNode masterNode = new BuildSpecificationNode(new MasterBuildHostRequirements(), "recipe 1");
-        spec.addNode(masterNode);
+        spec.getRoot().addChild(masterNode);
 
         Slave slave = new Slave("test slave", "test host");
         slaveDao.save(slave);

@@ -43,7 +43,7 @@ public class CreateProjectAction extends ProjectActionSupport
         // TODO: remove once we have a GUI to add this stuff
         Slave slave = slaveDao.findAll().get(0);
         BuildSpecification spec = new BuildSpecification("default");
-        spec.addNode(new BuildSpecificationNode(new SlaveBuildHostRequirements(slave), null));
+        spec.getRoot().addChild(new BuildSpecificationNode(new SlaveBuildHostRequirements(slave), null));
         project.addBuildSpecification(spec);
         getProjectManager().save(project);
         return SUCCESS;

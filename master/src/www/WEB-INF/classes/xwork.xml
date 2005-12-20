@@ -313,5 +313,36 @@
             <result name="success" type="redirect">/serverStatus.action</result>
         </action>
 
+        <action name="createBuildSpecification!default"
+                class="com.cinnamonbob.web.project.CreateBuildSpecificationAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">create-build-specification.vm</result>
+        </action>
+
+        <action name="createBuildSpecification" class="com.cinnamonbob.web.project.CreateBuildSpecificationAction">
+            <result name="input" type="velocity">create-build-specification.vm</result>
+            <result name="cancel" type="velocity">undefined.vm</result>
+            <result name="error" type="velocity">create-build-specification.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specification.id}</result>
+        </action>
+
+        <action name="createBuildSpecificationNode!default"
+                class="com.cinnamonbob.web.project.CreateBuildSpecificationNodeAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">create-build-specification-node.vm</result>
+        </action>
+
+        <action name="createBuildSpecificationNode"
+                class="com.cinnamonbob.web.project.CreateBuildSpecificationNodeAction">
+            <result name="input" type="velocity">create-build-specification-node.vm</result>
+            <result name="cancel" type="velocity">undefined.vm</result>
+            <result name="error" type="velocity">create-build-specification-node.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}</result>
+        </action>
+
+        <action name="viewBuildSpecification" class="com.cinnamonbob.web.project.ViewBuildSpecificationAction">
+            <result name="success" type="velocity">view-build-specification.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
     </package>
 </xwork>

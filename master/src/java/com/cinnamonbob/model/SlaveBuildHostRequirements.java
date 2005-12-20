@@ -30,6 +30,11 @@ public class SlaveBuildHostRequirements extends AbstractBuildHostRequirements
         return false;
     }
 
+    public String getSummary()
+    {
+        return slave.getName();
+    }
+
     public Slave getSlave()
     {
         return slave;

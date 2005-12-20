@@ -2,9 +2,6 @@ package com.cinnamonbob.model;
 
 import com.cinnamonbob.core.model.Entity;
 
-import java.util.List;
-import java.util.LinkedList;
-
 /**
  * Describes the steps (recipes) required for a build, and where they should
  * be executed.
@@ -12,7 +9,7 @@ import java.util.LinkedList;
 public class BuildSpecification extends Entity
 {
     private String name;
-    private List<BuildSpecificationNode> nodes = new LinkedList<BuildSpecificationNode>();
+    private BuildSpecificationNode root = new BuildSpecificationNode(null, null);
 
     public BuildSpecification()
     {
@@ -29,23 +26,18 @@ public class BuildSpecification extends Entity
         return name;
     }
 
-    private void setName(String name)
+    public void setName(String name)
     {
         this.name = name;
     }
 
-    public List<BuildSpecificationNode> getNodes()
+    public BuildSpecificationNode getRoot()
     {
-        return nodes;
+        return root;
     }
 
-    public void addNode(BuildSpecificationNode node)
+    public void setRoot(BuildSpecificationNode root)
     {
-        nodes.add(node);
-    }
-
-    private void setNodes(List<BuildSpecificationNode> nodes)
-    {
-        this.nodes = nodes;
+        this.root = root;
     }
 }
