@@ -3,8 +3,10 @@ package com.cinnamonbob.hessian;
 import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
 import com.caucho.hessian.io.SerializerFactory;
+import com.caucho.hessian.io.AbstractSerializerFactory;
 import com.caucho.hessian.server.HessianSkeleton;
 import com.cinnamonbob.spring.SpringObjectFactory;
+import com.cinnamonbob.bootstrap.ComponentContext;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -53,7 +55,7 @@ public class CustomHessianServlet extends GenericServlet
         }
 
         factory = new SerializerFactory();
-        factory.addFactory(new CustomSerialiserFactory());
+        factory.addFactory((AbstractSerializerFactory) ComponentContext.getBean("customSerialiserFactory"));
     }
 
 

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!-- NOTE:
+This spring context file contains the configuration for Jetty, the applications webserver.
+Initialisation of jetty has been split out from the rest to ensure that the majority of the
+system is setup before we start creating the web context. Various components in the web context
+manually autowire themselves during init (eg: Hessian), this does not work well when the context
+setup is not complete.
+-->
+<beans>
+
+    <!-- is the initContext really needed? It appears that singletons are initialised anyways
+    without being referenced...-->
+    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation">
+        <property name="initBeans">
+            <list>
+                <ref bean="jettyManager"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="jettyServer" class="com.cinnamonbob.jetty.JettyServerFactoryBean" destroy-method="shutdown">
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+    </bean>
+
+    <bean id="jettyManager" class="com.cinnamonbob.jetty.JettyManager" init-method="deployWebapp">
+        <property name="jettyServer">
+            <ref bean="jettyServer"/>
+        </property>
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+    </bean>
+
+</beans>

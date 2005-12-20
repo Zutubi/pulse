@@ -17,8 +17,6 @@ public class SlaveServiceImpl implements SlaveService
 
     public void build(String master, RecipeRequest request)
     {
-        // TODO fix this wiring
-        ComponentContext.autowire(this);
         RecipeCommand command = new RecipeCommand(master, request);
         ComponentContext.autowire(command);
         threadPool.executeCommand(command);

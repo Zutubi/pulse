@@ -2,12 +2,9 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
+    <!-- is the initContext really needed? It appears that singletons are initialised anyways
+         without being referenced...-->
     <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation">
-        <property name="initBeans">
-            <list>
-                <ref bean="jettyManager"/>
-            </list>
-        </property>
     </bean>
 
     <bean id="velocityEngine" class="com.cinnamonbob.bootstrap.velocity.VelocityEngineFactoryBean"/>
@@ -24,29 +21,11 @@
         </property>
     </bean>
 
-    <bean id="jettyServer" class="com.cinnamonbob.jetty.JettyServerFactoryBean" destroy-method="shutdown">
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
-        </property>
-    </bean>
-
-    <bean id="jettyManager" class="com.cinnamonbob.jetty.JettyManager" init-method="deployWebapp">
-        <property name="jettyServer">
-            <ref bean="jettyServer"/>
-        </property>
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
-        </property>
-    </bean>
-
     <bean id="buildManager" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"/>
 
     <bean id="userManager" class="com.cinnamonbob.model.DefaultUserManager" autowire="byName"/>
 
     <bean id="projectManager" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
-
-    <!--<bean id="scheduleManager" class="com.cinnamonbob.schedule.DefaultScheduleManager" autowire="byName"-->
-    <!--init-method="init"/>-->
 
     <!-- ==================== -->
     <!-- scheduling subsystem -->

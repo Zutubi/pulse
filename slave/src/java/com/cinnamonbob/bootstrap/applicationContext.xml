@@ -6,26 +6,7 @@
         <property name="initBeans">
             <list>
                 <ref bean="threadPool"/>
-                <ref bean="jettyManager"/>
             </list>
-        </property>
-    </bean>
-
-    <!-- Do we need this?  If so, have to move from master to server-core. -->
-    <!--<bean id="velocityEngine" class="com.cinnamonbob.bootstrap.velocity.VelocityEngineFactoryBean"/>-->
-
-    <bean id="jettyServer" class="com.cinnamonbob.jetty.JettyServerFactoryBean" destroy-method="shutdown">
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
-        </property>
-    </bean>
-
-    <bean id="jettyManager" class="com.cinnamonbob.jetty.JettyManager" init-method="deployWebapp">
-        <property name="jettyServer">
-            <ref bean="jettyServer"/>
-        </property>
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
         </property>
     </bean>
 
