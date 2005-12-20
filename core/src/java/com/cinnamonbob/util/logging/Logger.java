@@ -14,6 +14,11 @@ public class Logger
         this.delegate = delegate;
     }
 
+    public static Logger getLogger(Class cls)
+    {
+        return Logger.getLogger(cls.getName());
+    }
+
     public static Logger getLogger(String name)
     {
         return new Logger(java.util.logging.Logger.getLogger(name));
@@ -22,6 +27,11 @@ public class Logger
     public void severe(String msg, Throwable t)
     {
         delegate.log(Level.SEVERE, msg, t);
+    }
+
+    public void severe(Throwable t)
+    {
+        severe(t.getMessage(), t);
     }
 
     public void severe(String msg)
@@ -34,6 +44,11 @@ public class Logger
         delegate.log(Level.INFO, msg, t);
     }
 
+    public void info(Throwable t)
+    {
+        info(t.getMessage(), t);
+    }
+
     public void info(String msg)
     {
         delegate.info(msg);
@@ -42,6 +57,11 @@ public class Logger
     public void warning(String msg, Throwable t)
     {
         delegate.log(Level.WARNING, msg, t);
+    }
+
+    public void warning(Throwable t)
+    {
+        warning(t.getMessage(), t);
     }
 
     public void warning(String msg)
