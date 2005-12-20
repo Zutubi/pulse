@@ -29,7 +29,7 @@ public class ShutdownService
 
     private boolean stopping;
 
-    private static final Logger LOG = Logger.getLogger(ShutdownService.class.getName());
+    private static final Logger LOG = Logger.getLogger(ShutdownService.class);
 
     /**
      *

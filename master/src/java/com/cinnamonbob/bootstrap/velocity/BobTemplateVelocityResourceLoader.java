@@ -14,7 +14,7 @@ import com.cinnamonbob.util.logging.Logger;
 public class BobTemplateVelocityResourceLoader extends FileResourceLoader
 {
 
-    private static final Logger LOG = Logger.getLogger(BobTemplateVelocityResourceLoader.class.getName());
+    private static final Logger LOG = Logger.getLogger(BobTemplateVelocityResourceLoader.class);
 
     public static String getFullTemplatePath()
     {

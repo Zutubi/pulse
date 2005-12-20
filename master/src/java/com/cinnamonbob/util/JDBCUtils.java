@@ -18,7 +18,7 @@ import java.sql.PreparedStatement;
  */
 public class JDBCUtils
 {
-    private static final Logger LOG = Logger.getLogger(JDBCUtils.class.getName());
+    private static final Logger LOG = Logger.getLogger(JDBCUtils.class);
 
     /**
      * Execute the given schema script on the given JDBC Connection.

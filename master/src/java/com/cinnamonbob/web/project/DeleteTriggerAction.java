@@ -10,7 +10,7 @@ import com.cinnamonbob.util.logging.Logger;
  */
 public class DeleteTriggerAction extends ProjectActionSupport
 {
-    private static final Logger LOG = Logger.getLogger(DeleteTriggerAction.class.getName());
+    private static final Logger LOG = Logger.getLogger(DeleteTriggerAction.class);
 
     private long id;
     private Trigger trigger;

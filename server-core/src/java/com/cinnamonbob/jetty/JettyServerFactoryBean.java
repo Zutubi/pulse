@@ -14,7 +14,7 @@ import com.cinnamonbob.util.logging.Logger;
 public class JettyServerFactoryBean implements FactoryBean
 {
 
-    private static final Logger LOG = Logger.getLogger(JettyServerFactoryBean.class.getName());
+    private static final Logger LOG = Logger.getLogger(JettyServerFactoryBean.class);
 
     private static Server SERVER;
 

@@ -283,7 +283,7 @@ class StdOutErrParser extends Thread
     /**
      *
      */
-    private static final Logger LOG = Logger.getLogger(StdOutErrParser.class.getName());
+    private static final Logger LOG = Logger.getLogger(StdOutErrParser.class);
 
     /**
      *

@@ -20,7 +20,7 @@ import java.io.File;
  */
 public class FatController implements EventListener
 {
-    private static final Logger LOG = Logger.getLogger(FatController.class.getName());
+    private static final Logger LOG = Logger.getLogger(FatController.class);
 
     private EventManager eventManager;
     private AsynchronousDelegatingListener asyncListener;

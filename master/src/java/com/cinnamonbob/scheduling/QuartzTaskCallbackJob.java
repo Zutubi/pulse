@@ -12,7 +12,7 @@ import com.cinnamonbob.util.logging.Logger;
  */
 public class QuartzTaskCallbackJob implements Job
 {
-    private static final Logger LOG = Logger.getLogger(QuartzTaskCallbackJob.class.getName());
+    private static final Logger LOG = Logger.getLogger(QuartzTaskCallbackJob.class);
 
     public static final String TRIGGER_PROP = "trigger";
 

@@ -12,7 +12,7 @@ import java.util.TreeMap;
  */
 public class DefaultScheduler
 {
-    private static final Logger LOG = Logger.getLogger(DefaultScheduler.class.getName());
+    private static final Logger LOG = Logger.getLogger(DefaultScheduler.class);
 
     private Map<String, SchedulerStrategy> strategies = new TreeMap<String, SchedulerStrategy>();
 

@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  */
 public class SlaveRecipeProcessor
 {
-    private static final Logger LOG = Logger.getLogger(SlaveRecipeProcessor.class.getName());
+    private static final Logger LOG = Logger.getLogger(SlaveRecipeProcessor.class);
 
     private RecipeProcessor recipeProcessor;
     private ConfigurationManager configurationManager;

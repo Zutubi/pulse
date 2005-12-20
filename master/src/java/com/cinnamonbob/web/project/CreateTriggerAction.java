@@ -13,7 +13,7 @@ import com.cinnamonbob.util.logging.Logger;
  */
 public class CreateTriggerAction extends ProjectActionSupport
 {
-    private static final Logger LOG = Logger.getLogger(CreateTriggerAction.class.getName());
+    private static final Logger LOG = Logger.getLogger(CreateTriggerAction.class);
 
     private long project;
     private String name;

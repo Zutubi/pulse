@@ -14,7 +14,7 @@ import java.io.Writer;
  */
 public class VelocityBuildResultRenderer implements BuildResultRenderer
 {
-    private static final Logger LOG = Logger.getLogger(VelocityBuildResultRenderer.class.getName());
+    private static final Logger LOG = Logger.getLogger(VelocityBuildResultRenderer.class);
 
     private VelocityEngine velocityEngine;
 

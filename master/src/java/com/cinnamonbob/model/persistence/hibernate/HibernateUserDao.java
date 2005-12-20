@@ -18,7 +18,7 @@ import com.cinnamonbob.util.logging.Logger;
  */
 public class HibernateUserDao extends HibernateEntityDao<User> implements UserDao
 {
-    private static final Logger LOG = Logger.getLogger(HibernateEntityDao.class.getName());
+    private static final Logger LOG = Logger.getLogger(HibernateEntityDao.class);
 
     public Class persistentClass()
     {

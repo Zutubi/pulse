@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class DefaultRecipeQueue implements Runnable
 {
-    private static final Logger LOG = Logger.getLogger(DefaultRecipeQueue.class.getName());
+    private static final Logger LOG = Logger.getLogger(DefaultRecipeQueue.class);
 
     private final ReentrantLock lock = new ReentrantLock();
 

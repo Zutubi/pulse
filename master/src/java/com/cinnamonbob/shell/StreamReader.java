@@ -10,7 +10,7 @@ import java.io.*;
  */
 public class StreamReader extends Thread
 {
-    private static final Logger LOG = Logger.getLogger(StreamReader.class.getName());
+    private static final Logger LOG = Logger.getLogger(StreamReader.class);
 
     final InputStream input;
     final OutputStream output;

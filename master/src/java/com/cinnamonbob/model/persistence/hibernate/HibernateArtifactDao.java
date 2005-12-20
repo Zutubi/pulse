@@ -7,7 +7,7 @@ import com.cinnamonbob.util.logging.Logger;
 
 public class HibernateArtifactDao extends HibernateEntityDao<StoredArtifact> implements ArtifactDao
 {
-    private static final Logger LOG = Logger.getLogger(HibernateEntityDao.class.getName());
+    private static final Logger LOG = Logger.getLogger(HibernateEntityDao.class);
 
     @Override
     public Class persistentClass()

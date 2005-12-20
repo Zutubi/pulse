@@ -15,7 +15,7 @@ import java.util.TreeMap;
  */
 public class ResourceRepository
 {
-    private static final Logger LOG = Logger.getLogger(ResourceRepository.class.getName());
+    private static final Logger LOG = Logger.getLogger(ResourceRepository.class);
 
     private Map<String, Resource> resources = new TreeMap<String, Resource>();
 

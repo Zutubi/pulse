@@ -10,7 +10,7 @@ import com.cinnamonbob.util.logging.Logger;
  */
 public class SlaveServer
 {
-    private static final Logger LOG = Logger.getLogger(SlaveServer.class.getName());
+    private static final Logger LOG = Logger.getLogger(SlaveServer.class);
 
     public SlaveServer()
     {

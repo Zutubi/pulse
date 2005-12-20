@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class RecipeQueue
 {
-    private static final Logger LOG = Logger.getLogger(RecipeQueue.class.getName());
+    private static final Logger LOG = Logger.getLogger(RecipeQueue.class);
 
     private List<BuildService> buildServices;
     private SlaveDao slaveDao;

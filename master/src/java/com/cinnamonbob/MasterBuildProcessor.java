@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class MasterBuildProcessor implements EventListener
 {
-    private static final Logger LOG = Logger.getLogger(MasterBuildProcessor.class.getName());
+    private static final Logger LOG = Logger.getLogger(MasterBuildProcessor.class);
 
     private RecipeProcessor processor;
     private ProjectManager projectManager;

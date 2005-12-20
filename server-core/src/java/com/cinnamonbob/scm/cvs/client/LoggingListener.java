@@ -15,7 +15,7 @@ public class LoggingListener extends CVSAdapter
 {
     private final StringBuffer taggedLine = new StringBuffer();
 
-    private static final Logger LOG = Logger.getLogger(LoggingListener.class.getName());
+    private static final Logger LOG = Logger.getLogger(LoggingListener.class);
 
     /**
      * Called when the server wants to send a message to be displayed to

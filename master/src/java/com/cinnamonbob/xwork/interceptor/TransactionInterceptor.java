@@ -25,7 +25,7 @@ public class TransactionInterceptor implements Interceptor
      */
     private static ThreadLocal<TransactionStatus> currentTransactionStatus = new ThreadLocal<TransactionStatus>();
 
-    private static final Logger LOG = Logger.getLogger(TransactionInterceptor.class.getName());
+    private static final Logger LOG = Logger.getLogger(TransactionInterceptor.class);
 
     /**
      * Delegate used to create, commit and rollback transactions

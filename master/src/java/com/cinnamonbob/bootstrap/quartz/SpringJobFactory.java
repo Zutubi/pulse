@@ -14,7 +14,7 @@ import org.quartz.spi.TriggerFiredBundle;
  */
 public class SpringJobFactory extends SimpleJobFactory
 {
-    private static final Logger LOG = Logger.getLogger(SpringJobFactory.class.getName());
+    private static final Logger LOG = Logger.getLogger(SpringJobFactory.class);
 
     public Job newJob(TriggerFiredBundle bundle) throws SchedulerException
     {

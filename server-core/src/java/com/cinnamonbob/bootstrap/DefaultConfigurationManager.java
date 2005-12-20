@@ -15,7 +15,7 @@ public class DefaultConfigurationManager implements ConfigurationManager
 {
     private static final String PROPERTIES_FILENAME = "bob.properties";
 
-    private static final Logger LOG = Logger.getLogger(DefaultConfigurationManager.class.getName());
+    private static final Logger LOG = Logger.getLogger(DefaultConfigurationManager.class);
 
     private ApplicationPaths paths;
 

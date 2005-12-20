@@ -23,7 +23,7 @@ import java.util.Properties;
  */
 public class EmailContactPoint extends ContactPoint
 {
-    private static final Logger LOG = Logger.getLogger(EmailContactPoint.class.getName());
+    private static final Logger LOG = Logger.getLogger(EmailContactPoint.class);
 
     private static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
     private static final String SMTP_FROM_PROPERTY = "mail.smtp.from";

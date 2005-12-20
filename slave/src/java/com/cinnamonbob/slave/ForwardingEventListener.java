@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  */
 public class ForwardingEventListener implements EventListener
 {
-    private static final Logger LOG = Logger.getLogger(ForwardingEventListener.class.getName());
+    private static final Logger LOG = Logger.getLogger(ForwardingEventListener.class);
 
     private MasterService service;
     private long id;

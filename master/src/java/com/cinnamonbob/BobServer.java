@@ -19,7 +19,7 @@ import java.net.UnknownHostException;
  */
 public class BobServer
 {
-    private static final Logger LOG = Logger.getLogger(BobServer.class.getName());
+    private static final Logger LOG = Logger.getLogger(BobServer.class);
     private static final String HOST_NAME_PROPERTY = "host.name";
 
     private ShutdownService shutdownService = null;

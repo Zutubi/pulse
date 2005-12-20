@@ -18,7 +18,7 @@ public class DatabaseBootstrap
 {
     public static final String DEFAULT_SCHEMA_TEST_TABLE = "USER";
 
-    private static final Logger LOG = Logger.getLogger(DatabaseBootstrap.class.getName());
+    private static final Logger LOG = Logger.getLogger(DatabaseBootstrap.class);
 
     private DataSource dataSource;
     private String schemaTestTable = DEFAULT_SCHEMA_TEST_TABLE;

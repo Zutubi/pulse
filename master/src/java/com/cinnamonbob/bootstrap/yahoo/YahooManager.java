@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 public class YahooManager
 {
-    private static final Logger LOG = Logger.getLogger(YahooManager.class.getName());
+    private static final Logger LOG = Logger.getLogger(YahooManager.class);
 
     private static final String YAHOO_ID = "yahoo.id";
     private static final String YAHOO_PASSWORD = "yahoo.password";

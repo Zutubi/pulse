@@ -15,7 +15,7 @@ import java.net.Socket;
  */
 public class Bootstrap
 {
-    private static final Logger LOG = Logger.getLogger(Bootstrap.class.getName());
+    private static final Logger LOG = Logger.getLogger(Bootstrap.class);
 
     //TODO: support command the form ... options COMMAND command-options ARGUMENTS
 

@@ -14,7 +14,7 @@ import java.io.File;
  */
 public class JettyManager
 {
-    private static final Logger LOG = Logger.getLogger(JettyManager.class.getName());
+    private static final Logger LOG = Logger.getLogger(JettyManager.class);
     private static final String BEAN_NAME = "jettyManager";
 
     private Server server;
