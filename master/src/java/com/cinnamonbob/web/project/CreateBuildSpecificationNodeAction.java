@@ -112,6 +112,11 @@ public class CreateBuildSpecificationNodeAction extends ActionSupport
             node.setHostRequirements(new SlaveBuildHostRequirements(slave));
         }
 
+        if (node.getRecipe().equals(""))
+        {
+            node.setRecipe(null);
+        }
+
         parent.addChild(node);
         buildSpecificationNodeDao.save(node);
 
