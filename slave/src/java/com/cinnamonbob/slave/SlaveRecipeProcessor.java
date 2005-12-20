@@ -1,6 +1,7 @@
 package com.cinnamonbob.slave;
 
 import com.cinnamonbob.RecipeRequest;
+import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.RecipeProcessor;
@@ -13,8 +14,6 @@ import com.cinnamonbob.services.MasterService;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  */
@@ -46,7 +45,7 @@ public class SlaveRecipeProcessor
         {
             // There is no way we can let the master know: the best thing we
             // can do is log the problem.
-            LOG.log(Level.SEVERE, "Could not create connection to master '" + master + "'", e);
+            LOG.severe("Could not create connection to master '" + master + "'", e);
         }
 
         return null;

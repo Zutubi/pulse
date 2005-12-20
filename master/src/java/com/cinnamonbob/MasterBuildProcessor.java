@@ -40,7 +40,7 @@ public class MasterBuildProcessor implements EventListener
     private SubscriptionManager subscriptionManager;
     private EventManager eventManager;
 
-    public RecipeResult execute(BuildRequest request)
+    public BuildResult execute(BuildRequest request)
     {
         Project project = projectManager.getProject(request.getProjectName());
         if (project == null)
@@ -99,7 +99,7 @@ public class MasterBuildProcessor implements EventListener
             }
         }
 
-        return recipeResult;
+        return buildResult;
     }
 
     public static String getProjectDirName(Project project)

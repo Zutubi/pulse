@@ -4,9 +4,7 @@ import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.events.build.RecipeEvent;
 import com.cinnamonbob.services.MasterService;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.cinnamonbob.util.logging.Logger;
 
 /**
  */
@@ -35,7 +33,7 @@ public class ForwardingEventListener implements EventListener
             }
             catch (Exception e)
             {
-                LOG.log(Level.SEVERE, "Could not forward event for recipe '" + Long.toString(id) + "' to master", e);
+                LOG.severe("Could not forward event for recipe '" + Long.toString(id) + "' to master", e);
             }
         }
     }
