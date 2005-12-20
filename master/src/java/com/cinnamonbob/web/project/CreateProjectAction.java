@@ -1,7 +1,6 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.persistence.SlaveDao;
 
 /**
  * 
@@ -41,10 +40,5 @@ public class CreateProjectAction extends ProjectActionSupport
     {
         getProjectManager().save(project);
         return SUCCESS;
-    }
-
-    public void setSlaveDao(SlaveDao slaveDao)
-    {
-        this.slaveDao = slaveDao;
     }
 }
