@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<project name="testProject" defaultRecipe="default">
+
+    <dependency name="1" version="2"/>
+
+    <recipe name="default">
+        <dependency name="a" version="b"/>
+    </recipe>
+
+</project>

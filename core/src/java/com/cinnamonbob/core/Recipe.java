@@ -13,7 +13,8 @@ public class Recipe implements Reference, Namespace
     private String name;
 
     private List<Command> commands = new LinkedList<Command>();
-    
+    private List<Dependency> dependencies = new LinkedList<Dependency>();
+
     public String getName()
     {
         return name;
@@ -37,5 +38,15 @@ public class Recipe implements Reference, Namespace
     public List<Command> getCommands()
     {
         return Collections.unmodifiableList(commands);
+    }
+
+    public List<Dependency> getDependencies()
+    {
+        return Collections.unmodifiableList(dependencies);
+    }
+
+    public void addDependency(Dependency dependency)
+    {
+        dependencies.add(dependency);
     }
 }

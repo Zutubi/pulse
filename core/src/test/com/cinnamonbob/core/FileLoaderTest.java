@@ -41,6 +41,7 @@ public class FileLoaderTest extends BobTestCase
         loader.register("command", CommandGroup.class);
         loader.register("regex", RegexPostProcessor.class);
         loader.register("executable", ExecutableCommand.class);
+        loader.register("dependency", Dependency.class);
     }
 
     public void tearDown() throws Exception
@@ -112,6 +113,23 @@ public class FileLoaderTest extends BobTestCase
         loader.load(getInput("testSampleProject"), bf, properties);
     }
 
+    public void testDependency() throws Exception
+    {
+        BobFile bf = new BobFile();
+        loader.load(getInput("testDependency"), bf);
+
+        assertNotNull(bf.getDependencies());
+        assertEquals(1, bf.getDependencies().size());
+        assertEquals("1", bf.getDependencies().get(0).getName());
+        assertEquals("2", bf.getDependencies().get(0).getVersion());
+
+        Recipe recipe = bf.getRecipe(bf.getDefaultRecipe());
+        assertNotNull(recipe);
+        assertEquals(1, recipe.getDependencies().size());
+        assertEquals("a", recipe.getDependencies().get(0).getName());
+        assertEquals("b", recipe.getDependencies().get(0).getVersion());
+    }
+
     private List<ExecutableCommand.Arg> executableArgsHelper(int commandIndex) throws Exception
     {
         BobFile bf = new BobFile();
@@ -168,6 +186,4 @@ public class FileLoaderTest extends BobTestCase
         assertEquals(args.get(2).getText(), "here are some spaces");
         assertEquals(args.get(3).getText(), "and yet more spaces");
     }
-
-
 }

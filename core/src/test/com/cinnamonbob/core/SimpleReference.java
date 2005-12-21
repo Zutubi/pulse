@@ -1,9 +1,5 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.core.BobFile;
-import com.cinnamonbob.core.BobFileComponent;
-import com.cinnamonbob.core.Reference;
-
 /**
  * 
  *
@@ -12,7 +8,7 @@ public class SimpleReference implements Reference
 {
     private String name;
     private Reference ref;
-    
+
     public String getName()
     {
         return name;

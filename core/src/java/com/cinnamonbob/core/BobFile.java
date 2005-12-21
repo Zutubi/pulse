@@ -10,9 +10,11 @@ import java.util.List;
 public class BobFile implements Namespace
 {
     private String defaultRecipe;
+    private String name;
     
     private List<Recipe> recipes = new LinkedList<Recipe>();
-    
+    private List<Dependency> dependencies = new LinkedList<Dependency>();
+
     public String getDefaultRecipe()
     {
         return defaultRecipe;
@@ -48,5 +50,25 @@ public class BobFile implements Namespace
             }
         }
         return null;
+    }
+
+    public List<Dependency> getDependencies()
+    {
+        return Collections.unmodifiableList(dependencies);
+    }
+
+    public void addDependency(Dependency dependency)
+    {
+        dependencies.add(dependency);
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 }
