@@ -19,24 +19,10 @@ public class ResourceRepository
 
     private Map<String, Resource> resources = new TreeMap<String, Resource>();
 
-    private FileLoader fileLoader;
-
     private File resourceDef;
 
     public ResourceRepository()
     {
-
-    }
-
-    public ResourceRepository(FileLoader loader)
-    {
-        setFileLoader(loader);
-    }
-
-    public void load(InputStream input) throws BobException
-    {
-        resources.clear();
-        fileLoader.load(input, this);
     }
 
     public void addResource(Resource r)
@@ -52,15 +38,6 @@ public class ResourceRepository
     public List<String> getResourceNames()
     {
         return new LinkedList<String>(resources.keySet());
-    }
-
-    public void setFileLoader(FileLoader loader)
-    {
-        this.fileLoader = loader;
-
-        loader.register("resource", Resource.class);
-        loader.register("version", ResourceVersion.class);
-        loader.register("property", Property.class);
     }
 
     public void initialise()
@@ -83,7 +60,7 @@ public class ResourceRepository
             try
             {
                 input = new FileInputStream(resourceDef);
-                load(input);
+                ResourceFileLoader.load(input, this);
             }
             catch (FileNotFoundException e)
             {

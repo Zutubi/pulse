@@ -8,7 +8,7 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
     private String name;
     private String version;
 
-    private ResourceRepository repo;
+    private ResourceRepository repository;
     private Scope scope;
 
     public void setScope(Scope scope)
@@ -20,9 +20,9 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
     {
         Resource resource = null;
 
-        if(repo != null)
+        if(repository != null)
         {
-            resource = repo.getResource(name);
+            resource = repository.getResource(name);
         }
 
         if(resource == null)
@@ -52,7 +52,7 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
 
     public void setResourceRepository(ResourceRepository repo)
     {
-        this.repo = repo;
+        this.repository = repo;
     }
 
     public void setName(String name)

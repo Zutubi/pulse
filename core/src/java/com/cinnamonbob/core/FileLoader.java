@@ -36,6 +36,11 @@ public class FileLoader
         setResourceRepository(repository);
     }
 
+    /**
+     * The object factory will be used to instantiate new instances of types.
+     *
+     * @param factory
+     */
     public void setObjectFactory(ObjectFactory factory)
     {
         this.factory = factory;

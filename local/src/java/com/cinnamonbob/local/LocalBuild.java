@@ -87,29 +87,25 @@ public class LocalBuild
 
     private ResourceRepository createRepository(String resourcesFile) throws BobException
     {
-        FileLoader loader = new FileLoader(new ObjectFactory(), null);
-        ResourceRepository repository = new ResourceRepository(loader);
-
-        if (resourcesFile != null)
+        if (resourcesFile == null)
         {
-            FileInputStream stream = null;
-
-            try
-            {
-                stream = new FileInputStream(resourcesFile);
-                repository.load(stream);
-            }
-            catch (FileNotFoundException e)
-            {
-                throw new BobException("Unable to open resources file '" + resourcesFile + "'");
-            }
-            finally
-            {
-                IOUtils.close(stream);
-            }
+            throw new BobException("Unable to open resources file '" + resourcesFile + "'");
         }
 
-        return repository;
+        FileInputStream stream = null;
+        try
+        {
+            stream = new FileInputStream(resourcesFile);
+            return ResourceFileLoader.load(stream);
+        }
+        catch (FileNotFoundException e)
+        {
+            throw new BobException("Unable to open resources file '" + resourcesFile + "'");
+        }
+        finally
+        {
+            IOUtils.close(stream);
+        }
     }
 
     /**
@@ -157,8 +153,7 @@ public class LocalBuild
 
             try
             {
-                FileLoader loader = new FileLoader(new ObjectFactory(), repository);
-                RecipeProcessor processor = new RecipeProcessor(manager, loader);
+                RecipeProcessor processor = new RecipeProcessor(manager, repository);
                 processor.build(workDir, bobFile, recipe, result, output);
             }
             catch (BuildException e)

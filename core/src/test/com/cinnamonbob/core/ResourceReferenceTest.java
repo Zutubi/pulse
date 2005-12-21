@@ -7,17 +7,9 @@ import com.cinnamonbob.test.BobTestCase;
  */
 public class ResourceReferenceTest extends BobTestCase
 {
-    private ResourceReference ref = null;
-    private ResourceRepository repo = null;
-
     public void setUp() throws Exception
     {
-        FileLoader loader = new FileLoader();
-        loader.setObjectFactory(new ObjectFactory());
-        repo = new ResourceRepository();
-        repo.setFileLoader(loader);
-        ref = new ResourceReference();
-        ref.setResourceRepository(repo);
+
     }
 
     public void tearDown() throws Exception
@@ -28,7 +20,9 @@ public class ResourceReferenceTest extends BobTestCase
     public void testResourceReference() throws Exception
     {
         Scope scope = new Scope();
-        repo.load(getInput("testResourceReference"));
+        ResourceRepository repo = ResourceFileLoader.load(getInput("testResourceReference"));
+        ResourceReference ref = new ResourceReference();
+        ref.setResourceRepository(repo);
 
         ref.setScope(scope);
         ref.setName("aResource");

@@ -15,11 +15,6 @@ public class ResourceRepositoryTest extends BobTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-
-        repo = new ResourceRepository();
-        FileLoader loader = new FileLoader();
-        loader.setObjectFactory(new ObjectFactory());
-        repo.setFileLoader(loader);
     }
 
     protected void tearDown() throws Exception
@@ -29,7 +24,7 @@ public class ResourceRepositoryTest extends BobTestCase
 
     public void testEmptyRepo() throws Exception
     {
-        repo.load(getInput("testEmptyRepo"));
+        repo = ResourceFileLoader.load(getInput("testEmptyRepo"));
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);
         assertEquals(0, resources.size());
@@ -37,7 +32,7 @@ public class ResourceRepositoryTest extends BobTestCase
 
     public void testResource() throws Exception
     {
-        repo.load(getInput("testResource"));
+        repo = ResourceFileLoader.load(getInput("testResource"));
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);
         assertEquals(1, resources.size());
@@ -51,7 +46,7 @@ public class ResourceRepositoryTest extends BobTestCase
 
     public void testResourceWithVersion() throws Exception
     {
-        repo.load(getInput("testResourceWithVersion"));
+        repo = ResourceFileLoader.load(getInput("testResourceWithVersion"));
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);
         assertEquals(1, resources.size());
@@ -70,7 +65,7 @@ public class ResourceRepositoryTest extends BobTestCase
 
     public void testMultipleResources() throws Exception
     {
-        repo.load(getInput("testMultipleResources"));
+        repo = ResourceFileLoader.load(getInput("testMultipleResources"));
 
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);

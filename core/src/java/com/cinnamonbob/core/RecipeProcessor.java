@@ -16,17 +16,17 @@ import java.util.List;
 public class RecipeProcessor
 {
     private EventManager eventManager;
-    private FileLoader fileLoader;
+    private ResourceRepository resourceRepository;
 
     public RecipeProcessor()
     {
         // For use with Spring
     }
 
-    public RecipeProcessor(EventManager eventManager, FileLoader fileLoader)
+    public RecipeProcessor(EventManager eventManager, ResourceRepository resourceRepository)
     {
         setEventManager(eventManager);
-        setFileLoader(fileLoader);
+        setResourceRepository(resourceRepository);
     }
 
     public static String getCommandDirName(int i, CommandResult result)
@@ -52,6 +52,11 @@ public class RecipeProcessor
         {
             throw new BuildException("Undefined recipe '" + recipeName + "'");
         }
+        build(recipe, recipeResult, outputDir);
+    }
+
+    private void build(Recipe recipe, RecipeResult recipeResult, File outputDir) throws BuildException
+    {
 
         // TODO: support continuing build when errors occur. Take care: exceptions.
         int i = 0;
@@ -73,7 +78,6 @@ public class RecipeProcessor
                     recipeResult.commandError();
                     return;
             }
-
             i++;
         }
     }
@@ -110,18 +114,15 @@ public class RecipeProcessor
     private BobFile loadBobFile(File workDir, String bobFileName) throws BuildException
     {
         List<Reference> properties = new LinkedList<Reference>();
-
         Property property = new Property("work.dir", workDir.getAbsolutePath());
         properties.add(property);
 
         try
         {
-            BobFile result = new BobFile();
             File bob = new File(workDir, bobFileName);
             FileInputStream stream = new FileInputStream(bob);
 
-            fileLoader.load(stream, result, properties);
-            return result;
+            return BobFileLoader.load(stream, resourceRepository, properties);
         }
         catch (Exception e)
         {
@@ -129,19 +130,9 @@ public class RecipeProcessor
         }
     }
 
-    public void setFileLoader(FileLoader fileLoader)
+    public void setResourceRepository(ResourceRepository resourceRepository)
     {
-        this.fileLoader = fileLoader;
-
-        // TODO: move config into file.
-        fileLoader.register("property", Property.class);
-        fileLoader.register("recipe", Recipe.class);
-        fileLoader.register("def", ComponentDefinition.class);
-        fileLoader.register("post-processor", PostProcessorGroup.class);
-        fileLoader.register("command", CommandGroup.class);
-        fileLoader.register("regex", RegexPostProcessor.class);
-        fileLoader.register("executable", ExecutableCommand.class);
-        fileLoader.register("resource", ResourceReference.class);
+        this.resourceRepository = resourceRepository;
     }
 
     public void setEventManager(EventManager eventManager)

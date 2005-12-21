@@ -56,6 +56,7 @@ public class MasterBuildProcessor implements EventListener
         RecipeResult recipeResult = new RecipeResult(request.getRecipeName());
         buildResult.add(new RecipeResultNode(recipeResult));
 
+        // initialise local directories
         File rootBuildDir = ConfigUtils.getManager().getAppConfig().getProjectRoot();
         File projectDir = new File(rootBuildDir, getProjectDirName(project));
         File buildsDir = new File(projectDir, "builds");
@@ -153,6 +154,7 @@ public class MasterBuildProcessor implements EventListener
 
                 saveChanges(resultDir, scm, changes);
 
+                // collect scm changes to be added to the build results.
                 List<Changelist> scmChanges = null;
 
                 try
