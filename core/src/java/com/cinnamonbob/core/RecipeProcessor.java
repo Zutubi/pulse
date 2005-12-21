@@ -23,12 +23,6 @@ public class RecipeProcessor
         // For use with Spring
     }
 
-    public RecipeProcessor(EventManager eventManager, ResourceRepository resourceRepository)
-    {
-        setEventManager(eventManager);
-        setResourceRepository(resourceRepository);
-    }
-
     public static String getCommandDirName(int i, CommandResult result)
     {
         // Use the command name because:
@@ -135,6 +129,11 @@ public class RecipeProcessor
         this.resourceRepository = resourceRepository;
     }
 
+    /**
+     * The event manager is a required reference.
+     *
+     * @param eventManager
+     */
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;

@@ -89,7 +89,7 @@ public class LocalBuild
     {
         if (resourcesFile == null)
         {
-            throw new BobException("Unable to open resources file '" + resourcesFile + "'");
+            return null;
         }
 
         FileInputStream stream = null;
@@ -153,7 +153,9 @@ public class LocalBuild
 
             try
             {
-                RecipeProcessor processor = new RecipeProcessor(manager, repository);
+                RecipeProcessor processor = new RecipeProcessor();
+                processor.setEventManager(manager);
+                processor.setResourceRepository(repository);
                 processor.build(workDir, bobFile, recipe, result, output);
             }
             catch (BuildException e)
