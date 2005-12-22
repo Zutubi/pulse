@@ -40,7 +40,4 @@
 
     <bean id="masterProxyFactory" class="com.cinnamonbob.slave.MasterProxyFactory" autowire="byName"/>
 
-    <bean id="recipeProcessorPaths" class="com.cinnamonbob.slave.RecipeProcessorPaths" autowire="byName"
-          init-method="init"/>
-
 </beans>

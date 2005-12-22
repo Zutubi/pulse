@@ -4,7 +4,6 @@ import com.cinnamonbob.core.*;
 import com.cinnamonbob.core.event.DefaultEventManager;
 import com.cinnamonbob.core.event.EventManager;
 import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.events.build.RecipeCommencedEvent;
 import com.cinnamonbob.events.build.RecipeCompletedEvent;
@@ -128,16 +127,14 @@ public class LocalBuild
         printPrologue(bobFile, resourcesFile, outputDir);
 
         ResourceRepository repository = createRepository(resourcesFile);
+        RecipePaths paths = new LocalRecipePaths(workDir, outputDir);
 
-        if (!workDir.isDirectory())
+        if (!paths.getWorkDir().isDirectory())
         {
-            throw new BobException("Working directory '" + workDir.getAbsolutePath() + "' does not exist");
+            throw new BobException("Working directory '" + paths.getWorkDir().getAbsolutePath() + "' does not exist");
         }
 
-        File output = new File(workDir, outputDir);
-        cleanOutputDir(output);
-
-        File logFile = new File(output, "build.log");
+        File logFile = new File(workDir, "build.log");
         FileOutputStream logStream = null;
 
         try
@@ -145,18 +142,19 @@ public class LocalBuild
             logStream = new FileOutputStream(logFile);
 
             EventManager manager = new DefaultEventManager();
-            manager.register(new BuildStatusPrinter(workDir, logStream));
+            manager.register(new BuildStatusPrinter(paths.getWorkDir(), logStream));
 
             RecipeResult result = new RecipeResult(recipe);
-            result.commence(output);
+            result.commence(paths.getOutputDir());
             manager.publish(new RecipeCommencedEvent(this, result));
 
             try
             {
+                Bootstrapper bootstrapper = new LocalBootstrapper();
                 RecipeProcessor processor = new RecipeProcessor();
                 processor.setEventManager(manager);
                 processor.setResourceRepository(repository);
-                processor.build(workDir, bobFile, recipe, result, output);
+                processor.build(paths, bootstrapper, bobFile, recipe, result);
             }
             catch (BuildException e)
             {
@@ -203,21 +201,6 @@ public class LocalBuild
         System.out.println("Build report saved to '" + logFile.getPath() + "'.");
     }
 
-    private void cleanOutputDir(File output)
-    {
-        if (output.isDirectory())
-        {
-            if (!FileSystemUtils.removeDirectory(output))
-            {
-                throw new BuildException("Unable to remove existing output directory '" + output.getPath() + "'");
-            }
-        }
-
-        if (!output.mkdirs())
-        {
-            throw new BuildException("Unable to create output directory '" + output.getPath() + "'");
-        }
-    }
 
     private static void fatal(Throwable throwable)
     {

@@ -1,6 +1,8 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.core.Bootstrapper;
 import com.cinnamonbob.core.BuildException;
+import com.cinnamonbob.core.RecipePaths;
 import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.model.Scm;
 import com.cinnamonbob.scm.SCMException;
@@ -27,7 +29,7 @@ public class ScmBootstrapper implements Bootstrapper
         checkouts.add(details);
     }
 
-    public void bootstrap(File workDir)
+    public void bootstrap(RecipePaths paths)
     {
         for (ScmCheckoutDetails details : checkouts)
         {
@@ -36,11 +38,11 @@ public class ScmBootstrapper implements Bootstrapper
 
             if (scm.getPath() != null)
             {
-                checkoutDir = new File(workDir, scm.getPath());
+                checkoutDir = new File(paths.getWorkDir(), scm.getPath());
             }
             else
             {
-                checkoutDir = workDir;
+                checkoutDir = paths.getWorkDir();
             }
 
             try

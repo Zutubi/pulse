@@ -1,5 +1,6 @@
 package com.cinnamonbob.slave;
 
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.util.FileSystemUtils;
 
 import java.io.File;
@@ -9,7 +10,7 @@ import java.io.File;
 public class CleanupResultsCommand implements Runnable
 {
     private long recipeId;
-    private RecipeProcessorPaths recipeProcessorPaths;
+    private ConfigurationManager configurationManager;
 
     public CleanupResultsCommand(long recipeId)
     {
@@ -18,13 +19,14 @@ public class CleanupResultsCommand implements Runnable
 
     public void run()
     {
-        FileSystemUtils.removeDirectory(recipeProcessorPaths.getOutputDir(recipeId));
-        File workZip = recipeProcessorPaths.getOutputZip(recipeId);
+        SlaveRecipePaths recipeProcessorPaths = new SlaveRecipePaths(recipeId, configurationManager);
+        FileSystemUtils.removeDirectory(recipeProcessorPaths.getOutputDir());
+        File workZip = recipeProcessorPaths.getOutputZip();
         workZip.delete();
     }
 
-    public void setRecipeProcessorPaths(RecipeProcessorPaths recipeProcessorPaths)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
-        this.recipeProcessorPaths = recipeProcessorPaths;
+        this.configurationManager = configurationManager;
     }
 }

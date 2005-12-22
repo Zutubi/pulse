@@ -1,9 +1,9 @@
 package com.cinnamonbob.local;
 
-import com.cinnamonbob.test.BobTestCase;
+import com.cinnamonbob.core.BobException;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.core.BobException;
+import com.cinnamonbob.test.BobTestCase;
 
 import java.io.*;
 import java.net.URL;
@@ -56,10 +56,10 @@ public class LocalBuildTest extends BobTestCase
         String bobFile = copyFile("basic");
 
         builder.runBuild(tmpDir, bobFile, "my-default", null, "out");
-        compareOutput("basic", "out");
+        compareOutput("basic");
     }
 
-    public void testInvalidWorkDir()
+    public void testInvalidWorkDir() throws BobException
     {
         File workDir = new File("/no/such/dir");
         try
@@ -81,15 +81,15 @@ public class LocalBuildTest extends BobTestCase
         File expectedDir = getExpectedOutput("invalidBobFile");
         File actualDir = new File(tmpDir, "out");
 
-        cleanBuildLog(new File(actualDir, "build.log"));
+        cleanBuildLog(new File(tmpDir, "build.log"));
 
         if (generateMode)
         {
-            tmpDir.renameTo(expectedDir);
+            tmpDir.renameTo(new File(expectedDir.getAbsolutePath().replace("classes", "src/test")));
         }
         else
         {
-            assertFilesEqual(new File(expectedDir, "build.log.cleaned"), new File(actualDir, "build.log.cleaned"));
+            assertFilesEqual(new File(expectedDir, "build.log.cleaned"), new File(tmpDir, "build.log.cleaned"));
             // Just verify exception file exists, content is too difficult...
             assertTrue((new File(actualDir, "exception")).isFile());
         }
@@ -101,7 +101,7 @@ public class LocalBuildTest extends BobTestCase
         String resourceFile = getInputURL("resources").getFile();
 
         builder.runBuild(tmpDir, bobFile, null, resourceFile, "out");
-        compareOutput("resourceload", "out");
+        compareOutput("resourceload");
     }
 
     private void cleanBuildLog(File log) throws IOException
@@ -138,20 +138,18 @@ public class LocalBuildTest extends BobTestCase
         log.delete();
     }
 
-    private void compareOutput(String expectedName, String actualName) throws IOException
+    private void compareOutput(String expectedName) throws IOException
     {
         File expectedDir = getExpectedOutput(expectedName);
-        File actualDir = new File(tmpDir, actualName);
-
-        cleanBuildLog(new File(actualDir, "build.log"));
+        cleanBuildLog(new File(tmpDir, "build.log"));
 
         if (generateMode)
         {
-            actualDir.renameTo(expectedDir);
+            tmpDir.renameTo(new File(expectedDir.getAbsolutePath().replace("classes", "src/test")));
         }
         else
         {
-            assertDirectoriesEqual(expectedDir, actualDir);
+            assertDirectoriesEqual(expectedDir, tmpDir);
         }
     }
 }

@@ -31,9 +31,11 @@ public class RecipeProcessor
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    public void build(File workDir, String bobFileName, String recipeName, RecipeResult recipeResult, File outputDir) throws BuildException
+    public void build(RecipePaths paths, Bootstrapper bootstrapper, String bobFileName, String recipeName, RecipeResult recipeResult) throws BuildException
     {
-        BobFile bobFile = loadBobFile(workDir, bobFileName);
+        bootstrapper.bootstrap(paths);
+
+        BobFile bobFile = loadBobFile(paths.getWorkDir(), bobFileName);
         Recipe recipe;
 
         if (recipeName == null)
@@ -46,10 +48,10 @@ public class RecipeProcessor
         {
             throw new BuildException("Undefined recipe '" + recipeName + "'");
         }
-        build(recipe, recipeResult, outputDir);
+        build(recipe, recipeResult, paths.getOutputDir());
     }
 
-    private void build(Recipe recipe, RecipeResult recipeResult, File outputDir) throws BuildException
+    public void build(Recipe recipe, RecipeResult recipeResult, File outputDir) throws BuildException
     {
 
         // TODO: support continuing build when errors occur. Take care: exceptions.

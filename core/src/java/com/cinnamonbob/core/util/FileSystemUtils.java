@@ -72,6 +72,23 @@ public class FileSystemUtils
         return dir.delete();
     }
 
+    public static void cleanOutputDir(File output) throws IOException
+    {
+        if (output.isDirectory())
+        {
+            if (!FileSystemUtils.removeDirectory(output))
+            {
+                throw new IOException("Unable to remove existing output directory '" + output.getPath() + "'");
+            }
+        }
+
+        if (!output.mkdirs())
+        {
+            throw new IOException("Unable to create output directory '" + output.getPath() + "'");
+        }
+    }
+
+
     public static File createTempDirectory(String prefix, String suffix) throws IOException
     {
         File file = File.createTempFile(prefix, suffix);
@@ -88,6 +105,22 @@ public class FileSystemUtils
             throw new IOException();
         }
         return file;
+    }
+
+    public static void createDirectory(File file) throws IOException
+    {
+        if (file.exists())
+        {
+            if (!file.isDirectory())
+            {
+                throw new IOException("Can not create directory. File '" + file + "' already exists.");
+            }
+            return;
+        }
+        if (!file.mkdirs())
+        {
+            throw new IOException("Failed to create directory '" + file + "'");
+        }
     }
 
     public static boolean isParentOf(File parent, File child) throws IOException

@@ -36,26 +36,17 @@ public class BuildStatusPrinter implements EventListener
         {
             handleBuildCommenced(recipeEvent);
         }
-        else
+        else if (recipeEvent instanceof CommandCommencedEvent)
         {
-            if (recipeEvent instanceof CommandCommencedEvent)
-            {
-                handleCommandCommenced(recipeEvent);
-            }
-            else
-            {
-                if (recipeEvent instanceof CommandCompletedEvent)
-                {
-                    handleCommandCompleted(recipeEvent);
-                }
-                else
-                {
-                    if (recipeEvent instanceof RecipeCompletedEvent)
-                    {
-                        handleBuildCompleted(recipeEvent);
-                    }
-                }
-            }
+            handleCommandCommenced(recipeEvent);
+        }
+        else if (recipeEvent instanceof CommandCompletedEvent)
+        {
+            handleCommandCompleted(recipeEvent);
+        }
+        else if (recipeEvent instanceof RecipeCompletedEvent)
+        {
+            handleBuildCompleted(recipeEvent);
         }
     }
 

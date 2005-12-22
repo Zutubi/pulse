@@ -1,5 +1,7 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.core.Bootstrapper;
+
 /**
  * A request to execute a specific recipe.  Includes details about how to
  * bootstrap this step of the build (e.g. by SCM checkout, or by using a

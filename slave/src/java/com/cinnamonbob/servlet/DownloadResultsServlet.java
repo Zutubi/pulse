@@ -4,7 +4,7 @@ import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.slave.RecipeProcessorPaths;
+import com.cinnamonbob.slave.SlaveRecipePaths;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,9 +25,9 @@ public class DownloadResultsServlet extends HttpServlet
             long recipeId = Long.parseLong(request.getParameter("recipe"));
 
             // lookup the recipe location, zip it up and write to output.
-            RecipeProcessorPaths paths = new RecipeProcessorPaths((ConfigurationManager) ComponentContext.getBean("configurationManager"));
-            File outputDir = paths.getOutputDir(recipeId);
-            File zipFile = paths.getOutputZip(recipeId);
+            SlaveRecipePaths paths = new SlaveRecipePaths(recipeId, (ConfigurationManager) ComponentContext.getBean("configurationManager"));
+            File outputDir = paths.getOutputDir();
+            File zipFile = paths.getOutputZip();
             try
             {
                 FileSystemUtils.createZip(zipFile, outputDir, outputDir);

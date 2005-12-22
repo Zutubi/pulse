@@ -25,7 +25,6 @@ public class BobServer
     private ShutdownService shutdownService = null;
 
     private static BuildQueue buildQueue = null;
-    private MasterBuildProcessor masterBuildProcessor = null;
 
     public BobServer()
     {
@@ -43,18 +42,6 @@ public class BobServer
         // to be shutdown.
         shutdownService = new ShutdownService(adminPort, this);
         shutdownService.start();
-
-        masterBuildProcessor = (MasterBuildProcessor) ComponentContext.getBean("masterBuildProcessor");
-
-        // initialise the build queue.
-        buildQueue = (BuildQueue) ComponentContext.getBean("buildQueue");
-        buildQueue.setDispatcher(new BuildDispatcher()
-        {
-            public void dispatch(BuildRequest request)
-            {
-                masterBuildProcessor.execute(request);
-            }
-        });
 
         ProjectManager projectManager = (ProjectManager) ComponentContext.getBean("projectManager");
         projectManager.initialise();
