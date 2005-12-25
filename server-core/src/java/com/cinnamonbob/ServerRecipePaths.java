@@ -6,6 +6,13 @@ import com.cinnamonbob.core.RecipePaths;
 import java.io.File;
 
 /**
+ * The server recipe paths:
+ *
+ * system/recipes/xyz/work
+ *                   /output
+ *
+ * where xyz is the recipe identifier.
+ *
  */
 public class ServerRecipePaths implements RecipePaths
 {

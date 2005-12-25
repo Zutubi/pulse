@@ -152,8 +152,8 @@ public class FileSystemUtils
             // The additional check for slashes is for systems that may accept something other than
             // their canonical file separator (e.g. '/' is acceptable on Windows despite '\' being
             // the canonical separator).
-            sourcePath = sourcePath.replace('\\', '/');
-            sourcePath = sourcePath.replace(File.separatorChar, '/');
+            sourcePath = sourcePath.replace('\\', ZIP_SEPARATOR);
+            sourcePath = sourcePath.replace(File.separatorChar, ZIP_SEPARATOR);
             if (sourcePath.startsWith("/"))
             {
                 sourcePath = sourcePath.substring(1);
@@ -204,7 +204,6 @@ public class FileSystemUtils
             {
                 IOUtils.close(is);
             }
-
         }
     }
 
@@ -226,7 +225,7 @@ public class FileSystemUtils
         zin.close();
     }
 
-    public static void unzip(InputStream zin, File file) throws IOException
+    private static void unzip(InputStream zin, File file) throws IOException
     {
         FileOutputStream out = new FileOutputStream(file);
         byte [] b = new byte[512];
