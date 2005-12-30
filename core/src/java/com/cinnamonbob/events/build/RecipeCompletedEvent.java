@@ -7,8 +7,22 @@ import com.cinnamonbob.core.model.RecipeResult;
  */
 public class RecipeCompletedEvent extends RecipeEvent
 {
+    private RecipeResult result;
+
+    private RecipeCompletedEvent()
+    {
+        // For hessian
+        super(null, 0);
+    }
+
     public RecipeCompletedEvent(Object source, RecipeResult result)
     {
-        super(source, result);
+        super(source, result.getId());
+        this.result = result;
+    }
+
+    public RecipeResult getResult()
+    {
+        return result;
     }
 }

@@ -80,7 +80,7 @@
 
     <bean id="buildProcessor" class="com.cinnamonbob.core.RecipeProcessor" autowire="byName"/>
 
-    <bean id="masterBuildProcessor" class="com.cinnamonbob.MasterBuildProcessor" autowire="byName"/>
+    <!--<bean id="masterBuildProcessor" class="com.cinnamonbob.MasterBuildProcessor" autowire="byName"/>-->
 
     <bean id="buildQueue" class="com.cinnamonbob.BuildQueue" autowire="byName"/>
 

@@ -3,10 +3,7 @@ package com.cinnamonbob.local;
 import com.cinnamonbob.core.*;
 import com.cinnamonbob.core.event.DefaultEventManager;
 import com.cinnamonbob.core.event.EventManager;
-import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.events.build.RecipeCommencedEvent;
-import com.cinnamonbob.events.build.RecipeCompletedEvent;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -144,31 +141,11 @@ public class LocalBuild
             EventManager manager = new DefaultEventManager();
             manager.register(new BuildStatusPrinter(paths.getWorkDir(), logStream));
 
-            RecipeResult result = new RecipeResult(recipe);
-            result.commence(paths.getOutputDir());
-            manager.publish(new RecipeCommencedEvent(this, result));
-
-            try
-            {
-                Bootstrapper bootstrapper = new LocalBootstrapper();
-                RecipeProcessor processor = new RecipeProcessor();
-                processor.setEventManager(manager);
-                processor.setResourceRepository(repository);
-                processor.build(paths, bootstrapper, bobFile, recipe, result);
-            }
-            catch (BuildException e)
-            {
-                result.error(e);
-            }
-            catch (Exception e)
-            {
-                result.error(new BuildException(e));
-            }
-            finally
-            {
-                result.complete();
-                manager.publish(new RecipeCompletedEvent(this, result));
-            }
+            Bootstrapper bootstrapper = new LocalBootstrapper();
+            RecipeProcessor processor = new RecipeProcessor();
+            processor.setEventManager(manager);
+            processor.setResourceRepository(repository);
+            processor.build(0, paths, bootstrapper, bobFile, recipe);
         }
         catch (FileNotFoundException e)
         {

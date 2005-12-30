@@ -9,29 +9,35 @@ import java.util.Date;
 public class TimeStamps
 {
     private long startTime;
-    private long endTime;    
-    
+    private long endTime;
+
     public TimeStamps()
     {
         startTime = System.currentTimeMillis();
         endTime = -1;
     }
-    
-    
+
+
+    public TimeStamps(long startTime)
+    {
+        this.startTime = startTime;
+    }
+
+
     public TimeStamps(long startTime, long endTime)
     {
         this.startTime = startTime;
         this.endTime = endTime;
     }
 
-    
+
     public TimeStamps(TimeStamps other)
     {
         this.startTime = other.startTime;
         this.endTime = other.endTime;
     }
 
-    
+
     public void end()
     {
         endTime = System.currentTimeMillis();
@@ -44,7 +50,7 @@ public class TimeStamps
     {
         return endTime;
     }
-    
+
 
     /**
      * @return Returns the startTime.
@@ -53,20 +59,20 @@ public class TimeStamps
     {
         return startTime;
     }
-    
+
     public void setStartTime(long t)
     {
         startTime = t;
     }
-    
+
     public void setEndTime(long t)
     {
         endTime = t;
     }
-    
+
     public long getElapsed()
     {
-        if(endTime > 0)
+        if (endTime > 0)
         {
             return endTime - startTime;
         }
@@ -75,8 +81,8 @@ public class TimeStamps
             return System.currentTimeMillis() - startTime;
         }
     }
-    
-    
+
+
     public String getPrettyEndTime()
     {
         return getPrettyTime(endTime);
@@ -88,16 +94,16 @@ public class TimeStamps
         return getPrettyTime(startTime);
     }
 
-    
+
     public String getPrettyElapsed()
     {
         StringBuffer result = new StringBuffer();
         long elapsed = getElapsed();
-        
+
         elapsed = addElapsedPart(elapsed, Constants.HOUR, "hour", result);
         elapsed = addElapsedPart(elapsed, Constants.MINUTE, "minute", result);
-        
-        if(elapsed < Constants.SECOND && result.length() == 0)
+
+        if (elapsed < Constants.SECOND && result.length() == 0)
         {
             result.append("< 1 second");
         }
@@ -105,51 +111,51 @@ public class TimeStamps
         {
             elapsed = addElapsedPart(elapsed, Constants.SECOND, "second", result);
         }
-        
+
         return result.toString();
     }
 
-    
+
     public boolean equals(Object other)
     {
-        if(!(other instanceof TimeStamps))
+        if (!(other instanceof TimeStamps))
         {
             return false;
         }
-        
-        TimeStamps otherStamps = (TimeStamps)other;
+
+        TimeStamps otherStamps = (TimeStamps) other;
         return startTime == otherStamps.startTime && endTime == otherStamps.endTime;
     }
-    
-    
+
+
     private long addElapsedPart(long elapsed, long millisPerPart, String partName, StringBuffer result)
     {
-        if(elapsed >= millisPerPart)
+        if (elapsed >= millisPerPart)
         {
             long part = elapsed / millisPerPart;
-            
-            if(result.length() > 0)
+
+            if (result.length() > 0)
             {
                 result.append(", ");
             }
-            
+
             result.append(Long.toString(part));
             result.append(' ');
             result.append(partName);
-            
-            if(part > 1)
+
+            if (part > 1)
             {
                 result.append('s');
             }
-            
+
             elapsed %= millisPerPart;
         }
-        
+
         return elapsed;
     }
-    
-    
-    private String getPrettyTime(long time)
+
+
+    public static String getPrettyTime(long time)
     {
         return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date(time));
     }

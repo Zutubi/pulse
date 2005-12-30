@@ -5,17 +5,12 @@ import com.cinnamonbob.RecipeRequest;
 import com.cinnamonbob.ServerBootstrapper;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.Bootstrapper;
-import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.RecipeProcessor;
 import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.core.event.EventManager;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.events.build.RecipeCommencedEvent;
-import com.cinnamonbob.events.build.RecipeCompletedEvent;
 import com.cinnamonbob.services.MasterService;
 import com.cinnamonbob.util.logging.Logger;
 
-import java.io.File;
 import java.net.MalformedURLException;
 
 /**
@@ -56,30 +51,15 @@ public class SlaveRecipeProcessor
     public void processRecipe(String master, RecipeRequest request)
     {
         SlaveRecipePaths processorPaths = new SlaveRecipePaths(request.getId(), configurationManager);
-        File workDir = processorPaths.getWorkDir();
-        File outputDir = processorPaths.getOutputDir();
-
         Bootstrapper bootstrapper = new ChainBootstrapper(new ServerBootstrapper(), request.getBootstrapper());
-
         EventListener listener = registerMasterListener(master, request.getId());
-
-        RecipeResult result = new RecipeResult(request.getRecipeName());
-        result.setId(request.getId());
-        result.commence(outputDir);
-        eventManager.publish(new RecipeCommencedEvent(this, result));
 
         try
         {
-            recipeProcessor.build(processorPaths, bootstrapper, request.getBobFile(), request.getRecipeName(), result);
-        }
-        catch (BuildException e)
-        {
-            result.error(e);
+            recipeProcessor.build(request.getId(), processorPaths, bootstrapper, request.getBobFile(), request.getRecipeName());
         }
         finally
         {
-            result.complete();
-            eventManager.publish(new RecipeCompletedEvent(this, result));
             eventManager.unregister(listener);
         }
     }

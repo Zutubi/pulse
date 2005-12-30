@@ -1,14 +1,27 @@
 package com.cinnamonbob.events.build;
 
-import com.cinnamonbob.core.model.RecipeResult;
-
 /**
  * This event is raised by the recipe processor when commencing a recipe.
  */
 public class RecipeCommencedEvent extends RecipeEvent
 {
-    public RecipeCommencedEvent(Object source, RecipeResult result)
+    private String name;
+    private long startTime;
+
+    public RecipeCommencedEvent(Object source, long recipeId, String name, long startTime)
     {
-        super(source, result);
+        super(source, recipeId);
+        this.name = name;
+        this.startTime = startTime;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public long getStartTime()
+    {
+        return startTime;
     }
 }

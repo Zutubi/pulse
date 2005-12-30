@@ -53,6 +53,12 @@ public abstract class Result extends Entity
         stamps = new TimeStamps();
     }
 
+    public void commence(long startTime)
+    {
+        this.stamps = new TimeStamps(startTime);
+        state = ResultState.IN_PROGRESS;
+    }
+
     public void complete()
     {
         if (state == ResultState.IN_PROGRESS)

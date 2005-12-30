@@ -23,9 +23,36 @@ public class RecipeResult extends Result
         results = new LinkedList<CommandResult>();
     }
 
+    public void commence(String recipeName, long startTime)
+    {
+        this.recipeName = recipeName;
+        super.commence(startTime);
+    }
+
     public void add(CommandResult result)
     {
         results.add(result);
+    }
+
+    public void update(CommandResult result)
+    {
+        results.remove(results.size() - 1);
+        results.add(result);
+
+        switch (result.state)
+        {
+            case ERROR:
+            case FAILURE:
+                state = ResultState.ERROR;
+                break;
+        }
+    }
+
+    public void update(RecipeResult result)
+    {
+        this.state = result.state;
+        this.stamps = result.stamps;
+        this.errorMessage = result.errorMessage;
     }
 
     public List<CommandResult> getCommandResults()
@@ -46,20 +73,5 @@ public class RecipeResult extends Result
     private void setRecipeName(String recipeName)
     {
         this.recipeName = recipeName;
-    }
-
-    public void commandError()
-    {
-        state = ResultState.ERROR;
-    }
-
-    public void update(RecipeResult result)
-    {
-        // TODO this is pretty lame
-        this.recipeName = result.recipeName;
-        this.state = result.state;
-        this.stamps = result.stamps;
-        this.errorMessage = result.errorMessage;
-        this.results = result.results;
     }
 }

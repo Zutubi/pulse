@@ -1,22 +1,21 @@
 package com.cinnamonbob.events.build;
 
 import com.cinnamonbob.core.event.Event;
-import com.cinnamonbob.core.model.RecipeResult;
 
 /**
  */
 public class RecipeEvent extends Event
 {
-    private RecipeResult result;
+    private long recipeId;
 
-    public RecipeEvent(Object source, RecipeResult result)
+    public RecipeEvent(Object source, long recipeId)
     {
         super(source);
-        this.result = result;
+        this.recipeId = recipeId;
     }
 
-    public RecipeResult getResult()
+    public long getRecipeId()
     {
-        return result;
+        return recipeId;
     }
 }

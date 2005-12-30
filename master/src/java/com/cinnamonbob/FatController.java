@@ -5,6 +5,7 @@ import com.cinnamonbob.core.event.AsynchronousDelegatingListener;
 import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.events.build.*;
@@ -160,37 +161,69 @@ public class FatController implements EventListener
     {
         // TODO blatantly assumes one recipe only from runningSpec
         // TODO oh, the humanity (and I don't mean the ground crew)
-        RecipeResult result = event.getResult();
-
-        if (result.getId() != runningBuild.getResults().get(0).getResult().getId())
+        RecipeResult recipeResult = runningBuild.getResults().get(0).getResult();
+        if (event.getRecipeId() != recipeResult.getId())
         {
             LOG.severe("i didn't expect that!");
         }
 
-        runningBuild.getResults().get(0).getResult().update(result);
-
-        // complete?
-        if (event instanceof RecipeCompletedEvent)
+        if (event instanceof RecipeCommencedEvent)
         {
-            // retrieve recipe output.
-            long recipeId = event.getResult().getId();
-            MasterBuildPaths paths = new MasterBuildPaths();
-            File outputDir = paths.getOutputDir(runningBuild.getProject(), runningBuild, recipeId);
-
-            if (!outputDir.mkdirs())
-            {
-                // TODO throw something, but where to handle it (need to locate which result to apply to...)
-            }
-
-            runningService.collectResults(recipeId, outputDir);
-            runningService.cleanupResults(recipeId);
-
-            // TODO if the whole build is done...
-            runningBuild.complete();
-            eventManager.publish(new BuildCompletedEvent(this, runningBuild));
+            handleRecipeCommenced((RecipeCommencedEvent) event, recipeResult);
+        }
+        else if (event instanceof CommandCommencedEvent)
+        {
+            handleCommandCommenced((CommandCommencedEvent) event, recipeResult);
+        }
+        else if (event instanceof CommandCompletedEvent)
+        {
+            handleCommandCompleted((CommandCompletedEvent) event, recipeResult);
+        }
+        else if (event instanceof RecipeCompletedEvent)
+        {
+            handleRecipeCompleted((RecipeCompletedEvent) event, recipeResult);
         }
 
         buildManager.save(runningBuild);
+    }
+
+    private void handleRecipeCommenced(RecipeCommencedEvent event, RecipeResult recipeResult)
+    {
+        recipeResult.commence(event.getName(), event.getStartTime());
+    }
+
+    private void handleCommandCommenced(CommandCommencedEvent event, RecipeResult recipeResult)
+    {
+        CommandResult result = new CommandResult(event.getName());
+        result.commence(event.getStartTime());
+        recipeResult.add(result);
+    }
+
+    private void handleCommandCompleted(CommandCompletedEvent event, RecipeResult recipeResult)
+    {
+        recipeResult.update(event.getResult());
+    }
+
+    private void handleRecipeCompleted(RecipeCompletedEvent event, RecipeResult recipeResult)
+    {
+        recipeResult.update(event.getResult());
+
+        // retrieve recipe output.
+        long recipeId = event.getResult().getId();
+        MasterBuildPaths paths = new MasterBuildPaths();
+        File outputDir = paths.getOutputDir(runningBuild.getProject(), runningBuild, recipeId);
+
+        if (!outputDir.mkdirs())
+        {
+            // TODO throw something, but where to handle it (need to locate which result to apply to...)
+        }
+
+        runningService.collectResults(recipeId, outputDir);
+        runningService.cleanupResults(recipeId);
+
+        // TODO if the whole build is done...
+        runningBuild.complete();
+        eventManager.publish(new BuildCompletedEvent(this, runningBuild));
     }
 
     public Class[] getHandledEvents()

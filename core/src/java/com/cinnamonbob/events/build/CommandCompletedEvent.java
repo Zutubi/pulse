@@ -1,13 +1,21 @@
 package com.cinnamonbob.events.build;
 
-import com.cinnamonbob.core.model.RecipeResult;
+import com.cinnamonbob.core.model.CommandResult;
 
 /**
  */
 public class CommandCompletedEvent extends RecipeEvent
 {
-    public CommandCompletedEvent(Object source, RecipeResult result)
+    private CommandResult result;
+
+    public CommandCompletedEvent(Object source, long recipeId, CommandResult result)
     {
-        super(source, result);
+        super(source, recipeId);
+        this.result = result;
+    }
+
+    public CommandResult getResult()
+    {
+        return result;
     }
 }

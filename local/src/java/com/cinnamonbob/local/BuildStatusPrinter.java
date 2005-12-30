@@ -4,6 +4,7 @@ import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.core.util.ForkOutputStream;
+import com.cinnamonbob.core.util.TimeStamps;
 import com.cinnamonbob.events.build.*;
 
 import java.io.File;
@@ -34,26 +35,25 @@ public class BuildStatusPrinter implements EventListener
 
         if (recipeEvent instanceof RecipeCommencedEvent)
         {
-            handleBuildCommenced(recipeEvent);
+            handleRecipeCommenced((RecipeCommencedEvent) recipeEvent);
         }
         else if (recipeEvent instanceof CommandCommencedEvent)
         {
-            handleCommandCommenced(recipeEvent);
+            handleCommandCommenced((CommandCommencedEvent) recipeEvent);
         }
         else if (recipeEvent instanceof CommandCompletedEvent)
         {
-            handleCommandCompleted(recipeEvent);
+            handleCommandCompleted((CommandCompletedEvent) recipeEvent);
         }
         else if (recipeEvent instanceof RecipeCompletedEvent)
         {
-            handleBuildCompleted(recipeEvent);
+            handleRecipeCompleted((RecipeCompletedEvent) recipeEvent);
         }
     }
 
-    private void handleBuildCommenced(RecipeEvent recipeEvent)
+    private void handleRecipeCommenced(RecipeCommencedEvent event)
     {
-        RecipeResult result = recipeEvent.getResult();
-        String recipeName = result.getRecipeName();
+        String recipeName = event.getName();
 
         if (recipeName == null)
         {
@@ -62,21 +62,19 @@ public class BuildStatusPrinter implements EventListener
 
         indenter.println("[" + recipeName + "]");
         indenter.indent();
-        indenter.println("commenced: " + result.getStamps().getPrettyStartTime());
+        indenter.println("commenced: " + TimeStamps.getPrettyTime(event.getStartTime()));
     }
 
-    private void handleCommandCommenced(RecipeEvent recipeEvent)
+    private void handleCommandCommenced(CommandCommencedEvent event)
     {
-        CommandResult result = getLastCommandResult(recipeEvent);
-
-        indenter.println("[" + result.getCommandName() + "]");
+        indenter.println("[" + event.getName() + "]");
         indenter.indent();
-        indenter.println("commenced: " + result.getStamps().getPrettyStartTime());
+        indenter.println("commenced: " + TimeStamps.getPrettyTime(event.getStartTime()));
     }
 
-    private void handleCommandCompleted(RecipeEvent recipeEvent)
+    private void handleCommandCompleted(CommandCompletedEvent event)
     {
-        CommandResult result = getLastCommandResult(recipeEvent);
+        CommandResult result = event.getResult();
 
         indenter.println("completed: " + result.getStamps().getPrettyEndTime());
         indenter.println("elapsed  : " + result.getStamps().getPrettyElapsed());
@@ -162,9 +160,9 @@ public class BuildStatusPrinter implements EventListener
         indenter.dedent();
     }
 
-    private void handleBuildCompleted(RecipeEvent recipeEvent)
+    private void handleRecipeCompleted(RecipeCompletedEvent event)
     {
-        RecipeResult result = recipeEvent.getResult();
+        RecipeResult result = event.getResult();
 
         indenter.println("completed: " + result.getStamps().getPrettyEndTime());
         indenter.println("elapsed  : " + result.getStamps().getPrettyElapsed());
@@ -177,13 +175,6 @@ public class BuildStatusPrinter implements EventListener
 
         indenter.dedent();
     }
-
-    private CommandResult getLastCommandResult(RecipeEvent recipeEvent)
-    {
-        List<CommandResult> results = recipeEvent.getResult().getCommandResults();
-        return results.get(results.size() - 1);
-    }
-
 
     public Class[] getHandledEvents()
     {

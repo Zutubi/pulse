@@ -24,7 +24,7 @@ public class ForwardingEventListener implements EventListener
     public void handleEvent(Event event)
     {
         RecipeEvent recipeEvent = (RecipeEvent) event;
-        if (recipeEvent.getResult().getId() == id)
+        if (recipeEvent.getRecipeId() == id)
         {
             try
             {

@@ -5,6 +5,8 @@ import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.events.build.CommandCommencedEvent;
 import com.cinnamonbob.events.build.CommandCompletedEvent;
+import com.cinnamonbob.events.build.RecipeCommencedEvent;
+import com.cinnamonbob.events.build.RecipeCompletedEvent;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,57 +33,77 @@ public class RecipeProcessor
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    public void build(RecipePaths paths, Bootstrapper bootstrapper, String bobFileName, String recipeName, RecipeResult recipeResult) throws BuildException
+    public void build(long recipeId, RecipePaths paths, Bootstrapper bootstrapper, String bobFileName, String recipeName)
     {
-        bootstrapper.bootstrap(paths);
+        // This result holds only the recipe details (stamps, state etc), not
+        // the command results.  A full recipe result with command results is
+        // assembled elsewhere.
+        RecipeResult result = new RecipeResult(recipeName);
+        result.setId(recipeId);
+        result.commence(paths.getOutputDir());
 
-        BobFile bobFile = loadBobFile(paths.getWorkDir(), bobFileName);
-        Recipe recipe;
+        eventManager.publish(new RecipeCommencedEvent(this, recipeId, recipeName, result.getStamps().getStartTime()));
 
-        if (recipeName == null)
+        try
         {
-            recipeName = bobFile.getDefaultRecipe();
-        }
+            bootstrapper.bootstrap(paths);
 
-        recipe = bobFile.getRecipe(recipeName);
-        if (recipe == null)
-        {
-            throw new BuildException("Undefined recipe '" + recipeName + "'");
+            BobFile bobFile = loadBobFile(paths.getWorkDir(), bobFileName);
+            Recipe recipe;
+
+            if (recipeName == null)
+            {
+                recipeName = bobFile.getDefaultRecipe();
+            }
+
+            recipe = bobFile.getRecipe(recipeName);
+            if (recipe == null)
+            {
+                throw new BuildException("Undefined recipe '" + recipeName + "'");
+            }
+
+            build(recipeId, recipe, paths.getOutputDir());
         }
-        build(recipe, recipeResult, paths.getOutputDir());
+        catch (BuildException e)
+        {
+            result.error(e);
+        }
+        catch (Exception e)
+        {
+            result.error(new BuildException("Unexpected error: " + e.getMessage(), e));
+        }
+        finally
+        {
+            result.complete();
+            eventManager.publish(new RecipeCompletedEvent(this, result));
+        }
     }
 
-    public void build(Recipe recipe, RecipeResult recipeResult, File outputDir) throws BuildException
+    public void build(long recipeId, Recipe recipe, File outputDir) throws BuildException
     {
-
         // TODO: support continuing build when errors occur. Take care: exceptions.
         int i = 0;
         for (Command command : recipe.getCommands())
         {
             CommandResult result = new CommandResult(command.getName());
 
-            recipeResult.add(result);
-
             File commandOutput = new File(outputDir, getCommandDirName(i, result));
-            executeCommand(result, commandOutput, recipeResult, command);
+            executeCommand(recipeId, result, commandOutput, command);
 
             switch (result.getState())
             {
                 case FAILURE:
-                    recipeResult.failure();
-                    return;
                 case ERROR:
-                    recipeResult.commandError();
                     return;
             }
             i++;
         }
     }
 
-    private void executeCommand(CommandResult result, File commandOutput, RecipeResult recipeResult, Command command)
+    private void executeCommand(long recipeId, CommandResult result, File commandOutput, Command command)
     {
         result.commence(commandOutput);
-        eventManager.publish(new CommandCommencedEvent(this, recipeResult));
+        eventManager.publish(new CommandCommencedEvent(this, recipeId, result.getCommandName(), result.getStamps().getStartTime()));
 
         try
         {
@@ -103,7 +125,7 @@ public class RecipeProcessor
         finally
         {
             result.complete();
-            eventManager.publish(new CommandCompletedEvent(this, recipeResult));
+            eventManager.publish(new CommandCompletedEvent(this, recipeId, result));
         }
     }
 
