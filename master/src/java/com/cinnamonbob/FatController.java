@@ -122,7 +122,10 @@ public class FatController implements EventListener
         // TODO: not this simple: need to know where to add it
         buildResult.add(resultNode);
         // Make sure the recipe result gets an id
-        buildManager.save(buildResult);
+        synchronized (buildResult)
+        {
+            buildManager.save(buildResult);
+        }
 
         MasterBuildPaths paths = new MasterBuildPaths();
         File recipeDir = paths.getRecipeDir(project, buildResult, result.getId());
@@ -184,7 +187,10 @@ public class FatController implements EventListener
             handleRecipeCompleted((RecipeCompletedEvent) event, recipeResult);
         }
 
-        buildManager.save(runningBuild);
+        synchronized (runningBuild)
+        {
+            buildManager.save(runningBuild);
+        }
     }
 
     private void handleRecipeCommenced(RecipeCommencedEvent event, RecipeResult recipeResult)

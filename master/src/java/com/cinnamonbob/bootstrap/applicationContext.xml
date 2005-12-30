@@ -78,9 +78,9 @@
     <bean id="resourceRepository" class="com.cinnamonbob.core.ResourceRepository" autowire="byName"
           init-method="initialise"/>
 
-    <bean id="buildProcessor" class="com.cinnamonbob.core.RecipeProcessor" autowire="byName"/>
+    <bean id="recipeProcessor" class="com.cinnamonbob.core.RecipeProcessor" autowire="byName"/>
 
-    <!--<bean id="masterBuildProcessor" class="com.cinnamonbob.MasterBuildProcessor" autowire="byName"/>-->
+    <bean id="masterRecipeProcessor" class="com.cinnamonbob.MasterRecipeProcessor" autowire="byName"/>
 
     <bean id="buildQueue" class="com.cinnamonbob.BuildQueue" autowire="byName"/>
 

@@ -1,5 +1,9 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.core.BuildException;
+
 import java.io.File;
 
 /**
@@ -7,25 +11,44 @@ import java.io.File;
  */
 public class MasterBuildService implements BuildService
 {
-    private long currentRecipe;
+    private MasterRecipeProcessor masterRecipeProcessor;
+    private ConfigurationManager configurationManager;
 
     public void build(RecipeRequest request)
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // TODO the dodgy wiring goes on unabated!
+        ComponentContext.autowire(this);
+        masterRecipeProcessor.processRecipe(request);
     }
 
     public void collectResults(long recipeId, File dir)
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        if (!dir.delete())
+        {
+            throw new BuildException("Unable to remove directory '" + dir.getAbsolutePath() + "'");
+        }
+
+        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager);
+        File outputDir = recipePaths.getOutputDir();
+
+        if (!outputDir.renameTo(dir))
+        {
+            throw new BuildException("Unable to rename output directory '" + outputDir.getAbsolutePath() + "' to '" + dir.getAbsolutePath() + "'");
+        }
     }
 
     public void cleanupResults(long recipeId)
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // We rename the output dir, so no need to remove it.
     }
 
-    public boolean isAvailable()
+    public void setMasterRecipeProcessor(MasterRecipeProcessor masterRecipeProcessor)
     {
-        return currentRecipe == -1;
+        this.masterRecipeProcessor = masterRecipeProcessor;
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

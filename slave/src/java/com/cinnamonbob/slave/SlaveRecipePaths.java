@@ -9,11 +9,6 @@ import java.io.File;
  */
 public class SlaveRecipePaths extends ServerRecipePaths
 {
-    public SlaveRecipePaths(long id)
-    {
-        super(id);
-    }
-
     public SlaveRecipePaths(long id, ConfigurationManager configurationManager)
     {
         super(id, configurationManager);

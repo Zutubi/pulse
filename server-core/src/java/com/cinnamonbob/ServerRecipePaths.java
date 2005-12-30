@@ -7,31 +7,20 @@ import java.io.File;
 
 /**
  * The server recipe paths:
- *
+ * <p/>
  * system/recipes/xyz/work
- *                   /output
- *
+ * /output
+ * <p/>
  * where xyz is the recipe identifier.
- *
  */
 public class ServerRecipePaths implements RecipePaths
 {
     private long id;
     private ConfigurationManager configurationManager;
 
-    public ServerRecipePaths(long id)
-    {
-        this.id = id;
-    }
-
     public ServerRecipePaths(long id, ConfigurationManager configurationManager)
     {
         this.id = id;
-        this.configurationManager = configurationManager;
-    }
-
-    public void setConfigurationManager(ConfigurationManager configurationManager)
-    {
         this.configurationManager = configurationManager;
     }
 

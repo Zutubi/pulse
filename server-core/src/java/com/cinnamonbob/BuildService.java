@@ -12,8 +12,6 @@ public interface BuildService
 
     void cleanupResults(long recipeId);
 
-    boolean isAvailable();
-
     // get available resources..... so that we can check to see if the
     // build host requirements are fullfilled.
 }

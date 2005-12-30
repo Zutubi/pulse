@@ -65,12 +65,6 @@ public class SlaveBuildService implements BuildService
         service.cleanupResults(recipeId);
     }
 
-    public boolean isAvailable()
-    {
-        // TODO, hmmm
-        return true;
-    }
-
     public Slave getSlave()
     {
         return slave;
