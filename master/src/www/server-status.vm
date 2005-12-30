@@ -8,15 +8,6 @@
       
   <body>
     <h1 class="build-log">:: server status ::</h1>
-    <h2 class="command-info">build queue</h2>
-    <div class="command-content">
-      <table>
-        <tr><th class="command-detail">project</th><th class="command-detail">requested</th></tr>
-#foreach($buildRequest in $buildQueue.iterator())
-        <tr><td class="build-info">$buildRequest.projectName</td><td class="build-info">$buildRequest.when</td></tr>
-#end
-      </table>
-    </div>
     <h2 class="command-info">slaves</h2>
     <div class="command-content">
       <table>

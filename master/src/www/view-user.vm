@@ -25,21 +25,22 @@
                 <tr>
                     <th class="command-detail">name</th>
                     <th class="command-detail">uid</th>
-                    <th class="command-detail">actions</th>
+                    <th class="command-detail" colspan="2">actions</th>
                 </tr>
             #foreach ($contact in $user.contactPoints)
                 <tr>
                     <td class="command-detail">$contact.name</td>
                     <td class="command-detail">#contactPointIcon($contact) $contact.uid</td>
                     <td class="command-detail">
-                        <a href="editContactPoint!default.action?id=$contact.id&user=$user.id">edit</a> |
-                        <a href="deleteContactPoint.action?id=$contact.id&user=$user.id">delete</a> |
-                        <a href="">test</a>
+                        <a href="editContactPoint!default.action?id=$contact.id&user=$user.id">edit</a>
+                    </td>
+                    <td class="command-detail">
+                        <a href="deleteContactPoint.action?id=$contact.id&user=$user.id">delete</a>
                     </td>
                 </tr>
             #end
                 <tr>
-                    <td class="command-detail" colspan="3"><b>+</b> <a href="createContactPoint!default.action?user=$user.id">add new contact point</a></td>
+                    <td class="command-detail" colspan="4"><b>+</b> <a href="createContactPoint!default.action?user=$user.id">add new contact point</a></td>
                 </tr>
             </table>
         </div>
@@ -50,7 +51,7 @@
                 <tr>
                     <th class="command-detail">project</th>
                     <th class="command-detail">contactpoint</th>
-                    <th class="command-detail">actions</th>
+                    <th class="command-detail" colspan="2">actions</th>
                 </tr>
             #foreach ($subscription in $user.subscriptions)
                 #set($contact = $subscription.contactPoint)
@@ -59,13 +60,15 @@
                     <td class="command-detail">$project.name</td>
                     <td class="command-detail">#contactPointIcon($contact) $contact.uid</td>
                     <td class="command-detail">
-                        <a href="editSubscription!default.action?id=$subscription.id&login=$user.login">edit</a> |
+                        <a href="editSubscription!default.action?id=$subscription.id&login=$user.login">edit</a>
+                    </td>
+                    <td class="command-detail">
                         <a href="deleteSubscription.action?id=$subscription.id&login=$user.login">delete</a>
                     </td>
                 </tr>
             #end
                 <tr>
-                    <td class="command-detail" colspan="3"><b>+</b> <a href="createSubscription!default.action?user=$user.login">add new subscription</a></td>
+                    <td class="command-detail" colspan="4"><b>+</b> <a href="createSubscription!default.action?user=$user.login">add new subscription</a></td>
                 </tr>
             </table>
         </div>

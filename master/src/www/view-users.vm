@@ -5,7 +5,7 @@
   </head>
   <body>
     <h1 class="build-log">:: all users ::</h1>
-    <h2 class="command-info">details</h2>
+    <h2 class="command-info">users</h2>
     <div class="command-content">
     <table>
       <tr>

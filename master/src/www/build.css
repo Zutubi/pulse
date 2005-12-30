@@ -1,12 +1,10 @@
-h1.build-log
-{
+h1.build-log {
     font-size: x-large;
     margin-top: 0.3em;
     color: #a0a0a0;
 }
 
-h2.command-info, h2.command-success, h2.command-failure
-{
+h2.command-info, h2.command-success, h2.command-failure {
     font-size: large;
     border-style: solid;
     border-width: 1px;
@@ -15,34 +13,29 @@ h2.command-info, h2.command-success, h2.command-failure
     padding: 0.2em;
 }
 
-h2.command-info
-{
+h2.command-info {
     border-color: #b0b0f0;
     background-color: #eeeeff;
 }
 
-h2.command-success
-{
+h2.command-success {
     border-color: #00c000;
     background-color: #ddffdd;
 }
 
-h2.command-failure
-{
+h2.command-failure {
     border-color: #c00000;
     background-color: #ffdddd;
 }
 
-h2.command-element
-{
+h2.command-element {
     border-width: 0px 0px 1px 1px;
     border-style: solid;
     border-color: #e0e0e0;
     padding-left: 0.2em
 }
 
-div.command-content
-{
+div.command-content {
     padding: 0.5em;
     background-color: #f4f4f4;
     border-style: solid;
@@ -52,8 +45,7 @@ div.command-content
     margin-bottom: 15px;
 }
 
-div.error, div.warning, div.info
-{
+div.error, div.warning, div.info {
     border-style: solid;
     border-width: 1px;
     padding-left: 0.3em;
@@ -61,26 +53,22 @@ div.error, div.warning, div.info
     margin-bottom: 3px;
 }
 
-div.error
-{
+div.error {
     border-color: #c00000;
     background-color: #ffe0e0;
 }
 
-div.warning
-{
+div.warning {
     border-color: #f0f000;
     background-color: #f0f0d0;
 }
 
-div.info
-{
+div.info {
     border-color: #b0b0f0;
     background-color: #eeeeff;
 }
 
-th.command-detail
-{
+th.command-detail {
     background-color: #ffffff;
     text-align: left;
     padding-left: 0.3em;
@@ -90,8 +78,7 @@ th.command-detail
     border-color: #ddddee;
 }
 
-td.command-detail, td.build-info, td.build-success, td.build-failure
-{
+td.command-detail, td.build-info, td.build-success, td.build-failure {
     font-size: small;
     background-color: #ffffff;
     border-style: solid;
@@ -101,48 +88,40 @@ td.command-detail, td.build-info, td.build-success, td.build-failure
     padding-right: 0.3em;
 }
 
-td.build-info
-{
+td.build-info {
     border-color: #b0b0f0;
     background-color: #eeeeff;
 }
 
-td.build-success
-{
+td.build-success {
     border-color: #00c000;
     background-color: #ddffdd;
 }
 
-td.build-failure
-{
+td.build-failure {
     border-color: #c00000;
     background-color: #ffdddd;
 }
 
-.filename
-{
+.filename {
     font-family: "Lucida Console" monospace;
 }
 
-div.artifact
-{
+div.artifact {
     margin-left: 20px;
 }
 
-ul.feature
-{
+ul.feature {
     margin: 0.2em 0.5em 0.2em 0;
 }
 
-td.action
-{
+td.action {
     font-weight: bold;
     white-space: nowrap;
 }
 
-h3.side-title
-{
-    font-size: medium; 
+h3.side-title {
+    font-size: medium;
     padding: 0.3em;
     margin-top: 0;
     margin-bottom: 0;
@@ -151,8 +130,7 @@ h3.side-title
     white-space: nowrap;
 }
 
-div.side-content
-{
+div.side-content {
     background-color: #f0f0ff;
     padding: 0.2em;
     border-style: solid;
@@ -161,14 +139,21 @@ div.side-content
     margin-bottom: 3px;
 }
 
-td.health-ok
-{
+td.health-ok {
     color: #00c000;
     font-weight: bold;
 }
 
-td.health-failed
-{
+td.health-failed {
     color: #c00000;
     font-weight: bold;
+}
+
+#project-left-column {
+    float: left;
+    width: 27%;
+}
+
+#project-content {
+    margin-left: 29%;
 }
