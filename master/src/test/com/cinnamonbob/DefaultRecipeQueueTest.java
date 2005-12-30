@@ -1,9 +1,10 @@
 package com.cinnamonbob;
 
-import junit.framework.*;
-import com.cinnamonbob.model.BuildHostRequirements;
-import com.cinnamonbob.model.MasterBuildHostRequirements;
 import com.cinnamonbob.core.event.DefaultEventManager;
+import com.cinnamonbob.model.BuildHostRequirements;
+import junit.framework.TestCase;
+
+import java.io.File;
 
 /**
  * <class-comment/>
@@ -85,13 +86,43 @@ public class DefaultRecipeQueueTest extends TestCase
 
     private BuildService createAvailableService()
     {
-        return new MasterBuildService();
+        return new MockBuildService();
     }
 
     private RecipeDispatchRequest createDispatchRequest()
     {
-        BuildHostRequirements requirements = new MasterBuildHostRequirements();
+        BuildHostRequirements requirements = new MockBuildHostRequirements();
         RecipeRequest request = new RecipeRequest(-1, null, null, null);
         return new RecipeDispatchRequest(requirements, request);
+    }
+
+    class MockBuildService implements BuildService
+    {
+
+        public void build(RecipeRequest request)
+        {
+        }
+
+        public void collectResults(long recipeId, File dir)
+        {
+        }
+
+        public void cleanupResults(long recipeId)
+        {
+        }
+    }
+
+    class MockBuildHostRequirements implements BuildHostRequirements
+    {
+
+        public boolean fulfilledBy(BuildService service)
+        {
+            return true;
+        }
+
+        public String getSummary()
+        {
+            return "mock";
+        }
     }
 }
