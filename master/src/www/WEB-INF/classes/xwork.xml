@@ -313,6 +313,11 @@
             <result name="success" type="redirect">/serverStatus.action</result>
         </action>
 
+        <action name="editSlave!default" class="com.cinnamonbob.web.EditSlaveAction" method="doDefault">
+            <result name="success" type="velocity">edit-slave.vm</result>
+            <result name="error" type="velocity">undefined.vm</result>
+        </action>
+
         <action name="createBuildSpecification!default"
                 class="com.cinnamonbob.web.project.CreateBuildSpecificationAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>

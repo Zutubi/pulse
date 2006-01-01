@@ -16,6 +16,7 @@
           <th class="command-detail">host</th>
           <th class="command-detail">last ping</th>
           <th class="command-detail">status</th>
+          <th class="command-detail" colspan="2">actions</th>
         </tr>
 #foreach($slave in $slaves)
         #if($slave.hasBeenPinged())
@@ -24,14 +25,16 @@
           #set($pingStatus = "&lt;never&gt;")
         #end
         <tr>
-          <td class="build-info">$slave.name</td>
-          <td class="build-info">$slave.host</td>
-          <td class="build-info">$pingStatus</td>
-          <td class="build-info">$slave.status.toString().toLowerCase()</td>
+          <td class="command-detail">$slave.name</td>
+          <td class="command-detail">$slave.host</td>
+          <td class="command-detail">$pingStatus</td>
+          <td class="command-detail">$slave.status.toString().toLowerCase()</td>
+          <td class="command-detail"><a href="editSlave!default.action?id=$slave.id">edit</a></td>
+          <td class="command-detail"><a href="deleteSlave.action?id=$slave.id">delete</a></td>
         </tr>
 #end
       <tr>
-        <td class="command-detail" colspan="4"><b>+</b> <a href="createSlave!default.action">add new slave</a></td>
+        <td class="command-detail" colspan="6"><b>+</b> <a href="createSlave!default.action">add new slave</a></td>
       </tr>
       </table>
     </div>
