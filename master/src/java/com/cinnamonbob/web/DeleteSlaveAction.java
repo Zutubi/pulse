@@ -35,12 +35,13 @@ public class DeleteSlaveAction extends ActionSupport
 
         if (slaveDao.findById(id) == null)
         {
-            addFieldError("id", "");
+            addFieldError("id", "A slave with the id '" + id + "' does not exist.");
         }
     }
 
     public String execute()
     {
+        slaveDao.delete(slaveDao.findById(id));
         return SUCCESS;
     }
 }

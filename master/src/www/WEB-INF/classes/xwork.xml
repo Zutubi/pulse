@@ -318,6 +318,18 @@
             <result name="error" type="velocity">undefined.vm</result>
         </action>
 
+        <action name="editSlave" class="com.cinnamonbob.web.EditSlaveAction">
+            <result name="error" type="velocity">edit-slave.vm</result>
+            <result name="input" type="velocity">edit-slave.vm</result>
+            <result name="cancel" type="redirect">/serverStatus.action</result>
+            <result name="success" type="redirect">/serverStatus.action</result>
+        </action>
+
+        <action name="deleteSlave" class="com.cinnamonbob.web.DeleteSlaveAction">
+            <result name="error" type="redirect">/serverStatus.action</result>
+            <result name="success" type="redirect">/serverStatus.action</result>
+        </action>
+
         <action name="createBuildSpecification!default"
                 class="com.cinnamonbob.web.project.CreateBuildSpecificationAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
