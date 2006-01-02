@@ -5,7 +5,7 @@
 <html>
     <head>
         <link href="build.css" rel="stylesheet" type="text/css">
-        <title>[CiB] $project.name</title>
+        <title>$project.name</title>
         <content tag="action">project.view</content>
     </head>
     <body>

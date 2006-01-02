@@ -8,14 +8,14 @@
 #parse("/template/includes/actionerrors.vm")
 
 #bodytag (Form "action='editSubscription.action'" "method='post'")
-    <h3>create subscription</h3>
+    <h3>edit subscription</h3>
     #tag (Hidden "name='id'")
     #tag (Hidden "name='login'")
     <fieldset>
-        #tag (TextField "name='user'" "disabled='true'" "label='User'" "tabindex='1'")
-        #tag (TextField "name='project'" "disabled='true'" "label='Project'" "tabindex='2'")
-        #tag (TextField "name='contactPoint'" "disabled='true'" "label='Contact Point'" "tabindex='3'")
-        #tag (Select "list=conditions" "name='condition'" "label='Notification Condition'" "tabindex='4'")
+        #tag (TextField "name='user'" "disabled='true'" "label='user'" "tabindex='1'")
+        #tag (TextField "name='project'" "disabled='true'" "label='project'" "tabindex='2'")
+        #tag (TextField "name='contactPoint'" "disabled='true'" "label='contact point'" "tabindex='3'")
+        #tag (Select "list=conditions" "name='condition'" "label='notification condition'" "tabindex='4'")
     </fieldset>
 
     <fieldset class="submit">

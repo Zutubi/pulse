@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>[CiB] find users</title>
+    <title>find-users</title>
     <link href="build.css" rel="stylesheet" type="text/css">
     <content tag="action">user.search</content>
 </head>

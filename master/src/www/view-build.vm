@@ -21,7 +21,7 @@
 
 <html>
   <head>
-    <title>[CiB] $project.name build $result.number</title>
+    <title>$project.name build $result.number</title>
     <link href="build.css" rel="stylesheet" type="text/css">
   </head>
   <body>

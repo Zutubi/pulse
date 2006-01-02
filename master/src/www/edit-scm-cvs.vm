@@ -1,5 +1,7 @@
 <html>
-<head></head>
+<head>
+    <title>edit-scm</title>
+</head>
 <content tag="action">scm.cvs.edit</content>
 <body>
     #parse("/template/includes/actionerrors.vm")
@@ -9,7 +11,7 @@
     #tag (Hidden "name='id'")
     #tag (Hidden "name='project'")
 
-    <h3>Edit scm</h3>
+    <h3>edit scm</h3>
 
     <fieldset>
         #tag (TextField "required='true'" "name='cvs.name'" "label='scm.name'" "tabindex='1'")

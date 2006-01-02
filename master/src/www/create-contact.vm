@@ -8,7 +8,7 @@
     
     #bodytag (Form "action='createContactPoint.action'" "method='post'")
         #tag (Hidden "name='user'")
-        <h3>Create contact</h3>
+        <h3>create contact</h3>
         <fieldset>
             #tag (Select "list=types" "name='type'" "tabindex='1'")
         </fieldset>

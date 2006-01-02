@@ -9,7 +9,7 @@
     #bodytag (Form "action='editYahooContactPoint.action'" "method='post'")
         #tag (Hidden "name='id'")
         #tag (Hidden "name='user'")
-        <h3>Create yahoo contact</h3>
+        <h3>create yahoo contact</h3>
         <fieldset>
             #tag (TextField "name='contact.name'" "tabindex='1'")
             #tag (TextField "label='contact.yahooId'" "name='contact.yahooId'" "tabindex='2'")

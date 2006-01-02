@@ -10,12 +10,12 @@
 #bodytag (Form "action='createTrigger.action'" "method='post'")
 
     #tag (Hidden "name='project'")
-    <h3>Create trigger</h3>
+    <h3>create trigger</h3>
 
     <fieldset>
         #tag (TextField "required='true'" "name='name'" "tabindex='1'")
         #tag (TextField "name='recipe'" "tabindex='2'")
-        #tag (TextField "name='cronExpression'" "tabindex='3'")
+        #tag (TextField "name='cronExpression'" "label=getText('trigger.cronExpression')" "tabindex='3'")
     </fieldset>
 
     <fieldset class="submit">

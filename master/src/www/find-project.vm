@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>[CiB] find projects</title>
+    <title>find-projects</title>
     <link href="build.css" rel="stylesheet" type="text/css">
     <content tag="action">project.search</content>
 </head>
