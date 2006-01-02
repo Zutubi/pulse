@@ -314,8 +314,8 @@
         </action>
 
         <action name="editSlave!default" class="com.cinnamonbob.web.EditSlaveAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">edit-slave.vm</result>
-            <result name="error" type="velocity">undefined.vm</result>
         </action>
 
         <action name="editSlave" class="com.cinnamonbob.web.EditSlaveAction">
