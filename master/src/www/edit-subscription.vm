@@ -8,7 +8,7 @@
 #parse("/template/includes/actionerrors.vm")
 
 #bodytag (Form "action='editSubscription.action'" "method='post'")
-    <h3>Create subscription</h3>
+    <h3>create subscription</h3>
     #tag (Hidden "name='id'")
     #tag (Hidden "name='login'")
     <fieldset>

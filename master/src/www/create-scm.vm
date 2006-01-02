@@ -9,7 +9,7 @@
 
 #bodytag (Form "action='createScm.action'" "method='post'")
     #tag (Hidden "name='project'")
-    <h3>Create scm: step 1</h3>
+    <h3>create scm: step 1</h3>
     <fieldset>
         #tag (Select "list=types" "name='type'" "label='scm.type'" "tabindex='1'")
     </fieldset>

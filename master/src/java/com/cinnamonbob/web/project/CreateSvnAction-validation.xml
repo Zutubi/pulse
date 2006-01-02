@@ -3,7 +3,7 @@
 <validators>
     <field name="svn">
         <field-validator type="visitor">
-            <message>Svn: </message>
+            <message>svn: </message>
         </field-validator>
     </field>
 </validators>

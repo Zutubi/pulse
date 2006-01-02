@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>#if ($title) $title #else [CiB] #end</title>
+		<title>#if ($title) [CiB] $title #else [CiB] #end</title>
 		<link href="$base/main.css" rel="stylesheet" type="text/css" media="screen">
 		<link href="$base/form.css" rel="stylesheet" type="text/css" media="screen">
 		$head
@@ -8,25 +8,23 @@
         
     <body>
     <div id="container">
+
+        <!-- page properties are specified using <content tag="selectedTab">navigate</content> -->
+        <!--#set ($selectedTab = $page.getProperty("page.selectedTab"))-->
+
         <div id="header">$title</div>
         <div id="navbar">
             <ul>
-                <li><a href="/">:: navigate ::</a></li>
-                <li><a href="serverStatus.action">server status</a></li>
-                <li><a href="viewProjects.action">all projects</a></li>
-                <li><a href="viewUsers.action">all users</a></li>
+                <li><a href="/">home</a></li>
+                <li><a href="serverStatus.action">server</a></li>
+                <li><a href="viewProjects.action">projects</a></li>
+                <li><a href="viewUsers.action">users</a></li>
             </ul>
         </div>
-                                        <!-- page properties are specified using <content tag="selectedTab">navigate</content> -->
-                                        <!-- #set ($selectedTab = $page.getProperty("page.selectedTab"))-->
-                                        <!-- #if ($selectedTab == "navigate")-->
-                                        <!--    <td class="navbar-active">:: navigate ::</td>-->
-                                        <!--#else-->
-                                        <!--    <td class="navbar" onMouseOver="this.className='navbar-active'" onMouseOut="this.className='navbar'"><a href="/">navigate</a></td>-->
-                                        <!--#end-->
-<!--        <div id="left"> -->
-            <!-- left navigation goes here -->
-<!--            <div class="menu">
+
+<!--
+        <div id="left">
+           <div class="menu">
                 <h3>User</h3>
                 <p>
                     <ul>
@@ -53,10 +51,12 @@
                 </p>
             </div>
         </div>
-
+-->
+<!--
         <div id="right">
-                <!-- right navigation goes here -->
-<!--        </div> -->
+
+        </div>
+-->
         <div id="content">
 		    $body
         </div>

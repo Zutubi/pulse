@@ -13,27 +13,35 @@
 
         <div id="project-left-column">
 
-        <h2 class="command-info">basic details (<a href="editProject!default.action?id=$project.id">edit</a>)</h2>
+        <h2 class="command-info">basic details</h2>
         <div class="command-content">
             <table>
                 #detailrow("name" $project.name)
                 #detailrow("description" $project.description)
                 #detailrow("bob file" $project.bobFile)
+                #detailrow("action" "<a href='editProject!default.action?id=$project.id'>edit</a>")
             </table>
         </div>
         
-        <h2 class="command-info">scm details (<a href="createScm!default.action?project=$project.id">add</a>)</h2>
+        <h2 class="command-info">scm details</h2>
         <div class="command-content">
             #set($scms = $project.scms)
-            #if ($scms.size() == 0)
-                No SCMs configured
-            #else
-                <ul>
-                #foreach ($scm in $scms)
-                    <li>#scmIcon($scm) $scm.name (<a href="editScm!default.action?id=$scm.id&project=$project.id">edit</a>|<a href="deleteScm.action?id=$project.id&name=$scm.name">delete</a>)</li>
-                #end
-                </ul>
+            <table>
+                <tr>
+                    <th class="command-detail">name</th>
+                    <th colspan="2" class="command-detail">actions</th>
+                </tr>
+            #foreach ($scm in $scms)
+                <tr>
+                    <td class="command-detail">#scmIcon($scm)<a href="">$scm.name</a></td>
+                    <td class="command-detail"><a href="editScm!default.action?id=$scm.id&project=$project.id">edit</a></td>
+                    <td class="command-detail"><a href="deleteScm.action?id=$project.id&name=$scm.name">delete</a></td>
+                </tr>
             #end
+                <tr>
+                    <td colspan="3" class="command-detail"><b>+</b> <a href="createScm!default.action?project=$project.id">add new scm</a></td>
+                </tr>
+            </table>
         </div>
 
         <h2 class="command-info">build specifications</h2>

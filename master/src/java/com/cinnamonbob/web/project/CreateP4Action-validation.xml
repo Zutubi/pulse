@@ -3,7 +3,7 @@
 <validators>
     <field name="p4">
         <field-validator type="visitor">
-            <message>Perforce: </message>
+            <message>perforce: </message>
         </field-validator>
     </field>
 </validators>

@@ -1,10 +1,10 @@
 <html>
   <head>
-    <title>[CiB] all projects</title>
+    <title>[CiB] projects</title>
     <link href="build.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <h1 class="build-log">:: all projects ::</h1>
+    <h1 class="build-log">:: projects ::</h1>
     <h2 class="command-info">projects</h2>
     <div class="command-content">
     <table>

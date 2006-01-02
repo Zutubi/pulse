@@ -29,9 +29,9 @@ public class CreateScmAction extends ProjectActionSupport
         if (types == null)
         {
             types = new TreeMap<String, String>();
-            types.put("svn", "Subversion");
-            types.put("p4", "Perforce");
-            types.put("cvs", "CVS");
+            types.put("svn", "subversion");
+            types.put("p4", "perforce");
+            types.put("cvs", "cvs");
         }
         return types;
     }

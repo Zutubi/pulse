@@ -3,12 +3,12 @@
 <validators>
     <field name="name">
         <field-validator type="requiredstring">
-            <message>Please specify an name for this schedule.</message>
+            <message>please specify an name for this schedule.</message>
         </field-validator>
     </field>
     <field name="cronExpression">
         <field-validator type="cronexpression">
-            <message>Please specify a valid cron expression.</message>
+            <message>please specify a valid cron expression.</message>
         </field-validator>
     </field>
 </validators>

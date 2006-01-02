@@ -8,7 +8,7 @@
     #parse("/template/includes/actionerrors.vm")
 
 #bodytag (Form "action='editSlave.action'" "method='post'")
-    <h3>Edit slave</h3>
+    <h3>edit slave: $slave.name</h3>
         #tag (Hidden "name='id'")
     <fieldset>
         #tag (TextField "required='true'" "name='slave.name'" "tabindex='1'")

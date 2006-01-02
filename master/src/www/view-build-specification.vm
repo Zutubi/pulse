@@ -18,7 +18,7 @@
       <li>$node.hostRequirements.getSummary(): $recipe</li>
       #showNodes($node $node.children)
     #end
-    <li><a href="createBuildSpecificationNode!default.action?specId=$id&parentId=$parent.id">+ add stage</a></li>
+    <li>+ <a href="createBuildSpecificationNode!default.action?specId=$id&parentId=$parent.id">add stage</a></li>
   </ul>
 #end
 

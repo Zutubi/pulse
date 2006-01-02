@@ -7,7 +7,7 @@
 #bodytag (Form "action='createCvs.action'" "method='post'")
 
     #tag (Hidden "name='project'")
-    <h3>Create scm: step 2</h3>
+    <h3>create scm: step 2</h3>
 
     <fieldset>
         #tag (TextField "required='true'" "name='cvs.name'" "label='scm.name'" "tabindex='1'")

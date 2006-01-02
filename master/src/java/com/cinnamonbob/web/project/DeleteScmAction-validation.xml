@@ -3,12 +3,12 @@
 <validators>
     <field name="name">
         <field-validator type="requiredstring">
-            <message>Contact Name is required.</message>
+            <message>contact name is required.</message>
         </field-validator>
     </field>
     <field name="id">
         <field-validator type="required">
-            <message>Project id is required.</message>
+            <message>project id is required.</message>
         </field-validator>
     </field>
 </validators>

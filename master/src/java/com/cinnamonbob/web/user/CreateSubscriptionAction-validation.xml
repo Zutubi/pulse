@@ -3,17 +3,17 @@
 <validators>
     <field name="user">
         <field-validator type="requiredstring">
-            <message>User is required.</message>
+            <message>user is required.</message>
         </field-validator>
     </field>
     <field name="project">
         <field-validator type="requiredstring">
-            <message>Project is required.</message>
+            <message>project is required.</message>
         </field-validator>
     </field>
     <field name="condition">
         <field-validator type="requiredstring">
-            <message>Condition is required.</message>
+            <message>condition is required.</message>
         </field-validator>
     </field>
 </validators>

@@ -3,7 +3,7 @@
 <validators>
     <field name="slave">
         <field-validator type="visitor">
-            <message>Slave: </message>
+            <message>slave: </message>
         </field-validator>
     </field>
 </validators>

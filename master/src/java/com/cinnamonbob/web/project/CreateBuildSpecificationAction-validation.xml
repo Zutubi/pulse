@@ -3,7 +3,7 @@
 <validators>
     <field name="specification">
         <field-validator type="visitor">
-            <message>Build specification:</message>
+            <message>build specification:</message>
         </field-validator>
     </field>
 </validators>

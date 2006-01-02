@@ -3,7 +3,7 @@
 <validators>
     <field name="type">
         <field-validator type="requiredstring">
-            <message>Missing type</message>
+            <message>missing type</message>
         </field-validator>
     </field>
 </validators>

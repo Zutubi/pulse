@@ -8,7 +8,7 @@
     #parse("/template/includes/actionerrors.vm")
 
     #bodytag (Form "action='editUser.action'" "method='post'")
-        <h3>Edit user: $user.login</h3>
+        <h3>edit user: $user.login</h3>
         #tag (Hidden "name='id'")
         #tag (Hidden "name='user.login'")
         <fieldset>

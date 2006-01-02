@@ -3,7 +3,7 @@
 <validators>
     <field name="root">
         <field-validator type="cvsroot">
-            <message>Valid cvs root is required.</message>
+            <message>valid cvs root is required.</message>
         </field-validator>
     </field>
 </validators>

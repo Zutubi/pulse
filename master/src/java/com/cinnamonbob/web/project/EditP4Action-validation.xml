@@ -3,7 +3,7 @@
 <validators>
     <field name="scm">
         <field-validator type="visitor">
-            <message>P4: </message>
+            <message>perforce: </message>
         </field-validator>
     </field>
 </validators>

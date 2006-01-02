@@ -3,15 +3,15 @@
 <validators>
     <field name="name">
         <field-validator type="requiredstring">
-            <message>Name is required.</message>
+            <message>name is required.</message>
         </field-validator>
     </field>
     <field name="email">
         <field-validator type="requiredstring">
-            <message>Email is required.</message>
+            <message>email is required.</message>
         </field-validator>
         <field-validator type="email">
-            <message>Valid email required.</message>
+            <message>valid email required.</message>
         </field-validator>
     </field>
 </validators>

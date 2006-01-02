@@ -3,12 +3,12 @@
 <validators>
     <field name="username">
         <field-validator type="requiredstring">
-            <message>Username is required.</message>
+            <message>username is required.</message>
         </field-validator>
     </field>
     <field name="url">
         <field-validator type="requiredstring">
-            <message>Url is required.</message>
+            <message>url is required.</message>
         </field-validator>
     </field>
 </validators>

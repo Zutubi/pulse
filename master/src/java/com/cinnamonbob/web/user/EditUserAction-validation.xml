@@ -3,7 +3,7 @@
 <validators>
     <field name="user">
         <field-validator type="visitor">
-            <message>User: </message>
+            <message>user: </message>
         </field-validator>
     </field>
 </validators>
