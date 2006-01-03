@@ -2,6 +2,7 @@ package com.cinnamonbob.model;
 
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
+import com.cinnamonbob.scm.cvs.CvsServer;
 
 /**
  *
@@ -14,7 +15,7 @@ public class Cvs extends Scm
 
     public SCMServer createServer() throws SCMException
     {
-        return null;
+        return new CvsServer(getRoot(), null);
     }
 
     public String getRoot()

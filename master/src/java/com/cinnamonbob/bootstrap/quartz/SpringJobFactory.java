@@ -36,7 +36,7 @@ public class SpringJobFactory extends SimpleJobFactory
         this.scheduler = scheduler;
     }
 
-    public void initJobFactory() throws SchedulerException
+    public void init() throws SchedulerException
     {
         scheduler.setJobFactory(this);
     }

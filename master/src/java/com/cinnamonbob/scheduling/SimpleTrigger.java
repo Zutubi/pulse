@@ -10,12 +10,26 @@ public class SimpleTrigger extends Trigger
     private static final String INTERVAL = "interval";
     private static final String REPEAT = "repeat";
 
+    public static final int REPEAT_INDEFINITELY = org.quartz.SimpleTrigger.REPEAT_INDEFINITELY;
+
     public SimpleTrigger()
     {
 
     }
 
-    public SimpleTrigger(String name, String group, int interval, int repeatCount)
+    public SimpleTrigger(String name, String group, long interval)
+    {
+        this(name, group, interval, REPEAT_INDEFINITELY);
+    }
+
+    /**
+     *
+     * @param name
+     * @param group
+     * @param interval in milliseconds between successive triggers.
+     * @param repeatCount
+     */
+    public SimpleTrigger(String name, String group, long interval, int repeatCount)
     {
         super(name, group);
         setInterval(interval);
@@ -27,14 +41,14 @@ public class SimpleTrigger extends Trigger
         return TYPE;
     }
 
-    private void setInterval(int interval)
+    private void setInterval(long interval)
     {
         getDataMap().put(INTERVAL, interval);
     }
 
-    public int getInterval()
+    public long getInterval()
     {
-        return (Integer)getDataMap().get(INTERVAL);
+        return (Long)getDataMap().get(INTERVAL);
     }
 
     private void setRepeatCount(int repeat)

@@ -36,6 +36,9 @@
         <subclass name="com.cinnamonbob.scheduling.EventTrigger" discriminator-value="EVENT" dynamic-update="false">
         </subclass>
 
+        <subclass name="com.cinnamonbob.scheduling.SimpleTrigger" discriminator-value="SIMPLE" dynamic-update="false">
+        </subclass>
+
     </class>
 
     <query name="findByGroup"><![CDATA[

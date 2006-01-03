@@ -9,12 +9,14 @@ import com.cinnamonbob.model.Scm;
  */
 public class SCMChangeEvent extends Event
 {
-    private Revision revision;
+    private Revision newRevision;
+    private Revision previousRevision;
 
-    public SCMChangeEvent(Scm source, Revision revision)
+    public SCMChangeEvent(Scm source, Revision newRevision, Revision previousRevision)
     {
         super(source);
-        this.revision = revision;
+        this.newRevision = newRevision;
+        this.previousRevision = previousRevision;
     }
 
     public Scm getScm()
@@ -22,8 +24,13 @@ public class SCMChangeEvent extends Event
         return (Scm) getSource();
     }
     
-    public Revision getRevision()
+    public Revision getNewRevision()
     {
-        return revision;
+        return newRevision;
+    }
+
+    public Revision getPreviousRevision()
+    {
+        return previousRevision;
     }
 }

@@ -1,5 +1,7 @@
 package com.cinnamonbob.scheduling;
 
+import com.cinnamonbob.bootstrap.ComponentContext;
+
 /**
  * <class-comment/>
  */
@@ -18,7 +20,9 @@ public class DefaultTriggerHandler implements TriggerHandler
         // determine the task to be executed.
         try
         {
+            //TODO: create this task correctly - that is, using the object factory.
             Task task = trigger.getTaskClass().newInstance();
+            ComponentContext.autowire(task);
             task.execute(context);
         }
         catch (Exception e)

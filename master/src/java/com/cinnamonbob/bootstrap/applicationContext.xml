@@ -15,7 +15,7 @@
         </property>
     </bean>
 
-    <bean id="quartzJobFactory" class="com.cinnamonbob.bootstrap.quartz.SpringJobFactory" init-method="initJobFactory">
+    <bean id="quartzJobFactory" class="com.cinnamonbob.bootstrap.quartz.SpringJobFactory" init-method="init">
         <property name="scheduler">
             <ref bean="quartzScheduler"/>
         </property>
@@ -67,7 +67,7 @@
 
     <bean id="subscriptionManager" class="com.cinnamonbob.model.DefaultSubscriptionManager" autowire="byName"/>
 
-    <bean id="scmManager" class="com.cinnamonbob.model.DefaultScmManager" autowire="byName"/>
+    <bean id="scmManager" class="com.cinnamonbob.model.DefaultScmManager" autowire="byName" init-method="init"/>
 
     <bean id="eventManager" class="com.cinnamonbob.core.event.DefaultEventManager" autowire="byName"/>
 
