@@ -5,12 +5,11 @@ import com.cinnamonbob.core.event.AsynchronousDelegatingListener;
 import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.core.event.EventManager;
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.events.build.*;
-import com.cinnamonbob.model.*;
-import com.cinnamonbob.scm.SCMException;
+import com.cinnamonbob.events.build.BuildRequestEvent;
+import com.cinnamonbob.model.BuildManager;
+import com.cinnamonbob.model.BuildResult;
+import com.cinnamonbob.model.BuildSpecification;
+import com.cinnamonbob.model.Project;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
@@ -27,10 +26,6 @@ public class FatController implements EventListener
     private AsynchronousDelegatingListener asyncListener;
     private BuildManager buildManager;
     private RecipeQueue recipeQueue;
-    // TODO obviously a hack, to be replaced with all build/recipe invocations in progress
-    private BuildSpecification runningSpec;
-    private BuildResult runningBuild;
-    private BuildService runningService;
 
     public FatController()
     {
@@ -55,186 +50,53 @@ public class FatController implements EventListener
         {
             handleBuildRequest((BuildRequestEvent) event);
         }
-        else if (event instanceof RecipeDispatchedEvent)
-        {
-            handleRecipeDispatch((RecipeDispatchedEvent) event);
-        }
-        else
-        {
-            handleRecipeEvent((RecipeEvent) event);
-        }
-    }
-
-    private void handleRecipeDispatch(RecipeDispatchedEvent event)
-    {
-        // TODO set the host on the result node
-        runningService = event.getService();
     }
 
     private void handleBuildRequest(BuildRequestEvent event)
     {
-        String specName = event.getSpecification();
-        Project project = event.getProject();
-        BuildSpecification buildSpec = project.getBuildSpecification(specName);
 
+        final Project project = event.getProject();
+        String specName = event.getSpecification();
+
+        BuildSpecification buildSpec = project.getBuildSpecification(specName);
         if (buildSpec == null)
         {
             LOG.warning("Request to build unknown specification '" + specName + "' for project '" + project.getName() + "'");
             return;
         }
 
-        runningSpec = buildSpec;
+        final MasterBuildPaths paths = new MasterBuildPaths();
 
-        long number = buildManager.getNextBuildNumber(project);
-
-        BuildResult buildResult = new BuildResult(project, number);
-        runningBuild = buildResult;
-
-        MasterBuildPaths paths = new MasterBuildPaths();
-        File buildDir = paths.getBuildDir(project, buildResult);
-
-        buildResult.commence(buildDir);
-        eventManager.publish(new BuildCommencedEvent(this, buildResult));
-
-        try
+        RecipeResultCollector collector = new RecipeResultCollector()
         {
-            if (!buildDir.mkdirs())
+            public void prepare(BuildResult result, long recipeId)
             {
-                throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
+                // ensure that we have created the necessary directories.
+                File recipeDir = paths.getRecipeDir(project, result, recipeId);
+                if (!recipeDir.mkdirs())
+                {
+                    throw new BuildException("Failed to create the '" + recipeDir + "' directory.");
+                }
             }
 
-            ScmBootstrapper bootstrapper = createBuildBootstrapper(project);
-
-            executeNode(project, buildResult, buildSpec.getRoot().getChildren().get(0), bootstrapper);
-        }
-        catch (BuildException e)
-        {
-            LOG.severe("Build error", e);
-            buildResult.error(e);
-        }
-    }
-
-    private void executeNode(Project project, BuildResult buildResult, BuildSpecificationNode node, ScmBootstrapper bootstrapper)
-    {
-        RecipeResult result = new RecipeResult(node.getRecipe());
-        RecipeResultNode resultNode = new RecipeResultNode(result);
-
-        // TODO: not this simple: need to know where to add it
-        buildResult.add(resultNode);
-        // Make sure the recipe result gets an id
-        synchronized (buildResult)
-        {
-            buildManager.save(buildResult);
-        }
-
-        MasterBuildPaths paths = new MasterBuildPaths();
-        File recipeDir = paths.getRecipeDir(project, buildResult, result.getId());
-
-        if (!recipeDir.mkdirs())
-        {
-            throw new BuildException("Could not create recipe directory '" + recipeDir.getAbsolutePath() + "'");
-        }
-
-        RecipeRequest request = new RecipeRequest(result.getId(), bootstrapper, project.getBobFile(), node.getRecipe());
-        RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(node.getHostRequirements(), request);
-        recipeQueue.enqueue(dispatchRequest);
-    }
-
-    public ScmBootstrapper createBuildBootstrapper(Project project)
-    {
-        ScmBootstrapper bootstrapper = new ScmBootstrapper();
-
-        for (Scm scm : project.getScms())
-        {
-            try
+            public void collect(BuildResult result, long recipeId, BuildService buildService)
             {
-                Revision revision = scm.createServer().getLatestRevision();
-                bootstrapper.add(new ScmCheckoutDetails(scm, revision));
+                buildService.collectResults(recipeId, paths.getRecipeDir(project, result, recipeId));
             }
-            catch (SCMException e)
+
+            public void cleanup(BuildResult result, long recipeId, BuildService buildService)
             {
-                throw new BuildException("Could not retrieve latest revision from SCM '" + scm.getName() + "'", e);
+                buildService.cleanup(recipeId);
             }
-        }
+        };
 
-        return bootstrapper;
-    }
-
-    private void handleRecipeEvent(RecipeEvent event)
-    {
-        // TODO blatantly assumes one recipe only from runningSpec
-        // TODO oh, the humanity (and I don't mean the ground crew)
-        RecipeResult recipeResult = runningBuild.getResults().get(0).getResult();
-        if (event.getRecipeId() != recipeResult.getId())
-        {
-            LOG.severe("i didn't expect that!");
-        }
-
-        if (event instanceof RecipeCommencedEvent)
-        {
-            handleRecipeCommenced((RecipeCommencedEvent) event, recipeResult);
-        }
-        else if (event instanceof CommandCommencedEvent)
-        {
-            handleCommandCommenced((CommandCommencedEvent) event, recipeResult);
-        }
-        else if (event instanceof CommandCompletedEvent)
-        {
-            handleCommandCompleted((CommandCompletedEvent) event, recipeResult);
-        }
-        else if (event instanceof RecipeCompletedEvent)
-        {
-            handleRecipeCompleted((RecipeCompletedEvent) event, recipeResult);
-        }
-
-        synchronized (runningBuild)
-        {
-            buildManager.save(runningBuild);
-        }
-    }
-
-    private void handleRecipeCommenced(RecipeCommencedEvent event, RecipeResult recipeResult)
-    {
-        recipeResult.commence(event.getName(), event.getStartTime());
-    }
-
-    private void handleCommandCommenced(CommandCommencedEvent event, RecipeResult recipeResult)
-    {
-        CommandResult result = new CommandResult(event.getName());
-        result.commence(event.getStartTime());
-        recipeResult.add(result);
-    }
-
-    private void handleCommandCompleted(CommandCompletedEvent event, RecipeResult recipeResult)
-    {
-        recipeResult.update(event.getResult());
-    }
-
-    private void handleRecipeCompleted(RecipeCompletedEvent event, RecipeResult recipeResult)
-    {
-        recipeResult.update(event.getResult());
-
-        // retrieve recipe output.
-        long recipeId = event.getResult().getId();
-        MasterBuildPaths paths = new MasterBuildPaths();
-        File outputDir = paths.getOutputDir(runningBuild.getProject(), runningBuild, recipeId);
-
-        if (!outputDir.mkdirs())
-        {
-            // TODO throw something, but where to handle it (need to locate which result to apply to...)
-        }
-
-        runningService.collectResults(recipeId, outputDir);
-        runningService.cleanupResults(recipeId);
-
-        // TODO if the whole build is done...
-        runningBuild.complete();
-        eventManager.publish(new BuildCompletedEvent(this, runningBuild));
+        BuildController controller = new BuildController(project, buildSpec, eventManager, buildManager, recipeQueue, collector);
+        controller.run();
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildRequestEvent.class, RecipeDispatchedEvent.class, RecipeEvent.class};
+        return new Class[]{BuildRequestEvent.class};
     }
 
     public void setBuildManager(BuildManager buildManager)
@@ -250,24 +112,5 @@ public class FatController implements EventListener
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
-    }
-
-    private class BuildInvocation
-    {
-        public BuildResult result;
-        public int pendingRecipes;
-
-        public BuildInvocation(BuildResult result)
-        {
-            this.result = result;
-            pendingRecipes = 0;
-        }
-    }
-
-    private class RecipeInvocation
-    {
-        public BuildInvocation parent;
-        public RecipeResult result;
-        public BuildSpecificationNode node;
     }
 }

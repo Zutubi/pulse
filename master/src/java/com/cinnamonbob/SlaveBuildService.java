@@ -1,5 +1,6 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.model.Slave;
@@ -25,15 +26,18 @@ public class SlaveBuildService implements BuildService
         this.service = service;
     }
 
+    public String getUrl()
+    {
+        return slave.getHost() + ":" + slave.getPort();
+    }
+
     public void build(RecipeRequest request)
     {
-        // TODO set to the real master URL!
-        service.build("localhost:8080", request);
+        service.build(BobServer.getHostURL(), request);
     }
 
     public void collectResults(long recipeId, File dir)
     {
-        // TODO proper error handling!
         ZipInputStream zis = null;
 
         try
@@ -48,11 +52,12 @@ public class SlaveBuildService implements BuildService
         }
         catch (MalformedURLException e)
         {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            // Programmer error
+            e.printStackTrace();
         }
         catch (IOException e)
         {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            throw new BuildException("Downloading results from slave '" + slave.getName() + ": " + e.getMessage(), e);
         }
         finally
         {
@@ -60,9 +65,14 @@ public class SlaveBuildService implements BuildService
         }
     }
 
-    public void cleanupResults(long recipeId)
+    public void cleanup(long recipeId)
     {
-        service.cleanupResults(recipeId);
+        service.cleanupRecipe(recipeId);
+    }
+
+    public String getHostName()
+    {
+        return slave.getName();
     }
 
     public Slave getSlave()

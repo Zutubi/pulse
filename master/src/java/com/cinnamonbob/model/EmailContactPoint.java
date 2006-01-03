@@ -1,12 +1,12 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.BobServer;
-import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.renderer.BuildResultRenderer;
+import com.cinnamonbob.util.logging.Logger;
 
 import javax.mail.Message;
 import javax.mail.Session;
@@ -48,8 +48,8 @@ public class EmailContactPoint extends ContactPoint
     public void notify(Project project, BuildResult result)
     {
         String subject = "[CiB] " + result.getProject().getName() + ": build " + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
-        // TODO distro
-        sendMail(subject, renderResult(project, result.getResults().get(0).getResult()));
+        // TODO distributed building...
+        sendMail(subject, renderResult(project, result.getRoot().getChildren().get(0).getResult()));
     }
 
     private String renderResult(Project project, RecipeResult result)

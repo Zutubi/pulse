@@ -157,3 +157,16 @@ td.health-failed {
 #project-content {
     margin-left: 29%;
 }
+
+ul.scm-changes {
+    list-style: none;
+    padding-left: 4px;
+}
+
+#build-tree ul {
+    list-style: none;
+}
+
+#build-tree li {
+    margin-top: 10px;
+}

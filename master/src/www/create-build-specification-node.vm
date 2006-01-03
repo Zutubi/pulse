@@ -13,7 +13,7 @@
     <h3>add build stage</h3>
     <fieldset>
         #tag (Select "name='buildHost'" "list=buildHosts" "tabindex='1'")
-        #tag (TextField "name='node.recipe'" "tabindex='2'")
+        #tag (TextField "name='stage.recipe'" "tabindex='2'")
     </fieldset>
 
     <fieldset class="submit">

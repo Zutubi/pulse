@@ -15,6 +15,11 @@ public class MasterBuildPaths
 
     }
 
+    public static String getProjectDirName(Project project)
+    {
+        return Long.toString(project.getId());
+    }
+
     public File getProjectDir(Project project)
     {
         File rootBuildDir = ConfigUtils.getManager().getAppConfig().getProjectRoot();
@@ -24,6 +29,11 @@ public class MasterBuildPaths
     public File getBuildsDir(Project project)
     {
         return new File(getProjectDir(project), "builds");
+    }
+
+    public static String getBuildDirName(BuildResult result)
+    {
+        return String.format("%08d", Long.valueOf(result.getNumber()));
     }
 
     public File getBuildDir(Project project, BuildResult result)
@@ -39,15 +49,5 @@ public class MasterBuildPaths
     public File getOutputDir(Project project, BuildResult result, long recipeId)
     {
         return new File(getRecipeDir(project, result, recipeId), "output");
-    }
-
-    public static String getProjectDirName(Project project)
-    {
-        return Long.toString(project.getId());
-    }
-
-    public static String getBuildDirName(BuildResult result)
-    {
-        return String.format("%08d", Long.valueOf(result.getNumber()));
     }
 }

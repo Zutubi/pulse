@@ -63,7 +63,7 @@ public class ViewBuildAction extends ProjectActionSupport
         project = getProjectManager().getProject(id);
         result = getBuildManager().getBuildResult(buildId);
 
-        for (RecipeResultNode node : result.getResults())
+        for (RecipeResultNode node : result.getRoot().getChildren())
         {
             for (CommandResult r : node.getResult().getCommandResults())
             {

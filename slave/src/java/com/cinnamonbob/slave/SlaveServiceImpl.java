@@ -22,9 +22,9 @@ public class SlaveServiceImpl implements SlaveService
         threadPool.executeCommand(command);
     }
 
-    public void cleanupResults(long recipeId)
+    public void cleanupRecipe(long recipeId)
     {
-        CleanupResultsCommand command = new CleanupResultsCommand(recipeId);
+        CleanupRecipeCommand command = new CleanupRecipeCommand(recipeId);
         // TODO more dodgy wiring :-/
         ComponentContext.autowire(command);
         threadPool.executeCommand(command);

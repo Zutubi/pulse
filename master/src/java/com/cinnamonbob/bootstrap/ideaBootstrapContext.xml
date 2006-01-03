@@ -33,13 +33,13 @@
                     <value>master/src/www</value>
                 </property>
                 <property name="configRoot">
-                    <value>master/src/etc</value>
+                    <value>master/etc</value>
                 </property>
                 <property name="templateRoot">
                     <value>master/src/templates</value>
                 </property>
                 <property name="userConfigRoot">
-                    <value>master/src/etc</value>
+                    <value>master/etc</value>
                 </property>
                 <property name="databaseRoot">
                     <value>master/system/database</value>

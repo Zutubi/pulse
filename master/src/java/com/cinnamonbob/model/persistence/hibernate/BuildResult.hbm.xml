@@ -21,7 +21,7 @@
 
         <property name="number" column="NUMBER" type="long" not-null="true"/>
 
-        <many-to-one name="project" column="PROJECT" class="com.cinnamonbob.model.Project" cascade="all"/>
+        <many-to-one name="project" column="PROJECT" class="com.cinnamonbob.model.Project" cascade="none"/>
 
         <map name="scmDetails" cascade="all-delete-orphan" lazy="false">
             <key column="BUILD_RESULT_ID"/>
@@ -29,11 +29,9 @@
             <one-to-many class="com.cinnamonbob.model.BuildScmDetails"/>
         </map>
 
-        <list name="results" cascade="all-delete-orphan" lazy="false">
-            <key column="BUILD_RESULT_ID"/>
-            <index column="POSITION"/>
-            <one-to-many class="com.cinnamonbob.model.RecipeResultNode"/>
-        </list>
+        <many-to-one name="root" class="com.cinnamonbob.model.RecipeResultNode" column="RECIPE_RESULT_ID"
+                     cascade="all"/>
+
     </class>
 
     <class name="com.cinnamonbob.model.BuildScmDetails" table="BUILD_SCM_DETAILS" lazy="false">

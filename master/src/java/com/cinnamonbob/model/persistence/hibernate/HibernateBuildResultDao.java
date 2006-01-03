@@ -1,9 +1,12 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
+import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.model.RecipeResultNode;
 import com.cinnamonbob.model.persistence.BuildResultDao;
+import com.cinnamonbob.util.logging.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -13,7 +16,6 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import java.sql.SQLException;
 import java.util.List;
-import com.cinnamonbob.util.logging.Logger;
 
 public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> implements BuildResultDao
 {
@@ -69,7 +71,16 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             return (BuildResult) results.get(0);
         }
         return null;
+    }
 
+    public void save(RecipeResultNode node)
+    {
+        getHibernateTemplate().saveOrUpdate(node);
+    }
+
+    public void save(RecipeResult result)
+    {
+        getHibernateTemplate().saveOrUpdate(result);
     }
 
 }

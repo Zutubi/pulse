@@ -1,8 +1,8 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.events.build.RecipeDispatchedEvent;
 import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.build.RecipeDispatchedEvent;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,9 +15,9 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * <class-comment/>
  */
-public class DefaultRecipeQueue implements Runnable
+public class ThreadedRecipeQueue implements Runnable, RecipeQueue
 {
-    private static final Logger LOG = Logger.getLogger(DefaultRecipeQueue.class);
+    private static final Logger LOG = Logger.getLogger(ThreadedRecipeQueue.class);
 
     private final ReentrantLock lock = new ReentrantLock();
 
@@ -44,7 +44,7 @@ public class DefaultRecipeQueue implements Runnable
 
     private EventManager eventManager;
 
-    public DefaultRecipeQueue()
+    public ThreadedRecipeQueue()
     {
         executor = Executors.newSingleThreadExecutor();
     }

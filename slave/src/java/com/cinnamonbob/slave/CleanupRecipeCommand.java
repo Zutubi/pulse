@@ -1,18 +1,19 @@
 package com.cinnamonbob.slave;
 
 import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.util.FileSystemUtils;
 
 import java.io.File;
 
 /**
  */
-public class CleanupResultsCommand implements Runnable
+public class CleanupRecipeCommand implements Runnable
 {
     private long recipeId;
     private ConfigurationManager configurationManager;
 
-    public CleanupResultsCommand(long recipeId)
+    public CleanupRecipeCommand(long recipeId)
     {
         this.recipeId = recipeId;
     }
@@ -20,9 +21,11 @@ public class CleanupResultsCommand implements Runnable
     public void run()
     {
         SlaveRecipePaths recipeProcessorPaths = new SlaveRecipePaths(recipeId, configurationManager);
-        FileSystemUtils.removeDirectory(recipeProcessorPaths.getOutputDir());
-        File workZip = recipeProcessorPaths.getOutputZip();
-        workZip.delete();
+        File recipeRoot = recipeProcessorPaths.getRecipeRoot();
+        if (!FileSystemUtils.removeDirectory(recipeRoot))
+        {
+            throw new BuildException("Unable to remove recipe directory '" + recipeRoot + "'");
+        }
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)

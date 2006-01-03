@@ -92,7 +92,7 @@
         <div id="project-content">
 
         #if($currentBuild)
-            #set($recipeResult = $currentBuild.results.get(0).result)
+            #set($recipeResult = $currentBuild.root.children.get(0).result)
             #if($recipeResult.inProgress())
                 #set($class = "info")
             #elseif($recipeResult.succeeded())
@@ -155,7 +155,7 @@
                 <th class="command-detail">result</th>
             </tr>
             #foreach($buildResult in $history)
-                #set($result = $buildResult.results.get(0).result)
+                #set($result = $buildResult.root.children.get(0).result)
                 #set($id = $buildResult.id)
                 #set($built = $result.stamps.prettyStartTime) 
                 #set($elapsed = $result.stamps.prettyElapsed)

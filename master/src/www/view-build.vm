@@ -25,7 +25,7 @@
     <link href="build.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <h1 class="build-log">:: brief ::</h1>
+    <h1 class="build-log">:: build $result.number ::</h1>
 #if($result.inProgress())
   #set($class = "info")
 #elseif($result.succeeded())
@@ -34,7 +34,7 @@
   #set($class = "failure")
 #end
 
-    <h2 class="command-$class">$project.name build $result.number</h2>
+    <h2 class="command-$class">summary</h2>
     <div class="command-content">
       <table>
         #detailrow("commenced" $result.stamps.prettyStartTime)
@@ -42,10 +42,9 @@
         #detailrow("elapsed"   $result.stamps.prettyElapsed)
         #detailrow("status"    $result.state.prettyString)
       </table>
-      #errordetails($result.results.get(0).result)
+      #errordetails($result)
     </div>
 
-    #if($result.hasChanges())
       <h2 class="command-info">changes</h2>
       <div class="command-content">
         #foreach($scmDetails in $result.scmDetails.values())
@@ -55,15 +54,28 @@
             #set($changes = $scmDetails.changelists)
 	        #if($changes.size() > 0)
               <h3>changes since last build</h3>
+                <table>
+                  <tr>
+                    <th>who</th>
+                    <th>when</th>
+                    <th>what</th>
+                    <th>revision</th>
+                    <th>files</th>
+                  </tr>
               #foreach($change in $changes)
-                <div class="info">
-                <b>revision $change.revision</b> $change.user@$change.date: $change.comment
-                <ul>
+                <tr>
+                  <td>$change.user</td>
+                  <td>$change.date</td>
+                  <td>$change.commend</td>
+                  <td>$change.revision</td>
+                  <td>
+                    <ul class="scm-changes">
                 #foreach($file in $change.changes)
-                  <li><span class="filename">$file.filename#$file.revision: $file.action</span></li>
+                      <li><span class="filename">$file.filename#$file.revision: $file.action</span></li>
                 #end
-                </ul>
-                </div>
+                    </ul>
+                  </td>
+                </table>
               #end
             #else
               <div>No changes since last build.</div>
@@ -71,12 +83,86 @@
 	      #end
 	    #end
 	  </div>
+
+#macro(showrecipes $node)
+  <ul>
+  #foreach($child in $node.children)
+    #set($recipeResult = $child.result)
+
+    #if(!$recipeResult.commenced())
+      #set($class = "pending")
+    #elseif($recipeResult.inProgress())
+      #set($class = "info")
+    #elseif($recipeResult.succeeded())
+      #set($class = "success")
+    #else
+      #set($class = "failure")
     #end
 
-    #set($recipeResult = $result.results.get(0).result)
+    #if($recipeResult.recipeName)
+      #set($recipeName = $recipeResult.recipeName)
+    #else
+      #set($recipeName = "[default]")
+    #end
+    <li>
+      <table>
+        <tr>
+          <th colspan="4" class="command-detail">$recipeName @ $child.host</th>
+        </tr>
+    #if($recipeResult.commenced())
+        <tr>
+          <th class="command-detail">commenced</th>
+          <th class="command-detail">completed</th>
+          <th class="command-detail">elapsed</th>
+          <th class="command-detail">status</th>
+        </tr>
+        <tr>
+          <td class="build-$class">$recipeResult.stamps.prettyStartTime</td>
+          <td class="build-$class">$recipeResult.stamps.prettyEndTime</td>
+          <td class="build-$class">$recipeResult.stamps.prettyElapsed</td>
+          <td class="build-$class">$recipeResult.state.prettyString</td>
+        <tr>
+    #end
     #if($recipeResult.commandResults.size() > 0)
-    <h1 class="build-log">:: command log ::</h1>
+        <tr>
+          <th class="command-detail">command</th>
+          <th class="command-detail">when</th>
+          <th class="command-detail">elapsed</th>
+          <th class="command-detail">status</th>
+        </tr>
+      #foreach($commandResult in $recipeResult.commandResults)
+        #if(!$commandResult.commenced())
+          #set($commandClass = "pending")
+        #elseif($commandResult.inProgress())
+          #set($commandClass = "info")
+        #elseif($commandResult.succeeded())
+          #set($commandClass = "success")
+        #else
+          #set($commandClass = "failure")
+        #end
+        <tr>
+          <td class="build-$commandClass">$commandResult.commandName</td>
+          <td class="build-$commandClass">$commandResult.stamps.prettyStartTime</td>
+          <td class="build-$commandClass">$commandResult.stamps.prettyElapsed</td>
+          <td class="build-$commandClass">$commandResult.state.prettyString</td>
+        </tr>
+      #end
+    #end
+      </table>
+    #if($child.children.size() > 0)
+      #showrecipes($child)
+    #end
+  #end
+  </ul>
+#end
 
+    <h2 class="command-$class">recipe results</h2>
+    <div class="command-content">
+      <span id="build-tree">
+        #showrecipes($result.root)
+      </span>
+    </div>
+<!--
 #foreach($commandResult in $recipeResult.commandResults)
   #if($commandResult.inProgress())
     #set($class = "info")
@@ -125,6 +211,6 @@
       #end
     </div>
 #end
-#end
+-->
   </body>
 </html>

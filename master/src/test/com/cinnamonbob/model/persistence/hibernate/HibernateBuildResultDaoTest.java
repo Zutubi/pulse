@@ -77,7 +77,7 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
         buildResult.addScmDetails(1, scmDetails);
         RecipeResultNode recipeNode = new RecipeResultNode(recipeResult);
         recipeNode.setHost("test host");
-        buildResult.add(recipeNode);
+        buildResult.getRoot().addChild(recipeNode);
 
         buildResultDao.save(buildResult);
         commitAndRefreshTransaction();

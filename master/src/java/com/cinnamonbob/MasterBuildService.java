@@ -3,6 +3,7 @@ package com.cinnamonbob;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.BuildException;
+import com.cinnamonbob.core.util.FileSystemUtils;
 
 import java.io.File;
 
@@ -14,6 +15,11 @@ public class MasterBuildService implements BuildService
     private MasterRecipeProcessor masterRecipeProcessor;
     private ConfigurationManager configurationManager;
 
+    public String getUrl()
+    {
+        return BobServer.getHostURL();
+    }
+
     public void build(RecipeRequest request)
     {
         // TODO the dodgy wiring goes on unabated!
@@ -23,11 +29,6 @@ public class MasterBuildService implements BuildService
 
     public void collectResults(long recipeId, File dir)
     {
-        if (!dir.delete())
-        {
-            throw new BuildException("Unable to remove directory '" + dir.getAbsolutePath() + "'");
-        }
-
         ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager);
         File outputDir = recipePaths.getOutputDir();
 
@@ -37,9 +38,21 @@ public class MasterBuildService implements BuildService
         }
     }
 
-    public void cleanupResults(long recipeId)
+    public void cleanup(long recipeId)
     {
         // We rename the output dir, so no need to remove it.
+        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager);
+        File recipeRoot = recipePaths.getRecipeRoot();
+
+        if (!FileSystemUtils.removeDirectory(recipeRoot))
+        {
+            throw new BuildException("Unable to remove recipe directory '" + recipeRoot.getAbsolutePath() + "'");
+        }
+    }
+
+    public String getHostName()
+    {
+        return "[master]";
     }
 
     public void setMasterRecipeProcessor(MasterRecipeProcessor masterRecipeProcessor)
@@ -51,4 +64,5 @@ public class MasterBuildService implements BuildService
     {
         this.configurationManager = configurationManager;
     }
+
 }

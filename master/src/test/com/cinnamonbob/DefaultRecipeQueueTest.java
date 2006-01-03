@@ -11,7 +11,7 @@ import java.io.File;
  */
 public class DefaultRecipeQueueTest extends TestCase
 {
-    private DefaultRecipeQueue queue;
+    private ThreadedRecipeQueue queue;
 
     public DefaultRecipeQueueTest(String testName)
     {
@@ -23,7 +23,7 @@ public class DefaultRecipeQueueTest extends TestCase
         super.setUp();
 
         // add setup code here.
-        queue = new DefaultRecipeQueue();
+        queue = new ThreadedRecipeQueue();
         queue.setEventManager(new DefaultEventManager());
         queue.start();
     }
@@ -92,7 +92,7 @@ public class DefaultRecipeQueueTest extends TestCase
     private RecipeDispatchRequest createDispatchRequest()
     {
         BuildHostRequirements requirements = new MockBuildHostRequirements();
-        RecipeRequest request = new RecipeRequest(-1, null, null, null);
+        RecipeRequest request = new RecipeRequest(-1, null, null);
         return new RecipeDispatchRequest(requirements, request);
     }
 
@@ -107,8 +107,18 @@ public class DefaultRecipeQueueTest extends TestCase
         {
         }
 
-        public void cleanupResults(long recipeId)
+        public void cleanup(long recipeId)
         {
+        }
+
+        public String getHostName()
+        {
+            return "[mock]";
+        }
+
+        public String getUrl()
+        {
+            return null;
         }
     }
 

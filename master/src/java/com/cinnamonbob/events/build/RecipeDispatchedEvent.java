@@ -1,17 +1,13 @@
 package com.cinnamonbob.events.build;
 
 import com.cinnamonbob.BuildService;
-import com.cinnamonbob.core.event.Event;
 
 /**
  * Raised when a recipe has been dispatched to a build host.
  */
-public class RecipeDispatchedEvent extends Event
+public class RecipeDispatchedEvent extends RecipeEvent
 {
-    /**
-     * THe id of the recipe that was dispatched
-     */
-    private long recipeId;
+
     /**
      * The service the recipe was dispatched to.
      */
@@ -20,9 +16,7 @@ public class RecipeDispatchedEvent extends Event
 
     public RecipeDispatchedEvent(Object source, long recipeId, BuildService service)
     {
-        super(source);
-        // TODO is this a RecipeEvent (once we remove the whole result from there)?
-        this.recipeId = recipeId;
+        super(source, recipeId);
         this.service = service;
     }
 
@@ -31,8 +25,4 @@ public class RecipeDispatchedEvent extends Event
         return service;
     }
 
-    public long getRecipeId()
-    {
-        return recipeId;
-    }
 }

@@ -4,8 +4,6 @@ import com.cinnamonbob.core.model.Result;
 import com.cinnamonbob.core.model.ResultState;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,7 +16,7 @@ public class BuildResult extends Result
      * Map from SCM id to details for that SCM.
      */
     private Map<Long, BuildScmDetails> scmDetails;
-    private List<RecipeResultNode> results;
+    private RecipeResultNode root;
 
     public BuildResult()
     {
@@ -30,7 +28,7 @@ public class BuildResult extends Result
         this.project = project;
         this.number = number;
         state = ResultState.INITIAL;
-        results = new LinkedList<RecipeResultNode>();
+        root = new RecipeResultNode(null);
     }
 
     public Project getProject()
@@ -90,18 +88,13 @@ public class BuildResult extends Result
         return false;
     }
 
-    public List<RecipeResultNode> getResults()
+    public RecipeResultNode getRoot()
     {
-        return results;
+        return root;
     }
 
-    private void setResults(List<RecipeResultNode> results)
+    private void setRoot(RecipeResultNode root)
     {
-        this.results = results;
-    }
-
-    public void add(RecipeResultNode result)
-    {
-        results.add(result);
+        this.root = root;
     }
 }

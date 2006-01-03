@@ -36,7 +36,10 @@ public class RecipeResult extends Result
 
     public void update(CommandResult result)
     {
-        results.remove(results.size() - 1);
+        // lets save this command result by replacing the existing persistent result
+        // with the new one... simple.
+        CommandResult currentResult = results.remove(results.size() - 1);
+        result.setId(currentResult.getId());
         results.add(result);
 
         switch (result.state)

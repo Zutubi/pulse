@@ -9,7 +9,7 @@ import com.cinnamonbob.core.model.Entity;
 public class BuildSpecification extends Entity
 {
     private String name;
-    private BuildSpecificationNode root = new BuildSpecificationNode(null, null);
+    private BuildSpecificationNode root = new BuildSpecificationNode(null);
 
     public BuildSpecification()
     {

@@ -21,11 +21,13 @@
             <generator class="hilo"/>
         </id>
 
-        <many-to-one name="hostRequirements" class="com.cinnamonbob.model.AbstractBuildHostRequirements"
-                     column="BUILD_HOST_REQUIREMENTS_ID"
-                     cascade="all" unique="true"/>
+        <component name="stage" class="com.cinnamonbob.model.BuildStage">
+            <many-to-one name="hostRequirements" class="com.cinnamonbob.model.AbstractBuildHostRequirements"
+                         column="BUILD_HOST_REQUIREMENTS_ID"
+                         cascade="all" unique="true"/>
 
-        <property name="recipe" type="string" length="255"/>
+            <property name="recipe" type="string" length="255"/>
+        </component>
 
         <list name="children" cascade="all-delete-orphan" lazy="false">
             <key column="PARENT_ID"/>

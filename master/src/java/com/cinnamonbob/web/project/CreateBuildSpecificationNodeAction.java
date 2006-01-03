@@ -1,9 +1,6 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.model.BuildSpecificationNode;
-import com.cinnamonbob.model.MasterBuildHostRequirements;
-import com.cinnamonbob.model.Slave;
-import com.cinnamonbob.model.SlaveBuildHostRequirements;
+import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildSpecificationNodeDao;
 import com.cinnamonbob.model.persistence.SlaveDao;
 import com.cinnamonbob.web.ActionSupport;
@@ -18,7 +15,7 @@ public class CreateBuildSpecificationNodeAction extends ActionSupport
 {
     private long specId;
     private long parentId;
-    private BuildSpecificationNode node = new BuildSpecificationNode();
+    private BuildStage stage = new BuildStage();
     private BuildSpecificationNodeDao buildSpecificationNodeDao;
     private SlaveDao slaveDao;
     private Long buildHost;
@@ -44,14 +41,14 @@ public class CreateBuildSpecificationNodeAction extends ActionSupport
         this.parentId = parentId;
     }
 
-    public BuildSpecificationNode getNode()
+    public BuildStage getStage()
     {
-        return node;
+        return stage;
     }
 
-    public void setNode(BuildSpecificationNode node)
+    public void setStage(BuildStage stage)
     {
-        this.node = node;
+        this.stage = stage;
     }
 
     public void setBuildSpecificationNodeDao(BuildSpecificationNodeDao buildSpecificationNodeDao)
@@ -102,21 +99,23 @@ public class CreateBuildSpecificationNodeAction extends ActionSupport
     public String execute()
     {
         BuildSpecificationNode parent = buildSpecificationNodeDao.findById(parentId);
+
         if (buildHost == 0)
         {
-            node.setHostRequirements(new MasterBuildHostRequirements());
+            stage.setHostRequirements(new MasterBuildHostRequirements());
         }
         else
         {
             Slave slave = slaveDao.findById(buildHost);
-            node.setHostRequirements(new SlaveBuildHostRequirements(slave));
+            stage.setHostRequirements(new SlaveBuildHostRequirements(slave));
         }
 
-        if (node.getRecipe().equals(""))
+        if (stage.getRecipe() != null && stage.getRecipe().equals(""))
         {
-            node.setRecipe(null);
+            stage.setRecipe(null);
         }
 
+        BuildSpecificationNode node = new BuildSpecificationNode(stage);
         parent.addChild(node);
         buildSpecificationNodeDao.save(node);
 

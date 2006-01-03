@@ -103,6 +103,6 @@
 
     <bean id="fatController" class="com.cinnamonbob.FatController" autowire="byName" init-method="init"/>
 
-    <bean id="recipeQueue" class="com.cinnamonbob.RecipeQueue" autowire="byName" init-method="init"/>
+    <bean id="recipeQueue" class="com.cinnamonbob.ImmediateDispatchRecipeQueue" autowire="byName" init-method="init"/>
 
 </beans>

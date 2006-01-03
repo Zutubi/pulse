@@ -37,13 +37,13 @@ public class HibernateBuildSpecificationDaoTest extends PersistenceTestCase
     {
         BuildSpecification spec = new BuildSpecification("test spec");
 
-        BuildSpecificationNode masterNode = new BuildSpecificationNode(new MasterBuildHostRequirements(), "recipe 1");
+        BuildSpecificationNode masterNode = new BuildSpecificationNode(new BuildStage(new MasterBuildHostRequirements(), "recipe 1"));
         spec.getRoot().addChild(masterNode);
 
         Slave slave = new Slave("test slave", "test host");
         slaveDao.save(slave);
 
-        BuildSpecificationNode slaveNode = new BuildSpecificationNode(new SlaveBuildHostRequirements(slave), "recipe 2");
+        BuildSpecificationNode slaveNode = new BuildSpecificationNode(new BuildStage(new SlaveBuildHostRequirements(slave), "recipe 2"));
         masterNode.addChild(slaveNode);
 
         buildSpecificationDao.save(spec);

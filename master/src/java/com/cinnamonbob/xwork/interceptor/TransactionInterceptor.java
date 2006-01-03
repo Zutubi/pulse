@@ -1,5 +1,6 @@
 package com.cinnamonbob.xwork.interceptor;
 
+import com.cinnamonbob.util.logging.Logger;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.ActionProxy;
 import com.opensymphony.xwork.interceptor.Interceptor;
@@ -10,11 +11,10 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
 
 import java.util.logging.Level;
-import com.cinnamonbob.util.logging.Logger;
 
 /**
  * An interceptor that wraps the action execution in a single Hibernate transaction.
- * 
+ * <p/>
  * NOTE: Code is adapted from com.atlassian.confluence.util.XWorkTransactionInterceptor. Will
  * need to receive clearance from Atlassian prior 'selling' this code.
  */
@@ -45,13 +45,14 @@ public class TransactionInterceptor implements Interceptor
      * Return the transaction status of the current method invocation.
      * Mainly intended for code that wants to set the current transaction
      * rollback-only but not throw an application exception.
-     *
      */
     public static TransactionStatus currentTransactionStatus() throws RuntimeException
     {
         TransactionStatus status = currentTransactionStatus.get();
         if (status == null)
+        {
             throw new RuntimeException("No transaction status in scope");
+        }
         return status;
     }
 
@@ -96,21 +97,27 @@ public class TransactionInterceptor implements Interceptor
         {
             // We'll want to commit the transaction before the model is called.
             if (status[0] != null)
+            {
                 invocation.addPreResultListener(new PreResultListener()
                 {
                     public void beforeResult(ActionInvocation actionInvocation, String s)
                     {
                         if (LOG.isLoggable(Level.INFO))
+                        {
                             LOG.info("Committing transaction for " + getDetails(invocation.getProxy()) + " before model");
+                        }
 
                         getTransactionManager().commit(status[0]);
 
                         if (LOG.isLoggable(Level.INFO))
+                        {
                             LOG.info("Opening new transaction for " + getDetails(invocation.getProxy()) + " model");
+                        }
 
                         status[0] = getTransactionManager().getTransaction(transAtt);
                     }
                 });
+            }
 
             retVal = invocation.invoke();
         }
@@ -153,16 +160,18 @@ public class TransactionInterceptor implements Interceptor
         String methodName = proxy.getConfig().getMethodName();
 
         if (methodName == null)
-            methodName = "execute";
+        {
+            methodName = "collect";
+        }
 
         String actionClazz = proxy.getConfig().getClassName();
-        
+
         int dotIndex = actionClazz.lastIndexOf('.');
         if (dotIndex >= 0)
         {
             actionClazz = actionClazz.substring(dotIndex);
         }
-        
+
         return proxy.getNamespace() + "/" + proxy.getActionName() + ".action (" + actionClazz + "." + methodName + "())";
     }
 
@@ -182,7 +191,9 @@ public class TransactionInterceptor implements Interceptor
             else
             {
                 if (LOG.isLoggable(Level.INFO))
+                {
                     LOG.info("Action '" + getDetails(invocation.getProxy()) + "' threw throwable but this does not force transaction rollback: " + ex);
+                }
                 // Will still roll back if rollbackOnly is true
                 getTransactionManager().commit(status);
             }

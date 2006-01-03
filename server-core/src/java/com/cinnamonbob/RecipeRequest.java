@@ -27,10 +27,9 @@ public class RecipeRequest
     private String recipeName;
 
 
-    public RecipeRequest(long id, Bootstrapper bootstrapper, String bobFile, String recipeName)
+    public RecipeRequest(long id, String bobFile, String recipeName)
     {
         this.id = id;
-        this.bootstrapper = bootstrapper;
         this.bobFile = bobFile;
         this.recipeName = recipeName;
     }
@@ -53,5 +52,10 @@ public class RecipeRequest
     public String getRecipeName()
     {
         return recipeName;
+    }
+
+    public void setBootstrapper(Bootstrapper bootstrapper)
+    {
+        this.bootstrapper = bootstrapper;
     }
 }

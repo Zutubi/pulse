@@ -1,5 +1,6 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.model.persistence.ArtifactDao;
 import com.cinnamonbob.model.persistence.BuildResultDao;
@@ -28,6 +29,16 @@ public class DefaultBuildManager implements BuildManager
     public void save(BuildResult buildResult)
     {
         buildResultDao.save(buildResult);
+    }
+
+    public void save(RecipeResultNode node)
+    {
+        buildResultDao.save(node);
+    }
+
+    public void save(RecipeResult result)
+    {
+        buildResultDao.save(result);
     }
 
     public BuildResult getBuildResult(long id)

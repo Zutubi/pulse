@@ -11,8 +11,7 @@ import java.util.List;
  */
 public class BuildSpecificationNode extends Entity
 {
-    private BuildHostRequirements hostRequirements;
-    private String recipe;
+    private BuildStage stage;
     private List<BuildSpecificationNode> children = new LinkedList<BuildSpecificationNode>();
 
     public BuildSpecificationNode()
@@ -20,10 +19,9 @@ public class BuildSpecificationNode extends Entity
 
     }
 
-    public BuildSpecificationNode(BuildHostRequirements resolver, String recipe)
+    public BuildSpecificationNode(BuildStage stage)
     {
-        this.hostRequirements = resolver;
-        this.recipe = recipe;
+        this.stage = stage;
     }
 
     public List<BuildSpecificationNode> getChildren()
@@ -41,23 +39,13 @@ public class BuildSpecificationNode extends Entity
         children.add(child);
     }
 
-    public String getRecipe()
+    public BuildStage getStage()
     {
-        return recipe;
+        return stage;
     }
 
-    public void setRecipe(String recipe)
+    public void setStage(BuildStage stage)
     {
-        this.recipe = recipe;
-    }
-
-    public BuildHostRequirements getHostRequirements()
-    {
-        return hostRequirements;
-    }
-
-    public void setHostRequirements(BuildHostRequirements hostRequirements)
-    {
-        this.hostRequirements = hostRequirements;
+        this.stage = stage;
     }
 }
