@@ -1,0 +1,24 @@
+<html>
+<head>
+    <title>create-trigger</title>
+</head>
+<content tag="action">trigger.create</content>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='addTrigger.action'" "method='post'")
+
+    <h3>create trigger: step 1</h3>
+    <fieldset>
+        #tag (Select "list=state.types" "name='state.type'" "label='trigger.type'" "tabindex='1'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('next.name')" "name='next'" "tabindex='2'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='2'")
+    </fieldset>
+ #end
+
+</body>
+</html>
