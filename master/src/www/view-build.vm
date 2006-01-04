@@ -49,26 +49,26 @@
       <div class="command-content">
         #foreach($scmDetails in $result.scmDetails.values())
           #if($scmDetails.revision)
-            <h2 class="command-element">$scmDetails.scmName</h2>
+            <h3>$scmDetails.scmName</h3>
             Checked out revision <b>$scmDetails.revision</b>.
             #set($changes = $scmDetails.changelists)
 	        #if($changes.size() > 0)
               <h3>changes since last build</h3>
                 <table>
                   <tr>
-                    <th>who</th>
-                    <th>when</th>
-                    <th>what</th>
-                    <th>revision</th>
-                    <th>files</th>
+                    <th class="command-detail">who</th>
+                    <th class="command-detail">when</th>
+                    <th class="command-detail">what</th>
+                    <th class="command-detail">revision</th>
+                    <th class="command-detail">files</th>
                   </tr>
               #foreach($change in $changes)
                 <tr>
-                  <td>$change.user</td>
-                  <td>$change.date</td>
-                  <td>$change.commend</td>
-                  <td>$change.revision</td>
-                  <td>
+                  <td class="command-detail">$change.user</td>
+                  <td class="command-detail">$change.date</td>
+                  <td class="command-detail">$change.comment</td>
+                  <td class="command-detail">$change.revision</td>
+                  <td class="command-detail">
                     <ul class="scm-changes">
                 #foreach($file in $change.changes)
                       <li><span class="filename">$file.filename#$file.revision: $file.action</span></li>

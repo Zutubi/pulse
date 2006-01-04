@@ -6,6 +6,7 @@ import com.cinnamonbob.core.event.AsynchronousDelegatingListener;
 import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.core.util.TreeNode;
@@ -14,6 +15,8 @@ import com.cinnamonbob.events.build.BuildCompletedEvent;
 import com.cinnamonbob.events.build.RecipeEvent;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.scm.SCMException;
+import com.cinnamonbob.scm.SCMServer;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -24,6 +27,8 @@ import java.util.List;
  */
 public class BuildController implements EventListener
 {
+    private static final Logger LOG = Logger.getLogger(BuildController.class);
+
     private Project project;
     private BuildSpecification specification;
     private EventManager eventManager;
@@ -93,14 +98,46 @@ public class BuildController implements EventListener
         {
             try
             {
-                Revision revision = scm.createServer().getLatestRevision();
-                bootstrapper.add(new ScmCheckoutDetails(scm, revision));
+                SCMServer server = scm.createServer();
+                Revision latestRevision = server.getLatestRevision();
+                bootstrapper.add(new ScmCheckoutDetails(scm, latestRevision));
+
+                // collect scm changes to be added to the build results.
+                List<Changelist> scmChanges = null;
+
+                try
+                {
+                    List<BuildResult> previousBuildResults = buildManager.getLatestBuildResultsForProject(project, 2);
+
+                    if (previousBuildResults.size() == 2)
+                    {
+                        BuildScmDetails previousScmDetails = previousBuildResults.get(1).getScmDetails(scm.getId());
+                        if (previousScmDetails != null)
+                        {
+                            Revision previousRevision = previousScmDetails.getRevision();
+                            if (previousRevision != null)
+                            {
+                                scmChanges = server.getChanges(previousRevision, latestRevision, "");
+                            }
+                        }
+                    }
+                }
+                catch (SCMException e)
+                {
+                    // TODO: need to report this failure to the user. However, this is not fatal to the current build
+                    LOG.warning("Unable to retrieve changelist details from SCM server. ", e);
+                }
+
+                BuildScmDetails scmDetails = new BuildScmDetails(scm.getName(), latestRevision, scmChanges);
+                buildResult.addScmDetails(scm.getId(), scmDetails);
             }
             catch (SCMException e)
             {
                 throw new BuildException("Could not retrieve latest revision from SCM '" + scm.getName() + "'", e);
             }
         }
+
+        buildManager.save(buildResult);
 
         return bootstrapper;
     }

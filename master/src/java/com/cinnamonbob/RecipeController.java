@@ -109,6 +109,7 @@ public class RecipeController
     private void handleRecipeCompleted(RecipeCompletedEvent event)
     {
         recipeResult.update(event.getResult());
+        recipeResult.complete();
         buildManager.save(recipeResult);
         finished = true;
     }
