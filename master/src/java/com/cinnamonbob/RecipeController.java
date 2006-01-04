@@ -135,4 +135,8 @@ public class RecipeController
         return new CopyBootstrapper(url, recipeResult.getId());
     }
 
+    public boolean succeeded()
+    {
+        return recipeResult.succeeded();
+    }
 }

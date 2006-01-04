@@ -1,5 +1,6 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
+import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.model.BuildResult;
@@ -71,6 +72,11 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             return (BuildResult) results.get(0);
         }
         return null;
+    }
+
+    public CommandResult findCommandResult(long id)
+    {
+        return (CommandResult) getHibernateTemplate().load(CommandResult.class, Long.valueOf(id));
     }
 
     public void save(RecipeResultNode node)

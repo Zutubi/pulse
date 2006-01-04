@@ -91,57 +91,87 @@
 
         <div id="project-content">
 
+#macro(showsummary $result)
+<tr>
+  <th class="command-detail">commenced</td>
+  <th class="command-detail">elapsed</td>
+  <th class="command-detail">status</td>
+</tr>
+<tr>
+  <td class="build-$class">$result.stamps.prettyStartTime</td>
+  <td class="build-$class">$result.stamps.prettyElapsed</td>
+  <td class="build-$class">$result.state.prettyString</td>
+</tr>
+  #if($result.errored() && $result.errorMessage)
+    <tr>
+      <td class="build-failure" colspan="4">
+        <h4>error message</h4>
+        <ul class="error">
+          <li class="error">$result.errorMessage</li>
+        </ul>
+      </td>
+    </tr>
+  #end      
+#end
+
+#macro(showrecipes node)
+<ul class="recipe-summary">
+  #foreach($child in $node.children)
+    #set($recipeResult = $child.result)
+
+    <li class="recipe-summary">
+    #if($recipeResult.commenced())
+      #if($recipeResult.inProgress())
+        #set($class = "info")
+      #elseif($recipeResult.succeeded())
+        #set($class = "success")
+      #else
+        #set($class = "failure")
+      #end
+
+      #if($recipeResult.recipeName)
+        #set($recipeName = $recipeResult.recipeName)
+      #else
+        #set($recipeName = "[default]")
+      #end
+
+      <table>
+        <tr>
+          <th class="build-$class" colspan="3">$recipeName @ $child.host</th>
+        </tr>
+        #showsummary($recipeResult)
+      </table>
+    #else
+      <table>
+        <tr>
+          <th class="build-pending">$recipeName @ [pending]</th>
+        <tr>
+      </table>
+    #end
+    </li>
+  #end
+  #if($child.children.size() > 0)
+    #showrecipes($child)
+  #end
+</ul>
+#end
         #if($currentBuild)
-            #set($recipeResult = $currentBuild.root.children.get(0).result)
-            #if($recipeResult.inProgress())
+            #if($currentBuild.inProgress())
                 #set($class = "info")
-            #elseif($recipeResult.succeeded())
+            #elseif($currentBuild.succeeded())
                 #set($class = "success")
             #else
               #set($class = "failure")
             #end
             <h2 class="command-$class">current build [<a href="viewBuild.action?id=$project.id&buildId=$currentBuild.id">$currentBuild.number</a>]</h2>
             <div class="command-content">
-            <table>          
-                #detailrow("commenced" $recipeResult.stamps.prettyStartTime)
-                #detailrow("elapsed"   $recipeResult.stamps.prettyElapsed)
-                #detailrow("status"    $recipeResult.state.prettyString)
+            <h4>summary</h4>
+            <table>
+                #showsummary($currentBuild)
             </table>
-            #if($recipeResult.errorMessage)
-                <h2 class="command-element">error details</h2>    
-                <div class="error">
-                <b>message</b>
-                <pre>$recipeResult.errorMessage</pre>
-                </div>
-            #end
-            #if($recipeResult.commandResults.size() > 0)
-                <h2 class="command-element">command log</h2>
-                <table>
-                   <tr>
-                        <th class="command-detail">command</th>
-                        <th class="command-detail">when</th>
-                        <th class="command-detail">elapsed</th>
-                        <th class="command-detail">status</th>
-                    </tr>
-                    #foreach($result in $recipeResult.commandResults)
-                        #if($result.commenced())
-                            #if($result.succeeded())
-                                #set($class = "success")
-                            #elseif($result.inProgress())
-                                #set($class = "info")
-                            #else
-                                #set($class = "failure")
-                            #end
-                            <tr>
-                                <td class="build-$class">$result.commandName</td>
-                                <td class="build-$class">$result.stamps.prettyStartTime</td>
-                                <td class="build-$class">$result.stamps.prettyElapsed</td>
-                                <td class="build-$class">$result.state.prettyString</td>
-                            </tr>
-                        #end
-                    #end
-                </table>
-            #end
+
+            <h4>recipes</h4>
+            #showrecipes($currentBuild.root)
         </div>
       #end
 

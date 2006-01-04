@@ -1,5 +1,6 @@
 package com.cinnamonbob.core.model;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,19 +42,30 @@ public class RecipeResult extends Result
         CommandResult currentResult = results.remove(results.size() - 1);
         result.setId(currentResult.getId());
         results.add(result);
+        File remoteDir = new File(result.getOutputDir());
+        File localDir = new File(getOutputDir(), remoteDir.getName());
+        result.setOutputDir(localDir.getAbsolutePath());
 
         switch (result.state)
         {
             case ERROR:
             case FAILURE:
-                state = ResultState.ERROR;
+                state = ResultState.FAILURE;
                 break;
         }
     }
 
     public void update(RecipeResult result)
     {
-        this.state = result.state;
+        // Don't unconditionally take state: take it only if it may indicate
+        // an error which we may not have noticed locally.
+        switch (result.state)
+        {
+            case ERROR:
+            case FAILURE:
+                state = result.state;
+        }
+
         this.stamps = result.stamps;
         this.errorMessage = result.errorMessage;
     }

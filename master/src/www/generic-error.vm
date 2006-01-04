@@ -4,11 +4,7 @@
   </head>
   <body>
     <h1>Error</h1>
-    <p>The following errors were detected:</p>
-    <ul>
-#foreach($error in $genericErrors)
-      <li>$error</li>
-#end
+#parse("/template/includes/actionerrors.vm")
     </ul>
   </body>
 </html>

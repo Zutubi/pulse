@@ -160,7 +160,7 @@ public abstract class Result extends Entity
         return result;
     }
 
-    private String getOutputDir()
+    public String getOutputDir()
     {
         if (outputDir == null)
         {
@@ -172,7 +172,7 @@ public abstract class Result extends Entity
         }
     }
 
-    private void setOutputDir(String dir)
+    public void setOutputDir(String dir)
     {
         if (dir == null)
         {

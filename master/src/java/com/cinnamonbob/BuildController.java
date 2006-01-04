@@ -120,6 +120,10 @@ public class BuildController implements EventListener
             RecipeResultNode childResultNode = new RecipeResultNode(recipeResult);
             resultNode.addChild(childResultNode);
             buildManager.save(resultNode);
+
+            MasterBuildPaths paths = new MasterBuildPaths();
+            recipeResult.setOutputDir(paths.getRecipeDir(project, buildResult, recipeResult.getId()).getAbsolutePath());
+
             RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), project.getBobFile(), stage.getRecipe());
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), recipeRequest);
             RecipeController rc = new RecipeController(childResultNode, dispatchRequest, collector, queue, buildManager);
@@ -170,11 +174,19 @@ public class BuildController implements EventListener
             {
                 controller.collect(buildResult);
                 finishedNodes.add(node);
-                for (TreeNode<RecipeController> child : node.getChildren())
-                {
-                    run(controller.getChildBootstrapper(), child);
-                }
 
+                if (controller.succeeded())
+                {
+                    for (TreeNode<RecipeController> child : node.getChildren())
+                    {
+                        run(controller.getChildBootstrapper(), child);
+                    }
+                }
+                else
+                {
+                    buildResult.failure();
+                    buildManager.save(buildResult);
+                }
             }
         }
 

@@ -84,6 +84,19 @@
 	    #end
 	  </div>
 
+#macro(errorrow $result)
+  #if($result.errored() && $result.errorMessage)
+    <tr>
+      <td class="build-failure" colspan="4">
+        <h4>error message</h4>
+        <ul class="error">
+          <li class="error">$result.errorMessage</li>
+        </ul>
+      </td>
+    </tr>
+  #end
+#end
+
 #macro(showrecipes $node)
   <ul>
   #foreach($child in $node.children)
@@ -123,12 +136,15 @@
           <td class="build-$class">$recipeResult.state.prettyString</td>
         <tr>
     #end
+
+    #errorrow($recipeResult)
+
     #if($recipeResult.commandResults.size() > 0)
         <tr>
           <th class="command-detail">command</th>
-          <th class="command-detail">when</th>
           <th class="command-detail">elapsed</th>
           <th class="command-detail">status</th>
+          <th class="command-detail">artifacts</th>
         </tr>
       #foreach($commandResult in $recipeResult.commandResults)
         #if(!$commandResult.commenced())
@@ -142,10 +158,21 @@
         #end
         <tr>
           <td class="build-$commandClass">$commandResult.commandName</td>
-          <td class="build-$commandClass">$commandResult.stamps.prettyStartTime</td>
           <td class="build-$commandClass">$commandResult.stamps.prettyElapsed</td>
           <td class="build-$commandClass">$commandResult.state.prettyString</td>
+          <td class="build-$commandClass">
+            #if($commandResult.artifacts.size() > 0)
+              <ul class="artifact">
+              #foreach($artifact in $commandResult.artifacts)
+                <li class="artifact"><a href="viewArtifact.action?id=$artifact.id&commandId=$commandResult.id">$artifact.name</a></li>
+              #end
+              </ul>
+            #else
+              [none]
+            #end
+          </td>
         </tr>
+        #errorrow($recipeResult)
       #end
     #end
       </table>

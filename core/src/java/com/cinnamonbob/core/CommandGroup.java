@@ -72,31 +72,32 @@ public class CommandGroup implements Command
         {
             StoredArtifact a = result.getArtifact(m.getArtifact());
 
-            if(a != null)
+            if (a != null)
             {
                 m.getProcessor().process(a);
             }
             else
             {
-                 throw new BuildException("Unable to post-process unknown artifact '" + m.getArtifact() + "'");
+                throw new BuildException("Unable to post-process unknown artifact '" + m.getArtifact() + "'");
             }
         }
     }
 
     private void collectArtifacts(CommandResult result, File outputDir)
     {
-        for(FileArtifact artifact: artifacts)
+        for (FileArtifact artifact : artifacts)
         {
             File toFile = artifact.getToFile();
 
-            if(toFile == null)
+            if (toFile == null)
             {
                 toFile = new File(artifact.getFile().getName());
             }
 
-            if(!toFile.isAbsolute())
+            if (!toFile.isAbsolute())
             {
                 // Then it is relative to the output path.
+                // TODO: I think an absolute path will actually break things :-(
                 toFile = new File(outputDir, toFile.getName());
             }
 
@@ -105,9 +106,9 @@ public class CommandGroup implements Command
             try
             {
                 IOUtils.copyFile(fromFile, toFile);
-                result.addArtifact(new StoredArtifact(artifact, toFile.getAbsolutePath()));
+                result.addArtifact(new StoredArtifact(artifact, toFile.getPath()));
             }
-            catch(IOException e)
+            catch (IOException e)
             {
                 throw new BuildException("Unable to collect artifact '" + artifact.getName() + "'", e);
             }
@@ -118,7 +119,7 @@ public class CommandGroup implements Command
     {
         return command;
     }
-    
+
     /**
      * 
      */

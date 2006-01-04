@@ -24,12 +24,12 @@ public class ExecutableCommand implements Command
     private String name;
 
     private List<Environment> env = new LinkedList<Environment>();
-    
+
     public void execute(File outputDir, CommandResult cmdResult)
     {
         List<String> command = new LinkedList<String>();
         command.add(exe);
-        
+
         if (args != null)
         {
             for (Arg arg : args)
@@ -43,27 +43,27 @@ public class ExecutableCommand implements Command
         {
             builder.directory(workingDir);
         }
-        
+
         for (Environment setting : env)
         {
-            builder.environment().put(setting.getName(), setting.getValue());    
+            builder.environment().put(setting.getName(), setting.getValue());
         }
-            
+
         builder.redirectErrorStream(true);
-        
-        try 
-        {            
+
+        try
+        {
             Process child = builder.start();
             File outputFile = new File(outputDir, "output.txt");
             FileOutputStream output = new FileOutputStream(outputFile);
             InputStream input = child.getInputStream();
-            
+
             IOUtils.joinStreams(input, output);
             final int result = child.waitFor();
-            
+
             output.close();
 
-            if(result == 0)
+            if (result == 0)
             {
                 cmdResult.success();
             }
@@ -71,39 +71,39 @@ public class ExecutableCommand implements Command
             {
                 cmdResult.failure();
             }
-            
+
             cmdResult.getProperties().put("exit code", Integer.toString(result));
             cmdResult.getProperties().put("command line", constructCommandLine(builder));
-            
-            if(builder.directory() != null)
+
+            if (builder.directory() != null)
             {
                 cmdResult.getProperties().put("working directory", builder.directory().getAbsolutePath());
             }
-            
+
             // TODO awkward to add this stored artifact to the model...
             FileArtifact outputArtifact = new FileArtifact("output", outputFile);
             outputArtifact.setTitle("Command Output");
             outputArtifact.setType("text/plain");
-            cmdResult.addArtifact(new StoredArtifact(outputArtifact, outputFile.getAbsolutePath()));
+            cmdResult.addArtifact(new StoredArtifact(outputArtifact, outputFile.getName()));
         }
         catch (IOException e)
         {
             throw new BuildException(e);
-        } 
+        }
         catch (InterruptedException e)
         {
             throw new BuildException(e);
-        }        
+        }
     }
 
     public void setExe(String exe)
     {
         this.exe = exe;
     }
-    
+
     public void setArgs(String args)
     {
-        for(String arg: args.split(" "))
+        for (String arg : args.split(" "))
         {
             this.args.add(new Arg(arg));
         }
@@ -120,36 +120,36 @@ public class ExecutableCommand implements Command
         args.add(arg);
         return arg;
     }
-    
+
     public Environment createEnvironment()
     {
         Environment setting = new Environment();
         env.add(setting);
         return setting;
     }
-    
+
     private String constructCommandLine(ProcessBuilder builder)
     {
         StringBuffer result = new StringBuffer();
-        
-        for(String part: builder.command())
+
+        for (String part : builder.command())
         {
             boolean containsSpaces = part.indexOf(' ') != -1;
-            
-            if(containsSpaces)
+
+            if (containsSpaces)
             {
                 result.append('"');
             }
 
             result.append(part);
-            
-            if(containsSpaces)
+
+            if (containsSpaces)
             {
                 result.append('"');
             }
             result.append(' ');
         }
-        
+
         return result.toString();
     }
 

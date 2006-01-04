@@ -1,5 +1,6 @@
 package com.cinnamonbob.model.persistence;
 
+import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
@@ -17,4 +18,5 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     public BuildResult findByProjectAndNumber(final Project project, final long number);
 
+    CommandResult findCommandResult(long id);
 }

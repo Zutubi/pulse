@@ -1,7 +1,9 @@
 package com.cinnamonbob.web.project;
 
+import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.StoredArtifact;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -13,6 +15,8 @@ import java.io.InputStream;
 public class ViewArtifactAction extends ProjectActionSupport
 {
     private long id;
+    private long commandId;
+    private CommandResult commandResult;
     private StoredArtifact artifact;
     private InputStream inputStream;
 
@@ -26,6 +30,16 @@ public class ViewArtifactAction extends ProjectActionSupport
         this.id = id;
     }
 
+    public long getCommandId()
+    {
+        return commandId;
+    }
+
+    public void setCommandId(long commandId)
+    {
+        this.commandId = commandId;
+    }
+
     public StoredArtifact getArtifact()
     {
         return artifact;
@@ -33,19 +47,31 @@ public class ViewArtifactAction extends ProjectActionSupport
 
     public void validate()
     {
+        commandResult = getBuildManager().getCommandResult(commandId);
+        if (commandResult == null)
+        {
+            addActionError("Unknown command result '" + commandId + "'");
+        }
 
+        artifact = getBuildManager().getArtifact(id);
+        if (artifact == null)
+        {
+            addActionError("Unknown artifact '" + id + "'");
+        }
     }
 
     public String execute()
     {
-        artifact = getBuildManager().getArtifact(id);
+        File artifactFile = new File(commandResult.getOutputDir(), artifact.getFile());
+
         try
         {
-            inputStream = new FileInputStream(artifact.getFile());
+            inputStream = new FileInputStream(artifactFile.getAbsolutePath());
         }
-        catch(FileNotFoundException e)
+        catch (FileNotFoundException e)
         {
             e.printStackTrace();
+            addActionError("Unable to open artifact file: " + e.getMessage());
             return ERROR;
         }
         return SUCCESS;

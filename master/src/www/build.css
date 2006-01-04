@@ -68,7 +68,7 @@ div.info {
     background-color: #eeeeff;
 }
 
-th.command-detail {
+th.command-detail, th.build-info, th.build-success, th.build-failure, th.build-pending {
     background-color: #ffffff;
     text-align: left;
     padding-left: 0.3em;
@@ -78,7 +78,7 @@ th.command-detail {
     border-color: #ddddee;
 }
 
-td.command-detail, td.build-info, td.build-success, td.build-failure {
+td.command-detail, td.build-info, td.build-success, td.build-failure, td.build-pending {
     font-size: small;
     background-color: #ffffff;
     border-style: solid;
@@ -86,21 +86,27 @@ td.command-detail, td.build-info, td.build-success, td.build-failure {
     border-color: #ddddee;
     padding-left: 0.3em;
     padding-right: 0.3em;
+    vertical-align: top;
 }
 
-td.build-info {
+td.build-info, th.build-info {
     border-color: #b0b0f0;
     background-color: #eeeeff;
 }
 
-td.build-success {
+td.build-success, th.build-success {
     border-color: #00c000;
     background-color: #ddffdd;
 }
 
-td.build-failure {
+td.build-failure, th.build-failure {
     border-color: #c00000;
     background-color: #ffdddd;
+}
+
+td.build-pending, th.build-pending {
+    border-color: #D0D9BD;
+    background-color: #f5f7f1;
 }
 
 .filename {
@@ -169,4 +175,49 @@ ul.scm-changes {
 
 #build-tree li {
     margin-top: 10px;
+}
+
+ul.error, ul.warning, ul.info {
+    list-style: none;
+    padding-left: 12px;
+}
+
+li.error, li.warning, li.info {
+    padding-left: 20px;
+}
+
+li.error {
+    background: url( /images/forbidden_16.gif ) no-repeat 0 0;
+}
+
+li.warning {
+    background: url( /images/warning_16.gif ) no-repeat 0 0;
+}
+
+li.info {
+    background: url( /images/info_16.gif ) no-repeat 0 0;
+}
+
+ul.artifact {
+    padding-left: 0px;
+}
+
+li.artifact {
+    display: inline;
+    padding-left: 20px;
+    background: url( /images/gnome-mime-text.png ) no-repeat 0 0;
+}
+
+ul.recipe-summary {
+    list-style: none;
+    padding-left: 20px;
+}
+
+li.recipe-summary {
+    margin-top: 12px;
+}
+
+h4 {
+    margin-top: 8px;
+    margin-bottom: 6px;
 }

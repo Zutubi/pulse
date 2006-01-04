@@ -1,5 +1,6 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.StoredArtifact;
 
@@ -25,8 +26,9 @@ public interface BuildManager
 
     BuildResult getByProjectAndNumber(final Project project, final long number);
 
+    CommandResult getCommandResult(long id);
+
     StoredArtifact getArtifact(long id);
 
     long getNextBuildNumber(Project project);
-
 }

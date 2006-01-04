@@ -1,5 +1,6 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.model.persistence.ArtifactDao;
@@ -64,6 +65,11 @@ public class DefaultBuildManager implements BuildManager
     public BuildResult getByProjectAndNumber(final Project project, final long number)
     {
         return buildResultDao.findByProjectAndNumber(project, number);
+    }
+
+    public CommandResult getCommandResult(long id)
+    {
+        return buildResultDao.findCommandResult(id);
     }
 
     public StoredArtifact getArtifact(long id)

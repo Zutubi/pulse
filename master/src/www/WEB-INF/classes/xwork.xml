@@ -29,6 +29,7 @@
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
             </result>
+            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewUsers" class="com.cinnamonbob.web.user.ViewUsersAction">
