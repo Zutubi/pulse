@@ -247,11 +247,12 @@
         </action>
 
         <action name="addTrigger" class="com.cinnamonbob.web.wizard.WizardAction">
-            <param name="wizard">com.cinnamonbob.web.project.AddTriggerWizard</param>
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.cinnamonbob.web.project.AddTriggerWizard</param>
             <result name="select" type="velocity">select-trigger.vm</result>
             <result name="monitor" type="velocity">configure-monitor-trigger.vm</result>
             <result name="cron" type="velocity">configure-cron-trigger.vm</result>
-            <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+            <result name="success" type="redirect">/manageProject.action?id=${project}</result>
         </action>
 
         <action name="createTrigger!default" class="com.cinnamonbob.web.project.CreateTriggerAction"

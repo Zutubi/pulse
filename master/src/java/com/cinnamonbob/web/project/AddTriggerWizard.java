@@ -5,11 +5,10 @@ import com.cinnamonbob.web.wizard.BaseWizardState;
 import com.cinnamonbob.web.wizard.Wizard;
 import com.cinnamonbob.model.ProjectManager;
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.scheduling.DefaultScheduler;
-import com.cinnamonbob.scheduling.CronTrigger;
-import com.cinnamonbob.scheduling.SchedulingException;
+import com.cinnamonbob.scheduling.*;
 import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
 import com.cinnamonbob.util.logging.Logger;
+import com.cinnamonbob.scm.SCMChangeEvent;
 import com.opensymphony.util.TextUtils;
 
 import java.util.Map;
@@ -25,18 +24,58 @@ public class AddTriggerWizard extends BaseWizard
     private ProjectManager projectManager;
     private DefaultScheduler scheduler;
 
+    private SelectTriggerType selectState;
+    private ConfigureCronTrigger configCron;
+    private ConfigureMonitorTrigger configMonitor;
+
     public AddTriggerWizard()
     {
-        SelectTriggerType select = new SelectTriggerType(this, "select");
-        setCurrentState(select);
-        addState(select);
-        addState(new ConfigureCronTrigger(this, "cron"));
-        addState(new ConfigureMonitorTrigger(this, "monitor"));
+        selectState = new SelectTriggerType(this, "select");
+        configCron = new ConfigureCronTrigger(this, "cron");
+        configMonitor = new ConfigureMonitorTrigger(this, "monitor");
+
+        setCurrentState(selectState);
+
+        addState(selectState);
+        addState(configCron);
+        addState(configMonitor);
+    }
+
+    public long getProject()
+    {
+        return selectState.getProject();
     }
 
     public void process()
     {
         // wizard is finished, now we create the appropriate trigger.
+
+        Project project = projectManager.getProject(getProject());
+
+        Trigger trigger = null;
+        if ("cron".equals(selectState.getType()))
+        {
+            trigger = new CronTrigger(configCron.cron, configCron.name);
+            trigger.getDataMap().put(BuildProjectTask.PARAM_RECIPE, configCron.recipe);
+        }
+        else if ("monitor".equals(selectState.getType()))
+        {
+            trigger = new EventTrigger(SCMChangeEvent.class, configMonitor.name);
+            trigger.getDataMap().put(BuildProjectTask.PARAM_RECIPE, configMonitor.recipe);
+        }
+
+        trigger.setProject(project.getId());
+        trigger.setTaskClass(BuildProjectTask.class);
+        trigger.getDataMap().put(BuildProjectTask.PARAM_PROJECT, project.getId());
+
+        try
+        {
+            scheduler.schedule(trigger);
+        }
+        catch (SchedulingException e)
+        {
+            LOG.severe(e.getMessage(), e);
+        }
     }
 
     public void setProjectManager(ProjectManager projectManager)
@@ -113,30 +152,24 @@ public class AddTriggerWizard extends BaseWizard
         private String recipe;
         private String cron;
 
-        public ConfigureCronTrigger(Wizard wizard, String name)
+        public ConfigureCronTrigger(Wizard wizard, String stateName)
         {
-            super(wizard, name);
+            super(wizard, stateName);
         }
 
-        public void execute()
+        public void validate()
         {
-            long id = ((SelectTriggerType) getState("select")).getProject();
-
-            Project project = projectManager.getProject(id);
-
-            CronTrigger trigger = new CronTrigger(cron, name);
-            trigger.setProject(project.getId());
-            trigger.setTaskClass(BuildProjectTask.class);
-            trigger.getDataMap().put(BuildProjectTask.PARAM_PROJECT, project.getId());
-            trigger.getDataMap().put(BuildProjectTask.PARAM_RECIPE, recipe);
-
-            try
+            if (!TextUtils.stringSet(cron))
             {
-                scheduler.schedule(trigger);
+                addFieldError("cron", "Missing data.");
             }
-            catch (SchedulingException e)
+            if (!TextUtils.stringSet(name))
             {
-                LOG.severe(e.getMessage(), e);
+                addFieldError("name", "Missing data.");
+            }
+            if (!TextUtils.stringSet(recipe))
+            {
+                addFieldError("recipe", "Missing data.");
             }
         }
 
@@ -178,14 +211,50 @@ public class AddTriggerWizard extends BaseWizard
 
     public class ConfigureMonitorTrigger extends BaseWizardState
     {
-        public ConfigureMonitorTrigger(Wizard wizard, String name)
+        private String name;
+        private String recipe;
+
+        public ConfigureMonitorTrigger(Wizard wizard, String stateName)
         {
-            super(wizard, name);
+            super(wizard, stateName);
         }
 
         public String getNextState()
         {
             return null;
         }
+
+        public void validate()
+        {
+            if (!TextUtils.stringSet(name))
+            {
+                addFieldError("name", "Missing data.");
+            }
+            if (!TextUtils.stringSet(recipe))
+            {
+                addFieldError("recipe", "Missing data.");
+            }
+        }
+
+        public void setName(String name)
+        {
+            this.name = name;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public void setRecipe(String recipe)
+        {
+            this.recipe = recipe;
+        }
+
+        public String getRecipe()
+        {
+            return recipe;
+        }
     }
+
 }

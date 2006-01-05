@@ -1,9 +1,10 @@
 package com.cinnamonbob.web.wizard;
 
+import com.opensymphony.xwork.ValidationAware;
+import com.opensymphony.xwork.ValidationAwareSupport;
+
+import java.util.Collection;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.LinkedList;
 
 /**
  * <class-comment/>
@@ -13,8 +14,7 @@ public abstract class BaseWizardState implements WizardState
     private final String stateName;
     private Wizard wizard;
 
-    private Map<String, String> fieldErrors = new HashMap<String, String>();
-    private List<String> actionErrors = new LinkedList<String>();
+    private final ValidationAware validationAware = new ValidationAwareSupport();
 
     public BaseWizardState(Wizard wizard, String name)
     {
@@ -27,12 +27,12 @@ public abstract class BaseWizardState implements WizardState
 
     }
 
-    public void validate()
+    public void execute()
     {
 
     }
 
-    public void execute()
+    public void validate()
     {
 
     }
@@ -42,39 +42,82 @@ public abstract class BaseWizardState implements WizardState
         return stateName;
     }
 
+    public void clearErrors()
+    {
+        validationAware.setActionErrors(null);
+        validationAware.setFieldErrors(null);
+        validationAware.setActionMessages(null);
+    }
+
     public final Wizard getWizard()
     {
         return wizard;
     }
 
-    public final boolean hasErrors()
+    // ---( Implement the ValidationAware interface. )---
+
+    public void addActionError(String anErrorMessage)
     {
-        return getActionErrors().size() > 0 || getFieldErrors().size() > 0;
+        validationAware.addActionError(anErrorMessage);
     }
 
-    public final List<String> getActionErrors()
+    public void addActionMessage(String aMessage)
     {
-        return actionErrors;
+        validationAware.addActionMessage(aMessage);
     }
 
-    public final void clearErrors()
+    public void addFieldError(String fieldName, String errorMessage)
     {
-        getFieldErrors().clear();
-        getActionErrors().clear();
+        validationAware.addFieldError(fieldName, errorMessage);
     }
 
-    public final Map<String, String> getFieldErrors()
+    public Collection getActionMessages()
     {
-        return fieldErrors;
+        return validationAware.getActionMessages();
     }
 
-    public final void addFieldError(String field, String message)
+    public boolean hasActionErrors()
     {
-        getFieldErrors().put(field, message);
+        return validationAware.hasActionErrors();
     }
 
-    public final void addActionError(String message)
+    public boolean hasActionMessages()
     {
-        getActionErrors().add(message);
+        return validationAware.hasActionMessages();
+    }
+
+    public boolean hasFieldErrors()
+    {
+        return validationAware.hasFieldErrors();
+    }
+
+    public void setActionErrors(Collection errorMessages)
+    {
+        validationAware.setActionErrors(errorMessages);
+    }
+
+    public void setActionMessages(Collection messages)
+    {
+        validationAware.setActionMessages(messages);
+    }
+
+    public void setFieldErrors(Map errorMap)
+    {
+        validationAware.setFieldErrors(errorMap);
+    }
+
+    public Collection getActionErrors()
+    {
+        return validationAware.getActionErrors();
+    }
+
+    public Map getFieldErrors()
+    {
+        return validationAware.getFieldErrors();
+    }
+
+    public boolean hasErrors()
+    {
+        return validationAware.hasErrors();
     }
 }

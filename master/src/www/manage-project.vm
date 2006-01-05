@@ -76,13 +76,13 @@
             #foreach ($trigger in $triggers)
                     #set($recipe = "[default]")
                 <tr>
-                    <td class="command-detail">$trigger.name</td>
+                    <td class="command-detail">$trigger.name ($trigger.type)</td>
                     <td class="command-detail">$recipe</td>
                     <td class="command-detail"><a href="deleteTrigger.action?id=$trigger.id">delete</a></td>
                 </tr>
             #end
                 <tr>
-                    <td colspan="4" class="command-detail"><b>+</b> <a href="createTrigger!default.action?project=$project.id">add new trigger</a></td>
+                    <td colspan="4" class="command-detail"><b>+</b> <a href="addTrigger.action?project=$project.id">add new trigger</a></td>
                 </tr>
             </table>
         </div>
@@ -93,9 +93,9 @@
 
 #macro(showsummary $result)
 <tr>
-  <th class="command-detail">commenced</td>
-  <th class="command-detail">elapsed</td>
-  <th class="command-detail">status</td>
+  <th class="command-detail">commenced</th>
+  <th class="command-detail">elapsed</th>
+  <th class="command-detail">status</th>
 </tr>
 <tr>
   <td class="build-$class">$result.stamps.prettyStartTime</td>
@@ -111,7 +111,7 @@
         </ul>
       </td>
     </tr>
-  #end      
+  #end
 #end
 
 #macro(showrecipes node)

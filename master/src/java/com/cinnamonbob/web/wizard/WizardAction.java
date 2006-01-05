@@ -1,9 +1,10 @@
 package com.cinnamonbob.web.wizard;
 
-import com.cinnamonbob.web.ActionSupport;
+import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.util.logging.Logger;
-import com.opensymphony.xwork.ActionContext;
+import com.cinnamonbob.web.ActionSupport;
 import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.ActionContext;
 
 import java.util.Map;
 
@@ -16,6 +17,9 @@ import java.util.Map;
  *       <result name="b" type="velocity">example-b.vm</result>
  *       <result name="success" type="redirect">/wizard-finished.action</result>
  *    </action>
+ *
+ * NOTE: This action requires the 'model' to be located AFTER the 'static-params' interceptor
+ * in the xwork interceptor stack. Reason: The wizard property.
  */
 public class WizardAction extends ActionSupport
 {
@@ -24,7 +28,7 @@ public class WizardAction extends ActionSupport
 
     private boolean isInitialHit = false;
 
-    public void setWizard(String wizardClass)
+    public void setWizardClass(String wizardClass)
     {
         this.wizardClass = wizardClass;
     }
@@ -34,14 +38,13 @@ public class WizardAction extends ActionSupport
         if (!TextUtils.stringSet(wizardClass))
         {
             addActionError("Please specify a wizard class parameter in the xwork.xml action mapping.");
-            return;
         }
     }
 
     public String execute()
     {
         // lookup wizard.
-        Wizard wizard = lookupWizard();
+        Wizard wizard = getWizard();
         if (isInitialHit)
         {
             // this is the first time this wizard is being executed.
@@ -55,12 +58,13 @@ public class WizardAction extends ActionSupport
         // handle interceptor stack manually for the current state.
         // a) set params: handled by this actions interceptors - getState()...
         // b) validate
+
+        // clear previous errors if any remain.
+        currentState.clearErrors();
+
         currentState.validate();
         if (currentState.hasErrors())
         {
-            getFieldErrors().putAll(currentState.getFieldErrors());
-            getActionErrors().addAll(currentState.getActionErrors());
-            currentState.clearErrors();
             return currentState.getStateName();
         }
 
@@ -72,8 +76,8 @@ public class WizardAction extends ActionSupport
         {
             // The wizard is complete.
             // - remove wizard from the session so that it can be executed again.
-            wizard.setCurrentState(null);
             wizard.process();
+            wizard.setCurrentState(null);
             ActionContext.getContext().getSession().remove(wizardClass);
             return SUCCESS;
         }
@@ -85,19 +89,16 @@ public class WizardAction extends ActionSupport
         return next.getStateName();
     }
 
-    public WizardState getState()
-    {
-        return lookupWizard().getCurrentState();
-    }
-
-    private Wizard lookupWizard()
+    public Wizard getWizard()
     {
         try
         {
             Map session = ActionContext.getContext().getSession();
             if (!session.containsKey(wizardClass))
             {
+                // use Object factory to create this wizard
                 Wizard wizardInstance = (Wizard) Class.forName(wizardClass).newInstance();
+                ComponentContext.autowire(wizardInstance);
                 session.put(wizardClass, wizardInstance);
                 isInitialHit = true;
             }
@@ -108,6 +109,11 @@ public class WizardAction extends ActionSupport
             LOG.severe(e);
             return null;
         }
+    }
 
+    // make the state directly available to the ognl stack.
+    public Object getCurrentState()
+    {
+        return getWizard().getCurrentState();
     }
 }

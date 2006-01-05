@@ -2,6 +2,7 @@ package com.cinnamonbob.web.wizard;
 
 import junit.framework.TestCase;
 import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.Action;
 import com.cinnamonbob.web.ActionSupport;
 
 import java.util.HashMap;
@@ -11,7 +12,6 @@ import java.util.HashMap;
  */
 public class WizardActionTest extends TestCase
 {
-    private WizardAction action;
 
     public WizardActionTest(String string)
     {
@@ -22,19 +22,17 @@ public class WizardActionTest extends TestCase
     {
         super.setUp();
         ActionContext.getContext().setSession(new HashMap());
-        action = new WizardAction();
     }
 
     protected void tearDown() throws Exception
     {
-        action = null;
         ActionContext.getContext().setSession(null);
         super.tearDown();
     }
 
     public void testOneStepWizard()
     {
-        action.setWizard(OneStepWizard.class.getName());
+        WizardAction action = createWizard(OneStepWizard.class.getName());
         action.validate();
         assertFalse(action.hasErrors());
 
@@ -43,8 +41,7 @@ public class WizardActionTest extends TestCase
         OneStepWizard wizard = (OneStepWizard) ActionContext.getContext().getSession().get(OneStepWizard.class.getName());
         assertTrue(wizard.state.isInitialised());
 
-        action = new WizardAction();
-        action.setWizard(OneStepWizard.class.getName());
+        action = createWizard(OneStepWizard.class.getName());
         action.validate();
         assertFalse(action.hasErrors());
         assertEquals(ActionSupport.SUCCESS, action.execute());
@@ -56,8 +53,7 @@ public class WizardActionTest extends TestCase
 
     public void testTwoStepWizard()
     {
-        action = new WizardAction();
-        action.setWizard(TwoStepWizard.class.getName());
+        WizardAction action = createWizard(TwoStepWizard.class.getName());
         action.validate();
         assertFalse(action.hasErrors());
 
@@ -67,8 +63,7 @@ public class WizardActionTest extends TestCase
         assertTrue(wizard.stateOne.isInitialised());
         assertEquals(wizard.stateOne, wizard.getCurrentState());
 
-        action = new WizardAction();
-        action.setWizard(TwoStepWizard.class.getName());
+        action = createWizard(TwoStepWizard.class.getName());
         action.validate();
         assertFalse(action.hasErrors());
         assertEquals("two", action.execute());
@@ -80,8 +75,7 @@ public class WizardActionTest extends TestCase
 
         assertTrue(wizard.stateTwo.isInitialised());
 
-        action = new WizardAction();
-        action.setWizard(TwoStepWizard.class.getName());
+        action = createWizard(TwoStepWizard.class.getName());
         action.validate();
         assertFalse(action.hasErrors());
         assertEquals(ActionSupport.SUCCESS, action.execute());
@@ -89,5 +83,12 @@ public class WizardActionTest extends TestCase
         assertTrue(wizard.stateTwo.isValidated());
         assertTrue(wizard.stateTwo.isExecuted());
         assertTrue(wizard.isComplete());
+    }
+
+    private WizardAction createWizard(String name)
+    {
+        WizardAction action = new WizardAction();
+        action.setWizardClass(name);
+        return action;
     }
 }

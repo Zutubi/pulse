@@ -1,0 +1,25 @@
+<html>
+<head>
+    <title>create trigger</title>
+</head>
+<content tag="action">trigger.create</content>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='addTrigger.action'" "method='post'")
+
+    <h3>Step 2: create scm trigger</h3>
+
+    <fieldset>
+        #tag (TextField "name='name'" "required='true'" "tabindex='1'")
+        #tag (TextField "name='recipe'" "required='true'" "tabindex='2'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='4'")
+    </fieldset>
+#end
+
+</body>
+</html>

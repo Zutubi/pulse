@@ -34,6 +34,7 @@
             <interceptor name="execAndWait" class="com.opensymphony.webwork.interceptor.ExecuteAndWaitInterceptor"/>
             <interceptor name="cancel" class="com.cinnamonbob.xwork.interceptor.CancelWorkflowInterceptor"/>
             <interceptor name="transaction" class="com.cinnamonbob.xwork.interceptor.TransactionInterceptor"/>
+            <interceptor name="wizard" class="com.cinnamonbob.web.wizard.WizardInterceptor"/>
 
             <!-- Basic stack -->
             <interceptor-stack name="defaultStack">
@@ -100,6 +101,23 @@
                 <interceptor-ref name="component"/>
                 <interceptor-ref name="fileUpload"/>
                 <interceptor-ref name="static-params"/>
+                <interceptor-ref name="params"/>
+                <interceptor-ref name="cancel"/>
+                <interceptor-ref name="conversionError"/>
+                <interceptor-ref name="validation"/>
+                <interceptor-ref name="workflow"/>
+            </interceptor-stack>
+
+            <interceptor-stack name="wizardStack">
+                <interceptor-ref name="transaction"/>
+                <interceptor-ref name="prepare"/>
+                <interceptor-ref name="servlet-config"/>
+                <interceptor-ref name="chain"/>
+                <interceptor-ref name="model-driven"/>
+                <interceptor-ref name="component"/>
+                <interceptor-ref name="fileUpload"/>
+                <interceptor-ref name="static-params"/>
+                <interceptor-ref name="wizard"/>
                 <interceptor-ref name="params"/>
                 <interceptor-ref name="cancel"/>
                 <interceptor-ref name="conversionError"/>
