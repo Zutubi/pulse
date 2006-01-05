@@ -1,0 +1,41 @@
+#macro(detailrow $header $content)
+  <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
+#end
+
+<html>
+  <head>
+    <title>view changelist</title>
+    <link href="build.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h1 class="build-log">:: changelist revision $changelist.revision ::</h1>
+
+    <h2 class="command-info">brief</h2>
+    <div class="command-content">
+    <table>
+      #detailrow("revision" $changelist.revision)
+      #detailrow("who" $changelist.user)
+      #detailrow("when" $changelist.date)
+      #detailrow("comment" $changelist.comment)
+    </table>
+    </div>
+
+    <h2 class="command-info">files changed</h2>
+    <div class="command-content">
+      <table>
+        <tr>
+          <th class="command-detail">file</th>
+          <th class="command-detail">revision</th>
+          <th class="command-detail">action</th>
+        </tr>
+        #foreach($file in $changelist.changes)
+          <tr>
+            <td class="command-detail"><span class="filename">$file.filename</span></td>
+            <td class="command-detail">$file.revision</td>
+            <td class="command-detail">$file.action</td>
+          </tr>
+        #end
+      </table>
+    </div>
+  </body>
+</html>

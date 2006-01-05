@@ -20,6 +20,11 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="viewChangelist" class="com.cinnamonbob.web.project.ViewChangelistAction">
+            <result name="success" type="velocity">view-changelist.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="triggerBuild" class="com.cinnamonbob.web.project.TriggerBuildAction">
             <result name="success" type="redirect">manageProject.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>

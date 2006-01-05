@@ -19,6 +19,46 @@
   #end      
 #end
 
+#macro(errorrow $result)
+  #if($result.errored() && $result.errorMessage)
+    <tr>
+      <td class="build-failure" colspan="4">
+        <h4>error message</h4>
+        <ul class="error">
+          <li class="error">$result.errorMessage</li>
+        </ul>
+      </td>
+    </tr>
+  #end
+#end
+
+#macro(resultsummary $result)
+  #if(!$result.commenced())
+    #set($class = "pending")
+  #elseif($result.inProgress())
+    #set($class = "info")
+  #elseif($result.succeeded())
+    #set($class = "success")
+  #else
+    #set($class = "failure")
+  #end
+
+  <tr>
+    <th class="command-detail">commenced</th>
+    <th class="command-detail">completed</th>
+    <th class="command-detail">elapsed</th>
+    <th class="command-detail">status</th>
+  </tr>
+  <tr>
+    <td class="build-$class">$result.stamps.prettyStartTime</td>
+    <td class="build-$class">$result.stamps.prettyEndTime</td>
+    <td class="build-$class">$result.stamps.prettyElapsed</td>
+    <td class="build-$class">$result.state.prettyString</td>
+  <tr>
+
+  #errorrow($result)
+#end
+
 <html>
   <head>
     <title>$project.name build $result.number</title>
@@ -37,80 +77,55 @@
     <h2 class="command-$class">summary</h2>
     <div class="command-content">
       <table>
-        #detailrow("commenced" $result.stamps.prettyStartTime)
-        #detailrow("completed" $result.stamps.prettyEndTime)
-        #detailrow("elapsed"   $result.stamps.prettyElapsed)
-        #detailrow("status"    $result.state.prettyString)
+        #resultsummary($result)
       </table>
-      #errordetails($result)
     </div>
 
       <h2 class="command-info">changes</h2>
       <div class="command-content">
         #foreach($scmDetails in $result.scmDetails.values())
           #if($scmDetails.revision)
-            <h3>$scmDetails.scmName</h3>
-            Checked out revision <b>$scmDetails.revision</b>.
+            <table>
+              <tr>
+                <th class="build-info" colspan="4">$scmDetails.scmName</th>
+              </tr>
+              <tr>
+                <th class="command-detail" colspan="4">
+                  checked out revision $scmDetails.revision
+                </th>
+              </tr>
             #set($changes = $scmDetails.changelists)
 	        #if($changes.size() > 0)
-              <h3>changes since last build</h3>
-                <table>
                   <tr>
+                    <th class="command-detail">revision</th>
                     <th class="command-detail">who</th>
                     <th class="command-detail">when</th>
-                    <th class="command-detail">what</th>
-                    <th class="command-detail">revision</th>
-                    <th class="command-detail">files</th>
+                    <th class="command-detail">comment</th>
                   </tr>
               #foreach($change in $changes)
                 <tr>
+                  <td class="command-detail"><a href="viewChangelist.action?id=$change.id">$change.revision</a></td>
                   <td class="command-detail">$change.user</td>
                   <td class="command-detail">$change.date</td>
                   <td class="command-detail">$change.comment</td>
-                  <td class="command-detail">$change.revision</td>
-                  <td class="command-detail">
-                    <ul class="scm-changes">
-                #foreach($file in $change.changes)
-                      <li><span class="filename">$file.filename#$file.revision: $file.action</span></li>
-                #end
-                    </ul>
-                  </td>
-                </table>
+                </tr>
               #end
             #else
-              <div>No changes since last build.</div>
+              <tr>
+                <td class="command-detail" colspan="4">
+                  no changes since last build
+                </td>
+              </tr>
             #end
+            </table>
 	      #end
 	    #end
 	  </div>
-
-#macro(errorrow $result)
-  #if($result.errored() && $result.errorMessage)
-    <tr>
-      <td class="build-failure" colspan="4">
-        <h4>error message</h4>
-        <ul class="error">
-          <li class="error">$result.errorMessage</li>
-        </ul>
-      </td>
-    </tr>
-  #end
-#end
 
 #macro(showrecipes $node)
   <ul>
   #foreach($child in $node.children)
     #set($recipeResult = $child.result)
-
-    #if(!$recipeResult.commenced())
-      #set($class = "pending")
-    #elseif($recipeResult.inProgress())
-      #set($class = "info")
-    #elseif($recipeResult.succeeded())
-      #set($class = "success")
-    #else
-      #set($class = "failure")
-    #end
 
     #if($recipeResult.recipeName)
       #set($recipeName = $recipeResult.recipeName)
@@ -123,21 +138,8 @@
           <th colspan="4" class="command-detail">$recipeName @ $child.host</th>
         </tr>
     #if($recipeResult.commenced())
-        <tr>
-          <th class="command-detail">commenced</th>
-          <th class="command-detail">completed</th>
-          <th class="command-detail">elapsed</th>
-          <th class="command-detail">status</th>
-        </tr>
-        <tr>
-          <td class="build-$class">$recipeResult.stamps.prettyStartTime</td>
-          <td class="build-$class">$recipeResult.stamps.prettyEndTime</td>
-          <td class="build-$class">$recipeResult.stamps.prettyElapsed</td>
-          <td class="build-$class">$recipeResult.state.prettyString</td>
-        <tr>
+      #resultsummary($result)
     #end
-
-    #errorrow($recipeResult)
 
     #if($recipeResult.commandResults.size() > 0)
         <tr>
