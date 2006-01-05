@@ -49,17 +49,18 @@
             <table>
                 <tr>
                     <th class="command-detail">name</th>
-                    <th colspan="2" class="command-detail">actions</th>
+                    <th colspan="3" class="command-detail">actions</th>
                 </tr>
             #foreach ($buildSpec in $project.buildSpecifications)
                 <tr>
                     <td class="command-detail"><a href="viewBuildSpecification.action?projectId=$project.id&id=$buildSpec.id">$buildSpec.name</a></td>
                     <td class="command-detail"><a href="triggerBuild.action?id=$buildSpec.id&projectId=$project.id">trigger</a></td>
+                    <td class="command-detail"><a href="viewBuildSpecification.action?projectId=$project.id&id=$buildSpec.id">edit</a></td>
                     <td class="command-detail"><a href="deleteBuildSpecification.action?id=$buildSpec.id">delete</a></td>
                 </tr>
             #end
                 <tr>
-                    <td colspan="3" class="command-detail"><b>+</b> <a href="createBuildSpecification!default.action?projectId=$project.id">add new build specification</a></td>
+                    <td colspan="4" class="command-detail"><b>+</b> <a href="createBuildSpecification!default.action?projectId=$project.id">add new build specification</a></td>
                 </tr>
             </table>
         </div>

@@ -131,7 +131,7 @@ public class AddTriggerWizard extends BaseWizard
         {
             if (!TextUtils.stringSet(type) || !types.containsKey(type))
             {
-                addFieldError("state.type", "Invalid type '" + type + "' specified. ");
+                addFieldError("type", "Invalid type '" + type + "' specified. ");
             }
         }
 
@@ -169,7 +169,7 @@ public class AddTriggerWizard extends BaseWizard
             }
             if (!TextUtils.stringSet(spec))
             {
-                addFieldError("recipe", "Missing data.");
+                addFieldError("spec", "Missing data.");
             }
         }
 

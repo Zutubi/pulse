@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>create-user</title>
+    <title>create user</title>
 </head>
 <content tag="action">user.create</content>
 <body>

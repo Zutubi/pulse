@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>create-build-specification</title>
+    <title>create build specification</title>
 </head>
 <content tag="action">buildSpecification.create</content>
 <body>

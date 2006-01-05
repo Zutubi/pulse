@@ -157,11 +157,11 @@ td.health-failed {
 
 #project-left-column {
     float: left;
-    width: 27%;
+    width: 33%;
 }
 
 #project-content {
-    margin-left: 29%;
+    margin-left: 35%;
 }
 
 ul.scm-changes {

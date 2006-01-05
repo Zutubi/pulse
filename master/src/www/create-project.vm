@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>create-project</title>
+    <title>create project</title>
 </head>
 <content tag="action">project.create</content>
 <body>

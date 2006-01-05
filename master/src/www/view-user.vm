@@ -11,11 +11,12 @@
     <body>    
         <h1 class="build-log">:: $user.name ::</h1>
         
-        <h2 class="command-info">basics (<a href="editUser!default.action?id=$user.id">edit</a>)</h2>
+        <h2 class="command-info">basics</h2>
         <div class="command-content">
             <table>
                 #detailrow("login" $user.login)
                 #detailrow("full name" $user.name)
+                #detailrow("action" "<a href='editUser!default.action?id=$user.id'>edit</a>")
             </table>
         </div>
         

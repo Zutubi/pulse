@@ -20,4 +20,4 @@
 #else
   #set ($label = $key )
 #end
-<span>$!webwork.htmlEncode($label):#if ($parameters.required)<em class="required">*</em>#end</span>
+<span>$label:#if ($parameters.required)<em class="required">*</em>#end</span>

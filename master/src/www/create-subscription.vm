@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>create-subscription</title>
+    <title>create subscription</title>
 </head>
 <content tag="action">subscription.create</content>
 <body>
@@ -8,7 +8,7 @@
 #parse("/template/includes/actionerrors.vm")
 
 #bodytag (Form "action='createSubscription.action'" "method='post'")
-    <h3>Create subscription</h3>
+    <h3>create subscription</h3>
     <fieldset>
         #tag (TextField "name='user'" "required='true'" "label='user'" "tabindex='1'")
         #tag (TextField "name='project'" "required='true'" "label='project'" "tabindex='2'")

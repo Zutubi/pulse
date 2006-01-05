@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>edit-subscription</title>
+    <title>edit subscription</title>
 </head>
 <content tag="action">subscription.edit</content>
 <body>

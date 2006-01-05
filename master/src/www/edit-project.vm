@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>edit-project</title>
+    <title>edit project</title>
 </head>
 <content tag="action">project.edit</content>
 <body>

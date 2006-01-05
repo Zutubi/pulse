@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>edit-scm</title>
+    <title>edit scm</title>
 </head>
 <content tag="action">scm.cvs.edit</content>
 <body>

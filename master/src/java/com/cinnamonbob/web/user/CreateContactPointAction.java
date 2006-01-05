@@ -20,8 +20,8 @@ public class CreateContactPointAction extends UserActionSupport
         if (types == null)
         {
             types = new HashMap();
-            types.put("email", "Email");
-            types.put("yahoo", "Yahoo Messenger");
+            types.put("email", "email");
+            types.put("yahoo", "yahoo messenger");
         }
         return types;
     }

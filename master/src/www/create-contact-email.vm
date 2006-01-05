@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>create-contact</title>
+    <title>create contact</title>
 </head>
 <body>
 
@@ -8,7 +8,7 @@
 
     #bodytag (Form "action='createEmailContactPoint.action'" "method='post'")
         #tag (Hidden "name='user'")
-        <h3>Create email contact</h3>
+        <h3>create email contact</h3>
         <fieldset>
             #tag (TextField "name='contact.name'" "tabindex='1'")
             #tag (TextField "label='contact.email'" "name='contact.email'" "tabindex='2'")

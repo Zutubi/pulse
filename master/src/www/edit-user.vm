@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>edit-user</title>
+    <title>edit user</title>
 </head>
 <content tag="action">user.edit</content>
 <body>

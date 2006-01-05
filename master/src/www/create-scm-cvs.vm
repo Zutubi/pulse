@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>create-scm</title>
+    <title>create scm</title>
 </head>
 <content tag="action">scm.cvs.create</content>
 <body>
