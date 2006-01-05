@@ -1,9 +1,9 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.scheduling.Trigger;
 import com.cinnamonbob.scheduling.CronTrigger;
 import com.cinnamonbob.scheduling.SchedulingException;
+import com.cinnamonbob.scheduling.Trigger;
 import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
 import com.cinnamonbob.util.logging.Logger;
 
@@ -91,7 +91,7 @@ public class CreateTriggerAction extends ProjectActionSupport
         trigger.setProject(project.getId());
         trigger.setTaskClass(BuildProjectTask.class);
         trigger.getDataMap().put(BuildProjectTask.PARAM_PROJECT, project.getId());
-        trigger.getDataMap().put(BuildProjectTask.PARAM_RECIPE, recipe);
+        trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, recipe);
 
         try
         {

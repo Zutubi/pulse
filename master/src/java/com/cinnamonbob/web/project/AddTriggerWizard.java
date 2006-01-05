@@ -1,14 +1,14 @@
 package com.cinnamonbob.web.project;
 
+import com.cinnamonbob.model.Project;
+import com.cinnamonbob.model.ProjectManager;
+import com.cinnamonbob.scheduling.*;
+import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
+import com.cinnamonbob.scm.SCMChangeEvent;
+import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.web.wizard.BaseWizard;
 import com.cinnamonbob.web.wizard.BaseWizardState;
 import com.cinnamonbob.web.wizard.Wizard;
-import com.cinnamonbob.model.ProjectManager;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.scheduling.*;
-import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
-import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.scm.SCMChangeEvent;
 import com.opensymphony.util.TextUtils;
 
 import java.util.Map;
@@ -56,12 +56,12 @@ public class AddTriggerWizard extends BaseWizard
         if ("cron".equals(selectState.getType()))
         {
             trigger = new CronTrigger(configCron.cron, configCron.name);
-            trigger.getDataMap().put(BuildProjectTask.PARAM_RECIPE, configCron.recipe);
+            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, configCron.spec);
         }
         else if ("monitor".equals(selectState.getType()))
         {
             trigger = new EventTrigger(SCMChangeEvent.class, configMonitor.name);
-            trigger.getDataMap().put(BuildProjectTask.PARAM_RECIPE, configMonitor.recipe);
+            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, configMonitor.spec);
         }
 
         trigger.setProject(project.getId());
@@ -121,8 +121,8 @@ public class AddTriggerWizard extends BaseWizard
             if (types == null)
             {
                 types = new TreeMap<String, String>();
-                types.put("monitor", "Monitor SCM Trigger");
-                types.put("cron", "Cron Trigger");
+                types.put("monitor", "monitor scm trigger");
+                types.put("cron", "cron trigger");
             }
             return types;
         }
@@ -149,7 +149,7 @@ public class AddTriggerWizard extends BaseWizard
     public class ConfigureCronTrigger extends BaseWizardState
     {
         private String name;
-        private String recipe;
+        private String spec;
         private String cron;
 
         public ConfigureCronTrigger(Wizard wizard, String stateName)
@@ -167,7 +167,7 @@ public class AddTriggerWizard extends BaseWizard
             {
                 addFieldError("name", "Missing data.");
             }
-            if (!TextUtils.stringSet(recipe))
+            if (!TextUtils.stringSet(spec))
             {
                 addFieldError("recipe", "Missing data.");
             }
@@ -198,21 +198,21 @@ public class AddTriggerWizard extends BaseWizard
             this.name = name;
         }
 
-        public String getRecipe()
+        public String getSpec()
         {
-            return recipe;
+            return spec;
         }
 
-        public void setRecipe(String recipe)
+        public void setSpec(String spec)
         {
-            this.recipe = recipe;
+            this.spec = spec;
         }
     }
 
     public class ConfigureMonitorTrigger extends BaseWizardState
     {
         private String name;
-        private String recipe;
+        private String spec;
 
         public ConfigureMonitorTrigger(Wizard wizard, String stateName)
         {
@@ -230,7 +230,7 @@ public class AddTriggerWizard extends BaseWizard
             {
                 addFieldError("name", "Missing data.");
             }
-            if (!TextUtils.stringSet(recipe))
+            if (!TextUtils.stringSet(spec))
             {
                 addFieldError("recipe", "Missing data.");
             }
@@ -246,14 +246,14 @@ public class AddTriggerWizard extends BaseWizard
             return name;
         }
 
-        public void setRecipe(String recipe)
+        public void setSpec(String spec)
         {
-            this.recipe = recipe;
+            this.spec = spec;
         }
 
-        public String getRecipe()
+        public String getSpec()
         {
-            return recipe;
+            return spec;
         }
     }
 

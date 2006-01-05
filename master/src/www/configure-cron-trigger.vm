@@ -9,11 +9,11 @@
 
 #bodytag (Form "action='addTrigger.action'" "method='post'")
 
-    <h3>Step 2: create cron trigger</h3>
+    <h3>step 2: create cron trigger</h3>
 
     <fieldset>
         #tag (TextField "name='name'" "required='true'" "tabindex='1'")
-        #tag (TextField "name='recipe'" "tabindex='2'")
+        #tag (TextField "name='spec'" "tabindex='2'")
         #tag (TextField "name='cron'" "label=getText('trigger.cron')" "tabindex='3'")
     </fieldset>
 

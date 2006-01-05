@@ -70,14 +70,13 @@
             <table>
                 <tr>
                     <th class="command-detail">name</th>
-                    <th class="command-detail">recipe</th>
+                    <th class="command-detail">build&nbsp;spec</th>
                     <th colspan="2" class="command-detail">actions</th>
                 </tr>
             #foreach ($trigger in $triggers)
-                    #set($recipe = "[default]")
                 <tr>
                     <td class="command-detail">$trigger.name ($trigger.type)</td>
-                    <td class="command-detail">$recipe</td>
+                    <td class="command-detail">$trigger.dataMap.spec</td>
                     <td class="command-detail"><a href="deleteTrigger.action?id=$trigger.id">delete</a></td>
                 </tr>
             #end
@@ -92,6 +91,16 @@
         <div id="project-content">
 
 #macro(showsummary $result)
+  #if(!$result.commenced())
+    #set($class = "pending")
+  #elseif($result.inProgress())
+    #set($class = "info")
+  #elseif($result.succeeded())
+    #set($class = "success")
+  #else
+    #set($class = "failure")
+  #end
+
 <tr>
   <th class="command-detail">commenced</th>
   <th class="command-detail">elapsed</th>
@@ -185,13 +194,10 @@
                 <th class="command-detail">result</th>
             </tr>
             #foreach($buildResult in $history)
-                #set($result = $buildResult.root.children.get(0).result)
                 #set($id = $buildResult.id)
-                #set($built = $result.stamps.prettyStartTime) 
-                #set($elapsed = $result.stamps.prettyElapsed)
-                #if($result.inProgress())
-                    #set($class = "info")
-                #elseif($result.succeeded())
+                #set($built = $buildResult.stamps.prettyStartTime)
+                #set($elapsed = $buildResult.stamps.prettyElapsed)
+                #if($buildResult.succeeded())
                     #set($class = "success")
                 #else
                     #set($class = "failure")
@@ -200,7 +206,7 @@
                 <td class="build-$class"><a href="viewBuild.action?id=$project.id&buildId=$id">build $buildResult.number</a></td>
                 <td class="build-$class">$built</td>
                 <td class="build-$class">$elapsed</td>
-                <td class="build-$class">$result.state.prettyString</td>
+                <td class="build-$class">$buildResult.state.prettyString</td>
             </tr>
             #end
         </table>

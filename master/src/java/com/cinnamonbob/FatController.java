@@ -54,7 +54,6 @@ public class FatController implements EventListener
 
     private void handleBuildRequest(BuildRequestEvent event)
     {
-
         final Project project = event.getProject();
         String specName = event.getSpecification();
 
