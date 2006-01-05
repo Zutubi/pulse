@@ -45,7 +45,7 @@ public class DeleteScmAction extends ProjectActionSupport
         Project project = getProjectManager().getProject(id);
         if (project == null)
         {
-            addFieldError("id", "Unknown project["+id+"]");
+            addActionError("Unknown project[" + id + "]");
         }
     }
 

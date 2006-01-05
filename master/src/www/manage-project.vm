@@ -56,7 +56,7 @@
                     <td class="command-detail"><a href="viewBuildSpecification.action?projectId=$project.id&id=$buildSpec.id">$buildSpec.name</a></td>
                     <td class="command-detail"><a href="triggerBuild.action?id=$buildSpec.id&projectId=$project.id">trigger</a></td>
                     <td class="command-detail"><a href="viewBuildSpecification.action?projectId=$project.id&id=$buildSpec.id">edit</a></td>
-                    <td class="command-detail"><a href="deleteBuildSpecification.action?id=$buildSpec.id">delete</a></td>
+                    <td class="command-detail"><a href="deleteBuildSpecification.action?projectId=$project.id&id=$buildSpec.id">delete</a></td>
                 </tr>
             #end
                 <tr>

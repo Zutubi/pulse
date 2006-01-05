@@ -358,6 +358,11 @@
             <result name="success" type="redirect">/viewBuildSpecification.action?id=${specification.id}</result>
         </action>
 
+        <action name="deleteBuildSpecification" class="com.cinnamonbob.web.project.DeleteBuildSpecificationAction">
+            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="createBuildSpecificationNode!default"
                 class="com.cinnamonbob.web.project.CreateBuildSpecificationNodeAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
