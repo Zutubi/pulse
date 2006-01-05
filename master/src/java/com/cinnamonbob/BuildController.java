@@ -202,19 +202,29 @@ public class BuildController implements EventListener
     private void handleRecipeEvent(RecipeEvent e)
     {
         List<TreeNode<RecipeController>> finishedNodes = new LinkedList<TreeNode<RecipeController>>();
+        RecipeController controller = null;
+        TreeNode<RecipeController> foundNode = null;
 
         for (TreeNode<RecipeController> node : executingControllers)
         {
-            RecipeController controller = node.getData();
-            controller.handleRecipeEvent(e);
+            controller = node.getData();
+            if (controller.handleRecipeEvent(e))
+            {
+                foundNode = node;
+                break;
+            }
+        }
+
+        if (foundNode != null)
+        {
             if (controller.isFinished())
             {
                 controller.collect(buildResult);
-                finishedNodes.add(node);
+                executingControllers.remove(foundNode);
 
                 if (controller.succeeded())
                 {
-                    for (TreeNode<RecipeController> child : node.getChildren())
+                    for (TreeNode<RecipeController> child : foundNode.getChildren())
                     {
                         run(controller.getChildBootstrapper(), child);
                     }
@@ -225,16 +235,11 @@ public class BuildController implements EventListener
                     buildManager.save(buildResult);
                 }
             }
-        }
 
-        for (TreeNode<RecipeController> node : finishedNodes)
-        {
-            executingControllers.remove(node);
-        }
-
-        if (executingControllers.size() == 0)
-        {
-            completeBuild();
+            if (executingControllers.size() == 0)
+            {
+                completeBuild();
+            }
         }
     }
 

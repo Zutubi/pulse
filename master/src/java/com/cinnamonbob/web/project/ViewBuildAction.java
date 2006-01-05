@@ -63,7 +63,16 @@ public class ViewBuildAction extends ProjectActionSupport
         project = getProjectManager().getProject(id);
         result = getBuildManager().getBuildResult(buildId);
 
-        for (RecipeResultNode node : result.getRoot().getChildren())
+        scrapeNode(result.getRoot());
+
+        //changes = model.getChangelists();
+
+        return SUCCESS;
+    }
+
+    private void scrapeNode(RecipeResultNode parent)
+    {
+        for (RecipeResultNode node : parent.getChildren())
         {
             for (CommandResult r : node.getResult().getCommandResults())
             {
@@ -76,11 +85,9 @@ public class ViewBuildAction extends ProjectActionSupport
                     }
                 }
             }
+
+            scrapeNode(node);
         }
-
-        //changes = model.getChangelists();
-
-        return SUCCESS;
     }
 
     public List<Changelist> getChanges()

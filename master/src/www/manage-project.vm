@@ -159,9 +159,9 @@
       </table>
     #end
     </li>
-  #end
-  #if($child.children.size() > 0)
-    #showrecipes($child)
+    #if($child.children.size() > 0)
+      #showrecipes($child)
+    #end
   #end
 </ul>
 #end

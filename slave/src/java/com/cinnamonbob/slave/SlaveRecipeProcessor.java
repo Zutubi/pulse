@@ -3,6 +3,7 @@ package com.cinnamonbob.slave;
 import com.cinnamonbob.ChainBootstrapper;
 import com.cinnamonbob.RecipeRequest;
 import com.cinnamonbob.ServerBootstrapper;
+import com.cinnamonbob.ServerRecipePaths;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.Bootstrapper;
 import com.cinnamonbob.core.RecipeProcessor;
@@ -50,7 +51,7 @@ public class SlaveRecipeProcessor
 
     public void processRecipe(String master, RecipeRequest request)
     {
-        SlaveRecipePaths processorPaths = new SlaveRecipePaths(request.getId(), configurationManager);
+        ServerRecipePaths processorPaths = new ServerRecipePaths(request.getId(), configurationManager);
         Bootstrapper bootstrapper = new ChainBootstrapper(new ServerBootstrapper(), request.getBootstrapper());
         EventListener listener = registerMasterListener(master, request.getId());
 

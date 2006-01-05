@@ -23,14 +23,14 @@ public class BuildProjectTask implements Task
 
     public void execute(TaskExecutionContext context)
     {
-        String recipe = (String) context.getTrigger().getDataMap().get(PARAM_SPEC);
+        String spec = (String) context.getTrigger().getDataMap().get(PARAM_SPEC);
         long projectId = (Long) context.getTrigger().getDataMap().get(PARAM_PROJECT);
         Project project = projectManager.getProject(projectId);
 
         if (project != null)
         {
             // generate build request.
-            eventManager.publish(new BuildRequestEvent(this, project, recipe));
+            eventManager.publish(new BuildRequestEvent(this, project, spec));
         }
         else
         {

@@ -43,4 +43,14 @@ public class ServerRecipePaths implements RecipePaths
     {
         return new File(getRecipeRoot(), "output");
     }
+
+    public File getWorkZip()
+    {
+        return new File(getWorkDir().getAbsolutePath() + ".zip");
+    }
+
+    public File getOutputZip()
+    {
+        return new File(getOutputDir().getAbsolutePath() + ".zip");
+    }
 }

@@ -1,5 +1,6 @@
 package com.cinnamonbob.slave;
 
+import com.cinnamonbob.ServerRecipePaths;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.util.FileSystemUtils;
@@ -20,7 +21,7 @@ public class CleanupRecipeCommand implements Runnable
 
     public void run()
     {
-        SlaveRecipePaths recipeProcessorPaths = new SlaveRecipePaths(recipeId, configurationManager);
+        ServerRecipePaths recipeProcessorPaths = new ServerRecipePaths(recipeId, configurationManager);
         File recipeRoot = recipeProcessorPaths.getRecipeRoot();
         if (!FileSystemUtils.removeDirectory(recipeRoot))
         {

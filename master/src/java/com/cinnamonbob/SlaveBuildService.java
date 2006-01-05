@@ -43,7 +43,7 @@ public class SlaveBuildService implements BuildService
         try
         {
             // Pull down the result from the slave then explode to dir
-            URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?recipe=" + recipeId);
+            URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?output=true&recipe=" + recipeId);
             URLConnection urlConnection = resultUrl.openConnection();
 
             // take url connection input stream and write contents to directory.

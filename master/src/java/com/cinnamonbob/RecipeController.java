@@ -49,12 +49,12 @@ public class RecipeController
     /**
      * @param event
      */
-    public void handleRecipeEvent(RecipeEvent event)
+    public boolean handleRecipeEvent(RecipeEvent event)
     {
         if (event.getRecipeId() != recipeResult.getId())
         {
             // not interested in this event..
-            return;
+            return false;
         }
 
         if (event instanceof RecipeDispatchedEvent)
@@ -77,6 +77,8 @@ public class RecipeController
         {
             handleRecipeCompleted((RecipeCompletedEvent) event);
         }
+
+        return true;
     }
 
     private void handleRecipeDispatch(RecipeDispatchedEvent event)
