@@ -26,11 +26,28 @@ public class WizardAction extends ActionSupport
     private static final Logger LOG = Logger.getLogger(WizardAction.class);
     private String wizardClass;
 
-    private boolean isInitialHit = false;
+    private boolean isInitialRequest = false;
+
+    private String cancel;
 
     public void setWizardClass(String wizardClass)
     {
         this.wizardClass = wizardClass;
+    }
+
+    public void setCancel(String str)
+    {
+        this.cancel = str;
+    }
+
+    private boolean isCancelled()
+    {
+        return TextUtils.stringSet(cancel);
+    }
+
+    private boolean isInitialRequest()
+    {
+        return isInitialRequest;
     }
 
     public void validate()
@@ -43,9 +60,17 @@ public class WizardAction extends ActionSupport
 
     public String execute()
     {
+        Map session = ActionContext.getContext().getSession();
+        if (isCancelled())
+        {
+            // clean out session.
+            session.remove(wizardClass);
+            return "cancel";
+        }
+
         // lookup wizard.
         Wizard wizard = getWizard();
-        if (isInitialHit)
+        if (isInitialRequest())
         {
             // this is the first time this wizard is being executed.
             WizardState initialState = wizard.getCurrentState();
@@ -100,7 +125,7 @@ public class WizardAction extends ActionSupport
                 Wizard wizardInstance = (Wizard) Class.forName(wizardClass).newInstance();
                 ComponentContext.autowire(wizardInstance);
                 session.put(wizardClass, wizardInstance);
-                isInitialHit = true;
+                isInitialRequest = true;
             }
             return (Wizard) session.get(wizardClass);
         }

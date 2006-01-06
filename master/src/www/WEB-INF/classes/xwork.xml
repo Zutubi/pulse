@@ -258,6 +258,7 @@
             <result name="monitor" type="velocity">configure-monitor-trigger.vm</result>
             <result name="cron" type="velocity">configure-cron-trigger.vm</result>
             <result name="success" type="redirect">/manageProject.action?id=${project}</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${project}</result>
         </action>
 
         <action name="createTrigger!default" class="com.cinnamonbob.web.project.CreateTriggerAction"
