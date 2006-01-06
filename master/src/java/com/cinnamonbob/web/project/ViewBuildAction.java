@@ -65,8 +65,6 @@ public class ViewBuildAction extends ProjectActionSupport
 
         scrapeNode(result.getRoot());
 
-        //changes = model.getChangelists();
-
         return SUCCESS;
     }
 

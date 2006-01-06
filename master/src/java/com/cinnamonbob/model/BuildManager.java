@@ -20,15 +20,20 @@ public interface BuildManager
 
     BuildResult getBuildResult(long id);
 
+    RecipeResultNode getRecipeResultNode(long id);
+
+    RecipeResult getRecipeResult(long id);
+
+    CommandResult getCommandResult(long id);
+
+    StoredArtifact getArtifact(long id);
+
     List<BuildResult> getLatestBuildResultsForProject(Project project, int max);
 
     BuildResult getLatestBuildResult(Project project);
 
     BuildResult getByProjectAndNumber(final Project project, final long number);
 
-    CommandResult getCommandResult(long id);
-
-    StoredArtifact getArtifact(long id);
-
     long getNextBuildNumber(Project project);
+
 }

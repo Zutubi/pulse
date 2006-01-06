@@ -237,7 +237,7 @@
 //
 //    public void handleEvent(Event event)
 //    {
-//        buildManager.save(((BuildEvent) event).getResult());
+//        buildManager.save(((BuildEvent) event).getNode());
 //    }
 //
 //    public Class[] getHandledEvents()

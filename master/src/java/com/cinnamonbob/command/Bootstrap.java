@@ -2,11 +2,12 @@ package com.cinnamonbob.command;
 
 import com.cinnamonbob.BobServer;
 import com.cinnamonbob.ShutdownService;
-import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.net.Socket;
 
 
@@ -33,7 +34,7 @@ public class Bootstrap
         String command = args[0];
         if ("start".equals(command))
         {
-            start();
+            start(args);
         }
         else if ("stop".equals(command))
         {
@@ -50,10 +51,28 @@ public class Bootstrap
         new Bootstrap().parse(argv);
     }
 
-    public void start() throws Exception
+    public void start(String argv[]) throws Exception
     {
         BobServer server = new BobServer();
         server.start();
+
+        if (argv.length > 1)
+        {
+            for (int i = 1; i < argv.length; i++)
+            {
+                try
+                {
+                    Class clazz = Class.forName(argv[i]);
+                    Constructor constructor = clazz.getConstructor();
+                    Runnable instance = (Runnable) constructor.newInstance();
+                    instance.run();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public void stop()

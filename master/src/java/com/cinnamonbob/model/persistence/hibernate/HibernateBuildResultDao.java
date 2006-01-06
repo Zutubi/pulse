@@ -79,6 +79,16 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return (CommandResult) getHibernateTemplate().load(CommandResult.class, Long.valueOf(id));
     }
 
+    public RecipeResultNode findRecipeResultNode(long id)
+    {
+        return (RecipeResultNode) getHibernateTemplate().load(RecipeResultNode.class, Long.valueOf(id));
+    }
+
+    public RecipeResult findRecipeResult(long id)
+    {
+        return (RecipeResult) getHibernateTemplate().load(RecipeResult.class, Long.valueOf(id));
+    }
+
     public void save(RecipeResultNode node)
     {
         getHibernateTemplate().saveOrUpdate(node);

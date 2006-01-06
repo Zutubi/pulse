@@ -19,4 +19,9 @@ public interface BuildResultDao extends EntityDao<BuildResult>
     public BuildResult findByProjectAndNumber(final Project project, final long number);
 
     CommandResult findCommandResult(long id);
+
+    RecipeResultNode findRecipeResultNode(long id);
+
+    RecipeResult findRecipeResult(long id);
+
 }

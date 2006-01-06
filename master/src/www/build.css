@@ -179,7 +179,16 @@ ul.scm-changes {
 
 ul.error, ul.warning, ul.info {
     list-style: none;
-    padding-left: 12px;
+    margin-left: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: solid 1px;
+}
+
+ul.info {
+    border-color: #b0b0f0;
+    background-color: #eeeeff;
 }
 
 li.error, li.warning, li.info {
@@ -199,11 +208,11 @@ li.info {
 }
 
 ul.artifact {
+    list-style: none;
     padding-left: 0px;
 }
 
 li.artifact {
-    display: inline;
     padding-left: 20px;
     background: url( /images/gnome-mime-text.png ) no-repeat 0 0;
 }
@@ -217,7 +226,10 @@ li.recipe-summary {
     margin-top: 12px;
 }
 
-h4 {
-    margin-top: 8px;
+li.title {
+    margin-bottom: 8px;
+    font-weight: bold;
+} h4 {
+margin-top : 8 px;
     margin-bottom: 6px;
 }

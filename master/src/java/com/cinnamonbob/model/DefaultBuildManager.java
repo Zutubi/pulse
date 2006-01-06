@@ -47,6 +47,16 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findById(id);
     }
 
+    public RecipeResultNode getRecipeResultNode(long id)
+    {
+        return buildResultDao.findRecipeResultNode(id);
+    }
+
+    public RecipeResult getRecipeResult(long id)
+    {
+        return buildResultDao.findRecipeResult(id);
+    }
+
     public List<BuildResult> getLatestBuildResultsForProject(Project project, int max)
     {
         return buildResultDao.findLatestByProject(project, max);

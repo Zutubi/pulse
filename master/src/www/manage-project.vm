@@ -22,7 +22,7 @@
                 #detailrow("action" "<a href='editProject!default.action?id=$project.id'>edit</a>")
             </table>
         </div>
-        
+
         <h2 class="command-info">scm details</h2>
         <div class="command-content">
             #set($scms = $project.scms)
@@ -147,7 +147,7 @@
 
       <table>
         <tr>
-          <th class="build-$class" colspan="3">$recipeName @ $child.host</th>
+          <th class="build-$class" colspan="3">$recipeName @ $child.host <a href="viewRecipe.action?id=$child.id">details</a></th>
         </tr>
         #showsummary($recipeResult)
       </table>

@@ -16,7 +16,7 @@
       <pre>$trace</pre>
     #end
     </div>
-  #end      
+  #end
 #end
 
 #macro(errorrow $result)
@@ -135,7 +135,7 @@
     <li>
       <table>
         <tr>
-          <th colspan="4" class="command-detail">$recipeName @ $child.host</th>
+          <th colspan="4" class="command-detail">$recipeName @ $child.host <a href="viewRecipe.action?id=$child.id">details</a></th>
         </tr>
     #if($recipeResult.commenced())
       #resultsummary($result)
@@ -146,7 +146,7 @@
           <th class="command-detail">command</th>
           <th class="command-detail">elapsed</th>
           <th class="command-detail">status</th>
-          <th class="command-detail">artifacts</th>
+          <th class="command-detail">primary artifact</th>
         </tr>
       #foreach($commandResult in $recipeResult.commandResults)
         #if(!$commandResult.commenced())
@@ -164,11 +164,8 @@
           <td class="build-$commandClass">$commandResult.state.prettyString</td>
           <td class="build-$commandClass">
             #if($commandResult.artifacts.size() > 0)
-              <ul class="artifact">
-              #foreach($artifact in $commandResult.artifacts)
-                <li class="artifact"><a href="viewArtifact.action?id=$artifact.id&commandId=$commandResult.id">$artifact.name</a></li>
-              #end
-              </ul>
+              #set($artifact = $commandResult.artifacts.get(0))
+                <img src="/images/gnome-mime-text.png"/><a href="viewArtifact.action?id=$artifact.id&commandId=$commandResult.id">$artifact.title</a>
             #else
               [none]
             #end
@@ -191,55 +188,6 @@
         #showrecipes($result.root)
       </span>
     </div>
-<!--
-#foreach($commandResult in $recipeResult.commandResults)
-  #if($commandResult.inProgress())
-    #set($class = "info")
-  #elseif($commandResult.succeeded())
-    #set($class = "success")
-  #else
-    #set($class = "failure")
-  #end
-    <h2 class="command-$class">$commandResult.commandName</h2>
-    <div class="command-content">
-      <table>
-        #detailrow("commenced" $commandResult.stamps.prettyStartTime)
-        #detailrow("completed" $commandResult.stamps.prettyEndTime)
-        #detailrow("elapsed"   $commandResult.stamps.prettyElapsed)
-        #detailrow("status"    $commandResult.state.prettyString)
-      </table>
-      #if($commandResult.errorMessage)
-        #errordetails($commandResult)
-      #else
-        <h2 class="command-element">details</h2>
-        <table>
-          #foreach($key in $commandResult.properties.keySet())
-            #detailrow($key $commandResult.properties.get($key))
-          #end
-        </table>
-        <h2 class="command-element">artifacts</h2>
-        #foreach($artifact in $commandResult.artifacts)
-          <h3>$artifact.title (<a href="viewArtifact.action?id=$artifact.id">view</a>)</h3>
-          <div class="artifact">
-          #if($artifact.hasFeatures())
-            #foreach($level in $artifact.levels)
-            <div class="$level.toString().toLowerCase()">
-              <b>$level.toString().toLowerCase() features</b>
-              <ul class="feature">
-              #foreach($feature in $artifact.getFeatures($level))
-                <li>$feature.summary</li>
-              #end
-              </ul>
-            </div>
-            #end
-          #else
-            &lt;No features&gt;
-          #end
-          </div>
-        #end
-      #end
-    </div>
-#end
--->
+
   </body>
 </html>

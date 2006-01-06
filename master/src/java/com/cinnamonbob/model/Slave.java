@@ -34,6 +34,14 @@ public class Slave extends Entity
         this.host = host;
     }
 
+    public Slave(String name, String host, int port)
+    {
+        super();
+        this.name = name;
+        this.host = host;
+        this.port = port;
+    }
+
     public String getName()
     {
         return name;

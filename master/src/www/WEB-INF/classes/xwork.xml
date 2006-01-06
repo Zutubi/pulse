@@ -20,6 +20,11 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="viewRecipe" class="com.cinnamonbob.web.project.ViewRecipeAction">
+            <result name="success" type="velocity">view-recipe.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="viewChangelist" class="com.cinnamonbob.web.project.ViewChangelistAction">
             <result name="success" type="velocity">view-changelist.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
