@@ -32,11 +32,6 @@ public abstract class BaseWizardState implements WizardState
 
     }
 
-    public void validate()
-    {
-
-    }
-
     public final String getStateName()
     {
         return stateName;

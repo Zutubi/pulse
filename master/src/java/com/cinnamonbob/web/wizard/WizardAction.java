@@ -5,6 +5,9 @@ import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.web.ActionSupport;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.Validateable;
+import com.opensymphony.xwork.validator.ActionValidatorManager;
+import com.opensymphony.xwork.validator.ValidationException;
 
 import java.util.Map;
 
@@ -80,20 +83,14 @@ public class WizardAction extends ActionSupport
 
         WizardState currentState = wizard.getCurrentState();
 
-        // handle interceptor stack manually for the current state.
-        // a) set params: handled by this actions interceptors - getState()...
-        // b) validate
-
-        // clear previous errors if any remain.
-        currentState.clearErrors();
-
-        currentState.validate();
+        // validate the current state.
+        doValidation(currentState);
         if (currentState.hasErrors())
         {
+            // if there are validation errors, we want to stay in the current state.
             return currentState.getStateName();
         }
 
-        // if not valid, return to current state.
         currentState.execute();
         WizardState next = wizard.getState(currentState.getNextState());
 
@@ -112,6 +109,25 @@ public class WizardAction extends ActionSupport
         next.initialise();
 
         return next.getStateName();
+    }
+
+    private void doValidation(WizardState currentState)
+    {
+        //  - first clear previous errors if any remain.
+        currentState.clearErrors();
+
+        try
+        {
+            ActionValidatorManager.validate(currentState, currentState.getClass().getName());
+            if (Validateable.class.isAssignableFrom(currentState.getClass()))
+            {
+                ((Validateable)currentState).validate();
+            }
+        }
+        catch (ValidationException e)
+        {
+            LOG.severe(e);
+        }
     }
 
     public Wizard getWizard()

@@ -1,9 +1,11 @@
 package com.cinnamonbob.web.wizard;
 
+import com.opensymphony.xwork.Validateable;
+
 /**
  * <class-comment/>
  */
-public class TestWizardState extends BaseWizardState
+public class TestWizardState extends BaseWizardState implements Validateable
 {
     private boolean executed;
     private boolean initialised;
@@ -50,7 +52,6 @@ public class TestWizardState extends BaseWizardState
 
     public void validate()
     {
-        super.validate();
         validated = true;
     }
 

@@ -19,6 +19,9 @@ import java.util.TreeMap;
  */
 public class AddTriggerWizard extends BaseWizard
 {
+    private static final String MONITOR_STATE = "monitor";
+    private static final String CRON_STATE = "cron";
+
     private static final Logger LOG = Logger.getLogger(AddTriggerWizard.class);
 
     private ProjectManager projectManager;
@@ -53,12 +56,12 @@ public class AddTriggerWizard extends BaseWizard
         Project project = projectManager.getProject(getProject());
 
         Trigger trigger = null;
-        if ("cron".equals(selectState.getType()))
+        if (CRON_STATE.equals(selectState.getType()))
         {
             trigger = new CronTrigger(configCron.cron, configCron.name);
             trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, configCron.spec);
         }
-        else if ("monitor".equals(selectState.getType()))
+        else if (MONITOR_STATE.equals(selectState.getType()))
         {
             trigger = new EventTrigger(SCMChangeEvent.class, configMonitor.name);
             trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, configMonitor.spec);
@@ -96,6 +99,11 @@ public class AddTriggerWizard extends BaseWizard
 
         private String type;
 
+        public SelectTriggerType(Wizard wizard, String name)
+        {
+            super(wizard, name);
+        }
+
         public String getType()
         {
             return type;
@@ -121,8 +129,8 @@ public class AddTriggerWizard extends BaseWizard
             if (types == null)
             {
                 types = new TreeMap<String, String>();
-                types.put("monitor", "monitor scm trigger");
-                types.put("cron", "cron trigger");
+                types.put(MONITOR_STATE, "monitor scm trigger");
+                types.put(CRON_STATE, "cron trigger");
             }
             return types;
         }
@@ -133,11 +141,6 @@ public class AddTriggerWizard extends BaseWizard
             {
                 addFieldError("type", "Invalid type '" + type + "' specified. ");
             }
-        }
-
-        public SelectTriggerType(Wizard wizard, String name)
-        {
-            super(wizard, name);
         }
 
         public String getNextState()
@@ -155,22 +158,6 @@ public class AddTriggerWizard extends BaseWizard
         public ConfigureCronTrigger(Wizard wizard, String stateName)
         {
             super(wizard, stateName);
-        }
-
-        public void validate()
-        {
-            if (!TextUtils.stringSet(cron))
-            {
-                addFieldError("cron", "Missing data.");
-            }
-            if (!TextUtils.stringSet(name))
-            {
-                addFieldError("name", "Missing data.");
-            }
-            if (!TextUtils.stringSet(spec))
-            {
-                addFieldError("spec", "Missing data.");
-            }
         }
 
         public String getNextState()
@@ -222,18 +209,6 @@ public class AddTriggerWizard extends BaseWizard
         public String getNextState()
         {
             return null;
-        }
-
-        public void validate()
-        {
-            if (!TextUtils.stringSet(name))
-            {
-                addFieldError("name", "Missing data.");
-            }
-            if (!TextUtils.stringSet(spec))
-            {
-                addFieldError("recipe", "Missing data.");
-            }
         }
 
         public void setName(String name)

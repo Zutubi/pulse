@@ -6,7 +6,7 @@ import com.opensymphony.xwork.ValidationAware;
 /**
  * <class-comment/>
  */
-public interface WizardState extends Validateable, ValidationAware
+public interface WizardState extends ValidationAware
 {
     void execute();
 
