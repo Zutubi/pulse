@@ -66,7 +66,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         }
     }
 
-    protected void ensureCallbackRegistered(Trigger trigger)
+    protected void ensureCallbackRegistered()
             throws SchedulerException
     {
         JobDetail existingJob = getQuartzScheduler().getJobDetail(CALLBACK_JOB_NAME, CALLBACK_JOB_GROUP);
@@ -75,7 +75,6 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
             // register the job detail once only.
             JobDetail detail = new JobDetail(CALLBACK_JOB_NAME, CALLBACK_JOB_GROUP, QuartzTaskCallbackJob.class);
             detail.setDurability(true); // will stay around after the trigger has gone.
-            detail.getJobDataMap().put(QuartzTaskCallbackJob.TRIGGER_PROP, trigger);
             getQuartzScheduler().addJob(detail, true);
         }
     }
@@ -88,9 +87,10 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
             org.quartz.Trigger quartzTrigger = createTrigger(trigger);
 
             // the callback job
-            ensureCallbackRegistered(trigger);
+            ensureCallbackRegistered();
             quartzTrigger.setJobName(CALLBACK_JOB_NAME);
             quartzTrigger.setJobGroup(CALLBACK_JOB_GROUP);
+            quartzTrigger.getJobDataMap().put(QuartzTaskCallbackJob.TRIGGER_PROP, trigger);
 
             getQuartzScheduler().scheduleJob(quartzTrigger);
 

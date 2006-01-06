@@ -24,24 +24,5 @@
     #end
 </table>
 
-<h3>Jobs:</h3>
-<table>
-    #foreach($groupName in $scheduler.jobGroupNames)
-        <tr>
-            <th>Name</th>
-            <th>Group</th>
-            <th>Description</th>
-        </tr>
-        #foreach($name in $scheduler.getJobNames($groupName))
-            #set($job = $scheduler.getJobDetail($name, $groupName))
-            <tr>
-                <td>$!job.name</td>
-                <td>$!job.group</td>
-                <td>$!job.description</td>
-            </tr>
-        #end
-    #end
-</table>
-
 </body>
 </html>

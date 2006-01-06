@@ -38,5 +38,12 @@
       </tr>
       </table>
     </div>
+
+    <p>
+        <ul>
+            <li><a href="quartzSystemInfo.action">Quartz info</a></li>
+        </ul>
+    </p>
+
   </body>
 </html>

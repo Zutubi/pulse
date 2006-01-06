@@ -26,10 +26,11 @@ public class QuartzTaskCallbackJob implements Job
         //       being used to handle autowiring...
 
         // notify schedule manager that this trigger has been activated.
-        JobDataMap data = context.getJobDetail().getJobDataMap();
+        JobDataMap data = context.getMergedJobDataMap();
         try
         {
-            triggerHandler.trigger((Trigger)data.get(TRIGGER_PROP));
+            Trigger trigger = (Trigger) data.get(TRIGGER_PROP);
+            triggerHandler.trigger(trigger);
         }
         catch (SchedulingException e)
         {

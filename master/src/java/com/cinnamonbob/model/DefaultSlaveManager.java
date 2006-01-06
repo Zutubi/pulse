@@ -1,7 +1,10 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.SlaveProxyFactory;
+import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.model.persistence.SlaveDao;
-import com.cinnamonbob.scheduling.Scheduler;
+import com.cinnamonbob.scheduling.*;
+import com.cinnamonbob.services.SlaveService;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.util.List;
@@ -17,28 +20,32 @@ public class DefaultSlaveManager implements SlaveManager
 
     private Scheduler scheduler;
 
+    private static final String PING_NAME = "ping";
+    private static final String PING_GROUP = "services";
+    private static final long PING_FREQUENCY = Constants.MINUTE;
+
     public void init()
     {
-//        // register a schedule for pinging the slaves.
-//        // check if the trigger exists. if not, create and schedule.
-//        Trigger trigger = scheduler.getTrigger(MONITOR_NAME, MONITOR_GROUP);
-//        if (trigger != null)
-//        {
-//            return;
-//        }
-//
-//        // initialise the trigger.
-//        trigger = new SimpleTrigger(MONITOR_NAME, MONITOR_GROUP, POLLING_FREQUENCY);
-//        trigger.setTaskClass(MonitorScms.class);
-//
-//        try
-//        {
-//            scheduler.schedule(trigger);
-//        }
-//        catch (SchedulingException e)
-//        {
-//            LOG.severe(e);
-//        }
+        // register a schedule for pinging the slaves.
+        // check if the trigger exists. if not, create and schedule.
+        Trigger trigger = scheduler.getTrigger(PING_NAME, PING_GROUP);
+        if (trigger != null)
+        {
+            return;
+        }
+
+        // initialise the trigger.
+        trigger = new SimpleTrigger(PING_NAME, PING_GROUP, PING_FREQUENCY);
+        trigger.setTaskClass(PingSlaves.class);
+
+        try
+        {
+            scheduler.schedule(trigger);
+        }
+        catch (SchedulingException e)
+        {
+            LOG.severe(e);
+        }
     }
 
     public Slave getSlave(String name)
