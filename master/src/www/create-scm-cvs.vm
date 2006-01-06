@@ -19,8 +19,8 @@
     </fieldset>
 
     <fieldset class="submit">
-        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='3'" "onclick='history.back();return false;'")
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='4'")
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
+        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='4'" "onclick='history.back();return false;'")
         #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
     </fieldset>
 

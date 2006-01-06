@@ -261,18 +261,6 @@
             <result name="cancel" type="redirect">/manageProject.action?id=${project}</result>
         </action>
 
-        <action name="createTrigger!default" class="com.cinnamonbob.web.project.CreateTriggerAction"
-                method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">create-trigger.vm</result>
-        </action>
-
-        <action name="createTrigger" class="com.cinnamonbob.web.project.CreateTriggerAction">
-            <result name="input" type="velocity">create-trigger.vm</result>
-            <result name="cancel" type="velocity">undefined.vm</result>
-            <result name="success" type="redirect">/manageProject.action?id=${project}</result>
-        </action>
-
         <action name="deleteTrigger" class="com.cinnamonbob.web.project.DeleteTriggerAction">
             <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
         </action>
