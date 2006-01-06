@@ -1,26 +1,29 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.test.BobTestCase;
-import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.core.model.Feature;
+import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.test.BobTestCase;
 
-import java.io.*;
-import java.util.regex.Pattern;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Tests for RegexPostProcessor.
  */
 public class RegexPostProcessorTest extends BobTestCase
 {
-    private static final String[] LINES = { "first line",
-                                            "second line",
-                                            "xxx",
-                                            "xxx abc",
-                                            "abc xxx",
-                                            "abc xxx abc" };
+    private static final String[] LINES = {"first line",
+            "second line",
+            "xxx",
+            "xxx abc",
+            "abc xxx",
+            "abc xxx abc"};
     private StoredArtifact artifact;
+    private File tempDir;
 
 
     public void setUp() throws IOException
@@ -31,13 +34,14 @@ public class RegexPostProcessorTest extends BobTestCase
         fileArtifact.setType("text/plain");
 
         File tempFile = File.createTempFile("regex-pp-test", null);
+        tempDir = tempFile.getParentFile();
         PrintWriter writer = null;
 
         try
         {
             writer = new PrintWriter(tempFile.getAbsolutePath());
 
-            for(String line: LINES)
+            for (String line : LINES)
             {
                 writer.println(line);
             }
@@ -47,7 +51,7 @@ public class RegexPostProcessorTest extends BobTestCase
             IOUtils.close(writer);
         }
 
-        artifact = new StoredArtifact(fileArtifact, tempFile.getAbsolutePath());
+        artifact = new StoredArtifact(fileArtifact, tempFile.getName());
     }
 
     public void tearDown()
@@ -127,11 +131,11 @@ public class RegexPostProcessorTest extends BobTestCase
 
     private void simpleErrors(RegexPostProcessor pp, String... lines)
     {
-        pp.process(artifact);
+        pp.process(tempDir, artifact);
         List<Feature> features = artifact.getFeatures();
 
         assertEquals(lines.length, features.size());
-        for(int i = 0; i < lines.length; i++)
+        for (int i = 0; i < lines.length; i++)
         {
             Feature feature = features.get(i);
             assertEquals(Feature.Level.ERROR, feature.getLevel());
@@ -158,7 +162,7 @@ public class RegexPostProcessorTest extends BobTestCase
     {
         RegexPostProcessor pp = new RegexPostProcessor("test-pp");
         RegexPattern pattern = new RegexPattern(Feature.Level.ERROR, Pattern.compile(expression));
-        for(String e: exclusions)
+        for (String e : exclusions)
         {
             pattern.addExclusion(Pattern.compile(e));
         }

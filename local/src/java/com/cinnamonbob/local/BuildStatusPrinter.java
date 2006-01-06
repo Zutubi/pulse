@@ -88,7 +88,7 @@ public class BuildStatusPrinter implements EventListener
         List<StoredArtifact> artifacts = result.getArtifacts();
         if (artifacts.size() > 0)
         {
-            showArtifacts(artifacts);
+            showArtifacts(result, artifacts);
         }
 
         indenter.println();
@@ -112,14 +112,13 @@ public class BuildStatusPrinter implements EventListener
         indenter.dedent();
     }
 
-    private void showArtifacts(List<StoredArtifact> artifacts)
+    private void showArtifacts(CommandResult result, List<StoredArtifact> artifacts)
     {
         indenter.println("artifacts:");
         indenter.indent();
         for (StoredArtifact artifact : artifacts)
         {
-            File file = new File(artifact.getFile());
-            indenter.println("* " + artifact.getTitle() + " (" + getFilePath(file) + ")");
+            indenter.println("* " + artifact.getTitle() + " (" + getFilePath(result, artifact.getFile()) + ")");
 
             for (Feature.Level level : Feature.Level.values())
             {
@@ -136,9 +135,11 @@ public class BuildStatusPrinter implements EventListener
         indenter.dedent();
     }
 
-    private String getFilePath(File file)
+    private String getFilePath(CommandResult commandResult, String name)
     {
-        String result = file.getPath();
+        File path = new File(commandResult.getOutputDir(), name);
+        String result = path.getPath();
+
         if (result.startsWith(workDir))
         {
             result = result.substring(workDir.length());

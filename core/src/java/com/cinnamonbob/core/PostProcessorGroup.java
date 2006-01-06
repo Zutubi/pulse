@@ -2,6 +2,7 @@ package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.StoredArtifact;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,11 +17,11 @@ public class PostProcessorGroup implements PostProcessor
 
     private List<PostProcessor> processors = new LinkedList<PostProcessor>();
 
-    public void process(StoredArtifact a)
+    public void process(File outputDir, StoredArtifact a)
     {
-        for (PostProcessor processor: processors)
+        for (PostProcessor processor : processors)
         {
-            processor.process(a);
+            processor.process(outputDir, a);
         }
     }
 

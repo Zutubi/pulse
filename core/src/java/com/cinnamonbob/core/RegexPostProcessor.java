@@ -2,14 +2,14 @@ package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.PlainFeature;
 import com.cinnamonbob.core.model.StoredArtifact;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import com.cinnamonbob.util.logging.Logger;
-import java.util.regex.Matcher;
 
 
 /**
@@ -35,21 +35,22 @@ public class RegexPostProcessor implements PostProcessor
         patterns = new LinkedList<RegexPattern>();
     }
 
-    public void process(StoredArtifact artifact)
+    public void process(File outputDir, StoredArtifact artifact)
     {
         try
         {
-            BufferedReader reader = new BufferedReader(new FileReader(artifact.getFile()));
+            File file = new File(outputDir, artifact.getFile());
+            BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
             long lineNumber = 0;
 
-            while((line = reader.readLine()) != null)
+            while ((line = reader.readLine()) != null)
             {
                 lineNumber++;
                 processLine(artifact, line, lineNumber);
             }
         }
-        catch(IOException e)
+        catch (IOException e)
         {
             LOG.warning("I/O error post-processing artifact '" + artifact.getName() + "': " + e.getMessage());
         }
@@ -58,10 +59,10 @@ public class RegexPostProcessor implements PostProcessor
 
     private void processLine(StoredArtifact artifact, String line, long lineNumber)
     {
-        for(RegexPattern p: patterns)
+        for (RegexPattern p : patterns)
         {
             String summary = p.match(line);
-            if(summary != null)
+            if (summary != null)
             {
                 artifact.addFeature(new PlainFeature(p.getCategory(), summary, lineNumber));
             }

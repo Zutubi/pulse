@@ -74,7 +74,7 @@ public class CommandGroup implements Command
 
             if (a != null)
             {
-                m.getProcessor().process(a);
+                m.getProcessor().process(outputDir, a);
             }
             else
             {

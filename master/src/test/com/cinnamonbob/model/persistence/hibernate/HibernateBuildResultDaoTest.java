@@ -7,6 +7,7 @@ import com.cinnamonbob.model.BuildScmDetails;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.RecipeResultNode;
 import com.cinnamonbob.model.persistence.BuildResultDao;
+import com.cinnamonbob.model.persistence.ProjectDao;
 
 import java.io.File;
 import java.util.Calendar;
@@ -19,11 +20,13 @@ import java.util.Calendar;
 public class HibernateBuildResultDaoTest extends PersistenceTestCase
 {
     private BuildResultDao buildResultDao;
+    private ProjectDao projectDao;
 
     public void setUp() throws Exception
     {
         super.setUp();
         buildResultDao = (BuildResultDao) context.getBean("buildResultDao");
+        projectDao = (ProjectDao) context.getBean("projectDao");
     }
 
     public void tearDown() throws Exception
@@ -72,7 +75,11 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
 
         scmDetails.add(changes);
 
-        BuildResult buildResult = new BuildResult(new Project(), 11);
+        // Need to save the Project as it is *not* cascaded from BuildResult
+        Project project = new Project();
+        projectDao.save(project);
+
+        BuildResult buildResult = new BuildResult(project, 11);
         buildResult.commence(new File("/tmp/buildout"));
         buildResult.addScmDetails(1, scmDetails);
         RecipeResultNode recipeNode = new RecipeResultNode(recipeResult);
