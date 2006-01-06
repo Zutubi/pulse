@@ -1,7 +1,7 @@
 package com.cinnamonbob.web;
 
 import com.cinnamonbob.model.Slave;
-import com.cinnamonbob.model.persistence.SlaveDao;
+import com.cinnamonbob.model.SlaveManager;
 
 /**
  * 
@@ -10,7 +10,7 @@ import com.cinnamonbob.model.persistence.SlaveDao;
 public class CreateSlaveAction extends ActionSupport
 {
     private Slave slave = new Slave();
-    private SlaveDao slaveDao;
+    private SlaveManager slaveManager;
 
     public Slave getSlave()
     {
@@ -26,7 +26,7 @@ public class CreateSlaveAction extends ActionSupport
             return;
         }
 
-        if (slaveDao.findByName(slave.getName()) != null)
+        if (slaveManager.getSlave(slave.getName()) != null)
         {
             // slave name already in use.
             addFieldError("slave.name", "A slave with name '" + slave.getName() + "' already exists.");
@@ -35,7 +35,7 @@ public class CreateSlaveAction extends ActionSupport
 
     public String execute()
     {
-        slaveDao.save(slave);
+        slaveManager.save(slave);
         return SUCCESS;
     }
 
@@ -45,8 +45,8 @@ public class CreateSlaveAction extends ActionSupport
         return SUCCESS;
     }
 
-    public void setSlaveDao(SlaveDao slaveDao)
+    public void setSlaveManager(SlaveManager slaveManager)
     {
-        this.slaveDao = slaveDao;
+        this.slaveManager = slaveManager;
     }
 }

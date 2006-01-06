@@ -2,7 +2,6 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildSpecificationNodeDao;
-import com.cinnamonbob.model.persistence.SlaveDao;
 import com.cinnamonbob.web.ActionSupport;
 
 import java.util.List;
@@ -17,7 +16,7 @@ public class CreateBuildSpecificationNodeAction extends ActionSupport
     private long parentId;
     private BuildStage stage = new BuildStage();
     private BuildSpecificationNodeDao buildSpecificationNodeDao;
-    private SlaveDao slaveDao;
+    private SlaveManager slaveManager;
     private Long buildHost;
     private Map<Long, String> buildHosts;
 
@@ -56,11 +55,6 @@ public class CreateBuildSpecificationNodeAction extends ActionSupport
         this.buildSpecificationNodeDao = buildSpecificationNodeDao;
     }
 
-    public void setSlaveDao(SlaveDao slaveDao)
-    {
-        this.slaveDao = slaveDao;
-    }
-
     public Map<Long, String> getBuildHosts()
     {
         return buildHosts;
@@ -90,7 +84,7 @@ public class CreateBuildSpecificationNodeAction extends ActionSupport
             addActionError("No build specification node found for id '" + Long.toString(parentId) + "'");
         }
 
-        if (buildHost != 0 && slaveDao.findById(buildHost) == null)
+        if (buildHost != 0 && slaveManager.getSlave(buildHost) == null)
         {
             addActionError("No build host found for id '" + buildHost.toString() + "'");
         }
@@ -106,7 +100,7 @@ public class CreateBuildSpecificationNodeAction extends ActionSupport
         }
         else
         {
-            Slave slave = slaveDao.findById(buildHost);
+            Slave slave = slaveManager.getSlave(buildHost);
             stage.setHostRequirements(new SlaveBuildHostRequirements(slave));
         }
 
@@ -124,7 +118,7 @@ public class CreateBuildSpecificationNodeAction extends ActionSupport
 
     public String doDefault()
     {
-        List<Slave> slaves = slaveDao.findAll();
+        List<Slave> slaves = slaveManager.getAll();
 
         buildHosts = new TreeMap<Long, String>();
         buildHosts.put(0L, "[master]");
@@ -135,5 +129,10 @@ public class CreateBuildSpecificationNodeAction extends ActionSupport
         }
 
         return SUCCESS;
+    }
+
+    public void setSlaveManager(SlaveManager slaveManager)
+    {
+        this.slaveManager = slaveManager;
     }
 }

@@ -4,6 +4,7 @@ import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.event.EventManager;
 import com.cinnamonbob.events.build.RecipeDispatchedEvent;
 import com.cinnamonbob.model.Slave;
+import com.cinnamonbob.model.SlaveManager;
 import com.cinnamonbob.model.persistence.SlaveDao;
 import com.cinnamonbob.util.logging.Logger;
 
@@ -21,7 +22,7 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue
     private static final Logger LOG = Logger.getLogger(ImmediateDispatchRecipeQueue.class);
 
     private List<BuildService> buildServices;
-    private SlaveDao slaveDao;
+    private SlaveManager slaveManager;
     private SlaveProxyFactory slaveProxyFactory;
     private EventManager eventManager;
 
@@ -34,7 +35,7 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue
     {
         buildServices.add(new MasterBuildService());
 
-        for (Slave slave : slaveDao.findAll())
+        for (Slave slave : slaveManager.getAll())
         {
             try
             {
@@ -63,11 +64,6 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue
         throw new BuildException("No build service found to handle request.");
     }
 
-    public void setSlaveDao(SlaveDao slaveDao)
-    {
-        this.slaveDao = slaveDao;
-    }
-
     public void setSlaveProxyFactory(SlaveProxyFactory slaveProxyFactory)
     {
         this.slaveProxyFactory = slaveProxyFactory;
@@ -76,5 +72,10 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void setSlaveManager(SlaveManager slaveManager)
+    {
+        this.slaveManager = slaveManager;
     }
 }

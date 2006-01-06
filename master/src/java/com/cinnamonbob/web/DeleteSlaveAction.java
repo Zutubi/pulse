@@ -1,20 +1,15 @@
 package com.cinnamonbob.web;
 
-import com.cinnamonbob.model.persistence.SlaveDao;
+import com.cinnamonbob.model.SlaveManager;
 
 /**
  * <class-comment/>
  */
 public class DeleteSlaveAction extends ActionSupport
 {
-    private SlaveDao slaveDao;
+    private SlaveManager slaveManager;
 
     private long id;
-
-    public void setSlaveDao(SlaveDao slaveDao)
-    {
-        this.slaveDao = slaveDao;
-    }
 
     public void setId(long id)
     {
@@ -33,7 +28,7 @@ public class DeleteSlaveAction extends ActionSupport
             return;
         }
 
-        if (slaveDao.findById(id) == null)
+        if (slaveManager.getSlave(id) == null)
         {
             addFieldError("id", "A slave with the id '" + id + "' does not exist.");
         }
@@ -41,7 +36,12 @@ public class DeleteSlaveAction extends ActionSupport
 
     public String execute()
     {
-        slaveDao.delete(slaveDao.findById(id));
+        slaveManager.delete(id);
         return SUCCESS;
+    }
+
+    public void setSlaveManager(SlaveManager slaveManager)
+    {
+        this.slaveManager = slaveManager;
     }
 }

@@ -10,7 +10,7 @@ import java.util.TreeMap;
 /**
  * <class-comment/>
  */
-public class DefaultScheduler
+public class DefaultScheduler implements Scheduler
 {
     private static final Logger LOG = Logger.getLogger(DefaultScheduler.class);
 

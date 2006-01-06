@@ -2,7 +2,7 @@ package com.cinnamonbob.web;
 
 import com.cinnamonbob.BuildQueue;
 import com.cinnamonbob.model.Slave;
-import com.cinnamonbob.model.persistence.SlaveDao;
+import com.cinnamonbob.model.SlaveManager;
 import com.opensymphony.xwork.ActionSupport;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
 public class ServerStatusAction extends ActionSupport
 {
     private BuildQueue buildQueue;
-    private SlaveDao slaveDao;
+    private SlaveManager slaveManager;
     private List<Slave> slaves;
 
     /**
@@ -23,7 +23,7 @@ public class ServerStatusAction extends ActionSupport
      */
     public String execute()
     {
-        slaves = slaveDao.findAll();
+        slaves = slaveManager.getAll();
         return SUCCESS;
     }
 
@@ -37,13 +37,13 @@ public class ServerStatusAction extends ActionSupport
         this.buildQueue = buildQueue;
     }
 
-    public void setSlaveDao(SlaveDao dao)
-    {
-        slaveDao = dao;
-    }
-
     public List<Slave> getSlaves()
     {
         return slaves;
+    }
+
+    public void setSlaveManager(SlaveManager slaveManager)
+    {
+        this.slaveManager = slaveManager;
     }
 }

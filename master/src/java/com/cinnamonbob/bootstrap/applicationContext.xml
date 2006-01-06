@@ -23,10 +23,6 @@
 
     <bean id="buildManager" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"/>
 
-    <bean id="userManager" class="com.cinnamonbob.model.DefaultUserManager" autowire="byName"/>
-
-    <bean id="projectManager" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
-
     <!-- ==================== -->
     <!-- scheduling subsystem -->
 
@@ -65,9 +61,82 @@
 
     <bean id="triggerHandler" class="com.cinnamonbob.scheduling.DefaultTriggerHandler"/>
 
-    <bean id="subscriptionManager" class="com.cinnamonbob.model.DefaultSubscriptionManager" autowire="byName"/>
 
-    <bean id="scmManager" class="com.cinnamonbob.model.DefaultScmManager" autowire="byName" init-method="init"/>
+    <bean id="userManagerTarget" class="com.cinnamonbob.model.DefaultUserManager" autowire="byName"/>
+    <bean id="userManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="userManagerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="projectManagerTarget" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
+    <bean id="projectManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="projectManagerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="subscriptionManagerTarget" class="com.cinnamonbob.model.DefaultSubscriptionManager" autowire="byName"/>
+    <bean id="subscriptionManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="subscriptionManagerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+
+    <bean id="scmManagerTarget" class="com.cinnamonbob.model.DefaultScmManager" autowire="byName" init-method="init"/>
+    <bean id="scmManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="scmManagerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="slaveManagerTarget" class="com.cinnamonbob.model.DefaultSlaveManager" autowire="byName" init-method="init"/>
+    <bean id="slaveManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="slaveManagerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
 
     <bean id="eventManager" class="com.cinnamonbob.core.event.DefaultEventManager" autowire="byName"/>
 

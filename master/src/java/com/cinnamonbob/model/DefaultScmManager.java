@@ -2,10 +2,7 @@ package com.cinnamonbob.model;
 
 import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.model.persistence.ScmDao;
-import com.cinnamonbob.scheduling.DefaultScheduler;
-import com.cinnamonbob.scheduling.SchedulingException;
-import com.cinnamonbob.scheduling.SimpleTrigger;
-import com.cinnamonbob.scheduling.Trigger;
+import com.cinnamonbob.scheduling.*;
 import com.cinnamonbob.scm.MonitorScms;
 import com.cinnamonbob.util.logging.Logger;
 
@@ -21,7 +18,7 @@ public class DefaultScmManager implements ScmManager
 
     private ScmDao scmDao = null;
 
-    private DefaultScheduler scheduler;
+    private Scheduler scheduler;
     private static final String MONITOR_NAME = "poll";
     private static final String MONITOR_GROUP = "scm";
     private static final long POLLING_FREQUENCY = Constants.MINUTE;
@@ -31,7 +28,7 @@ public class DefaultScmManager implements ScmManager
         this.scmDao = scmDao;
     }
 
-    public void setScheduler(DefaultScheduler scheduler)
+    public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
     }

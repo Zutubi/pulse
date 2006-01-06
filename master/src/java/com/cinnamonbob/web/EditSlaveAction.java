@@ -1,22 +1,17 @@
 package com.cinnamonbob.web;
 
-import com.cinnamonbob.model.persistence.SlaveDao;
 import com.cinnamonbob.model.Slave;
+import com.cinnamonbob.model.SlaveManager;
 
 /**
  * <class-comment/>
  */
 public class EditSlaveAction extends ActionSupport
 {
-    private SlaveDao dao;
+    private SlaveManager slaveManager;
 
     private long id;
     private Slave slave = new Slave();
-
-    public void setSlaveDao(SlaveDao dao)
-    {
-        this.dao = dao;
-    }
 
     public long getId()
     {
@@ -35,18 +30,23 @@ public class EditSlaveAction extends ActionSupport
 
     public String doDefault()
     {
-        slave = dao.findById(id);
+        slave = slaveManager.getSlave(id);
         return SUCCESS;
     }
 
     public String execute()
     {
-        Slave persistentSlave = dao.findById(id);
+        Slave persistentSlave = slaveManager.getSlave(id);
         persistentSlave.setHost(slave.getHost());
         persistentSlave.setName(slave.getName());
         persistentSlave.setPort(slave.getPort());
-        dao.save(persistentSlave);
-        
+        slaveManager.save(persistentSlave);
+
         return SUCCESS;
+    }
+
+    public void setSlaveManager(SlaveManager slaveManager)
+    {
+        this.slaveManager = slaveManager;
     }
 }

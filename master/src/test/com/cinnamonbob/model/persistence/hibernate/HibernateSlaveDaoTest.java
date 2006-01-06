@@ -40,13 +40,25 @@ public class HibernateSlaveDaoTest extends PersistenceTestCase
 
     public void testFindAll()
     {
+        List slaves = slaveDao.findAll();
+        assertNotNull(slaves);
+        assertEquals(0, slaves.size());
+
         Slave slave = new Slave();
         slaveDao.save(slave);
         commitAndRefreshTransaction();
 
-        List slaves = slaveDao.findAll();
+        slaves = slaveDao.findAll();
         assertNotNull(slaves);
         assertEquals(1, slaves.size());
+
+        slave = new Slave();
+        slaveDao.save(slave);
+        commitAndRefreshTransaction();
+
+        slaves = slaveDao.findAll();
+        assertNotNull(slaves);
+        assertEquals(2, slaves.size());
     }
 
 }

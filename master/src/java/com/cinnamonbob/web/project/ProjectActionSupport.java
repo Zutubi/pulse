@@ -5,7 +5,7 @@ import com.cinnamonbob.model.ProjectManager;
 import com.cinnamonbob.model.ScmManager;
 import com.cinnamonbob.web.ActionSupport;
 import com.cinnamonbob.xwork.interceptor.Cancelable;
-import com.cinnamonbob.scheduling.DefaultScheduler;
+import com.cinnamonbob.scheduling.Scheduler;
 
 /**
  * 
@@ -18,7 +18,7 @@ public class ProjectActionSupport extends ActionSupport implements Cancelable
     private BuildManager buildManager;
     private ScmManager scmManager;
 //    private ScheduleManager scheduleManager;
-    private DefaultScheduler scheduler;
+    private Scheduler scheduler;
 
     public boolean isCancelled()
     {
@@ -59,13 +59,13 @@ public class ProjectActionSupport extends ActionSupport implements Cancelable
     {
         return scmManager;
     }
-    
-    public DefaultScheduler getScheduler()
+
+    public Scheduler getScheduler()
     {
         return this.scheduler;
     }
 
-    public void setScheduler(DefaultScheduler scheduler)
+    public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
     }

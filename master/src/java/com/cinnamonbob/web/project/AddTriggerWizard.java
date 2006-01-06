@@ -25,7 +25,7 @@ public class AddTriggerWizard extends BaseWizard
     private static final Logger LOG = Logger.getLogger(AddTriggerWizard.class);
 
     private ProjectManager projectManager;
-    private DefaultScheduler scheduler;
+    private Scheduler scheduler;
 
     private SelectTriggerType selectState;
     private ConfigureCronTrigger configCron;
@@ -86,7 +86,7 @@ public class AddTriggerWizard extends BaseWizard
         this.projectManager = projectManager;
     }
 
-    public void setScheduler(DefaultScheduler scheduler)
+    public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
     }
