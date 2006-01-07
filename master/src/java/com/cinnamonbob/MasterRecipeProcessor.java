@@ -1,8 +1,8 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.Bootstrapper;
 import com.cinnamonbob.core.RecipeProcessor;
+import com.cinnamonbob.core.event.EventManager;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,23 +14,16 @@ public class MasterRecipeProcessor
     private ExecutorService executor;
     private RecipeProcessor recipeProcessor;
     private ConfigurationManager configurationManager;
+    private EventManager eventManager;
 
     public MasterRecipeProcessor()
     {
         executor = Executors.newSingleThreadExecutor();
     }
 
-    public void processRecipe(final RecipeRequest request)
+    public void processRecipe(RecipeRequest request)
     {
-        executor.execute(new Runnable()
-        {
-            public void run()
-            {
-                Bootstrapper bootstrapper = new ChainBootstrapper(new ServerBootstrapper(), request.getBootstrapper());
-                ServerRecipePaths recipePaths = new ServerRecipePaths(request.getId(), configurationManager);
-                recipeProcessor.build(request.getId(), recipePaths, bootstrapper, request.getBobFile(), request.getRecipeName());
-            }
-        });
+        executor.execute(new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager));
     }
 
     public void setRecipeProcessor(RecipeProcessor recipeProcessor)
@@ -41,5 +34,10 @@ public class MasterRecipeProcessor
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }
