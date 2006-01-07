@@ -15,6 +15,7 @@ public abstract class Result extends Entity
     protected TimeStamps stamps;
     protected File outputDir;
     protected String errorMessage;
+    protected String failureMessage;
 
     public boolean inProgress()
     {
@@ -75,20 +76,31 @@ public abstract class Result extends Entity
         state = ResultState.SUCCESS;
     }
 
-    public void failure()
+    public void failure(String message)
     {
         state = ResultState.FAILURE;
+        failureMessage = message;
+
+        if (failureMessage.length() > MAX_MESSAGE_LENGTH)
+        {
+            failureMessage = failureMessage.substring(0, MAX_MESSAGE_LENGTH);
+        }
     }
 
-    public void error(BuildException e)
+    public void error(String message)
     {
         state = ResultState.ERROR;
-        errorMessage = e.getMessage();
+        errorMessage = message;
 
         if (errorMessage.length() > MAX_MESSAGE_LENGTH)
         {
             errorMessage = errorMessage.substring(0, MAX_MESSAGE_LENGTH);
         }
+    }
+
+    public void error(BuildException e)
+    {
+        error(e.getMessage());
 
         if (outputDir != null)
         {
@@ -131,6 +143,16 @@ public abstract class Result extends Entity
     private void setStamps(TimeStamps stamps)
     {
         this.stamps = stamps;
+    }
+
+    public String getFailureMessage()
+    {
+        return failureMessage;
+    }
+
+    public void setFailureMessage(String failureMessage)
+    {
+        this.failureMessage = failureMessage;
     }
 
     public String getErrorMessage()

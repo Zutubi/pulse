@@ -80,10 +80,7 @@ public class BuildStatusPrinter implements EventListener
         indenter.println("elapsed  : " + result.getStamps().getPrettyElapsed());
         indenter.println("result   : " + result.getState().getPrettyString());
 
-        if (result.errored())
-        {
-            showErrorDetails(result);
-        }
+        showMessages(result);
 
         List<StoredArtifact> artifacts = result.getArtifacts();
         if (artifacts.size() > 0)
@@ -95,14 +92,26 @@ public class BuildStatusPrinter implements EventListener
         indenter.dedent();
     }
 
-    private void showErrorDetails(Result result)
+    private void showMessages(Result result)
+    {
+        if (result.errored())
+        {
+            showErrorDetails(result.getErrorMessage());
+        }
+        else if (result.failed())
+        {
+            showErrorDetails(result.getFailureMessage());
+        }
+    }
+
+    private void showErrorDetails(String message)
     {
         indenter.println("message  :");
         indenter.indent();
 
-        if (result.getErrorMessage() != null)
+        if (message != null)
         {
-            indenter.println(result.getErrorMessage());
+            indenter.println(message);
         }
         else
         {
@@ -169,10 +178,7 @@ public class BuildStatusPrinter implements EventListener
         indenter.println("elapsed  : " + result.getStamps().getPrettyElapsed());
         indenter.println("result   : " + result.getState().getPrettyString());
 
-        if (result.errored())
-        {
-            showErrorDetails(result);
-        }
+        showMessages(result);
 
         indenter.dedent();
     }

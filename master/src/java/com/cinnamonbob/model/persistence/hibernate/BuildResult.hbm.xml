@@ -19,6 +19,8 @@
 
         <property name="errorMessage" type="string" length="1023"/>
 
+        <property name="failureMessage" type="string" length="1023"/>
+
         <property name="number" column="NUMBER" type="long" not-null="true"/>
 
         <many-to-one name="project" column="PROJECT" class="com.cinnamonbob.model.Project" cascade="none"/>
@@ -88,6 +90,8 @@
         <property name="outputDir" type="string" length="1023"/>
 
         <property name="errorMessage" type="string" length="1023"/>
+
+        <property name="failureMessage" type="string" length="1023"/>
 
         <property name="recipeName" column="RECIPE_NAME" type="string" length="255"/>
 

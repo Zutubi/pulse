@@ -14,6 +14,8 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     public void save(RecipeResult result);
 
+    public void save(CommandResult result);
+
     public List<BuildResult> findLatestByProject(final Project project, final int max);
 
     public BuildResult findByProjectAndNumber(final Project project, final long number);

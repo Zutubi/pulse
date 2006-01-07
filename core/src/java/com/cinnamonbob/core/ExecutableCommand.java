@@ -69,7 +69,7 @@ public class ExecutableCommand implements Command
             }
             else
             {
-                cmdResult.failure();
+                cmdResult.failure("Command exited with code '" + result + "'");
             }
 
             cmdResult.getProperties().put("exit code", Integer.toString(result));

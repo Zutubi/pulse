@@ -72,7 +72,11 @@ public class TimeStamps
 
     public long getElapsed()
     {
-        if (endTime > 0)
+        if (startTime == -1)
+        {
+            return -1;
+        }
+        else if (endTime > 0)
         {
             return endTime - startTime;
         }
@@ -99,6 +103,11 @@ public class TimeStamps
     {
         StringBuffer result = new StringBuffer();
         long elapsed = getElapsed();
+
+        if (elapsed == -1)
+        {
+            return "n/a";
+        }
 
         elapsed = addElapsedPart(elapsed, Constants.HOUR, "hour", result);
         elapsed = addElapsedPart(elapsed, Constants.MINUTE, "minute", result);
@@ -157,6 +166,13 @@ public class TimeStamps
 
     public static String getPrettyTime(long time)
     {
-        return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date(time));
+        if (time == -1)
+        {
+            return "n/a";
+        }
+        else
+        {
+            return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date(time));
+        }
     }
 }

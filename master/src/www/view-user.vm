@@ -1,9 +1,5 @@
 <html>
     <head>
-<!-- custom macro. //-->
-#macro(detailrow $header $content)
-  <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
-#end
         <title>$user.name</title>
         <link href="build.css" rel="stylesheet" type="text/css">
         <content tag="action">user.view</content>

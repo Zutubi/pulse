@@ -24,3 +24,125 @@
     #if ($state.ordinal() == 1)<span style='color:black;'>none</span>#end
     #if ($state.ordinal() == 2)<span style='color:orange;'>paused</span>#end
 #end
+
+##
+## Outputs a single row for a name-value pair table.  Used for basic entity
+## details.
+##
+#macro(detailrow $header $content)
+  <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
+#end
+
+##
+## Sets the variable "class" depending on the state of the given result object.
+##
+#macro(classset $result)
+  #if(!$result.commenced())
+    #set($class = "pending")
+  #elseif($result.inProgress())
+    #set($class = "info")
+  #elseif($result.succeeded())
+    #set($class = "success")
+  #else
+    #set($class = "failure")
+  #end
+#end
+
+##
+## If the given result has an error or failure, outputs a table row with details.
+##
+#macro(errorrow $result)
+  #if($result.errored())
+    #set($resultMessage = $result.errorMessage)
+  #elseif($result.failed())
+    #set($resultMessage = $result.failureMessage)
+  #else
+    #set($resultMessage = false)
+  #end
+
+  #if($resultMessage)
+    <tr>
+      <td class="build-failure" colspan="4">
+        <h4>error message</h4>
+        <ul class="error-message">
+          <li class="error">$resultMessage</li>
+        </ul>
+      </td>
+    </tr>
+  #end
+#end
+
+##
+## Outputs table rows with a summary of the given result.
+##
+#macro(resultsummary $result)
+  #classset($result)
+
+  <tr>
+    <th class="command-detail">commenced</th>
+    <th class="command-detail">completed</th>
+    <th class="command-detail">elapsed</th>
+    <th class="command-detail">status</th>
+  </tr>
+  <tr>
+    <td class="build-$class">$result.stamps.prettyStartTime</td>
+    <td class="build-$class">$result.stamps.prettyEndTime</td>
+    <td class="build-$class">$result.stamps.prettyElapsed</td>
+    <td class="build-$class">$result.state.prettyString</td>
+  <tr>
+
+  #errorrow($result)
+#end
+
+##
+## Outputs a nested list of RecipeResult details starting from the given node.
+## If $showCommands is true, command results will also be displayed.
+##
+#macro(showrecipes $node $showCommands)
+  <ul class="recipe-tree">
+  #foreach($child in $node.children)
+    <li class="recipe-tree">
+      <table>
+    #if($child.result.commenced())
+        <tr>
+          <th colspan="4" class="command-detail">$child.result.recipeNameSafe @ $child.host <a href="viewRecipe.action?id=$child.id">details</a></th>
+        </tr>
+      #resultsummary($child.result)
+    #else
+        <tr>
+          <th class="build-pending">$child.result.recipeNameSafe @ [pending]  <a href="viewRecipe.action?id=$child.id">details</a></th>
+        <tr>
+    #end
+
+    #if($showCommands && $child.result.commandResults.size() > 0)
+        <tr>
+          <th class="command-detail">command</th>
+          <th class="command-detail">elapsed</th>
+          <th class="command-detail">status</th>
+          <th class="command-detail">primary artifact</th>
+        </tr>
+      #foreach($commandResult in $child.result.commandResults)
+        #classset($commandResult)
+        <tr>
+          <td class="build-$class">$commandResult.commandName</td>
+          <td class="build-$class">$commandResult.stamps.prettyElapsed</td>
+          <td class="build-$class">$commandResult.state.prettyString</td>
+          <td class="build-$class">
+            #if($commandResult.artifacts.size() > 0)
+              #set($artifact = $commandResult.artifacts.get(0))
+                <img src="/images/gnome-mime-text.png"/><a href="viewArtifact.action?id=$artifact.id&commandId=$commandResult.id">$artifact.title</a>
+            #else
+              [none]
+            #end
+          </td>
+        </tr>
+        #errorrow($commandResult)
+      #end
+    #end
+      </table>
+    #if($child.children.size() > 0)
+      #showrecipes($child $showCommands)
+    #end
+  #end
+  </ul>
+#end

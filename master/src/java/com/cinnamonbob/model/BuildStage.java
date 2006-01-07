@@ -1,5 +1,7 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.core.model.RecipeResult;
+
 /**
  */
 public class BuildStage
@@ -35,5 +37,10 @@ public class BuildStage
     public void setRecipe(String recipe)
     {
         this.recipe = recipe;
+    }
+
+    public String getRecipeSafe()
+    {
+        return RecipeResult.getRecipeSafe(recipe);
     }
 }

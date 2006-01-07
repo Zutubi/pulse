@@ -99,4 +99,9 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         getHibernateTemplate().saveOrUpdate(result);
     }
 
+    public void save(CommandResult result)
+    {
+        getHibernateTemplate().saveOrUpdate(result);
+    }
+
 }

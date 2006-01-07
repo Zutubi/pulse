@@ -1,7 +1,3 @@
-#macro(detailrow $header $content)
-    <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
-#end
-
 <html>
     <head>
         <link href="build.css" rel="stylesheet" type="text/css">
@@ -91,97 +87,17 @@
 
         <div id="project-content">
 
-#macro(showsummary $result)
-  #if(!$result.commenced())
-    #set($class = "pending")
-  #elseif($result.inProgress())
-    #set($class = "info")
-  #elseif($result.succeeded())
-    #set($class = "success")
-  #else
-    #set($class = "failure")
-  #end
-
-<tr>
-  <th class="command-detail">commenced</th>
-  <th class="command-detail">elapsed</th>
-  <th class="command-detail">status</th>
-</tr>
-<tr>
-  <td class="build-$class">$result.stamps.prettyStartTime</td>
-  <td class="build-$class">$result.stamps.prettyElapsed</td>
-  <td class="build-$class">$result.state.prettyString</td>
-</tr>
-  #if($result.errored() && $result.errorMessage)
-    <tr>
-      <td class="build-failure" colspan="4">
-        <h4>error message</h4>
-        <ul class="error">
-          <li class="error">$result.errorMessage</li>
-        </ul>
-      </td>
-    </tr>
-  #end
-#end
-
-#macro(showrecipes node)
-<ul class="recipe-summary">
-  #foreach($child in $node.children)
-    #set($recipeResult = $child.result)
-
-    <li class="recipe-summary">
-    #if($recipeResult.commenced())
-      #if($recipeResult.inProgress())
-        #set($class = "info")
-      #elseif($recipeResult.succeeded())
-        #set($class = "success")
-      #else
-        #set($class = "failure")
-      #end
-
-      #if($recipeResult.recipeName)
-        #set($recipeName = $recipeResult.recipeName)
-      #else
-        #set($recipeName = "[default]")
-      #end
-
-      <table>
-        <tr>
-          <th class="build-$class" colspan="3">$recipeName @ $child.host <a href="viewRecipe.action?id=$child.id">details</a></th>
-        </tr>
-        #showsummary($recipeResult)
-      </table>
-    #else
-      <table>
-        <tr>
-          <th class="build-pending">$recipeName @ [pending]</th>
-        <tr>
-      </table>
-    #end
-    </li>
-    #if($child.children.size() > 0)
-      #showrecipes($child)
-    #end
-  #end
-</ul>
-#end
         #if($currentBuild)
-            #if($currentBuild.inProgress())
-                #set($class = "info")
-            #elseif($currentBuild.succeeded())
-                #set($class = "success")
-            #else
-              #set($class = "failure")
-            #end
+          #classset($currentBuild)
             <h2 class="command-$class">current build [<a href="viewBuild.action?id=$project.id&buildId=$currentBuild.id">$currentBuild.number</a>]</h2>
             <div class="command-content">
             <h4>summary</h4>
             <table>
-                #showsummary($currentBuild)
+                #resultsummary($currentBuild)
             </table>
 
             <h4>recipes</h4>
-            #showrecipes($currentBuild.root)
+            #showrecipes($currentBuild.root false)
         </div>
       #end
 

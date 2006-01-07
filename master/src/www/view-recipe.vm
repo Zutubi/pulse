@@ -1,75 +1,18 @@
-#macro(detailrow $header $content)
-  <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
-#end
-
-#macro(errorrow $result)
-  #if($result.errored() && $result.errorMessage)
-    <tr>
-      <td class="build-failure" colspan="4">
-        <h4>error message</h4>
-        <ul class="error">
-          <li class="error">$result.errorMessage</li>
-        </ul>
-      </td>
-    </tr>
-  #end
-#end
-
-#macro(resultsummary $result)
-  #if(!$result.commenced())
-    #set($class = "pending")
-  #elseif($result.inProgress())
-    #set($class = "info")
-  #elseif($result.succeeded())
-    #set($class = "success")
-  #else
-    #set($class = "failure")
-  #end
-
-  <tr>
-    <th class="command-detail">commenced</th>
-    <th class="command-detail">completed</th>
-    <th class="command-detail">elapsed</th>
-    <th class="command-detail">status</th>
-  </tr>
-  <tr>
-    <td class="build-$class">$result.stamps.prettyStartTime</td>
-    <td class="build-$class">$result.stamps.prettyEndTime</td>
-    <td class="build-$class">$result.stamps.prettyElapsed</td>
-    <td class="build-$class">$result.state.prettyString</td>
-  <tr>
-
-  #errorrow($result)
-#end
-
-#set($result= $node.result)
-
-#if($result.recipeName)
-  #set($recipeName = $result.recipeName)
+#set($result = $node.result)
+#if($node.commenced())
+  #set($host = $node.host)
 #else
-  #set($recipeName = "[default]")
-#end
-
-#macro(classset $result)
-  #if(!$result.commenced())
-    #set($class = "pending")
-  #elseif($result.inProgress())
-    #set($class = "info")
-  #elseif($result.succeeded())
-    #set($class = "success")
-  #else
-    #set($class = "failure")
-  #end
+  #set($host = "[pending]")
 #end
 
 <html>
   <head>
-    <title>$recipeName @ $node.host</title>
+    <title>$result.recipeNameSafe @ $host</title>
     <link href="build.css" rel="stylesheet" type="text/css">
   </head>
   <body>
 #classset($result)
-    <h1 class="build-log">:: $recipeName @ $node.host ::</h1>
+    <h1 class="build-log">:: $result.recipeNameSafe @ $host ::</h1>
 
     <h2 class="command-$class">summary</h2>
     <div class="command-content">
@@ -120,3 +63,4 @@
 
   </body>
 </html>
+

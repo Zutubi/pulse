@@ -4,7 +4,7 @@ h1.build-log {
     color: #a0a0a0;
 }
 
-h2.command-info, h2.command-success, h2.command-failure {
+h2.command-info, h2.command-success, h2.command-failure, h2.command-pending {
     font-size: large;
     border-style: solid;
     border-width: 1px;
@@ -26,6 +26,11 @@ h2.command-success {
 h2.command-failure {
     border-color: #c00000;
     background-color: #ffdddd;
+}
+
+h2.command-pending {
+    border-color: #d0d9bd;
+    background-color: #f5f7f1;
 }
 
 h2.command-element {
@@ -53,21 +58,6 @@ div.error, div.warning, div.info {
     margin-bottom: 3px;
 }
 
-div.error {
-    border-color: #c00000;
-    background-color: #ffe0e0;
-}
-
-div.warning {
-    border-color: #f0f000;
-    background-color: #f0f0d0;
-}
-
-div.info {
-    border-color: #b0b0f0;
-    background-color: #eeeeff;
-}
-
 th.command-detail, th.build-info, th.build-success, th.build-failure, th.build-pending {
     background-color: #ffffff;
     text-align: left;
@@ -89,23 +79,40 @@ td.command-detail, td.build-info, td.build-success, td.build-failure, td.build-p
     vertical-align: top;
 }
 
-td.build-info, th.build-info {
+ul.error-message, ul.error, ul.warning, ul.info {
+    list-style: none;
+    padding: 8px;
+}
+
+ul.error, ul.warning, ul.info {
+    margin-left: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: solid 1px;
+}
+
+div.info, td.build-info, th.build-info, ul.info {
     border-color: #b0b0f0;
     background-color: #eeeeff;
 }
 
-td.build-success, th.build-success {
+td.build-success, th.build-success, ul.success {
     border-color: #00c000;
     background-color: #ddffdd;
 }
 
-td.build-failure, th.build-failure {
+div.warning, ul.warning {
+    border-color: #f0f000;
+    background-color: #f0f0d0;
+}
+
+div.error, td.build-failure, th.build-failure, ul.failure, ul.error {
     border-color: #c00000;
     background-color: #ffdddd;
 }
 
-td.build-pending, th.build-pending {
-    border-color: #D0D9BD;
+td.build-pending, th.build-pending, ul.pending {
+    border-color: #d0d9bd;
     background-color: #f5f7f1;
 }
 
@@ -145,16 +152,6 @@ div.side-content {
     margin-bottom: 3px;
 }
 
-td.health-ok {
-    color: #00c000;
-    font-weight: bold;
-}
-
-td.health-failed {
-    color: #c00000;
-    font-weight: bold;
-}
-
 #project-left-column {
     float: left;
     width: 33%;
@@ -169,26 +166,12 @@ ul.scm-changes {
     padding-left: 4px;
 }
 
-#build-tree ul {
+ul.recipe-tree {
     list-style: none;
 }
 
-#build-tree li {
+li.recipe-tree {
     margin-top: 10px;
-}
-
-ul.error, ul.warning, ul.info {
-    list-style: none;
-    margin-left: 20px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    padding: 8px;
-    border: solid 1px;
-}
-
-ul.info {
-    border-color: #b0b0f0;
-    background-color: #eeeeff;
 }
 
 li.error, li.warning, li.info {
@@ -229,7 +212,9 @@ li.recipe-summary {
 li.title {
     margin-bottom: 8px;
     font-weight: bold;
-} h4 {
-margin-top : 8 px;
+}
+
+h4 {
+    margin-top: 8px;
     margin-bottom: 6px;
 }

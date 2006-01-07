@@ -1,7 +1,3 @@
-#macro(detailrow $header $content)
-  <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
-#end
-
 <html>
   <head>
     <title>view changelist</title>

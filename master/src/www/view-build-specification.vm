@@ -10,12 +10,7 @@
 #macro(showNodes $parent $list)
   <ul>
     #foreach($node in $list)
-      #if($node.stage.recipe)
-        #set($recipe = $node.stage.recipe)
-      #else
-        #set($recipe = "[default]")
-      #end
-      <li>$node.stage.hostRequirements.getSummary(): $recipe</li>
+      <li>$node.stage.hostRequirements.getSummary(): $node.stage.recipeSafe</li>
       #showNodes($node $node.children)
     #end
     <li>+ <a href="createBuildSpecificationNode!default.action?specId=$id&parentId=$parent.id">add stage</a></li>

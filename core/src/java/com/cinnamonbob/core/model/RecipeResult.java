@@ -33,6 +33,17 @@ public class RecipeResult extends Result
     public void add(CommandResult result)
     {
         results.add(result);
+
+        switch (result.state)
+        {
+            case ERROR:
+            case FAILURE:
+                if (state != ResultState.ERROR && state != ResultState.FAILURE)
+                {
+                    failure("Command '" + result.getCommandName() + "' failed");
+                }
+                break;
+        }
     }
 
     public void update(CommandResult result)
@@ -41,33 +52,38 @@ public class RecipeResult extends Result
         // with the new one... simple.
         CommandResult currentResult = results.remove(results.size() - 1);
         result.setId(currentResult.getId());
-        results.add(result);
+        add(result);
+
+        // Adjust the command's output directory to the local one
         File remoteDir = new File(result.getOutputDir());
         File localDir = new File(getOutputDir(), remoteDir.getName());
         result.setOutputDir(localDir.getAbsolutePath());
-
-        switch (result.state)
-        {
-            case ERROR:
-            case FAILURE:
-                state = ResultState.FAILURE;
-                break;
-        }
     }
 
     public void update(RecipeResult result)
     {
-        // Don't unconditionally take state: take it only if it may indicate
-        // an error which we may not have noticed locally.
+        // Don't unconditionally take state and error messages: take it only
+        // if it may indicate an error which:
+        //   a) we may not have noticed locally; and
+        //   b) is more severe then anything we already know about
         switch (result.state)
         {
             case ERROR:
+                if (state != ResultState.ERROR)
+                {
+                    // More severe: take the error details
+                    error(result.errorMessage);
+                }
+                break;
             case FAILURE:
-                state = result.state;
+                if (state != ResultState.ERROR && state != ResultState.FAILURE)
+                {
+                    failure(result.failureMessage);
+                }
+                break;
         }
 
         this.stamps = result.stamps;
-        this.errorMessage = result.errorMessage;
     }
 
     public List<CommandResult> getCommandResults()
@@ -85,8 +101,25 @@ public class RecipeResult extends Result
         return recipeName;
     }
 
+    public String getRecipeNameSafe()
+    {
+        return getRecipeSafe(recipeName);
+    }
+
     private void setRecipeName(String recipeName)
     {
         this.recipeName = recipeName;
+    }
+
+    public static String getRecipeSafe(String recipeName)
+    {
+        if (recipeName == null)
+        {
+            return "[default]";
+        }
+        else
+        {
+            return recipeName;
+        }
     }
 }

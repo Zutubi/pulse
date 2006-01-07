@@ -3,41 +3,41 @@ package com.cinnamonbob.core.model;
 public enum ResultState
 {
     INITIAL
-    {
-        public String getPrettyString()
-        {
-            return "initial";
-        }
-    },
+            {
+                public String getPrettyString()
+                {
+                    return "pending";
+                }
+            },
     IN_PROGRESS
-    {
-        public String getPrettyString()
-        {
-            return "in progress";
-        }
-    },
+            {
+                public String getPrettyString()
+                {
+                    return "in progress";
+                }
+            },
     SUCCESS
-    {
-        public String getPrettyString()
-        {
-            return "success";
-        }
-    },
+            {
+                public String getPrettyString()
+                {
+                    return "success";
+                }
+            },
     FAILURE
-    {
-        public String getPrettyString()
-        {
-            return "failure";
-        }
-    },
+            {
+                public String getPrettyString()
+                {
+                    return "failure";
+                }
+            },
     ERROR
-    {
-        public String getPrettyString()
-        {
-            return "error";
-        }
-    };
-    
+            {
+                public String getPrettyString()
+                {
+                    return "error";
+                }
+            };
+
     public abstract String getPrettyString();
-    
+
 }

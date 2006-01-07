@@ -231,7 +231,7 @@ public class BuildController implements EventListener
                 }
                 else
                 {
-                    buildResult.failure();
+                    buildResult.failure("Recipe '" + controller.getRecipeName() + "@" + controller.getRecipeHost() + "' failed");
                     buildManager.save(buildResult);
                 }
             }

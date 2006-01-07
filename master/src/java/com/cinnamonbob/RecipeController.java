@@ -142,4 +142,14 @@ public class RecipeController
     {
         return recipeResult.succeeded();
     }
+
+    public String getRecipeName()
+    {
+        return recipeResultNode.getResult().getRecipeNameSafe();
+    }
+
+    public String getRecipeHost()
+    {
+        return recipeResultNode.getHost();
+    }
 }

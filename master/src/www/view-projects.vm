@@ -10,7 +10,6 @@
     <table>
       <tr>
         <th class="command-detail">project</th>
-        <!--<th class="command-detail">state</th>-->
         <th class="command-detail">last built</th>
         <th class="command-detail">build id</th>
         <th class="command-detail">elapsed</th>
@@ -24,13 +23,7 @@
   #set($id = $lastResult.number)
   #set($elapsed = $lastResult.stamps.prettyElapsed)
   #set($status = $lastResult.state.prettyString)
-  #if($lastResult.inProgress())
-    #set($class = "build-info")
-  #elseif($lastResult.succeeded())
-    #set($class = "build-success")
-  #else
-    #set($class = "build-failure")
-  #end
+  #classset($lastResult)
 #else
   #set($built = "never")
   #set($id = "n/a")
@@ -40,12 +33,11 @@
   #set($class = "command-detail")
 #end
       <tr>
-        <td class="$class"><a href="manageProject.action?id=$project.id">$project.name</a></td>
-        <!--<td class="build-$success">$project.State.toString().toLowerCase()</td>-->
-        <td class="$class">$built</td>
-        <td class="$class">$id</td>
-        <td class="$class">$elapsed</td>
-        <td class="$class">$status</td>
+        <td class="build-$class"><a href="manageProject.action?id=$project.id">$project.name</a></td>
+        <td class="build-$class">$built</td>
+        <td class="build-$class">$id</td>
+        <td class="build-$class">$elapsed</td>
+        <td class="build-$class">$status</td>
       </tr>
 #end
       <tr>
