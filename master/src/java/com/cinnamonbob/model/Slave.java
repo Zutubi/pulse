@@ -109,9 +109,9 @@ public class Slave extends Entity
         }
     }
 
-    public double getSecondsSincePing()
+    public long getSecondsSincePing()
     {
-        return (System.currentTimeMillis() - lastPingTime) / 1000.0;
+        return (System.currentTimeMillis() - lastPingTime) / 1000;
     }
 
     private void setLastPingTime(long time)

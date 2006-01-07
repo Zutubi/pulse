@@ -31,7 +31,7 @@ public class PingSlaves implements Task
             }
             catch (Exception e)
             {
-                LOG.info("Ping to slave '" + slave.getName() + "' failed. Reason: " + e.getMessage());
+                LOG.info("Ping to slave '" + slave.getName() + "' failed. Exception: '"+e.getClass().getName()+"' Reason: " + e.getMessage());
                 slave.lastPing(currentTime, false);
             }
             slaveManager.save(slave);
@@ -43,7 +43,7 @@ public class PingSlaves implements Task
         this.slaveManager = slaveManager;
     }
 
-    public void setFactory(SlaveProxyFactory factory)
+    public void setSlaveProxyFactory(SlaveProxyFactory factory)
     {
         this.factory = factory;
     }
