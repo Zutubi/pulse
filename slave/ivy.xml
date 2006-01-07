@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="cinnamonbob" module="slave" status="integration">
+    <info organisation="cinnamonbob" module="slave" revision="0.2" status="integration">
         <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
         <description homepage="http://www.cinnamonbob.com/">
             description....
@@ -20,7 +20,7 @@
 
     <dependencies>
 
-        <dependency org="junit" name="junit" rev="3.8.1"/>
+        <dependency org="junit" name="junit" rev="3.8.1" conf="external->default"/>
 
         <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="external->external"/>
         <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="internal->internal"/>

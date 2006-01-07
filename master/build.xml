@@ -42,35 +42,35 @@
             <fileset dir="build">
                 <include name="${bob.jar}"/>
             </fileset>
-            <fileset dir="src/etc">
+            <fileset dir="etc">
                 <include name="validators.xml"/>
             </fileset>
         </copy>
-        <copy todir="${package.root}/config">
-            <fileset dir="src/main/config">
-                <include name="**/*.xml"/>
-            </fileset>
-        </copy>
+        <!--<copy todir="${package.root}/config">-->
+            <!--<fileset dir="src/main/config">-->
+                <!--<include name="**/*.xml"/>-->
+            <!--</fileset>-->
+        <!--</copy>-->
         <copy todir="${package.root}/docs">
-            <fileset dir="src/etc" includes="delete-me.txt"/>
+            <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
         <copy todir="${package.root}/system/templates">
             <fileset dir="src/templates" includes="**/*.vm"/>
         </copy>
         <copy todir="${package.root}/system/database">
-            <fileset dir="src/etc" includes="delete-me.txt"/>
+            <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
         <copy todir="${package.root}/work">
-            <fileset dir="src/etc" includes="delete-me.txt"/>
+            <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
         <copy todir="${package.root}/system/logs">
-            <fileset dir="src/etc" includes="delete-me.txt"/>
+            <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
         <copy todir="${package.root}/system/www">
             <fileset dir="src/www" includes="**/*"/>
         </copy>
         <copy todir="${package.root}/system/config">
-            <fileset dir="src/etc" includes="*.properties"/>
+            <fileset dir="etc" includes="*.properties"/>
         </copy>
         <zip destfile="build/bob-${version}.zip" basedir="build/package"/>
     </target>

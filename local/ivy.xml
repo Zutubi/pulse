@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="cinnamonbob" module="local" revision="0.1" status="integration" publication="20051201000616">
+    <info organisation="cinnamonbob" module="local" revision="0.2" status="integration">
         <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
         <description homepage="http://www.cinnamonbob.com/">
             description....
@@ -21,10 +21,11 @@
 
     <dependencies>
 
+        <!-- command line parsing -->
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external->default"/>
 
-        <dependency org="cinnamonbob" name="core" rev="0.1" conf="internal->internal"/>
-        <dependency org="cinnamonbob" name="core" rev="0.1" conf="external->external"/>
+        <dependency org="cinnamonbob" name="core" rev="latest.integration" conf="internal->internal"/>
+        <dependency org="cinnamonbob" name="core" rev="latest.integration" conf="external->external"/>
 
     </dependencies>
 

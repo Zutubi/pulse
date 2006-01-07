@@ -20,7 +20,7 @@ public class ResultNotifier implements EventListener
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
-        eventManager.register(this);
+        this.eventManager.register(this);
     }
 
     public void setSubscriptionManager(SubscriptionManager subscriptionManager)

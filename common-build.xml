@@ -13,6 +13,7 @@
 
         <!-- revision -->
         <property name="rev" value="latest"/>
+        <property name="version" value="0.2"/>
 
         <!-- project structure -->
         <property name="build.dir" value="./build"/>
@@ -50,14 +51,16 @@
 
         <!-- a pattern set that defines the Test classes to ignore -->
         <patternset id="ignore.tests">
-            <exclude name="**/*.java"/>
+            <exclude name="**/*Test*.java"/>
         </patternset>
     </target>
 
+    <!-- Clean up all of the build artifacts -->
     <target name="clean" depends="common-init">
         <delete dir="${build.dir}"/>
     </target>
 
+    <!-- Prepare for a build -->
     <target name="prepare" depends="common-init">
         <tstamp/>
         <resolve conf="internal"/>
@@ -82,8 +85,8 @@
 
         <!-- build the test source -->
         <mkdir dir="${test-classes.dir}"/>
-        <javac srcdir="${test.dir}" destdir="${test-classes.dir}" debug="${compile.debug}"
-               optimize="${compile.optimize}"
+
+        <javac srcdir="${test.dir}" destdir="${test-classes.dir}" debug="${compile.debug}" optimize="${compile.optimize}"
                deprecation="${compile.deprecation}" debuglevel="${compile.debuglevel}">
             <classpath refid="lib.path"/>
             <classpath location="${classes.dir}"/>
@@ -137,6 +140,10 @@
         <zip destfile="build/${module}-src-test.zip" basedir="${test.dir}"/>
     </target>
 
+    <!-- ====================== -->
+    <!-- Dependency management  -->
+    <!-- ====================== -->
+
     <!-- resolve external dependencies for this component -->
     <target name="resolve.external" depends="common-init">
         <resolve conf="external"/>
@@ -152,7 +159,7 @@
         <sequential>
             <ivy:resolve file="ivy.xml" conf="@{conf}"/>
             <!-- clean out the lib dir to ensure no old files are left around. -->
-            <delete failonerror="false">
+            <delete failonerror="true">
                 <fileset dir="${lib.dir}/@{conf}" includes="**/*"/>
             </delete>
             <ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact]-[revision].[ext]" validate="true" conf="@{conf}"/>
@@ -162,40 +169,10 @@
 
     <target name="publish" depends="package">
         <dirname property="current.dir" file="ivy.xml"/>
-        <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"
-                     srcivypattern="${current.dir}/ivy.xml"/>
+        <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
     </target>
 
 
     <target name="project.build" depends="clean, resolve.internal, jar, test, publish"/>
-    <!-- ====================== -->
-    <!-- Dependency management  -->
-    <!-- ====================== -->
-    <!--<target name="resolve" depends="resolve.external, resolve.internal"/>-->
-
-    <!--<target name="resolve.internal" depends="common-init">-->
-    <!--<ivy:resolve file="ivy.xml" conf="internal"/>-->
-    <!--</target>-->
-
-    <!--<target name="resolve.external" depends="common-init">-->
-    <!--<ivy:resolve file="ivy.xml" conf="external"/>-->
-    <!--</target>-->
-
-    <!--<target name="retrieve" depends="resolve, retrieve.external, retrieve.internal"/>-->
-
-    <!--<target name="retrieve.internal" depends="common-init">-->
-    <!--<delete failonerror="false">-->
-    <!--<fileset dir="${ivy.lib.dir}/internal" includes="**/*"/>-->
-    <!--</delete>-->
-    <!--<ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]" validate="true" conf="internal"/>-->
-    <!--</target>-->
-
-    <!--<target name="retrieve.external" depends="common-init">-->
-    <!--<delete failonerror="false">-->
-    <!--<fileset dir="${ivy.lib.dir}/external" includes="**/*"/>-->
-    <!--</delete>-->
-    <!--<ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact]-[revision].[ext]" validate="true" conf="external"/>-->
-    <!--</target>-->
-
 
 </project>

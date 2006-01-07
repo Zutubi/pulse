@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="cinnamonbob" module="core" revision="0.1" status="integration" publication="20051204162525">
+    <info organisation="cinnamonbob" module="core" status="integration">
         <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
         <description homepage="http://www.cinnamonbob.com/">
             description....
@@ -21,13 +21,15 @@
 
     <dependencies>
 
-        <dependency org="apache" name="velocity" rev="1.3.1"/>
+        <dependency org="apache" name="velocity" rev="1.3.1" conf="external->default"/>
 
         <dependency org="junit" name="junit" rev="3.8.1" conf="external->default"/>
 
+        <!-- used for validation support -->
         <dependency org="opensymphony" name="xwork" rev="1.0.5" conf="external->default"/>
         <dependency org="opensymphony" name="oscore" rev="2.2.4" conf="external->default"/>
 
+        <!-- xml parsing -->
         <dependency org="xom" name="xom" rev="20051027" conf="external->default"/>
 
     </dependencies>
