@@ -1,18 +1,14 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.event.AsynchronousDelegatingListener;
 import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.core.event.EventManager;
 import com.cinnamonbob.events.build.BuildRequestEvent;
 import com.cinnamonbob.model.BuildManager;
-import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.BuildSpecification;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.util.logging.Logger;
-
-import java.io.File;
 
 /**
  * A FatController coordinates execution of a build specification, gathering
@@ -64,31 +60,7 @@ public class FatController implements EventListener
             return;
         }
 
-        final MasterBuildPaths paths = new MasterBuildPaths();
-
-        RecipeResultCollector collector = new RecipeResultCollector()
-        {
-            public void prepare(BuildResult result, long recipeId)
-            {
-                // ensure that we have created the necessary directories.
-                File recipeDir = paths.getRecipeDir(project, result, recipeId);
-                if (!recipeDir.mkdirs())
-                {
-                    throw new BuildException("Failed to create the '" + recipeDir + "' directory.");
-                }
-            }
-
-            public void collect(BuildResult result, long recipeId, BuildService buildService)
-            {
-                buildService.collectResults(recipeId, paths.getRecipeDir(project, result, recipeId));
-            }
-
-            public void cleanup(BuildResult result, long recipeId, BuildService buildService)
-            {
-                buildService.cleanup(recipeId);
-            }
-        };
-
+        RecipeResultCollector collector = new DefaultRecipeResultCollector(project);
         BuildController controller = new BuildController(project, buildSpec, eventManager, buildManager, recipeQueue, collector);
         controller.run();
     }

@@ -1,6 +1,7 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.core.Bootstrapper;
+import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.events.build.*;
@@ -35,6 +36,7 @@ public class RecipeController
 
     public void prepare(BuildResult buildResult)
     {
+        // Errors handled by BuildController
         collector.prepare(buildResult, recipeResultNode.getResult().getId());
     }
 
@@ -57,25 +59,38 @@ public class RecipeController
             return false;
         }
 
-        if (event instanceof RecipeDispatchedEvent)
+        try
         {
-            handleRecipeDispatch((RecipeDispatchedEvent) event);
+            if (event instanceof RecipeDispatchedEvent)
+            {
+                handleRecipeDispatch((RecipeDispatchedEvent) event);
+            }
+            else if (event instanceof RecipeCommencedEvent)
+            {
+                handleRecipeCommenced((RecipeCommencedEvent) event);
+            }
+            else if (event instanceof CommandCommencedEvent)
+            {
+                handleCommandCommenced((CommandCommencedEvent) event);
+            }
+            else if (event instanceof CommandCompletedEvent)
+            {
+                handleCommandCompleted((CommandCompletedEvent) event);
+            }
+            else if (event instanceof RecipeCompletedEvent)
+            {
+                handleRecipeCompleted((RecipeCompletedEvent) event);
+            }
         }
-        else if (event instanceof RecipeCommencedEvent)
+        catch (BuildException e)
         {
-            handleRecipeCommenced((RecipeCommencedEvent) event);
+            recipeResult.error(e);
+            complete();
         }
-        else if (event instanceof CommandCommencedEvent)
+        catch (Exception e)
         {
-            handleCommandCommenced((CommandCommencedEvent) event);
-        }
-        else if (event instanceof CommandCompletedEvent)
-        {
-            handleCommandCompleted((CommandCompletedEvent) event);
-        }
-        else if (event instanceof RecipeCompletedEvent)
-        {
-            handleRecipeCompleted((RecipeCompletedEvent) event);
+            recipeResult.error("Unexpected error: " + e.getMessage());
+            complete();
         }
 
         return true;
@@ -112,6 +127,12 @@ public class RecipeController
     {
         recipeResult.update(event.getResult());
         recipeResult.complete();
+        complete();
+    }
+
+    private void complete()
+    {
+        recipeResult.abortUnfinishedCommands();
         buildManager.save(recipeResult);
         finished = true;
     }

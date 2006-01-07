@@ -97,4 +97,12 @@ public class BuildResult extends Result
     {
         this.root = root;
     }
+
+    public void abortUnfinishedRecipes()
+    {
+        for (RecipeResultNode node : root.getChildren())
+        {
+            node.abort();
+        }
+    }
 }

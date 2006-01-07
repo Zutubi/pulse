@@ -60,15 +60,6 @@ public class BuildController implements EventListener
         buildResult.commence(buildDir);
         buildManager.save(buildResult);
 
-        // It is important that this directory is created *after* the build
-        // result is commenced and saved to the database, so that the
-        // database knows of the possibility of some other persistent
-        // artifacts, even if an error occurs very early in the build.
-        if (!buildDir.mkdirs())
-        {
-            throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
-        }
-
         // We handle this event ourselves: this ensures that all processing of
         // the build from this point forth is handled by the single thread in
         // our async listener.  Basically, given events could be coming from
@@ -172,23 +163,46 @@ public class BuildController implements EventListener
 
     public void handleEvent(Event evt)
     {
-        if (evt instanceof BuildCommencedEvent)
+        try
         {
-            BuildCommencedEvent e = (BuildCommencedEvent) evt;
-            if (e.getResult() == buildResult)
+            if (evt instanceof BuildCommencedEvent)
             {
-                handleBuildCommenced();
+                BuildCommencedEvent e = (BuildCommencedEvent) evt;
+                if (e.getResult() == buildResult)
+                {
+                    handleBuildCommenced();
+                }
+            }
+            else
+            {
+                RecipeEvent e = (RecipeEvent) evt;
+                handleRecipeEvent(e);
             }
         }
-        else
+        catch (BuildException e)
         {
-            RecipeEvent e = (RecipeEvent) evt;
-            handleRecipeEvent(e);
+            buildResult.error(e);
+            completeBuild();
+        }
+        catch (Exception e)
+        {
+            buildResult.error("Unexpected error: " + e.getMessage());
+            completeBuild();
         }
     }
 
     private void handleBuildCommenced()
     {
+        // It is important that this directory is created *after* the build
+        // result is commenced and saved to the database, so that the
+        // database knows of the possibility of some other persistent
+        // artifacts, even if an error occurs very early in the build.
+        File buildDir = new File(buildResult.getOutputDir());
+        if (!buildDir.mkdirs())
+        {
+            throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
+        }
+
         tree.prepare(buildResult);
 
         // execute the first level of recipe controllers...
@@ -245,6 +259,7 @@ public class BuildController implements EventListener
 
     private void completeBuild()
     {
+        buildResult.abortUnfinishedRecipes();
         tree.cleanup(buildResult);
         buildResult.complete();
         buildManager.save(buildResult);

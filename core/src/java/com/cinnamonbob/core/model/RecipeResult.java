@@ -122,4 +122,15 @@ public class RecipeResult extends Result
             return recipeName;
         }
     }
+
+    public void abortUnfinishedCommands()
+    {
+        for (CommandResult result : results)
+        {
+            if (!result.completed())
+            {
+                result.error("Build aborted");
+            }
+        }
+    }
 }

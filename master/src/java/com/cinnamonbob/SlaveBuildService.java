@@ -1,10 +1,12 @@
 package com.cinnamonbob;
 
+import com.caucho.hessian.client.HessianRuntimeException;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.model.Slave;
 import com.cinnamonbob.services.SlaveService;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +19,8 @@ import java.util.zip.ZipInputStream;
  */
 public class SlaveBuildService implements BuildService
 {
+    private static final Logger LOG = Logger.getLogger(SlaveBuildService.class);
+
     private SlaveService service;
     private Slave slave;
 
@@ -33,7 +37,14 @@ public class SlaveBuildService implements BuildService
 
     public void build(RecipeRequest request)
     {
-        service.build(BobServer.getHostURL(), request);
+        try
+        {
+            service.build(BobServer.getHostURL(), request);
+        }
+        catch (HessianRuntimeException e)
+        {
+            throw convertException("Unable to dispatch recipe request '" + request.getId() + "' to slave '" + slave.getName() + "'", e);
+        }
     }
 
     public void collectResults(long recipeId, File dir)
@@ -67,7 +78,14 @@ public class SlaveBuildService implements BuildService
 
     public void cleanup(long recipeId)
     {
-        service.cleanupRecipe(recipeId);
+        try
+        {
+            service.cleanupRecipe(recipeId);
+        }
+        catch (Exception e)
+        {
+            LOG.warning("Failed to cleanup recipe '" + recipeId + "' on slave '" + slave.getName() + "'", e);
+        }
     }
 
     public String getHostName()
@@ -78,5 +96,10 @@ public class SlaveBuildService implements BuildService
     public Slave getSlave()
     {
         return slave;
+    }
+
+    private BuildException convertException(String context, HessianRuntimeException e)
+    {
+        return new BuildException(context + ": " + e.getMessage(), e);
     }
 }
