@@ -42,6 +42,7 @@
     <p>
         <ul>
             <li><a href="quartzSystemInfo.action">Quartz info</a></li>
+            <li><a href="viewTriggers.action">System triggers</a></li>
         </ul>
     </p>
 
