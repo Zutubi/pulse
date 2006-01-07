@@ -6,9 +6,11 @@ import com.cinnamonbob.ServerBootstrapper;
 import com.cinnamonbob.ServerRecipePaths;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.Bootstrapper;
+import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.RecipeProcessor;
 import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.build.RecipeErrorEvent;
 import com.cinnamonbob.services.MasterService;
 import com.cinnamonbob.util.logging.Logger;
 
@@ -58,6 +60,16 @@ public class SlaveRecipeProcessor
         try
         {
             recipeProcessor.build(request.getId(), processorPaths, bootstrapper, request.getBobFile(), request.getRecipeName());
+        }
+        catch (BuildException e)
+        {
+            RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), e.getMessage());
+            eventManager.publish(error);
+        }
+        catch (Exception e)
+        {
+            RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), "Unexpected error: " + e.getMessage());
+            eventManager.publish(error);
         }
         finally
         {

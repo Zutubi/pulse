@@ -2,8 +2,8 @@ package com.cinnamonbob.slave;
 
 import com.cinnamonbob.ServerRecipePaths;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
 
@@ -11,6 +11,8 @@ import java.io.File;
  */
 public class CleanupRecipeCommand implements Runnable
 {
+    private static final Logger LOG = Logger.getLogger(CleanupRecipeCommand.class);
+
     private long recipeId;
     private ConfigurationManager configurationManager;
 
@@ -25,7 +27,7 @@ public class CleanupRecipeCommand implements Runnable
         File recipeRoot = recipeProcessorPaths.getRecipeRoot();
         if (!FileSystemUtils.removeDirectory(recipeRoot))
         {
-            throw new BuildException("Unable to remove recipe directory '" + recipeRoot + "'");
+            LOG.warning("Unable to remove recipe directory '" + recipeRoot + "'");
         }
     }
 

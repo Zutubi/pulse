@@ -19,7 +19,10 @@ public class SlaveServiceImpl implements SlaveService
     {
         RecipeCommand command = new RecipeCommand(master, request);
         ComponentContext.autowire(command);
-        threadPool.executeCommand(command);
+        ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(master, request.getId(), command);
+        ComponentContext.autowire(runnable);
+
+        threadPool.executeCommand(runnable);
     }
 
     public void cleanupRecipe(long recipeId)

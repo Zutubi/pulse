@@ -33,6 +33,8 @@ public class ForwardingEventListener implements EventListener
             }
             catch (Exception e)
             {
+                // TODO abort the recipe execution
+                // TODO support retrying events
                 LOG.severe("Could not forward event for recipe '" + Long.toString(id) + "' to master", e);
             }
         }

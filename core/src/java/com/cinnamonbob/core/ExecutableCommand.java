@@ -82,7 +82,7 @@ public class ExecutableCommand implements Command
 
             // TODO awkward to add this stored artifact to the model...
             FileArtifact outputArtifact = new FileArtifact("output", outputFile);
-            outputArtifact.setTitle("Command Output");
+            outputArtifact.setTitle("command output");
             outputArtifact.setType("text/plain");
             cmdResult.addArtifact(new StoredArtifact(outputArtifact, outputFile.getName()));
         }

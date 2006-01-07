@@ -81,6 +81,10 @@ public class RecipeController
             {
                 handleRecipeCompleted((RecipeCompletedEvent) event);
             }
+            else if (event instanceof RecipeErrorEvent)
+            {
+                handleRecipeError((RecipeErrorEvent) event);
+            }
         }
         catch (BuildException e)
         {
@@ -127,6 +131,12 @@ public class RecipeController
     {
         recipeResult.update(event.getResult());
         recipeResult.complete();
+        complete();
+    }
+
+    private void handleRecipeError(RecipeErrorEvent event)
+    {
+        recipeResult.error(event.getErrorMessage());
         complete();
     }
 
