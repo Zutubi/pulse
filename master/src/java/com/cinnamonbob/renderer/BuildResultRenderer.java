@@ -1,6 +1,6 @@
-package com.cinnamonbob.core.renderer;
+package com.cinnamonbob.renderer;
 
-import com.cinnamonbob.core.model.RecipeResult;
+import com.cinnamonbob.model.BuildResult;
 
 import java.io.Writer;
 
@@ -15,5 +15,5 @@ public interface BuildResultRenderer
     public static final String TYPE_PLAIN = "plain";
     public static final String TYPE_HTML = "html";
 
-    public void render(String hostUrl, String project, long projectId, RecipeResult result, String type, Writer writer);
+    public void render(String hostUrl, BuildResult result, String type, Writer writer);
 }

@@ -1,54 +1,8 @@
 =====================================================================
-:: $project ::
+:: $result.project.name ::
 =====================================================================
 Build $result.number has completed with status '$result.state.prettyString'.
 
 You can view the full build result at:
 
-http://$hostname/viewBuild.action?id=$projectId&buildId=$result.id
-#if($result.errorMessage)
-
-*error message*
-$result.errorMessage
-#end
-#if($result.commandResults.size() > 0)
-
-A brief command log is given below.
-
-
-=====================================================================
-:: command log ::
-=====================================================================
-#foreach($commandResult in $result.commandResults)
----------------------------------------------------------------------
-command '$commandResult.commandName'
----------------------------------------------------------------------
-*brief*
-commenced: $commandResult.stamps.prettyStartTime
-completed: $commandResult.stamps.prettyEndTime
-elapsed  : $commandResult.stamps.prettyElapsed
-status   : $commandResult.state.prettyString
-
-#if($commandResult.errorMessage)
-*error message*
-$commandResult.errorMessage
-
-#end
-*artifacts*
-#foreach($artifact in $commandResult.artifacts)
-$artifact.title
-#if($artifact.hasFeatures())
-#foreach($level in $artifact.levels)
-   + $level.toString().toLowerCase() features
-#foreach($feature in $artifact.getFeatures($level))
-      * $feature.summary
-#end
-#end
-#else
-  <No features>
-#end
-
-#end
-
-#end
-#end
+http://$hostname/viewBuild.action?id=$result.project.id&buildId=$result.id

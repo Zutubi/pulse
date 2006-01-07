@@ -102,6 +102,6 @@ public abstract class ContactPoint extends Entity
         this.subscriptions = subscriptions;
     }
 
-    public abstract void notify(Project project, BuildResult result);
+    public abstract void notify(BuildResult result);
 }
 

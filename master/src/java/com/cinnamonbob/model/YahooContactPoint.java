@@ -15,7 +15,7 @@ public class YahooContactPoint extends ContactPoint
         return getUid();
     }
 
-    public void notify(Project project, BuildResult result)
+    public void notify(BuildResult result)
     {
 
     }

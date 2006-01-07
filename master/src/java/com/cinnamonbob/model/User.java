@@ -17,6 +17,16 @@ public class User extends Entity
 //    private Map<String, ContactPoint> contactPoints = new HashMap<String, ContactPoint>();
     private List<ContactPoint> contactPoints;
 
+    public User()
+    {
+    }
+
+    public User(String login, String name)
+    {
+        this.login = login;
+        this.name = name;
+    }
+
     public String getLogin()
     {
         return login;
@@ -39,7 +49,7 @@ public class User extends Entity
 
     public void add(ContactPoint point)
     {
-        contactPoints.add(point);
+        getContactPoints().add(point);
         point.setUser(this);
     }
 
@@ -71,7 +81,7 @@ public class User extends Entity
     //TODO: name -> contactpoint.
     public ContactPoint getContactPoint(String name)
     {
-        for (ContactPoint cp: contactPoints)
+        for (ContactPoint cp : contactPoints)
         {
             if (cp.getName().compareTo(name) == 0)
             {
@@ -84,7 +94,7 @@ public class User extends Entity
     public List<Subscription> getSubscriptions()
     {
         List<Subscription> subscriptions = new LinkedList<Subscription>();
-        for (ContactPoint cp: contactPoints)
+        for (ContactPoint cp : contactPoints)
         {
             subscriptions.addAll(cp.getSubscriptions());
         }

@@ -1,6 +1,6 @@
-package com.cinnamonbob.core.renderer;
+package com.cinnamonbob.renderer;
 
-import com.cinnamonbob.core.model.RecipeResult;
+import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.util.logging.Logger;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -18,21 +18,19 @@ public class VelocityBuildResultRenderer implements BuildResultRenderer
 
     private VelocityEngine velocityEngine;
 
-    public void render(String hostUrl, String project, long projectId, RecipeResult result, String type, Writer writer)
+    public void render(String hostUrl, BuildResult result, String type, Writer writer)
     {
         VelocityContext context = new VelocityContext();
 
         context.put("renderer", this);
         context.put("type", type);
         context.put("hostname", hostUrl);
-        context.put("project", project);
-        context.put("projectId", projectId);
         context.put("result", result);
         context.put("model", result);
 
         try
         {
-            velocityEngine.mergeTemplate(type + File.separatorChar + "RecipeResult.vm", "utf-8", context, writer);
+            velocityEngine.mergeTemplate(type + File.separatorChar + "BuildResult.vm", "utf-8", context, writer);
         }
         catch (ResourceNotFoundException e)
         {

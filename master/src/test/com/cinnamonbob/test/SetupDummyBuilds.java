@@ -7,6 +7,7 @@ import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 import com.cinnamonbob.model.persistence.ProjectDao;
 import com.cinnamonbob.model.persistence.SlaveDao;
+import com.cinnamonbob.model.persistence.UserDao;
 
 import java.io.File;
 import java.util.Date;
@@ -20,6 +21,7 @@ public class SetupDummyBuilds implements Runnable
     private SlaveDao slaveDao;
     private ProjectDao projectDao;
     private BuildResultDao buildResultDao;
+    private UserDao userDao;
     private Slave slave;
     private P4 scm;
 
@@ -30,10 +32,12 @@ public class SetupDummyBuilds implements Runnable
         slaveDao = (SlaveDao) ComponentContext.getBean("slaveDao");
         projectDao = (ProjectDao) ComponentContext.getBean("projectDao");
         buildResultDao = (BuildResultDao) ComponentContext.getBean("buildResultDao");
+        userDao = (UserDao) ComponentContext.getBean("userDao");
 
         if (projectDao.findAll().size() == 0)
         {
             setupSlave();
+
             project = setupProject("complex success");
             createComplexSuccess(project);
 
@@ -51,6 +55,8 @@ public class SetupDummyBuilds implements Runnable
 
             project = setupProject("error features");
             createErrorFeatures(project);
+
+            setupUsers(project);
         }
     }
 
@@ -58,6 +64,17 @@ public class SetupDummyBuilds implements Runnable
     {
         slave = new Slave("local slave", "localhost", 8090);
         slaveDao.save(slave);
+    }
+
+    private void setupUsers(Project project)
+    {
+        User user = new User("jsankey", "Jason Sankey");
+
+        ContactPoint contactPoint = new EmailContactPoint("jsankey@gmail.com");
+        Subscription subscription = new Subscription(project, contactPoint);
+        contactPoint.add(subscription);
+        user.add(contactPoint);
+        userDao.save(user);
     }
 
     private Project setupProject(String name)

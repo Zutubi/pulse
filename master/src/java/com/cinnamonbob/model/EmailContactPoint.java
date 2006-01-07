@@ -4,8 +4,7 @@ import com.cinnamonbob.BobServer;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.core.renderer.BuildResultRenderer;
+import com.cinnamonbob.renderer.BuildResultRenderer;
 import com.cinnamonbob.util.logging.Logger;
 
 import javax.mail.Message;
@@ -32,6 +31,11 @@ public class EmailContactPoint extends ContactPoint
     {
     }
 
+    public EmailContactPoint(String email)
+    {
+        setEmail(email);
+    }
+
     public String getEmail()
     {
         return getUid();
@@ -45,18 +49,17 @@ public class EmailContactPoint extends ContactPoint
     /* (non-Javadoc)
     * @see com.cinnamonbob.core.ContactPoint#notify(com.cinnamonbob.core.model.RecipeResult)
     */
-    public void notify(Project project, BuildResult result)
+    public void notify(BuildResult result)
     {
         String subject = "[CiB] " + result.getProject().getName() + ": build " + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
-        // TODO distributed building...
-        sendMail(subject, renderResult(project, result.getRoot().getChildren().get(0).getResult()));
+        sendMail(subject, renderResult(result));
     }
 
-    private String renderResult(Project project, RecipeResult result)
+    private String renderResult(BuildResult result)
     {
         StringWriter w = new StringWriter();
         BuildResultRenderer renderer = (BuildResultRenderer) ComponentContext.getBean("buildResultRenderer");
-        renderer.render(BobServer.getHostURL(), project.getName(), project.getId(), result, BuildResultRenderer.TYPE_PLAIN, w);
+        renderer.render(BobServer.getHostURL(), result, BuildResultRenderer.TYPE_PLAIN, w);
         return w.toString();
     }
 

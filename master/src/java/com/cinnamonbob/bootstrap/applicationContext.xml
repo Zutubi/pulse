@@ -127,7 +127,8 @@
         </property>
     </bean>
 
-    <bean id="slaveManagerTarget" class="com.cinnamonbob.model.DefaultSlaveManager" autowire="byName" init-method="init"/>
+    <bean id="slaveManagerTarget" class="com.cinnamonbob.model.DefaultSlaveManager" autowire="byName"
+          init-method="init"/>
     <bean id="slaveManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
@@ -157,7 +158,7 @@
 
     <bean id="buildQueue" class="com.cinnamonbob.BuildQueue" autowire="byName"/>
 
-    <bean id="buildResultRenderer" class="com.cinnamonbob.core.renderer.VelocityBuildResultRenderer" autowire="byName"/>
+    <bean id="buildResultRenderer" class="com.cinnamonbob.renderer.VelocityBuildResultRenderer" autowire="byName"/>
 
     <bean id="userConfigRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
         <property name="targetBeanName">
@@ -177,5 +178,7 @@
     <bean id="fatController" class="com.cinnamonbob.FatController" autowire="byName" init-method="init"/>
 
     <bean id="recipeQueue" class="com.cinnamonbob.ImmediateDispatchRecipeQueue" autowire="byName" init-method="init"/>
+
+    <bean id="resultNotifier" class="com.cinnamonbob.ResultNotifier" autowire="byName"/>
 
 </beans>
