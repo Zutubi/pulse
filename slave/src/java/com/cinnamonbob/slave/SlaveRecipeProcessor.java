@@ -68,6 +68,7 @@ public class SlaveRecipeProcessor
         }
         catch (Exception e)
         {
+            LOG.severe(e);
             RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), "Unexpected error: " + e.getMessage());
             eventManager.publish(error);
         }

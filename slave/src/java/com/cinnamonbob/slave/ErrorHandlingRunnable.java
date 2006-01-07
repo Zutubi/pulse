@@ -39,7 +39,8 @@ public class ErrorHandlingRunnable implements Runnable
         }
         catch (Exception e)
         {
-            sendError(new BuildException("Unexpected error: " + e.getMessage()));
+            LOG.severe(e);
+            sendError(new BuildException("Unexpected error: " + e.getMessage(), e));
         }
     }
 

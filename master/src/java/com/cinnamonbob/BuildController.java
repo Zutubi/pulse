@@ -186,6 +186,7 @@ public class BuildController implements EventListener
         }
         catch (Exception e)
         {
+            LOG.severe(e);
             buildResult.error("Unexpected error: " + e.getMessage());
             completeBuild();
         }

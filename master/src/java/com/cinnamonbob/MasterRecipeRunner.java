@@ -6,11 +6,14 @@ import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.RecipeProcessor;
 import com.cinnamonbob.core.event.EventManager;
 import com.cinnamonbob.events.build.RecipeErrorEvent;
+import com.cinnamonbob.util.logging.Logger;
 
 /**
  */
 public class MasterRecipeRunner implements Runnable
 {
+    private static final Logger LOG = Logger.getLogger(MasterRecipeRunner.class);
+
     private RecipeRequest request;
     private RecipeProcessor recipeProcessor;
     private EventManager eventManager;
@@ -39,6 +42,7 @@ public class MasterRecipeRunner implements Runnable
         }
         catch (Exception e)
         {
+            LOG.severe(e);
             eventManager.publish(new RecipeErrorEvent(this, request.getId(), "Unexpected error: " + e.getMessage()));
         }
     }

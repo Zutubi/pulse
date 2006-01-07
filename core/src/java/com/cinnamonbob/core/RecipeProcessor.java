@@ -7,6 +7,7 @@ import com.cinnamonbob.events.build.CommandCommencedEvent;
 import com.cinnamonbob.events.build.CommandCompletedEvent;
 import com.cinnamonbob.events.build.RecipeCommencedEvent;
 import com.cinnamonbob.events.build.RecipeCompletedEvent;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +18,8 @@ import java.util.List;
  */
 public class RecipeProcessor
 {
+    private static final Logger LOG = Logger.getLogger(RecipeProcessor.class);
+
     private EventManager eventManager;
     private ResourceRepository resourceRepository;
 
@@ -70,6 +73,7 @@ public class RecipeProcessor
         }
         catch (Exception e)
         {
+            LOG.severe(e);
             result.error(new BuildException("Unexpected error: " + e.getMessage(), e));
         }
         finally

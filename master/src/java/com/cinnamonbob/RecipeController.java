@@ -8,12 +8,15 @@ import com.cinnamonbob.events.build.*;
 import com.cinnamonbob.model.BuildManager;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.RecipeResultNode;
+import com.cinnamonbob.util.logging.Logger;
 
 /**
  *
  */
 public class RecipeController
 {
+    private static final Logger LOG = Logger.getLogger(RecipeController.class);
+
     private RecipeResultNode recipeResultNode;
     private RecipeResult recipeResult;
     private RecipeDispatchRequest dispatchRequest;
@@ -93,6 +96,7 @@ public class RecipeController
         }
         catch (Exception e)
         {
+            LOG.severe(e);
             recipeResult.error("Unexpected error: " + e.getMessage());
             complete();
         }
