@@ -106,6 +106,15 @@
         <jar file="build/${module}-test.jar" basedir="${test-classes.dir}"/>
     </target>
 
+    <target name="publish" depends="jar">
+        <dirname property="current.dir" file="ivy.xml"/>
+        <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
+    </target>
+
+    <target name="package">
+        <!-- default noop packaging -->
+    </target>
+
     <!-- -->
     <target name="test" depends="common-init" unless="skip.tests">
 
@@ -128,6 +137,8 @@
         </junit>
     </target>
 
+    <target name="project.build" depends="resolve.internal, jar, test, publish, package"/>
+
     <target name="javadoc" depends="common-init">
         <javadoc destdir="build/docs/api" author="true" version="true" use="true">
             <fileset dir="${src.dir}" defaultexcludes="yes"/>
@@ -135,17 +146,12 @@
         </javadoc>
     </target>
 
-    <target name="package" depends="jar">
-        <zip destfile="build/${module}-src.zip" basedir="${src.dir}"/>
-        <zip destfile="build/${module}-src-test.zip" basedir="${test.dir}"/>
-    </target>
-
     <!-- ====================== -->
     <!-- Dependency management  -->
     <!-- ====================== -->
 
     <!-- resolve external dependencies for this component -->
-    <target name="resolve.external" depends="common-init">
+    <target name="resolve.dependencies" depends="common-init">
         <resolve conf="external"/>
     </target>
 
@@ -156,23 +162,18 @@
 
     <macrodef name="resolve">
         <attribute name="conf"/>
+        <attribute name="dest" default="${ivy.lib.dir}/@{conf}"/>
         <sequential>
             <ivy:resolve file="ivy.xml" conf="@{conf}"/>
-            <!-- clean out the lib dir to ensure no old files are left around. -->
+            <!-- ensure that the target lib directory exists -->
+            <mkdir dir="@{dest}"/>
+            <!-- ensure no old files are left around. -->
             <delete failonerror="true">
-                <fileset dir="${lib.dir}/@{conf}" includes="**/*"/>
+                <fileset dir="@{dest}" includes="**/*"/>
             </delete>
             <ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact]-[revision].[ext]" validate="true" conf="@{conf}"/>
             <ivy:deliver deliverpattern="${ivy.conf.dir}/build/repository/[module]/ivy-[revision].xml"/>
         </sequential>
     </macrodef>
-
-    <target name="publish" depends="package">
-        <dirname property="current.dir" file="ivy.xml"/>
-        <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
-    </target>
-
-
-    <target name="project.build" depends="clean, resolve.internal, jar, test, publish"/>
 
 </project>

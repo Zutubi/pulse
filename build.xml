@@ -16,36 +16,75 @@
         <ant dir="slave" antfile="build.xml" target="clean"/>
     </target>
 
-    <!-- resolve all of the external dependencies within the components. -->
-    <target name="resolve.external">
-        <ant dir="core" antfile="build.xml" target="resolve.external"/>
-        <ant dir="server-core" antfile="build.xml" target="resolve.external"/>
-        <ant dir="local" antfile="build.xml" target="resolve.external"/>
-        <ant dir="master" antfile="build.xml" target="resolve.external"/>
-        <ant dir="slave" antfile="build.xml" target="resolve.external"/>
+    <target name="clean.local" depends="clean">
+        <ant dir="core" antfile="build.xml" target="clean"/>
+        <ant dir="local" antfile="build.xml" target="clean"/>
     </target>
 
-    <target name="build.local">
+    <target name="clean.master" depends="clean">
+        <ant dir="core" antfile="build.xml" target="clean"/>
+        <ant dir="server-core" antfile="build.xml" target="clean"/>
+        <ant dir="master" antfile="build.xml" target="clean"/>
+    </target>
 
+    <target name="clean.slave" depends="clean">
+        <ant dir="core" antfile="build.xml" target="clean"/>
+        <ant dir="server-core" antfile="build.xml" target="clean"/>
+        <ant dir="slave" antfile="build.xml" target="clean"/>
+    </target>
+
+    <!-- ============================== -->
+    <!-- external dependency resolution -->
+    <!-- ============================== -->
+
+    <target name="resolve.dependencies">
+        <ant dir="core" antfile="build.xml" target="resolve.dependencies"/>
+        <ant dir="server-core" antfile="build.xml" target="resolve.dependencies"/>
+        <ant dir="local" antfile="build.xml" target="resolve.dependencies"/>
+        <ant dir="master" antfile="build.xml" target="resolve.dependencies"/>
+        <ant dir="slave" antfile="build.xml" target="resolve.dependencies"/>
+    </target>
+
+    <target name="resolve.dependencies.local">
+        <ant dir="core" antfile="build.xml" target="resolve.dependencies"/>
+        <ant dir="local" antfile="build.xml" target="resolve.dependencies"/>
+    </target>
+
+    <target name="resolve.dependencies.master">
+        <ant dir="core" antfile="build.xml" target="resolve.dependencies"/>
+        <ant dir="server-core" antfile="build.xml" target="resolve.dependencies"/>
+        <ant dir="master" antfile="build.xml" target="resolve.dependencies"/>
+    </target>
+
+    <target name="resolve.dependencies.slave">
+        <ant dir="core" antfile="build.xml" target="resolve.dependencies"/>
+        <ant dir="server-core" antfile="build.xml" target="resolve.dependencies"/>
+        <ant dir="slave" antfile="build.xml" target="resolve.dependencies"/>
+    </target>
+
+    <!-- ======================== -->
+    <!-- Component bulid targets. -->
+    <!-- ======================== -->
+
+    <target name="build.local">
         <ant dir="core" antfile="build.xml" target="project.build"/>
         <ant dir="local" antfile="build.xml" target="project.build"/>
-
     </target>
 
     <target name="build.master">
-
         <ant dir="core" antfile="build.xml" target="project.build"/>
         <ant dir="server-core" antfile="build.xml" target="project.build"/>
         <ant dir="master" antfile="build.xml" target="project.build"/>
-
     </target>
 
     <target name="build.slave">
-
         <ant dir="core" antfile="build.xml" target="project.build"/>
         <ant dir="server-core" antfile="build.xml" target="project.build"/>
         <ant dir="slave" antfile="build.xml" target="project.build"/>
-
     </target>
+
+    <target name="master" depends="clean.master, resolve.dependencies.master, build.master"/>
+    <target name="slave" depends="clean.slave, resolve.dependencies.slave, build.slave"/>
+    <target name="local" depends="clean.local, resolve.dependencies.local, build.local"/>
 
 </project>

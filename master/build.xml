@@ -46,11 +46,6 @@
                 <include name="validators.xml"/>
             </fileset>
         </copy>
-        <!--<copy todir="${package.root}/config">-->
-            <!--<fileset dir="src/main/config">-->
-                <!--<include name="**/*.xml"/>-->
-            <!--</fileset>-->
-        <!--</copy>-->
         <copy todir="${package.root}/docs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>

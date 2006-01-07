@@ -10,4 +10,48 @@
 
     </target>
 
+    <!-- create module package -->
+    <target name="package"><!-- depends="publish" -->
+
+        <mkdir dir="build/package"/>
+        <property name="package.root" value="build/package/bob-${module}-${version}"/>
+
+        <!-- various scripts used to work with this module -->
+        <copy todir="${package.root}/bin">
+            <fileset dir="src/bin" includes="**/*"/>
+        </copy>
+        <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+
+        <!--TODO: use ivy to locate the dependencies and copy them into the package. -->
+
+        <copy todir="${package.root}/lib">
+            <!-- 3rd party dependencies -->
+            <fileset dir="lib/external">
+                <include name="**/*.jar"/>
+            </fileset>
+            <!-- internal dependencies -->
+            <fileset dir="lib/internal">
+                <include name="**/*.jar"/>
+            </fileset>
+            <!-- this module -->
+            <fileset dir="build">
+                <include name="${module}.jar"/>
+            </fileset>
+            <!-- misc stuff that needs to be added to the classpath -->
+            <fileset dir="etc">
+                <include name="validators.xml"/>
+            </fileset>
+        </copy>
+        <!-- place holder for future documentation -->
+        <copy todir="${package.root}/docs">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+        <zip destfile="build/bob-${module}-${version}.zip" basedir="build/package"/>
+
+        <!-- do we want to make the source available? -->
+        <!--<zip destfile="build/${module}-src.zip" basedir="${src.dir}"/>-->
+        <!--<zip destfile="build/${module}-src-test.zip" basedir="${test.dir}"/>-->
+
+    </target>
+
 </project>
