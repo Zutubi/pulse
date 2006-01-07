@@ -59,8 +59,12 @@
         </property>
     </bean>
 
-    <bean id="triggerHandler" class="com.cinnamonbob.scheduling.DefaultTriggerHandler"/>
-
+    <bean id="triggerHandler" class="com.cinnamonbob.scheduling.DefaultTriggerHandler">
+        <!-- not sure why this is needs to be wired directly. -->
+        <property name="triggerDao">
+            <ref bean="triggerDao"/>
+        </property>
+    </bean>
 
     <bean id="userManagerTarget" class="com.cinnamonbob.model.DefaultUserManager" autowire="byName"/>
     <bean id="userManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

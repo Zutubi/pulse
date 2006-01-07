@@ -1,10 +1,9 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.SlaveProxyFactory;
 import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.model.persistence.SlaveDao;
 import com.cinnamonbob.scheduling.*;
-import com.cinnamonbob.services.SlaveService;
+import com.cinnamonbob.scheduling.tasks.PingSlaves;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.util.List;

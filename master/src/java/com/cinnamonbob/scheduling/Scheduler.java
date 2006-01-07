@@ -11,6 +11,8 @@ public interface Scheduler
 
     Trigger getTrigger(long id);
 
+    List<Trigger> getTriggers();
+
     List<Trigger> getTriggers(long id);
 
     Trigger getTrigger(long id, String name);

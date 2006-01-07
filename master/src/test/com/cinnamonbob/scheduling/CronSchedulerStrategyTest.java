@@ -8,7 +8,7 @@ import org.quartz.impl.StdSchedulerFactory;
  */
 public class CronSchedulerStrategyTest extends BaseSchedulerStrategyTest
 {
-    private Scheduler quartzScheduler = null;
+    private org.quartz.Scheduler quartzScheduler = null;
 
     public CronSchedulerStrategyTest(String testName)
     {

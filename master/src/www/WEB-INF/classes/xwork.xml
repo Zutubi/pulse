@@ -270,6 +270,10 @@
             <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
         </action>
 
+        <action name="viewTriggers" class="com.cinnamonbob.web.scheduling.ViewTriggersAction">
+            <result name="success" type="velocity">view-triggers.vm</result>
+        </action>
+
         <action name="createSubscription!default" class="com.cinnamonbob.web.user.CreateSubscriptionAction"
                 method="doDefault">
             <interceptor-ref name="defaultStack"/>

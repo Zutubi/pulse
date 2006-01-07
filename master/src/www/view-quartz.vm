@@ -18,7 +18,7 @@
                 <td>$!trigger.name</td>
                 <td>$!trigger.nextFireTime</td>
                 <td>$!trigger.previousFireTime</td>
-                <td>#renderTriggerState($scheduler.getTriggerState($name, $groupName))</td>
+                <td>#renderQuartzTriggerState($scheduler.getTriggerState($name, $groupName))</td>
             </tr>
         #end
     #end

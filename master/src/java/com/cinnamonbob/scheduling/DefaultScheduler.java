@@ -80,6 +80,11 @@ public class DefaultScheduler implements Scheduler
         return triggerDao.findById(id);
     }
 
+    public List<Trigger> getTriggers()
+    {
+        return triggerDao.findAll();
+    }
+
     public List<Trigger> getTriggers(long id)
     {
         return triggerDao.findByProject(id);

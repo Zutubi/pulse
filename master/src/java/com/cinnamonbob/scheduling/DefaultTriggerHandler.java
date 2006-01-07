@@ -1,12 +1,15 @@
 package com.cinnamonbob.scheduling;
 
 import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.scheduling.persistence.TriggerDao;
 
 /**
  * <class-comment/>
  */
 public class DefaultTriggerHandler implements TriggerHandler
 {
+    private TriggerDao triggerDao;
+
     public void trigger(Trigger trigger) throws SchedulingException
     {
         TaskExecutionContext context = new TaskExecutionContext();
@@ -17,6 +20,8 @@ public class DefaultTriggerHandler implements TriggerHandler
     {
         context.setTrigger(trigger);
         trigger.trigger();
+        triggerDao.save(trigger);
+        
         // determine the task to be executed.
         try
         {
@@ -29,5 +34,10 @@ public class DefaultTriggerHandler implements TriggerHandler
         {
             throw new SchedulingException(e);
         }
+    }
+
+    public void setTriggerDao(TriggerDao triggerDao)
+    {
+        this.triggerDao = triggerDao;
     }
 }

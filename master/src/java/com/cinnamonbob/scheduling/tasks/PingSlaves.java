@@ -1,9 +1,11 @@
-package com.cinnamonbob.model;
+package com.cinnamonbob.scheduling.tasks;
 
 import com.cinnamonbob.scheduling.Task;
 import com.cinnamonbob.scheduling.TaskExecutionContext;
 import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.SlaveProxyFactory;
+import com.cinnamonbob.model.SlaveManager;
+import com.cinnamonbob.model.Slave;
 import com.cinnamonbob.services.SlaveService;
 
 /**
