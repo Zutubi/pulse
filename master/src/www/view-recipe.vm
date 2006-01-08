@@ -7,7 +7,7 @@
   </head>
   <body>
 #classset($result)
-    <h1 class="build-log">:: $result.recipeNameSafe @ node.hostSafe ::</h1>
+    <h1 class="build-log">:: $result.recipeNameSafe @ $node.hostSafe ::</h1>
 
     <h2 class="command-$class">summary</h2>
     <div class="command-content">
