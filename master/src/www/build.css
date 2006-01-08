@@ -179,6 +179,7 @@ li.recipe-tree {
 }
 
 li.error, li.warning, li.info {
+    list-style: none;
     padding-left: 20px;
 }
 
@@ -229,4 +230,9 @@ ul.build-spec {
 
 li.build-spec {
     margin-top: 10px;
+}
+
+li.header {
+    font-weight: bold;
+    list-style: none;
 }

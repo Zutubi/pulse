@@ -11,9 +11,15 @@
 
     <h2 class="command-$class">summary</h2>
     <div class="command-content">
+      <h4>summary</h4>
       <table>
         #resultsummary($result)
       </table>
+
+      #recipeMessageSummary($result $result.getLevel("ERROR") true)
+
+      #recipeMessageSummary($result $result.getLevel("WARNING") true)
+
     </div>
 
 #if($result.commandResults.size() > 0)
@@ -24,6 +30,7 @@
     <div class="command-content">
       <table>
     #resultsummary($commandResult)
+    #errorrow($commandResult)
       </table>
     #if($commandResult.properties.size() > 0)
       <h4>details</h4>

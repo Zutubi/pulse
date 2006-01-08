@@ -5,6 +5,8 @@ import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.core.util.TimeStamps;
 
 import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class Result extends Entity
 {
@@ -79,9 +81,14 @@ public abstract class Result extends Entity
         state = ResultState.SUCCESS;
     }
 
-    public void failure(String message)
+    public void failure()
     {
         state = ResultState.FAILURE;
+    }
+
+    public void failure(String message)
+    {
+        failure();
         failureMessage = message;
 
         if (failureMessage.length() > MAX_MESSAGE_LENGTH)
@@ -207,5 +214,45 @@ public abstract class Result extends Entity
         {
             outputDir = new File(dir);
         }
+    }
+
+    public List<String> collectErrors()
+    {
+        List<String> errors = new LinkedList<String>();
+
+        if (errorMessage != null)
+        {
+            errors.add(errorMessage);
+        }
+
+        if (failureMessage != null)
+        {
+            errors.add(failureMessage);
+        }
+
+        return errors;
+    }
+
+    public boolean hasMessages(Feature.Level level)
+    {
+        if (level == Feature.Level.ERROR)
+        {
+            if (errorMessage != null)
+            {
+                return true;
+            }
+
+            if (failureMessage != null)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public Feature.Level getLevel(String name)
+    {
+        return Feature.Level.valueOf(name);
     }
 }

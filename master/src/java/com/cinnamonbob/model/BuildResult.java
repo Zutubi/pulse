@@ -1,9 +1,11 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.core.model.Result;
 import com.cinnamonbob.core.model.ResultState;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -104,5 +106,35 @@ public class BuildResult extends Result
         {
             node.abort();
         }
+    }
+
+    public List<String> collectErrors()
+    {
+        List<String> errors = super.collectErrors();
+
+        for (RecipeResultNode node : root.getChildren())
+        {
+            errors.addAll(node.collectErrors());
+        }
+
+        return errors;
+    }
+
+    public boolean hasMessages(Feature.Level level)
+    {
+        if (super.hasMessages(level))
+        {
+            return true;
+        }
+
+        for (RecipeResultNode node : root.getChildren())
+        {
+            if (node.hasMessages(level))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

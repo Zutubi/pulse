@@ -258,7 +258,7 @@ public class BuildController implements EventListener
             }
             else
             {
-                buildResult.failure("One or more recipes failed");
+                buildResult.failure();
                 buildManager.save(buildResult);
             }
         }

@@ -63,17 +63,19 @@ public class ExecutableCommand implements Command
 
             output.close();
 
+            String commandLine = constructCommandLine(builder);
+
             if (result == 0)
             {
                 cmdResult.success();
             }
             else
             {
-                cmdResult.failure("Command exited with code '" + result + "'");
+                cmdResult.failure("Command '" + commandLine + "' exited with code '" + result + "'");
             }
 
             cmdResult.getProperties().put("exit code", Integer.toString(result));
-            cmdResult.getProperties().put("command line", constructCommandLine(builder));
+            cmdResult.getProperties().put("command line", commandLine);
 
             if (builder.directory() != null)
             {

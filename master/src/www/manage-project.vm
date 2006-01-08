@@ -96,6 +96,10 @@
                 #resultsummary($currentBuild)
             </table>
 
+            #buildMessageSummary($currentBuild $currentBuild.getLevel("ERROR"))
+
+            #buildMessageSummary($currentBuild $currentBuild.getLevel("WARNING"))
+
             <h4>recipes</h4>
             #showrecipes($currentBuild.root false)
         </div>

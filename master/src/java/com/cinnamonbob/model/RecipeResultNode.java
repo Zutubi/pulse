@@ -1,6 +1,7 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.core.model.Entity;
+import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.core.model.RecipeResult;
 
 import java.util.LinkedList;
@@ -83,5 +84,35 @@ public class RecipeResultNode extends Entity
         {
             child.abort();
         }
+    }
+
+    public List<String> collectErrors()
+    {
+        List<String> errors = new LinkedList<String>();
+        errors.addAll(result.collectErrors());
+        for (RecipeResultNode child : children)
+        {
+            errors.addAll(child.collectErrors());
+        }
+
+        return errors;
+    }
+
+    public boolean hasMessages(Feature.Level level)
+    {
+        if (result.hasMessages(level))
+        {
+            return true;
+        }
+
+        for (RecipeResultNode child : children)
+        {
+            if (child.hasMessages(level))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -174,7 +174,7 @@ public class SetupDummyBuilds implements Runnable
         RecipeResultNode childNode = createCommandFailedRecipe();
         rootResultNode.addChild(childNode);
         result.getRoot().addChild(rootResultNode);
-        result.failure("Recipe '" + childNode.getResult().getRecipeNameSafe() + "@" + childNode.getHost() + "' failed");
+        result.failure();
         result.complete();
         buildResultDao.save(result);
     }
@@ -318,7 +318,7 @@ public class SetupDummyBuilds implements Runnable
         result.commence(new File("/complex/command/output/dir"));
         result.getProperties().put("command line", "/usr/local/bin/make -f my/path/to/Makefile build");
         result.getProperties().put("exit code", "1");
-        result.failure("Command exited with code '1'");
+        result.failure("Command 'command/line/here' exited with code '1'");
         result.complete();
         return result;
     }

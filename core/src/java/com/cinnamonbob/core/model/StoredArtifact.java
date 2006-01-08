@@ -21,11 +21,11 @@ public class StoredArtifact extends Entity
 
     public StoredArtifact(FileArtifact artifact, String file)
     {
-        name      = artifact.getName();
-        title     = artifact.getTitle();
-        type      = artifact.getType();
+        name = artifact.getName();
+        title = artifact.getTitle();
+        type = artifact.getType();
         this.file = file;
-        features  = new LinkedList<Feature>();
+        features = new LinkedList<Feature>();
     }
 
 
@@ -59,7 +59,7 @@ public class StoredArtifact extends Entity
     {
         Set<Feature.Level> levels = new TreeSet<Feature.Level>();
 
-        for(Feature f: features)
+        for (Feature f : features)
         {
             levels.add(f.getLevel());
         }
@@ -70,9 +70,9 @@ public class StoredArtifact extends Entity
     public List<Feature> getFeatures(Feature.Level level)
     {
         List<Feature> result = new LinkedList<Feature>();
-        for(Feature f: features)
+        for (Feature f : features)
         {
-            if(f.getLevel() == level)
+            if (f.getLevel() == level)
             {
                 result.add(f);
             }
@@ -118,5 +118,21 @@ public class StoredArtifact extends Entity
     private void setType(String type)
     {
         this.type = type;
+    }
+
+    public List<String> collectFeatures(Feature.Level level)
+    {
+        List<String> summaries = new LinkedList<String>();
+        for (Feature f : getFeatures(level))
+        {
+            summaries.add(f.getSummary());
+        }
+
+        return summaries;
+    }
+
+    public boolean hasMessages(Feature.Level level)
+    {
+        return getFeatures(level).size() > 0;
     }
 }

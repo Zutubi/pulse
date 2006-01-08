@@ -4,9 +4,28 @@ public class Feature extends Entity
 {
     public enum Level
     {
-        ERROR,
-        INFO,
+        ERROR
+                {
+                    public String getPrettyString()
+                    {
+                        return "error";
+                    }
+                },
+        INFO
+                {
+                    public String getPrettyString()
+                    {
+                        return "info";
+                    }
+                },
         WARNING
+                {
+                    public String getPrettyString()
+                    {
+                        return "warning";
+                    }
+                }
+
     }
 
     private Level level;

@@ -40,7 +40,7 @@ public class RecipeResult extends Result
             case FAILURE:
                 if (state != ResultState.ERROR && state != ResultState.FAILURE)
                 {
-                    failure("Command '" + result.getCommandName() + "' failed");
+                    failure();
                 }
                 break;
         }
@@ -132,5 +132,33 @@ public class RecipeResult extends Result
                 result.error("Build aborted");
             }
         }
+    }
+
+    public List<String> collectErrors()
+    {
+        List<String> errors = super.collectErrors();
+        for (CommandResult result : results)
+        {
+            errors.addAll(result.collectErrors());
+        }
+        return errors;
+    }
+
+    public boolean hasMessages(Feature.Level level)
+    {
+        if (super.hasMessages(level))
+        {
+            return true;
+        }
+
+        for (CommandResult result : results)
+        {
+            if (result.hasMessages(level))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -90,8 +90,6 @@
     <td class="build-$class">$result.stamps.prettyElapsed</td>
     <td class="build-$class">$result.state.prettyString</td>
   <tr>
-
-  #errorrow($result)
 #end
 
 ##
@@ -145,4 +143,102 @@
     #end
   #end
   </ul>
+#end
+
+##
+## Outputs list items for messages of a given level directly on the given result
+##
+#macro(resultMessageItems $result $level)
+  #if($level.toString() == "ERROR")
+    #if($result.errorMessage)
+      <li class="error">$result.errorMessage</li>
+    #end
+    #if($result.failureMessage)
+      <li class="error">$result.failureMessage</li>
+    #end
+  #end
+#end
+
+##
+## Summarises the messages of a given level on an artifact into a nested list
+##
+#macro(artifactMessageSummary $artifact $level)
+  #if($artifact.hasMessages($level))
+    #foreach($feature in $artifact.getFeatures($level))
+      <li class="$level.toString().toLowerCase()">$feature.summary</li>
+    #end
+  #end
+#end
+
+##
+## Summarises the messages of a given level on a command result into a nested list
+##
+#macro(commandMessageSummary $commandResult $level)
+  #if($commandResult.hasMessages($level))
+    #resultMessageItems($commandResult $level)
+    #foreach($artifact in $commandResult.getArtifacts())
+      #if($artifact.hasMessages($level))
+        <li class="header">artifact '$artifact.title'</li>
+        <ul>
+          #artifactMessageSummary($artifact $level)
+        </ul>
+      #end
+    #end
+  #end
+#end
+
+##
+## Summarises the messages of a given level on a recipe result into a nested list
+##
+#macro(recipeMessageSummary $recipeResult $level $top)
+  #if($recipeResult.hasMessages($level))
+    #if($top)
+      <h4>$level.toString().toLowerCase() messages</h4>
+      <ul class="$level.toString().toLowerCase()">
+    #end
+
+    #resultMessageItems($recipeResult $level)
+    #foreach($commandResult in $recipeResult.commandResults)
+      #if($commandResult.hasMessages($level))
+        <li class="header">command '$commandResult.commandName'</li>
+        <ul>
+          #commandMessageSummary($commandResult $level)
+        </ul>
+      #end
+    #end
+
+    #if($top)
+      </ul>
+    #end
+  #end
+#end
+
+##
+## Summarises the messages of a given level on a recipe result node into a nested list
+##
+#macro(nodeMessageSummary $node $level)
+  #if($node.hasMessages($level))
+    <li class="header">recipe $node.result.recipeNameSafe @ $node.hostSafe</li>
+    <ul>
+      #recipeMessageSummary($node.result $level false)
+      #foreach($child in $node.children)
+        #nodeMessageSummary($child $level)
+      #end
+    </ul>
+  #end
+#end
+
+##
+## Summarises the messages of a given level on a build result into a nested list
+##
+#macro(buildMessageSummary $buildResult $level)
+  #if($buildResult.hasMessages($level))
+    <h4>$level.toString().toLowerCase() messages</h4>
+    <ul class="$level.toString().toLowerCase()">
+      #resultMessageItems($buildResult $level)
+      #foreach($node in $buildResult.root.children)
+        #nodeMessageSummary($node $level)
+      #end
+    </ul>
+  #end
 #end

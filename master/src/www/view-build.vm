@@ -28,9 +28,14 @@
 
     <h2 class="command-$class">summary</h2>
     <div class="command-content">
+      <h4>summary</h4>
       <table>
         #resultsummary($result)
       </table>
+
+      #buildMessageSummary($result $result.getLevel("ERROR"))
+
+      #buildMessageSummary($result $result.getLevel("WARNING"))      
     </div>
 
       <h2 class="command-info">changes</h2>

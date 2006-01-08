@@ -25,7 +25,7 @@
 
         <property name="properties" column="PROPERTIES" type="com.cinnamonbob.util.PropertiesType" length="4096"/>
 
-        <list name="artifacts" cascade="all-delete-orphan">
+        <list name="artifacts" cascade="all-delete-orphan" lazy="false">
             <key column="COMMAND_RESULT_ID"/>
             <index column="POSITION"/>
             <one-to-many class="com.cinnamonbob.core.model.StoredArtifact"/>
