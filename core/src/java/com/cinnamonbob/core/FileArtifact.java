@@ -1,51 +1,54 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.validation.Validateable;
+import com.opensymphony.xwork.validator.ValidatorContext;
+
 import java.io.*;
 
 /**
  * 
  *
  */
-public class FileArtifact
+public class FileArtifact implements Validateable
 {
     private File file;
     private File toFile;
     private String name;
     private String title;
     private String type;
-    
+
     public FileArtifact(String name, File file)
     {
         this.name = name;
         this.file = file;
     }
-    
+
     public FileArtifact()
     {
-        
+
     }
-    
+
     public void setName(String name)
     {
         this.name = name;
     }
-    
+
     public void setFile(File file)
     {
         this.file = file;
     }
-    
+
     public InputStream getContent()
     {
         if (!file.exists())
         {
-            return new ByteArrayInputStream(new byte[0]);    
+            return new ByteArrayInputStream(new byte[0]);
         }
-            
+
         try
         {
             return new FileInputStream(file);
-        } 
+        }
         catch (FileNotFoundException e)
         {
             // will not get here since we have checked that the file exists.
@@ -62,7 +65,7 @@ public class FileArtifact
     {
         this.type = type;
     }
-    
+
     public void setFromFile(File f)
     {
         setFile(f);
@@ -72,7 +75,7 @@ public class FileArtifact
     {
         return toFile;
     }
-    
+
     public void setToFile(File f)
     {
         toFile = f;
@@ -96,5 +99,14 @@ public class FileArtifact
     public File getFile()
     {
         return file;
+    }
+
+    public void validate(ValidatorContext context)
+    {
+        if (getToFile() != null && getToFile().isAbsolute())
+        {
+            context.addFieldError("toFile", "The toFile attribute can not be absolute. " +
+                    "Please specify a file relative location.");
+        }
     }
 }

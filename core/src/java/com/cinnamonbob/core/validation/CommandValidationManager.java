@@ -9,7 +9,6 @@ import com.opensymphony.xwork.validator.ValidatorContext;
 /**
  * This class provides a wrapper around the xwork validation framework allowing it to
  * be used by all of the components that make up a bob file.
- *
  */
 public class CommandValidationManager
 {
@@ -27,6 +26,16 @@ public class CommandValidationManager
         ValidatorContext validatorContext = new DelegatingValidatorContext(validationAware, textProvider, localeProvider);
 
         ActionValidatorManager.validate(obj, name, validatorContext);
+
+        if (validatorContext.hasErrors())
+        {
+            throw new CommandValidationException(validatorContext);
+        }
+
+        if (Validateable.class.isAssignableFrom(obj.getClass()))
+        {
+            ((Validateable) obj).validate(validatorContext);
+        }
 
         if (validatorContext.hasErrors())
         {

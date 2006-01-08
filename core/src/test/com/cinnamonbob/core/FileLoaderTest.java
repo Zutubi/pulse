@@ -32,6 +32,7 @@ public class FileLoaderTest extends BobTestCase
         loader.register("nested", SimpleNestedType.class);
         loader.register("type", SimpleType.class);
         loader.register("some-reference", SomeReference.class);
+        loader.register("validateable", SimpleValidateable.class);
 
         // initialise the loader with some real objects.
         loader.register("property", Property.class);
@@ -99,7 +100,7 @@ public class FileLoaderTest extends BobTestCase
         Object a = root.getReference("a");
         assertNotNull(a);
         assertTrue(a instanceof SomeReference);
-        assertEquals("a", ((SomeReference)a).getSomeValue());
+        assertEquals("a", ((SomeReference) a).getSomeValue());
 
     }
 
@@ -143,7 +144,7 @@ public class FileLoaderTest extends BobTestCase
         assertEquals(commands.size(), 5);
         assertTrue(commands.get(commandIndex) instanceof ExecutableCommand);
 
-        ExecutableCommand command = (ExecutableCommand)commands.get(commandIndex);
+        ExecutableCommand command = (ExecutableCommand) commands.get(commandIndex);
         return command.getArgs();
     }
 
@@ -185,5 +186,20 @@ public class FileLoaderTest extends BobTestCase
         assertEquals(args.get(1).getText(), "two");
         assertEquals(args.get(2).getText(), "here are some spaces");
         assertEquals(args.get(3).getText(), "and yet more spaces");
+    }
+
+    public void testValidation() throws Exception
+    {
+        try
+        {
+            BobFile bf = new BobFile();
+            loader.load(getInput("testValidateable"), bf);
+            fail();
+        }
+        catch (ParseException e)
+        {
+            assertEquals(e.getMessage(), "Processing element 'validateable': starting at line 4 column 5: error");
+        }
+
     }
 }
