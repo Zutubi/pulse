@@ -9,6 +9,9 @@
 
     <bean id="velocityEngine" class="com.cinnamonbob.bootstrap.velocity.VelocityEngineFactoryBean"/>
 
+    <!-- ==================== -->
+    <!-- scheduling subsystem -->
+
     <bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="configLocation">
             <value>classpath:com/cinnamonbob/bootstrap/quartz/quartz.properties</value>
@@ -20,11 +23,6 @@
             <ref bean="quartzScheduler"/>
         </property>
     </bean>
-
-    <bean id="buildManager" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"/>
-
-    <!-- ==================== -->
-    <!-- scheduling subsystem -->
 
     <bean id="scheduler" class="com.cinnamonbob.scheduling.DefaultScheduler" init-method="init">
         <property name="triggerHandler">
@@ -63,6 +61,21 @@
         <!-- not sure why this is needs to be wired directly. -->
         <property name="triggerDao">
             <ref bean="triggerDao"/>
+        </property>
+    </bean>
+
+    <bean id="buildManagerTarget" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"/>
+    <bean id="buildManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="buildManagerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
         </property>
     </bean>
 
@@ -111,7 +124,6 @@
         </property>
     </bean>
 
-
     <bean id="scmManagerTarget" class="com.cinnamonbob.model.DefaultScmManager" autowire="byName" init-method="init"/>
     <bean id="scmManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
@@ -127,8 +139,7 @@
         </property>
     </bean>
 
-    <bean id="slaveManagerTarget" class="com.cinnamonbob.model.DefaultSlaveManager" autowire="byName"
-          init-method="init"/>
+    <bean id="slaveManagerTarget" class="com.cinnamonbob.model.DefaultSlaveManager" autowire="byName" init-method="init"/>
     <bean id="slaveManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
@@ -149,8 +160,7 @@
 
     <bean id="fileLoader" class="com.cinnamonbob.core.FileLoader" autowire="byName" singleton="false"/>
 
-    <bean id="resourceRepository" class="com.cinnamonbob.core.ResourceRepository" autowire="byName"
-          init-method="initialise"/>
+    <bean id="resourceRepository" class="com.cinnamonbob.core.ResourceRepository" autowire="byName" init-method="initialise"/>
 
     <bean id="recipeProcessor" class="com.cinnamonbob.core.RecipeProcessor" autowire="byName"/>
 
