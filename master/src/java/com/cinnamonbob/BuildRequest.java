@@ -40,7 +40,6 @@ public class BuildRequest
     
     /**
      * Get the name of the project to be built.
-     * @return
      */
     public String getProjectName()
     {
@@ -49,8 +48,7 @@ public class BuildRequest
 
     /**
      * The name of the recipe to be built.
-     * @return
-     */ 
+     */
     public String getRecipeName()
     {
         return recipeName;

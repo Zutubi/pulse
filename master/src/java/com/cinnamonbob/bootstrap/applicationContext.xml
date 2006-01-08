@@ -156,8 +156,6 @@
 
     <bean id="masterRecipeProcessor" class="com.cinnamonbob.MasterRecipeProcessor" autowire="byName"/>
 
-    <bean id="buildQueue" class="com.cinnamonbob.BuildQueue" autowire="byName"/>
-
     <bean id="buildResultRenderer" class="com.cinnamonbob.renderer.VelocityBuildResultRenderer" autowire="byName"/>
 
     <bean id="userConfigRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">

@@ -21,8 +21,6 @@ public class BobServer
 
     private ShutdownService shutdownService = null;
 
-    private static BuildQueue buildQueue = null;
-
     public BobServer()
     {
     }
@@ -49,24 +47,6 @@ public class BobServer
     {
         LOG.info("stop");
         shutdownService.stop();
-        buildQueue.stop();
-    }
-
-    public static void build(String projectName)
-    {
-        LOG.info("build '" + projectName + "'");
-        buildQueue.enqueue(new BuildRequest(projectName));
-    }
-
-    public static void build(String projectName, String recipeName)
-    {
-        LOG.info("build '" + projectName + ":" + recipeName + "'");
-        buildQueue.enqueue(new BuildRequest(projectName, recipeName));
-    }
-
-    public BuildQueue getBuildQueue()
-    {
-        return buildQueue;
     }
 
     public static String getHostURL()
