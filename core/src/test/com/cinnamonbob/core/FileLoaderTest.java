@@ -198,7 +198,7 @@ public class FileLoaderTest extends BobTestCase
         }
         catch (ParseException e)
         {
-            assertEquals(e.getMessage(), "Processing element 'validateable': starting at line 4 column 5: error");
+            assertEquals(e.getMessage(), "Processing element 'validateable': starting at line 4 column 5: error\n");
         }
 
     }
