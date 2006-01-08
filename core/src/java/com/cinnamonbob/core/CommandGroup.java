@@ -3,19 +3,23 @@ package com.cinnamonbob.core;
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.core.validation.Validateable;
 import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.validator.ValidatorContext;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 /**
  * 
  *
  */
-public class CommandGroup implements Command
+public class CommandGroup implements Command, Validateable
 {
     private String name;
 
@@ -83,30 +87,41 @@ public class CommandGroup implements Command
         }
     }
 
+    public List<String> getArtifactNames()
+    {
+        List<String> names = new LinkedList<String>();
+        for (FileArtifact artifact : artifacts)
+        {
+            names.add(artifact.getName());
+        }
+
+        // dont forget about our nested friend. he may have some artifacts as well.
+        names.addAll(getCommand().getArtifactNames());
+
+        // and definately dont forget the nested process mappings.
+        for (ProcessArtifactMapping mapping : mappings)
+        {
+            names.add(mapping.getArtifact());
+        }
+
+        return names;
+    }
+
     private void collectArtifacts(CommandResult result, File outputDir)
     {
         for (FileArtifact artifact : artifacts)
         {
-            File toFile = artifact.getToFile();
+            // the stored artifacts file name relative to the output directory.
+            String relativeFileName = artifact.getName();
 
-            if (toFile == null)
-            {
-                toFile = new File(artifact.getFile().getName());
-            }
-
-            if (!toFile.isAbsolute())
-            {
-                // Then it is relative to the output path.
-                // TODO: I think an absolute path will actually break things :-(
-                toFile = new File(outputDir, toFile.getName());
-            }
+            File toFile = new File(outputDir, relativeFileName);
 
             File fromFile = artifact.getFile();
 
             try
             {
                 IOUtils.copyFile(fromFile, toFile);
-                result.addArtifact(new StoredArtifact(artifact, toFile.getPath()));
+                result.addArtifact(new StoredArtifact(artifact, relativeFileName));
             }
             catch (IOException e)
             {
@@ -118,6 +133,22 @@ public class CommandGroup implements Command
     public Command getCommand()
     {
         return command;
+    }
+
+    public void validate(ValidatorContext context)
+    {
+        // ensure that our artifacts have unique names.
+        List<String> artifactNames = getArtifactNames();
+        Set<String> names = new TreeSet<String>();
+        for (String name : artifactNames)
+        {
+            if (names.contains(name))
+            {
+                context.addFieldError("name", "A duplicate artifact name '" + name + "' has been detected. Please only " +
+                        "use unique names for artifacts within a command group.");
+            }
+            names.add(name);
+        }
     }
 
     /**

@@ -200,6 +200,19 @@ public class FileLoaderTest extends BobTestCase
         {
             assertEquals(e.getMessage(), "Processing element 'validateable': starting at line 4 column 5: error\n");
         }
+    }
 
+    public void testArtifactNameValidation() throws Exception
+    {
+        try
+        {
+            BobFile bf = new BobFile();
+            loader.load(getInput("testArtifactNameValidation"), bf);
+            fail();
+        }
+        catch (ParseException e)
+        {
+            e.printStackTrace();
+        }
     }
 }

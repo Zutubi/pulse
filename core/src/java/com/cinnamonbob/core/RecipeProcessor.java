@@ -28,7 +28,7 @@ public class RecipeProcessor
         // For use with Spring
     }
 
-    public static String getCommandDirName(int i, CommandResult result)
+    private String getCommandDirName(int i, CommandResult result)
     {
         // Use the command name because:
         // a) we do not have an id for the command model

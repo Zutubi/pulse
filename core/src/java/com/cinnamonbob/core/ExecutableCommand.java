@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -96,6 +97,11 @@ public class ExecutableCommand implements Command
         {
             throw new BuildException(e);
         }
+    }
+
+    public List<String> getArtifactNames()
+    {
+        return Arrays.asList("output.txt");
     }
 
     public void setExe(String exe)
