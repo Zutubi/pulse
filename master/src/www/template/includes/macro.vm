@@ -105,7 +105,7 @@
       <table>
     #if($child.result.commenced())
         <tr>
-          <th colspan="4" class="command-detail">$child.result.recipeNameSafe @ $child.host <a href="viewRecipe.action?id=$child.id">details</a></th>
+          <th colspan="4" class="command-detail">$child.result.recipeNameSafe @ $child.hostSafe <a href="viewRecipe.action?id=$child.id">details</a></th>
         </tr>
       #resultsummary($child.result)
     #else

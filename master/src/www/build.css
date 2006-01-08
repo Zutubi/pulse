@@ -168,10 +168,14 @@ ul.scm-changes {
 
 ul.recipe-tree {
     list-style: none;
+    padding-left: 20px;
 }
 
 li.recipe-tree {
-    margin-top: 10px;
+    margin-top: 10px; /*padding-left: 20px;*/
+/*background: url( /images/arrow.png ) no-repeat 0 8px;*/
+    border-left: solid;
+    border-color: #d4d4d4;
 }
 
 li.error, li.warning, li.info {
@@ -217,4 +221,12 @@ li.title {
 h4 {
     margin-top: 8px;
     margin-bottom: 6px;
+}
+
+ul.build-spec {
+    list-style: none;
+}
+
+li.build-spec {
+    margin-top: 10px;
 }

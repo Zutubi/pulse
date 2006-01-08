@@ -1,18 +1,13 @@
 #set($result = $node.result)
-#if($node.commenced())
-  #set($host = $node.host)
-#else
-  #set($host = "[pending]")
-#end
 
 <html>
   <head>
-    <title>$result.recipeNameSafe @ $host</title>
+    <title>$result.recipeNameSafe @ $node.hostSafe</title>
     <link href="build.css" rel="stylesheet" type="text/css">
   </head>
   <body>
 #classset($result)
-    <h1 class="build-log">:: $result.recipeNameSafe @ $host ::</h1>
+    <h1 class="build-log">:: $result.recipeNameSafe @ node.hostSafe ::</h1>
 
     <h2 class="command-$class">summary</h2>
     <div class="command-content">

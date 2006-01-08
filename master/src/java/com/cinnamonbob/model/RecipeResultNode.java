@@ -34,6 +34,18 @@ public class RecipeResultNode extends Entity
         this.host = host;
     }
 
+    public String getHostSafe()
+    {
+        if (host == null)
+        {
+            return "[pending]";
+        }
+        else
+        {
+            return host;
+        }
+    }
+
     public RecipeResult getResult()
     {
         return result;

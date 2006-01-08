@@ -8,17 +8,35 @@
   <h1 class="build-log">:: $specification.name ::</h1>
 
 #macro(showNodes $parent $list)
-  <ul>
+  <ul class="build-spec">
     #foreach($node in $list)
-      <li>$node.stage.hostRequirements.getSummary(): $node.stage.recipeSafe</li>
+      <li class="build-spec">
+        <table>
+          <tr>
+            <th class="command-detail">host</th>
+            <th class="command-detail">recipe</th>
+          </tr>
+          <tr>
+            <td class="command-detail">$node.stage.hostRequirements.getSummary()</td>
+            <td class="command-detail">$node.stage.recipeSafe</td>
+          </tr>
+          <tr>
+            <td class="command-detail" colspan="2"><b>+</b> <a href="createBuildSpecificationNode!default.action?specId=$id&parentId=$node.id">add child stage</a></td>
+          </tr>
+        </table>
+      </li>
       #showNodes($node $node.children)
     #end
-    <li>+ <a href="createBuildSpecificationNode!default.action?specId=$id&parentId=$parent.id">add stage</a></li>
   </ul>
 #end
 
   <h2 class="command-info">build stages</h2>
   <div class="command-content">
+    <table>
+      <tr>
+        <td class="command-detail" colspan="2"><b>+</b> <a href="createBuildSpecificationNode!default.action?specId=$id&parentId=$specification.root.id">add initial stage</a></td>
+      </tr>
+    </table>
     #showNodes($specification.root $specification.root.children)
   </div>
 </body>
