@@ -216,7 +216,6 @@ public class BuildController implements EventListener
 
     private void handleRecipeEvent(RecipeEvent e)
     {
-        List<TreeNode<RecipeController>> finishedNodes = new LinkedList<TreeNode<RecipeController>>();
         RecipeController controller = null;
         TreeNode<RecipeController> foundNode = null;
 

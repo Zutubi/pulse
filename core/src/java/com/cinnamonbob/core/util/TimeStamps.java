@@ -8,19 +8,22 @@ import java.util.Date;
  */
 public class TimeStamps
 {
+    public static long UNINITIALISED_TIME = -1;
+
     private long startTime;
     private long endTime;
 
     public TimeStamps()
     {
         startTime = System.currentTimeMillis();
-        endTime = -1;
+        endTime = UNINITIALISED_TIME;
     }
 
 
     public TimeStamps(long startTime)
     {
         this.startTime = startTime;
+        this.endTime = UNINITIALISED_TIME;
     }
 
 
@@ -72,11 +75,11 @@ public class TimeStamps
 
     public long getElapsed()
     {
-        if (startTime == -1)
+        if (!started())
         {
-            return -1;
+            return UNINITIALISED_TIME;
         }
-        else if (endTime > 0)
+        else if (ended())
         {
             return endTime - startTime;
         }
@@ -104,7 +107,7 @@ public class TimeStamps
         StringBuffer result = new StringBuffer();
         long elapsed = getElapsed();
 
-        if (elapsed == -1)
+        if (elapsed == UNINITIALISED_TIME)
         {
             return "n/a";
         }
@@ -166,7 +169,7 @@ public class TimeStamps
 
     public static String getPrettyTime(long time)
     {
-        if (time == -1)
+        if (time == UNINITIALISED_TIME)
         {
             return "n/a";
         }
@@ -174,5 +177,15 @@ public class TimeStamps
         {
             return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date(time));
         }
+    }
+
+    public boolean started()
+    {
+        return startTime != UNINITIALISED_TIME;
+    }
+
+    public boolean ended()
+    {
+        return endTime != UNINITIALISED_TIME;
     }
 }

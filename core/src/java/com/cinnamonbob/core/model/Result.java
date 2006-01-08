@@ -12,7 +12,7 @@ public abstract class Result extends Entity
     private static final String EXCEPTION_FILE = "exception";
 
     protected ResultState state = ResultState.INITIAL;
-    protected TimeStamps stamps;
+    protected TimeStamps stamps = new TimeStamps(TimeStamps.UNINITIALISED_TIME);
     protected File outputDir;
     protected String errorMessage;
     protected String failureMessage;
@@ -68,7 +68,10 @@ public abstract class Result extends Entity
             state = ResultState.SUCCESS;
         }
 
-        stamps.end();
+        if (stamps.started())
+        {
+            stamps.end();
+        }
     }
 
     public void success()

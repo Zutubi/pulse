@@ -134,7 +134,6 @@ public class RecipeController
     private void handleRecipeCompleted(RecipeCompletedEvent event)
     {
         recipeResult.update(event.getResult());
-        recipeResult.complete();
         complete();
     }
 
@@ -146,6 +145,7 @@ public class RecipeController
 
     private void complete()
     {
+        recipeResult.complete();
         recipeResult.abortUnfinishedCommands();
         buildManager.save(recipeResult);
         finished = true;
