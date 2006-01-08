@@ -44,6 +44,7 @@
         </copy>
 
         <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+        <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh"/>
 
         <retrieve.package conf="local" dest="${package.root}/lib"/>
 
@@ -76,6 +77,7 @@
         </copy>
 
         <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+        <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh"/>
 
         <retrieve.package conf="local" dest="${package.root}/lib"/>
         <retrieve.package conf="master" dest="${package.root}/lib"/>
@@ -127,6 +129,7 @@
         </copy>
 
         <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+        <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh"/>
 
         <retrieve.package conf="local" dest="${package.root}/lib"/>
         <retrieve.package conf="slave" dest="${package.root}/lib"/>
