@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="local module" basedir=".">
 
-    <import file="../ant-common.xml" />
+    <import file="../common-build.xml" />
 
     <target name="module-init">
         <property name="module" value="local"/>

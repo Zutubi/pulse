@@ -8,24 +8,28 @@
         <delete dir="build"/>
     </target>
 
+    <target name="clean.all">
+        <foreach target="clean"/>
+    </target>
+
     <target name="build.core">
-        <ant inheritAll="false" dir="core" antfile="ant.xml" target="build.module"/>
+        <ant inheritAll="false" dir="core" antfile="build.xml" target="build.module"/>
     </target>
 
     <target name="build.server-core" depends="build.core">
-        <ant inheritAll="false" dir="server-core" antfile="ant.xml" target="build.module"/>
+        <ant inheritAll="false" dir="server-core" antfile="build.xml" target="build.module"/>
     </target>
 
     <target name="build.local" depends="build.core">
-        <ant inheritAll="false" dir="local" antfile="ant.xml" target="build.module"/>
+        <ant inheritAll="false" dir="local" antfile="build.xml" target="build.module"/>
     </target>
 
     <target name="build.master" depends="build.server-core">
-        <ant inheritAll="false" dir="master" antfile="ant.xml" target="build.module"/>
+        <ant inheritAll="false" dir="master" antfile="build.xml" target="build.module"/>
     </target>
 
     <target name="build.slave" depends="build.server-core">
-        <ant inheritAll="false" dir="slave" antfile="ant.xml" target="build.module"/>
+        <ant inheritAll="false" dir="slave" antfile="build.xml" target="build.module"/>
     </target>
 
     <target name="package.local" depends="init, build.local">
@@ -143,5 +147,17 @@
             <ivy:retrieve pattern="@{dest}/[artifact]-[revision].[ext]" validate="true" conf="@{conf}"/>
         </sequential>
     </macrodef>
+
+    <macrodef name="foreach">
+        <attribute name="target"/>
+        <sequential>
+            <ant inheritAll="false" dir="core" antfile="build.xml" target="@{target}"/>
+            <ant inheritAll="false" dir="local" antfile="build.xml" target="@{target}"/>
+            <ant inheritAll="false" dir="server-core" antfile="build.xml" target="@{target}"/>
+            <ant inheritAll="false" dir="master" antfile="build.xml" target="@{target}"/>
+            <ant inheritAll="false" dir="slave" antfile="build.xml" target="@{target}"/>
+        </sequential>
+    </macrodef>
+
 
 </project>
