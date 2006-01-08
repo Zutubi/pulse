@@ -56,6 +56,7 @@ public class Bootstrap
         BobServer server = new BobServer();
         server.start();
 
+        //TODO: move this into the spring context xml file. 
         if (argv.length > 1)
         {
             for (int i = 1; i < argv.length; i++)
@@ -69,7 +70,7 @@ public class Bootstrap
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    LOG.warning("Failed to run startup task. Reason: " + e.getMessage(), e);
                 }
             }
         }

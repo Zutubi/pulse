@@ -3,6 +3,8 @@
         <link href="build.css" rel="stylesheet" type="text/css">
         <title>$project.name</title>
         <content tag="action">project.view</content>
+        <!-- a tick to the self updating webpage box... -->
+        <meta http-equiv="refresh" content="30">
     </head>
     <body>
         <h1 class="build-log">:: $project.name ::</h1>
