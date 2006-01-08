@@ -133,12 +133,6 @@ public class BuildController implements EventListener
         return bootstrapper;
     }
 
-    private void run(Bootstrapper bootstrapper, TreeNode<RecipeController> node)
-    {
-        executingControllers.add(node);
-        node.getData().initialise(bootstrapper);
-    }
-
     private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode, BuildSpecificationNode specNode)
     {
         for (BuildSpecificationNode node : specNode.getChildren())
@@ -208,15 +202,29 @@ public class BuildController implements EventListener
 
         // execute the first level of recipe controllers...
         Bootstrapper initialBootstrapper = createBuildBootstrapper();
-        for (TreeNode<RecipeController> node : tree.getRoot())
+        initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
+    }
+
+    private void initialiseNodes(Bootstrapper bootstrapper, List<TreeNode<RecipeController>> nodes)
+    {
+        // Important to add them all first as a failure during initialisation
+        // will test if there are other executing controllers (if not the
+        // build is finished).
+        for (TreeNode<RecipeController> node : nodes)
         {
-            run(initialBootstrapper, node);
+            executingControllers.add(node);
+        }
+
+        for (TreeNode<RecipeController> node : nodes)
+        {
+            node.getData().initialise(bootstrapper);
+            checkNodeStatus(node);
         }
     }
 
     private void handleRecipeEvent(RecipeEvent e)
     {
-        RecipeController controller = null;
+        RecipeController controller;
         TreeNode<RecipeController> foundNode = null;
 
         for (TreeNode<RecipeController> node : executingControllers)
@@ -231,29 +239,33 @@ public class BuildController implements EventListener
 
         if (foundNode != null)
         {
-            if (controller.isFinished())
-            {
-                controller.collect(buildResult);
-                executingControllers.remove(foundNode);
+            checkNodeStatus(foundNode);
+        }
+    }
 
-                if (controller.succeeded())
-                {
-                    for (TreeNode<RecipeController> child : foundNode.getChildren())
-                    {
-                        run(controller.getChildBootstrapper(), child);
-                    }
-                }
-                else
-                {
-                    buildResult.failure("Recipe '" + controller.getRecipeName() + "@" + controller.getRecipeHost() + "' failed");
-                    buildManager.save(buildResult);
-                }
-            }
+    private void checkNodeStatus(TreeNode<RecipeController> node)
+    {
+        RecipeController controller = node.getData();
 
-            if (executingControllers.size() == 0)
+        if (controller.isFinished())
+        {
+            controller.collect(buildResult);
+            executingControllers.remove(node);
+
+            if (controller.succeeded())
             {
-                completeBuild();
+                initialiseNodes(controller.getChildBootstrapper(), node.getChildren());
             }
+            else
+            {
+                buildResult.failure("One or more recipes failed");
+                buildManager.save(buildResult);
+            }
+        }
+
+        if (executingControllers.size() == 0)
+        {
+            completeBuild();
         }
     }
 

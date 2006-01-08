@@ -30,7 +30,10 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
 
     public void collect(BuildResult result, long recipeId, BuildService buildService)
     {
-        buildService.collectResults(recipeId, paths.getRecipeDir(project, result, recipeId));
+        if (buildService != null)
+        {
+            buildService.collectResults(recipeId, paths.getRecipeDir(project, result, recipeId));
+        }
     }
 
     public void cleanup(BuildResult result, long recipeId, BuildService buildService)

@@ -45,10 +45,21 @@ public class RecipeController
 
     public void initialise(Bootstrapper bootstrapper)
     {
-        // allow for just in time setting of the bootstrapper since this can not be configured during
-        // the build initialisation.
-        dispatchRequest.getRequest().setBootstrapper(bootstrapper);
-        queue.enqueue(dispatchRequest);
+        try
+        {
+            // allow for just in time setting of the bootstrapper since this can not be configured during
+            // the build initialisation.
+            dispatchRequest.getRequest().setBootstrapper(bootstrapper);
+            queue.enqueue(dispatchRequest);
+        }
+        catch (BuildException e)
+        {
+            handleBuildException(e);
+        }
+        catch (Exception e)
+        {
+            handleUnexpectedException(e);
+        }
     }
 
     /**
@@ -91,14 +102,11 @@ public class RecipeController
         }
         catch (BuildException e)
         {
-            recipeResult.error(e);
-            complete();
+            handleBuildException(e);
         }
         catch (Exception e)
         {
-            LOG.severe(e);
-            recipeResult.error("Unexpected error: " + e.getMessage());
-            complete();
+            handleUnexpectedException(e);
         }
 
         return true;
@@ -158,12 +166,30 @@ public class RecipeController
 
     public void collect(BuildResult buildResult)
     {
-        collector.collect(buildResult, recipeResult.getId(), buildService);
+        try
+        {
+            collector.collect(buildResult, recipeResult.getId(), buildService);
+        }
+        catch (BuildException e)
+        {
+            handleBuildException(e);
+        }
+        catch (Exception e)
+        {
+            handleUnexpectedException(e);
+        }
     }
 
     public void cleanup(BuildResult buildResult)
     {
-        collector.cleanup(buildResult, recipeResult.getId(), buildService);
+        try
+        {
+            collector.cleanup(buildResult, recipeResult.getId(), buildService);
+        }
+        catch (Exception e)
+        {
+            LOG.warning("Unable to clean up recipe '" + recipeResult.getId() + "'", e);
+        }
     }
 
     public Bootstrapper getChildBootstrapper()
@@ -185,6 +211,20 @@ public class RecipeController
 
     public String getRecipeHost()
     {
-        return recipeResultNode.getHost();
+        return recipeResultNode.getHostSafe();
     }
+
+    private void handleBuildException(BuildException e)
+    {
+        recipeResult.error(e);
+        complete();
+    }
+
+    private void handleUnexpectedException(Exception e)
+    {
+        LOG.severe(e);
+        recipeResult.error("Unexpected error: " + e.getMessage());
+        complete();
+    }
+
 }
