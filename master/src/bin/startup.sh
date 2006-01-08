@@ -1,3 +1,3 @@
 #! /bin/sh
 
-common.sh com.cinnamonbob.command.Bootstrap start
+`dirname $0`/common.sh com.cinnamonbob.command.Bootstrap start

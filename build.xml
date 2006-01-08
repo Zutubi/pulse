@@ -8,7 +8,7 @@
         <delete dir="build"/>
     </target>
 
-    <target name="clean.all">
+    <target name="clean.all" depends="clean">
         <foreach target="clean"/>
     </target>
 
@@ -34,8 +34,9 @@
 
     <target name="package.local" depends="init, build.local">
 
-        <mkdir dir="build/package"/>
-        <property name="package.root" value="build/package/bob-local-0.2"/>
+        <property name="package.root" value="build/package"/>
+        <delete dir="${package.root}"/>
+        <mkdir dir="${package.root}"/>
 
         <copy todir="${package.root}/bin">
             <fileset dir="core/src/bin" includes="**/*"/>
@@ -54,16 +55,18 @@
         <copy todir="${package.root}/system/logs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
-        <zip destfile="build/bob-local-0.2.zip" basedir="build/package"/>
+
+        <zip destfile="build/bob-local-0.2.zip">
+            <zipfileset dir="build/package" includes="**/*" prefix="bob-local-0.2"/>
+        </zip>
 
     </target>
 
     <target name="package.master" depends="init, build.local, build.master">
 
-        <property name="package.name" value="bob-master-0.2"/>
-
-        <mkdir dir="build/package"/>
-        <property name="package.root" value="build/package/${package.name}"/>
+        <property name="package.root" value="build/package"/>
+        <delete dir="${package.root}"/>
+        <mkdir dir="${package.root}"/>
 
         <copy todir="${package.root}/bin">
             <fileset dir="core/src/bin" includes="**/*"/>
@@ -75,6 +78,7 @@
         <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
 
         <retrieve.package conf="local" dest="${package.root}/lib"/>
+        <retrieve.package conf="master" dest="${package.root}/lib"/>
         <retrieve.package conf="master" dest="${package.root}/system/www/WEB-INF/lib"/>
 
         <!-- place holder for package documentation -->
@@ -103,7 +107,49 @@
             <fileset dir="master/etc" includes="*.properties"/>
         </copy>
 
-        <zip destfile="build/${package.name}.zip" basedir="build/package"/>
+        <zip destfile="build/bob-master-0.2.zip">
+            <zipfileset dir="build/package" includes="**/*" prefix="bob-master-0.2"/>
+        </zip>
+
+    </target>
+
+    <target name="package.slave" depends="init, build.local, build.slave">
+
+        <property name="package.root" value="build/package"/>
+        <delete dir="${package.root}"/>
+        <mkdir dir="${package.root}"/>
+
+        <copy todir="${package.root}/bin">
+            <fileset dir="core/src/bin" includes="**/*"/>
+            <fileset dir="local/src/bin" includes="**/*"/>
+            <fileset dir="server-core/src/bin" includes="**/*"/>
+            <fileset dir="slave/src/bin" includes="**/*"/>
+        </copy>
+
+        <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+
+        <retrieve.package conf="local" dest="${package.root}/lib"/>
+        <retrieve.package conf="slave" dest="${package.root}/lib"/>
+        <retrieve.package conf="slave" dest="${package.root}/system/www/WEB-INF/lib"/>
+
+        <!-- place holder for package documentation -->
+        <copy todir="${package.root}/docs">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+        <!-- place holder for the logs directory -->
+        <copy todir="${package.root}/system/logs">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+        <copy todir="${package.root}/system/www">
+            <fileset dir="slave/src/www" includes="**/*"/>
+        </copy>
+        <copy todir="${package.root}/system/config">
+            <fileset dir="slave/etc" includes="*.properties"/>
+        </copy>
+
+        <zip destfile="build/bob-slave-0.2.zip">
+            <zipfileset dir="build/package" includes="**/*" prefix="bob-slave-0.2"/>
+        </zip>
 
     </target>
 

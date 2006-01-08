@@ -5,9 +5,6 @@ import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.bootstrap.SystemBootstrapManager;
 import com.cinnamonbob.model.ProjectManager;
-import com.cinnamonbob.model.Slave;
-import com.cinnamonbob.model.persistence.SlaveDao;
-import com.cinnamonbob.services.SlaveService;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.net.InetAddress;

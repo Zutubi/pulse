@@ -14,8 +14,6 @@
         <property name="test.classes.dir" value="${build.dir}/test.classes"/>
 
         <dirname property="current.dir" file="ivy.xml"/>
-        <echo message="${current.dir}"/>
-        <echo message="${project.root.dir}"/>
 
         <property file="${project.root.dir}/ivy.properties"/>
         <ivy:configure file="${project.root.dir}/ivyconf.xml"/>
