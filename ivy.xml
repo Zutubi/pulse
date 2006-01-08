@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="cinnamonbob" module="core" revision="0.1" status="integration">
+    <info organisation="cinnamonbob" module="core" status="integration">
         <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
         <description homepage="http://www.cinnamonbob.com/">
             description....
@@ -11,11 +11,15 @@
 
     <configurations>
         <conf name="local" description="Local package"/>
+        <conf name="master" description="Master package"/>
+        <conf name="slave" description="Slave package"/>
     </configurations>
 
     <dependencies>
 
-        <dependency org="cinnamonbob" name="local" rev="latest.integration" conf="local->release"/>
+        <dependency org="cinnamonbob" name="local" rev="0.2" conf="local->*"/>
+        <dependency org="cinnamonbob" name="master" rev="0.2" conf="master->*"/>
+        <dependency org="cinnamonbob" name="slave" rev="0.2" conf="slave->*"/>
 
     </dependencies>
 

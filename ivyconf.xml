@@ -8,15 +8,17 @@
 
         <dual name="resolvers">
             <chain name="ivy">
-                <filesystem name="ivy-repository" checkmodified="true">
+                <filesystem name="ivy-repository">
                     <ivy pattern="${ivy.conf.dir}/ivy-repository/[organisation]/[module]/ivy-[revision].xml"/>
                 </filesystem>
             </chain>
             <chain name="artifact">
-                <url name="artifact-repository" checkmodified="true">
+                <filesystem name="local-repository" checkmodified="true">
+                    <artifact pattern="e:/work/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
+                </filesystem>
+                <url name="artifact-repository">
                     <artifact pattern="http://www.cinnamonbob.com/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
                 </url>
-
             </chain>
         </dual>
 

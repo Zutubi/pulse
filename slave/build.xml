@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Cinnamon Bob" basedir=".">
+<project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="slave module" basedir=".">
 
     <import file="../common-build.xml" />
 
     <target name="module-init">
-
         <property name="module" value="slave"/>
         <property name="project.root.dir" value="../"/>
-
     </target>
 
 </project>

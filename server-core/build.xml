@@ -4,10 +4,8 @@
     <import file="../common-build.xml" />
 
     <target name="module-init">
-
         <property name="module" value="server-core"/>
         <property name="project.root.dir" value="../"/>
-
     </target>
 
 </project>

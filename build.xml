@@ -8,83 +8,140 @@
         <delete dir="build"/>
     </target>
 
-    <target name="clean.all" depends="clean">
-        <ant dir="core" antfile="build.xml" target="clean"/>
-        <ant dir="server-core" antfile="build.xml" target="clean"/>
-        <ant dir="local" antfile="build.xml" target="clean"/>
-        <ant dir="master" antfile="build.xml" target="clean"/>
-        <ant dir="slave" antfile="build.xml" target="clean"/>
+    <target name="build.core">
+        <ant inheritAll="false" dir="core" antfile="ant.xml" target="build.module"/>
     </target>
 
-    <target name="clean.local" depends="clean">
-        <ant dir="core" antfile="build.xml" target="clean"/>
-        <ant dir="local" antfile="build.xml" target="clean"/>
+    <target name="build.server-core" depends="build.core">
+        <ant inheritAll="false" dir="server-core" antfile="ant.xml" target="build.module"/>
     </target>
 
-    <target name="clean.master" depends="clean">
-        <ant dir="core" antfile="build.xml" target="clean"/>
-        <ant dir="server-core" antfile="build.xml" target="clean"/>
-        <ant dir="master" antfile="build.xml" target="clean"/>
+    <target name="build.local" depends="build.core">
+        <ant inheritAll="false" dir="local" antfile="ant.xml" target="build.module"/>
     </target>
 
-    <target name="clean.slave" depends="clean">
-        <ant dir="core" antfile="build.xml" target="clean"/>
-        <ant dir="server-core" antfile="build.xml" target="clean"/>
-        <ant dir="slave" antfile="build.xml" target="clean"/>
+    <target name="build.master" depends="build.server-core">
+        <ant inheritAll="false" dir="master" antfile="ant.xml" target="build.module"/>
     </target>
 
-    <!-- ============================== -->
-    <!-- external dependency resolution -->
-    <!-- ============================== -->
-
-    <target name="resolve.dependencies">
-        <ant dir="core" antfile="build.xml" target="resolve.dependencies"/>
-        <ant dir="server-core" antfile="build.xml" target="resolve.dependencies"/>
-        <ant dir="local" antfile="build.xml" target="resolve.dependencies"/>
-        <ant dir="master" antfile="build.xml" target="resolve.dependencies"/>
-        <ant dir="slave" antfile="build.xml" target="resolve.dependencies"/>
+    <target name="build.slave" depends="build.server-core">
+        <ant inheritAll="false" dir="slave" antfile="ant.xml" target="build.module"/>
     </target>
 
-    <target name="resolve.dependencies.local">
-        <ant dir="core" antfile="build.xml" target="resolve.dependencies"/>
-        <ant dir="local" antfile="build.xml" target="resolve.dependencies"/>
+    <target name="package.local" depends="init, build.local">
+
+        <mkdir dir="build/package"/>
+        <property name="package.root" value="build/package/bob-local-0.2"/>
+
+        <copy todir="${package.root}/bin">
+            <fileset dir="core/src/bin" includes="**/*"/>
+            <fileset dir="local/src/bin" includes="**/*"/>
+        </copy>
+
+        <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+
+        <retrieve.package conf="local" dest="${package.root}/lib"/>
+
+        <!-- place holder for package documentation -->
+        <copy todir="${package.root}/docs">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+        <!-- place holder for the logs directory -->
+        <copy todir="${package.root}/system/logs">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+        <zip destfile="build/bob-local-0.2.zip" basedir="build/package"/>
+
     </target>
 
-    <target name="resolve.dependencies.master">
-        <ant dir="core" antfile="build.xml" target="resolve.dependencies"/>
-        <ant dir="server-core" antfile="build.xml" target="resolve.dependencies"/>
-        <ant dir="master" antfile="build.xml" target="resolve.dependencies"/>
+    <target name="package.master" depends="init, build.local, build.master">
+
+        <property name="package.name" value="bob-master-0.2"/>
+
+        <mkdir dir="build/package"/>
+        <property name="package.root" value="build/package/${package.name}"/>
+
+        <copy todir="${package.root}/bin">
+            <fileset dir="core/src/bin" includes="**/*"/>
+            <fileset dir="local/src/bin" includes="**/*"/>
+            <fileset dir="server-core/src/bin" includes="**/*"/>
+            <fileset dir="master/src/bin" includes="**/*"/>
+        </copy>
+
+        <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+
+        <retrieve.package conf="local" dest="${package.root}/lib"/>
+        <retrieve.package conf="master" dest="${package.root}/system/www/WEB-INF/lib"/>
+
+        <!-- place holder for package documentation -->
+        <copy todir="${package.root}/docs">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+        <copy todir="${package.root}/system/templates">
+            <fileset dir="master/src/templates" includes="**/*.vm"/>
+        </copy>
+        <!-- place holder for the database directory -->
+        <copy todir="${package.root}/system/database">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+        <!-- place holder for the project work directory -->
+        <copy todir="${package.root}/work">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+        <!-- place holder for the logs directory -->
+        <copy todir="${package.root}/system/logs">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+        <copy todir="${package.root}/system/www">
+            <fileset dir="master/src/www" includes="**/*"/>
+        </copy>
+        <copy todir="${package.root}/system/config">
+            <fileset dir="master/etc" includes="*.properties"/>
+        </copy>
+
+        <zip destfile="build/${package.name}.zip" basedir="build/package"/>
+
     </target>
 
-    <target name="resolve.dependencies.slave">
-        <ant dir="core" antfile="build.xml" target="resolve.dependencies"/>
-        <ant dir="server-core" antfile="build.xml" target="resolve.dependencies"/>
-        <ant dir="slave" antfile="build.xml" target="resolve.dependencies"/>
+
+    <target name="init">
+        <property name="project.root.dir" value="."/>
+        <property name="project.repository" value="${project.root.dir}/build/repository"/>
     </target>
 
-    <!-- ======================== -->
-    <!-- Component bulid targets. -->
-    <!-- ======================== -->
+    <target name="refresh.lib" depends="clean, init">
 
-    <target name="build.local">
-        <ant dir="core" antfile="build.xml" target="project.build"/>
-        <ant dir="local" antfile="build.xml" target="project.build"/>
+        <delete dir="lib"/>
+        <mkdir dir="lib"/>
+
+        <ivy:configure file="ivyconf.xml"/>
+        <retrieve.dependencies module="core"/>
+        <retrieve.dependencies module="server-core"/>
+        <retrieve.dependencies module="local"/>
+        <retrieve.dependencies module="master"/>
+        <retrieve.dependencies module="slave"/>
+
     </target>
 
-    <target name="build.master">
-        <ant dir="core" antfile="build.xml" target="project.build"/>
-        <ant dir="server-core" antfile="build.xml" target="project.build"/>
-        <ant dir="master" antfile="build.xml" target="project.build"/>
-    </target>
+    <macrodef name="retrieve.dependencies">
+        <attribute name="module"/>
+        <attribute name="conf" default="external"/>
+        <sequential>
+            <ivy:resolve file="@{module}/ivy.xml" conf="@{conf}"/>
+            <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
+            <ivy:retrieve validate="true" conf="@{conf}"/>
+        </sequential>
+    </macrodef>
 
-    <target name="build.slave">
-        <ant dir="core" antfile="build.xml" target="project.build"/>
-        <ant dir="server-core" antfile="build.xml" target="project.build"/>
-        <ant dir="slave" antfile="build.xml" target="project.build"/>
-    </target>
 
-    <target name="master" depends="clean.master, resolve.dependencies.master, build.master"/>
-    <target name="slave" depends="clean.slave, resolve.dependencies.slave, build.slave"/>
-    <target name="local" depends="clean.local, resolve.dependencies.local, build.local"/>
+    <macrodef name="retrieve.package">
+        <attribute name="conf"/>
+        <attribute name="dest"/>
+        <sequential>
+            <ivy:resolve file="ivy.xml" conf="@{conf}"/>
+            <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
+            <ivy:retrieve pattern="@{dest}/[artifact]-[revision].[ext]" validate="true" conf="@{conf}"/>
+        </sequential>
+    </macrodef>
 
 </project>

@@ -1,34 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="common core" basedir=".">
 
-<!-- -->
-<!-- -->
-<!-- -->
-<project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="common build file" basedir=".">
+    <!-- initialise configuration -->
+    <target name="init" depends="module-init">
 
-    <!--
-    initialise system configuration. these properties can be overriden by the
-    individual components during the module-init
-    -->
-    <target name="common-init" depends="module-init">
+        <property name="module.root.dir" value="${project.root.dir}/${module}"/>
 
-        <!-- revision -->
-        <property name="rev" value="latest"/>
-        <property name="version" value="0.2"/>
+        <property name="src.dir" value="${module.root.dir}/src/java"/>
+        <property name="test.dir" value="${module.root.dir}/src/test"/>
 
-        <!-- project structure -->
-        <property name="build.dir" value="./build"/>
-        <property name="src.dir" value="src/java"/>
-        <property name="test.dir" value="src/test"/>
-        <property name="lib.dir" value="lib"/>
+        <property name="build.dir" value="${module.root.dir}/build"/>
         <property name="classes.dir" value="${build.dir}/classes"/>
-        <property name="test-classes.dir" value="${build.dir}/test-classes"/>
-        <property name="report.dir" value="${build.dir}/reports"/>
+        <property name="test.classes.dir" value="${build.dir}/test.classes"/>
 
-        <!-- compile flags, can be overridden on the command line using the -D flag -->
-        <property name="compile.debug" value="true"/>
-        <property name="compile.deprecation" value="false"/>
-        <property name="compile.optimize" value="true"/>
-        <property name="compile.debuglevel" value="lines, vars, source"/>
+        <dirname property="current.dir" file="ivy.xml"/>
+        <echo message="${current.dir}"/>
+        <echo message="${project.root.dir}"/>
+
+        <property file="${project.root.dir}/ivy.properties"/>
+        <ivy:configure file="${project.root.dir}/ivyconf.xml"/>
+
+        <!-- library paths. -->
+        <fileset id="module.libs" dir="${module.root.dir}/build/lib">
+            <include name="**/*.jar"/>
+        </fileset>
+        <path id="lib.path">
+            <fileset refid="module.libs"/>
+        </path>
 
         <!-- resources / properties definition-->
         <patternset id="resources">
@@ -37,43 +35,31 @@
             <include name="**/*.xml"/>
         </patternset>
 
-        <!-- init the ivy configuration -->
-        <ivy:configure file="${project.root.dir}/ivyconf.xml"/>
-        <property name="ivy.lib.dir" value="${lib.dir}"/>
-
-        <!-- library paths. -->
-        <fileset id="module.libs" dir="${ivy.lib.dir}">
-            <include name="**/*.jar"/>
-        </fileset>
-        <path id="lib.path">
-            <fileset refid="module.libs"/>
-        </path>
-
-        <!-- a pattern set that defines the Test classes to ignore -->
-        <patternset id="ignore.tests">
-            <exclude name="**/*Test*.java"/>
-        </patternset>
     </target>
 
-    <!-- Clean up all of the build artifacts -->
-    <target name="clean" depends="common-init">
+    <!-- clean dependencies -->
+    <target name="clean" depends="init">
         <delete dir="${build.dir}"/>
     </target>
 
-    <!-- Prepare for a build -->
-    <target name="prepare" depends="common-init">
-        <tstamp/>
+    <!-- prepare for new build -->
+    <target name="prepare" depends="init">
+        <!-- create necessary directories -->
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${test.classes.dir}"/>
+        <mkdir dir="${module.root.dir}/build/lib"/>
+
+        <!-- resolve dependencies -->
+        <resolve conf="external"/>
         <resolve conf="internal"/>
+
     </target>
 
-    <!-- -->
-    <target name="build" depends="prepare">
+    <!-- execute build -->
+    <target name="build" depends="init">
 
-        <!-- build the source -->
-        <mkdir dir="${classes.dir}"/>
-
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="${compile.debug}" optimize="${compile.optimize}"
-               deprecation="${compile.deprecation}" debuglevel="${compile.debuglevel}">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}">
             <classpath refid="lib.path"/>
         </javac>
 
@@ -83,16 +69,12 @@
             </fileset>
         </copy>
 
-        <!-- build the test source -->
-        <mkdir dir="${test-classes.dir}"/>
-
-        <javac srcdir="${test.dir}" destdir="${test-classes.dir}" debug="${compile.debug}" optimize="${compile.optimize}"
-               deprecation="${compile.deprecation}" debuglevel="${compile.debuglevel}">
+        <javac srcdir="${test.dir}" destdir="${test.classes.dir}">
             <classpath refid="lib.path"/>
             <classpath location="${classes.dir}"/>
         </javac>
 
-        <copy todir="${test-classes.dir}" overwrite="true">
+        <copy todir="${test.classes.dir}" overwrite="true">
             <fileset dir="${test.dir}">
                 <patternset refid="resources"/>
             </fileset>
@@ -100,79 +82,32 @@
 
     </target>
 
-    <!-- Generate the artifacts. -->
-    <target name="jar" depends="build">
-        <jar file="build/${module}.jar" basedir="${classes.dir}"/>
-        <jar file="build/${module}-test.jar" basedir="${test-classes.dir}"/>
+    <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
+
+    <!-- run test cases -->
+    <target name="test" depends="init">
     </target>
 
-    <target name="publish" depends="jar">
+    <!-- package artifacts -->
+    <target name="package" depends="init">
+        <jar file="${module.root.dir}/build/${module}.jar" basedir="${classes.dir}"/>
+        <jar file="${module.root.dir}/build/${module}-test.jar" basedir="${test.classes.dir}"/>
+    </target>
+
+    <target name="publish" depends="init">
         <dirname property="current.dir" file="ivy.xml"/>
         <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
     </target>
 
-    <target name="package">
-        <!-- default noop packaging -->
-    </target>
-
-    <!-- -->
-    <target name="test" depends="common-init" unless="skip.tests">
-
-        <mkdir dir="${report.dir}"/>
-        <junit printsummary="yes" forkmode="once" haltonfailure="true">
-            <classpath>
-                <path refid="lib.path"/>
-                <pathelement location="build/${module}.jar"/>
-                <pathelement location="build/${module}-test.jar"/>
-            </classpath>
-
-            <formatter type="plain"/>
-
-            <batchtest fork="yes" todir="${report.dir}">
-                <fileset dir="${test.dir}">
-                    <include name="**/*Test*.java"/>
-                    <patternset refid="ignore.tests"/>
-                </fileset>
-            </batchtest>
-        </junit>
-    </target>
-
-    <target name="project.build" depends="resolve.internal, jar, test, publish, package"/>
-
-    <target name="javadoc" depends="common-init">
-        <javadoc destdir="build/docs/api" author="true" version="true" use="true">
-            <fileset dir="${src.dir}" defaultexcludes="yes"/>
-            <bottom><![CDATA[<i>Copyright &copy; 2005 Daniel Ostermeier and Jason Sankey.</i>]]></bottom>
-        </javadoc>
-    </target>
-
-    <!-- ====================== -->
-    <!-- Dependency management  -->
-    <!-- ====================== -->
-
-    <!-- resolve external dependencies for this component -->
-    <target name="resolve.dependencies" depends="common-init">
-        <resolve conf="external"/>
-    </target>
-
-    <!-- resolve internal dependencies for this component -->
-    <target name="resolve.internal" depends="common-init">
-        <resolve conf="internal"/>
-    </target>
-
+    <!-- build file extras -->
     <macrodef name="resolve">
         <attribute name="conf"/>
-        <attribute name="dest" default="${ivy.lib.dir}/@{conf}"/>
         <sequential>
-            <ivy:resolve file="ivy.xml" conf="@{conf}"/>
-            <!-- ensure that the target lib directory exists -->
-            <mkdir dir="@{dest}"/>
-            <!-- ensure no old files are left around. -->
-            <delete failonerror="true">
-                <fileset dir="@{dest}" includes="**/*"/>
-            </delete>
-            <ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact]-[revision].[ext]" validate="true" conf="@{conf}"/>
-            <ivy:deliver deliverpattern="${ivy.conf.dir}/build/repository/[module]/ivy-[revision].xml"/>
+            <!-- lookup dependencies, loading them into the cache -->
+            <ivy:resolve conf="@{conf}"/>
+            <!-- copy the dependencies into the local directory -->
+            <ivy:retrieve validate="true" conf="@{conf}"/>
+            <ivy:deliver deliverpattern="${project.root.dir}/build/repository/[module]/ivy-[revision].xml"/>
         </sequential>
     </macrodef>
 
