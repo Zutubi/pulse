@@ -8,7 +8,7 @@
     </field>
     <field name="spec">
         <field-validator type="requiredstring">
-            <message>name is required.</message>
+            <message>build specification is required.</message>
         </field-validator>
     </field>
     <field name="cron">
