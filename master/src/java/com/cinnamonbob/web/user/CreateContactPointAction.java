@@ -2,6 +2,7 @@ package com.cinnamonbob.web.user;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -19,7 +20,7 @@ public class CreateContactPointAction extends UserActionSupport
     {
         if (types == null)
         {
-            types = new HashMap();
+            types = new TreeMap();
             types.put("email", "email");
             types.put("yahoo", "yahoo messenger");
         }
