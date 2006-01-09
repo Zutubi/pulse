@@ -98,12 +98,6 @@ public class CommandGroup implements Command, Validateable
         // dont forget about our nested friend. he may have some artifacts as well.
         names.addAll(getCommand().getArtifactNames());
 
-        // and definately dont forget the nested process mappings.
-        for (ProcessArtifactMapping mapping : mappings)
-        {
-            names.add(mapping.getArtifact());
-        }
-
         return names;
     }
 

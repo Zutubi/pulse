@@ -101,7 +101,7 @@ public class ExecutableCommand implements Command
 
     public List<String> getArtifactNames()
     {
-        return Arrays.asList("output.txt");
+        return Arrays.asList("output");
     }
 
     public void setExe(String exe)
