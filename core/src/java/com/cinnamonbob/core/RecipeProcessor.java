@@ -57,6 +57,10 @@ public class RecipeProcessor
             if (recipeName == null)
             {
                 recipeName = bobFile.getDefaultRecipe();
+                if (recipeName == null)
+                {
+                    throw new BuildException("Please specify a default recipe for your project.");
+                }
             }
 
             recipe = bobFile.getRecipe(recipeName);
