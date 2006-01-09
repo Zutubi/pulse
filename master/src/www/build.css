@@ -68,7 +68,7 @@ th.command-detail, th.build-info, th.build-success, th.build-failure, th.build-p
     border-color: #ddddee;
 }
 
-td.command-detail, td.build-info, td.build-success, td.build-failure, td.build-pending {
+td.command-detail, td.build-info, td.build-success, td.build-failure, td.build-pending, td.build-detail {
     font-size: small;
     background-color: #ffffff;
     border-style: solid;

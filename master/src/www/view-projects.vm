@@ -30,7 +30,7 @@
   #set($elapsed = "n/a")
   #set($success = "n/a")  
   #set($status = "n/a")
-  #set($class = "command-detail")
+  #set($class = "detail")
 #end
       <tr>
         <td class="build-$class"><a href="manageProject.action?id=$project.id">$project.name</a></td>
