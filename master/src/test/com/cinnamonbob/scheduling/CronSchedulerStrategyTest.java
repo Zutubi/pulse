@@ -66,6 +66,9 @@ public class CronSchedulerStrategyTest extends BaseSchedulerStrategyTest
                 });
 
                 // manually trigger the quartz callback job.
+                JobDataMap map = quartzScheduler.getJobDetail(QuartzSchedulerStrategy.CALLBACK_JOB_NAME, QuartzSchedulerStrategy.CALLBACK_JOB_GROUP).getJobDataMap();
+                map.clear();
+                map.putAll(t.getJobDataMap());
                 quartzScheduler.triggerJob("cron.trigger.job.name", "cron.trigger.job.group");
 
                 while (!triggered[0])
