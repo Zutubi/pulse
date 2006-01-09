@@ -28,6 +28,7 @@ public class WizardAction extends ActionSupport
 {
     private static final Logger LOG = Logger.getLogger(WizardAction.class);
     private String wizardClass;
+    private Wizard wizard;
 
     private boolean isInitialRequest = false;
 
@@ -43,7 +44,7 @@ public class WizardAction extends ActionSupport
         this.cancel = str;
     }
 
-    private boolean isCancelled()
+    public boolean isCancelled()
     {
         return TextUtils.stringSet(cancel);
     }
@@ -100,7 +101,7 @@ public class WizardAction extends ActionSupport
             // - remove wizard from the session so that it can be executed again.
             wizard.process();
             wizard.setCurrentState(null);
-            ActionContext.getContext().getSession().remove(wizardClass);
+            session.remove(wizardClass);
             return SUCCESS;
         }
 
@@ -132,6 +133,11 @@ public class WizardAction extends ActionSupport
 
     public Wizard getWizard()
     {
+        if (wizard != null)
+        {
+            return wizard;
+        }
+
         try
         {
             Map session = ActionContext.getContext().getSession();
@@ -143,7 +149,8 @@ public class WizardAction extends ActionSupport
                 session.put(wizardClass, wizardInstance);
                 isInitialRequest = true;
             }
-            return (Wizard) session.get(wizardClass);
+            wizard =  (Wizard) session.get(wizardClass);
+            return wizard;
         }
         catch (Exception e)
         {

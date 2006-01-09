@@ -145,7 +145,11 @@ public class AddTriggerWizard extends BaseWizard
 
         public String getNextState()
         {
-            return type;
+            if (TextUtils.stringSet(type))
+            {
+                return type;
+            }
+            return super.getStateName();
         }
     }
 
