@@ -278,12 +278,13 @@
                 method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-subscription.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="createSubscription" class="com.cinnamonbob.web.user.CreateSubscriptionAction">
             <result name="input" type="velocity">create-subscription.vm</result>
             <result name="cancel" type="redirect">/</result>
-            <result name="success" type="redirect">/viewUser.action?login=${user}</result>
+            <result name="success" type="redirect">/viewUser.action?id=${userId}</result>
         </action>
 
         <action name="deleteSubscription" class="com.cinnamonbob.web.user.DeleteSubscriptionAction">

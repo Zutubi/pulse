@@ -7,19 +7,21 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='addTrigger.action'" "method='post'")
+#if (!$actionErrorDetected)
+  #bodytag (Form "action='addTrigger.action'" "method='post'")
 
     <h3>step 2: create scm trigger</h3>
 
     <fieldset>
         #tag (TextField "name='name'" "required='true'" "tabindex='1'")
-        #tag (TextField "name='spec'" "required='true'" "tabindex='2'")
+        #tag (Select "list=specs" "name='spec'" "required='true'" "tabindex='2'")
     </fieldset>
 
     <fieldset class="submit">
         #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
         #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
     </fieldset>
+  #end
 #end
 
 </body>

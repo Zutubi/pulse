@@ -91,6 +91,18 @@ public class User extends Entity
         return null;
     }
 
+    public ContactPoint getContactPoint(long contactPointId)
+    {
+        for (ContactPoint cp : contactPoints)
+        {
+            if (cp.getId() == contactPointId)
+            {
+                return cp;
+            }
+        }
+        return null;
+    }
+
     public List<Subscription> getSubscriptions()
     {
         List<Subscription> subscriptions = new LinkedList<Subscription>();
@@ -100,4 +112,5 @@ public class User extends Entity
         }
         return subscriptions;
     }
+
 }

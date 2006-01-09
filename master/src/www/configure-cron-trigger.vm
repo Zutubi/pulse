@@ -12,7 +12,7 @@
     <h3>step 2: create cron trigger</h3>
     <fieldset>
         #tag (TextField "name='name'" "required='true'" "tabindex='1'")
-        #tag (TextField "name='spec'" "tabindex='2'")
+        #tag (Select "list=specs" "name='spec'" "required='true'" "tabindex='2'")
         #tag (TextField "name='cron'" "label=getText('trigger.cron')" "tabindex='3'")
     </fieldset>
     <fieldset class="submit">

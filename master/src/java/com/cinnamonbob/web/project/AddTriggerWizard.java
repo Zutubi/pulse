@@ -2,6 +2,7 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.ProjectManager;
+import com.cinnamonbob.model.BuildSpecification;
 import com.cinnamonbob.scheduling.*;
 import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
 import com.cinnamonbob.scm.SCMChangeEvent;
@@ -13,6 +14,8 @@ import com.opensymphony.util.TextUtils;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * <class-comment/>
@@ -58,13 +61,13 @@ public class AddTriggerWizard extends BaseWizard
         Trigger trigger = null;
         if (CRON_STATE.equals(selectState.getType()))
         {
-            trigger = new CronTrigger(configCron.cron, configCron.name);
-            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, configCron.spec);
+            trigger = new CronTrigger(configCron.cron, configCron.getName());
+            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, configCron.getSpec());
         }
         else if (MONITOR_STATE.equals(selectState.getType()))
         {
-            trigger = new EventTrigger(SCMChangeEvent.class, configMonitor.name);
-            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, configMonitor.spec);
+            trigger = new EventTrigger(SCMChangeEvent.class, configMonitor.getName());
+            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, configMonitor.getSpec());
         }
 
         trigger.setProject(project.getId());
@@ -129,7 +132,7 @@ public class AddTriggerWizard extends BaseWizard
             if (types == null)
             {
                 types = new TreeMap<String, String>();
-                types.put(MONITOR_STATE, "monitor scm trigger");
+                types.put(MONITOR_STATE, "monitor scm tigger");
                 types.put(CRON_STATE, "cron trigger");
             }
             return types;
@@ -153,20 +156,79 @@ public class AddTriggerWizard extends BaseWizard
         }
     }
 
-    public class ConfigureCronTrigger extends BaseWizardState
+    public abstract class BaseConfigureTrigger extends BaseWizardState
     {
         private String name;
         private String spec;
-        private String cron;
+        private List<String> specs;
 
-        public ConfigureCronTrigger(Wizard wizard, String stateName)
+        public BaseConfigureTrigger(Wizard wizard, String name)
         {
-            super(wizard, stateName);
+            super(wizard, name);
         }
 
         public String getNextState()
         {
             return null;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public void setName(String name)
+        {
+            this.name = name;
+        }
+
+        public String getSpec()
+        {
+            return spec;
+        }
+
+        public void setSpec(String spec)
+        {
+            this.spec = spec;
+        }
+
+        @Override
+        public void initialise()
+        {
+            long projectId = ((AddTriggerWizard) getWizard()).getProject();
+            Project project = projectManager.getProject(projectId);
+            if(project == null)
+            {
+                addActionError("Unknown project '" + projectId + "'");
+                return;
+            }
+
+            specs = new LinkedList<String>();
+            for(BuildSpecification spec: project.getBuildSpecifications())
+            {
+                specs.add(spec.getName());
+            }
+
+            if(specs.size() == 0)
+            {
+                addActionError("No build specifications for project '" + project.getName() + "'");
+            }
+        }
+
+        public List<String> getSpecs()
+        {
+            return specs;
+        }
+
+    }
+
+    public class ConfigureCronTrigger extends BaseConfigureTrigger
+    {
+        private String cron;
+
+        public ConfigureCronTrigger(Wizard wizard, String stateName)
+        {
+            super(wizard, stateName);
         }
 
         public String getCron()
@@ -178,61 +240,13 @@ public class AddTriggerWizard extends BaseWizard
         {
             this.cron = cron;
         }
-
-        public String getName()
-        {
-            return name;
-        }
-
-        public void setName(String name)
-        {
-            this.name = name;
-        }
-
-        public String getSpec()
-        {
-            return spec;
-        }
-
-        public void setSpec(String spec)
-        {
-            this.spec = spec;
-        }
     }
 
-    public class ConfigureMonitorTrigger extends BaseWizardState
+    public class ConfigureMonitorTrigger extends BaseConfigureTrigger
     {
-        private String name;
-        private String spec;
-
-        public ConfigureMonitorTrigger(Wizard wizard, String stateName)
+        public ConfigureMonitorTrigger(AddTriggerWizard wizard, String stateName)
         {
             super(wizard, stateName);
-        }
-
-        public String getNextState()
-        {
-            return null;
-        }
-
-        public void setName(String name)
-        {
-            this.name = name;
-        }
-
-        public String getName()
-        {
-            return name;
-        }
-
-        public void setSpec(String spec)
-        {
-            this.spec = spec;
-        }
-
-        public String getSpec()
-        {
-            return spec;
         }
     }
 

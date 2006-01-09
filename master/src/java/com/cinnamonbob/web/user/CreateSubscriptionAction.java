@@ -5,6 +5,7 @@ import com.opensymphony.util.TextUtils;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.List;
 
 /**
  *
@@ -14,12 +15,18 @@ public class CreateSubscriptionAction extends UserActionSupport
 {
     private ProjectManager projectManager;
 
-    private String projectName;
-    private String userName;
-    private String contactPoint;
+    private long userId;
+    private long projectId;
+    private long contactPointId;
     private String condition;
 
     private Map<String, String> conditions;
+    private Map<Long, String> projects;
+    private Map<Long, String> contactPoints;
+
+    private User user;
+    private Project project;
+    private ContactPoint contactPoint;
 
     public String getCondition()
     {
@@ -36,10 +43,10 @@ public class CreateSubscriptionAction extends UserActionSupport
         if (conditions == null)
         {
             conditions = new TreeMap<String, String>();
-            conditions.put(NotifyConditionFactory.ALL_BUILDS, "All builds");
-            conditions.put(NotifyConditionFactory.ALL_CHANGED, "All changed builds");
-            conditions.put(NotifyConditionFactory.ALL_FAILED, "All failed builds");
-            conditions.put(NotifyConditionFactory.ALL_CHANGED_OR_FAILED, "All changed or failed builds");
+            conditions.put(NotifyConditionFactory.ALL_BUILDS, "all builds");
+            conditions.put(NotifyConditionFactory.ALL_CHANGED, "all changed builds");
+            conditions.put(NotifyConditionFactory.ALL_FAILED, "all failed builds");
+            conditions.put(NotifyConditionFactory.ALL_CHANGED_OR_FAILED, "all changed or failed builds");
         }
         return conditions;
     }
@@ -54,34 +61,83 @@ public class CreateSubscriptionAction extends UserActionSupport
         return projectManager;
     }
 
-    public String getProject()
+    public long getUserId()
     {
-        return projectName;
+        return userId;
     }
 
-    public void setProject(String project)
+    public void setUserId(long userId)
     {
-        this.projectName = project;
+        this.userId = userId;
     }
 
-    public String getUser()
+    public long getProjectId()
     {
-        return userName;
+        return projectId;
     }
 
-    public void setUser(String user)
+    public void setProjectId(long projectId)
     {
-        this.userName = user;
+        this.projectId = projectId;
     }
 
-    public String getContactPoint()
+    public long getContactPointId()
     {
-        return contactPoint;
+        return contactPointId;
     }
 
-    public void setContactPoint(String str)
+    public void setContactPointId(long contactPointId)
     {
-        this.contactPoint = str;
+        this.contactPointId = contactPointId;
+    }
+
+    public Map<Long, String> getProjects()
+    {
+        return projects;
+    }
+
+    public Map<Long, String> getContactPoints()
+    {
+        return contactPoints;
+    }
+
+    public String doDefault()
+    {
+        List<Project> allProjects = projectManager.getAllProjects();
+        if(allProjects.size() == 0)
+        {
+            addActionError("No projects available.  Please configure a project before creating a subscription.");
+            return ERROR;
+        }
+
+        user = getUserManager().getUser(userId);
+        if(user == null)
+        {
+            addActionError("Unknown user '" + userId + "'");
+            return ERROR;
+        }
+
+        // validate that the userId has configured contact points.
+        if (user.getContactPoints().size() == 0)
+        {
+            addFieldError("userId", "This userId does not have any contact points available. " +
+                    "Please configure contact points before creating a subscription.");
+            return ERROR;
+        }
+
+        projects = new TreeMap<Long, String>();
+        for(Project project: allProjects)
+        {
+            projects.put(project.getId(), project.getName());
+        }
+
+        contactPoints = new TreeMap<Long, String>();
+        for(ContactPoint contact: user.getContactPoints())
+        {
+            contactPoints.put(contact.getId(), contact.getName());
+        }
+
+        return SUCCESS;
     }
 
     public void validate()
@@ -90,61 +146,30 @@ public class CreateSubscriptionAction extends UserActionSupport
         {
             return;
         }
-        // validate that project and user names reference existing entities.
-        Project project = getProjectManager().getProject(projectName);
-        if (project == null)
-        {
-            addFieldError("project", "Unknown project '"+projectName +"'");
-        }
-        User user = getUserManager().getUser(userName);
+
+        user = getUserManager().getUser(userId);
         if (user == null)
         {
-            addFieldError("user", "Unknown user '"+userName +"'");
+            addActionError("Unknown user '" + userId + "'");
         }
 
-        if (hasFieldErrors())
+        project = getProjectManager().getProject(projectId);
+        if (project == null)
         {
-            return;
+            addFieldError("projectId", "Unknown project '"+ projectId +"'");
         }
 
-        // validate that the user has configured contact points.
-        if (user.getContactPoints().size() == 0)
+        contactPoint = user.getContactPoint(contactPointId);
+        if (contactPoint == null)
         {
-            addFieldError("user", "This user does not have any contact points available. " +
-                    "Please configure contact points before creating a subscription.");
-            return;
+            addFieldError("contactPointId", "Unknown contact point '" + contactPointId + "' for user '" + user.getName() + "'");
         }
-
-        if (TextUtils.stringSet(contactPoint) && user.getContactPoint(contactPoint) == null)
-        {
-            addFieldError("contactPoint", "The contact point you have specified does not exist for this user. " +
-                    "Please specify another contact point.");
-        }
-    }
-
-    public String doDefault()
-    {
-        return SUCCESS;
     }
 
     public String execute()
     {
-        Project project = getProjectManager().getProject(projectName);
-        User user = getUserManager().getUser(userName);
-
-        ContactPoint cp = null;
-        if (TextUtils.stringSet(contactPoint))
-        {
-            cp = user.getContactPoint(contactPoint);
-        }
-        else
-        {
-            cp = user.getContactPoints().get(0);
-        }
-
-        Subscription subscription = new Subscription(project, cp);
+        Subscription subscription = new Subscription(project, contactPoint);
         subscription.setCondition(condition);
-
         getSubscriptionManager().save(subscription);
 
         return SUCCESS;

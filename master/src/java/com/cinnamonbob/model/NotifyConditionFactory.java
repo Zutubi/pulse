@@ -9,10 +9,10 @@ import java.util.HashMap;
 public class NotifyConditionFactory
 {
 
-    public static final String ALL_BUILDS = "all_builds";
-    public static final String ALL_CHANGED = "all_changed";
-    public static final String ALL_FAILED = "all_failed";
-    public static final String ALL_CHANGED_OR_FAILED = "all_changed_or_failed";
+    public static final String ALL_BUILDS = "all builds";
+    public static final String ALL_CHANGED = "all changed";
+    public static final String ALL_FAILED = "all failed";
+    public static final String ALL_CHANGED_OR_FAILED = "all changed or failed";
 
     private final static Map<String, NotifyCondition> instanceMap = new HashMap<String, NotifyCondition>();
     static {
