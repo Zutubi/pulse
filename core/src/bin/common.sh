@@ -14,7 +14,7 @@ if [ -z "$BOB_HOME" -o ! -d "$BOB_HOME" ] ; then
   BOB_HOME=`cd "$BOB_HOME" && pwd`
 fi
 
-if [ ! -f "$BOB_HOME"/lib/core-*.jar ] ; then
+if [ ! -f "$BOB_HOME"/lib/core-[0-9]*.jar ] ; then
   echo "Error: BOB_HOME is not defined correctly."
   echo "  We cannot find the core jar"
   exit 1

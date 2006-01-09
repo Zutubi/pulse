@@ -65,4 +65,9 @@ public class MasterBuildService implements BuildService
         this.configurationManager = configurationManager;
     }
 
+    @Override
+    public boolean equals(Object obj)
+    {
+        return obj instanceof MasterBuildService;
+    }
 }

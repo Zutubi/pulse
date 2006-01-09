@@ -2,7 +2,10 @@ package com.cinnamonbob;
 
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.core.event.EventListener;
+import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.events.build.RecipeDispatchedEvent;
+import com.cinnamonbob.events.SlaveAvailableEvent;
 import com.cinnamonbob.model.Slave;
 import com.cinnamonbob.model.SlaveManager;
 import com.cinnamonbob.model.persistence.SlaveDao;
@@ -17,7 +20,7 @@ import java.util.List;
  * as possible to build hosts.  It is assumed all requests in the queue may
  * be handled in parallel.
  */
-public class ImmediateDispatchRecipeQueue implements RecipeQueue
+public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
 {
     private static final Logger LOG = Logger.getLogger(ImmediateDispatchRecipeQueue.class);
 
@@ -37,15 +40,28 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue
 
         for (Slave slave : slaveManager.getAll())
         {
-            try
+            SlaveBuildService slaveService = createSlaveService(slave);
+            if(slaveService != null)
             {
-                buildServices.add(new SlaveBuildService(slave, slaveProxyFactory.createProxy(slave)));
-            }
-            catch (MalformedURLException e)
-            {
-                LOG.severe("Error creating build service for slave '" + slave.getName() + "': " + e.getMessage(), e);
+                buildServices.add(slaveService);
             }
         }
+
+        eventManager.register(this);
+    }
+
+    private SlaveBuildService createSlaveService(Slave slave)
+    {
+        try
+        {
+            return new SlaveBuildService(slave, slaveProxyFactory.createProxy(slave));
+        }
+        catch (MalformedURLException e)
+        {
+            LOG.severe("Error creating build service for slave '" + slave.getName() + "': " + e.getMessage(), e);
+        }
+
+        return null;
     }
 
     public void enqueue(RecipeDispatchRequest request)
@@ -64,6 +80,30 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue
         throw new BuildException("No build service found to handle request.");
     }
 
+    public void handleEvent(Event evt)
+    {
+        SlaveAvailableEvent event = (SlaveAvailableEvent) evt;
+        SlaveBuildService newService = createSlaveService(event.getSlave());
+
+        if(newService != null)
+        {
+            for(BuildService service: buildServices)
+            {
+                if(service.equals(newService))
+                {
+                    return;
+                }
+            }
+        }
+
+        buildServices.add(newService);
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[] { SlaveAvailableEvent.class };
+    }
+
     public void setSlaveProxyFactory(SlaveProxyFactory slaveProxyFactory)
     {
         this.slaveProxyFactory = slaveProxyFactory;
@@ -78,4 +118,5 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue
     {
         this.slaveManager = slaveManager;
     }
+
 }

@@ -4,6 +4,8 @@ import com.cinnamonbob.scheduling.Task;
 import com.cinnamonbob.scheduling.TaskExecutionContext;
 import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.SlaveProxyFactory;
+import com.cinnamonbob.events.SlaveAvailableEvent;
+import com.cinnamonbob.core.event.EventManager;
 import com.cinnamonbob.model.SlaveManager;
 import com.cinnamonbob.model.Slave;
 import com.cinnamonbob.services.SlaveService;
@@ -17,6 +19,7 @@ public class PingSlaves implements Task
 
     private SlaveManager slaveManager;
     private SlaveProxyFactory factory;
+    private EventManager eventManager;
 
     public void execute(TaskExecutionContext context)
     {
@@ -30,6 +33,7 @@ public class PingSlaves implements Task
                 SlaveService service = factory.createProxy(slave);
                 service.ping();
                 slave.lastPing(currentTime, true);
+                eventManager.publish(new SlaveAvailableEvent(this, slave));
             }
             catch (Exception e)
             {
@@ -48,5 +52,10 @@ public class PingSlaves implements Task
     public void setSlaveProxyFactory(SlaveProxyFactory factory)
     {
         this.factory = factory;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }

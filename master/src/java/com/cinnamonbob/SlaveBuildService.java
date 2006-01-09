@@ -102,4 +102,16 @@ public class SlaveBuildService implements BuildService
     {
         return new BuildException(context + ": " + e.getMessage(), e);
     }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof SlaveBuildService)
+        {
+            SlaveBuildService other = (SlaveBuildService) obj;
+            return other.getSlave().equals(slave);
+        }
+
+        return false;
+    }
 }
