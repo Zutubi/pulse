@@ -106,8 +106,15 @@
         <copy todir="${package.root}/system/www">
             <fileset dir="master/src/www" includes="**/*"/>
         </copy>
+
+        <!-- /config is for user configuration properties -->
+        <copy todir="${package.root}/config">
+            <fileset dir="master/etc" includes="bob.properties"/>
+        </copy>
+
+        <!-- /system/config is for system configuration files - not changed unless there is a problem... -->
         <copy todir="${package.root}/system/config">
-            <fileset dir="master/etc" includes="*.properties"/>
+            <fileset dir="master/etc" includes="log.properties"/>
         </copy>
 
         <zip destfile="build/bob-master-0.2.zip">
@@ -140,6 +147,10 @@
         <copy todir="${package.root}/docs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
+        <!-- /config is for user configuration properties -->
+        <copy todir="${package.root}/config">
+            <fileset dir="master/etc" includes="bob.properties"/>
+        </copy>
         <!-- place holder for the logs directory -->
         <copy todir="${package.root}/system/logs">
             <fileset dir="etc" includes="delete-me.txt"/>
@@ -147,9 +158,11 @@
         <copy todir="${package.root}/system/www">
             <fileset dir="slave/src/www" includes="**/*"/>
         </copy>
+        <!-- /system/config is for system configuration files - not changed unless there is a problem... -->
         <copy todir="${package.root}/system/config">
-            <fileset dir="slave/etc" includes="*.properties"/>
+            <fileset dir="master/etc" includes="log.properties"/>
         </copy>
+
 
         <zip destfile="build/bob-slave-0.2.zip">
             <zipfileset dir="build/package" includes="**/*" prefix="bob-slave-0.2"/>
