@@ -121,26 +121,30 @@ public class RecipeController
 
     private void handleRecipeCommenced(RecipeCommencedEvent event)
     {
-        recipeResult.commence(event.getName(), event.getStartTime());
+        recipeResult.commence(event.getName(), System.currentTimeMillis());
         buildManager.save(recipeResult);
     }
 
     private void handleCommandCommenced(CommandCommencedEvent event)
     {
         CommandResult result = new CommandResult(event.getName());
-        result.commence(event.getStartTime());
+        result.commence(System.currentTimeMillis());
         recipeResult.add(result);
         buildManager.save(recipeResult);
     }
 
     private void handleCommandCompleted(CommandCompletedEvent event)
     {
-        recipeResult.update(event.getResult());
+        CommandResult result = event.getResult();
+        result.getStamps().setEndTime(System.currentTimeMillis());
+        recipeResult.update(result);
         buildManager.save(recipeResult);
     }
 
     private void handleRecipeCompleted(RecipeCompletedEvent event)
     {
+        RecipeResult result = event.getResult();
+        result.getStamps().setEndTime(System.currentTimeMillis());
         recipeResult.update(event.getResult());
         complete();
     }

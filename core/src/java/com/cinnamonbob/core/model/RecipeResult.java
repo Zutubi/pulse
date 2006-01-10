@@ -52,6 +52,7 @@ public class RecipeResult extends Result
         // with the new one... simple.
         CommandResult currentResult = results.remove(results.size() - 1);
         result.setId(currentResult.getId());
+        result.getStamps().setStartTime(currentResult.getStamps().getStartTime());
         add(result);
 
         // Adjust the command's output directory to the local one
@@ -83,7 +84,7 @@ public class RecipeResult extends Result
                 break;
         }
 
-        this.stamps = result.stamps;
+        this.stamps.setEndTime(result.stamps.getEndTime());
     }
 
     public List<CommandResult> getCommandResults()
