@@ -3,6 +3,7 @@ package com.cinnamonbob.web.project;
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.core.model.StoredArtifact;
+import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.RecipeResultNode;
 
 import java.util.Iterator;
@@ -14,6 +15,7 @@ import java.util.Iterator;
 public class ViewRecipeAction extends ProjectActionSupport
 {
     private long id;
+    private long projectId;
     private RecipeResultNode node;
 
     public long getId()
@@ -24,6 +26,16 @@ public class ViewRecipeAction extends ProjectActionSupport
     public void setId(long id)
     {
         this.id = id;
+    }
+
+    public void setProjectId(long projectId)
+    {
+        this.projectId = projectId;
+    }
+
+    public Project getProject()
+    {
+        return getProjectManager().getProject(projectId);
     }
 
     public RecipeResultNode getNode()

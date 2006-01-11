@@ -3,6 +3,8 @@
         <link href="build.css" rel="stylesheet" type="text/css">
         <title>$project.name</title>
         <content tag="action">project.view</content>
+    <content tag="navProject">$project.id</content>
+    <content tag="navProjectName">$project.name</content>
         <!-- a tick to the self updating webpage box... -->
         <meta http-equiv="refresh" content="30">
     </head>
@@ -103,7 +105,7 @@
             #buildMessageSummary($currentBuild $currentBuild.getLevel("WARNING"))
 
             <h4>recipes</h4>
-            #showrecipes($currentBuild.root false)
+            #showrecipes($currentBuild.root false $project.id)
         </div>
       #end
 

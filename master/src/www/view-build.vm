@@ -21,6 +21,8 @@
   <head>
     <title>$project.name build $result.number</title>
     <link href="build.css" rel="stylesheet" type="text/css">
+    <content tag="navProject">$project.id</content>
+    <content tag="navProjectName">$project.name</content>
   </head>
   <body>
     <h1 class="build-log">:: build $result.number ::</h1>
@@ -82,7 +84,7 @@
     #classset($result)
     <h2 class="command-$class">recipe results</h2>
     <div class="command-content">
-      #showrecipes($result.root true)
+      #showrecipes($result.root true $id)
     </div>
 
   </body>

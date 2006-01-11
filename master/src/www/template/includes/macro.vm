@@ -96,19 +96,19 @@
 ## Outputs a nested list of RecipeResult details starting from the given node.
 ## If $showCommands is true, command results will also be displayed.
 ##
-#macro(showrecipes $node $showCommands)
+#macro(showrecipes $node $showCommands $projectId)
   <ul class="recipe-tree">
   #foreach($child in $node.children)
     <li class="recipe-tree">
       <table>
     #if($child.result.commenced())
         <tr>
-          <th colspan="4" class="command-detail">$child.result.recipeNameSafe @ $child.hostSafe <a href="viewRecipe.action?id=$child.id">details</a></th>
+          <th colspan="4" class="command-detail">$child.result.recipeNameSafe @ $child.hostSafe <a href="viewRecipe.action?id=$child.id&projectId=$projectId">details</a></th>
         </tr>
       #resultsummary($child.result)
     #else
         <tr>
-          <th class="build-pending">$child.result.recipeNameSafe @ [pending]  <a href="viewRecipe.action?id=$child.id">details</a></th>
+          <th class="build-pending">$child.result.recipeNameSafe @ [pending]  <a href="viewRecipe.action?id=$child.id&projectId=$projectId">details</a></th>
         <tr>
     #end
 
@@ -139,7 +139,7 @@
     #end
       </table>
     #if($child.children.size() > 0)
-      #showrecipes($child $showCommands)
+      #showrecipes($child $showCommands $projectId)
     #end
   #end
   </ul>

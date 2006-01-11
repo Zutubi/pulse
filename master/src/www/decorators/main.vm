@@ -11,8 +11,10 @@
 
         <!-- page properties are specified using <content tag="selectedTab">navigate</content> -->
         <!--#set ($selectedTab = $page.getProperty("page.selectedTab"))-->
+        #set ($navProject = $page.getProperty("page.navProject"))
+        #set ($navProjectName = $page.getProperty("page.navProjectName"))
 
-        <div id="header">$title</div>
+        <div id="header">:: cinnamon bob :: #if($navProject) <a href="manageProject.action?id=$navProject">$navProjectName</a>#end</div>
         <div id="navbar">
             <ul>
                 <li><a href="/">home</a></li>

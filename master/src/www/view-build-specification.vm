@@ -2,6 +2,8 @@
 <head>
     <link href="build.css" rel="stylesheet" type="text/css">
     <title>view build specification</title>
+    <content tag="navProject">$project.id</content>
+    <content tag="navProjectName">$project.name</content>
 </head>
 <content tag="action">build-specification.edit</content>
 <body>

@@ -4,6 +4,8 @@
   <head>
     <title>$result.recipeNameSafe @ $node.hostSafe</title>
     <link href="build.css" rel="stylesheet" type="text/css">
+    <content tag="navProject">$project.id</content>
+    <content tag="navProjectName">$project.name</content>
   </head>
   <body>
 #classset($result)
