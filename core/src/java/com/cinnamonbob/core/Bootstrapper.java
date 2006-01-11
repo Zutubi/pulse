@@ -6,5 +6,5 @@ public interface Bootstrapper
 {
     /**
      */
-    void bootstrap(RecipePaths paths) throws BuildException;
+    void bootstrap(long recipeId, RecipePaths paths) throws BuildException;
 }

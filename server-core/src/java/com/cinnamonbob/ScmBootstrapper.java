@@ -29,7 +29,7 @@ public class ScmBootstrapper implements Bootstrapper
         checkouts.add(details);
     }
 
-    public void bootstrap(RecipePaths paths)
+    public void bootstrap(long recipeId, RecipePaths paths)
     {
         for (ScmCheckoutDetails details : checkouts)
         {
@@ -48,11 +48,11 @@ public class ScmBootstrapper implements Bootstrapper
             try
             {
                 // TODO this list is not needed, perhaps make it optional in SCM interface?
-                details.scm.createServer().checkout(checkoutDir, details.revision, new LinkedList<Change>());
+                details.scm.createServer().checkout(recipeId, checkoutDir, details.revision, new LinkedList<Change>());
             }
             catch (SCMException e)
             {
-                throw new BuildException("Error checking out from SCM '" + scm.getName() + "'", e);
+                throw new BuildException("Error checking out from SCM '" + scm.getName() + "': " + e.getMessage(), e);
             }
         }
     }

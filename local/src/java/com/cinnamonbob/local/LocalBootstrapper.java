@@ -11,7 +11,7 @@ import java.io.IOException;
  */
 public class LocalBootstrapper implements Bootstrapper
 {
-    public void bootstrap(RecipePaths paths) throws BuildException
+    public void bootstrap(long recipeId, RecipePaths paths) throws BuildException
     {
         try
         {

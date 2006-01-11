@@ -28,7 +28,7 @@ public class CvsServer implements SCMServer
         this.cvsModule = module;
     }
 
-    public Revision checkout(File toDirectory, Revision revision, List<Change> changes) throws SCMException
+    public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
     {
         try
         {
@@ -178,7 +178,7 @@ public class CvsServer implements SCMServer
 
         // cvs is not atomic, so take the current time and restrict the checkout to 'now'
         // to prevent problems with people checking in during the checkout.
-        
+
         Date now = new Date(System.currentTimeMillis()); // this needs to be GMT 00.
         return new CvsRevision(null, null, null, now);
     }

@@ -29,6 +29,8 @@ public class P4Server implements SCMServer
     private static final String COMMAND_CLIENT = "client";
     private static final String COMMAND_DESCRIBE = "describe";
     private static final String COMMAND_SYNC = "sync";
+    private static final String FLAG_CLIENT = "-c";
+    private static final String FLAG_DELETE = "-d";
     private static final String FLAG_FORCE = "-f";
     private static final String FLAG_INPUT = "-i";
     private static final String FLAG_MAXIMUM = "-m";
@@ -40,6 +42,7 @@ public class P4Server implements SCMServer
 
     private ProcessBuilder p4Builder;
     private Pattern changesPattern;
+    private String templateClient;
     private File clientRoot;
 
     private class P4Result
@@ -131,15 +134,20 @@ public class P4Server implements SCMServer
         return result;
     }
 
-    private void updateClient(File toDirectory) throws SCMException
+    private String updateClient(long id, File toDirectory) throws SCMException
     {
         P4Result result = runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_OUTPUT);
         String clientSpec = result.stdout.toString();
+        String clientName = "bob-temp-" + id;
 
         clientSpec = clientSpec.replaceAll("\nRoot:.*", Matcher.quoteReplacement("\nRoot: " + toDirectory.getAbsolutePath()));
+//        clientSpec = clientSpec.replaceAll("\nClient:.*" + templateClient, Matcher.quoteReplacement("\nClient: " + clientName));
+//        clientSpec = clientSpec.replaceAll("//" + templateClient + "/", Matcher.quoteReplacement("//" + clientName + "/"));
 
         runP4(clientSpec, P4_COMMAND, COMMAND_CLIENT, FLAG_INPUT);
         clientRoot = toDirectory;
+
+        return clientName;
     }
 
     private void getClientRoot() throws SCMException
@@ -349,6 +357,7 @@ public class P4Server implements SCMServer
     public P4Server(String port, String user, String password, String client)
     {
         p4Builder = new ProcessBuilder();
+        templateClient = client;
         // Output of p4 changes -s submitted -m 1:
         //   Change <number> on <date> by <user>@<client>
         changesPattern = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.+)'$", Pattern.MULTILINE);
@@ -359,19 +368,27 @@ public class P4Server implements SCMServer
         setEnv(ENV_CLIENT, client);
     }
 
-    public Revision checkout(File toDirectory, Revision revision, List<Change> changes) throws SCMException
+    public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
     {
-        updateClient(toDirectory);
+        String clientName = updateClient(id, toDirectory);
 
+//        try
+//        {
         if (revision == null)
         {
             revision = getLatestRevision();
         }
 
         long number = ((NumericalRevision) revision).getRevisionNumber();
+//            P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
         P4Result result = runP4(null, P4_COMMAND, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
 
         populateChanges(result.stdout, changes);
+//        }
+//        finally
+//        {
+//            runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_DELETE, clientName);
+//        }
 
         return revision;
     }

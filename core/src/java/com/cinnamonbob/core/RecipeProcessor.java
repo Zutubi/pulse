@@ -49,7 +49,7 @@ public class RecipeProcessor
 
         try
         {
-            bootstrapper.bootstrap(paths);
+            bootstrapper.bootstrap(recipeId, paths);
 
             BobFile bobFile = loadBobFile(paths.getWorkDir(), bobFileName);
             Recipe recipe;

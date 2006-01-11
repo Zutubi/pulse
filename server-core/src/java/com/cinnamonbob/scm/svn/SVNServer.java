@@ -188,9 +188,9 @@ public class SVNServer implements SCMServer
     //=======================================================================
 
     /**
-     * @see SCMServer#checkout(File, Revision, List<Change>)
+     * @see SCMServer#checkout(long, File, Revision, List<Change>)
      */
-    public Revision checkout(File toDirectory, Revision revision, List<Change> changes) throws SCMException
+    public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
     {
         NumericalRevision svnRevision;
         ISVNWorkspace workspace;
@@ -245,9 +245,6 @@ public class SVNServer implements SCMServer
         return new NumericalRevision(revisionNumber);
     }
 
-    /**
-     * @see SCMServer#checkout(File, Revision, List<Change>)
-     */
     public List<Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException
     {
         List<Changelist>  result = new LinkedList<Changelist>();

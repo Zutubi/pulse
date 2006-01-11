@@ -17,6 +17,7 @@ public interface SCMServer
     /**
      * Checks out a new working copy to the specified directory.
      *
+     * @param id          a unique identifier for this checkout
      * @param toDirectory root directory to check the copy out to
      * @param revision    the revision to check out, or null for most recent (HEAD)
      * @param changes     receives a list of change objects indicating the files that were
@@ -24,7 +25,7 @@ public interface SCMServer
      * @return the revision actually checked out
      * @throws SCMException if an error occurs communicating with the server
      */
-    Revision checkout(File toDirectory, Revision revision, List<Change> changes) throws SCMException;
+    Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException;
 
     /**
      * Returns a list of changelists occuring in between the given revisions.

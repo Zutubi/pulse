@@ -11,7 +11,7 @@ import java.io.IOException;
  */
 public class ServerBootstrapper implements Bootstrapper
 {
-    public void bootstrap(RecipePaths paths)
+    public void bootstrap(long recipeId, RecipePaths paths)
     {
         // ensure that the paths exist
         try

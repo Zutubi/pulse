@@ -19,11 +19,11 @@ public class ChainBootstrapper implements Bootstrapper
         this.bootstrappers.addAll(Arrays.asList(bootstrappers));
     }
 
-    public void bootstrap(RecipePaths paths) throws BuildException
+    public void bootstrap(long recipeId, RecipePaths paths) throws BuildException
     {
         for (Bootstrapper bootstrapper : bootstrappers)
         {
-            bootstrapper.bootstrap(paths);
+            bootstrapper.bootstrap(recipeId, paths);
         }
     }
 

@@ -17,22 +17,22 @@ import java.util.zip.ZipInputStream;
 public class CopyBootstrapper implements Bootstrapper
 {
     private String url;
-    private long recipeId;
+    private long previousRecipeId;
 
-    public CopyBootstrapper(String url, long recipeId)
+    public CopyBootstrapper(String url, long previousRecipeId)
     {
         this.url = url;
-        this.recipeId = recipeId;
+        this.previousRecipeId = previousRecipeId;
     }
 
-    public void bootstrap(RecipePaths paths) throws BuildException
+    public void bootstrap(long recipeId, RecipePaths paths) throws BuildException
     {
         ZipInputStream zis = null;
 
         try
         {
             // Pull down the result from the slave then explode to dir
-            URL resultUrl = new URL("http://" + url + "/download?output=false&recipe=" + recipeId);
+            URL resultUrl = new URL("http://" + url + "/download?output=false&recipe=" + previousRecipeId);
             URLConnection urlConnection = resultUrl.openConnection();
 
             // take url connection input stream and write contents to directory.
