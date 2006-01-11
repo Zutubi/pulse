@@ -106,7 +106,9 @@ textarea {
     height: 8em;
     display: block;
     margin-left: 11em;
-    font-size: 110%;
+    background-color: #ffffff;
+    color: #102132;
+    border: 1px solid #b0b0f0;
 }
 
 .required {

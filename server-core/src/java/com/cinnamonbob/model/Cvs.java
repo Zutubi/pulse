@@ -12,10 +12,21 @@ public class Cvs extends Scm
 {
     private static final String ROOT = "cvs.root";
     private static final String PASS = "cvs.password";
+    private static final String MODULE = "cvs.module";
 
     public SCMServer createServer() throws SCMException
     {
-        return new CvsServer(getRoot(), null);
+        return new CvsServer(getRoot(), getModule());
+    }
+
+    public String getModule()
+    {
+        return getProperties().getProperty(MODULE);
+    }
+
+    public void setModule(String str)
+    {
+        getProperties().setProperty(MODULE, str);
     }
 
     public String getRoot()

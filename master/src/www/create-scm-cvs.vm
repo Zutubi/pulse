@@ -15,13 +15,14 @@
         #tag (TextField "required='true'" "name='cvs.name'" "label='scm.name'" "tabindex='1'")
         #tag (TextField "name='cvs.path'" "label='scm.path'" "tabindex='2'")
         #tag (TextField "required='true'" "name='cvs.root'" "tabindex='3'")
-        #tag (Password "name='cvs.password'" "tabindex='4'")
+        #tag (TextField "name='cvs.module'" "tabindex='4'")
+        #tag (Password "name='cvs.password'" "tabindex='5'")
     </fieldset>
 
     <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
-        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='4'" "onclick='history.back();return false;'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='7'")
+        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='8'" "onclick='history.back();return false;'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='9'")
     </fieldset>
 
  #end

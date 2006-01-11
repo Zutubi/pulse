@@ -1,13 +1,11 @@
 package com.cinnamonbob.scheduling;
 
-import com.cinnamonbob.core.event.EventManager;
-import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.core.event.Event;
+import com.cinnamonbob.core.event.EventListener;
+import com.cinnamonbob.core.event.EventManager;
 
-import java.util.Map;
 import java.util.HashMap;
-
-import org.hibernate.proxy.HibernateProxy;
+import java.util.Map;
 
 /**
  * <class-comment/>

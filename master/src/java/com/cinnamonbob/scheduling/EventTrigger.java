@@ -53,4 +53,14 @@ public class EventTrigger extends Trigger
     {
         return triggers;
     }
+
+    private Class getTriggerEvent()
+    {
+        return getTriggerEvents()[0];
+    }
+
+    private void setTriggerEvent(Class event)
+    {
+        getTriggerEvents()[0] = event;
+    }
 }

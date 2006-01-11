@@ -5,9 +5,12 @@ import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.CvsRevision;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.cvs.client.*;
+import com.cinnamonbob.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
+import org.netbeans.lib.cvsclient.commandLine.command.log;
+//import org.netbeans.lib.cvsclient.util.Logger;
 import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
 import org.netbeans.lib.cvsclient.command.CommandAbortedException;
 import org.netbeans.lib.cvsclient.command.CommandException;
@@ -24,6 +27,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Allows for the system to interact with a cvs repository.
@@ -33,7 +37,9 @@ import java.util.*;
  */
 public class CvsClient
 {
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+    private static final Logger LOG = Logger.getLogger(CvsClient.class);
 
     private CVSRoot root;
 
@@ -53,6 +59,8 @@ public class CvsClient
     public CvsClient(CVSRoot root)
     {
         this.root = root;
+
+        //org.netbeans.lib.cvsclient.util.Logger.setLogging("system");
     }
 
     /**
@@ -104,11 +112,20 @@ public class CvsClient
             connection.open();
 
             Client client = new Client(connection, new StandardAdminHandler());
-            client.setLocalPath(localPath.getAbsolutePath());
             client.getEventManager().addCVSListener(new LoggingListener());
 
             CheckoutCommand checkout = new CheckoutCommand();
             checkout.setModule(module);
+            checkout.setPruneDirectories(true);
+
+            // hack: the javacvs.Client does not like a blank or '.' checkout directory. however, if one
+            //       is not set, then the module path is prefixed to the checkout directory structure.
+            //       So that we can checkout the module into the current working directory, update the local
+            //       path to refer to its parent, and set the checkout directory to be the remainder of the
+            //       local path.
+            client.setLocalPath(localPath.getParentFile().getAbsolutePath());
+            checkout.setCheckoutDirectory(localPath.getName());
+
             if (branch != null)
             {
                 checkout.setCheckoutByRevision(branch);

@@ -10,9 +10,8 @@ import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.util.*;
 
 /**
  * 
@@ -36,14 +35,14 @@ public class CvsClientTest extends TestCase
         Logger.setLogging("system");
 
         // cleanup the working directory.
-        workdir = FileSystemUtils.createTempDirectory("CvsClient", "Test");
+        workdir = FileSystemUtils.createTempDirectory(CvsClientTest.class.getName(), "");
     }
 
     public void tearDown() throws Exception
     {
         if (!FileSystemUtils.removeDirectory(workdir))
         {
-            throw new RuntimeException("Failed to setup test case.");
+            throw new RuntimeException("Failed to clean test case.");
         }
         super.tearDown();
     }
@@ -65,7 +64,7 @@ public class CvsClientTest extends TestCase
         cvs.checkout("project", null);
 
         assertTrue(foo.exists());
-        assertFalse(new File(workdir, "project/test/branch.only").exists());
+        assertFalse(new File(workdir, "test/branch.only").exists());
     }
 
     public void testCheckoutBranch() throws Exception
@@ -75,14 +74,14 @@ public class CvsClientTest extends TestCase
         cvs.setBranch("BRANCH");
         cvs.checkout("project", null);
 
-        assertTrue(new File(workdir, "project/test/branch.only").exists());
+        assertTrue(new File(workdir, "test/branch.only").exists());
     }
 
     public void testHasChangedSince() throws Exception
     {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         assertTrue(cvs.hasChangedSince(dateFormat.parse("2005-05-10"), null));
-        assertFalse(cvs.hasChangedSince(dateFormat.parse("2005-10-10"), null));
+        assertFalse(cvs.hasChangedSince(dateFormat.parse("2006-11-01"), null));
     }
 
     public void testHasChangedSinceWithModule() throws Exception
