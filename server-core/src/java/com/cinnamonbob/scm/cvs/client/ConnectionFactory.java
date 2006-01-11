@@ -34,7 +34,7 @@ public class ConnectionFactory
         {
             return new PServerConnection(cvsRoot);
         }
-        else if (CVSRoot.METHOD_LOCAL.equals(method))
+        else if (CVSRoot.METHOD_LOCAL.equals(method) || method == null)
         {
             LocalConnection c = new LocalConnection();
             c.setRepository(cvsRoot.getRepository());
