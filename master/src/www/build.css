@@ -102,8 +102,8 @@ td.build-success, th.build-success, ul.success {
 }
 
 div.warning, ul.warning {
-    border-color: #f0f000;
-    background-color: #f0f0d0;
+    background: #ffffce;
+    border-color: #f0c000
 }
 
 div.error, td.build-failure, th.build-failure, ul.failure, ul.error {
@@ -174,8 +174,8 @@ ul.recipe-tree {
 li.recipe-tree {
     margin-top: 10px; /*padding-left: 20px;*/
 /*background: url( /images/arrow.png ) no-repeat 0 8px;*/
-    border-left: solid;
-    border-color: #d4d4d4;
+/*border-left: solid;*/
+/*border-color: #d4d4d4;*/
 }
 
 li.error, li.warning, li.info {
