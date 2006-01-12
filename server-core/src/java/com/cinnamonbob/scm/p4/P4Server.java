@@ -295,39 +295,28 @@ public class P4Server implements SCMServer
         {
             return Change.Action.ADD;
         }
+        else if (action.equals("branch"))
+        {
+            return Change.Action.BRANCH;
+        }
+        else if (action.equals("delete"))
+        {
+            return Change.Action.DELETE;
+        }
+        else if (action.equals("edit"))
+        {
+            return Change.Action.EDIT;
+        }
+        else if (action.equals("integrate"))
+        {
+            return Change.Action.INTEGRATE;
+        }
         else
         {
-            if (action.equals("branch"))
-            {
-                return Change.Action.BRANCH;
-            }
-            else
-            {
-                if (action.equals("delete"))
-                {
-                    return Change.Action.DELETE;
-                }
-                else
-                {
-                    if (action.equals("edit"))
-                    {
-                        return Change.Action.EDIT;
-                    }
-                    else
-                    {
-                        if (action.equals("integrate"))
-                        {
-                            return Change.Action.INTEGRATE;
-                        }
-                        else
-                        {
-                            return Change.Action.UNKNOWN;
-                        }
-                    }
-                }
-            }
+            return Change.Action.UNKNOWN;
         }
     }
+
 
     private String getChangelistComment(String[] lines, int affectedFilesIndex)
     {

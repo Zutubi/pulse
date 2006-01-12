@@ -10,6 +10,7 @@
 #bodytag (Form "action='createBuildSpecificationNode.action'" "method='post'")
     #tag (Hidden "name='specId'")
     #tag (Hidden "name='parentId'")
+    #tag (Hidden "name='projectId'")
     <h3>add build stage</h3>
     <fieldset>
         #tag (Select "name='buildHost'" "list=buildHosts" "tabindex='1'")

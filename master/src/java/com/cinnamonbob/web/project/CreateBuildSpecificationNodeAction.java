@@ -14,6 +14,7 @@ public class CreateBuildSpecificationNodeAction extends ActionSupport
 {
     private long specId;
     private long parentId;
+    private long projectId;
     private BuildStage stage = new BuildStage();
     private BuildSpecificationNodeDao buildSpecificationNodeDao;
     private SlaveManager slaveManager;
@@ -38,6 +39,16 @@ public class CreateBuildSpecificationNodeAction extends ActionSupport
     public void setParentId(long parentId)
     {
         this.parentId = parentId;
+    }
+
+    public long getProjectId()
+    {
+        return projectId;
+    }
+
+    public void setProjectId(long projectId)
+    {
+        this.projectId = projectId;
     }
 
     public BuildStage getStage()

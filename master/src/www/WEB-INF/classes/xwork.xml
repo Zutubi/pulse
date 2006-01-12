@@ -354,7 +354,7 @@
             <result name="input" type="velocity">create-build-specification.vm</result>
             <result name="cancel" type="velocity">undefined.vm</result>
             <result name="error" type="velocity">create-build-specification.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specification.id}</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specification.id}&amp;projectId=${projectId}</result>
         </action>
 
         <action name="deleteBuildSpecification" class="com.cinnamonbob.web.project.DeleteBuildSpecificationAction">
@@ -373,7 +373,7 @@
             <result name="input" type="velocity">create-build-specification-node.vm</result>
             <result name="cancel" type="velocity">undefined.vm</result>
             <result name="error" type="velocity">create-build-specification-node.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
         </action>
 
         <action name="viewBuildSpecification" class="com.cinnamonbob.web.project.ViewBuildSpecificationAction">
