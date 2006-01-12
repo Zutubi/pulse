@@ -2,7 +2,7 @@ package com.cinnamonbob.shell;
 
 import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.util.RandomUtils;
+import com.cinnamonbob.core.util.RandomUtils;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.io.*;

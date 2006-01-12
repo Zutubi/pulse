@@ -6,7 +6,7 @@ import com.cinnamonbob.core.RecipePaths;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -27,8 +27,6 @@ public class CopyBootstrapper implements Bootstrapper
 
     public void bootstrap(long recipeId, RecipePaths paths) throws BuildException
     {
-        ZipInputStream zis = null;
-
         try
         {
             // Pull down the result from the slave then explode to dir
@@ -36,8 +34,31 @@ public class CopyBootstrapper implements Bootstrapper
             URLConnection urlConnection = resultUrl.openConnection();
 
             // take url connection input stream and write contents to directory.
-            zis = new ZipInputStream(urlConnection.getInputStream());
-            FileSystemUtils.extractZip(zis, paths.getWorkDir());
+            FileOutputStream zos = null;
+            File zipName = new File(paths.getWorkDir().getAbsolutePath() + ".zip");
+
+            try
+            {
+                zos = new FileOutputStream(zipName);
+                IOUtils.joinStreams(urlConnection.getInputStream(), zos);
+            }
+            finally
+            {
+                IOUtils.close(urlConnection.getInputStream());
+                IOUtils.close(zos);
+            }
+
+            ZipInputStream zis = null;
+
+            try
+            {
+                zis = new ZipInputStream(new FileInputStream(zipName));
+                FileSystemUtils.extractZip(zis, paths.getWorkDir());
+            }
+            finally
+            {
+                IOUtils.close(zis);
+            }
         }
         catch (MalformedURLException e)
         {
@@ -47,10 +68,6 @@ public class CopyBootstrapper implements Bootstrapper
         catch (IOException e)
         {
             throw new BuildException("Bootstrapping working directory from '" + url + "': " + e.getMessage(), e);
-        }
-        finally
-        {
-            IOUtils.close(zis);
         }
     }
 }

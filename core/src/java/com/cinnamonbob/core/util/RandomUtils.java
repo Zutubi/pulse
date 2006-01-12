@@ -1,4 +1,4 @@
-package com.cinnamonbob.util;
+package com.cinnamonbob.core.util;
 
 import java.util.Random;
 

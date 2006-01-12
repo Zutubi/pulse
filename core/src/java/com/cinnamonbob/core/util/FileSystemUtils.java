@@ -169,6 +169,7 @@ public class FileSystemUtils
     private static void addToZip(ZipOutputStream os, File base, String sourcePath) throws IOException
     {
         File source = new File(base, sourcePath);
+        long modifiedTime = source.lastModified();
 
         if (source.isDirectory())
         {
@@ -177,6 +178,7 @@ public class FileSystemUtils
             {
                 dirPath = sourcePath + ZIP_SEPARATOR;
                 ZipEntry entry = new ZipEntry(dirPath);
+                entry.setTime(modifiedTime);
                 os.putNextEntry(entry);
             }
 
@@ -191,6 +193,7 @@ public class FileSystemUtils
         else
         {
             ZipEntry entry = new ZipEntry(sourcePath);
+            entry.setTime(modifiedTime);
             os.putNextEntry(entry);
 
             FileInputStream is = null;
@@ -213,6 +216,7 @@ public class FileSystemUtils
         while ((entry = zin.getNextEntry()) != null)
         {
             File file = new File(dir, entry.getName());
+
             if (entry.isDirectory())
             {
                 file.mkdir();
@@ -221,6 +225,8 @@ public class FileSystemUtils
             {
                 unzip(zin, file);
             }
+
+            file.setLastModified(entry.getTime());
         }
         zin.close();
     }
