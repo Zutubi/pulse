@@ -224,6 +224,26 @@ public class FileSystemUtils
             else
             {
                 unzip(zin, file);
+
+                Process p = null;
+
+                try
+                {
+                    ProcessBuilder builder = new ProcessBuilder("chmod", "+x", file.getAbsolutePath());
+                    p = builder.start();
+                    p.waitFor();
+                }
+                catch(Exception e)
+                {
+                    // Ignored
+                }
+                finally
+                {
+                    if(p != null)
+                    {
+                        p.destroy();
+                    }
+                }
             }
 
             file.setLastModified(entry.getTime());
