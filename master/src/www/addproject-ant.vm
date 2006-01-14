@@ -1,0 +1,26 @@
+<html>
+<head>
+    <title>ant project</title>
+</head>
+<content tag="action">ant.project.create</content>
+<body>
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='addProject.action'" "method='post'")
+
+    <h3>ant project</h3>
+
+    <fieldset>
+        #tag (TextField "name='details.buildFile'" "label='ant.fileName'" "required='true'" "tabindex='1'")
+        #tag (TextField "name='details.targets'" "label='ant.targets'" "tabindex='2'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('finish.name')" "name='finish'" "tabindex='3'")
+        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='4'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
+    </fieldset>
+
+ #end
+</body>
+</html>

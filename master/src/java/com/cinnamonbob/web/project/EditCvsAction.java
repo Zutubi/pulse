@@ -35,7 +35,6 @@ public class EditCvsAction extends AbstractEditScmAction
     public String execute()
     {
         Cvs persistentCvs = (Cvs) getScmManager().getScm(getId());
-        persistentCvs.setName(scm.getName());
         persistentCvs.setPassword(scm.getPassword());
         persistentCvs.setPath(scm.getPath());
         persistentCvs.setRoot(scm.getRoot());

@@ -249,11 +249,17 @@
             <result name="success" type="redirect">/manageProject.action?id=${project}</result>
         </action>
 
-        <action name="deleteScm" class="com.cinnamonbob.web.project.DeleteScmAction">
-            <result name="input" type="velocity">view-project.vm</result>
-            <result name="cancel" type="velocity">view-project.vm</result>
-            <result name="error" type="velocity">view-project.vm</result>
-            <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+        <action name="addProject" class="com.cinnamonbob.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.cinnamonbob.web.project.AddProjectWizard</param>
+            <result name="project" type="velocity">addproject-project.vm</result>
+            <result name="cvs" type="velocity">addproject-cvs.vm</result>
+            <result name="svn" type="velocity">addproject-svn.vm</result>
+            <result name="p4" type="velocity">addproject-p4.vm</result>
+            <result name="custom" type="velocity">addproject-custom.vm</result>
+            <result name="ant" type="velocity">addproject-ant.vm</result>
+            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="cancel" type="redirect">/viewProjects.action</result>
         </action>
 
         <action name="addTrigger" class="com.cinnamonbob.web.wizard.WizardAction">

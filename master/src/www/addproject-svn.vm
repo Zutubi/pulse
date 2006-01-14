@@ -1,0 +1,31 @@
+<html>
+<head>
+    <title>subversion setup</title>
+</head>
+<content tag="action">scm.svn.create</content>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='addProject.action'" "method='post'")
+
+    <h3>subversion setup</h3>
+    <fieldset>
+        #tag (TextField "name='svn.path'" "label='scm.path'" "tabindex='2'")
+        #tag (TextField "name='svn.username'" "required='true'" "tabindex='3'")
+        #tag (Password "name='svn.password'" "tabindex='4'")
+        #tag (TextField "name='svn.url'" "required='true'" "tabindex='5'")
+        #tag (TextField "name='svn.keyfile'" "tabindex='6'")
+        #tag (Password "name='svn.passphrase'" "tabindex='7'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('next.name')" "name='next'" "tabindex='8'")
+        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='9'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='10'")
+    </fieldset>
+
+ #end
+
+</body>
+</html>

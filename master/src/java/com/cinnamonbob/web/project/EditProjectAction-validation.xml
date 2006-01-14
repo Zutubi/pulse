@@ -3,7 +3,12 @@
 <validators>
     <field name="project">
         <field-validator type="visitor">
-            <message>project: </message>
+            <message>project:</message>
+        </field-validator>
+    </field>
+    <field name="bobFileName">
+        <field-validator type="requiredstring">
+            <message>bob file is required</message>
         </field-validator>
     </field>
 </validators>

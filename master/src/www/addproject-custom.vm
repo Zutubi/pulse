@@ -1,0 +1,25 @@
+<html>
+<head>
+    <title>custom project</title>
+</head>
+<content tag="action">custom.project.create</content>
+<body>
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='addProject.action'" "method='post'")
+
+    <h3>custom project</h3>
+
+    <fieldset>
+        #tag (TextField "name='details.bobFileName'" "label='bobFileName'" "required='true'" "tabindex='1'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('finish.name')" "name='finish'" "tabindex='2'")
+        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='3'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
+    </fieldset>
+
+ #end
+</body>
+</html>

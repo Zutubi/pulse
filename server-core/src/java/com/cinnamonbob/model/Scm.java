@@ -12,21 +12,10 @@ import java.util.Properties;
  */
 public abstract class Scm extends Entity
 {
-    private String name;
     private String path;
     private Properties properties;
 
     public abstract SCMServer createServer() throws SCMException;
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
 
     protected Properties getProperties()
     {

@@ -34,7 +34,7 @@ public class MasterRecipeRunner implements Runnable
 
         try
         {
-            recipeProcessor.build(request.getId(), recipePaths, bootstrapper, request.getBobFile(), request.getRecipeName());
+            recipeProcessor.build(request.getId(), recipePaths, bootstrapper, request.getBobFileSource(), request.getRecipeName());
         }
         catch (BuildException e)
         {

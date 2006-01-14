@@ -1,5 +1,6 @@
 package com.cinnamonbob.web.project;
 
+import com.cinnamonbob.core.model.CustomBobFileDetails;
 import com.cinnamonbob.model.Project;
 
 /**
@@ -9,6 +10,7 @@ import com.cinnamonbob.model.Project;
 public class CreateProjectAction extends ProjectActionSupport
 {
     private Project project = new Project();
+    private String bobFileName = "bob.xml";
 
     public Project getProject()
     {
@@ -18,6 +20,16 @@ public class CreateProjectAction extends ProjectActionSupport
     public long getId()
     {
         return getProject().getId();
+    }
+
+    public String getBobFileName()
+    {
+        return bobFileName;
+    }
+
+    public void setBobFileName(String bobFileName)
+    {
+        this.bobFileName = bobFileName;
     }
 
     public void validate()
@@ -38,6 +50,7 @@ public class CreateProjectAction extends ProjectActionSupport
 
     public String execute()
     {
+        project.setBobFileDetails(new CustomBobFileDetails(bobFileName));
         getProjectManager().save(project);
         return SUCCESS;
     }

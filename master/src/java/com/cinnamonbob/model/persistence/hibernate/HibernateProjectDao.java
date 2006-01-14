@@ -1,16 +1,12 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
+import com.cinnamonbob.core.model.AntBobFileDetails;
+import com.cinnamonbob.core.model.CustomBobFileDetails;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.persistence.ProjectDao;
-import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.util.List;
-import com.cinnamonbob.util.logging.Logger;
 
 /**
  * 
@@ -33,5 +29,25 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
     public List<Project> findByLikeName(final String name)
     {
         return findByNamedQuery("findByLikeName", "name", name);
+    }
+
+    public void save(CustomBobFileDetails details)
+    {
+        getHibernateTemplate().saveOrUpdate(details);
+    }
+
+    public CustomBobFileDetails findCustomBobFileSource(long id)
+    {
+        return (CustomBobFileDetails) getHibernateTemplate().load(CustomBobFileDetails.class, id);
+    }
+
+    public void save(AntBobFileDetails source)
+    {
+        getHibernateTemplate().saveOrUpdate(source);
+    }
+
+    public AntBobFileDetails findAntBobFileSource(long id)
+    {
+        return (AntBobFileDetails) getHibernateTemplate().load(AntBobFileDetails.class, id);
     }
 }

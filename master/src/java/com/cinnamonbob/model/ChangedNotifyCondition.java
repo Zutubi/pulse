@@ -17,19 +17,17 @@ public class ChangedNotifyCondition implements NotifyCondition
     }
 
     /**
-     * @see NotifyCondition#satisfied(com.cinnamonbob.core.model.RecipeResult)
+     * @see NotifyCondition#satisfied(com.cinnamonbob.model.BuildResult)
      */
     public boolean satisfied(BuildResult result)
     {
         // look for a change.
-        for (BuildScmDetails scmDetails : result.getScmDetails().values())
+        BuildScmDetails scmDetails = result.getScmDetails();
+        for (Changelist changelist : scmDetails.getChangelists())
         {
-            for (Changelist changelist : scmDetails.getChangelists())
+            if (changelist.getChanges().size() > 0)
             {
-                if (changelist.getChanges().size() > 0)
-                {
-                    return true;
-                }
+                return true;
             }
         }
         return false;

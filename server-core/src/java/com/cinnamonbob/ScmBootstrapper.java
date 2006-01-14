@@ -4,12 +4,12 @@ import com.cinnamonbob.core.Bootstrapper;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.RecipePaths;
 import com.cinnamonbob.core.model.Change;
+import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.model.Scm;
 import com.cinnamonbob.scm.SCMException;
 
 import java.io.File;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A bootstrapper that populates the working directory by checking out from one
@@ -17,43 +17,40 @@ import java.util.List;
  */
 public class ScmBootstrapper implements Bootstrapper
 {
-    private List<ScmCheckoutDetails> checkouts;
+    public Scm scm;
+    public Revision revision;
 
-    public ScmBootstrapper()
+    public ScmBootstrapper(Scm scm)
     {
-        checkouts = new LinkedList<ScmCheckoutDetails>();
-    }
-
-    public void add(ScmCheckoutDetails details)
-    {
-        checkouts.add(details);
+        this.scm = scm;
     }
 
     public void bootstrap(long recipeId, RecipePaths paths)
     {
-        for (ScmCheckoutDetails details : checkouts)
+        File checkoutDir;
+
+        if (scm.getPath() != null)
         {
-            Scm scm = details.scm;
-            File checkoutDir;
-
-            if (scm.getPath() != null)
-            {
-                checkoutDir = new File(paths.getWorkDir(), scm.getPath());
-            }
-            else
-            {
-                checkoutDir = paths.getWorkDir();
-            }
-
-            try
-            {
-                // TODO this list is not needed, perhaps make it optional in SCM interface?
-                details.scm.createServer().checkout(recipeId, checkoutDir, details.revision, new LinkedList<Change>());
-            }
-            catch (SCMException e)
-            {
-                throw new BuildException("Error checking out from SCM '" + scm.getName() + "': " + e.getMessage(), e);
-            }
+            checkoutDir = new File(paths.getWorkDir(), scm.getPath());
         }
+        else
+        {
+            checkoutDir = paths.getWorkDir();
+        }
+
+        try
+        {
+            // TODO this list is not needed, perhaps make it optional in SCM interface?
+            scm.createServer().checkout(recipeId, checkoutDir, revision, new LinkedList<Change>());
+        }
+        catch (SCMException e)
+        {
+            throw new BuildException("Error checking out from SCM: " + e.getMessage(), e);
+        }
+    }
+
+    public void setRevision(Revision revision)
+    {
+        this.revision = revision;
     }
 }

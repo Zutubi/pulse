@@ -1,9 +1,6 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.core.model.StoredArtifact;
+import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.events.build.*;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.test.BobTestCase;
@@ -46,7 +43,7 @@ public class RecipeControllerTest extends BobTestCase
         childNode.setId(103);
         rootNode.addChild(childNode);
 
-        recipeRequest = new RecipeRequest(rootResult.getId(), "test-bob.xml", rootResult.getRecipeName());
+        recipeRequest = new RecipeRequest(rootResult.getId(), new CustomBobFileDetails("test-bob.xml"), rootResult.getRecipeName());
         dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), recipeRequest);
         recipeController = new RecipeController(rootNode, dispatchRequest, resultCollector, recipeQueue, buildManager);
     }
@@ -64,7 +61,7 @@ public class RecipeControllerTest extends BobTestCase
     public void testDispatchRequest()
     {
         // Initialising should cause a dispatch request, and should initialise the bootstrapper
-        ScmBootstrapper bootstrapper = new ScmBootstrapper();
+        ScmBootstrapper bootstrapper = new ScmBootstrapper(new Svn());
         recipeController.initialise(bootstrapper);
         assertTrue(recipeQueue.hasDispatched(rootResult.getId()));
         RecipeDispatchRequest dispatched = recipeQueue.getRequest(rootResult.getId());

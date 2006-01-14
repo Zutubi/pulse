@@ -83,49 +83,47 @@ public class BuildController implements EventListener
 
     private ScmBootstrapper createBuildBootstrapper()
     {
-        ScmBootstrapper bootstrapper = new ScmBootstrapper();
+        Scm scm = project.getScm();
+        ScmBootstrapper bootstrapper = new ScmBootstrapper(scm);
 
-        for (Scm scm : project.getScms())
+        try
         {
+            SCMServer server = scm.createServer();
+            Revision latestRevision = server.getLatestRevision();
+            bootstrapper.setRevision(latestRevision);
+
+            // collect scm changes to be added to the build results.
+            List<Changelist> scmChanges = null;
+
             try
             {
-                SCMServer server = scm.createServer();
-                Revision latestRevision = server.getLatestRevision();
-                bootstrapper.add(new ScmCheckoutDetails(scm, latestRevision));
+                List<BuildResult> previousBuildResults = buildManager.getLatestBuildResultsForProject(project, 2);
 
-                // collect scm changes to be added to the build results.
-                List<Changelist> scmChanges = null;
-
-                try
+                if (previousBuildResults.size() == 2)
                 {
-                    List<BuildResult> previousBuildResults = buildManager.getLatestBuildResultsForProject(project, 2);
-
-                    if (previousBuildResults.size() == 2)
+                    BuildScmDetails previousScmDetails = previousBuildResults.get(1).getScmDetails();
+                    if (previousScmDetails != null)
                     {
-                        BuildScmDetails previousScmDetails = previousBuildResults.get(1).getScmDetails(scm.getId());
-                        if (previousScmDetails != null)
+                        Revision previousRevision = previousScmDetails.getRevision();
+                        if (previousRevision != null)
                         {
-                            Revision previousRevision = previousScmDetails.getRevision();
-                            if (previousRevision != null)
-                            {
-                                scmChanges = server.getChanges(previousRevision, latestRevision, "");
-                            }
+                            scmChanges = server.getChanges(previousRevision, latestRevision, "");
                         }
                     }
                 }
-                catch (SCMException e)
-                {
-                    // TODO: need to report this failure to the user. However, this is not fatal to the current build
-                    LOG.warning("Unable to retrieve changelist details from SCM server. ", e);
-                }
-
-                BuildScmDetails scmDetails = new BuildScmDetails(scm.getName(), latestRevision, scmChanges);
-                buildResult.addScmDetails(scm.getId(), scmDetails);
             }
             catch (SCMException e)
             {
-                throw new BuildException("Could not retrieve latest revision from SCM '" + scm.getName() + "'", e);
+                // TODO: need to report this failure to the user. However, this is not fatal to the current build
+                LOG.warning("Unable to retrieve changelist details from SCM server. ", e);
             }
+
+            BuildScmDetails scmDetails = new BuildScmDetails(latestRevision, scmChanges);
+            buildResult.setScmDetails(scmDetails);
+        }
+        catch (SCMException e)
+        {
+            throw new BuildException("Could not retrieve latest revision from SCM: " + e.getMessage(), e);
         }
 
         buildManager.save(buildResult);
@@ -146,7 +144,7 @@ public class BuildController implements EventListener
             MasterBuildPaths paths = new MasterBuildPaths();
             recipeResult.setOutputDir(paths.getRecipeDir(project, buildResult, recipeResult.getId()).getAbsolutePath());
 
-            RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), project.getBobFile(), stage.getRecipe());
+            RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), null, stage.getRecipe());
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), recipeRequest);
             RecipeController rc = new RecipeController(childResultNode, dispatchRequest, collector, queue, buildManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
@@ -201,7 +199,7 @@ public class BuildController implements EventListener
         tree.prepare(buildResult);
 
         // execute the first level of recipe controllers...
-        Bootstrapper initialBootstrapper = createBuildBootstrapper();
+        ScmBootstrapper initialBootstrapper = createBuildBootstrapper();
         initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
     }
 

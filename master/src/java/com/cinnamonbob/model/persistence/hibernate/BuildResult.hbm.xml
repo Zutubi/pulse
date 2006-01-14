@@ -25,11 +25,8 @@
 
         <many-to-one name="project" column="PROJECT" class="com.cinnamonbob.model.Project" cascade="none"/>
 
-        <map name="scmDetails" cascade="all-delete-orphan" lazy="false">
-            <key column="BUILD_RESULT_ID"/>
-            <index column="SCM_ID" type="long"/>
-            <one-to-many class="com.cinnamonbob.model.BuildScmDetails"/>
-        </map>
+        <many-to-one name="scmDetails" class="com.cinnamonbob.model.BuildScmDetails" column="SCM_DETAILS"
+                     cascade="all-delete-orphan" lazy="false"/>
 
         <many-to-one name="root" class="com.cinnamonbob.model.RecipeResultNode" column="RECIPE_RESULT_ID"
                      cascade="all"/>
@@ -41,8 +38,6 @@
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
-
-        <property name="scmName" type="string" length="255"/>
 
         <many-to-one name="revision" class="com.cinnamonbob.core.model.Revision" column="REVISION_ID" cascade="all"
                      unique="true"/>

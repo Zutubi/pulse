@@ -1,0 +1,31 @@
+<html>
+<head>
+    <title>perforce setup</title>
+</head>
+<content tag="action"></content>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='addProject.action'" "method='post'")
+
+    <h3>perforce setup</h3>
+
+    <fieldset>
+        #tag (TextField "name='p4.path'" "label='scm.path'" "tabindex='2'")
+        #tag (TextField "name='p4.port'" "required='true'" "tabindex='3'")
+        #tag (TextField "name='p4.user'" "required='true'" "tabindex='4'")
+        #tag (Password "name='p4.password'" "tabindex='5'")
+        #tag (TextField "name='p4.client'" "required='true'" "tabindex='6'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('next.name')" "name='next'" "tabindex='7'")
+        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='8'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='9'")
+    </fieldset>
+
+ #end
+
+</body>
+</html>

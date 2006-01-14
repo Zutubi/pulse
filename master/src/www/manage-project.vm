@@ -3,8 +3,8 @@
         <link href="build.css" rel="stylesheet" type="text/css">
         <title>$project.name</title>
         <content tag="action">project.view</content>
-    <content tag="navProject">$project.id</content>
-    <content tag="navProjectName">$project.name</content>
+        <content tag="navProject">$project.id</content>
+        <content tag="navProjectName">$project.name</content>
         <!-- a tick to the self updating webpage box... -->
         <meta http-equiv="refresh" content="30">
     </head>
@@ -18,29 +18,9 @@
             <table>
                 #detailrow("name" $project.name)
                 #detailrow("description" $project.description)
-                #detailrow("bob file" $project.bobFile)
+                #detailrow("bob file" $project.bobFileSource.bobFileName)
+                #scmdetailrow("scm" $project.scm)
                 #detailrow("action" "<a href='editProject!default.action?id=$project.id'>edit</a>")
-            </table>
-        </div>
-
-        <h2 class="command-info">scm details</h2>
-        <div class="command-content">
-            #set($scms = $project.scms)
-            <table>
-                <tr>
-                    <th class="command-detail">name</th>
-                    <th colspan="2" class="command-detail">actions</th>
-                </tr>
-            #foreach ($scm in $scms)
-                <tr>
-                    <td class="command-detail">#scmIcon($scm)<a href="">$scm.name</a></td>
-                    <td class="command-detail"><a href="editScm!default.action?id=$scm.id&project=$project.id">edit</a></td>
-                    <td class="command-detail"><a href="deleteScm.action?id=$project.id&name=$scm.name">delete</a></td>
-                </tr>
-            #end
-                <tr>
-                    <td colspan="3" class="command-detail"><b>+</b> <a href="createScm!default.action?project=$project.id">add new scm</a></td>
-                </tr>
             </table>
         </div>
 

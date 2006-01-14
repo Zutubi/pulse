@@ -12,7 +12,7 @@
     <fieldset>
         #tag (TextField "required='true'" "name='project.name'" "tabindex='1'")
         #tag (TextField "name='project.description'" "tabindex='2'")
-        #tag (TextField "required='true'" "name='project.bobFile'" "tabindex='3'")
+        #tag (TextField "required='true'" "name='bobFileName'" "tabindex='3'")
     </fieldset>
         
     <fieldset class="submit">

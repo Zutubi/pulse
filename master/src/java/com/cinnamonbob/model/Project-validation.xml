@@ -6,9 +6,4 @@
             <message>name is required.</message>
         </field-validator>
     </field>
-    <field name="bobFile">
-        <field-validator type="requiredstring">
-            <message>bob file is required.</message>
-        </field-validator>
-    </field>
 </validators>

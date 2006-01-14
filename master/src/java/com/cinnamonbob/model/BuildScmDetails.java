@@ -13,7 +13,6 @@ import java.util.List;
  */
 public class BuildScmDetails extends Entity
 {
-    private String scmName;
     private Revision revision;
     private List<Changelist> changelists;
 
@@ -22,21 +21,10 @@ public class BuildScmDetails extends Entity
 
     }
 
-    public BuildScmDetails(String scmName, Revision revision, List<Changelist> changelists)
+    public BuildScmDetails(Revision revision, List<Changelist> changelists)
     {
-        this.scmName = scmName;
         this.revision = revision;
         this.changelists = changelists;
-    }
-
-    public String getScmName()
-    {
-        return scmName;
-    }
-
-    private void setScmName(String scmName)
-    {
-        this.scmName = scmName;
     }
 
     public Revision getRevision()

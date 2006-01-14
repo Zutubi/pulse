@@ -1,8 +1,10 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.core.model.BobFileSource;
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.RecipeResult;
+import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.events.build.CommandCommencedEvent;
 import com.cinnamonbob.events.build.CommandCompletedEvent;
 import com.cinnamonbob.events.build.RecipeCommencedEvent;
@@ -10,7 +12,7 @@ import com.cinnamonbob.events.build.RecipeCompletedEvent;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,7 +38,7 @@ public class RecipeProcessor
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    public void build(long recipeId, RecipePaths paths, Bootstrapper bootstrapper, String bobFileName, String recipeName)
+    public void build(long recipeId, RecipePaths paths, Bootstrapper bootstrapper, BobFileSource bobFileSource, String recipeName)
     {
         // This result holds only the recipe details (stamps, state etc), not
         // the command results.  A full recipe result with command results is
@@ -51,7 +53,7 @@ public class RecipeProcessor
         {
             bootstrapper.bootstrap(recipeId, paths);
 
-            BobFile bobFile = loadBobFile(paths.getWorkDir(), bobFileName);
+            BobFile bobFile = loadBobFile(paths.getWorkDir(), bobFileSource);
             Recipe recipe;
 
             if (recipeName == null)
@@ -137,22 +139,26 @@ public class RecipeProcessor
         }
     }
 
-    private BobFile loadBobFile(File workDir, String bobFileName) throws BuildException
+    private BobFile loadBobFile(File workDir, BobFileSource bobFileSource) throws BuildException
     {
         List<Reference> properties = new LinkedList<Reference>();
         Property property = new Property("work.dir", workDir.getAbsolutePath());
         properties.add(property);
 
+        InputStream stream = null;
+
         try
         {
-            File bob = new File(workDir, bobFileName);
-            FileInputStream stream = new FileInputStream(bob);
-
+            stream = bobFileSource.getBobFile(workDir);
             return BobFileLoader.load(stream, resourceRepository, properties);
         }
         catch (Exception e)
         {
             throw new BuildException(e);
+        }
+        finally
+        {
+            IOUtils.close(stream);
         }
     }
 

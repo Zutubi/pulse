@@ -80,14 +80,13 @@ public class SetupDummyBuilds implements Runnable
     private Project setupProject(String name)
     {
         Project project = new Project(name, "A test project with a decently long description to test wrapping etc.");
-        project.setBobFile("bob.xml");
+        project.setBobFileDetails(new CustomBobFileDetails("bob.xml"));
 
         scm = new P4();
-        scm.setName("perforce");
         scm.setPort(":1666");
         scm.setUser("jsankey");
         scm.setClient("bob");
-        project.addScm(scm);
+        project.setScm(scm);
 
         BuildSpecification simpleSpec = new BuildSpecification("simple");
         BuildStage simpleStage = new BuildStage(new MasterBuildHostRequirements(), null);
@@ -129,8 +128,8 @@ public class SetupDummyBuilds implements Runnable
         list.addChange(new Change("/home/jsankey/some/branched/file", "1", Change.Action.BRANCH));
         changelists.add(list);
 
-        BuildScmDetails scmDetails = new BuildScmDetails(scm.getName(), new NumericalRevision(16672), changelists);
-        result.addScmDetails(scm.getId(), scmDetails);
+        BuildScmDetails scmDetails = new BuildScmDetails(new NumericalRevision(16672), changelists);
+        result.setScmDetails(scmDetails);
 
         result.commence(new File("/complex/build/output/dir"));
         RecipeResultNode rootResultNode = createComplexRecipe();

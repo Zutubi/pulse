@@ -1,7 +1,7 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.model.Scm;
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.model.Scm;
 
 /**
  *
@@ -35,19 +35,12 @@ public abstract class AbstractCreateScmAction extends ProjectActionSupport
             addActionError("No project with id '" + Long.toString(this.project) + "'");
             return;
         }
-
-        // ensure that the name is unique to the project.
-        Scm projectsScm = project.getScm(getScm().getName());
-        if (projectsScm != null)
-        {
-            addFieldError(getScmProperty() + ".name", "Name already within this project.");
-        }
     }
 
     public String execute()
     {
         Project project = getProjectManager().getProject(getProject());
-        project.addScm(getScm());
+        project.setScm(getScm());
         getProjectManager().save(project);
         return SUCCESS;
     }
@@ -58,6 +51,7 @@ public abstract class AbstractCreateScmAction extends ProjectActionSupport
     }
 
     public abstract Scm getScm();
+
     public abstract String getScmProperty();
 
 }

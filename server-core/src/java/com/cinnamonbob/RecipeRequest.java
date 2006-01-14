@@ -1,6 +1,7 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.core.Bootstrapper;
+import com.cinnamonbob.core.model.BobFileSource;
 
 /**
  * A request to execute a specific recipe.  Includes details about how to
@@ -18,19 +19,19 @@ public class RecipeRequest
      */
     private Bootstrapper bootstrapper;
     /**
-     * Path of the bobfile relative to the working root (after bootstrap).
+     * Source used to retrieve the bob file.
      */
-    private String bobFile;
+    private BobFileSource bobFileSource;
     /**
      * The name of the recipe to execute, or null to execute the default.
      */
     private String recipeName;
 
 
-    public RecipeRequest(long id, String bobFile, String recipeName)
+    public RecipeRequest(long id, BobFileSource bobFileSource, String recipeName)
     {
         this.id = id;
-        this.bobFile = bobFile;
+        this.bobFileSource = bobFileSource;
         this.recipeName = recipeName;
     }
 
@@ -44,9 +45,9 @@ public class RecipeRequest
         return bootstrapper;
     }
 
-    public String getBobFile()
+    public BobFileSource getBobFileSource()
     {
-        return bobFile;
+        return bobFileSource;
     }
 
     public String getRecipeName()

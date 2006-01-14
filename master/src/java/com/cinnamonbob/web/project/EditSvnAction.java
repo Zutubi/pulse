@@ -34,7 +34,6 @@ public class EditSvnAction extends AbstractEditScmAction
     public String execute()
     {
         Svn persistentSvn = (Svn) getScmManager().getScm(getId());
-        persistentSvn.setName(scm.getName());
         persistentSvn.setKeyfile(scm.getKeyfile());
         persistentSvn.setPassphrase(scm.getPassphrase());
         persistentSvn.setPassword(scm.getPassword());

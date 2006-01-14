@@ -285,11 +285,9 @@ public class FileSystemUtils
     }
 
     /**
-     *
      * @param src
      * @param dest
      * @param force delete the destination directory if it already exists before renaming.
-     *
      * @return true if the rename was successful, false otherwise.
      */
     public static boolean rename(File src, File dest, boolean force)
@@ -321,6 +319,21 @@ public class FileSystemUtils
         finally
         {
             IOUtils.close(ow);
+            IOUtils.close(os);
+        }
+    }
+
+    public static void createFile(File file, InputStream is) throws IOException
+    {
+        FileOutputStream os = null;
+
+        try
+        {
+            os = new FileOutputStream(file);
+            IOUtils.joinStreams(is, os);
+        }
+        finally
+        {
             IOUtils.close(os);
         }
     }

@@ -75,7 +75,7 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
     {
         RecipeResult recipeResult = createRecipe();
 
-        BuildScmDetails scmDetails = new BuildScmDetails("my scm", new NumericalRevision(42), null);
+        BuildScmDetails scmDetails = new BuildScmDetails(new NumericalRevision(42), null);
 
         Revision revision = new NumericalRevision(12345);
         revision.setDate(Calendar.getInstance().getTime());
@@ -95,7 +95,7 @@ public class HibernateBuildResultDaoTest extends PersistenceTestCase
 
         BuildResult buildResult = new BuildResult(project, 11);
         buildResult.commence(new File("/tmp/buildout"));
-        buildResult.addScmDetails(1, scmDetails);
+        buildResult.setScmDetails(scmDetails);
         RecipeResultNode recipeNode = new RecipeResultNode(recipeResult);
         recipeNode.setHost("test host");
         buildResult.getRoot().addChild(recipeNode);

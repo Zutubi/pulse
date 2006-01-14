@@ -3,6 +3,7 @@ package com.cinnamonbob.local;
 import com.cinnamonbob.core.*;
 import com.cinnamonbob.core.event.DefaultEventManager;
 import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.core.model.CustomBobFileDetails;
 import com.cinnamonbob.core.util.IOUtils;
 import org.apache.commons.cli.*;
 
@@ -145,7 +146,7 @@ public class LocalBuild
             RecipeProcessor processor = new RecipeProcessor();
             processor.setEventManager(manager);
             processor.setResourceRepository(repository);
-            processor.build(0, paths, bootstrapper, bobFile, recipe);
+            processor.build(0, paths, bootstrapper, new CustomBobFileDetails(bobFile), recipe);
         }
         catch (FileNotFoundException e)
         {

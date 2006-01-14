@@ -59,7 +59,7 @@ public class SlaveRecipeProcessor
 
         try
         {
-            recipeProcessor.build(request.getId(), processorPaths, bootstrapper, request.getBobFile(), request.getRecipeName());
+            recipeProcessor.build(request.getId(), processorPaths, bootstrapper, request.getBobFileSource(), request.getRecipeName());
         }
         catch (BuildException e)
         {

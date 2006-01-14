@@ -1,0 +1,28 @@
+<html>
+<head>
+    <title>project setup</title>
+</head>
+<content tag="action">scm.svn.create</content>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='addProject.action'" "method='post'")
+
+    <h3>project setup</h3>
+    <fieldset>
+        #tag (TextField "name='name'" "label='project.name'" "required='true'" "tabindex='1'")
+        #tag (TextField "name='description'" "label='project.description'" "tabindex='2'")
+        #tag (Select "list=scms" "name='scm'" "required='true'" "tabindex='3'")
+        #tag (Select "list=types" "name='type'" "required='true'" "tabindex='4'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('next.name')" "name='next'" "tabindex='5'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='6'")
+    </fieldset>
+
+ #end
+
+</body>
+</html>

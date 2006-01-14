@@ -41,7 +41,7 @@
       </tr>
 #end
       <tr>
-        <td class="command-detail" colspan="5"><b>+</b> <a href="createProject!default.action">add new project</a></td>
+        <td class="command-detail" colspan="5"><b>+</b> <a href="addProject.action">add new project</a></td>
       </tr>
     </table>
     </div>

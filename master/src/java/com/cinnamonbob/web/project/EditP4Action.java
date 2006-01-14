@@ -34,7 +34,6 @@ public class EditP4Action extends AbstractEditScmAction
     public String execute()
     {
         P4 persistentP4 = (P4) getScmManager().getScm(getId());
-        persistentP4.setName(scm.getName());
         persistentP4.setPassword(scm.getPassword());
         persistentP4.setPath(scm.getPath());
         persistentP4.setClient(scm.getClient());

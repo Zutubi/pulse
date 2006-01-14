@@ -15,8 +15,6 @@
   #end
 #end
 
-
-
 <html>
   <head>
     <title>$project.name build $result.number</title>
@@ -42,42 +40,38 @@
 
       <h2 class="command-info">changes</h2>
       <div class="command-content">
-        #foreach($scmDetails in $result.scmDetails.values())
-          #if($scmDetails.revision)
-            <table>
-              <tr>
-                <th class="build-info" colspan="4">$scmDetails.scmName</th>
-              </tr>
-              <tr>
-                <th class="command-detail" colspan="4">
-                  checked out revision $scmDetails.revision
-                </th>
-              </tr>
-            #set($changes = $scmDetails.changelists)
-	        #if($changes.size() > 0)
-                  <tr>
-                    <th class="command-detail">revision</th>
-                    <th class="command-detail">who</th>
-                    <th class="command-detail">when</th>
-                    <th class="command-detail">comment</th>
-                  </tr>
-              #foreach($change in $changes)
-                <tr>
-                  <td class="command-detail"><a href="viewChangelist.action?id=$change.id">$change.revision</a></td>
-                  <td class="command-detail">$change.user</td>
-                  <td class="command-detail">$change.date</td>
-                  <td class="command-detail">$change.comment</td>
-                </tr>
-              #end
-            #else
-              <tr>
-                <td class="command-detail" colspan="4">
-                  no changes since last build
-                </td>
-              </tr>
+        #set($scmDetails = $result.scmDetails)
+        #if($scmDetails.revision)
+          <table>
+            <tr>
+              <th class="command-detail" colspan="4">
+                checked out revision $scmDetails.revision
+              </th>
+            </tr>
+          #set($changes = $scmDetails.changelists)
+          #if($changes.size() > 0)
+            <tr>
+              <th class="command-detail">revision</th>
+              <th class="command-detail">who</th>
+              <th class="command-detail">when</th>
+              <th class="command-detail">comment</th>
+            </tr>
+            #foreach($change in $changes)
+            <tr>
+              <td class="command-detail"><a href="viewChangelist.action?id=$change.id">$change.revision</a></td>
+              <td class="command-detail">$change.user</td>
+              <td class="command-detail">$change.date</td>
+              <td class="command-detail">$change.comment</td>
+            </tr>
             #end
-            </table>
-	      #end
+          #else
+            <tr>
+              <td class="command-detail" colspan="4">
+                no changes since last build
+              </td>
+            </tr>
+          #end
+          </table>
 	    #end
 	  </div>
 
