@@ -10,6 +10,7 @@ import com.opensymphony.util.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -43,6 +44,11 @@ public class CvsServer implements SCMServer
         {
             throw new SCMException(e);
         }
+    }
+
+    public InputStream checkout(long id, Revision revision, String file) throws SCMException
+    {
+        throw new RuntimeException("Method not implemented.");
     }
 
     public List<Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException

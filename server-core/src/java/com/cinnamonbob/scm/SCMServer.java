@@ -5,6 +5,7 @@ import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.Revision;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -26,6 +27,17 @@ public interface SCMServer
      * @throws SCMException if an error occurs communicating with the server
      */
     Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException;
+
+    /**
+     * Checkout the specified file.
+     *
+     * @param id       a unique identifier for this checkout
+     * @param revision the revision be checked out
+     * @param file     the path of the file relative to the configured scms checkout path
+     * @return the contents of the requested file
+     * @throws SCMException
+     */
+    InputStream checkout(long id, Revision revision, String file) throws SCMException;
 
     /**
      * Returns a list of changelists occuring in between the given revisions.
