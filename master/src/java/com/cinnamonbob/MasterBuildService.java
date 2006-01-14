@@ -4,6 +4,7 @@ import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
 
@@ -12,6 +13,8 @@ import java.io.File;
  */
 public class MasterBuildService implements BuildService
 {
+    private static final Logger LOG = Logger.getLogger(MasterBuildService.class);
+
     private MasterRecipeProcessor masterRecipeProcessor;
     private ConfigurationManager configurationManager;
 
@@ -32,7 +35,7 @@ public class MasterBuildService implements BuildService
         ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager);
         File outputDir = recipePaths.getOutputDir();
 
-        if (!outputDir.renameTo(dir))
+        if (!FileSystemUtils.rename(outputDir, dir, true))
         {
             throw new BuildException("Unable to rename output directory '" + outputDir.getAbsolutePath() + "' to '" + dir.getAbsolutePath() + "'");
         }

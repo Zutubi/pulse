@@ -9,8 +9,6 @@ import com.cinnamonbob.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
-import org.netbeans.lib.cvsclient.commandLine.command.log;
-//import org.netbeans.lib.cvsclient.util.Logger;
 import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
 import org.netbeans.lib.cvsclient.command.CommandAbortedException;
 import org.netbeans.lib.cvsclient.command.CommandException;
@@ -27,7 +25,6 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
 
 /**
  * Allows for the system to interact with a cvs repository.
@@ -60,7 +57,10 @@ public class CvsClient
     {
         this.root = root;
 
-        //org.netbeans.lib.cvsclient.util.Logger.setLogging("system");
+        //TODO: Integrate the following logging into the systems logging. This information
+        //      will be very useful in tracking problems with the cvs client integration.
+        //      It will likely require patching the cvsclient.util.Logger code.
+        org.netbeans.lib.cvsclient.util.Logger.setLogging("system");
     }
 
     /**
