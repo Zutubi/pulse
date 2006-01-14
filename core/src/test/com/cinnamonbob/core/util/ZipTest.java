@@ -11,7 +11,7 @@ import java.util.zip.ZipInputStream;
 
 /**
  */
-public class FileSystemUtilsTest extends BobTestCase
+public class ZipTest extends BobTestCase
 {
     File tmpDir;
     File inDir;
@@ -23,7 +23,7 @@ public class FileSystemUtilsTest extends BobTestCase
     {
         super.setUp();
         // Create a temporary working directory
-        tmpDir = FileSystemUtils.createTempDirectory(FileSystemUtilsTest.class.getName(), "");
+        tmpDir = FileSystemUtils.createTempDirectory(ZipTest.class.getName(), "");
         inDir = new File(tmpDir, "in");
         inDir.mkdir();
         outDir = new File(tmpDir, "out");

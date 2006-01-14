@@ -26,34 +26,47 @@ public class FileSystemUtils
         {
             return true;
         }
+
         if (!dir.isDirectory())
         {
             return false;
         }
 
-        String[] contents = dir.list();
+        String canonicalDir;
 
+        try
+        {
+            canonicalDir = dir.getCanonicalPath();
+        }
+        catch (IOException e)
+        {
+            return false;
+        }
+
+        String[] contents = dir.list();
         assert(contents != null);
 
         for (String child : contents)
         {
             File file = new File(dir, child);
-            String canonical;
+            String canonicalFile;
 
             // The canonical path lets us distinguish symlinks from actual
             // directories.
             try
             {
-                canonical = file.getCanonicalPath();
+                canonicalFile = file.getCanonicalPath();
             }
             catch (IOException e)
             {
                 return false;
             }
 
-            // TODO: Fix the following condition - fails in windows since because of 8.3 file names
-            // do not follow symlinks when deleting directories.            
-            if (file.isDirectory()) // && canonical.equals(file.getAbsolutePath()))
+            // We don't want to traverse symbolic links to directories.
+            // The canonical path tells us where the file really is, and we
+            // double check it is under the directory (using the canonical
+            // path for the directory too).
+            if (file.isDirectory() && canonicalFile.startsWith(canonicalDir))
             {
                 if (!removeDirectory(file))
                 {
@@ -229,17 +242,18 @@ public class FileSystemUtils
 
                 try
                 {
+                    // TODO: at the very least, only do this where necessary!
                     ProcessBuilder builder = new ProcessBuilder("chmod", "+x", file.getAbsolutePath());
                     p = builder.start();
                     p.waitFor();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     // Ignored
                 }
                 finally
                 {
-                    if(p != null)
+                    if (p != null)
                     {
                         p.destroy();
                     }
@@ -248,18 +262,43 @@ public class FileSystemUtils
 
             file.setLastModified(entry.getTime());
         }
-        zin.close();
     }
 
     private static void unzip(InputStream zin, File file) throws IOException
     {
-        FileOutputStream out = new FileOutputStream(file);
-        byte [] b = new byte[512];
-        int len = 0;
-        while ((len = zin.read(b)) != -1)
+        FileOutputStream out = null;
+
+        try
         {
-            out.write(b, 0, len);
+            out = new FileOutputStream(file);
+            byte [] b = new byte[512];
+            int len = 0;
+            while ((len = zin.read(b)) != -1)
+            {
+                out.write(b, 0, len);
+            }
         }
-        out.close();
+        finally
+        {
+            IOUtils.close(out);
+        }
+    }
+
+    public static void createFile(File file, String data) throws IOException
+    {
+        FileOutputStream os = null;
+        OutputStreamWriter ow = null;
+
+        try
+        {
+            os = new FileOutputStream(file);
+            ow = new OutputStreamWriter(os);
+            ow.write(data);
+        }
+        finally
+        {
+            IOUtils.close(ow);
+            IOUtils.close(os);
+        }
     }
 }

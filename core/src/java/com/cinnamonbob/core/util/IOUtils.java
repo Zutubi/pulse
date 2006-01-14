@@ -154,8 +154,8 @@ public class IOUtils
         }
         finally
         {
-            IOUtils.close(inStream);
-            IOUtils.close(outStream);
+            close(inStream);
+            close(outStream);
         }
     }
 
@@ -169,7 +169,20 @@ public class IOUtils
 
     public static String fileToString(File file) throws IOException
     {
-        FileInputStream is = new FileInputStream(file);
-        return inputStreamToString(is);
+        FileInputStream is = null;
+        String result;
+
+        try
+        {
+            is = new FileInputStream(file);
+            result = inputStreamToString(is);
+        }
+        finally
+        {
+            close(is);
+        }
+
+        return result;
     }
+
 }
