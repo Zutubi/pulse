@@ -10,7 +10,6 @@ import com.opensymphony.util.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -46,7 +45,7 @@ public class CvsServer implements SCMServer
         }
     }
 
-    public InputStream checkout(long id, Revision revision, String file) throws SCMException
+    public String checkout(Revision revision, String file) throws SCMException
     {
         throw new RuntimeException("Method not implemented.");
     }

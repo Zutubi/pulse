@@ -1,7 +1,5 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.core.model.BobFileDetails;
-import com.cinnamonbob.core.model.CustomBobFileDetails;
 import com.cinnamonbob.core.model.Entity;
 
 import java.util.LinkedList;

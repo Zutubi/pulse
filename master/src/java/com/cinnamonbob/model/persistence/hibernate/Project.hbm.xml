@@ -11,7 +11,7 @@
         <property name="name" column="NAME" type="string" length="255"/>
         <property name="description" column="DESCRIPTION" type="string" length="4096"/>
 
-        <many-to-one name="bobFileDetails" class="com.cinnamonbob.core.model.BobFileDetails" column="BOB_FILE_DETAILS"
+        <many-to-one name="bobFileDetails" class="com.cinnamonbob.model.BobFileDetails" column="BOB_FILE_DETAILS"
                      lazy="false" cascade="all"/>
 
         <many-to-one name="scm" class="com.cinnamonbob.model.Scm" column="SCM" cascade="all-delete-orphan"
@@ -23,7 +23,7 @@
         </bag>
     </class>
 
-    <class name="com.cinnamonbob.core.model.BobFileDetails">
+    <class name="com.cinnamonbob.model.BobFileDetails">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -31,13 +31,13 @@
 
         <discriminator column="SOURCE_TYPE" type="string" length="63"/>
 
-        <subclass name="com.cinnamonbob.core.model.CustomBobFileDetails" discriminator-value="CUSTOM">
+        <subclass name="com.cinnamonbob.model.CustomBobFileDetails" discriminator-value="CUSTOM">
 
             <property name="bobFileName" column="BOB_FILE_NAME" type="string" length="255"/>
 
         </subclass>
 
-        <subclass name="com.cinnamonbob.core.model.AntBobFileDetails" discriminator-value="ANT">
+        <subclass name="com.cinnamonbob.model.AntBobFileDetails" discriminator-value="ANT">
 
             <property name="buildFile" column="BUILD_FILE" type="string" length="255"/>
 
@@ -50,6 +50,7 @@
             </map>
 
         </subclass>
+
     </class>
 
     <query name="findByLikeName"><![CDATA[

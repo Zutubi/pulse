@@ -37,6 +37,7 @@ public class BuildController implements EventListener
     private RecipeResultCollector collector;
     private BuildTree tree;
     private BuildResult buildResult;
+    private ScmBootstrapper initialBootstrapper;
     private AsynchronousDelegatingListener asyncListener;
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
 
@@ -144,7 +145,7 @@ public class BuildController implements EventListener
             MasterBuildPaths paths = new MasterBuildPaths();
             recipeResult.setOutputDir(paths.getRecipeDir(project, buildResult, recipeResult.getId()).getAbsolutePath());
 
-            RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), null, stage.getRecipe());
+            RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe());
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), recipeRequest);
             RecipeController rc = new RecipeController(childResultNode, dispatchRequest, collector, queue, buildManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
@@ -196,10 +197,12 @@ public class BuildController implements EventListener
             throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
         }
 
-        tree.prepare(buildResult);
+        ScmBootstrapper initialBootstrapper = createBuildBootstrapper();
+        String bobFileSource = project.getBobFileDetails().getBobFile(project, initialBootstrapper.getRevision());
+
+        tree.prepare(buildResult, bobFileSource);
 
         // execute the first level of recipe controllers...
-        ScmBootstrapper initialBootstrapper = createBuildBootstrapper();
         initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
     }
 

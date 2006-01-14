@@ -14,8 +14,8 @@ import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.internal.ws.fs.FSEntryFactory;
 import org.tmatesoft.svn.core.io.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -246,9 +246,20 @@ public class SVNServer implements SCMServer
         return new NumericalRevision(revisionNumber);
     }
 
-    public InputStream checkout(long id, Revision revision, String file) throws SCMException
+    public String checkout(Revision revision, String file) throws SCMException
     {
-        throw new RuntimeException("Method not implemented.");
+        ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
+
+        try
+        {
+            repository.getFile(file, convertRevision(revision), null, os);
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
+
+        return os.toString();
     }
 
     public List<Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException

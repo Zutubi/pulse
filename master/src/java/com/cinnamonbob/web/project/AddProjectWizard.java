@@ -1,8 +1,5 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.core.model.AntBobFileDetails;
-import com.cinnamonbob.core.model.BobFileDetails;
-import com.cinnamonbob.core.model.CustomBobFileDetails;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.web.wizard.BaseWizard;
 import com.cinnamonbob.web.wizard.BaseWizardState;

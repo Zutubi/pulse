@@ -1,6 +1,9 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.core.model.*;
+import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.RecipeResult;
+import com.cinnamonbob.core.model.ResultState;
+import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.events.build.*;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.test.BobTestCase;
@@ -43,7 +46,7 @@ public class RecipeControllerTest extends BobTestCase
         childNode.setId(103);
         rootNode.addChild(childNode);
 
-        recipeRequest = new RecipeRequest(rootResult.getId(), new CustomBobFileDetails("test-bob.xml"), rootResult.getRecipeName());
+        recipeRequest = new RecipeRequest(rootResult.getId(), rootResult.getRecipeName());
         dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), recipeRequest);
         recipeController = new RecipeController(rootNode, dispatchRequest, resultCollector, recipeQueue, buildManager);
     }

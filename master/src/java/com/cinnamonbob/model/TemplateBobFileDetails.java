@@ -1,6 +1,7 @@
-package com.cinnamonbob.core.model;
+package com.cinnamonbob.model;
 
 import com.cinnamonbob.core.BuildException;
+import com.cinnamonbob.core.model.Revision;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
@@ -10,11 +11,9 @@ import java.io.StringWriter;
  */
 public abstract class TemplateBobFileDetails extends BobFileDetails
 {
-    public BobFileSource getSource()
+    public String getBobFile(Project project, Revision revision)
     {
-        String data;
         VelocityEngine engine = new VelocityEngine();
-
         try
         {
             engine.setProperty("file.resource.loader.path", "/home/jsankey/svn/bob/trunk/master/src/templates/bob-file");
@@ -23,14 +22,12 @@ public abstract class TemplateBobFileDetails extends BobFileDetails
             populateContext(context);
             StringWriter stringWriter = new StringWriter(1024);
             engine.mergeTemplate(getTemplateName(), context, stringWriter);
-            data = stringWriter.getBuffer().toString();
+            return stringWriter.getBuffer().toString();
         }
         catch (Exception e)
         {
             throw new BuildException("Loading template bob file: " + e.getMessage(), e);
         }
-
-        return new InMemoryBobFileSource(data);
     }
 
     protected abstract String getTemplateName();

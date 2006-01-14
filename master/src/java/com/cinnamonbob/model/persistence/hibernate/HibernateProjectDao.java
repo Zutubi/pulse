@@ -1,7 +1,7 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.core.model.AntBobFileDetails;
-import com.cinnamonbob.core.model.CustomBobFileDetails;
+import com.cinnamonbob.model.AntBobFileDetails;
+import com.cinnamonbob.model.CustomBobFileDetails;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.persistence.ProjectDao;
 import com.cinnamonbob.util.logging.Logger;

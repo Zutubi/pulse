@@ -37,9 +37,10 @@ public class RecipeController
         this.buildManager = manager;
     }
 
-    public void prepare(BuildResult buildResult)
+    public void prepare(BuildResult buildResult, String bobFileSource)
     {
         // Errors handled by BuildController
+        dispatchRequest.getRequest().setBobFileSource(bobFileSource);
         collector.prepare(buildResult, recipeResultNode.getResult().getId());
     }
 

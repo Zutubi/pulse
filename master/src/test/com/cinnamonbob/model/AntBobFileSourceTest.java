@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.model;
+package com.cinnamonbob.model;
 
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
@@ -48,10 +48,9 @@ public class AntBobFileSourceTest extends BobTestCase
 
     private void createAndVerify(AntBobFileDetails source, String expectedName) throws IOException
     {
-        InputStream gotStream = source.getSource().getBobFile(tmpDir);
         InputStream expectedStream = getInput(expectedName);
 
-        String got = IOUtils.inputStreamToString(gotStream);
+        String got = source.getBobFile(null, null);
         String expected = IOUtils.inputStreamToString(expectedStream);
 
         assertEquals(expected, got);

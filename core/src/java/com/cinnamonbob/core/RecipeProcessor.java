@@ -1,7 +1,6 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.event.EventManager;
-import com.cinnamonbob.core.model.BobFileSource;
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.util.IOUtils;
@@ -11,6 +10,7 @@ import com.cinnamonbob.events.build.RecipeCommencedEvent;
 import com.cinnamonbob.events.build.RecipeCompletedEvent;
 import com.cinnamonbob.util.logging.Logger;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -38,7 +38,7 @@ public class RecipeProcessor
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    public void build(long recipeId, RecipePaths paths, Bootstrapper bootstrapper, BobFileSource bobFileSource, String recipeName)
+    public void build(long recipeId, RecipePaths paths, Bootstrapper bootstrapper, String bobFileSource, String recipeName)
     {
         // This result holds only the recipe details (stamps, state etc), not
         // the command results.  A full recipe result with command results is
@@ -139,7 +139,7 @@ public class RecipeProcessor
         }
     }
 
-    private BobFile loadBobFile(File workDir, BobFileSource bobFileSource) throws BuildException
+    private BobFile loadBobFile(File workDir, String bobFileSource) throws BuildException
     {
         List<Reference> properties = new LinkedList<Reference>();
         Property property = new Property("work.dir", workDir.getAbsolutePath());
@@ -149,7 +149,7 @@ public class RecipeProcessor
 
         try
         {
-            stream = bobFileSource.getBobFile(workDir);
+            stream = new ByteArrayInputStream(bobFileSource.getBytes());
             return BobFileLoader.load(stream, resourceRepository, properties);
         }
         catch (Exception e)

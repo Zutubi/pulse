@@ -1,6 +1,6 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.core.model.CustomBobFileDetails;
+import com.cinnamonbob.model.CustomBobFileDetails;
 import com.cinnamonbob.model.Project;
 
 /**

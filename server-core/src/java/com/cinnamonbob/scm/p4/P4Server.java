@@ -382,9 +382,12 @@ public class P4Server implements SCMServer
         return revision;
     }
 
-    public InputStream checkout(long id, Revision revision, String file) throws SCMException
+    public String checkout(Revision revision, String file) throws SCMException
     {
-        throw new RuntimeException("Method not implemented.");
+        getClientRoot();
+        File bobFile = new File(clientRoot, file);
+        P4Result result = runP4(null, P4_COMMAND, "print", "-q", bobFile.getAbsolutePath() + "@" + revision);
+        return result.stdout.toString();
     }
 
     public List<Changelist> getChanges(Revision from, Revision to, String... paths) throws SCMException

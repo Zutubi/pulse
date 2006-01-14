@@ -92,7 +92,7 @@ public class DefaultRecipeQueueTest extends TestCase
     private RecipeDispatchRequest createDispatchRequest()
     {
         BuildHostRequirements requirements = new MockBuildHostRequirements();
-        RecipeRequest request = new RecipeRequest(-1, null, null);
+        RecipeRequest request = new RecipeRequest(-1, null);
         return new RecipeDispatchRequest(requirements, request);
     }
 

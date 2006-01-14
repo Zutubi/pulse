@@ -49,8 +49,14 @@ public class ScmBootstrapper implements Bootstrapper
         }
     }
 
+    public Revision getRevision()
+    {
+        return revision;
+    }
+
     public void setRevision(Revision revision)
     {
         this.revision = revision;
     }
+
 }

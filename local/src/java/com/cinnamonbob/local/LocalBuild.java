@@ -3,14 +3,10 @@ package com.cinnamonbob.local;
 import com.cinnamonbob.core.*;
 import com.cinnamonbob.core.event.DefaultEventManager;
 import com.cinnamonbob.core.event.EventManager;
-import com.cinnamonbob.core.model.CustomBobFileDetails;
 import com.cinnamonbob.core.util.IOUtils;
 import org.apache.commons.cli.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.*;
 
 /**
  * Entry point for executing local builds within a development tree.
@@ -111,7 +107,7 @@ public class LocalBuild
      * relative to the current working directory.
      *
      * @param workDir       the working directory in which to execute the build
-     * @param bobFile       the name of the bobfile to load
+     * @param bobFileName   the name of the bobfile to load
      * @param recipe        the recipe to execute, may be null to indicate the default
      *                      recipe in the given bobfile
      * @param resourcesFile the resources file to load prior to building , or null if no
@@ -120,9 +116,9 @@ public class LocalBuild
      *                      and save results to
      * @throws BobException
      */
-    public void runBuild(File workDir, String bobFile, String recipe, String resourcesFile, String outputDir) throws BobException
+    public void runBuild(File workDir, String bobFileName, String recipe, String resourcesFile, String outputDir) throws BobException
     {
-        printPrologue(bobFile, resourcesFile, outputDir);
+        printPrologue(bobFileName, resourcesFile, outputDir);
 
         ResourceRepository repository = createRepository(resourcesFile);
         RecipePaths paths = new LocalRecipePaths(workDir, outputDir);
@@ -133,12 +129,13 @@ public class LocalBuild
         }
 
         File logFile = new File(workDir, "build.log");
+        File bobFile = new File(workDir, bobFileName);
         FileOutputStream logStream = null;
-
+        FileInputStream bobFileInputStream = null;
         try
         {
             logStream = new FileOutputStream(logFile);
-
+            bobFileInputStream = new FileInputStream(bobFile);
             EventManager manager = new DefaultEventManager();
             manager.register(new BuildStatusPrinter(paths.getWorkDir(), logStream));
 
@@ -146,15 +143,20 @@ public class LocalBuild
             RecipeProcessor processor = new RecipeProcessor();
             processor.setEventManager(manager);
             processor.setResourceRepository(repository);
-            processor.build(0, paths, bootstrapper, new CustomBobFileDetails(bobFile), recipe);
+            processor.build(0, paths, bootstrapper, IOUtils.inputStreamToString(bobFileInputStream), recipe);
         }
         catch (FileNotFoundException e)
         {
             throw new BobException("Unable to create log file '" + logFile.getPath() + "': " + e.getMessage());
         }
+        catch (IOException e)
+        {
+            throw new BobException("Unable to load bob file '" + bobFile.getPath() + "': " + e.getMessage());
+        }
         finally
         {
             IOUtils.close(logStream);
+            IOUtils.close(bobFileInputStream);
         }
 
         printEpilogue(logFile);
