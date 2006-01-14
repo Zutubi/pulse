@@ -71,6 +71,7 @@ public class WizardAction extends ActionSupport
         }
         catch (RuntimeException e)
         {
+            LOG.severe(e);
             // remove the wizard from the session so that we can start fresh
             Map session = ActionContext.getContext().getSession();
             session.remove(wizardClass);
@@ -78,7 +79,7 @@ public class WizardAction extends ActionSupport
         }
     }
 
-    public String doExecute()
+    private String doExecute()
     {
         Map session = ActionContext.getContext().getSession();
         Wizard wizard = getWizard();
@@ -103,43 +104,6 @@ public class WizardAction extends ActionSupport
         }
         return nextState;
     }
-//        // lookup wizard.
-//        if (isInitialRequest())
-//        {
-//            // this is the first time this wizard is being executed.
-//            WizardState initialState = wizard.getCurrentState();
-//            initialState.initialise();
-//            return initialState.getStateName();
-//        }
-//
-//        WizardState currentState = wizard.getCurrentState();
-//
-//        // validate the current state.
-//        doValidation(currentState);
-//        if (currentState.hasErrors())
-//        {
-//            // if there are validation errors, we want to stay in the current state.
-//            return currentState.getStateName();
-//        }
-//
-//        currentState.execute();
-//        WizardState next = wizard.getState(currentState.getNextState());
-//
-//        if (next == null)
-//        {
-//            // The wizard is complete.
-//            // - remove wizard from the session so that it can be executed again.
-//            wizard.process();
-//            wizard.setCurrentState(null);
-//            session.remove(wizardClass);
-//            return SUCCESS;
-//        }
-//
-//        wizard.setCurrentState(next);
-//
-//        next.initialise();
-//
-//        return next.getStateName();
 
     public Wizard getWizard()
     {
