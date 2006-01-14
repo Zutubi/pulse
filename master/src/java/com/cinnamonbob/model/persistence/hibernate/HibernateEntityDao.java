@@ -5,6 +5,7 @@ import com.cinnamonbob.model.persistence.EntityDao;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -19,7 +20,14 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
 {
     public T findById(long id)
     {
-        return (T) getHibernateTemplate().load(persistentClass(), Long.valueOf(id));
+        try
+        {
+            return (T) getHibernateTemplate().load(persistentClass(), Long.valueOf(id));
+        }
+        catch (ObjectNotFoundException onfe)
+        {
+            return null;
+        }
     }
 
     public List<T> findAll()

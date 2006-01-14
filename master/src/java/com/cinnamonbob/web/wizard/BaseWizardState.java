@@ -2,6 +2,7 @@ package com.cinnamonbob.web.wizard;
 
 import com.opensymphony.xwork.ValidationAware;
 import com.opensymphony.xwork.ValidationAwareSupport;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.util.Collection;
 import java.util.Map;
@@ -11,6 +12,8 @@ import java.util.Map;
  */
 public abstract class BaseWizardState implements WizardState
 {
+    private static final Logger LOG = Logger.getLogger(BaseWizardState.class);
+
     private final String stateName;
     private Wizard wizard;
 
@@ -24,7 +27,7 @@ public abstract class BaseWizardState implements WizardState
 
     public void initialise()
     {
-
+        clearErrors();
     }
 
     public void execute()
@@ -32,7 +35,7 @@ public abstract class BaseWizardState implements WizardState
 
     }
 
-    public final String getStateName()
+    public final String getWizardStateName()
     {
         return stateName;
     }
@@ -53,6 +56,7 @@ public abstract class BaseWizardState implements WizardState
 
     public void addActionError(String anErrorMessage)
     {
+        LOG.severe("addActionError: " + anErrorMessage);
         validationAware.addActionError(anErrorMessage);
     }
 

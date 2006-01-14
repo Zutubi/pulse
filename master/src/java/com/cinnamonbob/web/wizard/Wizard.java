@@ -5,13 +5,28 @@ package com.cinnamonbob.web.wizard;
  */
 public interface Wizard
 {
+    /**
+     * Retrieve the current state of the wizard.
+     *
+     * @return the current wizard state.
+     */
     WizardState getCurrentState();
 
-    void setCurrentState(WizardState next);
-
-    WizardState getState(String state);
-
+    /**
+     * Returns true if this wizard has been completed and requires processing.
+     *
+     * @return true if complete, false otherwise.
+     */
     boolean isComplete();
 
+    /**
+     *
+     */
     void process();
+
+    String traverseForward();
+
+    String traverseBackward();
+
+    void cancel();
 }

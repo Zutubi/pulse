@@ -5,9 +5,6 @@ import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.web.ActionSupport;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
-import com.opensymphony.xwork.Validateable;
-import com.opensymphony.xwork.validator.ActionValidatorManager;
-import com.opensymphony.xwork.validator.ValidationException;
 
 import java.util.Map;
 
@@ -30,9 +27,8 @@ public class WizardAction extends ActionSupport
     private String wizardClass;
     private Wizard wizard;
 
-    private boolean isInitialRequest = false;
-
     private String cancel;
+    private String previous;
 
     public void setWizardClass(String wizardClass)
     {
@@ -44,14 +40,19 @@ public class WizardAction extends ActionSupport
         this.cancel = str;
     }
 
+    public void setPrevious(String previous)
+    {
+        this.previous = previous;
+    }
+
     public boolean isCancelled()
     {
         return TextUtils.stringSet(cancel);
     }
 
-    private boolean isInitialRequest()
+    private boolean isPrevious()
     {
-        return isInitialRequest;
+        return TextUtils.stringSet(previous);
     }
 
     public void validate()
@@ -64,72 +65,81 @@ public class WizardAction extends ActionSupport
 
     public String execute()
     {
+        try
+        {
+            return doExecute();
+        }
+        catch (RuntimeException e)
+        {
+            // remove the wizard from the session so that we can start fresh
+            Map session = ActionContext.getContext().getSession();
+            session.remove(wizardClass);
+            return "error";
+        }
+    }
+
+    public String doExecute()
+    {
         Map session = ActionContext.getContext().getSession();
+        Wizard wizard = getWizard();
+
         if (isCancelled())
         {
             // clean out session.
+            wizard.cancel();
             session.remove(wizardClass);
             return "cancel";
         }
 
-        // lookup wizard.
-        Wizard wizard = getWizard();
-        if (isInitialRequest())
+        if (isPrevious())
         {
-            // this is the first time this wizard is being executed.
-            WizardState initialState = wizard.getCurrentState();
-            initialState.initialise();
-            return initialState.getStateName();
+            return wizard.traverseBackward();
         }
 
-        WizardState currentState = wizard.getCurrentState();
-
-        // validate the current state.
-        doValidation(currentState);
-        if (currentState.hasErrors())
+        String nextState = wizard.traverseForward();
+        if (wizard.isComplete())
         {
-            // if there are validation errors, we want to stay in the current state.
-            return currentState.getStateName();
-        }
-
-        currentState.execute();
-        WizardState next = wizard.getState(currentState.getNextState());
-
-        if (next == null)
-        {
-            // The wizard is complete.
-            // - remove wizard from the session so that it can be executed again.
-            wizard.process();
-            wizard.setCurrentState(null);
             session.remove(wizardClass);
-            return SUCCESS;
         }
-
-        wizard.setCurrentState(next);
-
-        next.initialise();
-
-        return next.getStateName();
+        return nextState;
     }
-
-    private void doValidation(WizardState currentState)
-    {
-        //  - first clear previous errors if any remain.
-        currentState.clearErrors();
-
-        try
-        {
-            ActionValidatorManager.validate(currentState, currentState.getClass().getName());
-            if (Validateable.class.isAssignableFrom(currentState.getClass()))
-            {
-                ((Validateable)currentState).validate();
-            }
-        }
-        catch (ValidationException e)
-        {
-            LOG.severe(e);
-        }
-    }
+//        // lookup wizard.
+//        if (isInitialRequest())
+//        {
+//            // this is the first time this wizard is being executed.
+//            WizardState initialState = wizard.getCurrentState();
+//            initialState.initialise();
+//            return initialState.getStateName();
+//        }
+//
+//        WizardState currentState = wizard.getCurrentState();
+//
+//        // validate the current state.
+//        doValidation(currentState);
+//        if (currentState.hasErrors())
+//        {
+//            // if there are validation errors, we want to stay in the current state.
+//            return currentState.getStateName();
+//        }
+//
+//        currentState.execute();
+//        WizardState next = wizard.getState(currentState.getNextState());
+//
+//        if (next == null)
+//        {
+//            // The wizard is complete.
+//            // - remove wizard from the session so that it can be executed again.
+//            wizard.process();
+//            wizard.setCurrentState(null);
+//            session.remove(wizardClass);
+//            return SUCCESS;
+//        }
+//
+//        wizard.setCurrentState(next);
+//
+//        next.initialise();
+//
+//        return next.getStateName();
 
     public Wizard getWizard()
     {
@@ -147,7 +157,6 @@ public class WizardAction extends ActionSupport
                 Wizard wizardInstance = (Wizard) Class.forName(wizardClass).newInstance();
                 ComponentContext.autowire(wizardInstance);
                 session.put(wizardClass, wizardInstance);
-                isInitialRequest = true;
             }
             wizard =  (Wizard) session.get(wizardClass);
             return wizard;

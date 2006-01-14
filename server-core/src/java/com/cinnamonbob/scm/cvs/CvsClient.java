@@ -60,7 +60,7 @@ public class CvsClient
         //TODO: Integrate the following logging into the systems logging. This information
         //      will be very useful in tracking problems with the cvs client integration.
         //      It will likely require patching the cvsclient.util.Logger code.
-        org.netbeans.lib.cvsclient.util.Logger.setLogging("system");
+        //org.netbeans.lib.cvsclient.util.Logger.setLogging("system");
     }
 
     /**

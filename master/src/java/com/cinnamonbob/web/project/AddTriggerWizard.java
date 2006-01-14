@@ -10,6 +10,7 @@ import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.web.wizard.BaseWizard;
 import com.cinnamonbob.web.wizard.BaseWizardState;
 import com.cinnamonbob.web.wizard.Wizard;
+import com.cinnamonbob.web.wizard.WizardCompleteState;
 import com.opensymphony.util.TextUtils;
 
 import java.util.Map;
@@ -27,29 +28,39 @@ public class AddTriggerWizard extends BaseWizard
 
     private static final Logger LOG = Logger.getLogger(AddTriggerWizard.class);
 
+    private long project;
+
     private ProjectManager projectManager;
     private Scheduler scheduler;
 
     private SelectTriggerType selectState;
     private ConfigureCronTrigger configCron;
     private ConfigureMonitorTrigger configMonitor;
+    private WizardCompleteState finalState;
 
     public AddTriggerWizard()
     {
         selectState = new SelectTriggerType(this, "select");
         configCron = new ConfigureCronTrigger(this, "cron");
         configMonitor = new ConfigureMonitorTrigger(this, "monitor");
+        finalState = new WizardCompleteState(this, "success");
 
-        setCurrentState(selectState);
+        initialState = selectState;
 
         addState(selectState);
         addState(configCron);
         addState(configMonitor);
+        addState(finalState);
     }
 
     public long getProject()
     {
-        return selectState.getProject();
+        return project;
+    }
+
+    public void setProject(long project)
+    {
+        this.project = project;
     }
 
     public void process()
@@ -152,7 +163,7 @@ public class AddTriggerWizard extends BaseWizard
             {
                 return type;
             }
-            return super.getStateName();
+            return super.getWizardStateName();
         }
     }
 
@@ -169,7 +180,7 @@ public class AddTriggerWizard extends BaseWizard
 
         public String getNextState()
         {
-            return null;
+            return "success";
         }
 
         public String getName()
@@ -249,5 +260,4 @@ public class AddTriggerWizard extends BaseWizard
             super(wizard, stateName);
         }
     }
-
 }
