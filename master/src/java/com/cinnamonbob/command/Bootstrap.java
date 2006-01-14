@@ -7,7 +7,6 @@ import com.cinnamonbob.util.logging.Logger;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 import java.net.Socket;
 
 
@@ -55,25 +54,6 @@ public class Bootstrap
     {
         BobServer server = new BobServer();
         server.start();
-
-        //TODO: move this into the spring context xml file. 
-        if (argv.length > 1)
-        {
-            for (int i = 1; i < argv.length; i++)
-            {
-                try
-                {
-                    Class clazz = Class.forName(argv[i]);
-                    Constructor constructor = clazz.getConstructor();
-                    Runnable instance = (Runnable) constructor.newInstance();
-                    instance.run();
-                }
-                catch (Exception e)
-                {
-                    LOG.warning("Failed to run startup task. Reason: " + e.getMessage(), e);
-                }
-            }
-        }
     }
 
     public void stop()

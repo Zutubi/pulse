@@ -1,5 +1,9 @@
 package com.cinnamonbob.bootstrap;
 
+import com.cinnamonbob.util.logging.Logger;
+
+import java.lang.reflect.Constructor;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -8,7 +12,10 @@ import java.util.List;
  */
 public class StartupManager
 {
+    private static final Logger LOG = Logger.getLogger(StartupManager.class);
+
     private List<String> systemContexts;
+    private List<String> startupRunnables = new LinkedList<String>();
 
     private boolean systemStarted;
     private long startTime;
@@ -22,12 +29,26 @@ public class StartupManager
 
         try
         {
-
             for (String context : systemContexts)
             {
                 ComponentContext.addClassPathContextDefinitions(new String[]{context});
                 // init.
                 ComponentContext.getBean("initContext");
+            }
+
+            for (String name : startupRunnables)
+            {
+                try
+                {
+                    Class clazz = Class.forName(name);
+                    Constructor constructor = clazz.getConstructor();
+                    Runnable instance = (Runnable) constructor.newInstance();
+                    instance.run();
+                }
+                catch (Exception e)
+                {
+                    LOG.warning("Failed to run startup task. Reason: " + e.getMessage(), e);
+                }
             }
 
             setSystemStarted(true);
@@ -55,6 +76,11 @@ public class StartupManager
     public void setSystemContexts(List<String> contexts)
     {
         this.systemContexts = contexts;
+    }
+
+    public void setStartupRunnables(List<String> classes)
+    {
+        this.startupRunnables = classes;
     }
 
     public long getUptime()

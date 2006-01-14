@@ -16,6 +16,11 @@
                 <value>com/cinnamonbob/bootstrap/webworkContext.xml</value>
             </list>
         </property>
+        <property name="startupRunnables">
+            <list>
+                <value>com.cinnamonbob.test.SetupDummyBuilds</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="configurationManager" class="com.cinnamonbob.bootstrap.DefaultConfigurationManager" init-method="init">
