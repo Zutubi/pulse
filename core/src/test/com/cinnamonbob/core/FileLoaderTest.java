@@ -212,7 +212,8 @@ public class FileLoaderTest extends BobTestCase
         }
         catch (ParseException e)
         {
-            e.printStackTrace();
+            // Error should indicate a duplicate artifact
+            assertTrue(e.getMessage().indexOf("duplicate") >= 0);
         }
     }
 }

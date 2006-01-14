@@ -96,7 +96,6 @@ public class RecipeControllerTest extends BobTestCase
         RecipeCommencedEvent event = new RecipeCommencedEvent(this, rootResult.getId(), rootResult.getRecipeName(), 10101);
         assertTrue(recipeController.handleRecipeEvent(event));
         assertEquals(ResultState.IN_PROGRESS, rootResult.getState());
-        assertEquals(event.getStartTime(), rootResult.getStamps().getStartTime());
 
         assertSame(rootResult, buildManager.getRecipeResult(rootResult.getId()));
     }
@@ -116,7 +115,6 @@ public class RecipeControllerTest extends BobTestCase
         CommandResult result = commandResults.get(commandResults.size() - 1);
         assertEquals(ResultState.IN_PROGRESS, result.getState());
         assertEquals(event.getName(), result.getCommandName());
-        assertEquals(event.getStartTime(), result.getStamps().getStartTime());
 
         assertSame(rootResult, buildManager.getRecipeResult(rootResult.getId()));
     }

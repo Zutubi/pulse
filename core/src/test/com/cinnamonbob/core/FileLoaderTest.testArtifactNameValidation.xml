@@ -10,7 +10,7 @@
     <recipe name="default">
         <command name="doSomething">
             <executable exe="netstat"/>
-            <process artifact="output.txt" processor="${connections.pp}"/>
+            <artifact name="output" type="text/plain" from-file="output/file"/>
         </command>
     </recipe>
 
