@@ -284,6 +284,29 @@ public class FileSystemUtils
         }
     }
 
+    /**
+     *
+     * @param src
+     * @param dest
+     * @param force delete the destination directory if it already exists before renaming.
+     *
+     * @return true if the rename was successful, false otherwise.
+     */
+    public static boolean rename(File src, File dest, boolean force)
+    {
+        if (dest.exists() && force)
+        {
+            removeDirectory(dest);
+        }
+
+        return src.renameTo(dest);
+    }
+
+    public static boolean rename(File src, File dest)
+    {
+        return rename(src, dest, false);
+    }
+
     public static void createFile(File file, String data) throws IOException
     {
         FileOutputStream os = null;
