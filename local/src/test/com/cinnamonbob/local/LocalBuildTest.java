@@ -77,21 +77,14 @@ public class LocalBuildTest extends BobTestCase
 
     public void testInvalidBobFile() throws BobException, IOException
     {
-        builder.runBuild(tmpDir, "no-such-bob.xml", "my-default", null, "out");
-        File expectedDir = getExpectedOutput("invalidBobFile");
-        File actualDir = new File(tmpDir, "out");
-
-        cleanBuildLog(new File(tmpDir, "build.log"));
-
-        if (generateMode)
+        try
         {
-            tmpDir.renameTo(new File(expectedDir.getAbsolutePath().replace("classes", "src/test")));
+            builder.runBuild(tmpDir, "no-such-bob.xml", "my-default", null, "out");
+            fail();
         }
-        else
+        catch (BobException e)
         {
-            assertFilesEqual(new File(expectedDir, "build.log.cleaned"), new File(tmpDir, "build.log.cleaned"));
-            // Just verify exception file exists, content is too difficult...
-            assertTrue((new File(actualDir, "exception")).isFile());
+            assertTrue(e.getMessage().contains("Unable to load bob file"));
         }
     }
 

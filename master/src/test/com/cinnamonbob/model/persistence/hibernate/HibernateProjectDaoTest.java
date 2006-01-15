@@ -53,21 +53,22 @@ public class HibernateProjectDaoTest extends PersistenceTestCase
         assertPropertyEquals(details, otherDetails);
     }
 
-    public void testLoadSaveAntBobFileSource()
+    public void testLoadSaveAntBobFileDetails()
     {
         TreeMap<String, String> environment = new TreeMap<String, String>();
         environment.put("PATH", "/bin");
 
-        AntBobFileDetails source = new AntBobFileDetails("build.xml", "build test", environment);
+        AntBobFileDetails details = new AntBobFileDetails("build.xml", "build test", environment);
 
-        projectDao.save(source);
+        projectDao.save(details);
         commitAndRefreshTransaction();
 
-        AntBobFileDetails otherSource = projectDao.findAntBobFileSource(source.getId());
-        assertPropertyEquals(source, otherSource);
+        AntBobFileDetails otherDetails = projectDao.findAntBobFileSource(details.getId());
+        assertEquals(details.getBuildFile(), otherDetails.getBuildFile());
+        assertEquals(details.getTargets(), otherDetails.getTargets());
         for (String key : environment.keySet())
         {
-            assertEquals(environment.get(key), otherSource.getEnvironment().get(key));
+            assertEquals(environment.get(key), otherDetails.getEnvironment().get(key));
         }
     }
 

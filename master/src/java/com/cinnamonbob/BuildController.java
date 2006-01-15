@@ -1,5 +1,6 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.core.Bootstrapper;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.event.AsynchronousDelegatingListener;
@@ -198,7 +199,10 @@ public class BuildController implements EventListener
         }
 
         ScmBootstrapper initialBootstrapper = createBuildBootstrapper();
-        String bobFileSource = project.getBobFileDetails().getBobFile(project, initialBootstrapper.getRevision());
+        // TODO dodgy autowire
+        BobFileDetails bobFileDetails = project.getBobFileDetails();
+        ComponentContext.autowire(bobFileDetails);
+        String bobFileSource = bobFileDetails.getBobFile(project, initialBootstrapper.getRevision());
 
         tree.prepare(buildResult, bobFileSource);
 

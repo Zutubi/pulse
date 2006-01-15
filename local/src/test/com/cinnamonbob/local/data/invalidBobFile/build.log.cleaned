@@ -1,7 +1,0 @@
-[my-default]
-  commenced:
-  completed:
-  elapsed  :
-  result   : error
-  message  :
-    com.cinnamonbob.core.BuildException: tmpDir/no-such-bob.xml (No such file or directory)

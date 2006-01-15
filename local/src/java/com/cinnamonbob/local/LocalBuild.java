@@ -129,13 +129,11 @@ public class LocalBuild
         }
 
         File logFile = new File(workDir, "build.log");
-        File bobFile = new File(workDir, bobFileName);
         FileOutputStream logStream = null;
-        FileInputStream bobFileInputStream = null;
+
         try
         {
             logStream = new FileOutputStream(logFile);
-            bobFileInputStream = new FileInputStream(bobFile);
             EventManager manager = new DefaultEventManager();
             manager.register(new BuildStatusPrinter(paths.getWorkDir(), logStream));
 
@@ -143,11 +141,30 @@ public class LocalBuild
             RecipeProcessor processor = new RecipeProcessor();
             processor.setEventManager(manager);
             processor.setResourceRepository(repository);
-            processor.build(0, paths, bootstrapper, IOUtils.inputStreamToString(bobFileInputStream), recipe);
+            processor.build(0, paths, bootstrapper, loadBobFile(workDir, bobFileName), recipe);
         }
         catch (FileNotFoundException e)
         {
             throw new BobException("Unable to create log file '" + logFile.getPath() + "': " + e.getMessage());
+        }
+        finally
+        {
+            IOUtils.close(logStream);
+        }
+
+        printEpilogue(logFile);
+    }
+
+    private String loadBobFile(File workDir, String bobFileName) throws BobException
+    {
+        File bobFile = new File(workDir, bobFileName);
+        FileInputStream bobFileInputStream = null;
+        String result;
+
+        try
+        {
+            bobFileInputStream = new FileInputStream(bobFile);
+            result = IOUtils.inputStreamToString(bobFileInputStream);
         }
         catch (IOException e)
         {
@@ -155,11 +172,10 @@ public class LocalBuild
         }
         finally
         {
-            IOUtils.close(logStream);
             IOUtils.close(bobFileInputStream);
         }
 
-        printEpilogue(logFile);
+        return result;
     }
 
     private void printPrologue(String bobFile, String resourcesFile, String outputDir)
