@@ -3,9 +3,9 @@ package com.cinnamonbob.model.persistence.hibernate;
 import com.cinnamonbob.core.model.Entity;
 import com.cinnamonbob.model.persistence.EntityDao;
 import org.hibernate.HibernateException;
+import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.ObjectNotFoundException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -20,9 +20,14 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
 {
     public T findById(long id)
     {
+        return (T) findByIdAndType(id, persistentClass());
+    }
+
+    public <U extends T> U findByIdAndType(long id, Class<U> type)
+    {
         try
         {
-            return (T) getHibernateTemplate().load(persistentClass(), Long.valueOf(id));
+            return (U) getHibernateTemplate().load(type, Long.valueOf(id));
         }
         catch (ObjectNotFoundException onfe)
         {
@@ -32,9 +37,9 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
 
     public List<T> findAll()
     {
-        return (List<T>)getHibernateTemplate().find("from " + persistentClass().getName());
+        return (List<T>) getHibernateTemplate().find("from " + persistentClass().getName());
     }
-    
+
     public void save(T entity)
     {
         getHibernateTemplate().saveOrUpdate(entity);
@@ -77,25 +82,25 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
 
     public <U> List<U> findByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final int maxResults, final boolean cachable)
     {
-        return (List<U>)getHibernateTemplate().execute(new HibernateCallback()
-         {
-             public Object doInHibernate(Session session) throws HibernateException
-             {
-                 Query queryObject = session.getNamedQuery(queryName);
-                 if (propertyName != null)
-                 {
-                     queryObject.setParameter(propertyName, propertyValue);
-                 }
-                 if (maxResults > 0)
-                 {
-                     queryObject.setMaxResults(maxResults);
-                 }
-                 queryObject.setCacheable(cachable);
+        return (List<U>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.getNamedQuery(queryName);
+                if (propertyName != null)
+                {
+                    queryObject.setParameter(propertyName, propertyValue);
+                }
+                if (maxResults > 0)
+                {
+                    queryObject.setMaxResults(maxResults);
+                }
+                queryObject.setCacheable(cachable);
 
-                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                 return queryObject.list();
-             }
-         });
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.list();
+            }
+        });
     }
 
     public final Object findUniqueByNamedQuery(final String queryName)
@@ -126,23 +131,23 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
     public final Object findUniqueByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final String secondPropertyName, final Object secondPropertyValue, final boolean cachable)
     {
         return getHibernateTemplate().execute(new HibernateCallback()
-         {
-             public Object doInHibernate(Session session) throws HibernateException
-             {
-                 Query queryObject = session.getNamedQuery(queryName);
-                 if (propertyName != null)
-                 {
-                     queryObject.setParameter(propertyName, propertyValue);
-                 }
-                 if (secondPropertyName != null)
-                 {
-                     queryObject.setParameter(secondPropertyName, secondPropertyValue);
-                 }
-                 queryObject.setCacheable(cachable);
-                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                 return queryObject.uniqueResult();
-             }
-         });
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.getNamedQuery(queryName);
+                if (propertyName != null)
+                {
+                    queryObject.setParameter(propertyName, propertyValue);
+                }
+                if (secondPropertyName != null)
+                {
+                    queryObject.setParameter(secondPropertyName, secondPropertyValue);
+                }
+                queryObject.setCacheable(cachable);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.uniqueResult();
+            }
+        });
     }
 
     public abstract Class persistentClass();

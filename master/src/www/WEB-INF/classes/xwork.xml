@@ -249,6 +249,39 @@
             <result name="success" type="redirect">/manageProject.action?id=${project}</result>
         </action>
 
+        <action name="editBobFileDetails!default" class="com.cinnamonbob.web.project.EditBobFileDetailsAction"
+                method="doDefault">
+            <result name="custom" type="chain">editCustomDetails!default</result>
+            <result name="jakarta ant" type="chain">editAntDetails!default</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="editCustomDetails!default" class="com.cinnamonbob.web.project.EditCustomDetailsAction"
+                method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">edit-details-custom.vm</result>
+        </action>
+
+        <action name="editCustomDetails" class="com.cinnamonbob.web.project.EditCustomDetailsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-custom.vm</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="editAntDetails!default" class="com.cinnamonbob.web.project.EditAntDetailsAction"
+                method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">edit-details-ant.vm</result>
+        </action>
+
+        <action name="editAntDetails" class="com.cinnamonbob.web.project.EditAntDetailsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-ant.vm</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+        </action>
+
         <action name="addProject" class="com.cinnamonbob.web.wizard.WizardAction">
             <interceptor-ref name="wizardStack"/>
             <param name="wizardClass">com.cinnamonbob.web.project.AddProjectWizard</param>

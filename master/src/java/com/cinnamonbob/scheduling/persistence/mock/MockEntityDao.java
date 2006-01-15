@@ -3,10 +3,10 @@ package com.cinnamonbob.scheduling.persistence.mock;
 import com.cinnamonbob.core.model.Entity;
 import com.cinnamonbob.model.persistence.EntityDao;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <class-comment/>
@@ -34,6 +34,18 @@ public abstract class MockEntityDao<T extends Entity> implements EntityDao<T>
             if (t.getId() == id)
             {
                 return t;
+            }
+        }
+        return null;
+    }
+
+    public <U extends T> U findByIdAndType(long id, Class<U> type)
+    {
+        for (T t : entities)
+        {
+            if (t.getId() == id)
+            {
+                return (U) t;
             }
         }
         return null;

@@ -22,6 +22,26 @@
         </property>
     </bean>
 
+    <bean id="bobFileDetailsDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateBobFileDetailsDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="bobFileDetailsDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="bobFileDetailsDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
     <bean id="buildResultDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateBuildResultDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>

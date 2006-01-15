@@ -1,0 +1,26 @@
+<html>
+<head>
+    <title>edit custom details</title>
+</head>
+<body>
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='editCustomDetails.action'" "method='post'")
+
+    #tag (Hidden "name='id'")
+    #tag (Hidden "name='projectId'")
+
+    <h3>edit custom details</h3>
+
+    <fieldset>
+        #tag (TextField "name='details.bobFileName'" "label='bobFileName'" "required='true'" "tabindex='1'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='2'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='3'")
+    </fieldset>
+
+ #end
+</body>
+</html>

@@ -20,7 +20,7 @@
                 #detailrow("description" $project.description)
                 #detailrow("action" "<a href='editProject!default.action?id=$project.id'>edit</a>")
                 #scmdetailrow("scm" $project $project.scm)
-                #detailrow("type" $project.bobFileDetails.type)
+                #detailrow("type" "<a href='editBobFileDetails!default.action?id=$project.bobFileDetails.id&projectId=$project.id'>$project.bobFileDetails.type</a>")
             </table>
         </div>
 
