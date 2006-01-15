@@ -3,10 +3,19 @@
     #if ($contact.class.name == 'com.cinnamonbob.model.YahooContactPoint')<img src="/images/yahoo_16.png"/>#end
 #end
 
-#macro( scmDetail $scm)
-    #if ($scm.class.name == 'com.cinnamonbob.model.Svn')<img src="/images/svn_16.png"/> subversion#end
-    #if ($scm.class.name == 'com.cinnamonbob.model.Cvs')<img src="/images/cvs_16.png"/> cvs#end
-    #if ($scm.class.name == 'com.cinnamonbob.model.P4')<img src="/images/p4_16.png"/> perforce#end
+#macro( scmIcon $scm)
+    #if ($scm.class.name == 'com.cinnamonbob.model.Svn')<img src="/images/svn_16.png"/>#end
+    #if ($scm.class.name == 'com.cinnamonbob.model.Cvs')<img src="/images/cvs_16.png"/>#end
+    #if ($scm.class.name == 'com.cinnamonbob.model.P4')<img src="/images/p4_16.png"/>#end
+#end
+
+#macro( scmDetail $project $scm)
+    #scmIcon($scm)
+    <a href="editScm!default.action?id=$scm.id&project=$project.id">
+    #if ($scm.class.name == 'com.cinnamonbob.model.Svn') subversion #end
+    #if ($scm.class.name == 'com.cinnamonbob.model.Cvs') cvs #end
+    #if ($scm.class.name == 'com.cinnamonbob.model.P4') perforce #end
+    </a>
 #end
 
 <!--- quartz trigger state -->
@@ -32,8 +41,8 @@
 #macro(detailrow $header $content)
   <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
 #end
-#macro(scmdetailrow $header $scm)
-  <tr><th class="command-detail">$header</th><td class="command-detail">#scmDetail($scm)</td></tr>
+#macro(scmdetailrow $header $project $scm)
+  <tr><th class="command-detail">$header</th><td class="command-detail">#scmDetail($project $scm)</td></tr>
 #end
 
 ##

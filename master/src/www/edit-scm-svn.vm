@@ -14,18 +14,17 @@
     <h3>edit scm</h3>
 
     <fieldset>
-        #tag (TextField "required='true'" "name='svn.name'" "label='scm.name'" "tabindex='1'")
-        #tag (TextField "name='svn.path'" "label='scm.path'" "tabindex='2'")
-        #tag (TextField "required='true'" "name='svn.username'" "tabindex='3'")
-        #tag (Password "name='svn.password'" "tabindex='4'")
-        #tag (TextField "required='true'" "name='svn.url'" "tabindex='5'")
-        #tag (TextField "name='svn.keyfile'" "tabindex='6'")
-        #tag (Password "name='svn.passphrase'" "tabindex='7'")
+        #tag (TextField "name='svn.path'" "label='scm.path'" "tabindex='1'")
+        #tag (TextField "required='true'" "name='svn.username'" "tabindex='2'")
+        #tag (Password "name='svn.password'" "tabindex='3'")
+        #tag (TextField "required='true'" "name='svn.url'" "tabindex='4'")
+        #tag (TextField "name='svn.keyfile'" "tabindex='5'")
+        #tag (Password "name='svn.passphrase'" "tabindex='6'")
     </fieldset>
 
     <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='4'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='7'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='8'")
     </fieldset>
 
  #end

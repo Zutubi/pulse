@@ -20,6 +20,11 @@ public class CustomBobFileDetails extends BobFileDetails
         this.bobFileName = bobFileName;
     }
 
+    public String getType()
+    {
+        return "custom";
+    }
+
     public String getBobFile(Project project, Revision revision)
     {
         Scm scm = project.getScm();

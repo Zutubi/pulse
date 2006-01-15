@@ -13,14 +13,14 @@
 
         <div id="project-left-column">
 
-        <h2 class="command-info">basic details</h2>
+        <h2 class="command-info">details</h2>
         <div class="command-content">
             <table>
                 #detailrow("name" $project.name)
                 #detailrow("description" $project.description)
-                #detailrow("bob file" $project.bobFileSource.bobFileName)
-                #scmdetailrow("scm" $project.scm)
                 #detailrow("action" "<a href='editProject!default.action?id=$project.id'>edit</a>")
+                #scmdetailrow("scm" $project $project.scm)
+                #detailrow("type" $project.bobFileDetails.type)
             </table>
         </div>
 

@@ -84,4 +84,9 @@ public class AntBobFileDetails extends TemplateBobFileDetails
     {
         environment.put(name, value);
     }
+
+    public String getType()
+    {
+        return "jakarta ant";
+    }
 }

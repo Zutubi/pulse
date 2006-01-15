@@ -3,8 +3,7 @@
 <validators>
     <field name="cvs">
         <field-validator type="visitor">
-            <message>cvs: </message>
+            <message></message>
         </field-validator>
     </field>
 </validators>
-

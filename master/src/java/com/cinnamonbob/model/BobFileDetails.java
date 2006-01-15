@@ -7,5 +7,7 @@ import com.cinnamonbob.core.model.Revision;
  */
 public abstract class BobFileDetails extends Entity
 {
+    public abstract String getType();
+
     public abstract String getBobFile(Project project, Revision revision);
 }
