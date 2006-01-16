@@ -1,10 +1,12 @@
 <?xml version="1.0"?>
 <project defaultRecipe="maven build">
     <recipe name="maven build">
-        <executable exe="${maven.bin}">
+        <command name="build">
+            <executable exe="maven.bat">
 #foreach($target in $targets)
-            <arg>$target</arg>
+                <arg>$target</arg>
 #end
-        </executable>
+            </executable>
+        </command>
     </recipe>
 </project>

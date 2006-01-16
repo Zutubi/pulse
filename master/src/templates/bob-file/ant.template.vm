@@ -1,17 +1,19 @@
 <?xml version="1.0"?>
 <project defaultRecipe="ant build">
     <recipe name="ant build">
-        <executable exe="${ant.bin}">
+        <command name="build">
+            <executable exe="${ant.bin}">
 #if($buildFile)
-            <arg>-f</arg>
-            <arg>$buildFile</arg>
+                <arg>-f</arg>
+                <arg>$buildFile</arg>
 #end
 #foreach($target in $targets)
-            <arg>$target</arg>
+                <arg>$target</arg>
 #end
 #foreach($key in $environment.keySet())
-            <environment name="$key" value="$environment.get($key)"/>
+                <environment name="$key" value="$environment.get($key)"/>
 #end
-        </executable>
+            </executable>
+        </command>
     </recipe>
 </project>
