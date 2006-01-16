@@ -77,7 +77,7 @@ public class RemoveDirectoryTest extends BobTestCase
         File symlink = new File(tmpDir, "symlink");
         File linkDestination = createTmpDir();
 
-        if (createSymlink(symlink, linkDestination))
+        if (FileSystemUtils.createSymlink(symlink, linkDestination))
         {
             assertTrue(FileSystemUtils.removeDirectory(tmpDir));
             assertTrue(linkDestination.isDirectory());
@@ -89,21 +89,6 @@ public class RemoveDirectoryTest extends BobTestCase
 
         assertTrue(FileSystemUtils.removeDirectory(linkDestination));
     }
-
-    private boolean createSymlink(File symlink, File destination) throws IOException, InterruptedException
-    {
-        String os = System.getProperty("os.name");
-
-        if (os.equals("Linux"))
-        {
-            Process p = Runtime.getRuntime().exec(new String[]{"ln", "-s", destination.getAbsolutePath(), symlink.getAbsolutePath()});
-            int result = p.waitFor();
-            return result == 0;
-        }
-
-        return false;
-    }
-
 
     private File createTmpDir() throws IOException
     {

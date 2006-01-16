@@ -1,5 +1,7 @@
 package com.cinnamonbob.core.util;
 
+import com.cinnamonbob.util.logging.Logger;
+
 import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -12,6 +14,8 @@ import java.util.zip.ZipOutputStream;
  */
 public class FileSystemUtils
 {
+    private static final Logger LOG = Logger.getLogger(FileSystemUtils.class);
+
     private static final char ZIP_SEPARATOR = '/';
 
     /**
@@ -26,7 +30,7 @@ public class FileSystemUtils
         {
             return false;
         }
-        
+
         if (!dir.exists())
         {
             return true;
@@ -49,40 +53,42 @@ public class FileSystemUtils
         }
 
         String[] contents = dir.list();
-        assert(contents != null);
 
-        for (String child : contents)
+        if (contents != null)
         {
-            File file = new File(dir, child);
-            String canonicalFile;
+            for (String child : contents)
+            {
+                File file = new File(dir, child);
+                String canonicalFile;
 
-            // The canonical path lets us distinguish symlinks from actual
-            // directories.
-            try
-            {
-                canonicalFile = file.getCanonicalPath();
-            }
-            catch (IOException e)
-            {
-                return false;
-            }
-
-            // We don't want to traverse symbolic links to directories.
-            // The canonical path tells us where the file really is, and we
-            // double check it is under the directory (using the canonical
-            // path for the directory too).
-            if (file.isDirectory() && canonicalFile.startsWith(canonicalDir))
-            {
-                if (!removeDirectory(file))
+                // The canonical path lets us distinguish symlinks from actual
+                // directories.
+                try
+                {
+                    canonicalFile = file.getCanonicalPath();
+                }
+                catch (IOException e)
                 {
                     return false;
                 }
-            }
-            else
-            {
-                if (!file.delete())
+
+                // We don't want to traverse symbolic links to directories.
+                // The canonical path tells us where the file really is, and we
+                // double check it is under the directory (using the canonical
+                // path for the directory too).
+                if (file.isDirectory() && canonicalFile.startsWith(canonicalDir))
                 {
-                    return false;
+                    if (!removeDirectory(file))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (!file.delete())
+                    {
+                        return false;
+                    }
                 }
             }
         }
@@ -149,6 +155,128 @@ public class FileSystemUtils
         return childPath.startsWith(parentPath);
     }
 
+    public static boolean isSymlink(File file) throws IOException
+    {
+        if (SystemUtils.isWindows())
+        {
+            return false;
+        }
+
+        return !file.getCanonicalPath().equals(file.getAbsolutePath());
+    }
+
+    /**
+     * On supported systems, returns the permissions of the given file
+     * encoded as a single integer.  The encoding depends on the platform:
+     * <p/>
+     * - Un*x: the least significant four digits of the integer hold four
+     * octal digits giving permissions as used by chmod/stat
+     * <p/>
+     * On unsupported platforms, this call always returns 0.
+     *
+     * @param file the file to return the permissions for
+     * @return an encoding of the permissions of the given file
+     */
+    public static int getPermissions(File file)
+    {
+        int result = 0;
+
+        if (SystemUtils.isWindows())
+        {
+            return result;
+        }
+
+        Process process = null;
+        try
+        {
+            try
+            {
+                process = Runtime.getRuntime().exec("stat -c %a " + file.getAbsolutePath());
+            }
+            catch (IOException e)
+            {
+                // This occurs when there is no stat: i.e. unsupported platform.
+                return 0;
+            }
+
+            InputStreamReader stdoutReader = new InputStreamReader(process.getInputStream());
+            StringWriter stdoutWriter = new StringWriter();
+            IOUtils.joinReaderToWriter(stdoutReader, stdoutWriter);
+
+            int exitCode = process.waitFor();
+
+            if (exitCode == 0)
+            {
+                result = Integer.parseInt(stdoutWriter.getBuffer().toString().trim());
+            }
+            else
+            {
+                LOG.warning("Unable to get permissions for '" + file.getAbsolutePath() + "': stat exited with code " + exitCode);
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.warning("Unable to get permissions for '" + file.getAbsolutePath() + "': " + e.getMessage(), e);
+        }
+        finally
+        {
+            if (process != null)
+            {
+                process.destroy();
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Attempts to set the permissions on the given file to the given
+     * permissions.  Not supported on all systems.
+     *
+     * @param file        the file to set permissions on
+     * @param permissions the permissions to set, as encoded by
+     *                    {@link #getPermissions(File)}
+     */
+    public static void setPermissions(File file, int permissions)
+    {
+        if (SystemUtils.isWindows())
+        {
+            return;
+        }
+
+        Process process = null;
+
+        try
+        {
+            process = Runtime.getRuntime().exec("chmod " + permissions + " " + file.getAbsolutePath());
+        }
+        catch (IOException e)
+        {
+            // Cannot execute chmod: therefore unsupported system.
+            return;
+        }
+
+        try
+        {
+            int exitCode = process.waitFor();
+            if (exitCode != 0)
+            {
+                LOG.warning("Unable to set permissions for '" + file.getAbsolutePath() + "': chmod exited with code " + exitCode);
+            }
+        }
+        catch (InterruptedException e)
+        {
+            LOG.warning("Unable to set permissions for '" + file.getAbsolutePath() + "': " + e.getMessage(), e);
+        }
+        finally
+        {
+            if (process != null)
+            {
+                process.destroy();
+            }
+        }
+    }
+
     public static void createZip(File zipFile, File base, File source) throws IOException
     {
         if (!source.exists())
@@ -187,6 +315,12 @@ public class FileSystemUtils
     private static void addToZip(ZipOutputStream os, File base, String sourcePath) throws IOException
     {
         File source = new File(base, sourcePath);
+
+        if (isSymlink(source))
+        {
+            return;
+        }
+
         long modifiedTime = source.lastModified();
 
         if (source.isDirectory())
@@ -212,6 +346,7 @@ public class FileSystemUtils
         {
             ZipEntry entry = new ZipEntry(sourcePath);
             entry.setTime(modifiedTime);
+            entry.setExtra(Integer.toOctalString(getPermissions(source)).getBytes());
             os.putNextEntry(entry);
 
             FileInputStream is = null;
@@ -242,26 +377,11 @@ public class FileSystemUtils
             else
             {
                 unzip(zin, file);
-
-                Process p = null;
-
-                try
+                String octalPermissions = new String(entry.getExtra());
+                int permissions = Integer.parseInt(octalPermissions, 8);
+                if (permissions != 0)
                 {
-                    // TODO: at the very least, only do this where necessary!
-                    ProcessBuilder builder = new ProcessBuilder("chmod", "+x", file.getAbsolutePath());
-                    p = builder.start();
-                    p.waitFor();
-                }
-                catch (Exception e)
-                {
-                    // Ignored
-                }
-                finally
-                {
-                    if (p != null)
-                    {
-                        p.destroy();
-                    }
+                    setPermissions(file, permissions);
                 }
             }
 
@@ -342,4 +462,26 @@ public class FileSystemUtils
             IOUtils.close(os);
         }
     }
+
+    public static boolean createSymlink(File symlink, File destination) throws IOException
+    {
+        if (SystemUtils.isLinux())
+        {
+            Process p = Runtime.getRuntime().exec("ln -s " + destination.getAbsolutePath() + " " + symlink.getAbsolutePath());
+            int result = 0;
+            try
+            {
+                result = p.waitFor();
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+
+            return result == 0;
+        }
+
+        return false;
+    }
+
 }

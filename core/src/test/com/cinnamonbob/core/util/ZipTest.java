@@ -258,7 +258,48 @@ public class ZipTest extends BobTestCase
         createExtractAndVerify("simpleDir");
     }
 
-    private void createExtractAndVerify(String path)
+    public void testZipWithSymlink() throws IOException
+    {
+        if (SystemUtils.isLinux())
+        {
+            Map<String, String> files = new TreeMap<String, String>();
+            files.put("top", null);
+            files.put(composePath("top", "file1"), "content of file 1");
+            createDataFiles(files);
+
+            File topDir = new File(inDir, "top");
+            File symlink = new File(topDir, "link");
+            if (FileSystemUtils.createSymlink(symlink, tmpDir))
+            {
+                createAndExtract("top");
+                assertTrue(symlink.delete());
+                assertDirectoriesEqual(inDir, unzipDir);
+            }
+        }
+    }
+
+    public void testZipPreservesPermissions() throws IOException
+    {
+        Map<String, String> files = new TreeMap<String, String>();
+        files.put("top", null);
+        files.put(composePath("top", "file1"), "content of file 1");
+        createDataFiles(files);
+
+        File topDir = new File(inDir, "top");
+        File file1 = new File(topDir, "file1");
+
+        if (FileSystemUtils.getPermissions(file1) != 0)
+        {
+            FileSystemUtils.setPermissions(file1, 777);
+
+            createExtractAndVerify("top");
+            File outTop = new File(unzipDir, "top");
+            File out1 = new File(outTop, "file1");
+            assertEquals(777, FileSystemUtils.getPermissions(out1));
+        }
+    }
+
+    private void createAndExtract(String path)
             throws IOException
     {
         File zip = getZipName();
@@ -274,6 +315,12 @@ public class ZipTest extends BobTestCase
         {
             IOUtils.close(zin);
         }
+    }
+
+    private void createExtractAndVerify(String path)
+            throws IOException
+    {
+        createAndExtract(path);
         assertDirectoriesEqual(inDir, unzipDir);
     }
 
