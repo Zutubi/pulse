@@ -42,7 +42,7 @@ public class CvsClient
 
     private File localPath;
 
-    private String branch;
+    private String revision;
 
     /**
      * @param cvsRoot
@@ -76,13 +76,19 @@ public class CvsClient
     }
 
     /**
-     * Set the working branch.
+     * Set the working revision. This revision string can represent either a branch or
+     * a tag.
      *
-     * @param branch
+     * @param revision
      */
-    public void setBranch(String branch)
+    public void setRevision(String revision)
     {
-        this.branch = branch;
+        this.revision = revision;
+    }
+
+    public void checkout(String file) throws SCMException
+    {
+        checkout(file, null);
     }
 
     /**
@@ -90,17 +96,7 @@ public class CvsClient
      */
     public void checkout(String module, Date date) throws SCMException
     {
-        if (!TextUtils.stringSet(module))
-        {
-            throw new IllegalArgumentException("Command requires a module.");
-        }
-
-        // HACK: cvs client has trouble absolute references, hanging if they are invalid.
-        // Therefore, do not allow them.
-        while (module.startsWith("/"))
-        {
-            module = module.substring(1);
-        }
+        module = checkModule(module);
 
         Connection connection = null;
         try
@@ -117,18 +113,11 @@ public class CvsClient
             CheckoutCommand checkout = new CheckoutCommand();
             checkout.setModule(module);
             checkout.setPruneDirectories(true);
+            client.setLocalPath(localPath.getAbsolutePath());
 
-            // hack: the javacvs.Client does not like a blank or '.' checkout directory. however, if one
-            //       is not set, then the module path is prefixed to the checkout directory structure.
-            //       So that we can checkout the module into the current working directory, update the local
-            //       path to refer to its parent, and set the checkout directory to be the remainder of the
-            //       local path.
-            client.setLocalPath(localPath.getParentFile().getAbsolutePath());
-            checkout.setCheckoutDirectory(localPath.getName());
-
-            if (branch != null)
+            if (revision != null)
             {
-                checkout.setCheckoutByRevision(branch);
+                checkout.setCheckoutByRevision(revision);
             }
             if (date != null)
             {
@@ -157,6 +146,22 @@ public class CvsClient
             // cleanup any resources used by this command.
             CvsUtils.close(connection);
         }
+    }
+
+    private String checkModule(String module)
+    {
+        if (!TextUtils.stringSet(module))
+        {
+            throw new IllegalArgumentException("Command requires a module.");
+        }
+
+        // HACK: cvs client has trouble absolute references, hanging if they are invalid.
+        // Therefore, do not allow them.
+        while (module.startsWith("/"))
+        {
+            module = module.substring(1);
+        }
+        return module;
     }
 
     /**
@@ -205,9 +210,6 @@ public class CvsClient
             connection.open();
 
             Client client = new Client(connection, new StandardAdminHandler());
-
-            HistoryBuilder builder = new HistoryBuilder();
-            client.getEventManager().addCVSListener(new BuilderAdapter(builder));
 
             RtagCommand rtag = new RtagCommand();
             rtag.setTag(tag);

@@ -12,16 +12,16 @@ public final class WizardCompleteState extends BaseWizardState
         super(wizard, name);
     }
 
-    public String getNextState()
+    public String getNextStateName()
     {
-        return this.getWizardStateName();
+        return this.getStateName();
     }
 
     public void initialise()
     {
         execute();
     }
-    
+
     public void execute()
     {
         // ensure that we do not process the wizard a second time.

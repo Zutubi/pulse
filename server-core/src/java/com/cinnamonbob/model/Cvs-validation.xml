@@ -6,4 +6,9 @@
             <message>valid cvs root is required.</message>
         </field-validator>
     </field>
+    <field name="module">
+        <field-validator type="requiredstring">
+            <message>module is required.</message>
+        </field-validator>
+    </field>
 </validators>

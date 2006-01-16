@@ -35,7 +35,7 @@ public abstract class BaseWizardState implements WizardState
 
     }
 
-    public final String getWizardStateName()
+    public final String getStateName()
     {
         return stateName;
     }

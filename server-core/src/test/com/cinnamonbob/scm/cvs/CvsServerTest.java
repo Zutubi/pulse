@@ -56,6 +56,12 @@ public class CvsServerTest extends TestCase
         assertFalse(new File(workdir, "project/test/test2").exists());
     }
 
+    public void testCheckoutFile() throws Exception
+    {
+        CvsServer cvsServer = new CvsServer(cvsRoot, "moduleD");
+        assertNotNull(cvsServer.checkout(CvsRevision.HEAD, "moduleD/bob.xml"));
+    }
+
     public void testCheckoutBranch() throws Exception
     {
         CvsServer cvsServer = new CvsServer(cvsRoot, "project/test");

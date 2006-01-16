@@ -47,11 +47,11 @@ public class BaseWizard implements Wizard
 
     public void addState(WizardState state)
     {
-        if (!TextUtils.stringSet(state.getWizardStateName()))
+        if (!TextUtils.stringSet(state.getStateName()))
         {
             throw new IllegalArgumentException();
         }
-        states.put(state.getWizardStateName(), state);
+        states.put(state.getStateName(), state);
     }
 
     public boolean isComplete()
@@ -84,14 +84,14 @@ public class BaseWizard implements Wizard
         {
             currentState = initialState;
             currentState.initialise();
-            return currentState.getWizardStateName();
+            return currentState.getStateName();
         }
 
         validate(currentState);
         if (currentState.hasErrors())
         {
             // we can not progress to the next state until validation is successful.
-            return currentState.getWizardStateName();
+            return currentState.getStateName();
         }
 
         // execute current state
@@ -99,17 +99,17 @@ public class BaseWizard implements Wizard
         history.push(currentState);
 
         // get next state.
-        String nextState = currentState.getNextState();
+        String nextState = currentState.getNextStateName();
         if (nextState == null)
         {
             currentState.addActionError("Unknwon next state: " + nextState);
-            return currentState.getWizardStateName();
+            return currentState.getStateName();
         }
 
         currentState = getState(nextState);
         currentState.clearErrors();
         currentState.initialise();
-        return currentState.getWizardStateName();
+        return currentState.getStateName();
     }
 
     public String traverseBackward()
@@ -118,7 +118,7 @@ public class BaseWizard implements Wizard
         {
             currentState = history.pop();
         }
-        return currentState.getWizardStateName();
+        return currentState.getStateName();
     }
 
     private void validate(WizardState state)

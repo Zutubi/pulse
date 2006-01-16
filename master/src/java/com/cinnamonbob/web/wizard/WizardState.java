@@ -12,9 +12,9 @@ public interface WizardState extends ValidationAware
 
     void initialise();
 
-    String getWizardStateName();
+    String getStateName();
 
-    String getNextState();
+    String getNextStateName();
 
     void clearErrors();
 }

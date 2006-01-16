@@ -4,12 +4,17 @@ import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.CvsRevision;
 import com.cinnamonbob.core.model.Revision;
+import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
+import com.cinnamonbob.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.FileInputStream;
 import java.util.*;
 
 /**
@@ -21,6 +26,8 @@ public class CvsServer implements SCMServer
     private String cvsModule;
 
     private List<Changelist> EMPTY_LIST = Collections.unmodifiableList(new LinkedList<Changelist>());
+
+    private static final Logger LOG = Logger.getLogger(CvsServer.class);
 
     public CvsServer(String root, String module)
     {
@@ -47,7 +54,50 @@ public class CvsServer implements SCMServer
 
     public String checkout(Revision revision, String file) throws SCMException
     {
-        throw new RuntimeException("Method not implemented.");
+        if (revision == null)
+        {
+            throw new IllegalArgumentException("can not checkout a null revision of file '"+file+"'.");
+        }
+        if (!TextUtils.stringSet(file))
+        {
+            throw new IllegalArgumentException("You need to specify a file to checkout.");
+        }
+
+        File tmpDir = null;
+        try
+        {
+            tmpDir = FileSystemUtils.createTempDirectory("CvsServer", "checkout");
+            String branch = revision.getBranch();
+            Date date = revision.getDate();
+
+            internalCheckout(tmpDir, branch, date, file, null);
+
+            // read checked out file.
+            InputStream in = null;
+            try
+            {
+                File checkedOutFile = new File(tmpDir, file);
+                if (!checkedOutFile.exists())
+                {
+                    throw new SCMException("Unable to checkout file '"+file+"' from cvs["+cvsRoot+"].");
+                }
+                in = new FileInputStream(checkedOutFile);
+                return IOUtils.inputStreamToString(in);
+            }
+            finally
+            {
+                IOUtils.close(in);
+            }
+        }
+        catch (IOException e)
+        {
+            LOG.severe(e);
+            throw new SCMException("Unable to retrieve requested file: " + file, e);
+        }
+        finally
+        {
+            FileSystemUtils.removeDirectory(tmpDir);
+        }
     }
 
     public List<Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException
@@ -97,7 +147,7 @@ public class CvsServer implements SCMServer
         CvsClient client = new CvsClient(cvsRoot);
         if (TextUtils.stringSet(since.getBranch()))
         {
-            client.setBranch(since.getBranch());
+            client.setRevision(since.getBranch());
         }
         return client.hasChangedSince(since.getDate(), cvsModule);
     }
@@ -117,7 +167,7 @@ public class CvsServer implements SCMServer
         // to prevent problems with people checking in during the checkout.
         Date now = new Date(System.currentTimeMillis());
 
-        internalCheckout(checkoutDir, branch, now, null);
+        internalCheckout(checkoutDir, branch, now, cvsModule, null);
         return new CvsRevision(null, branch, null, now);
     }
 
@@ -139,7 +189,7 @@ public class CvsServer implements SCMServer
             throw new IllegalArgumentException("Unsupported revision type: " + revision.getClass() + ".");
         }
 
-        internalCheckout(checkoutDir, revision.getBranch(), revision.getDate(), null);
+        internalCheckout(checkoutDir, revision.getBranch(), revision.getDate(), cvsModule, null);
         return revision;
     }
 
@@ -151,7 +201,7 @@ public class CvsServer implements SCMServer
      * @param date        (optional)
      * @param tag         (not supported)
      */
-    private void internalCheckout(File checkoutDir, String branch, Date date, String tag) throws IOException, SCMException
+    private void internalCheckout(File checkoutDir, String branch, Date date, String serverPath, String tag) throws IOException, SCMException
     {
         if (checkoutDir == null)
         {
@@ -170,9 +220,9 @@ public class CvsServer implements SCMServer
         client.setLocalPath(checkoutDir);
         if (TextUtils.stringSet(branch))
         {
-            client.setBranch(branch);
+            client.setRevision(branch);
         }
-        client.checkout(cvsModule, date);
+        client.checkout(serverPath, date);
     }
 
     public Revision getLatestRevision() throws SCMException

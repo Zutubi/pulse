@@ -22,6 +22,11 @@ public class FileSystemUtils
      */
     public static boolean removeDirectory(File dir)
     {
+        if (dir == null)
+        {
+            return false;
+        }
+        
         if (!dir.exists())
         {
             return true;

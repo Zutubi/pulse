@@ -41,8 +41,8 @@ public class AddTriggerWizard extends BaseWizard
     public AddTriggerWizard()
     {
         selectState = new SelectTriggerType(this, "select");
-        configCron = new ConfigureCronTrigger(this, "cron");
-        configMonitor = new ConfigureMonitorTrigger(this, "monitor");
+        configCron = new ConfigureCronTrigger(this, CRON_STATE);
+        configMonitor = new ConfigureMonitorTrigger(this, MONITOR_STATE);
         finalState = new WizardCompleteState(this, "success");
 
         initialState = selectState;
@@ -157,13 +157,13 @@ public class AddTriggerWizard extends BaseWizard
             }
         }
 
-        public String getNextState()
+        public String getNextStateName()
         {
             if (TextUtils.stringSet(type))
             {
                 return type;
             }
-            return super.getWizardStateName();
+            return super.getStateName();
         }
     }
 
@@ -178,7 +178,7 @@ public class AddTriggerWizard extends BaseWizard
             super(wizard, name);
         }
 
-        public String getNextState()
+        public String getNextStateName()
         {
             return "success";
         }

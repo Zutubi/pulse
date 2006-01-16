@@ -10,8 +10,10 @@ import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.text.DateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -64,17 +66,27 @@ public class CvsClientTest extends TestCase
         cvs.checkout("project", null);
 
         assertTrue(foo.exists());
-        assertFalse(new File(workdir, "test/branch.only").exists());
+        assertFalse(new File(workdir, "project/test/branch.only").exists());
+    }
+
+    public void testCheckoutFile() throws Exception
+    {
+        File foo = new File(workdir, "project/test/foo");
+        assertTrue(!foo.exists());
+        // checkout...
+        cvs.setLocalPath(workdir);
+        cvs.checkout("project/test/foo");
+        assertTrue(foo.exists());
     }
 
     public void testCheckoutBranch() throws Exception
     {
         // checkout...
         cvs.setLocalPath(workdir);
-        cvs.setBranch("BRANCH");
+        cvs.setRevision("BRANCH");
         cvs.checkout("project", null);
 
-        assertTrue(new File(workdir, "test/branch.only").exists());
+        assertTrue(new File(workdir, "project/test/branch.only").exists());
     }
 
     public void testHasChangedSince() throws Exception
@@ -99,7 +111,7 @@ public class CvsClientTest extends TestCase
         // attempting to checkout with a leading '/' results in the CheckoutCommand hanging.
         try
         {
-            cvs.checkout("/e/cvsroot/project", null);
+            cvs.checkout("/e/cvsroot/project", (Date)null);
             assertFalse(true);
         }
         catch (SCMException e)
@@ -113,7 +125,6 @@ public class CvsClientTest extends TestCase
         // get changes since the start.
         List<Changelist> changes = cvs.getChangeLists(null, null);
         assertNotNull(changes);
-        assertTrue(changes.size() == 10);
         assertEquals(2, changes.get(0).getChanges().size());
         assertEquals(1, changes.get(1).getChanges().size());
         assertEquals(2, changes.get(2).getChanges().size());
@@ -130,17 +141,7 @@ public class CvsClientTest extends TestCase
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         changes = cvs.getChangeLists(dateFormat.parse("2005-05-10"), null);
         assertNotNull(changes);
-        assertTrue(changes.size() == 5);
-    }
-
-    public void testGetChangesFromAtlassian() throws Exception
-    {
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//
-//        CVSRoot root = CVSRoot.parse(":ext:dostermeier:4edueWX7@cvs.atlassian.com:/cvsroot/atlassian");
-//        CvsClient cvs = new CvsClient(root);
-//        List<Changelist> changes = cvs.getChangeLists(dateFormat.parse("2005-10-05"), null);
-//        System.out.println("changes:" + changes.size());
+        assertTrue(changes.size() == 12);
     }
 
     public void testUpdate() throws Exception

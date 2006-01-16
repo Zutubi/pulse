@@ -23,7 +23,7 @@ public class TestWizardState extends BaseWizardState implements Validateable
         this.nextState = state;
     }
 
-    public String getNextState()
+    public String getNextStateName()
     {
         return nextState;
     }
