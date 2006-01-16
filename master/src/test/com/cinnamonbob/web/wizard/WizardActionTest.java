@@ -1,9 +1,8 @@
 package com.cinnamonbob.web.wizard;
 
-import junit.framework.TestCase;
-import com.opensymphony.xwork.ActionContext;
-import com.opensymphony.xwork.Action;
 import com.cinnamonbob.web.ActionSupport;
+import com.opensymphony.xwork.ActionContext;
+import junit.framework.TestCase;
 
 import java.util.HashMap;
 

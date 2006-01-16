@@ -114,13 +114,20 @@ public abstract class Result extends Entity
 
         if (outputDir != null)
         {
+
+            FileOutputStream fos = null;
             try
             {
-                e.printStackTrace(new PrintStream(new FileOutputStream(new File(outputDir, EXCEPTION_FILE)), true));
+                fos = new FileOutputStream(new File(outputDir, EXCEPTION_FILE));
+                e.printStackTrace(new PrintStream(fos, true));
             }
             catch (FileNotFoundException ignored)
             {
                 // no need to handle this, we did our level best
+            }
+            finally
+            {
+                IOUtils.close(fos);
             }
         }
     }

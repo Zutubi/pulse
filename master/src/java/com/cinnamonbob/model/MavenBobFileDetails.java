@@ -1,6 +1,7 @@
 package com.cinnamonbob.model;
 
 import org.apache.velocity.VelocityContext;
+import com.opensymphony.util.TextUtils;
 
 /**
  * <class-comment/>
@@ -12,6 +13,8 @@ public class MavenBobFileDetails extends TemplateBobFileDetails
      */
     private String targets;
 
+    private String baseDir;
+
     protected String getTemplateName()
     {
         return "maven.template.vm";
@@ -19,9 +22,17 @@ public class MavenBobFileDetails extends TemplateBobFileDetails
 
     protected void populateContext(VelocityContext context)
     {
-        if (targets != null)
+        if (TextUtils.stringSet(targets))
         {
-            context.put("targets", targets.split(" "));
+            String[] arg = targets.split(" ");
+            if (arg.length > 0)
+            {
+                context.put("targets", arg);
+            }
+        }
+        if (TextUtils.stringSet(baseDir))
+        {
+            context.put("baseDir", baseDir.trim());
         }
     }
 
@@ -38,5 +49,15 @@ public class MavenBobFileDetails extends TemplateBobFileDetails
     public void setTargets(String targets)
     {
         this.targets = targets;
+    }
+
+    public String getBaseDir()
+    {
+        return baseDir;
+    }
+
+    public void setBaseDir(String baseDir)
+    {
+        this.baseDir = baseDir;
     }
 }

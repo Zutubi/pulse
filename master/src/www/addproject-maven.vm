@@ -11,7 +11,8 @@
     <h3>maven project</h3>
 
     <fieldset>
-        #tag (TextField "name='details.targets'" "label='maven.targets'" "tabindex='2'")
+        #tag (TextField "name='details.targets'" "label='maven.targets'" "tabindex='1'")
+        #tag (TextField "name='details.baseDir'" "label='maven.baseDir'" "tabindex='2'")
     </fieldset>
 
     <fieldset class="submit">

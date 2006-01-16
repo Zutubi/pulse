@@ -1,12 +1,22 @@
 <?xml version="1.0"?>
 <project defaultRecipe="maven build">
+
+    <post-processor name="maven.pp">
+        <regex>
+            <pattern category="error" expression=".*BUILD FAILED.*"/>
+        </regex>
+    </post-processor>
+
     <recipe name="maven build">
         <command name="build">
-            <executable exe="maven.bat">
+            <executable exe="maven.bat" working-dir="${work.dir}">
+                <arg>-d</arg>
+                <arg>$baseDir</arg>
 #foreach($target in $targets)
                 <arg>$target</arg>
 #end
             </executable>
+            <process artifact="output" processor="${maven.pp}"/>
         </command>
     </recipe>
 </project>

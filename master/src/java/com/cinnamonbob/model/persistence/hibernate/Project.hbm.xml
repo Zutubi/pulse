@@ -53,6 +53,7 @@
 
         <subclass name="com.cinnamonbob.model.MavenBobFileDetails" discriminator-value="MAVEN">
 
+            <property name="baseDir" column="BASE_DIR" type="string" length="255"/>
             <property name="targets" column="TARGETS" type="string" length="255"/>
 
         </subclass>

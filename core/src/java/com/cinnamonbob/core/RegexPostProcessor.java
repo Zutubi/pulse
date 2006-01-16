@@ -2,6 +2,7 @@ package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.PlainFeature;
 import com.cinnamonbob.core.model.StoredArtifact;
+import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.io.BufferedReader;
@@ -37,10 +38,11 @@ public class RegexPostProcessor implements PostProcessor
 
     public void process(File outputDir, StoredArtifact artifact)
     {
+        BufferedReader reader = null;
         try
         {
             File file = new File(outputDir, artifact.getFile());
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+            reader = new BufferedReader(new FileReader(file));
             String line;
             long lineNumber = 0;
 
@@ -54,7 +56,10 @@ public class RegexPostProcessor implements PostProcessor
         {
             LOG.warning("I/O error post-processing artifact '" + artifact.getName() + "': " + e.getMessage());
         }
-
+        finally
+        {
+            IOUtils.close(reader);
+        }
     }
 
     private void processLine(StoredArtifact artifact, String line, long lineNumber)

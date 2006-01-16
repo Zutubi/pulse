@@ -1,0 +1,27 @@
+<html>
+<head>
+    <title>edit maven details</title>
+</head>
+<body>
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='editMavenDetails.action'" "method='post'")
+
+    #tag (Hidden "name='id'")
+    #tag (Hidden "name='projectId'")
+
+    <h3>edit maven details</h3>
+
+    <fieldset>
+        #tag (TextField "name='details.baseDir'" "label='maven.baseDir'" "tabindex='1'")
+        #tag (TextField "name='details.targets'" "label='maven.targets'" "tabindex='2'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
+    </fieldset>
+
+ #end
+</body>
+</html>

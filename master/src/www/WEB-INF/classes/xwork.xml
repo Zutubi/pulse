@@ -253,6 +253,7 @@
                 method="doDefault">
             <result name="custom" type="chain">editCustomDetails!default</result>
             <result name="jakarta ant" type="chain">editAntDetails!default</result>
+            <result name="maven" type="chain">editMavenDetails!default</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
@@ -278,6 +279,19 @@
         <action name="editAntDetails" class="com.cinnamonbob.web.project.EditAntDetailsAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-details-ant.vm</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="editMavenDetails!default" class="com.cinnamonbob.web.project.EditMavenDetailsAction"
+                method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">edit-details-maven.vm</result>
+        </action>
+
+        <action name="editMavenDetails" class="com.cinnamonbob.web.project.EditMavenDetailsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-maven.vm</result>
             <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>
             <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
         </action>

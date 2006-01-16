@@ -3,6 +3,7 @@ package com.cinnamonbob.core;
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,6 +19,8 @@ import java.util.List;
  */
 public class ExecutableCommand implements Command
 {
+    private static final Logger LOG = Logger.getLogger(ExecutableCommand.class);
+
     private String exe;
     private List<Arg> args = new LinkedList<Arg>();
     private File workingDir;
@@ -56,14 +59,20 @@ public class ExecutableCommand implements Command
         {
             Process child = builder.start();
             File outputFile = new File(outputDir, "output.txt");
-            FileOutputStream output = new FileOutputStream(outputFile);
-            InputStream input = child.getInputStream();
+            FileOutputStream output = null;
+            try
+            {
+                output = new FileOutputStream(outputFile);
+                InputStream input = child.getInputStream();
 
-            IOUtils.joinStreams(input, output);
+                IOUtils.joinStreams(input, output);
+            }
+            finally
+            {
+                IOUtils.close(output);
+            }
+
             final int result = child.waitFor();
-
-            output.close();
-
             String commandLine = constructCommandLine(builder);
 
             if (result == 0)
