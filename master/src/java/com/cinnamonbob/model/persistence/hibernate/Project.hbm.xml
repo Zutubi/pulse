@@ -51,6 +51,12 @@
 
         </subclass>
 
+        <subclass name="com.cinnamonbob.model.MavenBobFileDetails" discriminator-value="MAVEN">
+
+            <property name="targets" column="TARGETS" type="string" length="255"/>
+
+        </subclass>
+
     </class>
 
     <query name="findByLikeName"><![CDATA[

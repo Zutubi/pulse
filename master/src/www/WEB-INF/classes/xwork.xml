@@ -290,6 +290,7 @@
             <result name="svn" type="velocity">addproject-svn.vm</result>
             <result name="p4" type="velocity">addproject-p4.vm</result>
             <result name="custom" type="velocity">addproject-custom.vm</result>
+            <result name="maven" type="velocity">addproject-maven.vm</result>
             <result name="ant" type="velocity">addproject-ant.vm</result>
             <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
             <result name="cancel" type="redirect">/viewProjects.action</result>

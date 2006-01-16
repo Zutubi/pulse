@@ -1,10 +1,15 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.*;
+import com.cinnamonbob.model.persistence.BuildSpecificationNodeDao;
 import com.cinnamonbob.web.wizard.BaseWizard;
 import com.cinnamonbob.web.wizard.BaseWizardState;
 import com.cinnamonbob.web.wizard.Wizard;
 import com.cinnamonbob.web.wizard.WizardCompleteState;
+import com.cinnamonbob.scheduling.*;
+import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
+import com.cinnamonbob.scm.SCMChangeEvent;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -13,6 +18,8 @@ import java.util.TreeMap;
  */
 public class AddProjectWizard extends BaseWizard
 {
+    private static final Logger LOG = Logger.getLogger(AddProjectWizard.class);
+
     protected ProjectDetails projectDetails;
     private CvsDetails cvsDetails;
     private SvnDetails svnDetails;
@@ -23,8 +30,11 @@ public class AddProjectWizard extends BaseWizard
     private WizardCompleteState completeState;
 
     private ProjectManager projectManager;
+    private BuildSpecificationNodeDao buildSpecificationNodeDao;
+    private Scheduler scheduler;
 
     private long projectId;
+    private MavenDetails mavenDetails;
 
     public AddProjectWizard()
     {
@@ -34,6 +44,7 @@ public class AddProjectWizard extends BaseWizard
         p4Details = new P4Details(this, "p4");
 
         antDetails = new AntDetails(this, "ant");
+        mavenDetails = new MavenDetails(this, "maven");
         customDetails = new CustomDetails(this, "custom");
         completeState = new WizardCompleteState(this, "success");
 
@@ -44,6 +55,7 @@ public class AddProjectWizard extends BaseWizard
         addState(svnDetails);
         addState(p4Details);
         addState(antDetails);
+        addState(mavenDetails);
         addState(customDetails);
         addState(completeState);
     }
@@ -82,16 +94,58 @@ public class AddProjectWizard extends BaseWizard
         {
             details = customDetails.getDetails();
         }
+        else if ("maven".equals(projectType))
+        {
+            details = mavenDetails.getDetails();
+        }
         project.setBobFileDetails(details);
+
+        BuildSpecification buildSpec = new BuildSpecification("default");
+        project.addBuildSpecification(buildSpec);
 
         projectManager.save(project);
         projectId = project.getId();
+
+        // TODO: All of this should be done within a manager.
+
+        // create a simple build specification that executes the default recipe.
+        BuildSpecificationNode parent = buildSpecificationNodeDao.findById(buildSpec.getRoot().getId());
+        BuildStage stage = new BuildStage();
+        stage.setHostRequirements(new MasterBuildHostRequirements());
+        BuildSpecificationNode node = new BuildSpecificationNode(stage);
+        parent.addChild(node);
+        buildSpecificationNodeDao.save(parent);
+
+        // schedule the event trigger.
+        Trigger trigger = new EventTrigger(SCMChangeEvent.class, "scm monitor");
+        trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, "default");
+        trigger.setProject(project.getId());
+        trigger.setTaskClass(BuildProjectTask.class);
+        trigger.getDataMap().put(BuildProjectTask.PARAM_PROJECT, project.getId());
+
+        try
+        {
+            scheduler.schedule(trigger);
+        }
+        catch (SchedulingException e)
+        {
+            LOG.severe(e.getMessage(), e);
+        }
     }
 
+    public void setScheduler(Scheduler scheduler)
+    {
+        this.scheduler = scheduler;
+    }
 
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setBuildSpecificationNodeDao(BuildSpecificationNodeDao buildSpecificationNodeDao)
+    {
+        this.buildSpecificationNodeDao = buildSpecificationNodeDao;
     }
 
     public long getProjectId()
@@ -134,6 +188,7 @@ public class AddProjectWizard extends BaseWizard
                 types = new TreeMap<String, String>();
                 types.put("ant", "jakarta ant project");
                 types.put("custom", "custom project");
+                types.put("maven", "maven project");
             }
             return types;
         }
@@ -264,6 +319,26 @@ public class AddProjectWizard extends BaseWizard
         private AntBobFileDetails details = new AntBobFileDetails("build.xml", "", null);
 
         public AntDetails(Wizard wizard, String name)
+        {
+            super(wizard, name);
+        }
+
+        public String getNextStateName()
+        {
+            return ((AddProjectWizard) getWizard()).completeState.getStateName();
+        }
+
+        public BobFileDetails getDetails()
+        {
+            return details;
+        }
+    }
+
+    private class MavenDetails extends BaseWizardState
+    {
+        private MavenBobFileDetails details = new MavenBobFileDetails();
+
+        public MavenDetails(Wizard wizard, String name)
         {
             super(wizard, name);
         }

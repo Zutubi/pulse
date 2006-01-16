@@ -1,0 +1,25 @@
+<html>
+<head>
+    <title>maven project</title>
+</head>
+<content tag="action">maven.project.create</content>
+<body>
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='addProject.action'" "method='post'")
+
+    <h3>maven project</h3>
+
+    <fieldset>
+        #tag (TextField "name='details.targets'" "label='maven.targets'" "tabindex='2'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('finish.name')" "name='finish'" "tabindex='3'")
+        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='4'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
+    </fieldset>
+
+ #end
+</body>
+</html>
