@@ -153,7 +153,7 @@ public class AddProjectWizard extends BaseWizard
             }
         }
 
-        public String getNextState()
+        public String getNextStateName()
         {
             return scm;
         }
@@ -213,7 +213,7 @@ public class AddProjectWizard extends BaseWizard
             return cvs;
         }
 
-        public String getNextState()
+        public String getNextStateName()
         {
             return ((AddProjectWizard) getWizard()).projectDetails.getType();
         }
@@ -233,7 +233,7 @@ public class AddProjectWizard extends BaseWizard
             return svn;
         }
 
-        public String getNextState()
+        public String getNextStateName()
         {
             return ((AddProjectWizard) getWizard()).projectDetails.getType();
         }
@@ -253,7 +253,7 @@ public class AddProjectWizard extends BaseWizard
             return p4;
         }
 
-        public String getNextState()
+        public String getNextStateName()
         {
             return ((AddProjectWizard) getWizard()).projectDetails.getType();
         }
@@ -268,9 +268,9 @@ public class AddProjectWizard extends BaseWizard
             super(wizard, name);
         }
 
-        public String getNextState()
+        public String getNextStateName()
         {
-            return ((AddProjectWizard) getWizard()).completeState.getWizardStateName();
+            return ((AddProjectWizard) getWizard()).completeState.getStateName();
         }
 
         public BobFileDetails getDetails()
@@ -288,9 +288,9 @@ public class AddProjectWizard extends BaseWizard
             super(wizard, name);
         }
 
-        public String getNextState()
+        public String getNextStateName()
         {
-            return ((AddProjectWizard) getWizard()).completeState.getWizardStateName();
+            return ((AddProjectWizard) getWizard()).completeState.getStateName();
         }
 
         public BobFileDetails getDetails()
