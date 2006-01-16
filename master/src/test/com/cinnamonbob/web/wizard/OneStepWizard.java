@@ -6,11 +6,16 @@ package com.cinnamonbob.web.wizard;
 public class OneStepWizard extends BaseWizard
 {
     TestWizardState state;
+    WizardCompleteState completeState;
 
     public OneStepWizard()
     {
         state = new TestWizardState(this, "a");
-        setCurrentState(state);
+        completeState = new WizardCompleteState(this, "success");
+        state.setNextState(completeState.getStateName());
+        initialState = state;
+        addState(state);
+        addState(completeState);
     }
 
 }
