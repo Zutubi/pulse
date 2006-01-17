@@ -118,6 +118,7 @@ public class AddProjectWizard extends BaseWizard
 
         // schedule the event trigger.
         Trigger trigger = new EventTrigger(SCMChangeEvent.class, "scm monitor");
+        trigger.setProject(project.getId());
         trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, "default");
         trigger.setProject(project.getId());
         trigger.setTaskClass(BuildProjectTask.class);

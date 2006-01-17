@@ -42,7 +42,9 @@ public class MonitorScms implements Task
                 if (!latestRevisions.containsKey(scm.getId()))
                 {
                     latestRevisions.put(scm.getId(), server.getLatestRevision());
+                    continue;
                 }
+
                 Revision previous = latestRevisions.get(scm.getId());
                 if (server.hasChangedSince(previous))
                 {
