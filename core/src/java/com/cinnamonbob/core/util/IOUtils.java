@@ -1,15 +1,21 @@
 package com.cinnamonbob.core.util;
 
+import com.cinnamonbob.util.logging.Logger;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
 
 /**
+ * A utility class for standard IO operations.
+ *
  * @author Daniel Ostermeier
  */
 public class IOUtils
 {
+    private static final Logger LOG = Logger.getLogger(IOUtils.class);
+
     public static void close(Socket s)
     {
         try
@@ -21,7 +27,7 @@ public class IOUtils
         }
         catch (IOException e)
         {
-            // nop
+            LOG.finest(e);
         }
     }
 
@@ -55,7 +61,7 @@ public class IOUtils
         }
         catch (IOException e)
         {
-            //nop
+            LOG.finest(e);
         }
     }
 
@@ -70,7 +76,7 @@ public class IOUtils
         }
         catch (IOException e)
         {
-            // nop
+            LOG.finest(e);
         }
     }
 
@@ -85,7 +91,7 @@ public class IOUtils
         }
         catch (IOException e)
         {
-            // nop
+            LOG.finest(e);
         }
     }
 
@@ -100,7 +106,7 @@ public class IOUtils
         }
         catch (IOException e)
         {
-            //noop    
+            LOG.finest(e);
         }
     }
 
@@ -115,7 +121,7 @@ public class IOUtils
         }
         catch (IOException e)
         {
-            //noop    
+            LOG.finest(e);
         }
     }
 
@@ -170,19 +176,15 @@ public class IOUtils
     public static String fileToString(File file) throws IOException
     {
         FileInputStream is = null;
-        String result;
-
         try
         {
             is = new FileInputStream(file);
-            result = inputStreamToString(is);
+            return inputStreamToString(is);
         }
         finally
         {
             close(is);
         }
-
-        return result;
     }
 
 }

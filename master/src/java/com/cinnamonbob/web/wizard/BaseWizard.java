@@ -60,8 +60,7 @@ public class BaseWizard implements Wizard
     }
 
     /**
-     * Override this to handle any final processing required when the wizard is
-     * complete.
+     * Override this to handle any final processing required when the wizard is completed.
      *
      */
     public void process()

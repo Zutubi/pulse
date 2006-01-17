@@ -72,6 +72,7 @@ public class WizardAction extends ActionSupport
         catch (RuntimeException e)
         {
             LOG.severe(e);
+            addActionError("Unexpected exception: " + e.getClass().getName() + ", " + e.getMessage());
             // remove the wizard from the session so that we can start fresh
             Map session = ActionContext.getContext().getSession();
             session.remove(wizardClass);

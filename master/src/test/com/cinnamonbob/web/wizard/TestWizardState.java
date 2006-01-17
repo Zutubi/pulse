@@ -59,4 +59,11 @@ public class TestWizardState extends BaseWizardState implements Validateable
     {
         return validated;
     }
+
+    public void reset()
+    {
+        executed = false;
+        validated = false;
+        initialised = false;
+    }
 }
