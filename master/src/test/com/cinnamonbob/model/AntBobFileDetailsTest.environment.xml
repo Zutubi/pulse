@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 <project defaultRecipe="ant build">
     <recipe name="ant build">
-        <executable exe="${ant.bin}">
-            <environment name="var" value="value"/>
-            <environment name="var2" value="value2"/>
-        </executable>
+        <command name="build">
+            <executable exe="${ant.bin}">
+                <environment name="var" value="value"/>
+                <environment name="var2" value="value2"/>
+            </executable>
+        </command>
     </recipe>
 </project>
