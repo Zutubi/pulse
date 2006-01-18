@@ -1,5 +1,9 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.model.Property;
+import com.cinnamonbob.core.model.Resource;
+import com.cinnamonbob.core.model.ResourceVersion;
+
 import java.io.InputStream;
 
 /**

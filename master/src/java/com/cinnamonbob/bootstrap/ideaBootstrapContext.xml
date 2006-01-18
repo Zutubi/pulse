@@ -10,6 +10,7 @@
         <property name="systemContexts">
             <list>
                 <value>com/cinnamonbob/bootstrap/databaseBootstrapContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/coreDatabaseContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/databaseContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/applicationContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/webserverContext.xml</value>

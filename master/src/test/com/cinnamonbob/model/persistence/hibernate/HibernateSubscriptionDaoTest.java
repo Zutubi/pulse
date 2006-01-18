@@ -1,10 +1,12 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.model.*;
-import com.cinnamonbob.model.persistence.ScmDao;
-import com.cinnamonbob.model.persistence.SubscriptionDao;
+import com.cinnamonbob.model.ContactPoint;
+import com.cinnamonbob.model.EmailContactPoint;
+import com.cinnamonbob.model.Project;
+import com.cinnamonbob.model.Subscription;
 import com.cinnamonbob.model.persistence.ContactPointDao;
 import com.cinnamonbob.model.persistence.ProjectDao;
+import com.cinnamonbob.model.persistence.SubscriptionDao;
 
 import java.util.List;
 
@@ -12,7 +14,7 @@ import java.util.List;
 /**
  * <class-comment/>
  */
-public class HibernateSubscriptionDaoTest extends PersistenceTestCase
+public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
 {
     private SubscriptionDao subDao;
     private ProjectDao projectDao;
@@ -31,7 +33,7 @@ public class HibernateSubscriptionDaoTest extends PersistenceTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        
+
         subDao = (SubscriptionDao) context.getBean("subscriptionDao");
         projectDao = (ProjectDao) context.getBean("projectDao");
         contactDao = (ContactPointDao) context.getBean("contactPointDao");
@@ -40,7 +42,7 @@ public class HibernateSubscriptionDaoTest extends PersistenceTestCase
     public void tearDown() throws Exception
     {
         // tear down here.
-        
+
         super.tearDown();
     }
 

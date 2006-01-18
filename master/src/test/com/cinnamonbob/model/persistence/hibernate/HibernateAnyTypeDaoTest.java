@@ -13,7 +13,7 @@ import com.cinnamonbob.model.persistence.ObjectHandle;
 import java.util.LinkedList;
 import java.util.List;
 
-public class HibernateAnyTypeDaoTest extends PersistenceTestCase
+public class HibernateAnyTypeDaoTest extends MasterPersistenceTestCase
 {
     private AnyTypeDao dao;
 

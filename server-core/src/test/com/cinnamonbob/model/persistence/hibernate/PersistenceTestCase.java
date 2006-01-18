@@ -56,7 +56,7 @@ public abstract class PersistenceTestCase extends BobTestCase
         dbBootstrap.setDataSource(dataSource);
         dbBootstrap.initialiseDatabase();
 
-        transactionManager = (PlatformTransactionManager)context.getBean("transactionManager");
+        transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
         transactionDefinition = new DefaultTransactionDefinition(DefaultTransactionDefinition.PROPAGATION_REQUIRED);
         transactionStatus = transactionManager.getTransaction(transactionDefinition);
 
@@ -77,7 +77,7 @@ public abstract class PersistenceTestCase extends BobTestCase
             e.printStackTrace();
         }
 
-        Connection con = ((DataSource)context.getBean("dataSource")).getConnection();
+        Connection con = ((DataSource) context.getBean("dataSource")).getConnection();
         Statement stmt = null;
         try
         {
@@ -87,7 +87,9 @@ public abstract class PersistenceTestCase extends BobTestCase
         finally
         {
             if (stmt != null)
+            {
                 stmt.close();
+            }
         }
         transactionStatus = null;
         transactionDefinition = null;
@@ -95,13 +97,7 @@ public abstract class PersistenceTestCase extends BobTestCase
         super.tearDown();
     }
 
-    protected String[] getConfigLocations()
-    {
-        return new String[]{
-            "com/cinnamonbob/bootstrap/testBootstrapContext.xml",
-            "com/cinnamonbob/bootstrap/testApplicationContext.xml"
-        };
-    }
+    protected abstract String[] getConfigLocations();
 
     protected void commitAndRefreshTransaction()
     {

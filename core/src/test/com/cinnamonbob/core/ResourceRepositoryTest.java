@@ -1,5 +1,8 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.model.Property;
+import com.cinnamonbob.core.model.Resource;
+import com.cinnamonbob.core.model.ResourceVersion;
 import com.cinnamonbob.test.BobTestCase;
 
 import java.util.List;

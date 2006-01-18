@@ -1,5 +1,7 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.model.Property;
+
 import java.io.InputStream;
 import java.util.List;
 

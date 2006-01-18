@@ -1,5 +1,6 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.model.Property;
 import junit.framework.TestCase;
 
 /**

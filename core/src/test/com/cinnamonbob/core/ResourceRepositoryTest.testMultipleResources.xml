@@ -2,17 +2,17 @@
 <resources>
 
     <resource name="aResource">
-        <version id="aVersion">
+        <version value="aVersion">
             <property name="b" value="c"/>
             <property name="d" value="e"/>
         </version>
     </resource>
     <resource name="bResource">
-        <version id="aVersion">
+        <version value="aVersion">
             <property name="b" value="c"/>
             <property name="d" value="e"/>
         </version>
-        <version id="bVersion">
+        <version value="bVersion">
             <property name="1" value="2"/>
             <property name="3" value="4"/>
         </version>

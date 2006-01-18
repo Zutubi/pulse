@@ -12,7 +12,7 @@ import java.util.TreeMap;
  * 
  *
  */
-public class HibernateProjectDaoTest extends PersistenceTestCase
+public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 {
     private ProjectDao projectDao;
 

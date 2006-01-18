@@ -1,17 +1,15 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.EmailContactPoint;
+import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.persistence.UserDao;
 
 import java.util.List;
 
 /**
- * 
- *
  * @noinspection FieldCanBeLocal
  */
-public class HibernateUserDaoTest extends PersistenceTestCase
+public class HibernateUserDaoTest extends MasterPersistenceTestCase
 {
     private UserDao userDao;
 

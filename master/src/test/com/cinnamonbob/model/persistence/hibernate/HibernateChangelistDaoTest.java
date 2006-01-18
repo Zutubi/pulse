@@ -12,7 +12,7 @@ import java.util.Date;
  * 
  *
  */
-public class HibernateChangelistDaoTest extends PersistenceTestCase
+public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 {
 
     private ChangelistDao changelistDao;

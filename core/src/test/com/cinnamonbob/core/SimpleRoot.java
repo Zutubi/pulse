@@ -1,7 +1,9 @@
 package com.cinnamonbob.core;
 
-import java.util.List;
+import com.cinnamonbob.core.model.Property;
+
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 

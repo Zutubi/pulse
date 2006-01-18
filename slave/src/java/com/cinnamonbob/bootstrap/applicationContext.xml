@@ -10,6 +10,12 @@
         </property>
     </bean>
 
+    <bean id="databaseBootstrap" class="com.cinnamonbob.bootstrap.DatabaseBootstrap" init-method="initialiseDatabase">
+        <property name="dataSource">
+            <ref bean="dataSource"/>
+        </property>
+    </bean>
+
     <bean id="threadPool" class="com.cinnamonbob.slave.SlaveThreadPool" autowire="byName"/>
 
     <bean id="slaveRecipeProcessor" class="com.cinnamonbob.slave.SlaveRecipeProcessor" autowire="byName"/>

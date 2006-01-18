@@ -1,5 +1,8 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.model.Resource;
+import com.cinnamonbob.core.model.ResourceVersion;
+
 /**
  * <class-comment/>
  */
@@ -20,23 +23,23 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
     {
         Resource resource = null;
 
-        if(repository != null)
+        if (repository != null)
         {
             resource = repository.getResource(name);
         }
 
-        if(resource == null)
+        if (resource == null)
         {
             throw new FileLoadException("Reference to undefined resource '" + name + "'");
         }
 
         scope.add(resource.getProperties());
 
-        if(version != null)
+        if (version != null)
         {
             ResourceVersion resourceVersion = resource.getVersion(version);
 
-            if(resourceVersion == null)
+            if (resourceVersion == null)
             {
                 throw new FileLoadException("Reference to undefined version '" + version + "' of resource '" + name + "'");
             }

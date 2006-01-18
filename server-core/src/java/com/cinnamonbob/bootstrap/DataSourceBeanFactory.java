@@ -24,7 +24,7 @@ public class DataSourceBeanFactory implements FactoryBean, ApplicationContextAwa
     {
         if (dataSource == null)
         {
-            synchronized(this)
+            synchronized (this)
             {
                 if (dataSource == null)
                 {
@@ -79,6 +79,8 @@ public class DataSourceBeanFactory implements FactoryBean, ApplicationContextAwa
     public void close() throws SQLException
     {
         if (dataSource != null)
+        {
             dataSource.close();
+        }
     }
 }

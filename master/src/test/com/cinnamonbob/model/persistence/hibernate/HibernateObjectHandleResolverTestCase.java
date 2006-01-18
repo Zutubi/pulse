@@ -8,7 +8,7 @@ import org.hibernate.SessionFactory;
 /**
  * @author Daniel Ostermeier
  */
-public class HibernateObjectHandleResolverTestCase extends PersistenceTestCase
+public class HibernateObjectHandleResolverTestCase extends MasterPersistenceTestCase
 {
     private HibernateObjectHandleResolver resolver;
     private ProjectDao projectDao;

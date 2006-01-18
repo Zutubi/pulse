@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @noinspection FieldCanBeLocal
  */
-public class HibernateSlaveDaoTest extends PersistenceTestCase
+public class HibernateSlaveDaoTest extends MasterPersistenceTestCase
 {
     private SlaveDao slaveDao;
 

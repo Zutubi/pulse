@@ -9,7 +9,7 @@ import com.cinnamonbob.model.persistence.SlaveDao;
  * 
  *
  */
-public class HibernateBuildSpecificationDaoTest extends PersistenceTestCase
+public class HibernateBuildSpecificationDaoTest extends MasterPersistenceTestCase
 {
     private BuildSpecificationDao buildSpecificationDao;
     private SlaveDao slaveDao;

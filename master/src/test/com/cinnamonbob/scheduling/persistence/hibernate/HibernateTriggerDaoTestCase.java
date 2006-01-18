@@ -3,14 +3,14 @@
  */
 package com.cinnamonbob.scheduling.persistence.hibernate;
 
-import com.cinnamonbob.model.persistence.hibernate.PersistenceTestCase;
+import com.cinnamonbob.model.persistence.hibernate.MasterPersistenceTestCase;
 import com.cinnamonbob.scheduling.NoopTrigger;
 import com.cinnamonbob.scheduling.Trigger;
 import com.cinnamonbob.scheduling.persistence.TriggerDao;
 
 import java.util.List;
 
-public class HibernateTriggerDaoTestCase extends PersistenceTestCase
+public class HibernateTriggerDaoTestCase extends MasterPersistenceTestCase
 {
     private TriggerDao dao;
 
@@ -36,8 +36,8 @@ public class HibernateTriggerDaoTestCase extends PersistenceTestCase
 
     protected String[] getConfigLocations()
     {
-        return new String[]{ "com/cinnamonbob/bootstrap/testBootstrapContext.xml",
-            "com/cinnamonbob/scheduling/persistence/hibernate/HibernateTriggerDaoContext.xml"
+        return new String[]{"com/cinnamonbob/bootstrap/testBootstrapContext.xml",
+                "com/cinnamonbob/scheduling/persistence/hibernate/HibernateTriggerDaoContext.xml"
         };
     }
 

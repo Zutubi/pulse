@@ -1,4 +1,7 @@
-package com.cinnamonbob.core;
+package com.cinnamonbob.core.model;
+
+import com.cinnamonbob.core.FileLoadException;
+import com.cinnamonbob.core.Namespace;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -6,24 +9,29 @@ import java.util.TreeMap;
 /**
  * <class-comment/>
  */
-public class ResourceVersion implements Namespace
+public class ResourceVersion extends Entity implements Namespace
 {
-    private String id;
+    private String value;
     private Map<String, Property> properties = new TreeMap<String, Property>();
 
-    public String getId()
+    public String getValue()
     {
-        return id;
+        return value;
     }
 
-    public void setId(String id)
+    public void setValue(String value)
     {
-        this.id = id;
+        this.value = value;
     }
 
     public Map<String, Property> getProperties()
     {
         return properties;
+    }
+
+    private void setProperties(Map<String, Property> properties)
+    {
+        this.properties = properties;
     }
 
     public boolean hasProperty(String name)
@@ -36,7 +44,7 @@ public class ResourceVersion implements Namespace
         String name = p.getName();
         if (hasProperty(name))
         {
-            throw new FileLoadException("Property with name '"+name+"' already exists with value '"+properties.get(name).getValue()+"'");
+            throw new FileLoadException("Property with name '" + name + "' already exists with value '" + properties.get(name).getValue() + "'");
         }
         properties.put(name, p);
     }

@@ -1,11 +1,13 @@
-package com.cinnamonbob.core;
+package com.cinnamonbob.core.model;
+
+import com.cinnamonbob.core.Reference;
 
 
 /**
  * 
  *
  */
-public class Property implements Reference
+public class Property extends Entity implements Reference
 {
     private String name;
     private String value;

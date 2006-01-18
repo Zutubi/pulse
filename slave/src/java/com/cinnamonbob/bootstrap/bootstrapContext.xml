@@ -7,6 +7,8 @@
     <bean id="startupManager" class="com.cinnamonbob.bootstrap.StartupManager">
         <property name="systemContexts">
             <list>
+                <value>com/cinnamonbob/bootstrap/databaseBootstrapContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/coreDatabaseContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/applicationContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/webserverContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/webworkContext.xml</value>
@@ -21,5 +23,7 @@
             </props>
         </property>
     </bean>
+
+    <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
 
 </beans>

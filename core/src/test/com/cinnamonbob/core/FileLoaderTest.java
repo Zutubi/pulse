@@ -1,5 +1,6 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.model.Property;
 import com.cinnamonbob.test.BobTestCase;
 
 import java.util.LinkedList;

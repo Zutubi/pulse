@@ -17,7 +17,7 @@ import java.util.Calendar;
  * 
  *
  */
-public class HibernateBuildResultDaoTest extends PersistenceTestCase
+public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 {
     private BuildResultDao buildResultDao;
     private ProjectDao projectDao;

@@ -1,13 +1,13 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.model.persistence.ScmDao;
 import com.cinnamonbob.model.Svn;
+import com.cinnamonbob.model.persistence.ScmDao;
 
 /**
  * 
  *
  */
-public class HibernateScmDaoTest extends PersistenceTestCase
+public class HibernateScmDaoTest extends MasterPersistenceTestCase
 {
 
     private ScmDao scmDao;
@@ -28,7 +28,7 @@ public class HibernateScmDaoTest extends PersistenceTestCase
         Svn svn = new Svn();
         svn.setUrl("http://blah.com/svn/root");
         scmDao.save(svn);
-        
+
         commitAndRefreshTransaction();
 
         Svn otherSvn = (Svn) scmDao.findById(svn.getId());

@@ -2,26 +2,6 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation">
-        <property name="initBeans">
-            <list>
-                <ref bean="databaseBootstrap"/>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="databaseBootstrap" class="com.cinnamonbob.bootstrap.DatabaseBootstrap" init-method="initialiseDatabase">
-        <property name="dataSource">
-            <ref bean="dataSource"/>
-        </property>
-    </bean>
-
-    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-
     <bean id="bobFileDetailsDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateBobFileDetailsDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>

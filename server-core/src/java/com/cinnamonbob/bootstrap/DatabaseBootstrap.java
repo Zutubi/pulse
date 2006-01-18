@@ -1,5 +1,6 @@
 package com.cinnamonbob.bootstrap;
 
+import com.cinnamonbob.util.logging.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
@@ -7,8 +8,6 @@ import javax.sql.DataSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import com.cinnamonbob.util.logging.Logger;
 
 /**
  * Hibernate specific bootstrap support that creates the database scheme

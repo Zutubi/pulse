@@ -2,6 +2,7 @@ package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.event.EventManager;
 import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.Property;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.events.build.CommandCommencedEvent;
