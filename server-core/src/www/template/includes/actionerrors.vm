@@ -2,7 +2,7 @@
 #if($actionErrors && $actionErrors.size() > 0)
     #set($actionErrorDetected = true)
     <div class="errorBox">
-    <span class="errorMessage">$action.getText("errors.occurred")</span>
+    <span class="errorMessage">the following errors occurred</span>
     <ul>
         #foreach($error in $actionErrors)
         <li>$error</li>

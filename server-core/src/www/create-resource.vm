@@ -9,7 +9,7 @@
 #bodytag (Form "action='createResource.action'" "method='post'")
     <h3>create resource</h3>
     <fieldset>
-        #tag (TextField "required='true'" "name='resource.name'" "tabindex='1'")
+        #tag (TextField "required='true'" "name='resource.name'" "label='name'" "tabindex='1'")
     </fieldset>
         
     <fieldset class="submit">

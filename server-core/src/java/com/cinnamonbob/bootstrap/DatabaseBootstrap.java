@@ -15,7 +15,7 @@ import java.sql.SQLException;
  */
 public class DatabaseBootstrap
 {
-    public static final String DEFAULT_SCHEMA_TEST_TABLE = "USER";
+    public static final String DEFAULT_SCHEMA_TEST_TABLE = "RESOURCE";
 
     private static final Logger LOG = Logger.getLogger(DatabaseBootstrap.class);
 

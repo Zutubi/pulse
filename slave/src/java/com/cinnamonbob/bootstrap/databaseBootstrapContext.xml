@@ -7,7 +7,7 @@
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="mappingResources">
             <list>
-                <!--<value>com/cinnamonbob/model/persistence/hibernate/User.hbm.xml</value>-->
+                <value>com/cinnamonbob/model/persistence/hibernate/Resource.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">

@@ -12,7 +12,7 @@
 
     <h3>create property</h3>
     <fieldset>
-        #tag (TextField "required='true'" "name='property.name'" "tabindex='1'")
+        #tag (TextField "required='true'" "name='property.name'"  "label='name'" "tabindex='1'")
         #tag (TextField "name='value'" "tabindex='2'")
     </fieldset>
         

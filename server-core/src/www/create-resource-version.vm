@@ -11,7 +11,7 @@
     
     <h3>create resource version</h3>
     <fieldset>
-        #tag (TextField "required='true'" "name='resourceVersion.value'" "tabindex='1'")
+        #tag (TextField "required='true'" "name='resourceVersion.value'"  "label='version'" "tabindex='1'")
     </fieldset>
         
     <fieldset class="submit">

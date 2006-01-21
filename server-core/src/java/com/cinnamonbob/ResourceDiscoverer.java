@@ -28,7 +28,7 @@ public class ResourceDiscoverer implements Runnable
             if (home != null)
             {
                 Resource antResource = new Resource("ant");
-                antResource.addProperty(new Property("ant.home", "home"));
+                antResource.addProperty(new Property("ant.home", home));
                 File antBin;
 
                 if (SystemUtils.isWindows())
