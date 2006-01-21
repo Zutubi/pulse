@@ -39,6 +39,24 @@
       </table>
     </div>
 
+    <h2 class="command-info">resources</h2>
+    <div class="command-content">
+      <table>
+        <tr>
+          <th class="command-detail">resource</th>
+          <th class="command-detail">action</th>
+        <tr>
+#foreach($resource in $resources)
+        <tr>
+          <td class="command-detail"><a href="viewResource.action?id=$resource.id">$resource.name</a></td>
+          <td class="command-detail"><a href="deleteResource.action?id=$resource.id">delete</a></td>
+        </tr>
+#end
+        <tr>
+          <td class="command-detail" colspan="2"><b>+</b> <a href="createResource!default.action">add new resource</a></td>
+        </tr>
+      </table>
+    </div>
     <p>
         <ul>
             <li><a href="quartzSystemInfo.action">Quartz info</a></li>

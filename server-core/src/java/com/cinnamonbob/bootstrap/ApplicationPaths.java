@@ -1,6 +1,7 @@
 package com.cinnamonbob.bootstrap;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Defines the location of application paths, including paths for input
@@ -44,12 +45,12 @@ public interface ApplicationPaths
     File getUserConfigRoot();
 
     /**
-     * The template root directory.  All velocity templates are nested under
-     * this directory.
+     * The template root directories.  All velocity templates are nested under
+     * these directories.
      *
-     * @return the directory that contains all velocity templates
+     * @return a list of the directories that contain all velocity templates
      */
-    File getTemplateRoot();
+    List<File> getTemplateRoots();
 
     /**
      * The database root directory.  All database files are stored under this

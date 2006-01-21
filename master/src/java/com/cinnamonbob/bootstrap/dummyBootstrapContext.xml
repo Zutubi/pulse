@@ -40,8 +40,12 @@
                 <property name="configRoot">
                     <value>master/etc</value>
                 </property>
-                <property name="templateRoot">
-                    <value>master/src/templates</value>
+                <property name="templateRoots">
+                    <list>
+                        <value type="java.io.File">server-core/src/www</value>
+                        <value type="java.io.File">master/src/templates</value>
+                        <value type="java.io.File">master/src/www</value>
+                    </list>
                 </property>
                 <property name="userConfigRoot">
                     <value>master/etc</value>

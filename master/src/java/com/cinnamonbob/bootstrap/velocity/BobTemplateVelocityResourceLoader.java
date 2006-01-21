@@ -2,10 +2,11 @@ package com.cinnamonbob.bootstrap.velocity;
 
 import com.cinnamonbob.bootstrap.ApplicationPaths;
 import com.cinnamonbob.bootstrap.ConfigUtils;
+import com.cinnamonbob.util.logging.Logger;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.runtime.resource.loader.FileResourceLoader;
 
-import com.cinnamonbob.util.logging.Logger;
+import java.io.File;
 
 /**
  * 
@@ -19,7 +20,24 @@ public class BobTemplateVelocityResourceLoader extends FileResourceLoader
     public static String getFullTemplatePath()
     {
         ApplicationPaths paths = ConfigUtils.getManager().getApplicationPaths();
-        return paths.getTemplateRoot().getAbsolutePath();
+
+        StringBuffer result = new StringBuffer();
+        boolean first = true;
+
+        for (File path : paths.getTemplateRoots())
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                result.append(',');
+            }
+            result.append(path.getAbsolutePath());
+        }
+
+        return result.toString();
     }
 
     public void init(ExtendedProperties configuration)

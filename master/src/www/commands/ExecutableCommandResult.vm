@@ -1,6 +1,0 @@
-#set($dq='"')
-<table>
-  #detailrow("Command Line" "<span class=${dq}filename${dq}>$commandResult.Result.CommandLine</span>")
-  #detailrow("Working Dir"  "<span class=${dq}filename${dq}>$commandResult.Result.WorkingDir</span>")
-  #detailrow("Exit Code"    $commandResult.Result.ExitCode)
-</table>

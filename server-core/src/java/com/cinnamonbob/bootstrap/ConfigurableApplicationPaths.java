@@ -1,6 +1,7 @@
 package com.cinnamonbob.bootstrap;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * 
@@ -11,7 +12,7 @@ public class ConfigurableApplicationPaths implements ApplicationPaths
     private File systemRoot;
     private File contentRoot;
     private File configRoot;
-    private File templateRoot;
+    private List<File> templateRoots;
     private File userConfigRoot;
     private File databaseRoot;
 
@@ -30,14 +31,19 @@ public class ConfigurableApplicationPaths implements ApplicationPaths
         return configRoot;
     }
 
-    public File getTemplateRoot()
-    {
-        return templateRoot;
-    }
-
     public File getUserConfigRoot()
     {
         return userConfigRoot;
+    }
+
+    public List<File> getTemplateRoots()
+    {
+        return templateRoots;
+    }
+
+    public void setTemplateRoots(List<File> templateRoots)
+    {
+        this.templateRoots = templateRoots;
     }
 
     public void setSystemRoot(File systemRoot)
@@ -53,11 +59,6 @@ public class ConfigurableApplicationPaths implements ApplicationPaths
     public void setConfigRoot(File configRoot)
     {
         this.configRoot = configRoot;
-    }
-
-    public void setTemplateRoot(File templateRoot)
-    {
-        this.templateRoot = templateRoot;
     }
 
     public void setUserConfigRoot(File userConfigRoot)

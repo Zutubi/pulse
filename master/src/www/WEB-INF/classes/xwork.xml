@@ -11,6 +11,67 @@
             <result name="success" type="velocity">server-status.vm</result>
         </action>
 
+        <action name="viewResource" class="com.cinnamonbob.web.ViewResourceAction">
+            <result name="input" type="velocity">view-resource.vm</result>
+            <result name="success" type="velocity">view-resource.vm</result>
+        </action>
+
+        <action name="createResource!default" class="com.cinnamonbob.web.CreateResourceAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">create-resource.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="createResource" class="com.cinnamonbob.web.CreateResourceAction">
+            <result name="input" type="velocity">create-resource.vm</result>
+            <result name="cancel" type="velocity">server-status.vm</result>
+            <result name="error" type="velocity">create-resource.vm</result>
+            <result name="success" type="redirect">/viewResource.action?id=${resource.id}</result>
+        </action>
+
+        <action name="deleteResource" class="com.cinnamonbob.web.DeleteResourceAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/serverStatus.action</result>
+        </action>
+
+        <action name="createResourceVersion!default" class="com.cinnamonbob.web.CreateResourceVersionAction"
+                method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">create-resource-version.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="createResourceVersion" class="com.cinnamonbob.web.CreateResourceVersionAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">create-resource-version.vm</result>
+            <result name="cancel" type="redirect">/viewResource.action?id=${resourceId}</result>
+            <result name="error" type="velocity">create-resource-version.vm</result>
+            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+        </action>
+
+        <action name="deleteResourceVersion" class="com.cinnamonbob.web.DeleteResourceVersionAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+        </action>
+
+        <action name="createProperty!default" class="com.cinnamonbob.web.CreatePropertyAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">create-property.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="createProperty" class="com.cinnamonbob.web.CreatePropertyAction">
+            <result name="input" type="velocity">create-property.vm</result>
+            <result name="cancel" type="redirect">viewResource.action?id=${resourceId}</result>
+            <result name="error" type="velocity">create-property.vm</result>
+            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+        </action>
+
+        <action name="deleteProperty" class="com.cinnamonbob.web.DeletePropertyAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+        </action>
+
         <action name="viewProjects" class="com.cinnamonbob.web.project.ViewProjectsAction">
             <result name="success" type="velocity">view-projects.vm</result>
         </action>

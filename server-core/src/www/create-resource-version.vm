@@ -1,0 +1,24 @@
+<html>
+<head>
+    <title>create resource version</title>
+</head>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+    
+#bodytag (Form "action='createResourceVersion.action'" "method='post'")
+    #tag (Hidden "name='resourceId'")
+    
+    <h3>create resource version</h3>
+    <fieldset>
+        #tag (TextField "required='true'" "name='resourceVersion.value'" "tabindex='1'")
+    </fieldset>
+        
+    <fieldset class="submit">
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='2'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='3'")
+    </fieldset>
+#end 
+
+</body>
+</html>

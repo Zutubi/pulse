@@ -37,12 +37,17 @@ public class Resource extends Entity implements Namespace
         this.name = name;
     }
 
+    public boolean hasVersion(String value)
+    {
+        return versions.containsKey(value);
+    }
+
     public ResourceVersion getVersion(String id)
     {
         return versions.get(id);
     }
 
-    private Map<String, ResourceVersion> getVersions()
+    public Map<String, ResourceVersion> getVersions()
     {
         return versions;
     }
@@ -67,6 +72,11 @@ public class Resource extends Entity implements Namespace
         return properties.containsKey(name);
     }
 
+    public Property getProperty(String name)
+    {
+        return properties.get(name);
+    }
+
     public void addProperty(Property p) throws FileLoadException
     {
         String name = p.getName();
@@ -77,8 +87,14 @@ public class Resource extends Entity implements Namespace
         properties.put(name, p);
     }
 
+    public void deleteProperty(String name)
+    {
+        properties.remove(name);
+    }
+
     public void add(ResourceVersion v)
     {
         versions.put(v.getValue(), v);
     }
+
 }

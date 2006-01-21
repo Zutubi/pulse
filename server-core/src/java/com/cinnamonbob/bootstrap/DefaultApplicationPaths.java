@@ -1,6 +1,8 @@
 package com.cinnamonbob.bootstrap;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
@@ -13,7 +15,7 @@ public class DefaultApplicationPaths implements ApplicationPaths
     private File systemRoot;
     private File contentRoot;
     private File configRoot;
-    private File templateRoot;
+    private List<File> templateRoots;
     private File userConfigRoot;
     private File databaseRoot;
 
@@ -49,13 +51,15 @@ public class DefaultApplicationPaths implements ApplicationPaths
         return configRoot;
     }
 
-    public File getTemplateRoot()
+    public List<File> getTemplateRoots()
     {
-        if (templateRoot == null)
+        if (templateRoots == null)
         {
-            templateRoot = new File(getSystemRoot(), "templates");
+            templateRoots = new LinkedList<File>();
+            templateRoots.add(new File(getSystemRoot(), "templates"));
+            templateRoots.add(new File(getSystemRoot(), "www"));
         }
-        return templateRoot;
+        return templateRoots;
     }
 
     public File getUserConfigRoot()

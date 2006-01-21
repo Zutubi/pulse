@@ -12,4 +12,5 @@
     <validator name="cvsroot" class="com.cinnamonbob.xwork.validator.validators.CvsRootValidator"/>
     <validator name="cronexpression" class="com.cinnamonbob.xwork.validator.validators.CronExpressionValidator"/>
     <validator name="integral" class="com.cinnamonbob.xwork.validator.validators.IntegralValidator"/>
+    <validator name="name" class="com.cinnamonbob.xwork.validator.validators.NameValidator"/>
 </validators>

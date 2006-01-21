@@ -1,0 +1,26 @@
+<html>
+<head>
+    <title>create property</title>
+</head>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+    
+#bodytag (Form "action='createProperty.action'" "method='post'")
+    #tag (Hidden "name='resourceId'")
+    #tag (Hidden "name='versionId'")
+
+    <h3>create property</h3>
+    <fieldset>
+        #tag (TextField "required='true'" "name='property.name'" "tabindex='1'")
+        #tag (TextField "name='value'" "tabindex='2'")
+    </fieldset>
+        
+    <fieldset class="submit">
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
+    </fieldset>
+#end 
+
+</body>
+</html>

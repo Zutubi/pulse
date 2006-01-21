@@ -1,1 +1,0 @@
-#parse("/template/xhtml/controlheader.vm")#parse("/template/simple/text.vm")#parse("/template/xhtml/controlfooter.vm")

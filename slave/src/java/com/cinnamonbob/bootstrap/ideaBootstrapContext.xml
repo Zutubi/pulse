@@ -34,8 +34,11 @@
                 <property name="configRoot">
                     <value>slave/src/etc</value>
                 </property>
-                <property name="templateRoot">
-                    <value>slave/src/templates</value>
+                <property name="templateRoots">
+                    <list>
+                        <value type="java.io.File">server-core/src/www</value>
+                        <value type="java.io.File">slave/src/www</value>
+                    </list>
                 </property>
                 <property name="userConfigRoot">
                     <value>slave/src/etc</value>

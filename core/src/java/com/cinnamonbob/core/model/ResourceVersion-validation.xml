@@ -1,0 +1,10 @@
+<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
+        "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
+<validators>
+    <field name="value">
+        <field-validator type="name">
+            <message>version must consist of an alphanumeric character followed by zero or more alphanumeric characters
+                mixed with characters '.', '-' or '_'</message>
+        </field-validator>
+    </field>
+</validators>

@@ -14,6 +14,16 @@ public class ResourceVersion extends Entity implements Namespace
     private String value;
     private Map<String, Property> properties = new TreeMap<String, Property>();
 
+    public ResourceVersion()
+    {
+
+    }
+
+    public ResourceVersion(String value)
+    {
+        this.value = value;
+    }
+
     public String getValue()
     {
         return value;
@@ -39,6 +49,11 @@ public class ResourceVersion extends Entity implements Namespace
         return properties.containsKey(name);
     }
 
+    public Property getProperty(String name)
+    {
+        return properties.get(name);
+    }
+
     public void addProperty(Property p) throws FileLoadException
     {
         String name = p.getName();
@@ -47,5 +62,10 @@ public class ResourceVersion extends Entity implements Namespace
             throw new FileLoadException("Property with name '" + name + "' already exists with value '" + properties.get(name).getValue() + "'");
         }
         properties.put(name, p);
+    }
+
+    public void deleteProperty(String name)
+    {
+        properties.remove(name);
     }
 }

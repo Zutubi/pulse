@@ -13,6 +13,7 @@
                 <value>com/cinnamonbob/model/persistence/hibernate/CommandResult.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Feature.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Project.hbm.xml</value>
+                <value>com/cinnamonbob/model/persistence/hibernate/Resource.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Revision.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Scm.hbm.xml</value>
                 <value>com/cinnamonbob/model/persistence/hibernate/Slave.hbm.xml</value>

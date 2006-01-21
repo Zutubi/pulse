@@ -7,6 +7,7 @@ import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateObjectRetrievalFailureException;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -29,7 +30,11 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
         {
             return (U) getHibernateTemplate().load(type, Long.valueOf(id));
         }
-        catch (ObjectNotFoundException onfe)
+        catch (ObjectNotFoundException e)
+        {
+            return null;
+        }
+        catch (HibernateObjectRetrievalFailureException e)
         {
             return null;
         }
