@@ -17,6 +17,7 @@
         </property>
         <property name="startupRunnables">
             <list>
+                <value>com.cinnamonbob.BuildAborter</value>
                 <value>com.cinnamonbob.ResourceDiscoverer</value>
             </list>
         </property>
