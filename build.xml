@@ -104,6 +104,7 @@
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
         <copy todir="${package.root}/system/www">
+            <fileset dir="server-core/src/www" includes="**/*"/>
             <fileset dir="master/src/www" includes="**/*"/>
         </copy>
 
