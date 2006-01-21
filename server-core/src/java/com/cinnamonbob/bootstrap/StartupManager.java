@@ -43,6 +43,7 @@ public class StartupManager
                     Class clazz = Class.forName(name);
                     Constructor constructor = clazz.getConstructor();
                     Runnable instance = (Runnable) constructor.newInstance();
+                    ComponentContext.autowire(instance);
                     instance.run();
                 }
                 catch (Exception e)

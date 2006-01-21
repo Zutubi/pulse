@@ -1,6 +1,5 @@
 package com.cinnamonbob.core.model;
 
-import com.cinnamonbob.core.FileLoadException;
 import com.cinnamonbob.core.Namespace;
 
 import java.util.Map;
@@ -77,13 +76,9 @@ public class Resource extends Entity implements Namespace
         return properties.get(name);
     }
 
-    public void addProperty(Property p) throws FileLoadException
+    public void addProperty(Property p)
     {
         String name = p.getName();
-        if (hasProperty(name))
-        {
-            throw new FileLoadException("Property with name '" + name + "' already exists with value '" + properties.get(name).getValue() + "'");
-        }
         properties.put(name, p);
     }
 
