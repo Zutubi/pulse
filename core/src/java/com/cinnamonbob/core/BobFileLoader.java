@@ -16,9 +16,9 @@ public class BobFileLoader
         return load(input, null);
     }
 
-    public static BobFile load(InputStream input, ResourceRepository resourceRepository) throws BobException
+    public static BobFile load(InputStream input, FileResourceRepository fileResourceRepository) throws BobException
     {
-        return load(input, resourceRepository, null);
+        return load(input, fileResourceRepository, null);
     }
 
     public static BobFile load(InputStream input, ResourceRepository resourceRepository, List<Reference> references) throws BobException

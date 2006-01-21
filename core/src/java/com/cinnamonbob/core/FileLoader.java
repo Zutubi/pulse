@@ -30,7 +30,7 @@ public class FileLoader
         // For the Spring
     }
 
-    public FileLoader(ObjectFactory factory, ResourceRepository repository)
+    public FileLoader(ObjectFactory factory, FileResourceRepository repository)
     {
         setObjectFactory(factory);
         setResourceRepository(repository);
@@ -146,12 +146,12 @@ public class FileLoader
 
             if (ScopeAware.class.isAssignableFrom(type.getClass()))
             {
-                ((ScopeAware)type).setScope(scope);
+                ((ScopeAware) type).setScope(scope);
             }
 
             if (ResourceAware.class.isAssignableFrom(type.getClass()))
             {
-                ((ResourceAware)type).setResourceRepository(repository);
+                ((ResourceAware) type).setResourceRepository(repository);
             }
 
             if (InitComponent.class.isAssignableFrom(type.getClass()))

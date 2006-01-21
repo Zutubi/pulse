@@ -1,0 +1,132 @@
+<select name="$!webwork.htmlEncode($parameters.name)"
+    #if ($parameters.size)             size="$!webwork.htmlEncode($parameters.size)"               #end
+    #if ($parameters.disabled)         disabled="disabled"                                         #end
+    #if ($parameters.tabindex)         tabindex="$!webwork.htmlEncode($parameters.tabindex)"       #end
+    #if ($parameters.id)               id="$!webwork.htmlEncode($parameters.id)"                   #end
+    #if ($parameters.multiple)         multiple="multiple"                                         #end
+    #if ($parameters.cssClass)         class="$!webwork.htmlEncode($parameters.cssClass)"          #end
+    #if ($parameters.cssStyle)         style="$!webwork.htmlEncode($parameters.cssStyle)"          #end
+    #if ($parameters.onclick)          onclick="$!webwork.htmlEncode($parameters.onclick)"         #end
+    #if ($parameters.ondblclick)       ondblclick="$!webwork.htmlEncode($parameters.ondblclick)"   #end
+    #if ($parameters.onmousedown)      onmousedown="$!webwork.htmlEncode($parameters.onmousedown)" #end
+    #if ($parameters.onmouseup)        onmouseup="$!webwork.htmlEncode($parameters.onmouseup)"     #end
+    #if ($parameters.onmouseover)      onmouseover="$!webwork.htmlEncode($parameters.onmouseover)" #end
+    #if ($parameters.onmousemove)      onmousemove="$!webwork.htmlEncode($parameters.onmousemove)" #end
+    #if ($parameters.onmouseout)       onmouseout="$!webwork.htmlEncode($parameters.onmouseout)"   #end
+    #if ($parameters.onfocus)          onfocus="$!webwork.htmlEncode($parameters.onfocus)"         #end
+    #if ($parameters.onblur)           onblur="$!webwork.htmlEncode($parameters.onblur)"           #end
+    #if ($parameters.onkeypress)       onkeypress="$!webwork.htmlEncode($parameters.onkeypress)"   #end
+    #if ($parameters.onkeydown)        onkeydown="$!webwork.htmlEncode($parameters.onkeydown)"     #end
+    #if ($parameters.onkeyup)          onkeyup="$!webwork.htmlEncode($parameters.onkeyup)"         #end
+    #if ($parameters.onselect)         onselect="$!webwork.htmlEncode($parameters.onselect)"       #end
+    onchange="$!{webwork.htmlEncode($parameters.name)}Redirect(this.options.selectedIndex)">
+
+#set ( $startCount = 0)
+#if ($parameters.headerKey && $parameters.headerValue)
+    <option value="$!webwork.htmlEncode($parameters.headerKey)">$!webwork.htmlEncode($parameters.headerValue)</option>
+    #set ( $startCount = $startCount + 1)
+#end
+
+#if ($parameters.emptyOption)
+    <option value=""></option>
+    #set ( $startCount = $startCount + 1)
+#end
+
+#set( $items = $parameters.list )
+#if( $items )
+    #foreach( $item in $items )
+        $stack.push($item)
+        #if( $parameters.listKey )
+            #set( $itemKey = $stack.findValue($parameters.listKey) )
+        #else
+            #set( $itemKey = $item )
+        #end
+        #if( $parameters.listValue )
+            #set( $itemValue  = $stack.findValue($parameters.listValue) )
+        #else
+            #set( $itemValue = $item )
+        #end
+        <option value="$!webwork.htmlEncode($itemKey)"#if( $tag.contains($parameters.nameValue, $itemKey) ) selected="selected"#end>$!webwork.htmlEncode($itemValue)</option>
+        #set ($trash = $stack.pop())
+    #end
+#end
+</select>
+<br/>
+<select name="$!webwork.htmlEncode($parameters.doubleName)"
+    #if ($parameters.disabled)         disabled="disabled"                                         #end
+    #if ($parameters.doubleTabindex)   tabindex="$!webwork.htmlEncode($parameters.doubleTabindex)" #end
+    #if ($parameters.doubleId)         id="$!webwork.htmlEncode($parameters.doubleId)"             #end
+    #if ($parameters.multiple)         multiple="multiple"                                         #end
+    #if ($parameters.cssClass)         class="$!webwork.htmlEncode($parameters.cssClass)"          #end
+    #if ($parameters.cssStyle)         style="$!webwork.htmlEncode($parameters.cssStyle)"          #end
+>
+</select>
+<script type="text/javascript">
+#set( $itemCount = $startCount )
+var $!webwork.htmlEncode($parameters.name)Group = new Array($!{parameters.listSize} + $startCount);
+for (i = 0; i < ($!{parameters.listSize} + $startCount); i++)
+$!webwork.htmlEncode($parameters.name)Group[i] = new Array();
+#foreach( $item in $items )
+    $stack.push($item)
+    #if( $parameters.listKey )
+        #set( $itemKey = $stack.findValue($parameters.listKey) )
+    #else
+        #set( $itemKey = $item )
+    #end
+    #if( $parameters.listValue )
+        #set( $itemValue  = $stack.findValue($parameters.listValue) )
+    #else
+        #set( $itemValue = $item )
+    #end
+    #set( $doubleItems = $stack.findValue($parameters.doubleList) )
+    #set( $doubleItemCount = 0 )
+    #if( $doubleItems )
+        #foreach( $doubleItem in $doubleItems )
+            $stack.push($doubleItem)
+            #if( $parameters.doubleListKey )
+                #set( $doubleItemKey = $stack.findValue($parameters.doubleListKey) )
+            #else
+                #set( $doubleItemKey = $doubleItem )
+            #end
+            #if( $parameters.doubleListValue )
+                #set( $doubleItemValue  = $stack.findValue($parameters.doubleListValue) )
+            #else
+                #set( $doubleItemValue = $doubleItem )
+            #end
+            $!webwork.htmlEncode($parameters.name)Group[$itemCount][$doubleItemCount] = new Option("$doubleItemKey", "$doubleItemValue");
+            #set( $doubleItemCount = $doubleItemCount + 1 )
+            #set ($trash = $stack.pop())
+        #end
+        #set( $itemCount = $itemCount + 1 )
+    #end
+    #set ($trash = $stack.pop())
+#end
+var $!webwork.htmlEncode($parameters.name)Temp = document.$!webwork.htmlEncode(${parameters.formName}).$!webwork.htmlEncode(${parameters.doubleName});
+#set( $itemCount = $startCount )
+#set( $redirectTo = 0 )
+#foreach( $item in $items )
+    $stack.push($item)
+    #if( $parameters.listValue )
+        #set( $itemValue  = $stack.findValue($parameters.listValue) )
+    #else
+        #set( $itemValue = $item )
+    #end
+    #if( $tag.contains($parameters.nameValue, $itemKey) )
+        #set( $redirectTo = $itemCount )
+    #end
+    #set( $itemCount = $itemCount + 1 )
+    #set ($trash = $stack.pop())
+#end
+$!{webwork.htmlEncode($parameters.name)}Redirect($redirectTo);
+function $!{webwork.htmlEncode($parameters.name)}Redirect(x) {
+    for (m = $!{webwork.htmlEncode($parameters.name)}Temp.options.length - 1; m >= 0; m--)
+        $!{webwork.htmlEncode($parameters.name)}Temp.options[m] = null;
+
+    for (i = 0; i < $!{parameters.name}Group[x].length; i++) {
+        $!{webwork.htmlEncode($parameters.name)}Temp.options[i] = new Option($!{webwork.htmlEncode($parameters.name)}Group[x][i].text, $!{webwork.htmlEncode($parameters.name)}Group[x][i].value);
+    }
+
+    if ($!{parameters.name}Temp.options.length > 0)
+        $!{webwork.htmlEncode($parameters.name)}Temp.options[0].selected = true;
+}
+</script>

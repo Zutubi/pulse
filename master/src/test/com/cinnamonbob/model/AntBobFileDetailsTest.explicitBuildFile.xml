@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <project defaultRecipe="ant build">
     <recipe name="ant build">
+        <resource name="ant"/>
         <command name="build">
-            <executable exe="${ant.bin}">
+            <executable exe="${ant.bin}" working-dir="${work.dir}">
                 <arg>-f</arg>
                 <arg>test.xml</arg>
             </executable>

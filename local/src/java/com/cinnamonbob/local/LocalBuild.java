@@ -78,7 +78,7 @@ public class LocalBuild
         }
     }
 
-    private ResourceRepository createRepository(String resourcesFile) throws BobException
+    private FileResourceRepository createRepository(String resourcesFile) throws BobException
     {
         if (resourcesFile == null)
         {
@@ -120,7 +120,7 @@ public class LocalBuild
     {
         printPrologue(bobFileName, resourcesFile, outputDir);
 
-        ResourceRepository repository = createRepository(resourcesFile);
+        FileResourceRepository repository = createRepository(resourcesFile);
         RecipePaths paths = new LocalRecipePaths(workDir, outputDir);
 
         if (!paths.getWorkDir().isDirectory())

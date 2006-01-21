@@ -1,0 +1,5 @@
+##
+#if( !$parameters.cssClass )
+  $!parameters.put('cssClass', 'select')
+#end
+#parse("/template/css/controlheader.vm")#parse("/template/simple/select.vm")#parse("/template/css/controlfooter.vm")

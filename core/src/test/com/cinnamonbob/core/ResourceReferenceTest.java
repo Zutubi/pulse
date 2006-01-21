@@ -20,7 +20,7 @@ public class ResourceReferenceTest extends BobTestCase
     public void testResourceReference() throws Exception
     {
         Scope scope = new Scope();
-        ResourceRepository repo = ResourceFileLoader.load(getInput("testResourceReference"));
+        FileResourceRepository repo = ResourceFileLoader.load(getInput("testResourceReference"));
         ResourceReference ref = new ResourceReference();
         ref.setResourceRepository(repo);
 

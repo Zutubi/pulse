@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class ResourceRepositoryTest extends BobTestCase
 {
-    private ResourceRepository repo = null;
+    private FileResourceRepository repo = null;
 
     protected void setUp() throws Exception
     {
