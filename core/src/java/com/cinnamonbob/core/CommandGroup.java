@@ -145,10 +145,16 @@ public class CommandGroup implements Command, Validateable
         }
     }
 
+    // Exposed for testing
+    List<ProcessArtifactMapping> getMappings()
+    {
+        return mappings;
+    }
+
     /**
      * 
      */
-    private class ProcessArtifactMapping
+    class ProcessArtifactMapping implements Validateable
     {
         private String artifact;
         private PostProcessor processor;
@@ -171,6 +177,28 @@ public class CommandGroup implements Command, Validateable
         public PostProcessor getProcessor()
         {
             return processor;
+        }
+
+        public void validate(ValidatorContext context)
+        {
+            if (artifact == null)
+            {
+                // Default to the command's first artifact
+                List<String> artifacts = command.getArtifactNames();
+                if (artifacts.size() > 0)
+                {
+                    artifact = artifacts.get(0);
+                }
+                else
+                {
+                    context.addActionError("No artifact specified and no default artifact for command");
+                }
+            }
+
+            if (processor == null)
+            {
+                context.addActionError("Required attribute 'processor' not specified");
+            }
         }
     }
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<project>
+    <recipe name="wow">
+        <command name="cool">
+            <executable exe="foo"/>
+            <process/>
+        </command>
+    </recipe>
+</project>

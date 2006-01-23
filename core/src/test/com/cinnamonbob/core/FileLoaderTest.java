@@ -217,4 +217,27 @@ public class FileLoaderTest extends BobTestCase
             assertTrue(e.getMessage().indexOf("duplicate") >= 0);
         }
     }
+
+    public void testProcessNoProcessor() throws BobException
+    {
+        try
+        {
+            BobFile bf = new BobFile();
+            loader.load(getInput("testProcessNoProcessor"), bf);
+        }
+        catch (ParseException e)
+        {
+            assertTrue(e.getMessage().contains("attribute 'processor' not specified"));
+        }
+    }
+
+    public void testProcessDefaultArtifact() throws BobException
+    {
+        BobFile bf = new BobFile();
+        loader.load(getInput("testProcessDefaultArtifact"), bf);
+        Recipe recipe = bf.getRecipes().get(0);
+        CommandGroup command = (CommandGroup) recipe.getCommands().get(0);
+        CommandGroup.ProcessArtifactMapping mapping = command.getMappings().get(0);
+        assertEquals(mapping.getArtifact(), command.getCommand().getArtifactNames().get(0));
+    }
 }
