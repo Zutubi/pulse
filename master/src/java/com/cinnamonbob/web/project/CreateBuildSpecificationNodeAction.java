@@ -3,6 +3,7 @@ package com.cinnamonbob.web.project;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildSpecificationNodeDao;
 import com.cinnamonbob.web.ActionSupport;
+import com.cinnamonbob.xwork.interceptor.Cancelable;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,7 @@ import java.util.TreeMap;
 
 /**
  */
-public class CreateBuildSpecificationNodeAction extends ActionSupport
+public class CreateBuildSpecificationNodeAction extends ActionSupport implements Cancelable
 {
     private long specId;
     private long parentId;
@@ -146,4 +147,5 @@ public class CreateBuildSpecificationNodeAction extends ActionSupport
     {
         this.slaveManager = slaveManager;
     }
+
 }

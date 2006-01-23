@@ -35,12 +35,15 @@ public class ManageProjectAction extends ProjectActionSupport
 
     public void validate()
     {
-
+        project = getProjectManager().getProject(id);
+        if (project == null)
+        {
+            addActionError("Unknown project '" + id + "'");
+        }
     }
 
     public String execute()
     {
-        project = getProjectManager().getProject(id);
         history = getBuildManager().getLatestBuildResultsForProject(project, 11);
         if (history.size() > 0)
         {

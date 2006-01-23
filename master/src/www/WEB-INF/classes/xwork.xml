@@ -241,6 +241,7 @@
 
         <action name="manageProject" class="com.cinnamonbob.web.project.ManageProjectAction">
             <result name="success" type="velocity">manage-project.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="createScm!default" class="com.cinnamonbob.web.project.CreateScmAction" method="doDefault">
@@ -378,7 +379,7 @@
             <result name="monitor" type="velocity">configure-monitor-trigger.vm</result>
             <result name="cron" type="velocity">configure-cron-trigger.vm</result>
             <result name="success" type="redirect">/manageProject.action?id=${project}</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${project}</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${wizard.project}</result>
         </action>
 
         <action name="deleteTrigger" class="com.cinnamonbob.web.project.DeleteTriggerAction">
@@ -467,7 +468,7 @@
 
         <action name="createBuildSpecification" class="com.cinnamonbob.web.project.CreateBuildSpecificationAction">
             <result name="input" type="velocity">create-build-specification.vm</result>
-            <result name="cancel" type="velocity">undefined.vm</result>
+            <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>
             <result name="error" type="velocity">create-build-specification.vm</result>
             <result name="success" type="redirect">/viewBuildSpecification.action?id=${specification.id}&amp;projectId=${projectId}</result>
         </action>
@@ -486,7 +487,8 @@
         <action name="createBuildSpecificationNode"
                 class="com.cinnamonbob.web.project.CreateBuildSpecificationNodeAction">
             <result name="input" type="velocity">create-build-specification-node.vm</result>
-            <result name="cancel" type="velocity">undefined.vm</result>
+            <result name="cancel" type="redirect">
+                /viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
             <result name="error" type="velocity">create-build-specification-node.vm</result>
             <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
         </action>

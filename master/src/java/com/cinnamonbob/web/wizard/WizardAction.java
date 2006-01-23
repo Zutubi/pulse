@@ -10,14 +10,14 @@ import java.util.Map;
 
 /**
  * Usage:
- *
- *    <action name="wizard" class="com.cinnamonbob.web.wizard.WizardAction">
- *       <param name="wizard">com.cinnamonbob.web.wizard.example.ExampleWizard</param>
- *       <result name="a" type="velocity">example-a.vm</result>
- *       <result name="b" type="velocity">example-b.vm</result>
- *       <result name="success" type="redirect">/wizard-finished.action</result>
- *    </action>
- *
+ * <p/>
+ * <action name="wizard" class="com.cinnamonbob.web.wizard.WizardAction">
+ * <param name="wizard">com.cinnamonbob.web.wizard.example.ExampleWizard</param>
+ * <result name="a" type="velocity">example-a.vm</result>
+ * <result name="b" type="velocity">example-b.vm</result>
+ * <result name="success" type="redirect">/wizard-finished.action</result>
+ * </action>
+ * <p/>
  * NOTE: This action requires the 'model' to be located AFTER the 'static-params' interceptor
  * in the xwork interceptor stack. Reason: The wizard property.
  */
@@ -46,6 +46,12 @@ public class WizardAction extends ActionSupport
     }
 
     public boolean isCancelled()
+    {
+        // Wizards manage cancelling their own way
+        return false;
+    }
+
+    public boolean isWizardCancelled()
     {
         return TextUtils.stringSet(cancel);
     }
@@ -85,7 +91,7 @@ public class WizardAction extends ActionSupport
         Map session = ActionContext.getContext().getSession();
         Wizard wizard = getWizard();
 
-        if (isCancelled())
+        if (isWizardCancelled())
         {
             // clean out session.
             wizard.cancel();
@@ -123,7 +129,7 @@ public class WizardAction extends ActionSupport
                 ComponentContext.autowire(wizardInstance);
                 session.put(wizardClass, wizardInstance);
             }
-            wizard =  (Wizard) session.get(wizardClass);
+            wizard = (Wizard) session.get(wizardClass);
             return wizard;
         }
         catch (Exception e)
