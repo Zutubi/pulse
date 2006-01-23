@@ -8,6 +8,7 @@
     #parse("/template/includes/actionerrors.vm")
 
 #bodytag (Form "action='addTrigger.action'" "method='post'")
+    #tag (Hidden "name='wizard.project'")
 
     <h3>create trigger: step 1</h3>
     <fieldset>
