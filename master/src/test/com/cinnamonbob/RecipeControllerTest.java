@@ -305,7 +305,7 @@ public class RecipeControllerTest extends BobTestCase
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void collectResults(long recipeId, File dir)
+        public void collectResults(long recipeId, File outputDest, File workDest)
         {
             throw new RuntimeException("Method not implemented.");
         }

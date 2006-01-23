@@ -8,7 +8,7 @@ public interface BuildService extends RemoteService
 {
     void build(RecipeRequest request);
 
-    void collectResults(long recipeId, File dir);
+    void collectResults(long recipeId, File outputDest, File workDest);
 
     void cleanup(long recipeId);
 

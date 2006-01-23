@@ -47,7 +47,7 @@ public class SlaveBuildService implements BuildService
         }
     }
 
-    public void collectResults(long recipeId, File dir)
+    public void collectResults(long recipeId, File outputDest, File workDest)
     {
         ZipInputStream zis = null;
 
@@ -59,7 +59,14 @@ public class SlaveBuildService implements BuildService
 
             // take url connection input stream and write contents to directory.
             zis = new ZipInputStream(urlConnection.getInputStream());
-            FileSystemUtils.extractZip(zis, dir);
+            FileSystemUtils.extractZip(zis, outputDest);
+            IOUtils.close(zis);
+            zis = null;
+
+            resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?output=false&recipe=" + recipeId);
+            urlConnection = resultUrl.openConnection();
+            zis = new ZipInputStream(urlConnection.getInputStream());
+            FileSystemUtils.extractZip(zis, workDest);
         }
         catch (MalformedURLException e)
         {
@@ -68,7 +75,7 @@ public class SlaveBuildService implements BuildService
         }
         catch (IOException e)
         {
-            throw new BuildException("Downloading results from slave '" + slave.getName() + ": " + e.getMessage(), e);
+            throw new BuildException("Error downloading results from slave '" + slave.getName() + ": " + e.getMessage(), e);
         }
         finally
         {
@@ -106,7 +113,7 @@ public class SlaveBuildService implements BuildService
     @Override
     public boolean equals(Object obj)
     {
-        if(obj instanceof SlaveBuildService)
+        if (obj instanceof SlaveBuildService)
         {
             SlaveBuildService other = (SlaveBuildService) obj;
             return other.getSlave().equals(slave);

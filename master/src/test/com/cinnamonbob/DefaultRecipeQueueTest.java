@@ -98,12 +98,11 @@ public class DefaultRecipeQueueTest extends TestCase
 
     class MockBuildService implements BuildService
     {
-
         public void build(RecipeRequest request)
         {
         }
 
-        public void collectResults(long recipeId, File dir)
+        public void collectResults(long recipeId, File outputDest, File workDest)
         {
         }
 

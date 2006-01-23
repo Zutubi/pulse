@@ -50,4 +50,9 @@ public class MasterBuildPaths
     {
         return new File(getRecipeDir(project, result, recipeId), "output");
     }
+
+    public File getWorkDir(Project project, BuildResult result, long recipeId)
+    {
+        return new File(getRecipeDir(project, result, recipeId), "work");
+    }
 }

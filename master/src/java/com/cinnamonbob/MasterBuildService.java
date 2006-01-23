@@ -30,14 +30,20 @@ public class MasterBuildService implements BuildService
         masterRecipeProcessor.processRecipe(request);
     }
 
-    public void collectResults(long recipeId, File dir)
+    public void collectResults(long recipeId, File outputDest, File workDest)
     {
         ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager);
         File outputDir = recipePaths.getOutputDir();
 
-        if (!FileSystemUtils.rename(outputDir, dir, true))
+        if (!FileSystemUtils.rename(outputDir, outputDest, true))
         {
-            throw new BuildException("Unable to rename output directory '" + outputDir.getAbsolutePath() + "' to '" + dir.getAbsolutePath() + "'");
+            throw new BuildException("Unable to rename output directory '" + outputDir.getAbsolutePath() + "' to '" + outputDest.getAbsolutePath() + "'");
+        }
+
+        File workDir = recipePaths.getWorkDir();
+        if (!FileSystemUtils.rename(workDir, workDest, true))
+        {
+            throw new BuildException("Unable to rename working directory '" + workDir.getAbsolutePath() + "' to '" + workDest.getAbsolutePath() + "'");
         }
     }
 

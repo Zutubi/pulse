@@ -144,7 +144,7 @@ public class BuildController implements EventListener
             buildManager.save(resultNode);
 
             MasterBuildPaths paths = new MasterBuildPaths();
-            recipeResult.setOutputDir(paths.getRecipeDir(project, buildResult, recipeResult.getId()).getAbsolutePath());
+            recipeResult.setOutputDir(paths.getOutputDir(project, buildResult, recipeResult.getId()).getAbsolutePath());
 
             RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe());
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), recipeRequest);

@@ -32,7 +32,20 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
     {
         if (buildService != null)
         {
-            buildService.collectResults(recipeId, paths.getRecipeDir(project, result, recipeId));
+            File outputDest = paths.getOutputDir(project, result, recipeId);
+            File workDest = paths.getWorkDir(project, result, recipeId);
+
+            if (!outputDest.mkdirs())
+            {
+                throw new BuildException("Unable to create output destination '" + outputDest.getAbsolutePath() + "'");
+            }
+
+            if (!workDest.mkdirs())
+            {
+                throw new BuildException("Unable to create work destination '" + workDest.getAbsolutePath() + "'");
+            }
+
+            buildService.collectResults(recipeId, outputDest, workDest);
         }
     }
 
