@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface Command
 {
-    void execute(File outputDir, CommandResult result);
+    void execute(File workDir, File outputDir, CommandResult result);
 
     List<String> getArtifactNames();
 

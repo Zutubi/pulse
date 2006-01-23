@@ -67,9 +67,9 @@ public class CommandGroup implements Command, Validateable
         return customArtifact;
     }
 
-    public void execute(File outputDir, CommandResult result)
+    public void execute(File workDir, File outputDir, CommandResult result)
     {
-        command.execute(outputDir, result);
+        command.execute(workDir, outputDir, result);
         collectArtifacts(result, outputDir);
 
         for (ProcessArtifactMapping m : mappings)

@@ -72,7 +72,7 @@ public class RecipeProcessor
                 throw new BuildException("Undefined recipe '" + recipeName + "'");
             }
 
-            build(recipeId, recipe, paths.getOutputDir());
+            build(recipeId, recipe, paths.getWorkDir(), paths.getOutputDir());
         }
         catch (BuildException e)
         {
@@ -90,7 +90,7 @@ public class RecipeProcessor
         }
     }
 
-    public void build(long recipeId, Recipe recipe, File outputDir) throws BuildException
+    public void build(long recipeId, Recipe recipe, File workDir, File outputDir) throws BuildException
     {
         // TODO: support continuing build when errors occur. Take care: exceptions.
         int i = 0;
@@ -99,7 +99,7 @@ public class RecipeProcessor
             CommandResult result = new CommandResult(command.getName());
 
             File commandOutput = new File(outputDir, getCommandDirName(i, result));
-            executeCommand(recipeId, result, commandOutput, command);
+            executeCommand(recipeId, result, workDir, commandOutput, command);
 
             switch (result.getState())
             {
@@ -111,7 +111,7 @@ public class RecipeProcessor
         }
     }
 
-    private void executeCommand(long recipeId, CommandResult result, File commandOutput, Command command)
+    private void executeCommand(long recipeId, CommandResult result, File workDir, File commandOutput, Command command)
     {
         result.commence(commandOutput);
         eventManager.publish(new CommandCommencedEvent(this, recipeId, result.getCommandName(), result.getStamps().getStartTime()));
@@ -123,7 +123,7 @@ public class RecipeProcessor
                 throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
             }
 
-            command.execute(commandOutput, result);
+            command.execute(workDir, commandOutput, result);
         }
         catch (BuildException e)
         {

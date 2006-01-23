@@ -29,7 +29,7 @@ public class ExecutableCommand implements Command
 
     private List<Environment> env = new LinkedList<Environment>();
 
-    public void execute(File outputDir, CommandResult cmdResult)
+    public void execute(File workDir, File outputDir, CommandResult cmdResult)
     {
         List<String> command = new LinkedList<String>();
         command.add(exe);
@@ -43,7 +43,11 @@ public class ExecutableCommand implements Command
         }
 
         ProcessBuilder builder = new ProcessBuilder(command);
-        if (workingDir != null)
+        if (workingDir == null)
+        {
+            builder.directory(workDir);
+        }
+        else
         {
             builder.directory(workingDir);
         }
