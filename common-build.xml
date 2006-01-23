@@ -94,6 +94,7 @@
 
     <target name="publish" depends="init">
         <dirname property="current.dir" file="ivy.xml"/>
+        <!-- copy built artifacts to the build/repository -->
         <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
     </target>
 
@@ -105,6 +106,7 @@
             <ivy:resolve conf="@{conf}"/>
             <!-- copy the dependencies into the local directory -->
             <ivy:retrieve validate="true" conf="@{conf}"/>
+            <!-- deliver resolved ivy file so that it can be used by dependent modules. -->
             <ivy:deliver deliverpattern="${project.root.dir}/build/repository/[module]/ivy-[revision].xml"/>
         </sequential>
     </macrodef>
