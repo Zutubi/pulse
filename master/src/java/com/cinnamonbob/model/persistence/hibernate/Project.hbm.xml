@@ -14,13 +14,18 @@
         <many-to-one name="bobFileDetails" class="com.cinnamonbob.model.BobFileDetails" column="BOB_FILE_DETAILS"
                      lazy="false" cascade="all"/>
 
-        <many-to-one name="scm" class="com.cinnamonbob.model.Scm" column="SCM" cascade="all-delete-orphan"
-                     lazy="false"/>
-
         <bag name="buildSpecifications" cascade="all-delete-orphan" lazy="false">
             <key column="PROJECTID"/>
             <one-to-many class="com.cinnamonbob.model.BuildSpecification"/>
         </bag>
+
+        <component name="cleanupPolicy" class="com.cinnamonbob.model.AgeBuildResultCleanupPolicy">
+            <property name="workDirDays" column="WORK_DIR_DAYS" type="long"/>
+            <property name="resultDays" column="RESULT_DAYS" type="long"/>
+        </component>
+
+        <many-to-one name="scm" class="com.cinnamonbob.model.Scm" column="SCM" cascade="all-delete-orphan"
+                     lazy="false"/>
     </class>
 
     <class name="com.cinnamonbob.model.BobFileDetails">

@@ -11,9 +11,12 @@ import java.util.List;
  */
 public class Project extends Entity
 {
+    public static final int DEFAULT_WORK_DIR_DAYS = 30;
+
     private String name;
     private String description;
     private BobFileDetails bobFileDetails;
+    private AgeBuildResultCleanupPolicy cleanupPolicy = new AgeBuildResultCleanupPolicy(DEFAULT_WORK_DIR_DAYS, AgeBuildResultCleanupPolicy.NEVER_CLEAN);
     private Scm scm;
 
     private List<BuildSpecification> buildSpecifications;
@@ -54,6 +57,16 @@ public class Project extends Entity
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    public AgeBuildResultCleanupPolicy getCleanupPolicy()
+    {
+        return cleanupPolicy;
+    }
+
+    public void setCleanupPolicy(AgeBuildResultCleanupPolicy cleanupPolicy)
+    {
+        this.cleanupPolicy = cleanupPolicy;
     }
 
     public Scm getScm()

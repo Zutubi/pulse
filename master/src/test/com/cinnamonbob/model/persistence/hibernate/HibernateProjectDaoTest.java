@@ -1,9 +1,6 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.model.AntBobFileDetails;
-import com.cinnamonbob.model.CustomBobFileDetails;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.Svn;
+import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.ProjectDao;
 
 import java.util.TreeMap;
@@ -40,6 +37,20 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 
         Project otherProject = projectDao.findById(project.getId());
         assertPropertyEquals(project, otherProject);
+    }
+
+    public void testLoadSaveCleanupPolicy()
+    {
+        Project project = new Project("yay", "test");
+        AgeBuildResultCleanupPolicy policy = new AgeBuildResultCleanupPolicy(5, 10);
+        project.setCleanupPolicy(policy);
+
+        projectDao.save(project);
+        commitAndRefreshTransaction();
+
+        Project otherProject = projectDao.findById(project.getId());
+        AgeBuildResultCleanupPolicy otherPolicy = otherProject.getCleanupPolicy();
+        assertEquals(policy, otherPolicy);
     }
 
     public void testLoadSaveCustomBobFileSource()

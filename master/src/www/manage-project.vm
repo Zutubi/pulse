@@ -91,30 +91,41 @@
 
         <h2 class="command-info">history</h2>
         <div class="command-content">
-        <table>
-            <tr>
-                <th class="command-detail">build id</th>
-                <th class="command-detail">when</th>
-                <th class="command-detail">elapsed</th>
-                <th class="command-detail">result</th>
-            </tr>
-            #foreach($buildResult in $history)
-                #set($id = $buildResult.id)
-                #set($built = $buildResult.stamps.prettyStartTime)
-                #set($elapsed = $buildResult.stamps.prettyElapsed)
-                #if($buildResult.succeeded())
-                    #set($class = "success")
-                #else
-                    #set($class = "failure")
+            <h4>recent builds</h4>
+        #if($history.size() > 0)
+            <table>
+                <tr>
+                    <th class="command-detail">build id</th>
+                    <th class="command-detail">when</th>
+                    <th class="command-detail">elapsed</th>
+                    <th class="command-detail">result</th>
+                </tr>
+                #foreach($buildResult in $history)
+                    #set($id = $buildResult.id)
+                    #set($built = $buildResult.stamps.prettyStartTime)
+                    #set($elapsed = $buildResult.stamps.prettyElapsed)
+                    #if($buildResult.succeeded())
+                        #set($class = "success")
+                    #else
+                        #set($class = "failure")
+                    #end
+                <tr>
+                    <td class="build-$class"><a href="viewBuild.action?id=$project.id&buildId=$id">build $buildResult.number</a></td>
+                    <td class="build-$class">$built</td>
+                    <td class="build-$class">$elapsed</td>
+                    <td class="build-$class">$buildResult.state.prettyString</td>
+                </tr>
                 #end
-            <tr>
-                <td class="build-$class"><a href="viewBuild.action?id=$project.id&buildId=$id">build $buildResult.number</a></td>
-                <td class="build-$class">$built</td>
-                <td class="build-$class">$elapsed</td>
-                <td class="build-$class">$buildResult.state.prettyString</td>
-            </tr>
-            #end
-        </table>
+            </table>
+        #else
+            this project has no historical builds
+        #end
+            <h4>cleanup policy</h4>
+            <table>
+                #detailrow("working directories deleted" $project.cleanupPolicy.prettyWorkDirDays)
+                #detailrow("build results deleted" $project.cleanupPolicy.prettyResultDays)
+                #detailrow("action" "<a href='editCleanupPolicy!default.action?projectId=$project.id'>edit</a>")
+            </table>
         </div>
 
         </div>

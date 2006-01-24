@@ -36,4 +36,5 @@ public interface BuildManager
 
     long getNextBuildNumber(Project project);
 
+    void cleanupBuilds();
 }

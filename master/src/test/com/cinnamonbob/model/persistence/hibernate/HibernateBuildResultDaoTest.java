@@ -11,6 +11,7 @@ import com.cinnamonbob.model.persistence.ProjectDao;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.List;
 
 
 /**
@@ -179,6 +180,102 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         artifact.addFeature(feature);
         result.addArtifact(artifact);
+        return result;
+    }
+
+    public void testGetOldestBuilds()
+    {
+        Project p1 = new Project();
+        Project p2 = new Project();
+
+        projectDao.save(p1);
+        projectDao.save(p2);
+
+        BuildResult r1 = createCompletedBuild(p1, 1);
+        BuildResult r2 = createCompletedBuild(p1, 2);
+        BuildResult r3 = createCompletedBuild(p1, 3);
+        BuildResult r4 = createCompletedBuild(p1, 4);
+        BuildResult otherP = createCompletedBuild(p2, 1);
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+        buildResultDao.save(r4);
+        buildResultDao.save(otherP);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1);
+        assertEquals(1, oldest.size());
+        assertPropertyEquals(r1, oldest.get(0));
+
+        oldest = buildResultDao.findOldestByProject(p1, 3);
+        assertEquals(3, oldest.size());
+        assertPropertyEquals(r1, oldest.get(0));
+        assertPropertyEquals(r2, oldest.get(1));
+        assertPropertyEquals(r3, oldest.get(2));
+
+        oldest = buildResultDao.findOldestByProject(p1, 100);
+        assertEquals(4, oldest.size());
+    }
+
+    public void testGetOldestBuildsPaged()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildResult r1 = createCompletedBuild(p1, 1);
+        BuildResult r2 = createCompletedBuild(p1, 2);
+        BuildResult r3 = createCompletedBuild(p1, 3);
+        BuildResult r4 = createCompletedBuild(p1, 4);
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+        buildResultDao.save(r4);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1, 2);
+        assertEquals(2, oldest.size());
+        assertPropertyEquals(r2, oldest.get(0));
+        assertPropertyEquals(r3, oldest.get(1));
+    }
+
+    public void testGetOldestBuildsInitial()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildResult result = new BuildResult(p1, 1);
+        buildResultDao.save(result);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1);
+        assertEquals(0, oldest.size());
+    }
+
+    public void testGetOldestBuildsInProgress()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildResult result = new BuildResult(p1, 1);
+        result.commence(0);
+        buildResultDao.save(result);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1);
+        assertEquals(0, oldest.size());
+    }
+
+    private BuildResult createCompletedBuild(Project project, long number)
+    {
+        BuildResult result = new BuildResult(project, number);
+        result.commence(0);
+        result.complete();
         return result;
     }
 

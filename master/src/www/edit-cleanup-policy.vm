@@ -1,0 +1,26 @@
+<html>
+<head>
+    <title>edit cleanup policy</title>
+</head>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='editCleanupPolicy.action'" "method='post'")
+    <h3>edit cleanup policy</h3>
+        #tag (Hidden "name='projectId'")
+    <fieldset>
+        #tag (Checkbox "name='enableWorkDirCleanup'" "label='enable working directory cleanup'" "fieldValue='true'" "tabindex='1'")
+        #tag (TextField "required='true'" "name='policy.workDirDays'" "label='cleanup after x days'" "tabindex='2'")
+        #tag (Checkbox "name='enableResultCleanup'" "label='enable full result cleanup'" "fieldValue='true'" "tabindex='3'")
+        #tag (TextField "required='true'" "name='policy.resultDays'" "label='cleanup after x days'" "tabindex='4'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='5'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='6'")
+    </fieldset>
+#end
+
+</body>
+</html>

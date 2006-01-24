@@ -75,7 +75,8 @@
         </property>
     </bean>
 
-    <bean id="buildManagerTarget" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"/>
+    <bean id="buildManagerTarget" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"
+          init-method="init"/>
     <bean id="buildManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>

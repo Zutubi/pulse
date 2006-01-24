@@ -99,4 +99,9 @@ public class MockBuildManager implements BuildManager
     {
         return nextBuildNumber++;
     }
+
+    public void cleanupBuilds()
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
 }

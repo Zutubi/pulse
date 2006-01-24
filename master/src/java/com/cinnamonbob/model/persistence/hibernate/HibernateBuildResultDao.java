@@ -28,15 +28,40 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return BuildResult.class;
     }
 
-    public List findLatestByProject(final Project project, final int max)
+    public List<BuildResult> findLatestByProject(final Project project, final int max)
     {
-        return (List) getHibernateTemplate().execute(new HibernateCallback()
+        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
-            public Object doInHibernate(Session session) throws HibernateException, SQLException
+            public Object doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.stateName != :initial order by id desc");
                 queryObject.setEntity("project", project);
                 queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
+                queryObject.setMaxResults(max);
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.list();
+            }
+        });
+    }
+
+    public List<BuildResult> findOldestByProject(final Project project, final int max)
+    {
+        return findOldestByProject(project, 0, max);
+    }
+
+    public List<BuildResult> findOldestByProject(final Project project, final int first, final int max)
+    {
+        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.stateName != :initial and model.stateName != :inProgress order by id asc");
+                queryObject.setEntity("project", project);
+                queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
+                queryObject.setParameter("inProgress", ResultState.IN_PROGRESS.toString(), Hibernate.STRING);
+                queryObject.setFirstResult(first);
                 queryObject.setMaxResults(max);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());

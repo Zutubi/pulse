@@ -18,6 +18,10 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     public List<BuildResult> findLatestByProject(final Project project, final int max);
 
+    List<BuildResult> findOldestByProject(Project project, int max);
+
+    List<BuildResult> findOldestByProject(Project project, int first, int max);
+
     public BuildResult findByProjectAndNumber(final Project project, final long number);
 
     CommandResult findCommandResult(long id);
