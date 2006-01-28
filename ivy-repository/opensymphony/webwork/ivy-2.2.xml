@@ -91,9 +91,9 @@
         <dependency org="tomcat" name="jasper-runtime" rev="5.5.12" conf="quickstart->default"/>
         <dependency org="tomcat" name="jasper-compiler" rev="5.5.12" conf="quickstart->default"/>
         <dependency org="tomcat" name="jasper-compiler-jdt" rev="5.5.12" conf="quickstart->default"/>
-        <dependency org="commons-el" name="commons-el" rev="1.0" conf="quickstart->default"/>
-        <dependency org="commons-io" name="commons-io" rev="1.0" conf="quickstart->default"/>
-        <dependency org="commons-lang" name="commons-lang" rev="2.1" conf="quickstart->default"/>
+        <dependency org="apache" name="commons-el" rev="1.0" conf="quickstart->default"/>
+        <dependency org="apache" name="commons-io" rev="1.0" conf="quickstart->default"/>
+        <dependency org="apache" name="commons-lang" rev="2.1" conf="quickstart->default"/>
         <dependency org="servletapi" name="servletapi" rev="2.4" conf="quickstart->*"/>
         <dependency org="jspapi" name="jsp-api" rev="2.0" conf="quickstart->*"/>
         <dependency org="log4j" name="log4j" rev="1.2.9" conf="quickstart->*"/>
@@ -103,9 +103,9 @@
         <dependency org="jasperreports" name="jasperreports" rev="1.1.0" conf="jasperreports->default"/>
         <dependency org="itext" name="itext" rev="1.3.1" conf="jasperreports->default"/>
         <dependency org="poi" name="poi" rev="2.5.1" conf="jasperreports->default"/>
-        <dependency org="commons-beanutils" name="commons-beanutils" rev="1.7.0" conf="jasperreports->default"/>
-        <dependency org="commons-digester" name="commons-digester" rev="1.7" conf="jasperreports->default"/>
-        <dependency org="commons-collections" name="commons-collections" rev="2.1.1" conf="jasperreports->default"/>
+        <dependency org="apache" name="commons-beanutils" rev="1.7.0" conf="jasperreports->default"/>
+        <dependency org="apache" name="commons-digester" rev="1.7" conf="jasperreports->default"/>
+        <dependency org="apache" name="commons-collections" rev="2.1.1" conf="jasperreports->default"/>
 
 
         <dependency org="jfree" name="jcommon" rev="1.0.0" conf="jfree->default"/>
