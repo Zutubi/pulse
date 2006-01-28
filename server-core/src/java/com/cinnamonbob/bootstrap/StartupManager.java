@@ -1,5 +1,7 @@
 package com.cinnamonbob.bootstrap;
 
+import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.event.system.SystemStartedEvent;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.lang.reflect.Constructor;
@@ -53,6 +55,9 @@ public class StartupManager
             }
 
             setSystemStarted(true);
+
+            EventManager eventManager = (EventManager) ComponentContext.getBean("eventManager");
+            eventManager.publish(new SystemStartedEvent(this));
         }
         catch (Exception e)
         {

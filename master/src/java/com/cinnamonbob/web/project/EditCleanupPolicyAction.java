@@ -105,7 +105,7 @@ public class EditCleanupPolicyAction extends ProjectActionSupport
         {
             if (policy.getWorkDirDays() > policy.getResultDays())
             {
-                addActionError("It is not meaningful to clean up working directories less frequently than results");
+                addActionError("Working directories must be cleaned up at least as frequently as results");
             }
         }
     }

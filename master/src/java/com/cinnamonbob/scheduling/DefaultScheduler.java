@@ -1,5 +1,9 @@
 package com.cinnamonbob.scheduling;
 
+import com.cinnamonbob.core.event.Event;
+import com.cinnamonbob.core.event.EventListener;
+import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.event.system.SystemStartedEvent;
 import com.cinnamonbob.scheduling.persistence.TriggerDao;
 import com.cinnamonbob.util.logging.Logger;
 
@@ -10,7 +14,7 @@ import java.util.TreeMap;
 /**
  * <class-comment/>
  */
-public class DefaultScheduler implements Scheduler
+public class DefaultScheduler implements Scheduler, EventListener
 {
     private static final Logger LOG = Logger.getLogger(DefaultScheduler.class);
 
@@ -198,5 +202,23 @@ public class DefaultScheduler implements Scheduler
     public void setTriggerHandler(TriggerHandler triggerHandler)
     {
         this.triggerHandler = triggerHandler;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        eventManager.register(this);
+    }
+
+    public void handleEvent(Event evt)
+    {
+        if (evt instanceof SystemStartedEvent)
+        {
+            init();
+        }
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{SystemStartedEvent.class};
     }
 }

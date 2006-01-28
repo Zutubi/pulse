@@ -6,6 +6,9 @@ Initialisation of jetty has been split out from the rest to ensure that the majo
 system is setup before we start creating the web context. Various components in the web context
 manually autowire themselves during init (eg: Hessian), this does not work well when the context
 setup is not complete.
+
+Also, as part of three-stage startup, the web app is not deployed until the system startup event
+is received, so that users cannot start interacting with the system before it is fully started.
 -->
 <beans>
 
@@ -25,9 +28,12 @@ setup is not complete.
         </property>
     </bean>
 
-    <bean id="jettyManager" class="com.cinnamonbob.jetty.JettyManager" init-method="deployWebapp">
+    <bean id="jettyManager" class="com.cinnamonbob.jetty.JettyManager">
         <property name="jettyServer">
             <ref bean="jettyServer"/>
+        </property>
+        <property name="eventManager">
+            <ref bean="eventManager"/>
         </property>
         <property name="configurationManager">
             <ref bean="configurationManager"/>

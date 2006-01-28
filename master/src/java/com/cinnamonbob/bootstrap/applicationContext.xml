@@ -35,12 +35,16 @@
         </property>
     </bean>
 
-    <bean id="scheduler" class="com.cinnamonbob.scheduling.DefaultScheduler" init-method="init">
+    <!-- We don't initialise the scheduler here: it must wait for the startup event. -->
+    <bean id="scheduler" class="com.cinnamonbob.scheduling.DefaultScheduler">
         <property name="triggerHandler">
             <ref bean="triggerHandler"/>
         </property>
         <property name="triggerDao">
             <ref bean="triggerDao"/>
+        </property>
+        <property name="eventManager">
+            <ref bean="eventManager"/>
         </property>
         <property name="strategies">
             <list>
