@@ -94,6 +94,21 @@ public class Logger
         delegate.log(Level.FINEST, msg, t);
     }
 
+    public void debug(String msg)
+    {
+        finest(msg);
+    }
+
+    public void debug(Throwable t)
+    {
+        finest(t);
+    }
+
+    public void debug(String msg, Throwable t)
+    {
+        finest(msg, t);
+    }
+
     public boolean isLoggable(Level level)
     {
         return delegate.isLoggable(level);

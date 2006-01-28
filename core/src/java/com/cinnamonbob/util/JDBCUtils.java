@@ -8,10 +8,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.LinkedList;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.PreparedStatement;
+import java.sql.*;
 
 /**
  * <class-comment/>
@@ -99,6 +96,58 @@ public class JDBCUtils
         return statements.toArray(new String[statements.size()]);
     }
 
+    public static boolean tableExists(Connection con, String tableName)
+    {
+        CallableStatement stmt = null;
+        try
+        {
+            stmt = con.prepareCall("SELECT COUNT(*) FROM " + tableName);
+            stmt.execute();
+            return true;
+        }
+        catch (SQLException e)
+        {
+            return false;
+        }
+        finally
+        {
+            JDBCUtils.close(stmt);
+        }
+    }
+
+    public static String[] getSchemaTableNames(Connection con)
+    {
+        try
+        {
+            List<String> tableNames = new LinkedList<String>();
+
+            DatabaseMetaData meta = con.getMetaData();
+
+            ResultSet rs = null;
+            try
+            {
+                rs = meta.getTables(null, null, "%", new String[]{"TABLE"});
+                while (rs.next())
+                {
+                    String tableName = rs.getString("TABLE_NAME");
+                    tableNames.add(tableName);
+                }
+                return tableNames.toArray(new String[tableNames.size()]);
+
+            }
+            finally
+            {
+                close(rs);
+            }
+        }
+        catch (SQLException e)
+        {
+            LOG.severe(e);
+        }
+        return null;
+    }
+
+
     public static void close(Statement stmt)
     {
         if (stmt != null)
@@ -109,7 +158,7 @@ public class JDBCUtils
             }
             catch (SQLException e)
             {
-                //noop
+                LOG.debug(e);
             }
         }
     }
@@ -124,7 +173,7 @@ public class JDBCUtils
             }
             catch (SQLException e)
             {
-                // noop
+                LOG.debug(e);
             }
         }
     }
@@ -139,7 +188,22 @@ public class JDBCUtils
             }
             catch (SQLException e)
             {
-                // noop
+                LOG.debug(e);
+            }
+        }
+    }
+
+    public static void close(ResultSet rs)
+    {
+        if (rs != null)
+        {
+            try
+            {
+                rs.close();
+            }
+            catch (SQLException e)
+            {
+                LOG.debug(e);
             }
         }
     }
