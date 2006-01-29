@@ -5,13 +5,13 @@ import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.services.SlaveService;
 import com.cinnamonbob.slave.command.CleanupRecipeCommand;
 import com.cinnamonbob.slave.command.RecipeCommand;
-import com.cinnamonbob.slave.command.TerminateRecipeCommand;
 
 /**
  */
 public class SlaveServiceImpl implements SlaveService
 {
     private SlaveThreadPool threadPool;
+    private SlaveRecipeProcessor slaveRecipeProcessor;
 
     public void ping()
     {
@@ -38,14 +38,17 @@ public class SlaveServiceImpl implements SlaveService
 
     public void terminateRecipe(long recipeId)
     {
-        TerminateRecipeCommand command = new TerminateRecipeCommand(recipeId);
-        // TODO more dodgy wiring :-/
-        ComponentContext.autowire(command);
-        threadPool.executeCommand(command);
+        // Do this request synchronously
+        slaveRecipeProcessor.terminateRecipe();
     }
 
     public void setThreadPool(SlaveThreadPool threadPool)
     {
         this.threadPool = threadPool;
+    }
+
+    public void setSlaveRecipeProcessor(SlaveRecipeProcessor slaveRecipeProcessor)
+    {
+        this.slaveRecipeProcessor = slaveRecipeProcessor;
     }
 }
