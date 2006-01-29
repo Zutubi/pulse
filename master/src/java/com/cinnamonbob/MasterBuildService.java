@@ -59,6 +59,11 @@ public class MasterBuildService implements BuildService
         }
     }
 
+    public void terminateRecipe(long recipeId)
+    {
+        masterRecipeProcessor.terminateCurrentRecipe();
+    }
+
     public String getHostName()
     {
         return "[master]";

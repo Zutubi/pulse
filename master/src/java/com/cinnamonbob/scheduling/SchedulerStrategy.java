@@ -1,11 +1,11 @@
 package com.cinnamonbob.scheduling;
 
-import java.util.List;
+import com.cinnamonbob.core.Stoppable;
 
 /**
  * <class-comment/>
  */
-public interface SchedulerStrategy
+public interface SchedulerStrategy extends Stoppable
 {
     String canHandle();
 

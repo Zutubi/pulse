@@ -144,6 +144,10 @@
                 <interceptor-ref name="validation"/>
                 <interceptor-ref name="workflow"/>
             </interceptor-stack>
+
+            <interceptor-stack name="paramsStack">
+                <interceptor-ref name="params"/>
+            </interceptor-stack>
         </interceptors>
     </package>
 </xwork>

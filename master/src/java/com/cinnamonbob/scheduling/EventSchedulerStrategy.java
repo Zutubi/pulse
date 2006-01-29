@@ -27,7 +27,7 @@ public class EventSchedulerStrategy implements SchedulerStrategy
 
     public void schedule(final Trigger trigger) throws SchedulingException
     {
-        final EventTrigger eventTrigger = (EventTrigger)trigger;
+        final EventTrigger eventTrigger = (EventTrigger) trigger;
 
         EventListener eventListener = new EventListener()
         {
@@ -87,6 +87,19 @@ public class EventSchedulerStrategy implements SchedulerStrategy
             eventManager.register(listener);
             activeListenerMap.put(trigger, listener);
             trigger.setState(TriggerState.ACTIVE);
+        }
+    }
+
+    public void stop(boolean force)
+    {
+        for (EventListener listener : activeListenerMap.values())
+        {
+            eventManager.unregister(listener);
+        }
+
+        for (EventListener listener : pausedListenerMap.values())
+        {
+            eventManager.unregister(listener);
         }
     }
 

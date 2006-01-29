@@ -58,13 +58,13 @@ public class Bootstrap
 
     public void stop()
     {
-        // connect to the admin port and send the shutdown command...
+        // connect to the admin port and send the stop command...
         Socket socket = null;
         try
         {
             socket = new Socket(host, 8081);
 
-            // send the shutdown command.
+            // send the stop command.
             OutputStream out = socket.getOutputStream();
             out.write(ShutdownService.Command.SHUTDOWN.getBytes());
             out.close();
@@ -72,7 +72,7 @@ public class Bootstrap
         }
         catch (IOException e)
         {
-            LOG.warning("Unable to send shutdown request", e);
+            LOG.warning("Unable to send stop request", e);
 
         }
         finally

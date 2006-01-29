@@ -3,7 +3,6 @@ package com.cinnamonbob.slave;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.SystemBootstrapManager;
 import com.cinnamonbob.jetty.JettyManager;
-
 import com.cinnamonbob.util.logging.Logger;
 
 /**
@@ -27,7 +26,7 @@ public class SlaveServer
     public void stop()
     {
         LOG.info("stop");
-        ((JettyManager) ComponentContext.getBean("jettyManager")).stop();
+        ((JettyManager) ComponentContext.getBean("jettyManager")).stop(true);
     }
 
     public static void main(String argv[])

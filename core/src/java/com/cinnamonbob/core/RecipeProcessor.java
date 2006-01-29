@@ -16,6 +16,9 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  */
@@ -25,6 +28,10 @@ public class RecipeProcessor
 
     private EventManager eventManager;
     private ResourceRepository resourceRepository;
+    private Lock runningLock = new ReentrantLock();
+    private Condition runningCondition = runningLock.newCondition();
+    private Command runningCommand = null;
+    private boolean terminating = false;
 
     public RecipeProcessor()
     {
@@ -87,6 +94,14 @@ public class RecipeProcessor
         {
             result.complete();
             eventManager.publish(new RecipeCompletedEvent(this, result));
+
+            runningLock.lock();
+            if (terminating)
+            {
+                terminating = false;
+                runningCondition.signalAll();
+            }
+            runningLock.unlock();
         }
     }
 
@@ -99,6 +114,17 @@ public class RecipeProcessor
             CommandResult result = new CommandResult(command.getName());
 
             File commandOutput = new File(outputDir, getCommandDirName(i, result));
+
+            runningLock.lock();
+            if (terminating)
+            {
+                runningLock.unlock();
+                return;
+            }
+
+            runningCommand = command;
+            runningLock.unlock();
+
             executeCommand(recipeId, result, workDir, commandOutput, command);
 
             switch (result.getState())
@@ -176,5 +202,40 @@ public class RecipeProcessor
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void terminateRecipe() throws InterruptedException
+    {
+        // Preconditions:
+        //   - this call is only made if the processor is executing or will
+        //     be shortly executing (i.e. a thread is guaranteed to call
+        //     build)
+        // Responsibilities of this method:
+        //   - after this call, no further command should be started
+        //   - if a command is running during this call, it should be
+        //     terminated
+        //   - this call should not exit until the recipe has been
+        //     terminated
+        // It is acceptable for the build to commence after this call, so
+        // long as no commands (which have unpredictable running time) are
+        // started.
+        runningLock.lock();
+        try
+        {
+            terminating = true;
+            if (runningCommand != null)
+            {
+                runningCommand.terminate();
+            }
+
+            while (terminating)
+            {
+                runningCondition.await();
+            }
+        }
+        finally
+        {
+            runningLock.unlock();
+        }
     }
 }

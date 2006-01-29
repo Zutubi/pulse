@@ -97,4 +97,16 @@ public class SlaveRecipeProcessor
     {
         this.masterProxyFactory = masterProxyFactory;
     }
+
+    public void terminateRecipe()
+    {
+        try
+        {
+            recipeProcessor.terminateRecipe();
+        }
+        catch (InterruptedException e)
+        {
+            LOG.warning("Interrupted while terminating recipe", e);
+        }
+    }
 }

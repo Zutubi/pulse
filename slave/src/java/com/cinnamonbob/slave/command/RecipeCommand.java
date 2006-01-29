@@ -1,6 +1,7 @@
-package com.cinnamonbob.slave;
+package com.cinnamonbob.slave.command;
 
 import com.cinnamonbob.RecipeRequest;
+import com.cinnamonbob.slave.SlaveRecipeProcessor;
 
 /**
  */

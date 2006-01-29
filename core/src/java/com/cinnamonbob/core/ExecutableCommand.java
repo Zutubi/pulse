@@ -28,6 +28,8 @@ public class ExecutableCommand implements Command
     private String name;
 
     private List<Environment> env = new LinkedList<Environment>();
+    private Process child;
+
 
     public void execute(File workDir, File outputDir, CommandResult cmdResult)
     {
@@ -61,7 +63,7 @@ public class ExecutableCommand implements Command
 
         try
         {
-            Process child = builder.start();
+            child = builder.start();
             File outputFile = new File(outputDir, "output.txt");
             FileOutputStream output = null;
             try
@@ -182,6 +184,14 @@ public class ExecutableCommand implements Command
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public void terminate()
+    {
+        if (child != null)
+        {
+            child.destroy();
+        }
     }
 
     List<Arg> getArgs()

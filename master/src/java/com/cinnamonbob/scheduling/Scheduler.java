@@ -1,11 +1,13 @@
 package com.cinnamonbob.scheduling;
 
+import com.cinnamonbob.core.Stoppable;
+
 import java.util.List;
 
 /**
  * <class-comment/>
  */
-public interface Scheduler
+public interface Scheduler extends Stoppable
 {
     Trigger getTrigger(String name, String group);
 

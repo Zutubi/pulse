@@ -1,14 +1,17 @@
 package com.cinnamonbob.scheduling;
 
+import com.cinnamonbob.util.logging.Logger;
+import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.JobDetail;
 
 /**
  * <class-comment/>
  */
 public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
 {
+    private static final Logger LOG = Logger.getLogger(QuartzSchedulerStrategy.class);
+
     protected static final String CALLBACK_JOB_NAME = "cron.trigger.job.name";
 
     protected static final String CALLBACK_JOB_GROUP = "cron.trigger.job.group";
@@ -50,6 +53,21 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         catch (SchedulerException e)
         {
             throw new SchedulingException(e);
+        }
+    }
+
+    public void stop(boolean force)
+    {
+        try
+        {
+            // Quartz shceduler stop takes an argument indicating if we
+            // should wait for scheduled tasks to complete first (hence the
+            // inversion of force).
+            getQuartzScheduler().shutdown(!force);
+        }
+        catch (SchedulerException e)
+        {
+            LOG.severe("Unable to shutdown Quartz scheduler", e);
         }
     }
 

@@ -221,4 +221,12 @@ public class DefaultScheduler implements Scheduler, EventListener
     {
         return new Class[]{SystemStartedEvent.class};
     }
+
+    public void stop(boolean force)
+    {
+        for (SchedulerStrategy strategy : strategies.values())
+        {
+            strategy.stop(force);
+        }
+    }
 }

@@ -14,4 +14,6 @@ public interface SlaveService
     void build(String master, RecipeRequest request);
 
     void cleanupRecipe(long recipeId);
+
+    void terminateRecipe(long recipeId);
 }

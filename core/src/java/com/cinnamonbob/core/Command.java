@@ -18,4 +18,6 @@ public interface Command
     String getName();
 
     void setName(String name);
+
+    void terminate();
 }

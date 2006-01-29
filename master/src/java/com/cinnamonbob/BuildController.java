@@ -13,6 +13,7 @@ import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.core.util.TreeNode;
 import com.cinnamonbob.events.build.BuildCommencedEvent;
 import com.cinnamonbob.events.build.BuildCompletedEvent;
+import com.cinnamonbob.events.build.BuildTerminationRequestEvent;
 import com.cinnamonbob.events.build.RecipeEvent;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.scm.SCMException;
@@ -38,7 +39,6 @@ public class BuildController implements EventListener
     private RecipeResultCollector collector;
     private BuildTree tree;
     private BuildResult buildResult;
-    private ScmBootstrapper initialBootstrapper;
     private AsynchronousDelegatingListener asyncListener;
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
 
@@ -167,6 +167,10 @@ public class BuildController implements EventListener
                     handleBuildCommenced();
                 }
             }
+            else if (evt instanceof BuildTerminationRequestEvent)
+            {
+                handleBuildTerminationRequest();
+            }
             else
             {
                 RecipeEvent e = (RecipeEvent) evt;
@@ -208,6 +212,17 @@ public class BuildController implements EventListener
 
         // execute the first level of recipe controllers...
         initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
+    }
+
+    private void handleBuildTerminationRequest()
+    {
+        for (TreeNode<RecipeController> controllerNode : executingControllers)
+        {
+            controllerNode.getData().terminateRecipe();
+        }
+
+        buildResult.error("Build forcefully terminated");
+        completeBuild();
     }
 
     private void initialiseNodes(Bootstrapper bootstrapper, List<TreeNode<RecipeController>> nodes)
@@ -282,11 +297,11 @@ public class BuildController implements EventListener
         buildManager.save(buildResult);
         eventManager.unregister(asyncListener);
         eventManager.publish(new BuildCompletedEvent(this, buildResult));
-        asyncListener.stop();
+        asyncListener.stop(true);
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildCommencedEvent.class, RecipeEvent.class};
+        return new Class[]{BuildCommencedEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class};
     }
 }

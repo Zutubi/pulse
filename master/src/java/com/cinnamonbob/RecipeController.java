@@ -232,4 +232,12 @@ public class RecipeController
         complete();
     }
 
+    public void terminateRecipe()
+    {
+        // Tell the build service that it can stop trying to execute this
+        // recipe
+        buildService.terminateRecipe(recipeResult.getId());
+        recipeResult.error("Recipe forcefully terminated");
+        complete();
+    }
 }

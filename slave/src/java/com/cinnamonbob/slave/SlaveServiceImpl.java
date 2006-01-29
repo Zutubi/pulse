@@ -3,6 +3,9 @@ package com.cinnamonbob.slave;
 import com.cinnamonbob.RecipeRequest;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.services.SlaveService;
+import com.cinnamonbob.slave.command.CleanupRecipeCommand;
+import com.cinnamonbob.slave.command.RecipeCommand;
+import com.cinnamonbob.slave.command.TerminateRecipeCommand;
 
 /**
  */
@@ -28,6 +31,14 @@ public class SlaveServiceImpl implements SlaveService
     public void cleanupRecipe(long recipeId)
     {
         CleanupRecipeCommand command = new CleanupRecipeCommand(recipeId);
+        // TODO more dodgy wiring :-/
+        ComponentContext.autowire(command);
+        threadPool.executeCommand(command);
+    }
+
+    public void terminateRecipe(long recipeId)
+    {
+        TerminateRecipeCommand command = new TerminateRecipeCommand(recipeId);
         // TODO more dodgy wiring :-/
         ComponentContext.autowire(command);
         threadPool.executeCommand(command);

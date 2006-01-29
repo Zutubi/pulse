@@ -20,6 +20,11 @@ public class NoopSchedulerStrategy implements SchedulerStrategy
         trigger.setState(TriggerState.ACTIVE);
     }
 
+    public void stop(boolean force)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public void schedule(Trigger trigger) throws SchedulingException
     {
         trigger.setState(TriggerState.ACTIVE);

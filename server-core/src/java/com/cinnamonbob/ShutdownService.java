@@ -10,23 +10,19 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * The shutdown service provides a way for clients the to shutdown the
+ * The stop service provides a way for clients the to stop the
  * server.
  *
  * @author Daniel Ostermeier
  */
 public class ShutdownService
 {
-
-    private BobServer bobServer;
-
+    private ShutdownManager shutdownManager;
     private ServerSocket socketServer;
-
     /**
      * The port on which the admin service will be listening for requests.
      */
     private int port;
-
     private boolean stopping;
 
     private static final Logger LOG = Logger.getLogger(ShutdownService.class);
@@ -36,21 +32,21 @@ public class ShutdownService
      */
     public static interface Command
     {
-        public static final String SHUTDOWN = "shutdown";
+        public static final String SHUTDOWN = "stop";
+        public static final String FORCED_SHUTDOWN = "stop-now";
     }
 
     /**
      * @param port
      */
-    public ShutdownService(int port, BobServer server)
+    public ShutdownService(int port)
     {
         this.port = port;
-        this.bobServer = server;
     }
 
     /**
      * Start the service. Once started, the service will listen for
-     * shutdown requests.
+     * stop requests.
      */
     public void start() throws IOException
     {
@@ -79,14 +75,15 @@ public class ShutdownService
         try
         {
             socketServer.close();
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             // nop
         }
     }
 
     /**
-     * Main execution loop for the shutdown service.
+     * Main execution loop for the stop service.
      */
     private void runService()
     {
@@ -99,14 +96,16 @@ public class ShutdownService
                 try
                 {
                     handleConnection(s);
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     e.printStackTrace();
                 }
-                
+
                 IOUtils.close(s);
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             LOG.severe("Error in socketServer, shutting down service.", e);
             IOUtils.close(socketServer);
@@ -131,18 +130,29 @@ public class ShutdownService
             String cmd = reader.readLine();
             if (Command.SHUTDOWN.equals(cmd))
             {
-                processShutdown();
+                processShutdown(false);
             }
-        } finally
+            else if (Command.FORCED_SHUTDOWN.equals(cmd))
+            {
+                processShutdown(true);
+            }
+        }
+        finally
         {
             IOUtils.close(reader);
         }
     }
 
-    private void processShutdown()
+    private void processShutdown(boolean force)
     {
         LOG.info("Shutting down server...");
-
-        bobServer.stop();
+        shutdownManager.shutdown(force);
+        stop();
     }
+
+    public void setShutdownManager(ShutdownManager shutdownManager)
+    {
+        this.shutdownManager = shutdownManager;
+    }
+
 }

@@ -48,6 +48,11 @@ public class CommandGroup implements Command, Validateable
         this.name = name;
     }
 
+    public void terminate()
+    {
+        command.terminate();
+    }
+
     public String getName()
     {
         return name;

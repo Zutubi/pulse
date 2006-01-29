@@ -8,6 +8,14 @@
       
   <body>
     <h1 class="build-log">:: server status ::</h1>
+    <h2 class="command-info">control panel</h2>
+    <div class="command-content">
+      <ul>
+        <li><a href="shutdownServer.action?force=false">clean shutdown</a></li>
+        <li><a href="shutdownServer.action?force=true">forced shutdown</a></li>
+      </ul>
+    </div>
+
     <h2 class="command-info">slaves</h2>
     <div class="command-content">
       <table>

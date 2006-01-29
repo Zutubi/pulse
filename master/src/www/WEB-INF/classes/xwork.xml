@@ -512,5 +512,11 @@
             <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
         </action>
 
+        <action name="shutdownServer" class="com.cinnamonbob.web.ShutdownServerAction">
+            <interceptor-ref name="paramsStack"/>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/serverStatus.action</result>
+        </action>
+
     </package>
 </xwork>

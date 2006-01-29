@@ -2,6 +2,7 @@ package com.cinnamonbob.jetty;
 
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.core.Stoppable;
 import com.cinnamonbob.core.event.Event;
 import com.cinnamonbob.core.event.EventListener;
 import com.cinnamonbob.core.event.EventManager;
@@ -17,7 +18,7 @@ import java.io.File;
  * 
  *
  */
-public class JettyManager implements EventListener
+public class JettyManager implements EventListener, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(JettyManager.class);
     private static final String BEAN_NAME = "jettyManager";
@@ -63,16 +64,15 @@ public class JettyManager implements EventListener
         return (JettyManager) ComponentContext.getBean(BEAN_NAME);
     }
 
-    public void stop()
+    public void stop(boolean force)
     {
         try
         {
             server.stop(true);
-            server.destroy();
+            //server.destroy();
         }
         catch (InterruptedException e)
         {
-            // Empty
             LOG.severe("Error while stopping Jetty", e);
         }
     }

@@ -1,12 +1,10 @@
 package com.cinnamonbob.scheduling;
 
+import com.cinnamonbob.util.logging.Logger;
 import org.quartz.Job;
+import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.JobDataMap;
-
-import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.bootstrap.ComponentContext;
 
 /**
  * <class-comment/>
@@ -21,10 +19,6 @@ public class QuartzTaskCallbackJob implements Job
 
     public void execute(JobExecutionContext context) throws JobExecutionException
     {
-        // NOTE: When this is executed the first time (on scheduler startup), this throws
-        //       an NPE since the triggerHandler has not been constructed in the spring context
-        //       being used to handle autowiring...
-
         // notify schedule manager that this trigger has been activated.
         JobDataMap data = context.getMergedJobDataMap();
         try

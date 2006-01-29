@@ -1,4 +1,4 @@
-package com.cinnamonbob.slave;
+package com.cinnamonbob.slave.command;
 
 import com.cinnamonbob.ServerRecipePaths;
 import com.cinnamonbob.bootstrap.ConfigurationManager;

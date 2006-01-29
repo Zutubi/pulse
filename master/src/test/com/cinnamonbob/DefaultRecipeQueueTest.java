@@ -110,6 +110,11 @@ public class DefaultRecipeQueueTest extends TestCase
         {
         }
 
+        public void terminateRecipe(long recipeId)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
         public String getHostName()
         {
             return "[mock]";

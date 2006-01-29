@@ -95,6 +95,11 @@ public class SlaveBuildService implements BuildService
         }
     }
 
+    public void terminateRecipe(long recipeId)
+    {
+        service.terminateRecipe(recipeId);
+    }
+
     public String getHostName()
     {
         return slave.getName();

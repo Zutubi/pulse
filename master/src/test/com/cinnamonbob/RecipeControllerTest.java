@@ -315,6 +315,11 @@ public class RecipeControllerTest extends BobTestCase
             throw new RuntimeException("Method not implemented.");
         }
 
+        public void terminateRecipe(long recipeId)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
         public String getHostName()
         {
             return "mock build service";
