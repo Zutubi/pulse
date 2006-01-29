@@ -19,7 +19,7 @@ public class SystemUtilsTest extends BobTestCase
 
         if (SystemUtils.isWindows())
         {
-            list = "dir";
+            list = "dir.exe";
         }
         else
         {
