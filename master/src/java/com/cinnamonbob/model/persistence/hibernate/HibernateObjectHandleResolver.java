@@ -8,7 +8,8 @@ import org.hibernate.engine.SessionImplementor;
 import org.hibernate.loader.Loader;
 import org.hibernate.loader.entity.EntityLoader;
 import org.hibernate.metadata.ClassMetadata;
-import org.hibernate.persister.entity.BasicEntityPersister;
+import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.persister.entity.OuterJoinLoadable;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -28,7 +29,7 @@ public class HibernateObjectHandleResolver extends ObjectHandleResolver
 
     public Object resolve(ObjectHandle handle)
     {
-        return session.load(handle.clazz, handle.id);
+        return session.immediateLoad(handle.clazz.getName(), handle.id);
     }
 
     public Object[] resolve(ObjectHandle[] handles)
@@ -41,8 +42,8 @@ public class HibernateObjectHandleResolver extends ObjectHandleResolver
         // initialise the entity loader
         Class persistentType = handles[0].clazz;
         ClassMetadata metaData = factory.getClassMetadata(persistentType);
-        BasicEntityPersister persister = (BasicEntityPersister) factory.getEntityPersister(metaData.getEntityName());
-        Loader loader = new EntityLoader(persister, handles.length, LockMode.READ, factory, Collections.EMPTY_MAP);
+        EntityPersister persister = factory.getEntityPersister(metaData.getEntityName());
+        Loader loader = new EntityLoader((OuterJoinLoadable) persister, handles.length, LockMode.READ, factory, Collections.EMPTY_MAP);
 
         List objects = loader.loadEntityBatch(session, ids, persister.getIdentifierType(), null, null, null, persister);
         return objects.toArray(new Object[objects.size()]);
@@ -57,8 +58,6 @@ public class HibernateObjectHandleResolver extends ObjectHandleResolver
         }
         return ids.toArray(new Serializable[ids.size()]);
     }
-
-
 
     //---( required resources )---
 

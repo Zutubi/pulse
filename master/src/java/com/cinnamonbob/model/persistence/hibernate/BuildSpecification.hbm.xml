@@ -11,7 +11,7 @@
         <property name="name" column="NAME" type="string" length="255"/>
 
         <many-to-one name="root" class="com.cinnamonbob.model.BuildSpecificationNode"
-                     column="ROOT_ID" cascade="all-delete-orphan" lazy="false"/>
+                     column="ROOT_ID" cascade="all" lazy="false"/>
 
     </class>
 
@@ -31,7 +31,7 @@
 
         <list name="children" cascade="all-delete-orphan" lazy="false">
             <key column="PARENT_ID"/>
-            <index column="POSITION"/>
+            <index column="ORDINAL"/>
             <one-to-many class="com.cinnamonbob.model.BuildSpecificationNode"/>
         </list>
 

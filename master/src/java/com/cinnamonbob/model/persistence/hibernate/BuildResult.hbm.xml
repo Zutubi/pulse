@@ -9,8 +9,8 @@
         </id>
 
         <property name="stamps" type="com.cinnamonbob.util.TimeStampsType">
-            <column name="start" sql-type="BIGINT"/>
-            <column name="end" sql-type="BIGINT"/>
+            <column name="START" sql-type="BIGINT"/>
+            <column name="FINISH" sql-type="BIGINT"/>
         </property>
 
         <property name="stateName" column="STATE" type="string" length="127"/>
@@ -26,7 +26,7 @@
         <many-to-one name="project" column="PROJECT" class="com.cinnamonbob.model.Project" cascade="none"/>
 
         <many-to-one name="scmDetails" class="com.cinnamonbob.model.BuildScmDetails" column="SCM_DETAILS"
-                     cascade="all-delete-orphan" lazy="false"/>
+                     cascade="all" lazy="false"/>
 
         <many-to-one name="root" class="com.cinnamonbob.model.RecipeResultNode" column="RECIPE_RESULT_ID"
                      cascade="all"/>
@@ -44,7 +44,7 @@
 
         <list name="changelists" cascade="all-delete-orphan" lazy="false">
             <key column="BUILD_SCM_DETAILS_ID"/>
-            <index column="POSITION"/>
+            <index column="ORDINAL"/>
             <one-to-many class="com.cinnamonbob.core.model.Changelist"/>
         </list>
 
@@ -63,7 +63,7 @@
 
         <list name="children" cascade="all-delete-orphan" lazy="false">
             <key column="PARENT_ID"/>
-            <index column="POSITION"/>
+            <index column="ORDINAL"/>
             <one-to-many class="com.cinnamonbob.model.RecipeResultNode"/>
         </list>
 
@@ -76,8 +76,8 @@
         </id>
 
         <property name="stamps" type="com.cinnamonbob.util.TimeStampsType">
-            <column name="start" sql-type="BIGINT"/>
-            <column name="end" sql-type="BIGINT"/>
+            <column name="START" sql-type="BIGINT"/>
+            <column name="FINISH" sql-type="BIGINT"/>
         </property>
 
         <property name="stateName" column="STATE" type="string" length="127"/>
@@ -92,7 +92,7 @@
 
         <list name="commandResults" cascade="all-delete-orphan" lazy="false">
             <key column="BUILD_RESULT_ID"/>
-            <index column="POSITION"/>
+            <index column="ORDINAL"/>
             <one-to-many class="com.cinnamonbob.core.model.CommandResult"/>
         </list>
 

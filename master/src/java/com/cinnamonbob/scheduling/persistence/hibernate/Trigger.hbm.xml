@@ -10,15 +10,15 @@
 
         <discriminator column="TRIGGER_TYPE" type="string" length="255"/>
 
-        <property name="name" column="NAME" type="string" not-null="true" length="255"/>
+        <property name="name" column="TRIGGER_NAME" type="string" not-null="true" length="255"/>
 
-        <property name="group" column="GROUP" type="string" not-null="true" length="255"/>
+        <property name="group" column="TRIGGER_GROUP" type="string" not-null="true" length="255"/>
 
         <property name="taskClass" column="TASK_CLASS" type="class"/>
 
         <property name="project" column="PROJECT" type="long"/>
 
-        <property name="triggerCount" column="COUNT" type="long"/>
+        <property name="triggerCount" column="TRIGGER_COUNT" type="long"/>
 
         <property name="previousTriggerTime" column="PREVIOUS_TRIGGER_TIME" type="timestamp"/>
 

@@ -14,7 +14,7 @@
 
         <list name="changes" cascade="all-delete-orphan" lazy="false">
             <key column="CHANGELIST_ID"/>
-            <index column="POSITION"/>
+            <index column="ORDINAL"/>
             <one-to-many class="com.cinnamonbob.core.model.Change"/>
         </list>
     </class>

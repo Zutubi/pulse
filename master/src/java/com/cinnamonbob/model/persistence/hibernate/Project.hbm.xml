@@ -24,7 +24,7 @@
             <property name="resultDays" column="RESULT_DAYS" type="long"/>
         </component>
 
-        <many-to-one name="scm" class="com.cinnamonbob.model.Scm" column="SCM" cascade="all-delete-orphan"
+        <many-to-one name="scm" class="com.cinnamonbob.model.Scm" column="SCM" cascade="all"
                      lazy="false"/>
     </class>
 

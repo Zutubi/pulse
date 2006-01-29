@@ -20,8 +20,6 @@
 
     <dependencies>
 
-        <dependency org="junit" name="junit" rev="3.8.1" conf="external->default"/>
-
         <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="external->external"/>
         <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="internal->internal"/>
 

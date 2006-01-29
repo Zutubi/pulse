@@ -177,6 +177,14 @@
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
     </target>
 
+    <target name="resolve.lib" depends="init">
+    	<resolve.dependencies module="core"/>
+    	<resolve.dependencies module="server-core"/>
+    	<resolve.dependencies module="local"/>
+    	<resolve.dependencies module="master"/>
+    	<resolve.dependencies module="slave"/>
+    </target>
+
     <target name="refresh.lib" depends="clean, init">
 
         <delete dir="lib"/>
@@ -197,6 +205,15 @@
         <sequential>
             <ivy:resolve file="@{module}/ivy.xml" conf="@{conf}"/>
             <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
+            <ivy:retrieve validate="true" conf="@{conf}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="resolve.dependencies">
+        <attribute name="module"/>
+        <attribute name="conf" default="external"/>
+        <sequential>
+            <ivy:resolve file="@{module}/ivy.xml" conf="@{conf}"/>
             <ivy:retrieve validate="true" conf="@{conf}"/>
         </sequential>
     </macrodef>

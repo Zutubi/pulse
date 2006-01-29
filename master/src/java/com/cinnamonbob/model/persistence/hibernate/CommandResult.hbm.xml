@@ -11,8 +11,8 @@
         <property name="commandName" column="COMMAND_NAME" type="string" length="255"/>
 
         <property name="stamps" type="com.cinnamonbob.util.TimeStampsType">
-            <column name="start" sql-type="BIGINT"/>
-            <column name="end" sql-type="BIGINT"/>
+            <column name="START" sql-type="BIGINT"/>
+            <column name="FINISH" sql-type="BIGINT"/>
         </property>
 
         <property name="stateName" type="string" length="31" not-null="true"/>
@@ -27,7 +27,7 @@
 
         <list name="artifacts" cascade="all-delete-orphan" lazy="false">
             <key column="COMMAND_RESULT_ID"/>
-            <index column="POSITION"/>
+            <index column="ORDINAL"/>
             <one-to-many class="com.cinnamonbob.core.model.StoredArtifact"/>
         </list>
 

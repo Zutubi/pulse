@@ -30,6 +30,7 @@ public abstract class PersistenceTestCase extends BobTestCase
     private DefaultTransactionDefinition transactionDefinition;
 
     protected SessionFactory sessionFactory;
+    protected DataSource dataSource;
 
     public PersistenceTestCase()
     {
@@ -50,7 +51,7 @@ public abstract class PersistenceTestCase extends BobTestCase
         ComponentContext.addClassPathContextDefinitions(configLocations);
         context = ComponentContext.getContext();
 
-        DataSource dataSource = (DataSource) context.getBean("dataSource");
+        dataSource = (DataSource) context.getBean("dataSource");
 
         DatabaseBootstrap dbBootstrap = new DatabaseBootstrap();
         dbBootstrap.setDataSource(dataSource);
@@ -66,7 +67,6 @@ public abstract class PersistenceTestCase extends BobTestCase
     public void tearDown() throws Exception
     {
         sessionFactory = null;
-
         try
         {
             transactionManager.commit(transactionStatus);
@@ -77,7 +77,7 @@ public abstract class PersistenceTestCase extends BobTestCase
             e.printStackTrace();
         }
 
-        Connection con = ((DataSource) context.getBean("dataSource")).getConnection();
+        Connection con = dataSource.getConnection();
         Statement stmt = null;
         try
         {
@@ -91,6 +91,8 @@ public abstract class PersistenceTestCase extends BobTestCase
                 stmt.close();
             }
         }
+
+        dataSource = null;
         transactionStatus = null;
         transactionDefinition = null;
         transactionManager = null;
