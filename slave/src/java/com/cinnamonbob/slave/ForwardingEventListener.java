@@ -1,7 +1,7 @@
 package com.cinnamonbob.slave;
 
-import com.cinnamonbob.core.event.Event;
-import com.cinnamonbob.core.event.EventListener;
+import com.cinnamonbob.events.Event;
+import com.cinnamonbob.events.EventListener;
 import com.cinnamonbob.events.build.RecipeEvent;
 import com.cinnamonbob.services.MasterService;
 import com.cinnamonbob.util.logging.Logger;

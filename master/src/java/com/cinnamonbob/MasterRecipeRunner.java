@@ -4,7 +4,7 @@ import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.Bootstrapper;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.RecipeProcessor;
-import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.events.build.RecipeErrorEvent;
 import com.cinnamonbob.util.logging.Logger;
 

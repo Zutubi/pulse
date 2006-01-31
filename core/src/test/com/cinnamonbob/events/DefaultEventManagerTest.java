@@ -1,9 +1,11 @@
-package com.cinnamonbob.core.event;
+package com.cinnamonbob.events;
 
 import junit.framework.TestCase;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import com.cinnamonbob.events.DefaultEventManager;
 
 /**
  * <class-comment/>
@@ -27,7 +29,7 @@ public class DefaultEventManagerTest extends TestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        
+
         evtManager = new DefaultEventManager(new SynchronousDispatcher());
         listener = new RecordingEventListener(new Class[]{Event.class});
     }
@@ -35,7 +37,7 @@ public class DefaultEventManagerTest extends TestCase
     public void tearDown() throws Exception
     {
         // tear down here.
-        
+
         super.tearDown();
     }
 

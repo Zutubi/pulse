@@ -5,7 +5,7 @@ import com.cinnamonbob.scheduling.TaskExecutionContext;
 import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.SlaveProxyFactory;
 import com.cinnamonbob.events.SlaveAvailableEvent;
-import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.model.SlaveManager;
 import com.cinnamonbob.model.Slave;
 import com.cinnamonbob.services.SlaveService;

@@ -12,16 +12,6 @@ is received, so that users cannot start interacting with the system before it is
 -->
 <beans>
 
-    <!-- is the initContext really needed? It appears that singletons are initialised anyways
-    without being referenced...-->
-    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation">
-        <property name="initBeans">
-            <list>
-                <ref bean="jettyManager"/>
-            </list>
-        </property>
-    </bean>
-
     <bean id="jettyServer" class="com.cinnamonbob.jetty.JettyServerFactoryBean" destroy-method="shutdown">
         <property name="configurationManager">
             <ref bean="configurationManager"/>
@@ -39,6 +29,9 @@ is received, so that users cannot start interacting with the system before it is
             <ref bean="configurationManager"/>
         </property>
     </bean>
+
+    <!-- this spring object factory will ensure that WebWork Actions are autowired. -->
+    <bean id="spring-object-factory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 
     <bean id="shutdownManager" class="com.cinnamonbob.ShutdownManager">
         <property name="stoppables">

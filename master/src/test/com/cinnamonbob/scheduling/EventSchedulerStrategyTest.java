@@ -1,8 +1,8 @@
 package com.cinnamonbob.scheduling;
 
-import com.cinnamonbob.core.event.DefaultEventManager;
-import com.cinnamonbob.core.event.Event;
-import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.DefaultEventManager;
+import com.cinnamonbob.events.Event;
+import com.cinnamonbob.events.EventManager;
 
 /**
  * <class-comment/>

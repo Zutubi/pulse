@@ -1,6 +1,6 @@
 package com.cinnamonbob.services;
 
-import com.cinnamonbob.core.event.Event;
+import com.cinnamonbob.events.Event;
 
 /**
  */

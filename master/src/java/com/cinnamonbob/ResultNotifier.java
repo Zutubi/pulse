@@ -1,8 +1,8 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.core.event.Event;
-import com.cinnamonbob.core.event.EventListener;
-import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.Event;
+import com.cinnamonbob.events.EventListener;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.events.build.BuildCompletedEvent;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Subscription;

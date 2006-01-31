@@ -1,6 +1,6 @@
 package com.cinnamonbob.event.system;
 
-import com.cinnamonbob.core.event.Event;
+import com.cinnamonbob.events.Event;
 
 /**
  * Parent for all system events.  These are events that indicate a change in

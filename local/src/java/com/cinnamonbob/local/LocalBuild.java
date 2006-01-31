@@ -1,8 +1,8 @@
 package com.cinnamonbob.local;
 
 import com.cinnamonbob.core.*;
-import com.cinnamonbob.core.event.DefaultEventManager;
-import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.DefaultEventManager;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.core.util.IOUtils;
 import org.apache.commons.cli.*;
 

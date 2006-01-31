@@ -1,6 +1,6 @@
 package com.cinnamonbob.scheduling.tasks;
 
-import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.events.build.BuildRequestEvent;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.ProjectManager;

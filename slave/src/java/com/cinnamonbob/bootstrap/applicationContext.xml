@@ -22,7 +22,7 @@
 
     <bean id="recipeProcessor" class="com.cinnamonbob.core.RecipeProcessor" autowire="byName"/>
 
-    <bean id="eventManager" class="com.cinnamonbob.core.event.DefaultEventManager" autowire="byName"/>
+    <bean id="eventManager" class="com.cinnamonbob.events.DefaultEventManager" autowire="byName"/>
 
     <bean id="objectFactory" class="com.cinnamonbob.core.ObjectFactory" autowire="byName"/>
 

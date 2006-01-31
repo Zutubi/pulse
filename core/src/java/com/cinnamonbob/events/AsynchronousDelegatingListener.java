@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.event;
+package com.cinnamonbob.events;
 
 import com.cinnamonbob.core.Stoppable;
 import com.cinnamonbob.util.logging.Logger;

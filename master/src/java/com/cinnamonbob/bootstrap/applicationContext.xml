@@ -20,67 +20,8 @@
 
     <bean id="velocityEngine" class="com.cinnamonbob.bootstrap.velocity.VelocityEngineFactoryBean"/>
 
-    <!-- ==================== -->
-    <!-- scheduling subsystem -->
+    <bean id="buildManagerTarget" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName" init-method="init"/>
 
-    <bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-        <property name="configLocation">
-            <value>classpath:com/cinnamonbob/bootstrap/quartz/quartz.properties</value>
-        </property>
-    </bean>
-
-    <bean id="quartzJobFactory" class="com.cinnamonbob.bootstrap.quartz.SpringJobFactory" init-method="init">
-        <property name="scheduler">
-            <ref bean="quartzScheduler"/>
-        </property>
-    </bean>
-
-    <!-- We don't initialise the scheduler here: it must wait for the startup event. -->
-    <bean id="scheduler" class="com.cinnamonbob.scheduling.DefaultScheduler">
-        <property name="triggerHandler">
-            <ref bean="triggerHandler"/>
-        </property>
-        <property name="triggerDao">
-            <ref bean="triggerDao"/>
-        </property>
-        <property name="eventManager">
-            <ref bean="eventManager"/>
-        </property>
-        <property name="strategies">
-            <list>
-                <ref bean="cronSchedulerStrategy"/>
-                <ref bean="simpleSchedulerStrategy"/>
-                <ref bean="eventSchedulerStrategy"/>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="cronSchedulerStrategy" class="com.cinnamonbob.scheduling.CronSchedulerStrategy">
-        <property name="quartzScheduler">
-            <ref bean="quartzScheduler"/>
-        </property>
-    </bean>
-    <bean id="simpleSchedulerStrategy" class="com.cinnamonbob.scheduling.SimpleSchedulerStrategy">
-        <property name="quartzScheduler">
-            <ref bean="quartzScheduler"/>
-        </property>
-    </bean>
-
-    <bean id="eventSchedulerStrategy" class="com.cinnamonbob.scheduling.EventSchedulerStrategy">
-        <property name="eventManager">
-            <ref bean="eventManager"/>
-        </property>
-    </bean>
-
-    <bean id="triggerHandler" class="com.cinnamonbob.scheduling.DefaultTriggerHandler">
-        <!-- not sure why this is needs to be wired directly. -->
-        <property name="triggerDao">
-            <ref bean="triggerDao"/>
-        </property>
-    </bean>
-
-    <bean id="buildManagerTarget" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"
-          init-method="init"/>
     <bean id="buildManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
@@ -170,8 +111,6 @@
             </props>
         </property>
     </bean>
-
-    <bean id="eventManager" class="com.cinnamonbob.core.event.DefaultEventManager" autowire="byName"/>
 
     <bean id="objectFactory" class="com.cinnamonbob.core.ObjectFactory" autowire="byName"/>
 

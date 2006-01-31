@@ -1,6 +1,6 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.Property;
 import com.cinnamonbob.core.model.RecipeResult;

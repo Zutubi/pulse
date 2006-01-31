@@ -1,6 +1,6 @@
 package com.cinnamonbob.scheduling;
 
-import com.cinnamonbob.core.event.Event;
+import com.cinnamonbob.events.Event;
 
 /**
  * The EventTrigger is triggered by the occurance of an event within the system.

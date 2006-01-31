@@ -1,8 +1,8 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.core.event.Event;
-import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.Event;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.services.MasterService;
 
 /**

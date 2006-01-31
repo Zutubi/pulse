@@ -1,8 +1,8 @@
 package com.cinnamonbob.scheduling;
 
-import com.cinnamonbob.core.event.Event;
-import com.cinnamonbob.core.event.EventListener;
-import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.Event;
+import com.cinnamonbob.events.EventListener;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.event.system.SystemStartedEvent;
 import com.cinnamonbob.scheduling.persistence.TriggerDao;
 import com.cinnamonbob.util.logging.Logger;

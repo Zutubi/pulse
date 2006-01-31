@@ -10,7 +10,6 @@
     </head>
     <body>
         <h1 class="build-log">:: $project.name ::</h1>
-
         <div id="project-left-column">
 
         <h2 class="command-info">details</h2>

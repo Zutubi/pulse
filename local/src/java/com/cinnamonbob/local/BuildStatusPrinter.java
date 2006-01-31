@@ -1,7 +1,7 @@
 package com.cinnamonbob.local;
 
-import com.cinnamonbob.core.event.Event;
-import com.cinnamonbob.core.event.EventListener;
+import com.cinnamonbob.events.Event;
+import com.cinnamonbob.events.EventListener;
 import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.core.util.ForkOutputStream;
 import com.cinnamonbob.core.util.TimeStamps;

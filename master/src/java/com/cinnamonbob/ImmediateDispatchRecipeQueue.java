@@ -1,14 +1,12 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.event.EventManager;
-import com.cinnamonbob.core.event.EventListener;
-import com.cinnamonbob.core.event.Event;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.events.build.RecipeDispatchedEvent;
-import com.cinnamonbob.events.SlaveAvailableEvent;
+import com.cinnamonbob.events.Event;
+import com.cinnamonbob.events.*;
 import com.cinnamonbob.model.Slave;
 import com.cinnamonbob.model.SlaveManager;
-import com.cinnamonbob.model.persistence.SlaveDao;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.net.MalformedURLException;

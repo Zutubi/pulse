@@ -1,6 +1,6 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.events.build.RecipeDispatchedEvent;
 import com.cinnamonbob.util.logging.Logger;
 

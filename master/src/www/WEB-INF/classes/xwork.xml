@@ -7,6 +7,16 @@
     <package name="default" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
+        <action name="login" class="com.cinnamonbob.web.LoginAction">
+            <result name="cancel" type="redirect">/</result>
+            <result name="input" type="velocity">login.vm</result>
+            <result name="success" type="velocity">login.vm</result>
+        </action>
+
+        <action name="logout" class="com.cinnamonbob.web.LogoutAction">
+            <result name="success" type="redirect">/</result>
+        </action>
+
         <action name="serverStatus" class="com.cinnamonbob.web.ServerStatusAction">
             <result name="success" type="velocity">server-status.vm</result>
         </action>

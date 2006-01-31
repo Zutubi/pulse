@@ -1,0 +1,27 @@
+<html>
+<head>
+    <title>Login</title>
+</head>
+
+<body>
+
+#foreach($error in $action.actionErrors)
+    <h2 style="color:red">$error</h2>
+#end
+
+#bodytag (Form "action='/j_acegi_security_check'" "method='post'")
+    <h3>login:</h3>
+    <fieldset>
+        #tag (TextField "name='j_username'" "label='login.username'" "tabindex='1'")
+        #tag (Password "name='j_password'" "label='login.password'" "tabindex='2'")
+        #tag (Checkbox "name='_acegi_security_remember_me'" "label='login.rememberme'" "tabindex='2'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('login.name')" "name='login'" "tabindex='3'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
+    </fieldset>
+#end
+
+</body>
+</html>

@@ -4,6 +4,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import com.cinnamonbob.spring.SpringAutowireSupport;
+import com.cinnamonbob.spring.DelegatingApplicationContext;
 
 /**
  * The component context is the central storage location for the systems ApplicatonContext 
@@ -13,7 +14,7 @@ import com.cinnamonbob.spring.SpringAutowireSupport;
  */
 public class ComponentContext
 {
-    private static ApplicationContext context = null;
+    private static final DelegatingApplicationContext context = new DelegatingApplicationContext();
 
     public static ApplicationContext getContext()
     {
@@ -24,7 +25,7 @@ public class ComponentContext
     {
         if (definitions != null && definitions.length > 0)
         {
-            context = new FileSystemXmlApplicationContext(definitions, context);
+            context.setDelegate(new FileSystemXmlApplicationContext(definitions, context.getDelegate()));
         }
     }
 
@@ -32,7 +33,7 @@ public class ComponentContext
     {
         if (definitions != null && definitions.length > 0)
         {
-            context = new ClassPathXmlApplicationContext(definitions, context);
+            context.setDelegate(new ClassPathXmlApplicationContext(definitions, context.getDelegate()));
         }
     }
 

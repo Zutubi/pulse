@@ -1,7 +1,7 @@
 package com.cinnamonbob.scm;
 
 import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.model.Scm;
 import com.cinnamonbob.model.ScmManager;
 import com.cinnamonbob.scheduling.Task;

@@ -1,6 +1,6 @@
 package com.cinnamonbob.events.build;
 
-import com.cinnamonbob.core.event.Event;
+import com.cinnamonbob.events.Event;
 import com.cinnamonbob.model.Project;
 
 /**

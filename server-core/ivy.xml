@@ -35,6 +35,8 @@
         <dependency org="springframework" name="spring" rev="1.2.6"
                     conf="external->spring-aop,spring-jdbc,spring-beans,spring-context,spring-core,spring-orm,spring-hibernate3,spring-support"/>
 
+        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.0-RC1" conf="external->default"/>
+
         <dependency org="opensymphony" name="sitemesh" rev="2.2.1" conf="external->default"/>
         <dependency org="opensymphony" name="webwork" rev="2.1.7" conf="external->default"/>
 

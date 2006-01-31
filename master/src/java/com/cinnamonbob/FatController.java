@@ -1,13 +1,16 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.events.EventListener;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.core.Stoppable;
-import com.cinnamonbob.core.event.AsynchronousDelegatingListener;
-import com.cinnamonbob.core.event.Event;
-import com.cinnamonbob.core.event.EventListener;
-import com.cinnamonbob.core.event.EventManager;
 import com.cinnamonbob.events.build.BuildCompletedEvent;
 import com.cinnamonbob.events.build.BuildRequestEvent;
+
+import com.cinnamonbob.events.AsynchronousDelegatingListener;
+import com.cinnamonbob.events.Event;
+
 import com.cinnamonbob.events.build.BuildTerminationRequestEvent;
+
 import com.cinnamonbob.model.BuildManager;
 import com.cinnamonbob.model.BuildSpecification;
 import com.cinnamonbob.model.Project;

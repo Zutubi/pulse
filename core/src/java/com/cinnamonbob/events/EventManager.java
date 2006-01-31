@@ -1,4 +1,7 @@
-package com.cinnamonbob.core.event;
+package com.cinnamonbob.events;
+
+import com.cinnamonbob.events.Event;
+import com.cinnamonbob.events.EventListener;
 
 /**
  *

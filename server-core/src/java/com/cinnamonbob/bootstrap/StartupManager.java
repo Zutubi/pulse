@@ -1,6 +1,6 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.core.event.EventManager;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.event.system.SystemStartedEvent;
 import com.cinnamonbob.util.logging.Logger;
 

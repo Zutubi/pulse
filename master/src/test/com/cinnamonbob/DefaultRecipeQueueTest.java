@@ -1,6 +1,6 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.core.event.DefaultEventManager;
+import com.cinnamonbob.events.DefaultEventManager;
 import com.cinnamonbob.model.BuildHostRequirements;
 import junit.framework.TestCase;
 
