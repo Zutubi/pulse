@@ -173,6 +173,11 @@ public class DefaultBuildManager implements BuildManager
         {
             List<BuildResult> oldBuilds = getOldestBuildsForProject(project, offset, 10);
 
+            if (oldBuilds.size() == 0)
+            {
+                break;
+            }
+
             for (BuildResult build : oldBuilds)
             {
                 if (policy.canCleanupResult(build))
