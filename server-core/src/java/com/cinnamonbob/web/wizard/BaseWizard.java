@@ -35,11 +35,6 @@ public class BaseWizard implements Wizard
         return currentState;
     }
 
-    public void setCurrentState(WizardState currentState)
-    {
-        this.currentState = currentState;
-    }
-
     public WizardState getState(String state)
     {
         return states.get(state);
@@ -77,6 +72,11 @@ public class BaseWizard implements Wizard
 
     }
 
+    /**
+     * Take a step forward.
+     *
+     * @return the state name for the state to be displayed next.
+     */
     public String traverseForward()
     {
         if (currentState == null)
@@ -111,6 +111,11 @@ public class BaseWizard implements Wizard
         return currentState.getStateName();
     }
 
+    /**
+     * Take a step backwards to the previous wizard state.
+     *
+     * @return the state name for the next state to be displayed.
+     */
     public String traverseBackward()
     {
         if (history.size() > 0)
@@ -120,10 +125,15 @@ public class BaseWizard implements Wizard
         return currentState.getStateName();
     }
 
+    /**
+     * Validate the specified wizard state, using Xworks validation framework.
+     *
+     * @param state
+     */
     private void validate(WizardState state)
     {
-        //  first clear errors from any previous attempts at validation to ensure a
-        // a clean validation check.
+        //  states persist between requests, so first clear errors from any previous attempts
+        // at validation to ensure a clean validation check.
         state.clearErrors();
         assert !state.hasErrors();
 
@@ -138,7 +148,7 @@ public class BaseWizard implements Wizard
         catch (ValidationException e)
         {
             state.addActionError("ValidationException: "+e.getMessage());
-            LOG.severe(e);
+            LOG.error(e);
         }
     }
 

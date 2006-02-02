@@ -38,14 +38,20 @@ public class AddProjectWizard extends BaseWizard
 
     public AddProjectWizard()
     {
+        // step 1.
         projectDetails = new ProjectDetails(this, "project");
+
+        // step 2, scms.
         cvsDetails = new CvsDetails(this, "cvs");
         svnDetails = new SvnDetails(this, "svn");
         p4Details = new P4Details(this, "p4");
 
+        // step 3, project.
         antDetails = new AntDetails(this, "ant");
         mavenDetails = new MavenDetails(this, "maven");
         customDetails = new CustomDetails(this, "custom");
+
+        // finished.
         completeState = new WizardCompleteState(this, "success");
 
         initialState = projectDetails;
@@ -64,10 +70,12 @@ public class AddProjectWizard extends BaseWizard
     {
         super.process();
 
+        // initialise new project.
         Project project = new Project();
         project.setName(projectDetails.getName());
         project.setDescription(projectDetails.getDescription());
 
+        // setup scm details.
         Scm scm = null;
         String scmType = projectDetails.getScm();
         if ("cvs".equals(scmType))
@@ -84,6 +92,7 @@ public class AddProjectWizard extends BaseWizard
         }
         project.setScm(scm);
 
+        // configure bob file.
         BobFileDetails details = null;
         String projectType = projectDetails.getType();
         if ("ant".equals(projectType))
@@ -119,9 +128,8 @@ public class AddProjectWizard extends BaseWizard
         // schedule the event trigger.
         Trigger trigger = new EventTrigger(SCMChangeEvent.class, "scm monitor");
         trigger.setProject(project.getId());
-        trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, "default");
-        trigger.setProject(project.getId());
         trigger.setTaskClass(BuildProjectTask.class);
+        trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, "default");
         trigger.getDataMap().put(BuildProjectTask.PARAM_PROJECT, project.getId());
 
         try
@@ -130,6 +138,7 @@ public class AddProjectWizard extends BaseWizard
         }
         catch (SchedulingException e)
         {
+            // need to display this error to the user...
             LOG.severe(e.getMessage(), e);
         }
     }
