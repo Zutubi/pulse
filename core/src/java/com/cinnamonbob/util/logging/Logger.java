@@ -109,6 +109,25 @@ public class Logger
         finest(msg, t);
     }
 
+    /**
+     * Alias for severe.
+     * @param msg
+     */
+    public void error(String msg)
+    {
+        severe(msg);
+    }
+
+    public void error(Throwable t)
+    {
+        severe(t);
+    }
+
+    public void error(String msg, Throwable t)
+    {
+        severe(msg, t);
+    }
+
     public boolean isLoggable(Level level)
     {
         return delegate.isLoggable(level);
