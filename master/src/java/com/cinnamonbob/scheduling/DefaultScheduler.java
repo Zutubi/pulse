@@ -24,6 +24,8 @@ public class DefaultScheduler implements Scheduler, EventListener
 
     private TriggerDao triggerDao;
 
+    private boolean started = false;
+
     /**
      * Register a scheduling strategy that will be used to handle a specific trigger type.
      *
@@ -31,7 +33,6 @@ public class DefaultScheduler implements Scheduler, EventListener
      */
     public void register(SchedulerStrategy strategy)
     {
-        strategy.setTriggerHandler(triggerHandler);
         strategies.put(strategy.canHandle(), strategy);
     }
 
@@ -40,37 +41,43 @@ public class DefaultScheduler implements Scheduler, EventListener
         strategies.clear();
         for (SchedulerStrategy strategy : schedulerStrategies)
         {
-            strategy.setTriggerHandler(triggerHandler);
             strategies.put(strategy.canHandle(), strategy);
         }
     }
 
-    protected void init()
+    protected void start()
     {
-        // ensure that the strategies are correctly configured.
-        for (SchedulerStrategy strategy : strategies.values())
+        try
         {
-            strategy.setTriggerHandler(triggerHandler);
-        }
-
-        for (Trigger trigger : triggerDao.findAll())
-        {
-            SchedulerStrategy strategy = getStrategy(trigger);
-            try
+            // ensure that the strategies are correctly configured.
+            for (SchedulerStrategy strategy : strategies.values())
             {
-                strategy.schedule(trigger);
-                // TODO: there is a very brief opportunity here for a paused trigger to execute.... should close this gap..
-                if (trigger.isPaused())
+                strategy.setTriggerHandler(triggerHandler);
+            }
+
+            for (Trigger trigger : triggerDao.findAll())
+            {
+                SchedulerStrategy strategy = getStrategy(trigger);
+                try
                 {
-                    strategy.pause(trigger);
+                    strategy.schedule(trigger);
+                    // TODO: there is a very brief opportunity here for a paused trigger to execute.... should close this gap..
+                    if (trigger.isPaused())
+                    {
+                        strategy.pause(trigger);
+                    }
+                }
+                catch (SchedulingException e)
+                {
+                    // not the fact that this trigger is invalid but do not prevent the rest of the triggers from
+                    // being initialisd.
+                    LOG.severe("failed to initialise a trigger.", e);
                 }
             }
-            catch (SchedulingException e)
-            {
-                // not the fact that this trigger is invalid but do not prevent the rest of the triggers from
-                // being initialisd.
-                LOG.severe("failed to initialise a trigger.", e);
-            }
+        }
+        finally
+        {
+            started = true;
         }
     }
 
@@ -106,11 +113,14 @@ public class DefaultScheduler implements Scheduler, EventListener
             throw new SchedulingException("A trigger with name " + trigger.getName() + " and group " + trigger.getGroup() + " has already been registered.");
         }
 
-        SchedulerStrategy impl = getStrategy(trigger);
-        impl.schedule(trigger);
-
         // assosiate trigger and task so that task can be retrieved when trigger fires.
         triggerDao.save(trigger);
+
+        if (started)
+        {
+            SchedulerStrategy impl = getStrategy(trigger);
+            impl.schedule(trigger);
+        }
     }
 
     public void trigger(Trigger trigger) throws SchedulingException
@@ -213,7 +223,7 @@ public class DefaultScheduler implements Scheduler, EventListener
     {
         if (evt instanceof SystemStartedEvent)
         {
-            init();
+            start();
         }
     }
 
@@ -224,9 +234,22 @@ public class DefaultScheduler implements Scheduler, EventListener
 
     public void stop(boolean force)
     {
-        for (SchedulerStrategy strategy : strategies.values())
+        if (!started)
         {
-            strategy.stop(force);
+            // nothing to do here.
+            return;
+        }
+
+        try
+        {
+            for (SchedulerStrategy strategy : strategies.values())
+            {
+                strategy.stop(force);
+            }
+        }
+        finally
+        {
+            started = false;
         }
     }
 }
