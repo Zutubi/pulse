@@ -30,6 +30,7 @@ public class DefaultSchedulerTest extends TestCase
         scheduler.setTriggerDao(triggerDao);
 
         scheduler.register(new NoopSchedulerStrategy());
+        scheduler.start();
     }
 
     public void tearDown() throws Exception
