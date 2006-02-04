@@ -10,6 +10,7 @@
 #bodytag (Form "action='addProject.action'" "method='post'")
 
     <h3>project setup</h3>
+    #tag (Hidden "name='state'")
     <fieldset>
         #tag (TextField "name='name'" "label='project.name'" "required='true'" "tabindex='1'")
         #tag (TextField "name='description'" "label='project.description'" "tabindex='2'")

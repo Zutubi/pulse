@@ -8,6 +8,8 @@
 
 #bodytag (Form "action='addProject.action'" "method='post'")
 
+    #tag (Hidden "name='state'")
+
     <h3>ant project</h3>
 
     <fieldset>
@@ -16,7 +18,7 @@
     </fieldset>
 
     <fieldset class="submit">
-        #tag (Submit "value=getText('finish.name')" "name='finish'" "tabindex='3'")
+        #tag (Submit "value=getText('finish.name')" "name='next'" "tabindex='3'")
         #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='4'")
         #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
     </fieldset>

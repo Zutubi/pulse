@@ -72,6 +72,36 @@ public class BaseWizard implements Wizard
 
     }
 
+    public void initialise()
+    {
+        currentState = initialState;
+        currentState.initialise();
+    }
+
+    public boolean goTo(String requestedState)
+    {
+        if (getState(requestedState) == null)
+        {
+            return false;
+        }
+        if (currentState.getStateName().equals(requestedState))
+        {
+            return true;
+        }
+
+        while (history.size() > 0)
+        {
+            currentState = history.pop();
+
+            if (currentState.getStateName().equals(requestedState))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Take a step forward.
      *
@@ -79,12 +109,6 @@ public class BaseWizard implements Wizard
      */
     public String traverseForward()
     {
-        if (currentState == null)
-        {
-            currentState = initialState;
-            currentState.initialise();
-            return currentState.getStateName();
-        }
 
         validate(currentState);
         if (currentState.hasErrors())
@@ -122,6 +146,16 @@ public class BaseWizard implements Wizard
         {
             currentState = history.pop();
         }
+        return currentState.getStateName();
+    }
+
+    /**
+     * Restart this wizard.
+     *
+     */
+    public String restart()
+    {
+        currentState = initialState;
         return currentState.getStateName();
     }
 

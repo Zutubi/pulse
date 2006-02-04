@@ -9,13 +9,14 @@
 #bodytag (Form "action='addProject.action'" "method='post'")
 
     <h3>custom project</h3>
+    #tag (Hidden "name='state'")
 
     <fieldset>
         #tag (TextField "name='details.bobFileName'" "label='bobFileName'" "required='true'" "tabindex='1'")
     </fieldset>
 
     <fieldset class="submit">
-        #tag (Submit "value=getText('finish.name')" "name='finish'" "tabindex='2'")
+        #tag (Submit "value=getText('finish.name')" "name='next'" "tabindex='2'")
         #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='3'")
         #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
     </fieldset>

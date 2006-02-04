@@ -9,34 +9,31 @@ import org.apache.velocity.runtime.resource.loader.FileResourceLoader;
 import java.io.File;
 
 /**
- * 
+ * A velocity resource file loader that uses the application installation
+ * directories to lookup velocity templates.
  *
  */
 public class BobTemplateVelocityResourceLoader extends FileResourceLoader
 {
-
     private static final Logger LOG = Logger.getLogger(BobTemplateVelocityResourceLoader.class);
 
+    /**
+     * Retrieve a comma separated list of the systems template paths. These paths
+     * are represented as absolute paths.
+     *
+     */
     public static String getFullTemplatePath()
     {
         ApplicationPaths paths = ConfigUtils.getManager().getApplicationPaths();
 
         StringBuffer result = new StringBuffer();
-        boolean first = true;
-
+        String sep = "";
         for (File path : paths.getTemplateRoots())
         {
-            if (first)
-            {
-                first = false;
-            }
-            else
-            {
-                result.append(',');
-            }
+            result.append(sep);
             result.append(path.getAbsolutePath());
+            sep = ",";
         }
-
         return result.toString();
     }
 

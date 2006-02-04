@@ -9,6 +9,7 @@
 #bodytag (Form "action='addProject.action'" "method='post'")
 
     <h3>create scm: step 2</h3>
+    #tag (Hidden "name='state'")
 
     <fieldset>
         #tag (TextField "name='cvs.path'" "label='scm.path'" "tabindex='2'")

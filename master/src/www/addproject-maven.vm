@@ -9,6 +9,7 @@
 #bodytag (Form "action='addProject.action'" "method='post'")
 
     <h3>maven project</h3>
+    #tag (Hidden "name='state'")
 
     <fieldset>
         #tag (TextField "name='details.targets'" "label='maven.targets'" "tabindex='1'")
@@ -16,7 +17,7 @@
     </fieldset>
 
     <fieldset class="submit">
-        #tag (Submit "value=getText('finish.name')" "name='finish'" "tabindex='3'")
+        #tag (Submit "value=getText('finish.name')" "name='next'" "tabindex='3'")
         #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='4'")
         #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
     </fieldset>

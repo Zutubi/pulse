@@ -13,6 +13,10 @@ public class CvsRootValidator extends FieldValidatorSupport
     public void validate(Object object) throws ValidationException
     {
         Object obj = getFieldValue(getFieldName(), object);
+        if (obj == null)
+        {
+            addFieldError(getFieldName(), getMessageKey());
+        }
         try
         {
             CVSRoot.parse((String)obj);

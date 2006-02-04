@@ -10,6 +10,7 @@
 #bodytag (Form "action='addProject.action'" "method='post'")
 
     <h3>perforce setup</h3>
+    #tag (Hidden "name='state'")
 
     <fieldset>
         #tag (TextField "name='p4.path'" "label='scm.path'" "tabindex='2'")

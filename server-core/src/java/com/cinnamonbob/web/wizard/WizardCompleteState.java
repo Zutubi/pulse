@@ -31,4 +31,9 @@ public final class WizardCompleteState extends BaseWizardState
             haveProcessedWizard = true;
         }
     }
+
+    public void reset()
+    {
+
+    }
 }

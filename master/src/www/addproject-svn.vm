@@ -10,6 +10,7 @@
 #bodytag (Form "action='addProject.action'" "method='post'")
 
     <h3>subversion setup</h3>
+    #tag (Hidden "name='state'")
     <fieldset>
         #tag (TextField "name='svn.path'" "label='scm.path'" "tabindex='2'")
         #tag (TextField "name='svn.username'" "required='true'" "tabindex='3'")

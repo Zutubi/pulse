@@ -48,7 +48,11 @@ public class DelegatingApplicationContext implements ApplicationContext
 
     public ApplicationContext getParent()
     {
-        return delegate.getParent();
+        if (delegate != null)
+        {
+            return delegate.getParent();
+        }
+        return null;
     }
 
     public long getStartupDate()

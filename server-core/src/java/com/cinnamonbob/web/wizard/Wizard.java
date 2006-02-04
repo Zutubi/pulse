@@ -46,4 +46,21 @@ public interface Wizard
      *
      */
     void cancel();
+
+    /**
+     * Initialise this wizard. This will be called sometime after the wizard is instantiated
+     * but before traverse is requested.
+     */
+    void initialise();
+
+    /**
+     * Attempt to transition the wizard to the named state. If this state does not exist, an
+     * illegal argument exception will be thrown. If this state is not part of the wizards current
+     * history, then the wizard will be reset to the start.
+     *
+     * @param actualState
+     */
+    boolean goTo(String actualState);
+
+    String restart();
 }

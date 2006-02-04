@@ -35,6 +35,11 @@ public abstract class BaseWizardState implements WizardState
 
     }
 
+    public void reset()
+    {
+
+    }
+
     public final String getStateName()
     {
         return stateName;

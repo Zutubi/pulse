@@ -3,6 +3,7 @@ package com.cinnamonbob.bootstrap;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.web.context.support.StaticWebApplicationContext;
 import com.cinnamonbob.spring.SpringAutowireSupport;
 import com.cinnamonbob.spring.DelegatingApplicationContext;
 

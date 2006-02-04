@@ -28,6 +28,7 @@ public class WizardAction extends ActionSupport
     private Wizard wizard;
 
     private String cancel;
+    private String next;
     private String previous;
 
     public void setWizardClass(String wizardClass)
@@ -43,6 +44,11 @@ public class WizardAction extends ActionSupport
     public void setPrevious(String previous)
     {
         this.previous = previous;
+    }
+
+    public void setNext(String next)
+    {
+        this.next = next;
     }
 
     public boolean isCancelled()
@@ -61,6 +67,11 @@ public class WizardAction extends ActionSupport
         return TextUtils.stringSet(previous);
     }
 
+    private boolean isNext()
+    {
+        return TextUtils.stringSet(next);
+    }
+
     public void validate()
     {
         if (!TextUtils.stringSet(wizardClass))
@@ -73,29 +84,34 @@ public class WizardAction extends ActionSupport
     {
         try
         {
-            return doExecute();
+            return processRequest();
         }
         catch (RuntimeException e)
         {
             LOG.severe(e);
             addActionError("Unexpected exception: " + e.getClass().getName() + ", " + e.getMessage());
+
             // remove the wizard from the session so that we can start fresh
-            Map session = ActionContext.getContext().getSession();
-            session.remove(wizardClass);
+            removeWizard();
             return "error";
         }
     }
 
-    private String doExecute()
+    private String processRequest()
     {
         Map session = ActionContext.getContext().getSession();
         Wizard wizard = getWizard();
+
+        // if state == current wizard state, then all is well.
+
+        // else we need to locate that state and use it, or restart the wizard because
+        // something crap has happened..
 
         if (isWizardCancelled())
         {
             // clean out session.
             wizard.cancel();
-            session.remove(wizardClass);
+            removeWizard();
             return "cancel";
         }
 
@@ -104,12 +120,24 @@ public class WizardAction extends ActionSupport
             return wizard.traverseBackward();
         }
 
-        String nextState = wizard.traverseForward();
-        if (wizard.isComplete())
+        if (isNext())
         {
-            session.remove(wizardClass);
+            String nextState = wizard.traverseForward();
+            if (wizard.isComplete())
+            {
+                session.remove(wizardClass);
+            }
+            return nextState;
         }
-        return nextState;
+
+        // return current state.
+        return wizard.getCurrentState().getStateName();
+    }
+
+    private void removeWizard()
+    {
+        Map session = ActionContext.getContext().getSession();
+        session.remove(wizardClass);
     }
 
     public Wizard getWizard()
@@ -127,6 +155,9 @@ public class WizardAction extends ActionSupport
                 // use Object factory to create this wizard
                 Wizard wizardInstance = (Wizard) Class.forName(wizardClass).newInstance();
                 ComponentContext.autowire(wizardInstance);
+                wizardInstance.initialise();
+
+                // small fudge to cleanly handle the first time we run this wizard.
                 session.put(wizardClass, wizardInstance);
             }
             wizard = (Wizard) session.get(wizardClass);
@@ -140,8 +171,13 @@ public class WizardAction extends ActionSupport
     }
 
     // make the state directly available to the ognl stack.
-    public Object getCurrentState()
+    public WizardState getCurrentState()
     {
         return getWizard().getCurrentState();
+    }
+
+    public String getState()
+    {
+        return getCurrentState().getStateName();
     }
 }
