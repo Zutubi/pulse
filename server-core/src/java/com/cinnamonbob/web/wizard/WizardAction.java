@@ -5,8 +5,13 @@ import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.web.ActionSupport;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.TextProvider;
+import com.opensymphony.xwork.TextProviderSupport;
+import com.opensymphony.xwork.util.OgnlValueStack;
 
 import java.util.Map;
+import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * Usage:
@@ -30,6 +35,8 @@ public class WizardAction extends ActionSupport
     private String cancel;
     private String next;
     private String previous;
+
+    private transient TextProvider textProvider = null;
 
     public void setWizardClass(String wizardClass)
     {
@@ -170,7 +177,8 @@ public class WizardAction extends ActionSupport
         }
     }
 
-    // make the state directly available to the ognl stack.
+// make the state directly available to the ognl stack.
+
     public WizardState getCurrentState()
     {
         return getWizard().getCurrentState();
@@ -179,5 +187,41 @@ public class WizardAction extends ActionSupport
     public String getState()
     {
         return getCurrentState().getStateName();
+    }
+
+    // override the text provider to handle the wizard class for lookups.
+    // lazy load the textProvider so that we have the wizards class available.
+
+    private TextProvider getTextProvider()
+    {
+        if (textProvider == null)
+        {
+            textProvider = new TextProviderSupport(getWizard().getClass(), this);
+        }
+        return textProvider;
+    }
+    
+    public String getText(String aTextName) {
+        return getTextProvider().getText(aTextName);
+    }
+
+    public String getText(String aTextName, String defaultValue) {
+        return getTextProvider().getText(aTextName, defaultValue);
+    }
+
+    public String getText(String aTextName, List args) {
+        return getTextProvider().getText(aTextName, args);
+    }
+
+    public String getText(String aTextName, String defaultValue, List args) {
+        return getTextProvider().getText(aTextName, defaultValue, args);
+    }
+
+    public ResourceBundle getTexts(String aBundleName) {
+        return getTextProvider().getTexts(aBundleName);
+    }
+
+    public String getText(String key, String defaultValue, List args, OgnlValueStack stack) {
+        return getTextProvider().getText(key,defaultValue,args,stack);
     }
 }

@@ -1,11 +1,10 @@
 package com.cinnamonbob.bootstrap;
 
+import com.cinnamonbob.spring.DelegatingApplicationContext;
+import com.cinnamonbob.spring.SpringAutowireSupport;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
-import org.springframework.web.context.support.StaticWebApplicationContext;
-import com.cinnamonbob.spring.SpringAutowireSupport;
-import com.cinnamonbob.spring.DelegatingApplicationContext;
 
 /**
  * The component context is the central storage location for the systems ApplicatonContext 
