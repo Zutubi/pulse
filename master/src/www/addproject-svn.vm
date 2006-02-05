@@ -1,32 +1,30 @@
 <html>
 <head>
-    <title>subversion setup</title>
+    <title>#wwtext("name=add.project")</title>
 </head>
-<content tag="action">scm.svn.create</content>
 <body>
+    <h1>:: #wwtext("name=add.project") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='addProject.action'" "method='post'")
+#wwcform("action=addProject.action" "heading=%{getText('svn.setup')}" "method=post")
+    #wwhidden("name=state")
 
-    <h3>subversion setup</h3>
-    #tag (Hidden "name='state'")
-    <fieldset>
-        #tag (TextField "name='svn.path'" "label='scm.path'" "tabindex='2'")
-        #tag (TextField "name='svn.username'" "required='true'" "tabindex='3'")
-        #tag (Password "name='svn.password'" "tabindex='4'")
-        #tag (TextField "name='svn.url'" "required='true'" "tabindex='5'")
-        #tag (TextField "name='svn.keyfile'" "tabindex='6'")
-        #tag (Password "name='svn.passphrase'" "tabindex='7'")
-    </fieldset>
+    #wwtextfield("name=svn.username" "label=%{getText('svn.username')}" "required=true" "tabindex=1")
+    #wwpassword("name=svn.password" "label=%{getText('svn.password')}" "required=true" "tabindex=2")
+    #wwtextfield("name=svn.url" "label=%{getText('svn.url')}" "required=true" "size=60" "tabindex=3")
+    #wwtextfield("name=svn.keyfile" "label=%{getText('svn.keyfile')}" "size=60" "tabindex=4")
+    #inlineHelp("svn.keyfile.help")
+    #wwpassword("name=svn.passphrase" "label=%{getText('svn.passphrase')}" "tabindex=5")
+    #inlineHelp("svn.passphrase.help")
+    #wwtextfield("name=svn.path" "label=%{getText('scm.path')}" "size=60" "tabindex='6'")
+    #inlineHelp("scm.path.help")
 
-    <fieldset class="submit">
-        #tag (Submit "value=getText('next.name')" "name='next'" "tabindex='8'")
-        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='9'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='10'")
-    </fieldset>
-
- #end
-
+    #openSubmit()
+        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=7")
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=8")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=9")
+    #closeSubmit()
+#end
 </body>
 </html>

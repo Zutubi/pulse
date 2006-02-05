@@ -1,29 +1,25 @@
 <html>
 <head>
-    <title>project setup</title>
+    <title>#wwtext("name=add.project")</title>
 </head>
-<content tag="action">scm.svn.create</content>
 <body>
+    <h1>:: #wwtext("name=add.project") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='addProject.action'" "method='post'")
+#wwcform("action=addProject.action" "heading=%{getText('project.basics')}" "method=post")
+    #wwhidden("name=state")
 
-    <h3>project setup</h3>
-    #tag (Hidden "name='state'")
-    <fieldset>
-        #tag (TextField "name='name'" "label='project.name'" "required='true'" "tabindex='1'")
-        #tag (TextField "name='description'" "label='project.description'" "tabindex='2'")
-        #tag (Select "list=scms" "name='scm'" "required='true'" "tabindex='3'")
-        #tag (Select "list=types" "name='type'" "required='true'" "tabindex='4'")
-    </fieldset>
+    #wwtextfield("name=name" "label=%{getText('project.name')}" "required=true" "tabindex=1")
+    #wwtextfield("name=description" "label=%{getText('project.description')}" "size=60" "tabindex=2")
+    #wwselect("name=scm" "label=%{getText('scm')}" "list=scms" "required=true" "tabindex=3")
+    #wwselect("name=type" "label=%{getText('project.type')}" "list=types" "required=true" "tabindex=4")
+    #inlineHelp("project.type.help")
 
-    <fieldset class="submit">
-        #tag (Submit "value=getText('next.name')" "name='next'" "tabindex='5'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='6'")
-    </fieldset>
-
- #end
-
+    #openSubmit()
+        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=5")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=6")
+    #closeSubmit()
+#end
 </body>
 </html>

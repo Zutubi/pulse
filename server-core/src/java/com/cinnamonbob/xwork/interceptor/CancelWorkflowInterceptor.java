@@ -1,6 +1,5 @@
 package com.cinnamonbob.xwork.interceptor;
 
-import com.opensymphony.xwork.Action;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.interceptor.Interceptor;
 
@@ -14,7 +13,7 @@ public class CancelWorkflowInterceptor implements Interceptor
 
     public void init()
     {
-        
+
     }
 
     public void destroy()
@@ -24,9 +23,10 @@ public class CancelWorkflowInterceptor implements Interceptor
 
     public String intercept(ActionInvocation invocation) throws Exception
     {
-        Action action = invocation.getAction();
+        Object action = invocation.getAction();
 
-        if (action instanceof Cancelable) {
+        if (action instanceof Cancelable)
+        {
             Cancelable cancelable = (Cancelable) action;
             if (cancelable.isCancelled())
             {

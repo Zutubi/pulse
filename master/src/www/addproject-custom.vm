@@ -1,26 +1,23 @@
 <html>
 <head>
-    <title>custom project</title>
+    <title>#wwtext("name=add.project")</title>
 </head>
-<content tag="action">custom.project.create</content>
 <body>
+    <h1>:: #wwtext("name=add.project") ::</h1>
+
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='addProject.action'" "method='post'")
+#wwcform("action=addProject.action" "heading=%{getText('custom.setup')}" "method=post")
+    #wwhidden("name=state")
 
-    <h3>custom project</h3>
-    #tag (Hidden "name='state'")
+    #wwtextfield("name=details.bobFileName" "label=%{getText('bob.filename')}" "required=true" "size=40" "tabindex=1")
+    #inlineHelp("bob.filename.help")
 
-    <fieldset>
-        #tag (TextField "name='details.bobFileName'" "label='bobFileName'" "required='true'" "tabindex='1'")
-    </fieldset>
-
-    <fieldset class="submit">
-        #tag (Submit "value=getText('finish.name')" "name='next'" "tabindex='2'")
-        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='3'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
-    </fieldset>
-
+    #openSubmit()
+        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=2")
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=3")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=4")
+     #closeSubmit()
  #end
 </body>
 </html>

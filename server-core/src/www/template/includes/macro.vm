@@ -1,37 +1,190 @@
-#macro( contactPointIcon $contact)
-    #if ($contact.class.name == 'com.cinnamonbob.model.EmailContactPoint')<img src="/images/email_16.png"/>#end
-    #if ($contact.class.name == 'com.cinnamonbob.model.YahooContactPoint')<img src="/images/yahoo_16.png"/>#end
+##
+## Outputs a tab header bar, with the javascript necessary to control the
+## tab selection.
+##
+#macro(tabBar $tabNames)
+    <script language="JavaScript" type="text/javascript">
+        function Tab(htmlId)
+        {
+            this.elementId = htmlId;
+            var selected = false;
+            var self = this;
+
+            /*
+             * Shows or hides this page depending on whether the visible
+             * tab id matches this objects id.
+             *
+             * @param visibleTabId the id of the tab that was selected
+             */
+            this.updateVisibility = function(visibleTabId)
+            {
+                var thElement = document.getElementById('tab_header_' + self.elementId);
+                var tcElement = document.getElementById('tab_contents_' + self.elementId);
+
+                if(!selected && visibleTabId == self.elementId)
+                {
+                    thElement.className = "active";
+                    tcElement.style.display = "block";
+                    self.selected = true;
+                }
+                else
+                {
+                    thElement.className = "inactive";
+                    tcElement.style.display = "none";
+                    self.selected = false;
+                }
+            }
+        }
+
+        var pageTabs = new Array(3);
+
+    #foreach($name in $tabNames)
+        #set($index = $velocityCount - 1)
+        pageTabs[$index] = new Tab("$name");
+    #end
+
+        function chooseTab(selectedTab)
+        {
+            for(i in pageTabs)
+            {
+                pageTabs[i].updateVisibility(selectedTab);
+            }
+
+            return false;
+        }
+
+    </script>
+
+    <ul id="innernav">
+    #foreach($name in $tabNames)
+        <li><a id="tab_header_$name" href="#" onclick="chooseTab('$name')" class="inactive">#wwtext("name=${name}.tab")</a></li>
+    #end
+    </ul>
+    <span class="hidden">ie workaround</span>
 #end
 
-#macro( scmIcon $scm)
-    #if ($scm.class.name == 'com.cinnamonbob.model.Svn')<img src="/images/svn_16.png"/>#end
-    #if ($scm.class.name == 'com.cinnamonbob.model.Cvs')<img src="/images/cvs_16.png"/>#end
-    #if ($scm.class.name == 'com.cinnamonbob.model.P4')<img src="/images/p4_16.png"/>#end
+##
+## Selects the given tab
+##
+#macro(selectTab $name)
+    <script language="JavaScript" type="text/javascript">
+        chooseTab("$name");
+    </script>
 #end
 
-#macro( scmDetail $project $scm)
-    #scmIcon($scm)
-    <a href="editScm!default.action?id=$scm.id&project=$project.id">
-    #if ($scm.class.name == 'com.cinnamonbob.model.Svn') subversion #end
-    #if ($scm.class.name == 'com.cinnamonbob.model.Cvs') cvs #end
-    #if ($scm.class.name == 'com.cinnamonbob.model.P4') perforce #end
-    </a>
+##
+## Outputs a div to open a tab page
+##
+#macro(openTab $name)
+    <div id="tab_contents_$name">
 #end
 
-<!--- quartz trigger state -->
-#macro( renderQuartzTriggerState $state)
-    #if ($state == -1)<span style='color:black;'>none</span>#end
-    #if ($state == 0)<span style='color:blue;'>normal</span>#end
-    #if ($state == 1)<span style='color:orange;'>paused</span>#end
-    #if ($state == 2)<span style='color:green;'>complete</span>#end
-    #if ($state == 3)<span style='color:red;'>error</span>#end
-    #if ($state == 4)<span style='color:red;'>blocked</span>#end
+##
+## Closes off a tab page
+##
+#macro(closeTab)
+    </div>
 #end
 
-#macro( renderTriggerState $state)
-    #if ($state.ordinal() == 0)<span style='color:blue;'>active</span>#end
-    #if ($state.ordinal() == 1)<span style='color:black;'>none</span>#end
-    #if ($state.ordinal() == 2)<span style='color:orange;'>paused</span>#end
+##
+## Outputs a heading row for a content table
+##
+#macro(headingRow $key $span)
+    <tr>
+        <th class="heading" colspan="$span">#wwtext("name=$key")</th>
+    </tr>
+#end
+
+##
+## Outputs a heading cell for a content table
+##
+#macro(contentHeading $key $span)
+    <th class="content" #if($span > 1) colspan="$span" #end>#wwtext("name=$key")</th>
+#end
+
+##
+## Outputs a regular cell for a content table
+##
+#macro(contentCell $key)
+    <td class="content">#wwtext("name=$key")</td>
+#end
+
+##
+## Outputs a table cell with class based on $cssClass
+##
+#macro(classCell $content)
+    <td class="$cssClass">$content</td>
+#end
+
+##
+## Outputs a build/project status cell
+##
+#macro(statusCell $result)
+    <td class="$result.state.string">
+    #if($result.succeeded())
+        <img alt="success" src="images/accept.gif"/>
+    #elseif($result.inProgress())
+        <img alt="in progress" src="images/hourglass.gif"/>
+    #elseif($result.errored() || $result.failed())
+        <img alt="failure" src="images/exclamation.gif"/>
+    #else
+        &nbsp;
+    #end
+    </td>
+    <td class="$result.state.string">
+        $result.state.prettyString
+    </td>
+#end
+
+##
+## Outputs an action cell for viewing a build result
+##
+#macro(viewCell $project $result)
+    <td class="content">
+        <a href="viewBuild.action?id=$project.id&buildId=$result.id">#wwtext("name=view")</a>
+    </td>
+#end
+
+##
+## Outputs an action cell for viewing changes for a build
+##
+#macro(changesCell $project $result)
+    <td class="content">
+        <a href="viewChanges.action?id=$project.id&buildId=$result.id">#wwtext("name=changes")</a>
+    </td>
+#end
+
+##
+## Outputs a heading for a box
+##
+#macro(boxHeading $key)
+    <h3 class="heading">#wwtext("name=$key")</h3>
+#end
+
+##
+## Outputs a table row with inline help text
+##
+#macro(inlineHelp $helpKey)
+    <tr>
+        <td>&nbsp;</td>
+        <td class="inline-help">#wwtext("name=$helpKey")</td>
+    </tr>
+#end
+
+##
+## Opens a row for submission buttons
+##
+#macro(openSubmit)
+    <tr>
+        <td class="submit" colspan="2">
+#end
+
+##
+## Closes a row for submission buttons
+##
+#macro(closeSubmit)
+        </td>
+    </tr>
 #end
 
 ##
@@ -161,96 +314,137 @@
 ## Outputs list items for messages of a given level directly on the given result
 ##
 #macro(resultMessageItems $result $level)
-  #if($level.toString() == "ERROR")
-    #if($result.errorMessage)
-      <li class="error">$result.errorMessage</li>
+    #if($level.toString() == "ERROR")
+        #if($result.errorMessage)
+            <li class="error">$!webwork.htmlEncode($result.errorMessage)</li>
+        #end
+        #if($result.failureMessage)
+            <li class="error">$!webwork.htmlEncode($result.failureMessage)</li>
+        #end
     #end
-    #if($result.failureMessage)
-      <li class="error">$result.failureMessage</li>
-    #end
-  #end
 #end
 
 ##
 ## Summarises the messages of a given level on an artifact into a nested list
 ##
 #macro(artifactMessageSummary $artifact $level)
-  #if($artifact.hasMessages($level))
-    #foreach($feature in $artifact.getFeatures($level))
-      <li class="$level.toString().toLowerCase()">$feature.summary</li>
+    #if($artifact.hasMessages($level))
+        #foreach($feature in $artifact.getFeatures($level))
+            <li class="$level.toString().toLowerCase()">$!webwork.htmlEncode($feature.summary)</li>
+        #end
     #end
-  #end
 #end
 
 ##
 ## Summarises the messages of a given level on a command result into a nested list
 ##
 #macro(commandMessageSummary $commandResult $level)
-  #if($commandResult.hasMessages($level))
-    #resultMessageItems($commandResult $level)
-    #foreach($artifact in $commandResult.getArtifacts())
-      #if($artifact.hasMessages($level))
-        <li class="header">artifact '$artifact.title'</li>
-        <ul>
-          #artifactMessageSummary($artifact $level)
-        </ul>
-      #end
+    #if($commandResult.hasMessages($level))
+        #resultMessageItems($commandResult $level)
+        #foreach($artifact in $commandResult.getArtifacts())
+            #if($artifact.hasMessages($level))
+                <li class="header">#wwtext("name=artifact"): $!webwork.htmlEncode("$artifact.title")
+                    <ul>
+                    #artifactMessageSummary($artifact $level)
+                    </ul>
+                </li>
+            #end
+        #end
     #end
-  #end
 #end
 
 ##
 ## Summarises the messages of a given level on a recipe result into a nested list
 ##
 #macro(recipeMessageSummary $recipeResult $level $top)
-  #if($recipeResult.hasMessages($level))
-    #if($top)
-      <h4>$level.toString().toLowerCase() messages</h4>
-      <ul class="$level.toString().toLowerCase()">
-    #end
+    #if($recipeResult.hasMessages($level))
+        #if($top)
+            <h4>#wwtext("name=${level.toString().toLowerCase()}.messages")</h4>
+            <ul class="$level.toString().toLowerCase()">
+        #end
 
-    #resultMessageItems($recipeResult $level)
-    #foreach($commandResult in $recipeResult.commandResults)
-      #if($commandResult.hasMessages($level))
-        <li class="header">command '$commandResult.commandName'</li>
-        <ul>
-          #commandMessageSummary($commandResult $level)
-        </ul>
-      #end
-    #end
+        #resultMessageItems($recipeResult $level)
+        #foreach($commandResult in $recipeResult.commandResults)
+            #if($commandResult.hasMessages($level))
+                <li class="header">#wwtext("name=command"): $!webwork.htmlEncode("$commandResult.commandName")
+                    <ul>
+                    #commandMessageSummary($commandResult $level)
+                    </ul>
+                </li>
+            #end
+        #end
 
-    #if($top)
-      </ul>
+        #if($top)
+            </ul>
+        #end
     #end
-  #end
 #end
 
 ##
 ## Summarises the messages of a given level on a recipe result node into a nested list
 ##
 #macro(nodeMessageSummary $node $level)
-  #if($node.hasMessages($level))
-    <li class="header">recipe $node.result.recipeNameSafe @ $node.hostSafe</li>
-    <ul>
-      #recipeMessageSummary($node.result $level false)
-      #foreach($child in $node.children)
-        #nodeMessageSummary($child $level)
-      #end
-    </ul>
-  #end
+    #if($node.hasMessages($level))
+        <li class="header">#wwtext("name=recipe"): $!webwork.htmlEncode("$node.result.recipeNameSafe @ $node.hostSafe")
+            <ul>
+            #recipeMessageSummary($node.result $level false)
+            #foreach($child in $node.children)
+                #nodeMessageSummary($child $level)
+            #end
+            </ul>
+        </li>
+    #end
 #end
 
 ##
 ## Summarises the messages of a given level on a build result into a nested list
 ##
 #macro(buildMessageSummary $buildResult $level)
-  #if($buildResult.hasMessages($level))
-    <h4>$level.toString().toLowerCase() messages</h4>
-    <ul class="$level.toString().toLowerCase()">
-      #resultMessageItems($buildResult $level)
-      #foreach($node in $buildResult.root.children)
-        #nodeMessageSummary($node $level)
-      #end
-    </ul>
-  #end
+    #if($buildResult.hasMessages($level))
+        <h4>#wwtext("name=${level.toString().toLowerCase()}.messages")</h4>
+        <ul class="$level.toString().toLowerCase()">
+        #resultMessageItems($buildResult $level)
+        #foreach($node in $buildResult.root.children)
+            #nodeMessageSummary($node $level)
+        #end
+        </ul>
+    #end
+#end
+
+
+
+#macro( contactPointIcon $contact)
+    #if ($contact.class.name == 'com.cinnamonbob.model.EmailContactPoint')<img src="/images/email_16.png"/>#end
+    #if ($contact.class.name == 'com.cinnamonbob.model.YahooContactPoint')<img src="/images/yahoo_16.png"/>#end
+#end
+
+#macro( scmIcon $scm)
+    #if ($scm.class.name == 'com.cinnamonbob.model.Svn')<img src="/images/svn_16.png"/>#end
+    #if ($scm.class.name == 'com.cinnamonbob.model.Cvs')<img src="/images/cvs_16.png"/>#end
+    #if ($scm.class.name == 'com.cinnamonbob.model.P4')<img src="/images/p4_16.png"/>#end
+#end
+
+#macro( scmDetail $project $scm)
+    #scmIcon($scm)
+    <a href="editScm!default.action?id=$scm.id&project=$project.id">
+    #if ($scm.class.name == 'com.cinnamonbob.model.Svn') subversion #end
+    #if ($scm.class.name == 'com.cinnamonbob.model.Cvs') cvs #end
+    #if ($scm.class.name == 'com.cinnamonbob.model.P4') perforce #end
+    </a>
+#end
+
+<!--- quartz trigger state -->
+#macro( renderQuartzTriggerState $state)
+    #if ($state == -1)<span style='color:black;'>none</span>#end
+    #if ($state == 0)<span style='color:blue;'>normal</span>#end
+    #if ($state == 1)<span style='color:orange;'>paused</span>#end
+    #if ($state == 2)<span style='color:green;'>complete</span>#end
+    #if ($state == 3)<span style='color:red;'>error</span>#end
+    #if ($state == 4)<span style='color:red;'>blocked</span>#end
+#end
+
+#macro( renderTriggerState $state)
+    #if ($state.ordinal() == 0)<span style='color:blue;'>active</span>#end
+    #if ($state.ordinal() == 1)<span style='color:black;'>none</span>#end
+    #if ($state.ordinal() == 2)<span style='color:orange;'>paused</span>#end
 #end

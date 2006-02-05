@@ -1,49 +1,56 @@
+<content tag="selectedTab">projects</content>
 <html>
-  <head>
-    <title>projects</title>
-    <link href="build.css" rel="stylesheet" type="text/css">
-  </head>
-  <body>
-    <h1 class="build-log">:: projects ::</h1>
-    <h2 class="command-info">projects</h2>
-    <div class="command-content">
-    <table>
-      <tr>
-        <th class="command-detail">project</th>
-        <th class="command-detail">last built</th>
-        <th class="command-detail">build id</th>
-        <th class="command-detail">elapsed</th>
-        <th class="command-detail">status</th>
-      </tr>
+    <head>
+        <title>#wwtext("name=projects")</title>
+    </head>
+    <body>
+        <h1>:: #wwtext("name=projects") ::</h1>
+        <table class="content">
+            #headingRow("latest.builds" 8)
+            <tr>
+                #contentHeading("project.name" 1)
+                #contentHeading("build.status" 2)
+                #contentHeading("last.built" 1)
+                #contentHeading("build.id" 1)
+                #contentHeading("build.elapsed" 1)
+                #contentHeading("actions" 2)
+            </tr>
+
 #foreach($project in $projects)
-  #set($index = $velocityCount - 1)
-  #set($lastResult = $latestBuilds.get($index))
-#if($latestBuilds.get($index))
-  #set($built = $lastResult.stamps.prettyStartTime) 
-  #set($id = $lastResult.number)
-  #set($elapsed = $lastResult.stamps.prettyElapsed)
-  #set($status = $lastResult.state.prettyString)
-  #classset($lastResult)
-#else
-  #set($built = "never")
-  #set($id = "n/a")
-  #set($elapsed = "n/a")
-  #set($success = "n/a")  
-  #set($status = "n/a")
-  #set($class = "detail")
+    #set($index = $velocityCount - 1)
+
+            <tr>
+                <td class="content"><a href="manageProject.action?id=$project.id">$!webwork.htmlEncode($project.name)</a></td>
+
+    #if($latestBuilds.get($index))
+        #set($lastResult = $latestBuilds.get($index))
+        #set($cssClass = $lastResult.state.string)
+
+                #statusCell($lastResult)
+                #classCell($lastResult.stamps.prettyStartTime)
+                #classCell($lastResult.number)
+                #classCell($lastResult.stamps.prettyElapsed)
+                #viewCell($project $id)
+                #changesCell($project $id)
+    #else
+                #contentCell("empty.cell")
+                #contentCell("not.applicable")
+                #contentCell("built.never")
+                #contentCell("not.applicable")
+                #contentCell("not.applicable")
+                #contentCell("empty.cell")
+                #contentCell("empty.cell")
+    #end
+            </tr>
 #end
-      <tr>
-        <td class="build-$class"><a href="manageProject.action?id=$project.id">$project.name</a></td>
-        <td class="build-$class">$built</td>
-        <td class="build-$class">$id</td>
-        <td class="build-$class">$elapsed</td>
-        <td class="build-$class">$status</td>
-      </tr>
-#end
-      <tr>
-        <td class="command-detail" colspan="5"><b>+</b> <a href="addProject.action">add new project</a></td>
-      </tr>
-    </table>
-    </div>
-  </body>
+
+            <tr>
+                <td class="add" colspan="8">
+                    <a href="addProject.action">
+                        <img alt="add" src="images/add.gif"/> #wwtext("name=add.project")
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </body>
 </html>

@@ -1,6 +1,5 @@
 package com.cinnamonbob.web.wizard;
 
-import com.opensymphony.xwork.Action;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.interceptor.Interceptor;
@@ -24,7 +23,8 @@ public class WizardInterceptor implements Interceptor
 
     }
 
-    public String intercept(ActionInvocation invocation) throws Exception {
+    public String intercept(ActionInvocation invocation) throws Exception
+    {
         String result = before(invocation);
         if (result != null)
         {
@@ -35,7 +35,7 @@ public class WizardInterceptor implements Interceptor
 
     protected String before(ActionInvocation invocation) throws Exception
     {
-        Action action = invocation.getAction();
+        Object action = invocation.getAction();
 
         String shortCircuit = null;
 
@@ -88,7 +88,11 @@ public class WizardInterceptor implements Interceptor
                 }
             });
         }
-        
+
         return shortCircuit;
+    }
+
+    protected void after(ActionInvocation dispatcher, String result) throws Exception
+    {
     }
 }

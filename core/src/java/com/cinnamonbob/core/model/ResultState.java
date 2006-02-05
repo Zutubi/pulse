@@ -4,6 +4,11 @@ public enum ResultState
 {
     INITIAL
             {
+                public String getString()
+                {
+                    return "pending";
+                }
+
                 public String getPrettyString()
                 {
                     return "pending";
@@ -11,6 +16,11 @@ public enum ResultState
             },
     IN_PROGRESS
             {
+                public String getString()
+                {
+                    return "inprogress";
+                }
+
                 public String getPrettyString()
                 {
                     return "in progress";
@@ -18,6 +28,11 @@ public enum ResultState
             },
     SUCCESS
             {
+                public String getString()
+                {
+                    return "success";
+                }
+
                 public String getPrettyString()
                 {
                     return "success";
@@ -25,6 +40,11 @@ public enum ResultState
             },
     FAILURE
             {
+                public String getString()
+                {
+                    return "failure";
+                }
+
                 public String getPrettyString()
                 {
                     return "failure";
@@ -32,6 +52,11 @@ public enum ResultState
             },
     ERROR
             {
+                public String getString()
+                {
+                    return "error";
+                }
+
                 public String getPrettyString()
                 {
                     return "error";
@@ -39,5 +64,7 @@ public enum ResultState
             };
 
     public abstract String getPrettyString();
+
+    public abstract String getString();
 
 }

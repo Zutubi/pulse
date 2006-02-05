@@ -1,32 +1,29 @@
 <html>
 <head>
-    <title>perforce setup</title>
+    <title>#wwtext("name=add.project")</title>
 </head>
-<content tag="action"></content>
 <body>
+    <h1>:: #wwtext("name=add.project") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='addProject.action'" "method='post'")
+#wwcform("action=addProject.action" "heading=%{getText('perforce.setup')}" "method=post")
+    #wwhidden("name=state")
 
-    <h3>perforce setup</h3>
-    #tag (Hidden "name='state'")
+    #wwtextfield("name=p4.port" "label=%{getText('p4.port')}" "required=true" "tabindex=1")
+    #inlineHelp("p4.port.help")
+    #wwtextfield("name=p4.user" "label=%{getText('p4.user')}" "required='true'" "tabindex=2")
+    #wwpassword("name=p4.password" "label=%{getText('p4.password')}" "tabindex=3")
+    #wwtextfield("name=p4.client" "label=%{getText('p4.client')}" "required=true" "tabindex=4")
+    #inlineHelp("p4.client.help")
+    #wwtextfield("name=p4.path" "label=%{getText('scm.path')}" "size=60" "tabindex=5")
+    #inlineHelp("scm.path.help")
 
-    <fieldset>
-        #tag (TextField "name='p4.path'" "label='scm.path'" "tabindex='2'")
-        #tag (TextField "name='p4.port'" "required='true'" "tabindex='3'")
-        #tag (TextField "name='p4.user'" "required='true'" "tabindex='4'")
-        #tag (Password "name='p4.password'" "tabindex='5'")
-        #tag (TextField "name='p4.client'" "required='true'" "tabindex='6'")
-    </fieldset>
-
-    <fieldset class="submit">
-        #tag (Submit "value=getText('next.name')" "name='next'" "tabindex='7'")
-        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='8'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='9'")
-    </fieldset>
-
+    #openSubmit()
+        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=6")
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=7")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=8")
+    #closeSubmit()
  #end
-
 </body>
 </html>

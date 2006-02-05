@@ -2,8 +2,8 @@ package com.cinnamonbob.xwork.servlet;
 
 import com.opensymphony.xwork.util.LocalizedTextUtil;
 
-import javax.servlet.ServletContextListener;
 import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 /**
  * <class-comment/>
@@ -19,6 +19,7 @@ public class ReloadResourceContextListener implements ServletContextListener
 
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
-        LocalizedTextUtil.setReloadBundles(Boolean.getBoolean(PROPERTY_KEY));
+        boolean reload = Boolean.getBoolean(PROPERTY_KEY);
+        LocalizedTextUtil.setReloadBundles(reload);
     }
 }

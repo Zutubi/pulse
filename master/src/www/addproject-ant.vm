@@ -1,28 +1,25 @@
 <html>
 <head>
-    <title>ant project</title>
+    <title>#wwtext("name=add.project")</title>
 </head>
-<content tag="action">ant.project.create</content>
 <body>
+    <h1>:: #wwtext("name=add.project") ::</h1>
+
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='addProject.action'" "method='post'")
+#wwcform("action=addProject.action" "heading=%{getText('ant.setup')}" "method=post")
+    #wwhidden("name=state")
 
-    #tag (Hidden "name='state'")
+    #wwtextfield("name=details.buildFile" "label=%{getText('ant.filename')}" "required=true" "size=40" "tabindex=1")
+    #inlineHelp("ant.filename.help")
+    #wwtextfield("name=details.targets" "label=%{getText('ant.targets')}" "size=40" "tabindex=2")
+    #inlineHelp("ant.targets.help")
 
-    <h3>ant project</h3>
-
-    <fieldset>
-        #tag (TextField "name='details.buildFile'" "label='ant.fileName'" "required='true'" "tabindex='1'")
-        #tag (TextField "name='details.targets'" "label='ant.targets'" "tabindex='2'")
-    </fieldset>
-
-    <fieldset class="submit">
-        #tag (Submit "value=getText('finish.name')" "name='next'" "tabindex='3'")
-        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='4'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
-    </fieldset>
-
- #end
+    #openSubmit()
+        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=3")
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=4")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=5")
+    #closeSubmit()
+#end
 </body>
 </html>

@@ -26,7 +26,7 @@
         <dependency org="junit" name="junit" rev="3.8.1" conf="external->default"/>
 
         <!-- used for validation support -->
-        <dependency org="opensymphony" name="xwork" rev="1.0.5" conf="external->default"/>
+        <dependency org="opensymphony" name="xwork" rev="1.1" conf="external->default"/>
         <dependency org="opensymphony" name="oscore" rev="2.2.4" conf="external->default"/>
 
         <!-- xml parsing -->

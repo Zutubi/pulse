@@ -1,71 +1,43 @@
-<html>
-	<head>
-		<title>#if ($title) [CiB] $title #else [CiB] #end</title>
-		<link href="$base/main.css" rel="stylesheet" type="text/css" media="screen">
-		<link href="$base/form.css" rel="stylesheet" type="text/css" media="screen">
+<!-- page properties are specified using <content tag="selectedTab">navigate</content> -->
+#set ($projectId = $page.getProperty("page.projectId"))
+#set ($projectName = $page.getProperty("page.projectName"))
+#set ($user = $page.getProperty("page.user"))
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  	<head>
+		<title>:: cinnabo :: #if ($title) $title #end</title>
+		<link href="$base/main2.css" rel="stylesheet" type="text/css" media="screen"/>
+		<link href="$base/form2.css" rel="stylesheet" type="text/css" media="screen"/>
 		$head
 	</head>
         
     <body>
-    <div id="container">
+      <div id="header">
+        <table>
+            <tr>
+              <td class="logo">:: cinnabo :: #if($projectId) <a href="/manageProject.action?id=${projectId}">$projectName</a> #end</td>
+              #if($user) <td align="right" class="user">$user.login [ <a href="/logout.action">logout</a> ]</td> #end
+            </tr>
+        </table>
+      </div>
 
-        <!-- page properties are specified using <content tag="selectedTab">navigate</content> -->
-        <!--#set ($selectedTab = $page.getProperty("page.selectedTab"))-->
-        #set ($navProject = $page.getProperty("page.navProject"))
-        #set ($navProjectName = $page.getProperty("page.navProjectName"))
+      #set ($selectedTab = $page.getProperty("page.selectedTab"))
 
-        <div id="header">:: cinnamon bob :: #if($navProject) <a href="manageProject.action?id=$navProject">$navProjectName</a>#end</div>
-        <div id="navbar">
-            <ul>
-                <li><a href="/">home</a></li>
-                <li><a href="serverStatus.action">server</a></li>
-                <li><a href="viewProjects.action">projects</a></li>
-                <li><a href="viewUsers.action">users</a></li>
-            </ul>
-        </div>
+      <ul id="nav">
+        <li><a #if($selectedTab == "dashboard")      class="active" #end href="/dashboard.action">dashboard</a></li>
+        <li><a #if($selectedTab == "projects")       class="active" #end href="/viewProjects.action">projects</a></li>
+        <li><a #if($selectedTab == "server")         class="active" #end href="/serverStatus.action">server</a></li>
+        <li><a #if($selectedTab == "administration") class="active" #end href="/adimistration.action">administration</a></li>
+      </ul>
+      <div class="clear"></div>
 
-<!--
-        <div id="left">
-           <div class="menu">
-                <h3>user</h3>
-                <p>
-                    <ul>
-                        <li> <a href="findUsers!default.action">find</a></li>
-                        <li> <a href="createUser!default.action">create</a></li>
-                    </ul>
-                </p>
-            </div>
-            <div class="menu">
-                <h3>subscription</h3>
-                <p>
-                    <ul>
-                        <li> <a href="createSubscription!default.action">create</a></li>
-                    </ul>
-                </p>
-            </div>
-            <div class="menu">
-                <h3>project request.project.name</h3>
-                <p>
-                    <ul>
-                        <li> <a href="findProjects!default.action">find</a></li>
-                        <li> <a href="createProject!default.action">create</a></li>
-                    </ul>
-                </p>
-            </div>
-        </div>
--->
-<!--
-        <div id="right">
-
-        </div>
--->
-        <div id="content">
-		    $body
-        </div>
-        <div id="footer">
-            <b>:: project cinnamon bob ::</b>
-            copyright &copy; 2005-2006 daniel ostermeier and jason sankey
-        </div>        
-    </div>
+      <div class="content">
+        $body
+      </div>
+      <div id="footer">
+        <strong>:: cinnabo ::</strong>
+        copyright &copy; 2005-2006 daniel ostermeier and jason sankey
+      </div>
     </body>
 </html>

@@ -38,7 +38,7 @@
         <dependency org="acegisecurity" name="acegisecurity" rev="1.0.0-RC1" conf="external->default"/>
 
         <dependency org="opensymphony" name="sitemesh" rev="2.2.1" conf="external->default"/>
-        <dependency org="opensymphony" name="webwork" rev="2.1.7" conf="external->default"/>
+        <dependency org="opensymphony" name="webwork" rev="2.2" conf="external->default"/>
 
         <!-- database support -->
         <dependency org="hibernate" name="hibernate" rev="3.1.1" conf="external->default"/>

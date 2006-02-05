@@ -1,16 +1,100 @@
+<content tag="projectId">$project.id</content>
+<content tag="projectName">$!webwork.htmlEncode($project.name)</content>
+
 <html>
-    <head>
-        <link href="build.css" rel="stylesheet" type="text/css">
-        <title>$project.name</title>
-        <content tag="action">project.view</content>
-        <content tag="navProject">$project.id</content>
-        <content tag="navProjectName">$project.name</content>
-        <!-- a tick to the self updating webpage box... -->
-        <meta http-equiv="refresh" content="30">
-    </head>
-    <body>
-        <h1 class="build-log">:: $project.name ::</h1>
-        <div id="project-left-column">
+<head>
+    <title>$!webwork.htmlEncode($project.name)</title>
+</head>
+<body>
+    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+
+    #tabBar(["current-build", "history", "configuration"])
+
+    #openTab("current-build")
+        #if($currentBuild)
+        <table>
+            <tr><td>
+            <table class="content">
+                #headingRow("build.summary" 7)
+                <tr>
+                    #contentHeading("build.id" 1)
+                    #contentHeading("build.status" 2)
+                    #contentHeading("build.when" 1)
+                    #contentHeading("build.elapsed" 1)
+                    #contentHeading("actions" 2)
+                </tr>
+                <tr>
+                    #set($cssClass = $currentBuild.state.string)
+                    #contentCell($currentBuild.number)
+                    #statusCell($currentBuild)
+                    #classCell($currentBuild.stamps.prettyStartTime)
+                    #classCell($currentBuild.stamps.prettyElapsed)
+                    #viewCell($project $currentBuild)
+                    #changesCell($project $currentBuild)
+                </tr>
+            </table>
+            </tr></td>
+            <tr><td>
+            <table class="content" width="100%">
+                #headingRow("build.features" 1)
+               <tr>
+                   <td class="content">
+                       #buildMessageSummary($currentBuild $currentBuild.getLevel("ERROR"))
+                       #buildMessageSummary($currentBuild $currentBuild.getLevel("WARNING"))
+                   </td>
+               </tr>
+            </table>
+            </tr></td>
+            </table>
+#*
+            <h4>recipes</h4>
+            #showrecipes($currentBuild.root false $project.id)
+*#
+        #else
+            #wwtext("name=never.built")
+        #end
+    #closeTab()
+
+    #openTab("history")
+        #if($history.size() > 0)
+        <table class="content">
+            <tr>
+                <th class="heading" colspan="6">
+                    <span class="action"><a href="searchBuilds.action?projectId=$project.id"><img alt="search" src="images/zoom.png"/>#wwtext("name=search.builds")</a></span>#wwtext("name=recent.builds")
+                </th>
+            </tr>
+            <tr>
+                #contentHeading("build.id" 1)
+                #contentHeading("build.status" 2)
+                #contentHeading("build.when" 1)
+                #contentHeading("build.elapsed" 1)
+                #contentHeading("actions" 2)
+            </tr>
+            #foreach($buildResult in $history)
+                #set($cssClass = $buildResult.state.string)
+            <tr>
+                <td class="content"><a href="viewBuild.action?id=$project.id&amp;buildId=$buildResult.id">$buildResult.number</a></td>
+                #statusCell($buildResult)
+                #classCell($buildResult.stamps.prettyStartTime)
+                #classCell($buildResult.stamps.prettyElapsed)
+                #viewCell($project $buildResult)
+                #changesCell($project $buildResult)
+            </tr>
+            #end
+        </table>
+        #else
+            #wwtext("name=no.history")
+        #end
+    #closeTab()
+
+    #openTab("configuration")
+        configuration content
+    #closeTab()
+
+    #selectTab("current-build")
+
+#*
+      <div id="project-left-column">
 
         <h2 class="command-info">details</h2>
         <div class="command-content">
@@ -69,56 +153,6 @@
         </div>
 
         <div id="project-content">
-
-        #if($currentBuild)
-          #classset($currentBuild)
-            <h2 class="command-$class">current build [<a href="viewBuild.action?id=$project.id&buildId=$currentBuild.id">$currentBuild.number</a>]</h2>
-            <div class="command-content">
-            <h4>summary</h4>
-            <table>
-                #resultsummary($currentBuild)
-            </table>
-
-            #buildMessageSummary($currentBuild $currentBuild.getLevel("ERROR"))
-
-            #buildMessageSummary($currentBuild $currentBuild.getLevel("WARNING"))
-
-            <h4>recipes</h4>
-            #showrecipes($currentBuild.root false $project.id)
-        </div>
-      #end
-
-        <h2 class="command-info">history</h2>
-        <div class="command-content">
-            <h4>recent builds</h4>
-        #if($history.size() > 0)
-            <table>
-                <tr>
-                    <th class="command-detail">build id</th>
-                    <th class="command-detail">when</th>
-                    <th class="command-detail">elapsed</th>
-                    <th class="command-detail">result</th>
-                </tr>
-                #foreach($buildResult in $history)
-                    #set($id = $buildResult.id)
-                    #set($built = $buildResult.stamps.prettyStartTime)
-                    #set($elapsed = $buildResult.stamps.prettyElapsed)
-                    #if($buildResult.succeeded())
-                        #set($class = "success")
-                    #else
-                        #set($class = "failure")
-                    #end
-                <tr>
-                    <td class="build-$class"><a href="viewBuild.action?id=$project.id&buildId=$id">build $buildResult.number</a></td>
-                    <td class="build-$class">$built</td>
-                    <td class="build-$class">$elapsed</td>
-                    <td class="build-$class">$buildResult.state.prettyString</td>
-                </tr>
-                #end
-            </table>
-        #else
-            this project has no historical builds
-        #end
             <h4>cleanup policy</h4>
             <table>
                 #detailrow("working directories deleted" $project.cleanupPolicy.prettyWorkDirDays)
@@ -128,5 +162,6 @@
         </div>
 
         </div>
+*#
     </body>
 </html>
