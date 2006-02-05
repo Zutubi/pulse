@@ -1,7 +1,7 @@
 package com.cinnamonbob.bootstrap;
 
 import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.event.system.SystemStartedEvent;
+import com.cinnamonbob.events.system.SystemStartedEvent;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.lang.reflect.Constructor;

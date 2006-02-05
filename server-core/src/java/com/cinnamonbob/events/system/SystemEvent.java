@@ -1,4 +1,4 @@
-package com.cinnamonbob.event.system;
+package com.cinnamonbob.events.system;
 
 import com.cinnamonbob.events.Event;
 
