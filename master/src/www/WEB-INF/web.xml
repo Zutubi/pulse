@@ -39,6 +39,15 @@
         <listener-class>com.cinnamonbob.spring.web.context.ContextLoaderListener</listener-class>
     </listener>
 
+    <!--
+    If the System property 'xwork.reload.bundles' is specified, the following listener to set
+    xwork to not cache property values loaded for I18N. This should only be used during development
+    and debugging.
+    -->
+    <listener>
+        <listener-class>com.cinnamonbob.xwork.servlet.ReloadResourceContextListener</listener-class>
+    </listener>
+
     <servlet>
         <servlet-name>sitemesh-velocity</servlet-name>
         <servlet-class>com.opensymphony.module.sitemesh.velocity.VelocityDecoratorServlet</servlet-class>
