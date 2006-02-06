@@ -91,15 +91,6 @@ public class DefaultConfigurationManager implements ConfigurationManager
                 }
                 return 8081;
             }
-
-            public File getProjectRoot()
-            {
-                if (hasProperty("project.root"))
-                {
-                    return new File(lookupProperty("project.root"));
-                }
-                return new File(getApplicationPaths().getSystemRoot(), "projects");
-            }
         };
     }
 

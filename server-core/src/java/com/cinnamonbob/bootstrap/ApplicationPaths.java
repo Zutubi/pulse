@@ -59,4 +59,11 @@ public interface ApplicationPaths
      * @return the directory to use as the database root
      */
     File getDatabaseRoot();
+
+    /**
+     * The project root directory. All working files are
+     *
+     * @return the directory in which project build artifacts are stored.
+     */
+    File getProjectRoot();
 }

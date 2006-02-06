@@ -22,7 +22,7 @@ public class MasterBuildPaths
 
     public File getProjectDir(Project project)
     {
-        File rootBuildDir = ConfigUtils.getManager().getAppConfig().getProjectRoot();
+        File rootBuildDir = ConfigUtils.getManager().getApplicationPaths().getProjectRoot();
         return new File(rootBuildDir, getProjectDirName(project));
     }
 

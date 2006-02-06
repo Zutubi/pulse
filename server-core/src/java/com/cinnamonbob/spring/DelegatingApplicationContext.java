@@ -1,12 +1,11 @@
 package com.cinnamonbob.spring;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.NoSuchMessageException;
-import org.springframework.context.MessageSourceResolvable;
+import org.springframework.context.*;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.io.Resource;
 
 import java.util.Map;
@@ -18,20 +17,20 @@ import java.io.IOException;
  * application context and then later change/update the delegate, ensuring that any
  * references still held to the application context contain the latest data.
  */
-public class DelegatingApplicationContext implements ApplicationContext
+public class DelegatingApplicationContext implements ConfigurableApplicationContext
 {
-    private ApplicationContext delegate;
+    private ConfigurableApplicationContext delegate;
 
     public DelegatingApplicationContext()
     {
     }
 
-    public DelegatingApplicationContext(ApplicationContext delegate)
+    public DelegatingApplicationContext(ConfigurableApplicationContext delegate)
     {
         this.delegate = delegate;
     }
 
-    public void setDelegate(ApplicationContext delegate)
+    public void setDelegate(ConfigurableApplicationContext delegate)
     {
         this.delegate = delegate;
     }
@@ -163,5 +162,40 @@ public class DelegatingApplicationContext implements ApplicationContext
     public Resource getResource(String location)
     {
         return delegate.getResource(location);
+    }
+
+    public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor processor)
+    {
+        delegate.addBeanFactoryPostProcessor(processor);
+    }
+
+    public void close()
+    {
+        delegate.close();
+    }
+
+    public ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException
+    {
+        return delegate.getBeanFactory();
+    }
+
+    public void refresh() throws BeansException, IllegalStateException
+    {
+        delegate.refresh();
+    }
+
+    public void setParent(ApplicationContext context)
+    {
+        delegate.setParent(context);
+    }
+
+    public void closeAll()
+    {
+        ConfigurableApplicationContext parent = (ConfigurableApplicationContext) delegate.getParent();
+        while (parent != null)
+        {
+            parent.close();
+            parent = (ConfigurableApplicationContext) parent.getParent();
+        }
     }
 }

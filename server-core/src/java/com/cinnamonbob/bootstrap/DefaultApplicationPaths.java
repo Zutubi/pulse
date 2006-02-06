@@ -18,6 +18,7 @@ public class DefaultApplicationPaths implements ApplicationPaths
     private List<File> templateRoots;
     private File userConfigRoot;
     private File databaseRoot;
+    private File projectRoot;
 
     public DefaultApplicationPaths(File bobHome)
     {
@@ -78,5 +79,14 @@ public class DefaultApplicationPaths implements ApplicationPaths
             databaseRoot = new File(getSystemRoot(), "database");
         }
         return databaseRoot;
+    }
+
+    public File getProjectRoot()
+    {
+        if (projectRoot == null)
+        {
+            projectRoot = new File(getSystemRoot(), "projects");
+        }
+        return projectRoot;
     }
 }

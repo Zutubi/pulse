@@ -51,6 +51,9 @@
                 <property name="databaseRoot">
                     <value>slave/system/database</value>
                 </property>
+                <property name="projectRoot">
+                    <value>slave/system/projects</value>
+                </property>
             </bean>
         </property>
     </bean>

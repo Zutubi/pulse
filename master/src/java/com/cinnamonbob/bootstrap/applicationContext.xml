@@ -2,16 +2,6 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <!-- is the initContext really needed? It appears that singletons are initialised anyways
-         without being referenced...-->
-    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation">
-        <!--<property name="initBeans">-->
-        <!--<list>-->
-        <!--<ref bean="databaseBootstrap"/>-->
-        <!--</list>-->
-        <!--</property>-->
-    </bean>
-
     <bean id="databaseBootstrap" class="com.cinnamonbob.bootstrap.DatabaseBootstrap" init-method="initialiseDatabase">
         <property name="dataSource">
             <ref bean="dataSource"/>

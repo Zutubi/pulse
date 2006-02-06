@@ -15,6 +15,7 @@ public class ConfigurableApplicationPaths implements ApplicationPaths
     private List<File> templateRoots;
     private File userConfigRoot;
     private File databaseRoot;
+    private File projectRoot;
 
     public File getSystemRoot()
     {
@@ -74,5 +75,16 @@ public class ConfigurableApplicationPaths implements ApplicationPaths
     public void setDatabaseRoot(File databaseRoot)
     {
         this.databaseRoot = databaseRoot;
+    }
+
+
+    public File getProjectRoot()
+    {
+        return projectRoot;
+    }
+
+    public void setProjectRoot(File projectRoot)
+    {
+        this.projectRoot = projectRoot;
     }
 }

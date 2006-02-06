@@ -57,6 +57,9 @@
                 <property name="databaseRoot">
                     <value>master/system/database</value>
                 </property>
+                <property name="projectRoot">
+                    <value>master/system/projects</value>
+                </property>
             </bean>
         </property>
     </bean>
