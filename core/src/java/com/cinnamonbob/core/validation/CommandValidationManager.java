@@ -1,7 +1,7 @@
 package com.cinnamonbob.core.validation;
 
 import com.opensymphony.xwork.*;
-import com.opensymphony.xwork.validator.ActionValidatorManager;
+import com.opensymphony.xwork.validator.DefaultActionValidatorManager;
 import com.opensymphony.xwork.validator.DelegatingValidatorContext;
 import com.opensymphony.xwork.validator.ValidationException;
 import com.opensymphony.xwork.validator.ValidatorContext;
@@ -25,7 +25,7 @@ public class CommandValidationManager
 
         ValidatorContext validatorContext = new DelegatingValidatorContext(validationAware, textProvider, localeProvider);
 
-        ActionValidatorManager.validate(obj, name, validatorContext);
+        new DefaultActionValidatorManager().validate(obj, name, validatorContext);
 
         if (validatorContext.hasErrors())
         {

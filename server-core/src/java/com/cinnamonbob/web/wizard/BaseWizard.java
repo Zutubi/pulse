@@ -1,10 +1,10 @@
 package com.cinnamonbob.web.wizard;
 
-import com.opensymphony.util.TextUtils;
-import com.opensymphony.xwork.validator.ActionValidatorManager;
-import com.opensymphony.xwork.validator.ValidationException;
-import com.opensymphony.xwork.Validateable;
 import com.cinnamonbob.util.logging.Logger;
+import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.Validateable;
+import com.opensymphony.xwork.validator.DefaultActionValidatorManager;
+import com.opensymphony.xwork.validator.ValidationException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +24,8 @@ public class BaseWizard implements Wizard
     private WizardState currentState;
 
     private Map<String, WizardState> states = new HashMap<String, WizardState>();
+    private DefaultActionValidatorManager validationManager = new DefaultActionValidatorManager();
+    ;
 
     public BaseWizard()
     {
@@ -56,7 +58,6 @@ public class BaseWizard implements Wizard
 
     /**
      * Override this to handle any final processing required when the wizard is completed.
-     *
      */
     public void process()
     {
@@ -65,7 +66,6 @@ public class BaseWizard implements Wizard
 
     /**
      * Override this to handle any processing required when this wizard is cancelled.
-     *
      */
     public void cancel()
     {
@@ -151,7 +151,6 @@ public class BaseWizard implements Wizard
 
     /**
      * Restart this wizard.
-     *
      */
     public String restart()
     {
@@ -173,15 +172,15 @@ public class BaseWizard implements Wizard
 
         try
         {
-            ActionValidatorManager.validate(state, state.getClass().getName());
+            validationManager.validate(state, state.getClass().getName());
             if (Validateable.class.isAssignableFrom(state.getClass()))
             {
-                ((Validateable)state).validate();
+                ((Validateable) state).validate();
             }
         }
         catch (ValidationException e)
         {
-            state.addActionError("ValidationException: "+e.getMessage());
+            state.addActionError("ValidationException: " + e.getMessage());
             LOG.error(e);
         }
     }

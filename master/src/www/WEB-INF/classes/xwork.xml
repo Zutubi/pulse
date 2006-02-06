@@ -238,15 +238,12 @@
             <result name="success" type="velocity">find-project.vm</result>
         </action>
 
-        <action name="editProject!default" class="com.cinnamonbob.web.project.EditProjectAction" method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">edit-project.vm</result>
-        </action>
-
         <action name="editProject" class="com.cinnamonbob.web.project.EditProjectAction">
+            <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-project.vm</result>
             <result name="cancel" type="redirect">/manageProject.action?id=${id}</result>
             <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="manageProject" class="com.cinnamonbob.web.project.ManageProjectAction">

@@ -1,6 +1,4 @@
-<content tag="projectId">$project.id</content>
-<content tag="projectName">$!webwork.htmlEncode($project.name)</content>
-
+#projectTags($project)
 <html>
 <head>
     <title>$!webwork.htmlEncode($project.name)</title>
@@ -90,7 +88,7 @@
             <tr>
                 <td class="columns" width="40%">
                     <table class="fill-content">
-                        #editHeadingRow("project.basics" 2 "editProject!default.action?id=$project.id")
+                        #editHeadingRow("project.basics" 2 "editProject!input.action?id=$project.id")
                         #dynamicRow("project.name" $project.name)
                         #dynamicRow("project.description" $project.description)
                     </table>

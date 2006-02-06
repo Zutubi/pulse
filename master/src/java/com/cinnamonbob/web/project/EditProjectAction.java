@@ -1,16 +1,16 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Project;
+import com.opensymphony.xwork.Preparable;
 
 /**
  * 
  *
  */
-public class EditProjectAction extends ProjectActionSupport
+public class EditProjectAction extends ProjectActionSupport implements Preparable
 {
     private long id;
-
-    private Project project = new Project();
+    private Project project;// = new Project();
 
     public void setId(long id)
     {
@@ -27,6 +27,22 @@ public class EditProjectAction extends ProjectActionSupport
         return project;
     }
 
+    public boolean checkProject()
+    {
+        if (project == null)
+        {
+            addActionError("Unknown project [" + getId() + "]");
+            return true;
+        }
+
+        return false;
+    }
+
+    public void prepare() throws Exception
+    {
+        project = getProjectManager().getProject(getId());
+    }
+
     public void validate()
     {
         if (hasErrors())
@@ -34,24 +50,23 @@ public class EditProjectAction extends ProjectActionSupport
             return;
         }
 
-        if (getProjectManager().getProject(getId()) == null)
-        {
-            addActionError("Unknown project [" + getId() + "]");
-        }
+        checkProject();
     }
 
-    public String doDefault()
+    public String doInput()
     {
-        project = getProjectManager().getProject(getId());
-        return SUCCESS;
+        if (checkProject())
+        {
+            return ERROR;
+        }
+
+        return INPUT;
     }
 
     public String execute()
     {
-        Project persistentProject = getProjectManager().getProject(getId());
-        persistentProject.setName(project.getName());
-        persistentProject.setDescription(project.getDescription());
-
+        getProjectManager().save(project);
         return SUCCESS;
     }
+
 }

@@ -1,4 +1,12 @@
 ##
+## Outputs sitemesh content tags for the project links on the header bar
+##
+#macro(projectTags $project)
+    <content tag="projectId">$project.id</content>
+    <content tag="projectName">$!webwork.htmlEncode($project.name)</content>
+#end
+
+##
 ## Outputs a tab header bar, with the javascript necessary to control the
 ## tab selection.
 ##

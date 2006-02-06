@@ -1,27 +1,22 @@
+#projectTags($project)
 <html>
 <head>
-    <title>edit project</title>
+    <title>#wwtext("name=edit.project")</title>
 </head>
-<content tag="action">project.edit</content>
 <body>
+    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
     
-#bodytag (Form "action='editProject.action'" "method='post'")  
-    
-        #tag (Hidden "name='id'")
-    <h3>edit project</h3>        
-    <fieldset>
-        #tag (TextField "required='true'" "name='project.name'" "tabindex='1'")
-        #tag (TextField "name='project.description'" "tabindex='2'")
-    </fieldset>
-        
-    <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
-    </fieldset>
+#wwcform("action=editProject.action" "heading=%{getText('edit.project')}" "method=post")
+    #wwhidden("name=id")
+    #wwtextfield("name=project.name" "label=%{getText('project.name')}" "required=true"  "tabindex=1")
+    #wwtextfield("name=project.description" "label=%{getText('project.description')}" "size=60" "tabindex=2")
 
-#end 
-
+    #openSubmit()
+        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=3")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=4")
+    #closeSubmit()
+#end
 </body>
 </html>
