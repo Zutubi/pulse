@@ -25,7 +25,6 @@ public class BaseWizard implements Wizard
 
     private Map<String, WizardState> states = new HashMap<String, WizardState>();
     private DefaultActionValidatorManager validationManager = new DefaultActionValidatorManager();
-    ;
 
     public BaseWizard()
     {
@@ -109,7 +108,6 @@ public class BaseWizard implements Wizard
      */
     public String traverseForward()
     {
-
         validate(currentState);
         if (currentState.hasErrors())
         {
@@ -125,7 +123,7 @@ public class BaseWizard implements Wizard
         String nextState = currentState.getNextStateName();
         if (nextState == null)
         {
-            currentState.addActionError("Unknwon next state: " + nextState);
+            currentState.addActionError("Unknown next state: " + nextState);
             return currentState.getStateName();
         }
 
