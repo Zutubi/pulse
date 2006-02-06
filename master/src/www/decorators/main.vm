@@ -25,10 +25,10 @@
       #set ($selectedTab = $page.getProperty("page.selectedTab"))
 
       <ul id="nav">
-        <li><a #if($selectedTab == "dashboard")      class="active" #end href="/dashboard.action">dashboard</a></li>
-        <li><a #if($selectedTab == "projects")       class="active" #end href="/viewProjects.action">projects</a></li>
-        <li><a #if($selectedTab == "server")         class="active" #end href="/serverStatus.action">server</a></li>
-        <li><a #if($selectedTab == "administration") class="active" #end href="/adimistration.action">administration</a></li>
+        <li><a #if($selectedTab && $selectedTab == "dashboard")      class="active" #end href="/dashboard.action">dashboard</a></li>
+        <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end href="/viewProjects.action">projects</a></li>
+        <li><a #if($selectedTab && $selectedTab == "server")         class="active" #end href="/serverStatus.action">server</a></li>
+        <li><a #if($selectedTab && $selectedTab == "administration") class="active" #end href="/adimistration.action">administration</a></li>
       </ul>
       <div class="clear"></div>
 

@@ -1,7 +1,9 @@
 package com.cinnamonbob.model;
 
-import org.apache.velocity.VelocityContext;
 import com.opensymphony.util.TextUtils;
+import org.apache.velocity.VelocityContext;
+
+import java.util.Properties;
 
 /**
  * <class-comment/>
@@ -39,6 +41,24 @@ public class MavenBobFileDetails extends TemplateBobFileDetails
     public String getType()
     {
         return "maven";
+    }
+
+    public Properties getProperties()
+    {
+        // TODO i18n
+        Properties result = new Properties();
+
+        if (TextUtils.stringSet(targets))
+        {
+            result.put("targets", targets);
+        }
+
+        if (TextUtils.stringSet(baseDir))
+        {
+            result.put("baseDir", baseDir);
+        }
+
+        return result;
     }
 
     public String getTargets()

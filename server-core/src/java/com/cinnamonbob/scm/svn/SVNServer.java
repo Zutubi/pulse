@@ -188,6 +188,11 @@ public class SVNServer implements SCMServer
     // SCMServer interface
     //=======================================================================
 
+    public String getLocation()
+    {
+        return location.toString();
+    }
+
     /**
      * @see SCMServer#checkout(long, File, Revision, List<Change>)
      */

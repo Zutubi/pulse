@@ -44,6 +44,7 @@ public class P4Server implements SCMServer
     private Pattern changesPattern;
     private String templateClient;
     private File clientRoot;
+    private String port;
 
     private class P4Result
     {
@@ -347,6 +348,7 @@ public class P4Server implements SCMServer
     {
         p4Builder = new ProcessBuilder();
         templateClient = client;
+        this.port = port;
         // Output of p4 changes -s submitted -m 1:
         //   Change <number> on <date> by <user>@<client>
         changesPattern = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.+)'$", Pattern.MULTILINE);
@@ -355,6 +357,11 @@ public class P4Server implements SCMServer
         setEnv(ENV_USER, user);
         setEnv(ENV_PASSWORD, password);
         setEnv(ENV_CLIENT, client);
+    }
+
+    public String getLocation()
+    {
+        return templateClient + "@" + port;
     }
 
     public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException

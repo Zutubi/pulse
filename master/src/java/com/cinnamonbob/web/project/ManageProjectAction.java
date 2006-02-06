@@ -1,5 +1,6 @@
 package com.cinnamonbob.web.project;
 
+import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.scheduling.Trigger;
@@ -67,5 +68,15 @@ public class ManageProjectAction extends ProjectActionSupport
     public List<Trigger> getTriggers()
     {
         return triggers;
+    }
+
+    public Feature.Level getErrorLevel()
+    {
+        return Feature.Level.ERROR;
+    }
+
+    public Feature.Level getWarningLevel()
+    {
+        return Feature.Level.WARNING;
     }
 }

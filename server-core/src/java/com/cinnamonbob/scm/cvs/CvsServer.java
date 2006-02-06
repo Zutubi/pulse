@@ -12,9 +12,9 @@ import com.cinnamonbob.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.FileInputStream;
 import java.util.*;
 
 /**
@@ -33,6 +33,11 @@ public class CvsServer implements SCMServer
     {
         this.cvsRoot = root;
         this.cvsModule = module;
+    }
+
+    public String getLocation()
+    {
+        return cvsRoot + " [" + cvsModule + "]";
     }
 
     public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
@@ -56,7 +61,7 @@ public class CvsServer implements SCMServer
     {
         if (revision == null)
         {
-            throw new IllegalArgumentException("can not checkout a null revision of file '"+file+"'.");
+            throw new IllegalArgumentException("can not checkout a null revision of file '" + file + "'.");
         }
         if (!TextUtils.stringSet(file))
         {
@@ -79,7 +84,7 @@ public class CvsServer implements SCMServer
                 File checkedOutFile = new File(tmpDir, file);
                 if (!checkedOutFile.exists())
                 {
-                    throw new SCMException("Unable to checkout file '"+file+"' from cvs["+cvsRoot+"].");
+                    throw new SCMException("Unable to checkout file '" + file + "' from cvs[" + cvsRoot + "].");
                 }
                 in = new FileInputStream(checkedOutFile);
                 return IOUtils.inputStreamToString(in);

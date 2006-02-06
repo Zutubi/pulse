@@ -11,7 +11,7 @@
     #tabBar(["current-build", "history", "configuration"])
 
     #openTab("current-build")
-        #if($currentBuild)
+#if($currentBuild)
         <table>
             <tr><td>
             <table class="content">
@@ -33,36 +33,34 @@
                     #changesCell($project $currentBuild)
                 </tr>
             </table>
-            </tr></td>
+            </td></tr>
+    #if($currentBuild.hasMessages($errorLevel) || $currentBuild.hasMessages($warningLevel))
             <tr><td>
             <table class="content" width="100%">
                 #headingRow("build.features" 1)
                <tr>
                    <td class="content">
-                       #buildMessageSummary($currentBuild $currentBuild.getLevel("ERROR"))
-                       #buildMessageSummary($currentBuild $currentBuild.getLevel("WARNING"))
+                       #buildMessageSummary($currentBuild $errorLevel)
+                       #buildMessageSummary($currentBuild $warningLevel)
                    </td>
                </tr>
             </table>
-            </tr></td>
+            </td></tr>
+    #end
             </table>
 #*
             <h4>recipes</h4>
             #showrecipes($currentBuild.root false $project.id)
 *#
-        #else
+#else
             #wwtext("name=never.built")
-        #end
+#end
     #closeTab()
 
     #openTab("history")
         #if($history.size() > 0)
         <table class="content">
-            <tr>
-                <th class="heading" colspan="6">
-                    <span class="action"><a href="searchBuilds.action?projectId=$project.id"><img alt="search" src="images/zoom.png"/>#wwtext("name=search.builds")</a></span>#wwtext("name=recent.builds")
-                </th>
-            </tr>
+            #actionHeadingRow("recent.builds" 7 "search.builds" "searchBuilds.action?projectId=$project.id" "zoom.gif")
             <tr>
                 #contentHeading("build.id" 1)
                 #contentHeading("build.status" 2)
@@ -88,80 +86,77 @@
     #closeTab()
 
     #openTab("configuration")
-        configuration content
+        <table class="columns" width="90%">
+            <tr>
+                <td class="columns" width="40%">
+                    <table class="fill-content">
+                        #editHeadingRow("project.basics" 2 "editProject!default.action?id=$project.id")
+                        #dynamicRow("project.name" $project.name)
+                        #dynamicRow("project.description" $project.description)
+                    </table>
+                    <table class="fill-content">
+                        #editHeadingRow("project.specifics" 2 "editBobFileDetails!default.action?id=$project.bobFileDetails.id&amp;projectId=$project.id")
+                        #dynamicRow("project.type" $project.bobFileDetails.type)
+#foreach($property in $project.bobFileDetails.properties.entrySet())
+                        #propertyRow($property)
+#end
+                    </table>
+                    <table class="fill-content">
+                        #editHeadingRow("project.scm" 2 "editScm!default.action?id=$project.scm.id&amp;project=$project.id")
+                        #scmRow($project)
+                        #dynamicRow("scm.location" "$project.scm.createServer().location")
+                    </table>
+                    <table class="fill-content">
+                        #editHeadingRow("project.cleanup" 2 "editCleanupPolicy!default.action?projectId=$project.id")
+                        #dynamicRow("project.work.dirs.deleted" $project.cleanupPolicy.prettyWorkDirDays)
+                        #dynamicRow("project.results.deleted" $project.cleanupPolicy.prettyResultDays)
+                    </table>
+                </td>
+                <td class="columns" width="40%">
+                    <table class="fill-content">
+                        #headingRow("project.buildspecs" 6)
+                        <tr>
+                            #contentHeading("buildspec.name" 1)
+                            #contentHeading("recipe" 1)
+                            #contentHeading("buildspec.timeout" 1)
+                            #contentHeading("actions" 3)
+                        </tr>
+#foreach($buildSpec in $project.buildSpecifications)
+                        <tr>
+                            #dynamicCell($buildSpec.name)
+                            #dynamicCell($buildSpec.root.children.get(0).stage.recipeSafe)
+                            #dynamicCell("<TODO>")
+                            #actionCell("buildspec.trigger" "triggerBuild.action?id=$buildSpec.id&amp;projectId=$project.id" "lightning.gif")
+                            #editCell("viewBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id")
+                            #deleteCell("deleteBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id")
+                        </tr>
+#end
+                        #addRow("buildspec.add" 6 "createBuildSpecification!default.action?projectId=$project.id")
+                    </table>
+                    <table class="fill-content">
+                        #headingRow("project.triggers" 5)
+                        <tr>
+                            #contentHeading("trigger.name" 1)
+                            #contentHeading("trigger.type" 1)
+                            #contentHeading("trigger.spec" 1)
+                            #contentHeading("actions" 2)
+                        </tr>
+#foreach($trigger in $triggers)
+                        <tr>
+                            #dynamicCell($trigger.name)
+                            #dynamicCell($trigger.type)
+                            #dynamicCell($trigger.dataMap.spec)
+                            #editCell("editTrigger.action?id=$trigger.id")
+                            #deleteCell("deleteTrigger.action?id=$trigger.id")
+                        </tr>
+#end
+                        #addRow("trigger.add" 5 "addTrigger.action?project=$project.id")
+                    </table>
+                </td>
+            </tr>
+        </table>
     #closeTab()
 
     #selectTab("current-build")
 
-#*
-      <div id="project-left-column">
-
-        <h2 class="command-info">details</h2>
-        <div class="command-content">
-            <table>
-                #detailrow("name" $project.name)
-                #detailrow("description" $project.description)
-                #detailrow("action" "<a href='editProject!default.action?id=$project.id'>edit</a>")
-                #scmdetailrow("scm" $project $project.scm)
-                #detailrow("type" "<a href='editBobFileDetails!default.action?id=$project.bobFileDetails.id&projectId=$project.id'>$project.bobFileDetails.type</a>")
-            </table>
-        </div>
-
-        <h2 class="command-info">build specifications</h2>
-        <div class="command-content">
-            <table>
-                <tr>
-                    <th class="command-detail">name</th>
-                    <th colspan="3" class="command-detail">actions</th>
-                </tr>
-            #foreach ($buildSpec in $project.buildSpecifications)
-                <tr>
-                    <td class="command-detail"><a href="viewBuildSpecification.action?projectId=$project.id&id=$buildSpec.id">$buildSpec.name</a></td>
-                    <td class="command-detail"><a href="triggerBuild.action?id=$buildSpec.id&projectId=$project.id">trigger</a></td>
-                    <td class="command-detail"><a href="viewBuildSpecification.action?projectId=$project.id&id=$buildSpec.id">edit</a></td>
-                    <td class="command-detail"><a href="deleteBuildSpecification.action?projectId=$project.id&id=$buildSpec.id">delete</a></td>
-                </tr>
-            #end
-                <tr>
-                    <td colspan="4" class="command-detail"><b>+</b> <a href="createBuildSpecification!default.action?projectId=$project.id">add new build specification</a></td>
-                </tr>
-            </table>
-        </div>
-
-
-        <h2 class="command-info">triggers</h2>
-        <div class="command-content">
-            <table>
-                <tr>
-                    <th class="command-detail">name</th>
-                    <th class="command-detail">build&nbsp;spec</th>
-                    <th colspan="2" class="command-detail">actions</th>
-                </tr>
-            #foreach ($trigger in $triggers)
-                <tr>
-                    <td class="command-detail">$trigger.name ($trigger.type)</td>
-                    <td class="command-detail">$trigger.dataMap.spec</td>
-                    <td class="command-detail"><a href="deleteTrigger.action?id=$trigger.id">delete</a></td>
-                </tr>
-            #end
-                <tr>
-                    <td colspan="4" class="command-detail"><b>+</b> <a href="addTrigger.action?project=$project.id">add new trigger</a></td>
-                </tr>
-            </table>
-        </div>
-
-        </div>
-
-        <div id="project-content">
-            <h4>cleanup policy</h4>
-            <table>
-                #detailrow("working directories deleted" $project.cleanupPolicy.prettyWorkDirDays)
-                #detailrow("build results deleted" $project.cleanupPolicy.prettyResultDays)
-                #detailrow("action" "<a href='editCleanupPolicy!default.action?projectId=$project.id'>edit</a>")
-            </table>
-        </div>
-
-        </div>
-*#
-    </body>
 </html>

@@ -4,6 +4,8 @@ import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.scm.SCMException;
 
+import java.util.Properties;
+
 /**
  */
 public class CustomBobFileDetails extends BobFileDetails
@@ -23,6 +25,14 @@ public class CustomBobFileDetails extends BobFileDetails
     public String getType()
     {
         return "custom";
+    }
+
+    public Properties getProperties()
+    {
+        // TODO i18n
+        Properties result = new Properties();
+        result.put("cinnabo file", bobFileName);
+        return result;
     }
 
     public String getBobFile(Project project, Revision revision)

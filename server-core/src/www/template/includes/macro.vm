@@ -87,12 +87,33 @@
 #end
 
 ##
+## Outputs a heading row for a content table with an action
+##
+#macro(actionHeadingRow $key $span $actionKey $url $image)
+    <tr>
+        <th class="heading" colspan="$span">
+    #if($actionKey)
+            <span class="action">
+                <a href="$url"><img alt="$action.getText($actionKey)" src="images/$image"/>#wwtext("name=$actionKey")</a>
+            </span>
+    #end
+            #wwtext("name=$key")
+        </th>
+    </tr>
+#end
+
+##
 ## Outputs a heading row for a content table
 ##
 #macro(headingRow $key $span)
-    <tr>
-        <th class="heading" colspan="$span">#wwtext("name=$key")</th>
-    </tr>
+    #actionHeadingRow($key $span false false false)
+#end
+
+##
+## Outputs a heading row with an edit action
+##
+#macro(editHeadingRow $key $span $url)
+    #actionHeadingRow($key $span "edit" $url "page_white_edit.gif")
 #end
 
 ##
@@ -110,10 +131,81 @@
 #end
 
 ##
+## Outputs a heading cell for a content table with the given dynamic content,
+## which should be escaped
+##
+#macro(dynamicHeading $content)
+    <th class="content">$!webwork.htmlEncode($content)</th>
+#end
+
+##
+## Outputs a cell for a content table with the given dynamic content, which
+## should be escaped
+##
+#macro(dynamicCell $content)
+    <td class="content">$!webwork.htmlEncode($content)</td>
+#end
+
+##
+## Outputs a name:value pair row where the value needs to be escaped
+##
+#macro(dynamicRow $key $value)
+    <tr>
+        #contentHeading($key 1)
+        #dynamicCell($value)
+    </tr>
+#end
+
+##
+## Outputs a name:value pair row from a property; both name and value need to
+## be escaped.
+##
+#macro(propertyRow $property)
+    <tr>
+        #dynamicHeading($property.key)
+        #dynamicCell($property.value)
+    </tr>
+#end
+
+##
+## Outputs an action cell for a content table
+##
+#macro(actionCell $actionKey $url $image)
+    <td class="content">
+        <a href="$url"><img alt="$action.getText($actionKey)" src="images/$image"/>#wwtext("name=$actionKey")</a>
+    </td>
+#end
+
+##
+## Outputs an edit cell for a content table
+##
+#macro(editCell $url)
+    #actionCell("edit" $url "page_white_edit.gif")
+#end
+
+##
+## Outputs a delete cell for a content table
+##
+#macro(deleteCell $url)
+    #actionCell("delete" $url "delete.gif")
+#end
+
+##
 ## Outputs a table cell with class based on $cssClass
 ##
 #macro(classCell $content)
-    <td class="$cssClass">$content</td>
+    <td class="$cssClass">$!webwork.htmlEncode($content)</td>
+#end
+
+##
+## Outputs an add row for the tail of a content table
+##
+#macro(addRow $key $span $url)
+    <tr>
+        <td class="add" colspan="$span">
+            <a href="addProject.action"><img alt="add" src="images/add.gif"/> #wwtext("name=$key")</a>
+        </td>
+    </tr>
 #end
 
 ##
@@ -155,6 +247,16 @@
 #end
 
 ##
+## Outputs a row with SCM details
+##
+#macro(scmRow $project)
+    <tr>
+        #contentHeading("scm.type" 1)
+        <td class="content">#scmDetail($project)</td>
+    </tr>
+#end
+
+##
 ## Outputs a heading for a box
 ##
 #macro(boxHeading $key)
@@ -187,6 +289,7 @@
     </tr>
 #end
 
+
 ##
 ## Outputs a single row for a name-value pair table.  Used for basic entity
 ## details.
@@ -194,9 +297,7 @@
 #macro(detailrow $header $content)
   <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
 #end
-#macro(scmdetailrow $header $project $scm)
-  <tr><th class="command-detail">$header</th><td class="command-detail">#scmDetail($project $scm)</td></tr>
-#end
+
 
 ##
 ## Sets the variable "class" depending on the state of the given result object.
@@ -424,13 +525,11 @@
     #if ($scm.class.name == 'com.cinnamonbob.model.P4')<img src="/images/p4_16.png"/>#end
 #end
 
-#macro( scmDetail $project $scm)
-    #scmIcon($scm)
-    <a href="editScm!default.action?id=$scm.id&project=$project.id">
-    #if ($scm.class.name == 'com.cinnamonbob.model.Svn') subversion #end
-    #if ($scm.class.name == 'com.cinnamonbob.model.Cvs') cvs #end
-    #if ($scm.class.name == 'com.cinnamonbob.model.P4') perforce #end
-    </a>
+#macro( scmDetail $project)
+    #scmIcon($project.scm)
+    #if ($project.scm.class.name == 'com.cinnamonbob.model.Svn') subversion #end
+    #if ($project.scm.class.name == 'com.cinnamonbob.model.Cvs') cvs #end
+    #if ($project.scm.class.name == 'com.cinnamonbob.model.P4') perforce #end
 #end
 
 <!--- quartz trigger state -->

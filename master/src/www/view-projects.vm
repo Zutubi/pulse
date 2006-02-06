@@ -43,14 +43,7 @@
     #end
             </tr>
 #end
-
-            <tr>
-                <td class="add" colspan="8">
-                    <a href="addProject.action">
-                        <img alt="add" src="images/add.gif"/> #wwtext("name=add.project")
-                    </a>
-                </td>
-            </tr>
+            #addRow("add.project" 8 "addProject.action")
         </table>
     </body>
 </html>
