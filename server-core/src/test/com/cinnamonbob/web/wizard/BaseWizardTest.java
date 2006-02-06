@@ -33,11 +33,16 @@ public class BaseWizardTest extends TestCase
         TestWizardState testState = new TestWizardState(wizard, "a");
         wizard.initialState = testState;
         wizard.addState(testState);
+        wizard.initialise();
 
-        assertEquals("a", wizard.traverseForward());
-        assertTrue(testState.isInitialised());
         assertFalse(testState.isValidated());
         assertFalse(testState.isExecuted());
+
+        assertEquals("a", wizard.traverseForward());
+        assertTrue(testState.hasErrors()); // attempted to traverse forward when no action was available.
+        assertTrue(testState.isInitialised());
+        assertTrue(testState.isValidated());
+        assertTrue(testState.isExecuted());
     }
 
     public void testTraverseForwardBackward()
@@ -48,11 +53,8 @@ public class BaseWizardTest extends TestCase
         wizard.initialState = testStateA;
         wizard.addState(testStateA);
         wizard.addState(testStateB);
+        wizard.initialise();
 
-        assertEquals("a", wizard.traverseForward());
-
-        testStateA.reset();
-        testStateB.reset();
         assertEquals("b", wizard.traverseForward());
         assertTrue(testStateA.isExecuted());
         assertTrue(testStateA.isValidated());
