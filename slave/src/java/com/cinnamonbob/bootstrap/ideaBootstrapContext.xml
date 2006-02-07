@@ -4,7 +4,7 @@
 
     <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation"></bean>
 
-    <bean id="startupManager" class="com.cinnamonbob.bootstrap.StartupManager">
+    <bean id="startupManager" class="com.cinnamonbob.bootstrap.DefaultStartupManager">
         <property name="systemContexts">
             <list>
                 <value>com/cinnamonbob/bootstrap/databaseBootstrapContext.xml</value>

@@ -33,7 +33,6 @@ public class SystemInfoAction extends ActionSupport
 
     /**
      *
-     * @return
      */
     public String execute()
     {
@@ -53,7 +52,6 @@ public class SystemInfoAction extends ActionSupport
 
     /**
      *
-     * @return
      */
     public Map getProperties()
     {
@@ -84,7 +82,6 @@ public class SystemInfoAction extends ActionSupport
     /**
      * Get the memory used by the runtime in MBs. This is the difference between tht total memory available
      * to the runtime and the current free memory amount. 
-     * @return
      */
     public long getUsedMemory()
     {
@@ -105,13 +102,13 @@ public class SystemInfoAction extends ActionSupport
         long days = uptime / Constants.DAY;
         if (days > 0)
         {
-            buffer.append(sep + days + " day" + ((days != 1) ? "s" : ""));
+            buffer.append(sep).append(days).append(" day").append(((days != 1) ? "s" : ""));
             sep = " ";
         }
         long hours = uptime % Constants.DAY / Constants.HOUR;
         long minutes = uptime % Constants.DAY % Constants.HOUR / Constants.MINUTE;
         long seconds = uptime % Constants.DAY % Constants.HOUR % Constants.MINUTE / Constants.SECOND;
-        buffer.append(sep + MessageFormat.format("{0,number,00}:{1,number,00}:{2,number,00}", hours, minutes, seconds));
+        buffer.append(sep).append(MessageFormat.format("{0,number,00}:{1,number,00}:{2,number,00}", hours, minutes, seconds));
         return buffer.toString();
     }
 }

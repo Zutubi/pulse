@@ -6,7 +6,7 @@
 
     <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
 
-    <bean id="startupManager" class="com.cinnamonbob.bootstrap.StartupManager">
+    <bean id="startupManager" class="com.cinnamonbob.bootstrap.DefaultStartupManager">
         <property name="systemContexts">
             <list>
                 <value>com/cinnamonbob/bootstrap/coreSubsystemContext.xml</value>
