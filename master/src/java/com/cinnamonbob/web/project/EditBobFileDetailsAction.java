@@ -22,7 +22,7 @@ public class EditBobFileDetailsAction extends ProjectActionSupport
         this.id = id;
     }
 
-    public String doDefault()
+    public String doInput()
     {
         BobFileDetails details = bobFileDetailsDao.findById(id);
         if (details == null)

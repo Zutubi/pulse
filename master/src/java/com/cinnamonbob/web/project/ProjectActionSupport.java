@@ -15,7 +15,6 @@ public class ProjectActionSupport extends ActionSupport
     private ProjectManager projectManager;
     private BuildManager buildManager;
     private ScmManager scmManager;
-//    private ScheduleManager scheduleManager;
     private Scheduler scheduler;
 
     public void setProjectManager(ProjectManager manager)

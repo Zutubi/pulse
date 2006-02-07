@@ -1,6 +1,7 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.BobFileDetails;
+import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.persistence.BobFileDetailsDao;
 import com.opensymphony.xwork.Preparable;
 
@@ -12,6 +13,7 @@ public abstract class AbstractEditDetailsAction extends ProjectActionSupport imp
 {
     private long id;
     private long projectId;
+    private Project project;
     private BobFileDetailsDao bobFileDetailsDao;
 
     public long getId()
@@ -34,6 +36,11 @@ public abstract class AbstractEditDetailsAction extends ProjectActionSupport imp
         this.projectId = projectId;
     }
 
+    public Project getProject()
+    {
+        return project;
+    }
+
     public BobFileDetailsDao getBobFileDetailsDao()
     {
         return bobFileDetailsDao;
@@ -44,16 +51,19 @@ public abstract class AbstractEditDetailsAction extends ProjectActionSupport imp
         this.bobFileDetailsDao = bobFileDetailsDao;
     }
 
-    public String doDefault() throws Exception
+    public String doInput() throws Exception
     {
         prepare();
+
+        project = getProjectManager().getProject(projectId);
+
         if (getDetails() == null)
         {
             addActionError("Unknown project details '" + getId() + "'");
             return ERROR;
         }
 
-        return SUCCESS;
+        return INPUT;
     }
 
     public String execute()
@@ -68,5 +78,4 @@ public abstract class AbstractEditDetailsAction extends ProjectActionSupport imp
     }
 
     public abstract BobFileDetails getDetails();
-
 }

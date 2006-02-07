@@ -1,27 +1,26 @@
+#projectTags($project)
 <html>
 <head>
-    <title>edit maven details</title>
+    <title>#wwtext("name=edit.maven")</title>
 </head>
 <body>
+    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='editMavenDetails.action'" "method='post'")
+#wwcform("action=editMavenDetails.action" "heading=%{getText('edit.maven')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=projectId")
 
-    #tag (Hidden "name='id'")
-    #tag (Hidden "name='projectId'")
+    #wwtextfield("name=details.baseDir" "label=%{getText('maven.base.dir')}" "tabindex=1")
+    #inlineHelp("maven.base.dir.help")
+    #wwtextfield("name=details.targets" "label=%{getText('maven.targets')}" "tabindex=2")
+    #inlineHelp("maven.targets.help")
 
-    <h3>edit maven details</h3>
-
-    <fieldset>
-        #tag (TextField "name='details.baseDir'" "label='maven.baseDir'" "tabindex='1'")
-        #tag (TextField "name='details.targets'" "label='maven.targets'" "tabindex='2'")
-    </fieldset>
-
-    <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
-    </fieldset>
-
+    #openSubmit()
+        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=3")
+        #wwsubmit("name='cancel'" "value=%{getText('cancel.name')}" "tabindex=4")
+    #closeSubmit()
  #end
 </body>
 </html>

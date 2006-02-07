@@ -1,27 +1,26 @@
+#projectTags($project)
 <html>
 <head>
-    <title>edit ant details</title>
+    <title>#wwtext("name=edit.ant")</title>
 </head>
 <body>
+    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='editAntDetails.action'" "method='post'")
+#wwcform("action=editAntDetails.action" "heading=%{getText('edit.ant')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=projectId")
 
-    #tag (Hidden "name='id'")
-    #tag (Hidden "name='projectId'")
+    #wwtextfield("name=details.buildFile" "label=%{getText('ant.filename')}" "required=true" "tabindex=1")
+    #inlineHelp("ant.filename.help")
+    #wwtextfield("name=details.targets" "label=%{getText('ant.targets')}" "tabindex=2")
+    #inlineHelp("ant.targets.help")
 
-    <h3>edit ant details</h3>
-
-    <fieldset>
-        #tag (TextField "name='details.buildFile'" "label='ant.fileName'" "required='true'" "tabindex='1'")
-        #tag (TextField "name='details.targets'" "label='ant.targets'" "tabindex='2'")
-    </fieldset>
-
-    <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
-    </fieldset>
-
+    #openSubmit()
+        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=3")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=4")
+    #closeSubmit()
  #end
 </body>
 </html>

@@ -93,7 +93,7 @@
                         #dynamicRow("project.description" $project.description)
                     </table>
                     <table class="fill-content">
-                        #editHeadingRow("project.specifics" 2 "editBobFileDetails!default.action?id=$project.bobFileDetails.id&amp;projectId=$project.id")
+                        #editHeadingRow("project.specifics" 2 "editBobFileDetails!input.action?id=$project.bobFileDetails.id&amp;projectId=$project.id")
                         #dynamicRow("project.type" $project.bobFileDetails.type)
 #foreach($property in $project.bobFileDetails.properties.entrySet())
                         #propertyRow($property)

@@ -106,7 +106,12 @@ public class AntBobFileDetails extends TemplateBobFileDetails
             result.put("targets", targets);
         }
 
-        result.put("environment", getEnvironmentString());
+        String env = getEnvironmentString();
+        if (env.length() > 0)
+        {
+            result.put("environment", env);
+        }
+
         return result;
     }
 

@@ -1,26 +1,24 @@
+#projectTags($project)
 <html>
 <head>
-    <title>edit custom details</title>
+    <title>#wwtext("name=edit.custom")</title>
 </head>
 <body>
+    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='editCustomDetails.action'" "method='post'")
+#wwcform("action=editCustomDetails.action" "heading=%{getText('edit.custom')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=projectId")
 
-    #tag (Hidden "name='id'")
-    #tag (Hidden "name='projectId'")
-
-    <h3>edit custom details</h3>
-
-    <fieldset>
-        #tag (TextField "name='details.bobFileName'" "label='bobFileName'" "required='true'" "tabindex='1'")
-    </fieldset>
-
-    <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='2'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='3'")
-    </fieldset>
-
+    #wwtextfield("name=details.bobFileName" "label=%{getText('bob.filename')}" "required=true" "tabindex=1")
+    #inlineHelp("bob.filename.help")
+    
+    #openSubmit()
+        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=2")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=3")
+    #closeSubmit()
  #end
 </body>
 </html>
