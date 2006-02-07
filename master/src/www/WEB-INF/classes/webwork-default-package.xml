@@ -25,21 +25,21 @@
             <interceptor name="model-driven" class="com.opensymphony.xwork.interceptor.ModelDrivenInterceptor"/>
             <interceptor name="component" class="com.opensymphony.xwork.interceptor.component.ComponentInterceptor"/>
             <interceptor name="token" class="com.opensymphony.webwork.interceptor.TokenInterceptor"/>
-            <interceptor name="token-session" class="com.opensymphony.webwork.interceptor.TokenSessionStoreInterceptor"/>
+            <interceptor name="token-session"
+                         class="com.opensymphony.webwork.interceptor.TokenSessionStoreInterceptor"/>
             <interceptor name="validation" class="com.opensymphony.xwork.validator.ValidationInterceptor"/>
             <interceptor name="workflow" class="com.opensymphony.xwork.interceptor.DefaultWorkflowInterceptor"/>
             <interceptor name="servlet-config" class="com.opensymphony.webwork.interceptor.ServletConfigInterceptor"/>
             <interceptor name="prepare" class="com.opensymphony.xwork.interceptor.PrepareInterceptor"/>
-            <interceptor name="conversionError" class="com.opensymphony.webwork.interceptor.WebWorkConversionErrorInterceptor"/>
+            <interceptor name="conversionError"
+                         class="com.opensymphony.webwork.interceptor.WebWorkConversionErrorInterceptor"/>
             <interceptor name="fileUpload" class="com.opensymphony.webwork.interceptor.FileUploadInterceptor"/>
             <interceptor name="execAndWait" class="com.opensymphony.webwork.interceptor.ExecuteAndWaitInterceptor"/>
             <interceptor name="cancel" class="com.cinnamonbob.xwork.interceptor.CancelWorkflowInterceptor"/>
-            <interceptor name="transaction" class="com.cinnamonbob.xwork.interceptor.TransactionInterceptor"/>
             <interceptor name="wizard" class="com.cinnamonbob.web.wizard.WizardInterceptor"/>
 
             <!-- Basic stack -->
             <interceptor-stack name="defaultStack">
-                <interceptor-ref name="transaction"/>
                 <interceptor-ref name="servlet-config"/>
                 <interceptor-ref name="prepare"/>
                 <interceptor-ref name="static-params"/>
@@ -94,7 +94,6 @@
                  before prepare() is called, you'd need to move the component
                  interceptor up -->
             <interceptor-stack name="completeStack">
-                <interceptor-ref name="transaction"/>
                 <interceptor-ref name="prepare"/>
                 <interceptor-ref name="servlet-config"/>
                 <interceptor-ref name="chain"/>
@@ -114,7 +113,6 @@
             </interceptor-stack>
 
             <interceptor-stack name="crudStack">
-                <interceptor-ref name="transaction"/>
                 <interceptor-ref name="params"/>
                 <interceptor-ref name="prepare"/>
                 <interceptor-ref name="servlet-config"/>
@@ -135,7 +133,6 @@
             </interceptor-stack>
 
             <interceptor-stack name="wizardStack">
-                <interceptor-ref name="transaction"/>
                 <interceptor-ref name="prepare"/>
                 <interceptor-ref name="servlet-config"/>
                 <interceptor-ref name="chain"/>
@@ -157,4 +154,3 @@
         </interceptors>
     </package>
 </xwork>
-

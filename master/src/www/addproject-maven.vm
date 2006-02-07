@@ -12,7 +12,7 @@
 
     #wwtextfield("name=details.targets" "label=%{getText('maven.targets')}" "tabindex=1")
     #inlineHelp("maven.targets.help")
-    #wwtextfield("name=details.baseDir" "label=%{getText('maven.base.dir')}" "tabindex=2")
+    #wwtextfield("name=details.baseDir" "label=%{getText('maven.base.dir')}" "size=40" "tabindex=2")
     #inlineHelp("maven.base.dir.help")
 
     #openSubmit()

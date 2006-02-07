@@ -1,5 +1,6 @@
 package com.cinnamonbob.web.project;
 
+import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.Scm;
 
 /**
@@ -9,7 +10,8 @@ import com.cinnamonbob.model.Scm;
 public abstract class AbstractEditScmAction extends ProjectActionSupport
 {
     private long id;
-    private long project;
+    private long projectId;
+    private Project project;
 
     public long getId()
     {
@@ -21,17 +23,35 @@ public abstract class AbstractEditScmAction extends ProjectActionSupport
         this.id = id;
     }
 
-    public long getProject()
+    public long getProjectId()
+    {
+        return projectId;
+    }
+
+    public void setProjectId(long projectId)
+    {
+        this.projectId = projectId;
+    }
+
+    public Project getProject()
     {
         return project;
     }
 
-    public void setProject(long project)
+    public String doInput()
     {
-        this.project = project;
+        project = getProjectManager().getProject(projectId);
+        return INPUT;
+    }
+
+    public String execute()
+    {
+        getScmManager().save(getScm());
+        return SUCCESS;
     }
 
     public abstract Scm getScm();
 
     public abstract String getScmProperty();
+
 }

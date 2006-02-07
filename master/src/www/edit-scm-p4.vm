@@ -1,31 +1,30 @@
+#projectTags($project)
 <html>
 <head>
-    <title>edit scm</title>
+    <title>#wwtext("name=edit.p4")</title>
 </head>
-<content tag="action">scm.p4.edit</content>
 <body>
+    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='editP4.action'" "method='post'")
+#wwcform("action=editP4.action" "heading=%{getText('edit.p4')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=projectId")
 
-    #tag (Hidden "name='id'")
-    #tag (Hidden "name='project'")
+    #wwtextfield("name=p4.port" "label=%{getText('p4.port')}" "required=true" "tabindex=1")
+    #inlineHelp("p4.port.help")
+    #wwtextfield("name=p4.user" "label=%{getText('p4.user')}" "required='true'" "tabindex=2")
+    #wwpassword("name=p4.password" "label=%{getText('p4.password')}" "tabindex=3")
+    #wwtextfield("name=p4.client" "label=%{getText('p4.client')}" "required=true" "tabindex=4")
+    #inlineHelp("p4.client.help")
+    #wwtextfield("name=p4.path" "label=%{getText('scm.path')}" "size=60" "tabindex=5")
+    #inlineHelp("scm.path.help")
 
-    <h3>edit scm</h3>
-
-    <fieldset>
-        #tag (TextField "name='p4.path'" "label='scm.path'" "tabindex='1'")
-        #tag (TextField "required='true'" "name='p4.port'" "tabindex='2'")
-        #tag (TextField "required='true'" "name='p4.user'" "tabindex='3'")
-        #tag (Password "name='p4.password'" "tabindex='4'")
-        #tag (TextField "required='true'" "name='p4.client'" "tabindex='5'")
-    </fieldset>
-
-    <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='6'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='7'")
-    </fieldset>
-
+    #openSubmit()
+        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=6")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=7")
+    #closeSubmit()
  #end
 </body>
 </html>

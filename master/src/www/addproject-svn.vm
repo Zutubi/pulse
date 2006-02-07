@@ -11,7 +11,7 @@
     #wwhidden("name=state")
 
     #wwtextfield("name=svn.username" "label=%{getText('svn.username')}" "required=true" "tabindex=1")
-    #wwpassword("name=svn.password" "label=%{getText('svn.password')}" "required=true" "tabindex=2")
+    #wwpassword("name=svn.password" "label=%{getText('svn.password')}" "tabindex=2")
     #wwtextfield("name=svn.url" "label=%{getText('svn.url')}" "required=true" "size=60" "tabindex=3")
     #wwtextfield("name=svn.keyfile" "label=%{getText('svn.keyfile')}" "size=60" "tabindex=4")
     #inlineHelp("svn.keyfile.help")

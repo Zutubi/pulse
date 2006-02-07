@@ -9,13 +9,8 @@ import com.cinnamonbob.model.*;
 public class EditScmAction extends ProjectActionSupport
 {
     private long id;
-
-    private String type;
-
-    public String getType()
-    {
-        return type;
-    }
+    private long projectId;
+    private Project project;
 
     public long getId()
     {
@@ -27,17 +22,35 @@ public class EditScmAction extends ProjectActionSupport
         this.id = id;
     }
 
-    public String doDefault()
+    public long getProjectId()
     {
+        return projectId;
+    }
+
+    public void setProjectId(long projectId)
+    {
+        this.projectId = projectId;
+    }
+
+    public Project getProject()
+    {
+        return project;
+    }
+
+    public String doInput()
+    {
+        project = getProjectManager().getProject(projectId);
+
         Scm scm = getScmManager().getScm(id);
         if (scm == null)
         {
-            return INPUT;
+            addActionError("Unknown scm [" + id + "]");
+            return ERROR;
         }
-        
+
         if (scm instanceof P4)
         {
-            return  "p4";
+            return "p4";
         }
         else if (scm instanceof Cvs)
         {
@@ -47,11 +60,8 @@ public class EditScmAction extends ProjectActionSupport
         {
             return "svn";
         }
-        return ERROR;
-    }
 
-    public String execute()
-    {
-        return SUCCESS;
+        addActionError("Internal error: unrecognised scm type");
+        return ERROR;
     }
 }

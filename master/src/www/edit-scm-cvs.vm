@@ -1,30 +1,27 @@
+#projectTags($project)
 <html>
 <head>
-    <title>edit scm</title>
+    <title>#wwtext("name=edit.cvs")</title>
 </head>
-<content tag="action">scm.cvs.edit</content>
 <body>
+    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='editCvs.action'" "method='post'")
+#wwcform("action=editCvs.action" "heading=%{getText('edit.cvs')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=projectId")
 
-    #tag (Hidden "name='id'")
-    #tag (Hidden "name='project'")
+    #wwtextfield("name=cvs.root" "label=%{getText('cvs.root')}" "required=true" "size=60" "tabindex=1")
+    #wwtextfield("name=cvs.module" "label=%{getText('cvs.module')}" "required=true" "tabindex=2")
+    #wwpassword("name=cvs.password" "label=%{getText('cvs.password')}" "tabindex=3")
+    #wwtextfield("name=cvs.path" "label=%{getText('scm.path')}" "size=60" "tabindex=4")
+    #inlineHelp("scm.path.help")
 
-    <h3>edit scm</h3>
-
-    <fieldset>
-        #tag (TextField "name='cvs.path'" "label='scm.path'" "tabindex='1'")
-        #tag (TextField "name='cvs.root'" "required='true'" "tabindex='2'")
-        #tag (TextField "name='cvs.module'" "required='true'" "tabindex='3'")
-        #tag (Password "name='cvs.password'" "tabindex='4'")
-    </fieldset>
-
-    <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='5'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='6'")
-    </fieldset>
-
+    #openSubmit()
+        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=5")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=6")
+    #closeSubmit()
  #end
 </body>
 </html>

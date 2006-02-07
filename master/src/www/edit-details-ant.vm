@@ -12,9 +12,9 @@
     #wwhidden("name=id")
     #wwhidden("name=projectId")
 
-    #wwtextfield("name=details.buildFile" "label=%{getText('ant.filename')}" "required=true" "tabindex=1")
+    #wwtextfield("name=details.buildFile" "label=%{getText('ant.filename')}" "required=true" "size=40" "tabindex=1")
     #inlineHelp("ant.filename.help")
-    #wwtextfield("name=details.targets" "label=%{getText('ant.targets')}" "tabindex=2")
+    #wwtextfield("name=details.targets" "label=%{getText('ant.targets')}" "size=40" "tabindex=2")
     #inlineHelp("ant.targets.help")
 
     #openSubmit()

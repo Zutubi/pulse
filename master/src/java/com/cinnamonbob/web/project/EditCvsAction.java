@@ -1,14 +1,14 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Cvs;
+import com.opensymphony.xwork.Preparable;
 
 /**
  *
  *
  */
-public class EditCvsAction extends AbstractEditScmAction
+public class EditCvsAction extends AbstractEditScmAction implements Preparable
 {
-
     private Cvs scm = new Cvs();
 
     public Cvs getScm()
@@ -26,18 +26,8 @@ public class EditCvsAction extends AbstractEditScmAction
         return getScm();
     }
 
-    public String doDefault()
+    public void prepare() throws Exception
     {
         scm = (Cvs) getScmManager().getScm(getId());
-        return SUCCESS;
-    }
-
-    public String execute()
-    {
-        Cvs persistentCvs = (Cvs) getScmManager().getScm(getId());
-        persistentCvs.setPassword(scm.getPassword());
-        persistentCvs.setPath(scm.getPath());
-        persistentCvs.setRoot(scm.getRoot());
-        return SUCCESS;
     }
 }

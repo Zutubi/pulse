@@ -1,32 +1,31 @@
+#projectTags($project)
 <html>
 <head>
-<title>edit scm</title>
+    <title>#wwtext("name=edit.svn")</title>
 </head>
-<content tag="action">scm.svn.edit</content>
 <body>
+    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='editSvn.action'" "method='post'")
+#wwcform("action=editSvn.action" "heading=%{getText('edit.svn')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=projectId")
 
-    #tag (Hidden "name='id'")
-    #tag (Hidden "name='project'")
+    #wwtextfield("name=svn.username" "label=%{getText('svn.username')}" "required=true" "tabindex=1")
+    #wwpassword("name=svn.password" "label=%{getText('svn.password')}" "tabindex=2")
+    #wwtextfield("name=svn.url" "label=%{getText('svn.url')}" "required=true" "size=60" "tabindex=3")
+    #wwtextfield("name=svn.keyfile" "label=%{getText('svn.keyfile')}" "size=60" "tabindex=4")
+    #inlineHelp("svn.keyfile.help")
+    #wwpassword("name=svn.passphrase" "label=%{getText('svn.passphrase')}" "tabindex=5")
+    #inlineHelp("svn.passphrase.help")
+    #wwtextfield("name=svn.path" "label=%{getText('scm.path')}" "size=60" "tabindex='6'")
+    #inlineHelp("scm.path.help")
 
-    <h3>edit scm</h3>
-
-    <fieldset>
-        #tag (TextField "name='svn.path'" "label='scm.path'" "tabindex='1'")
-        #tag (TextField "required='true'" "name='svn.username'" "tabindex='2'")
-        #tag (Password "name='svn.password'" "tabindex='3'")
-        #tag (TextField "required='true'" "name='svn.url'" "tabindex='4'")
-        #tag (TextField "name='svn.keyfile'" "tabindex='5'")
-        #tag (Password "name='svn.passphrase'" "tabindex='6'")
-    </fieldset>
-
-    <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='7'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='8'")
-    </fieldset>
-
+    #openSubmit()
+        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=7")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=8")
+    #closeSubmit()
  #end
 </body>
 </html>

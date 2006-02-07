@@ -1,12 +1,13 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.P4;
+import com.opensymphony.xwork.Preparable;
 
 /**
  *
  *
  */
-public class EditP4Action extends AbstractEditScmAction
+public class EditP4Action extends AbstractEditScmAction implements Preparable
 {
     private P4 scm = new P4();
 
@@ -25,21 +26,8 @@ public class EditP4Action extends AbstractEditScmAction
         return getScm();
     }
 
-    public String doDefault()
+    public void prepare() throws Exception
     {
         scm = (P4) getScmManager().getScm(getId());
-        return SUCCESS;
-    }
-
-    public String execute()
-    {
-        P4 persistentP4 = (P4) getScmManager().getScm(getId());
-        persistentP4.setPassword(scm.getPassword());
-        persistentP4.setPath(scm.getPath());
-        persistentP4.setClient(scm.getClient());
-        persistentP4.setPort(scm.getPort());
-        persistentP4.setUser(scm.getUser());
-
-        return SUCCESS;
     }
 }

@@ -100,7 +100,7 @@
 #end
                     </table>
                     <table class="fill-content">
-                        #editHeadingRow("project.scm" 2 "editScm!default.action?id=$project.scm.id&amp;project=$project.id")
+                        #editHeadingRow("project.scm" 2 "editScm!input.action?id=$project.scm.id&amp;projectId=$project.id")
                         #scmRow($project)
                         #dynamicRow("scm.location" "$project.scm.createServer().location")
                     </table>
