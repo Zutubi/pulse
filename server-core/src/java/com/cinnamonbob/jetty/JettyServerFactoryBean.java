@@ -13,7 +13,6 @@ import com.cinnamonbob.util.logging.Logger;
  */
 public class JettyServerFactoryBean implements FactoryBean
 {
-
     private static final Logger LOG = Logger.getLogger(JettyServerFactoryBean.class);
 
     private static Server SERVER;
@@ -34,7 +33,6 @@ public class JettyServerFactoryBean implements FactoryBean
                     SocketListener listener = new SocketListener();
                     listener.setPort(configManager.getAppConfig().getServerPort());
                     SERVER.addListener(listener);
-
                 }
             }
         }
