@@ -22,10 +22,7 @@
     #wwtextfield("name=svn.path" "label=%{getText('scm.path')}" "size=60" "tabindex='6'")
     #inlineHelp("scm.path.help")
 
-    #openSubmit()
-        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=7")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=8")
-    #closeSubmit()
+    #saveCancel(7)
  #end
 </body>
 </html>

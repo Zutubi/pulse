@@ -516,13 +516,6 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="editCleanupPolicy!default" class="com.cinnamonbob.web.project.EditCleanupPolicyAction"
-                method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="velocity">edit-cleanup-policy.vm</result>
-        </action>
-
         <action name="editCleanupPolicy" class="com.cinnamonbob.web.project.EditCleanupPolicyAction">
             <result name="input" type="velocity">edit-cleanup-policy.vm</result>
             <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>

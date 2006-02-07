@@ -25,6 +25,11 @@ public class EditCleanupPolicyAction extends ProjectActionSupport
         this.projectId = projectId;
     }
 
+    public Project getProject()
+    {
+        return project;
+    }
+
     public AgeBuildResultCleanupPolicy getPolicy()
     {
         return policy;
@@ -55,7 +60,7 @@ public class EditCleanupPolicyAction extends ProjectActionSupport
         this.enableResultCleanup = enableResultCleanup;
     }
 
-    public String doDefault()
+    public String doInput()
     {
         project = getProjectManager().getProject(projectId);
         if (project == null)
@@ -68,7 +73,7 @@ public class EditCleanupPolicyAction extends ProjectActionSupport
         enableWorkDirCleanup = policy.getWorkDirDays() != AgeBuildResultCleanupPolicy.NEVER_CLEAN;
         enableResultCleanup = policy.getResultDays() != AgeBuildResultCleanupPolicy.NEVER_CLEAN;
 
-        return SUCCESS;
+        return INPUT;
     }
 
     public void validate()

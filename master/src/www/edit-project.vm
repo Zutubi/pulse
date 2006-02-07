@@ -13,10 +13,7 @@
     #wwtextfield("name=project.name" "label=%{getText('project.name')}" "required=true"  "tabindex=1")
     #wwtextfield("name=project.description" "label=%{getText('project.description')}" "size=60" "tabindex=2")
 
-    #openSubmit()
-        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=3")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=4")
-    #closeSubmit()
+    #saveCancel(3)
 #end
 </body>
 </html>

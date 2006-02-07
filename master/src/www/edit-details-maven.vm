@@ -17,10 +17,7 @@
     #wwtextfield("name=details.targets" "label=%{getText('maven.targets')}" "size=40" "tabindex=2")
     #inlineHelp("maven.targets.help")
 
-    #openSubmit()
-        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=3")
-        #wwsubmit("name='cancel'" "value=%{getText('cancel.name')}" "tabindex=4")
-    #closeSubmit()
+    #saveCancel(3)
  #end
 </body>
 </html>

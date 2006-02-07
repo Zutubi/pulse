@@ -297,6 +297,16 @@
     </tr>
 #end
 
+##
+## Shows a standard Save or Cancel submit row, given the first tab index.
+##
+#macro(saveCancel $tabIndex)
+    #openSubmit()
+        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=$tabIndex")
+        #set($tabIndex = $tabIndex + 1)
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
+    #closeSubmit()
+#end
 
 ##
 ## Outputs a single row for a name-value pair table.  Used for basic entity

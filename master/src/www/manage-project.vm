@@ -105,7 +105,7 @@
                         #dynamicRow("scm.location" "$project.scm.createServer().location")
                     </table>
                     <table class="fill-content">
-                        #editHeadingRow("project.cleanup" 2 "editCleanupPolicy!default.action?projectId=$project.id")
+                        #editHeadingRow("project.cleanup" 2 "editCleanupPolicy!input.action?projectId=$project.id")
                         #dynamicRow("project.work.dirs.deleted" $project.cleanupPolicy.prettyWorkDirDays)
                         #dynamicRow("project.results.deleted" $project.cleanupPolicy.prettyResultDays)
                     </table>

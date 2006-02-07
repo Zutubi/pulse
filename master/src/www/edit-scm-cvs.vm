@@ -18,10 +18,7 @@
     #wwtextfield("name=cvs.path" "label=%{getText('scm.path')}" "size=60" "tabindex=4")
     #inlineHelp("scm.path.help")
 
-    #openSubmit()
-        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=5")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=6")
-    #closeSubmit()
+    #saveCancel(5)
  #end
 </body>
 </html>

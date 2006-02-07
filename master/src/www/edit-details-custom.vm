@@ -15,10 +15,7 @@
     #wwtextfield("name=details.bobFileName" "label=%{getText('bob.filename')}" "required=true" "size=40" "tabindex=1")
     #inlineHelp("bob.filename.help")
     
-    #openSubmit()
-        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=2")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=3")
-    #closeSubmit()
+    #saveCancel(2)
  #end
 </body>
 </html>

@@ -9,6 +9,7 @@
 		<title>:: cinnabo :: #if ($title) $title #end</title>
 		<link href="$base/main2.css" rel="stylesheet" type="text/css" media="screen"/>
 		<link href="$base/form2.css" rel="stylesheet" type="text/css" media="screen"/>
+        <script type="text/javascript" src="/main.js"></script>
 		$head
 	</head>
         
