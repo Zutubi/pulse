@@ -1,9 +1,6 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.bootstrap.ConfigUtils;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.bootstrap.SystemBootstrapManager;
+import com.cinnamonbob.bootstrap.*;
 import com.cinnamonbob.model.ProjectManager;
 import com.cinnamonbob.util.logging.Logger;
 
@@ -17,7 +14,6 @@ import java.net.UnknownHostException;
 public class BobServer
 {
     private static final Logger LOG = Logger.getLogger(BobServer.class);
-    private static final String HOST_NAME_PROPERTY = "host.name";
 
     private ShutdownService shutdownService = null;
 
@@ -51,16 +47,15 @@ public class BobServer
 
     public static String getHostURL()
     {
-        ConfigurationManager config = ConfigUtils.getManager();
-        if (config.hasProperty(HOST_NAME_PROPERTY))
+        ApplicationConfiguration config = ConfigUtils.getManager().getAppConfig();
+        if (config.getHostName() != null)
         {
-            return config.lookupProperty(HOST_NAME_PROPERTY);
+            return config.getHostName();
         }
         else
         {
             InetAddress address;
             String result = null;
-
             try
             {
                 address = InetAddress.getLocalHost();
@@ -70,7 +65,6 @@ public class BobServer
             {
                 LOG.warning("Could not obtain local host name", e);
             }
-
             return result;
         }
     }

@@ -1,12 +1,10 @@
 package com.cinnamonbob.bootstrap;
 
-import java.io.File;
-
 /**
  * 
  *
  */
-public interface Config
+public interface ApplicationConfiguration
 {
     /**
      * The port on which the http server will listen for connections.
@@ -19,4 +17,10 @@ public interface Config
      *
      */
     int getAdminPort();
+
+    String getSmtpHost();
+
+    String getHostName();
+
+    String getSmtpFrom();
 }

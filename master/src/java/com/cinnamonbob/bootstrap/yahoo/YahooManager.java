@@ -40,8 +40,8 @@ public class YahooManager
             return;
         }
 
-        String yahooId = configManager.lookupProperty(YAHOO_ID);
-        String yahooPassword = configManager.lookupProperty(YAHOO_PASSWORD);
+        String yahooId = null;//configManager.lookupProperty(YAHOO_ID);
+        String yahooPassword = null;//configManager.lookupProperty(YAHOO_PASSWORD);
 
         // if id and password are not configured, then do not attempt to log in.
         if (!TextUtils.stringSet(yahooId) || !TextUtils.stringSet(yahooPassword))

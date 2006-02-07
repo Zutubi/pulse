@@ -22,6 +22,8 @@ public class DefaultConfigurationManager implements ConfigurationManager
     private Properties defaultProperties = null;
     private Properties userProperties = null;
 
+    private ApplicationConfiguration appConfig;
+
     public void init() throws StartupException
     {
         if (paths == null)
@@ -69,57 +71,22 @@ public class DefaultConfigurationManager implements ConfigurationManager
         }
     }
 
-    public Config getAppConfig()
+    public ApplicationConfiguration getAppConfig()
     {
-
-        return new Config()
+        if (appConfig == null)
         {
-            public int getServerPort()
-            {
-                if (hasProperty("webapp.port"))
-                {
-                    return Integer.parseInt(lookupProperty("webapp.port"));
-                }
-                return 8080;
-            }
+            Configuration system = new ReadOnlyConfiguration(System.getProperties());
+            Configuration users = new ReadOnlyConfiguration(userProperties);
+            Configuration defaults = new ReadOnlyConfiguration(defaultProperties);
 
-            public int getAdminPort()
-            {
-                if (hasProperty("admin.port"))
-                {
-                    return Integer.parseInt(lookupProperty("admin.port"));
-                }
-                return 8081;
-            }
-        };
+            appConfig = new ApplicationConfigurationSupport(system, users, defaults);
+        }
+        return appConfig;
     }
 
     public void setDefaultProperties(Properties properties)
     {
         this.defaultProperties = properties;
-    }
-
-    public String lookupProperty(String key)
-    {
-        if (System.getProperties().containsKey(key))
-        {
-            return System.getProperty(key);
-        }
-        else
-        {
-            if (userProperties.containsKey(key))
-            {
-                return userProperties.getProperty(key);
-            }
-        }
-        return defaultProperties.getProperty(key);
-    }
-
-    public boolean hasProperty(String key)
-    {
-        return System.getProperties().contains(key) ||
-                userProperties.containsKey(key) ||
-                defaultProperties.containsKey(key);
     }
 
     /**

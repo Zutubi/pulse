@@ -1,9 +1,9 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.BobServer;
+import com.cinnamonbob.bootstrap.ApplicationConfiguration;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigUtils;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.renderer.BuildResultRenderer;
 import com.cinnamonbob.util.logging.Logger;
 
@@ -25,7 +25,6 @@ public class EmailContactPoint extends ContactPoint
     private static final Logger LOG = Logger.getLogger(EmailContactPoint.class);
 
     private static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
-    private static final String SMTP_FROM_PROPERTY = "mail.smtp.from";
 
     public EmailContactPoint()
     {
@@ -65,26 +64,24 @@ public class EmailContactPoint extends ContactPoint
 
     private void sendMail(String subject, String body)
     {
-        ConfigurationManager config = ConfigUtils.getManager();
-        Properties properties = System.getProperties();
-
-        if (!config.hasProperty(SMTP_HOST_PROPERTY))
+        ApplicationConfiguration config = ConfigUtils.getManager().getAppConfig();
+        if (config.getSmtpHost() == null)
         {
             LOG.severe("Unable to deliver mail to contact point: SMTP host not configured.");
             return;
         }
 
-        properties.put(SMTP_HOST_PROPERTY, config.lookupProperty(SMTP_HOST_PROPERTY));
+        Properties properties = (Properties) System.getProperties().clone();
+        properties.put(SMTP_HOST_PROPERTY, config.getSmtpHost());
 
         Session session = Session.getDefaultInstance(properties, null);
-
         try
         {
             Message msg = new MimeMessage(session);
 
-            if (config.hasProperty(SMTP_FROM_PROPERTY))
+            if (config.getSmtpFrom() != null)
             {
-                String fromAddress = config.lookupProperty(SMTP_FROM_PROPERTY);
+                String fromAddress = config.getSmtpFrom();
                 msg.setFrom(new InternetAddress(fromAddress));
             }
 
