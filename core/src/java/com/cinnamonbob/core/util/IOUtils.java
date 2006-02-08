@@ -50,6 +50,23 @@ public class IOUtils
         }
     }
 
+    public static void write(Properties properties, File dest) throws IOException
+    {
+        write(properties, new FileOutputStream(dest));
+    }
+
+    public static void write(Properties properties, OutputStream out) throws IOException
+    {
+        try
+        {
+            properties.store(out, "");
+        }
+        finally
+        {
+            IOUtils.close(out);
+        }
+    }
+
     public static void close(InputStream i)
     {
         try

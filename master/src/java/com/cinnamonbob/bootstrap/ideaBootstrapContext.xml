@@ -30,7 +30,8 @@
     <bean id="configurationManager" class="com.cinnamonbob.bootstrap.DefaultConfigurationManager" init-method="init">
         <property name="defaultProperties">
             <props>
-                <prop key="name">value</prop>
+                <prop key="admin.port">8081</prop>
+                <prop key="webapp.port">8080</prop>
             </props>
         </property>
         <property name="applicationPaths">

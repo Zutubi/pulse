@@ -1,30 +1,28 @@
-package com.cinnamonbob.bootstrap;
-
-import java.util.Properties;
+package com.cinnamonbob.bootstrap.config;
 
 /**
  * <class-comment/>
  */
 public class ReadOnlyConfiguration implements Configuration
 {
-    private final Properties props;
+    private Configuration delegate;
 
-    public ReadOnlyConfiguration(Properties props)
+    public ReadOnlyConfiguration(Configuration delegate)
     {
-        this.props = props;
+        this.delegate = delegate;
     }
 
     public String getProperty(String key)
     {
-        return props.getProperty(key);
+        return delegate.getProperty(key);
     }
 
     public boolean hasProperty(String key)
     {
-        return props.getProperty(key) != null;
+        return delegate.hasProperty(key);
     }
 
-    public void resetDefaults()
+    public void removeProperty(String key)
     {
         throw new UnsupportedOperationException();
     }
