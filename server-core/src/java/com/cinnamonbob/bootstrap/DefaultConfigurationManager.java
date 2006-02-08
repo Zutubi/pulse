@@ -7,7 +7,7 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * 
+ * The Configuration manager is the central location for retrieving system Configurations.
  *
  */
 public class DefaultConfigurationManager implements ConfigurationManager
@@ -138,7 +138,8 @@ public class DefaultConfigurationManager implements ConfigurationManager
     {
         if (defaultConfig == null)
         {
-            defaultConfig = new ReadOnlyConfiguration(new PropertiesConfiguration(defaultProperties));
+            File defaultsFile = new File(paths.getConfigRoot(), DEFAULTS_FILENAME);
+            defaultConfig = new ReadOnlyConfiguration(new FileConfiguration(defaultsFile));
         }
         return defaultConfig;
     }
