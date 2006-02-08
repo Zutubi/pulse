@@ -62,4 +62,4 @@ if [ ! -x "$JAVACMD" ] ; then
   exit 1
 fi
 
-exec "$JAVACMD" -classpath "$CLASSPATH" -Dbob.home="$BOB_HOME" -Djava.awt.headless=true $@
+exec "$JAVACMD" -classpath "$CLASSPATH" -Dbob.install="$BOB_HOME" -Djava.awt.headless=true $@

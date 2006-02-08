@@ -44,7 +44,7 @@ set LOCALCLASSPATH=%CLASSPATH%
 for %%i in ("%BOB_HOME%\lib\*.jar") do call "%BOB_HOME%\bin\lcp.bat" %%i
 set LOCALCLASSPATH=%LOCALCLASSPATH%;"%BOB_HOME%\lib\validators.xml"
 
-%_EXECCMD% %BOB_OPTS% -classpath "%LOCALCLASSPATH%" -Dbob.home="$BOB_HOME" -Djava.awt.headless=true %*
+%_EXECCMD% %BOB_OPTS% -classpath "%LOCALCLASSPATH%" -Dbob.install="$BOB_HOME" -Djava.awt.headless=true %*
 
 rem if "%1" == "start" goto end
 rem if errorlevel 1 pause
