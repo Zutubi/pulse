@@ -1,25 +1,26 @@
+#projectTags($wizard.project)
 <html>
 <head>
-    <title>create trigger</title>
+    <title>#wwtext("name=add.trigger")</title>
 </head>
-<content tag="action">trigger.create</content>
 <body>
+    <h1>:: #wwtext("name=add.trigger") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='addTrigger.action'" "method='post'")
+#wwcform("action=addTrigger.action" "heading=%{getText('trigger.cron.step')}" "method=post")
+    #wwhidden("name=state")
 
-    <h3>step 2: create cron trigger</h3>
-    <fieldset>
-        #tag (TextField "name='name'" "required='true'" "tabindex='1'")
-        #tag (Select "list=specs" "name='spec'" "required='true'" "tabindex='2'")
-        #tag (TextField "name='cron'" "label=getText('trigger.cron')" "tabindex='3'")
-    </fieldset>
-    <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='4'")
-        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='5'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='6'")
-    </fieldset>
+    #wwtextfield("name=name" "label=%{getText('trigger.name')}" "required=true" "tabindex=1")
+    #wwselect("name=spec" "label=%{getText('trigger.spec')}" "list=specs" "tabindex=2")
+    #wwtextfield("name=cron" "label=%{getText('trigger.cron.string')}" "required=true" "tabindex=3")
+    #inlineHelp("trigger.cron.string.help")
+
+    #openSubmit()
+        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=4")
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=5")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=5")
+     #closeSubmit()
 #end
 </body>
 </html>

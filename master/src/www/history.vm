@@ -1,0 +1,38 @@
+#projectTags($project)
+<html>
+<head>
+    <title>$!webwork.htmlEncode($project.name)</title>
+</head>
+<body>
+    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+
+    #projectTabs("history")
+
+#if($history.size() > 0)
+    <table class="content">
+        #actionHeadingRow("recent.builds" 7 "search.builds" "searchBuilds.action?projectId=$project.id" "zoom.gif")
+        <tr>
+            #contentHeading("build.id" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
+            #contentHeading("actions" 2)
+        </tr>
+        #foreach($buildResult in $history)
+            #set($cssClass = $buildResult.state.string)
+        <tr>
+            <td class="content"><a href="viewBuild.action?id=$project.id&amp;buildId=$buildResult.id">$buildResult.number</a></td>
+            #statusCell($buildResult)
+            #classCell($buildResult.stamps.prettyStartTime)
+            #classCell($buildResult.stamps.prettyElapsed)
+            #viewCell($project $buildResult)
+            #changesCell($project $buildResult)
+        </tr>
+        #end
+    </table>
+#else
+    <p>
+        #wwtext("name=no.history")
+    </p>
+#end
+</html>

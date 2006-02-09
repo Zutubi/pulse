@@ -1,25 +1,23 @@
+#projectTags($wizard.project)
 <html>
 <head>
-    <title>create trigger</title>
+    <title>#wwtext("name=add.trigger")</title>
 </head>
-<content tag="action">trigger.create</content>
 <body>
+    <h1>:: #wwtext("name=add.trigger") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
 
-#bodytag (Form "action='addTrigger.action'" "method='post'")
-    #tag (Hidden "name='wizard.project'")
+#wwcform("action=addTrigger.action" "heading=%{getText('trigger.type.step')}" "method=post")
+    #wwhidden("name=state")
+    #wwhidden("name=wizard.projectId")
 
-    <h3>create trigger: step 1</h3>
-    <fieldset>
-        #tag (Select "list=types" "name='type'" "label='trigger.type'" "tabindex='1'")
-    </fieldset>
+    #wwselect("name=type" "label=%{getText('trigger.type')}" "list=types" "tabindex=1")
 
-    <fieldset class="submit">
-        #tag (Submit "value=getText('next.name')" "name='next'" "tabindex='2'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='2'")
-    </fieldset>
- #end
-
+    #openSubmit()
+        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=2")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=3")
+    #closeSubmit()
+#end
 </body>
 </html>

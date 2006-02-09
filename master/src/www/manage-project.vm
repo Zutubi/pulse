@@ -148,13 +148,17 @@
                             #deleteCell("deleteTrigger.action?id=$trigger.id")
                         </tr>
 #end
-                        #addRow("trigger.add" 5 "addTrigger.action?project=$project.id")
+                        #addRow("trigger.add" 5 "addTrigger.action?projectId=$project.id")
                     </table>
                 </td>
             </tr>
         </table>
     #closeTab()
 
-    #selectTab("current-build")
+    #if(!$tab)
+        #set($tab = "current-build")
+    #end
+
+    #selectTab($tab)
 
 </html>

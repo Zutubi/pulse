@@ -1,5 +1,6 @@
 package com.cinnamonbob.web.project;
 
+import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.model.BuildManager;
 import com.cinnamonbob.model.ProjectManager;
 import com.cinnamonbob.model.ScmManager;
@@ -55,5 +56,15 @@ public class ProjectActionSupport extends ActionSupport
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
+    }
+
+    public Feature.Level getErrorLevel()
+    {
+        return Feature.Level.ERROR;
+    }
+
+    public Feature.Level getWarningLevel()
+    {
+        return Feature.Level.WARNING;
     }
 }

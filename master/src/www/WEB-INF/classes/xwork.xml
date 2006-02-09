@@ -105,7 +105,7 @@
         </action>
 
         <action name="triggerBuild" class="com.cinnamonbob.web.project.TriggerBuildAction">
-            <result name="success" type="redirect">manageProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">currentBuild.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
@@ -228,7 +228,7 @@
         <action name="createProject" class="com.cinnamonbob.web.project.CreateProjectAction">
             <result name="input" type="velocity">create-project.vm</result>
             <result name="cancel" type="velocity">undefined.vm</result>
-            <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${id}</result>
         </action>
 
         <action name="findProjects!default" class="com.cinnamonbob.web.ActionSupport">
@@ -244,42 +244,24 @@
         <action name="editProject" class="com.cinnamonbob.web.project.EditProjectAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-project.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${id}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${id}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${id}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${id}</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="manageProject" class="com.cinnamonbob.web.project.ManageProjectAction">
-            <result name="success" type="velocity">manage-project.vm</result>
+        <action name="currentBuild" class="com.cinnamonbob.web.project.CurrentBuildAction">
+            <result name="success" type="velocity">current-build.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="createScm!default" class="com.cinnamonbob.web.project.CreateScmAction" method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">create-scm.vm</result>
+        <action name="history" class="com.cinnamonbob.web.project.HistoryAction">
+            <result name="success" type="velocity">history.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="createScm" class="com.cinnamonbob.web.project.CreateScmAction">
-            <result name="input" type="velocity">create-scm.vm</result>
-            <result name="success" type="velocity">create-scm-${type}.vm</result>
-        </action>
-
-        <action name="createP4" class="com.cinnamonbob.web.project.CreateP4Action">
-            <result name="input" type="velocity">create-scm-p4.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${project}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${project}</result>
-        </action>
-
-        <action name="createSvn" class="com.cinnamonbob.web.project.CreateSvnAction">
-            <result name="input" type="velocity">create-scm-svn.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${project}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${project}</result>
-        </action>
-
-        <action name="createCvs" class="com.cinnamonbob.web.project.CreateCvsAction">
-            <result name="input" type="velocity">create-scm-cvs.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${project}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${project}</result>
+        <action name="configureProject" class="com.cinnamonbob.web.project.ConfigureProjectAction">
+            <result name="success" type="velocity">configure-project.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="editScm" class="com.cinnamonbob.web.project.EditScmAction">
@@ -298,8 +280,8 @@
         <action name="editSvn" class="com.cinnamonbob.web.project.EditSvnAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-scm-svn.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
@@ -311,8 +293,8 @@
         <action name="editCvs" class="com.cinnamonbob.web.project.EditCvsAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-scm-cvs.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
@@ -324,8 +306,8 @@
         <action name="editP4" class="com.cinnamonbob.web.project.EditP4Action">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-scm-p4.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
         <action name="editBobFileDetails" class="com.cinnamonbob.web.project.EditBobFileDetailsAction">
@@ -345,8 +327,8 @@
         <action name="editCustomDetails" class="com.cinnamonbob.web.project.EditCustomDetailsAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-details-custom.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
@@ -358,8 +340,8 @@
         <action name="editAntDetails" class="com.cinnamonbob.web.project.EditAntDetailsAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-details-ant.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
@@ -372,8 +354,10 @@
         <action name="editMavenDetails" class="com.cinnamonbob.web.project.EditMavenDetailsAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-details-maven.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>
-            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="cancel" type="redirect">
+                /configureProject.action?id=${projectId}&amp;tab=configuration</result>
+            <result name="success" type="redirect">
+                /configureProject.action?id=${projectId}}&amp;tab=configuration</result>
         </action>
 
         <action name="addProject" class="com.cinnamonbob.web.wizard.WizardAction">
@@ -386,7 +370,7 @@
             <result name="custom" type="velocity">addproject-custom.vm</result>
             <result name="maven" type="velocity">addproject-maven.vm</result>
             <result name="ant" type="velocity">addproject-ant.vm</result>
-            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="cancel" type="redirect">/viewProjects.action</result>
         </action>
 
@@ -396,12 +380,12 @@
             <result name="select" type="velocity">select-trigger.vm</result>
             <result name="monitor" type="velocity">configure-monitor-trigger.vm</result>
             <result name="cron" type="velocity">configure-cron-trigger.vm</result>
-            <result name="success" type="redirect">/manageProject.action?id=${project}</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${wizard.project}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
         </action>
 
         <action name="deleteTrigger" class="com.cinnamonbob.web.project.DeleteTriggerAction">
-            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
         <action name="viewTriggers" class="com.cinnamonbob.web.scheduling.ViewTriggersAction">
@@ -486,13 +470,13 @@
 
         <action name="createBuildSpecification" class="com.cinnamonbob.web.project.CreateBuildSpecificationAction">
             <result name="input" type="velocity">create-build-specification.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="error" type="velocity">create-build-specification.vm</result>
             <result name="success" type="redirect">/viewBuildSpecification.action?id=${specification.id}&amp;projectId=${projectId}</result>
         </action>
 
         <action name="deleteBuildSpecification" class="com.cinnamonbob.web.project.DeleteBuildSpecificationAction">
-            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
@@ -518,9 +502,9 @@
 
         <action name="editCleanupPolicy" class="com.cinnamonbob.web.project.EditCleanupPolicyAction">
             <result name="input" type="velocity">edit-cleanup-policy.vm</result>
-            <result name="cancel" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/manageProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
         <action name="shutdownServer" class="com.cinnamonbob.web.ShutdownServerAction">

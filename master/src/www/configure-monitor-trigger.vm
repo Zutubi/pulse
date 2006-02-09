@@ -1,29 +1,24 @@
+#projectTags($wizard.project)
 <html>
 <head>
-    <title>create trigger</title>
+    <title>#wwtext("name=add.trigger")</title>
 </head>
-<content tag="action">trigger.create</content>
 <body>
+    <h1>:: #wwtext("name=add.trigger") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
 
-#if (!$actionErrorDetected)
-  #bodytag (Form "action='addTrigger.action'" "method='post'")
+#wwcform("action=addTrigger.action" "heading=%{getText('trigger.monitor.step')}" "method=post")
+    #wwhidden("name=state")
 
-    <h3>step 2: create scm trigger</h3>
+    #wwtextfield("name=name" "label=%{getText('trigger.name')}" "required=true" "tabindex=1")
+    #wwselect("name=spec" "label=%{getText('trigger.spec')}" "list=specs" "tabindex=2")
 
-    <fieldset>
-        #tag (TextField "name='name'" "required='true'" "tabindex='1'")
-        #tag (Select "list=specs" "name='spec'" "required='true'" "tabindex='2'")
-    </fieldset>
-
-    <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
-        #tag (Submit "value=getText('previous.name')" "name='previous'" "tabindex='4'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
-    </fieldset>
-  #end
+    #openSubmit()
+        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=3")
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=4")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=5")
+     #closeSubmit()
 #end
-
 </body>
 </html>

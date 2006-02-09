@@ -13,7 +13,7 @@
 #macro(tabBar $tabNames)
     <script language="JavaScript" type="text/javascript">
         function Tab(htmlId)
-        {
+       {
             this.elementId = htmlId;
             var selected = false;
             var self = this;
@@ -92,6 +92,35 @@
 ##
 #macro(closeTab)
     </div>
+#end
+
+##
+## Shows a project tab of the given name with the given action name
+##
+#macro(projectTab $name $action $selected)
+        <li>
+            <a
+    #if($selected == $name)
+                class="active"
+    #else
+                href="${action}.action?id=$project.id" class="inactive"
+    #end
+              >
+                #wwtext("name=${name}.tab")
+            </a>
+        </li>
+#end
+
+##
+## Shows the tab bar for project pages with the given tab selected.
+##
+#macro(projectTabs $selected)
+    <ul id="innernav">
+        #projectTab("current-build" "currentBuild" $selected)
+        #projectTab("history" "history" $selected)
+        #projectTab("configuration" "configureProject" $selected)
+    </ul>
+    <span class="hidden">ie workaround</span>
 #end
 
 ##
@@ -211,7 +240,7 @@
 #macro(addRow $key $span $url)
     <tr>
         <td class="add" colspan="$span">
-            <a href="addProject.action"><img alt="add" src="images/add.gif"/> #wwtext("name=$key")</a>
+            <a href="$url"><img alt="add" src="images/add.gif"/> #wwtext("name=$key")</a>
         </td>
     </tr>
 #end

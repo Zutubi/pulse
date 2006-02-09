@@ -1,8 +1,8 @@
 package com.cinnamonbob.web.project;
 
+import com.cinnamonbob.model.BuildSpecification;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.ProjectManager;
-import com.cinnamonbob.model.BuildSpecification;
 import com.cinnamonbob.scheduling.*;
 import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
 import com.cinnamonbob.scm.SCMChangeEvent;
@@ -13,10 +13,10 @@ import com.cinnamonbob.web.wizard.Wizard;
 import com.cinnamonbob.web.wizard.WizardCompleteState;
 import com.opensymphony.util.TextUtils;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.List;
-import java.util.LinkedList;
 
 /**
  * <class-comment/>
@@ -28,7 +28,7 @@ public class AddTriggerWizard extends BaseWizard
 
     private static final Logger LOG = Logger.getLogger(AddTriggerWizard.class);
 
-    private long project;
+    private long projectId;
 
     private ProjectManager projectManager;
     private Scheduler scheduler;
@@ -53,21 +53,26 @@ public class AddTriggerWizard extends BaseWizard
         addState(finalState);
     }
 
-    public long getProject()
+    public long getProjectId()
     {
-        return project;
+        return projectId;
     }
 
-    public void setProject(long project)
+    public void setProjectId(long projectId)
     {
-        this.project = project;
+        this.projectId = projectId;
+    }
+
+    public Project getProject()
+    {
+        return projectManager.getProject(projectId);
     }
 
     public void process()
     {
         // wizard is finished, now we create the appropriate trigger.
 
-        Project project = projectManager.getProject(getProject());
+        Project project = projectManager.getProject(getProjectId());
 
         Trigger trigger = null;
         if (CRON_STATE.equals(selectState.getType()))
@@ -109,7 +114,7 @@ public class AddTriggerWizard extends BaseWizard
     {
         private Map<String, String> types;
 
-        private long project;
+        private long projectId;
 
         private String type;
 
@@ -128,14 +133,14 @@ public class AddTriggerWizard extends BaseWizard
             this.type = type;
         }
 
-        public long getProject()
+        public long getProjectId()
         {
-            return project;
+            return projectId;
         }
 
-        public void setProject(long project)
+        public void setProjectId(long projectId)
         {
-            this.project = project;
+            this.projectId = projectId;
         }
 
         public Map<String, String> getTypes()
@@ -143,7 +148,7 @@ public class AddTriggerWizard extends BaseWizard
             if (types == null)
             {
                 types = new TreeMap<String, String>();
-                types.put(MONITOR_STATE, "monitor scm tigger");
+                types.put(MONITOR_STATE, "monitor scm trigger");
                 types.put(CRON_STATE, "cron trigger");
             }
             return types;
@@ -206,23 +211,23 @@ public class AddTriggerWizard extends BaseWizard
         @Override
         public void initialise()
         {
-            long projectId = ((AddTriggerWizard) getWizard()).getProject();
+            long projectId = ((AddTriggerWizard) getWizard()).getProjectId();
             Project project = projectManager.getProject(projectId);
-            if(project == null)
+            if (project == null)
             {
-                addActionError("Unknown project '" + projectId + "'");
+                addActionError("Unknown projectId '" + projectId + "'");
                 return;
             }
 
             specs = new LinkedList<String>();
-            for(BuildSpecification spec: project.getBuildSpecifications())
+            for (BuildSpecification spec : project.getBuildSpecifications())
             {
                 specs.add(spec.getName());
             }
 
-            if(specs.size() == 0)
+            if (specs.size() == 0)
             {
-                addActionError("No build specifications for project '" + project.getName() + "'");
+                addActionError("No build specifications for projectId '" + project.getName() + "'");
             }
         }
 
