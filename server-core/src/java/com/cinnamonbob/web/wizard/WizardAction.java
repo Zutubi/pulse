@@ -2,11 +2,11 @@ package com.cinnamonbob.web.wizard;
 
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.web.ActionSupport;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.TextProviderSupport;
+import com.opensymphony.xwork.ActionSupport;
 import com.opensymphony.xwork.util.OgnlValueStack;
 
 import java.util.Map;
@@ -29,15 +29,44 @@ import java.util.ResourceBundle;
 public class WizardAction extends ActionSupport
 {
     private static final Logger LOG = Logger.getLogger(WizardAction.class);
+
+    /**
+     * The type of wizard that will be driving the interaction. This also becomes the
+     * key with which the wizard is stored in the session.
+     */
     private String wizardClass;
+
+    /**
+     * Local wizard instance, taken from the current session.
+     */
     private Wizard wizard;
 
+    /**
+     * This is set to something if the user has selected the cancel action.
+     */
     private String cancel;
+
+    /**
+     * This is set to something if the user has selected the next action.
+     */
     private String next;
+
+    /**
+     * This is set to something if the user has selected the previous action.
+     */
     private String previous;
 
+    /**
+     * Local text provider, used in to retrieve the i18n text based on the wizard class,
+     * not this action class.
+     */
     private transient TextProvider textProvider = null;
 
+    /**
+     * Set the wizard class.
+     *
+     * @param wizardClass is a fully qualified class name.
+     */
     public void setWizardClass(String wizardClass)
     {
         this.wizardClass = wizardClass;
@@ -58,23 +87,17 @@ public class WizardAction extends ActionSupport
         this.next = next;
     }
 
-    public boolean isCancelled()
-    {
-        // Wizards manage cancelling their own way
-        return false;
-    }
-
-    public boolean isWizardCancelled()
+    public boolean isCancelSelected()
     {
         return TextUtils.stringSet(cancel);
     }
 
-    private boolean isPrevious()
+    public boolean isPreviousSelected()
     {
         return TextUtils.stringSet(previous);
     }
 
-    private boolean isNext()
+    public boolean isNextSelected()
     {
         return TextUtils.stringSet(next);
     }
@@ -85,66 +108,129 @@ public class WizardAction extends ActionSupport
         {
             addActionError("Please specify a wizard class parameter in the xwork.xml action mapping.");
         }
+
+        // pass the validate request on to the wizard.
+
+        // Now, if there is a validation failure, we will need to return to the current state. This
+        // will need to be handled by which ever method (execute() doInput() doDefault() has been
+        // called). We dont want to add  these errors to the wizard instance since WW will then
+        // return the INPUT result.
+        if (isNextSelected())
+        {
+            // only want to be validating when we are moving forward.
+            getWizard().validate();
+        }
+    }
+
+    public String doInput()
+    {
+        try
+        {
+            // always return to the current state.
+            return getCurrentStateName();
+        }
+        catch (RuntimeException e)
+        {
+            handleException(e);
+            return ERROR;
+        }
+    }
+
+    public String doPrevious()
+    {
+        try
+        {
+            // always return to the previous state.
+            return wizard.traverseBackward();
+        }
+        catch (RuntimeException e)
+        {
+            handleException(e);
+            return ERROR;
+        }
+    }
+
+    public String doNext()
+    {
+        try
+        {
+            // always attempt to move to the next state.
+            if (getCurrentState().hasErrors())
+            {
+                return getCurrentStateName();
+            }
+            String nextState = wizard.traverseForward();
+            if (wizard.isComplete())
+            {
+                removeWizard();
+            }
+            return nextState;
+        }
+        catch (RuntimeException e)
+        {
+            handleException(e);
+            return ERROR;
+        }
+    }
+
+    public String doCancel()
+    {
+        try
+        {
+            // clean out session.
+            getWizard().cancel();
+            removeWizard();
+            return "cancel";
+        }
+        catch (RuntimeException e)
+        {
+            handleException(e);
+            return ERROR;
+        }
     }
 
     public String execute()
     {
         try
         {
-            return processRequest();
+            if (isCancelSelected())
+            {
+                return doCancel();
+            }
+
+            if (isPreviousSelected())
+            {
+                return doPrevious();
+            }
+
+            if (isNextSelected())
+            {
+                return doNext();
+            }
+
+            // no post has been made, so default to the current state.
+            return getCurrentStateName();
         }
         catch (RuntimeException e)
         {
-            LOG.severe(e);
-            addActionError("Unexpected exception: " + e.getClass().getName() + ", " + e.getMessage());
-
-            // remove the wizard from the session so that we can start fresh
-            removeWizard();
-            return "error";
+            handleException(e);
+            return ERROR;
         }
-    }
-
-    private String processRequest()
-    {
-        Map session = ActionContext.getContext().getSession();
-        Wizard wizard = getWizard();
-
-        // if state == current wizard state, then all is well.
-
-        // else we need to locate that state and use it, or restart the wizard because
-        // something crap has happened..
-
-        if (isWizardCancelled())
-        {
-            // clean out session.
-            wizard.cancel();
-            removeWizard();
-            return "cancel";
-        }
-
-        if (isPrevious())
-        {
-            return wizard.traverseBackward();
-        }
-
-        if (isNext())
-        {
-            String nextState = wizard.traverseForward();
-            if (wizard.isComplete())
-            {
-                session.remove(wizardClass);
-            }
-            return nextState;
-        }
-
-        // return current state.
-        return wizard.getCurrentState().getStateName();
     }
 
     private void removeWizard()
     {
         Map session = ActionContext.getContext().getSession();
         session.remove(wizardClass);
+    }
+
+    private void handleException(RuntimeException e)
+    {
+        LOG.error(e.getMessage(), e);
+        addActionError("Unexpected exception: " + e.getClass().getName() + ", " + e.getMessage());
+
+        // remove the wizard from the session so that we can start fresh
+        removeWizard();
     }
 
     public Wizard getWizard()
@@ -163,8 +249,6 @@ public class WizardAction extends ActionSupport
                 Wizard wizardInstance = (Wizard) Class.forName(wizardClass).newInstance();
                 ComponentContext.autowire(wizardInstance);
                 wizardInstance.initialise();
-
-                // small fudge to cleanly handle the first time we run this wizard.
                 session.put(wizardClass, wizardInstance);
             }
             wizard = (Wizard) session.get(wizardClass);
@@ -184,14 +268,25 @@ public class WizardAction extends ActionSupport
         return getWizard().getCurrentState();
     }
 
-    public String getState()
+    public String getCurrentStateName()
     {
-        return getCurrentState().getStateName();
+        return getWizard().getCurrentState().getStateName();
     }
 
-    // override the text provider to handle the wizard class for lookups.
-    // lazy load the textProvider so that we have the wizards class available.
+    /**
+     * Shortcut for the current state name, makes it easier to add a state hidden field to
+     * the wizard forms.
+     *
+     * NOTE: DO NOT CHANGE THIS METHOD SIGNATURE, YOU WILL BREAK ALL OF THE EXISTING WIZARDS.
+     */
+    public String getState()
+    {
+        return getCurrentStateName();
+    }
 
+    /**
+     * Override the text provider to use the wizard class for lookups.
+     */
     private TextProvider getTextProvider()
     {
         if (textProvider == null)
@@ -223,5 +318,10 @@ public class WizardAction extends ActionSupport
 
     public String getText(String key, String defaultValue, List args, OgnlValueStack stack) {
         return getTextProvider().getText(key,defaultValue,args,stack);
+    }
+
+    public void clearErrors()
+    {
+        getCurrentState().clearErrors();
     }
 }

@@ -1,7 +1,6 @@
 package com.cinnamonbob.web.wizard;
 
 import com.cinnamonbob.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
 import com.opensymphony.xwork.validator.DefaultActionValidatorManager;
 import com.opensymphony.xwork.validator.ValidationException;
@@ -15,44 +14,102 @@ import java.util.Stack;
  */
 public class BaseWizard implements Wizard
 {
+    /**
+     * The wizard state history. States on this stack have been previously traversed by
+     * the user.
+     */
     private Stack<WizardState> history = new Stack<WizardState>();
 
+    /**
+     * Logger.
+     */
     private static final Logger LOG = Logger.getLogger(BaseWizard.class);
 
+    /**
+     * The initial state of the wizard.
+     */
     protected WizardState initialState;
 
+    /**
+     * The current state of the wizard.
+     */
     private WizardState currentState;
 
+    /**
+     * The final state of the wizard.
+     */
+    protected WizardState finalState;
+
+    /**
+     * A mapping of all the wizards states and their names.
+     */
     private Map<String, WizardState> states = new HashMap<String, WizardState>();
+
+    /**
+     * An instance of the validation manager used by this wizard instance to handle wizard state
+     * validation.
+     */
     private DefaultActionValidatorManager validationManager = new DefaultActionValidatorManager();
 
+    /**
+     * Required no-arg constructor. A no-arg constructor should be created by subclasses
+     * initialise the wizard states.
+     */
     public BaseWizard()
     {
 
     }
 
+    /**
+     * Retrieve the wizards current state.
+     *
+     */
     public WizardState getCurrentState()
     {
         return currentState;
     }
 
-    public WizardState getState(String state)
+    /**
+     * Retrieve the named state.
+     *
+     * @param name
+     */
+    public WizardState getState(String name)
     {
-        return states.get(state);
+        return states.get(name);
     }
 
     public void addState(WizardState state)
     {
-        if (!TextUtils.stringSet(state.getStateName()))
-        {
-            throw new IllegalArgumentException();
-        }
-        states.put(state.getStateName(), state);
+        addState(state.getStateName(), state);
     }
 
+    public void addState(String name, WizardState state)
+    {
+        states.put(name, state);
+    }
+
+    public void addInitialState(String name, WizardState state)
+    {
+        initialState = state;
+        states.put(name, state);
+    }
+
+    public void addFinalState(String name, WizardState state)
+    {
+        finalState = state;
+        states.put(name, state);
+    }
+
+    /**
+     * The wizard is complete if we have reached the final state.
+     *
+     * @return true if the wizard is complete and requires no more interaction, false
+     * otherwise.
+     */
     public boolean isComplete()
     {
-        return currentState instanceof WizardCompleteState;
+        return currentState == finalState;
     }
 
     /**
@@ -77,7 +134,16 @@ public class BaseWizard implements Wizard
         currentState.initialise();
     }
 
-    public boolean goTo(String requestedState)
+    /**
+     * Go back to the requested state. If this state is located in the wizards history,
+     * the it is set as the current state. If it is not located, no change is made.
+     *
+     * @param requestedState
+     *
+     * @return true if the wizard has been rewound to the requested state, false if no change
+     * has occured..
+     */
+    public boolean goBackTo(String requestedState)
     {
         if (getState(requestedState) == null)
         {
@@ -88,16 +154,17 @@ public class BaseWizard implements Wizard
             return true;
         }
 
+        WizardState state;
         while (history.size() > 0)
         {
-            currentState = history.pop();
+            state = history.pop();
 
-            if (currentState.getStateName().equals(requestedState))
+            if (state.getStateName().equals(requestedState))
             {
+                currentState = state;
                 return true;
             }
         }
-
         return false;
     }
 
@@ -108,10 +175,9 @@ public class BaseWizard implements Wizard
      */
     public String traverseForward()
     {
-        validate(currentState);
+        // we can not progress to the next state until validation is successful.
         if (currentState.hasErrors())
         {
-            // we can not progress to the next state until validation is successful.
             return currentState.getStateName();
         }
 
@@ -127,9 +193,12 @@ public class BaseWizard implements Wizard
             return currentState.getStateName();
         }
 
+        // move on to the next state.
         currentState = getState(nextState);
+
         currentState.clearErrors();
         currentState.initialise();
+
         return currentState.getStateName();
     }
 
@@ -157,29 +226,27 @@ public class BaseWizard implements Wizard
     }
 
     /**
-     * Validate the specified wizard state, using Xworks validation framework.
+     * Validate the current wizard state, using Xworks validation framework.
      *
-     * @param state
      */
-    private void validate(WizardState state)
+    public void validate()
     {
-        //  states persist between requests, so first clear errors from any previous attempts
-        // at validation to ensure a clean validation check.
-        state.clearErrors();
-        assert !state.hasErrors();
+        // Since this state persists over multiple requests, we need to ensure that
+        // we reset its error state before starting the validation.
+        currentState.clearErrors();
+        assert !currentState.hasErrors();
 
         try
         {
-            validationManager.validate(state, state.getClass().getName());
-            if (Validateable.class.isAssignableFrom(state.getClass()))
+            validationManager.validate(currentState, currentState.getClass().getName());
+            if (Validateable.class.isAssignableFrom(currentState.getClass()))
             {
-                ((Validateable) state).validate();
+                ((Validateable) currentState).validate();
             }
         }
         catch (ValidationException e)
         {
-            state.addActionError("ValidationException: " + e.getMessage());
-            LOG.error(e);
+            currentState.addActionError(e.getMessage());
         }
     }
 

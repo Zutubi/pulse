@@ -43,7 +43,7 @@
     #end
             </tr>
 #end
-            #addRow("add.project" 8 "addProject.action")
+            #addRow("add.project" 8 "addProject!input.action")
         </table>
     </body>
 </html>

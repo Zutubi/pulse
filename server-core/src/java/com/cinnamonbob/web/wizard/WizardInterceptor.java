@@ -42,16 +42,21 @@ public class WizardInterceptor implements Interceptor
         if (action instanceof WizardAction)
         {
             WizardAction wizardAction = (WizardAction) action;
+
+            // reset validation.
+            wizardAction.clearErrors();
+
             OgnlValueStack stack = invocation.getStack();
 
             // if an action has been requested, then we need to ensure that the state for which the action was
             // requests matches the state of the wizard. If the user has used the browser back button for example,
             // the wizard state will be out of sync.
+            // NOTE: we need to go directly to the parameters here since the wizard will not have been through
+            //       the params interceptor.
             final Map parameters = ActionContext.getContext().getParameters();
             boolean actionRequested = parameters.containsKey("next") ||
                     parameters.containsKey("previous") ||
                     parameters.containsKey("cancel");
-
 
             if (actionRequested)
             {
@@ -61,16 +66,11 @@ public class WizardInterceptor implements Interceptor
                 String expectedState = wizardAction.getCurrentState().getStateName();
                 if (!expectedState.equals(actualState))
                 {
-                    if (!wizardAction.getWizard().goTo(actualState))
+                    if (!wizardAction.getWizard().goBackTo(actualState))
                     {
                         shortCircuit = wizardAction.getWizard().restart();
                     }
                 }
-            }
-            else
-            {
-                // else if no action was requested, then just show the current state again.
-                shortCircuit = wizardAction.getWizard().getCurrentState().getStateName();
             }
 
             // add the necessary components to the stack so that the rest of the interceptors

@@ -16,7 +16,7 @@ public interface WizardState extends ValidationAware
 
     /**
      * Initialise this state. This method is called when a state is about to be
-     * displaed.
+     * displayed.
      */
     void initialise();
 

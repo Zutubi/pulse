@@ -13,7 +13,7 @@ public class CvsRootValidator extends FieldValidatorSupport
     public void validate(Object object) throws ValidationException
     {
         Object obj = getFieldValue(getFieldName(), object);
-        if (obj == null)
+        if (obj == null || !(obj instanceof String))
         {
             addFieldError(getFieldName(), getMessageKey());
         }

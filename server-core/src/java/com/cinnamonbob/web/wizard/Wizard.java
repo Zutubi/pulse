@@ -1,10 +1,12 @@
 package com.cinnamonbob.web.wizard;
 
+import com.opensymphony.xwork.Validateable;
+
 /**
  * 
  *
  */
-public interface Wizard
+public interface Wizard extends Validateable
 {
     /**
      * Retrieve the current state of the wizard.
@@ -60,7 +62,7 @@ public interface Wizard
      *
      * @param actualState
      */
-    boolean goTo(String actualState);
+    boolean goBackTo(String actualState);
 
     String restart();
 }
