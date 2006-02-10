@@ -8,15 +8,15 @@ import org.netbeans.lib.cvsclient.CVSRoot;
  *
  *
  */
-public class
-        CvsRootValidator extends FieldValidatorSupport
+public class CvsRootValidator extends FieldValidatorSupport
 {
     public void validate(Object object) throws ValidationException
     {
         Object obj = getFieldValue(getFieldName(), object);
         if (obj == null || !(obj instanceof String))
         {
-            addFieldError(getFieldName(), getMessageKey());
+            addFieldError(getFieldName(), "A string value is required.");
+            return;
         }
         try
         {
@@ -24,7 +24,7 @@ public class
         }
         catch (IllegalArgumentException iae)
         {
-            addFieldError(getFieldName(), iae.getMessage());
+            addFieldError(getFieldName(), "Illegal argument: " + iae.getMessage());
         }
     }
 }
