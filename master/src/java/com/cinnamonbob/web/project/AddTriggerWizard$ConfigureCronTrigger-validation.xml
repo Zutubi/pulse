@@ -12,8 +12,11 @@
         </field-validator>
     </field>
     <field name="cron">
+        <field-validator type="requiredstring">
+            <message>cron expression is required</message>
+        </field-validator>
         <field-validator type="cronexpression">
-            <message>please specify a valid cron expression.</message>
+            <message>${message}</message>
         </field-validator>
     </field>
 </validators>

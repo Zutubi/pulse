@@ -1,11 +1,9 @@
 package com.cinnamonbob.xwork.validator.validators;
 
-import com.opensymphony.xwork.validator.validators.FieldValidatorSupport;
 import com.opensymphony.xwork.validator.ValidationException;
-
-import java.text.ParseException;
-
+import com.opensymphony.xwork.validator.validators.FieldValidatorSupport;
 import org.quartz.CronTrigger;
+import org.quartz.impl.calendar.BaseCalendar;
 
 /**
  * <class-comment/>
@@ -16,21 +14,22 @@ public class CronExpressionValidator extends FieldValidatorSupport
     public void validate(Object object) throws ValidationException
     {
         Object obj = getFieldValue(getFieldName(), object);
-        if (obj == null)
+        if (obj != null && obj instanceof String)
         {
-            addFieldError(getFieldName(), "Field can not be null.");
-        }
-        try
-        {
-            new CronTrigger("triggerName", null, (String)obj);
-        }
-        catch (ParseException e)
-        {
-            addFieldError(getFieldName(), e.getMessage());
-        }
-        catch (IllegalArgumentException e)
-        {
-            addFieldError(getFieldName(), e.getMessage());
+            String expression = (String) obj;
+
+            if (expression.length() > 0)
+            {
+                try
+                {
+                    new CronTrigger("triggerName", null, expression).computeFirstFireTime(new BaseCalendar());
+                }
+                catch (Exception e)
+                {
+                    setDefaultMessage(e.getMessage());
+                    addFieldError(getFieldName(), object);
+                }
+            }
         }
     }
 }

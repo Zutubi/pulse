@@ -31,21 +31,17 @@ public class CurrentBuildAction extends ProjectActionSupport
         return currentBuild;
     }
 
-
-    public void validate()
-    {
-        project = getProjectManager().getProject(id);
-        if (project == null)
-        {
-            addActionError("Unknown project [" + id + "]");
-        }
-    }
-
     public String execute()
     {
+        project = getProjectManager().getProject(id);
         if (project != null)
         {
             currentBuild = getBuildManager().getLatestBuildResult(project);
+        }
+        else
+        {
+            addActionError("Unknown project [" + id + "]");
+            return ERROR;
         }
 
         return SUCCESS;

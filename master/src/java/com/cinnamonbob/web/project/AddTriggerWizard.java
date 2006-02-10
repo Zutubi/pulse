@@ -114,8 +114,6 @@ public class AddTriggerWizard extends BaseWizard
     {
         private Map<String, String> types;
 
-        private long projectId;
-
         private String type;
 
         public SelectTriggerType(Wizard wizard, String name)
@@ -131,16 +129,6 @@ public class AddTriggerWizard extends BaseWizard
         public void setType(String type)
         {
             this.type = type;
-        }
-
-        public long getProjectId()
-        {
-            return projectId;
-        }
-
-        public void setProjectId(long projectId)
-        {
-            this.projectId = projectId;
         }
 
         public Map<String, String> getTypes()

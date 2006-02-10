@@ -1,14 +1,15 @@
 package com.cinnamonbob.xwork.validator.validators;
 
-import com.opensymphony.xwork.validator.validators.FieldValidatorSupport;
 import com.opensymphony.xwork.validator.ValidationException;
+import com.opensymphony.xwork.validator.validators.FieldValidatorSupport;
 import org.netbeans.lib.cvsclient.CVSRoot;
 
 /**
  *
  *
  */
-public class CvsRootValidator extends FieldValidatorSupport
+public class
+        CvsRootValidator extends FieldValidatorSupport
 {
     public void validate(Object object) throws ValidationException
     {
@@ -19,7 +20,7 @@ public class CvsRootValidator extends FieldValidatorSupport
         }
         try
         {
-            CVSRoot.parse((String)obj);
+            CVSRoot.parse((String) obj);
         }
         catch (IllegalArgumentException iae)
         {
