@@ -17,7 +17,7 @@
       <div id="header">
         <table>
             <tr>
-              <td class="logo">:: cinnabo :: #if($projectId) <a href="/currentBuild.action?id=${projectId}">$projectName</a> #end</td>
+              <td class="logo">:: cinnabo :: #if($projectId && $projectId != 0) <a href="/currentBuild.action?id=${projectId}">$projectName</a> #end</td>
               #if($user) <td align="right" class="user">$user.login [ <a href="/logout.action">logout</a> ]</td> #end
             </tr>
         </table>

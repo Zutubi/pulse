@@ -33,17 +33,15 @@ public class ConfigureProjectAction extends ProjectActionSupport
         return triggers;
     }
 
-    public void validate()
+    public String execute()
     {
         project = getProjectManager().getProject(id);
         if (project == null)
         {
             addActionError("Unknown project '" + id + "'");
+            return ERROR;
         }
-    }
 
-    public String execute()
-    {
         triggers = getScheduler().getTriggers(id);
         return SUCCESS;
     }

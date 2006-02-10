@@ -33,22 +33,16 @@ public class HistoryAction extends ProjectActionSupport
         return history;
     }
 
-    public void validate()
+    public String execute()
     {
         project = getProjectManager().getProject(id);
         if (project == null)
         {
             addActionError("Unknown project [" + id + "]");
-        }
-    }
-
-    public String execute()
-    {
-        if (project != null)
-        {
-            history = getBuildManager().getLatestBuildResultsForProject(project, 10);
+            return ERROR;
         }
 
+        history = getBuildManager().getLatestBuildResultsForProject(project, 10);
         return SUCCESS;
     }
 }

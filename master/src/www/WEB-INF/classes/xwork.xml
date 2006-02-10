@@ -251,17 +251,17 @@
 
         <action name="currentBuild" class="com.cinnamonbob.web.project.CurrentBuildAction">
             <result name="success" type="velocity">current-build.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="error" type="redirect">viewProjects.action</result>
         </action>
 
         <action name="history" class="com.cinnamonbob.web.project.HistoryAction">
             <result name="success" type="velocity">history.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="error" type="redirect">viewProjects.action</result>
         </action>
 
         <action name="configureProject" class="com.cinnamonbob.web.project.ConfigureProjectAction">
             <result name="success" type="velocity">configure-project.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="error" type="redirect">viewProjects.action</result>
         </action>
 
         <action name="editScm" class="com.cinnamonbob.web.project.EditScmAction">
