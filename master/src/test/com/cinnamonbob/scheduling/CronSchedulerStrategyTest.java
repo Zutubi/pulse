@@ -2,6 +2,7 @@ package com.cinnamonbob.scheduling;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import com.cinnamonbob.scheduling.quartz.TriggerAdapter;
 
 /**
  * <class-comment/>
@@ -90,33 +91,5 @@ public class CronSchedulerStrategyTest extends BaseSchedulerStrategyTest
         // during the course of this test case since we are 'manually' handling the triggering
         // via the activateTrigger method.
         return new CronTrigger("0 0 12 ? * WED", "default");
-    }
-}
-
-class TriggerAdapter implements TriggerListener
-{
-    public String getName()
-    {
-        return "TriggerAdapter";
-    }
-
-    public void triggerComplete(org.quartz.Trigger trigger, JobExecutionContext context, int triggerInstructionCode)
-    {
-
-    }
-
-    public void triggerFired(org.quartz.Trigger trigger, JobExecutionContext context)
-    {
-
-    }
-
-    public void triggerMisfired(org.quartz.Trigger trigger)
-    {
-
-    }
-
-    public boolean vetoJobExecution(org.quartz.Trigger trigger, JobExecutionContext context)
-    {
-        return false;
     }
 }
