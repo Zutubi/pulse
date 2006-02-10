@@ -172,7 +172,7 @@
 ## which should be escaped
 ##
 #macro(dynamicHeading $content)
-    <th class="content">$!webwork.htmlEncode($content)</th>
+    <th class="content-row">$!webwork.htmlEncode($content)</th>
 #end
 
 ##
@@ -188,7 +188,7 @@
 ##
 #macro(dynamicRow $key $value)
     <tr>
-        #contentHeading($key 1)
+        <th class="content-row" #if($span > 1) colspan="$span" #end>#wwtext("name=$key")</th>
         #dynamicCell($value)
     </tr>
 #end

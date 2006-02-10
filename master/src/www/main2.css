@@ -197,12 +197,14 @@ table {
 
 hr {
     display: none;
-} /*------------------------------
+}
+
+    /*------------------------------
     Content
     */
 
 #main {
-float : left;
+    float: left;
     width: 66%;
     margin-left: 10px;
     margin-right: 10px;
@@ -236,12 +238,12 @@ table.fill-content {
     width: 100%;
 }
 
-h3.heading, div.box, th.heading, th.content, td.content, td.success, td.failure, td.error, td.inprogress, td.add {
+h3.heading, div.box, th.heading, th.content, th.content-row, td.content, td.success, td.failure, td.error, td.inprogress, td.add {
     border: 1px solid #bbb;
     padding: 4px;
 }
 
-th.heading, th.content, td.content, td.success, td.failure, td.error, td.inprogress, td.add {
+th.heading, th.content, th.content-row, td.content, td.success, td.failure, td.error, td.inprogress, td.add {
     text-align: left;
     vertical-align: top;
 }
@@ -249,6 +251,11 @@ th.heading, th.content, td.content, td.success, td.failure, td.error, td.inprogr
 a img {
     color: #fff;
     border: 0;
+}
+
+th.content-row {
+    width: 1%;
+    white-space: nowrap;
 }
 
 h3.heading, th.heading {
