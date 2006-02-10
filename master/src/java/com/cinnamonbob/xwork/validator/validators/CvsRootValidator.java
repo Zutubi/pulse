@@ -24,7 +24,8 @@ public class CvsRootValidator extends FieldValidatorSupport
         }
         catch (IllegalArgumentException iae)
         {
-            addFieldError(getFieldName(), "Illegal argument: " + iae.getMessage());
+            setDefaultMessage(iae.getMessage());
+            addFieldError(getFieldName(), object);
         }
     }
 }

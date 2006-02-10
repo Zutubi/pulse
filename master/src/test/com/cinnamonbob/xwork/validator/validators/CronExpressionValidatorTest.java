@@ -5,9 +5,10 @@ import com.opensymphony.xwork.validator.FieldValidator;
 /**
  * <class-comment/>
  */
-public class CvsRootValidatorTest extends BaseFieldValidatorTest
+public class CronExpressionValidatorTest extends BaseFieldValidatorTest
 {
-    public CvsRootValidatorTest(String testName)
+
+    public CronExpressionValidatorTest(String testName)
     {
         super(testName);
     }
@@ -15,39 +16,29 @@ public class CvsRootValidatorTest extends BaseFieldValidatorTest
     public void setUp() throws Exception
     {
         super.setUp();
+
     }
 
     public void tearDown() throws Exception
     {
+
         super.tearDown();
     }
 
     protected FieldValidator createValidator()
     {
-        return new CvsRootValidator();
+        return new CronExpressionValidator();
     }
 
     public void testEmptyString() throws Exception
     {
         validator.validate(new FieldProvider(""));
-        assertTrue(validationAware.hasErrors());
+        assertFalse(validationAware.hasErrors());
     }
 
     public void testNull() throws Exception
     {
-        validator.validate(new FieldProvider(null));
-        assertTrue(validationAware.hasErrors());
-    }
-
-    public void testLocalRoot() throws Exception
-    {
-        validator.validate(new FieldProvider("/local"));
-        assertFalse(validationAware.hasErrors());
-    }
-
-    public void testPSever() throws Exception
-    {
-        validator.validate(new FieldProvider(":pserver:blah@somehost.com:/path/to/root"));
+        validator.validate(new FieldProvider(""));
         assertFalse(validationAware.hasErrors());
     }
 }
