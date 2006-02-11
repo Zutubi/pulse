@@ -5,3 +5,11 @@ function setEnableState(id, checkboxId)
     element = document.getElementById(id);
     element.disabled = !document.getElementById(checkboxId).checked;
 }
+
+function confirmUrl(message, url)
+{
+    if (confirm(message))
+    {
+        location.href = url;
+    }
+}

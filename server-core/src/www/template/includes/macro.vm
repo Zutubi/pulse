@@ -223,8 +223,11 @@
 ##
 ## Outputs a delete cell for a content table
 ##
-#macro(deleteCell $url)
-    #actionCell("delete" $url "delete.gif")
+#macro(deleteCell $message $url)
+    <td class="content">
+        <a href="#" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="images/delete.gif"/>#wwtext("name=delete")</a>
+    </td>
+##    #actionCell("delete" $url "delete.gif")
 #end
 
 ##

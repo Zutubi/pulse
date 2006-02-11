@@ -3,17 +3,18 @@ package com.cinnamonbob;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.core.Bootstrapper;
 import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.core.util.TreeNode;
+import com.cinnamonbob.events.AsynchronousDelegatingListener;
+import com.cinnamonbob.events.Event;
+import com.cinnamonbob.events.EventListener;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.events.build.BuildCommencedEvent;
 import com.cinnamonbob.events.build.BuildCompletedEvent;
 import com.cinnamonbob.events.build.BuildTerminationRequestEvent;
 import com.cinnamonbob.events.build.RecipeEvent;
-import com.cinnamonbob.events.AsynchronousDelegatingListener;
-import com.cinnamonbob.events.*;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
@@ -168,7 +169,7 @@ public class BuildController implements EventListener
             }
             else if (evt instanceof BuildTerminationRequestEvent)
             {
-                handleBuildTerminationRequest();
+                handleBuildTerminationRequest((BuildTerminationRequestEvent) evt);
             }
             else
             {
@@ -213,14 +214,21 @@ public class BuildController implements EventListener
         initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
     }
 
-    private void handleBuildTerminationRequest()
+    private void handleBuildTerminationRequest(BuildTerminationRequestEvent event)
     {
         for (TreeNode<RecipeController> controllerNode : executingControllers)
         {
-            controllerNode.getData().terminateRecipe();
+            controllerNode.getData().terminateRecipe(event.isTimeout());
         }
 
-        buildResult.error("Build forcefully terminated");
+        if (event.isTimeout())
+        {
+            buildResult.error("Build timed out");
+        }
+        else
+        {
+            buildResult.error("Build forcefully terminated");
+        }
         completeBuild();
     }
 

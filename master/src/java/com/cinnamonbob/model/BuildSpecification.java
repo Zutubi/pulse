@@ -8,7 +8,10 @@ import com.cinnamonbob.core.model.Entity;
  */
 public class BuildSpecification extends Entity
 {
+    public static final int TIMEOUT_NEVER = 0;
+
     private String name;
+    private int timeout = TIMEOUT_NEVER;
     private BuildSpecificationNode root = new BuildSpecificationNode(null);
 
     public BuildSpecification()
@@ -29,6 +32,28 @@ public class BuildSpecification extends Entity
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public int getTimeout()
+    {
+        return timeout;
+    }
+
+    public String getPrettyTimeout()
+    {
+        if (timeout == TIMEOUT_NEVER)
+        {
+            return "[never]";
+        }
+        else
+        {
+            return timeout + " minutes";
+        }
+    }
+
+    public void setTimeout(int timeout)
+    {
+        this.timeout = timeout;
     }
 
     public BuildSpecificationNode getRoot()

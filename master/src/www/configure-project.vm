@@ -44,16 +44,17 @@
                         #contentHeading("actions" 3)
                     </tr>
 #foreach($buildSpec in $project.buildSpecifications)
+    #set($confirmMessage = $action.getText("buildspec.confirm.delete", [$buildSpec.name]))
                     <tr>
                         #dynamicCell($buildSpec.name)
                         #dynamicCell($buildSpec.root.children.get(0).stage.recipeSafe)
-                        #dynamicCell("<TODO>")
+                        #dynamicCell($buildSpec.prettyTimeout)
                         #actionCell("buildspec.trigger" "triggerBuild.action?id=$buildSpec.id&amp;projectId=$project.id" "lightning.gif")
-                        #editCell("viewBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id")
-                        #deleteCell("deleteBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id")
+                        #editCell("editBuildSpecification!input.action?projectId=$project.id&amp;id=$buildSpec.id")
+                        #deleteCell($confirmMessage "deleteBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id")
                     </tr>
 #end
-                    #addRow("buildspec.add" 6 "createBuildSpecification!default.action?projectId=$project.id")
+                    #addRow("buildspec.add" 6 "createBuildSpecification!input.action?projectId=$project.id")
                 </table>
                 <table class="fill-content">
                     #headingRow("project.triggers" 5)
@@ -64,12 +65,13 @@
                         #contentHeading("actions" 2)
                     </tr>
 #foreach($trigger in $triggers)
+    #set($confirmMessage = $action.getText("trigger.confirm.delete", [$trigger.name]))
                     <tr>
                         #dynamicCell($trigger.name)
                         #dynamicCell($trigger.type)
                         #dynamicCell($trigger.dataMap.spec)
                         #editCell("editTrigger.action?id=$trigger.id")
-                        #deleteCell("deleteTrigger.action?id=$trigger.id")
+                        #deleteCell($confirmMessage "deleteTrigger.action?id=$trigger.id")
                     </tr>
 #end
                     #addRow("trigger.add" 5 "addTrigger.action?projectId=$project.id")

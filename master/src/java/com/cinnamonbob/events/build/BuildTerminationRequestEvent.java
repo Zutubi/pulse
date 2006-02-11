@@ -7,8 +7,16 @@ import com.cinnamonbob.events.Event;
  */
 public class BuildTerminationRequestEvent extends Event
 {
-    public BuildTerminationRequestEvent(Object source)
+    boolean timeout;
+
+    public BuildTerminationRequestEvent(Object source, boolean timeout)
     {
         super(source);
+        this.timeout = timeout;
+    }
+
+    public boolean isTimeout()
+    {
+        return timeout;
     }
 }

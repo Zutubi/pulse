@@ -10,6 +10,8 @@
 
         <property name="name" column="NAME" type="string" length="255"/>
 
+        <property name="timeout" column="TIMEOUT" type="int"/>
+
         <many-to-one name="root" class="com.cinnamonbob.model.BuildSpecificationNode"
                      column="ROOT_ID" cascade="all" lazy="false"/>
 

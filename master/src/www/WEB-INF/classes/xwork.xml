@@ -462,17 +462,18 @@
             <result name="success" type="redirect">/serverStatus.action</result>
         </action>
 
-        <action name="createBuildSpecification!default"
-                class="com.cinnamonbob.web.project.CreateBuildSpecificationAction" method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">create-build-specification.vm</result>
-        </action>
-
         <action name="createBuildSpecification" class="com.cinnamonbob.web.project.CreateBuildSpecificationAction">
             <result name="input" type="velocity">create-build-specification.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="error" type="velocity">create-build-specification.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specification.id}&amp;projectId=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="editBuildSpecification" class="com.cinnamonbob.web.project.EditBuildSpecificationAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-build-specification.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
         <action name="deleteBuildSpecification" class="com.cinnamonbob.web.project.DeleteBuildSpecificationAction">
