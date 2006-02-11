@@ -51,6 +51,12 @@ public class AntBobFileDetailsTest extends BobTestCase
         createAndVerify("environment");
     }
 
+    public void testExplicitTargets() throws IOException
+    {
+        details.setTargets("build test");
+        createAndVerify("explicitTargets");
+    }
+
     private void createAndVerify(String expectedName) throws IOException
     {
         InputStream expectedStream = getInput(expectedName);

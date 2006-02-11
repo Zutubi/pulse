@@ -38,6 +38,7 @@ public class BobFileLoader
         fileLoader.register("post-processor", PostProcessorGroup.class);
         fileLoader.register("command", CommandGroup.class);
         fileLoader.register("regex", RegexPostProcessor.class);
+        fileLoader.register("ant", AntCommand.class);
         fileLoader.register("executable", ExecutableCommand.class);
         fileLoader.register("resource", ResourceReference.class);
 

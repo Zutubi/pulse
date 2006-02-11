@@ -119,6 +119,11 @@ public class ExecutableCommand implements Command
         return Arrays.asList("output");
     }
 
+    public String getExe()
+    {
+        return exe;
+    }
+
     public void setExe(String exe)
     {
         this.exe = exe;
@@ -142,6 +147,15 @@ public class ExecutableCommand implements Command
         Arg arg = new Arg();
         args.add(arg);
         return arg;
+    }
+
+    protected void addArguments(String ...arguments)
+    {
+        for (String arg : arguments)
+        {
+            Arg argument = new Arg(arg);
+            args.add(argument);
+        }
     }
 
     public Environment createEnvironment()
@@ -227,7 +241,6 @@ public class ExecutableCommand implements Command
     }
 
     /**
-     * 
      */
     public class Environment
     {

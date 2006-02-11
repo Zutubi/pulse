@@ -1,6 +1,7 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.Property;
+import com.cinnamonbob.core.util.SystemUtils;
 import com.cinnamonbob.test.BobTestCase;
 
 import java.util.LinkedList;
@@ -43,6 +44,7 @@ public class FileLoaderTest extends BobTestCase
         loader.register("command", CommandGroup.class);
         loader.register("regex", RegexPostProcessor.class);
         loader.register("executable", ExecutableCommand.class);
+        loader.register("ant", AntCommand.class);
         loader.register("dependency", Dependency.class);
     }
 
@@ -240,4 +242,39 @@ public class FileLoaderTest extends BobTestCase
         CommandGroup.ProcessArtifactMapping mapping = command.getMappings().get(0);
         assertEquals(mapping.getArtifact(), command.getCommand().getArtifactNames().get(0));
     }
+
+    private AntCommand antCommandHelper(int commandIndex) throws Exception
+    {
+        BobFile bf = new BobFile();
+        loader.load(getInput("testAntCommand"), bf);
+
+        List<Recipe> recipes = bf.getRecipes();
+        assertEquals(recipes.size(), 1);
+
+        Recipe recipe = recipes.get(0);
+        List<Command> commands = recipe.getCommands();
+        assertTrue(commands.get(commandIndex) instanceof AntCommand);
+
+        return (AntCommand) commands.get(commandIndex);
+    }
+
+    public void testAntCommandDefaults() throws Exception
+    {
+        AntCommand command = antCommandHelper(0);
+        assertEquals(SystemUtils.isWindows() ? "ant.bat" : "ant", command.getExe());
+        assertNull(command.getTargets());
+    }
+
+    public void testAntCommandCustomExe() throws Exception
+    {
+        AntCommand command = antCommandHelper(1);
+        assertEquals("myant", command.getExe());
+    }
+
+    public void testAntCommandTargets() throws Exception
+    {
+        AntCommand command = antCommandHelper(2);
+        assertEquals("build test", command.getTargets());
+    }
+
 }

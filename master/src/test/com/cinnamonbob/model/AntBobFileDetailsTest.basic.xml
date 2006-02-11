@@ -3,8 +3,9 @@
     <recipe name="ant build">
         <resource name="ant"/>
         <command name="build">
-            <executable exe="${ant.bin}" working-dir="${work.dir}">
-            </executable>
+            <ant exe="${ant.bin}" working-dir="${work.dir}"
+                    >
+            </ant>
         </command>
     </recipe>
 </project>

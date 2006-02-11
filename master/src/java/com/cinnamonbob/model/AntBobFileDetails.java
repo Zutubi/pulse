@@ -45,7 +45,7 @@ public class AntBobFileDetails extends TemplateBobFileDetails
 
         if (targets != null)
         {
-            context.put("targets", targets.split(" "));
+            context.put("targets", targets);
         }
 
         context.put("environment", environment);

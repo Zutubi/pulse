@@ -3,10 +3,11 @@
     <recipe name="ant build">
         <resource name="ant"/>
         <command name="build">
-            <executable exe="${ant.bin}" working-dir="${work.dir}">
+            <ant exe="${ant.bin}" working-dir="${work.dir}"
+                    >
                 <environment name="var" value="value"/>
                 <environment name="var2" value="value2"/>
-            </executable>
+            </ant>
         </command>
     </recipe>
 </project>

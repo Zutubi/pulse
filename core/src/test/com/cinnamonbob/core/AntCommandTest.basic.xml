@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Test" default="build">
+    <target name="build">
+        <echo message="build target"/>
+    </target>
+
+    <target name="test">
+        <echo message="test target"/>
+    </target>
+
+    <target name="environment">
+        <property environment="env"/>
+        <echo message="${env.TEST_ENV_VAR}"/>
+    </target>
+</project>
