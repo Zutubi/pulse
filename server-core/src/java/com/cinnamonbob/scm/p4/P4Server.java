@@ -355,7 +355,12 @@ public class P4Server implements SCMServer
 
         setEnv(ENV_PORT, port);
         setEnv(ENV_USER, user);
-        setEnv(ENV_PASSWORD, password);
+
+        if (password != null)
+        {
+            setEnv(ENV_PASSWORD, password);
+        }
+
         setEnv(ENV_CLIENT, client);
     }
 

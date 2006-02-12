@@ -2,14 +2,18 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildSpecificationNodeDao;
+import com.cinnamonbob.scheduling.EventTrigger;
+import com.cinnamonbob.scheduling.Scheduler;
+import com.cinnamonbob.scheduling.SchedulingException;
+import com.cinnamonbob.scheduling.Trigger;
+import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
+import com.cinnamonbob.scm.SCMChangeEvent;
+import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.web.wizard.BaseWizard;
 import com.cinnamonbob.web.wizard.BaseWizardState;
 import com.cinnamonbob.web.wizard.Wizard;
 import com.cinnamonbob.web.wizard.WizardCompleteState;
-import com.cinnamonbob.scheduling.*;
-import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
-import com.cinnamonbob.scm.SCMChangeEvent;
-import com.cinnamonbob.util.logging.Logger;
+import com.opensymphony.util.TextUtils;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -282,6 +286,15 @@ public class AddProjectWizard extends BaseWizard
         {
             return ((AddProjectWizard) getWizard()).projectDetails.getType();
         }
+
+        public void execute()
+        {
+            if (!TextUtils.stringSet(cvs.getPath()))
+            {
+                cvs.setPath(null);
+            }
+
+        }
     }
 
     private class SvnDetails extends BaseWizardState
@@ -301,6 +314,29 @@ public class AddProjectWizard extends BaseWizard
         public String getNextStateName()
         {
             return ((AddProjectWizard) getWizard()).projectDetails.getType();
+        }
+
+        public void execute()
+        {
+            if (!TextUtils.stringSet(svn.getPassword()))
+            {
+                svn.setPassword(null);
+            }
+
+            if (!TextUtils.stringSet(svn.getKeyfile()))
+            {
+                svn.setKeyfile(null);
+            }
+
+            if (!TextUtils.stringSet(svn.getPassphrase()))
+            {
+                svn.setPassphrase(null);
+            }
+
+            if (!TextUtils.stringSet(svn.getPath()))
+            {
+                svn.setPath(null);
+            }
         }
     }
 
@@ -322,11 +358,24 @@ public class AddProjectWizard extends BaseWizard
         {
             return ((AddProjectWizard) getWizard()).projectDetails.getType();
         }
+
+        public void execute()
+        {
+            if (!TextUtils.stringSet(p4.getPassword()))
+            {
+                p4.setPassword(null);
+            }
+
+            if (!TextUtils.stringSet(p4.getPath()))
+            {
+                p4.setPath(null);
+            }
+        }
     }
 
     private class AntDetails extends BaseWizardState
     {
-        private AntBobFileDetails details = new AntBobFileDetails("build.xml", "", null);
+        private AntBobFileDetails details = new AntBobFileDetails("build.xml", null, null);
 
         public AntDetails(Wizard wizard, String name)
         {
@@ -341,6 +390,19 @@ public class AddProjectWizard extends BaseWizard
         public BobFileDetails getDetails()
         {
             return details;
+        }
+
+        public void execute()
+        {
+            if (!TextUtils.stringSet(details.getBuildFile()))
+            {
+                details.setBuildFile(null);
+            }
+
+            if (!TextUtils.stringSet(details.getTargets()))
+            {
+                details.setTargets(null);
+            }
         }
     }
 
@@ -361,6 +423,19 @@ public class AddProjectWizard extends BaseWizard
         public BobFileDetails getDetails()
         {
             return details;
+        }
+
+        public void execute()
+        {
+            if (!TextUtils.stringSet(details.getTargets()))
+            {
+                details.setTargets(null);
+            }
+
+            if (!TextUtils.stringSet(details.getBaseDir()))
+            {
+                details.setBaseDir(null);
+            }
         }
     }
 
