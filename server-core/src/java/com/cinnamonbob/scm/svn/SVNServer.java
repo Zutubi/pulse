@@ -311,7 +311,15 @@ public class SVNServer implements SCMServer
 
     public boolean hasChangedSince(Revision since) throws SCMException
     {
-        return getLatestRevision().getRevisionNumber() != ((NumericalRevision) since).getRevisionNumber();
+        NumericalRevision latestRevision = getLatestRevision();
+        if (latestRevision.getRevisionNumber() != ((NumericalRevision) since).getRevisionNumber())
+        {
+            return getChanges(since, latestRevision, "").size() > 0;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public NumericalRevision getLatestRevision() throws SCMException
