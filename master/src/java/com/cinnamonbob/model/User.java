@@ -11,11 +11,29 @@ import java.util.List;
  */
 public class User extends Entity
 {
+    /**
+     * The login name is used to identify this user.
+     */
     private String login;
+
+    /**
+     * The name of the user is the users full name.
+     */
     private String name;
 
-//    private Map<String, ContactPoint> contactPoints = new HashMap<String, ContactPoint>();
+    /**
+     * Indicates whether or not the user is enabled. Only enabled users can
+     * log in to the system.
+     */
+    private boolean enabled;
+
+    /**
+     * The users password.
+     */
+    private String password;
+
     private List<ContactPoint> contactPoints;
+    private List<GrantedAuthority> authorities;
 
     public User()
     {
@@ -45,6 +63,26 @@ public class User extends Entity
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
+    }
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public void setPassword(String password)
+    {
+        this.password = password;
     }
 
     public void add(ContactPoint point)
@@ -111,6 +149,26 @@ public class User extends Entity
             subscriptions.addAll(cp.getSubscriptions());
         }
         return subscriptions;
+    }
+
+    public List<GrantedAuthority> getAuthorities()
+    {
+        if (authorities == null)
+        {
+            authorities = new LinkedList<GrantedAuthority>();
+        }
+        return authorities;
+    }
+
+    private void setAuthorities(List<GrantedAuthority> authorities)
+    {
+        this.authorities = authorities;
+    }
+
+    public void add(GrantedAuthority authority)
+    {
+        getAuthorities().add(authority);
+        authority.setUser(this);
     }
 
 }
