@@ -3,6 +3,7 @@ package com.cinnamonbob.core.model;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.text.DateFormat;
 
 /**
  * A trivial implementation of the Changelist interface.
@@ -38,6 +39,11 @@ public class Changelist extends Entity
     public Date getDate()
     {
         return getRevision().getDate();
+    }
+
+    public String getPrettyDate()
+    {
+        return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(getRevision().getDate());
     }
 
     public String getUser()

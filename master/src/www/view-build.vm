@@ -1,85 +1,12 @@
-#macro(errordetails $result)
-  #if($result.errorMessage)
-    <h2 class="command-element">error details</h2>
-    #set($trace = $result.exceptionTrace)
-    <div class="error">
-    #if($result.errorMessage)
-      <h3>message</h3>
-      <pre>$result.errorMessage</pre>
-    #end
-    #if($trace)
-      <h3>full trace</h3>
-      <pre>$trace</pre>
-    #end
-    </div>
-  #end
-#end
-
+#buildTags($project $result)
 <html>
-  <head>
-    <title>$project.name build $result.number</title>
-    <link href="build.css" rel="stylesheet" type="text/css">
-    <content tag="navProject">$project.id</content>
-    <content tag="navProjectName">$project.name</content>
-  </head>
-  <body>
-    <h1 class="build-log">:: build $result.number ::</h1>
-#classset($result)
+<head>
+    <title>#wwtext("name=build") $result.number</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=build") $result.number ::</h1>
 
-    <h2 class="command-$class">summary</h2>
-    <div class="command-content">
-      <h4>summary</h4>
-      <table>
-        #resultsummary($result)
-      </table>
+    #buildTabs($result "summary")
 
-      #buildMessageSummary($result $result.getLevel("ERROR"))
-
-      #buildMessageSummary($result $result.getLevel("WARNING"))      
-    </div>
-
-      <h2 class="command-info">changes</h2>
-      <div class="command-content">
-        #set($scmDetails = $result.scmDetails)
-        #if($scmDetails.revision)
-          <table>
-            <tr>
-              <th class="command-detail" colspan="4">
-                checked out revision $scmDetails.revision
-              </th>
-            </tr>
-          #set($changes = $scmDetails.changelists)
-          #if($changes.size() > 0)
-            <tr>
-              <th class="command-detail">revision</th>
-              <th class="command-detail">who</th>
-              <th class="command-detail">when</th>
-              <th class="command-detail">comment</th>
-            </tr>
-            #foreach($change in $changes)
-            <tr>
-              <td class="command-detail"><a href="viewChangelist.action?id=$change.id">$change.revision</a></td>
-              <td class="command-detail">$change.user</td>
-              <td class="command-detail">$change.date</td>
-              <td class="command-detail">$change.comment</td>
-            </tr>
-            #end
-          #else
-            <tr>
-              <td class="command-detail" colspan="4">
-                no changes since last build
-              </td>
-            </tr>
-          #end
-          </table>
-	    #end
-	  </div>
-
-    #classset($result)
-    <h2 class="command-$class">recipe results</h2>
-    <div class="command-content">
-      #showrecipes($result.root true $id)
-    </div>
-
-  </body>
+    #showBuild($result false)
 </html>

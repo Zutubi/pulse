@@ -25,4 +25,14 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     {
         return SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
+
+    public String trimmedString(String s, int length)
+    {
+        if(s.length() > length)
+        {
+            return s.substring(0, length - 3) + "...";
+        }
+
+        return s;
+    }
 }

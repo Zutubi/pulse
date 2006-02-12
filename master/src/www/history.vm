@@ -22,7 +22,7 @@
         #foreach($buildResult in $history)
             #set($cssClass = $buildResult.state.string)
         <tr>
-            <td class="content"><a href="viewBuild.action?id=$project.id&amp;buildId=$buildResult.id">$buildResult.number</a></td>
+            <td class="content"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
             #statusCell($buildResult)
             #classCell($buildResult.buildSpecification.name)
             #classCell($buildResult.stamps.prettyStartTime)

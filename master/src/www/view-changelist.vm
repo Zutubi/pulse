@@ -1,37 +1,32 @@
+#buildTags($buildResult.project $buildResult)
 <html>
-  <head>
-    <title>view changelist</title>
-    <link href="build.css" rel="stylesheet" type="text/css">
-  </head>
-  <body>
-    <h1 class="build-log">:: changelist revision $changelist.revision ::</h1>
+<head>
+    <title>#wwtext("name=changelist") $changelist.revision</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=changelist") $changelist.revision ::</h1>
 
-    <h2 class="command-info">brief</h2>
-    <div class="command-content">
-    <table>
-      #detailrow("revision" $changelist.revision)
-      #detailrow("who" $changelist.user)
-      #detailrow("when" $changelist.date)
-      #detailrow("comment" $changelist.comment)
+    <table class="content">
+        #headingRow("changelist.details" 2)
+        #dynamicRow("changelist.revision" $changelist.revision)
+        #dynamicRow("changelist.who" $changelist.user)
+        #dynamicRow("changelist.when" $changelist.prettyDate)
+#set($comment = $!webwork.htmlEncode($changelist.comment))
+        #dynamicRow("changelist.comment" $comment)
     </table>
-    </div>
-
-    <h2 class="command-info">files changed</h2>
-    <div class="command-content">
-      <table>
+    <table class="content">
+        #headingRow("changelist.files" 3)
         <tr>
-          <th class="command-detail">file</th>
-          <th class="command-detail">revision</th>
-          <th class="command-detail">action</th>
+            #contentHeading("changelist.file" 1)
+            #contentHeading("changelist.revision" 1)
+            #contentHeading("changelist.action" 1)
         </tr>
-        #foreach($file in $changelist.changes)
-          <tr>
-            <td class="command-detail"><span class="filename">$file.filename</span></td>
-            <td class="command-detail">$file.revision</td>
-            <td class="command-detail">$file.action</td>
-          </tr>
-        #end
-      </table>
-    </div>
-  </body>
+#foreach($file in $changelist.changes)
+        <tr>
+            #dynamicCell($file.filename)
+            #dynamicCell($file.revision)
+            #dynamicCell($file.action)
+        </tr>
+#end
+    </table>
 </html>

@@ -2,6 +2,8 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.model.persistence.ChangelistDao;
+import com.cinnamonbob.model.persistence.BuildResultDao;
+import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.web.ActionSupport;
 
 /**
@@ -9,8 +11,11 @@ import com.cinnamonbob.web.ActionSupport;
 public class ViewChangelistAction extends ActionSupport
 {
     private long id;
+    private long buildId;
     private Changelist changelist;
     private ChangelistDao changelistDao;
+    private BuildResultDao buildResultDao;
+    private BuildResult buildResult;
 
     public long getId()
     {
@@ -20,6 +25,21 @@ public class ViewChangelistAction extends ActionSupport
     public void setId(long id)
     {
         this.id = id;
+    }
+
+    public long getBuildId()
+    {
+        return buildId;
+    }
+
+    public void setBuildId(long buildId)
+    {
+        this.buildId = buildId;
+    }
+
+    public BuildResult getBuildResult()
+    {
+        return buildResult;
     }
 
     public Changelist getChangelist()
@@ -43,7 +63,8 @@ public class ViewChangelistAction extends ActionSupport
 
     public String execute()
     {
-        // TODO dodgy walking of tree: read up on hibernate eager/lazy loading!
+        buildResult = buildResultDao.findById(buildId);
+        // TODO dodgy walking of tree: hibernate eager/lazy loading!
         changelist.getRevision();
         changelist.getChanges();
         return SUCCESS;
@@ -52,5 +73,10 @@ public class ViewChangelistAction extends ActionSupport
     public void setChangelistDao(ChangelistDao changelistDao)
     {
         this.changelistDao = changelistDao;
+    }
+
+    public void setBuildResultDao(BuildResultDao buildResultDao)
+    {
+        this.buildResultDao = buildResultDao;
     }
 }

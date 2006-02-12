@@ -1,0 +1,67 @@
+#buildTags($project $result)
+<html>
+<head>
+    <title>#wwtext("name=build") $result.number</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=build") $result.number ::</h1>
+
+    #buildTabs($result "changes")
+
+    <table class="content">
+#set($title = "$action.getText('changes') $!webwork.htmlEncode($result.buildSpecification.name)")
+        #headingRow($title 5)
+#set($scmDetails = $result.scmDetails)
+#if($scmDetails.revision)
+        <tr>
+            <td class="content" colspan="5">#wwtext("name=changes.checkedout") $scmDetails.revision</td>
+        </tr>
+#end
+#set($changes = $scmDetails.changelists)
+#if($changes.size() > 0)
+    #foreach($change in $changes)
+        <tr>
+            #contentHeading("change.revision" 1)
+            #contentHeading("change.who" 1)
+            #contentHeading("change.when" 1)
+            #contentHeading("change.comment" 1)
+            #contentHeading("actions" 1)
+        </tr>
+        <tr>
+            #dynamicCell($change.revision)
+            #dynamicCell($change.user)
+            #dynamicCell($change.prettyDate)
+            #dynamicCell($action.trimmedString($change.comment, 60))
+            #linkCell("view" "viewChangelist.action?id=$change.id&amp;buildId=$result.id")
+        </tr>
+        #if($change.changes.size() > 0)
+        <tr>
+            <td class="content" colspan="5">
+                <b>#wwtext("name=changes.files")</b>
+                <ul>
+            #if($change.changes.size() < 5)
+                #set($limit = $change.changes.size() - 1)
+                #set($remaining = 0)
+            #else
+                #set($limit = 4)
+                #set($remaining = $change.changes.size() - 5)
+            #end
+            #foreach($i in [0..$limit])
+                #set($file = $change.changes.get($i))
+                    <li>$!webwork.htmlEncode($file.filename) #$file.revision - $file.action</li>
+            #end
+            #if($remaining > 0)
+                    <li>... ($remaining #wwtext("name=changes.more.files"))</li>
+            #end
+                </ul>
+            </td>
+        </tr>
+        #end
+    #end
+#else
+        <tr>
+            <td class="content" colspan="5">#wwtext("name=changes.none")</td>
+        </tr>
+#end
+    </table>
+</html>

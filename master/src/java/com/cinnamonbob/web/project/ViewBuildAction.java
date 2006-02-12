@@ -18,8 +18,6 @@ import java.util.List;
 public class ViewBuildAction extends ProjectActionSupport
 {
     private long id;
-    private long buildId;
-    private Project project;
     private BuildResult result;
     private List<Changelist> changes;
 
@@ -33,19 +31,9 @@ public class ViewBuildAction extends ProjectActionSupport
         this.id = id;
     }
 
-    public long getBuildId()
-    {
-        return buildId;
-    }
-
-    public void setBuildId(long id)
-    {
-        this.buildId = id;
-    }
-
     public Project getProject()
     {
-        return project;
+        return result.getProject();
     }
 
     public BuildResult getResult()
@@ -60,11 +48,13 @@ public class ViewBuildAction extends ProjectActionSupport
 
     public String execute()
     {
-        project = getProjectManager().getProject(id);
-        result = getBuildManager().getBuildResult(buildId);
+        result = getBuildManager().getBuildResult(id);
+        if(result == null)
+        {
+            return ERROR;
+        }
 
         scrapeNode(result.getRoot());
-
         return SUCCESS;
     }
 

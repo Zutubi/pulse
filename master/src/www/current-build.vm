@@ -9,48 +9,7 @@
     #projectTabs("current-build")
 
 #if($currentBuild)
-    <table>
-        <tr><td>
-            <table class="content">
-                #headingRow("build.summary" 8)
-                <tr>
-                    #contentHeading("build.id" 1)
-                    #contentHeading("build.status" 2)
-                    #contentHeading("build.spec" 1)
-                    #contentHeading("build.when" 1)
-                    #contentHeading("build.elapsed" 1)
-                    #contentHeading("actions" 2)
-                </tr>
-                <tr>
-                    #set($cssClass = $currentBuild.state.string)
-                    #contentCell($currentBuild.number)
-                    #statusCell($currentBuild)
-                    #classCell($currentBuild.buildSpecification.name)
-                    #classCell($currentBuild.stamps.prettyStartTime)
-                    #classCell($currentBuild.stamps.prettyElapsed)
-                    #viewCell($project $currentBuild)
-                    #changesCell($project $currentBuild)
-                </tr>
-            </table>
-        </td></tr>
-    #if($currentBuild.hasMessages($errorLevel) || $currentBuild.hasMessages($warningLevel))
-        <tr><td>
-            <table class="content" width="100%">
-                #headingRow("build.features" 1)
-               <tr>
-                   <td class="content">
-                       #buildMessageSummary($currentBuild $errorLevel)
-                       #buildMessageSummary($currentBuild $warningLevel)
-                   </td>
-               </tr>
-            </table>
-        </td></tr>
-    #end
-    </table>
-#*
-            <h4>recipes</h4>
-            #showrecipes($currentBuild.root false $project.id)
-*#
+    #showBuild($currentBuild true)
 #else
     <p>
         #wwtext("name=never.built")

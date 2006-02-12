@@ -7,6 +7,15 @@
 #end
 
 ##
+## Outputs sitemesh content tags for build links on the header bar
+##
+#macro(buildTags $project $buildResult)
+    #projectTags($project)
+    <content tag="buildId">$buildResult.id</content>
+    <content tag="buildNumber">$buildResult.number</content>
+#end
+
+##
 ## Outputs a tab header bar, with the javascript necessary to control the
 ## tab selection.
 ##
@@ -95,32 +104,70 @@
 #end
 
 ##
+## Opens a list of tabs
+##
+#macro(openTabs)
+    <ul id="innernav">
+#end
+
+##
+## Closes a list of tabs
+##
+#macro(closeTabs)
+    </ul>
+    <span class="hidden">ie workaround</span>
+#end
+
+##
+## A single tab
+##
+#macro(tabItem $name $url $selected)
+    <li>
+        <a
+    #if($selected == $name)
+            class="active"
+    #else
+            href="$url" class="inactive"
+    #end
+          >
+            #wwtext("name=${name}.tab")
+        </a>
+    </li>
+#end
+
+##
 ## Shows a project tab of the given name with the given action name
 ##
 #macro(projectTab $name $action $selected)
-        <li>
-            <a
-    #if($selected == $name)
-                class="active"
-    #else
-                href="${action}.action?id=$project.id" class="inactive"
-    #end
-              >
-                #wwtext("name=${name}.tab")
-            </a>
-        </li>
+    #tabItem($name "${action}.action?id=$project.id" $selected)
 #end
 
 ##
 ## Shows the tab bar for project pages with the given tab selected.
 ##
 #macro(projectTabs $selected)
-    <ul id="innernav">
+    #openTabs()
         #projectTab("current-build" "currentBuild" $selected)
         #projectTab("history" "history" $selected)
         #projectTab("configuration" "configureProject" $selected)
-    </ul>
-    <span class="hidden">ie workaround</span>
+    #closeTabs()
+#end
+
+##
+## Shows a build tab of the given name with the given action name
+##
+#macro(buildTab $result $name $action $selected)
+    #tabItem($name "${action}.action?id=$result.id" $selected)
+#end
+
+##
+## Shows the tab bar for build pages with the given tab selected.
+##
+#macro(buildTabs $result $selected)
+    #openTabs()
+        #buildTab($result "summary" "viewBuild" $selected)
+        #buildTab($result "changes" "viewChanges" $selected)
+    #closeTabs()
 #end
 
 ##
@@ -214,6 +261,15 @@
 #end
 
 ##
+## Outputs a link cell for a content table
+##
+#macro(linkCell $key $url)
+    <td class="content">
+        <a href="$url">#wwtext("name=$key")</a>
+    </td>
+#end
+
+##
 ## Outputs an edit cell for a content table
 ##
 #macro(editCell $url)
@@ -273,7 +329,7 @@
 ##
 #macro(viewCell $project $result)
     <td class="content">
-        <a href="viewBuild.action?id=$project.id&buildId=$result.id">#wwtext("name=view")</a>
+        <a href="viewBuild.action?id=$result.id">#wwtext("name=view")</a>
     </td>
 #end
 
@@ -282,7 +338,7 @@
 ##
 #macro(changesCell $project $result)
     <td class="content">
-        <a href="viewChanges.action?id=$project.id&buildId=$result.id">#wwtext("name=changes")</a>
+        <a href="viewChanges.action?id=$result.id">#wwtext("name=changes")</a>
     </td>
 #end
 
@@ -406,6 +462,91 @@
     <td class="build-$class">$result.stamps.prettyElapsed</td>
     <td class="build-$class">$result.state.prettyString</td>
   <tr>
+#end
+
+##
+## Shows a summary for a recipe result
+##
+#macro(recipeSummary $resultNode $project)
+    <table class="content">
+        #headingRow("recipe" 8)
+        <tr>
+            #contentHeading("recipe.name" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
+            #contentHeading("actions" 1)
+        </tr>
+        <tr>
+            #set($result = $resultNode.result)
+            #set($cssClass = $result.state.string)
+            #contentCell($result.recipeNameSafe)
+            #statusCell($result)
+            #classCell($result.stamps.prettyStartTime)
+            #classCell($result.stamps.prettyElapsed)
+            #linkCell("view" "viewRecipe.action?id=$resultNode.id&amp;projectId=$project.id")
+        </tr>
+    </table>
+#end
+
+##
+## Shows the main build result view (shared with project current build)
+##
+#macro(showBuild $buildResult $showActions)
+    <table>
+        <tr><td>
+            <table class="content">
+                #headingRow("build.summary" 8)
+                <tr>
+                    #contentHeading("build.id" 1)
+                    #contentHeading("build.status" 2)
+                    #contentHeading("build.spec" 1)
+                    #contentHeading("build.when" 1)
+                    #contentHeading("build.elapsed" 1)
+    #if($showActions)
+                    #contentHeading("actions" 2)
+    #end
+                </tr>
+                <tr>
+                    #set($cssClass = $buildResult.state.string)
+                    #contentCell($buildResult.number)
+                    #statusCell($buildResult)
+                    #classCell($buildResult.buildSpecification.name)
+                    #classCell($buildResult.stamps.prettyStartTime)
+                    #classCell($buildResult.stamps.prettyElapsed)
+    #if($showActions)
+                    #viewCell($project $buildResult)
+                    #changesCell($project $buildResult)
+    #end
+                </tr>
+            </table>
+        </td></tr>
+    #if($buildResult.hasMessages($errorLevel) || $buildResult.hasMessages($warningLevel))
+        <tr><td>
+            <table class="content" width="100%">
+                #headingRow("build.features" 1)
+               <tr>
+                   <td class="content">
+                       #buildMessageSummary($buildResult $errorLevel)
+                       #buildMessageSummary($buildResult $warningLevel)
+                   </td>
+               </tr>
+            </table>
+        </td></tr>
+    #end
+        <tr><td>
+##            <table class="content" width="100%">
+##                #headingRow("recipe" 1)
+##                <tr>
+##                    <td class="content">
+    #if($buildResult.root.children.size() > 0)
+                          #recipeSummary($buildResult.root.children.get(0) $project)
+    #end
+##                    </td>
+##                </tr>
+##            </table>
+        </td></tr>
+    </table>
 #end
 
 ##

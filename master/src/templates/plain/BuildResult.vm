@@ -5,4 +5,4 @@ Build $result.number has completed with status '$result.state.prettyString'.
 
 You can view the full build result at:
 
-http://$hostname/viewBuild.action?id=$result.project.id&buildId=$result.id
+http://$hostname/viewBuild.action?id=$result.id

@@ -126,6 +126,18 @@ public class SetupDummyBuilds implements Runnable
         list.addChange(new Change("/home/jsankey/some/normal/file", "11", Change.Action.EDIT));
         list.addChange(new Change("/home/jsankey/some/other/file", "10", Change.Action.EDIT));
         list.addChange(new Change("/home/jsankey/some/branched/file", "1", Change.Action.BRANCH));
+        list.addChange(new Change("/home/jsankey/some/branched/file2", "1", Change.Action.BRANCH));
+        list.addChange(new Change("/home/jsankey/some/branched/file3", "1", Change.Action.BRANCH));
+        list.addChange(new Change("/home/jsankey/some/branched/file4", "1", Change.Action.BRANCH));
+        list.addChange(new Change("/home/jsankey/some/branched/file5", "1", Change.Action.BRANCH));
+        changelists.add(list);
+
+        userRevision = new NumericalRevision(9101);
+        userRevision.setAuthor("jsankey");
+        userRevision.setComment("a very long comment including\nnewlines like that one you just saw dude, not really very friendly at all");
+        userRevision.setDate(new Date(System.currentTimeMillis() - 10000));
+        list = new Changelist(userRevision);
+        list.addChange(new Change("/home/jsankey/some/branched/file/with/a/very/long/filename/to/test/the/display/handling/of/such/things", "1", Change.Action.BRANCH));
         changelists.add(list);
 
         BuildScmDetails scmDetails = new BuildScmDetails(new NumericalRevision(16672), changelists);

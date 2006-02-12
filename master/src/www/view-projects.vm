@@ -32,8 +32,8 @@
                 #classCell($lastResult.number)
                 #classCell($lastResult.buildSpecification.name)
                 #classCell($lastResult.stamps.prettyElapsed)
-                #viewCell($project $id)
-                #changesCell($project $id)
+                #viewCell($project $lastResult)
+                #changesCell($project $lastResult)
     #else
                 #contentCell("empty.cell")
                 #contentCell("not.applicable")

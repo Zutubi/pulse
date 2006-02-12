@@ -175,7 +175,7 @@ public class TimeStamps
         }
         else
         {
-            return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date(time));
+            return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date(time));
         }
     }
 
