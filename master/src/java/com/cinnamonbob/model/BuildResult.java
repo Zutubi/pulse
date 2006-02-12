@@ -11,6 +11,7 @@ import java.util.List;
 public class BuildResult extends Result
 {
     private Project project;
+    private BuildSpecification buildSpecification;
     private long number;
     private BuildScmDetails scmDetails;
     private RecipeResultNode root;
@@ -20,9 +21,10 @@ public class BuildResult extends Result
 
     }
 
-    public BuildResult(Project project, long number)
+    public BuildResult(Project project, BuildSpecification buildSpecification, long number)
     {
         this.project = project;
+        this.buildSpecification = buildSpecification;
         this.number = number;
         state = ResultState.INITIAL;
         root = new RecipeResultNode(null);
@@ -36,6 +38,16 @@ public class BuildResult extends Result
     private void setProject(Project project)
     {
         this.project = project;
+    }
+
+    public BuildSpecification getBuildSpecification()
+    {
+        return buildSpecification;
+    }
+
+    private void setBuildSpecification(BuildSpecification buildSpecification)
+    {
+        this.buildSpecification = buildSpecification;
     }
 
     public long getNumber()

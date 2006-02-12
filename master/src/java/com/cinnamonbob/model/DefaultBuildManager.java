@@ -100,6 +100,11 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findLatestByProject(project, max);
     }
 
+    public List<BuildResult> getLatestCompletedBuildResults(Project project, BuildSpecification spec, int max)
+    {
+        return buildResultDao.findLatestCompleted(project, spec, max);
+    }
+
     public List<BuildResult> getOldestBuildsForProject(Project project, int max)
     {
         return buildResultDao.findOldestByProject(project, max);

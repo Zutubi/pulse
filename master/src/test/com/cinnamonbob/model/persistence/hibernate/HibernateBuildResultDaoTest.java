@@ -2,12 +2,10 @@ package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.core.FileArtifact;
 import com.cinnamonbob.core.model.*;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.BuildScmDetails;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.RecipeResultNode;
+import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 import com.cinnamonbob.model.persistence.ProjectDao;
+import com.cinnamonbob.model.persistence.BuildSpecificationDao;
 
 import java.io.File;
 import java.util.Calendar;
@@ -22,12 +20,14 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 {
     private BuildResultDao buildResultDao;
     private ProjectDao projectDao;
+    private BuildSpecificationDao buildSpecificationDao;
 
     public void setUp() throws Exception
     {
         super.setUp();
         buildResultDao = (BuildResultDao) context.getBean("buildResultDao");
         projectDao = (ProjectDao) context.getBean("projectDao");
+        buildSpecificationDao = (BuildSpecificationDao) context.getBean("buildSpecificationDao");
     }
 
     public void tearDown() throws Exception
@@ -94,7 +94,11 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project project = new Project();
         projectDao.save(project);
 
-        BuildResult buildResult = new BuildResult(project, 11);
+        // Ditto for spec
+        BuildSpecification spec = new BuildSpecification();
+        buildSpecificationDao.save(spec);
+
+        BuildResult buildResult = new BuildResult(project, spec, 11);
         buildResult.commence(new File("/tmp/buildout"));
         buildResult.setScmDetails(scmDetails);
         RecipeResultNode recipeNode = new RecipeResultNode(recipeResult);
@@ -247,7 +251,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildResult result = new BuildResult(p1, 1);
+        BuildResult result = new BuildResult(p1, null, 1);
         buildResultDao.save(result);
 
         commitAndRefreshTransaction();
@@ -261,7 +265,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildResult result = new BuildResult(p1, 1);
+        BuildResult result = new BuildResult(p1, null, 1);
         result.commence(0);
         buildResultDao.save(result);
 
@@ -271,12 +275,115 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(0, oldest.size());
     }
 
+    public void testGetLatestCompletedSimple()
+    {
+        Project p1 = new Project();
+        Project p2 = new Project();
+        projectDao.save(p1);
+        projectDao.save(p2);
+
+        BuildSpecification b1 = new BuildSpecification();
+        BuildSpecification b2 = new BuildSpecification();
+        buildSpecificationDao.save(b1);
+        buildSpecificationDao.save(b2);
+
+        BuildResult r1 = createCompletedBuild(p1, b1, 1);
+        BuildResult r2 = createCompletedBuild(p1, b1, 2);
+        BuildResult r3 = createCompletedBuild(p1, b2, 3);
+        BuildResult r4 = createCompletedBuild(p2, b1, 3);
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+        buildResultDao.save(r4);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1, 10);
+        assertEquals(2, latestCompleted.size());
+        assertPropertyEquals(r2, latestCompleted.get(0));
+        assertPropertyEquals(r1, latestCompleted.get(1));
+    }
+
+    public void testGetLatestCompletedInitial()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildSpecification b1 = new BuildSpecification();
+        buildSpecificationDao.save(b1);
+
+        BuildResult r1 = createCompletedBuild(p1, b1, 1);
+        BuildResult r2 = new BuildResult(p1, b1, 2);
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1, 10);
+        assertEquals(1, latestCompleted.size());
+        assertPropertyEquals(r1, latestCompleted.get(0));
+    }
+
+    public void testGetLatestCompletedInProgress()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildSpecification b1 = new BuildSpecification();
+        buildSpecificationDao.save(b1);
+
+        BuildResult r1 = createCompletedBuild(p1, b1, 1);
+        BuildResult r2 = new BuildResult(p1, b1, 2);
+        r2.commence(new File("test"));
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1, 10);
+        assertEquals(1, latestCompleted.size());
+        assertPropertyEquals(r1, latestCompleted.get(0));
+    }
+
+    public void testGetLatestCompletedMax()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildSpecification b1 = new BuildSpecification();
+        buildSpecificationDao.save(b1);
+
+        BuildResult r1 = createCompletedBuild(p1, b1, 1);
+        BuildResult r2 = createCompletedBuild(p1, b1, 2);
+        BuildResult r3 = createCompletedBuild(p1, b1, 3);
+        BuildResult r4 = createCompletedBuild(p1, b1, 4);
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+        buildResultDao.save(r4);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1, 2);
+        assertEquals(2, latestCompleted.size());
+        assertPropertyEquals(r4, latestCompleted.get(0));
+        assertPropertyEquals(r3, latestCompleted.get(1));
+    }
+
     private BuildResult createCompletedBuild(Project project, long number)
     {
-        BuildResult result = new BuildResult(project, number);
+        return createCompletedBuild(project,  null, number);
+    }
+
+    private BuildResult createCompletedBuild(Project project, BuildSpecification spec, long number)
+    {
+        BuildResult result = new BuildResult(project, spec, number);
         result.commence(0);
         result.complete();
         return result;
     }
-
 }

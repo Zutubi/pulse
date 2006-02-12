@@ -6,6 +6,7 @@ import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.RecipeResultNode;
+import com.cinnamonbob.model.BuildSpecification;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 import com.cinnamonbob.util.logging.Logger;
 import org.hibernate.Hibernate;
@@ -37,6 +38,26 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.stateName != :initial order by id desc");
                 queryObject.setEntity("project", project);
                 queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
+                queryObject.setMaxResults(max);
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.list();
+            }
+        });
+    }
+
+    public List<BuildResult> findLatestCompleted(final Project project, final BuildSpecification spec, final int max)
+    {
+        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.buildSpecification = :spec and model.stateName != :initial and model.stateName != :inProgress order by id desc");
+                queryObject.setEntity("project", project);
+                queryObject.setEntity("spec", spec);
+                queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
+                queryObject.setParameter("inProgress", ResultState.IN_PROGRESS.toString(), Hibernate.STRING);
                 queryObject.setMaxResults(max);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());

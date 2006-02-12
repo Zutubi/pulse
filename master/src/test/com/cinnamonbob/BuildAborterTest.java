@@ -37,7 +37,7 @@ public class BuildAborterTest extends BobTestCase
     public void testCompletedBuild()
     {
         Project project = new Project("test", "project");
-        BuildResult result = new BuildResult(project, 1);
+        BuildResult result = new BuildResult(project, null, 1);
         result.commence(10);
         result.complete();
 
@@ -52,7 +52,7 @@ public class BuildAborterTest extends BobTestCase
     public void testIncompleteBuild()
     {
         Project project = new Project("test", "project");
-        BuildResult result = new BuildResult(project, 1);
+        BuildResult result = new BuildResult(project, null, 1);
         result.commence(10);
 
         projectManager.save(project);

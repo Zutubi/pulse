@@ -12,10 +12,11 @@
     <table>
         <tr><td>
             <table class="content">
-                #headingRow("build.summary" 7)
+                #headingRow("build.summary" 8)
                 <tr>
                     #contentHeading("build.id" 1)
                     #contentHeading("build.status" 2)
+                    #contentHeading("build.spec" 1)
                     #contentHeading("build.when" 1)
                     #contentHeading("build.elapsed" 1)
                     #contentHeading("actions" 2)
@@ -24,6 +25,7 @@
                     #set($cssClass = $currentBuild.state.string)
                     #contentCell($currentBuild.number)
                     #statusCell($currentBuild)
+                    #classCell($currentBuild.buildSpecification.name)
                     #classCell($currentBuild.stamps.prettyStartTime)
                     #classCell($currentBuild.stamps.prettyElapsed)
                     #viewCell($project $currentBuild)

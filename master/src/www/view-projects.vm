@@ -6,12 +6,13 @@
     <body>
         <h1>:: #wwtext("name=projects") ::</h1>
         <table class="content">
-            #headingRow("latest.builds" 8)
+            #headingRow("latest.builds" 9)
             <tr>
                 #contentHeading("project.name" 1)
                 #contentHeading("build.status" 2)
                 #contentHeading("last.built" 1)
                 #contentHeading("build.id" 1)
+                #contentHeading("build.spec" 1)
                 #contentHeading("build.elapsed" 1)
                 #contentHeading("actions" 2)
             </tr>
@@ -29,6 +30,7 @@
                 #statusCell($lastResult)
                 #classCell($lastResult.stamps.prettyStartTime)
                 #classCell($lastResult.number)
+                #classCell($lastResult.buildSpecification.name)
                 #classCell($lastResult.stamps.prettyElapsed)
                 #viewCell($project $id)
                 #changesCell($project $id)
@@ -38,12 +40,13 @@
                 #contentCell("built.never")
                 #contentCell("not.applicable")
                 #contentCell("not.applicable")
+                #contentCell("not.applicable")
                 #contentCell("empty.cell")
                 #contentCell("empty.cell")
     #end
             </tr>
 #end
-            #addRow("add.project" 8 "addProject!input.action")
+            #addRow("add.project" 9 "addProject!input.action")
         </table>
     </body>
 </html>
