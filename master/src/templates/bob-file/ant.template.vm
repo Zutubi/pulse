@@ -10,7 +10,7 @@
 #if($targets)
                  targets="$targets"
 #end
-            >
+                    >
 #foreach($key in $environment.keySet())
                 <environment name="$key" value="$environment.get($key)"/>
 #end
