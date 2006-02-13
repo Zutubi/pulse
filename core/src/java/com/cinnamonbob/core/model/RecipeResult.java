@@ -162,4 +162,17 @@ public class RecipeResult extends Result
 
         return false;
     }
+
+    public boolean hasArtifacts()
+    {
+        for (CommandResult result : results)
+        {
+            if (result.hasArtifacts())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

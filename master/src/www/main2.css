@@ -332,7 +332,7 @@ ul.info {
     background-color: #eeeeff;
 }
 
-li.error, li.warning, li.info {
+li.error, li.warning, li.info, li.artifact, li.file-artifact {
     font-weight: normal;
     list-style: none;
     padding-left: 20px;
@@ -352,8 +352,20 @@ li.info {
     background: url( images/information.gif ) no-repeat 0 0;
 }
 
+li.artifact {
+    background: url( images/resultset_next.gif ) no-repeat 0 0;
+}
+
+li.file-artifact {
+    background: url( images/gnome-mime-text.png ) no-repeat 0 0;
+}
+
 li.header {
     font-weight: bold;
     margin-top: 4px;
     margin-bottom: 4px;
+}
+
+h3 {
+    margin-top: 0px;
 }

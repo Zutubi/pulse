@@ -115,4 +115,22 @@ public class RecipeResultNode extends Entity
 
         return false;
     }
+
+    public boolean hasArtifacts()
+    {
+        if (result.hasArtifacts())
+        {
+            return true;
+        }
+
+        for (RecipeResultNode child : children)
+        {
+            if (child.hasArtifacts())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

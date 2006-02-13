@@ -1,0 +1,14 @@
+#buildTags($project $result)
+<html>
+<head>
+    <title>#wwtext("name=build") $result.number</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=build") $result.number ::</h1>
+
+    #buildTabs($result "artifacts")
+
+    <h3>#wwtext("name=artifacts.all")</h3>
+
+    #buildArtifacts($result)
+</html>

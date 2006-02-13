@@ -167,6 +167,7 @@
     #openTabs()
         #buildTab($result "summary" "viewBuild" $selected)
         #buildTab($result "changes" "viewChanges" $selected)
+        #buildTab($result "artifacts" "viewBuildArtifacts" $selected)
     #closeTabs()
 #end
 
@@ -343,6 +344,15 @@
 #end
 
 ##
+## Outputs an action cell for viewing artifacts for a build
+##
+#macro(artifactsCell $project $result)
+    <td class="content">
+        <a href="viewBuildArtifacts.action?id=$result.id">#wwtext("name=artifacts")</a>
+    </td>
+#end
+
+##
 ## Outputs a row with SCM details
 ##
 #macro(scmRow $project)
@@ -496,7 +506,7 @@
     <table>
         <tr><td>
             <table class="content">
-                #headingRow("build.summary" 8)
+                #headingRow("build.summary" 9)
                 <tr>
                     #contentHeading("build.id" 1)
                     #contentHeading("build.status" 2)
@@ -504,7 +514,7 @@
                     #contentHeading("build.when" 1)
                     #contentHeading("build.elapsed" 1)
     #if($showActions)
-                    #contentHeading("actions" 2)
+                    #contentHeading("actions" 3)
     #end
                 </tr>
                 <tr>
@@ -517,6 +527,7 @@
     #if($showActions)
                     #viewCell($project $buildResult)
                     #changesCell($project $buildResult)
+                    #artifactsCell($project $buildResult)
     #end
                 </tr>
             </table>
@@ -703,7 +714,75 @@
     #end
 #end
 
+##
+## Shows a list of artifacts for a command
+##
+#macro(commandArtifacts $result)
+    <ul class="artifact">
+    #foreach($artifact in $result.artifacts)
+        <li class="file-artifact"><a href="viewArtifact.action?id=$artifact.id&amp;commandId=$result.id">$artifact.title</a></li>
+    #end
+    </ul>
+#end
 
+##
+## Shows a nested list of artifacts for each command in a recipe
+##
+#macro(recipeArtifacts $result $top)
+    #if($result.hasArtifacts())
+        #if($top)
+    <ul class="artifact">
+        #end
+        #foreach($commandResult in $result.commandResults)
+            #if($commandResult.hasArtifacts())
+        <li class="artifact">#wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)
+            #commandArtifacts($commandResult)
+        </li>
+            #end
+        #end
+        #if($top)
+    </ul>
+        #end
+    #else
+    <p>
+        #wwtext("name=artifacts.none")
+    </p>
+    #end
+#end
+
+##
+## Shows a nested list of artifacts for a recipe result node
+##
+#macro(recipeNodeArtifacts $node)
+    #if($node.hasArtifacts())
+        <li class="artifact">#wwtext("name=recipe") :: $!webwork.htmlEncode($node.result.recipeNameSafe)
+            <ul class="artifact">
+            #recipeArtifacts($node.result false)
+            #foreach($child in $node.children)
+                #recipeNodeArtifacts($child)
+            #end
+            </ul>
+        </li>
+    #end
+
+#end
+
+##
+## Shows a nested list of artifacts for the build result
+##
+#macro(buildArtifacts $result)
+    #if($result.hasArtifacts())
+    <ul class="artifact">
+        #foreach($node in $result.root.children)
+            #recipeNodeArtifacts($node)
+        #end
+    </ul>
+    #else
+    <p>
+        #wwtext("name=artifacts.none")
+    </p>
+    #end
+#end
 
 #macro( contactPointIcon $contact)
     #if ($contact.class.name == 'com.cinnamonbob.model.EmailContactPoint')<img src="/images/email_16.png"/>#end

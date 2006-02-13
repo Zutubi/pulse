@@ -113,6 +113,19 @@ public class BuildResult extends Result
         return false;
     }
 
+    public boolean hasArtifacts()
+    {
+        for (RecipeResultNode node : root.getChildren())
+        {
+            if (node.hasArtifacts())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public BuildScmDetails getScmDetails()
     {
         return scmDetails;

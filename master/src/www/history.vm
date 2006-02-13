@@ -10,14 +10,14 @@
 
 #if($history.size() > 0)
     <table class="content">
-        #actionHeadingRow("recent.builds" 8 "search.builds" "searchBuilds.action?projectId=$project.id" "zoom.gif")
+        #actionHeadingRow("recent.builds" 9 "search.builds" "searchBuilds.action?projectId=$project.id" "zoom.gif")
         <tr>
             #contentHeading("build.id" 1)
             #contentHeading("build.status" 2)
             #contentHeading("build.spec" 1)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 2)
+            #contentHeading("actions" 3)
         </tr>
         #foreach($buildResult in $history)
             #set($cssClass = $buildResult.state.string)
@@ -29,6 +29,7 @@
             #classCell($buildResult.stamps.prettyElapsed)
             #viewCell($project $buildResult)
             #changesCell($project $buildResult)
+            #artifactsCell($project $buildResult)
         </tr>
         #end
     </table>

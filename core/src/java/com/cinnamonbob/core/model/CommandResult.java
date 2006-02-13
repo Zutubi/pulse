@@ -104,4 +104,9 @@ public class CommandResult extends Result
 
         return false;
     }
+
+    public boolean hasArtifacts()
+    {
+        return artifacts.size() > 0;
+    }
 }
