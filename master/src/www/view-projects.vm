@@ -6,7 +6,7 @@
     <body>
         <h1>:: #wwtext("name=projects") ::</h1>
         <table class="content">
-            #headingRow("latest.builds" 10)
+            #headingRow("latest.builds" 11)
             <tr>
                 #contentHeading("project.name" 1)
                 #contentHeading("build.status" 2)
@@ -14,7 +14,7 @@
                 #contentHeading("build.id" 1)
                 #contentHeading("build.spec" 1)
                 #contentHeading("build.elapsed" 1)
-                #contentHeading("actions" 3)
+                #contentHeading("actions" 4)
             </tr>
 
 #foreach($project in $projects)
@@ -33,6 +33,7 @@
                 #classCell($lastResult.buildSpecification.name)
                 #classCell($lastResult.stamps.prettyElapsed)
                 #viewCell($project $lastResult)
+                #logCell($project $lastResult)
                 #changesCell($project $lastResult)
                 #artifactsCell($project $lastResult)
     #else
@@ -45,10 +46,11 @@
                 #contentCell("empty.cell")
                 #contentCell("empty.cell")
                 #contentCell("empty.cell")
+                #contentCell("empty.cell")
     #end
             </tr>
 #end
-            #addRow("add.project" 10 "addProject!input.action")
+            #addRow("add.project" 11 "addProject!input.action")
         </table>
     </body>
 </html>

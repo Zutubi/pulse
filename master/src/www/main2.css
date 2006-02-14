@@ -357,7 +357,7 @@ li.artifact {
 }
 
 li.file-artifact {
-    background: url( images/gnome-mime-text.png ) no-repeat 0 0;
+    background: url( images/page.gif ) no-repeat 0 0;
 }
 
 li.header {
@@ -368,4 +368,12 @@ li.header {
 
 h3 {
     margin-top: 0px;
+}
+
+h2.command-log {
+    margin-top: 5px;
+    padding: 3px;
+    color: #606078;
+    font-size: 150%;
+    border-bottom: solid 2px #a0a0c0;
 }

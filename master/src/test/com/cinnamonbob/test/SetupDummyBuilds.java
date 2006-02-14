@@ -195,8 +195,8 @@ public class SetupDummyBuilds implements Runnable
         BuildResult result = new BuildResult(project, getSpec(project), 10000);
 
         result.commence(new File("/complex/build/output/dir"));
-        RecipeResultNode rootResultNode = createComplexRecipe("root recipe");
-        RecipeResultNode childNode = createWarningFeaturesRecipe();
+        RecipeResultNode rootResultNode = createWarningFeaturesRecipe();
+        RecipeResultNode childNode = createComplexRecipe("root recipe");
         rootResultNode.addChild(childNode);
         result.getRoot().addChild(rootResultNode);
         result.complete();
@@ -208,8 +208,8 @@ public class SetupDummyBuilds implements Runnable
         BuildResult result = new BuildResult(project, getSpec(project), 10000);
 
         result.commence(new File("/complex/build/output/dir"));
-        RecipeResultNode rootResultNode = createComplexRecipe("root recipe");
-        RecipeResultNode childNode = createErrorFeaturesRecipe();
+        RecipeResultNode rootResultNode = createErrorFeaturesRecipe();
+        RecipeResultNode childNode = createComplexRecipe("child recipe");
         rootResultNode.addChild(childNode);
         result.getRoot().addChild(rootResultNode);
         result.complete();

@@ -7,6 +7,9 @@ import com.cinnamonbob.model.ScmManager;
 import com.cinnamonbob.scheduling.Scheduler;
 import com.cinnamonbob.web.ActionSupport;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * 
  *
@@ -66,5 +69,14 @@ public class ProjectActionSupport extends ActionSupport
     public Feature.Level getWarningLevel()
     {
         return Feature.Level.WARNING;
+    }
+
+    public List<Feature.Level> getFeatureLevels()
+    {
+        List<Feature.Level> levels = new LinkedList<Feature.Level>();
+        levels.add(Feature.Level.ERROR);
+        levels.add(Feature.Level.WARNING);
+        levels.add(Feature.Level.INFO);
+        return levels;
     }
 }

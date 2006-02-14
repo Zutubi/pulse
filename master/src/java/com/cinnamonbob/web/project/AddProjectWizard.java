@@ -200,7 +200,7 @@ public class AddProjectWizard extends BaseWizard
             if (types == null)
             {
                 types = new TreeMap<String, String>();
-                types.put("ant", "jakarta ant project");
+                types.put("ant", "ant project");
                 types.put("custom", "custom project");
                 types.put("maven", "maven project");
             }
@@ -286,15 +286,6 @@ public class AddProjectWizard extends BaseWizard
         {
             return ((AddProjectWizard) getWizard()).projectDetails.getType();
         }
-
-        public void execute()
-        {
-            if (!TextUtils.stringSet(cvs.getPath()))
-            {
-                cvs.setPath(null);
-            }
-
-        }
     }
 
     private class SvnDetails extends BaseWizardState
@@ -315,29 +306,6 @@ public class AddProjectWizard extends BaseWizard
         {
             return ((AddProjectWizard) getWizard()).projectDetails.getType();
         }
-
-        public void execute()
-        {
-            if (!TextUtils.stringSet(svn.getPassword()))
-            {
-                svn.setPassword(null);
-            }
-
-            if (!TextUtils.stringSet(svn.getKeyfile()))
-            {
-                svn.setKeyfile(null);
-            }
-
-            if (!TextUtils.stringSet(svn.getPassphrase()))
-            {
-                svn.setPassphrase(null);
-            }
-
-            if (!TextUtils.stringSet(svn.getPath()))
-            {
-                svn.setPath(null);
-            }
-        }
     }
 
     private class P4Details extends BaseWizardState
@@ -357,19 +325,6 @@ public class AddProjectWizard extends BaseWizard
         public String getNextStateName()
         {
             return ((AddProjectWizard) getWizard()).projectDetails.getType();
-        }
-
-        public void execute()
-        {
-            if (!TextUtils.stringSet(p4.getPassword()))
-            {
-                p4.setPassword(null);
-            }
-
-            if (!TextUtils.stringSet(p4.getPath()))
-            {
-                p4.setPath(null);
-            }
         }
     }
 

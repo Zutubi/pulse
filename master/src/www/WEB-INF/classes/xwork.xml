@@ -99,6 +99,11 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="viewCommandLog" class="com.cinnamonbob.web.project.ViewBuildAction">
+            <result name="success" type="velocity">view-command-log.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="viewBuildArtifacts" class="com.cinnamonbob.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-artifacts.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>

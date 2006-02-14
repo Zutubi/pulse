@@ -166,6 +166,7 @@
 #macro(buildTabs $result $selected)
     #openTabs()
         #buildTab($result "summary" "viewBuild" $selected)
+        #buildTab($result "command-log" "viewCommandLog" $selected)
         #buildTab($result "changes" "viewChanges" $selected)
         #buildTab($result "artifacts" "viewBuildArtifacts" $selected)
     #closeTabs()
@@ -335,6 +336,15 @@
 #end
 
 ##
+## Outputs an action cell for viewing a command log for a build
+##
+#macro(logCell $project $result)
+    <td class="content">
+        <a href="viewCommandLog.action?id=$result.id">#wwtext("name=command.log")</a>
+    </td>
+#end
+
+##
 ## Outputs an action cell for viewing changes for a build
 ##
 #macro(changesCell $project $result)
@@ -479,22 +489,23 @@
 ##
 #macro(recipeSummary $resultNode $project)
     <table class="content">
-        #headingRow("recipe" 8)
+        #headingRow("recipe" 5)
         <tr>
             #contentHeading("recipe.name" 1)
             #contentHeading("build.status" 2)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 1)
+##            #contentHeading("actions" 1)
         </tr>
         <tr>
+            #set($id = $resultNode.id)
             #set($result = $resultNode.result)
             #set($cssClass = $result.state.string)
             #contentCell($result.recipeNameSafe)
             #statusCell($result)
             #classCell($result.stamps.prettyStartTime)
             #classCell($result.stamps.prettyElapsed)
-            #linkCell("view" "viewRecipe.action?id=$resultNode.id&amp;projectId=$project.id")
+##            #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$project.id")
         </tr>
     </table>
 #end
@@ -506,7 +517,7 @@
     <table>
         <tr><td>
             <table class="content">
-                #headingRow("build.summary" 9)
+                #headingRow("build.summary" 10)
                 <tr>
                     #contentHeading("build.id" 1)
                     #contentHeading("build.status" 2)
@@ -514,7 +525,7 @@
                     #contentHeading("build.when" 1)
                     #contentHeading("build.elapsed" 1)
     #if($showActions)
-                    #contentHeading("actions" 3)
+                    #contentHeading("actions" 4)
     #end
                 </tr>
                 <tr>
@@ -526,6 +537,7 @@
                     #classCell($buildResult.stamps.prettyElapsed)
     #if($showActions)
                     #viewCell($project $buildResult)
+                    #logCell($project $buildResult)
                     #changesCell($project $buildResult)
                     #artifactsCell($project $buildResult)
     #end
@@ -717,10 +729,21 @@
 ##
 ## Shows a list of artifacts for a command
 ##
-#macro(commandArtifacts $result)
+#macro(commandArtifacts $result $showFeatures)
     <ul class="artifact">
     #foreach($artifact in $result.artifacts)
-        <li class="file-artifact"><a href="viewArtifact.action?id=$artifact.id&amp;commandId=$result.id">$artifact.title</a></li>
+        <li class="file-artifact"><a href="viewArtifact.action?id=$artifact.id&amp;commandId=$result.id">$artifact.title</a>
+        #if($showFeatures)
+            #foreach($level in $featureLevels)
+                #if($artifact.hasMessages($level))
+        <ul class="$level.toString().toLowerCase()">
+            <li class="header">$level.toString().toLowerCase() #wwtext("name=features")</li>
+            #artifactMessageSummary($artifact $level)
+        </ul>
+                #end
+            #end
+        #end
+        </li>
     #end
     </ul>
 #end
@@ -736,7 +759,7 @@
         #foreach($commandResult in $result.commandResults)
             #if($commandResult.hasArtifacts())
         <li class="artifact">#wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)
-            #commandArtifacts($commandResult)
+            #commandArtifacts($commandResult false)
         </li>
             #end
         #end

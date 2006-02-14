@@ -1,0 +1,52 @@
+#buildTags($project $result)
+<html>
+<head>
+    <title>#wwtext("name=build") $result.number</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=build") $result.number ::</h1>
+
+    #buildTabs($result "command-log")
+
+#set($recipeResult = $result.root.children.get(0).result)
+#if($recipeResult.commandResults.size() > 0)
+    #foreach($commandResult in $recipeResult.commandResults)
+    <h2 class="command-log">$!webwork.htmlEncode($commandResult.commandName)</h2>
+
+    <table class="content">
+        #headingRow("summary" 5)
+        <tr>
+            #contentHeading("command.name" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
+        </tr>
+        <tr>
+            #set($cssClass = $commandResult.state.string)
+            #contentCell($commandResult.commandName)
+            #statusCell($commandResult)
+            #classCell($commandResult.stamps.prettyStartTime)
+            #classCell($commandResult.stamps.prettyElapsed)
+        </tr>
+    </table>
+
+        #if($commandResult.properties.size() > 0)
+    <table class="content">
+        #headingRow("command.properties" 2)
+            #foreach($property in $commandResult.properties.entrySet())
+        #propertyRow($property)
+            #end
+    </table>
+        #end
+
+        #if($commandResult.hasArtifacts())
+    <h3>#wwtext("name=command.artifacts")</h3>
+    #commandArtifacts($commandResult true)
+        #end
+    #end
+#else
+    <p>
+        #wwtext("name=commands.none")
+    </p>
+#end
+</html>
