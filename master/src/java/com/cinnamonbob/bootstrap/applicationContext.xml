@@ -10,7 +10,8 @@
 
     <bean id="velocityEngine" class="com.cinnamonbob.bootstrap.velocity.VelocityEngineFactoryBean"/>
 
-    <bean id="buildManagerTarget" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName" init-method="init"/>
+    <bean id="buildManagerTarget" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"
+          init-method="init"/>
 
     <bean id="buildManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
@@ -138,7 +139,7 @@
 
     <bean id="fatController" class="com.cinnamonbob.FatController" autowire="byName" init-method="init"/>
 
-    <bean id="recipeQueue" class="com.cinnamonbob.ImmediateDispatchRecipeQueue" autowire="byName" init-method="init"/>
+    <bean id="recipeQueue" class="com.cinnamonbob.ThreadedRecipeQueue" autowire="byName" init-method="init"/>
 
     <bean id="resultNotifier" class="com.cinnamonbob.ResultNotifier" autowire="byName"/>
 

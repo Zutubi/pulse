@@ -1,11 +1,18 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.events.Event;
+import com.cinnamonbob.events.EventListener;
 import com.cinnamonbob.events.EventManager;
+import com.cinnamonbob.events.build.RecipeCompletedEvent;
 import com.cinnamonbob.events.build.RecipeDispatchedEvent;
+import com.cinnamonbob.events.build.RecipeErrorEvent;
+import com.cinnamonbob.events.build.RecipeEvent;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * <class-comment/>
  */
-public class ThreadedRecipeQueue implements Runnable, RecipeQueue
+public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 {
     private static final Logger LOG = Logger.getLogger(ThreadedRecipeQueue.class);
 
@@ -36,6 +43,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue
     private final List<BuildService> newServices = new LinkedList<BuildService>();
     private final List<BuildService> availableServices = new LinkedList<BuildService>();
 
+    /**
+     * Maps from recipe ID to the build service executing the recipe.
+     */
+    private final Map<Long, BuildService> executingServices = new TreeMap<Long, BuildService>();
+
     private final ExecutorService executor;
 
     private boolean stopRequested = false;
@@ -49,13 +61,20 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue
         executor = Executors.newSingleThreadExecutor();
     }
 
+    public void init()
+    {
+        availableServices.add(new MasterBuildService());
+        eventManager.register(this);
+        start();
+    }
+
     public void start()
     {
         if (isRunning())
         {
             throw new IllegalStateException("The queue is already running.");
         }
-        LOG.info("start();");
+        LOG.debug("start();");
         executor.execute(this);
     }
 
@@ -96,7 +115,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue
     {
         isRunning = true;
         stopRequested = false;
-        LOG.info("started.");
+        LOG.debug("started.");
 
         // wait for changes to either of the inbound queues. When change detected,
         // copy the new data into the internal queue (to minimize locked time) and
@@ -105,20 +124,20 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue
         while (!stopRequested)
         {
             lock.lock();
-            LOG.info("lock.lock();");
+            LOG.debug("lock.lock();");
             try
             {
                 if (newDispatches.size() == 0 && newServices.size() == 0)
                 {
                     try
                     {
-                        LOG.info("lockCondition.await();");
+                        LOG.debug("lockCondition.await();");
                         lockCondition.await(60, TimeUnit.SECONDS);
-                        LOG.info("lockCondition.unawait();");
+                        LOG.debug("lockCondition.unawait();");
                     }
                     catch (InterruptedException e)
                     {
-                        LOG.info("lockCondition.wait() was interrupted: " + e.getMessage());
+                        LOG.debug("lockCondition.wait() was interrupted: " + e.getMessage());
                     }
                 }
 
@@ -135,7 +154,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue
             finally
             {
                 lock.unlock();
-                LOG.info("lock.unlock();");
+                LOG.debug("lock.unlock();");
             }
 
             List<RecipeDispatchRequest> dispatchedRequests = new LinkedList<RecipeDispatchRequest>();
@@ -146,12 +165,22 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue
                 for (BuildService service : availableServices)
                 {
                     // can the request be sent to this service?
-                    if (request.getHostRequirements().fulfilledBy(service))
+                    if (request.getHostRequirements().fulfilledBy(service) && !unavailableServices.contains(service))
                     {
                         service.build(request.getRequest());
                         unavailableServices.add(service);
+                        lock.lock();
+                        try
+                        {
+                            executingServices.put(request.getRequest().getId(), service);
+                        }
+                        finally
+                        {
+                            lock.unlock();
+                        }
                         dispatchedRequests.add(request);
                         eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest().getId(), service));
+                        break;
                     }
                 }
             }
@@ -159,7 +188,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue
             queuedDispatches.removeAll(dispatchedRequests);
             availableServices.removeAll(unavailableServices);
         }
-        LOG.info("stopped.");
+        LOG.debug("stopped.");
         isRunning = false;
     }
 
@@ -173,7 +202,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue
         lock.lock();
         try
         {
-            LOG.info("stop();");
+            LOG.debug("stop();");
             stopRequested = true;
             lockCondition.signal();
         }
@@ -206,8 +235,38 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue
         }
     }
 
+    public void handleEvent(Event evt)
+    {
+        RecipeEvent event = (RecipeEvent) evt;
+
+        lock.lock();
+        try
+        {
+            BuildService service = executingServices.get(event.getRecipeId());
+
+            // The service could be null if there was a temporary loss of
+            // communication with the build service leading to abortion of the
+            // recipe on the master.
+            if (service != null)
+            {
+                executingServices.remove(event.getRecipeId());
+                available(service);
+            }
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class};
+    }
+
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
     }
+
 }
