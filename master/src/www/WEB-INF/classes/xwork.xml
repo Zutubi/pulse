@@ -20,6 +20,11 @@
             <result name="success" type="redirect">/</result>
         </action>
 
+        <action name="viewRecipeQueue" class="com.cinnamonbob.web.server.ViewRecipeQueueAction">
+            <result name="success" type="velocity">view-recipe-queue.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="serverStatus" class="com.cinnamonbob.web.ServerStatusAction">
             <result name="success" type="velocity">server-status.vm</result>
         </action>

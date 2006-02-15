@@ -1,10 +1,11 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.events.build.RecipeDispatchedEvent;
 import com.cinnamonbob.events.Event;
-import com.cinnamonbob.events.*;
+import com.cinnamonbob.events.EventListener;
+import com.cinnamonbob.events.EventManager;
+import com.cinnamonbob.events.SlaveAvailableEvent;
+import com.cinnamonbob.events.build.RecipeDispatchedEvent;
 import com.cinnamonbob.model.Slave;
 import com.cinnamonbob.model.SlaveManager;
 import com.cinnamonbob.util.logging.Logger;
@@ -39,7 +40,7 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
         for (Slave slave : slaveManager.getAll())
         {
             SlaveBuildService slaveService = createSlaveService(slave);
-            if(slaveService != null)
+            if (slaveService != null)
             {
                 buildServices.add(slaveService);
             }
@@ -64,7 +65,8 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
 
     public void enqueue(RecipeDispatchRequest request)
     {
-        // TODO obviously this is a skeleton: it assumes we can dispatch now!
+        // This assumes we can dispatch now, which is unlikely to be a
+        // practical dispatch algorithm!
         for (BuildService service : buildServices)
         {
             if (request.getHostRequirements().fulfilledBy(service))
@@ -78,16 +80,22 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
         throw new BuildException("No build service found to handle request.");
     }
 
+    public List<RecipeDispatchRequest> takeSnapshot()
+    {
+        // Never actually queue anything!
+        return new LinkedList<RecipeDispatchRequest>();
+    }
+
     public void handleEvent(Event evt)
     {
         SlaveAvailableEvent event = (SlaveAvailableEvent) evt;
         SlaveBuildService newService = createSlaveService(event.getSlave());
 
-        if(newService != null)
+        if (newService != null)
         {
-            for(BuildService service: buildServices)
+            for (BuildService service : buildServices)
             {
-                if(service.equals(newService))
+                if (service.equals(newService))
                 {
                     return;
                 }
@@ -99,7 +107,7 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { SlaveAvailableEvent.class };
+        return new Class[]{SlaveAvailableEvent.class};
     }
 
     public void setSlaveProxyFactory(SlaveProxyFactory slaveProxyFactory)

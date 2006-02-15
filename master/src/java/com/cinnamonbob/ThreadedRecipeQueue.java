@@ -97,6 +97,24 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
+    public List<RecipeDispatchRequest> takeSnapshot()
+    {
+        List<RecipeDispatchRequest> snapshot = new LinkedList<RecipeDispatchRequest>();
+
+        lock.lock();
+        try
+        {
+            snapshot.addAll(queuedDispatches);
+            snapshot.addAll(newDispatches);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+
+        return snapshot;
+    }
+
     public void available(BuildService buildService)
     {
         lock.lock();
@@ -119,7 +137,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
         // wait for changes to either of the inbound queues. When change detected,
         // copy the new data into the internal queue (to minimize locked time) and
-        // start processing.
+        // start processing.  JS: extended lock time to simplify snapshotting:
+        // review iff this leads to a performance issue (seems unlikely).
 
         while (!stopRequested)
         {
@@ -150,44 +169,45 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 newDispatches.clear();
                 availableServices.addAll(newServices);
                 newServices.clear();
+
+                List<RecipeDispatchRequest> dispatchedRequests = new LinkedList<RecipeDispatchRequest>();
+                List<BuildService> unavailableServices = new LinkedList<BuildService>();
+
+                for (RecipeDispatchRequest request : queuedDispatches)
+                {
+                    for (BuildService service : availableServices)
+                    {
+                        // can the request be sent to this service?
+                        if (request.getHostRequirements().fulfilledBy(service) && !unavailableServices.contains(service))
+                        {
+                            service.build(request.getRequest());
+                            unavailableServices.add(service);
+                            lock.lock();
+                            try
+                            {
+                                executingServices.put(request.getRequest().getId(), service);
+                            }
+                            finally
+                            {
+                                lock.unlock();
+                            }
+                            dispatchedRequests.add(request);
+                            eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest().getId(), service));
+                            break;
+                        }
+                    }
+                }
+
+                queuedDispatches.removeAll(dispatchedRequests);
+                availableServices.removeAll(unavailableServices);
             }
             finally
             {
                 lock.unlock();
                 LOG.debug("lock.unlock();");
             }
-
-            List<RecipeDispatchRequest> dispatchedRequests = new LinkedList<RecipeDispatchRequest>();
-            List<BuildService> unavailableServices = new LinkedList<BuildService>();
-
-            for (RecipeDispatchRequest request : queuedDispatches)
-            {
-                for (BuildService service : availableServices)
-                {
-                    // can the request be sent to this service?
-                    if (request.getHostRequirements().fulfilledBy(service) && !unavailableServices.contains(service))
-                    {
-                        service.build(request.getRequest());
-                        unavailableServices.add(service);
-                        lock.lock();
-                        try
-                        {
-                            executingServices.put(request.getRequest().getId(), service);
-                        }
-                        finally
-                        {
-                            lock.unlock();
-                        }
-                        dispatchedRequests.add(request);
-                        eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest().getId(), service));
-                        break;
-                    }
-                }
-            }
-
-            queuedDispatches.removeAll(dispatchedRequests);
-            availableServices.removeAll(unavailableServices);
         }
+
         LOG.debug("stopped.");
         isRunning = false;
     }

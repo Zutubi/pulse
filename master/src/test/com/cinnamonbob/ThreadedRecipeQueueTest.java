@@ -8,6 +8,7 @@ import com.cinnamonbob.model.BuildHostRequirements;
 import junit.framework.TestCase;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -185,6 +186,34 @@ public class ThreadedRecipeQueueTest extends TestCase
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
     }
 
+    public void testSnapshot()
+    {
+        RecipeDispatchRequest request1 = createDispatchRequest(0);
+        RecipeDispatchRequest request2 = createDispatchRequest(0);
+        queue.enqueue(request1);
+        queue.enqueue(request2);
+
+        List<RecipeDispatchRequest> snapshot = queue.takeSnapshot();
+        assertEquals(2, snapshot.size());
+        assertEquals(request1, snapshot.get(0));
+        assertEquals(request2, snapshot.get(1));
+    }
+
+    public void testSnapshotAfterDispatch() throws Exception
+    {
+        RecipeDispatchRequest request1 = createDispatchRequest(0);
+        RecipeDispatchRequest request2 = createDispatchRequest(1);
+        queue.enqueue(request1);
+        queue.enqueue(request2);
+
+        queue.available(createAvailableService(0));
+        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
+
+        List<RecipeDispatchRequest> snapshot = queue.takeSnapshot();
+        assertEquals(1, snapshot.size());
+        assertEquals(request2, snapshot.get(0));
+    }
+
     private void sendRecipeCompleted(long id)
     {
         RecipeResult result = new RecipeResult();
@@ -206,7 +235,7 @@ public class ThreadedRecipeQueueTest extends TestCase
     {
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
         RecipeRequest request = new RecipeRequest(id, null);
-        return new RecipeDispatchRequest(requirements, request);
+        return new RecipeDispatchRequest(requirements, request, null);
     }
 
     private RecipeDispatchRequest createDispatchRequest(int type)

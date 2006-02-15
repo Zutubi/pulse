@@ -173,6 +173,24 @@
 #end
 
 ##
+## Shows a server tab of the given name with the given action name
+##
+#macro(serverTab $name $action $selected)
+    #tabItem($name "${action}.action" $selected)
+#end
+
+##
+## Shows the tab bar for server pages with the given tab selected.
+##
+#macro(serverTabs $selected)
+    #openTabs()
+        #serverTab("recipe-queue" "viewRecipeQueue" $selected)
+        #serverTab("resources" "viewResources" $selected)
+        #serverTab("server-info" "viewServerInfo" $selected)
+    #closeTabs()
+#end
+
+##
 ## Outputs a heading row for a content table with an action
 ##
 #macro(actionHeadingRow $key $span $actionKey $url $image)
@@ -231,6 +249,15 @@
 #macro(dynamicCell $content)
     <td class="content">$!webwork.htmlEncode($content)</td>
 #end
+
+##
+## Outputs a cell for a content table with the given dynamic content, which
+## should be escaped, with a link to somewhere...
+##
+#macro(dynamicLinkCell $content $url)
+    <td class="content"><a href="$url">$!webwork.htmlEncode($content)</a></td>
+#end
+
 
 ##
 ## Outputs a name:value pair row where the value needs to be escaped

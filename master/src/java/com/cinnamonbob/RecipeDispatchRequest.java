@@ -1,6 +1,8 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.core.util.TimeStamps;
 import com.cinnamonbob.model.BuildHostRequirements;
+import com.cinnamonbob.model.BuildResult;
 
 /**
  * A request to dispatch a recipe to some build hostRequirements, which may be restricted.
@@ -9,11 +11,14 @@ public class RecipeDispatchRequest
 {
     private BuildHostRequirements hostRequirements;
     private RecipeRequest request;
+    private BuildResult build;
+    private long queueTime;
 
-    public RecipeDispatchRequest(BuildHostRequirements hostRequirements, RecipeRequest request)
+    public RecipeDispatchRequest(BuildHostRequirements hostRequirements, RecipeRequest request, BuildResult build)
     {
         this.hostRequirements = hostRequirements;
         this.request = request;
+        this.build = build;
     }
 
     public BuildHostRequirements getHostRequirements()
@@ -24,5 +29,25 @@ public class RecipeDispatchRequest
     public RecipeRequest getRequest()
     {
         return request;
+    }
+
+    public BuildResult getBuild()
+    {
+        return build;
+    }
+
+    public void queued()
+    {
+        queueTime = System.currentTimeMillis();
+    }
+
+    public long getQueueTime()
+    {
+        return queueTime;
+    }
+
+    public String getPrettyQueueTime()
+    {
+        return TimeStamps.getPrettyTime(queueTime);
     }
 }

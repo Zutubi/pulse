@@ -51,6 +51,7 @@ public class RecipeController
             // allow for just in time setting of the bootstrapper since this can not be configured during
             // the build initialisation.
             dispatchRequest.getRequest().setBootstrapper(bootstrapper);
+            dispatchRequest.queued();
             queue.enqueue(dispatchRequest);
         }
         catch (BuildException e)

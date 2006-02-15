@@ -46,7 +46,7 @@ public class RecipeControllerTest extends BobTestCase
         rootNode.addChild(childNode);
 
         recipeRequest = new RecipeRequest(rootResult.getId(), rootResult.getRecipeName());
-        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), recipeRequest);
+        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), recipeRequest, null);
         recipeController = new RecipeController(rootNode, dispatchRequest, resultCollector, recipeQueue, buildManager);
     }
 
@@ -285,6 +285,11 @@ public class RecipeControllerTest extends BobTestCase
         public void enqueue(RecipeDispatchRequest request)
         {
             dispatched.put(request.getRequest().getId(), request);
+        }
+
+        public List<RecipeDispatchRequest> takeSnapshot()
+        {
+            throw new RuntimeException("Method not implemented.");
         }
 
         public boolean hasDispatched(long recipeId)

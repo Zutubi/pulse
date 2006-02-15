@@ -1,0 +1,36 @@
+<content tag="selectedTab">server</content>
+<html>
+<head>
+    <title>#wwtext("name=server")</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=server") ::</h1>
+
+    #serverTabs("recipe-queue")
+
+    <table class="content">
+        #headingRow("recipe.queue" 4)
+        <tr>
+            #contentHeading("recipe.queue.when" 1)
+            #contentHeading("project" 1)
+            #contentHeading("build.id" 1)
+            #contentHeading("build.spec" 1)
+        </tr>
+#if($snapshot.size() > 0)
+    #foreach($dispatchRequest in $snapshot)
+        #set($build = $dispatchRequest.build)
+        #set($project = $build.project)
+        <tr>
+            #contentCell($dispatchRequest.prettyQueueTime)
+            #dynamicLinkCell($project.name "currentBuild.action?id=$project.id")
+            #contentCell($build.number)
+            #dynamicCell($build.buildSpecification.name)
+        </tr>
+    #end
+#else
+    <tr>
+        <td class="content" colspan="4">#wwtext("name=recipe.queue.empty")</td>
+    </tr>
+#end
+    </table>
+</html>
