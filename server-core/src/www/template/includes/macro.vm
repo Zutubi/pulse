@@ -186,7 +186,7 @@
     #openTabs()
         #serverTab("recipe-queue" "viewRecipeQueue" $selected)
         #serverTab("resources" "viewResources" $selected)
-        #serverTab("server-info" "viewServerInfo" $selected)
+        #serverTab("server-info" "viewSystemInfo" $selected)
     #closeTabs()
 #end
 

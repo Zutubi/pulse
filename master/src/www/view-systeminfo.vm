@@ -1,37 +1,34 @@
+<content tag="selectedTab">server</content>
 <html>
-<head></head>
+<head>
+    <title>#wwtext("name=server")</title>
+</head>
 <body>
+    <h1>:: #wwtext("name=server") ::</h1>
 
-    #set ($propertiesMap = $action.getProperties())
-    #set ($properties = ["system.date", "system.time", "system.uptime", "java.version", "java.vendor", "java.vm.name", "java.runtime.name", "user.name", "user.timezone", "os.name"])
+    #serverTabs("server-info")
 
-    <table width="90%" cellspacing="0" class="grid">
-        <tr>
-            <th colspan="2" width="90%">$action.getText("system.info")</th>
-        </tr>
-        #foreach ($key in $properties)
-        <tr #if ($velocityCount%2 == 0) bgcolor="#f9f9f9" #end >
-            <td width="35%"><b>$action.getText($key)</b></td><td>$propertiesMap.get($key)</td>
-        </tr>
-        #end
-    </table>
+#set ($propertiesMap = $action.getProperties())
+#set ($properties = ["system.date", "system.time", "system.uptime", "java.version", "java.vendor", "java.vm.name", "java.runtime.name", "user.name", "user.timezone", "os.name"])
 
-    <p>&nbsp;</p>
+    <table class="content">
+        #headingRow("system.info" 2)
+#foreach ($key in $properties)
+        #dynamicRow($action.getText($key) $propertiesMap.get($key))
+#end
 
-    <!--Table for graph-->
-    #set ($percentageUsed = $action.getPercentage($action.getUsedMemory(), $action.getTotalMemory()))
-    #set ($percentageFree = $action.getPercentage($action.getFreeMemory(), $action.getTotalMemory()))
-    <table width="90%">
+#set ($percentageUsed = $action.getPercentage($action.getUsedMemory(), $action.getTotalMemory()))
+#set ($percentageFree = $action.getPercentage($action.getFreeMemory(), $action.getTotalMemory()))
     <tr>
-        <td width="35%"><b>Memory Graph</b></td>
-        <td>
-            <table align=left border="0" cellpadding="0" cellspacing="0" width="60%">
+        <th class="content-row">#wwtext("name=memory.usage")</th>
+        <td class="content">
+            <table align=left border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                     <td valign=top width="50%">
                         <table  border="0" cellpadding="0" cellspacing="0" width="100%">
                             <td bgcolor="#CC3333" width="${percentageUsed}%">
-                                <a title="Used Memory" >
-                                    <img src="$req.contextPath/images/spacer.gif"
+                                <a class="unadorned" title="Used Memory" >
+                                    <img src="images/spacer.gif"
                                          height=15
                                          width="100%"
                                          border=0 title="Used Memory ( ${percentageUsed} %)">
@@ -39,8 +36,8 @@
                             </td>
 
                             <td bgcolor="#00CC00" width="${percentageFree}%">
-                                <a title="Free Memory">
-                                    <img src="$req.contextPath/images/spacer.gif"
+                                <a class="unadorned" title="Free Memory">
+                                    <img src="images/spacer.gif"
                                          height=15
                                          width="100%"
                                          border=0 title="Free Memory ( ${percentageFree} %)">
@@ -48,12 +45,11 @@
                             </td>
                         </table>
                     </td>
-                    <td valign=top width="10%" align=left nowrap><b>&nbsp;&nbsp;$percentageFree % Free (<a href="garbageCollect.action">GC</a>)</b></td>
+                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free", ["$percentageFree"]) (<a href="garbageCollect.action">gc</a>)</td>
                 </tr>
             </table>
         </td>
     </tr>
     </table>
 
-</body>
 </html>
