@@ -64,6 +64,12 @@ public class CreatePropertyAction extends ActionSupport
         property.setValue(value);
     }
 
+    public String doInput()
+    {
+        // setup any default data.
+        return INPUT;
+    }
+
     public void validate()
     {
         if (hasErrors())
@@ -76,13 +82,15 @@ public class CreatePropertyAction extends ActionSupport
         resource = resourceDao.findById(resourceId);
         if (resource == null)
         {
-            addActionError("Unknown resource '" + resourceId + "'");
+            addActionError("Unknown resource [" + resourceId + "]");
             return;
         }
 
         if (versionId != null)
         {
             version = resourceVersionDao.findById(versionId);
+            // TODO: use same session!
+            version = resource.getVersion(version.getValue());
         }
 
         if (version == null)
@@ -120,12 +128,6 @@ public class CreatePropertyAction extends ActionSupport
         }
 
         resourceDao.save(resource);
-        return SUCCESS;
-    }
-
-    public String doDefault()
-    {
-        // setup any default data.
         return SUCCESS;
     }
 

@@ -1,0 +1,27 @@
+<content tag="selectedTab">server</content>
+<html>
+<head>
+    <title>#wwtext("name=server")</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=server") ::</h1>
+
+    #serverTabs("resources")
+
+    <table class="content">
+        #headingRow("resources.all" 3)
+        <tr>
+            #contentHeading("resource.name" 1)
+            #contentHeading("actions" 2)
+        </tr>
+#foreach($resource in $resources)
+    #set($confirmMessage = $action.getText("resource.confirm.delete", [$resource.name]))
+        <tr>
+             #dynamicCell($resource.name)
+             #editCell("viewResource.action?id=$resource.id")
+             #deleteCell($confirmMessage "deleteResource.action?id=$resource.id")
+        </tr>
+#end
+        #addRow("resource.add" 3 "createResource!input.action")
+    </table>
+</html>

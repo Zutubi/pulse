@@ -5,8 +5,7 @@ import com.cinnamonbob.core.model.ResourceVersion;
 import com.cinnamonbob.model.persistence.ResourceDao;
 
 /**
- * 
- *
+ * Used to add a new version to a resource.
  */
 public class CreateResourceVersionAction extends ActionSupport
 {
@@ -40,9 +39,9 @@ public class CreateResourceVersionAction extends ActionSupport
         this.resourceVersion = resourceVersion;
     }
 
-    public String doDefault()
+    public String doInput()
     {
-        return SUCCESS;
+        return INPUT;
     }
 
     public void validate()
@@ -57,7 +56,7 @@ public class CreateResourceVersionAction extends ActionSupport
         resource = resourceDao.findById(resourceId);
         if (resource == null)
         {
-            addActionError("Unknown resource '" + resourceId + "'");
+            addActionError("Unknown resource [" + resourceId + "]");
             return;
         }
 
@@ -79,5 +78,4 @@ public class CreateResourceVersionAction extends ActionSupport
     {
         this.resourceDao = resourceDao;
     }
-
 }

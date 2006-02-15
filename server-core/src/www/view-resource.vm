@@ -1,55 +1,51 @@
-<html>
-    <head>
-        <title>resource $resource.name</title>
-        <link href="build.css" rel="stylesheet" type="text/css">
-    </head>
-    <body>    
-        <h1 class="build-log">:: resource $resource.name ::</h1>
-
-#parse("/template/includes/actionerrors.vm")
-
-#macro(showproperties $properties $version)
+#macro(showProperties $properties $version)
     #if($version)
-        #set($versionLink = "&versionId=$version.id")
+        #set($versionLink = "&amp;versionId=$version.id")
     #else
         #set($versionLink = "")
     #end
-            <table>
-                <tr>
-                    <th class="command-detail">name</th>
-                    <th class="command-detail">value</th>
-                    <th class="command-detail">action</th>
-                </tr>
+    <tr>
+        #contentHeading("property.name" 1)
+        #contentHeading("property.value" 1)
+        #contentHeading("actions" 1)
+    </tr>
     #foreach($property in $properties)
-                <tr>
-                    <td class="command-detail">$property.name</td>
-                    <td class="command-detail">$!webwork.htmlEncode($property.value)</td>
-                    <td class="command-detail"><a href="deleteProperty.action?resourceId=$resource.id$versionLink&name=$!webwork.htmlEncode($property.name)">delete</a></td>
-                <tr>
+        #set($confirmMessage = $action.getText("property.confirm.delete", [$property.name]))
+    <tr>
+        #dynamicCell($property.name)
+        #dynamicCell($property.value)
+        #deleteCell($confirmMessage "deleteProperty.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)")
+    <tr>
     #end
-                <tr>
-                    <td class="command-detail" colspan="3"><b>+</b> <a href="createProperty!default.action?resourceId=$resource.id$versionLink">add new property</a></td>
-                </tr>
-    #if($version)
-    #end
-            </table>
+    #addRow("property.add" 3 "createProperty!input.action?resourceId=$resource.id$versionLink")
 #end
 
-        <h2 class="command-info">properties</h2>
-        <div class="command-content">
-        <h4>[default]</h4>
-#showproperties($resource.properties null)
+<html>
+<head>
+    <title>#wwtext("name=resource") $!webwork.htmlEncode($resource.name)</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=resource") $!webwork.htmlEncode($resource.name) ::</h1>
+
+    <table class="content">
+        #addRow("version.add" 1 "createResourceVersion!input.action?resourceId=$resource.id")
+    </table>
+
+    <h2 class="section">#wwtext("name=defaults")</h2>
+    <table class="content">
+        #headingRow("properties" 3)
+#showProperties($resource.properties null)
+    </table>
 
 #foreach($version in $resource.versions.values())
-        <h4>version $version.value (<a href="deleteResourceVersion.action?id=$version.id&resourceId=$resource.id">delete</a>)</h4>
-    #showproperties($version.properties $version)
+    #set($confirmMessage = $action.getText("version.confirm.delete", [$version.value]))
+    <h2 class="section">
+        #wwtext("name=version") $!webwork.htmlEncode($version.value) [<a href="#" class="unadorned" onclick="confirmUrl('$confirmMessage', 'deleteResourceVersion.action?id=$version.id&amp;resourceId=$resource.id')"><img alt="$action.getText('delete')" src="images/delete.gif"/></a>]
+    </h2>
+    <table class="content">
+        #headingRow("properties" 3)
+    #showProperties($version.properties $version)
+    </table>
 #end
-            <br>
-            <table>
-                <tr>
-                    <td class="command-detail"><a href="createResourceVersion!default.action?resourceId=$resource.id">+ add new version</a></td>
-                </tr>
-            </table>
-        </div>
     </body>
 </html>

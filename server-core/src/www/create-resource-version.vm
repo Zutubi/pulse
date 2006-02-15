@@ -1,24 +1,17 @@
 <html>
 <head>
-    <title>create resource version</title>
+    <title>#wwtext("name=version.add")</title>
 </head>
 <body>
+    <h1>:: #wwtext("name=version.add") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
-    
-#bodytag (Form "action='createResourceVersion.action'" "method='post'")
-    #tag (Hidden "name='resourceId'")
-    
-    <h3>create resource version</h3>
-    <fieldset>
-        #tag (TextField "required='true'" "name='resourceVersion.value'"  "label='version'" "tabindex='1'")
-    </fieldset>
-        
-    <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='2'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='3'")
-    </fieldset>
-#end 
 
+#wwcform("action=createResourceVersion.action" "heading=%{getText('version.add')}" "method=post")
+    #wwhidden("name=resourceId")
+    #wwtextfield("name=resourceVersion.value" "label=%{getText('version.value')}" "required=true"  "tabindex=1")
+
+    #saveCancel(2)
+#end
 </body>
 </html>

@@ -166,7 +166,16 @@ h2 {
     font-size: 120%;
 }
 
+h2.section {
+    margin-top: 5px;
+    padding: 3px;
+    color: #606078;
+    font-size: 150%;
+    border-bottom: solid 2px #a0a0c0;
+}
+
 h3 {
+    margin-top: 0px;
     font-size: 100%;
 }
 
@@ -189,6 +198,10 @@ a {
     font-weight: bold;
     text-decoration: none;
     border-bottom: dotted 1px #336;
+}
+
+a.unadorned {
+    border-bottom: none;
 }
 
 table {
@@ -260,6 +273,7 @@ th.content-row {
 
 h3.heading, th.heading {
     background: #e9e9f5;
+    white-space: nowrap;
 }
 
 td.success {
@@ -364,16 +378,4 @@ li.header {
     font-weight: bold;
     margin-top: 4px;
     margin-bottom: 4px;
-}
-
-h3 {
-    margin-top: 0px;
-}
-
-h2.command-log {
-    margin-top: 5px;
-    padding: 3px;
-    color: #606078;
-    font-size: 150%;
-    border-bottom: solid 2px #a0a0c0;
 }

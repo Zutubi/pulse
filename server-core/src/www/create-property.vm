@@ -1,26 +1,19 @@
 <html>
 <head>
-    <title>create property</title>
+    <title>#wwtext("name=property.add")</title>
 </head>
 <body>
+    <h1>:: #wwtext("name=property.add") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
-    
-#bodytag (Form "action='createProperty.action'" "method='post'")
-    #tag (Hidden "name='resourceId'")
-    #tag (Hidden "name='versionId'")
 
-    <h3>create property</h3>
-    <fieldset>
-        #tag (TextField "required='true'" "name='property.name'"  "label='name'" "tabindex='1'")
-        #tag (TextField "name='value'" "tabindex='2'")
-    </fieldset>
-        
-    <fieldset class="submit">
-        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
-        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
-    </fieldset>
-#end 
+#wwcform("action=createProperty.action" "heading=%{getText('property.add')}" "method=post")
+    #wwhidden("name=versionId")
+    #wwhidden("name=resourceId")
+    #wwtextfield("name=property.name" "label=%{getText('property.name')}" "required=true" "tabindex=1")
+    #wwtextfield("name=value" "label=%{getText('property.value')}" "tabindex=2")
 
+    #saveCancel(3)
+#end
 </body>
 </html>

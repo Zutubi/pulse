@@ -17,11 +17,17 @@ public class CreateResourceAction extends ActionSupport
         return resource;
     }
 
+    public String doInput()
+    {
+        // setup any default data.
+        return INPUT;
+    }
+
     public void validate()
     {
         if (hasErrors())
         {
-            // do not attempt to validate unless all other validation rules have 
+            // do not attempt to validate unless all other validation rules have
             // completed successfully.
             return;
         }
@@ -35,12 +41,6 @@ public class CreateResourceAction extends ActionSupport
     public String execute()
     {
         resourceDao.save(resource);
-        return SUCCESS;
-    }
-
-    public String doDefault()
-    {
-        // setup any default data.
         return SUCCESS;
     }
 

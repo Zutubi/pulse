@@ -11,7 +11,7 @@
 #set($recipeResult = $result.root.children.get(0).result)
 #if($recipeResult.commandResults.size() > 0)
     #foreach($commandResult in $recipeResult.commandResults)
-    <h2 class="command-log">$!webwork.htmlEncode($commandResult.commandName)</h2>
+    <h2 class="section">$!webwork.htmlEncode($commandResult.commandName)</h2>
 
     <table class="content">
         #headingRow("summary" 5)
