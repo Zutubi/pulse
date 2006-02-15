@@ -11,6 +11,7 @@
         <property name="commandName" column="COMMAND_NAME" type="string" length="255"/>
 
         <property name="stamps" type="com.cinnamonbob.util.TimeStampsType">
+            <column name="QUEUE" sql-type="BIGINT"/>
             <column name="START" sql-type="BIGINT"/>
             <column name="FINISH" sql-type="BIGINT"/>
         </property>

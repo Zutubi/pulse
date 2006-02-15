@@ -11,10 +11,7 @@ import com.cinnamonbob.events.AsynchronousDelegatingListener;
 import com.cinnamonbob.events.Event;
 import com.cinnamonbob.events.EventListener;
 import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.events.build.BuildCommencedEvent;
-import com.cinnamonbob.events.build.BuildCompletedEvent;
-import com.cinnamonbob.events.build.BuildTerminationRequestEvent;
-import com.cinnamonbob.events.build.RecipeEvent;
+import com.cinnamonbob.events.build.*;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
@@ -59,7 +56,7 @@ public class BuildController implements EventListener
 
         MasterBuildPaths paths = new MasterBuildPaths();
         File buildDir = paths.getBuildDir(project, buildResult);
-        buildResult.commence(buildDir);
+        buildResult.queue(buildDir);
         buildManager.save(buildResult);
 
         // We handle this event ourselves: this ensures that all processing of
@@ -251,6 +248,12 @@ public class BuildController implements EventListener
 
     private void handleRecipeEvent(RecipeEvent e)
     {
+        if (e instanceof RecipeDispatchedEvent)
+        {
+            buildResult.recipeDispatched();
+            buildManager.save(buildResult);
+        }
+
         RecipeController controller;
         TreeNode<RecipeController> foundNode = null;
 

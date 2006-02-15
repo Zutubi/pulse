@@ -15,7 +15,7 @@ import java.sql.SQLException;
 
 public class TimeStampsType implements CompositeUserType
 {
-    private static final int[] TYPES = new int[]{Types.BIGINT, Types.BIGINT};
+    private static final int[] TYPES = new int[]{Types.BIGINT, Types.BIGINT, Types.BIGINT};
 
     public int[] sqlTypes()
     {
@@ -29,16 +29,28 @@ public class TimeStampsType implements CompositeUserType
 
     public boolean equals(Object x, Object y)
     {
-        if (x == y) return true;
-        if (x == null || y == null) return false;
+        if (x == y)
+        {
+            return true;
+        }
+        if (x == null || y == null)
+        {
+            return false;
+        }
 
         return x.equals(y);
     }
 
     public Object deepCopy(Object x)
     {
-        if (x == null) return null;
-        if (!(x instanceof TimeStamps)) return null;
+        if (x == null)
+        {
+            return null;
+        }
+        if (!(x instanceof TimeStamps))
+        {
+            return null;
+        }
         TimeStamps result = new TimeStamps((TimeStamps) x);
         return result;
     }
@@ -48,48 +60,55 @@ public class TimeStampsType implements CompositeUserType
         return true;
     }
 
-    public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session,    Object owner)
+    public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session, Object owner)
             throws HibernateException, SQLException
     {
 
-        Long startTime = (Long) Hibernate.LONG.nullSafeGet(rs, names[0]);
-        Long endTime = (Long) Hibernate.LONG.nullSafeGet(rs, names[1]);
+        Long queueTime = (Long) Hibernate.LONG.nullSafeGet(rs, names[0]);
+        Long startTime = (Long) Hibernate.LONG.nullSafeGet(rs, names[1]);
+        Long endTime = (Long) Hibernate.LONG.nullSafeGet(rs, names[2]);
 
-        return new TimeStamps((startTime != null) ? startTime : -1, (endTime != null) ? endTime : -1);
+        return new TimeStamps((queueTime != null) ? queueTime : -1, (startTime != null) ? startTime : -1, (endTime != null) ? endTime : -1);
     }
 
     public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor session)
             throws HibernateException, SQLException
     {
 
-        if(value != null)
+        if (value != null)
         {
-            TimeStamps stamps = (TimeStamps)value;
+            TimeStamps stamps = (TimeStamps) value;
 
-            Hibernate.LONG.nullSafeSet(st, stamps.getStartTime(), index);
-            Hibernate.LONG.nullSafeSet(st, stamps.getEndTime(), index + 1);
+            Hibernate.LONG.nullSafeSet(st, stamps.getQueueTime(), index);
+            Hibernate.LONG.nullSafeSet(st, stamps.getStartTime(), index + 1);
+            Hibernate.LONG.nullSafeSet(st, stamps.getEndTime(), index + 2);
         }
         else
         {
             Hibernate.LONG.nullSafeSet(st, null, index);
             Hibernate.LONG.nullSafeSet(st, null, index + 1);
+            Hibernate.LONG.nullSafeSet(st, null, index + 2);
         }
     }
 
     public String[] getPropertyNames()
     {
-        return new String[]{"startTime", "endTime"};
+        return new String[]{"queueTime", "startTime", "endTime"};
     }
 
     public Type[] getPropertyTypes()
     {
-        return new Type[]{Hibernate.LONG, Hibernate.LONG};
+        return new Type[]{Hibernate.LONG, Hibernate.LONG, Hibernate.LONG};
     }
 
     public Object getPropertyValue(Object component, int property)
     {
         TimeStamps stamps = (TimeStamps) component;
         if (property == 0)
+        {
+            return stamps.getQueueTime();
+        }
+        else if (property == 1)
         {
             return stamps.getStartTime();
         }
@@ -107,11 +126,15 @@ public class TimeStampsType implements CompositeUserType
         TimeStamps stamps = (TimeStamps) component;
         if (property == 0)
         {
-            stamps.setStartTime((Long)value);
+            stamps.setQueueTime((Long) value);
+        }
+        else if (property == 1)
+        {
+            stamps.setStartTime((Long) value);
         }
         else
         {
-            stamps.setEndTime((Long)value);
+            stamps.setEndTime((Long) value);
         }
     }
 
@@ -136,6 +159,6 @@ public class TimeStampsType implements CompositeUserType
 
     public Object replace(Object original, Object target, SessionImplementor session, Object owner) throws HibernateException
     {
-        return new TimeStamps((TimeStamps)original);
+        return new TimeStamps((TimeStamps) original);
     }
 }

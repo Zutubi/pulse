@@ -14,7 +14,7 @@ public abstract class Result extends Entity
     private static final String EXCEPTION_FILE = "exception";
 
     protected ResultState state = ResultState.INITIAL;
-    protected TimeStamps stamps = new TimeStamps(TimeStamps.UNINITIALISED_TIME);
+    protected TimeStamps stamps = new TimeStamps();
     protected File outputDir;
     protected String errorMessage;
     protected String failureMessage;
@@ -49,16 +49,23 @@ public abstract class Result extends Entity
         return succeeded() || errored() || failed();
     }
 
+    public void queue(File outputDir)
+    {
+        this.outputDir = outputDir;
+        stamps.setQueueTime(System.currentTimeMillis());
+    }
+
     public void commence(File outputDir)
     {
         this.outputDir = outputDir;
         state = ResultState.IN_PROGRESS;
         stamps = new TimeStamps();
+        stamps.setStartTime(System.currentTimeMillis());
     }
 
     public void commence(long startTime)
     {
-        this.stamps = new TimeStamps(startTime);
+        stamps.setStartTime(startTime);
         state = ResultState.IN_PROGRESS;
     }
 

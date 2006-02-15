@@ -9,6 +9,7 @@
         </id>
 
         <property name="stamps" type="com.cinnamonbob.util.TimeStampsType">
+            <column name="QUEUE" sql-type="BIGINT"/>
             <column name="START" sql-type="BIGINT"/>
             <column name="FINISH" sql-type="BIGINT"/>
         </property>
@@ -25,7 +26,8 @@
 
         <many-to-one name="project" column="PROJECT" class="com.cinnamonbob.model.Project" cascade="none"/>
 
-        <many-to-one name="buildSpecification" column="BUILD_SPEC" class="com.cinnamonbob.model.BuildSpecification" cascade="none"/>
+        <many-to-one name="buildSpecification" column="BUILD_SPEC" class="com.cinnamonbob.model.BuildSpecification"
+                     cascade="none"/>
 
         <many-to-one name="scmDetails" class="com.cinnamonbob.model.BuildScmDetails" column="SCM_DETAILS"
                      cascade="all" lazy="false"/>
@@ -78,6 +80,7 @@
         </id>
 
         <property name="stamps" type="com.cinnamonbob.util.TimeStampsType">
+            <column name="QUEUE" sql-type="BIGINT"/>
             <column name="START" sql-type="BIGINT"/>
             <column name="FINISH" sql-type="BIGINT"/>
         </property>

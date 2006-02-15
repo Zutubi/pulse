@@ -8,52 +8,47 @@ import java.util.Date;
  */
 public class TimeStamps
 {
-    public static long UNINITIALISED_TIME = -1;
+    public static final long UNINITIALISED_TIME = -1;
 
+    private long queueTime;
     private long startTime;
     private long endTime;
 
     public TimeStamps()
     {
-        startTime = System.currentTimeMillis();
+        queueTime = UNINITIALISED_TIME;
+        startTime = UNINITIALISED_TIME;
         endTime = UNINITIALISED_TIME;
     }
 
-
-    public TimeStamps(long startTime)
+    public TimeStamps(long queueTime, long startTime, long endTime)
     {
-        this.startTime = startTime;
-        this.endTime = UNINITIALISED_TIME;
-    }
-
-
-    public TimeStamps(long startTime, long endTime)
-    {
+        this.queueTime = queueTime;
         this.startTime = startTime;
         this.endTime = endTime;
     }
 
-
     public TimeStamps(TimeStamps other)
     {
+        this.queueTime = other.queueTime;
         this.startTime = other.startTime;
         this.endTime = other.endTime;
     }
-
 
     public void end()
     {
         endTime = System.currentTimeMillis();
     }
 
-    /**
-     * @return Returns the endTime.
-     */
-    public long getEndTime()
+    public long getQueueTime()
     {
-        return endTime;
+        return queueTime;
     }
 
+    public void setQueueTime(long queueTime)
+    {
+        this.queueTime = queueTime;
+    }
 
     /**
      * @return Returns the startTime.
@@ -66,6 +61,14 @@ public class TimeStamps
     public void setStartTime(long t)
     {
         startTime = t;
+    }
+
+    /**
+     * @return Returns the endTime.
+     */
+    public long getEndTime()
+    {
+        return endTime;
     }
 
     public void setEndTime(long t)
@@ -89,18 +92,20 @@ public class TimeStamps
         }
     }
 
-
-    public String getPrettyEndTime()
+    public String getPrettyQueueTime()
     {
-        return getPrettyTime(endTime);
+        return getPrettyTime(queueTime);
     }
-
 
     public String getPrettyStartTime()
     {
         return getPrettyTime(startTime);
     }
 
+    public String getPrettyEndTime()
+    {
+        return getPrettyTime(endTime);
+    }
 
     public String getPrettyElapsed()
     {
@@ -121,12 +126,11 @@ public class TimeStamps
         }
         else
         {
-            elapsed = addElapsedPart(elapsed, Constants.SECOND, "second", result);
+            addElapsedPart(elapsed, Constants.SECOND, "second", result);
         }
 
         return result.toString();
     }
-
 
     public boolean equals(Object other)
     {
@@ -136,9 +140,8 @@ public class TimeStamps
         }
 
         TimeStamps otherStamps = (TimeStamps) other;
-        return startTime == otherStamps.startTime && endTime == otherStamps.endTime;
+        return queueTime == otherStamps.queueTime && startTime == otherStamps.startTime && endTime == otherStamps.endTime;
     }
-
 
     private long addElapsedPart(long elapsed, long millisPerPart, String partName, StringBuffer result)
     {
@@ -165,7 +168,6 @@ public class TimeStamps
 
         return elapsed;
     }
-
 
     public static String getPrettyTime(long time)
     {
