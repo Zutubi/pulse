@@ -23,6 +23,7 @@ public class RegexPostProcessorTest extends BobTestCase
             "abc xxx",
             "abc xxx abc"};
     private StoredArtifact artifact;
+    private File tempFile;
     private File tempDir;
 
 
@@ -33,7 +34,7 @@ public class RegexPostProcessorTest extends BobTestCase
         fileArtifact.setTitle("test title");
         fileArtifact.setType("text/plain");
 
-        File tempFile = File.createTempFile("regex-pp-test", null);
+        tempFile = File.createTempFile("regex-pp-test", null);
         tempDir = tempFile.getParentFile();
         PrintWriter writer = null;
 
@@ -56,7 +57,6 @@ public class RegexPostProcessorTest extends BobTestCase
 
     public void tearDown()
     {
-        File tempFile = new File(artifact.getFile());
         tempFile.delete();
     }
 
