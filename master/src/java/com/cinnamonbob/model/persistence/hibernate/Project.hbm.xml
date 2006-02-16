@@ -37,13 +37,10 @@
         <discriminator column="SOURCE_TYPE" type="string" length="63"/>
 
         <subclass name="com.cinnamonbob.model.CustomBobFileDetails" discriminator-value="CUSTOM" lazy="false">
-
             <property name="bobFileName" column="BOB_FILE_NAME" type="string" length="255"/>
-
         </subclass>
 
         <subclass name="com.cinnamonbob.model.AntBobFileDetails" discriminator-value="ANT" lazy="false">
-
             <property name="buildFile" column="BUILD_FILE" type="string" length="255"/>
 
             <property name="targets" column="TARGETS" type="string" length="255"/>
@@ -53,14 +50,23 @@
                 <index column="NAME" type="string"/>
                 <element type="string" column="VALUE"/>
             </map>
+        </subclass>
 
+        <subclass name="com.cinnamonbob.model.MakeBobFileDetails" discriminator-value="MAKE" lazy="false">
+            <property name="makefile" column="MAKEFILE" type="string" length="255"/>
+
+            <property name="targets" column="TARGETS" type="string" length="255"/>
+
+            <map name="environment" lazy="false" table="MAKE_SOURCE_ENVIRONMENT" cascade="all">
+                <key column="SOURCE_ID"/>
+                <index column="NAME" type="string"/>
+                <element type="string" column="VALUE"/>
+            </map>
         </subclass>
 
         <subclass name="com.cinnamonbob.model.MavenBobFileDetails" discriminator-value="MAVEN" lazy="false">
-
             <property name="baseDir" column="BASE_DIR" type="string" length="255"/>
             <property name="targets" column="TARGETS" type="string" length="255"/>
-
         </subclass>
 
     </class>

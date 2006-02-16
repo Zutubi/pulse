@@ -1,9 +1,9 @@
 <!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
         "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
 <validators>
-    <field name="details">
-        <field-validator type="visitor">
-            <message></message>
+    <field name="makefile">
+        <field-validator type="requiredstring">
+            <message>makefile is required.</message>
         </field-validator>
     </field>
 </validators>

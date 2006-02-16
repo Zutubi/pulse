@@ -8,39 +8,39 @@ import java.util.TreeMap;
 
 /**
  */
-public class AntBobFileDetails extends TemplateBobFileDetails
+public class MakeBobFileDetails extends TemplateBobFileDetails
 {
-    private String buildFile;
+    private String makefile;
     /**
      * Space-separated list of target names (persists more efficiently)
      */
     private String targets;
     private Map<String, String> environment;
 
-    public AntBobFileDetails()
+    public MakeBobFileDetails()
     {
-        buildFile = null;
+        makefile = null;
         targets = null;
         environment = new TreeMap<String, String>();
     }
 
-    public AntBobFileDetails(String buildFile, String targets, Map<String, String> environment)
+    public MakeBobFileDetails(String buildFile, String targets, Map<String, String> environment)
     {
-        this.buildFile = buildFile;
+        this.makefile = buildFile;
         this.targets = targets;
         this.environment = environment;
     }
 
     protected String getTemplateName()
     {
-        return "ant.template.vm";
+        return "make.template.vm";
     }
 
     protected void populateContext(VelocityContext context)
     {
-        if (buildFile != null)
+        if (makefile != null)
         {
-            context.put("buildFile", buildFile);
+            context.put("makefile", makefile);
         }
 
         if (targets != null)
@@ -51,14 +51,14 @@ public class AntBobFileDetails extends TemplateBobFileDetails
         context.put("environment", environment);
     }
 
-    public String getBuildFile()
+    public String getMakefile()
     {
-        return buildFile;
+        return makefile;
     }
 
-    public void setBuildFile(String buildFile)
+    public void setMakefile(String makefile)
     {
-        this.buildFile = buildFile;
+        this.makefile = makefile;
     }
 
     public String getTargets()
@@ -88,7 +88,7 @@ public class AntBobFileDetails extends TemplateBobFileDetails
 
     public String getType()
     {
-        return "ant";
+        return "make";
     }
 
     public Properties getProperties()
@@ -96,9 +96,9 @@ public class AntBobFileDetails extends TemplateBobFileDetails
         // TODO i18n
         Properties result = new Properties();
 
-        if (buildFile != null)
+        if (makefile != null)
         {
-            result.put("build file", buildFile);
+            result.put("makefile", makefile);
         }
 
         if (targets != null)

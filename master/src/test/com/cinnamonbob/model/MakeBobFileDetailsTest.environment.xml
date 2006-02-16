@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<project defaultRecipe="make build">
+    <recipe name="make build">
+        <resource name="make"/>
+        <command name="build">
+            <make exe="${make.bin}" working-dir="${work.dir}"
+                    >
+                <environment name="var" value="value"/>
+                <environment name="var2" value="value2"/>
+            </make>
+        </command>
+    </recipe>
+</project>

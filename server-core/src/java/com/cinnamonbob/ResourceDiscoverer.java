@@ -18,6 +18,7 @@ public class ResourceDiscoverer implements Runnable
     public void run()
     {
         discoverAnt();
+        discoverMake();
     }
 
     private void discoverAnt()
@@ -52,6 +53,20 @@ public class ResourceDiscoverer implements Runnable
                 }
 
                 resourceDao.save(antResource);
+            }
+        }
+    }
+
+    private void discoverMake()
+    {
+        if (!resourceRepository.hasResource("make"))
+        {
+            File makeBin = SystemUtils.findInPath("make");
+            if (makeBin != null)
+            {
+                Resource makeResource = new Resource("make");
+                makeResource.addProperty(new Property("make.bin", makeBin.getAbsolutePath()));
+                resourceDao.save(makeResource);
             }
         }
     }

@@ -4,5 +4,6 @@
         <ant name="test"/>
         <ant name="test" exe="myant"/>
         <ant name="test" targets="build test"/>
+        <ant name="test" build-file="mybuild.xml"/>
     </recipe>
 </project>

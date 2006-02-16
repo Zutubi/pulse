@@ -40,6 +40,7 @@ public class BobFileLoader
         fileLoader.register("regex", RegexPostProcessor.class);
         fileLoader.register("ant", AntCommand.class);
         fileLoader.register("executable", ExecutableCommand.class);
+        fileLoader.register("make", MakeCommand.class);
         fileLoader.register("resource", ResourceReference.class);
 
         fileLoader.setObjectFactory(new ObjectFactory());

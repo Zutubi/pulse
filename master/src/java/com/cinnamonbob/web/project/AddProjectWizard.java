@@ -31,6 +31,9 @@ public class AddProjectWizard extends BaseWizard
 
     private CustomDetails customDetails;
     private AntDetails antDetails;
+    private MakeDetails makeDetails;
+    private MavenDetails mavenDetails;
+
     private WizardCompleteState completeState;
 
     private ProjectManager projectManager;
@@ -38,7 +41,6 @@ public class AddProjectWizard extends BaseWizard
     private Scheduler scheduler;
 
     private long projectId;
-    private MavenDetails mavenDetails;
 
     public AddProjectWizard()
     {
@@ -52,6 +54,7 @@ public class AddProjectWizard extends BaseWizard
 
         // step 3, project.
         antDetails = new AntDetails(this, "ant");
+        makeDetails = new MakeDetails(this, "make");
         mavenDetails = new MavenDetails(this, "maven");
         customDetails = new CustomDetails(this, "custom");
 
@@ -65,6 +68,7 @@ public class AddProjectWizard extends BaseWizard
         addState(svnDetails);
         addState(p4Details);
         addState(antDetails);
+        addState(makeDetails);
         addState(mavenDetails);
         addState(customDetails);
         addState(completeState);
@@ -106,6 +110,10 @@ public class AddProjectWizard extends BaseWizard
         else if ("custom".equals(projectType))
         {
             details = customDetails.getDetails();
+        }
+        else if ("make".equals(projectType))
+        {
+            details = makeDetails.getDetails();
         }
         else if ("maven".equals(projectType))
         {
@@ -202,6 +210,7 @@ public class AddProjectWizard extends BaseWizard
                 types = new TreeMap<String, String>();
                 types.put("ant", "ant project");
                 types.put("custom", "custom project");
+                types.put("make", "make project");
                 types.put("maven", "maven project");
             }
             return types;
@@ -342,7 +351,7 @@ public class AddProjectWizard extends BaseWizard
             return ((AddProjectWizard) getWizard()).completeState.getStateName();
         }
 
-        public BobFileDetails getDetails()
+        public AntBobFileDetails getDetails()
         {
             return details;
         }
@@ -352,6 +361,39 @@ public class AddProjectWizard extends BaseWizard
             if (!TextUtils.stringSet(details.getBuildFile()))
             {
                 details.setBuildFile(null);
+            }
+
+            if (!TextUtils.stringSet(details.getTargets()))
+            {
+                details.setTargets(null);
+            }
+        }
+    }
+
+    private class MakeDetails extends BaseWizardState
+    {
+        private MakeBobFileDetails details = new MakeBobFileDetails("Makefile", null, null);
+
+        public MakeDetails(Wizard wizard, String name)
+        {
+            super(wizard, name);
+        }
+
+        public String getNextStateName()
+        {
+            return ((AddProjectWizard) getWizard()).completeState.getStateName();
+        }
+
+        public MakeBobFileDetails getDetails()
+        {
+            return details;
+        }
+
+        public void execute()
+        {
+            if (!TextUtils.stringSet(details.getMakefile()))
+            {
+                details.setMakefile(null);
             }
 
             if (!TextUtils.stringSet(details.getTargets()))

@@ -1,16 +1,15 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.util.SystemUtils;
 
 import java.io.File;
 
 /**
  */
-public class AntCommand extends ExecutableCommand implements Command, ScopeAware
+public class MakeCommand extends ExecutableCommand implements Command, ScopeAware
 {
     private Scope scope;
-    private String buildFile;
+    private String makefile;
     private String targets;
 
     private void checkExe()
@@ -19,7 +18,7 @@ public class AntCommand extends ExecutableCommand implements Command, ScopeAware
         {
             if (scope != null)
             {
-                Reference ref = scope.getReference("ant.bin");
+                Reference ref = scope.getReference("make.bin");
                 if (ref != null && ref.getValue() instanceof String)
                 {
                     setExe((String) ref.getValue());
@@ -28,14 +27,7 @@ public class AntCommand extends ExecutableCommand implements Command, ScopeAware
 
             if (getExe() == null)
             {
-                if (SystemUtils.isWindows())
-                {
-                    setExe("ant.bat");
-                }
-                else
-                {
-                    setExe("ant");
-                }
+                setExe("make");
             }
         }
     }
@@ -44,10 +36,10 @@ public class AntCommand extends ExecutableCommand implements Command, ScopeAware
     {
         checkExe();
 
-        if (buildFile != null)
+        if (makefile != null)
         {
-            addArguments("-f", buildFile);
-            cmdResult.getProperties().put("build file", buildFile);
+            addArguments("-f", makefile);
+            cmdResult.getProperties().put("makefile", makefile);
         }
 
         if (targets != null)
@@ -59,14 +51,14 @@ public class AntCommand extends ExecutableCommand implements Command, ScopeAware
         super.execute(workDir, outputDir, cmdResult);
     }
 
-    public String getBuildFile()
+    public String getMakefile()
     {
-        return buildFile;
+        return makefile;
     }
 
-    public void setBuildFile(String buildFile)
+    public void setMakefile(String makefile)
     {
-        this.buildFile = buildFile;
+        this.makefile = makefile;
     }
 
     public String getTargets()

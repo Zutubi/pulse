@@ -21,6 +21,12 @@ public class SystemUtils
         return osName().toLowerCase().contains("win");
     }
 
+    /**
+     * Attempts to find a file with the given name in the PATH.
+     *
+     * @param name the name of the file to look for
+     * @return the file in the path, or null if not found
+     */
     public static File findInPath(String name)
     {
         String path = System.getenv("PATH");

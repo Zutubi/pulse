@@ -1,0 +1,23 @@
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=edit.make")</title>
+</head>
+<body>
+    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editMakeDetails.action" "heading=%{getText('edit.make')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=projectId")
+
+    #wwtextfield("name=details.makefile" "label=%{getText('make.filename')}" "required=true" "size=40" "tabindex=1")
+    #inlineHelp("make.filename.help")
+    #wwtextfield("name=details.targets" "label=%{getText('make.targets')}" "size=40" "tabindex=2")
+    #inlineHelp("make.targets.help")
+
+    #saveCancel(3)
+ #end
+</body>
+</html>

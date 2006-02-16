@@ -318,7 +318,8 @@
 
         <action name="editBobFileDetails" class="com.cinnamonbob.web.project.EditBobFileDetailsAction">
             <result name="custom" type="chain">editCustomDetails!input</result>
-            <result name="jakarta ant" type="chain">editAntDetails!input</result>
+            <result name="ant" type="chain">editAntDetails!input</result>
+            <result name="make" type="chain">editMakeDetails!input</result>
             <result name="maven" type="chain">editMavenDetails!input</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
@@ -351,6 +352,19 @@
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editMakeDetails!input" class="com.cinnamonbob.web.project.EditMakeDetailsAction" method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-make.vm</result>
+        </action>
+
+        <action name="editMakeDetails" class="com.cinnamonbob.web.project.EditMakeDetailsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-make.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
         <action name="editMavenDetails!input" class="com.cinnamonbob.web.project.EditMavenDetailsAction"
                 method="doInput">
             <interceptor-ref name="crudStack"/>
@@ -376,6 +390,7 @@
             <result name="custom" type="velocity">addproject-custom.vm</result>
             <result name="maven" type="velocity">addproject-maven.vm</result>
             <result name="ant" type="velocity">addproject-ant.vm</result>
+            <result name="make" type="velocity">addproject-make.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="cancel" type="redirect">/viewProjects.action</result>
         </action>

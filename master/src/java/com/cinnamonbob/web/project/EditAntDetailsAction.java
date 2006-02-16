@@ -5,8 +5,7 @@ import com.cinnamonbob.model.BobFileDetails;
 import com.opensymphony.util.TextUtils;
 
 /**
- *
- *
+ * Action for editing properties of an ant project.
  */
 public class EditAntDetailsAction extends AbstractEditDetailsAction
 {

@@ -6,13 +6,13 @@ import java.io.IOException;
 
 /**
  */
-public class AntBobFileDetailsTest extends TemplateBobFileDetailsTest
+public class MakeBobFileDetailsTest extends TemplateBobFileDetailsTest
 {
-    private AntBobFileDetails details;
+    private MakeBobFileDetails details;
 
     protected void setUp() throws Exception
     {
-        details = new AntBobFileDetails();
+        details = new MakeBobFileDetails();
         super.setUp();
     }
 
@@ -34,8 +34,8 @@ public class AntBobFileDetailsTest extends TemplateBobFileDetailsTest
 
     public void testExplicitBuildFile() throws IOException
     {
-        details.setBuildFile("test.xml");
-        createAndVerify("explicitBuildFile");
+        details.setMakefile("test.makefile");
+        createAndVerify("explicitMakefile");
     }
 
     public void testEnvironment() throws IOException

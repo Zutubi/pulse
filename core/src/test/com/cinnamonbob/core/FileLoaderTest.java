@@ -46,6 +46,7 @@ public class FileLoaderTest extends BobTestCase
         loader.register("regex", RegexPostProcessor.class);
         loader.register("executable", ExecutableCommand.class);
         loader.register("ant", AntCommand.class);
+        loader.register("make", MakeCommand.class);
         loader.register("dependency", Dependency.class);
     }
 
@@ -244,6 +245,10 @@ public class FileLoaderTest extends BobTestCase
         assertEquals(mapping.getArtifact(), command.getCommand().getArtifactNames().get(0));
     }
 
+    //-----------------------------------------------------------------------
+    // Ant command
+    //-----------------------------------------------------------------------
+
     private AntCommand antCommandHelper(int commandIndex) throws Exception
     {
         BobFile bf = new BobFile();
@@ -276,6 +281,56 @@ public class FileLoaderTest extends BobTestCase
     {
         AntCommand command = antCommandHelper(2);
         assertEquals("build test", command.getTargets());
+    }
+
+    public void testAntCommandBuildFile() throws Exception
+    {
+        AntCommand command = antCommandHelper(3);
+        assertEquals("mybuild.xml", command.getBuildFile());
+    }
+
+    //-----------------------------------------------------------------------
+    // Make command
+    //-----------------------------------------------------------------------
+
+    private MakeCommand makeCommandHelper(int commandIndex) throws Exception
+    {
+        BobFile bf = new BobFile();
+        loader.load(getInput("testMakeCommand"), bf);
+
+        List<Recipe> recipes = bf.getRecipes();
+        assertEquals(recipes.size(), 1);
+
+        Recipe recipe = recipes.get(0);
+        List<Command> commands = recipe.getCommands();
+        assertTrue(commands.get(commandIndex) instanceof MakeCommand);
+
+        return (MakeCommand) commands.get(commandIndex);
+    }
+
+    public void testMakeCommandDefaults() throws Exception
+    {
+        MakeCommand command = makeCommandHelper(0);
+        assertEquals("make", command.getExe());
+        assertNull(command.getTargets());
+    }
+
+    public void testMakeCommandCustomExe() throws Exception
+    {
+        MakeCommand command = makeCommandHelper(1);
+        assertEquals("mymake", command.getExe());
+    }
+
+    public void testMakeCommandTargets() throws Exception
+    {
+        MakeCommand command = makeCommandHelper(2);
+        assertEquals("build test", command.getTargets());
+    }
+
+    public void testMakeCommandMakefile() throws Exception
+    {
+        MakeCommand command = makeCommandHelper(3);
+        assertEquals("mymakefile", command.getMakefile());
     }
 
     //-----------------------------------------------------------------------

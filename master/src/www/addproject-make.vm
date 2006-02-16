@@ -1,0 +1,25 @@
+<html>
+<head>
+    <title>#wwtext("name=add.project")</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=add.project") ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=addProject.action" "heading=%{getText('make.setup')}" "method=post")
+    #wwhidden("name=state")
+
+    #wwtextfield("name=details.makefile" "label=%{getText('make.filename')}" "required=true" "size=40" "tabindex=1")
+    #inlineHelp("make.filename.help")
+    #wwtextfield("name=details.targets" "label=%{getText('make.targets')}" "size=40" "tabindex=2")
+    #inlineHelp("make.targets.help")
+
+    #openSubmit()
+        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=3")
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=4")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=5")
+    #closeSubmit()
+#end
+</body>
+</html>

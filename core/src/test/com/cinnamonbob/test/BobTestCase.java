@@ -1,5 +1,6 @@
 package com.cinnamonbob.test;
 
+import com.cinnamonbob.Version;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
@@ -203,14 +204,24 @@ public abstract class BobTestCase extends TestCase
         }
     }
 
-
     protected InputStream getInput(String testName)
     {
-        return getClass().getResourceAsStream(getClass().getSimpleName() + "." + testName + ".xml");
+        return getInput(testName, "xml");
+    }
+
+    protected InputStream getInput(String testName, String extension)
+    {
+        return getClass().getResourceAsStream(getClass().getSimpleName() + "." + testName + "." + extension);
     }
 
     protected URL getInputURL(String testName)
     {
         return getClass().getResource(getClass().getSimpleName() + "." + testName + ".xml");
+    }
+
+    protected File getBobRoot()
+    {
+        URL resource = Version.class.getResource("version.properties");
+        return new File(resource.getPath().replaceFirst("core/classes/.*", ""));
     }
 }

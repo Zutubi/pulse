@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<project defaultRecipe="make build">
+    <recipe name="make build">
+        <resource name="make"/>
+        <command name="build">
+            <make exe="${make.bin}" working-dir="${work.dir}"
+#if($makefile)
+                 makefile="$makefile"
+#end
+#if($targets)
+                 targets="$targets"
+#end
+                    >
+#foreach($key in $environment.keySet())
+                <environment name="$key" value="$environment.get($key)"/>
+#end
+            </make>
+        </command>
+    </recipe>
+</project>
