@@ -28,6 +28,16 @@ public class EditMakeDetailsAction extends AbstractEditDetailsAction
             details.setTargets(null);
         }
 
+        if (!TextUtils.stringSet(details.getArguments()))
+        {
+            details.setArguments(null);
+        }
+
+        if (!TextUtils.stringSet(details.getWorkingDir()))
+        {
+            details.setWorkingDir(null);
+        }
+
         return details;
     }
 }

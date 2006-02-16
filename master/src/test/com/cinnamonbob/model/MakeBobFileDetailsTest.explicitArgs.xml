@@ -4,6 +4,7 @@
         <resource name="make"/>
         <command name="build">
             <make exe="${make.bin}"
+                  args="arg1 arg2"
                     >
             </make>
         </command>

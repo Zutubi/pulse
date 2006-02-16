@@ -15,19 +15,31 @@ public class MakeBobFileDetails extends TemplateBobFileDetails
      * Space-separated list of target names (persists more efficiently)
      */
     private String targets;
+    /**
+     * Extra arguments to pass to make.
+     */
+    private String arguments;
+    /**
+     * Path relative to work.dir in which to execute the make.
+     */
+    private String workingDir;
     private Map<String, String> environment;
 
     public MakeBobFileDetails()
     {
         makefile = null;
         targets = null;
+        arguments = null;
+        workingDir = null;
         environment = new TreeMap<String, String>();
     }
 
-    public MakeBobFileDetails(String buildFile, String targets, Map<String, String> environment)
+    public MakeBobFileDetails(String buildFile, String targets, String arguments, String workDir, Map<String, String> environment)
     {
         this.makefile = buildFile;
         this.targets = targets;
+        this.arguments = arguments;
+        this.workingDir = workDir;
         this.environment = environment;
     }
 
@@ -46,6 +58,16 @@ public class MakeBobFileDetails extends TemplateBobFileDetails
         if (targets != null)
         {
             context.put("targets", targets);
+        }
+
+        if (arguments != null)
+        {
+            context.put("arguments", arguments);
+        }
+
+        if (workingDir != null)
+        {
+            context.put("workingDir", workingDir);
         }
 
         context.put("environment", environment);
@@ -69,6 +91,26 @@ public class MakeBobFileDetails extends TemplateBobFileDetails
     public void setTargets(String targets)
     {
         this.targets = targets;
+    }
+
+    public String getArguments()
+    {
+        return arguments;
+    }
+
+    public void setArguments(String arguments)
+    {
+        this.arguments = arguments;
+    }
+
+    public String getWorkingDir()
+    {
+        return workingDir;
+    }
+
+    public void setWorkingDir(String workingDir)
+    {
+        this.workingDir = workingDir;
     }
 
     public Map<String, String> getEnvironment()
@@ -104,6 +146,16 @@ public class MakeBobFileDetails extends TemplateBobFileDetails
         if (targets != null)
         {
             result.put("targets", targets);
+        }
+
+        if (workingDir != null)
+        {
+            result.put("working directory", workingDir);
+        }
+
+        if (arguments != null)
+        {
+            result.put("arguments", arguments);
         }
 
         String env = getEnvironmentString();

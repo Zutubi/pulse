@@ -57,6 +57,10 @@
 
             <property name="targets" column="TARGETS" type="string" length="255"/>
 
+            <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
+
+            <property name="workingDir" column="WORKING_DIR" type="string" length="255"/>
+
             <map name="environment" lazy="false" table="MAKE_SOURCE_ENVIRONMENT" cascade="all">
                 <key column="SOURCE_ID"/>
                 <index column="NAME" type="string"/>

@@ -3,12 +3,18 @@
     <recipe name="make build">
         <resource name="make"/>
         <command name="build">
-            <make exe="${make.bin}" working-dir="${work.dir}"
+            <make exe="${make.bin}"
+#if($arguments)
+                  args="$arguments"
+#end
+#if($workingDir)
+                  working-dir="${work.dir}/$workingDir"
+#end
 #if($makefile)
-                 makefile="$makefile"
+                  makefile="$makefile"
 #end
 #if($targets)
-                 targets="$targets"
+                  targets="$targets"
 #end
                     >
 #foreach($key in $environment.keySet())

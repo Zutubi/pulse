@@ -50,4 +50,16 @@ public class MakeBobFileDetailsTest extends TemplateBobFileDetailsTest
         details.setTargets("build test");
         createAndVerify("explicitTargets");
     }
+
+    public void testExplicitWorkingDir() throws IOException
+    {
+        details.setWorkingDir("mywork");
+        createAndVerify("explicitWorkingDir");
+    }
+
+    public void testExplicitArgs() throws IOException
+    {
+        details.setArguments("arg1 arg2");
+        createAndVerify("explicitArgs");
+    }
 }

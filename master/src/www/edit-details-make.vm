@@ -16,8 +16,12 @@
     #inlineHelp("make.filename.help")
     #wwtextfield("name=details.targets" "label=%{getText('make.targets')}" "size=40" "tabindex=2")
     #inlineHelp("make.targets.help")
+    #wwtextfield("name=details.workingDir" "label=%{getText('make.working.dir')}" "size=40" "tabindex=3")
+    #inlineHelp("make.working.dir.help")
+    #wwtextfield("name=details.arguments" "label=%{getText('make.args')}" "size=40" "tabindex=4")
+    #inlineHelp("make.args.help")
 
-    #saveCancel(3)
+    #saveCancel(5)
  #end
 </body>
 </html>

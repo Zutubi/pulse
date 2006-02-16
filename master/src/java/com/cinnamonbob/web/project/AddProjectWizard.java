@@ -372,7 +372,7 @@ public class AddProjectWizard extends BaseWizard
 
     private class MakeDetails extends BaseWizardState
     {
-        private MakeBobFileDetails details = new MakeBobFileDetails("Makefile", null, null);
+        private MakeBobFileDetails details = new MakeBobFileDetails("Makefile", null, null, null, null);
 
         public MakeDetails(Wizard wizard, String name)
         {
@@ -399,6 +399,16 @@ public class AddProjectWizard extends BaseWizard
             if (!TextUtils.stringSet(details.getTargets()))
             {
                 details.setTargets(null);
+            }
+
+            if (!TextUtils.stringSet(details.getArguments()))
+            {
+                details.setArguments(null);
+            }
+
+            if (!TextUtils.stringSet(details.getWorkingDir()))
+            {
+                details.setWorkingDir(null);
             }
         }
     }

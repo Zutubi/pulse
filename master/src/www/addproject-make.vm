@@ -14,11 +14,15 @@
     #inlineHelp("make.filename.help")
     #wwtextfield("name=details.targets" "label=%{getText('make.targets')}" "size=40" "tabindex=2")
     #inlineHelp("make.targets.help")
+    #wwtextfield("name=details.workingDir" "label=%{getText('make.working.dir')}" "size=40" "tabindex=3")
+    #inlineHelp("make.working.dir.help")
+    #wwtextfield("name=details.arguments" "label=%{getText('make.args')}" "size=40" "tabindex=4")
+    #inlineHelp("make.args.help")
 
     #openSubmit()
-        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=3")
-        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=4")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=5")
+        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=5")
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=6")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=7")
     #closeSubmit()
 #end
 </body>

@@ -3,7 +3,7 @@
     <recipe name="make build">
         <resource name="make"/>
         <command name="build">
-            <make exe="${make.bin}" working-dir="${work.dir}"
+            <make exe="${make.bin}"
                   targets="build test"
                     >
             </make>
