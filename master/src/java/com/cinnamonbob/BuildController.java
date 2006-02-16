@@ -113,8 +113,7 @@ public class BuildController implements EventListener
             }
             catch (SCMException e)
             {
-                // TODO: need to report this failure to the user. However, this is not fatal to the current build
-                LOG.warning("Unable to retrieve changelist details from SCM server. ", e);
+                LOG.warning("Unable to retrieve changelist details from SCM server: " + e.getMessage(), e);
             }
 
             BuildScmDetails scmDetails = new BuildScmDetails(latestRevision, scmChanges);

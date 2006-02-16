@@ -3,13 +3,11 @@ package com.cinnamonbob;
 import com.cinnamonbob.core.Bootstrapper;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.RecipePaths;
-import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.model.Scm;
 import com.cinnamonbob.scm.SCMException;
 
 import java.io.File;
-import java.util.LinkedList;
 
 /**
  * A bootstrapper that populates the working directory by checking out from one
@@ -40,8 +38,7 @@ public class ScmBootstrapper implements Bootstrapper
 
         try
         {
-            // TODO this list is not needed, perhaps make it optional in SCM interface?
-            scm.createServer().checkout(recipeId, checkoutDir, revision, new LinkedList<Change>());
+            scm.createServer().checkout(recipeId, checkoutDir, revision, null);
         }
         catch (SCMException e)
         {

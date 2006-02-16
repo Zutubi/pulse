@@ -28,8 +28,9 @@ public interface SCMServer
      * @param id          a unique identifier for this checkout
      * @param toDirectory root directory to check the copy out to
      * @param revision    the revision to check out, or null for most recent (HEAD)
-     * @param changes     receives a list of change objects indicating the files that were
-     *                    checked out (the action will be ADD)
+     * @param changes     if not null, receives a list of change objects
+     *                    indicating the files that were checked out (the
+     *                    action will be ADD)
      * @return the revision actually checked out
      * @throws SCMException if an error occurs communicating with the server
      */

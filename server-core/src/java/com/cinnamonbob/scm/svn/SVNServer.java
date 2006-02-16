@@ -223,7 +223,11 @@ public class SVNServer implements SCMServer
             {
                 workspace = SVNWorkspaceManager.createWorkspace("file", toDirectory.getAbsolutePath());
                 workspace.setCredentials(credentials);
-                workspace.addWorkspaceListener(accumulator);
+
+                if (changes != null)
+                {
+                    workspace.addWorkspaceListener(accumulator);
+                }
 
                 try
                 {

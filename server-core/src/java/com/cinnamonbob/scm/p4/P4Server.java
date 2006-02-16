@@ -142,8 +142,8 @@ public class P4Server implements SCMServer
         String clientName = "bob-temp-" + id;
 
         clientSpec = clientSpec.replaceAll("\nRoot:.*", Matcher.quoteReplacement("\nRoot: " + toDirectory.getAbsolutePath()));
-//        clientSpec = clientSpec.replaceAll("\nClient:.*" + templateClient, Matcher.quoteReplacement("\nClient: " + clientName));
-//        clientSpec = clientSpec.replaceAll("//" + templateClient + "/", Matcher.quoteReplacement("//" + clientName + "/"));
+        clientSpec = clientSpec.replaceAll("\nClient:.*" + templateClient, Matcher.quoteReplacement("\nClient: " + clientName));
+        clientSpec = clientSpec.replaceAll("//" + templateClient + "/", Matcher.quoteReplacement("//" + clientName + "/"));
 
         runP4(clientSpec, P4_COMMAND, COMMAND_CLIENT, FLAG_INPUT);
         clientRoot = toDirectory;
@@ -373,23 +373,25 @@ public class P4Server implements SCMServer
     {
         String clientName = updateClient(id, toDirectory);
 
-//        try
-//        {
-        if (revision == null)
+        try
         {
-            revision = getLatestRevision();
+            if (revision == null)
+            {
+                revision = getLatestRevision();
+            }
+
+            long number = ((NumericalRevision) revision).getRevisionNumber();
+            P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
+
+            if (changes != null)
+            {
+                populateChanges(result.stdout, changes);
+            }
         }
-
-        long number = ((NumericalRevision) revision).getRevisionNumber();
-//            P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
-        P4Result result = runP4(null, P4_COMMAND, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
-
-        populateChanges(result.stdout, changes);
-//        }
-//        finally
-//        {
-//            runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_DELETE, clientName);
-//        }
+        finally
+        {
+            runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_DELETE, clientName);
+        }
 
         return revision;
     }

@@ -63,14 +63,13 @@ public class FileConfigurationTest extends TestCase
         assertEquals(1, props.size());
     }
 
-    public void testModifyPropertiesFileDirectly() throws IOException
+    public void testModifyPropertiesFileDirectly() throws IOException, InterruptedException
     {
         assertEquals("value", config.getProperty("key"));
-
+        Thread.sleep(1000);
         Properties updatedProperties = new Properties();
         updatedProperties.put("key", "anotherValue");
         IOUtils.write(updatedProperties, testProperties);
-
         assertEquals("anotherValue", config.getProperty("key"));
     }
 }

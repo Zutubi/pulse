@@ -45,10 +45,14 @@ public class CvsServer implements SCMServer
         try
         {
             Revision checkedOutRevision = checkout(toDirectory, revision);
-            for (Changelist changelist : getChanges(revision, checkedOutRevision))
+            if (changes != null)
             {
-                changes.addAll(changelist.getChanges());
+                for (Changelist changelist : getChanges(revision, checkedOutRevision))
+                {
+                    changes.addAll(changelist.getChanges());
+                }
             }
+
             return checkedOutRevision;
         }
         catch (IOException e)
