@@ -37,8 +37,9 @@ public class LocalBuildTest extends BobTestCase
         URL url = getClass().getResource(getClass().getSimpleName() + ".basic.xml");
         File xmlFile = new File(url.getFile());
         File dataDir = new File(xmlFile.getParentFile(), "data");
+        File srcData = new File(dataDir.getAbsolutePath().replace("classes", "src/test"));
 
-        return new File(dataDir, name);
+        return new File(srcData, name);
     }
 
     private String copyFile(String name) throws IOException
@@ -53,10 +54,7 @@ public class LocalBuildTest extends BobTestCase
 
     public void testBasicBuild() throws Exception
     {
-        String bobFile = copyFile("basic");
-
-        builder.runBuild(tmpDir, bobFile, "my-default", null, "out");
-        compareOutput("basic");
+        simpleCase("basic");
     }
 
     public void testInvalidWorkDir() throws BobException
@@ -95,6 +93,18 @@ public class LocalBuildTest extends BobTestCase
 
         builder.runBuild(tmpDir, bobFile, null, resourceFile, "out");
         compareOutput("resourceload");
+    }
+
+    public void testCommandFailure() throws Exception
+    {
+        simpleCase("commandFailure");
+    }
+
+    private void simpleCase(String name) throws IOException, BobException
+    {
+        String bobFile = copyFile(name);
+        builder.runBuild(tmpDir, bobFile, "my-default", null, "out");
+        compareOutput(name);
     }
 
     private void cleanBuildLog(File log) throws IOException
@@ -136,13 +146,34 @@ public class LocalBuildTest extends BobTestCase
         File expectedDir = getExpectedOutput(expectedName);
         cleanBuildLog(new File(tmpDir, "build.log"));
 
+        cleanExceptionFiles(tmpDir);
+
         if (generateMode)
         {
-            tmpDir.renameTo(new File(expectedDir.getAbsolutePath().replace("classes", "src/test")));
+            tmpDir.renameTo(expectedDir);
         }
         else
         {
             assertDirectoriesEqual(expectedDir, tmpDir);
         }
+    }
+
+    private void cleanExceptionFiles(File dir)
+    {
+        File exceptionFile = new File(dir, "exception");
+        if (exceptionFile.exists())
+        {
+            exceptionFile.delete();
+        }
+
+        for (String filename : dir.list())
+        {
+            File f = new File(dir, filename);
+            if (f.isDirectory())
+            {
+                cleanExceptionFiles(f);
+            }
+        }
+
     }
 }

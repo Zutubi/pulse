@@ -1,0 +1,15 @@
+[my-default]
+  commenced:
+  [noice]
+    commenced:
+    completed:
+    elapsed  :
+    result   : error
+    message  :
+      java.io.IOException: java.io.IOException: nosuchexe: not found
+
+  completed:
+  elapsed  :
+  result   : failure
+  message  :
+    Command 'noice' failed

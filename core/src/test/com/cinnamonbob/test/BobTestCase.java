@@ -1,14 +1,11 @@
 package com.cinnamonbob.test;
 
-import junit.framework.TestCase;
 import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Arrays;
 import java.io.*;
 import java.net.URL;
+import java.util.*;
 
 /**
  * Base class for test cases.
@@ -58,7 +55,9 @@ public abstract class BobTestCase extends TestCase
     protected static void assertEquals(String msg, Map a, Map b)
     {
         if (msg == null)
+        {
             msg = "";
+        }
         assertEquals(msg + " [size difference]: ", a.size(), b.size());
         for (Object key : a.keySet())
         {
@@ -102,17 +101,18 @@ public abstract class BobTestCase extends TestCase
      *
      * @param dir1 the first directory in the comparison
      * @param dir2 the second directory in the comparison
-     * @throws junit.framework.AssertionFailedError if the given directories
-     *         differ
+     * @throws junit.framework.AssertionFailedError
+     *          if the given directories
+     *          differ
      */
     protected static void assertDirectoriesEqual(File dir1, File dir2) throws IOException
     {
-        if(!dir1.isDirectory())
+        if (!dir1.isDirectory())
         {
             throw new AssertionFailedError("Directory '" + dir1.getAbsolutePath() + "' does not exist or is not a directory");
         }
 
-        if(!dir2.isDirectory())
+        if (!dir2.isDirectory())
         {
             throw new AssertionFailedError("Directory '" + dir2.getAbsolutePath() + "' does not exist or is not a directory");
         }
@@ -124,19 +124,26 @@ public abstract class BobTestCase extends TestCase
         Arrays.sort(files1);
         Arrays.sort(files2);
 
-        if(!Arrays.equals(files1, files2))
+        List<String> fileList1 = new LinkedList<String>(Arrays.asList(files1));
+        List<String> fileList2 = new LinkedList<String>(Arrays.asList(files2));
+
+        // Ignore .svn directories
+        fileList1.remove(".svn");
+        fileList2.remove(".svn");
+
+        if (!fileList1.equals(fileList2))
         {
             throw new AssertionFailedError("Directory contents differ: " +
-                                           dir1.getAbsolutePath() + " = " + Arrays.toString(files1) + ", " +
-                                           dir2.getAbsolutePath() + " = " + Arrays.toString(files2));
+                    dir1.getAbsolutePath() + " = " + fileList1 + ", " +
+                    dir2.getAbsolutePath() + " = " + fileList2);
         }
 
-        for(String file: files1)
+        for (String file : fileList1)
         {
             File file1 = new File(dir1, file);
             File file2 = new File(dir2, file);
 
-            if(file1.isDirectory())
+            if (file1.isDirectory())
             {
                 assertDirectoriesEqual(file1, file2);
             }
@@ -156,12 +163,12 @@ public abstract class BobTestCase extends TestCase
      */
     protected static void assertFilesEqual(File file1, File file2) throws IOException
     {
-        if(!file1.isFile())
+        if (!file1.isFile())
         {
             throw new AssertionFailedError("File '" + file1.getAbsolutePath() + "' does not exist or is not a regular file");
         }
 
-        if(!file2.isFile())
+        if (!file2.isFile())
         {
             throw new AssertionFailedError("File '" + file2.getAbsolutePath() + "' does not exist or is not a regular file");
         }

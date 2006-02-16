@@ -1,9 +1,9 @@
 package com.cinnamonbob.local;
 
 import com.cinnamonbob.core.*;
+import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.events.DefaultEventManager;
 import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.core.util.IOUtils;
 import org.apache.commons.cli.*;
 
 import java.io.*;
@@ -24,6 +24,7 @@ public class LocalBuild
 
         Options options = new Options();
 
+        // TODO: rename bob file as appropriate
         options.addOption(OptionBuilder.withLongOpt("bob-file")
                 .withArgName("file")
                 .hasArg()

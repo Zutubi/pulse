@@ -11,17 +11,17 @@ import java.util.List;
 public class RecipeResult extends Result
 {
     private String recipeName;
-    private List<CommandResult> results;
+    private List<CommandResult> results = new LinkedList<CommandResult>();
 
     public RecipeResult()
     {
+        state = ResultState.INITIAL;
     }
 
     public RecipeResult(String recipeName)
     {
         this.recipeName = recipeName;
         state = ResultState.INITIAL;
-        results = new LinkedList<CommandResult>();
     }
 
     public void commence(String recipeName, long startTime)
@@ -40,7 +40,7 @@ public class RecipeResult extends Result
             case FAILURE:
                 if (state != ResultState.ERROR && state != ResultState.FAILURE)
                 {
-                    failure();
+                    failure("Command '" + result.getCommandName() + "' failed");
                 }
                 break;
         }
