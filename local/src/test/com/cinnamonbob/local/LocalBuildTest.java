@@ -20,7 +20,7 @@ public class LocalBuildTest extends BobTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        // Create a temporary working directory
+        // Create a temporary base directory
         tmpDir = FileSystemUtils.createTempDirectory(LocalBuildTest.class.getName(), "");
         builder = new LocalBuild();
     }
@@ -57,16 +57,16 @@ public class LocalBuildTest extends BobTestCase
         simpleCase("basic");
     }
 
-    public void testInvalidWorkDir() throws BobException
+    public void testInvalidBaseDir() throws BobException
     {
-        File workDir = new File("/no/such/dir");
+        File baseDir = new File("/no/such/dir");
         try
         {
-            builder.runBuild(workDir, "bob.xml", "my-default", null, "out");
+            builder.runBuild(baseDir, "bob.xml", "my-default", null, "out");
         }
         catch (BobException e)
         {
-            assertEquals("Working directory '" + workDir.getAbsolutePath() + "' does not exist", e.getMessage());
+            assertEquals("Base directory '" + baseDir.getAbsolutePath() + "' does not exist", e.getMessage());
             return;
         }
 

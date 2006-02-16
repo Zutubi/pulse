@@ -6,7 +6,10 @@ import com.cinnamonbob.core.RecipePaths;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -35,7 +38,7 @@ public class CopyBootstrapper implements Bootstrapper
 
             // take url connection input stream and write contents to directory.
             FileOutputStream zos = null;
-            File zipName = new File(paths.getWorkDir().getAbsolutePath() + ".zip");
+            File zipName = new File(paths.getBaseDir().getAbsolutePath() + ".zip");
 
             try
             {
@@ -53,7 +56,7 @@ public class CopyBootstrapper implements Bootstrapper
             try
             {
                 zis = new ZipInputStream(new FileInputStream(zipName));
-                FileSystemUtils.extractZip(zis, paths.getWorkDir());
+                FileSystemUtils.extractZip(zis, paths.getBaseDir());
             }
             finally
             {

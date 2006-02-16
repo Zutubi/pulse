@@ -113,7 +113,7 @@ public class FileLoaderTest extends BobTestCase
     {
         BobFile bf = new BobFile();
         List<Reference> properties = new LinkedList<Reference>();
-        Property property = new Property("work.dir", "/whatever");
+        Property property = new Property("base.dir", "/whatever");
         properties.add(property);
 
         loader.load(getInput("testSampleProject"), bf, properties);

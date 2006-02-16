@@ -12,18 +12,18 @@ import java.io.*;
  */
 public class AntCommandTest extends BobTestCase
 {
-    File workDir;
+    File baseDir;
     File outputDir;
 
     public void setUp() throws IOException
     {
-        workDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".work");
+        baseDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".base");
         outputDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".out");
     }
 
     public void tearDown()
     {
-        FileSystemUtils.removeDirectory(workDir);
+        FileSystemUtils.removeDirectory(baseDir);
         FileSystemUtils.removeDirectory(outputDir);
     }
 
@@ -109,9 +109,9 @@ public class AntCommandTest extends BobTestCase
 
     private CommandResult runCommand(AntCommand command)
     {
-        command.setWorkingDir(workDir);
+        command.setWorkingDir(baseDir);
         CommandResult commandResult = new CommandResult("test");
-        command.execute(workDir, outputDir, commandResult);
+        command.execute(baseDir, outputDir, commandResult);
         return commandResult;
     }
 
@@ -135,7 +135,7 @@ public class AntCommandTest extends BobTestCase
     private void copyBuildFile(String name, String filename) throws IOException
     {
         InputStream is = getInput(name);
-        FileOutputStream os = new FileOutputStream(new File(workDir, filename));
+        FileOutputStream os = new FileOutputStream(new File(baseDir, filename));
         IOUtils.joinStreams(is, os);
     }
 }

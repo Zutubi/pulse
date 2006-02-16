@@ -17,7 +17,7 @@ public class ServerBootstrapper implements Bootstrapper
         try
         {
             FileSystemUtils.createDirectory(paths.getOutputDir());
-            FileSystemUtils.createDirectory(paths.getWorkDir());
+            FileSystemUtils.createDirectory(paths.getBaseDir());
         }
         catch (IOException e)
         {

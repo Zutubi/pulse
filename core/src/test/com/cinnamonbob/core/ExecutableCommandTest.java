@@ -13,20 +13,20 @@ import java.io.File;
  */
 public class ExecutableCommandTest extends TestCase
 {
-    private File workDirectory;
+    private File baseDirectory;
     private File outputDirectory;
 
     public void setUp() throws Exception
     {
         super.setUp();
-        workDirectory = FileSystemUtils.createTempDirectory(ExecutableCommandTest.class.getName(), "");
-        outputDirectory = FileSystemUtils.createTempDirectory(ExecutableCommandTest.class.getName(), "");
+        baseDirectory = FileSystemUtils.createTempDirectory(ExecutableCommandTest.class.getName(), ".base");
+        outputDirectory = FileSystemUtils.createTempDirectory(ExecutableCommandTest.class.getName(), ".out");
     }
 
     public void tearDown() throws Exception
     {
         FileSystemUtils.removeDirectory(outputDirectory);
-        FileSystemUtils.removeDirectory(workDirectory);
+        FileSystemUtils.removeDirectory(baseDirectory);
         super.tearDown();
     }
 
@@ -36,7 +36,7 @@ public class ExecutableCommandTest extends TestCase
         command.setExe("dir");
         command.setArgs(".");
         CommandResult result = new CommandResult("success");
-        command.execute(workDirectory, outputDirectory, result);
+        command.execute(baseDirectory, outputDirectory, result);
         assertEquals(result.getState(), ResultState.SUCCESS);
     }
 
@@ -46,7 +46,7 @@ public class ExecutableCommandTest extends TestCase
         command.setExe("dir");
         command.setArgs("w");
         CommandResult result = new CommandResult("failure");
-        command.execute(workDirectory, outputDirectory, result);
+        command.execute(baseDirectory, outputDirectory, result);
         assertEquals(result.getState(), ResultState.FAILURE);
     }
 
@@ -55,7 +55,7 @@ public class ExecutableCommandTest extends TestCase
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("netstat");
         CommandResult result = new CommandResult("no arg");
-        command.execute(workDirectory, outputDirectory, result);
+        command.execute(baseDirectory, outputDirectory, result);
         assertEquals(result.getState(), ResultState.SUCCESS);
     }
 
@@ -66,7 +66,7 @@ public class ExecutableCommandTest extends TestCase
         command.setArgs("command");
         try
         {
-            command.execute(workDirectory, outputDirectory, new CommandResult("exception"));
+            command.execute(baseDirectory, outputDirectory, new CommandResult("exception"));
             assertTrue(false);
         }
         catch (BuildException e)

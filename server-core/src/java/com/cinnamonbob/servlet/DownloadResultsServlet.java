@@ -1,12 +1,12 @@
 package com.cinnamonbob.servlet;
 
 import com.cinnamonbob.ServerRecipePaths;
-import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.core.util.RandomUtils;
+import com.cinnamonbob.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -43,8 +43,8 @@ public class DownloadResultsServlet extends HttpServlet
             }
             else
             {
-                dir = paths.getWorkDir();
-                zipFile = new File(paths.getWorkZip().getAbsolutePath() + RandomUtils.randomString(10));
+                dir = paths.getBaseDir();
+                zipFile = new File(paths.getBaseZip().getAbsolutePath() + RandomUtils.randomString(10));
             }
 
             try

@@ -228,7 +228,7 @@ public class DefaultBuildManager implements BuildManager
     {
         for (RecipeResultNode node : nodes)
         {
-            File workDir = paths.getWorkDir(project, build, node.getResult().getId());
+            File workDir = paths.getBaseDir(project, build, node.getResult().getId());
             if (!FileSystemUtils.removeDirectory(workDir))
             {
                 LOG.warning("Unable to clean up build directory '" + workDir.getAbsolutePath() + "'");

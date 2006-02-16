@@ -8,7 +8,7 @@
                   args="$arguments"
 #end
 #if($workingDir)
-                  working-dir="${work.dir}/$workingDir"
+                  working-dir="${base.dir}/$workingDir"
 #end
 #if($makefile)
                   makefile="$makefile"

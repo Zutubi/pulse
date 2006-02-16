@@ -29,11 +29,11 @@ public class ScmBootstrapper implements Bootstrapper
 
         if (scm.getPath() != null)
         {
-            checkoutDir = new File(paths.getWorkDir(), scm.getPath());
+            checkoutDir = new File(paths.getBaseDir(), scm.getPath());
         }
         else
         {
-            checkoutDir = paths.getWorkDir();
+            checkoutDir = paths.getBaseDir();
         }
 
         try

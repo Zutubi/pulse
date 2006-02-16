@@ -4,7 +4,7 @@
         <resource name="make"/>
         <command name="build">
             <make exe="${make.bin}"
-                  working-dir="${work.dir}/mywork"
+                  working-dir="${base.dir}/mywork"
                     >
             </make>
         </command>

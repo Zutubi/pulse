@@ -7,5 +7,5 @@ import java.io.InputStream;
  */
 public interface BobFileSource
 {
-    public InputStream getBobFile(File workDir);
+    public InputStream getBobFile(File baseDir);
 }

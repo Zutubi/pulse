@@ -32,7 +32,7 @@ public class MakeCommand extends ExecutableCommand implements Command, ScopeAwar
         }
     }
 
-    public void execute(File workDir, File outputDir, CommandResult cmdResult)
+    public void execute(File baseDir, File outputDir, CommandResult cmdResult)
     {
         checkExe();
 
@@ -48,7 +48,7 @@ public class MakeCommand extends ExecutableCommand implements Command, ScopeAwar
             cmdResult.getProperties().put("targets", targets);
         }
 
-        super.execute(workDir, outputDir, cmdResult);
+        super.execute(baseDir, outputDir, cmdResult);
     }
 
     public String getMakefile()

@@ -70,8 +70,8 @@ public class LocalBuild
             }
 
             LocalBuild b = new LocalBuild();
-            File workDir = new File(System.getProperty("user.dir"));
-            b.runBuild(workDir, bobFile, recipe, resourcesFile, outputDir);
+            File baseDir = new File(System.getProperty("user.dir"));
+            b.runBuild(baseDir, bobFile, recipe, resourcesFile, outputDir);
         }
         catch (Exception e)
         {
@@ -107,7 +107,7 @@ public class LocalBuild
      * directory to save results.  All paths provided must be absolute or
      * relative to the current working directory.
      *
-     * @param workDir       the working directory in which to execute the build
+     * @param baseDir       the base directory in which to execute the build
      * @param bobFileName   the name of the bobfile to load
      * @param recipe        the recipe to execute, may be null to indicate the default
      *                      recipe in the given bobfile
@@ -117,32 +117,32 @@ public class LocalBuild
      *                      and save results to
      * @throws BobException
      */
-    public void runBuild(File workDir, String bobFileName, String recipe, String resourcesFile, String outputDir) throws BobException
+    public void runBuild(File baseDir, String bobFileName, String recipe, String resourcesFile, String outputDir) throws BobException
     {
         printPrologue(bobFileName, resourcesFile, outputDir);
 
         FileResourceRepository repository = createRepository(resourcesFile);
-        RecipePaths paths = new LocalRecipePaths(workDir, outputDir);
+        RecipePaths paths = new LocalRecipePaths(baseDir, outputDir);
 
-        if (!paths.getWorkDir().isDirectory())
+        if (!paths.getBaseDir().isDirectory())
         {
-            throw new BobException("Working directory '" + paths.getWorkDir().getAbsolutePath() + "' does not exist");
+            throw new BobException("Base directory '" + paths.getBaseDir().getAbsolutePath() + "' does not exist");
         }
 
-        File logFile = new File(workDir, "build.log");
+        File logFile = new File(baseDir, "build.log");
         FileOutputStream logStream = null;
 
         try
         {
             logStream = new FileOutputStream(logFile);
             EventManager manager = new DefaultEventManager();
-            manager.register(new BuildStatusPrinter(paths.getWorkDir(), logStream));
+            manager.register(new BuildStatusPrinter(paths.getBaseDir(), logStream));
 
             Bootstrapper bootstrapper = new LocalBootstrapper();
             RecipeProcessor processor = new RecipeProcessor();
             processor.setEventManager(manager);
             processor.setResourceRepository(repository);
-            processor.build(0, paths, bootstrapper, loadBobFile(workDir, bobFileName), recipe);
+            processor.build(0, paths, bootstrapper, loadBobFile(baseDir, bobFileName), recipe);
         }
         catch (FileNotFoundException e)
         {
@@ -156,9 +156,9 @@ public class LocalBuild
         printEpilogue(logFile);
     }
 
-    private String loadBobFile(File workDir, String bobFileName) throws BobException
+    private String loadBobFile(File baseDir, String bobFileName) throws BobException
     {
-        File bobFile = new File(workDir, bobFileName);
+        File bobFile = new File(baseDir, bobFileName);
         FileInputStream bobFileInputStream = null;
         String result;
 

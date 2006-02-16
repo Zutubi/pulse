@@ -15,7 +15,7 @@ public class InMemoryBobFileSource implements BobFileSource
         this.data = data;
     }
 
-    public InputStream getBobFile(File workDir)
+    public InputStream getBobFile(File baseDir)
     {
         return new ByteArrayInputStream(data.getBytes());
     }

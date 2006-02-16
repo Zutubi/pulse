@@ -40,10 +40,10 @@ public class MasterBuildService implements BuildService
             throw new BuildException("Unable to rename output directory '" + outputDir.getAbsolutePath() + "' to '" + outputDest.getAbsolutePath() + "'");
         }
 
-        File workDir = recipePaths.getWorkDir();
+        File workDir = recipePaths.getBaseDir();
         if (!FileSystemUtils.rename(workDir, workDest, true))
         {
-            throw new BuildException("Unable to rename working directory '" + workDir.getAbsolutePath() + "' to '" + workDest.getAbsolutePath() + "'");
+            throw new BuildException("Unable to rename work directory '" + workDir.getAbsolutePath() + "' to '" + workDest.getAbsolutePath() + "'");
         }
     }
 

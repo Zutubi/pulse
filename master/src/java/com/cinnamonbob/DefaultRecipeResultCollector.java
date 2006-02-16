@@ -33,7 +33,7 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
         if (buildService != null)
         {
             File outputDest = paths.getOutputDir(project, result, recipeId);
-            File workDest = paths.getWorkDir(project, result, recipeId);
+            File workDest = paths.getBaseDir(project, result, recipeId);
 
             if (!outputDest.mkdirs())
             {

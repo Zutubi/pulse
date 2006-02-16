@@ -18,14 +18,14 @@ import java.util.List;
 public class BuildStatusPrinter implements EventListener
 {
     private Indenter indenter;
-    private String workDir;
+    private String baseDir;
     private RecipeResult result;
 
-    public BuildStatusPrinter(File work, OutputStream logStream)
+    public BuildStatusPrinter(File base, OutputStream logStream)
     {
         ForkOutputStream fork = new ForkOutputStream(System.out, logStream);
         indenter = new Indenter(new PrintStream(fork), "  ");
-        workDir = work.getAbsolutePath() + File.separatorChar;
+        baseDir = base.getAbsolutePath() + File.separatorChar;
         result = new RecipeResult();
     }
 
@@ -157,9 +157,9 @@ public class BuildStatusPrinter implements EventListener
         File path = new File(commandResult.getOutputDir(), name);
         String result = path.getPath();
 
-        if (result.startsWith(workDir))
+        if (result.startsWith(baseDir))
         {
-            result = result.substring(workDir.length());
+            result = result.substring(baseDir.length());
         }
 
         return result;

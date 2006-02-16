@@ -30,21 +30,21 @@
     <recipe name="default">
         <command name="sync">
             <executable exe="svn" args="checkout svn+ssh://daniel@www.cinnamonbob.com/usr/local/svn-repo/bob"
-                        working-dir="${work.dir}"/>
+                        working-dir="${base.dir}"/>
             <process artifact="svn.txt" processor="${svn.pp}"/>
             <process artifact="generic.txt" processor="${generic.pp}"/>
         </command>
         <command name="build">
-            <executable exe="${ant.bin}" args="build" working-dir="${work.dir}/bob/trunk"/>
+            <executable exe="${ant.bin}" args="build" working-dir="${base.dir}/bob/trunk"/>
             <process artifact="ant.txt" processor="${ant.pp}"/>
             <process artifact="generic.txt" processor="${generic.pp}"/>
         </command>
         <command name="test">
-            <executable exe="${ant.bin}" args="test" working-dir="${work.dir}/bob/trunk">
+            <executable exe="${ant.bin}" args="test" working-dir="${base.dir}/bob/trunk">
                 <environment name="CLASSPATH" value="E:/opt/java/jdk1.5.0/bin/java"/>
             </executable>
             <artifact name="junit.report.txt" title="Test Report" type="text/plain"
-                      from-file="${work.dir}/bob/trunk/build/test/report/TEST-com.cinnamonbob.core.XMLConfigUtilsTest.txt"/>
+                      from-file="${base.dir}/bob/trunk/build/test/report/TEST-com.cinnamonbob.core.XMLConfigUtilsTest.txt"/>
             <process artifact="ant.txt" processor="${ant.pp}"/>
             <process artifact="generic.txt" processor="${generic.pp}"/>
             <process artifact="junit.txt" processor="${junit.pp}"/>

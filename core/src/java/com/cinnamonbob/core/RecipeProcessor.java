@@ -1,10 +1,10 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.Property;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.events.build.CommandCommencedEvent;
 import com.cinnamonbob.events.build.CommandCompletedEvent;
 import com.cinnamonbob.events.build.RecipeCommencedEvent;
@@ -61,7 +61,7 @@ public class RecipeProcessor
         {
             bootstrapper.bootstrap(recipeId, paths);
 
-            BobFile bobFile = loadBobFile(paths.getWorkDir(), bobFileSource);
+            BobFile bobFile = loadBobFile(paths.getBaseDir(), bobFileSource);
             Recipe recipe;
 
             if (recipeName == null)
@@ -79,7 +79,7 @@ public class RecipeProcessor
                 throw new BuildException("Undefined recipe '" + recipeName + "'");
             }
 
-            build(recipeId, recipe, paths.getWorkDir(), paths.getOutputDir());
+            build(recipeId, recipe, paths.getBaseDir(), paths.getOutputDir());
         }
         catch (BuildException e)
         {
@@ -105,7 +105,7 @@ public class RecipeProcessor
         }
     }
 
-    public void build(long recipeId, Recipe recipe, File workDir, File outputDir) throws BuildException
+    public void build(long recipeId, Recipe recipe, File baseDir, File outputDir) throws BuildException
     {
         // TODO: support continuing build when errors occur. Take care: exceptions.
         int i = 0;
@@ -125,7 +125,7 @@ public class RecipeProcessor
             runningCommand = command;
             runningLock.unlock();
 
-            executeCommand(recipeId, result, workDir, commandOutput, command);
+            executeCommand(recipeId, result, baseDir, commandOutput, command);
 
             switch (result.getState())
             {
@@ -137,7 +137,7 @@ public class RecipeProcessor
         }
     }
 
-    private void executeCommand(long recipeId, CommandResult result, File workDir, File commandOutput, Command command)
+    private void executeCommand(long recipeId, CommandResult result, File baseDir, File commandOutput, Command command)
     {
         result.commence(commandOutput);
         eventManager.publish(new CommandCommencedEvent(this, recipeId, result.getCommandName(), result.getStamps().getStartTime()));
@@ -149,7 +149,7 @@ public class RecipeProcessor
                 throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
             }
 
-            command.execute(workDir, commandOutput, result);
+            command.execute(baseDir, commandOutput, result);
         }
         catch (BuildException e)
         {
@@ -166,10 +166,10 @@ public class RecipeProcessor
         }
     }
 
-    private BobFile loadBobFile(File workDir, String bobFileSource) throws BuildException
+    private BobFile loadBobFile(File baseDir, String bobFileSource) throws BuildException
     {
         List<Reference> properties = new LinkedList<Reference>();
-        Property property = new Property("work.dir", workDir.getAbsolutePath());
+        Property property = new Property("base.dir", baseDir.getAbsolutePath());
         properties.add(property);
 
         InputStream stream = null;

@@ -1,6 +1,6 @@
 package com.cinnamonbob.local;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
 import java.io.File;
 
@@ -31,34 +31,34 @@ public class LocalRecipePathsTest extends TestCase
 
     public void testAbsoluteOutputPath()
     {
-        File work = getAbsolute("/c/tmp");
+        File base = getAbsolute("/c/tmp");
         File output = getAbsolute("/d/tmp");
 
-        LocalRecipePaths paths = new LocalRecipePaths(work, output.getAbsolutePath());
+        LocalRecipePaths paths = new LocalRecipePaths(base, output.getAbsolutePath());
 
-        assertEquals(work, paths.getWorkDir());
+        assertEquals(base, paths.getBaseDir());
         assertEquals(output, paths.getOutputDir());
     }
 
     public void testRelativeOutputPath()
     {
-        File work = getAbsolute("/c/tmp");
+        File base = getAbsolute("/c/tmp");
         File output = getAbsolute("/c/tmp/relative");
 
-        LocalRecipePaths paths = new LocalRecipePaths(work, "relative");
+        LocalRecipePaths paths = new LocalRecipePaths(base, "relative");
 
-        assertEquals(work, paths.getWorkDir());
+        assertEquals(base, paths.getBaseDir());
         assertEquals(output, paths.getOutputDir());
     }
 
     public void testRelativeWork()
     {
-        File work = new File("tmp");
+        File base = new File("tmp");
         File output = new File("tmp", "relative");
 
-        LocalRecipePaths paths = new LocalRecipePaths(work, "relative");
+        LocalRecipePaths paths = new LocalRecipePaths(base, "relative");
 
-        assertEquals(work, paths.getWorkDir());
+        assertEquals(base, paths.getBaseDir());
         assertEquals(output, paths.getOutputDir());
     }
 

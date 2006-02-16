@@ -6,17 +6,16 @@ import java.io.File;
 
 /**
  * The implementation of the RecipePaths interface for the local build. The output
- * path is relative to the working directory unless an absolute directory is specified.
- *
+ * path is relative to the base directory unless an absolute directory is specified.
  */
 public class LocalRecipePaths implements RecipePaths
 {
-    private File workDir;
+    private File baseDir;
     private File outputDir;
 
     public LocalRecipePaths(File work, String output)
     {
-        workDir = work;
+        baseDir = work;
         outputDir = new File(output);
         if (!outputDir.isAbsolute())
         {
@@ -25,9 +24,9 @@ public class LocalRecipePaths implements RecipePaths
 
     }
 
-    public File getWorkDir()
+    public File getBaseDir()
     {
-        return workDir;
+        return baseDir;
     }
 
     public File getOutputDir()

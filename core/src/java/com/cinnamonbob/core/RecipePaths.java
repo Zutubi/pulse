@@ -5,27 +5,21 @@ import java.io.File;
 /**
  * The RecipePaths interface provides an interface that provides access to a recipies
  * work and output directories.
- *
- * 
  */
 public interface RecipePaths
 {
     /**
-     * The work directory is, as the name suggests, the directory in which all of
-     * the work is done.
+     * The base directory is the root directory for execution of a recipe.
      *
-     * Everything in the working directory is considered transient and will be deleted
-     * after the execution of the recipe is complete.
-     *
-     * @return the working directory
+     * @return the base directory
      */
-    File getWorkDir();
+    File getBaseDir();
 
     /**
      * The output directory is the directory that contains all of the recipe processing
      * output. This includes all of the recipe artifacts and various log files generated
      * by the recipe execution.
-     *
+     * <p/>
      * Everything in the output directory is archived so that it can be used later.
      *
      * @return the output directory.

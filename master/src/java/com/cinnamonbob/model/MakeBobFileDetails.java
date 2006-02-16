@@ -34,12 +34,12 @@ public class MakeBobFileDetails extends TemplateBobFileDetails
         environment = new TreeMap<String, String>();
     }
 
-    public MakeBobFileDetails(String buildFile, String targets, String arguments, String workDir, Map<String, String> environment)
+    public MakeBobFileDetails(String buildFile, String targets, String arguments, String workingDir, Map<String, String> environment)
     {
         this.makefile = buildFile;
         this.targets = targets;
         this.arguments = arguments;
-        this.workingDir = workDir;
+        this.workingDir = workingDir;
         this.environment = environment;
     }
 
