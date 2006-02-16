@@ -1,5 +1,7 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.core.model.PlainFeature;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.core.util.IOUtils;
@@ -22,8 +24,18 @@ public class RegexPostProcessor implements PostProcessor
     private static final Logger LOG = Logger.getLogger(RegexPostProcessor.class.getName());
 
     private String name;
-
     private List<RegexPattern> patterns;
+    /**
+     * If true, any errors detected during post-processing will trigger
+     * command failure.
+     */
+    private boolean failOnError = true;
+    /**
+     * If true, any warnings detected during post-processing will trigger
+     * command failure.
+     */
+    private boolean failOnWarning = false;
+
 
     public RegexPostProcessor()
     {
@@ -36,7 +48,7 @@ public class RegexPostProcessor implements PostProcessor
         patterns = new LinkedList<RegexPattern>();
     }
 
-    public void process(File outputDir, StoredArtifact artifact)
+    public void process(File outputDir, StoredArtifact artifact, CommandResult result)
     {
         BufferedReader reader = null;
         try
@@ -49,7 +61,7 @@ public class RegexPostProcessor implements PostProcessor
             while ((line = reader.readLine()) != null)
             {
                 lineNumber++;
-                processLine(artifact, line, lineNumber);
+                processLine(artifact, result, line, lineNumber);
             }
         }
         catch (IOException e)
@@ -62,13 +74,22 @@ public class RegexPostProcessor implements PostProcessor
         }
     }
 
-    private void processLine(StoredArtifact artifact, String line, long lineNumber)
+    private void processLine(StoredArtifact artifact, CommandResult result, String line, long lineNumber)
     {
         for (RegexPattern p : patterns)
         {
             String summary = p.match(line);
             if (summary != null)
             {
+                if (p.getCategory() == Feature.Level.ERROR && failOnError)
+                {
+                    result.failure("Error features detected");
+                }
+                else if (p.getCategory() == Feature.Level.WARNING && failOnWarning)
+                {
+                    result.failure("Warning features detected");
+                }
+
                 artifact.addFeature(new PlainFeature(p.getCategory(), summary, lineNumber));
             }
         }
@@ -101,4 +122,30 @@ public class RegexPostProcessor implements PostProcessor
     {
         this.name = name;
     }
+
+    public List<RegexPattern> getPatterns()
+    {
+        return patterns;
+    }
+
+    public boolean getFailOnError()
+    {
+        return failOnError;
+    }
+
+    public void setFailOnError(boolean failOnError)
+    {
+        this.failOnError = failOnError;
+    }
+
+    public boolean getFailOnWarning()
+    {
+        return failOnWarning;
+    }
+
+    public void setFailOnWarning(boolean failOnWarning)
+    {
+        this.failOnWarning = failOnWarning;
+    }
+
 }

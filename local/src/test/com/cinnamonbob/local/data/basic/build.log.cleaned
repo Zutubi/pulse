@@ -15,8 +15,8 @@
     result   : success
     artifacts:
       * command output (out/00000001-oops/output.txt)
-        error features:
-          * error: everythings ok
+        warning features:
+          * warning: everythings ok
 
   [whoa]
     commenced:

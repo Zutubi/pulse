@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<project>
+    <regex name="empty"/>
+
+    <regex name="noFailOnError" fail-on-error="false"/>
+
+    <regex name="failOnWarning" fail-on-warning="true"/>
+
+    <regex name="errorPattern">
+        <pattern category="error" expression="."/>
+    </regex>
+
+    <regex name="warningPattern">
+        <pattern category="warning" expression="."/>
+    </regex>
+
+    <regex name="infoPattern">
+        <pattern category="info" expression="."/>
+    </regex>
+
+</project>

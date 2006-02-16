@@ -7,13 +7,14 @@ import java.util.List;
 /**
  *
  */
-public class BobFile implements Namespace
+public class BobFile implements Namespace, ScopeAware
 {
     private String defaultRecipe;
     private String name;
-    
+
     private List<Recipe> recipes = new LinkedList<Recipe>();
     private List<Dependency> dependencies = new LinkedList<Dependency>();
+    private Scope globalScope;
 
     public String getDefaultRecipe()
     {
@@ -24,12 +25,17 @@ public class BobFile implements Namespace
     {
         this.defaultRecipe = defaultRecipe;
     }
-    
+
+    public Scope getGlobalScope()
+    {
+        return globalScope;
+    }
+
     public void addRecipe(Recipe r)
     {
         recipes.add(r);
     }
-    
+
     public List<Recipe> getRecipes()
     {
         return Collections.unmodifiableList(recipes);
@@ -39,10 +45,10 @@ public class BobFile implements Namespace
     {
         if (name == null)
         {
-            return null;    
+            return null;
         }
-            
-        for (Recipe recipe: recipes)
+
+        for (Recipe recipe : recipes)
         {
             if (name.equals(recipe.getName()))
             {
@@ -70,5 +76,10 @@ public class BobFile implements Namespace
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public void setScope(Scope scope)
+    {
+        this.globalScope = scope;
     }
 }

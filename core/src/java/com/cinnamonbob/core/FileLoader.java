@@ -84,6 +84,12 @@ public class FileLoader
 
             // brief bootstraping of the loading process
             Element rootElement = doc.getRootElement();
+
+            if (ScopeAware.class.isAssignableFrom(root.getClass()))
+            {
+                ((ScopeAware) root).setScope(globalScope);
+            }
+
             mapAttributesToProperties(rootElement, root, globalScope);
 
             for (int index = 0; index < rootElement.getChildCount(); index++)
@@ -294,6 +300,10 @@ public class FileLoader
             {
                 String propertyName = convertLocalNameToPropertyName(a.getLocalName());
                 helper.set(propertyName, target, a.getValue(), scope);
+            }
+            catch (InvocationTargetException e)
+            {
+                throw new FileLoadException(e.getCause().getMessage());
             }
             catch (Exception e)
             {

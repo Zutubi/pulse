@@ -1,5 +1,6 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.core.util.IOUtils;
@@ -129,31 +130,92 @@ public class RegexPostProcessorTest extends BobTestCase
         simpleErrors(pp, "first line", "second line");
     }
 
-    private void simpleErrors(RegexPostProcessor pp, String... lines)
+    public void testFailOnError()
     {
-        pp.process(tempDir, artifact);
+        RegexPostProcessor pp = createPostProcessor(".*");
+        CommandResult result = simpleErrors(pp, LINES);
+        assertTrue(result.failed());
+        assertEquals("Error features detected", result.getFailureMessage());
+    }
+
+    public void testNoFailOnError()
+    {
+        RegexPostProcessor pp = createPostProcessor(".*");
+        pp.setFailOnError(false);
+        CommandResult result = simpleErrors(pp, LINES);
+        assertFalse(result.failed());
+    }
+
+    public void testNoFailOnWarning()
+    {
+        RegexPostProcessor pp = createPostProcessor(".*", Feature.Level.WARNING);
+        assertFalse(pp.getFailOnWarning());
+        CommandResult result = simpleFeatures(pp, Feature.Level.WARNING, LINES);
+        assertFalse(result.failed());
+    }
+
+    public void testFailOnWarning()
+    {
+        RegexPostProcessor pp = createPostProcessor(".*", Feature.Level.WARNING);
+        pp.setFailOnWarning(true);
+        CommandResult result = simpleFeatures(pp, Feature.Level.WARNING, LINES);
+        assertTrue(result.failed());
+        assertEquals("Warning features detected", result.getFailureMessage());
+    }
+
+    private CommandResult simpleFeatures(RegexPostProcessor pp, Feature.Level level, String... lines)
+    {
+        CommandResult result = new CommandResult("test");
+        pp.process(tempDir, artifact, result);
         List<Feature> features = artifact.getFeatures();
 
         assertEquals(lines.length, features.size());
         for (int i = 0; i < lines.length; i++)
         {
             Feature feature = features.get(i);
-            assertEquals(Feature.Level.ERROR, feature.getLevel());
+            assertEquals(level, feature.getLevel());
             assertEquals(lines[i], feature.getSummary());
         }
 
+        if (features.size() > 0)
+        {
+            if (level == Feature.Level.ERROR && pp.getFailOnError())
+            {
+                assertTrue(result.failed());
+                assertEquals("Error features detected", result.getFailureMessage());
+            }
+            else if (level == Feature.Level.WARNING && pp.getFailOnWarning())
+            {
+                assertTrue(result.failed());
+                assertEquals("Warning features detected", result.getFailureMessage());
+            }
+        }
+
+        return result;
+    }
+
+    private CommandResult simpleErrors(RegexPostProcessor pp, String... lines)
+    {
+        return simpleFeatures(pp, Feature.Level.ERROR, lines);
     }
 
     private void simpleErrors(String expression, String... lines)
     {
         RegexPostProcessor pp = createPostProcessor(expression);
+        assertTrue(pp.getFailOnError());
+        assertFalse(pp.getFailOnWarning());
         simpleErrors(pp, lines);
     }
 
     private RegexPostProcessor createPostProcessor(String expression)
     {
+        return createPostProcessor(expression, Feature.Level.ERROR);
+    }
+
+    private RegexPostProcessor createPostProcessor(String expression, Feature.Level level)
+    {
         RegexPostProcessor pp = new RegexPostProcessor("test-pp");
-        RegexPattern pattern = new RegexPattern(Feature.Level.ERROR, Pattern.compile(expression));
+        RegexPattern pattern = new RegexPattern(level, Pattern.compile(expression));
         pp.addRegexPattern(pattern);
         return pp;
     }

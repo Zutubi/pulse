@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<project>
+    <regex name="oops">
+        <pattern category="error" expression="("/>
+    </regex>
+</project>

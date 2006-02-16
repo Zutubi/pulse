@@ -17,7 +17,7 @@
     <recipe name="my-default">
         <executable name="noice" exe="echo" args="brief intro..."/>
         <command name="oops">
-            <executable exe="echo" args="error: everythings ok"/>
+            <executable exe="echo" args="warning: everythings ok"/>
             <process artifact="output" processor="${my-pp}"/>
         </command>
         <command name="whoa">

@@ -83,7 +83,7 @@ public class CommandGroup implements Command, Validateable
 
             if (a != null)
             {
-                m.getProcessor().process(outputDir, a);
+                m.getProcessor().process(outputDir, a, result);
             }
             else
             {
