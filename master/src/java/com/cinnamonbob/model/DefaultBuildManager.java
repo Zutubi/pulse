@@ -3,6 +3,7 @@ package com.cinnamonbob.model;
 import com.cinnamonbob.MasterBuildPaths;
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.RecipeResult;
+import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.core.util.FileSystemUtils;
@@ -102,8 +103,13 @@ public class DefaultBuildManager implements BuildManager
 
     public void fillHistoryPage(HistoryPage page)
     {
-        page.setTotalBuilds(buildResultDao.getBuildCount(page.getProject()));
-        page.setResults(buildResultDao.findLatestByProject(page.getProject(), page.getFirst(), page.getMax()));
+        fillHistoryPage(page, new ResultState[]{ResultState.ERROR, ResultState.FAILURE, ResultState.IN_PROGRESS, ResultState.SUCCESS}, null);
+    }
+
+    public void fillHistoryPage(HistoryPage page, ResultState[] states, BuildSpecification spec)
+    {
+        page.setTotalBuilds(buildResultDao.getBuildCount(page.getProject(), states, spec));
+        page.setResults(buildResultDao.findLatestByProject(page.getProject(), states, spec, page.getFirst(), page.getMax()));
     }
 
     public List<BuildResult> getLatestCompletedBuildResults(Project project, BuildSpecification spec, int max)

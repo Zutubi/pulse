@@ -65,7 +65,23 @@ public class SetupDummyBuilds implements Runnable
             project = setupProject("long history");
             for (long i = 1; i <= 1000; i++)
             {
-                createComplexSuccess(project, i);
+                double x = Math.random();
+                if (x < 0.1)
+                {
+                    createCommandFailure(project, i);
+                }
+                else if (x < 0.2)
+                {
+                    createBuildError(project, i);
+                }
+                else if (x < 0.3)
+                {
+                    createWarningFeatures(project, i);
+                }
+                else
+                {
+                    createComplexSuccess(project, i);
+                }
             }
 
             setupUsers(project);
@@ -195,7 +211,12 @@ public class SetupDummyBuilds implements Runnable
 
     private void createCommandFailure(Project project)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), 10000);
+        createCommandFailure(project, 10000);
+    }
+
+    private void createCommandFailure(Project project, long id)
+    {
+        BuildResult result = new BuildResult(project, getSpec(project), id);
 
         result.commence(new File("/complex/build/output/dir"));
         RecipeResultNode rootResultNode = createComplexRecipe("root recipe");
@@ -207,9 +228,26 @@ public class SetupDummyBuilds implements Runnable
         buildResultDao.save(result);
     }
 
+    private void createBuildError(Project project, long id)
+    {
+        BuildResult result = new BuildResult(project, getSpec(project), id);
+
+        result.commence(new File("/complex/build/output/dir"));
+        RecipeResultNode rootResultNode = createComplexRecipe("root recipe");
+        result.getRoot().addChild(rootResultNode);
+        result.error("something real bad happened");
+        result.complete();
+        buildResultDao.save(result);
+    }
+
     private void createWarningFeatures(Project project)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), 10000);
+        createWarningFeatures(project, 10000);
+    }
+
+    private void createWarningFeatures(Project project, long id)
+    {
+        BuildResult result = new BuildResult(project, getSpec(project), id);
 
         result.commence(new File("/complex/build/output/dir"));
         RecipeResultNode rootResultNode = createWarningFeaturesRecipe();

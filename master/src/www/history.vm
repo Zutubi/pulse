@@ -8,8 +8,22 @@
 
     #projectTabs("history")
 
-#if($history.size() > 0)
+
     <table>
+        <tr>
+            <td>
+
+    #wwcform("action=history.action" "heading=%{getText('quick.filters')}" "colspan=5" "width=100%" "method=get")
+        #wwhidden("name=id")
+
+        <tr>
+        #wwselect("name=stateFilter" "singleRow=true" "label=%{getText('filter.state')}" "list=stateFilters" "onchange=submit()" "tabindex=1")
+        #wwselect("name=spec" "singleRow=true" "label=%{getText('filter.spec')}" "list=specs" "onchange=submit()" "tabindex=2")
+        <td><a href="history.action?id=$project.id">#wwtext("name=filter.clear")</a></td>
+        </tr>
+    #end
+            </td>
+        </tr>
         <tr>
             <td>
 
@@ -23,7 +37,8 @@
             #contentHeading("build.elapsed" 1)
             #contentHeading("actions" 4)
         </tr>
-        #foreach($buildResult in $history)
+#if($history.size() > 0)
+    #foreach($buildResult in $history)
             #set($cssClass = $buildResult.state.string)
         <tr>
             <td class="content"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
@@ -36,7 +51,7 @@
             #changesCell($project $buildResult)
             #artifactsCell($project $buildResult)
         </tr>
-        #end
+    #end
     </table>
 
             </td>
@@ -46,13 +61,14 @@
 
             <table width="100%" class="content">
     #if($pageCount > 1)
+        #set($getParams = "id=$project.id&amp;stateFilter=$stateFilter&amp;spec=$spec")
         #set($nextPage = $startPage + 1)
         #set($previousPage = $startPage - 1)
         #set($lastPage = $pageCount - 1)
                 <tr>
                     <td class="content-centre">
         #if($startPage > 0)
-                        <a href="history.action?id=$project.id" class="unadorned">
+                        <a href="history.action?$getParams" class="unadorned">
         #end
                             #image("images/resultset_first.gif" "page.latest") #wwtext("name=page.latest")
         #if($startPage > 0)
@@ -61,7 +77,7 @@
                     </td>
                     <td class="content-centre">
         #if($startPage > 0)
-                        <a href="history.action?id=$project.id&amp;startPage=$previousPage" class="unadorned">
+                        <a href="history.action?$getParams&amp;startPage=$previousPage" class="unadorned">
         #end
                             #image("images/resultset_previous.gif" "page.newer") #wwtext("name=page.newer")
         #if($startPage > 0)
@@ -73,7 +89,7 @@
             #set($pageNumber = $pageIndex + 1)
                         &nbsp;
             #if($pageIndex != $startPage)
-                        <a href="history.action?id=$project.id&amp;startPage=$pageIndex">
+                        <a href="history.action?$getParams&amp;startPage=$pageIndex">
             #end
                             $pageNumber#if($pageIndex != $startPage)</a>#end
         #end
@@ -81,7 +97,7 @@
                     </td>
                     <td class="content-centre">
         #if($startPage < $lastPage)
-                        <a href="history.action?id=$project.id&amp;startPage=$nextPage" class="unadorned">
+                        <a href="history.action?$getParams&amp;startPage=$nextPage" class="unadorned">
         #end
                             #wwtext("name=page.older") #image("images/resultset_next.gif" "page.older")
         #if($startPage < $lastPage)
@@ -90,7 +106,7 @@
                     </td>
                     <td class="content-centre">
         #if($startPage < $lastPage)
-                        <a href="history.action?id=$project.id&amp;startPage=$lastPage" class="unadorned">
+                        <a href="history.action?$getParams&amp;startPage=$lastPage" class="unadorned">
         #end
                             #wwtext("name=page.oldest") #image("images/resultset_last.gif" "page.oldeset")
         #if($startPage < $lastPage)
@@ -104,10 +120,12 @@
 
             </td>
         </tr>
-    </table>
 #else
-    <p>
-        #wwtext("name=no.history")
-    </p>
+        <tr>
+            <td class="content" colspan="10">
+                #wwtext("name=no.history")
+            </td>
+        </tr>
 #end
+    </table>
 </html>

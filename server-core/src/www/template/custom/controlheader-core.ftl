@@ -12,7 +12,9 @@
 </tr>
 </#list>
 </#if>
+<#if !parameters.singleRow?exists>
 <tr>
+</#if>
     <th <#if hasFieldErrors>
         class="error-label"<#t/>
 <#else>

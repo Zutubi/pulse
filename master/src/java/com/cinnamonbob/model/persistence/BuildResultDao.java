@@ -2,6 +2,7 @@ package com.cinnamonbob.model.persistence;
 
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.RecipeResult;
+import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.BuildSpecification;
 import com.cinnamonbob.model.Project;
@@ -21,6 +22,8 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     List<BuildResult> findLatestByProject(Project project, int first, int max);
 
+    List<BuildResult> findLatestByProject(Project project, ResultState[] states, BuildSpecification spec, int first, int max);
+
     List<BuildResult> findLatestCompleted(Project project, BuildSpecification spec, int max);
 
     List<BuildResult> findOldestByProject(Project project, int max);
@@ -35,5 +38,5 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     RecipeResult findRecipeResult(long id);
 
-    int getBuildCount(Project project);
+    int getBuildCount(Project project, ResultState[] states, BuildSpecification spec);
 }

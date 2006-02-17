@@ -2,6 +2,7 @@ package com.cinnamonbob.model;
 
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.RecipeResult;
+import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.core.model.StoredArtifact;
 
 import java.util.List;
@@ -73,6 +74,11 @@ public class MockBuildManager implements BuildManager
     }
 
     public void fillHistoryPage(HistoryPage page)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public void fillHistoryPage(HistoryPage page, ResultState[] states, BuildSpecification spec)
     {
         throw new RuntimeException("Method not implemented.");
     }

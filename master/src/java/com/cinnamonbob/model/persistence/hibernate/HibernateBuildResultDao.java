@@ -9,10 +9,10 @@ import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.RecipeResultNode;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 import com.cinnamonbob.util.logging.Logger;
-import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
+import org.hibernate.*;
+import org.hibernate.criterion.Expression;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
@@ -69,6 +69,21 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
 
                 return queryObject.list();
+            }
+        });
+    }
+
+    public List<BuildResult> findLatestByProject(final Project project, final ResultState[] states, final BuildSpecification spec, final int first, final int max)
+    {
+        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = getBuildResultCriteria(session, project, states, spec);
+                criteria.setFirstResult(first);
+                criteria.setMaxResults(max);
+                criteria.addOrder(Order.desc("id"));
+                return criteria.list();
             }
         });
     }
@@ -141,21 +156,42 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return (RecipeResult) getHibernateTemplate().load(RecipeResult.class, Long.valueOf(id));
     }
 
-    public int getBuildCount(final Project project)
+    public int getBuildCount(final Project project, final ResultState[] states, final BuildSpecification spec)
     {
         return (Integer) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("select count(*) from BuildResult model where model.project = :project and model.stateName != :initial");
-                queryObject.setEntity("project", project);
-                queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
-                return queryObject.uniqueResult();
+                Criteria criteria = getBuildResultCriteria(session, project, states, spec);
+                criteria.setProjection(Projections.rowCount());
+                return criteria.uniqueResult();
             }
         });
+    }
+
+    private Criteria getBuildResultCriteria(Session session, Project project, ResultState[] states, BuildSpecification spec)
+    {
+        Criteria criteria = session.createCriteria(BuildResult.class);
+        criteria.add(Expression.eq("project", project));
+
+        if (states != null)
+        {
+            String[] stateNames = new String[states.length];
+            for (int i = 0; i < states.length; i++)
+            {
+                stateNames[i] = states[i].toString();
+            }
+
+            criteria.add(Expression.in("stateName", stateNames));
+        }
+
+        if (spec != null)
+        {
+            criteria.add(Expression.eq("buildSpecification", spec));
+        }
+
+        SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
+        return criteria;
     }
 
     public void save(RecipeResultNode node)
