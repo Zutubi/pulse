@@ -153,11 +153,11 @@ public class SetupDummyBuilds implements Runnable
         Changelist list = new Changelist(userRevision);
         list.addChange(new Change("/home/jsankey/some/normal/file", "11", Change.Action.EDIT));
         list.addChange(new Change("/home/jsankey/some/other/file", "10", Change.Action.EDIT));
+        list.addChange(new Change("/home/jsankey/a/silly/file/with/a/very/very/long/name/to/really/make/life/difficult/for/the/poor/little/UI/lets/see/if/it/gets/wrapped/shall/we", "1", Change.Action.BRANCH));
         list.addChange(new Change("/home/jsankey/some/branched/file", "1", Change.Action.BRANCH));
         list.addChange(new Change("/home/jsankey/some/branched/file2", "1", Change.Action.BRANCH));
         list.addChange(new Change("/home/jsankey/some/branched/file3", "1", Change.Action.BRANCH));
         list.addChange(new Change("/home/jsankey/some/branched/file4", "1", Change.Action.BRANCH));
-        list.addChange(new Change("/home/jsankey/some/branched/file5", "1", Change.Action.BRANCH));
         changelists.add(list);
 
         userRevision = new NumericalRevision(9101);
@@ -424,7 +424,7 @@ public class SetupDummyBuilds implements Runnable
     private StoredArtifact createInfoArtifact(String name, String filename)
     {
         StoredArtifact artifact = createSimpleArtifact(name, filename);
-        artifact.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));
+        artifact.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information\nwith a newline in the middle"));
         artifact.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));
         artifact.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));
         artifact.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));

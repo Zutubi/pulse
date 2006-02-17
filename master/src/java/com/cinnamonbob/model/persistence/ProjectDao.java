@@ -2,6 +2,7 @@ package com.cinnamonbob.model.persistence;
 
 import com.cinnamonbob.model.AntBobFileDetails;
 import com.cinnamonbob.model.CustomBobFileDetails;
+import com.cinnamonbob.model.MakeBobFileDetails;
 import com.cinnamonbob.model.Project;
 
 import java.util.List;
@@ -22,6 +23,9 @@ public interface ProjectDao extends EntityDao<Project>
 
     void save(AntBobFileDetails source);
 
+    void save(MakeBobFileDetails source);
+
     AntBobFileDetails findAntBobFileSource(long id);
 
+    MakeBobFileDetails findMakeBobFileSource(long id);
 }

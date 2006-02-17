@@ -16,8 +16,12 @@
     #inlineHelp("ant.filename.help")
     #wwtextfield("name=details.targets" "label=%{getText('ant.targets')}" "size=40" "tabindex=2")
     #inlineHelp("ant.targets.help")
+    #wwtextfield("name=details.workingDir" "label=%{getText('ant.working.dir')}" "size=40" "tabindex=3")
+    #inlineHelp("ant.working.dir.help")
+    #wwtextfield("name=details.arguments" "label=%{getText('ant.args')}" "size=40" "tabindex=4")
+    #inlineHelp("ant.args.help")
 
-    #saveCancel(3)
+    #saveCancel(5)
  #end
 </body>
 </html>

@@ -69,7 +69,7 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         TreeMap<String, String> environment = new TreeMap<String, String>();
         environment.put("PATH", "/bin");
 
-        AntBobFileDetails details = new AntBobFileDetails("build.xml", "build test", environment);
+        AntBobFileDetails details = new AntBobFileDetails("build.xml", "build test", "arg1", "workdir", environment);
 
         projectDao.save(details);
         commitAndRefreshTransaction();
@@ -77,6 +77,29 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         AntBobFileDetails otherDetails = projectDao.findAntBobFileSource(details.getId());
         assertEquals(details.getBuildFile(), otherDetails.getBuildFile());
         assertEquals(details.getTargets(), otherDetails.getTargets());
+        assertEquals(details.getArguments(), otherDetails.getArguments());
+        assertEquals(details.getWorkingDir(), otherDetails.getWorkingDir());
+        for (String key : environment.keySet())
+        {
+            assertEquals(environment.get(key), otherDetails.getEnvironment().get(key));
+        }
+    }
+
+    public void testLoadSaveMakeBobFileDetails()
+    {
+        TreeMap<String, String> environment = new TreeMap<String, String>();
+        environment.put("PATH", "/bin");
+
+        MakeBobFileDetails details = new MakeBobFileDetails("Makefile", "build test", "arg1", "workdir", environment);
+
+        projectDao.save(details);
+        commitAndRefreshTransaction();
+
+        MakeBobFileDetails otherDetails = projectDao.findMakeBobFileSource(details.getId());
+        assertEquals(details.getMakefile(), otherDetails.getMakefile());
+        assertEquals(details.getTargets(), otherDetails.getTargets());
+        assertEquals(details.getArguments(), otherDetails.getArguments());
+        assertEquals(details.getWorkingDir(), otherDetails.getWorkingDir());
         for (String key : environment.keySet())
         {
             assertEquals(environment.get(key), otherDetails.getEnvironment().get(key));

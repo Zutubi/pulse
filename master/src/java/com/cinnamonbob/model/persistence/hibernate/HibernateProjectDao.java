@@ -2,6 +2,7 @@ package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.model.AntBobFileDetails;
 import com.cinnamonbob.model.CustomBobFileDetails;
+import com.cinnamonbob.model.MakeBobFileDetails;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.persistence.ProjectDao;
 import com.cinnamonbob.util.logging.Logger;
@@ -46,8 +47,18 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
         getHibernateTemplate().saveOrUpdate(source);
     }
 
+    public void save(MakeBobFileDetails source)
+    {
+        getHibernateTemplate().saveOrUpdate(source);
+    }
+
     public AntBobFileDetails findAntBobFileSource(long id)
     {
         return (AntBobFileDetails) getHibernateTemplate().load(AntBobFileDetails.class, id);
+    }
+
+    public MakeBobFileDetails findMakeBobFileSource(long id)
+    {
+        return (MakeBobFileDetails) getHibernateTemplate().load(MakeBobFileDetails.class, id);
     }
 }

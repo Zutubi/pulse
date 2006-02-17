@@ -4,7 +4,7 @@
         <resource name="ant"/>
         <command name="build">
             <ant exe="${ant.bin}"
-                 targets="build test"
+                 args="arg1 arg2"
                     >
             </ant>
         </command>

@@ -3,12 +3,18 @@
     <recipe name="ant build">
         <resource name="ant"/>
         <command name="build">
-            <ant exe="${ant.bin}" working-dir="${base.dir}"
+            <ant exe="${ant.bin}"
 #if($buildFile)
                  build-file="$buildFile"
 #end
 #if($targets)
                  targets="$targets"
+#end
+#if($arguments)
+                 args="$arguments"
+#end
+#if($workingDir)
+                 working-dir="${base.dir}/$workingDir"
 #end
                     >
 #foreach($key in $environment.keySet())

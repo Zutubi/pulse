@@ -339,7 +339,7 @@ public class AddProjectWizard extends BaseWizard
 
     private class AntDetails extends BaseWizardState
     {
-        private AntBobFileDetails details = new AntBobFileDetails("build.xml", null, null);
+        private AntBobFileDetails details = new AntBobFileDetails("build.xml", null, null, null, null);
 
         public AntDetails(Wizard wizard, String name)
         {
@@ -366,6 +366,16 @@ public class AddProjectWizard extends BaseWizard
             if (!TextUtils.stringSet(details.getTargets()))
             {
                 details.setTargets(null);
+            }
+
+            if (!TextUtils.stringSet(details.getArguments()))
+            {
+                details.setArguments(null);
+            }
+
+            if (!TextUtils.stringSet(details.getWorkingDir()))
+            {
+                details.setWorkingDir(null);
             }
         }
     }
