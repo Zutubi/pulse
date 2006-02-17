@@ -191,6 +191,13 @@
 #end
 
 ##
+## Outputs an image tag with alt key looked up
+##
+#macro(image $src $altKey)
+    <img src="$src" alt="$action.getText('$altKey')"/>
+#end
+
+##
 ## Outputs a heading row for a content table with an action
 ##
 #macro(actionHeadingRow $key $span $actionKey $url $image)

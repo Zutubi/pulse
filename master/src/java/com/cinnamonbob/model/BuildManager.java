@@ -30,6 +30,8 @@ public interface BuildManager
 
     List<BuildResult> getLatestBuildResultsForProject(Project project, int max);
 
+    void fillHistoryPage(HistoryPage page);
+
     List<BuildResult> getLatestCompletedBuildResults(Project project, BuildSpecification spec, int max);
 
     BuildResult getLatestBuildResult(Project project);

@@ -100,6 +100,12 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findLatestByProject(project, max);
     }
 
+    public void fillHistoryPage(HistoryPage page)
+    {
+        page.setTotalBuilds(buildResultDao.getBuildCount(page.getProject()));
+        page.setResults(buildResultDao.findLatestByProject(page.getProject(), page.getFirst(), page.getMax()));
+    }
+
     public List<BuildResult> getLatestCompletedBuildResults(Project project, BuildSpecification spec, int max)
     {
         return buildResultDao.findLatestCompleted(project, spec, max);

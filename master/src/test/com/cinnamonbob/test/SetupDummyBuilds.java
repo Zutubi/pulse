@@ -56,6 +56,18 @@ public class SetupDummyBuilds implements Runnable
             project = setupProject("error features");
             createErrorFeatures(project);
 
+            project = setupProject("medium history");
+            for (long i = 1; i <= 34; i++)
+            {
+                createComplexSuccess(project, i);
+            }
+
+            project = setupProject("long history");
+            for (long i = 1; i <= 1000; i++)
+            {
+                createComplexSuccess(project, i);
+            }
+
             setupUsers(project);
         }
     }
@@ -113,9 +125,9 @@ public class SetupDummyBuilds implements Runnable
         return project;
     }
 
-    private void createComplexSuccess(Project project)
+    private void createComplexSuccess(Project project, long number)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), 1);
+        BuildResult result = new BuildResult(project, getSpec(project), number);
         List<Changelist> changelists = new LinkedList<Changelist>();
 
         NumericalRevision userRevision = new NumericalRevision(101);
@@ -150,6 +162,11 @@ public class SetupDummyBuilds implements Runnable
         result.getRoot().addChild(rootResultNode);
         result.complete();
         buildResultDao.save(result);
+    }
+
+    private void createComplexSuccess(Project project)
+    {
+        createComplexSuccess(project, 1);
     }
 
     private void createInProgress(Project project)

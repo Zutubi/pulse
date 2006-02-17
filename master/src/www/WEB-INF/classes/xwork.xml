@@ -262,7 +262,7 @@
 
         <action name="history" class="com.cinnamonbob.web.project.HistoryAction">
             <result name="success" type="velocity">history.vm</result>
-            <result name="error" type="redirect">viewProjects.action</result>
+            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="configureProject" class="com.cinnamonbob.web.project.ConfigureProjectAction">

@@ -212,6 +212,10 @@ hr {
     display: none;
 }
 
+img {
+    vertical-align: top;
+}
+
     /*------------------------------
     Content
     */
@@ -251,18 +255,19 @@ table.fill-content {
     width: 100%;
 }
 
-h3.heading, div.box, th.heading, th.content, th.content-row, td.content, td.success, td.failure, td.error, td.pending, td.inprogress, td.add {
+h3.heading, div.box, th.heading, th.content, th.content-row, td.content, td.content-centre, td.success, td.failure, td.error, td.pending, td.inprogress, td.add {
     border: 1px solid #bbb;
     padding: 4px;
 }
 
 th.heading, th.content, th.content-row, td.content, td.success, td.failure, td.error, td.pending, td.inprogress, td.add {
     text-align: left;
-    vertical-align: top;
 }
 
-a img {
-    color: #fff;
+td.content-centre {
+    text-align: center;
+} a img {
+color : #fff;
     border: 0;
 }
 
