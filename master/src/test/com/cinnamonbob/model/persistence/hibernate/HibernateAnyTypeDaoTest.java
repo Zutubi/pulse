@@ -6,7 +6,7 @@ package com.cinnamonbob.model.persistence.hibernate;
 import com.cinnamonbob.core.model.Entity;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.user.User;
+import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.persistence.AnyTypeDao;
 import com.cinnamonbob.model.persistence.ObjectHandle;
 
