@@ -27,7 +27,7 @@ public class ApplicationStartupManager extends AbstractSystemStartupManager
         this.subSystemContexts = subSystemContexts;
     }
 
-    public void startup() throws StartupException
+    protected void runStartup() throws StartupException
     {
         // load the subSystemContexts
         for (String subContext : subSystemContexts)
@@ -53,7 +53,5 @@ public class ApplicationStartupManager extends AbstractSystemStartupManager
 
         EventManager eventManager = (EventManager) ComponentContext.getBean("eventManager");
         eventManager.publish(new SystemStartedEvent(this));
-
-        setStarted(true);
     }
 }

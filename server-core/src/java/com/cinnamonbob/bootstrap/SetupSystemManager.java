@@ -5,11 +5,8 @@ package com.cinnamonbob.bootstrap;
  */
 public class SetupSystemManager extends AbstractSystemStartupManager
 {
-    public void startup() throws StartupException
+    protected void runStartup() throws StartupException
     {
         // nothing to do yet.
-
-        // okay, do we need to handle any upgrade processing?
-
     }
 }

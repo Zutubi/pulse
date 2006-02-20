@@ -35,7 +35,7 @@ public abstract class AbstractSystemStartupManager implements SystemStartupManag
         return started;
     }
 
-    protected void setStarted(boolean b)
+    private void setStarted(boolean b)
     {
         started = b;
         if (started)
@@ -44,4 +44,12 @@ public abstract class AbstractSystemStartupManager implements SystemStartupManag
             callback.done();
         }
     }
+
+    public void startup() throws StartupException
+    {
+        runStartup();
+        setStarted(true);
+    }
+
+    protected abstract void runStartup() throws StartupException;
 }
