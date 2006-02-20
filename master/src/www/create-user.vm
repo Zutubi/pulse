@@ -1,0 +1,24 @@
+<html>
+<head>
+    <title>create user</title>
+</head>
+<content tag="action">user.create</content>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+    
+#bodytag (Form "action='createUser.action'" "method='post'")  
+    <h3>create user</h3>    
+    <fieldset>
+        #tag (TextField "name='user.login'" "tabindex='1'")
+        #tag (TextField "name='user.name'" "tabindex='2'")
+    </fieldset>
+        
+    <fieldset class="submit">
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='3'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
+    </fieldset>
+#end 
+
+</body>
+</html>

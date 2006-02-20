@@ -30,5 +30,9 @@ public class RedirectServletFilter implements Filter
     public void init(FilterConfig config) throws ServletException
     {
         destination = config.getInitParameter(DESTINATION_PARAM_KEY);
+        if (destination == null)
+        {
+            // default...
+        }
     }
 }

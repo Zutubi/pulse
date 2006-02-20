@@ -3,7 +3,6 @@ package com.cinnamonbob.model.persistence.hibernate;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.DatabaseBootstrap;
 import com.cinnamonbob.test.BobTestCase;
-import com.cinnamonbob.util.jdbc.JDBCUtils;
 import org.hibernate.SessionFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -87,7 +86,10 @@ public abstract class PersistenceTestCase extends BobTestCase
         }
         finally
         {
-            JDBCUtils.close(stmt);
+            if (stmt != null)
+            {
+                stmt.close();
+            }
         }
 
         dataSource = null;
@@ -113,8 +115,7 @@ public abstract class PersistenceTestCase extends BobTestCase
             for (PropertyDescriptor property : beanInfo.getPropertyDescriptors())
             {
                 Method getter = property.getReadMethod();
-                Method setter = property.getWriteMethod();
-                if (setter != null && getter.getDeclaringClass() != Object.class)
+                if (getter.getDeclaringClass() != Object.class)
                 {
                     assertObjectEquals(getter.getName(), getter.invoke(a), getter.invoke(b));
                 }

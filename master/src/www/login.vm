@@ -1,23 +1,27 @@
 <html>
 <head>
-    <title>#wwtext("name=login")</title>
+    <title>Login</title>
 </head>
 
 <body>
 
-    #parse("/template/includes/actionerrors.vm")
+    #foreach($error in $action.actionErrors)
+        <h2 style="color:red">$error</h2>
+    #end
 
-    #wwcform("action=j_acegi_security_check" "heading=%{getText('login')}" "method=post")
+    #bodytag (Form "action='/j_acegi_security_check'" "method='post'")
+        <h3>login:</h3>
+        <fieldset>
+            #tag (TextField "name='j_username'" "label='login.username'" "tabindex='1'")
+            #tag (Password "name='j_password'" "label='login.password'" "tabindex='2'")
+            #tag (Checkbox "name='_acegi_security_remember_me'" "label='login.rememberme'" "tabindex='2'")
+        </fieldset>
 
-        #wwtextfield("name=j_username" "label=%{getText('login.username')}" "required=true" "size=40" "tabindex=1")
-        #wwtextfield("name=j_password" "label=%{getText('login.password')}" "required=true" "size=40" "tabindex=2")
-        #wwcheckbox("name=_acegi_security_remember_me" "label=%{getText('login.rememberme')}" "tabindex=3")
-
-        #openSubmit()
-            #wwsubmit("name=login" "value=%{getText('login.name')}" "tabindex=4")
-            #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=5")
-         #closeSubmit()
-     #end
+        <fieldset class="submit">
+            #tag (Submit "value=getText('login.name')" "name='login'" "tabindex='3'")
+            #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='4'")
+        </fieldset>
+    #end
 
 </body>
 </html>

@@ -2,7 +2,7 @@ package com.cinnamonbob.upgrade.tasks;
 
 import com.cinnamonbob.model.persistence.hibernate.PersistenceTestCase;
 import com.cinnamonbob.upgrade.UpgradeTask;
-import com.cinnamonbob.util.jdbc.JDBCUtils;
+import com.cinnamonbob.util.JDBCUtils;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;

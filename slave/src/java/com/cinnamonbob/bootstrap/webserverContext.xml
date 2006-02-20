@@ -9,6 +9,16 @@ setup is not complete.
 -->
 <beans>
 
+    <!-- is the initContext really needed? It appears that singletons are initialised anyways
+    without being referenced...-->
+    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation">
+        <property name="initBeans">
+            <list>
+                <ref bean="jettyManager"/>
+            </list>
+        </property>
+    </bean>
+
     <bean id="jettyServer" class="com.cinnamonbob.jetty.JettyServerFactoryBean" destroy-method="shutdown">
         <property name="configurationManager">
             <ref bean="configurationManager"/>

@@ -8,11 +8,11 @@ triggers.
 
     <bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="configLocation">
-            <value>classpath:com/cinnamonbob/quartz/quartz.properties</value>
+            <value>classpath:com/cinnamonbob/bootstrap/quartz/quartz.properties</value>
         </property>
     </bean>
 
-    <bean id="quartzJobFactory" class="com.cinnamonbob.quartz.SpringJobFactory" init-method="init">
+    <bean id="quartzJobFactory" class="com.cinnamonbob.bootstrap.quartz.SpringJobFactory" init-method="init">
         <property name="scheduler">
             <ref local="quartzScheduler"/>
         </property>

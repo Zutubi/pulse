@@ -1,7 +1,7 @@
 package com.cinnamonbob.web.user;
 
 import com.cinnamonbob.model.*;
-import com.cinnamonbob.user.User;
+import com.opensymphony.util.TextUtils;
 
 import java.util.Map;
 import java.util.TreeMap;

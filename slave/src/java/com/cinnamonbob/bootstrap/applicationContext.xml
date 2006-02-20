@@ -2,6 +2,14 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
+    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation">
+        <property name="initBeans">
+            <list>
+                <ref bean="threadPool"/>
+            </list>
+        </property>
+    </bean>
+
     <bean id="databaseBootstrap" class="com.cinnamonbob.bootstrap.DatabaseBootstrap" init-method="initialiseDatabase">
         <property name="dataSource">
             <ref bean="dataSource"/>

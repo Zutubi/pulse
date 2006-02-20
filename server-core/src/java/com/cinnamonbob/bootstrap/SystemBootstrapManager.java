@@ -1,19 +1,10 @@
 package com.cinnamonbob.bootstrap;
 
-import org.springframework.context.support.FileSystemXmlApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.ApplicationContext;
-
 import java.io.File;
 
 /**
- * This manager handles the first stage of system startup. It loads a spring context
- * that defines the systems "startupManager" bean and related beans such as the
- * configurationManager.
+ * This manager handles the first stage of system startup.
  *
- * The default bootstrapContext can be overriden using the -Dbootstrap= configuration
- * property. This property can refer to an absolute file location or a resource on the
- * classpath.
  *
  */
 public class SystemBootstrapManager
@@ -23,9 +14,6 @@ public class SystemBootstrapManager
      */
     private static final String DEFAULT_BOOTSTRAP_CONTEXT = "com/cinnamonbob/bootstrap/bootstrapContext.xml";
 
-    /**
-     * The system property used to override the default bootstrap context.
-     */
     public static final String BOOTSTRAP_CONTEXT_PROPERTY = "bootstrap";
 
     public void bootstrapSystem()
@@ -38,16 +26,16 @@ public class SystemBootstrapManager
         // b) try the classpath.
 
         File contextFile = new File(contextName);
-        ApplicationContext bootstrapContext;
         if (contextFile.exists())
         {
-            bootstrapContext = new FileSystemXmlApplicationContext(contextName);
+            ComponentContext.addFileContextDefinitions(new String[]{contextName});
         }
         else // look it up on the classpath.
         {
-            bootstrapContext = new ClassPathXmlApplicationContext(contextName);
+            ComponentContext.addClassPathContextDefinitions(new String[]{contextName});
         }
-        ((StartupManager) bootstrapContext.getBean("startupManager")).startup();
+
+        ((StartupManager) ComponentContext.getBean("startupManager")).init();
     }
 
     public static void main(String argv[])

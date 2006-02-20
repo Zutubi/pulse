@@ -1,7 +1,6 @@
 package com.cinnamonbob.bootstrap;
 
 import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.util.jdbc.JDBCUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
@@ -41,13 +40,15 @@ public class DatabaseBootstrap
         }
     }
 
-    public boolean schemaExists()
+    private boolean schemaExists()
     {
         // does the schema exist? there should be a better way to do this... have a look at the hibernate source...
         try
         {
             Connection con = dataSource.getConnection();
-            return JDBCUtils.tableExists(con, schemaTestTable);
+            CallableStatement stmt = con.prepareCall("SELECT COUNT(*) FROM " + schemaTestTable);
+            stmt.execute();
+            return true;
         }
         catch (SQLException e)
         {
@@ -55,22 +56,11 @@ public class DatabaseBootstrap
         }
     }
 
-    /**
-     * Required resource. This database provides access to the database being bootstrapped.
-     *
-     * @param dataSource
-     */
     public void setDataSource(DataSource dataSource)
     {
         this.dataSource = dataSource;
     }
 
-    /**
-     * Specify the schema test table, the name of the table used to check if the schema has
-     * been setup.
-     *
-     * @param testTable
-     */
     public void setSchemaTestTable(String testTable)
     {
         this.schemaTestTable = testTable;

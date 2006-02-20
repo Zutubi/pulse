@@ -12,7 +12,7 @@
             <table>
                 #detailrow("login" $user.login)
                 #detailrow("full name" $user.name)
-                #detailrow("action" "<a href='editUser!input.action?id=$user.id'>edit</a>")
+                #detailrow("action" "<a href='editUser!default.action?id=$user.id'>edit</a>")
             </table>
         </div>
         

@@ -1,6 +1,6 @@
 package com.cinnamonbob.web.user;
 
-import com.cinnamonbob.user.User;
+import com.cinnamonbob.model.User;
 
 /**
  * 
@@ -38,4 +38,11 @@ public class CreateUserAction extends UserActionSupport
 
         return SUCCESS;
     }
+
+    public String doDefault()
+    {
+        // setup any default data.
+        return SUCCESS;
+    }
+
 }

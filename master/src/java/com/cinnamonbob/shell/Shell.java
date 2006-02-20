@@ -391,7 +391,7 @@ class StdOutErrParser extends Thread
                     continue;
                 }
 
-                String nextCmdEndMarker = cmdEndMarkers.getFirst();
+                String nextCmdEndMarker = (String) cmdEndMarkers.getFirst();
 
                 // look for command termination string.
                 if (line.contains(nextCmdEndMarker))
@@ -476,6 +476,7 @@ class StdOutErrParser extends Thread
     /**
      * Get the exit status of the most recently completed command.
      *
+     * @return
      */
     public int getExitStatus()
     {

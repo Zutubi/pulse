@@ -8,7 +8,6 @@ import com.cinnamonbob.model.persistence.BuildResultDao;
 import com.cinnamonbob.model.persistence.ProjectDao;
 import com.cinnamonbob.model.persistence.SlaveDao;
 import com.cinnamonbob.model.persistence.UserDao;
-import com.cinnamonbob.user.User;
 
 import java.io.File;
 import java.util.Date;

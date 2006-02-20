@@ -2,7 +2,7 @@ package com.cinnamonbob.web.user;
 
 import java.util.List;
 
-import com.cinnamonbob.user.User;
+import com.cinnamonbob.model.User;
 
 public class ViewUsersAction extends UserActionSupport
 {
@@ -12,7 +12,7 @@ public class ViewUsersAction extends UserActionSupport
     {
         return users;
     }
-
+    
     public String execute()
     {
         users = getUserManager().getAllUsers();
