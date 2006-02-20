@@ -5,7 +5,7 @@ package com.cinnamonbob.bootstrap;
  */
 public class SetupSystemManager extends AbstractSystemStartupManager
 {
-    protected void runStartup() throws StartupException
+    public void startup() throws StartupException
     {
         // nothing to do yet.
 
