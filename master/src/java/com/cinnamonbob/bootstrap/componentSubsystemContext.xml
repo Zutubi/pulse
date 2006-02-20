@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <bean id="databaseBootstrap" class="com.cinnamonbob.bootstrap.DatabaseBootstrap" init-method="initialiseDatabase">
+        <property name="dataSource">
+            <ref bean="dataSource"/>
+        </property>
+    </bean>
+
+    <bean id="velocityEngine" class="com.cinnamonbob.velocity.VelocityEngineFactoryBean"/>
+
+    <bean id="buildManagerTarget" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"
+          init-method="init"/>
+
+    <bean id="buildManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="buildManagerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="userManagerTarget" class="com.cinnamonbob.user.DefaultUserManager" autowire="byName"/>
+    <bean id="userManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="userManagerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="projectManagerTarget" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
+    <bean id="projectManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="projectManagerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="subscriptionManagerTarget" class="com.cinnamonbob.model.DefaultSubscriptionManager" autowire="byName"/>
+    <bean id="subscriptionManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="subscriptionManagerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="scmManagerTarget" class="com.cinnamonbob.model.DefaultScmManager" autowire="byName" init-method="init"/>
+    <bean id="scmManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="scmManagerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="slaveManagerTarget" class="com.cinnamonbob.model.DefaultSlaveManager" autowire="byName"
+          init-method="init"/>
+    <bean id="slaveManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="slaveManagerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="objectFactory" class="com.cinnamonbob.core.ObjectFactory" autowire="byName"/>
+
+    <bean id="fileLoader" class="com.cinnamonbob.core.FileLoader" autowire="byName" singleton="false"/>
+
+    <bean id="fileResourceRepository" class="com.cinnamonbob.core.FileResourceRepository" autowire="byName"
+          init-method="initialise"/>
+
+    <bean id="resourceRepository" class="com.cinnamonbob.model.DatabaseResourceRepository" autowire="byName">
+        <property name="parent">
+            <ref bean="fileResourceRepository"/>
+        </property>
+    </bean>
+
+    <bean id="recipeProcessor" class="com.cinnamonbob.core.RecipeProcessor" autowire="byName"/>
+
+    <bean id="masterRecipeProcessor" class="com.cinnamonbob.MasterRecipeProcessor" autowire="byName"/>
+
+    <bean id="buildResultRenderer" class="com.cinnamonbob.renderer.VelocityBuildResultRenderer" autowire="byName"/>
+
+    <bean id="userConfigRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>applicationPaths.userConfigRoot</value>
+        </property>
+    </bean>
+
+    <bean id="customSerialiserFactory" class="com.cinnamonbob.hessian.CustomSerialiserFactory"/>
+
+    <bean id="hessianProxyFactory" class="com.cinnamonbob.hessian.CustomHessianProxyFactory" autowire="byName"/>
+
+    <bean id="slaveProxyFactory" class="com.cinnamonbob.SlaveProxyFactory" autowire="byName"/>
+
+    <bean id="fatController" class="com.cinnamonbob.FatController" autowire="byName" init-method="init"/>
+
+    <bean id="recipeQueue" class="com.cinnamonbob.ThreadedRecipeQueue" autowire="byName" init-method="init"/>
+
+    <bean id="resultNotifier" class="com.cinnamonbob.ResultNotifier" autowire="byName"/>
+
+    <!-- this spring object factory will ensure that WebWork Actions are autowired. -->
+    <bean id="spring-object-factory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
+
+    <bean id="shutdownManager" class="com.cinnamonbob.ShutdownManager">
+        <property name="stoppables">
+            <list>
+                <ref bean="scheduler"/>
+                <!-- We need a way to turn the UI "read only" at this point... -->
+                <ref bean="fatController"/>
+                <ref bean="masterRecipeProcessor"/>
+                <ref bean="jettyManager"/>
+            </list>
+        </property>
+    </bean>
+
+</beans>

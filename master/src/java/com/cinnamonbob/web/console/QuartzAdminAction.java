@@ -1,7 +1,7 @@
 package com.cinnamonbob.web.console;
 
 import com.cinnamonbob.web.ActionSupport;
-import com.cinnamonbob.bootstrap.quartz.QuartzManager;
+import com.cinnamonbob.quartz.QuartzManager;
 import org.quartz.Scheduler;
 
 /**

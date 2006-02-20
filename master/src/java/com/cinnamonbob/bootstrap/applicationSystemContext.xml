@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--
+This spring context file defines the application system.
+
+See upgradeSystemContext.xml and setupSystemContext.xml for the other systems.
+-->
+<beans>
+
+    <bean id="systemManager" class="com.cinnamonbob.bootstrap.ApplicationStartupManager">
+        <property name="subSystemContexts">
+            <list>
+                <value>com/cinnamonbob/bootstrap/coreSubsystemContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/hibernateDaoSubsystemContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/schedulingSubsystemContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/componentSubsystemContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/securitySubsystemContext.xml</value>
+            </list>
+        </property>
+        <property name="startupRunnables">
+            <list>
+                <value>com.cinnamonbob.BuildAborter</value>
+                <value>com.cinnamonbob.ResourceDiscoverer</value>
+            </list>
+        </property>
+    </bean>
+
+</beans>

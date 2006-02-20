@@ -1,0 +1,5 @@
+This is the administration index page.
+
+<p>
+    <a href="/admin/createUser!input.action">Create a new user.</a>
+</p>

@@ -2,25 +2,16 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation"></bean>
-
-    <bean id="startupManager" class="com.cinnamonbob.bootstrap.DefaultStartupManager">
-        <property name="systemContexts">
+    <bean id="startupManager" class="com.cinnamonbob.bootstrap.BootstrapStartupManager">
+        <property name="baseContexts">
             <list>
-                <value>com/cinnamonbob/bootstrap/coreSubsystemContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/databaseBootstrapContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/coreDatabaseContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/databaseContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/schedulingSubsystemContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/securitySubsystemContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/applicationContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/webserverContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/baseContext.xml</value>
             </list>
         </property>
-        <property name="startupRunnables">
+        <property name="systemContexts">
             <list>
-                <value>com.cinnamonbob.BuildAborter</value>
-                <value>com.cinnamonbob.ResourceDiscoverer</value>
+                <value>com/cinnamonbob/bootstrap/setupSystemContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/applicationSystemContext.xml</value>
             </list>
         </property>
     </bean>

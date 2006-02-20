@@ -1,6 +1,6 @@
 package com.cinnamonbob.web.user;
 
-import com.cinnamonbob.model.User;
+import com.cinnamonbob.user.User;
 
 /**
  *
@@ -27,10 +27,10 @@ public class EditUserAction extends UserActionSupport
         return user;
     }
 
-    public String doDefault()
+    public String doInput()
     {
         user = getUserManager().getUser(id);
-        return SUCCESS;
+        return INPUT;
     }
 
     public String execute()

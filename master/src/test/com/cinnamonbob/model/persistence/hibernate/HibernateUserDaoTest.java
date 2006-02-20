@@ -1,9 +1,10 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.model.EmailContactPoint;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.GrantedAuthority;
+import com.cinnamonbob.user.User;
+import com.cinnamonbob.user.UserAuthority;
 import com.cinnamonbob.model.persistence.UserDao;
+import com.cinnamonbob.model.persistence.hibernate.MasterPersistenceTestCase;
 
 import java.util.List;
 
@@ -76,15 +77,15 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         User user = new User();
         userDao.save(user);
 
-        GrantedAuthority authority = new GrantedAuthority();
+        UserAuthority authority = new UserAuthority();
         authority.setAuthority("SUPER_USER");
         user.add(authority);
         userDao.save(user);
         commitAndRefreshTransaction();
 
         user = userDao.findById(user.getId());
-        assertEquals(1, user.getAuthorities().size());
-        GrantedAuthority otherAuthority = user.getAuthorities().get(0);
+        assertEquals(1, user.getUserAuthorities().size());
+        UserAuthority otherAuthority = user.getUserAuthorities().get(0);
         assertPropertyEquals(authority, otherAuthority);
     }
 }

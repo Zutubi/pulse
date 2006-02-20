@@ -1,7 +1,7 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.bootstrap.config.*;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
 import java.util.Properties;

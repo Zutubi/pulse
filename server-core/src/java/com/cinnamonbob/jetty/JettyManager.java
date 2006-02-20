@@ -18,7 +18,7 @@ import java.io.File;
  * 
  *
  */
-public class JettyManager implements EventListener, Stoppable
+public class JettyManager implements Stoppable, EventListener
 {
     private static final Logger LOG = Logger.getLogger(JettyManager.class);
     private static final String BEAN_NAME = "jettyManager";

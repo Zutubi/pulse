@@ -1,7 +1,7 @@
 package com.cinnamonbob.web.user;
 
 import com.cinnamonbob.model.YahooContactPoint;
-import com.cinnamonbob.model.User;
+import com.cinnamonbob.user.User;
 
 /**
  *

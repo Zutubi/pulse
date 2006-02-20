@@ -2,8 +2,6 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation"></bean>
-
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="mappingResources">
             <list>
@@ -20,6 +18,52 @@
         </property>
         <property name="dataSource">
             <ref bean="dataSource"/>
+        </property>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="resourceDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateResourceDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="resourceDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="resourceDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="resourceVersionDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateResourceVersionDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="resourceVersionDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="resourceVersionDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
         </property>
     </bean>
 

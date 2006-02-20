@@ -1,8 +1,8 @@
 package com.cinnamonbob.web.console;
 
-import com.cinnamonbob.bootstrap.StartupManager;
 import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.web.ActionSupport;
+import com.cinnamonbob.bootstrap.StartupManager;
 
 import java.text.DateFormat;
 import java.text.MessageFormat;

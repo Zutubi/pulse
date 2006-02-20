@@ -5,11 +5,15 @@
     <display-name>CinnamonBob</display-name>
     <description>Continuous Integration Web UI</description>
 
+    <!-- Site mesh integration point. -->
     <filter>
         <filter-name>sitemesh</filter-name>
         <filter-class>com.opensymphony.module.sitemesh.filter.PageFilter</filter-class>
     </filter>
 
+    <!-- Handler for default '/' path. Redirect to default.action so that it can be handled
+         by the xwork mappings.
+     -->
     <filter>
         <filter-name>redirect</filter-name>
         <filter-class>com.cinnamonbob.servlet.RedirectServletFilter</filter-class>
@@ -19,6 +23,8 @@
         </init-param>
     </filter>
 
+<!--
+Temporarily disable security
    <filter>
         <filter-name>Acegi Filter Chain Proxy</filter-name>
         <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
@@ -27,6 +33,7 @@
             <param-value>org.acegisecurity.util.FilterChainProxy</param-value>
         </init-param>
    </filter>
+-->
 
     <filter-mapping>
         <filter-name>sitemesh</filter-name>
@@ -39,8 +46,8 @@
     </filter-mapping>
 
     <!--
-    -->
-    <!--
+    Temporarily disable security
+
     <filter-mapping>
         <filter-name>Acegi Filter Chain Proxy</filter-name>
         <url-pattern>/*</url-pattern>
@@ -49,9 +56,11 @@
     <!--
     This context loader is required by the acegisecurity component.
     -->
+    <!-- temporarily disable.
     <listener>
         <listener-class>com.cinnamonbob.spring.web.context.ContextLoaderListener</listener-class>
     </listener>
+    -->
 
     <!--
     If the System property 'xwork.reload.bundles' is specified, the following listener to set
@@ -78,6 +87,8 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
+<!-- Hessian is temporarily disabled until the web.xml loading in the context of startup/upgrade/application contexts
+     is sorted out.
     <servlet>
         <servlet-name>hessian</servlet-name>
         <servlet-class>com.cinnamonbob.hessian.CustomHessianServlet</servlet-class>
@@ -91,16 +102,19 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
+-->
 
     <servlet>
         <servlet-name>download</servlet-name>
         <servlet-class>com.cinnamonbob.servlet.DownloadResultsServlet</servlet-class>
     </servlet>
 
+<!--
     <servlet-mapping>
         <servlet-name>hessian</servlet-name>
         <url-pattern>/hessian</url-pattern>
     </servlet-mapping>
+-->
 
     <servlet-mapping>
         <servlet-name>webwork</servlet-name>

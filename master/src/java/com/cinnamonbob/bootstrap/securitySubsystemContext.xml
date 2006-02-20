@@ -27,7 +27,9 @@ The beans defined within the security subsystem need not be accessed by other co
 
     <bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
         <property name="userDetailsService">
-            <ref local="inMemoryDaoImpl"/>
+            <!--<ref local="inMemoryDaoImpl"/>-->
+            <!-- EXTERNAL DEPENDENCY: reference to the systems user manager. -->
+            <ref bean="userManager"/>
         </property>
 <!-- no password encoding for in memory credentials...
         <property name="passwordEncoder">
@@ -38,6 +40,8 @@ The beans defined within the security subsystem need not be accessed by other co
 
     <bean id="passwordEncoder" class="org.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
 
+<!-- This inMemoryDaoImpl can replace the userManager for testing purposes if you want to
+     mock out the User system.
     <bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
         <property name="userMap">
             <value>
@@ -46,6 +50,7 @@ The beans defined within the security subsystem need not be accessed by other co
             </value>
         </property>
     </bean>
+-->
 
     <!--
     this filter chain proxy is referenced in web.xml
@@ -149,7 +154,9 @@ The beans defined within the security subsystem need not be accessed by other co
 
     <bean id="rememberMeServices" class="org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices">
         <property name="userDetailsService">
-            <ref local="inMemoryDaoImpl"/>
+            <!--<ref local="inMemoryDaoImpl"/>-->
+            <!-- EXTERNAL DEPENDENCY: required reference to the systems UserManager -->
+            <ref bean="userManager"/>
         </property>
         <property name="key">
             <value>bob</value>
@@ -190,7 +197,8 @@ The beans defined within the security subsystem need not be accessed by other co
     -->
     <!-- In this example 'marissa' has ROLE_SUPERVISOR that can switch to regular ROLE_USER(s) -->
     <bean id="switchUserProcessingFilter" class="org.acegisecurity.ui.switchuser.SwitchUserProcessingFilter">
-        <property name="userDetailsService" ref="inMemoryDaoImpl"/>
+        <!--<property name="userDetailsService" ref="inMemoryDaoImpl"/>-->
+        <property name="userDetailsService" ref="userManager"/>
         <property name="switchUserUrl">
             <value>/j_acegi_switch_user</value>
         </property>

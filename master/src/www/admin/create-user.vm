@@ -1,0 +1,22 @@
+<html>
+<head>
+    <title>#wwtext("name=admin.create.user")</title>
+</head>
+<body>
+<h1>:: #wwtext("name=admin.user.create") ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+    
+    #wwcform("action=createUser.action" "heading=%{getText('admin.user.create')}" "method=post")
+
+        #wwtextfield("name=user.login" "label=%{getText('user.login')}" "required=true" "size=40" "tabindex=1")
+        #wwtextfield("name=user.name" "label=%{getText('user.name')}" "required=true" "size=40" "tabindex=2")
+
+        #openSubmit()
+            #wwsubmit("name=create" "value=%{getText('create.name')}" "tabindex=3")
+            #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=4")
+         #closeSubmit()
+     #end
+
+</body>
+</html>
