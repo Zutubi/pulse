@@ -73,7 +73,7 @@ public class BuildController implements EventListener
         tree = new BuildTree();
 
         TreeNode<RecipeController> root = tree.getRoot();
-        buildResult = new BuildResult(project, specification, buildManager.getNextBuildNumber(project));
+        buildResult = new BuildResult(project, specification.getName(), buildManager.getNextBuildNumber(project));
         buildManager.save(buildResult);
         configure(root, buildResult.getRoot(), specification.getRoot());
 
@@ -96,7 +96,7 @@ public class BuildController implements EventListener
 
             try
             {
-                List<BuildResult> previousBuildResults = buildManager.getLatestCompletedBuildResults(project, specification, 1);
+                List<BuildResult> previousBuildResults = buildManager.getLatestCompletedBuildResults(project, specification.getName(), 1);
 
                 if (previousBuildResults.size() == 1)
                 {

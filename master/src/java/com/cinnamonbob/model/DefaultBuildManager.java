@@ -106,13 +106,18 @@ public class DefaultBuildManager implements BuildManager
         fillHistoryPage(page, new ResultState[]{ResultState.ERROR, ResultState.FAILURE, ResultState.IN_PROGRESS, ResultState.SUCCESS}, null);
     }
 
-    public void fillHistoryPage(HistoryPage page, ResultState[] states, BuildSpecification spec)
+    public List<String> getBuildSpecifications(Project project)
+    {
+        return buildResultDao.findAllSpecifications(project);
+    }
+
+    public void fillHistoryPage(HistoryPage page, ResultState[] states, String spec)
     {
         page.setTotalBuilds(buildResultDao.getBuildCount(page.getProject(), states, spec));
         page.setResults(buildResultDao.findLatestByProject(page.getProject(), states, spec, page.getFirst(), page.getMax()));
     }
 
-    public List<BuildResult> getLatestCompletedBuildResults(Project project, BuildSpecification spec, int max)
+    public List<BuildResult> getLatestCompletedBuildResults(Project project, String spec, int max)
     {
         return buildResultDao.findLatestCompleted(project, spec, max);
     }

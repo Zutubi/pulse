@@ -26,8 +26,7 @@
 
         <many-to-one name="project" column="PROJECT" class="com.cinnamonbob.model.Project" cascade="none"/>
 
-        <many-to-one name="buildSpecification" column="BUILD_SPEC" class="com.cinnamonbob.model.BuildSpecification"
-                     cascade="none"/>
+        <property name="buildSpecification" column="BUILD_SPEC" type="string" length="255"/>
 
         <many-to-one name="scmDetails" class="com.cinnamonbob.model.BuildScmDetails" column="SCM_DETAILS"
                      cascade="all" lazy="false"/>

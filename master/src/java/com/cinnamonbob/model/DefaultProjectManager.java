@@ -1,6 +1,13 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.core.BobRuntimeException;
+import com.cinnamonbob.model.persistence.BuildSpecificationDao;
 import com.cinnamonbob.model.persistence.ProjectDao;
+import com.cinnamonbob.scheduling.Scheduler;
+import com.cinnamonbob.scheduling.SchedulingException;
+import com.cinnamonbob.scheduling.Trigger;
+import com.cinnamonbob.scheduling.persistence.TriggerDao;
+import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
 
 import java.util.List;
 
@@ -11,11 +18,9 @@ import java.util.List;
 public class DefaultProjectManager implements ProjectManager
 {
     private ProjectDao projectDao;
-
-    public void setProjectDao(ProjectDao dao)
-    {
-        projectDao = dao;
-    }
+    private BuildSpecificationDao buildSpecificationDao;
+    private TriggerDao triggerDao;
+    private Scheduler scheduler;
 
     public void save(Project project)
     {
@@ -46,8 +51,65 @@ public class DefaultProjectManager implements ProjectManager
     {
         projectDao.delete(entity);
     }
-    
+
     public void initialise()
     {
     }
+
+    public void deleteBuildSpecification(long projectId, long specId)
+    {
+        BuildSpecification spec = buildSpecificationDao.findById(specId);
+
+        if (spec == null)
+        {
+            throw new BobRuntimeException("Unknown build specification [" + specId + "]");
+        }
+
+        List<Trigger> triggers = triggerDao.findByProject(projectId);
+        for (Trigger trigger : triggers)
+        {
+            // Check the trigger's class to see if it is a build trigger, and
+            // the data map to see if the spec matches.
+            Class clazz = trigger.getTaskClass();
+            if (clazz.equals(BuildProjectTask.class))
+            {
+                String specName = (String) trigger.getDataMap().get(BuildProjectTask.PARAM_SPEC);
+
+                if (specName.equals(spec.getName()) && trigger.isScheduled())
+                {
+                    try
+                    {
+                        scheduler.unschedule(trigger);
+                    }
+                    catch (SchedulingException e)
+                    {
+                        throw new BobRuntimeException("Unable to unschedule trigger [" + trigger.getId() + "]");
+                    }
+                }
+            }
+        }
+
+        buildSpecificationDao.delete(spec);
+    }
+
+    public void setProjectDao(ProjectDao dao)
+    {
+        projectDao = dao;
+    }
+
+    public void setBuildSpecificationDao(BuildSpecificationDao buildSpecificationDao)
+    {
+        this.buildSpecificationDao = buildSpecificationDao;
+    }
+
+    public void setTriggerDao(TriggerDao triggerDao)
+    {
+        this.triggerDao = triggerDao;
+    }
+
+    public void setScheduler(Scheduler scheduler)
+    {
+        this.scheduler = scheduler;
+    }
+
 }

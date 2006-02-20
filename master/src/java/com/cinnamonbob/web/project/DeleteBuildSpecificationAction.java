@@ -1,6 +1,7 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.BuildSpecification;
+import com.cinnamonbob.model.ProjectManager;
 import com.cinnamonbob.model.persistence.BuildSpecificationDao;
 import com.cinnamonbob.web.ActionSupport;
 
@@ -14,6 +15,7 @@ public class DeleteBuildSpecificationAction extends ActionSupport
     private long projectId;
     private BuildSpecification specification;
     private BuildSpecificationDao buildSpecificationDao;
+    private ProjectManager projectManager;
 
     public long getId()
     {
@@ -35,11 +37,6 @@ public class DeleteBuildSpecificationAction extends ActionSupport
         this.projectId = projectId;
     }
 
-    public void setBuildSpecificationDao(BuildSpecificationDao buildSpecificationDao)
-    {
-        this.buildSpecificationDao = buildSpecificationDao;
-    }
-
     public void validate()
     {
         specification = buildSpecificationDao.findById(id);
@@ -51,7 +48,17 @@ public class DeleteBuildSpecificationAction extends ActionSupport
 
     public String execute()
     {
-        buildSpecificationDao.delete(specification);
+        projectManager.deleteBuildSpecification(projectId, id);
         return SUCCESS;
+    }
+
+    public void setBuildSpecificationDao(BuildSpecificationDao buildSpecificationDao)
+    {
+        this.buildSpecificationDao = buildSpecificationDao;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

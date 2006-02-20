@@ -47,9 +47,16 @@ public interface BuildManager
      * @param states if not null, restrict to results in one of these states
      * @param spec   if no null, restrict to results of the given spec
      */
-    void fillHistoryPage(HistoryPage page, ResultState[] states, BuildSpecification spec);
+    void fillHistoryPage(HistoryPage page, ResultState[] states, String spec);
 
-    List<BuildResult> getLatestCompletedBuildResults(Project project, BuildSpecification spec, int max);
+    /**
+     * @param project the project to search for
+     * @return all build specification names referred to by build results of
+     *         the given project
+     */
+    List<String> getBuildSpecifications(Project project);
+
+    List<BuildResult> getLatestCompletedBuildResults(Project project, String spec, int max);
 
     BuildResult getLatestBuildResult(Project project);
 
@@ -58,4 +65,5 @@ public interface BuildManager
     long getNextBuildNumber(Project project);
 
     void cleanupBuilds();
+
 }

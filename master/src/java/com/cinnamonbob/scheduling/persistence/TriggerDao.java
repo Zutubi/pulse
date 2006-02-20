@@ -1,7 +1,7 @@
 package com.cinnamonbob.scheduling.persistence;
 
-import com.cinnamonbob.scheduling.Trigger;
 import com.cinnamonbob.model.persistence.EntityDao;
+import com.cinnamonbob.scheduling.Trigger;
 
 import java.util.List;
 

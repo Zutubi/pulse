@@ -2,7 +2,6 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.BuildSpecification;
 import com.cinnamonbob.model.HistoryPage;
 import com.cinnamonbob.model.Project;
 import com.opensymphony.util.TextUtils;
@@ -179,10 +178,7 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
 
         specs = new LinkedList<String>();
         specs.add("");
-        for (BuildSpecification spec : project.getBuildSpecifications())
-        {
-            specs.add(spec.getName());
-        }
+        specs.addAll(getBuildManager().getBuildSpecifications(project));
 
         if (startPage < 0)
         {
@@ -206,22 +202,17 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
                 return ERROR;
             }
 
-            BuildSpecification specification;
+            String specName;
             if (!TextUtils.stringSet(spec))
             {
-                specification = null;
+                specName = null;
             }
             else
             {
-                specification = project.getBuildSpecification(spec);
-                if (specification == null)
-                {
-                    addActionError("Invalid specification '" + spec + "'");
-                    return ERROR;
-                }
+                specName = spec;
             }
 
-            getBuildManager().fillHistoryPage(page, states, specification);
+            getBuildManager().fillHistoryPage(page, states, specName);
         }
 
         history = page.getResults();

@@ -271,9 +271,9 @@ public class SetupDummyBuilds implements Runnable
         buildResultDao.save(result);
     }
 
-    private BuildSpecification getSpec(Project project)
+    private String getSpec(Project project)
     {
-        return project.getBuildSpecifications().get(0);
+        return project.getBuildSpecifications().get(0).getName();
     }
 
     private RecipeResultNode createComplexRecipe(String name)

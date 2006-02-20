@@ -4,7 +4,6 @@ import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.BuildSpecification;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.RecipeResultNode;
 import com.cinnamonbob.model.persistence.BuildResultDao;
@@ -53,7 +52,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public List<BuildResult> findLatestCompleted(final Project project, final BuildSpecification spec, final int max)
+    public List<BuildResult> findLatestCompleted(final Project project, final String spec, final int max)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
@@ -73,7 +72,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public List<BuildResult> findLatestByProject(final Project project, final ResultState[] states, final BuildSpecification spec, final int first, final int max)
+    public List<BuildResult> findLatestByProject(final Project project, final ResultState[] states, final String spec, final int first, final int max)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
@@ -156,7 +155,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return (RecipeResult) getHibernateTemplate().load(RecipeResult.class, Long.valueOf(id));
     }
 
-    public int getBuildCount(final Project project, final ResultState[] states, final BuildSpecification spec)
+    public int getBuildCount(final Project project, final ResultState[] states, final String spec)
     {
         return (Integer) getHibernateTemplate().execute(new HibernateCallback()
         {
@@ -169,7 +168,22 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    private Criteria getBuildResultCriteria(Session session, Project project, ResultState[] states, BuildSpecification spec)
+    public List<String> findAllSpecifications(final Project project)
+    {
+        return (List<String>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("select distinct model.buildSpecification from BuildResult model where model.project = :project");
+                queryObject.setEntity("project", project);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.list();
+            }
+        });
+
+    }
+
+    private Criteria getBuildResultCriteria(Session session, Project project, ResultState[] states, String spec)
     {
         Criteria criteria = session.createCriteria(BuildResult.class);
         criteria.add(Expression.eq("project", project));

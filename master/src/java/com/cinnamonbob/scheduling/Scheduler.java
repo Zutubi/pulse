@@ -32,4 +32,5 @@ public interface Scheduler extends Stoppable
     void resume(String group) throws SchedulingException;
 
     void resume(Trigger trigger) throws SchedulingException;
+
 }

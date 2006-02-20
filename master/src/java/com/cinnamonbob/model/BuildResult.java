@@ -11,7 +11,7 @@ import java.util.List;
 public class BuildResult extends Result
 {
     private Project project;
-    private BuildSpecification buildSpecification;
+    private String buildSpecification;
     private long number;
     private BuildScmDetails scmDetails;
     private RecipeResultNode root;
@@ -21,7 +21,7 @@ public class BuildResult extends Result
 
     }
 
-    public BuildResult(Project project, BuildSpecification buildSpecification, long number)
+    public BuildResult(Project project, String buildSpecification, long number)
     {
         this.project = project;
         this.buildSpecification = buildSpecification;
@@ -40,12 +40,12 @@ public class BuildResult extends Result
         this.project = project;
     }
 
-    public BuildSpecification getBuildSpecification()
+    public String getBuildSpecification()
     {
         return buildSpecification;
     }
 
-    private void setBuildSpecification(BuildSpecification buildSpecification)
+    private void setBuildSpecification(String buildSpecification)
     {
         this.buildSpecification = buildSpecification;
     }

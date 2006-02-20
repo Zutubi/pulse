@@ -4,8 +4,8 @@ import com.cinnamonbob.core.FileArtifact;
 import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildResultDao;
-import com.cinnamonbob.model.persistence.ProjectDao;
 import com.cinnamonbob.model.persistence.BuildSpecificationDao;
+import com.cinnamonbob.model.persistence.ProjectDao;
 
 import java.io.File;
 import java.util.Calendar;
@@ -98,7 +98,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         BuildSpecification spec = new BuildSpecification();
         buildSpecificationDao.save(spec);
 
-        BuildResult buildResult = new BuildResult(project, spec, 11);
+        BuildResult buildResult = new BuildResult(project, spec.getName(), 11);
         buildResult.commence(new File("/tmp/buildout"));
         buildResult.setScmDetails(scmDetails);
         RecipeResultNode recipeNode = new RecipeResultNode(recipeResult);
@@ -299,7 +299,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1, 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 10);
         assertEquals(2, latestCompleted.size());
         assertPropertyEquals(r2, latestCompleted.get(0));
         assertPropertyEquals(r1, latestCompleted.get(1));
@@ -314,14 +314,14 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         buildSpecificationDao.save(b1);
 
         BuildResult r1 = createCompletedBuild(p1, b1, 1);
-        BuildResult r2 = new BuildResult(p1, b1, 2);
+        BuildResult r2 = new BuildResult(p1, b1.getName(), 2);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1, 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 10);
         assertEquals(1, latestCompleted.size());
         assertPropertyEquals(r1, latestCompleted.get(0));
     }
@@ -335,7 +335,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         buildSpecificationDao.save(b1);
 
         BuildResult r1 = createCompletedBuild(p1, b1, 1);
-        BuildResult r2 = new BuildResult(p1, b1, 2);
+        BuildResult r2 = new BuildResult(p1, b1.getName(), 2);
         r2.commence(new File("test"));
 
         buildResultDao.save(r1);
@@ -343,7 +343,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1, 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 10);
         assertEquals(1, latestCompleted.size());
         assertPropertyEquals(r1, latestCompleted.get(0));
     }
@@ -368,7 +368,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1, 2);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 2);
         assertEquals(2, latestCompleted.size());
         assertPropertyEquals(r4, latestCompleted.get(0));
         assertPropertyEquals(r3, latestCompleted.get(1));
@@ -376,12 +376,12 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private BuildResult createCompletedBuild(Project project, long number)
     {
-        return createCompletedBuild(project,  null, number);
+        return createCompletedBuild(project, null, number);
     }
 
     private BuildResult createCompletedBuild(Project project, BuildSpecification spec, long number)
     {
-        BuildResult result = new BuildResult(project, spec, number);
+        BuildResult result = new BuildResult(project, spec.getName(), number);
         result.commence(0);
         result.complete();
         return result;
