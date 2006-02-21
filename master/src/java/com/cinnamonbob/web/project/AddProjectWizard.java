@@ -61,10 +61,7 @@ public class AddProjectWizard extends BaseWizard
         // finished.
         completeState = new WizardCompleteState(this, "success");
 
-        initialState = projectDetails;
-        finalState = completeState;
-
-        addState(projectDetails);
+        addInitialState(projectDetails.getStateName(), projectDetails);
         addState(cvsDetails);
         addState(svnDetails);
         addState(p4Details);
@@ -72,7 +69,7 @@ public class AddProjectWizard extends BaseWizard
         addState(makeDetails);
         addState(mavenDetails);
         addState(customDetails);
-        addState(completeState);
+        addFinalState(completeState.getStateName(), completeState);
     }
 
     public void process()

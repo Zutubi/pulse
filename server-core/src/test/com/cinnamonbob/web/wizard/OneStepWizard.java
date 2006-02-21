@@ -13,9 +13,8 @@ public class OneStepWizard extends BaseWizard
         state = new TestWizardState(this, "a");
         completeState = new WizardCompleteState(this, "success");
         state.setNextState(completeState.getStateName());
-        initialState = state;
-        addState(state);
-        addState(completeState);
+        addInitialState(state.getStateName(), state);
+        addFinalState(completeState.getStateName(), completeState);
     }
 
 }

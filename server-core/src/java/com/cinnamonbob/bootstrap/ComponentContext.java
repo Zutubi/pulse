@@ -50,7 +50,7 @@ public class ComponentContext
 
     public static void autowire(Object bean)
     {
-        if (getContext() != null)
+        if (context.getDelegate() != null)
         {
             SpringAutowireSupport support = new SpringAutowireSupport();
             support.setApplicationContext(context);

@@ -20,6 +20,6 @@ public class TwoStepWizard extends BaseWizard
 
         completeState = new WizardCompleteState(this, "success");
         stateTwo.setNextState(completeState.getStateName());
-        addState(completeState);
+        addFinalState(completeState.getStateName(), completeState);
     }
 }
