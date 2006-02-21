@@ -3,6 +3,7 @@ package com.cinnamonbob.bootstrap;
 import com.cinnamonbob.spring.DelegatingApplicationContext;
 import com.cinnamonbob.spring.SpringAutowireSupport;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
@@ -25,7 +26,8 @@ public class ComponentContext
     {
         if (definitions != null && definitions.length > 0)
         {
-            context.setDelegate(new FileSystemXmlApplicationContext(definitions, context.getDelegate()));
+            context.setDelegate(new FileSystemXmlApplicationContext(definitions, false, context.getDelegate()));
+            ((ConfigurableApplicationContext)context.getDelegate()).refresh();
         }
     }
 
@@ -33,7 +35,8 @@ public class ComponentContext
     {
         if (definitions != null && definitions.length > 0)
         {
-            context.setDelegate(new ClassPathXmlApplicationContext(definitions, context.getDelegate()));
+            context.setDelegate(new ClassPathXmlApplicationContext(definitions, false, context.getDelegate()));
+            ((ConfigurableApplicationContext)context.getDelegate()).refresh();
         }
     }
 
