@@ -18,6 +18,7 @@ public abstract class TemplateBobFileDetailsTest extends BobTestCase
 
     protected void setUp() throws Exception
     {
+        super.setUp();
         engine = new VelocityEngine();
         File bobRoot = new File(getBobRoot(), "master/src/templates");
         engine.setProperty("file.resource.loader.path", bobRoot.getAbsolutePath());
@@ -28,8 +29,9 @@ public abstract class TemplateBobFileDetailsTest extends BobTestCase
 
     protected void tearDown() throws Exception
     {
-        super.tearDown();
+        engine = null;
         FileSystemUtils.removeDirectory(tmpDir);
+        super.tearDown();
     }
 
     protected void createAndVerify(String expectedName) throws IOException

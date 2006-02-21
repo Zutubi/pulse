@@ -66,6 +66,7 @@ public abstract class PersistenceTestCase extends BobTestCase
 
     public void tearDown() throws Exception
     {
+        sessionFactory.close();
         sessionFactory = null;
         try
         {
@@ -92,10 +93,12 @@ public abstract class PersistenceTestCase extends BobTestCase
             }
         }
 
+        con.close();
         dataSource = null;
         transactionStatus = null;
         transactionDefinition = null;
         transactionManager = null;
+        ComponentContext.purge();
         super.tearDown();
     }
 
