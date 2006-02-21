@@ -544,6 +544,12 @@
             <result name="success" type="velocity">index.vm</result>
         </action>
 
+        <action name="smtp" class="com.cinnamonbob.web.admin.SmtpAction">
+            <result name="input" type="velocity">configure-smtp.vm</result>
+            <result name="error" type="velocity">configure-smtp.vm</result>
+            <result name="success" type="velocity">view-smtp.vm</result>
+        </action>
+
     </package>
 
 

@@ -5,7 +5,7 @@
 
 <body>
 
-    <a href="">configure smtp</a>
+    <a href="/admin/smtp.action">smtp configuration</a>
 
 </body>
 </html>
