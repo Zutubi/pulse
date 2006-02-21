@@ -8,13 +8,13 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=smtp!save.action" "heading=%{getText('smtp.setup')}" "method=post")
+#wwcform("action=editSmtp!save.action" "heading=%{getText('smtp.setup')}" "method=post")
 
     #wwtextfield("name=smtp.from" "label=%{getText('smtp.from')}" "required=true" "size=60" "tabindex=1")
-    #wwtextfield("name=smtp.prefix" "label=%{getText('smtp.prefix')}" "required=true" "size=60" "tabindex=2")
+    #wwtextfield("name=smtp.prefix" "label=%{getText('smtp.prefix')}" "size=60" "tabindex=2")
     #wwtextfield("name=smtp.host" "label=%{getText('smtp.host')}" "required=true" "size=60" "tabindex=3")
-    #wwtextfield("name=smtp.username" "label=%{getText('smtp.username')}" "required=true" "tabindex=4")
-    #wwpassword("name=smtp.password" "label=%{getText('smtp.password')}" "required=true" "tabindex=5")
+    #wwtextfield("name=smtp.username" "label=%{getText('smtp.username')}" "tabindex=4")
+    #wwpassword("name=smtp.password" "label=%{getText('smtp.password')}" "tabindex=5")
 
     #openSubmit()
         #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=6")
