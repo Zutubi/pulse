@@ -47,7 +47,7 @@ public abstract class Trigger extends Entity
      * The datamap, contains arbitrary pieces of data. This data is later made available
      * to the task being executed.
      */
-    private Map dataMap;
+    private Map<Object, Object> dataMap;
 
     private Class<? extends Task> taskClass;
 
@@ -94,16 +94,19 @@ public abstract class Trigger extends Entity
      */
     public abstract String getType();
 
-    public Map getDataMap()
+    public Map<Object, Object> getDataMap()
     {
         if (dataMap == null)
         {
-            dataMap = new HashMap();
+            dataMap = new HashMap<Object, Object>();
         }
         return dataMap;
     }
 
-    private void setDataMap(Map map)
+    /**
+     * used by hibernate.
+     */
+    private void setDataMap(Map<Object, Object> map)
     {
         dataMap = map;
     }
@@ -123,6 +126,9 @@ public abstract class Trigger extends Entity
         return triggerCount;
     }
 
+    /**
+     * used by hibernate.
+     */
     private void setTriggerCount(long count)
     {
         this.triggerCount = count;
@@ -139,6 +145,9 @@ public abstract class Trigger extends Entity
         return previousTriggerTime;
     }
 
+    /**
+     * used by hibernate.
+     */
     private void setPreviousTriggerTime(Date time)
     {
         this.previousTriggerTime = time;
@@ -149,6 +158,9 @@ public abstract class Trigger extends Entity
         return name;
     }
 
+    /**
+     * used by hibernate.
+     */
     private void setName(String name)
     {
         this.name = name;
@@ -159,16 +171,25 @@ public abstract class Trigger extends Entity
         return group;
     }
 
+    /**
+     * used by hibernate.
+     */
     private void setGroup(String group)
     {
         this.group = group;
     }
 
+    /**
+     * used by hibernate.
+     */
     private void setTriggerState(String str)
     {
         state = TriggerState.valueOf(str);
     }
 
+    /**
+     * used by hibernate.
+     */
     private String getTriggerState()
     {
         return state.toString();

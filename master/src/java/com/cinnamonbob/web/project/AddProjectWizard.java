@@ -62,6 +62,7 @@ public class AddProjectWizard extends BaseWizard
         completeState = new WizardCompleteState(this, "success");
 
         initialState = projectDetails;
+        finalState = completeState;
 
         addState(projectDetails);
         addState(cvsDetails);
