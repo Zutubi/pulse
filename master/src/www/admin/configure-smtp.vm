@@ -1,0 +1,28 @@
+<html>
+<head>
+    <title>#wwtext("name=add.project")</title>
+</head>
+
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=addProject.action" "heading=%{getText('cvs.setup')}" "method=post")
+    #wwhidden("name=state")
+
+    #wwtextfield("name=cvs.root" "label=%{getText('cvs.root')}" "required=true" "size=60" "tabindex=1")
+    #wwtextfield("name=cvs.module" "label=%{getText('cvs.module')}" "required=true" "tabindex=2")
+    #wwpassword("name=cvs.password" "label=%{getText('cvs.password')}" "tabindex=3")
+    #wwtextfield("name=cvs.path" "label=%{getText('scm.path')}" "size=60" "tabindex=4")
+    #inlineHelp("scm.path.help")
+
+    #openSubmit()
+        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=5")
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=6")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=7")
+    #closeSubmit()
+ #end
+
+
+</body>
+</html>

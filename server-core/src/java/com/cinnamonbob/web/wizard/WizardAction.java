@@ -2,10 +2,10 @@ package com.cinnamonbob.web.wizard;
 
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.util.logging.Logger;
+import com.cinnamonbob.xwork.TextProviderSupport;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.TextProvider;
-import com.opensymphony.xwork.TextProviderSupport;
 import com.opensymphony.xwork.ActionSupport;
 import com.opensymphony.xwork.util.OgnlValueStack;
 

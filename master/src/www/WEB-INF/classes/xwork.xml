@@ -536,4 +536,15 @@
         </action>
 
     </package>
+
+    <package name="admin" namespace="/admin" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="default" class="com.cinnamonbob.web.ActionSupport">
+            <result name="success" type="velocity">index.vm</result>
+        </action>
+
+    </package>
+
+
 </xwork>
