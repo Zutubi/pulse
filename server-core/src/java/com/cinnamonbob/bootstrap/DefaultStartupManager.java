@@ -31,12 +31,8 @@ public class DefaultStartupManager implements StartupManager
 
         try
         {
-            for (String context : systemContexts)
-            {
-                ComponentContext.addClassPathContextDefinitions(new String[]{context});
-                // init.
-                ComponentContext.getBean("initContext");
-            }
+            
+            ComponentContext.addClassPathContextDefinitions(systemContexts.toArray(new String[systemContexts.size()]));
 
             for (String name : startupRunnables)
             {
