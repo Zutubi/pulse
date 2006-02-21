@@ -60,7 +60,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             {
                 Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.buildSpecification = :spec and model.stateName != :initial and model.stateName != :inProgress order by id desc");
                 queryObject.setEntity("project", project);
-                queryObject.setEntity("spec", spec);
+                queryObject.setParameter("spec", spec);
                 queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
                 queryObject.setParameter("inProgress", ResultState.IN_PROGRESS.toString(), Hibernate.STRING);
                 queryObject.setMaxResults(max);

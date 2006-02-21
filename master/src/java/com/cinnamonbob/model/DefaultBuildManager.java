@@ -43,7 +43,6 @@ public class DefaultBuildManager implements BuildManager
         Trigger trigger = scheduler.getTrigger(CLEANUP_NAME, CLEANUP_GROUP);
         if (trigger != null)
         {
-            ll, i
             return;
         }
 

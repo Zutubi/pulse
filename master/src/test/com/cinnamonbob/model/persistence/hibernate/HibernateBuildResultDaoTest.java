@@ -282,8 +282,8 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         projectDao.save(p1);
         projectDao.save(p2);
 
-        BuildSpecification b1 = new BuildSpecification();
-        BuildSpecification b2 = new BuildSpecification();
+        BuildSpecification b1 = new BuildSpecification("b1");
+        BuildSpecification b2 = new BuildSpecification("b2");
         buildSpecificationDao.save(b1);
         buildSpecificationDao.save(b2);
 
@@ -310,7 +310,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildSpecification b1 = new BuildSpecification();
+        BuildSpecification b1 = new BuildSpecification("b1");
         buildSpecificationDao.save(b1);
 
         BuildResult r1 = createCompletedBuild(p1, b1, 1);
@@ -331,7 +331,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildSpecification b1 = new BuildSpecification();
+        BuildSpecification b1 = new BuildSpecification("b1");
         buildSpecificationDao.save(b1);
 
         BuildResult r1 = createCompletedBuild(p1, b1, 1);
@@ -353,7 +353,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildSpecification b1 = new BuildSpecification();
+        BuildSpecification b1 = new BuildSpecification("b1");
         buildSpecificationDao.save(b1);
 
         BuildResult r1 = createCompletedBuild(p1, b1, 1);
@@ -376,7 +376,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private BuildResult createCompletedBuild(Project project, long number)
     {
-        return createCompletedBuild(project, null, number);
+        return createCompletedBuild(project, new BuildSpecification("test spec"), number);
     }
 
     private BuildResult createCompletedBuild(Project project, BuildSpecification spec, long number)
