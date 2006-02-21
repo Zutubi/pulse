@@ -31,6 +31,7 @@
         <dependency org="apache" name="commons-pool" rev="1.2" conf="external->default"/>
 
         <dependency org="junit" name="junit" rev="3.8.1" conf="external->default"/>
+        <dependency org="jwebunit" name="jwebunit" rev="1.2" conf="external->default"/>
         <dependency org="jetty" name="org.mortbay.jetty" rev="5.1.6" conf="external->default"/>
         <dependency org="springframework" name="spring" rev="1.2.6"
                     conf="external->spring-aop,spring-jdbc,spring-beans,spring-context,spring-core,spring-orm,spring-hibernate3,spring-support"/>
