@@ -10,6 +10,10 @@ import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.model.persistence.ArtifactDao;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 import com.cinnamonbob.scheduling.Scheduler;
+import com.cinnamonbob.scheduling.SchedulingException;
+import com.cinnamonbob.scheduling.SimpleTrigger;
+import com.cinnamonbob.scheduling.Trigger;
+import com.cinnamonbob.scheduling.tasks.CleanupBuilds;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
@@ -34,26 +38,27 @@ public class DefaultBuildManager implements BuildManager
 
     public void init()
     {
-//        // register a schedule for cleaning up old build results.
-//        // check if the trigger exists. if not, create and schedule.
-//        Trigger trigger = scheduler.getTrigger(CLEANUP_NAME, CLEANUP_GROUP);
-//        if (trigger != null)
-//        {
-//            return;
-//        }
-//
-//        // initialise the trigger.
-//        trigger = new SimpleTrigger(CLEANUP_NAME, CLEANUP_GROUP, CLEANUP_FREQUENCY);
-//        trigger.setTaskClass(CleanupBuilds.class);
-//
-//        try
-//        {
-//            scheduler.schedule(trigger);
-//        }
-//        catch (SchedulingException e)
-//        {
-//            LOG.severe(e);
-//        }
+        // register a schedule for cleaning up old build results.
+        // check if the trigger exists. if not, create and schedule.
+        Trigger trigger = scheduler.getTrigger(CLEANUP_NAME, CLEANUP_GROUP);
+        if (trigger != null)
+        {
+            ll, i
+            return;
+        }
+
+        // initialise the trigger.
+        trigger = new SimpleTrigger(CLEANUP_NAME, CLEANUP_GROUP, CLEANUP_FREQUENCY);
+        trigger.setTaskClass(CleanupBuilds.class);
+
+        try
+        {
+            scheduler.schedule(trigger);
+        }
+        catch (SchedulingException e)
+        {
+            LOG.severe(e);
+        }
     }
 
     public void setBuildResultDao(BuildResultDao dao)
