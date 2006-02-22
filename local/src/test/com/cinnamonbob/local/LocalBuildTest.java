@@ -28,8 +28,9 @@ public class LocalBuildTest extends BobTestCase
     @Override
     protected void tearDown() throws Exception
     {
+        removeDirectory(tmpDir);
+
         super.tearDown();
-        FileSystemUtils.removeDirectory(tmpDir);
     }
 
     private File getExpectedOutput(String name)
