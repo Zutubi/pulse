@@ -15,4 +15,11 @@ public abstract class ExtendedWebTestCase extends WebTestCase
     {
         super(name);
     }
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+
+        getTestContext().setBaseUrl("http://localhost:8080/");
+    }
 }
