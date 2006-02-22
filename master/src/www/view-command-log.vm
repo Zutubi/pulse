@@ -4,14 +4,28 @@
     <title>#wwtext("name=build") $result.number</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=build") $result.number ::</h1>
+    <a name="top">
+        <h1>:: #wwtext("name=build") $result.number ::</h1>
+    </a>
 
     #buildTabs($result "command-log")
 
 #set($recipeResult = $result.root.children.get(0).result)
 #if($recipeResult.commandResults.size() > 0)
+    <p>
+        <b>#wwtext("name=jump.to")</b>
     #foreach($commandResult in $recipeResult.commandResults)
-    <h2 class="section">$!webwork.htmlEncode($commandResult.commandName)</h2>
+        :: <a href="#command-$velocityCount">$!webwork.htmlEncode($commandResult.commandName)</a>
+    #end
+    </p>
+
+    #foreach($commandResult in $recipeResult.commandResults)
+        <h2 class="section">
+    <a name="command-$velocityCount">
+           <a href="#top" class="unadorned"><img alt="top" src="images/arrow_up.gif"/></a>
+            $!webwork.htmlEncode($commandResult.commandName)
+    </a>
+        </h2>
 
     <table class="content">
         #headingRow("summary" 5)
@@ -28,6 +42,20 @@
             #classCell($commandResult.stamps.prettyStartTime)
             #classCell($commandResult.stamps.prettyElapsed)
         </tr>
+        #if($commandResult.errored())
+        <tr>
+            <td class="error" colspan="5">
+                $!webwork.htmlEncode($commandResult.errorMessage)
+            </td>
+        </tr>
+        #end
+        #if($commandResult.failed())
+        <tr>
+            <td class="failure" colspan="5">
+                $!webwork.htmlEncode($commandResult.failureMessage)
+            </td>
+        </tr>
+        #end
     </table>
 
         #if($commandResult.properties.size() > 0)

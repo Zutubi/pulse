@@ -178,9 +178,19 @@ public class ExecutableCommand implements Command
     private String constructCommandLine(ProcessBuilder builder)
     {
         StringBuffer result = new StringBuffer();
+        boolean first = true;
 
         for (String part : builder.command())
         {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                result.append(' ');
+            }
+
             boolean containsSpaces = part.indexOf(' ') != -1;
 
             if (containsSpaces)
@@ -194,7 +204,6 @@ public class ExecutableCommand implements Command
             {
                 result.append('"');
             }
-            result.append(' ');
         }
 
         return result.toString();
