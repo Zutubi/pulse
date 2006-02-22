@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
+import java.util.zip.ZipFile;
 
 /**
  * A utility class for standard IO operations.
@@ -134,6 +135,21 @@ public class IOUtils
             if (w != null)
             {
                 w.close();
+            }
+        }
+        catch (IOException e)
+        {
+            LOG.finest(e);
+        }
+    }
+
+    public static void close(ZipFile zipFile)
+    {
+        try
+        {
+            if (zipFile != null)
+            {
+                zipFile.close();
             }
         }
         catch (IOException e)

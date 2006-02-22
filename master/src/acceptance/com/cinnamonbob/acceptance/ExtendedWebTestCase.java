@@ -15,4 +15,9 @@ public class ExtendedWebTestCase extends WebTestCase
     {
         super(name);
     }
+
+    public void test()
+    {
+        // these acceptance tests should not be executed as part of the regular test cases.
+    }
 }

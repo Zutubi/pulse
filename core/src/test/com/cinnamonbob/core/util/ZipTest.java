@@ -35,8 +35,9 @@ public class ZipTest extends BobTestCase
     @Override
     protected void tearDown() throws Exception
     {
+        removeDirectory(tmpDir);
+
         super.tearDown();
-        FileSystemUtils.removeDirectory(tmpDir);
     }
 
     public void testZipNonExistant() throws IOException
@@ -146,7 +147,10 @@ public class ZipTest extends BobTestCase
         for (String component : components)
         {
             result += sep + component;
-            sep = File.separator;
+            // this separator will be used to locate the entries within the zip file, so
+            // needs to be the zip standard. The java.io.File object is able to handle this
+            // incorrect separator correctly when on windows.
+            sep = "/";
         }
 
         return result;
@@ -157,30 +161,39 @@ public class ZipTest extends BobTestCase
         File zip = getZipName();
         FileSystemUtils.createZip(zip, inDir, new File(inDir, path));
 
-
-        ZipFile zipFile = new ZipFile(zip);
-        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zip));
-        ZipEntry entry;
-
-        while ((entry = zipIn.getNextEntry()) != null)
+        ZipFile zipFile = null;
+        ZipInputStream zipIn = null;
+        try
         {
-            String name;
+            zipFile = new ZipFile(zip);
+            zipIn = new ZipInputStream(new FileInputStream(zip));
+            ZipEntry entry;
 
-            if (entry.isDirectory())
+            while ((entry = zipIn.getNextEntry()) != null)
             {
-                name = entry.getName().substring(0, entry.getName().length() - 1);
-                assertEquals(files.get(name), null);
-            }
-            else
-            {
-                name = entry.getName();
-                assertEquals(readContents(zipFile, entry), files.get(entry.getName()));
+                String name;
+
+                if (entry.isDirectory())
+                {
+                    name = entry.getName().substring(0, entry.getName().length() - 1);
+                    assertEquals(files.get(name), null);
+                }
+                else
+                {
+                    name = entry.getName();
+                    assertEquals(files.get(entry.getName()), readContents(zipFile, entry));
+                }
+
+                assertTrue(files.containsKey(name));
+                files.remove(name);
             }
 
-            assertTrue(files.containsKey(name));
-            files.remove(name);
         }
-
+        finally
+        {
+            IOUtils.close(zipFile);
+            IOUtils.close(zipIn);
+        }
         assertTrue(files.isEmpty());
     }
 

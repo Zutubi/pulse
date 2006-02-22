@@ -21,10 +21,10 @@ public class AntCommandTest extends BobTestCase
         outputDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".out");
     }
 
-    public void tearDown()
+    public void tearDown() throws IOException
     {
-        FileSystemUtils.removeDirectory(baseDir);
-        FileSystemUtils.removeDirectory(outputDir);
+        removeDirectory(baseDir);
+        removeDirectory(outputDir);
     }
 
     public void testBasicDefault() throws IOException
@@ -119,11 +119,19 @@ public class AntCommandTest extends BobTestCase
     {
         assertTrue(commandResult.getProperties().containsKey("command line"));
         assertTrue(commandResult.getProperties().get("command line").toString().startsWith("ant"));
-        FileInputStream is = new FileInputStream(new File(outputDir, "output.txt"));
-        String output = IOUtils.inputStreamToString(is);
-        for (String content : contents)
+        FileInputStream is = null;
+        try
         {
-            assertTrue(output.contains(content));
+            is = new FileInputStream(new File(outputDir, "output.txt"));
+            String output = IOUtils.inputStreamToString(is);
+            for (String content : contents)
+            {
+                assertTrue(output.contains(content));
+            }
+        }
+        finally
+        {
+            IOUtils.close(is);
         }
     }
 
@@ -134,8 +142,18 @@ public class AntCommandTest extends BobTestCase
 
     private void copyBuildFile(String name, String filename) throws IOException
     {
-        InputStream is = getInput(name);
-        FileOutputStream os = new FileOutputStream(new File(baseDir, filename));
-        IOUtils.joinStreams(is, os);
+        InputStream is = null;
+        FileOutputStream os = null;
+        try
+        {
+            is = getInput(name);
+            os = new FileOutputStream(new File(baseDir, filename));
+            IOUtils.joinStreams(is, os);
+        }
+        finally
+        {
+            IOUtils.close(is);
+            IOUtils.close(os);
+        }
     }
 }

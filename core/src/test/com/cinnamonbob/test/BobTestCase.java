@@ -1,6 +1,8 @@
 package com.cinnamonbob.test;
 
 import com.cinnamonbob.Version;
+import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.core.util.FileSystemUtils;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
@@ -174,33 +176,39 @@ public abstract class BobTestCase extends TestCase
             throw new AssertionFailedError("File '" + file2.getAbsolutePath() + "' does not exist or is not a regular file");
         }
 
-        FileInputStream is1 = new FileInputStream(file1);
-        FileInputStream is2 = new FileInputStream(file2);
-
-        BufferedReader rs1 = new BufferedReader(new InputStreamReader(is1));
-        BufferedReader rs2 = new BufferedReader(new InputStreamReader(is2));
-
-        while (true)
+        BufferedReader rs1 = null;
+        BufferedReader rs2 = null;
+        try
         {
-            String line1 = rs1.readLine();
-            String line2 = rs2.readLine();
+            rs1 = new BufferedReader(new InputStreamReader(new FileInputStream(file1)));
+            rs2 = new BufferedReader(new InputStreamReader(new FileInputStream(file2)));
+            while (true)
+            {
+                String line1 = rs1.readLine();
+                String line2 = rs2.readLine();
 
-            if (line1 == null)
-            {
-                if (line2 == null)
+                if (line1 == null)
                 {
-                    return;
-                }
-                throw new AssertionFailedError("Contents of '" + file1.getAbsolutePath() + " differs from contents of '" + file2.getAbsolutePath() + "'");
-            }
-            else
-            {
-                if (line2 == null)
-                {
+                    if (line2 == null)
+                    {
+                        return;
+                    }
                     throw new AssertionFailedError("Contents of '" + file1.getAbsolutePath() + " differs from contents of '" + file2.getAbsolutePath() + "'");
                 }
-                assertEquals(line1, line2);
+                else
+                {
+                    if (line2 == null)
+                    {
+                        throw new AssertionFailedError("Contents of '" + file1.getAbsolutePath() + " differs from contents of '" + file2.getAbsolutePath() + "'");
+                    }
+                    assertEquals(line1, line2);
+                }
             }
+        }
+        finally
+        {
+            IOUtils.close(rs1);
+            IOUtils.close(rs2);
         }
     }
 
@@ -223,5 +231,13 @@ public abstract class BobTestCase extends TestCase
     {
         URL resource = Version.class.getResource("version.properties");
         return new File(resource.getPath().replaceFirst("core/classes/.*", ""));
+    }
+
+    protected void removeDirectory(File dir) throws IOException
+    {
+        if (!FileSystemUtils.removeDirectory(dir))
+        {
+            throw new IOException("Failed to remove " + dir);
+        }
     }
 }
