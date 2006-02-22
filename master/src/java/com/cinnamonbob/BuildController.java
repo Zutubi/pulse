@@ -6,6 +6,7 @@ import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.Revision;
+import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.core.util.TreeNode;
 import com.cinnamonbob.events.AsynchronousDelegatingListener;
 import com.cinnamonbob.events.Event;
@@ -13,11 +14,17 @@ import com.cinnamonbob.events.EventListener;
 import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.events.build.*;
 import com.cinnamonbob.model.*;
+import com.cinnamonbob.scheduling.quartz.TimeoutBuildJob;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
 import com.cinnamonbob.util.logging.Logger;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
 
 import java.io.File;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +33,7 @@ import java.util.List;
  */
 public class BuildController implements EventListener
 {
+    private static final String TIMEOUT_TRIGGER_GROUP = "timeout";
     private static final Logger LOG = Logger.getLogger(BuildController.class);
 
     private Project project;
@@ -38,8 +46,9 @@ public class BuildController implements EventListener
     private BuildResult buildResult;
     private AsynchronousDelegatingListener asyncListener;
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
+    private Scheduler quartzScheduler;
 
-    public BuildController(Project project, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector)
+    public BuildController(Project project, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler)
     {
         this.project = project;
         this.specification = specification;
@@ -47,6 +56,7 @@ public class BuildController implements EventListener
         this.buildManager = buildManager;
         this.queue = queue;
         this.collector = collector;
+        this.quartzScheduler = quartScheduler;
         this.asyncListener = new AsynchronousDelegatingListener(this);
     }
 
@@ -208,24 +218,48 @@ public class BuildController implements EventListener
 
         // execute the first level of recipe controllers...
         initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
+
+        if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
+        {
+            scheduleTimeout();
+        }
+    }
+
+    private void scheduleTimeout()
+    {
+        String name = getTriggerName();
+        Date time = new Date(System.currentTimeMillis() + specification.getTimeout() * Constants.MINUTE);
+
+        Trigger timeoutTrigger = new SimpleTrigger(name, TIMEOUT_TRIGGER_GROUP, time);
+        timeoutTrigger.setJobName(FatController.TIMEOUT_JOB_NAME);
+        timeoutTrigger.setJobGroup(FatController.TIMEOUT_JOB_GROUP);
+        timeoutTrigger.getJobDataMap().put(TimeoutBuildJob.PARAM_ID, buildResult.getId());
+
+        try
+        {
+            quartzScheduler.scheduleJob(timeoutTrigger);
+        }
+        catch (SchedulerException e)
+        {
+            LOG.severe("Unable to schedule build timeout trigger: " + e.getMessage(), e);
+        }
+    }
+
+    private String getTriggerName()
+    {
+        return String.format("build-%d", buildResult.getId());
     }
 
     private void handleBuildTerminationRequest(BuildTerminationRequestEvent event)
     {
+        // Tell every running recipe to stop, and mark the build terminating
+        // (so it will go into the error state on completion).
         for (TreeNode<RecipeController> controllerNode : executingControllers)
         {
             controllerNode.getData().terminateRecipe(event.isTimeout());
         }
 
-        if (event.isTimeout())
-        {
-            buildResult.error("Build timed out");
-        }
-        else
-        {
-            buildResult.error("Build forcefully terminated");
-        }
-        completeBuild();
+        buildResult.terminate(event.isTimeout());
     }
 
     private void initialiseNodes(Bootstrapper bootstrapper, List<TreeNode<RecipeController>> nodes)
@@ -300,6 +334,15 @@ public class BuildController implements EventListener
 
     private void completeBuild()
     {
+        try
+        {
+            quartzScheduler.unscheduleJob(getTriggerName(), TIMEOUT_TRIGGER_GROUP);
+        }
+        catch (SchedulerException e)
+        {
+            LOG.warning("Unable to unschedule timeout trigger: " + e.getMessage(), e);
+        }
+
         buildResult.abortUnfinishedRecipes();
         tree.cleanup(buildResult);
         buildResult.complete();
@@ -312,5 +355,10 @@ public class BuildController implements EventListener
     public Class[] getHandledEvents()
     {
         return new Class[]{BuildCommencedEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class};
+    }
+
+    public long getBuildId()
+    {
+        return buildResult.getId();
     }
 }

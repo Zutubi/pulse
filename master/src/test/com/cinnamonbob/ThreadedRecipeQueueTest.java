@@ -214,6 +214,30 @@ public class ThreadedRecipeQueueTest extends TestCase
         assertEquals(request2, snapshot.get(0));
     }
 
+    public void testCancel() throws Exception
+    {
+        RecipeDispatchRequest request = createDispatchRequest(0, 1);
+        queue.enqueue(request);
+        assertTrue(queue.cancelRequest(1));
+    }
+
+    public void testCancelNoSuchId() throws Exception
+    {
+        RecipeDispatchRequest request = createDispatchRequest(0, 1);
+        queue.enqueue(request);
+        assertFalse(queue.cancelRequest(2));
+    }
+
+    public void testCancelAfterDispatch() throws Exception
+    {
+        BuildService service = createAvailableService(0);
+        queue.available(service);
+
+        queue.enqueue(createDispatchRequest(0, 1000));
+        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
+        assertFalse(queue.cancelRequest(1000));
+    }
+
     private void sendRecipeCompleted(long id)
     {
         RecipeResult result = new RecipeResult();

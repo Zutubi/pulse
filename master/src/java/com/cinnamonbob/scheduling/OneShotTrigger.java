@@ -7,6 +7,6 @@ public class OneShotTrigger extends SimpleTrigger
 {
     public OneShotTrigger(String name, String group)
     {
-        super(name, group, 0, 0);
+        super(name, group, null, 0, 0);
     }
 }

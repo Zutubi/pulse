@@ -26,6 +26,18 @@ public enum ResultState
                     return "in progress";
                 }
             },
+    TERMINATING
+            {
+                public String getString()
+                {
+                    return "terminating";
+                }
+
+                public String getPrettyString()
+                {
+                    return "terminating";
+                }
+            },
     SUCCESS
             {
                 public String getString()

@@ -61,7 +61,7 @@ public class MasterBuildService implements BuildService
 
     public void terminateRecipe(long recipeId)
     {
-        masterRecipeProcessor.terminateCurrentRecipe();
+        masterRecipeProcessor.terminateRecipe(recipeId);
     }
 
     public String getHostName()

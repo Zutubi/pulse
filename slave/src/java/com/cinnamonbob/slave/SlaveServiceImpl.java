@@ -39,7 +39,7 @@ public class SlaveServiceImpl implements SlaveService
     public void terminateRecipe(long recipeId)
     {
         // Do this request synchronously
-        slaveRecipeProcessor.terminateRecipe();
+        slaveRecipeProcessor.terminateRecipe(recipeId);
     }
 
     public void setThreadPool(SlaveThreadPool threadPool)

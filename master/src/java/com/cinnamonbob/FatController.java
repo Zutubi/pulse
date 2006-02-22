@@ -8,10 +8,15 @@ import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.events.build.BuildCompletedEvent;
 import com.cinnamonbob.events.build.BuildRequestEvent;
 import com.cinnamonbob.events.build.BuildTerminationRequestEvent;
+import com.cinnamonbob.events.build.BuildTimeoutEvent;
 import com.cinnamonbob.model.BuildManager;
 import com.cinnamonbob.model.BuildSpecification;
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.scheduling.quartz.TimeoutBuildJob;
 import com.cinnamonbob.util.logging.Logger;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +32,10 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class FatController implements EventListener, Stoppable
 {
+    public static final String PARAM_EVENT_MANAGER = "eventManager";
+    public static final String TIMEOUT_JOB_NAME = "build";
+    public static final String TIMEOUT_JOB_GROUP = "timeout";
+
     private static final Logger LOG = Logger.getLogger(FatController.class);
 
     private EventManager eventManager;
@@ -39,15 +48,21 @@ public class FatController implements EventListener, Stoppable
     private boolean stopping = false;
     private Map<Project, BuildRequestEvent> activeProjects = new HashMap<Project, BuildRequestEvent>();
     private Set<BuildController> runningBuilds = new HashSet<BuildController>();
+    private Scheduler quartzScheduler;
 
     public FatController()
     {
     }
 
-    public void init()
+    public void init() throws SchedulerException
     {
         asyncListener = new AsynchronousDelegatingListener(this);
         eventManager.register(asyncListener);
+
+        JobDetail detail = new JobDetail(TIMEOUT_JOB_NAME, TIMEOUT_JOB_GROUP, TimeoutBuildJob.class);
+        detail.getJobDataMap().put(PARAM_EVENT_MANAGER, eventManager);
+        detail.setDurability(true); // will stay around after the trigger has gone.
+        quartzScheduler.addJob(detail, true);
     }
 
     public void stop(boolean force)
@@ -103,6 +118,10 @@ public class FatController implements EventListener, Stoppable
         {
             handleBuildCompleted((BuildCompletedEvent) event);
         }
+        else if (event instanceof BuildTimeoutEvent)
+        {
+            handleBuildTimeout((BuildTimeoutEvent) event);
+        }
     }
 
     private void handleBuildRequest(BuildRequestEvent event)
@@ -131,7 +150,7 @@ public class FatController implements EventListener, Stoppable
                 if (!stopping)
                 {
                     RecipeResultCollector collector = new DefaultRecipeResultCollector(project);
-                    BuildController controller = new BuildController(project, buildSpec, eventManager, buildManager, recipeQueue, collector);
+                    BuildController controller = new BuildController(project, buildSpec, eventManager, buildManager, recipeQueue, collector, quartzScheduler);
                     controller.run();
                     runningBuilds.add(controller);
                 }
@@ -140,6 +159,28 @@ public class FatController implements EventListener, Stoppable
             {
                 lock.unlock();
             }
+        }
+    }
+
+    private void handleBuildTimeout(BuildTimeoutEvent event)
+    {
+        // No worries if we don't find the controller: it may have finished
+        long id = event.getBuildId();
+        try
+        {
+            lock.lock();
+            for (BuildController controller : runningBuilds)
+            {
+                if (controller.getBuildId() == id)
+                {
+                    controller.handleEvent(new BuildTerminationRequestEvent(this, true));
+                    break;
+                }
+            }
+        }
+        finally
+        {
+            lock.unlock();
         }
     }
 
@@ -175,7 +216,7 @@ public class FatController implements EventListener, Stoppable
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildRequestEvent.class, BuildCompletedEvent.class};
+        return new Class[]{BuildRequestEvent.class, BuildCompletedEvent.class, BuildTimeoutEvent.class};
     }
 
     public void setBuildManager(BuildManager buildManager)
@@ -191,5 +232,10 @@ public class FatController implements EventListener, Stoppable
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void setQuartzScheduler(Scheduler quartzScheduler)
+    {
+        this.quartzScheduler = quartzScheduler;
     }
 }

@@ -20,13 +20,11 @@
 
     <bean id="slaveRecipeProcessor" class="com.cinnamonbob.slave.SlaveRecipeProcessor" autowire="byName"/>
 
-    <bean id="recipeProcessor" class="com.cinnamonbob.core.RecipeProcessor" autowire="byName"/>
+    <bean id="recipeProcessor" class="com.cinnamonbob.core.RecipeProcessor" autowire="byName" init-method="init"/>
 
     <bean id="eventManager" class="com.cinnamonbob.events.DefaultEventManager" autowire="byName"/>
 
     <bean id="objectFactory" class="com.cinnamonbob.core.ObjectFactory" autowire="byName"/>
-
-    <bean id="fileLoader" class="com.cinnamonbob.core.FileLoader" autowire="byName" singleton="false"/>
 
     <bean id="fileResourceRepository" class="com.cinnamonbob.core.FileResourceRepository" autowire="byName"
           init-method="initialise"/>

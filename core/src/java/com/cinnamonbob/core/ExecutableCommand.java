@@ -29,6 +29,7 @@ public class ExecutableCommand implements Command
 
     private List<Environment> env = new LinkedList<Environment>();
     private Process child;
+    private volatile boolean terminated = false;
 
 
     public void execute(File baseDir, File outputDir, CommandResult cmdResult)
@@ -64,6 +65,15 @@ public class ExecutableCommand implements Command
         try
         {
             child = builder.start();
+
+            if (terminated)
+            {
+                // Catches the case where we were asked to terminate before
+                // creating the child process.
+                cmdResult.error("Command terminated");
+                return;
+            }
+
             File outputFile = new File(outputDir, "output.txt");
             FileOutputStream output = null;
             try
@@ -202,6 +212,7 @@ public class ExecutableCommand implements Command
 
     public void terminate()
     {
+        terminated = true;
         if (child != null)
         {
             child.destroy();

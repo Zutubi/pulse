@@ -98,11 +98,11 @@ public class SlaveRecipeProcessor
         this.masterProxyFactory = masterProxyFactory;
     }
 
-    public void terminateRecipe()
+    public void terminateRecipe(long id)
     {
         try
         {
-            recipeProcessor.terminateRecipe();
+            recipeProcessor.terminateRecipe(id);
         }
         catch (InterruptedException e)
         {

@@ -2,8 +2,8 @@ package com.cinnamonbob;
 
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.RecipeProcessor;
-import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.core.Stoppable;
+import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.util.concurrent.ExecutorService;
@@ -45,11 +45,11 @@ public class MasterRecipeProcessor implements Stoppable
         this.eventManager = eventManager;
     }
 
-    public void terminateCurrentRecipe()
+    public void terminateRecipe(long id)
     {
         try
         {
-            recipeProcessor.terminateRecipe();
+            recipeProcessor.terminateRecipe(id);
         }
         catch (InterruptedException e)
         {

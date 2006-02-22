@@ -124,6 +124,12 @@ public class RecipeController
     private void handleRecipeCommenced(RecipeCommencedEvent event)
     {
         recipeResult.commence(event.getName(), System.currentTimeMillis());
+        if (recipeResult.terminating())
+        {
+            // This terminate must have come in before the recipe commenced.
+            // Now we know who to tell to stop processing the recipe!
+            buildService.terminateRecipe(recipeResult.getId());
+        }
         buildManager.save(recipeResult);
     }
 
@@ -235,18 +241,20 @@ public class RecipeController
 
     public void terminateRecipe(boolean timeout)
     {
-        // Tell the build service that it can stop trying to execute this
-        // recipe
-        buildService.terminateRecipe(recipeResult.getId());
-        if (timeout)
+        if (recipeResult.commenced())
         {
-            recipeResult.error("Build timed out");
+            // Tell the build service that it can stop trying to execute this
+            // recipe.  We *must* have received the commenced event before we
+            // can do this.
+            buildService.terminateRecipe(recipeResult.getId());
         }
         else
         {
-            recipeResult.error("Recipe forcefully terminated");
+            // Not yet commanced, try and catch it at the recipe queue. If
+            // we don't catch it, then we wait for the RecipeCommencedEvent.
+            queue.cancelRequest(recipeResult.getId());
         }
 
-        complete();
+        recipeResult.terminate(timeout);
     }
 }

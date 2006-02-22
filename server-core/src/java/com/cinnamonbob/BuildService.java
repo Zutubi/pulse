@@ -12,6 +12,13 @@ public interface BuildService extends RemoteService
 
     void cleanup(long recipeId);
 
+    /**
+     * Terminates the given recipe if it is still running.  This method may
+     * only be called *after* receiving the recipe commenced event for the
+     * recipe.
+     *
+     * @param recipeId the recipe to terminate
+     */
     void terminateRecipe(long recipeId);
 
     // get available resources..... so that we can check to see if the

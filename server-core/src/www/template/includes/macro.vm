@@ -349,6 +349,8 @@
         <img alt="success" src="images/accept.gif"/>
     #elseif($result.inProgress())
         <img alt="in progress" src="images/hourglass.gif"/>
+    #elseif($result.terminating())
+        <img alt="terminating" src="images/stop.gif"/>
     #elseif($result.errored() || $result.failed())
         <img alt="failure" src="images/exclamation.gif"/>
     #else
@@ -456,22 +458,6 @@
 ##
 #macro(detailrow $header $content)
   <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
-#end
-
-
-##
-## Sets the variable "class" depending on the state of the given result object.
-##
-#macro(classset $result)
-  #if(!$result.commenced())
-    #set($class = "pending")
-  #elseif($result.inProgress())
-    #set($class = "info")
-  #elseif($result.succeeded())
-    #set($class = "success")
-  #else
-    #set($class = "failure")
-  #end
 #end
 
 ##

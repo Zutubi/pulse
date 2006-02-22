@@ -84,6 +84,9 @@ public class SetupDummyBuilds implements Runnable
                 }
             }
 
+            project = setupProject("terminating build");
+            createTerminatingBuild(project);
+
             setupUsers(project);
         }
     }
@@ -271,6 +274,17 @@ public class SetupDummyBuilds implements Runnable
         buildResultDao.save(result);
     }
 
+    private void createTerminatingBuild(Project project)
+    {
+        BuildResult result = new BuildResult(project, getSpec(project), 101);
+
+        result.commence(new File("/complex/build/output/dir"));
+        RecipeResultNode node = createTerminatingRecipe();
+        result.getRoot().addChild(node);
+        result.terminate(true);
+        buildResultDao.save(result);
+    }
+
     private String getSpec(Project project)
     {
         return project.getBuildSpecifications().get(0).getName();
@@ -303,6 +317,19 @@ public class SetupDummyBuilds implements Runnable
 
         RecipeResultNode node = new RecipeResultNode(recipeResult);
         node.setHost("my slave");
+        return node;
+    }
+
+    private RecipeResultNode createTerminatingRecipe()
+    {
+        RecipeResult recipeResult = new RecipeResult(null);
+
+        recipeResult.commence(new File("/complex/recipe/output/dir"));
+        recipeResult.add(createComplexCommand());
+        recipeResult.add(createTerminatingCommand());
+        recipeResult.terminate(true);
+        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        node.setHost(null);
         return node;
     }
 
@@ -375,6 +402,14 @@ public class SetupDummyBuilds implements Runnable
     {
         CommandResult result = new CommandResult("in progress command");
         result.commence(new File("wowsers"));
+        return result;
+    }
+
+    private CommandResult createTerminatingCommand()
+    {
+        CommandResult result = new CommandResult("in progress command");
+        result.commence(new File("wowsers"));
+        result.terminate(true);
         return result;
     }
 

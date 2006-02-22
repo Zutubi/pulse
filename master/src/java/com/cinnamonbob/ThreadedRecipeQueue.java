@@ -115,6 +115,55 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         return snapshot;
     }
 
+    public boolean cancelRequest(long id)
+    {
+        boolean removed = false;
+
+        try
+        {
+            lock.lock();
+            RecipeDispatchRequest removeRequest = null;
+
+            for (RecipeDispatchRequest request : newDispatches)
+            {
+                if (request.getRequest().getId() == id)
+                {
+                    removeRequest = request;
+                    break;
+                }
+            }
+
+            if (removeRequest != null)
+            {
+                newDispatches.remove(removeRequest);
+                removed = true;
+            }
+            else
+            {
+                for (RecipeDispatchRequest request : queuedDispatches)
+                {
+                    if (request.getRequest().getId() == id)
+                    {
+                        removeRequest = request;
+                        break;
+                    }
+                }
+
+                if (removeRequest != null)
+                {
+                    queuedDispatches.remove(removeRequest);
+                    removed = true;
+                }
+            }
+        }
+        finally
+        {
+            lock.unlock();
+        }
+
+        return removed;
+    }
+
     public void available(BuildService buildService)
     {
         lock.lock();

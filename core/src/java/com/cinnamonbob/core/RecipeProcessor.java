@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -29,16 +28,36 @@ public class RecipeProcessor
     private EventManager eventManager;
     private ResourceRepository resourceRepository;
     private Lock runningLock = new ReentrantLock();
-    private Condition runningCondition = runningLock.newCondition();
+    private long runningRecipe = 0;
     private Command runningCommand = null;
     private boolean terminating = false;
+    private FileLoader fileLoader;
 
     public RecipeProcessor()
     {
-        // For use with Spring
     }
 
-    private String getCommandDirName(int i, CommandResult result)
+    public void init()
+    {
+        if (fileLoader == null)
+        {
+            fileLoader = new FileLoader();
+            fileLoader.register("property", Property.class);
+            fileLoader.register("recipe", Recipe.class);
+            fileLoader.register("def", ComponentDefinition.class);
+            fileLoader.register("post-processor", PostProcessorGroup.class);
+            fileLoader.register("command", CommandGroup.class);
+            fileLoader.register("regex", RegexPostProcessor.class);
+            fileLoader.register("ant", AntCommand.class);
+            fileLoader.register("executable", ExecutableCommand.class);
+            fileLoader.register("make", MakeCommand.class);
+            fileLoader.register("resource", ResourceReference.class);
+            fileLoader.setObjectFactory(new ObjectFactory());
+            fileLoader.setResourceRepository(resourceRepository);
+        }
+    }
+
+    public static String getCommandDirName(int i, CommandResult result)
     {
         // Use the command name because:
         // a) we do not have an id for the command model
@@ -55,6 +74,7 @@ public class RecipeProcessor
         result.setId(recipeId);
         result.commence(paths.getOutputDir());
 
+        runningRecipe = recipeId;
         eventManager.publish(new RecipeCommencedEvent(this, recipeId, recipeName, result.getStamps().getStartTime()));
 
         try
@@ -96,10 +116,10 @@ public class RecipeProcessor
             eventManager.publish(new RecipeCompletedEvent(this, result));
 
             runningLock.lock();
+            runningRecipe = 0;
             if (terminating)
             {
                 terminating = false;
-                runningCondition.signalAll();
             }
             runningLock.unlock();
         }
@@ -157,7 +177,7 @@ public class RecipeProcessor
         }
         catch (Exception e)
         {
-            result.error(new BuildException(e));
+            result.error(new BuildException("Unexpected error: " + e.getMessage(), e));
         }
         finally
         {
@@ -177,7 +197,9 @@ public class RecipeProcessor
         try
         {
             stream = new ByteArrayInputStream(bobFileSource.getBytes());
-            return BobFileLoader.load(stream, resourceRepository, properties);
+            BobFile result = new BobFile();
+            fileLoader.load(stream, result, properties);
+            return result;
         }
         catch (Exception e)
         {
@@ -204,33 +226,38 @@ public class RecipeProcessor
         this.eventManager = eventManager;
     }
 
-    public void terminateRecipe() throws InterruptedException
+    public FileLoader getFileLoader()
+    {
+        return fileLoader;
+    }
+
+    public void setFileLoader(FileLoader fileLoader)
+    {
+        this.fileLoader = fileLoader;
+    }
+
+    public void terminateRecipe(long id) throws InterruptedException
     {
         // Preconditions:
-        //   - this call is only made if the processor is executing or will
-        //     be shortly executing (i.e. a thread is guaranteed to call
-        //     build)
+        //   - this call is only made after the processor has sent the recipe
+        //     commenced event
         // Responsibilities of this method:
         //   - after this call, no further command should be started
         //   - if a command is running during this call, it should be
         //     terminated
-        //   - this call should not exit until the recipe has been
-        //     terminated
-        // It is acceptable for the build to commence after this call, so
-        // long as no commands (which have unpredictable running time) are
-        // started.
         runningLock.lock();
         try
         {
-            terminating = true;
-            if (runningCommand != null)
+            // Check the id as it is possible for a request to come in after
+            // the recipe has completed (which does no harm so long as we
+            // don't terminate the next recipe!).
+            if (runningRecipe == id)
             {
-                runningCommand.terminate();
-            }
-
-            while (terminating)
-            {
-                runningCondition.await();
+                terminating = true;
+                if (runningCommand != null)
+                {
+                    runningCommand.terminate();
+                }
             }
         }
         finally

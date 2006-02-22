@@ -24,6 +24,11 @@ public abstract class Result extends Entity
         return ResultState.IN_PROGRESS == getState();
     }
 
+    public boolean terminating()
+    {
+        return ResultState.TERMINATING == getState();
+    }
+
     public boolean succeeded()
     {
         return ResultState.SUCCESS == getState();
@@ -41,7 +46,7 @@ public abstract class Result extends Entity
 
     public boolean commenced()
     {
-        return inProgress() || completed();
+        return inProgress() || terminating() || completed();
     }
 
     public boolean completed()
@@ -66,7 +71,11 @@ public abstract class Result extends Entity
     public void commence(long startTime)
     {
         stamps.setStartTime(startTime);
-        state = ResultState.IN_PROGRESS;
+        // Special case: marked as terminating before we commenced.
+        if (state != ResultState.TERMINATING)
+        {
+            state = ResultState.IN_PROGRESS;
+        }
     }
 
     public void complete()
@@ -75,6 +84,10 @@ public abstract class Result extends Entity
         {
             // Phew, nothing went wrong.
             state = ResultState.SUCCESS;
+        }
+        else if (state == ResultState.TERMINATING)
+        {
+            state = ResultState.ERROR;
         }
 
         if (stamps.started())
@@ -112,6 +125,19 @@ public abstract class Result extends Entity
         if (errorMessage.length() > MAX_MESSAGE_LENGTH)
         {
             errorMessage = errorMessage.substring(0, MAX_MESSAGE_LENGTH);
+        }
+    }
+
+    public void terminate(boolean timeout)
+    {
+        state = ResultState.TERMINATING;
+        if (timeout)
+        {
+            errorMessage = "Timed out";
+        }
+        else
+        {
+            errorMessage = "Forcefully terminated";
         }
     }
 
@@ -269,4 +295,5 @@ public abstract class Result extends Entity
     {
         return Feature.Level.valueOf(name);
     }
+
 }

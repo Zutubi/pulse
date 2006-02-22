@@ -1,7 +1,8 @@
 package com.cinnamonbob.scheduling;
 
 /**
- * <class-comment/>
+ * Startegy for scheduling simple triggers, by creating Quartz SimpleTrigger
+ * instances.
  */
 public class SimpleSchedulerStrategy extends QuartzSchedulerStrategy
 {
@@ -15,6 +16,8 @@ public class SimpleSchedulerStrategy extends QuartzSchedulerStrategy
         SimpleTrigger simpleTrigger = (SimpleTrigger) trigger;
         return new org.quartz.SimpleTrigger(simpleTrigger.getName(),
                 simpleTrigger.getGroup(),
+                simpleTrigger.getStartTime(),
+                null,
                 simpleTrigger.getRepeatCount(),
                 simpleTrigger.getInterval());
     }

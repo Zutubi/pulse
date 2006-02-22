@@ -86,6 +86,11 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
         return new LinkedList<RecipeDispatchRequest>();
     }
 
+    public boolean cancelRequest(long id)
+    {
+        return false;
+    }
+
     public void handleEvent(Event evt)
     {
         SlaveAvailableEvent event = (SlaveAvailableEvent) evt;

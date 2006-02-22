@@ -142,6 +142,7 @@ public class LocalBuild
             RecipeProcessor processor = new RecipeProcessor();
             processor.setEventManager(manager);
             processor.setResourceRepository(repository);
+            processor.init();
             processor.build(0, paths, bootstrapper, loadBobFile(baseDir, bobFileName), recipe);
         }
         catch (FileNotFoundException e)

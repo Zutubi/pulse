@@ -1,0 +1,25 @@
+package com.cinnamonbob.core;
+
+import com.cinnamonbob.core.model.CommandResult;
+
+import java.io.File;
+
+/**
+ * Simple testing command that always throws a BuildException.
+ */
+public class ExceptionCommand extends CommandSupport
+{
+    public ExceptionCommand()
+    {
+    }
+
+    public ExceptionCommand(String name)
+    {
+        super(name);
+    }
+
+    public void execute(File baseDir, File outputDir, CommandResult result)
+    {
+        throw new BuildException("exception command");
+    }
+}

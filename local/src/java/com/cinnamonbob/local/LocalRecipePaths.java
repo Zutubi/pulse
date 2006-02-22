@@ -13,13 +13,13 @@ public class LocalRecipePaths implements RecipePaths
     private File baseDir;
     private File outputDir;
 
-    public LocalRecipePaths(File work, String output)
+    public LocalRecipePaths(File base, String output)
     {
-        baseDir = work;
+        baseDir = base;
         outputDir = new File(output);
         if (!outputDir.isAbsolute())
         {
-            outputDir = new File(work, output);
+            outputDir = new File(base, output);
         }
 
     }
