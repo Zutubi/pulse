@@ -1,15 +1,30 @@
 <html>
 <head>
-    <title>#wwtext("name=smtp.setup")</title>
+    <title>#wwtext("name=smtp.config")</title>
 </head>
 
 <body>
-    <h1>:: #wwtext("name=smtp.setup") ::</h1>
+    <h1>:: #wwtext("name=smtp.config") ::</h1>
 
-    <p>display the smtp server details or a configure smtp server link.</p>
+    <a href="/admin/smtp!reset.action">reset</a>
 
-    <p><a href="/admin/editSmtp!input.action">configure</a> the smtp server</p>
-
+    <table class="columns" width="90%">
+        <tr>
+            <td class="columns" width="40%">
+                <table class="fill-content">
+                    #editHeadingRow("smtp.config" 2 "/admin/editSmtp!input.action")
+                    #dynamicRow("smtp.host" $smtp.host)
+                    #dynamicRow("smtp.prefix" $smtp.prefix)
+                    #dynamicRow("smtp.from" $smtp.from)
+                    #dynamicRow("smtp.username" $smtp.username)
+                    #dynamicRow("smtp.password" $smtp.password)
+                </table>
+            </td>
+            <td width="40%">
+                &nbsp;
+            </td>
+        </tr>
+    </table>
 
 </body>
 </html>

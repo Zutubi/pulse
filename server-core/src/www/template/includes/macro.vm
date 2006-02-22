@@ -205,7 +205,7 @@
         <th class="heading" colspan="$span">
     #if($actionKey)
             <span class="action">
-                <a href="$url"><img alt="$action.getText($actionKey)" src="images/$image"/>#wwtext("name=$actionKey")</a>
+                <a href="$url"><img alt="$action.getText($actionKey)" src="/images/$image"/>#wwtext("name=$actionKey")</a>
             </span>
     #end
             #wwtext("name=$key")

@@ -98,7 +98,7 @@ public class DefaultConfigurationManager implements ConfigurationManager
                 // fatal error, BOB_INSTALL property needs to reference bobs home directory
                 throw new StartupException("Property '"+BOB_INSTALL+"' does not refer to a directory ('" + bobInstall + ")");
             }
-            // initialise applicationPaths based on bob.home.        
+            // initialise applicationPaths based on bob.home.
             systemPaths = new DefaultSystemPaths(bobRoot);
         }
     }
@@ -150,9 +150,9 @@ public class DefaultConfigurationManager implements ConfigurationManager
     {
         if (userConfig == null)
         {
-            if (initConfig().hasProperty(BOB_HOME))
+            if (systemConfig().hasProperty(BOB_HOME))
             {
-                String bobHome = initConfig().getProperty(BOB_HOME);
+                String bobHome = systemConfig().getProperty(BOB_HOME);
                 userConfig = new FileConfiguration(new File(bobHome, PROPERTIES_FILENAME));
             }
             else

@@ -5,7 +5,7 @@ import net.sourceforge.jwebunit.WebTestCase;
 /**
  *
  */
-public class ExtendedWebTestCase extends WebTestCase
+public abstract class ExtendedWebTestCase extends WebTestCase
 {
     public ExtendedWebTestCase()
     {
@@ -14,10 +14,5 @@ public class ExtendedWebTestCase extends WebTestCase
     public ExtendedWebTestCase(String name)
     {
         super(name);
-    }
-
-    public void test()
-    {
-        // these acceptance tests should not be executed as part of the regular test cases.
     }
 }

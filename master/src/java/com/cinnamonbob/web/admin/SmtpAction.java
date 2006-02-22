@@ -18,19 +18,23 @@ public class SmtpAction extends ActionSupport
         return smtp;
     }
 
+    public String doReset()
+    {
+        resetConfig();
+        loadConfig();
+        return SUCCESS;
+    }
+
     public String doSave()
     {
+        saveConfig();
+
         return SUCCESS;
     }
 
     public String doInput()
     {
-        ApplicationConfiguration config = configurationManager.getAppConfig();
-
-        // load the smtp details.
-        smtp.setPrefix("[BOB]");
-        smtp.setFrom(config.getSmtpFrom());
-        smtp.setHost(config.getSmtpHost());
+        loadConfig();
 
         return INPUT;
     }
@@ -38,8 +42,39 @@ public class SmtpAction extends ActionSupport
     public String execute()
     {
         // default action, load the config details.
+        loadConfig();
 
         return SUCCESS;
+    }
+
+    private void resetConfig()
+    {
+        ApplicationConfiguration config = configurationManager.getAppConfig();
+        config.setSmtpPrefix(null);
+        config.setSmtpFrom(null);
+        config.setSmtpHost(null);
+        config.setSmtpUsername(null);
+        config.setSmtpPassword(null);
+    }
+
+    private void saveConfig()
+    {
+        ApplicationConfiguration config = configurationManager.getAppConfig();
+        config.setSmtpPrefix(smtp.getPrefix());
+        config.setSmtpFrom(smtp.getFrom());
+        config.setSmtpHost(smtp.getHost());
+        config.setSmtpUsername(smtp.getUsername());
+        config.setSmtpPassword(smtp.getPassword());
+    }
+
+    private void loadConfig()
+    {
+        ApplicationConfiguration config = configurationManager.getAppConfig();
+        smtp.setPrefix(config.getSmtpPrefix());
+        smtp.setFrom(config.getSmtpFrom());
+        smtp.setHost(config.getSmtpHost());
+        smtp.setUsername(config.getSmtpUsername());
+        smtp.setPassword(config.getSmtpPassword());
     }
 
     /**
@@ -55,7 +90,7 @@ public class SmtpAction extends ActionSupport
     /**
      * Holder for the form post.
      */
-    private class SmtpConfig
+    public class SmtpConfig
     {
         private String from;
         private String prefix;

@@ -31,7 +31,14 @@ public class ConfigurationSupport implements Configuration
 
     public void setProperty(String key, String value)
     {
-        config.setProperty(key, value);
+        if (value != null)
+        {
+            config.setProperty(key, value);
+        }
+        else
+        {
+            config.removeProperty(key);
+        }
     }
 
     public int getInt(String key)

@@ -19,6 +19,12 @@ public interface ApplicationConfiguration
 
     public static final String SMTP_FROM = "mail.smtp.from";
 
+    public static final String SMTP_PREFIX = "mail.smtp.prefix";
+
+    public static final String SMTP_USERNAME = "mail.smtp.username";
+
+    public static final String SMTP_PASSWORD = "mail.smtp.password";
+
     /**
      * The port on which the http server will listen for connections.
      *
@@ -31,9 +37,28 @@ public interface ApplicationConfiguration
      */
     int getAdminPort();
 
-    String getSmtpHost();
-
     String getHostName();
 
+    void setHostName(String host);
+
+    String getSmtpHost();
+
+    void setSmtpHost(String host);
+
     String getSmtpFrom();
+
+    void setSmtpFrom(String from);
+
+    String getSmtpPrefix();
+
+    void setSmtpPrefix(String prefix);
+
+    String getSmtpUsername();
+
+    void setSmtpUsername(String username);
+
+    String getSmtpPassword();
+
+    void setSmtpPassword(String password);
+
 }

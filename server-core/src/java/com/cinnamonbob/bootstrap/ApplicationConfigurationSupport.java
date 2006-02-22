@@ -35,13 +35,58 @@ public class ApplicationConfigurationSupport implements ApplicationConfiguration
         return config.getProperty(HOST_NAME);
     }
 
+    public void setHostName(String host)
+    {
+        config.setProperty(HOST_NAME, host);
+    }
+
     public String getSmtpHost()
     {
         return config.getProperty(SMTP_HOST);
     }
 
+    public void setSmtpHost(String host)
+    {
+        config.setProperty(SMTP_HOST, host);
+    }
+
     public String getSmtpFrom()
     {
         return config.getProperty(SMTP_FROM);
+    }
+
+    public void setSmtpFrom(String from)
+    {
+        config.setProperty(SMTP_FROM, from);
+    }
+
+    public String getSmtpPassword()
+    {
+        return config.getProperty(SMTP_PASSWORD);
+    }
+
+    public void setSmtpPassword(String password)
+    {
+        config.setProperty(SMTP_PASSWORD, password);
+    }
+
+    public String getSmtpPrefix()
+    {
+        return config.getProperty(SMTP_PREFIX);
+    }
+
+    public void setSmtpPrefix(String prefix)
+    {
+        config.setProperty(SMTP_PREFIX, prefix);
+    }
+
+    public String getSmtpUsername()
+    {
+        return config.getProperty(SMTP_USERNAME);
+    }
+
+    public void setSmtpUsername(String username)
+    {
+        config.setProperty(SMTP_USERNAME, username);
     }
 }
