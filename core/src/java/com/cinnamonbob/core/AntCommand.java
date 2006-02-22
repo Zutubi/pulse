@@ -57,6 +57,43 @@ public class AntCommand extends ExecutableCommand implements Command, ScopeAware
         }
 
         super.execute(baseDir, outputDir, cmdResult);
+
+        if (cmdResult.succeeded())
+        {
+            // Unfortunately the ant.bat file on windows does not exit with
+            // a non-zero code on failure.  Thus, we need to check the output
+            // to see if ant is reporting failure.
+            //
+            // Even worse: ant gives different failure messages in different
+            // cases, for example:
+            //
+            // jsankey@shiny:~/svn/bob/trunk$ ant -f nosuchfile
+            // Buildfile: nosuchfile does not exist!
+            // Build failed
+            //
+            // versus:
+            //
+            // jsankey@shiny:~/svn/bob/trunk$ ant nosuchtarget
+            // Buildfile: build.xml
+            //
+            // BUILD FAILED
+            // Target `nosuchtarget' does not exist in this project.
+            //
+            // Total time: 0 seconds
+            RegexPostProcessor pp = new RegexPostProcessor("ant.pp");
+            RegexPattern pattern = pp.createPattern();
+            try
+            {
+                pattern.setExpression("^Build failed|^BUILD FAILED");
+                pattern.setCategory("error");
+                pp.process(outputDir, cmdResult.getArtifact("output"), cmdResult);
+            }
+            catch (FileLoadException e)
+            {
+                // Programmer error (RE not valid)
+                e.printStackTrace();
+            }
+        }
     }
 
     public String getBuildFile()

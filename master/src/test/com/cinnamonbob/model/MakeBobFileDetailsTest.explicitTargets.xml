@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <project defaultRecipe="make build">
     <recipe name="make build">
-        <resource name="make"/>
         <command name="build">
-            <make exe="${make.bin}"
-                  targets="build test"
+            <make
+                    targets="build test"
                     >
             </make>
         </command>

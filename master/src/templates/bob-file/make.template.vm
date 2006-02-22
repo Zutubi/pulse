@@ -2,7 +2,7 @@
 <project defaultRecipe="make build">
     <recipe name="make build">
         <command name="build">
-            <make exe="${make.bin}"
+            <make
 #if($arguments)
                   args="$arguments"
 #end

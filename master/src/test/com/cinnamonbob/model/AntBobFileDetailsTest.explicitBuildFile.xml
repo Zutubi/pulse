@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <project defaultRecipe="ant build">
     <recipe name="ant build">
-        <resource name="ant"/>
         <command name="build">
-            <ant exe="${ant.bin}"
-                 build-file="test.xml"
+            <ant
+                    build-file="test.xml"
                     >
             </ant>
         </command>

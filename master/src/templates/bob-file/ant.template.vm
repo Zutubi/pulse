@@ -2,7 +2,7 @@
 <project defaultRecipe="ant build">
     <recipe name="ant build">
         <command name="build">
-            <ant exe="${ant.bin}"
+            <ant
 #if($buildFile)
                  build-file="$buildFile"
 #end
