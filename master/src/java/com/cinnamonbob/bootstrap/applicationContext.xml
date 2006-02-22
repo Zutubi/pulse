@@ -127,7 +127,7 @@
             <value>configurationManager</value>
         </property>
         <property name="propertyPath">
-            <value>applicationPaths.userConfigRoot</value>
+            <value>userPaths.userConfigRoot</value>
         </property>
     </bean>
 

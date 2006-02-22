@@ -1,7 +1,7 @@
 package com.cinnamonbob.bootstrap.velocity;
 
-import com.cinnamonbob.bootstrap.ApplicationPaths;
 import com.cinnamonbob.bootstrap.ConfigUtils;
+import com.cinnamonbob.bootstrap.SystemPaths;
 import com.cinnamonbob.util.logging.Logger;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.runtime.resource.loader.FileResourceLoader;
@@ -24,7 +24,7 @@ public class BobTemplateVelocityResourceLoader extends FileResourceLoader
      */
     public static String getFullTemplatePath()
     {
-        ApplicationPaths paths = ConfigUtils.getManager().getApplicationPaths();
+        SystemPaths paths = ConfigUtils.getManager().getSystemPaths();
 
         StringBuffer result = new StringBuffer();
         String sep = "";

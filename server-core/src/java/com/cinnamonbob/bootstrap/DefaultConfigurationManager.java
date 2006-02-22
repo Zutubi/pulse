@@ -1,7 +1,7 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.bootstrap.config.*;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
 import java.util.Properties;
@@ -55,8 +55,10 @@ public class DefaultConfigurationManager implements ConfigurationManager
 
     private static final String BOB_HOME = InitConfiguration.BOB_HOME;
 
-    private ApplicationPaths paths;
+    private SystemPaths systemPaths;
+    private UserPaths userPaths;
 
+    private Properties systemProperties = null;
     private Properties defaultProperties = null;
 
     /**
@@ -81,7 +83,7 @@ public class DefaultConfigurationManager implements ConfigurationManager
 
     public void init() throws StartupException
     {
-        if (paths == null)
+        if (systemPaths == null)
         {
             String bobInstall = System.getProperty(BOB_INSTALL);
             if (bobInstall == null || bobInstall.length() == 0)
@@ -97,7 +99,7 @@ public class DefaultConfigurationManager implements ConfigurationManager
                 throw new StartupException("Property '"+BOB_INSTALL+"' does not refer to a directory ('" + bobInstall + ")");
             }
             // initialise applicationPaths based on bob.home.        
-            paths = new DefaultApplicationPaths(bobRoot);
+            systemPaths = new DefaultSystemPaths(bobRoot);
         }
     }
 
@@ -128,7 +130,7 @@ public class DefaultConfigurationManager implements ConfigurationManager
     {
         if (initConfig == null)
         {
-            File initFile = new File(paths.getConfigRoot(), INIT_FILENAME);
+            File initFile = new File(getSystemPaths().getConfigRoot(), INIT_FILENAME);
             initConfig = new FileConfiguration(initFile);
         }
         return initConfig;
@@ -138,7 +140,7 @@ public class DefaultConfigurationManager implements ConfigurationManager
     {
         if (defaultConfig == null)
         {
-            File defaultsFile = new File(paths.getConfigRoot(), DEFAULTS_FILENAME);
+            File defaultsFile = new File(getSystemPaths().getConfigRoot(), DEFAULTS_FILENAME);
             defaultConfig = new ReadOnlyConfiguration(new FileConfiguration(defaultsFile));
         }
         return defaultConfig;
@@ -173,21 +175,52 @@ public class DefaultConfigurationManager implements ConfigurationManager
         this.defaultProperties = properties;
     }
 
-    /**
-     * @return application paths
-     */
-    public ApplicationPaths getApplicationPaths()
+    public SystemPaths getSystemPaths()
     {
-        return paths;
+        return systemPaths;
     }
 
     /**
-     * Set the application paths to be used.
+     * Set the applications system paths. If none is specified, a default will be used.
      *
      * @param paths
+     *
+     * @see SystemPaths
      */
-    public void setApplicationPaths(ApplicationPaths paths)
+    public void setSystemPaths(SystemPaths paths)
     {
-        this.paths = paths;
+        this.systemPaths = paths;
+    }
+
+    public UserPaths getUserPaths()
+    {
+        return userPaths;
+    }
+
+    /**
+     * Set the applications user paths. If none is specified, a default will be used.
+     *
+     * @param paths
+     *
+     * @see UserPaths
+     */
+    public void setUserPaths(UserPaths paths)
+    {
+        this.userPaths = paths;
+    }
+
+    public File getBobHome()
+    {
+        return getInitConfig().getBobHome();
+    }
+
+    public void setBobHome(File bobHome)
+    {
+        getInitConfig().setBobHome(bobHome);
+    }
+
+    public void setSystemProperties(Properties sys)
+    {
+
     }
 }

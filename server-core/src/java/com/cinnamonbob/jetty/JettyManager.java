@@ -44,7 +44,7 @@ public class JettyManager implements EventListener, Stoppable
 
     public void deployWebapp() throws Exception
     {
-        File wwwRoot = configurationManager.getApplicationPaths().getContentRoot();
+        File wwwRoot = configurationManager.getSystemPaths().getContentRoot();
 
         appContext = server.addWebApplication("/", wwwRoot.getAbsolutePath());
 

@@ -1,7 +1,7 @@
 package com.cinnamonbob.freemarker;
 
-import com.cinnamonbob.bootstrap.ApplicationPaths;
 import com.cinnamonbob.bootstrap.ConfigUtils;
+import com.cinnamonbob.bootstrap.SystemPaths;
 import com.cinnamonbob.util.logging.Logger;
 import com.opensymphony.webwork.views.freemarker.FreemarkerManager;
 import freemarker.cache.FileTemplateLoader;
@@ -21,7 +21,7 @@ public class CustomFreemarkerManager extends FreemarkerManager
 
     public static TemplateLoader[] getLoaders(TemplateLoader superLoader)
     {
-        ApplicationPaths paths = ConfigUtils.getManager().getApplicationPaths();
+        SystemPaths paths = ConfigUtils.getManager().getSystemPaths();
 
         List<File> templateRoots = paths.getTemplateRoots();
         TemplateLoader loaders[] = new TemplateLoader[templateRoots.size() + 1];

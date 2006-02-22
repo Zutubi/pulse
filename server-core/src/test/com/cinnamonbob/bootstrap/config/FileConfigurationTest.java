@@ -63,13 +63,29 @@ public class FileConfigurationTest extends TestCase
         assertEquals(1, props.size());
     }
 
-    public void testModifyPropertiesFileDirectly() throws IOException, InterruptedException
+    public void testModifyPropertiesFileDirectly() throws Exception
     {
         assertEquals("value", config.getProperty("key"));
+
+        // write updated properties directly to the properties file.
         Thread.sleep(1000);
         Properties updatedProperties = new Properties();
         updatedProperties.put("key", "anotherValue");
         IOUtils.write(updatedProperties, testProperties);
+
+        // assert that the config has picked up these changes.
         assertEquals("anotherValue", config.getProperty("key"));
+    }
+
+    public void testCreationOfPropertiesFile() throws Exception
+    {
+        assertTrue(testProperties.delete());
+        
+        config.setProperty("key", "anotherValue");
+        assertEquals("anotherValue", config.getProperty("key"));
+
+        Properties props = IOUtils.read(testProperties);
+        assertEquals("anotherValue", props.getProperty("key"));
+        assertEquals(1, props.size());
     }
 }

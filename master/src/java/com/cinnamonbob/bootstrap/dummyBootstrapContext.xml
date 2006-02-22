@@ -33,10 +33,10 @@
                 <prop key="name">value</prop>
             </props>
         </property>
-        <property name="applicationPaths">
-            <bean class="com.cinnamonbob.bootstrap.ConfigurableApplicationPaths">
+        <property name="systemPaths">
+            <bean class="com.cinnamonbob.bootstrap.ConfigurableSystemPaths">
                 <property name="systemRoot">
-                    <value>master/dummy-system</value>
+                    <value>master/system</value>
                 </property>
                 <property name="contentRoot">
                     <value>master/src/www</value>
@@ -51,11 +51,18 @@
                         <value type="java.io.File">master/src/www</value>
                     </list>
                 </property>
+            </bean>
+        </property>
+        <property name="userPaths">
+            <bean class="com.cinnamonbob.bootstrap.ConfigurableUserPaths">
                 <property name="userConfigRoot">
                     <value>master/etc</value>
                 </property>
                 <property name="databaseRoot">
-                    <value>master/dummy-system/database</value>
+                    <value>master/system/database</value>
+                </property>
+                <property name="projectRoot">
+                    <value>master/system/projects</value>
                 </property>
             </bean>
         </property>

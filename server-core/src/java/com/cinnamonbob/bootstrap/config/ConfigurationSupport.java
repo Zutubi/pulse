@@ -1,5 +1,7 @@
 package com.cinnamonbob.bootstrap.config;
 
+import java.io.File;
+
 /**
  * <class-comment/>
  */
@@ -61,5 +63,26 @@ public class ConfigurationSupport implements Configuration
         {
             removeProperty(key);
         }
+    }
+
+    public void setFile(String key, File value)
+    {
+        if (value != null)
+        {
+            setProperty(key, value.getAbsolutePath());
+        }
+        else
+        {
+            removeProperty(key);
+        }
+    }
+
+    public File getFile(String key)
+    {
+        if (hasProperty(key))
+        {
+            return new File(getProperty(key));
+        }
+        return null;
     }
 }

@@ -12,9 +12,7 @@ public interface ConfigurationManager
      */
     ApplicationConfiguration getAppConfig();
 
-    /**
-     * 
-     * @return application paths.
-     */
-    ApplicationPaths getApplicationPaths();
+    UserPaths getUserPaths();
+
+    SystemPaths getSystemPaths();
 }

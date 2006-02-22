@@ -4,18 +4,15 @@ import java.io.File;
 import java.util.List;
 
 /**
- * 
+ * A convenience object that allows for the System and User paths to be specified
  *
  */
-public class ConfigurableApplicationPaths implements ApplicationPaths
+public class ConfigurableSystemPaths implements SystemPaths
 {
     private File systemRoot;
     private File contentRoot;
     private File configRoot;
     private List<File> templateRoots;
-    private File userConfigRoot;
-    private File databaseRoot;
-    private File projectRoot;
 
     public File getSystemRoot()
     {
@@ -30,11 +27,6 @@ public class ConfigurableApplicationPaths implements ApplicationPaths
     public File getConfigRoot()
     {
         return configRoot;
-    }
-
-    public File getUserConfigRoot()
-    {
-        return userConfigRoot;
     }
 
     public List<File> getTemplateRoots()
@@ -60,31 +52,5 @@ public class ConfigurableApplicationPaths implements ApplicationPaths
     public void setConfigRoot(File configRoot)
     {
         this.configRoot = configRoot;
-    }
-
-    public void setUserConfigRoot(File userConfigRoot)
-    {
-        this.userConfigRoot = userConfigRoot;
-    }
-
-    public File getDatabaseRoot()
-    {
-        return databaseRoot;
-    }
-
-    public void setDatabaseRoot(File databaseRoot)
-    {
-        this.databaseRoot = databaseRoot;
-    }
-
-
-    public File getProjectRoot()
-    {
-        return projectRoot;
-    }
-
-    public void setProjectRoot(File projectRoot)
-    {
-        this.projectRoot = projectRoot;
     }
 }

@@ -3,6 +3,8 @@ package com.cinnamonbob.bootstrap;
 import com.cinnamonbob.bootstrap.config.Configuration;
 import com.cinnamonbob.bootstrap.config.ConfigurationSupport;
 
+import java.io.File;
+
 /**
  * <class-comment/>
  */
@@ -15,13 +17,13 @@ public class InitConfigurationSupport implements InitConfiguration
         this.config = new ConfigurationSupport(config);
     }
 
-    public String getBobHome()
+    public File getBobHome()
     {
-        return config.getProperty(BOB_HOME);
+        return config.getFile(BOB_HOME);
     }
 
-    public void setBobHome(String home)
+    public void setBobHome(File home)
     {
-        config.setProperty(BOB_HOME, home);
+        config.setFile(BOB_HOME, home);
     }
 }

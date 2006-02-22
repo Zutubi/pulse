@@ -8,28 +8,25 @@ import java.util.List;
  * 
  *
  */
-public class DefaultApplicationPaths implements ApplicationPaths
+public class DefaultSystemPaths implements SystemPaths
 {
-    private final File bobHome;
+    private final File bobInstall;
 
     private File systemRoot;
     private File contentRoot;
     private File configRoot;
     private List<File> templateRoots;
-    private File userConfigRoot;
-    private File databaseRoot;
-    private File projectRoot;
 
-    public DefaultApplicationPaths(File bobHome)
+    public DefaultSystemPaths(File bobHome)
     {
-        this.bobHome = bobHome;
+        this.bobInstall = bobHome;
     }
 
     public File getSystemRoot()
     {
         if (systemRoot == null)
         {
-            systemRoot = new File(bobHome, "system");
+            systemRoot = new File(bobInstall, "system");
         }
         return systemRoot;
     }
@@ -63,30 +60,4 @@ public class DefaultApplicationPaths implements ApplicationPaths
         return templateRoots;
     }
 
-    public File getUserConfigRoot()
-    {
-        if (userConfigRoot == null)
-        {
-            userConfigRoot = new File(bobHome, "config");
-        }
-        return userConfigRoot;
-    }
-
-    public File getDatabaseRoot()
-    {
-        if (databaseRoot == null)
-        {
-            databaseRoot = new File(getSystemRoot(), "database");
-        }
-        return databaseRoot;
-    }
-
-    public File getProjectRoot()
-    {
-        if (projectRoot == null)
-        {
-            projectRoot = new File(getSystemRoot(), "projects");
-        }
-        return projectRoot;
-    }
 }

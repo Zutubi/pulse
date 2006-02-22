@@ -1,5 +1,7 @@
 package com.cinnamonbob.bootstrap;
 
+import java.io.File;
+
 /**
  * <class-comment/>
  */
@@ -7,7 +9,7 @@ public interface InitConfiguration
 {
     public static final String BOB_HOME = "bob.home";
 
-    String getBobHome();
+    File getBobHome();
 
-    void setBobHome(String home);
+    void setBobHome(File home);
 }

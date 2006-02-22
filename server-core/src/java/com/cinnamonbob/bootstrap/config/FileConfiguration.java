@@ -1,6 +1,7 @@
 package com.cinnamonbob.bootstrap.config;
 
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
@@ -41,10 +42,11 @@ public class FileConfiguration implements Configuration, Editable
         {
             if (!file.exists())
             {
-                if (!file.mkdirs() && !file.createNewFile())
+                if (!file.getParentFile().mkdirs() && !file.createNewFile())
                 {
                     throw new IOException();
                 }
+                lastModified = file.lastModified();
             }
             IOUtils.write(getProperties(), file);
             lastModified = file.lastModified();
