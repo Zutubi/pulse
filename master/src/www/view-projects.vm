@@ -30,7 +30,7 @@
                 #statusCell($lastResult)
                 #classCell($lastResult.stamps.prettyStartTime)
                 #classCell($lastResult.number)
-                #classCell($lastResult.buildSpecification.name)
+                #classCell($lastResult.buildSpecification)
                 #classCell($lastResult.stamps.prettyElapsed)
                 #viewCell($project $lastResult)
                 #logCell($project $lastResult)

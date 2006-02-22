@@ -9,7 +9,7 @@
     #buildTabs($result "changes")
 
     <table class="content">
-#set($title = "$action.getText('changes') $!webwork.htmlEncode($result.buildSpecification.name)")
+#set($title = "$action.getText('changes') $!webwork.htmlEncode($result.buildSpecification)")
         #headingRow($title 5)
 #set($scmDetails = $result.scmDetails)
 #if($scmDetails.revision)

@@ -24,7 +24,7 @@
             #contentCell($dispatchRequest.prettyQueueTime)
             #dynamicLinkCell($project.name "currentBuild.action?id=$project.id")
             #contentCell($build.number)
-            #dynamicCell($build.buildSpecification.name)
+            #dynamicCell($build.buildSpecification)
         </tr>
     #end
 #else

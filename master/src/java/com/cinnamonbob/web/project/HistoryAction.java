@@ -160,7 +160,7 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
         stateFilters.add(STATE_SUCCESS);
 
         nameToStates = new TreeMap<String, ResultState[]>();
-        nameToStates.put(STATE_ANY, new ResultState[]{ResultState.IN_PROGRESS, ResultState.SUCCESS, ResultState.FAILURE, ResultState.ERROR});
+        nameToStates.put(STATE_ANY, new ResultState[]{ResultState.IN_PROGRESS, ResultState.TERMINATING, ResultState.SUCCESS, ResultState.FAILURE, ResultState.ERROR});
         nameToStates.put(STATE_FAILURE_OR_ERROR, new ResultState[]{ResultState.FAILURE, ResultState.ERROR});
         nameToStates.put(STATE_FAILURE, new ResultState[]{ResultState.FAILURE});
         nameToStates.put(STATE_ERROR, new ResultState[]{ResultState.ERROR});

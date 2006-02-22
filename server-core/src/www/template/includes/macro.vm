@@ -552,7 +552,7 @@
                     #set($cssClass = $buildResult.state.string)
                     #contentCell($buildResult.number)
                     #statusCell($buildResult)
-                    #classCell($buildResult.buildSpecification.name)
+                    #classCell($buildResult.buildSpecification)
                     #classCell($buildResult.stamps.prettyStartTime)
                     #classCell($buildResult.stamps.prettyElapsed)
     #if($showActions)
