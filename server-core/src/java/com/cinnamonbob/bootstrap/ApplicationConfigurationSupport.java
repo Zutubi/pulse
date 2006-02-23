@@ -40,6 +40,16 @@ public class ApplicationConfigurationSupport implements ApplicationConfiguration
         config.setProperty(HOST_NAME, host);
     }
 
+    public String getHelpUrl()
+    {
+        return config.getProperty(HELP_URL);
+    }
+
+    public void setHelpUrl(String helpUrl)
+    {
+        config.setProperty(HELP_URL, helpUrl);
+    }
+
     public String getSmtpHost()
     {
         return config.getProperty(SMTP_HOST);

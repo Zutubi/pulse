@@ -13,6 +13,9 @@ public interface ApplicationConfiguration
 
     public static final String HOST_NAME = "host.name";
 
+    //---( help configuration )---
+    public static final String HELP_URL = "help.url";
+
     //---( mail configuration )---
 
     public static final String SMTP_HOST = "mail.smtp.host";
@@ -27,19 +30,21 @@ public interface ApplicationConfiguration
 
     /**
      * The port on which the http server will listen for connections.
-     *
      */
     int getServerPort();
 
     /**
      * The port on which the server will listen for admin requests.
-     *
      */
     int getAdminPort();
 
     String getHostName();
 
     void setHostName(String host);
+
+    String getHelpUrl();
+
+    void setHelpUrl(String helpUrl);
 
     String getSmtpHost();
 

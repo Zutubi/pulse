@@ -4,6 +4,7 @@
 #set ($buildId = $page.getProperty("page.buildId"))
 #set ($buildNumber = $page.getProperty("page.buildNumber"))
 #set ($user = $page.getProperty("page.user"))
+#set ($helpPage = $page.getProperty("page.helpPage"))
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
@@ -28,7 +29,22 @@
                   :: <a href="/viewBuild.action?id=${buildId}">build $buildNumber</a>
 #end
               </td>
-              #if($user) <td align="right" class="user">$user.login [ <a href="/logout.action">logout</a> ]</td> #end
+              <td align="right">
+#if($user)
+                  $user.login [ <a href="/logout.action">logout</a> ]
+#else
+                  <a href="/login.action">login</a>
+#end
+                  &nbsp;
+#if($helpPage)
+
+#else
+    #set($helpPage = "Home")
+#end
+                  <a class="unadorned" href="$helpUrl/$helpPage">
+                      <img alt="help" src="/images/help.gif"/>
+                  </a>
+              </td>
             </tr>
         </table>
       </div>

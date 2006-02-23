@@ -19,14 +19,14 @@
         </init-param>
     </filter>
 
-   <filter>
+    <filter>
         <filter-name>Acegi Filter Chain Proxy</filter-name>
         <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
         <init-param>
             <param-name>targetClass</param-name>
             <param-value>org.acegisecurity.util.FilterChainProxy</param-value>
         </init-param>
-   </filter>
+    </filter>
 
     <filter-mapping>
         <filter-name>sitemesh</filter-name>
@@ -64,7 +64,7 @@
 
     <servlet>
         <servlet-name>sitemesh-velocity</servlet-name>
-        <servlet-class>com.opensymphony.module.sitemesh.velocity.VelocityDecoratorServlet</servlet-class>
+        <servlet-class>com.cinnamonbob.servlet.CustomVelocityDecoratorServlet</servlet-class>
         <init-param>
             <param-name>org.apache.velocity.properties</param-name>
             <param-value>/WEB-INF/velocity.properties</param-value>

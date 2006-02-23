@@ -1,4 +1,5 @@
 <content tag="selectedTab">projects</content>
+<content tag="helpPage">Projects+View</content>
 <html>
     <head>
         <title>#wwtext("name=projects")</title>
