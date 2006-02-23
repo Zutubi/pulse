@@ -7,7 +7,7 @@ import com.cinnamonbob.bootstrap.ApplicationConfiguration;
 /**
  * <class-comment/>
  */
-public class SmtpAction extends ActionSupport
+public class SmtpConfigurationAction extends ActionSupport
 {
     private ConfigurationManager configurationManager;
 

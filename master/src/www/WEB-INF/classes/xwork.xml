@@ -544,17 +544,31 @@
             <result name="success" type="velocity">index.vm</result>
         </action>
 
-        <action name="editSmtp" class="com.cinnamonbob.web.admin.SmtpAction">
+
+        <action name="smtp" class="com.cinnamonbob.web.admin.SmtpConfigurationAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">view-smtpconfig.vm</result>
+        </action>
+
+        <action name="editSmtp" class="com.cinnamonbob.web.admin.SmtpConfigurationAction">
             <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">configure-smtp.vm</result>
-            <result name="error" type="velocity">configure-smtp.vm</result>
+            <result name="input" type="velocity">configure-smtpconfig.vm</result>
+            <result name="error" type="velocity">configure-smtpconfig.vm</result>
             <result name="cancel" type="redirect">/admin/smtp.action</result>
             <result name="success" type="redirect">/admin/smtp.action</result>
         </action>
 
-        <action name="smtp" class="com.cinnamonbob.web.admin.SmtpAction">
+        <action name="general" class="com.cinnamonbob.web.admin.GeneralConfigurationAction">
             <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">view-smtp.vm</result>
+            <result name="success" type="velocity">view-generalconfig.vm</result>
+        </action>
+
+        <action name="generalSmtp" class="com.cinnamonbob.web.admin.GeneralConfigurationAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">configure-generalconfig.vm</result>
+            <result name="error" type="velocity">configure-generalconfig.vm</result>
+            <result name="cancel" type="redirect">/admin/general.action</result>
+            <result name="success" type="redirect">/admin/general.action</result>
         </action>
 
     </package>

@@ -1,0 +1,22 @@
+<html>
+<head>
+    <title>#wwtext("name=general.setup")</title>
+</head>
+
+<body>
+    <h1>:: #wwtext("name=general.setup") ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=generalSmtp!save.action" "heading=%{getText('general.setup')}" "method=post")
+
+    #wwtextfield("name=hostName" "label=%{getText('general.host')}" "required=true" "size=60" "tabindex=3")
+
+    #openSubmit()
+        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=6")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=7")
+    #closeSubmit()
+#end
+
+</body>
+</html>
