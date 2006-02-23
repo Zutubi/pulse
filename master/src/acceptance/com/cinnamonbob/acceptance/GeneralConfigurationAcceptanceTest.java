@@ -30,6 +30,7 @@ public class GeneralConfigurationAcceptanceTest extends ExtendedWebTestCase
 
         clickLinkWithText("reset");
         assertTextPresent("localhost:8080");
+        assertTextPresent("http://www.cinnamonbob.com:8080/display/CIB");
     }
 
     public void testEdit() throws Exception
@@ -37,12 +38,15 @@ public class GeneralConfigurationAcceptanceTest extends ExtendedWebTestCase
         navigateToGeneralConfiguration();
         // ensure that we are not starting with the email address we using for this test.
         assertTextNotPresent("saved.host.net");
+        assertTextNotPresent("saved.help.url");
 
         clickLinkWithText("edit");
         setFormElement("hostName", "saved.host.net");
+        setFormElement("helpUrl", "saved.help.url");
         submit("save");
 
         assertTextPresent("saved.host.net");
+        assertTextPresent("saved.help.url");
     }
 
     public void testCancel() throws Exception
@@ -63,7 +67,6 @@ public class GeneralConfigurationAcceptanceTest extends ExtendedWebTestCase
     {
         beginAt("/");
         clickLinkWithText("Administration");
-        clickLinkWithText("general configuration");
     }
 
 }

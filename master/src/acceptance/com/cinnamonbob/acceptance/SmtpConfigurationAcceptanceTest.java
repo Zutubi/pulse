@@ -28,7 +28,7 @@ public class SmtpConfigurationAcceptanceTest extends ExtendedWebTestCase
     {
         navigateToSmtpConfiguration();
 
-        clickLinkWithText("reset");
+        clickLinkWithText("reset", 1);
         assertTextPresent("bob@sensorynetworks.com");
         assertTextPresent("smtp.people.net.au");
     }
@@ -37,7 +37,6 @@ public class SmtpConfigurationAcceptanceTest extends ExtendedWebTestCase
     {
         beginAt("/");
         clickLinkWithText("Administration");
-        clickLinkWithText("smtp configuration");
     }
 
     public void testEdit() throws Exception
@@ -46,7 +45,7 @@ public class SmtpConfigurationAcceptanceTest extends ExtendedWebTestCase
         // ensure that we are not starting with the email address we using for this test.
         assertTextNotPresent("someone@somewhere.net");
 
-        clickLinkWithText("edit");
+        clickLinkWithText("edit", 1);
         setFormElement("smtp.from", "someone@somewhere.net");
         submit("save");
 
@@ -59,7 +58,7 @@ public class SmtpConfigurationAcceptanceTest extends ExtendedWebTestCase
         // ensure that we are not starting with the email address we using for this test.
         assertTextNotPresent("cancelled@action.com");
 
-        clickLinkWithText("edit");
+        clickLinkWithText("edit", 1);
         setFormElement("smtp.from", "cancelled@action.com");
         submit("cancel");
 

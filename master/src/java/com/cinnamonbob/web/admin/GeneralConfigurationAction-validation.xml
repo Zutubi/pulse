@@ -6,4 +6,9 @@
             <message key="general.hostname.error">required field</message>
         </field-validator>
     </field>
+    <field name="helpUrl">
+        <field-validator type="requiredstring">
+            <message key="general.help.url.error">required field</message>
+        </field-validator>
+    </field>
 </validators>

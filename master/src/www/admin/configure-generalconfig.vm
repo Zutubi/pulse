@@ -1,21 +1,19 @@
 <html>
 <head>
-    <title>#wwtext("name=general.setup")</title>
+    <title>#wwtext("name=general.config")</title>
 </head>
 
 <body>
-    <h1>:: #wwtext("name=general.setup") ::</h1>
+    <h1>:: #wwtext("name=general.config") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=generalSmtp!save.action" "heading=%{getText('general.setup')}" "method=post")
+#wwcform("action=editGeneral!save.action" "heading=%{getText('general.config')}" "method=post")
 
     #wwtextfield("name=hostName" "label=%{getText('general.host')}" "required=true" "size=60" "tabindex=3")
+    #wwtextfield("name=helpUrl" "label=%{getText('general.help.url')}" "required=true" "size=60" "tabindex=4")
 
-    #openSubmit()
-        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=6")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=7")
-    #closeSubmit()
+    #saveCancel("5")
 #end
 
 </body>

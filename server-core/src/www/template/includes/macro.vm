@@ -191,6 +191,23 @@
 #end
 
 ##
+## Shows a admin tab of the given name with the given action name
+##
+#macro(adminTab $name $action $selected)
+    #tabItem($name "${action}.action" $selected)
+#end
+
+##
+## Shows the tab bar for admin pages with the given tab selected.
+##
+#macro(adminTabs $selected)
+    #openTabs()
+        #adminTab("settings" "/admin/serverSettings.action" $selected)
+        #adminTab("users" "/admin/viewUsers" $selected)
+    #closeTabs()
+#end
+
+##
 ## Outputs an image tag with alt key looked up
 ##
 #macro(image $src $altKey)
@@ -224,7 +241,22 @@
 ## Outputs a heading row with an edit action
 ##
 #macro(editHeadingRow $key $span $url)
-    #actionHeadingRow($key $span "edit" $url "page_white_edit.gif")
+    #actionHeadingRow($key $span "edit" $url "pencil.gif")
+#end
+
+##
+## Outputs a heading row for a content table with a reset and edit action
+##
+#macro(adminHeadingRow $key $editUrl $resetUrl)
+    <tr>
+        <th class="heading" colspan="2">
+            <span class="action">
+                <a href="$editUrl"><img alt="$action.getText('edit')" src="/images/pencil.gif"/>#wwtext("name=edit")</a>
+                <a href="$resetUrl"><img alt="$action.getText('reset')" src="/images/arrow_rotate_anticlockwise.gif"/>#wwtext("name=reset")</a>
+            </span>
+            #wwtext("name=$key")
+        </th>
+    </tr>
 #end
 
 ##
@@ -309,7 +341,7 @@
 ## Outputs an edit cell for a content table
 ##
 #macro(editCell $url)
-    #actionCell("edit" $url "page_white_edit.gif")
+    #actionCell("edit" $url "pencil.gif")
 #end
 
 ##

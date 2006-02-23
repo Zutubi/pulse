@@ -1,8 +1,8 @@
 package com.cinnamonbob.web.admin;
 
-import com.cinnamonbob.web.ActionSupport;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.bootstrap.ApplicationConfiguration;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.web.ActionSupport;
 
 /**
  * <class-comment/>
@@ -12,6 +12,7 @@ public class GeneralConfigurationAction extends ActionSupport
     private ConfigurationManager configurationManager;
 
     private String hostName;
+    private String helpUrl;
 
     public String doReset()
     {
@@ -52,22 +53,35 @@ public class GeneralConfigurationAction extends ActionSupport
         this.hostName = hostName;
     }
 
+    public String getHelpUrl()
+    {
+        return helpUrl;
+    }
+
+    public void setHelpUrl(String helpUrl)
+    {
+        this.helpUrl = helpUrl;
+    }
+
     private void resetConfig()
     {
         ApplicationConfiguration config = configurationManager.getAppConfig();
         config.setHostName(null);
+        config.setHelpUrl(null);
     }
 
     private void saveConfig()
     {
         ApplicationConfiguration config = configurationManager.getAppConfig();
         config.setHostName(hostName);
+        config.setHelpUrl(helpUrl);
     }
 
     private void loadConfig()
     {
         ApplicationConfiguration config = configurationManager.getAppConfig();
         hostName = config.getHostName();
+        helpUrl = config.getHelpUrl();
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)

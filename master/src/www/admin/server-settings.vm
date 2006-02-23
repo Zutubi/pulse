@@ -1,0 +1,34 @@
+<content tag="selectedTab">administration</content>
+<html>
+<head>
+    <title>#wwtext("name=administration")</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=administration") ::</h1>
+
+    #adminTabs("settings")
+
+    <table class="columns" width="90%">
+        <tr>
+            <td class="columns" width="40%">
+                <table class="fill-content">
+                    #adminHeadingRow("general.config" "/admin/editGeneral!input.action" "/admin/general!reset.action")
+                    #dynamicRow("general.host" $config.hostName)
+                    #dynamicRow("general.help.url" $config.helpUrl)
+                </table>
+            </td>
+            <td class="columns" width="40%">
+                <table class="fill-content">
+                    #adminHeadingRow("smtp.config" "/admin/editSmtp!input.action" "/admin/smtp!reset.action")
+                    #dynamicRow("smtp.host" $config.smtpHost)
+                    #dynamicRow("smtp.prefix" $config.smtpPrefix)
+                    #dynamicRow("smtp.from" $config.smtpFrom)
+                    #dynamicRow("smtp.username" $config.smtpUsername)
+                    #dynamicRow("smtp.password" $config.smtpPassword)
+                </table>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

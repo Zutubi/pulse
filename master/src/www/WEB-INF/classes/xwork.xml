@@ -540,35 +540,37 @@
     <package name="admin" namespace="/admin" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="default" class="com.cinnamonbob.web.ActionSupport">
-            <result name="success" type="velocity">index.vm</result>
+        <action name="serverSettings" class="com.cinnamonbob.web.admin.ServerSettingsAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">server-settings.vm</result>
         </action>
-
 
         <action name="smtp" class="com.cinnamonbob.web.admin.SmtpConfigurationAction">
             <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">view-smtpconfig.vm</result>
+            <result name="error" type="velocity">configure-smtpconfig.vm</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
         <action name="editSmtp" class="com.cinnamonbob.web.admin.SmtpConfigurationAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">configure-smtpconfig.vm</result>
             <result name="error" type="velocity">configure-smtpconfig.vm</result>
-            <result name="cancel" type="redirect">/admin/smtp.action</result>
-            <result name="success" type="redirect">/admin/smtp.action</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
         <action name="general" class="com.cinnamonbob.web.admin.GeneralConfigurationAction">
             <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">view-generalconfig.vm</result>
+            <result name="error" type="velocity">configure-generalconfig.vm</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
-        <action name="generalSmtp" class="com.cinnamonbob.web.admin.GeneralConfigurationAction">
+        <action name="editGeneral" class="com.cinnamonbob.web.admin.GeneralConfigurationAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">configure-generalconfig.vm</result>
             <result name="error" type="velocity">configure-generalconfig.vm</result>
-            <result name="cancel" type="redirect">/admin/general.action</result>
-            <result name="success" type="redirect">/admin/general.action</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
     </package>

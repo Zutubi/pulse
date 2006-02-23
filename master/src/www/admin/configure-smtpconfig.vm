@@ -1,14 +1,14 @@
 <html>
 <head>
-    <title>#wwtext("name=smtp.setup")</title>
+    <title>#wwtext("name=smtp.config")</title>
 </head>
 
 <body>
-    <h1>:: #wwtext("name=smtp.setup") ::</h1>
+    <h1>:: #wwtext("name=smtp.config") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=editSmtp!save.action" "heading=%{getText('smtp.setup')}" "method=post")
+#wwcform("action=editSmtp!save.action" "heading=%{getText('smtp.config')}" "method=post")
 
     #wwtextfield("name=smtp.from" "label=%{getText('smtp.from')}" "required=true" "size=60" "tabindex=1")
     #wwtextfield("name=smtp.prefix" "label=%{getText('smtp.prefix')}" "size=60" "tabindex=2")
