@@ -8,6 +8,7 @@ import com.cinnamonbob.events.build.RecipeDispatchedEvent;
 import com.cinnamonbob.events.build.RecipeErrorEvent;
 import com.cinnamonbob.events.build.RecipeEvent;
 import com.cinnamonbob.util.logging.Logger;
+import com.cinnamonbob.core.Stoppable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * <class-comment/>
  */
-public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
+public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(ThreadedRecipeQueue.class);
 
@@ -48,7 +49,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
      */
     private final Map<Long, BuildService> executingServices = new TreeMap<Long, BuildService>();
 
-    private final ExecutorService executor;
+    private ExecutorService executor;
 
     private boolean stopRequested = false;
 
@@ -58,7 +59,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public ThreadedRecipeQueue()
     {
-        executor = Executors.newSingleThreadExecutor();
+
     }
 
     public void init()
@@ -75,6 +76,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             throw new IllegalStateException("The queue is already running.");
         }
         LOG.debug("start();");
+        executor = Executors.newSingleThreadExecutor();
         executor.execute(this);
     }
 
@@ -257,11 +259,12 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             }
         }
 
+        executor.shutdown();        
         LOG.debug("stopped.");
         isRunning = false;
     }
 
-    public void stop()
+    public void stop(boolean force)
     {
         if (isStopped())
         {

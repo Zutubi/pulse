@@ -32,6 +32,8 @@
 
         <!-- external notifications... -->
         <dependency org="ymsg" name="ymsg" rev="0.61" conf="external->default"/>
+        
+        <dependency org="apache" name="xmlrpc" rev="3.0a1" conf="external->default"/>
 
     </dependencies>
 

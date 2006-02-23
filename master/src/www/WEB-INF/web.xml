@@ -97,6 +97,11 @@
         <servlet-class>com.cinnamonbob.servlet.DownloadResultsServlet</servlet-class>
     </servlet>
 
+     <servlet>
+        <servlet-name>XmlRpcServlet</servlet-name>
+        <servlet-class>org.apache.xmlrpc.webserver.XmlRpcServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>hessian</servlet-name>
         <url-pattern>/hessian</url-pattern>
@@ -115,6 +120,11 @@
     <servlet-mapping>
         <servlet-name>download</servlet-name>
         <url-pattern>/download</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>XmlRpcServlet</servlet-name>
+        <url-pattern>/xmlrpc</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>

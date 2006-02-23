@@ -39,6 +39,7 @@ is received, so that users cannot start interacting with the system before it is
                 <ref bean="scheduler"/>
                 <!-- We need a way to turn the UI "read only" at this point... -->
                 <ref bean="fatController"/>
+                <ref bean="recipeQueue"/>
                 <ref bean="masterRecipeProcessor"/>
                 <ref bean="jettyManager"/>
             </list>

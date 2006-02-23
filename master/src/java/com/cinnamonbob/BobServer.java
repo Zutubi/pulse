@@ -31,9 +31,9 @@ public class BobServer
         int adminPort = ConfigUtils.getManager().getAppConfig().getAdminPort();
         // initialise the stop service to allow this server
         // to be stop.
-        shutdownService = new ShutdownService(adminPort);
-        ComponentContext.autowire(shutdownService);
-        shutdownService.start();
+        //shutdownService = new ShutdownService(adminPort);
+        //ComponentContext.autowire(shutdownService);
+        //shutdownService.start();
 
         ProjectManager projectManager = (ProjectManager) ComponentContext.getBean("projectManager");
         projectManager.initialise();
