@@ -27,12 +27,7 @@
         </property>
     </bean>
 
-    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.DefaultConfigurationManager" init-method="init">
-        <property name="defaultProperties">
-            <props>
-                <prop key="name">value</prop>
-            </props>
-        </property>
+    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.SimpleConfigurationManager">
         <property name="systemPaths">
             <bean class="com.cinnamonbob.bootstrap.ConfigurableSystemPaths">
                 <property name="systemRoot">
@@ -50,19 +45,6 @@
                         <value type="java.io.File">master/src/templates</value>
                         <value type="java.io.File">master/src/www</value>
                     </list>
-                </property>
-            </bean>
-        </property>
-        <property name="userPaths">
-            <bean class="com.cinnamonbob.bootstrap.ConfigurableUserPaths">
-                <property name="userConfigRoot">
-                    <value>master/etc</value>
-                </property>
-                <property name="databaseRoot">
-                    <value>master/system/database</value>
-                </property>
-                <property name="projectRoot">
-                    <value>master/system/projects</value>
                 </property>
             </bean>
         </property>

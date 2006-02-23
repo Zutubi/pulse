@@ -21,12 +21,7 @@
         </property>
     </bean>
 
-    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.DefaultConfigurationManager" init-method="init">
-        <property name="defaultProperties">
-            <props>
-                <prop key="name">value</prop>
-            </props>
-        </property>
+    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.SimpleConfigurationManager" init-method="init">
     </bean>
 
     <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>

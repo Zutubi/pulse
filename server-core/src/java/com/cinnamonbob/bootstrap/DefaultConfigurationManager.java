@@ -83,6 +83,7 @@ public class DefaultConfigurationManager implements ConfigurationManager
 
     public void init() throws StartupException
     {
+        // intialise the system paths if they have not been initialised already (via spring).
         if (systemPaths == null)
         {
             String bobInstall = System.getProperty(BOB_INSTALL);
@@ -121,7 +122,9 @@ public class DefaultConfigurationManager implements ConfigurationManager
     {
         if (systemConfig == null)
         {
-            systemConfig = new ReadOnlyConfiguration(new PropertiesConfiguration(System.getProperties()));
+            // take a copy of the system properties at startup.
+            Properties copy = (Properties) System.getProperties().clone();
+            systemConfig = new ReadOnlyConfiguration(new PropertiesConfiguration(copy));
         }
         return systemConfig;
     }

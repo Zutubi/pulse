@@ -2,8 +2,6 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation"></bean>
-
     <bean id="startupManager" class="com.cinnamonbob.bootstrap.DefaultStartupManager">
         <property name="systemContexts">
             <list>
@@ -25,12 +23,7 @@
         </property>
     </bean>
 
-    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.DefaultConfigurationManager" init-method="init">
-        <property name="defaultProperties">
-            <props>
-                <prop key="name">value</prop>
-            </props>
-        </property>
+    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.SimpleConfigurationManager">
     </bean>
 
     <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>

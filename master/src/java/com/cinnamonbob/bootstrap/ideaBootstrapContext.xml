@@ -2,8 +2,6 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation"></bean>
-
     <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
 
     <bean id="startupManager" class="com.cinnamonbob.bootstrap.DefaultStartupManager">
@@ -27,13 +25,7 @@
         </property>
     </bean>
 
-    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.DefaultConfigurationManager" init-method="init">
-        <property name="defaultProperties">
-            <props>
-                <prop key="admin.port">8081</prop>
-                <prop key="webapp.port">8080</prop>
-            </props>
-        </property>
+    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.SimpleConfigurationManager">
         <property name="systemPaths">
             <bean class="com.cinnamonbob.bootstrap.ConfigurableSystemPaths">
                 <property name="systemRoot">
@@ -51,19 +43,6 @@
                         <value type="java.io.File">master/src/templates</value>
                         <value type="java.io.File">master/src/www</value>
                     </list>
-                </property>
-            </bean>
-        </property>
-        <property name="userPaths">
-            <bean class="com.cinnamonbob.bootstrap.ConfigurableUserPaths">
-                <property name="userConfigRoot">
-                    <value>master/etc</value>
-                </property>
-                <property name="databaseRoot">
-                    <value>master/system/database</value>
-                </property>
-                <property name="projectRoot">
-                    <value>master/system/projects</value>
                 </property>
             </bean>
         </property>
