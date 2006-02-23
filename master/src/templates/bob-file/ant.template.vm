@@ -4,16 +4,16 @@
         <command name="build">
             <ant
 #if($buildFile)
-                 build-file="$buildFile"
+                    build-file="$buildFile"
 #end
 #if($targets)
-                 targets="$targets"
+                    targets="$targets"
 #end
 #if($arguments)
-                 args="$arguments"
+                    args="$arguments"
 #end
 #if($workingDir)
-                 working-dir="${base.dir}/$workingDir"
+                    working-dir="${base.dir}/$workingDir"
 #end
                     >
 #foreach($key in $environment.keySet())
