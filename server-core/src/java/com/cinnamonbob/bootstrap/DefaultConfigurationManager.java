@@ -183,7 +183,7 @@ public class DefaultConfigurationManager implements ConfigurationManager
         return systemPaths;
     }
 
-    /**
+     /**
      * Set the applications system paths. If none is specified, a default will be used.
      *
      * @param paths

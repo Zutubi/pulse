@@ -8,6 +8,9 @@
         </property>
     </bean>
 
+    <!-- this spring object factory will ensure that WebWork Actions are autowired. -->
+    <bean id="spring-object-factory-2" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
+
     <bean id="velocityEngine" class="com.cinnamonbob.bootstrap.velocity.VelocityEngineFactoryBean"/>
 
     <bean id="buildManagerTarget" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"
@@ -42,7 +45,7 @@
         </property>
     </bean>
 
-    <bean id="projectManagerTarget" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"/>
+    <bean id="projectManagerTarget" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName" init-method="initialise"/>
     <bean id="projectManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
@@ -129,10 +132,6 @@
         </property>
     </bean>
 
-    <bean id="customSerialiserFactory" class="com.cinnamonbob.hessian.CustomSerialiserFactory"/>
-
-    <bean id="hessianProxyFactory" class="com.cinnamonbob.hessian.CustomHessianProxyFactory" autowire="byName"/>
-
     <bean id="slaveProxyFactory" class="com.cinnamonbob.SlaveProxyFactory" autowire="byName"/>
 
     <bean id="fatController" class="com.cinnamonbob.FatController" autowire="byName" init-method="init"/>
@@ -140,5 +139,18 @@
     <bean id="recipeQueue" class="com.cinnamonbob.ThreadedRecipeQueue" autowire="byName" init-method="init"/>
 
     <bean id="resultNotifier" class="com.cinnamonbob.ResultNotifier" autowire="byName"/>
+
+    <bean id="shutdownManager" class="com.cinnamonbob.ShutdownManager">
+        <property name="stoppables">
+            <list>
+                <ref bean="scheduler"/>
+                <!-- We need a way to turn the UI "read only" at this point... -->
+                <ref bean="fatController"/>
+                <ref bean="recipeQueue"/>
+                <ref bean="masterRecipeProcessor"/>
+                <ref bean="jettyManager"/>
+            </list>
+        </property>
+    </bean>
 
 </beans>

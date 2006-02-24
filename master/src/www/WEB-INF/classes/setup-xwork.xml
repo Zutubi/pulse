@@ -1,0 +1,20 @@
+<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.0//EN"
+        "http://www.opensymphony.com/xwork/xwork-1.1.1.dtd">
+<xwork>
+    <include file="webwork-default-package.xml"/>
+
+    <package name="default" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="default" class="com.cinnamonbob.web.ActionSupport">
+            <result name="success" type="redirect">/setup!input.action</result>
+        </action>
+
+        <action name="setup" class="com.cinnamonbob.web.setup.SetupAction">
+            <result name="input" type="velocity">/setup/configure-bobhome.vm</result>
+            <result name="success" type="redirect">/</result>
+        </action>
+
+    </package>
+
+</xwork>

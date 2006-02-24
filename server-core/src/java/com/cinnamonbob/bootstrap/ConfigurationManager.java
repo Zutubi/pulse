@@ -1,5 +1,7 @@
 package com.cinnamonbob.bootstrap;
 
+import java.io.File;
+
 /**
  * 
  *
@@ -15,4 +17,7 @@ public interface ConfigurationManager
     UserPaths getUserPaths();
 
     SystemPaths getSystemPaths();
+
+    void setBobHome(File bobHome);
+
 }

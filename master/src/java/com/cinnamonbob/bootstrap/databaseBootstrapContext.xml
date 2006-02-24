@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation"></bean>
+    <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
 
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="mappingResources">

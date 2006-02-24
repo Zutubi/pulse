@@ -5,6 +5,7 @@ import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.bootstrap.config.Configuration;
 import com.cinnamonbob.bootstrap.config.FileConfiguration;
 import com.cinnamonbob.bootstrap.config.CompositeConfiguration;
+import com.cinnamonbob.bootstrap.config.ReadOnlyConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,10 +27,14 @@ public class SimpleConfigurationManager implements ConfigurationManager
         {
             Configuration user = new FileConfiguration(new File(paths.getUserConfigRoot(), "bob.properties"));
             Configuration defaults = new FileConfiguration(new File(getSystemPaths().getConfigRoot(), "bob-defaults.properties"));
-            Configuration composite = new CompositeConfiguration(user, defaults);
+            Configuration composite = new CompositeConfiguration(user, new ReadOnlyConfiguration(defaults));
             return new ApplicationConfigurationSupport(composite);
         }
-        return null;
+        else
+        {
+            Configuration defaults = new FileConfiguration(new File(getSystemPaths().getConfigRoot(), "bob-defaults.properties"));
+            return new ApplicationConfigurationSupport(new ReadOnlyConfiguration(defaults));
+        }
     }
 
     public UserPaths getUserPaths()
@@ -50,7 +55,12 @@ public class SimpleConfigurationManager implements ConfigurationManager
             return new File(System.getProperty("bob.home"));
         }
         // lookup file.
-        File f = getSystemPaths().getConfigRoot();
+        File f = new File(getSystemPaths().getConfigRoot(), "bob-init.properties");
+        if (!f.exists())
+        {
+            return null;
+        }
+
         Properties props;
         try
         {
@@ -74,7 +84,7 @@ public class SimpleConfigurationManager implements ConfigurationManager
         props.setProperty("bob.home", f.getAbsolutePath());
         try
         {
-            IOUtils.write(props, getSystemPaths().getConfigRoot());
+            IOUtils.write(props, new File(getSystemPaths().getConfigRoot(), "bob-init.properties"));
         }
         catch (IOException e)
         {

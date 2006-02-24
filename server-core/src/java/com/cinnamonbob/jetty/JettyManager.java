@@ -18,7 +18,7 @@ import java.io.File;
  * 
  *
  */
-public class JettyManager implements EventListener, Stoppable
+public class JettyManager implements Stoppable
 {
     private static final Logger LOG = Logger.getLogger(JettyManager.class);
     private static final String BEAN_NAME = "jettyManager";
@@ -30,11 +30,6 @@ public class JettyManager implements EventListener, Stoppable
     public void setJettyServer(Server server)
     {
         this.server = server;
-    }
-
-    public void setEventManager(EventManager eventManager)
-    {
-        eventManager.register(this);
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)
@@ -75,25 +70,5 @@ public class JettyManager implements EventListener, Stoppable
         {
             LOG.severe("Error while stopping Jetty", e);
         }
-    }
-
-    public void handleEvent(Event evt)
-    {
-        if (evt instanceof SystemStartedEvent)
-        {
-            try
-            {
-                deployWebapp();
-            }
-            catch (Exception e)
-            {
-                LOG.severe("Unable to deploy web application", e);
-            }
-        }
-    }
-
-    public Class[] getHandledEvents()
-    {
-        return new Class[]{SystemEvent.class};
     }
 }

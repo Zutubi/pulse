@@ -1,0 +1,21 @@
+<html>
+<head>
+    <title>#wwtext("name=setup.bobHome")</title>
+</head>
+
+<body>
+    <h1>:: #wwtext("name=setup.bobHome") ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=setup.action" "heading=%{getText('setup.bobHome')}" "method=post")
+
+    #wwtextfield("name=bobHome" "label=%{getText('setup.bob.home')}" "required=true" "size=60" "tabindex=1")
+
+    #openSubmit()
+        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=2")
+    #closeSubmit()
+#end
+
+</body>
+</html>

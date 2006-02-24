@@ -2,19 +2,22 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
-
     <bean id="startupManager" class="com.cinnamonbob.bootstrap.DefaultStartupManager">
-        <property name="systemContexts">
+        <property name="setupContexts">
             <list>
                 <value>com/cinnamonbob/bootstrap/coreSubsystemContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/webserverContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/setupContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/securitySubsystemContext.xml</value>
+            </list>
+        </property>
+        <property name="systemContexts">
+            <list>
                 <value>com/cinnamonbob/bootstrap/databaseBootstrapContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/coreDatabaseContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/databaseContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/schedulingSubsystemContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/securitySubsystemContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/applicationContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/webserverContext.xml</value>
             </list>
         </property>
         <property name="startupRunnables">
