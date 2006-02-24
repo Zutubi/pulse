@@ -6,7 +6,8 @@
     <package name="default" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="default" class="com.cinnamonbob.web.ActionSupport">
+        <action name="default" class="com.cinnamonbob.web.DefaultAction">
+            <result name="setupAdmin" type="redirect">/setupWizard.action</result>
             <result name="success" type="velocity">index.html</result>
         </action>
 
@@ -533,6 +534,14 @@
             <interceptor-ref name="paramsStack"/>
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/serverStatus.action</result>
+        </action>
+
+        <action name="setupWizard" class="com.cinnamonbob.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.cinnamonbob.web.setup.SetupWizard</param>
+            <result name="admin" type="velocity">/setup/create-admin.vm</result>
+            <result name="success" type="redirect">/</result>
+            <result name="cancel" type="redirect">/</result>
         </action>
 
     </package>

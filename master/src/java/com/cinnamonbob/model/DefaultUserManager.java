@@ -68,4 +68,9 @@ public class DefaultUserManager implements UserManager
     {
         contactDao.delete(contact);
     }
+
+    public int getUserCount()
+    {
+        return userDao.getUserCount();
+    }
 }

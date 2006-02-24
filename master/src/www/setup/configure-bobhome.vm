@@ -1,16 +1,17 @@
 <html>
 <head>
-    <title>#wwtext("name=setup.bobHome")</title>
+    <title>#wwtext("name=bobHome.setup")</title>
 </head>
 
 <body>
-    <h1>:: #wwtext("name=setup.bobHome") ::</h1>
+    <h1>:: #wwtext("name=bobHome.setup") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=setup.action" "heading=%{getText('setup.bobHome')}" "method=post")
+#wwcform("action=setup.action" "heading=%{getText('bobHome.setup')}" "method=post")
 
-    #wwtextfield("name=bobHome" "label=%{getText('setup.bob.home')}" "required=true" "size=60" "tabindex=1")
+    #wwtextfield("name=bobHome" "label=%{getText('bobHome.field')}" "required=true" "size=60" "tabindex=1")
+    #inlineHelp("bobHome.help")
 
     #openSubmit()
         #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=2")

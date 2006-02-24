@@ -13,4 +13,6 @@ public interface UserDao extends EntityDao<User>
     User findByLogin(String login);
 
     List<User> findByLikeLogin(String login);
+
+    int getUserCount();
 }

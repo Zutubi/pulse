@@ -30,4 +30,11 @@ public interface UserManager extends EntityManager<User>
     
     ContactPoint getContactPoint(long id);
     void delete(ContactPoint contact);
+
+    /**
+     * Return the number of users configured in the system.
+     *
+     * @return
+     */
+    int getUserCount();
 }

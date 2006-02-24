@@ -2,10 +2,8 @@ package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.persistence.UserDao;
-import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
+import org.hibernate.*;
+import org.hibernate.criterion.Projections;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
@@ -61,6 +59,19 @@ public class HibernateUserDao extends HibernateEntityDao<User> implements UserDa
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 
                 return queryObject.list();
+            }
+        });
+    }
+
+    public int getUserCount()
+    {
+        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = session.createCriteria(User.class);
+                criteria.setProjection(Projections.rowCount());
+                return criteria.uniqueResult();
             }
         });
     }

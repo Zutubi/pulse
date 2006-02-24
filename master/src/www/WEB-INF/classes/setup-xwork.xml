@@ -10,7 +10,7 @@
             <result name="success" type="redirect">/setup!input.action</result>
         </action>
 
-        <action name="setup" class="com.cinnamonbob.web.setup.SetupAction">
+        <action name="setup" class="com.cinnamonbob.web.setup.ConfigureBobHomeAction">
             <result name="input" type="velocity">/setup/configure-bobhome.vm</result>
             <result name="success" type="redirect">/</result>
         </action>

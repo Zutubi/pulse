@@ -9,7 +9,7 @@ import java.io.File;
 /**
  * <class-comment/>
  */
-public class SetupAction extends ActionSupport
+public class ConfigureBobHomeAction extends ActionSupport
 {
     private ConfigurationManager configurationManager;
     private StartupManager startupManager;
