@@ -5,6 +5,10 @@ import com.cinnamonbob.model.persistence.ContactPointDao;
 
 import java.util.List;
 
+import org.acegisecurity.userdetails.UserDetails;
+import org.acegisecurity.userdetails.UsernameNotFoundException;
+import org.springframework.dao.DataAccessException;
+
 /**
  * 
  *
@@ -72,5 +76,10 @@ public class DefaultUserManager implements UserManager
     public int getUserCount()
     {
         return userDao.getUserCount();
+    }
+
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException
+    {
+        return userDao.findByLogin(username);
     }
 }

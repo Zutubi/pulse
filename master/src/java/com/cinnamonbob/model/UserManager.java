@@ -1,12 +1,14 @@
 package com.cinnamonbob.model;
 
+import org.acegisecurity.userdetails.UserDetailsService;
+
 import java.util.List;
 
 /**
  * 
  *
  */
-public interface UserManager extends EntityManager<User>
+public interface UserManager extends EntityManager<User>, UserDetailsService
 {
     /**
      * Retrieve an instance of the user identified by the login name
@@ -34,7 +36,6 @@ public interface UserManager extends EntityManager<User>
     /**
      * Return the number of users configured in the system.
      *
-     * @return
      */
     int getUserCount();
 }

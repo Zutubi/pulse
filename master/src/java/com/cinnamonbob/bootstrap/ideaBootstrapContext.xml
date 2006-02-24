@@ -8,11 +8,11 @@
                 <value>com/cinnamonbob/bootstrap/coreSubsystemContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/webserverContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/setupContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/securitySubsystemContext.xml</value>
             </list>
         </property>
         <property name="systemContexts">
             <list>
+                <value>com/cinnamonbob/bootstrap/securitySubsystemContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/databaseBootstrapContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/coreDatabaseContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/databaseContext.xml</value>

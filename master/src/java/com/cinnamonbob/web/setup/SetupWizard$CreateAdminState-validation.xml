@@ -6,5 +6,10 @@
             <message></message>
         </field-validator>
     </field>
+    <field name="confirm">
+        <field-validator type="requiredstring">
+            <message>password confirmation is required.</message>
+        </field-validator>
+    </field>
 </validators>
 

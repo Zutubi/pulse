@@ -11,11 +11,13 @@
 #wwcform("action=setupWizard.action" "heading=%{getText('admin.create')}" "method=post")
     #wwhidden("name=state")
 
-    #wwtextfield("name=admin.login" "label=%{getText('admin.login')}" "required=true" "size=60" "tabindex=1")
-    #wwtextfield("name=admin.name" "label=%{getText('admin.name')}" "required=true" "size=60" "tabindex=1")
+    #wwtextfield("name=admin.login" "label=%{getText('admin.login')}" "required=true" "tabindex=1")
+    #wwtextfield("name=admin.name" "label=%{getText('admin.name')}" "required=true" "tabindex=2")
+    #wwpassword("name=admin.password" "label=%{getText('admin.password')}" "required=true" "tabindex=3")
+    #wwpassword("name=confirm" "label=%{getText('admin.confirm')}" "required=true" "tabindex=4")
 
     #openSubmit()
-        #wwsubmit("name=next" "value=%{getText('save.name')}" "tabindex=2")
+        #wwsubmit("name=next" "value=%{getText('save.name')}" "tabindex=5")
     #closeSubmit()
 #end
 

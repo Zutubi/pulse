@@ -11,4 +11,9 @@
             <message>login is required.</message>
         </field-validator>
     </field>
+    <field name="password">
+        <field-validator type="requiredstring">
+            <message>password is required.</message>
+        </field-validator>
+    </field>
 </validators>

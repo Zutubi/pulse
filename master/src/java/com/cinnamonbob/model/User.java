@@ -5,11 +5,13 @@ import com.cinnamonbob.core.model.Entity;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.acegisecurity.userdetails.UserDetails;
+
 /**
  * 
  *
  */
-public class User extends Entity
+public class User extends Entity implements UserDetails
 {
     /**
      * The login name is used to identify this user.
@@ -151,7 +153,12 @@ public class User extends Entity
         return subscriptions;
     }
 
-    public List<GrantedAuthority> getAuthorities()
+    public GrantedAuthority[] getAuthorities()
+    {
+        return getGrantedAuthorities().toArray(new GrantedAuthority[getGrantedAuthorities().size()]);
+    }
+
+    public List<GrantedAuthority> getGrantedAuthorities()
     {
         if (authorities == null)
         {
@@ -160,15 +167,34 @@ public class User extends Entity
         return authorities;
     }
 
-    private void setAuthorities(List<GrantedAuthority> authorities)
+    private void setGrantedAuthorities(List<GrantedAuthority> authorities)
     {
         this.authorities = authorities;
     }
 
     public void add(GrantedAuthority authority)
     {
-        getAuthorities().add(authority);
+        getGrantedAuthorities().add(authority);
         authority.setUser(this);
     }
 
+    public String getUsername()
+    {
+        return getLogin();
+    }
+
+    public boolean isAccountNonExpired()
+    {
+        return true;
+    }
+
+    public boolean isAccountNonLocked()
+    {
+        return true;
+    }
+
+    public boolean isCredentialsNonExpired()
+    {
+        return true;
+    }
 }

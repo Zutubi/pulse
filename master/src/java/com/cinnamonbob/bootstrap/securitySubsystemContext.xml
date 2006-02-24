@@ -13,6 +13,10 @@ The beans defined within the security subsystem need not be accessed by other co
 -->
 <beans>
 
+    <bean id="securityManager" class="com.cinnamonbob.security.SecurityManager" init-method="init">
+        <property name="jettyManager"><ref bean="jettyManager"/></property>
+    </bean>
+
     <!-- ============================================================= -->
     <!-- The first half of this context is dedicated to authentication -->
 
@@ -27,7 +31,8 @@ The beans defined within the security subsystem need not be accessed by other co
 
     <bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
         <property name="userDetailsService">
-            <ref local="inMemoryDaoImpl"/>
+            <!--<ref local="inMemoryDaoImpl"/>-->
+            <ref bean="userManager"/>
         </property>
 <!-- no password encoding for in memory credentials...
         <property name="passwordEncoder">
@@ -38,6 +43,7 @@ The beans defined within the security subsystem need not be accessed by other co
 
     <bean id="passwordEncoder" class="org.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
 
+<!--
     <bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
         <property name="userMap">
             <value>
@@ -46,6 +52,7 @@ The beans defined within the security subsystem need not be accessed by other co
             </value>
         </property>
     </bean>
+-->
 
     <!--
     this filter chain proxy is referenced in web.xml
@@ -149,7 +156,8 @@ The beans defined within the security subsystem need not be accessed by other co
 
     <bean id="rememberMeServices" class="org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices">
         <property name="userDetailsService">
-            <ref local="inMemoryDaoImpl"/>
+            <ref bean="userManager"/>
+            <!--<ref local="inMemoryDaoImpl"/>-->
         </property>
         <property name="key">
             <value>bob</value>
@@ -190,7 +198,7 @@ The beans defined within the security subsystem need not be accessed by other co
     -->
     <!-- In this example 'marissa' has ROLE_SUPERVISOR that can switch to regular ROLE_USER(s) -->
     <bean id="switchUserProcessingFilter" class="org.acegisecurity.ui.switchuser.SwitchUserProcessingFilter">
-        <property name="userDetailsService" ref="inMemoryDaoImpl"/>
+        <property name="userDetailsService" ref="userManager"/>
         <property name="switchUserUrl">
             <value>/j_acegi_switch_user</value>
         </property>
@@ -236,6 +244,10 @@ The beans defined within the security subsystem need not be accessed by other co
                 /j_acegi_switch_user=ROLE_ADMINISTRATOR
                 /login.action*=ROLE_ANONYMOUS,ROLE_USER
                 /logout.action=ROLE_ANONYMOUS,ROLE_USER
+                /=ROLE_ANONYMOUS
+                /default.action=ROLE_ANONYMOUS
+                /setup/**/*=ROLE_ANONYMOUS
+                /admin/**/*=ROLE_ADMINISTRATOR
                 /**/*.action*=ROLE_USER
             </value>
         </property>

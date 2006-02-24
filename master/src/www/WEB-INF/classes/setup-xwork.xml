@@ -7,8 +7,13 @@
         <default-interceptor-ref name="completeStack"/>
 
         <action name="default" class="com.cinnamonbob.web.ActionSupport">
-            <result name="success" type="redirect">/setup!input.action</result>
+            <result name="success" type="redirect">/setup/setup!input.action</result>
         </action>
+
+    </package>
+
+    <package name="setup" namespace="/setup" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
 
         <action name="setup" class="com.cinnamonbob.web.setup.ConfigureBobHomeAction">
             <result name="input" type="velocity">/setup/configure-bobhome.vm</result>
