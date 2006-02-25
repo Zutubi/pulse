@@ -7,6 +7,8 @@ import com.cinnamonbob.model.UserManager;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -14,6 +16,7 @@ import java.util.TreeSet;
  */
 public class TokenManager
 {
+    private int loginCount = 0;
     private Set<String> validTokens = new TreeSet<String>();
     private UserManager userManager;
 
@@ -22,8 +25,13 @@ public class TokenManager
         return login(username, password, Constants.MINUTE * 30);
     }
 
-    public String login(String username, String password, long expiry) throws AuthenticationException
+    public synchronized String login(String username, String password, long expiry) throws AuthenticationException
     {
+        if (++loginCount % 1000 == 0)
+        {
+            checkForExpiredTokens();
+        }
+
         User user = userManager.getUser(username);
         if (user == null)
         {
@@ -96,6 +104,52 @@ public class TokenManager
             throw new AuthenticationException("Invalid token");
         }
 
+        String username;
+        try
+        {
+            username = verifyExpiry(token);
+        }
+        catch (AuthenticationException e)
+        {
+            validTokens.remove(token);
+            throw e;
+        }
+
+        User user = userManager.getUser(username);
+
+        // This can happen if the user is removed in the mean time
+        if (user == null)
+        {
+            throw new AuthenticationException("Unknown user");
+        }
+
+        return user;
+    }
+
+    private synchronized void checkForExpiredTokens()
+    {
+        List<String> expiredTokens = new LinkedList<String>();
+
+        for (String token : validTokens)
+        {
+            try
+            {
+                verifyExpiry(token);
+            }
+            catch (AuthenticationException e)
+            {
+                expiredTokens.add(token);
+            }
+        }
+
+        for (String token : expiredTokens)
+        {
+            validTokens.remove(token);
+        }
+    }
+
+    private String verifyExpiry(String token) throws AuthenticationException
+    {
         // Token cannot have a bad format or expiry as it was found in
         // validTokens.  We don't even have to verify the signature
         // separately!
@@ -105,19 +159,10 @@ public class TokenManager
         long expiry = Long.parseLong(parts[1]);
         if (System.currentTimeMillis() > expiry)
         {
-            validTokens.remove(token);
             throw new AuthenticationException("Token expired");
         }
 
-        User user = userManager.getUser(parts[0]);
-
-        // This can happen if the user is removed in the mean time
-        if (user == null)
-        {
-            throw new AuthenticationException("Unknown user");
-        }
-
-        return user;
+        return parts[0];
     }
 
     private String getTokenSignature(String username, long expiryTime, String password)

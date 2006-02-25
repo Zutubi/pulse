@@ -147,4 +147,18 @@ public class TokenManagerTest extends BobTestCase
         userManager.delete(userManager.getUser("jason"));
         assertFalse(tokenManager.logout(token));
     }
+
+    public void testDetectsStaleTokens() throws Exception
+    {
+        String firstToken = tokenManager.login("jason", "password", 1);
+        Thread.sleep(10);
+
+        for (int i = 0; i < 1000; i++)
+        {
+            String token = tokenManager.login("jason", "password");
+            assertTrue(tokenManager.logout(token));
+        }
+
+        assertFalse(tokenManager.logout(firstToken));
+    }
 }
