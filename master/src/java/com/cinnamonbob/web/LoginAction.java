@@ -69,7 +69,6 @@ public class LoginAction extends ActionSupport
         {
             AuthenticationException ae = (AuthenticationException) session.get(AbstractProcessingFilter.ACEGI_SECURITY_LAST_EXCEPTION_KEY);
             username = (String)ae.getAuthentication().getPrincipal();
-
             addActionError(ae.getMessage());
         }
     }

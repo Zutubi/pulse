@@ -7,6 +7,7 @@ import com.cinnamonbob.web.wizard.WizardCompleteState;
 import com.cinnamonbob.model.UserManager;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.GrantedAuthority;
+import com.cinnamonbob.security.AcegiUtils;
 import com.opensymphony.xwork.Validateable;
 
 /**
@@ -37,6 +38,9 @@ public class SetupWizard extends BaseWizard
         admin.add(GrantedAuthority.USER);
         admin.add(GrantedAuthority.ADMINISTRATOR);
         userManager.save(admin);
+
+        // login as the admin user.
+        AcegiUtils.loginAs(admin);
     }
 
     public void setUserManager(UserManager userManager)
