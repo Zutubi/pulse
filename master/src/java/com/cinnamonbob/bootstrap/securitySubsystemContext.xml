@@ -244,8 +244,8 @@ The beans defined within the security subsystem need not be accessed by other co
                 /j_acegi_switch_user=ROLE_ADMINISTRATOR
                 /login.action*=ROLE_ANONYMOUS,ROLE_USER
                 /logout.action=ROLE_ANONYMOUS,ROLE_USER
-                /=ROLE_ANONYMOUS,ROLE_USER
-                /default.action=ROLE_ANONYMOUS,ROLE_USER
+                /=ROLE_USER
+                /default.action=ROLE_USER
                 /setup/**/*=ROLE_ANONYMOUS,ROLE_USER
                 /admin/**/*=ROLE_ADMINISTRATOR
                 /**/*.action*=ROLE_USER
