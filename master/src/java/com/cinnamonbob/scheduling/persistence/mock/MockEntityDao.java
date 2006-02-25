@@ -70,7 +70,7 @@ public abstract class MockEntityDao<T extends Entity> implements EntityDao<T>
         }
     }
 
-    protected List<T> findByFilter(Filter f)
+    protected List<T> findByFilter(Filter<T> f)
     {
         LinkedList<T> findResults = new LinkedList<T>();
         for (T t : entities)
@@ -83,7 +83,7 @@ public abstract class MockEntityDao<T extends Entity> implements EntityDao<T>
         return findResults;
     }
 
-    protected T findUniqueByFilter(Filter f)
+    protected T findUniqueByFilter(Filter<T> f)
     {
         List<T> findResults = findByFilter(f);
         if (findResults.size() > 1)
@@ -134,8 +134,8 @@ public abstract class MockEntityDao<T extends Entity> implements EntityDao<T>
         }
     }
 
-    protected interface Filter
+    protected interface Filter<T>
     {
-        boolean include(Object o);
+        boolean include(T o);
     }
 }

@@ -14,11 +14,10 @@ public class MockTriggerDao extends MockEntityDao<Trigger> implements TriggerDao
 
     public List<Trigger> findByGroup(final String group)
     {
-        return findByFilter(new Filter()
+        return findByFilter(new Filter<Trigger>()
         {
-            public boolean include(Object o)
+            public boolean include(Trigger trigger)
             {
-                Trigger trigger = (Trigger) o;
                 return group.compareTo(trigger.getGroup()) == 0;
             }
         });
@@ -26,11 +25,10 @@ public class MockTriggerDao extends MockEntityDao<Trigger> implements TriggerDao
 
     public Trigger findByNameAndGroup(final String name, final String group)
     {
-        return findUniqueByFilter(new Filter()
+        return findUniqueByFilter(new Filter<Trigger>()
         {
-            public boolean include(Object o)
+            public boolean include(Trigger trigger)
             {
-                Trigger trigger = (Trigger) o;
                 return group.compareTo(trigger.getGroup()) == 0 &&
                         name.compareTo(trigger.getName()) == 0;
             }
@@ -39,11 +37,10 @@ public class MockTriggerDao extends MockEntityDao<Trigger> implements TriggerDao
 
     public List<Trigger> findByProject(final long id)
     {
-        return findByFilter(new Filter()
+        return findByFilter(new Filter<Trigger>()
         {
-            public boolean include(Object o)
+            public boolean include(Trigger trigger)
             {
-                Trigger trigger = (Trigger) o;
                 return trigger.getProject() == id;
             }
         });
@@ -51,11 +48,10 @@ public class MockTriggerDao extends MockEntityDao<Trigger> implements TriggerDao
 
     public Trigger findByProjectAndName(final long id, final String name)
     {
-        return findUniqueByFilter(new Filter()
+        return findUniqueByFilter(new Filter<Trigger>()
         {
-            public boolean include(Object o)
+            public boolean include(Trigger trigger)
             {
-                Trigger trigger = (Trigger) o;
                 return name.compareTo(trigger.getName()) == 0 &&
                         id == trigger.getProject();
             }

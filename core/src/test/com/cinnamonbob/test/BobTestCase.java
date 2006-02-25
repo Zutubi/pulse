@@ -1,8 +1,8 @@
 package com.cinnamonbob.test;
 
 import com.cinnamonbob.Version;
-import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.core.util.IOUtils;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
@@ -43,6 +43,10 @@ public abstract class BobTestCase extends TestCase
         else if (a instanceof Collection)
         {
             assertEquals(msg, (Collection) a, (Collection) b);
+        }
+        else if (a.getClass().isArray())
+        {
+            Arrays.equals((Object[]) a, (Object[]) b);
         }
         else
         {

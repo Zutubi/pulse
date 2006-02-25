@@ -1,0 +1,33 @@
+package com.cinnamonbob.scheduling.persistence.mock;
+
+import com.cinnamonbob.model.User;
+import com.cinnamonbob.model.persistence.UserDao;
+
+import java.util.List;
+
+/**
+ */
+public class MockUserDao extends MockEntityDao<User> implements UserDao
+{
+    public User findByLogin(final String login)
+    {
+        return findUniqueByFilter(new Filter<User>()
+        {
+
+            public boolean include(User user)
+            {
+                return user.getLogin().equals(login);
+            }
+        });
+    }
+
+    public List<User> findByLikeLogin(String login)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public int getUserCount()
+    {
+        return findAll().size();
+    }
+}

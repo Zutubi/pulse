@@ -1,11 +1,11 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.core.model.Entity;
+import org.acegisecurity.userdetails.UserDetails;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.acegisecurity.userdetails.UserDetails;
 
 /**
  * 
@@ -45,6 +45,13 @@ public class User extends Entity implements UserDetails
     {
         this.login = login;
         this.name = name;
+    }
+
+    public User(String login, String name, String password, GrantedAuthority... authorities)
+    {
+        this(login, name);
+        this.password = password;
+        this.authorities = Arrays.asList(authorities);
     }
 
     public String getLogin()

@@ -1,0 +1,150 @@
+package com.cinnamonbob.api;
+
+import com.cinnamonbob.model.DefaultUserManager;
+import com.cinnamonbob.model.GrantedAuthority;
+import com.cinnamonbob.model.User;
+import com.cinnamonbob.model.persistence.UserDao;
+import com.cinnamonbob.scheduling.persistence.mock.MockUserDao;
+import com.cinnamonbob.test.BobTestCase;
+
+/**
+ */
+public class TokenManagerTest extends BobTestCase
+{
+    DefaultUserManager userManager;
+    TokenManager tokenManager;
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        UserDao userDao = new MockUserDao();
+        userDao.save(new User("jason", "Jason Sankey", "password", GrantedAuthority.USER, GrantedAuthority.ADMINISTRATOR));
+        userDao.save(new User("dan", "Daniel Ostermeier", "insecure", GrantedAuthority.USER));
+        userDao.save(new User("anon", "A. Nonymous", "none"));
+
+        userManager = new DefaultUserManager();
+        userManager.setUserDao(userDao);
+        tokenManager = new TokenManager();
+        tokenManager.setUserManager(userManager);
+    }
+
+    public void testLoginUnknownUser() throws Exception
+    {
+        try
+        {
+            tokenManager.login("nosuchuser", "");
+        }
+        catch (AuthenticationException e)
+        {
+            assertEquals("Invalid username", e.getMessage());
+        }
+    }
+
+    public void testLoginWrongPassword() throws Exception
+    {
+        try
+        {
+            tokenManager.login("jason", "wrong");
+        }
+        catch (AuthenticationException e)
+        {
+            assertEquals("Invalid password", e.getMessage());
+        }
+    }
+
+    public void testLogin() throws Exception
+    {
+        tokenManager.login("jason", "password");
+    }
+
+    public void testLoginLogout() throws Exception
+    {
+        String token = tokenManager.login("jason", "password");
+        assertTrue(tokenManager.logout(token));
+        assertFalse(tokenManager.logout(token));
+    }
+
+    public void testLogoutInvalid() throws Exception
+    {
+        assertFalse(tokenManager.logout("bogustoken"));
+    }
+
+    public void testUserAccess() throws Exception
+    {
+        String token = tokenManager.login("jason", "password");
+        tokenManager.verifyUser(token);
+
+        token = tokenManager.login("dan", "insecure");
+        tokenManager.verifyUser(token);
+
+        token = tokenManager.login("anon", "none");
+        try
+        {
+            tokenManager.verifyUser(token);
+        }
+        catch (AuthenticationException e)
+        {
+            assertEquals("Access denied", e.getMessage());
+        }
+    }
+
+    public void testAdminAccess() throws Exception
+    {
+        String token = tokenManager.login("jason", "password");
+        tokenManager.verifyAdmin(token);
+
+        token = tokenManager.login("dan", "insecure");
+        try
+        {
+            tokenManager.verifyAdmin(token);
+        }
+        catch (AuthenticationException e)
+        {
+            assertEquals("Access denied", e.getMessage());
+        }
+
+        token = tokenManager.login("anon", "none");
+        try
+        {
+            tokenManager.verifyAdmin(token);
+        }
+        catch (AuthenticationException e)
+        {
+            assertEquals("Access denied", e.getMessage());
+        }
+    }
+
+    public void testUserOrAdminAccess() throws Exception
+    {
+        String token = tokenManager.login("jason", "password");
+        tokenManager.verifyRoleIn(token, GrantedAuthority.USER, GrantedAuthority.ADMINISTRATOR);
+
+        token = tokenManager.login("dan", "insecure");
+        tokenManager.verifyRoleIn(token, GrantedAuthority.USER, GrantedAuthority.ADMINISTRATOR);
+
+        token = tokenManager.login("anon", "none");
+        try
+        {
+            tokenManager.verifyRoleIn(token, GrantedAuthority.USER, GrantedAuthority.ADMINISTRATOR);
+        }
+        catch (AuthenticationException e)
+        {
+            assertEquals("Access denied", e.getMessage());
+        }
+    }
+
+    public void testExpiry() throws Exception
+    {
+        String token = tokenManager.login("jason", "password", 1);
+        Thread.sleep(10);
+
+        assertFalse(tokenManager.logout(token));
+    }
+
+    public void testRemoveUser() throws Exception
+    {
+        String token = tokenManager.login("jason", "password");
+        userManager.delete(userManager.getUser("jason"));
+        assertFalse(tokenManager.logout(token));
+    }
+}
