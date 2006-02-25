@@ -2,51 +2,71 @@ package com.cinnamonbob.jetty;
 
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.events.EventListener;
-import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.core.Stoppable;
-import com.cinnamonbob.events.system.SystemEvent;
-import com.cinnamonbob.events.system.SystemStartedEvent;
 import com.cinnamonbob.util.logging.Logger;
+import org.acegisecurity.util.FilterToBeanProxy;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.servlet.Dispatcher;
+import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 import org.mortbay.jetty.servlet.WebApplicationHandler;
-import org.mortbay.jetty.servlet.FilterHolder;
-import org.mortbay.jetty.servlet.Dispatcher;
-import org.mortbay.http.HttpContext;
-import org.acegisecurity.util.FilterToBeanProxy;
 
 import java.io.File;
 
 /**
- * 
+ * The Jetty Manager provides access to the runtime configuration of the jetty server, and hence
+ * the Web Application Container and its configuration.
  *
  */
 public class JettyManager implements Stoppable
 {
     private static final Logger LOG = Logger.getLogger(JettyManager.class);
+
+    /**
+     * The name of the JettyManager bean deployed within Spring.
+     */
     private static final String BEAN_NAME = "jettyManager";
 
     private Server server;
     private ConfigurationManager configurationManager;
     private WebApplicationContext appContext;
 
+    /**
+     * The context path under which the applications Web UI is deployed.
+     */
+    private String contextPath = "/";
+
+    /**
+     * Required resource.
+     *
+     * @param server
+     */
     public void setJettyServer(Server server)
     {
         this.server = server;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param configurationManager
+     */
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }
 
-    public void deployWebapp() throws Exception
+    /**
+     * Start the embedded jetty server (to handle Http requests) and deploy the
+     * default web application.
+     *
+     * @throws Exception
+     */
+    public void start() throws Exception
     {
         File wwwRoot = configurationManager.getSystemPaths().getContentRoot();
 
-        appContext = server.addWebApplication("/", wwwRoot.getAbsolutePath());
+        appContext = server.addWebApplication(contextPath, wwwRoot.getAbsolutePath());
 
         if (!server.isStarted())
         {
@@ -54,11 +74,24 @@ public class JettyManager implements Stoppable
         }
     }
 
-    public void deployInWebApplicationContext(String name, Object obj)
+    /**
+     * Get the web application context. This context is used for 'things' that are
+     * deployed application wide. Other things to checkout include the session context,
+     * request context and page context.
+     *
+     * @return application context
+     */
+    public WebApplicationContext getApplicationContext()
     {
-        appContext.setAttribute(name, obj);
+        return appContext;
     }
 
+    /**
+     * Static helper method used as a convenience method to access the Jetty Manager when
+     * auto wiring via spring is not an option.
+     *
+     * @return the singleton JettyManager instance.
+     */
     public static JettyManager getInstance()
     {
         return (JettyManager) ComponentContext.getBean(BEAN_NAME);
@@ -69,7 +102,6 @@ public class JettyManager implements Stoppable
         try
         {
             server.stop(true);
-            //server.destroy();
         }
         catch (InterruptedException e)
         {
@@ -77,37 +109,18 @@ public class JettyManager implements Stoppable
         }
     }
 
-    public void addFilter()
+    /**
+     * Get the WebApplicationHandler for the deployed web application. It is through this handler
+     * that new servlets and filters can be deployed into the running Web Application.
+     *
+     * @return handler for the deployed web application.
+     */
+    public WebApplicationHandler getHandler()
     {
-        WebApplicationHandler handler = ((WebApplicationHandler)server.getContext("/").getHandlers()[0]);
-
-        FilterHolder filter = new FilterHolder(handler, "Acegi Filter Chain Proxy", "com.cinnamonbob.spring.web.context.FilterToBeanProxy");
-        filter.setInitParameter("targetClass", "org.acegisecurity.util.FilterChainProxy");
-        handler.addFilterHolder(filter);
-        handler.addFilterPathMapping("/*", "Acegi Filter Chain Proxy", Dispatcher.__REQUEST | Dispatcher.__FORWARD);
-        try
+        if (server.isStarted())
         {
-            filter.start();
+            return ((WebApplicationHandler)server.getContext(contextPath).getHandlers()[0]);
         }
-        catch (Exception e)
-        {
-            LOG.severe(e);
-        }
-        assert filter.getFilter() != null;
+        return null;
     }
 }
-/*
-    <filter>
-        <filter-name>Acegi Filter Chain Proxy</filter-name>
-        <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
-        <init-param>
-            <param-name>targetClass</param-name>
-            <param-value>org.acegisecurity.util.FilterChainProxy</param-value>
-        </init-param>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>Acegi Filter Chain Proxy</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-*/

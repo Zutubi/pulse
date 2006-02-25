@@ -20,7 +20,7 @@ public class DefaultSetupManager implements SetupManager
     {
         try
         {
-            jettyManager.deployWebapp();
+            jettyManager.start();
         }
         catch (Exception e)
         {
