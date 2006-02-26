@@ -37,11 +37,11 @@
     <!--
     This context loader is required by the acegisecurity component.
     -->
-<!--
-    <listener>
-        <listener-class>com.cinnamonbob.spring.web.context.ContextLoaderListener</listener-class>
-    </listener>
--->
+    <!--
+        <listener>
+            <listener-class>com.cinnamonbob.spring.web.context.ContextLoaderListener</listener-class>
+        </listener>
+    -->
 
     <!--
     If the System property 'xwork.reload.bundles' is specified, the following listener to set
@@ -87,7 +87,7 @@
         <servlet-class>com.cinnamonbob.servlet.DownloadResultsServlet</servlet-class>
     </servlet>
 
-     <servlet>
+    <servlet>
         <servlet-name>XmlRpcServlet</servlet-name>
         <servlet-class>org.apache.xmlrpc.webserver.XmlRpcServlet</servlet-class>
     </servlet>
@@ -120,10 +120,5 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
-
-    <taglib>
-        <taglib-uri>webwork</taglib-uri>
-        <taglib-location>/WEB-INF/lib/webwork-2.1.7.jar</taglib-location>
-    </taglib>
 
 </web-app>
