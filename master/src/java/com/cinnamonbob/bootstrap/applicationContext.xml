@@ -92,6 +92,7 @@
         </property>
     </bean>
 
+<!-- We are not using the Slaves in the current release, so dont deploy the manager.
     <bean id="slaveManagerTarget" class="com.cinnamonbob.model.DefaultSlaveManager" autowire="byName"
           init-method="init"/>
     <bean id="slaveManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -107,6 +108,7 @@
             </props>
         </property>
     </bean>
+-->
 
     <bean id="objectFactory" class="com.cinnamonbob.core.ObjectFactory" autowire="byName"/>
 
