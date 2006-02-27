@@ -13,7 +13,7 @@ The beans defined within the security subsystem need not be accessed by other co
 -->
 <beans>
 
-    <bean id="securityManager" class="com.cinnamonbob.security.SecurityManager" init-method="init">
+    <bean id="securityManager" class="com.cinnamonbob.security.AcegiSecurityManager" init-method="init">
         <property name="jettyManager"><ref bean="jettyManager"/></property>
     </bean>
 
@@ -31,10 +31,9 @@ The beans defined within the security subsystem need not be accessed by other co
 
     <bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
         <property name="userDetailsService">
-            <!--<ref local="inMemoryDaoImpl"/>-->
             <ref bean="userManager"/>
         </property>
-<!-- no password encoding for in memory credentials...
+<!-- no password encoding at the moment.
         <property name="passwordEncoder">
             <ref local="passwordEncoder"/>
         </property>
@@ -43,8 +42,8 @@ The beans defined within the security subsystem need not be accessed by other co
 
     <bean id="passwordEncoder" class="org.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
 
-<!--
-    <bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
+<!-- Use this for an in memory user manager.
+    <bean id="userManager" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
         <property name="userMap">
             <value>
                 admin=admin,ROLE_ADMINISTRATOR,ROLE_USER
@@ -157,7 +156,6 @@ The beans defined within the security subsystem need not be accessed by other co
     <bean id="rememberMeServices" class="org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices">
         <property name="userDetailsService">
             <ref bean="userManager"/>
-            <!--<ref local="inMemoryDaoImpl"/>-->
         </property>
         <property name="key">
             <value>bob</value>
