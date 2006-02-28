@@ -153,10 +153,6 @@
             <result name="success" type="redirect">/viewUser.action?id=${user}</result>
         </action>
 
-        <action name="deleteContactPoint" class="com.cinnamonbob.web.user.DeleteContactPointAction">
-            <result name="success" type="redirect">/viewUser.action?id=${user}</result>
-        </action>
-
         <action name="index!default" class="com.cinnamonbob.web.ActionSupport">
             <result name="success" type="velocity">index.vm</result>
         </action>
@@ -541,30 +537,9 @@
             <result name="success" type="redirect">viewUser.action?id=${userId}</result>
         </action>
 
-        <action name="createContactPoint!default" class="com.cinnamonbob.web.user.CreateContactPointAction"
-                method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">create-contact.vm</result>
+        <action name="deleteContactPoint" class="com.cinnamonbob.web.admin.user.DeleteContactPointAction">
+            <result name="success" type="redirect">viewUser.action?id=${user}</result>
         </action>
-
-        <action name="createContactPoint" class="com.cinnamonbob.web.user.CreateContactPointAction">
-            <result name="input" type="velocity">create-contact.vm</result>
-            <result name="success" type="velocity">create-contact-${type}.vm</result>
-        </action>
-
-        <action name="createEmailContactPoint" class="com.cinnamonbob.web.user.CreateEmailContactPointAction">
-            <result name="input" type="velocity">create-contact-email.vm</result>
-            <result name="cancel" type="redirect">/viewUser.action?id=${user}</result>
-            <result name="success" type="redirect">/viewUser.action?id=${user}</result>
-        </action>
-
-        <action name="createYahooContactPoint" class="com.cinnamonbob.web.user.CreateYahooContactPointAction">
-            <result name="input" type="velocity">create-contact-yahoo.vm</result>
-            <result name="cancel" type="redirect">/viewUser.action?id=${user}</result>
-            <result name="success" type="redirect">/viewUser.action?id=${user}</result>
-        </action>
-
-
 
         <!--
                 <action name="findUsers!default" class="com.opensymphony.xwork.ActionSupport">
