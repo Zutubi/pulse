@@ -1,8 +1,9 @@
 <html>
 <head>
-    <title>create contact</title>
+    <title>#wwtext("name=email.create")</title>
 </head>
 <body>
+<h1>:: #wwtext("name=email.create") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
 

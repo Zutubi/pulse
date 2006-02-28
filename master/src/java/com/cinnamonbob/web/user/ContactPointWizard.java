@@ -94,8 +94,8 @@ public class ContactPointWizard extends BaseWizard
             if (contacts == null)
             {
                 contacts = new TreeMap<String, String>();
-                contacts.put("email", "email");
-                contacts.put("yahoo", "y!");
+                contacts.put("email", "email"); //TODO: externalise these strings..
+                contacts.put("yahoo", "yahoo id");
             }
             return contacts;
         }

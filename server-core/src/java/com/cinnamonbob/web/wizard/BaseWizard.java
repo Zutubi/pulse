@@ -1,6 +1,7 @@
 package com.cinnamonbob.web.wizard;
 
 import com.cinnamonbob.util.logging.Logger;
+import com.cinnamonbob.xwork.TextProviderSupport;
 import com.opensymphony.xwork.Validateable;
 import com.opensymphony.xwork.validator.DefaultActionValidatorManager;
 import com.opensymphony.xwork.validator.ValidationException;

@@ -24,11 +24,10 @@ public class EditSubscriptionAction extends UserActionSupport
     {
         if (conditions == null)
         {
-            conditions = new TreeMap<String, String>();
-            conditions.put(NotifyConditionFactory.ALL_BUILDS, "All builds");
-            conditions.put(NotifyConditionFactory.ALL_CHANGED, "All changed builds");
-            conditions.put(NotifyConditionFactory.ALL_FAILED, "All failed builds");
-            conditions.put(NotifyConditionFactory.ALL_CHANGED_OR_FAILED, "All changed or failed builds");
+            conditions.put(NotifyConditionFactory.ALL_BUILDS, getText("condition.allbuilds"));
+            conditions.put(NotifyConditionFactory.ALL_CHANGED, getText("condition.allchanged"));
+            conditions.put(NotifyConditionFactory.ALL_FAILED, getText("condition.allfailed"));
+            conditions.put(NotifyConditionFactory.ALL_CHANGED_OR_FAILED, getText("condition.allchangedorfailed"));
         }
         return conditions;
     }
