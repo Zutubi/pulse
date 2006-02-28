@@ -1,9 +1,9 @@
 package com.cinnamonbob.core.model;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.text.DateFormat;
 
 /**
  * A trivial implementation of the Changelist interface.
@@ -14,6 +14,12 @@ public class Changelist extends Entity
 {
     private Revision revision;
     private List<Change> changes;
+    /**
+     * Id of the build result this is part of: the BuildResult class is up
+     * in master so we can't map it directly.  In any case, this forces lazy
+     * loading of the result which is a Good Thing.
+     */
+    private long resultId;
 
     protected Changelist()
     {
@@ -69,5 +75,15 @@ public class Changelist extends Entity
     private void setRevision(Revision revision)
     {
         this.revision = revision;
+    }
+
+    public long getResultId()
+    {
+        return resultId;
+    }
+
+    public void setResultId(long resultId)
+    {
+        this.resultId = resultId;
     }
 }

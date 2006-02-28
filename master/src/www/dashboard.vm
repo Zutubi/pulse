@@ -12,8 +12,11 @@
     #recentBuilds($projects false)
 
     <table class="content">
-        #headingRow("my.changes" 5)
+        #headingRow("my.changes" 8)
         <tr>
+            #contentHeading("project" 1)
+            #contentHeading("build.id" 1)
+            #contentHeading("build.status" 2)
             #contentHeading("change.revision" 1)
             #contentHeading("change.when" 1)
             #contentHeading("change.comment" 1)
@@ -21,16 +24,23 @@
         </tr>
 #if($changelists.size() > 0)
     #foreach($changelist in $changelists)
+        #set($index = $velocityCount - 1)
+        #set($project = $changeProjects.get($index))
+        #set($build = $changeBuilds.get($index))
+        #set($cssClass = $build.state.string)
         <tr>
+            <td class="content"><a href="currentBuild.action?id=$project.id">$!webwork.htmlEncode($project.name)</a></td>
+            <td class="$cssClass"><a href="viewBuild.action?id=$build.id">$build.number</td>
+            #statusCell($build)
             #dynamicCell($changelist.revision)
             #dynamicCell($changelist.prettyDate)
             #dynamicCell($action.trimmedString($changelist.comment, 60))
-            #linkCell("view" "viewChangelist.action?id=$changelist.id&amp;buildId=$result.id")
+            #linkCell("view" "viewChangelist.action?id=$changelist.id")
         </tr>
     #end
 #else
         <tr>
-            <td class="content" colspan="5">#wwtext("name=no.changes")</td>
+            <td class="content" colspan="8">#wwtext("name=no.changes")</td>
         <tr>
 #end
     </table>

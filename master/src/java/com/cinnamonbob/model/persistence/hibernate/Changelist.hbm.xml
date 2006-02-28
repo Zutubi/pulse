@@ -17,6 +17,8 @@
             <index column="ORDINAL"/>
             <one-to-many class="com.cinnamonbob.core.model.Change"/>
         </list>
+
+        <property name="resultId" type="long"/>
     </class>
 
     <class name="com.cinnamonbob.core.model.Change" table="CHANGE" lazy="false">

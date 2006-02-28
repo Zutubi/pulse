@@ -117,6 +117,10 @@ public class BuildController implements EventListener
                         if (previousRevision != null)
                         {
                             scmChanges = server.getChanges(previousRevision, latestRevision, "");
+                            for (Changelist change : scmChanges)
+                            {
+                                change.setResultId(buildResult.getId());
+                            }
                         }
                     }
                 }

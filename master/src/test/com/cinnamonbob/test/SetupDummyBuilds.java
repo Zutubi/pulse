@@ -151,6 +151,8 @@ public class SetupDummyBuilds implements Runnable
     private void createComplexSuccess(Project project, long number)
     {
         BuildResult result = new BuildResult(project, getSpec(project), number);
+        buildResultDao.save(result);
+
         List<Changelist> changelists = new LinkedList<Changelist>();
 
         NumericalRevision userRevision = new NumericalRevision(101);
@@ -165,6 +167,7 @@ public class SetupDummyBuilds implements Runnable
         list.addChange(new Change("/home/jsankey/some/branched/file2", "1", Change.Action.BRANCH));
         list.addChange(new Change("/home/jsankey/some/branched/file3", "1", Change.Action.BRANCH));
         list.addChange(new Change("/home/jsankey/some/branched/file4", "1", Change.Action.BRANCH));
+        list.setResultId(result.getId());
         changelists.add(list);
 
         userRevision = new NumericalRevision(9101);
@@ -173,6 +176,7 @@ public class SetupDummyBuilds implements Runnable
         userRevision.setDate(new Date(System.currentTimeMillis() - 10000));
         list = new Changelist(userRevision);
         list.addChange(new Change("/home/jsankey/some/branched/file/with/a/very/long/filename/to/test/the/display/handling/of/such/things", "1", Change.Action.BRANCH));
+        list.setResultId(result.getId());
         changelists.add(list);
 
         BuildScmDetails scmDetails = new BuildScmDetails(new NumericalRevision(16672), changelists);

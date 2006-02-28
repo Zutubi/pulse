@@ -17,6 +17,8 @@ public class DashboardAction extends ActionSupport
     private List<Project> projects;
     private List<BuildResult> latestBuilds;
     private List<Changelist> changelists;
+    private List<Project> changeProjects;
+    private List<BuildResult> changeBuilds;
     private ProjectManager projectManager;
     private BuildManager buildManager;
 
@@ -38,6 +40,16 @@ public class DashboardAction extends ActionSupport
     public List<Changelist> getChangelists()
     {
         return changelists;
+    }
+
+    public List<Project> getChangeProjects()
+    {
+        return changeProjects;
+    }
+
+    public List<BuildResult> getChangeBuilds()
+    {
+        return changeBuilds;
     }
 
     public String execute() throws Exception
@@ -65,6 +77,15 @@ public class DashboardAction extends ActionSupport
         }
 
         changelists = buildManager.getLatestChangesForUser(user, 10);
+        changeProjects = new LinkedList<Project>();
+        changeBuilds = new LinkedList<BuildResult>();
+
+        for (Changelist list : changelists)
+        {
+            BuildResult build = buildManager.getBuildResult(list.getResultId());
+            changeProjects.add(build.getProject());
+            changeBuilds.add(build);
+        }
 
         return SUCCESS;
     }

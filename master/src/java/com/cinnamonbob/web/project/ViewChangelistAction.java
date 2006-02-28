@@ -1,9 +1,9 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.model.persistence.ChangelistDao;
-import com.cinnamonbob.model.persistence.BuildResultDao;
 import com.cinnamonbob.model.BuildResult;
+import com.cinnamonbob.model.persistence.BuildResultDao;
+import com.cinnamonbob.model.persistence.ChangelistDao;
 import com.cinnamonbob.web.ActionSupport;
 
 /**
@@ -32,11 +32,6 @@ public class ViewChangelistAction extends ActionSupport
         return buildId;
     }
 
-    public void setBuildId(long buildId)
-    {
-        this.buildId = buildId;
-    }
-
     public BuildResult getBuildResult()
     {
         return buildResult;
@@ -63,6 +58,7 @@ public class ViewChangelistAction extends ActionSupport
 
     public String execute()
     {
+        buildId = changelist.getResultId();
         buildResult = buildResultDao.findById(buildId);
         // TODO dodgy walking of tree: hibernate eager/lazy loading!
         changelist.getRevision();
