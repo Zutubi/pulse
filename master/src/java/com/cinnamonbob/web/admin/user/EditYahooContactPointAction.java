@@ -1,4 +1,4 @@
-package com.cinnamonbob.web.user;
+package com.cinnamonbob.web.admin.user;
 
 import com.cinnamonbob.model.YahooContactPoint;
 
@@ -15,10 +15,10 @@ public class EditYahooContactPointAction extends AbstractEditContactPointAction
         return contact;
     }
 
-    public String doDefault()
+    public String doInput()
     {
         contact = (YahooContactPoint) getUserManager().getContactPoint(getId());
-        return SUCCESS;
+        return INPUT;
     }
 
     public String execute()

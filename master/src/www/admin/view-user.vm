@@ -30,7 +30,6 @@
                 #contactPointIcon($contact)
                 <tr>
                     #set($confirmMessage = $action.getText("contact.delete.confirm", [$contact.name]))
-
                     #dynamicCell($contact.name)
                     #dynamicCell($contact.uid)
                     #editCell("editContactPoint!default.action?id=$contact.id&user=$user.id")

@@ -1,4 +1,4 @@
-package com.cinnamonbob.web.user;
+package com.cinnamonbob.web.admin.user;
 
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.ContactPoint;
@@ -10,8 +10,8 @@ import com.cinnamonbob.web.admin.user.UserActionSupport;
  */
 public abstract class AbstractEditContactPointAction extends UserActionSupport
 {
-    private long id;
-    private long user;
+    protected long id;
+    protected long user;
     public void setId(long id)
     {
         this.id = id;

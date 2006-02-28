@@ -1,4 +1,4 @@
-package com.cinnamonbob.web.user;
+package com.cinnamonbob.web.admin.user;
 
 import com.cinnamonbob.model.EmailContactPoint;
 
@@ -14,10 +14,10 @@ public class EditEmailContactPointAction extends AbstractEditContactPointAction
         return contact;
     }
 
-    public String doDefault()
+    public String doInput()
     {
         contact = (EmailContactPoint) getUserManager().getContactPoint(getId());
-        return SUCCESS;
+        return INPUT;
     }
 
     public String execute()
@@ -25,6 +25,7 @@ public class EditEmailContactPointAction extends AbstractEditContactPointAction
         EmailContactPoint persistentContact = (EmailContactPoint) getUserManager().getContactPoint(getId());
         persistentContact.setEmail(contact.getEmail());
         persistentContact.setName(contact.getName());
+        getUserManager().save(persistentContact);
         return SUCCESS;
     }
 

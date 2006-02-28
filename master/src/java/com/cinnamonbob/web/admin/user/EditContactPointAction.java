@@ -1,4 +1,4 @@
-package com.cinnamonbob.web.user;
+package com.cinnamonbob.web.admin.user;
 
 import com.cinnamonbob.model.EmailContactPoint;
 import com.cinnamonbob.model.ContactPoint;
@@ -12,7 +12,6 @@ import com.cinnamonbob.web.admin.user.UserActionSupport;
 public class EditContactPointAction extends UserActionSupport
 {
     private long id;
-    private EmailContactPoint contact = new EmailContactPoint();
 
     public void setId(long id)
     {
@@ -22,11 +21,6 @@ public class EditContactPointAction extends UserActionSupport
     public long getId()
     {
         return id;
-    }
-
-    public EmailContactPoint getContact()
-    {
-        return contact;
     }
 
     public String doDefault()

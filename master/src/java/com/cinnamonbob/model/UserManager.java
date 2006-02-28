@@ -38,4 +38,6 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
      *
      */
     int getUserCount();
+
+    void save(ContactPoint contact);
 }
