@@ -1,8 +1,9 @@
-package com.cinnamonbob.web.user;
+package com.cinnamonbob.web.admin.user;
 
 import java.util.List;
 
 import com.cinnamonbob.model.User;
+import com.cinnamonbob.web.user.UserActionSupport;
 
 public class ViewUsersAction extends UserActionSupport
 {
@@ -12,7 +13,7 @@ public class ViewUsersAction extends UserActionSupport
     {
         return users;
     }
-    
+
     public String execute()
     {
         users = getUserManager().getAllUsers();

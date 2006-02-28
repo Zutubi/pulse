@@ -202,8 +202,8 @@
 ##
 #macro(adminTabs $selected)
     #openTabs()
-        #adminTab("settings" "/admin/serverSettings.action" $selected)
-        #adminTab("users" "/admin/viewUsers" $selected)
+        #adminTab("settings" "/admin/serverSettings" $selected)
+        #adminTab("users" "/admin/userSettings" $selected)
     #closeTabs()
 #end
 
@@ -251,8 +251,12 @@
     <tr>
         <th class="heading" colspan="2">
             <span class="action">
+            #if($editUrl)
                 <a href="$editUrl"><img alt="$action.getText('edit')" src="/images/pencil.gif"/>#wwtext("name=edit")</a>
+            #end
+            #if($resetUrl)
                 <a href="$resetUrl"><img alt="$action.getText('reset')" src="/images/arrow_rotate_anticlockwise.gif"/>#wwtext("name=reset")</a>
+            #end
             </span>
             #wwtext("name=$key")
         </th>
@@ -324,7 +328,7 @@
 ##
 #macro(actionCell $actionKey $url $image)
     <td class="content">
-        <a href="$url"><img alt="$action.getText($actionKey)" src="images/$image"/>#wwtext("name=$actionKey")</a>
+        <a href="$url"><img alt="$action.getText($actionKey)" src="/images/$image"/>#wwtext("name=$actionKey")</a>
     </td>
 #end
 
@@ -349,7 +353,7 @@
 ##
 #macro(deleteCell $message $url)
     <td class="content">
-        <a href="#" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="images/delete.gif"/>#wwtext("name=delete")</a>
+        <a href="#" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="/images/delete.gif"/>#wwtext("name=delete")</a>
     </td>
 ##    #actionCell("delete" $url "delete.gif")
 #end
@@ -367,7 +371,7 @@
 #macro(addRow $key $span $url)
     <tr>
         <td class="add" colspan="$span">
-            <a href="$url"><img alt="add" src="images/add.gif"/> #wwtext("name=$key")</a>
+            <a href="$url"><img alt="add" src="/images/add.gif"/> #wwtext("name=$key")</a>
         </td>
     </tr>
 #end
@@ -378,13 +382,13 @@
 #macro(statusCell $result)
     <td class="$result.state.string">
     #if($result.succeeded())
-        <img alt="success" src="images/accept.gif"/>
+        <img alt="success" src="/images/accept.gif"/>
     #elseif($result.inProgress())
-        <img alt="in progress" src="images/hourglass.gif"/>
+        <img alt="in progress" src="/images/hourglass.gif"/>
     #elseif($result.terminating())
-        <img alt="terminating" src="images/stop.gif"/>
+        <img alt="terminating" src="/images/stop.gif"/>
     #elseif($result.errored() || $result.failed())
-        <img alt="failure" src="images/exclamation.gif"/>
+        <img alt="failure" src="/images/exclamation.gif"/>
     #else
         &nbsp;
     #end

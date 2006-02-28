@@ -3,17 +3,17 @@
 <validators>
     <field name="name">
         <field-validator type="requiredstring">
-            <message>name is required.</message>
+            <message key="user.name.required">required field.</message>
         </field-validator>
     </field>
     <field name="login">
         <field-validator type="requiredstring">
-            <message>login is required.</message>
+            <message key="user.login.required">required field.</message>
         </field-validator>
     </field>
     <field name="password">
         <field-validator type="requiredstring">
-            <message>password is required.</message>
+            <message key="user.password.required">required field.</message>
         </field-validator>
     </field>
 </validators>

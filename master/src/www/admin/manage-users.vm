@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <title>users</title>
+    <link href="build.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+      <h1>:: #wwtext("name=users") ::</h1>
+
+      #adminTabs("users")
+
+      <table class="columns" width="90%">
+          <tr>
+              #wwaction("name=viewUsers" "id=blah" "executeResult=false")
+
+              <td class="columns" width="40%">
+                  <table class="content">
+                      #headingRow("users" 3)
+                      <tr>
+                          #contentHeading("user.login" 1)
+                          #contentHeading("user.name" 1)
+                          #contentHeading("actions" 1)
+                      </tr>
+                      #foreach($user in $blah.users)
+                      <tr>
+                          #dynamicCell($user.login)
+                          #dynamicCell($user.name)
+                        #contentCell("empty.cell")
+                      </tr>
+                      #end
+                  </table>
+              </td>
+              <td class="columns" width="40%">
+                  #wwcform("action=createUser.action" "heading=%{getText('user.create')}" "method=post")
+                      #wwtextfield("name=user.login" "label=%{getText('user.login')}" "required=true" "tabindex=1")
+                      #wwtextfield("name=user.name" "label=%{getText('user.name')}" "required=true" "tabindex=2")
+                      #wwpassword("name=user.password" "label=%{getText('user.password')}" "required=true" "tabindex=3")
+                      #wwpassword("name=confirm" "label=%{getText('user.confirm')}" "required=true" "tabindex=4")
+                      #saveCancel(5)
+                  #end
+              </td>
+          </tr>
+      </table>
+
+
+
+
+
+  </body>
+</html>

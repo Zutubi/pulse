@@ -123,44 +123,6 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewUsers" class="com.cinnamonbob.web.user.ViewUsersAction">
-            <result name="success" type="velocity">view-users.vm</result>
-        </action>
-
-        <action name="findUsers!default" class="com.opensymphony.xwork.ActionSupport">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">find-user.vm</result>
-        </action>
-
-        <action name="findUsers" class="com.cinnamonbob.web.user.FindUsersAction">
-            <result name="input" type="velocity">find-user.vm</result>
-            <result name="success" type="velocity">find-user.vm</result>
-        </action>
-
-        <action name="createUser!default" class="com.cinnamonbob.web.user.CreateUserAction" method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">create-user.vm</result>
-        </action>
-
-        <action name="createUser" class="com.cinnamonbob.web.user.CreateUserAction">
-            <result name="input" type="velocity">create-user.vm</result>
-            <result name="cancel" type="velocity">undefined.vm</result>
-            <result name="error" type="velocity">create-user.vm</result>
-            <result name="success" type="redirect">/viewUser.action?id=${user.id}</result>
-        </action>
-
-        <action name="editUser!default" class="com.cinnamonbob.web.user.EditUserAction" method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">edit-user.vm</result>
-        </action>
-
-        <action name="editUser" class="com.cinnamonbob.web.user.EditUserAction">
-            <result name="input" type="velocity">edit-user.vm</result>
-            <result name="cancel" type="redirect">/viewUser.action?id=${id}</result>
-            <result name="error" type="velocity">edit-user.vm</result>
-            <result name="success" type="redirect">/viewUser.action?id=${id}</result>
-        </action>
-
         <action name="createContactPoint!default" class="com.cinnamonbob.web.user.CreateContactPointAction"
                 method="doDefault">
             <interceptor-ref name="defaultStack"/>
@@ -557,6 +519,45 @@
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">server-settings.vm</result>
         </action>
+
+        <action name="userSettings" class="com.cinnamonbob.web.ActionSupport">
+            <result name="success" type="velocity">manage-users.vm</result>
+        </action>
+
+        <action name="viewUsers" class="com.cinnamonbob.web.admin.user.ViewUsersAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">manage-users.vm</result>
+        </action>
+
+        <action name="createUser" class="com.cinnamonbob.web.admin.user.CreateUserAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">manage-users.vm</result>
+            <result name="cancel" type="redirect">userSettings.action</result>
+            <result name="success" type="redirect">userSettings.action</result>
+        </action>
+<!--
+        <action name="editUser!default" class="com.cinnamonbob.web.user.EditUserAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">edit-user.vm</result>
+        </action>
+
+        <action name="editUser" class="com.cinnamonbob.web.user.EditUserAction">
+            <result name="input" type="velocity">edit-user.vm</result>
+            <result name="cancel" type="redirect">/viewUser.action?id=${id}</result>
+            <result name="error" type="velocity">edit-user.vm</result>
+            <result name="success" type="redirect">/viewUser.action?id=${id}</result>
+        </action>
+
+        <action name="findUsers!default" class="com.opensymphony.xwork.ActionSupport">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">find-user.vm</result>
+        </action>
+
+        <action name="findUsers" class="com.cinnamonbob.web.user.FindUsersAction">
+            <result name="input" type="velocity">find-user.vm</result>
+            <result name="success" type="velocity">find-user.vm</result>
+        </action>
+-->
 
         <action name="smtp" class="com.cinnamonbob.web.admin.SmtpConfigurationAction">
             <interceptor-ref name="defaultStack"/>
