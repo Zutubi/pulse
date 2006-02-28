@@ -499,7 +499,7 @@
         -->
         <action name="contactWizard" class="com.cinnamonbob.web.wizard.WizardAction">
             <interceptor-ref name="wizardStack"/>
-            <param name="wizardClass">com.cinnamonbob.web.admin.user.ContactPointWizard</param>
+            <param name="wizardClass">com.cinnamonbob.web.user.ContactPointWizard</param>
             <result name="select" type="velocity">create-contact.vm</result>
             <result name="email" type="velocity">create-contact-email.vm</result>
             <result name="yahoo" type="velocity">create-contact-yahoo.vm</result>
@@ -507,31 +507,31 @@
             <result name="success" type="redirect">viewUser.action?id=${userId}</result>
         </action>
 
-        <action name="deleteContactPoint" class="com.cinnamonbob.web.admin.user.DeleteContactPointAction">
+        <action name="deleteContactPoint" class="com.cinnamonbob.web.user.DeleteContactPointAction">
             <result name="success" type="redirect">viewUser.action?id=${user}</result>
         </action>
 
-        <action name="editContactPoint" class="com.cinnamonbob.web.admin.user.EditContactPointAction">
+        <action name="editContactPoint" class="com.cinnamonbob.web.user.EditContactPointAction">
             <result name="email" type="chain">editEmailContactPoint!input</result>
             <result name="yahoo" type="chain">editYahooContactPoint!input</result>
         </action>
 
         <!-- need to fully specify the chained action!method name else chaining fails... -->
-        <action name="editEmailContactPoint!input" class="com.cinnamonbob.web.admin.user.EditEmailContactPointAction" method="doInput">
+        <action name="editEmailContactPoint!input" class="com.cinnamonbob.web.user.EditEmailContactPointAction" method="doInput">
             <interceptor-ref name="defaultStack"/>
             <result name="input" type="velocity">edit-contact-email.vm</result>
         </action>
-        <action name="editEmailContactPoint" class="com.cinnamonbob.web.admin.user.EditEmailContactPointAction">
+        <action name="editEmailContactPoint" class="com.cinnamonbob.web.user.EditEmailContactPointAction">
             <result name="input" type="velocity">edit-contact-email.vm</result>
             <result name="cancel" type="redirect">viewUser.action?id=${user}</result>
             <result name="success" type="redirect">viewUser.action?id=${user}</result>
         </action>
 
-        <action name="editYahooContactPoint!input" class="com.cinnamonbob.web.admin.user.EditYahooContactPointAction" method="doInput">
+        <action name="editYahooContactPoint!input" class="com.cinnamonbob.web.user.EditYahooContactPointAction" method="doInput">
             <interceptor-ref name="defaultStack"/>
             <result name="input" type="velocity">edit-contact-yahoo.vm</result>
         </action>
-        <action name="editYahooContactPoint" class="com.cinnamonbob.web.admin.user.EditYahooContactPointAction">
+        <action name="editYahooContactPoint" class="com.cinnamonbob.web.user.EditYahooContactPointAction">
             <result name="input" type="velocity">edit-contact-yahoo.vm</result>
             <result name="cancel" type="redirect">viewUser.action?id=${user}</result>
             <result name="success" type="redirect">viewUser.action?id=${user}</result>

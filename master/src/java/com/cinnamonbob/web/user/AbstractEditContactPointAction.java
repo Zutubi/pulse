@@ -1,8 +1,7 @@
-package com.cinnamonbob.web.admin.user;
+package com.cinnamonbob.web.user;
 
-import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.ContactPoint;
-import com.cinnamonbob.web.admin.user.UserActionSupport;
+import com.cinnamonbob.model.User;
 
 /**
  *

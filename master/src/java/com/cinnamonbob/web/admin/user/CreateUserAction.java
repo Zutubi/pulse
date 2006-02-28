@@ -1,7 +1,7 @@
 package com.cinnamonbob.web.admin.user;
 
 import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.UserManager;
+import com.cinnamonbob.web.user.UserActionSupport;
 
 import java.util.Arrays;
 

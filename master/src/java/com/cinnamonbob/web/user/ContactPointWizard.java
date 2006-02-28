@@ -1,10 +1,10 @@
-package com.cinnamonbob.web.admin.user;
+package com.cinnamonbob.web.user;
 
+import com.cinnamonbob.model.*;
 import com.cinnamonbob.web.wizard.BaseWizard;
 import com.cinnamonbob.web.wizard.BaseWizardState;
 import com.cinnamonbob.web.wizard.Wizard;
 import com.cinnamonbob.web.wizard.WizardCompleteState;
-import com.cinnamonbob.model.*;
 
 import java.util.Map;
 import java.util.TreeMap;

@@ -1,8 +1,7 @@
 package com.cinnamonbob.web.user;
 
-import com.cinnamonbob.model.Subscription;
 import com.cinnamonbob.model.NotifyConditionFactory;
-import com.cinnamonbob.web.admin.user.UserActionSupport;
+import com.cinnamonbob.model.Subscription;
 
 import java.util.Map;
 import java.util.TreeMap;

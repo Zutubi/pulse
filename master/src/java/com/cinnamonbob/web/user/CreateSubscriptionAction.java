@@ -1,11 +1,10 @@
 package com.cinnamonbob.web.user;
 
 import com.cinnamonbob.model.*;
-import com.cinnamonbob.web.admin.user.UserActionSupport;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.List;
 
 /**
  *

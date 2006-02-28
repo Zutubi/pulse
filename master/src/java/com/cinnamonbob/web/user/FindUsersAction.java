@@ -1,7 +1,5 @@
 package com.cinnamonbob.web.user;
 
-import com.cinnamonbob.web.admin.user.UserActionSupport;
-
 import java.util.Collections;
 import java.util.List;
 

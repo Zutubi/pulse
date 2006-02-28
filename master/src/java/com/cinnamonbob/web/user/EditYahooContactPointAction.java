@@ -1,4 +1,4 @@
-package com.cinnamonbob.web.admin.user;
+package com.cinnamonbob.web.user;
 
 import com.cinnamonbob.model.YahooContactPoint;
 
