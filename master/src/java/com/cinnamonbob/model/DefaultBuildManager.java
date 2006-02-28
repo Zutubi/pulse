@@ -1,14 +1,12 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.MasterBuildPaths;
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.core.model.StoredArtifact;
+import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.model.persistence.ArtifactDao;
 import com.cinnamonbob.model.persistence.BuildResultDao;
+import com.cinnamonbob.model.persistence.ChangelistDao;
 import com.cinnamonbob.scheduling.Scheduler;
 import com.cinnamonbob.scheduling.SchedulingException;
 import com.cinnamonbob.scheduling.SimpleTrigger;
@@ -29,6 +27,7 @@ public class DefaultBuildManager implements BuildManager
 
     private BuildResultDao buildResultDao;
     private ArtifactDao artifactDao;
+    private ChangelistDao changelistDao;
     private ProjectManager projectManager;
     private Scheduler scheduler;
 
@@ -185,6 +184,11 @@ public class DefaultBuildManager implements BuildManager
         }
     }
 
+    public List<Changelist> getLatestChangesForUser(User user, int max)
+    {
+        return changelistDao.findLatestByUser(user, max);
+    }
+
     private void cleanupBuilds(Project project)
     {
         BuildResultCleanupPolicy policy = project.getCleanupPolicy();
@@ -267,5 +271,10 @@ public class DefaultBuildManager implements BuildManager
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setChangelistDao(ChangelistDao changelistDao)
+    {
+        this.changelistDao = changelistDao;
     }
 }

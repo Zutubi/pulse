@@ -1,0 +1,38 @@
+<content tag="selectedTab">dashboard</content>
+<content tag="helpPage">Dashboard</content>
+<html>
+<head>
+    <title>#wwtext("name=dashboard")</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=dashboard") ::</h1>
+
+    #dashboardTabs("homepage")
+
+    #recentBuilds($projects false)
+
+    <table class="content">
+        #headingRow("my.changes" 5)
+        <tr>
+            #contentHeading("change.revision" 1)
+            #contentHeading("change.when" 1)
+            #contentHeading("change.comment" 1)
+            #contentHeading("actions" 1)
+        </tr>
+#if($changelists.size() > 0)
+    #foreach($changelist in $changelists)
+        <tr>
+            #dynamicCell($changelist.revision)
+            #dynamicCell($changelist.prettyDate)
+            #dynamicCell($action.trimmedString($changelist.comment, 60))
+            #linkCell("view" "viewChangelist.action?id=$changelist.id&amp;buildId=$result.id")
+        </tr>
+    #end
+#else
+        <tr>
+            <td class="content" colspan="5">#wwtext("name=no.changes")</td>
+        <tr>
+#end
+    </table>
+</body>
+</html>

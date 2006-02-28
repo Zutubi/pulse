@@ -1,9 +1,6 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.core.model.StoredArtifact;
+import com.cinnamonbob.core.model.*;
 
 import java.util.List;
 import java.util.Map;
@@ -122,6 +119,11 @@ public class MockBuildManager implements BuildManager
     }
 
     public void cleanupBuilds()
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public List<Changelist> getLatestChangesForUser(User user, int max)
     {
         throw new RuntimeException("Method not implemented.");
     }

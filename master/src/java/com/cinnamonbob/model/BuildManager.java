@@ -1,9 +1,6 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.core.model.StoredArtifact;
+import com.cinnamonbob.core.model.*;
 
 import java.util.List;
 
@@ -66,4 +63,12 @@ public interface BuildManager
 
     void cleanupBuilds();
 
+    /**
+     * Returns the most recent changelists submitted by the given user.
+     *
+     * @param user the user to get the changelists for
+     * @param max  the maximum number of results to return
+     * @return a list of up to max of the most recent changes for the user
+     */
+    List<Changelist> getLatestChangesForUser(User user, int max);
 }

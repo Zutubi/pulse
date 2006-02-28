@@ -6,52 +6,7 @@
     </head>
     <body>
         <h1>:: #wwtext("name=projects") ::</h1>
-        <table class="content">
-            #headingRow("latest.builds" 11)
-            <tr>
-                #contentHeading("project.name" 1)
-                #contentHeading("build.status" 2)
-                #contentHeading("last.built" 1)
-                #contentHeading("build.id" 1)
-                #contentHeading("build.spec" 1)
-                #contentHeading("build.elapsed" 1)
-                #contentHeading("actions" 4)
-            </tr>
 
-#foreach($project in $projects)
-    #set($index = $velocityCount - 1)
-
-            <tr>
-                <td class="content"><a href="currentBuild.action?id=$project.id">$!webwork.htmlEncode($project.name)</a></td>
-
-    #if($latestBuilds.get($index))
-        #set($lastResult = $latestBuilds.get($index))
-        #set($cssClass = $lastResult.state.string)
-
-                #statusCell($lastResult)
-                #classCell($lastResult.stamps.prettyStartTime)
-                #classCell($lastResult.number)
-                #classCell($lastResult.buildSpecification)
-                #classCell($lastResult.stamps.prettyElapsed)
-                #viewCell($project $lastResult)
-                #logCell($project $lastResult)
-                #changesCell($project $lastResult)
-                #artifactsCell($project $lastResult)
-    #else
-                #contentCell("empty.cell")
-                #contentCell("not.applicable")
-                #contentCell("built.never")
-                #contentCell("not.applicable")
-                #contentCell("not.applicable")
-                #contentCell("not.applicable")
-                #contentCell("empty.cell")
-                #contentCell("empty.cell")
-                #contentCell("empty.cell")
-                #contentCell("empty.cell")
-    #end
-            </tr>
-#end
-            #addRow("add.project" 11 "addProject!input.action")
-        </table>
+        #recentBuilds($projects true)
     </body>
 </html>

@@ -191,7 +191,7 @@
 #end
 
 ##
-## Shows a admin tab of the given name with the given action name
+## Shows an admin tab of the given name with the given action name
 ##
 #macro(adminTab $name $action $selected)
     #tabItem($name "${action}.action" $selected)
@@ -204,6 +204,23 @@
     #openTabs()
         #adminTab("settings" "/admin/serverSettings" $selected)
         #adminTab("users" "/admin/userSettings" $selected)
+    #closeTabs()
+#end
+
+##
+## Shows a dashboard tab of the given name with the given action name
+##
+#macro(dashboardTab $name $action $selected)
+    #tabItem($name "${action}.action" $selected)
+#end
+
+##
+## Shows the tab bar for dashboard pages with the given tab selected.
+##
+#macro(dashboardTabs $selected)
+    #openTabs()
+        #dashboardTab("homepage" "/dashboard" $selected)
+        #dashboardTab("preferences" "/preferences" $selected)
     #closeTabs()
 #end
 
@@ -904,4 +921,59 @@
     #if ($state.ordinal() == 0)<span style='color:blue;'>active</span>#end
     #if ($state.ordinal() == 1)<span style='color:black;'>none</span>#end
     #if ($state.ordinal() == 2)<span style='color:orange;'>paused</span>#end
+#end
+
+##
+## Shows a list of recent builds for the given list of projects
+##
+#macro(recentBuilds $projects $showAdd)
+    <table class="content">
+        #headingRow("latest.builds" 11)
+        <tr>
+            #contentHeading("project.name" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("last.built" 1)
+            #contentHeading("build.id" 1)
+            #contentHeading("build.spec" 1)
+            #contentHeading("build.elapsed" 1)
+            #contentHeading("actions" 4)
+        </tr>
+
+    #foreach($project in $projects)
+        #set($index = $velocityCount - 1)
+
+        <tr>
+            <td class="content"><a href="currentBuild.action?id=$project.id">$!webwork.htmlEncode($project.name)</a></td>
+
+        #if($latestBuilds.get($index))
+            #set($lastResult = $latestBuilds.get($index))
+            #set($cssClass = $lastResult.state.string)
+
+            #statusCell($lastResult)
+            #classCell($lastResult.stamps.prettyStartTime)
+            #classCell($lastResult.number)
+            #classCell($lastResult.buildSpecification)
+            #classCell($lastResult.stamps.prettyElapsed)
+            #viewCell($project $lastResult)
+            #logCell($project $lastResult)
+            #changesCell($project $lastResult)
+            #artifactsCell($project $lastResult)
+        #else
+            #contentCell("empty.cell")
+            #contentCell("not.applicable")
+            #contentCell("built.never")
+            #contentCell("not.applicable")
+            #contentCell("not.applicable")
+            #contentCell("not.applicable")
+            #contentCell("empty.cell")
+            #contentCell("empty.cell")
+            #contentCell("empty.cell")
+            #contentCell("empty.cell")
+        #end
+        </tr>
+    #end
+    #if($showAdd)
+        #addRow("add.project" 11 "addProject!input.action")
+    #end
+        </table>
 #end

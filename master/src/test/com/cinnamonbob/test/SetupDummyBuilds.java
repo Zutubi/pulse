@@ -100,6 +100,10 @@ public class SetupDummyBuilds implements Runnable
     private void setupUsers(Project project)
     {
         User user = new User("jsankey", "Jason Sankey");
+        user.setPassword("password");
+        user.setEnabled(true);
+        user.add(GrantedAuthority.USER);
+        user.add(GrantedAuthority.ADMINISTRATOR);
 
         ContactPoint contactPoint = new EmailContactPoint("jsankey@gmail.com");
         Subscription subscription = new Subscription(project, contactPoint);
@@ -150,7 +154,7 @@ public class SetupDummyBuilds implements Runnable
         List<Changelist> changelists = new LinkedList<Changelist>();
 
         NumericalRevision userRevision = new NumericalRevision(101);
-        userRevision.setAuthor("jsankey");
+        userRevision.setAuthor("jason");
         userRevision.setComment("a short comment");
         userRevision.setDate(new Date(System.currentTimeMillis() - 100000));
         Changelist list = new Changelist(userRevision);
