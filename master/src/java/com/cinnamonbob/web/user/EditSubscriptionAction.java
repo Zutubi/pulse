@@ -15,7 +15,6 @@ public class EditSubscriptionAction extends UserActionSupport
     private String login;
 
     private String project;
-    private String user;
     private String condition;
     private String contactPoint;
 
@@ -62,23 +61,22 @@ public class EditSubscriptionAction extends UserActionSupport
         }
     }
 
-    public String doDefault()
+    public String doInput()
     {
         Subscription subscription = getSubscriptionManager().getSubscription(getId());
         project = subscription.getProject().getName();
         contactPoint = subscription.getContactPoint().getName();
-        user = subscription.getContactPoint().getUser().getLogin();
         condition = subscription.getCondition();
 
-        return SUCCESS;
+        return INPUT;
     }
 
     public String execute()
     {
-        Subscription persistentSubscription = getSubscriptionManager().getSubscription(getId());
-
         // update condition.
+        Subscription persistentSubscription = getSubscriptionManager().getSubscription(getId());
         persistentSubscription.setCondition(condition);
+        getSubscriptionManager().save(persistentSubscription);
 
         return SUCCESS;
     }
@@ -86,11 +84,6 @@ public class EditSubscriptionAction extends UserActionSupport
     public String getProject()
     {
         return project;
-    }
-
-    public String getUser()
-    {
-        return user;
     }
 
     public String getContactPoint()
@@ -106,11 +99,6 @@ public class EditSubscriptionAction extends UserActionSupport
     public void setProject(String str)
     {
         this.project = str;
-    }
-
-    public void setUser(String str)
-    {
-        this.user = str;
     }
 
     public void setContactPoint(String str)

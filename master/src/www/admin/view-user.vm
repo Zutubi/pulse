@@ -27,7 +27,6 @@
                 </tr>
 
                 #foreach ($contact in $user.contactPoints)
-                #contactPointIcon($contact)
                 <tr>
                     #set($confirmMessage = $action.getText("contact.delete.confirm", [$contact.name]))
                     #dynamicCell($contact.name)
@@ -56,16 +55,18 @@
                 #set($project = $subscription.project)
                 <tr>
                     #set($confirmMessage = $action.getText("subscription.delete.confirm", [$subscription.name]))
-
-                    #contactPointIcon($contact)
                     #dynamicCell($project.name)
                     #dynamicCell($contact.uid)
                     #dynamicCell($subscription.condition)
-                    #editCell("editSubscription!default.action?id=$subscription.id&login=$user.login")
+                    #editCell("editSubscription!input.action?id=$subscription.id&login=$user.login")
                     #deleteCell($confirmMessage "deleteSubscription.action?id=$subscription.id&login=$user.login")
                 </tr>
             #end
-            #addRow("subscription.create" 4 "createSubscription!default.action?userId=$user.id")
+            <!--
+             can only create subscriptions is the system has configured projects accessible to
+             the user AND the user has configured contact points.
+            -->
+            #addRow("subscription.create" 4 "createSubscription!input.action?userId=$user.id")
             </table>
         </div>
 

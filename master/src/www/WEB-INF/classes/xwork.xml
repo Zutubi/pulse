@@ -314,35 +314,6 @@
             <result name="success" type="velocity">view-triggers.vm</result>
         </action>
 
-        <action name="createSubscription!default" class="com.cinnamonbob.web.user.CreateSubscriptionAction"
-                method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">create-subscription.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
-        <action name="createSubscription" class="com.cinnamonbob.web.user.CreateSubscriptionAction">
-            <result name="input" type="velocity">create-subscription.vm</result>
-            <result name="cancel" type="redirect">/</result>
-            <result name="success" type="redirect">/viewUser.action?id=${userId}</result>
-        </action>
-
-        <action name="deleteSubscription" class="com.cinnamonbob.web.user.DeleteSubscriptionAction">
-            <result name="success" type="redirect">/viewUser.action?login=${login}</result>
-        </action>
-
-        <action name="editSubscription!default" class="com.cinnamonbob.web.user.EditSubscriptionAction"
-                method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">edit-subscription.vm</result>
-        </action>
-
-        <action name="editSubscription" class="com.cinnamonbob.web.user.EditSubscriptionAction">
-            <result name="input" type="velocity">edit-subscription.vm</result>
-            <result name="cancel" type="redirect">/viewUser.action?login=${login}</result>
-            <result name="success" type="redirect">/viewUser.action?login=${login}</result>
-        </action>
-
         <action name="viewSystemInfo" class="com.cinnamonbob.web.console.SystemInfoAction">
             <result name="success" type="velocity">view-systeminfo.vm</result>
         </action>
@@ -516,25 +487,45 @@
             <result name="yahoo" type="chain">editYahooContactPoint!input</result>
         </action>
 
-        <!-- need to fully specify the chained action!method name else chaining fails... -->
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
         <action name="editEmailContactPoint!input" class="com.cinnamonbob.web.user.EditEmailContactPointAction" method="doInput">
             <interceptor-ref name="defaultStack"/>
             <result name="input" type="velocity">edit-contact-email.vm</result>
         </action>
+
         <action name="editEmailContactPoint" class="com.cinnamonbob.web.user.EditEmailContactPointAction">
             <result name="input" type="velocity">edit-contact-email.vm</result>
             <result name="cancel" type="redirect">viewUser.action?id=${user}</result>
             <result name="success" type="redirect">viewUser.action?id=${user}</result>
         </action>
 
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
         <action name="editYahooContactPoint!input" class="com.cinnamonbob.web.user.EditYahooContactPointAction" method="doInput">
             <interceptor-ref name="defaultStack"/>
             <result name="input" type="velocity">edit-contact-yahoo.vm</result>
         </action>
+
         <action name="editYahooContactPoint" class="com.cinnamonbob.web.user.EditYahooContactPointAction">
             <result name="input" type="velocity">edit-contact-yahoo.vm</result>
             <result name="cancel" type="redirect">viewUser.action?id=${user}</result>
             <result name="success" type="redirect">viewUser.action?id=${user}</result>
+        </action>
+
+        <action name="createSubscription" class="com.cinnamonbob.web.user.CreateSubscriptionAction">
+            <result name="input" type="velocity">create-subscription.vm</result>
+            <result name="cancel" type="redirect">viewUser.action?id=${userId}</result>
+            <result name="error" type="redirect">viewUser.action?id=${userId}</result>
+            <result name="success" type="redirect">viewUser.action?id=${userId}</result>
+        </action>
+
+        <action name="deleteSubscription" class="com.cinnamonbob.web.user.DeleteSubscriptionAction">
+            <result name="success" type="redirect">viewUser.action?login=${login}</result>
+        </action>
+
+        <action name="editSubscription" class="com.cinnamonbob.web.user.EditSubscriptionAction">
+            <result name="input" type="velocity">edit-subscription.vm</result>
+            <result name="cancel" type="redirect">viewUser.action?login=${login}</result>
+            <result name="success" type="redirect">viewUser.action?login=${login}</result>
         </action>
 
 

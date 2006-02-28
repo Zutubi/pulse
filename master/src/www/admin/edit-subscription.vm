@@ -1,0 +1,26 @@
+<html>
+<head>
+    <title>#wwtext("name=subscription.edit")</title>
+</head>
+<content tag="action">subscription.edit</content>
+<body>
+
+<h1>:: #wwtext("name=subscription.edit") ::</h1>
+
+#parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editSubscription.action" "heading=%{getText('subscription.create')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=login")
+
+    #wwtextfield("name=project" "label=%{getText('subscription.project')}" "disabled=true" "tabindex=1")
+    #wwtextfield("name=contactPoint" "label=%{getText('subscription.contact')}" "disabled=true" "tabindex=2")
+    #wwselect("name=condition" "label=%{getText('subscription.conditions')}" "list=conditions" "required=true" "tabindex=3")
+    #openSubmit()
+        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=4")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=5")
+    #closeSubmit()
+#end
+
+</body>
+</html>

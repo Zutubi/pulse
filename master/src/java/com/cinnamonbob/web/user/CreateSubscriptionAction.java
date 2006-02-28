@@ -100,7 +100,7 @@ public class CreateSubscriptionAction extends UserActionSupport
         return contactPoints;
     }
 
-    public String doDefault()
+    public String doInput()
     {
         List<Project> allProjects = projectManager.getAllProjects();
         if(allProjects.size() == 0)
@@ -136,7 +136,7 @@ public class CreateSubscriptionAction extends UserActionSupport
             contactPoints.put(contact.getId(), contact.getName());
         }
 
-        return SUCCESS;
+        return INPUT;
     }
 
     public void validate()
@@ -150,12 +150,14 @@ public class CreateSubscriptionAction extends UserActionSupport
         if (user == null)
         {
             addActionError("Unknown user '" + userId + "'");
+            return;
         }
 
         project = getProjectManager().getProject(projectId);
         if (project == null)
         {
             addFieldError("projectId", "Unknown project '"+ projectId +"'");
+            return;
         }
 
         contactPoint = user.getContactPoint(contactPointId);
@@ -170,7 +172,6 @@ public class CreateSubscriptionAction extends UserActionSupport
         Subscription subscription = new Subscription(project, contactPoint);
         subscription.setCondition(condition);
         getSubscriptionManager().save(subscription);
-
         return SUCCESS;
     }
 
