@@ -37,7 +37,7 @@
                     #deleteCell($confirmMessage "deleteContactPoint.action?id=$contact.id&user=$user.id")
                 </tr>
                 #end
-                #addRow("contact.create" 4 "createContactPoint!default.action?user=$user.id")
+                #addRow("contact.create" 4 "contactWizard.action?userId=$user.id")
             </table>
         </div>
 

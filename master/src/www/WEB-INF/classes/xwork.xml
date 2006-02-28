@@ -123,29 +123,6 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="createContactPoint!default" class="com.cinnamonbob.web.user.CreateContactPointAction"
-                method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">create-contact.vm</result>
-        </action>
-
-        <action name="createContactPoint" class="com.cinnamonbob.web.user.CreateContactPointAction">
-            <result name="input" type="velocity">create-contact.vm</result>
-            <result name="success" type="velocity">create-contact-${type}.vm</result>
-        </action>
-
-        <action name="createEmailContactPoint" class="com.cinnamonbob.web.user.CreateEmailContactPointAction">
-            <result name="input" type="velocity">create-contact-email.vm</result>
-            <result name="cancel" type="redirect">/viewUser.action?id=${user}</result>
-            <result name="success" type="redirect">/viewUser.action?id=${user}</result>
-        </action>
-
-        <action name="createYahooContactPoint" class="com.cinnamonbob.web.user.CreateYahooContactPointAction">
-            <result name="input" type="velocity">create-contact-yahoo.vm</result>
-            <result name="cancel" type="redirect">/viewUser.action?id=${user}</result>
-            <result name="success" type="redirect">/viewUser.action?id=${user}</result>
-        </action>
-
         <action name="editContactPoint!default" class="com.cinnamonbob.web.user.EditContactPointAction"
                 method="doDefault">
             <result name="email" type="chain">editEmailContactPoint!default</result>
@@ -519,6 +496,9 @@
             <result name="success" type="velocity">manage-users.vm</result>
         </action>
 
+        <!--
+        USERS
+        -->
         <action name="viewUser" class="com.cinnamonbob.web.admin.user.ViewUserAction">
             <result name="input" type="velocity">undefined.vm</result>
             <result name="success" type="velocity">view-user.vm</result>
@@ -547,6 +527,44 @@
             <result name="input" type="velocity">undefined.vm</result>
             <result name="success" type="redirect">viewUsers.action</result>
         </action>
+
+        <!--
+        CONTACT POINTS
+        -->
+        <action name="contactWizard" class="com.cinnamonbob.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.cinnamonbob.web.admin.user.ContactPointWizard</param>
+            <result name="select" type="velocity">create-contact.vm</result>
+            <result name="email" type="velocity">create-contact-email.vm</result>
+            <result name="yahoo" type="velocity">create-contact-yahoo.vm</result>
+            <result name="cancel" type="redirect">viewUser.action?id=${userId}</result>
+            <result name="success" type="redirect">viewUser.action?id=${userId}</result>
+        </action>
+
+        <action name="createContactPoint!default" class="com.cinnamonbob.web.user.CreateContactPointAction"
+                method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">create-contact.vm</result>
+        </action>
+
+        <action name="createContactPoint" class="com.cinnamonbob.web.user.CreateContactPointAction">
+            <result name="input" type="velocity">create-contact.vm</result>
+            <result name="success" type="velocity">create-contact-${type}.vm</result>
+        </action>
+
+        <action name="createEmailContactPoint" class="com.cinnamonbob.web.user.CreateEmailContactPointAction">
+            <result name="input" type="velocity">create-contact-email.vm</result>
+            <result name="cancel" type="redirect">/viewUser.action?id=${user}</result>
+            <result name="success" type="redirect">/viewUser.action?id=${user}</result>
+        </action>
+
+        <action name="createYahooContactPoint" class="com.cinnamonbob.web.user.CreateYahooContactPointAction">
+            <result name="input" type="velocity">create-contact-yahoo.vm</result>
+            <result name="cancel" type="redirect">/viewUser.action?id=${user}</result>
+            <result name="success" type="redirect">/viewUser.action?id=${user}</result>
+        </action>
+
+
 
         <!--
                 <action name="findUsers!default" class="com.opensymphony.xwork.ActionSupport">

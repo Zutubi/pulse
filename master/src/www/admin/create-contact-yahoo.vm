@@ -1,0 +1,22 @@
+<html>
+<head>
+    <title>create contact</title>
+</head>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+
+    #wwcform("action=contactWizard.action" "heading=%{getText('email.create')}" "method=post")
+        #wwhidden("name=state")
+        #wwtextfield("name=contact.name" "label=%{getText('contact.name')}" "required=true" "tabindex=1")
+        #wwtextfield("name=contact.yahooId" "label=%{getText('contact.yahooId')}" "required=true" "tabindex=2")
+        #openSubmit()
+            #wwsubmit("name=next" "value=%{getText('save.name')}" "tabindex=3")
+            #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=4")
+            #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=5")
+        #closeSubmit()
+    #end
+
+
+</body>
+</html>

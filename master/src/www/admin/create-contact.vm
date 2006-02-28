@@ -1,0 +1,20 @@
+<html>
+<head>
+    <title>#wwtext("name=contact.create")</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=contact.create") ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+    #wwcform("action=contactWizard.action" "heading=%{getText('contact.create')}" "method=post")
+        #wwhidden("name=state")
+        #wwselect("name=contact" "label=%{getText('contact')}" "list=contacts" "required=true" "tabindex=1")
+        #openSubmit()
+            #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=2")
+            #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=3")
+        #closeSubmit()
+    #end
+
+</body>
+</html>
