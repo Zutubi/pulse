@@ -32,6 +32,12 @@ public abstract class BobTestCase extends TestCase
 
     protected static void assertObjectEquals(String msg, Object a, Object b)
     {
+        if (a == null)
+        {
+            assertNull(b);
+            return;
+        }
+
         if (a instanceof Map)
         {
             assertEquals(msg, (Map) a, (Map) b);
