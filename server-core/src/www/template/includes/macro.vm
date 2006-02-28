@@ -324,11 +324,20 @@
 #end
 
 ##
-## Outputs an action cell for a content table
+## Outputs an action cell for a content table with an image.
 ##
 #macro(actionCell $actionKey $url $image)
     <td class="content">
         <a href="$url"><img alt="$action.getText($actionKey)" src="/images/$image"/>#wwtext("name=$actionKey")</a>
+    </td>
+#end
+
+##
+## Outputs an action cell for a content table
+##
+#macro(actionCell2 $actionKey $url)
+    <td class="content">
+        <a href="$url">#wwtext("name=$actionKey")</a>
     </td>
 #end
 
