@@ -1,6 +1,7 @@
 package com.cinnamonbob.web.user;
 
-import java.util.HashMap;
+import com.cinnamonbob.web.admin.user.UserActionSupport;
+
 import java.util.Map;
 import java.util.TreeMap;
 

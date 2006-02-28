@@ -14,17 +14,20 @@
 
               <td class="columns" width="40%">
                   <table class="content">
-                      #headingRow("users" 3)
+                      #headingRow("users" 4)
                       <tr>
                           #contentHeading("user.login" 1)
                           #contentHeading("user.name" 1)
-                          #contentHeading("actions" 1)
+                          #contentHeading("actions" 2)
                       </tr>
                       #foreach($user in $blah.users)
                       <tr>
-                          #dynamicCell($user.login)
+                          #set($confirmMessage = $action.getText("user.delete.confirm", [$user.name]))
+
+                          #dynamicLinkCell($user.login "viewUser.action?id=$user.id")
                           #dynamicCell($user.name)
-                        #contentCell("empty.cell")
+                          #editCell("editUser!input.action?id=$user.id")
+                          #deleteCell($confirmMessage "deleteUser.action?id=$user.id")
                       </tr>
                       #end
                   </table>

@@ -3,6 +3,7 @@ package com.cinnamonbob.web.user;
 import com.cinnamonbob.model.EmailContactPoint;
 import com.cinnamonbob.model.ContactPoint;
 import com.cinnamonbob.model.YahooContactPoint;
+import com.cinnamonbob.web.admin.user.UserActionSupport;
 
 /**
  *

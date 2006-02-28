@@ -180,11 +180,6 @@
             <result name="success" type="redirect">/viewUser.action?id=${user}</result>
         </action>
 
-        <action name="viewUser" class="com.cinnamonbob.web.user.ViewUserAction">
-            <result name="input" type="velocity">undefined.vm</result>
-            <result name="success" type="velocity">view-user.vm</result>
-        </action>
-
         <action name="index!default" class="com.cinnamonbob.web.ActionSupport">
             <result name="success" type="velocity">index.vm</result>
         </action>
@@ -524,6 +519,11 @@
             <result name="success" type="velocity">manage-users.vm</result>
         </action>
 
+        <action name="viewUser" class="com.cinnamonbob.web.admin.user.ViewUserAction">
+            <result name="input" type="velocity">undefined.vm</result>
+            <result name="success" type="velocity">view-user.vm</result>
+        </action>
+
         <action name="viewUsers" class="com.cinnamonbob.web.admin.user.ViewUsersAction">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">manage-users.vm</result>
@@ -535,19 +535,15 @@
             <result name="cancel" type="redirect">userSettings.action</result>
             <result name="success" type="redirect">userSettings.action</result>
         </action>
-<!--
-        <action name="editUser!default" class="com.cinnamonbob.web.user.EditUserAction" method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">edit-user.vm</result>
-        </action>
 
-        <action name="editUser" class="com.cinnamonbob.web.user.EditUserAction">
+        <action name="editUser" class="com.cinnamonbob.web.admin.user.EditUserAction">
             <result name="input" type="velocity">edit-user.vm</result>
-            <result name="cancel" type="redirect">/viewUser.action?id=${id}</result>
             <result name="error" type="velocity">edit-user.vm</result>
-            <result name="success" type="redirect">/viewUser.action?id=${id}</result>
+            <result name="cancel" type="redirect">viewUser.action?id=${id}</result>
+            <result name="success" type="redirect">viewUser.action?id=${id}</result>
         </action>
 
+<!--
         <action name="findUsers!default" class="com.opensymphony.xwork.ActionSupport">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">find-user.vm</result>

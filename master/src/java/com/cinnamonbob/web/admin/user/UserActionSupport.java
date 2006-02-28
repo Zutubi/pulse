@@ -1,4 +1,4 @@
-package com.cinnamonbob.web.user;
+package com.cinnamonbob.web.admin.user;
 
 import com.cinnamonbob.model.SubscriptionManager;
 import com.cinnamonbob.model.UserManager;

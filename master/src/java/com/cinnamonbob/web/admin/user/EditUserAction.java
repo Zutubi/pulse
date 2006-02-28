@@ -1,4 +1,4 @@
-package com.cinnamonbob.web.user;
+package com.cinnamonbob.web.admin.user;
 
 import com.cinnamonbob.model.User;
 
@@ -27,16 +27,17 @@ public class EditUserAction extends UserActionSupport
         return user;
     }
 
-    public String doDefault()
+    public String doInput()
     {
         user = getUserManager().getUser(id);
-        return SUCCESS;
+        return INPUT;
     }
 
     public String execute()
     {
         User persistentUser = getUserManager().getUser(getId());
         persistentUser.setName(getUser().getName());
+        getUserManager().save(persistentUser);
         return SUCCESS;
     }
 }
