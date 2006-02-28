@@ -515,7 +515,7 @@
             <result name="success" type="velocity">server-settings.vm</result>
         </action>
 
-        <action name="userSettings" class="com.cinnamonbob.web.ActionSupport">
+        <action name="userSettings" class="com.cinnamonbob.web.admin.user.ViewUsersAction">
             <result name="success" type="velocity">manage-users.vm</result>
         </action>
 
@@ -543,17 +543,22 @@
             <result name="success" type="redirect">viewUser.action?id=${id}</result>
         </action>
 
-<!--
-        <action name="findUsers!default" class="com.opensymphony.xwork.ActionSupport">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">find-user.vm</result>
+        <action name="deleteUser" class="com.cinnamonbob.web.admin.user.DeleteUserAction">
+            <result name="input" type="velocity">undefined.vm</result>
+            <result name="success" type="redirect">viewUsers.action</result>
         </action>
 
-        <action name="findUsers" class="com.cinnamonbob.web.user.FindUsersAction">
-            <result name="input" type="velocity">find-user.vm</result>
-            <result name="success" type="velocity">find-user.vm</result>
-        </action>
--->
+        <!--
+                <action name="findUsers!default" class="com.opensymphony.xwork.ActionSupport">
+                    <interceptor-ref name="defaultStack"/>
+                    <result name="success" type="velocity">find-user.vm</result>
+                </action>
+
+                <action name="findUsers" class="com.cinnamonbob.web.user.FindUsersAction">
+                    <result name="input" type="velocity">find-user.vm</result>
+                    <result name="success" type="velocity">find-user.vm</result>
+                </action>
+        -->
 
         <action name="smtp" class="com.cinnamonbob.web.admin.SmtpConfigurationAction">
             <interceptor-ref name="defaultStack"/>
