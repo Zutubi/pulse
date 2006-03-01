@@ -20,7 +20,7 @@ public class PreferencesAction extends UserActionSupport
 
     public String execute()
     {
-        user = AcegiUtils.getLoggedInUser();
+        user = (User) AcegiUtils.getLoggedInUser();
         if (user == null)
         {
             return ERROR;

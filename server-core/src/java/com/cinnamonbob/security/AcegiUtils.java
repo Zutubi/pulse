@@ -1,6 +1,5 @@
 package com.cinnamonbob.security;
 
-import com.cinnamonbob.model.User;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
@@ -24,9 +23,9 @@ public class AcegiUtils
      * @return the logged in user's User object, or null if there is no
      *         logged in user
      */
-    public static User getLoggedInUser()
+    public static Object getLoggedInUser()
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (User) authentication.getPrincipal();
+        return authentication.getPrincipal();
     }
 }

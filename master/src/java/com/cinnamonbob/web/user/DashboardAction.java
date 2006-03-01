@@ -54,7 +54,7 @@ public class DashboardAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        user = AcegiUtils.getLoggedInUser();
+        user = (User) AcegiUtils.getLoggedInUser();
         if (user == null)
         {
             return ERROR;

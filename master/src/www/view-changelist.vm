@@ -1,3 +1,4 @@
+#authorisationTags($principle)
 #buildTags($buildResult.project $buildResult)
 <html>
 <head>

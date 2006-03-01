@@ -3,7 +3,8 @@
 #set ($projectName = $page.getProperty("page.projectName"))
 #set ($buildId = $page.getProperty("page.buildId"))
 #set ($buildNumber = $page.getProperty("page.buildNumber"))
-#set ($user = $page.getProperty("page.user"))
+#set ($userName = $page.getProperty("page.user.name"))
+#set ($userLogin = $page.getProperty("page.user.login"))
 #set ($helpPage = $page.getProperty("page.helpPage"))
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -30,8 +31,8 @@
 #end
               </td>
               <td align="right">
-#if($user)
-                  $user.login [ <a href="/logout.action">logout</a> ]
+#if($userName)
+                  $userName [ <a href="/logout.action">logout</a> ]
 #else
                   <a href="/login.action">login</a>
 #end

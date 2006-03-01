@@ -1,4 +1,14 @@
 ##
+## Outputs security / credentials content tgs for permissions related uses.
+##
+#macro(authorisationTags $user)
+    #if($user)
+        <content tag="user.name">$user.name</content>
+        <content tag="user.login">$user.login</content>
+    #end
+#end
+
+##
 ## Outputs sitemesh content tags for the project links on the header bar
 ##
 #macro(projectTags $project)

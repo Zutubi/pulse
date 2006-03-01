@@ -1,3 +1,4 @@
+#authorisationTags($principle)
 #macro(showProperties $properties $version)
     #if($version)
         #set($versionLink = "&amp;versionId=$version.id")

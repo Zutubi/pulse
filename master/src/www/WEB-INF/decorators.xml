@@ -11,6 +11,14 @@
         <pattern>/*</pattern>
     </decorator>
 
+    <decorator name="login" page="basic.vm">
+        <pattern>/login*</pattern>
+    </decorator>
+
+    <decorator name="setup" page="basic.vm">
+        <pattern>/setup/*</pattern>
+    </decorator>
+
     <decorator name="panel" page="panel.vm"/>
     <decorator name="printable" page="printable.vm"/>
 </decorators>

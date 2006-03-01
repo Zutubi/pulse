@@ -2,6 +2,7 @@ package com.cinnamonbob.web;
 
 import com.cinnamonbob.xwork.interceptor.Cancelable;
 import com.cinnamonbob.xwork.TextProviderSupport;
+import com.cinnamonbob.security.AcegiUtils;
 import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import org.acegisecurity.context.SecurityContextHolder;
@@ -35,7 +36,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public Object getPrinciple()
     {
-        return SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return AcegiUtils.getLoggedInUser();
     }
 
     public String trimmedString(String s, int length)
