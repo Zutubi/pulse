@@ -353,7 +353,7 @@ ul.info {
     background-color: #eeeeff;
 }
 
-li.error, li.warning, li.info, li.artifact, li.file-artifact {
+li.error, li.warning, li.info, li.artifact, li.file-artifact, li.task, li.explore {
     font-weight: normal;
     list-style: none;
     padding-left: 20px;
@@ -379,6 +379,14 @@ li.info {
 
 li.artifact {
     background: url( images/resultset_next.gif ) no-repeat 0 0;
+}
+
+li.task {
+    background: url( images/accept.gif ) no-repeat 0 0;
+}
+
+li.explore {
+    background: url( images/zoom.gif ) no-repeat 0 0;
 }
 
 li.file-artifact {

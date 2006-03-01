@@ -6,6 +6,7 @@ import com.cinnamonbob.model.GrantedAuthority;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.UserManager;
 import com.cinnamonbob.security.AcegiUtils;
+import com.cinnamonbob.web.DefaultAction;
 import com.cinnamonbob.web.wizard.BaseWizard;
 import com.cinnamonbob.web.wizard.BaseWizardState;
 import com.cinnamonbob.web.wizard.Wizard;
@@ -43,6 +44,8 @@ public class SetupWizard extends BaseWizard
         admin.setEnabled(true);
         admin.add(GrantedAuthority.USER);
         admin.add(GrantedAuthority.ADMINISTRATOR);
+        // Send the admin to a welcome page by default
+        admin.setDefaultAction(DefaultAction.WELCOME_ACTION);
         userManager.save(admin);
 
         // apply the settings

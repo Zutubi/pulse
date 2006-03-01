@@ -8,7 +8,8 @@
 
         <action name="default" class="com.cinnamonbob.web.DefaultAction">
             <result name="setupAdmin" type="redirect">/setup/setupWizard.action</result>
-            <result name="success" type="redirect">/dashboard.action</result>
+            <result name="dashboard" type="redirect">/dashboard.action</result>
+            <result name="welcome" type="velocity">/welcome.vm</result>
         </action>
 
         <action name="login" class="com.cinnamonbob.web.LoginAction">
@@ -19,6 +20,10 @@
 
         <action name="logout" class="com.cinnamonbob.web.LogoutAction">
             <result name="success" type="redirect">/</result>
+        </action>
+
+        <action name="dismissWelcome" class="com.cinnamonbob.web.DismissWelcomeAction">
+            <result name="success" type="redirect">/default.action</result>
         </action>
 
         <action name="dashboard" class="com.cinnamonbob.web.user.DashboardAction">

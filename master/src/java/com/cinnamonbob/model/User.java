@@ -1,9 +1,9 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.core.model.Entity;
+import com.cinnamonbob.web.DefaultAction;
 import org.acegisecurity.userdetails.UserDetails;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,6 +33,11 @@ public class User extends Entity implements UserDetails
      * The users password.
      */
     private String password;
+    /**
+     * The action to take the user to when they log in.  Usually their
+     * dashboard, but can be a welcome page when they first sign up.
+     */
+    private String defaultAction = DefaultAction.DASHBOARD_ACTION;
 
     private List<ContactPoint> contactPoints;
     private List<GrantedAuthority> authorities;
@@ -96,6 +101,16 @@ public class User extends Entity implements UserDetails
     public void setPassword(String password)
     {
         this.password = password;
+    }
+
+    public String getDefaultAction()
+    {
+        return defaultAction;
+    }
+
+    public void setDefaultAction(String defaultAction)
+    {
+        this.defaultAction = defaultAction;
     }
 
     public void add(ContactPoint point)
