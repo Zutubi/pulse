@@ -36,6 +36,9 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public Object getPrinciple()
     {
+        // note, need to be careful - the returned user is likely to be
+        // hopelessly out of sync if any changes have been made to the user during the
+        // latest session...
         return AcegiUtils.getLoggedInUser();
     }
 

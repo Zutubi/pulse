@@ -1,4 +1,5 @@
 #authorisationTags($principle)
+<content tag="selectedTab">projects</content>
 <html>
 <head>
     <title>#wwtext("name=add.project")</title>

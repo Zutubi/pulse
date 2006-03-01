@@ -19,22 +19,26 @@ triggers.
     </bean>
 
     <!-- We don't initialise the scheduler here: it must wait for the startup event. -->
-    <bean id="scheduler" class="com.cinnamonbob.scheduling.DefaultScheduler">
-        <property name="triggerHandler">
-            <ref local="triggerHandler"/>
-        </property>
-        <property name="triggerDao">
-            <ref bean="triggerDao"/>
-        </property>
-        <property name="eventManager">
-            <ref bean="eventManager"/>
-        </property>
+    <bean id="schedulerTarget" class="com.cinnamonbob.scheduling.DefaultScheduler" autowire="byName">
         <property name="strategies">
             <list>
                 <ref local="cronSchedulerStrategy"/>
                 <ref local="simpleSchedulerStrategy"/>
                 <ref local="eventSchedulerStrategy"/>
             </list>
+        </property>
+    </bean>
+    <bean id="scheduler" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="schedulerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
         </property>
     </bean>
 

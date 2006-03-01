@@ -61,7 +61,8 @@ public class DefaultScheduler implements Scheduler, EventListener
                 try
                 {
                     strategy.schedule(trigger);
-                    // TODO: there is a very brief opportunity here for a paused trigger to execute.... should close this gap..
+                    // WARNING: there is a very brief opportunity here for a paused trigger to
+                    // execute.... should close this gap..
                     if (trigger.isPaused())
                     {
                         strategy.pause(trigger);
