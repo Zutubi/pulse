@@ -1,3 +1,4 @@
+<content tag="selectedTab">dashboard</content>
 <html>
 <head>
     <title>#wwtext("name=subscription.edit")</title>

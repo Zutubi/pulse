@@ -1,3 +1,4 @@
+<content tag="selectedTab">administration</content>
 <html>
     <head>
         <title>$user.name</title>

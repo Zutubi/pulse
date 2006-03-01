@@ -1,3 +1,4 @@
+<content tag="selectedTab">dashboard</content>
 <html>
 <head>
     <title>#wwtext("name=email.create")</title>
@@ -9,8 +10,8 @@
 
     #wwcform("action=contactWizard.action" "heading=%{getText('email.create')}" "method=post")
         #wwhidden("name=state")
-        #wwtextfield("name=contact.name" "label=%{getText('contact.name')}" "required=true" "tabindex=1")
-        #wwtextfield("name=contact.email" "label=%{getText('contact.email')}" "required=true" "tabindex=2")
+        #wwtextfield("name=contact.name" "label=%{getText('contact.name')}" "size=60" "required=true" "tabindex=1")
+        #wwtextfield("name=contact.email" "label=%{getText('contact.email')}" "size=60" "required=true" "tabindex=2")
         #openSubmit()
             #wwsubmit("name=next" "value=%{getText('save.name')}" "tabindex=3")
             #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=4")
