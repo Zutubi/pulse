@@ -26,6 +26,10 @@ public class AcegiUtils
     public static Object getLoggedInUser()
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getPrincipal();
+        if (authentication != null)
+        {
+            return authentication.getPrincipal();
+        }
+        return null;
     }
 }

@@ -7,7 +7,7 @@
 
     <filter>
         <filter-name>sitemesh</filter-name>
-        <filter-class>com.opensymphony.module.sitemesh.filter.PageFilter</filter-class>
+        <filter-class>com.opensymphony.webwork.sitemesh.VelocityPageFilter</filter-class>
     </filter>
 
     <filter>

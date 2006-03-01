@@ -16,13 +16,13 @@
         <script type="text/javascript" src="/main.js"></script>
 		$head
 	</head>
-        
-    <body>
+
+      <body>
       <div id="header">
         <table>
             <tr>
               <td class="logo">
-                  :: cinnabo ::
+                  <a href="/default.action">:: cinnabo ::</a>
 #if($projectId && $projectId != "0")
                   <a href="/currentBuild.action?id=${projectId}">$projectName</a>
 #end
