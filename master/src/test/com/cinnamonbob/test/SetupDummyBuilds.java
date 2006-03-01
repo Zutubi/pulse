@@ -24,6 +24,7 @@ public class SetupDummyBuilds implements Runnable
     private UserDao userDao;
     private Slave slave;
     private P4 scm;
+    private static final int BUILDS_IN_LONG_HISTORY_PROJECT = 100;
 
     public void run()
     {
@@ -63,7 +64,7 @@ public class SetupDummyBuilds implements Runnable
             }
 
             project = setupProject("long history");
-            for (long i = 1; i <= 1000; i++)
+            for (long i = 1; i <= BUILDS_IN_LONG_HISTORY_PROJECT; i++)
             {
                 double x = Math.random();
                 if (x < 0.1)
@@ -106,6 +107,7 @@ public class SetupDummyBuilds implements Runnable
         user.add(GrantedAuthority.ADMINISTRATOR);
 
         ContactPoint contactPoint = new EmailContactPoint("jsankey@gmail.com");
+        contactPoint.setName("gmail");
         Subscription subscription = new Subscription(project, contactPoint);
         contactPoint.add(subscription);
         user.add(contactPoint);

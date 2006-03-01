@@ -7,12 +7,11 @@ import com.cinnamonbob.core.model.Entity;
  */
 public class GrantedAuthority extends Entity implements org.acegisecurity.GrantedAuthority
 {
-    public static final GrantedAuthority USER = new GrantedAuthority("ROLE_USER");
-    public static final GrantedAuthority ADMINISTRATOR = new GrantedAuthority("ROLE_ADMINISTRATOR");
+    public static final String USER = "ROLE_USER";
+    public static final String ADMINISTRATOR = "ROLE_ADMINISTRATOR";
 
     private User user;
     private String authority;
-
 
     public GrantedAuthority()
     {

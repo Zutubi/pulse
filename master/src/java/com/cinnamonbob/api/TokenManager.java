@@ -80,14 +80,14 @@ public class TokenManager
         verifyRoleIn(token, GrantedAuthority.USER);
     }
 
-    public void verifyRoleIn(String token, GrantedAuthority... allowedAuthorities) throws AuthenticationException
+    public void verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException
     {
         User user = verifyToken(token);
         for (GrantedAuthority authority : user.getAuthorities())
         {
-            for (GrantedAuthority allowedAuthority : allowedAuthorities)
+            for (String allowedAuthority : allowedAuthorities)
             {
-                if (authority.getAuthority().equals(allowedAuthority.getAuthority()))
+                if (authority.getAuthority().equals(allowedAuthority))
                 {
                     return;
                 }

@@ -8,7 +8,7 @@
 
         <action name="default" class="com.cinnamonbob.web.DefaultAction">
             <result name="setupAdmin" type="redirect">/setup/setupWizard.action</result>
-            <result name="success" type="velocity">index.html</result>
+            <result name="success" type="redirect">/dashboard.action</result>
         </action>
 
         <action name="login" class="com.cinnamonbob.web.LoginAction">

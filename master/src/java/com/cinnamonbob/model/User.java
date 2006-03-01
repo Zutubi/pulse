@@ -47,11 +47,15 @@ public class User extends Entity implements UserDetails
         this.name = name;
     }
 
-    public User(String login, String name, String password, GrantedAuthority... authorities)
+    public User(String login, String name, String password, String... authorities)
     {
         this(login, name);
         this.password = password;
-        this.authorities = Arrays.asList(authorities);
+        this.authorities = new LinkedList<GrantedAuthority>();
+        for (String authority : authorities)
+        {
+            this.authorities.add(new GrantedAuthority(authority));
+        }
     }
 
     public String getLogin()
@@ -179,10 +183,11 @@ public class User extends Entity implements UserDetails
         this.authorities = authorities;
     }
 
-    public void add(GrantedAuthority authority)
+    public void add(String authority)
     {
-        getGrantedAuthorities().add(authority);
-        authority.setUser(this);
+        GrantedAuthority grantedAuthority = new GrantedAuthority(authority);
+        getGrantedAuthorities().add(grantedAuthority);
+        grantedAuthority.setUser(this);
     }
 
     public String getUsername()

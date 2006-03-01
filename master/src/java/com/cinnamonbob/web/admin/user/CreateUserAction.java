@@ -1,6 +1,7 @@
 package com.cinnamonbob.web.admin.user;
 
 import com.cinnamonbob.model.User;
+import com.cinnamonbob.model.GrantedAuthority;
 import com.cinnamonbob.web.user.UserActionSupport;
 
 import java.util.Arrays;
@@ -52,6 +53,10 @@ public class CreateUserAction extends UserActionSupport
 
     public String execute() throws Exception
     {
+        // ensure that the user has the correct authorities to login.
+        user.add(GrantedAuthority.USER);
+        user.add(GrantedAuthority.ADMINISTRATOR);
+        user.setEnabled(true);
         getUserManager().save(user);
         doReset();
         return SUCCESS;

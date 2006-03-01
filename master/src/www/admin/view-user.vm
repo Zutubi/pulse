@@ -15,7 +15,9 @@
                 #dynamicRow("user.name" $user.name)
             </table>
         </div>
-        
+
+        $user.grantedAuthorities
+
         <h2 class="command-info">#wwtext("name=contacts")  ($user.contactPoints.size()) </h2>
         <div class="command-content">
             <table class="content">
