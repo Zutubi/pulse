@@ -17,7 +17,7 @@
 
         <action name="setup" class="com.cinnamonbob.web.setup.ConfigureBobHomeAction">
             <result name="input" type="velocity">/setup/configure-bobhome.vm</result>
-            <result name="success" type="redirect">/default.action</result>
+            <result name="success" type="redirect">/setup/setupWizard.action</result>
         </action>
 
     </package>

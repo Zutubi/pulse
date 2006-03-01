@@ -500,6 +500,7 @@
             <interceptor-ref name="wizardStack"/>
             <param name="wizardClass">com.cinnamonbob.web.setup.SetupWizard</param>
             <result name="admin" type="velocity">/setup/create-admin.vm</result>
+            <result name="settings" type="velocity">/setup/server-settings.vm</result>
             <result name="success" type="redirect">/</result>
             <result name="cancel" type="redirect">/</result>
         </action>

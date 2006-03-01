@@ -1,0 +1,28 @@
+<html>
+<head>
+    <title>#wwtext("name=server.settings")</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=server.settings") ::</h1>
+
+#wwcform("action=setupWizard.action" "heading=%{getText('server.settings')}" "method=post")
+    #wwhidden("name=state")
+
+    #wwtextfield("name=hostname" "label=%{getText('general.host')}" "required=true" "size=40" "tabindex=1")
+    #inlineHelp("general.host.help")
+    #wwtextfield("name=fromAddress" "label=%{getText('smtp.from')}" "required=true" "size=40" "tabindex=2")
+    #inlineHelp("smtp.from.help")
+    #wwtextfield("name=smtpHost" "label=%{getText('smtp.host')}" "required=true" "size=40" "tabindex=3")
+    #inlineHelp("smtp.host.help")
+    #wwtextfield("name=smtp.username" "label=%{getText('smtp.username')}" "tabindex=4")
+    #inlineHelp("smtp.username.help")
+    #wwpassword("name=smtp.password" "label=%{getText('smtp.password')}" "tabindex=5")
+    #inlineHelp("smtp.password.help")
+
+    #openSubmit()
+        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=6")
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=7")
+    #closeSubmit()
+#end
+</body>
+</html>

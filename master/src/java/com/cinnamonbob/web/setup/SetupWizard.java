@@ -1,13 +1,15 @@
 package com.cinnamonbob.web.setup;
 
+import com.cinnamonbob.bootstrap.ApplicationConfiguration;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.model.GrantedAuthority;
+import com.cinnamonbob.model.User;
+import com.cinnamonbob.model.UserManager;
+import com.cinnamonbob.security.AcegiUtils;
 import com.cinnamonbob.web.wizard.BaseWizard;
 import com.cinnamonbob.web.wizard.BaseWizardState;
 import com.cinnamonbob.web.wizard.Wizard;
 import com.cinnamonbob.web.wizard.WizardCompleteState;
-import com.cinnamonbob.model.UserManager;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.GrantedAuthority;
-import com.cinnamonbob.security.AcegiUtils;
 import com.opensymphony.xwork.Validateable;
 
 /**
@@ -18,13 +20,17 @@ public class SetupWizard extends BaseWizard
     private CreateAdminState createAdminState;
 
     private UserManager userManager;
+    private ConfigurationManager configurationManager;
+    private ServerSettingsState serverSettingsState;
 
     public SetupWizard()
     {
         // create the admin user.
         createAdminState = new CreateAdminState(this, "admin");
+        serverSettingsState = new ServerSettingsState(this, "settings");
 
         addInitialState("admin", createAdminState);
+        addState("settings", serverSettingsState);
         addFinalState("success", new WizardCompleteState(this, "success"));
     }
 
@@ -39,6 +45,14 @@ public class SetupWizard extends BaseWizard
         admin.add(GrantedAuthority.ADMINISTRATOR);
         userManager.save(admin);
 
+        // apply the settings
+        ApplicationConfiguration config = configurationManager.getAppConfig();
+        config.setHostName(serverSettingsState.getHostname());
+        config.setSmtpFrom(serverSettingsState.getFromAddress());
+        config.setSmtpHost(serverSettingsState.getSmtpHost());
+        config.setSmtpUsername(serverSettingsState.getUsername());
+        config.setSmtpPassword(serverSettingsState.getPassword());
+
         // login as the admin user.
         AcegiUtils.loginAs(admin);
     }
@@ -46,6 +60,11 @@ public class SetupWizard extends BaseWizard
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 
     public class CreateAdminState extends BaseWizardState implements Validateable
@@ -69,7 +88,7 @@ public class SetupWizard extends BaseWizard
 
         public String getNextStateName()
         {
-            return "success";
+            return "settings";
         }
 
         public User getAdmin()
@@ -85,6 +104,75 @@ public class SetupWizard extends BaseWizard
         public void setConfirm(String confirm)
         {
             this.confirm = confirm;
+        }
+    }
+
+    public class ServerSettingsState extends BaseWizardState
+    {
+        private String hostname;
+        private String fromAddress;
+        private String smtpHost;
+        private String username;
+        private String password;
+
+        public ServerSettingsState(Wizard wizard, String name)
+        {
+            super(wizard, name);
+        }
+
+        public String getNextStateName()
+        {
+            return "success";
+        }
+
+        public String getHostname()
+        {
+            return hostname;
+        }
+
+        public void setHostname(String hostname)
+        {
+            this.hostname = hostname;
+        }
+
+        public String getFromAddress()
+        {
+            return fromAddress;
+        }
+
+        public void setFromAddress(String fromAddress)
+        {
+            this.fromAddress = fromAddress;
+        }
+
+        public String getSmtpHost()
+        {
+            return smtpHost;
+        }
+
+        public void setSmtpHost(String smtpHost)
+        {
+            this.smtpHost = smtpHost;
+        }
+
+        public String getUsername()
+        {
+            return username;
+        }
+
+        public void setUsername(String username)
+        {
+            this.username = username;
+        }
+
+        public String getPassword()
+        {
+            return password;
+        }
+
+        public void setPassword(String password)
+        {
+            this.password = password;
         }
     }
 }

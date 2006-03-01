@@ -16,7 +16,7 @@
     #wwtextfield("name=smtp.prefix" "label=%{getText('smtp.prefix')}" "size=60" "tabindex=2")
     #wwtextfield("name=smtp.host" "label=%{getText('smtp.host')}" "required=true" "size=60" "tabindex=3")
     #wwtextfield("name=smtp.username" "label=%{getText('smtp.username')}" "tabindex=4")
-    #wwtextfield("name=smtp.password" "label=%{getText('smtp.password')}" "tabindex=5")
+    #wwpassword("name=smtp.password" "label=%{getText('smtp.password')}" "tabindex=5")
 
     #openSubmit()
         #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=6")

@@ -13,6 +13,7 @@
 #wwcform("action=editGeneral!save.action" "heading=%{getText('general.config')}" "method=post")
 
     #wwtextfield("name=hostName" "label=%{getText('general.host')}" "required=true" "size=60" "tabindex=3")
+    #inlineHelp("general.host.help")
     #wwtextfield("name=helpUrl" "label=%{getText('general.help.url')}" "required=true" "size=60" "tabindex=4")
 
     #saveCancel("5")

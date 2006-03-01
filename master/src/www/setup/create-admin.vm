@@ -17,7 +17,7 @@
     #wwpassword("name=confirm" "label=%{getText('admin.confirm')}" "required=true" "tabindex=4")
 
     #openSubmit()
-        #wwsubmit("name=next" "value=%{getText('save.name')}" "tabindex=5")
+        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=5")
     #closeSubmit()
 #end
 

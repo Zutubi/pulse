@@ -25,7 +25,7 @@
                     #dynamicRow("smtp.prefix" $config.smtpPrefix)
                     #dynamicRow("smtp.from" $config.smtpFrom)
                     #dynamicRow("smtp.username" $config.smtpUsername)
-                    #dynamicRow("smtp.password" $config.smtpPassword)
+                    <!-- Probably best we don't show the password -->
                 </table>
             </td>
         </tr>
