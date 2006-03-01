@@ -6,10 +6,9 @@ import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigUtils;
 import com.cinnamonbob.renderer.BuildResultRenderer;
 import com.cinnamonbob.util.logging.Logger;
+import com.opensymphony.util.TextUtils;
 
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.StringWriter;
@@ -25,6 +24,7 @@ public class EmailContactPoint extends ContactPoint
     private static final Logger LOG = Logger.getLogger(EmailContactPoint.class);
 
     private static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
+    private static final String SMTP_AUTH_PROPERTY = "mail.smtp.auth";
 
     public EmailContactPoint()
     {
@@ -50,8 +50,20 @@ public class EmailContactPoint extends ContactPoint
     */
     public void notify(BuildResult result)
     {
-        String subject = "[CiB] " + result.getProject().getName() + ": build " + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
-        sendMail(subject, renderResult(result));
+        ApplicationConfiguration config = ConfigUtils.getManager().getAppConfig();
+        String prefix = config.getSmtpPrefix();
+
+        if (prefix == null)
+        {
+            prefix = "";
+        }
+        else if (prefix.length() > 0)
+        {
+            prefix += " ";
+        }
+
+        String subject = prefix + result.getProject().getName() + ": build " + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
+        sendMail(subject, renderResult(result), config);
     }
 
     private String renderResult(BuildResult result)
@@ -62,9 +74,8 @@ public class EmailContactPoint extends ContactPoint
         return w.toString();
     }
 
-    private void sendMail(String subject, String body)
+    private void sendMail(String subject, String body, final ApplicationConfiguration config)
     {
-        ApplicationConfiguration config = ConfigUtils.getManager().getAppConfig();
         if (config.getSmtpHost() == null)
         {
             LOG.severe("Unable to deliver mail to contact point: SMTP host not configured.");
@@ -74,7 +85,21 @@ public class EmailContactPoint extends ContactPoint
         Properties properties = (Properties) System.getProperties().clone();
         properties.put(SMTP_HOST_PROPERTY, config.getSmtpHost());
 
-        Session session = Session.getDefaultInstance(properties, null);
+        Authenticator authenticator = null;
+        if (TextUtils.stringSet(config.getSmtpUsername()))
+        {
+            properties.put(SMTP_AUTH_PROPERTY, "true");
+            authenticator = new Authenticator()
+            {
+                protected PasswordAuthentication getPasswordAuthentication()
+                {
+                    return new PasswordAuthentication(config.getSmtpUsername(), config.getSmtpPassword());
+                }
+            };
+        }
+
+        Session session = Session.getInstance(properties, authenticator);
+
         try
         {
             Message msg = new MimeMessage(session);

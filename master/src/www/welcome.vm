@@ -16,39 +16,39 @@
         bottom of the page.
     </p>
 
-        <h3 class="heading">configure</h3>
-        <div class="box">
-                <ul>
-                    <li class="task">
-                        <a href="addProject!input.action">add new projects</a> :: using the add project wizard (projects &gt; add new project)
-                    </li>
-                    <li class="task">
-                        <a href="admin/userSettings.action">add new users</a> :: at the users view (administration &gt; users tab )
-                    </li>
-                    <li class="task">
-                        <a href="admin/serverSettings.action">configure server settings</a> :: at the server settings view (administration &gt; settings tab)
-                    </li>
-                    <li class="task">
-                        <a href="viewResources.action">add new resources</a> :: at the server resources view (server &gt; resources tab)
-                    </li>
-                </ul>
-        </div>
+    <h3 class="heading">configure</h3>
+    <div class="box">
+        <ul>
+            <li class="task">
+                <a href="addProject!input.action">add new projects</a> :: using the add project wizard (projects &gt; add new project)
+            </li>
+            <li class="task">
+                <a href="admin/userSettings.action">add new users</a> :: at the users view (administration &gt; users tab )
+            </li>
+            <li class="task">
+                <a href="admin/serverSettings.action">configure server settings</a> :: at the server settings view (administration &gt; settings tab)
+            </li>
+            <li class="task">
+                <a href="viewResources.action">add new resources</a> :: at the server resources view (server &gt; resources tab)
+            </li>
+        </ul>
+    </div>
 
-        <h3 class="heading">explore</h3>
-        <div class="box">
-                <ul>
-                    <li class="explore">
-                        <a href="dashboard.action">go to your home page</a> :: at the dashboard view (dashboard &gt; home)
-                    </li>
-                    <li class="explore">
-                        <a href="viewProjects.action">view all projects</a> :: at the projects view (projects)
-                    </li>
-                    <li class="explore">
-                        <a href="viewRecipeQueue.action">view server activity</a> :: at the server status view (server &gt; status )
-                    </li>
-                </ul>
-        </div>
-    </p>
+    <h3 class="heading">explore</h3>
+    <div class="box">
+       <ul>
+           <li class="explore">
+               <a href="dashboard.action">go to your home page</a> :: at the dashboard view (dashboard &gt; home)
+           </li>
+           <li class="explore">
+               <a href="viewProjects.action">view all projects</a> :: at the projects view (projects)
+           </li>
+           <li class="explore">
+               <a href="viewRecipeQueue.action">view server activity</a> :: at the server status view (server &gt; status )
+           </li>
+       </ul>
+    </div>
+
     <p>
         <a href="dismissWelcome.action"><img alt="$!webwork.getText('delete')" src="images/delete.gif".>dismiss this page forever</a>
     </p>
