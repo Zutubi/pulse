@@ -58,7 +58,7 @@ public class ComponentContext
         }
     }
 
-    public static void purge()
+    public static void closeAll()
     {
         context.closeAll();
     }

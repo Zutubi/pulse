@@ -1,7 +1,8 @@
 package com.cinnamonbob.scheduling;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.core.ObjectFactory;
 import com.cinnamonbob.scheduling.persistence.TriggerDao;
+import com.cinnamonbob.spring.SpringObjectFactory;
 
 /**
  * <class-comment/>
@@ -9,6 +10,7 @@ import com.cinnamonbob.scheduling.persistence.TriggerDao;
 public class DefaultTriggerHandler implements TriggerHandler
 {
     private TriggerDao triggerDao;
+    private ObjectFactory objectFactory = new SpringObjectFactory();
 
     public void trigger(Trigger trigger) throws SchedulingException
     {
@@ -21,13 +23,11 @@ public class DefaultTriggerHandler implements TriggerHandler
         context.setTrigger(trigger);
         trigger.trigger();
         triggerDao.save(trigger);
-        
+
         // determine the task to be executed.
         try
         {
-            //TODO: create this task correctly - that is, using the object factory.
-            Task task = trigger.getTaskClass().newInstance();
-            ComponentContext.autowire(task);
+            Task task = objectFactory.buildBean(trigger.getTaskClass());
             task.execute(context);
         }
         catch (Exception e)

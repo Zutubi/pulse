@@ -3,6 +3,8 @@ package com.cinnamonbob.web.wizard;
 import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.xwork.TextProviderSupport;
+import com.cinnamonbob.core.ObjectFactory;
+import com.cinnamonbob.spring.SpringObjectFactory;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.TextProvider;
@@ -245,9 +247,8 @@ public class WizardAction extends ActionSupport
             Map session = ActionContext.getContext().getSession();
             if (!session.containsKey(wizardClass))
             {
-                // use Object factory to create this wizard
-                Wizard wizardInstance = (Wizard) Class.forName(wizardClass).newInstance();
-                ComponentContext.autowire(wizardInstance);
+                ObjectFactory objectFactory = new SpringObjectFactory();
+                Wizard wizardInstance = objectFactory.buildBean(wizardClass);
                 wizardInstance.initialise();
                 session.put(wizardClass, wizardInstance);
             }

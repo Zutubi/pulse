@@ -3,6 +3,8 @@ package com.cinnamonbob.bootstrap;
 import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.events.system.SystemStartedEvent;
 import com.cinnamonbob.util.logging.Logger;
+import com.cinnamonbob.spring.SpringObjectFactory;
+import com.cinnamonbob.core.ObjectFactory;
 import com.opensymphony.xwork.config.*;
 import com.opensymphony.xwork.config.ConfigurationManager;
 import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
@@ -66,14 +68,12 @@ public class DefaultStartupManager implements StartupManager
 
         ComponentContext.addClassPathContextDefinitions(systemContexts.toArray(new String[systemContexts.size()]));
 
+        ObjectFactory objectFactory = new SpringObjectFactory();
         for (String name : startupRunnables)
         {
             try
             {
-                Class clazz = Class.forName(name);
-                Constructor constructor = clazz.getConstructor();
-                Runnable instance = (Runnable) constructor.newInstance();
-                ComponentContext.autowire(instance);
+                Runnable instance = objectFactory.buildBean(name);
                 instance.run();
             }
             catch (Exception e)

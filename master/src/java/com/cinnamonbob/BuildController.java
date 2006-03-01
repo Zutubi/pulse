@@ -213,7 +213,6 @@ public class BuildController implements EventListener
         }
 
         ScmBootstrapper initialBootstrapper = createBuildBootstrapper();
-        // TODO dodgy autowire
         BobFileDetails bobFileDetails = project.getBobFileDetails();
         ComponentContext.autowire(bobFileDetails);
         String bobFileSource = bobFileDetails.getBobFile(project, initialBootstrapper.getRevision());

@@ -14,6 +14,7 @@ public class DismissWelcomeAction extends ActionSupport
     public String execute() throws Exception
     {
         User user = (User) getPrinciple();
+        user = userManager.getUser(user.getId());
         user.setDefaultAction(DefaultAction.DASHBOARD_ACTION);
         userManager.save(user);
         return SUCCESS;

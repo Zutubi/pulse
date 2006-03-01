@@ -98,7 +98,7 @@ public abstract class PersistenceTestCase extends BobTestCase
         transactionStatus = null;
         transactionDefinition = null;
         transactionManager = null;
-        ComponentContext.purge();
+        ComponentContext.closeAll();
         super.tearDown();
     }
 

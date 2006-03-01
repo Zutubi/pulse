@@ -35,8 +35,8 @@ public class ObjectFactory
         return clazz;
     }
 
-    public Object buildBean(Class clazz) throws Exception {
-        return clazz.newInstance();
+    public <V> V buildBean(Class clazz) throws Exception {
+        return (V)clazz.newInstance();
     }
 
     public <U> U buildBean(String className) throws Exception {

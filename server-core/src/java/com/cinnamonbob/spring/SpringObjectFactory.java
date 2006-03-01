@@ -8,8 +8,8 @@ import com.cinnamonbob.core.ObjectFactory;
  */
 public class SpringObjectFactory extends ObjectFactory
 {
-    public Object buildBean(Class clazz) throws Exception {
-        Object bean = super.buildBean(clazz);
+    public <W> W buildBean(Class clazz) throws Exception {
+        W bean = (W)super.buildBean(clazz);
         ComponentContext.autowire(bean);
         return bean;
     }
