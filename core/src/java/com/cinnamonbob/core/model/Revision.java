@@ -14,6 +14,19 @@ public class Revision extends Entity
     private long time;
     private String revisionString;
 
+    public Revision()
+    {
+
+    }
+
+    public Revision(String author, String comment, long time, String revisionString)
+    {
+        this.author = author;
+        this.comment = comment;
+        this.time = time;
+        this.revisionString = revisionString;
+    }
+
     /**
      * The author of change
      */

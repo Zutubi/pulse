@@ -1,0 +1,14 @@
+=====================================================================
+:: test project ::
+=====================================================================
+Build 101 has completed with status 'success'.
+
+You can view the full build result at:
+
+http://another.url/viewBuild.action?id=11
+
+New changes in this build:
+  * 655 by test author:
+    short comment
+  * 656 by author2:
+    this time we will use a longer comment to make sure that ...

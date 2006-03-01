@@ -1,11 +1,11 @@
 package com.cinnamonbob.web;
 
-import com.cinnamonbob.xwork.interceptor.Cancelable;
-import com.cinnamonbob.xwork.TextProviderSupport;
+import com.cinnamonbob.core.util.StringUtils;
 import com.cinnamonbob.security.AcegiUtils;
+import com.cinnamonbob.xwork.TextProviderSupport;
+import com.cinnamonbob.xwork.interceptor.Cancelable;
 import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
-import org.acegisecurity.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -44,12 +44,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public String trimmedString(String s, int length)
     {
-        if(s.length() > length)
-        {
-            return s.substring(0, length - 3) + "...";
-        }
-
-        return s;
+        return StringUtils.trimmedString(s, length);
     }
 
     //---( TextProvider implementation )---

@@ -1,5 +1,6 @@
 package com.cinnamonbob.renderer;
 
+import com.cinnamonbob.core.util.StringUtils;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.util.logging.Logger;
 import org.apache.velocity.VelocityContext;
@@ -40,6 +41,11 @@ public class VelocityBuildResultRenderer implements BuildResultRenderer
         {
             LOG.severe("Could not apply template for type '" + type + "'", e);
         }
+    }
+
+    public String trimmedString(String s, int length)
+    {
+        return StringUtils.trimmedString(s, length);
     }
 
     public void setVelocityEngine(VelocityEngine velocityEngine)
