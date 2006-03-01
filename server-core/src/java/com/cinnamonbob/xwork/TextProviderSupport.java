@@ -22,6 +22,11 @@ public class TextProviderSupport implements com.opensymphony.xwork.TextProvider
         showKeys = b;
     }
 
+    public static boolean isShowKeys()
+    {
+        return showKeys;
+    }
+
     public TextProviderSupport(ResourceBundle bundle, LocaleProvider provider)
     {
         delegate = new com.opensymphony.xwork.TextProviderSupport(bundle, provider);
