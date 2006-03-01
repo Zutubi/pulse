@@ -9,7 +9,7 @@
         <h2 style="color:red">$error</h2>
     #end
 
-    #wwcform("action=/j_acegi_security_check" "heading=%{getText('login')}" "method=post")
+    #wwcform("action=/j_acegi_security_check" "name=j_acegi_security_check" "heading=%{getText('login')}" "method=post")
 
         #wwtextfield("name=j_username" "label=%{getText('login.username')}" "required=true" "size=60" "tabindex=1")
         #wwpassword("name=j_password" "label=%{getText('login.password')}" "required=true" "size=60" "tabindex=2")

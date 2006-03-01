@@ -3,7 +3,7 @@ package com.cinnamonbob.acceptance;
 /**
  * <class-comment/>
  */
-public class GeneralConfigurationAcceptanceTest extends ExtendedWebTestCase
+public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
 {
     public GeneralConfigurationAcceptanceTest()
     {
@@ -17,6 +17,8 @@ public class GeneralConfigurationAcceptanceTest extends ExtendedWebTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
+
+        login("admin", "admin");
     }
 
     protected void tearDown() throws Exception

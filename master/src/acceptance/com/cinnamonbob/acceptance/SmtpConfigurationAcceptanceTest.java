@@ -3,7 +3,7 @@ package com.cinnamonbob.acceptance;
 /**
  * <class-comment/>
  */
-public class SmtpConfigurationAcceptanceTest extends ExtendedWebTestCase
+public class SmtpConfigurationAcceptanceTest extends BaseAcceptanceTest
 {
     public SmtpConfigurationAcceptanceTest()
     {
@@ -17,6 +17,7 @@ public class SmtpConfigurationAcceptanceTest extends ExtendedWebTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
+        login("admin", "admin");
     }
 
     protected void tearDown() throws Exception
@@ -36,7 +37,7 @@ public class SmtpConfigurationAcceptanceTest extends ExtendedWebTestCase
     private void navigateToSmtpConfiguration()
     {
         beginAt("/");
-        clickLinkWithText("Administration");
+        clickLinkWithText("administration");
     }
 
     public void testEdit() throws Exception
