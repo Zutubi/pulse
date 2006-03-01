@@ -5,6 +5,7 @@ import com.cinnamonbob.model.Subscription;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.HashMap;
 
 /**
  * <class-comment/>
@@ -24,6 +25,7 @@ public class EditSubscriptionAction extends UserActionSupport
     {
         if (conditions == null)
         {
+            conditions = new HashMap<String, String>();
             conditions.put(NotifyConditionFactory.ALL_BUILDS, getText("condition.allbuilds"));
             conditions.put(NotifyConditionFactory.ALL_CHANGED, getText("condition.allchanged"));
             conditions.put(NotifyConditionFactory.ALL_FAILED, getText("condition.allfailed"));

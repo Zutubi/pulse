@@ -9,7 +9,7 @@
 
 #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=editSubscription.action" "heading=%{getText('subscription.create')}" "method=post")
+#wwcform("action=editSubscription.action" "heading=%{getText('subscription.edit')}" "method=post")
     #wwhidden("name=id")
     #wwhidden("name=login")
 

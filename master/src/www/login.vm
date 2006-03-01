@@ -5,6 +5,8 @@
 
 <body>
 
+<h1>login</h1>
+
     #foreach($error in $action.actionErrors)
         <h2 style="color:red">$error</h2>
     #end

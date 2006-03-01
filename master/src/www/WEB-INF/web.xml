@@ -92,10 +92,12 @@
         <servlet-class>org.apache.xmlrpc.webserver.XmlRpcServlet</servlet-class>
     </servlet>
 
+<!--
     <servlet>
         <servlet-name>UserProfileServlet</servlet-name>
         <servlet-class>com.cinnamonbob.servlet.ProfileServlet</servlet-class>
     </servlet>
+-->
 
     <servlet-mapping>
         <servlet-name>hessian</servlet-name>
@@ -122,10 +124,12 @@
         <url-pattern>/xmlrpc</url-pattern>
     </servlet-mapping>
 
+<!--
     <servlet-mapping>
         <servlet-name>UserProfileServlet</servlet-name>
         <url-pattern>/user/*</url-pattern>
     </servlet-mapping>
+-->
 
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>

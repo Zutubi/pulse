@@ -26,6 +26,11 @@
             <result name="error" type="redirect">/</result>
         </action>
 
+        <action name="preferences" class="com.cinnamonbob.web.user.PreferencesAction">
+            <result name="success" type="velocity">preferences.vm</result>
+            <result name="error" type="redirect">/</result>
+        </action>
+
         <action name="viewRecipeQueue" class="com.cinnamonbob.web.server.ViewRecipeQueueAction">
             <result name="success" type="velocity">view-recipe-queue.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
@@ -414,6 +419,80 @@
 
     </package>
 
+    <package name="user" namespace="/user" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="editUser" class="com.cinnamonbob.web.admin.user.EditUserAction">
+            <result name="input" type="velocity">edit-user.vm</result>
+            <result name="error" type="velocity">edit-user.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="contactWizard" class="com.cinnamonbob.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.cinnamonbob.web.user.ContactPointWizard</param>
+            <result name="select" type="velocity">create-contact.vm</result>
+            <result name="email" type="velocity">create-contact-email.vm</result>
+            <result name="yahoo" type="velocity">create-contact-yahoo.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="deleteContactPoint" class="com.cinnamonbob.web.user.DeleteContactPointAction">
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="editContactPoint" class="com.cinnamonbob.web.user.EditContactPointAction">
+            <result name="email" type="chain">editEmailContactPoint!input</result>
+            <result name="yahoo" type="chain">editYahooContactPoint!input</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editEmailContactPoint!input" class="com.cinnamonbob.web.user.EditEmailContactPointAction"
+                method="doInput">
+            <interceptor-ref name="defaultStack"/>
+            <result name="input" type="velocity">edit-contact-email.vm</result>
+        </action>
+
+        <action name="editEmailContactPoint" class="com.cinnamonbob.web.user.EditEmailContactPointAction">
+            <result name="input" type="velocity">edit-contact-email.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editYahooContactPoint!input" class="com.cinnamonbob.web.user.EditYahooContactPointAction"
+                method="doInput">
+            <interceptor-ref name="defaultStack"/>
+            <result name="input" type="velocity">edit-contact-yahoo.vm</result>
+        </action>
+
+        <action name="editYahooContactPoint" class="com.cinnamonbob.web.user.EditYahooContactPointAction">
+            <result name="input" type="velocity">edit-contact-yahoo.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="createSubscription" class="com.cinnamonbob.web.user.CreateSubscriptionAction">
+            <result name="input" type="velocity">create-subscription.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="error" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="deleteSubscription" class="com.cinnamonbob.web.user.DeleteSubscriptionAction">
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="editSubscription" class="com.cinnamonbob.web.user.EditSubscriptionAction">
+            <result name="input" type="velocity">edit-subscription.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+    </package>
+
     <package name="setup" namespace="/setup" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
@@ -458,14 +537,12 @@
             <result name="success" type="redirect">userSettings.action</result>
         </action>
 
-        <action name="editUser" class="com.cinnamonbob.web.admin.user.EditUserAction">
-            <result name="input" type="velocity">edit-user.vm</result>
-            <result name="error" type="velocity">edit-user.vm</result>
-            <result name="cancel" type="redirect">viewUser.action?id=${id}</result>
-            <result name="success" type="redirect">viewUser.action?id=${id}</result>
+        <action name="deleteUser" class="com.cinnamonbob.web.admin.user.DeleteUserAction">
+            <result name="input" type="velocity">undefined.vm</result>
+            <result name="success" type="redirect">viewUsers.action</result>
         </action>
 
-        <action name="deleteUser" class="com.cinnamonbob.web.admin.user.DeleteUserAction">
+        <action name="disableUser" class="com.cinnamonbob.web.admin.user.DisableUserAction">
             <result name="input" type="velocity">undefined.vm</result>
             <result name="success" type="redirect">viewUsers.action</result>
         </action>
@@ -475,71 +552,6 @@
             <result name="reset" type="redirect">viewUsers.action</result>
             <result name="cancel" type="redirect">viewUsers.action</result>
             <result name="success" type="redirect">viewUsers.action</result>
-        </action>
-
-        <!--
-        CONTACT POINTS
-        -->
-        <action name="contactWizard" class="com.cinnamonbob.web.wizard.WizardAction">
-            <interceptor-ref name="wizardStack"/>
-            <param name="wizardClass">com.cinnamonbob.web.user.ContactPointWizard</param>
-            <result name="select" type="velocity">create-contact.vm</result>
-            <result name="email" type="velocity">create-contact-email.vm</result>
-            <result name="yahoo" type="velocity">create-contact-yahoo.vm</result>
-            <result name="cancel" type="redirect">viewUser.action?id=${userId}</result>
-            <result name="success" type="redirect">viewUser.action?id=${userId}</result>
-        </action>
-
-        <action name="deleteContactPoint" class="com.cinnamonbob.web.user.DeleteContactPointAction">
-            <result name="success" type="redirect">viewUser.action?id=${user}</result>
-        </action>
-
-        <action name="editContactPoint" class="com.cinnamonbob.web.user.EditContactPointAction">
-            <result name="email" type="chain">editEmailContactPoint!input</result>
-            <result name="yahoo" type="chain">editYahooContactPoint!input</result>
-        </action>
-
-        <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editEmailContactPoint!input" class="com.cinnamonbob.web.user.EditEmailContactPointAction"
-                method="doInput">
-            <interceptor-ref name="defaultStack"/>
-            <result name="input" type="velocity">edit-contact-email.vm</result>
-        </action>
-
-        <action name="editEmailContactPoint" class="com.cinnamonbob.web.user.EditEmailContactPointAction">
-            <result name="input" type="velocity">edit-contact-email.vm</result>
-            <result name="cancel" type="redirect">viewUser.action?id=${user}</result>
-            <result name="success" type="redirect">viewUser.action?id=${user}</result>
-        </action>
-
-        <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editYahooContactPoint!input" class="com.cinnamonbob.web.user.EditYahooContactPointAction"
-                method="doInput">
-            <interceptor-ref name="defaultStack"/>
-            <result name="input" type="velocity">edit-contact-yahoo.vm</result>
-        </action>
-
-        <action name="editYahooContactPoint" class="com.cinnamonbob.web.user.EditYahooContactPointAction">
-            <result name="input" type="velocity">edit-contact-yahoo.vm</result>
-            <result name="cancel" type="redirect">viewUser.action?id=${user}</result>
-            <result name="success" type="redirect">viewUser.action?id=${user}</result>
-        </action>
-
-        <action name="createSubscription" class="com.cinnamonbob.web.user.CreateSubscriptionAction">
-            <result name="input" type="velocity">create-subscription.vm</result>
-            <result name="cancel" type="redirect">viewUser.action?id=${userId}</result>
-            <result name="error" type="redirect">viewUser.action?id=${userId}</result>
-            <result name="success" type="redirect">viewUser.action?id=${userId}</result>
-        </action>
-
-        <action name="deleteSubscription" class="com.cinnamonbob.web.user.DeleteSubscriptionAction">
-            <result name="success" type="redirect">viewUser.action?login=${login}</result>
-        </action>
-
-        <action name="editSubscription" class="com.cinnamonbob.web.user.EditSubscriptionAction">
-            <result name="input" type="velocity">edit-subscription.vm</result>
-            <result name="cancel" type="redirect">viewUser.action?login=${login}</result>
-            <result name="success" type="redirect">viewUser.action?login=${login}</result>
         </action>
 
 

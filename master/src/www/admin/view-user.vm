@@ -7,70 +7,50 @@
     <body>    
         <h1 class="build-log">:: $user.name ::</h1>
 
-        <h2 class="command-info">#wwtext("name=user")</h2>
-        <div class="command-content">
-            <table class="fill-content">
-                #editHeadingRow("user" 2 "/admin/editUser!input.action?id=$user.id")
-                #dynamicRow("user.login" $user.login)
-                #dynamicRow("user.name" $user.name)
-            </table>
-        </div>
+        <table class="columns" width="50%">
+            <tr>
+                <td class="columns" width="40%">
+                    <table class="fill-content">
+                        #headingRow("user" 2)
+                        #dynamicRow("user.login" $user.login)
+                        #dynamicRow("user.name" $user.name)
+                    </table>
+                    <table class="fill-content">
+                        #headingRow("contacts" 2)
+                        <tr>
+                            #contentHeading("contact.name" 1)
+                            #contentHeading("contact.uid" 1)
+                        </tr>
 
-        $user.grantedAuthorities
+                        #foreach ($contact in $user.contactPoints)
+                        <tr>
+                            #dynamicCell($contact.name)
+                            #dynamicCell($contact.uid)
+                        </tr>
+                        #end
+                    </table>
+                    <table class="fill-content">
+                        #headingRow("subscriptions" 3)
+                        <tr>
+                            #contentHeading("subscription.project" 1)
+                            #contentHeading("subscription.contact" 1)
+                            #contentHeading("subscription.condition" 1)
+                        </tr>
 
-        <h2 class="command-info">#wwtext("name=contacts")  ($user.contactPoints.size()) </h2>
-        <div class="command-content">
-            <table class="content">
-                #headingRow("contacts" 4)
-                <tr>
-                    #contentHeading("contact.name" 1)
-                    #contentHeading("contact.uid" 1)
-                    #contentHeading("actions" 2)
-                </tr>
+                    #foreach ($subscription in $user.subscriptions)
+                        #set($contact = $subscription.contactPoint)
+                        #set($project = $subscription.project)
+                        <tr>
+                            #dynamicCell($project.name)
+                            #dynamicCell($contact.uid)
+                            #dynamicCell($subscription.condition)
+                        </tr>
+                    #end
+                    </table>
+                </td>
+            </tr>
 
-                #foreach ($contact in $user.contactPoints)
-                <tr>
-                    #set($confirmMessage = $action.getText("contact.delete.confirm", [$contact.name]))
-                    #dynamicCell($contact.name)
-                    #dynamicCell($contact.uid)
-                    #editCell("editContactPoint!default.action?id=$contact.id&user=$user.id")
-                    #deleteCell($confirmMessage "deleteContactPoint.action?id=$contact.id&user=$user.id")
-                </tr>
-                #end
-                #addRow("contact.create" 4 "contactWizard.action?userId=$user.id")
-            </table>
-        </div>
-
-        <h2 class="command-info">#wwtext("name=subscriptions")  ($user.subscriptions.size())</h2>
-        <div class="command-content">
-            <table class="content">
-                #headingRow("subscriptions" 5)
-                <tr>
-                    #contentHeading("subscription.project" 1)
-                    #contentHeading("subscription.contact" 1)
-                    #contentHeading("subscription.condition" 1)
-                    #contentHeading("actions" 2)
-                </tr>
-
-            #foreach ($subscription in $user.subscriptions)
-                #set($contact = $subscription.contactPoint)
-                #set($project = $subscription.project)
-                <tr>
-                    #set($confirmMessage = $action.getText("subscription.delete.confirm", [$subscription.name]))
-                    #dynamicCell($project.name)
-                    #dynamicCell($contact.uid)
-                    #dynamicCell($subscription.condition)
-                    #editCell("editSubscription!input.action?id=$subscription.id&login=$user.login")
-                    #deleteCell($confirmMessage "deleteSubscription.action?id=$subscription.id&login=$user.login")
-                </tr>
-            #end
-            <!--
-             can only create subscriptions is the system has configured projects accessible to
-             the user AND the user has configured contact points.
-            -->
-            #addRow("subscription.create" 5 "createSubscription!input.action?userId=$user.id")
-            </table>
-        </div>
+        </table>
 
     </body>
 </html>

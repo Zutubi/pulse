@@ -1,0 +1,74 @@
+<content tag="selectedTab">dashboard</content>
+<content tag="helpPage">Dashboard</content>
+<html>
+<head>
+    <title>#wwtext("name=dashboard")</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=dashboard") ::</h1>
+
+    #dashboardTabs("preferences")
+
+    <table class="columns" width="90%">
+        <tr>
+            <td class="columns" width="40%">
+                <table class="fill-content">
+                    #editHeadingRow("user" 2 "/user/editUser!input.action?id=$user.id")
+                    #dynamicRow("user.login" $user.login)
+                    #dynamicRow("user.name" $user.name)
+                </table>
+                <table class="fill-content">
+                    #headingRow("contacts" 4)
+                    <tr>
+                        #contentHeading("contact.name" 1)
+                        #contentHeading("contact.uid" 1)
+                        #contentHeading("actions" 2)
+                    </tr>
+
+                    #foreach ($contact in $user.contactPoints)
+                    <tr>
+                        #set($confirmMessage = $action.getText("contact.delete.confirm", [$contact.name]))
+                        #dynamicCell($contact.name)
+                        #dynamicCell($contact.uid)
+                        #editCell("/user/editContactPoint!default.action?id=$contact.id&user=$user.id")
+                        #deleteCell($confirmMessage "/user/deleteContactPoint.action?id=$contact.id&user=$user.id")
+                    </tr>
+                    #end
+                    #addRow("contact.create" 4 "/user/contactWizard.action?userId=$user.id")
+                </table>
+            </td>
+            <td class="columns" width="40%">
+                <table class="fill-content">
+                    #headingRow("subscriptions" 5)
+                    <tr>
+                        #contentHeading("subscription.project" 1)
+                        #contentHeading("subscription.contact" 1)
+                        #contentHeading("subscription.condition" 1)
+                        #contentHeading("actions" 2)
+                    </tr>
+
+                #foreach ($subscription in $user.subscriptions)
+                    #set($contact = $subscription.contactPoint)
+                    #set($project = $subscription.project)
+                    <tr>
+                        #set($confirmMessage = $action.getText("subscription.delete.confirm", [$subscription.name]))
+                        #dynamicCell($project.name)
+                        #dynamicCell($contact.uid)
+                        #dynamicCell($subscription.condition)
+                        #editCell("/user/editSubscription!input.action?id=$subscription.id&login=$user.login")
+                        #deleteCell($confirmMessage "/user/deleteSubscription.action?id=$subscription.id&login=$user.login")
+                    </tr>
+                #end
+                <!--
+                 can only create subscriptions is the system has configured projects accessible to
+                 the user AND the user has configured contact points.
+                -->
+                #addRow("subscription.create" 5 "/user/createSubscription!input.action?userId=$user.id")
+                </table>
+            </td>
+        </tr>
+
+    </table>
+
+</body>
+</html>
