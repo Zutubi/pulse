@@ -25,6 +25,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
     public void tearDown() throws Exception
     {
+        changelistDao = null;
         super.tearDown();
     }
 

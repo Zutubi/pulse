@@ -42,6 +42,9 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
     public void tearDown() throws Exception
     {
         // tear down here.
+        subDao = null;
+        projectDao = null;
+        contactDao = null;
 
         super.tearDown();
     }

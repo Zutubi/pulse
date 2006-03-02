@@ -23,6 +23,9 @@ public class HibernateBuildSpecificationDaoTest extends MasterPersistenceTestCas
 
     public void tearDown() throws Exception
     {
+        slaveDao = null;
+        buildSpecificationDao = null;
+
         try
         {
             super.tearDown();

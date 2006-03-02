@@ -32,6 +32,10 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void tearDown() throws Exception
     {
+        buildSpecificationDao = null;
+        projectDao = null;
+        buildResultDao = null;
+
         try
         {
             super.tearDown();

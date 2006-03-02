@@ -20,6 +20,7 @@ public class HibernateSlaveDaoTest extends MasterPersistenceTestCase
 
     public void tearDown() throws Exception
     {
+        slaveDao = null;
         super.tearDown();
     }
 

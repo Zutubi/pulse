@@ -21,6 +21,7 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
 
     public void tearDown() throws Exception
     {
+        userDao = null;
         super.tearDown();
     }
 

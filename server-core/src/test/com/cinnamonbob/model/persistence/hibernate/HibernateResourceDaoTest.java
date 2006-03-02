@@ -21,6 +21,7 @@ public class HibernateResourceDaoTest extends ServerCorePersistenceTestCase
 
     public void tearDown() throws Exception
     {
+        resourceDao = null;
         super.tearDown();
     }
 
