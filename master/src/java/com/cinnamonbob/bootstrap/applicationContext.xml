@@ -9,7 +9,8 @@
     </bean>
 
     <!-- this spring object factory will ensure that WebWork Actions are autowired. -->
-    <bean id="xwork-object-factory-2" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
+    <bean id="xwork-object-factory-2" class="com.opensymphony.xwork.spring.SpringObjectFactory"
+          init-method="initObjectFactory"/>
 
     <bean id="velocityEngine" class="com.cinnamonbob.bootstrap.velocity.VelocityEngineFactoryBean"/>
 
@@ -91,23 +92,23 @@
         </property>
     </bean>
 
-<!-- We are not using the Slaves in the current release, so dont deploy the manager.
-    <bean id="slaveManagerTarget" class="com.cinnamonbob.model.DefaultSlaveManager" autowire="byName"
-          init-method="init"/>
-    <bean id="slaveManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="slaveManagerTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
--->
+    <!-- We are not using the Slaves in the current release, so dont deploy the manager.
+        <bean id="slaveManagerTarget" class="com.cinnamonbob.model.DefaultSlaveManager" autowire="byName"
+              init-method="init"/>
+        <bean id="slaveManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+            <property name="transactionManager">
+                <ref bean="transactionManager"/>
+            </property>
+            <property name="target">
+                <ref bean="slaveManagerTarget"/>
+            </property>
+            <property name="transactionAttributes">
+                <props>
+                    <prop key="*">PROPAGATION_REQUIRED</prop>
+                </props>
+            </property>
+        </bean>
+    -->
 
     <bean id="fileResourceRepository" class="com.cinnamonbob.core.FileResourceRepository" autowire="byName"
           init-method="initialise"/>
@@ -122,7 +123,10 @@
 
     <bean id="masterRecipeProcessor" class="com.cinnamonbob.MasterRecipeProcessor" autowire="byName"/>
 
-    <bean id="buildResultRenderer" class="com.cinnamonbob.renderer.VelocityBuildResultRenderer" autowire="byName"/>
+    <bean id="freemarkerConfiguration" class="com.cinnamonbob.bootstrap.freemarker.FreemarkerConfigurationFactoryBean"
+          autowire="byName"/>
+
+    <bean id="buildResultRenderer" class="com.cinnamonbob.renderer.FreemarkerBuildResultRenderer" autowire="byName"/>
 
     <bean id="userConfigRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
         <property name="targetBeanName">

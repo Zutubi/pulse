@@ -1,5 +1,6 @@
 package com.cinnamonbob.renderer;
 
+import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.core.util.StringUtils;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.util.logging.Logger;
@@ -28,6 +29,8 @@ public class VelocityBuildResultRenderer implements BuildResultRenderer
         context.put("hostname", hostUrl);
         context.put("result", result);
         context.put("model", result);
+        context.put("errorLevel", Feature.Level.ERROR);
+        context.put("warningLevel", Feature.Level.WARNING);
 
         try
         {

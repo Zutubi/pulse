@@ -7,7 +7,8 @@ import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.BuildScmDetails;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.test.BobTestCase;
-import org.apache.velocity.app.VelocityEngine;
+import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,22 +19,21 @@ import java.util.List;
 
 /**
  */
-public class VelocityBuildResultRendererTest extends BobTestCase
+public class FreemarkerBuildResultRendererTest extends BobTestCase
 {
-    VelocityBuildResultRenderer renderer;
+    FreemarkerBuildResultRenderer renderer;
 
     protected void setUp() throws Exception
     {
         super.setUp();
-        renderer = new VelocityBuildResultRenderer();
+        renderer = new FreemarkerBuildResultRenderer();
 
         File bobRoot = new File(getBobRoot(), "master/src/templates");
 
-        VelocityEngine engine = new VelocityEngine();
-        engine.setProperty("file.resource.loader.path", bobRoot.getAbsolutePath());
-//        engine.setProperty("velocimacro.library", "plain-macro.vm");
-        engine.init();
-        renderer.setVelocityEngine(engine);
+        Configuration freemarkerConfiguration = new Configuration();
+        freemarkerConfiguration.setDirectoryForTemplateLoading(bobRoot);
+        freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper());
+        renderer.setFreemarkerConfiguration(freemarkerConfiguration);
     }
 
     protected void tearDown() throws Exception
@@ -71,6 +71,7 @@ public class VelocityBuildResultRendererTest extends BobTestCase
     {
         BuildResult result = new BuildResult(new Project("test project", "test description"), "test spec", 101);
         result.setId(11);
+        result.setScmDetails(new BuildScmDetails());
         result.commence(System.currentTimeMillis() - 10000);
         result.complete();
         return result;
