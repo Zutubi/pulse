@@ -7,6 +7,11 @@ import com.cinnamonbob.core.util.RandomUtils;
  */
 public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
 {
+    private static final String FE_LOGIN = "user.login";
+    private static final String FE_NAME = "user.name";
+    private static final String FE_PASSWORD = "user.password";
+    private static final String FE_CONFIRM = "confirm";
+
     public UserAdministrationAcceptanceTest()
     {
     }
@@ -48,10 +53,10 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         assertLinkPresentWithText(login);
 
         // assert form is reset.
-        assertFormElementEmpty("user.login");
-        assertFormElementEmpty("user.name");
-        assertFormElementEmpty("user.password");
-        assertFormElementEmpty("confirm");
+        assertFormElementEmpty(FE_LOGIN);
+        assertFormElementEmpty(FE_NAME);
+        assertFormElementEmpty(FE_PASSWORD);
+        assertFormElementEmpty(FE_CONFIRM);
 
         // check that we can login with this new user.
         clickLinkWithText("logout");
@@ -77,24 +82,24 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         // should get an error message.
         assertTextPresent("required");
         assertLinkNotPresentWithText(login);
-        assertFormElementEmpty("user.login");
-        assertFormElementEquals("user.name", login);
+        assertFormElementEmpty(FE_LOGIN);
+        assertFormElementEquals(FE_NAME, login);
 
         // check validation - password is required.
         submitCreateUserForm(login, login, "", "");
 
         assertTextPresent("required");
         assertLinkNotPresentWithText(login);
-        assertFormElementEquals("user.login", login);
-        assertFormElementEquals("user.name", login);
+        assertFormElementEquals(FE_LOGIN, login);
+        assertFormElementEquals(FE_NAME, login);
 
         // check validation - password and confirmation mismatch
         submitCreateUserForm(login, login, login, "something not very random");
 
         assertTextPresent("does not match");
         assertLinkNotPresentWithText(login);
-        assertFormElementEquals("user.login", login);
-        assertFormElementEquals("user.name", login);
+        assertFormElementEquals(FE_LOGIN, login);
+        assertFormElementEquals(FE_NAME, login);
     }
 
     public void testDeleteUser()
@@ -120,11 +125,11 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
 
     private void submitCreateUserForm(String login, String name, String password, String confirm)
     {
-        setWorkingForm("create.user");
-        setFormElement("user.login", login);
-        setFormElement("user.name", name);
-        setFormElement("user.password", password);
-        setFormElement("confirm", confirm);
+        setWorkingForm("user.create");
+        setFormElement(FE_LOGIN, login);
+        setFormElement(FE_NAME, name);
+        setFormElement(FE_PASSWORD, password);
+        setFormElement(FE_CONFIRM, confirm);
         submit("save");
     }
 

@@ -5,7 +5,7 @@
 <body>
     <h1>:: #wwtext("name=server.settings") ::</h1>
 
-#wwcform("action=setupWizard.action" "heading=%{getText('server.settings')}" "method=post")
+#wwcform("action=setupWizard.action" "heading=%{getText('server.settings')}" "name=server.settings" "method=post")
     #wwhidden("name=state")
 
     #wwtextfield("name=hostname" "label=%{getText('general.host')}" "required=true" "size=40" "tabindex=1")

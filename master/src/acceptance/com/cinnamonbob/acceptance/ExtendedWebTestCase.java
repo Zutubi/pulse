@@ -16,9 +16,11 @@ public abstract class ExtendedWebTestCase extends WebTestCase
         super(name);
     }
 
-    protected void setUp() throws Exception
-    {
-        super.setUp();
 
+    public void assertFormElementNotEmpty(String formElementName) {
+        assertFormElementPresent(formElementName);
+        String formElementValue = tester.getDialog().getFormParameterValue(formElementName);
+        assertNotNull(formElementValue);
+        assertFalse(formElementValue.equals(""));
     }
 }

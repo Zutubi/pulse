@@ -8,7 +8,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=setup.action" "heading=%{getText('bobHome.setup')}" "method=post")
+#wwcform("action=setup.action" "heading=%{getText('bobHome.setup')}" "name=setup.bobHome" "method=post")
 
     #wwtextfield("name=bobHome" "label=%{getText('bobHome.field')}" "required=true" "size=60" "tabindex=1")
     #inlineHelp("bobHome.help")
