@@ -3,6 +3,7 @@ package com.cinnamonbob.web.admin.user;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.GrantedAuthority;
 import com.cinnamonbob.web.user.UserActionSupport;
+import com.cinnamonbob.web.DefaultAction;
 
 import java.util.Arrays;
 
@@ -56,6 +57,7 @@ public class CreateUserAction extends UserActionSupport
         // ensure that the user has the correct authorities to login.
         user.add(GrantedAuthority.USER);
         user.setEnabled(true);
+        user.setDefaultAction(DefaultAction.WELCOME_ACTION);
         getUserManager().save(user);
         doReset();
         return SUCCESS;

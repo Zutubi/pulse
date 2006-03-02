@@ -22,12 +22,14 @@
             <li class="task">
                 <a href="addProject!input.action">add new projects</a> :: using the add project wizard (projects &gt; add new project)
             </li>
+            #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
             <li class="task">
                 <a href="admin/userSettings.action">add new users</a> :: at the users view (administration &gt; users tab )
             </li>
             <li class="task">
                 <a href="admin/serverSettings.action">configure server settings</a> :: at the server settings view (administration &gt; settings tab)
             </li>
+            #end
             <li class="task">
                 <a href="viewResources.action">add new resources</a> :: at the server resources view (server &gt; resources tab)
             </li>
@@ -43,9 +45,11 @@
            <li class="explore">
                <a href="viewProjects.action">view all projects</a> :: at the projects view (projects)
            </li>
+           #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
            <li class="explore">
                <a href="viewRecipeQueue.action">view server activity</a> :: at the server status view (server &gt; status )
            </li>
+           #end
        </ul>
     </div>
 

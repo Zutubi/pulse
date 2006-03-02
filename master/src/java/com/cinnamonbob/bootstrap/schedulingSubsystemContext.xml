@@ -16,6 +16,9 @@ triggers.
         <property name="scheduler">
             <ref local="quartzScheduler"/>
         </property>
+        <property name="objectFactory">
+            <ref bean="objectFactory"/>
+        </property>
     </bean>
 
     <!-- We don't initialise the scheduler here: it must wait for the startup event. -->
@@ -63,6 +66,9 @@ triggers.
         <!-- not sure why this is needs to be wired directly. -->
         <property name="triggerDao">
             <ref bean="triggerDao"/>
+        </property>
+        <property name="objectFactory">
+            <ref bean="objectFactory"/>
         </property>
     </bean>
 

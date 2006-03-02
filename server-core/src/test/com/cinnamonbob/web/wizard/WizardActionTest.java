@@ -1,6 +1,7 @@
 package com.cinnamonbob.web.wizard;
 
 import com.cinnamonbob.web.ActionSupport;
+import com.cinnamonbob.core.ObjectFactory;
 import com.opensymphony.xwork.ActionContext;
 import junit.framework.TestCase;
 
@@ -91,6 +92,8 @@ public class WizardActionTest extends TestCase
     {
         WizardAction action = new WizardAction();
         action.setWizardClass(name);
+        // do not require any autowiring from spring in this test.
+        action.setObjectFactory(new ObjectFactory());
         return action;
     }
 }
