@@ -396,6 +396,16 @@
 #end
 
 ##
+## Outputs a delete cell for a content table, and uses the specified id for the link.
+##
+#macro(deleteCellWithId $message $url $id)
+    <td class="content">
+        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="/images/delete.gif"/>#wwtext("name=delete")</a>
+    </td>
+#end
+
+
+##
 ## Outputs a table cell with class based on $cssClass
 ##
 #macro(classCell $content)

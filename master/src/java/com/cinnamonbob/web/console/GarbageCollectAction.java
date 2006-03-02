@@ -3,7 +3,7 @@ package com.cinnamonbob.web.console;
 import com.cinnamonbob.web.ActionSupport;
 
 /**
- * Trigger garbage collection.
+ * Trigger the system garbage collection.
  *
  */
 public class GarbageCollectAction extends ActionSupport

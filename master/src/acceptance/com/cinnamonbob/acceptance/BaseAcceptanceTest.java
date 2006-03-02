@@ -3,7 +3,7 @@ package com.cinnamonbob.acceptance;
 /**
  * <class-comment/>
  */
-public class BaseAcceptanceTest extends ExtendedWebTestCase
+public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
 {
     public BaseAcceptanceTest()
     {
@@ -21,10 +21,6 @@ public class BaseAcceptanceTest extends ExtendedWebTestCase
         getTestContext().setBaseUrl("http://localhost:8080/");
     }
 
-    public void test()
-    {
-        
-    }
     protected void login(String user, String password)
     {
         beginAt("/login.action");
