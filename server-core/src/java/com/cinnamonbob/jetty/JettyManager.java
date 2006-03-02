@@ -86,17 +86,6 @@ public class JettyManager implements Stoppable
         return appContext;
     }
 
-    /**
-     * Static helper method used as a convenience method to access the Jetty Manager when
-     * auto wiring via spring is not an option.
-     *
-     * @return the singleton JettyManager instance.
-     */
-    public static JettyManager getInstance()
-    {
-        return (JettyManager) ComponentContext.getBean(BEAN_NAME);
-    }
-
     public void stop(boolean force)
     {
         try

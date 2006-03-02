@@ -1,7 +1,6 @@
 package com.cinnamonbob.web.console;
 
 import com.cinnamonbob.web.ActionSupport;
-import com.cinnamonbob.bootstrap.quartz.QuartzManager;
 import org.quartz.Scheduler;
 
 /**
@@ -9,8 +8,16 @@ import org.quartz.Scheduler;
  */
 public class QuartzAdminAction extends ActionSupport
 {
+    private Scheduler scheduler;
+
     public Scheduler getScheduler()
     {
-        return QuartzManager.getScheduler();
+        return scheduler;
     }
+
+    public void setScheduler(Scheduler scheduler)
+    {
+        this.scheduler = scheduler;
+    }
+
 }

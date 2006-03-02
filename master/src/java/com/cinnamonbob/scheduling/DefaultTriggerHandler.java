@@ -2,7 +2,6 @@ package com.cinnamonbob.scheduling;
 
 import com.cinnamonbob.core.ObjectFactory;
 import com.cinnamonbob.scheduling.persistence.TriggerDao;
-import com.cinnamonbob.spring.SpringObjectFactory;
 
 /**
  * <class-comment/>
@@ -10,7 +9,7 @@ import com.cinnamonbob.spring.SpringObjectFactory;
 public class DefaultTriggerHandler implements TriggerHandler
 {
     private TriggerDao triggerDao;
-    private ObjectFactory objectFactory = new SpringObjectFactory();
+    private ObjectFactory objectFactory;
 
     public void trigger(Trigger trigger) throws SchedulingException
     {
@@ -39,5 +38,10 @@ public class DefaultTriggerHandler implements TriggerHandler
     public void setTriggerDao(TriggerDao triggerDao)
     {
         this.triggerDao = triggerDao;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

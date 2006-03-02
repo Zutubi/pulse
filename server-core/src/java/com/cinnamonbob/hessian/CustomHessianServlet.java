@@ -3,10 +3,10 @@ package com.cinnamonbob.hessian;
 import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
 import com.caucho.hessian.io.SerializerFactory;
-import com.caucho.hessian.io.AbstractSerializerFactory;
 import com.caucho.hessian.server.HessianSkeleton;
-import com.cinnamonbob.spring.SpringObjectFactory;
 import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.core.ObjectFactory;
+import com.cinnamonbob.spring.SpringObjectFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +22,8 @@ public class CustomHessianServlet extends GenericServlet
 {
     HessianSkeleton skeleton;
     SerializerFactory factory;
+    private ObjectFactory objectFactory = new SpringObjectFactory();
+    private CustomSerialiserFactory customSerialiserFactory;
 
     @Override
     public void init(ServletConfig config) throws ServletException
@@ -43,9 +45,8 @@ public class CustomHessianServlet extends GenericServlet
 
         try
         {
-            Class serviceClass = Class.forName(serviceName);
-
-            skeleton = new HessianSkeleton(new SpringObjectFactory().buildBean(implName), serviceClass);
+            Class serviceClass = objectFactory.getClassInstance(serviceName);
+            skeleton = new HessianSkeleton(objectFactory.buildBean(implName), serviceClass);
         }
         catch (Exception e)
         {
@@ -55,9 +56,23 @@ public class CustomHessianServlet extends GenericServlet
         }
 
         factory = new SerializerFactory();
-        factory.addFactory((AbstractSerializerFactory) ComponentContext.getBean("customSerialiserFactory"));
+        factory.addFactory(getSerialiserFactory());
     }
 
+    public void setCustomSerialiserFactory(CustomSerialiserFactory serialiserFactory)
+    {
+        this.customSerialiserFactory = serialiserFactory;
+    }
+
+    public CustomSerialiserFactory getSerialiserFactory()
+    {
+        if (customSerialiserFactory == null)
+        {
+            // TODO: when we get autowiring of servlets sorted out, we can remove this call to the ComponentContext.
+            customSerialiserFactory = (CustomSerialiserFactory) ComponentContext.getBean("customSerialiserFactory");
+        }
+        return customSerialiserFactory;
+    }
 
     public void service(ServletRequest servletRequest, ServletResponse servletResponse) throws ServletException, IOException
     {

@@ -13,8 +13,6 @@ public class MasterServiceImpl implements MasterService
 
     public void handleEvent(Event event)
     {
-        // TODO: fix wiring of services from hessian
-        ComponentContext.autowire(this);
         eventManager.publish(event);
     }
 

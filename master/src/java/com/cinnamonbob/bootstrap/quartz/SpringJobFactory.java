@@ -1,15 +1,13 @@
 package com.cinnamonbob.bootstrap.quartz;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.core.ObjectFactory;
 import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.spring.SpringObjectFactory;
 import org.quartz.Job;
+import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.JobDetail;
-import org.quartz.simpl.SimpleJobFactory;
-import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.spi.JobFactory;
+import org.quartz.spi.TriggerFiredBundle;
 
 /**
  * Use spring to autowire jobs are they are created.
@@ -19,8 +17,7 @@ public class SpringJobFactory implements JobFactory
 {
     private static final Logger LOG = Logger.getLogger(SpringJobFactory.class);
 
-    //TODO: need a better way to install the object factory.
-    private SpringObjectFactory objectFactory = new SpringObjectFactory();
+    private ObjectFactory objectFactory;
 
     public Job newJob(TriggerFiredBundle bundle) throws SchedulerException
     {
@@ -50,5 +47,15 @@ public class SpringJobFactory implements JobFactory
     public void init() throws SchedulerException
     {
         scheduler.setJobFactory(this);
+    }
+
+    /**
+     * Set the object factory to be used by this job factory implementation.
+     *
+     * @param objectFactory
+     */
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

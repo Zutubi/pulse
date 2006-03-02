@@ -10,19 +10,7 @@ import java.util.Map;
  */
 public class ObjectFactory
 {
-    private static ObjectFactory instance = new ObjectFactory();
-
     private final Map<String, Class> classes = new HashMap<String, Class>();
-
-    public static ObjectFactory getObjectFactory()
-    {
-        return instance;
-    }
-
-    public static void setObjectFactory(ObjectFactory factory)
-    {
-        instance = factory;
-    }
 
     public Class getClassInstance(String className) throws ClassNotFoundException {
 

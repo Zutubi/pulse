@@ -1,18 +1,16 @@
 package com.cinnamonbob.web.wizard;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.core.ObjectFactory;
 import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.xwork.TextProviderSupport;
-import com.cinnamonbob.core.ObjectFactory;
-import com.cinnamonbob.spring.SpringObjectFactory;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
-import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.ActionSupport;
+import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
 
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -63,6 +61,7 @@ public class WizardAction extends ActionSupport
      * not this action class.
      */
     private transient TextProvider textProvider = null;
+    private ObjectFactory objectFactory;
 
     /**
      * Set the wizard class.
@@ -241,13 +240,11 @@ public class WizardAction extends ActionSupport
         {
             return wizard;
         }
-
         try
         {
             Map session = ActionContext.getContext().getSession();
             if (!session.containsKey(wizardClass))
             {
-                ObjectFactory objectFactory = new SpringObjectFactory();
                 Wizard wizardInstance = objectFactory.buildBean(wizardClass);
                 wizardInstance.initialise();
                 session.put(wizardClass, wizardInstance);
@@ -262,8 +259,14 @@ public class WizardAction extends ActionSupport
         }
     }
 
-// make the state directly available to the ognl stack.
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
+    }
 
+    /**
+     * make the state directly available to the ognl stack.
+     */
     public WizardState getCurrentState()
     {
         return getWizard().getCurrentState();
@@ -277,7 +280,7 @@ public class WizardAction extends ActionSupport
     /**
      * Shortcut for the current state name, makes it easier to add a state hidden field to
      * the wizard forms.
-     *
+     * <p/>
      * NOTE: DO NOT CHANGE THIS METHOD SIGNATURE, YOU WILL BREAK ALL OF THE EXISTING WIZARDS.
      */
     public String getState()
@@ -296,29 +299,35 @@ public class WizardAction extends ActionSupport
         }
         return textProvider;
     }
-    
-    public String getText(String aTextName) {
+
+    public String getText(String aTextName)
+    {
         return getTextProvider().getText(aTextName);
     }
 
-    public String getText(String aTextName, String defaultValue) {
+    public String getText(String aTextName, String defaultValue)
+    {
         return getTextProvider().getText(aTextName, defaultValue);
     }
 
-    public String getText(String aTextName, List args) {
+    public String getText(String aTextName, List args)
+    {
         return getTextProvider().getText(aTextName, args);
     }
 
-    public String getText(String aTextName, String defaultValue, List args) {
+    public String getText(String aTextName, String defaultValue, List args)
+    {
         return getTextProvider().getText(aTextName, defaultValue, args);
     }
 
-    public ResourceBundle getTexts(String aBundleName) {
+    public ResourceBundle getTexts(String aBundleName)
+    {
         return getTextProvider().getTexts(aBundleName);
     }
 
-    public String getText(String key, String defaultValue, List args, OgnlValueStack stack) {
-        return getTextProvider().getText(key,defaultValue,args,stack);
+    public String getText(String key, String defaultValue, List args, OgnlValueStack stack)
+    {
+        return getTextProvider().getText(key, defaultValue, args, stack);
     }
 
     public void clearErrors()

@@ -9,8 +9,7 @@
     </bean>
 
     <!-- this spring object factory will ensure that WebWork Actions are autowired. -->
-    <bean id="spring-object-factory-2" class="com.opensymphony.xwork.spring.SpringObjectFactory"
-          init-method="initObjectFactory"/>
+    <bean id="spring-object-factory-2" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 
     <bean id="velocityEngine" class="com.cinnamonbob.bootstrap.velocity.VelocityEngineFactoryBean"/>
 
@@ -109,8 +108,6 @@
         </property>
     </bean>
 -->
-
-    <bean id="objectFactory" class="com.cinnamonbob.core.ObjectFactory" autowire="byName"/>
 
     <bean id="fileResourceRepository" class="com.cinnamonbob.core.FileResourceRepository" autowire="byName"
           init-method="initialise"/>

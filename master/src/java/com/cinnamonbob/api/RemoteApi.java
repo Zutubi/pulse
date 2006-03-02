@@ -9,10 +9,12 @@ import com.cinnamonbob.bootstrap.ComponentContext;
 public class RemoteApi
 {
     private TokenManager tokenManager;
+    private ShutdownManager shutdownManager;
 
     public RemoteApi()
     {
-        tokenManager = (TokenManager) ComponentContext.getBean("tokenManager");
+        // can remove this call when we sort out autowiring from the XmlRpcServlet.
+        ComponentContext.autowire(this);
     }
 
     public String login(String username, String password) throws AuthenticationException
@@ -41,6 +43,11 @@ public class RemoteApi
         this.tokenManager = tokenManager;
     }
 
+    public void setShutdownManager(ShutdownManager shutdownManager)
+    {
+        this.shutdownManager = shutdownManager;
+    }
+
     private class ShutdownRunner implements Runnable
     {
         private boolean force;
@@ -61,7 +68,6 @@ public class RemoteApi
             {
                 // Empty
             }
-            ShutdownManager shutdownManager = (ShutdownManager) ComponentContext.getBean("shutdownManager");
             shutdownManager.shutdown(force);
         }
     }

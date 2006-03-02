@@ -1,15 +1,12 @@
 package com.cinnamonbob.bootstrap;
 
+import com.cinnamonbob.core.ObjectFactory;
 import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.events.system.SystemStartedEvent;
 import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.spring.SpringObjectFactory;
-import com.cinnamonbob.core.ObjectFactory;
-import com.opensymphony.xwork.config.*;
 import com.opensymphony.xwork.config.ConfigurationManager;
 import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
 
-import java.lang.reflect.Constructor;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,6 +24,8 @@ public class DefaultStartupManager implements StartupManager
 
     private boolean systemStarted;
     private long startTime;
+
+    private ObjectFactory objectFactory;
 
     public void init() throws StartupException
     {
@@ -68,7 +67,6 @@ public class DefaultStartupManager implements StartupManager
 
         ComponentContext.addClassPathContextDefinitions(systemContexts.toArray(new String[systemContexts.size()]));
 
-        ObjectFactory objectFactory = new SpringObjectFactory();
         for (String name : startupRunnables)
         {
             try
@@ -127,8 +125,8 @@ public class DefaultStartupManager implements StartupManager
         return startTime;
     }
 
-    public void next()
+    public void setObjectFactory(ObjectFactory objectFactory)
     {
-
+        this.objectFactory = objectFactory;
     }
 }

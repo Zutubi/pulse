@@ -26,6 +26,9 @@
                 <value>com.cinnamonbob.ResourceDiscoverer</value>
             </list>
         </property>
+        <property name="objectFactory">
+            <ref bean="objectFactory"/>
+        </property>
     </bean>
 
     <bean id="configurationManager" class="com.cinnamonbob.bootstrap.SimpleConfigurationManager">
@@ -50,5 +53,7 @@
             </bean>
         </property>
     </bean>
+
+    <bean name="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory"/>
 
 </beans>

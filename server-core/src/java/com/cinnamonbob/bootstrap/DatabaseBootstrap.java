@@ -2,7 +2,9 @@ package com.cinnamonbob.bootstrap;
 
 import com.cinnamonbob.util.logging.Logger;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
+import org.springframework.beans.BeansException;
 
 import javax.sql.DataSource;
 import java.sql.CallableStatement;
@@ -13,7 +15,7 @@ import java.sql.SQLException;
  * Hibernate specific bootstrap support that creates the database scheme
  * if it does not already exist in the configured database.
  */
-public class DatabaseBootstrap
+public class DatabaseBootstrap implements ApplicationContextAware
 {
     public static final String DEFAULT_SCHEMA_TEST_TABLE = "RESOURCE";
 
@@ -22,20 +24,17 @@ public class DatabaseBootstrap
     private DataSource dataSource;
     private String schemaTestTable = DEFAULT_SCHEMA_TEST_TABLE;
 
+    private ApplicationContext context;
+
     public DatabaseBootstrap()
     {
-    }
-
-    private ApplicationContext getContext()
-    {
-        return ComponentContext.getContext();
     }
 
     public void initialiseDatabase()
     {
         if (!schemaExists())
         {
-            LocalSessionFactoryBean factoryBean = (LocalSessionFactoryBean) getContext().getBean("&sessionFactory");
+            LocalSessionFactoryBean factoryBean = (LocalSessionFactoryBean) context.getBean("&sessionFactory");
             factoryBean.createDatabaseSchema();
         }
     }
@@ -66,4 +65,8 @@ public class DatabaseBootstrap
         this.schemaTestTable = testTable;
     }
 
+    public void setApplicationContext(ApplicationContext context) throws BeansException
+    {
+        this.context = context;
+    }
 }

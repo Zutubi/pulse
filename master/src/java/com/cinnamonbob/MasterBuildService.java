@@ -18,6 +18,12 @@ public class MasterBuildService implements BuildService
     private MasterRecipeProcessor masterRecipeProcessor;
     private ConfigurationManager configurationManager;
 
+    public MasterBuildService()
+    {
+        // TODO the dodgy wiring goes on unabated!
+        ComponentContext.autowire(this);
+    }
+
     public String getUrl()
     {
         return BobServer.getHostURL();
@@ -25,8 +31,6 @@ public class MasterBuildService implements BuildService
 
     public void build(RecipeRequest request)
     {
-        // TODO the dodgy wiring goes on unabated!
-        ComponentContext.autowire(this);
         masterRecipeProcessor.processRecipe(request);
     }
 

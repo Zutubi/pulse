@@ -24,8 +24,6 @@
 
     <bean id="eventManager" class="com.cinnamonbob.events.DefaultEventManager" autowire="byName"/>
 
-    <bean id="objectFactory" class="com.cinnamonbob.core.ObjectFactory" autowire="byName"/>
-
     <bean id="fileResourceRepository" class="com.cinnamonbob.core.FileResourceRepository" autowire="byName"
           init-method="initialise"/>
 
