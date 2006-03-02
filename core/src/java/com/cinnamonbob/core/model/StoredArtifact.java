@@ -23,6 +23,10 @@ public class StoredArtifact extends Entity
     {
         name = artifact.getName();
         title = artifact.getTitle();
+        if (title == null)
+        {
+            title = artifact.getName();
+        }
         type = artifact.getType();
         this.file = file;
         features = new LinkedList<Feature>();

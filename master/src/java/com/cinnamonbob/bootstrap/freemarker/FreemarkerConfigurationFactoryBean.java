@@ -33,6 +33,7 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
                     FREEMARKER_CONFIGURATION = new Configuration();
                     FREEMARKER_CONFIGURATION.setTemplateLoader(getMultiLoader());
                     FREEMARKER_CONFIGURATION.setObjectWrapper(new DefaultObjectWrapper());
+                    FREEMARKER_CONFIGURATION.addAutoInclude("macro.ftl");
                 }
             }
         }

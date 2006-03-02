@@ -19,3 +19,7 @@ New changes in this build:
 [#else]
 There were no new changes in this build.
 [/#if]
+
+[@buildMessages result=result level=errorLevel/]
+
+[@buildMessages result=result level=warningLevel/]

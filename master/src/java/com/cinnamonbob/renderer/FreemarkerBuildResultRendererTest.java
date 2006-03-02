@@ -1,11 +1,12 @@
 package com.cinnamonbob.renderer;
 
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.Revision;
+import com.cinnamonbob.core.FileArtifact;
+import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.BuildScmDetails;
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.model.RecipeResultNode;
 import com.cinnamonbob.test.BobTestCase;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -33,6 +34,7 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
         Configuration freemarkerConfiguration = new Configuration();
         freemarkerConfiguration.setDirectoryForTemplateLoading(bobRoot);
         freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper());
+        freemarkerConfiguration.addAutoInclude("macro.ftl");
         renderer.setFreemarkerConfiguration(freemarkerConfiguration);
     }
 
@@ -50,6 +52,54 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
 
     public void testWithChanges() throws IOException
     {
+        BuildResult result = createBuildWithChanges();
+
+        createAndVerify("changes", "another.url", result);
+    }
+
+    public void testWithErrors() throws IOException
+    {
+        BuildResult result = createBuildWithChanges();
+        result.error("test error message");
+        RecipeResultNode firstNode = result.getRoot().getChildren().get(0);
+        firstNode.getResult().error("test recipe error message");
+
+        RecipeResultNode nestedNode = firstNode.getChildren().get(0);
+        nestedNode.getResult().failure("test recipe failure message with the unfortunate need to wrap because it is really quite ridiculously long");
+
+        RecipeResultNode secondNode = result.getRoot().getChildren().get(1);
+        RecipeResult secondResult = secondNode.getResult();
+
+        CommandResult command = new CommandResult("test command");
+        command.error("bad stuff happened, so wrap this: 000000000000000000000000000000000000000000000000000000000000000000000");
+        secondResult.add(command);
+
+        command = new CommandResult("artifact command");
+        command.failure("artifacts let me down");
+
+        FileArtifact fileArtifact = new FileArtifact("first artifact", new File("somefile"));
+        fileArtifact.setTitle("first artifact title which is so long it needs to be wrapped");
+        StoredArtifact artifact = new StoredArtifact(fileArtifact, "test");
+        artifact.addFeature(new Feature(Feature.Level.INFO, "info message"));
+        artifact.addFeature(new Feature(Feature.Level.ERROR, "error message"));
+        artifact.addFeature(new Feature(Feature.Level.WARNING, "warning message"));
+        command.addArtifact(artifact);
+
+        fileArtifact = new FileArtifact("second artifact", new File("somefile"));
+        fileArtifact.setTitle("second artifact title");
+        artifact = new StoredArtifact(fileArtifact, "test");
+        artifact.addFeature(new Feature(Feature.Level.ERROR, "error 1"));
+        artifact.addFeature(new Feature(Feature.Level.ERROR, "error 2"));
+        artifact.addFeature(new Feature(Feature.Level.ERROR, "error 3: in this case a longer error message so i can see how the wrapping works on the artifact messages"));
+        command.addArtifact(artifact);
+
+        secondResult.add(command);
+
+        createAndVerify("errors", "another.url", result);
+    }
+
+    private BuildResult createBuildWithChanges()
+    {
         BuildResult result = createSuccessfulBuild();
 
         Revision buildRevision = new Revision();
@@ -63,8 +113,7 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
 
         BuildScmDetails details = new BuildScmDetails(buildRevision, changes);
         result.setScmDetails(details);
-
-        createAndVerify("changes", "another.url", result);
+        return result;
     }
 
     private BuildResult createSuccessfulBuild()
@@ -73,6 +122,19 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
         result.setId(11);
         result.setScmDetails(new BuildScmDetails());
         result.commence(System.currentTimeMillis() - 10000);
+
+        RecipeResult recipeResult = new RecipeResult("first recipe");
+        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        result.getRoot().addChild(node);
+
+        recipeResult = new RecipeResult("second recipe");
+        node = new RecipeResultNode(recipeResult);
+        result.getRoot().addChild(node);
+
+        recipeResult = new RecipeResult("nested recipe");
+        node = new RecipeResultNode(recipeResult);
+        result.getRoot().getChildren().get(0).addChild(node);
+
         result.complete();
         return result;
     }

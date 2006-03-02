@@ -50,6 +50,11 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         return StringUtils.trimmedString(s, length);
     }
 
+    public String wrapString(String s, String prefix)
+    {
+        return StringUtils.wrapString(s, 64, prefix);
+    }
+
     public void setFreemarkerConfiguration(Configuration freemarkerConfiguration)
     {
         this.freemarkerConfiguration = freemarkerConfiguration;

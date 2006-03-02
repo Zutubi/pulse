@@ -1,0 +1,43 @@
+=====================================================================
+:: test project ::
+=====================================================================
+Build 101 has completed with status 'error'.
+
+You can view the full build result at:
+
+http://another.url/viewBuild.action?id=11
+
+New changes in this build:
+  * 655 by test author:
+    short comment
+  * 656 by author2:
+    this time we will use a longer comment to make sure that ...
+
+Error messages:
+  * test error message
+  - first recipe
+    * test recipe error message
+  - first recipe :: nested recipe
+    * test recipe failure message with the unfortunate need to wrap
+      because it is really quite ridiculously long
+  - second recipe
+    * Command 'test command' failed
+  - second recipe :: test command
+    * bad stuff happened, so wrap this:
+      0000000000000000000000000000000000000000000000000000000000
+      00000000000
+  - second recipe :: artifact command
+    * artifacts let me down
+  - second recipe :: artifact command :: first artifact title which
+    is so long it needs to be wrapped
+    * error message
+  - second recipe :: artifact command :: second artifact title
+    * error 1
+    * error 2
+    * error 3: in this case a longer error message so i can see how
+      the wrapping works on the artifact messages
+
+Warning messages:
+  - second recipe :: artifact command :: first artifact title which
+    is so long it needs to be wrapped
+    * warning message
