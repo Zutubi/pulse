@@ -55,6 +55,7 @@ public abstract class PersistenceTestCase extends BobTestCase
 
         DatabaseBootstrap dbBootstrap = new DatabaseBootstrap();
         dbBootstrap.setDataSource(dataSource);
+        dbBootstrap.setApplicationContext(context);
         dbBootstrap.initialiseDatabase();
 
         transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
