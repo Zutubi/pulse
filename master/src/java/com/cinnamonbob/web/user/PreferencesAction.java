@@ -20,14 +20,18 @@ public class PreferencesAction extends UserActionSupport
 
     public String execute()
     {
-        user = (User) AcegiUtils.getLoggedInUser();
-        if (user == null)
+        String login = AcegiUtils.getLoggedInUser();
+        if (login == null)
         {
             return ERROR;
         }
 
         // load the user from the db.
         user = userManager.getUser(user.getLogin());
+        if (user == null)
+        {
+            return ERROR;
+        }
 
         return SUCCESS;
     }

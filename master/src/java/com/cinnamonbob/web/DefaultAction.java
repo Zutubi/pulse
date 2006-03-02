@@ -2,6 +2,7 @@ package com.cinnamonbob.web;
 
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.UserManager;
+import com.cinnamonbob.security.AcegiUtils;
 
 /**
  * <class-comment/>
@@ -17,7 +18,8 @@ public class DefaultAction extends ActionSupport
     {
         if (userManager.getUserCount() > 0)
         {
-            return ((User) getPrinciple()).getDefaultAction();
+            String login = AcegiUtils.getLoggedInUser();
+            return userManager.getUser(login).getDefaultAction();
         }
         return "setupAdmin";
     }

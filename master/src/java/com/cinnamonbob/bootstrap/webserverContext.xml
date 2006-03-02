@@ -32,7 +32,6 @@ is received, so that users cannot start interacting with the system before it is
     </bean>
 
     <!-- this spring object factory will ensure that WebWork Actions are autowired. -->
-    <bean id="spring-object-factory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
-
+    <bean id="xwork-object-factory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 
 </beans>

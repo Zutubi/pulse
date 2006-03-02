@@ -49,8 +49,8 @@ public class EditUserAction extends UserActionSupport
         // one admin in the system.
         User user = getUserManager().getUser(getId());
 
-        User loggedInUser = (User) AcegiUtils.getLoggedInUser();
-        if (user.getId() == loggedInUser.getId() && (admin == false))
+        String loggedInUser = AcegiUtils.getLoggedInUser();
+        if (user.getLogin().equals(loggedInUser) && (admin == false))
         {
             addFieldError("admin", getText("admin.permission.self"));
         }

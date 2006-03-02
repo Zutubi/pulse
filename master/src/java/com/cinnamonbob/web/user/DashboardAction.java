@@ -19,8 +19,10 @@ public class DashboardAction extends ActionSupport
     private List<Changelist> changelists;
     private List<Project> changeProjects;
     private List<BuildResult> changeBuilds;
+
     private ProjectManager projectManager;
     private BuildManager buildManager;
+    private UserManager userManager;
 
     public User getUser()
     {
@@ -54,7 +56,12 @@ public class DashboardAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        user = (User) AcegiUtils.getLoggedInUser();
+        String login = AcegiUtils.getLoggedInUser();
+        if (login == null)
+        {
+            return ERROR;
+        }
+        user = userManager.getUser(login);
         if (user == null)
         {
             return ERROR;
@@ -98,5 +105,10 @@ public class DashboardAction extends ActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 }

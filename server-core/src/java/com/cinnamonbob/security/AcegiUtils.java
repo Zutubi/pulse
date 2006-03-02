@@ -10,6 +10,12 @@ import org.acegisecurity.userdetails.UserDetails;
  */
 public class AcegiUtils
 {
+    /**
+     * A utility method to 'log in' the specified user. After this call, all authentication
+     * requests will be made against the new user.
+     *
+     * @param targetUser
+     */
     public static void loginAs(UserDetails targetUser)
     {
         UsernamePasswordAuthenticationToken targetUserRequest =
@@ -18,17 +24,17 @@ public class AcegiUtils
     }
 
     /**
-     * Returns the User object for the currently-logged-in User.
+     * Returns the username for the currently-logged-in User.
      *
-     * @return the logged in user's User object, or null if there is no
+     * @return the logged in user's login name, or null if there is no
      *         logged in user
      */
-    public static Object getLoggedInUser()
+    public static String getLoggedInUser()
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null)
         {
-            return authentication.getPrincipal();
+            return ((UserDetails)authentication.getPrincipal()).getUsername();
         }
         return null;
     }
