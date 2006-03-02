@@ -11,4 +11,26 @@ The core subsystem is the first sub-system initialise after bootstrapping.
 
     <bean id="eventDispatcher" class="com.cinnamonbob.events.SynchronousDispatcher"/>
 
+    <!--
+    Initial security components.
+    -->
+    <bean id="httpSessionContextIntegrationFilterProxy" class="org.acegisecurity.util.FilterChainProxy">
+        <property name="filterInvocationDefinitionSource">
+            <value>
+                CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+                PATTERN_TYPE_APACHE_ANT
+                /**=httpSessionContextIntegrationFilter
+            </value>
+        </property>
+    </bean>
+
+    <!--
+    This filter is placed at the start of the chain so that a Context can be setup in the SecurityContextHolder at the
+    beginning of a web request, and any changes to the Context can be copied to the HttpSession when the web request
+    ends (ready for use with the next web request)
+    -->
+    <bean id="httpSessionContextIntegrationFilter"
+          class="org.acegisecurity.context.HttpSessionContextIntegrationFilter"/>
+
+
 </beans>

@@ -6,6 +6,15 @@
     <description>Continuous Integration Web UI</description>
 
     <filter>
+         <filter-name>Acegi Session Filter Chain Proxy</filter-name>
+         <filter-class>com.cinnamonbob.spring.web.context.FilterToBeanProxy</filter-class>
+         <init-param>
+             <param-name>targetBean</param-name>
+             <param-value>httpSessionContextIntegrationFilterProxy</param-value>
+         </init-param>
+    </filter>
+
+    <filter>
         <filter-name>sitemesh</filter-name>
         <filter-class>com.opensymphony.webwork.sitemesh.VelocityPageFilter</filter-class>
     </filter>
@@ -19,6 +28,10 @@
         </init-param>
     </filter>
 
+    <filter-mapping>
+        <filter-name>Acegi Session Filter Chain Proxy</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <filter-mapping>
         <filter-name>sitemesh</filter-name>

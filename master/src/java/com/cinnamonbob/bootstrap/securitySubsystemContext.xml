@@ -61,10 +61,11 @@ The beans defined within the security subsystem need not be accessed by other co
             <value>
                 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
                 PATTERN_TYPE_APACHE_ANT
-                /**=httpSessionContextIntegrationFilter,authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,securityEnforcementFilter,switchUserProcessingFilter
+                /**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,securityEnforcementFilter,switchUserProcessingFilter
             </value>
         </property>
     </bean>
+
 
     <!--
     The AuthenticationProcessingFilter is responsible for handling the login request. It monitors for requests
@@ -88,14 +89,6 @@ The beans defined within the security subsystem need not be accessed by other co
             <ref local="rememberMeServices"/>
         </property>
     </bean>
-
-    <!--
-    This filter is placed at the start of the chain so that a Context can be setup in the SecurityContextHolder at the
-    beginning of a web request, and any changes to the Context can be copied to the HttpSession when the web request
-    ends (ready for use with the next web request)
-    -->
-    <bean id="httpSessionContextIntegrationFilter"
-          class="org.acegisecurity.context.HttpSessionContextIntegrationFilter"/>
 
     <!--
     This filter provides support for processing basic authentication credentials presented in HTTP headers.
