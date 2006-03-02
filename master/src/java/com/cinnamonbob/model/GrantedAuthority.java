@@ -18,9 +18,10 @@ public class GrantedAuthority extends Entity implements org.acegisecurity.Grante
 
     }
 
-    public GrantedAuthority(String authority)
+    public GrantedAuthority(User user, String authority)
     {
         this.authority = authority;
+        this.user = user;
     }
 
     public String getAuthority()
@@ -28,7 +29,11 @@ public class GrantedAuthority extends Entity implements org.acegisecurity.Grante
         return authority;
     }
 
-    public void setAuthority(String authority)
+    /**
+     * For hibernate.
+     * @param authority
+     */
+    private void setAuthority(String authority)
     {
         this.authority = authority;
     }
@@ -38,7 +43,12 @@ public class GrantedAuthority extends Entity implements org.acegisecurity.Grante
         return user;
     }
 
-    public void setUser(User user)
+    /**
+     * For hibernate.
+     *
+     * @param user
+     */
+    private void setUser(User user)
     {
         this.user = user;
     }

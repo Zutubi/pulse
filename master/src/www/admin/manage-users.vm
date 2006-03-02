@@ -28,9 +28,9 @@
 
                           #dynamicLinkCell($user.login "viewUser.action?id=$user.id")
                           #dynamicCell($user.name)
+                          #editCell("editUser!input.action?id=$user.id")
                           #deleteCell($confirmMessage "deleteUser.action?id=$user.id")
                           <!--
-                          #editCell("editUser!input.action?id=$user.id")
                           #actionCell2("password.edit" "editPassword!input.action?id=$user.id")
                           #actionCell2("password.reset" "editPassword!reset.action?id=$user.id")
                           -->

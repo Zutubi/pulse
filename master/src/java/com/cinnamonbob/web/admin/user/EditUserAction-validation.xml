@@ -1,9 +1,9 @@
 <!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
         "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
 <validators>
-    <field name="user.name">
-        <field-validator type="requiredstring">
-            <message key="user.name.required">field required.</message>
+    <field name="id">
+        <field-validator type="required">
+            <message key="user.id.required">field required.</message>
         </field-validator>
     </field>
 </validators>

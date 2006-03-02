@@ -59,7 +59,7 @@ public class User extends Entity implements UserDetails
         this.authorities = new LinkedList<GrantedAuthority>();
         for (String authority : authorities)
         {
-            this.authorities.add(new GrantedAuthority(authority));
+            this.authorities.add(new GrantedAuthority(this, authority));
         }
     }
 
@@ -200,9 +200,39 @@ public class User extends Entity implements UserDetails
 
     public void add(String authority)
     {
-        GrantedAuthority grantedAuthority = new GrantedAuthority(authority);
-        getGrantedAuthorities().add(grantedAuthority);
-        grantedAuthority.setUser(this);
+        if (!hasAuthority(authority))
+        {
+            GrantedAuthority grantedAuthority = new GrantedAuthority(this, authority);
+            getGrantedAuthorities().add(grantedAuthority);
+        }
+    }
+
+    public void remove(String authority)
+    {
+        GrantedAuthority authorityToBeRemoved = null;
+        for (GrantedAuthority grantedAuthority : getGrantedAuthorities())
+        {
+            if (grantedAuthority.getAuthority().equals(authority))
+            {
+                authorityToBeRemoved = grantedAuthority;
+                break;
+            }
+        }
+        // for this to actually delete the authority, we require cascade delete-orphan.
+        // otherwise the reference from the authority to the user will keep it alive.
+        getGrantedAuthorities().remove(authorityToBeRemoved);
+    }
+
+    public boolean hasAuthority(String authority)
+    {
+        for (GrantedAuthority grantedAuth : getGrantedAuthorities())
+        {
+            if (grantedAuth.getAuthority().equals(authority))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getUsername()
@@ -210,16 +240,25 @@ public class User extends Entity implements UserDetails
         return getLogin();
     }
 
+    /**
+     * @see org.acegisecurity.userdetails.UserDetails#isAccountNonExpired()
+     */
     public boolean isAccountNonExpired()
     {
         return true;
     }
 
+    /**
+     * @see org.acegisecurity.userdetails.UserDetails#isAccountNonLocked()
+     */
     public boolean isAccountNonLocked()
     {
         return true;
     }
 
+    /**
+     * @see org.acegisecurity.userdetails.UserDetails#isCredentialsNonExpired()
+     */
     public boolean isCredentialsNonExpired()
     {
         return true;

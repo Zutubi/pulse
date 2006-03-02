@@ -19,7 +19,7 @@
 
         <property name="defaultAction" type="string" length="63"/>
 
-        <bag name="grantedAuthorities" inverse="true" cascade="all" lazy="false">
+        <bag name="grantedAuthorities" inverse="true" cascade="all,delete-orphan" lazy="false">
             <key column="USERID"/>
             <one-to-many class="com.cinnamonbob.model.GrantedAuthority"/>
         </bag>

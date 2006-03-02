@@ -560,6 +560,11 @@
             <result name="success" type="redirect">viewUsers.action</result>
         </action>
 
+        <action name="editUser" class="com.cinnamonbob.web.admin.user.EditUserAction">
+            <result name="input" type="velocity">edit-user.vm</result>
+            <result name="cancel" type="redirect">viewUsers.action</result>
+            <result name="success" type="redirect">viewUsers.action</result>
+        </action>
 
         <!--
                 <action name="findUsers!default" class="com.opensymphony.xwork.ActionSupport">

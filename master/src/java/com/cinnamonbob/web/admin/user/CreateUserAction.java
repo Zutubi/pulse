@@ -55,7 +55,6 @@ public class CreateUserAction extends UserActionSupport
     {
         // ensure that the user has the correct authorities to login.
         user.add(GrantedAuthority.USER);
-        user.add(GrantedAuthority.ADMINISTRATOR);
         user.setEnabled(true);
         getUserManager().save(user);
         doReset();

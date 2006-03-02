@@ -8,6 +8,8 @@ public class Entity
 {
     private long id;
 
+    private static final int UNSAVED = 0;
+
     public long getId()
     {
         return id;
@@ -20,7 +22,7 @@ public class Entity
 
     public boolean isPersistent()
     {
-        return this.id != 0;
+        return this.id != UNSAVED;
     }
 
     public boolean equals(Object other)
@@ -30,7 +32,7 @@ public class Entity
             return false;
         }
         Entity otherEntity = (Entity) other;
-        if (id == 0 || otherEntity.id == 0)
+        if (id == UNSAVED || otherEntity.id == UNSAVED)
         {
             return false;
         }
