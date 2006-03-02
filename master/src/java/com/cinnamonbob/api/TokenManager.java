@@ -1,12 +1,18 @@
 package com.cinnamonbob.api;
 
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.util.Constants;
+import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.core.util.RandomUtils;
 import com.cinnamonbob.model.GrantedAuthority;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.UserManager;
+import com.cinnamonbob.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -16,9 +22,25 @@ import java.util.TreeSet;
  */
 public class TokenManager
 {
+    private static final Logger LOG = Logger.getLogger(TokenManager.class);
+    private static final String TOKEN_FILE = "admin.token";
+
     private int loginCount = 0;
+    /**
+     * A random token that allows a single admin login: the token is changed
+     * each time it it used.
+     */
+    private String adminToken;
     private Set<String> validTokens = new TreeSet<String>();
     private UserManager userManager;
+    private ConfigurationManager configurationManager;
+
+
+    public static File getAdminTokenFilename(ConfigurationManager configurationManager)
+    {
+        File configPath = configurationManager.getSystemPaths().getConfigRoot();
+        return new File(configPath, TOKEN_FILE);
+    }
 
     public synchronized String login(String username, String password) throws AuthenticationException
     {
@@ -82,6 +104,14 @@ public class TokenManager
 
     public void verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException
     {
+        if (token.equals(adminToken))
+        {
+            // Matches the sigle-use admin token.  Allow login and generate a
+            // new token.
+            newRandomToken();
+            return;
+        }
+
         User user = verifyToken(token);
         for (GrantedAuthority authority : user.getAuthorities())
         {
@@ -170,9 +200,28 @@ public class TokenManager
         return DigestUtils.md5Hex(username + ":" + expiryTime + ":" + password);
     }
 
+    private void newRandomToken()
+    {
+        File tokenFile = getAdminTokenFilename(configurationManager);
+        adminToken = RandomUtils.randomString(128);
+        try
+        {
+            FileSystemUtils.createFile(tokenFile, adminToken);
+        }
+        catch (IOException e)
+        {
+            LOG.severe("Unable to write admin token file: " + e.getMessage(), e);
+        }
+    }
+
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
     }
 
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+        newRandomToken();
+    }
 }

@@ -1,9 +1,16 @@
 package com.cinnamonbob.api.clients;
 
+import com.cinnamonbob.api.TokenManager;
+import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.bootstrap.SystemBootstrapManager;
+import com.cinnamonbob.core.util.IOUtils;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -16,21 +23,18 @@ public class ShutdownClient
     {
         boolean force = false;
 
-        if (argv.length < 2)
-        {
-            System.err.println("Admin username and password must be specified");
-            System.exit(1);
-        }
-
-        if (argv.length > 2 && argv[2].equals("force"))
+        if (argv.length > 0 && argv[0].equals("force"))
         {
             force = true;
         }
 
+        SystemBootstrapManager.loadBootstrapContext();
+        ConfigurationManager configurationManager = (ConfigurationManager) ComponentContext.getBean("configurationManager");
+
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         try
         {
-            int webPort = 8080; //ConfigUtils.getManager().getAppConfig().getServerPort();
+            int webPort = configurationManager.getAppConfig().getServerPort();
             config.setServerURL(new URL("http", "127.0.0.1", webPort, "/xmlrpc"));
         }
         catch (MalformedURLException e)
@@ -44,8 +48,13 @@ public class ShutdownClient
 
         try
         {
-            String token = (String) client.execute("RemoteApi.login", new Object[]{argv[0], argv[1]});
+            String token = loadAdminToken(configurationManager);
             client.execute("RemoteApi.shutdown", new Object[]{token, force});
+        }
+        catch (IOException e)
+        {
+            System.err.println("Error opening admin token file: " + e.getMessage());
+            System.exit(1);
         }
         catch (XmlRpcException e)
         {
@@ -54,5 +63,11 @@ public class ShutdownClient
         }
 
         System.exit(0);
+    }
+
+    private static String loadAdminToken(ConfigurationManager configurationManager) throws IOException
+    {
+        File tokenFile = TokenManager.getAdminTokenFilename(configurationManager);
+        return IOUtils.fileToString(tokenFile);
     }
 }

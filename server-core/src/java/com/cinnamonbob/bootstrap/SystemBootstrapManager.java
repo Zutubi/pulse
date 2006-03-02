@@ -4,19 +4,16 @@ import java.io.File;
 
 /**
  * This manager handles the first stage of system startup.
- *
- *
  */
 public class SystemBootstrapManager
 {
     /**
      * The default bootstrapContext file.
      */
-    private static final String DEFAULT_BOOTSTRAP_CONTEXT = "com/cinnamonbob/bootstrap/bootstrapContext.xml";
-
+    public static final String DEFAULT_BOOTSTRAP_CONTEXT = "com/cinnamonbob/bootstrap/bootstrapContext.xml";
     public static final String BOOTSTRAP_CONTEXT_PROPERTY = "bootstrap";
 
-    public void bootstrapSystem()
+    public static void loadBootstrapContext()
     {
         // lookup bootstrap context via the system properties.
         String contextName = System.getProperty(BOOTSTRAP_CONTEXT_PROPERTY, DEFAULT_BOOTSTRAP_CONTEXT);
@@ -34,7 +31,11 @@ public class SystemBootstrapManager
         {
             ComponentContext.addClassPathContextDefinitions(new String[]{contextName});
         }
+    }
 
+    public void bootstrapSystem()
+    {
+        loadBootstrapContext();
         ((StartupManager) ComponentContext.getBean("startupManager")).init();
     }
 
