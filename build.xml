@@ -4,6 +4,8 @@
 <!-- -->
 <project name="Cinnamon Bob" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
 
+    <property name="bob.version" value="0.2"/>
+
     <target name="clean">
         <delete dir="build"/>
         <delete dir=".ivy-cache/cinnamonbob"/>
@@ -58,15 +60,17 @@
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
 
-        <zip destfile="build/bob-local-0.2.zip">
-            <zipfileset dir="build/package" includes="**/*" prefix="bob-local-0.2"/>
+        <zip destfile="build/bob-local-${bob.version}.zip">
+            <zipfileset dir="build/package" includes="**/*" prefix="bob-local-${bob.version}"/>
         </zip>
 
     </target>
 
     <target name="package.master" depends="init, build.local, build.master">
 
-        <property name="package.root" value="build/package"/>
+        <property name="package.name" value="bob-master-${bob.version}"/>
+        <property name="package.root" value="build/package/${package.name}"/>
+
         <delete dir="${package.root}"/>
         <mkdir dir="${package.root}"/>
 
@@ -78,7 +82,7 @@
         </copy>
 
         <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
-        <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh"/>
+        <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh" verbose="true"/>
 
         <retrieve.package conf="local" dest="${package.root}/lib"/>
         <retrieve.package conf="master" dest="${package.root}/lib"/>
@@ -95,10 +99,6 @@
         <copy todir="${package.root}/system/database">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
-        <!-- place holder for the project work directory -->
-        <copy todir="${package.root}/work">
-            <fileset dir="etc" includes="delete-me.txt"/>
-        </copy>
         <!-- place holder for the logs directory -->
         <copy todir="${package.root}/system/logs">
             <fileset dir="etc" includes="delete-me.txt"/>
@@ -109,8 +109,8 @@
         </copy>
 
         <!-- /config is for user configuration properties -->
-        <copy todir="${package.root}/config">
-            <fileset dir="master/etc" includes="bob.properties"/>
+        <copy todir="${package.root}/system/config">
+            <fileset dir="master/etc" includes="bob-defaults.properties"/>
         </copy>
 
         <!-- /system/config is for system configuration files - not changed unless there is a problem... -->
@@ -118,10 +118,20 @@
             <fileset dir="master/etc" includes="log.properties"/>
         </copy>
 
-        <zip destfile="build/bob-master-0.2.zip">
-            <zipfileset dir="build/package" includes="**/*" prefix="bob-master-0.2"/>
+       <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
+        <zip destfile="build/${package.name}.zip">
+            <zipfileset dir="${package.root}/.." includes="${package.name}/**/*"/>
         </zip>
 
+        <tar destfile="build/${package.name}.tgz" compression="gzip">
+            <tarfileset dir="${package.root}/.." mode="755" username="root" group="root">
+                <include name="${package.name}/bin/*"/>
+            </tarfileset>
+            <tarfileset dir="${package.root}/.." username="root" group="root">
+                <include name="${package.name}/**/*"/>
+                <exclude name="${package.name}/bin/*"/>
+            </tarfileset>
+        </tar>
     </target>
 
     <target name="package.slave" depends="init, build.local, build.slave">
@@ -165,8 +175,8 @@
         </copy>
 
 
-        <zip destfile="build/bob-slave-0.2.zip">
-            <zipfileset dir="build/package" includes="**/*" prefix="bob-slave-0.2"/>
+        <zip destfile="build/bob-slave-${bob.version}.zip">
+            <zipfileset dir="build/package" includes="**/*" prefix="bob-slave-${bob.version}"/>
         </zip>
 
     </target>
