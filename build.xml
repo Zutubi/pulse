@@ -119,9 +119,9 @@
         </copy>
 
        <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
-        <zip destfile="build/${package.name}.zip">
-            <zipfileset dir="${package.root}/.." includes="${package.name}/**/*"/>
-        </zip>
+        <exec executable="zip" dir="${package.root}/..">
+            <arg line="-r ../${package.name}.zip ${package.name}"/>
+        </exec>
 
         <tar destfile="build/${package.name}.tgz" compression="gzip">
             <tarfileset dir="${package.root}/.." mode="755" username="root" group="root">
