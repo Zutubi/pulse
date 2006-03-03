@@ -19,6 +19,18 @@ public class CustomFreemarkerManager extends FreemarkerManager
 {
     private static final Logger LOG = Logger.getLogger(CustomFreemarkerManager.class);
 
+    static
+    {
+        try
+        {
+            freemarker.log.Logger.selectLoggerLibrary(freemarker.log.Logger.LIBRARY_JAVA);
+        }
+        catch (ClassNotFoundException e)
+        {
+            LOG.severe("Unable to set freemarker logger: " + e.getMessage(), e);
+        }
+    }
+
     public static TemplateLoader[] getLoaders(TemplateLoader superLoader)
     {
         SystemPaths paths = ConfigUtils.getManager().getSystemPaths();
