@@ -11,6 +11,7 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
     private static final String FE_NAME = "user.name";
     private static final String FE_PASSWORD = "user.password";
     private static final String FE_CONFIRM = "confirm";
+    private static final String FE_ADMIN = "admin";
 
     public UserAdministrationAcceptanceTest()
     {
@@ -29,11 +30,10 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
 
     protected void tearDown() throws Exception
     {
-
         super.tearDown();
     }
 
-    public void testCreateUser()
+    public void testCreateStandardUser()
     {
         // navigate to user admin tab.
         navigateToUserAdministration();
@@ -41,22 +41,15 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         // create random login name.
         String login = RandomUtils.randomString(10);
 
-        // PROBLEM: this will only work while there is no pagination. we need another way to
-        // lookup a user, a more direct method.
-        assertTextNotPresent(login);
-        assertLinkNotPresentWithText(login);
+        assertUserNotExists(login);
 
-        submitCreateUserForm(login, login, login, login);
+        submitCreateUserForm(login, login, login, login, false);
 
         // assert user does exist.
-        assertTextPresent(login);
-        assertLinkPresentWithText(login);
+        assertUserExists(login);
 
         // assert form is reset.
-        assertFormElementEmpty(FE_LOGIN);
-        assertFormElementEmpty(FE_NAME);
-        assertFormElementEmpty(FE_PASSWORD);
-        assertFormElementEmpty(FE_CONFIRM);
+        assertFormReset();
 
         // check that we can login with this new user.
         clickLinkWithText("logout");
@@ -66,6 +59,41 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         // if login was successful, should see the welcome page and a logout link.
         assertTextPresent(":: welcome ::");
         assertLinkPresentWithText("logout");
+
+        // ensure that this user does not have admin permissions.
+        assertLinkNotPresentWithText("administration");
+    }
+
+    public void testCreateAdminUser()
+    {
+        // navigate to user admin tab.
+        navigateToUserAdministration();
+
+        // create random login name.
+        String login = RandomUtils.randomString(10);
+
+        assertUserNotExists(login);
+
+        submitCreateUserForm(login, login, login, login, true);
+
+        // assert user does exist.
+        assertUserExists(login);
+
+        // assert form is reset.
+        assertFormReset();
+
+        // check that we can login with this new user.
+        clickLinkWithText("logout");
+
+        login(login, login);
+
+        // if login was successful, should see the welcome page and a logout link.
+        assertTextPresent(":: welcome ::");
+        assertLinkPresentWithText("logout");
+
+        // ensure that this user does not have admin permissions.
+        assertLinkPresentWithText("administration");
+
     }
 
     public void testCreateUserValidation()
@@ -77,7 +105,7 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         String login = RandomUtils.randomString(10);
 
         // check validation - login is required.
-        submitCreateUserForm("", login, login, login);
+        submitCreateUserForm("", login, login, login, false);
 
         // should get an error message.
         assertTextPresent("required");
@@ -86,7 +114,7 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         assertFormElementEquals(FE_NAME, login);
 
         // check validation - password is required.
-        submitCreateUserForm(login, login, "", "");
+        submitCreateUserForm(login, login, "", "", false);
 
         assertTextPresent("required");
         assertLinkNotPresentWithText(login);
@@ -94,7 +122,7 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         assertFormElementEquals(FE_NAME, login);
 
         // check validation - password and confirmation mismatch
-        submitCreateUserForm(login, login, login, "something not very random");
+        submitCreateUserForm(login, login, login, "something not very random", false);
 
         assertTextPresent("does not match");
         assertLinkNotPresentWithText(login);
@@ -109,7 +137,7 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
 
         // create a user to delete - assume that user creation is successful?
         String login = RandomUtils.randomString(10);
-        submitCreateUserForm(login, login, login, login);
+        submitCreateUserForm(login, login, login, login, false);
         // check that it worked.
         assertLinkPresentWithText(login);
         assertLinkPresent("delete_" + login);
@@ -123,13 +151,46 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         assertLinkNotPresentWithText(login);
     }
 
-    private void submitCreateUserForm(String login, String name, String password, String confirm)
+    private void assertFormReset()
+    {
+        assertFormElementEmpty(FE_LOGIN);
+        assertFormElementEmpty(FE_NAME);
+        assertFormElementEmpty(FE_PASSWORD);
+        assertFormElementEmpty(FE_CONFIRM);
+        assertCheckboxNotSelected(FE_ADMIN);
+    }
+
+    private void assertUserExists(String login)
+    {
+        // PROBLEM: this will only work while there is no pagination. we need another way to
+        // lookup a user, a more direct method.
+        assertTextPresent(login);
+        assertLinkPresentWithText(login);
+    }
+
+    private void assertUserNotExists(String login)
+    {
+        // PROBLEM: this will only work while there is no pagination. we need another way to
+        // lookup a user, a more direct method.
+        assertTextNotPresent(login);
+        assertLinkNotPresentWithText(login);
+    }
+
+    private void submitCreateUserForm(String login, String name, String password, String confirm, boolean admin)
     {
         setWorkingForm("user.create");
         setFormElement(FE_LOGIN, login);
         setFormElement(FE_NAME, name);
         setFormElement(FE_PASSWORD, password);
         setFormElement(FE_CONFIRM, confirm);
+        if (admin)
+        {
+            checkCheckbox(FE_ADMIN, "true");
+        }
+        else
+        {
+            uncheckCheckbox(FE_ADMIN);
+        }
         submit("save");
     }
 

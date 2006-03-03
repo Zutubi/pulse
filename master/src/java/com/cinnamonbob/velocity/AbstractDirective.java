@@ -39,7 +39,7 @@ public abstract class AbstractDirective extends Directive
             throws IOException, MethodInvocationException, ParseErrorException, ResourceNotFoundException
     {
         StringWriter bodyContent = new StringWriter(1024);
-
+        
         int bodyNode = 1;
 /*
         if (node.jjtGetNumChildren() == 3)
@@ -58,7 +58,7 @@ public abstract class AbstractDirective extends Directive
      *
      * @param params
      */
-    protected void copyParams(Map params)
+    protected void wireParams(Map params)
     {
         OgnlValueStack stack = new OgnlValueStack();
         stack.push(this);

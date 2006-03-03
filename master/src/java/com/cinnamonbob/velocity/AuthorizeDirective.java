@@ -1,6 +1,7 @@
 package com.cinnamonbob.velocity;
 
 import com.cinnamonbob.util.logging.Logger;
+import com.cinnamonbob.bootstrap.ComponentContext;
 import org.acegisecurity.taglibs.authz.AuthorizeTag;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
@@ -17,12 +18,16 @@ import java.util.Map;
 /**
  * <class-comment/>
  */
-public class AuthorizeDirective
-extends AbstractDirective
+public class AuthorizeDirective extends AbstractDirective
 {
     private static final Logger LOG = Logger.getLogger(AuthorizeDirective.class);
 
     private AuthorizeTag delegateTag = new AuthorizeTag();
+
+    public AuthorizeDirective()
+    {
+        ComponentContext.autowire(this);
+    }
 
     public String getName()
     {
@@ -40,7 +45,7 @@ extends AbstractDirective
         try
         {
             Map params = createPropertyMap(context, node);
-            copyParams(params);
+            wireParams(params);
 
             if (delegateTag.doStartTag() == Tag.EVAL_BODY_INCLUDE)
             {
@@ -90,6 +95,4 @@ extends AbstractDirective
             LOG.severe(e);
         }
     }
-
-
 }

@@ -14,6 +14,7 @@ public class CreateUserAction extends UserActionSupport
 {
     private User user = new User();
     private String confirm;
+    private boolean grantAdminPermissions;
 
     public Object getUser()
     {
@@ -28,6 +29,16 @@ public class CreateUserAction extends UserActionSupport
     public void setConfirm(String confirm)
     {
         this.confirm = confirm;
+    }
+
+    public boolean isAdmin()
+    {
+        return grantAdminPermissions;
+    }
+
+    public void setAdmin(boolean admin)
+    {
+        this.grantAdminPermissions = admin;
     }
 
     public void validate()
@@ -56,6 +67,10 @@ public class CreateUserAction extends UserActionSupport
     {
         // ensure that the user has the correct authorities to login.
         user.add(GrantedAuthority.USER);
+        if (grantAdminPermissions)
+        {
+            user.add(GrantedAuthority.ADMINISTRATOR);
+        }
         user.setEnabled(true);
         user.setDefaultAction(DefaultAction.WELCOME_ACTION);
         getUserManager().save(user);

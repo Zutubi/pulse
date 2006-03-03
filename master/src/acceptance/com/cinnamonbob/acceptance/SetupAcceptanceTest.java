@@ -69,43 +69,10 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
 
         // create admin.
         assertFormPresent(FO_ADMIN_CREATE);
-
-        // check validation on the form.
-        submitCreateAdminForm("", "A. D. Ministrator", "pass", "pass");
-        assertTextPresent("required");
-        assertFormPresent(FO_ADMIN_CREATE);
-        assertFormElementEmpty(FE_LOGIN);
-        assertFormElementEquals(FE_NAME, "A. D. Ministrator");
-        assertFormElementEmpty(FE_PASSWORD);
-        assertFormElementEmpty(FE_CONFIRM);
-
-        // - no name
-        submitCreateAdminForm("admin", "", "pass", "pass");
-        assertTextPresent("required");
-        assertFormPresent(FO_ADMIN_CREATE);
-        assertFormElementEquals(FE_LOGIN, "admin");
-        assertFormElementEmpty(FE_NAME);
-        assertFormElementEmpty(FE_PASSWORD);
-        assertFormElementEmpty(FE_CONFIRM);
-
-        // - no password
-        submitCreateAdminForm("admin", "A. D. Ministrator", "", "pass");
-        assertTextPresent("required");
-        assertFormPresent(FO_ADMIN_CREATE);
-        assertFormElementEquals(FE_LOGIN, "admin");
-        assertFormElementEquals(FE_NAME, "A. D. Ministrator");
-        assertFormElementEmpty(FE_PASSWORD);
-        assertFormElementEmpty(FE_CONFIRM);
-
-        // - password and confirmation do not match
-        submitCreateAdminForm("admin", "A. D. Ministrator", "pass", "something other then pass");
-        assertFormPresent(FO_ADMIN_CREATE);
-//        assertTextPresent("do not match");
-        assertFormElementEquals(FE_LOGIN, "admin");
-        assertFormElementEquals(FE_NAME, "A. D. Ministrator");
+        checkValidationForCreateAdminForm();
 
         // now create the administrator.
-        submitCreateAdminForm("admin", "A. D. Ministrator", "pass", "pass");
+        submitCreateAdminForm("admin", "A. D. Ministrator", "admin", "admin");
 
         // check that any attempts to bypass the setup fail.
         //beginAt("/");
@@ -121,6 +88,43 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
 
         assertTextPresent(":: welcome ::");
         assertLinkPresentWithText("logout");
+    }
+
+    private void checkValidationForCreateAdminForm()
+    {
+        // check validation on the form.
+        submitCreateAdminForm("", "A. D. Ministrator", "admin", "admin");
+        assertTextPresent("required");
+        assertFormPresent(FO_ADMIN_CREATE);
+        assertFormElementEmpty(FE_LOGIN);
+        assertFormElementEquals(FE_NAME, "A. D. Ministrator");
+        assertFormElementEmpty(FE_PASSWORD);
+        assertFormElementEmpty(FE_CONFIRM);
+
+        // - no name
+        submitCreateAdminForm("admin", "", "admin", "admin");
+        assertTextPresent("required");
+        assertFormPresent(FO_ADMIN_CREATE);
+        assertFormElementEquals(FE_LOGIN, "admin");
+        assertFormElementEmpty(FE_NAME);
+        assertFormElementEmpty(FE_PASSWORD);
+        assertFormElementEmpty(FE_CONFIRM);
+
+        // - no password
+        submitCreateAdminForm("admin", "A. D. Ministrator", "", "admin");
+        assertTextPresent("required");
+        assertFormPresent(FO_ADMIN_CREATE);
+        assertFormElementEquals(FE_LOGIN, "admin");
+        assertFormElementEquals(FE_NAME, "A. D. Ministrator");
+        assertFormElementEmpty(FE_PASSWORD);
+        assertFormElementEmpty(FE_CONFIRM);
+
+        // - password and confirmation do not match
+        submitCreateAdminForm("admin", "A. D. Ministrator", "admin", "something other then pass");
+        assertFormPresent(FO_ADMIN_CREATE);
+//        assertTextPresent("do not match");
+        assertFormElementEquals(FE_LOGIN, "admin");
+        assertFormElementEquals(FE_NAME, "A. D. Ministrator");
     }
 
     private void submitCreateAdminForm(String login, String name, String password, String confirm)

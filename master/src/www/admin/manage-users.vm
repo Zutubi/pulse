@@ -44,7 +44,8 @@
                       #wwtextfield("name=user.name" "label=%{getText('user.name')}" "required=true" "tabindex=2")
                       #wwpassword("name=user.password" "label=%{getText('user.password')}" "required=true" "tabindex=3")
                       #wwpassword("name=confirm" "label=%{getText('user.confirm')}" "required=true" "tabindex=4")
-                      #saveCancel(5)
+                      #wwcheckbox("name=admin" "label=%{getText('user.admin')}" "tabindex=5")
+                      #saveCancel(6)
                   #end
               </td>
           </tr>
