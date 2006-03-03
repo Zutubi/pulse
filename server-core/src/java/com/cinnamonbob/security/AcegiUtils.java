@@ -34,7 +34,11 @@ public class AcegiUtils
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null)
         {
-            return ((UserDetails)authentication.getPrincipal()).getUsername();
+            Object principle = authentication.getPrincipal();
+            if (principle instanceof UserDetails)
+            {
+                return ((UserDetails)principle).getUsername();
+            }
         }
         return null;
     }

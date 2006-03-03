@@ -31,8 +31,8 @@
 #end
               </td>
               <td align="right">
-#if($userName)
-                  $userName [ <a href="/logout.action">logout</a> ]
+#if($principle)
+                  $principle.name [ <a href="/logout.action">logout</a> ]
 #else
                   <a href="/login.action">login</a>
 #end

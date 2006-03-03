@@ -88,6 +88,7 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
 
         assertTextPresent(":: welcome ::");
         assertLinkPresentWithText("logout");
+        assertTextPresent("A. D. Ministrator");
     }
 
     private void checkValidationForCreateAdminForm()
