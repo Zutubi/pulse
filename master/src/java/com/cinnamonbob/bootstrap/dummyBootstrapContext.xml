@@ -51,4 +51,6 @@
         </property>
     </bean>
 
+    <bean name="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory"/>
+
 </beans>

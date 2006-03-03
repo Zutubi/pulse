@@ -27,7 +27,7 @@ public class PreferencesAction extends UserActionSupport
         }
 
         // load the user from the db.
-        user = userManager.getUser(user.getLogin());
+        user = userManager.getUser(login);
         if (user == null)
         {
             return ERROR;
