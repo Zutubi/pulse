@@ -28,7 +28,10 @@ if $cygwin; then
 fi
 
 # Construct the runtime classpath.
-for i in "$BOB_HOME"/lib "$BOB_HOME"/lib/*.jar "$BOB_HOME"/lib/*.xml; do
+for i in "$BOB_HOME"/system/www/WEB-INF/classes \
+         "$BOB_HOME"/lib                        \
+         "$BOB_HOME"/lib/*.jar                  \
+         "$BOB_HOME"/lib/*.xml; do
   CLASSPATH="$CLASSPATH":"$i"
 done
 

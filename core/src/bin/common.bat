@@ -40,7 +40,7 @@ set _EXECCMD=start "Bob" "%_JAVACMD%"
 
 
 rem setup the classpath...
-set LOCALCLASSPATH=%CLASSPATH%
+set LOCALCLASSPATH=%CLASSPATH%;"%BOB_HOME%/system/www/WEB-INF/classes"
 for %%i in ("%BOB_HOME%\lib\*.jar") do call "%BOB_HOME%\bin\lcp.bat" %%i
 set LOCALCLASSPATH=%LOCALCLASSPATH%;"%BOB_HOME%\lib\validators.xml"
 
