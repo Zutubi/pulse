@@ -21,10 +21,10 @@ public class MakeCommandTest extends BobTestCase
         outputDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".out");
     }
 
-    public void tearDown()
+    public void tearDown() throws IOException
     {
-        FileSystemUtils.removeDirectory(baseDir);
-        FileSystemUtils.removeDirectory(outputDir);
+        removeDirectory(baseDir);
+        removeDirectory(outputDir);
     }
 
     public void testBasicDefault() throws IOException
@@ -137,8 +137,18 @@ public class MakeCommandTest extends BobTestCase
 
     private void copyBuildFile(String name, String filename) throws IOException
     {
-        InputStream is = getInput(name, "txt");
-        FileOutputStream os = new FileOutputStream(new File(baseDir, filename));
-        IOUtils.joinStreams(is, os);
+        InputStream is = null;
+        OutputStream os = null;
+        try
+        {
+            is = getInput(name, "txt");
+            os = new FileOutputStream(new File(baseDir, filename));
+            IOUtils.joinStreams(is, os);
+        }
+        finally
+        {
+            IOUtils.close(is);
+            IOUtils.close(os);
+        }
     }
 }
