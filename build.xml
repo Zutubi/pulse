@@ -93,7 +93,7 @@
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
         <copy todir="${package.root}/system/templates">
-            <fileset dir="master/src/templates" includes="**/*.vm"/>
+            <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl"/>
         </copy>
         <!-- place holder for the database directory -->
         <copy todir="${package.root}/system/database">
