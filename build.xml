@@ -55,8 +55,8 @@
         <copy todir="${package.root}/docs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
-        <!-- place holder for the logs directory -->
-        <copy todir="${package.root}/system/logs">
+        <!-- place holder for the log directory -->
+        <copy todir="${package.root}/system/log">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
 
@@ -99,8 +99,8 @@
         <copy todir="${package.root}/system/database">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
-        <!-- place holder for the logs directory -->
-        <copy todir="${package.root}/system/logs">
+        <!-- place holder for the log directory -->
+        <copy todir="${package.root}/system/log">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
         <copy todir="${package.root}/system/www">
@@ -110,12 +110,7 @@
 
         <!-- /config is for user configuration properties -->
         <copy todir="${package.root}/system/config">
-            <fileset dir="master/etc" includes="bob-defaults.properties"/>
-        </copy>
-
-        <!-- /system/config is for system configuration files - not changed unless there is a problem... -->
-        <copy todir="${package.root}/system/config">
-            <fileset dir="master/etc" includes="log.properties"/>
+            <fileset dir="master/etc" includes="bob-defaults.properties,logging.properties"/>
         </copy>
 
        <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
