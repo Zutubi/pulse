@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 
 /**
  * This manager handles the first stage of system startup.
@@ -46,7 +48,9 @@ public class SystemBootstrapManager
         try
         {
             SystemPaths systemPaths = ConfigUtils.getManager().getSystemPaths();
-            Logger.getLogger("").addHandler(new FileHandler(systemPaths.getLogRoot().getAbsolutePath() + "/cinnabo%u.log"));
+            FileHandler handler = new FileHandler(systemPaths.getLogRoot().getAbsolutePath() + "/cinnabo%u.log");
+            handler.setLevel(Level.INFO);
+            Logger.getLogger("").addHandler(handler);
         }
         catch (IOException e)
         {
