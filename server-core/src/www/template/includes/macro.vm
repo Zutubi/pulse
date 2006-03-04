@@ -482,6 +482,25 @@
 #end
 
 ##
+## Expands to the icon for the given type of SCM.
+##
+#macro(scmIcon $scm)
+    #if ($scm.class.name == 'com.cinnamonbob.model.Svn')<img src="/images/svn_16.png"/>#end
+    #if ($scm.class.name == 'com.cinnamonbob.model.Cvs')<img src="/images/cvs_16.png"/>#end
+    #if ($scm.class.name == 'com.cinnamonbob.model.P4')<img src="/images/p4_16.png"/>#end
+#end
+
+##
+## Expands to an SCM icon and name for the projects SCM.
+##
+#macro(scmDetail $project)
+    #scmIcon($project.scm)
+    #if ($project.scm.class.name == 'com.cinnamonbob.model.Svn') subversion #end
+    #if ($project.scm.class.name == 'com.cinnamonbob.model.Cvs') cvs #end
+    #if ($project.scm.class.name == 'com.cinnamonbob.model.P4') perforce #end
+#end
+
+##
 ## Outputs a row with SCM details
 ##
 #macro(scmRow $project)
@@ -610,68 +629,6 @@
             #classCell($result.stamps.prettyElapsed)
 ##            #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$project.id")
         </tr>
-    </table>
-#end
-
-##
-## Shows the main build result view (shared with project current build)
-##
-#macro(showBuild $buildResult $showActions)
-    <table>
-        <tr><td>
-            <table class="content">
-                #headingRow("build.summary" 10)
-                <tr>
-                    #contentHeading("build.id" 1)
-                    #contentHeading("build.status" 2)
-                    #contentHeading("build.spec" 1)
-                    #contentHeading("build.when" 1)
-                    #contentHeading("build.elapsed" 1)
-    #if($showActions)
-                    #contentHeading("actions" 4)
-    #end
-                </tr>
-                <tr>
-                    #set($cssClass = $buildResult.state.string)
-                    #contentCell($buildResult.number)
-                    #statusCell($buildResult)
-                    #classCell($buildResult.buildSpecification)
-                    #classCell($buildResult.stamps.prettyStartTime)
-                    #classCell($buildResult.stamps.prettyElapsed)
-    #if($showActions)
-                    #viewCell($project $buildResult)
-                    #logCell($project $buildResult)
-                    #changesCell($project $buildResult)
-                    #artifactsCell($project $buildResult)
-    #end
-                </tr>
-            </table>
-        </td></tr>
-    #if($buildResult.hasMessages($errorLevel) || $buildResult.hasMessages($warningLevel))
-        <tr><td>
-            <table class="content" width="100%">
-                #headingRow("build.features" 1)
-               <tr>
-                   <td class="content">
-                       #buildMessageSummary($buildResult $errorLevel)
-                       #buildMessageSummary($buildResult $warningLevel)
-                   </td>
-               </tr>
-            </table>
-        </td></tr>
-    #end
-        <tr><td>
-##            <table class="content" width="100%">
-##                #headingRow("recipe" 1)
-##                <tr>
-##                    <td class="content">
-    #if($buildResult.root.children.size() > 0)
-                          #recipeSummary($buildResult.root.children.get(0) $project)
-    #end
-##                    </td>
-##                </tr>
-##            </table>
-        </td></tr>
     </table>
 #end
 
@@ -910,22 +867,71 @@
     #end
 #end
 
+##
+## Shows the main build result view (shared with project current build)
+##
+#macro(showBuild $buildResult $showActions)
+    <table>
+        <tr><td>
+            <table class="content">
+                #headingRow("build.summary" 10)
+                <tr>
+                    #contentHeading("build.id" 1)
+                    #contentHeading("build.status" 2)
+                    #contentHeading("build.spec" 1)
+                    #contentHeading("build.when" 1)
+                    #contentHeading("build.elapsed" 1)
+    #if($showActions)
+                    #contentHeading("actions" 4)
+    #end
+                </tr>
+                <tr>
+                    #set($cssClass = $buildResult.state.string)
+                    #contentCell($buildResult.number)
+                    #statusCell($buildResult)
+                    #classCell($buildResult.buildSpecification)
+                    #classCell($buildResult.stamps.prettyStartTime)
+                    #classCell($buildResult.stamps.prettyElapsed)
+    #if($showActions)
+                    #viewCell($project $buildResult)
+                    #logCell($project $buildResult)
+                    #changesCell($project $buildResult)
+                    #artifactsCell($project $buildResult)
+    #end
+                </tr>
+            </table>
+        </td></tr>
+    #if($buildResult.hasMessages($errorLevel) || $buildResult.hasMessages($warningLevel))
+        <tr><td>
+            <table class="content" width="100%">
+                #headingRow("build.features" 1)
+               <tr>
+                   <td class="content">
+                       #buildMessageSummary($buildResult $errorLevel)
+                       #buildMessageSummary($buildResult $warningLevel)
+                   </td>
+               </tr>
+            </table>
+        </td></tr>
+    #end
+        <tr><td>
+##            <table class="content" width="100%">
+##                #headingRow("recipe" 1)
+##                <tr>
+##                    <td class="content">
+    #if($buildResult.root.children.size() > 0)
+                          #recipeSummary($buildResult.root.children.get(0) $project)
+    #end
+##                    </td>
+##                </tr>
+##            </table>
+        </td></tr>
+    </table>
+#end
+
 #macro( contactPointIcon $contact)
     #if ($contact.class.name == 'com.cinnamonbob.model.EmailContactPoint')<img src="/images/email_16.png"/>#end
     #if ($contact.class.name == 'com.cinnamonbob.model.YahooContactPoint')<img src="/images/yahoo_16.png"/>#end
-#end
-
-#macro( scmIcon $scm)
-    #if ($scm.class.name == 'com.cinnamonbob.model.Svn')<img src="/images/svn_16.png"/>#end
-    #if ($scm.class.name == 'com.cinnamonbob.model.Cvs')<img src="/images/cvs_16.png"/>#end
-    #if ($scm.class.name == 'com.cinnamonbob.model.P4')<img src="/images/p4_16.png"/>#end
-#end
-
-#macro( scmDetail $project)
-    #scmIcon($project.scm)
-    #if ($project.scm.class.name == 'com.cinnamonbob.model.Svn') subversion #end
-    #if ($project.scm.class.name == 'com.cinnamonbob.model.Cvs') cvs #end
-    #if ($project.scm.class.name == 'com.cinnamonbob.model.P4') perforce #end
 #end
 
 <!--- quartz trigger state -->

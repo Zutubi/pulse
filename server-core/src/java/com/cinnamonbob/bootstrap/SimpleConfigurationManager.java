@@ -1,11 +1,11 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.util.logging.Logger;
+import com.cinnamonbob.bootstrap.config.CompositeConfiguration;
 import com.cinnamonbob.bootstrap.config.Configuration;
 import com.cinnamonbob.bootstrap.config.FileConfiguration;
-import com.cinnamonbob.bootstrap.config.CompositeConfiguration;
 import com.cinnamonbob.bootstrap.config.ReadOnlyConfiguration;
+import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +16,8 @@ import java.util.Properties;
  */
 public class SimpleConfigurationManager implements ConfigurationManager
 {
+    public static final String BOB_INSTALL = "bob.install";
+
     private static final Logger LOG = Logger.getLogger(SimpleConfigurationManager.class);
 
     private SystemPaths systemPaths = null;
@@ -94,18 +96,18 @@ public class SimpleConfigurationManager implements ConfigurationManager
 
     private SystemPaths initSystemPaths()
     {
-        String bobInstall = System.getProperty("bob.install");
+        String bobInstall = System.getProperty(BOB_INSTALL);
         if (bobInstall == null || bobInstall.length() == 0)
         {
             // fatal error, BOB_INSTALL property needs to exist.
-            throw new StartupException("Required property 'bob.install' is not set");
+            throw new StartupException("Required property '" + BOB_INSTALL + "' is not set");
         }
 
         File bobRoot = new File(bobInstall);
         if (!bobRoot.exists() || !bobRoot.isDirectory())
         {
             // fatal error, BOB_INSTALL property needs to reference bobs home directory
-            throw new StartupException("Property 'bob.install' does not refer to a directory ('" + bobInstall + ")");
+            throw new StartupException("Property '" + BOB_INSTALL + "' does not refer to a directory ('" + bobInstall + ")");
         }
         // initialise applicationPaths based on bob.home.
         return new DefaultSystemPaths(bobRoot);

@@ -5,13 +5,13 @@ import java.util.List;
 
 /**
  * A convenience object that allows for the System and User paths to be specified
- *
  */
 public class ConfigurableSystemPaths implements SystemPaths
 {
     private File systemRoot;
     private File contentRoot;
     private File configRoot;
+    private File logRoot;
     private List<File> templateRoots;
 
     public File getSystemRoot()
@@ -27,6 +27,11 @@ public class ConfigurableSystemPaths implements SystemPaths
     public File getConfigRoot()
     {
         return configRoot;
+    }
+
+    public File getLogRoot()
+    {
+        return logRoot;
     }
 
     public List<File> getTemplateRoots()
@@ -52,5 +57,10 @@ public class ConfigurableSystemPaths implements SystemPaths
     public void setConfigRoot(File configRoot)
     {
         this.configRoot = configRoot;
+    }
+
+    public void setLogRoot(File logRoot)
+    {
+        this.logRoot = logRoot;
     }
 }

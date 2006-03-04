@@ -42,4 +42,11 @@ public interface SystemPaths
      */
     File getConfigRoot();
 
+    /**
+     * Returns the directory to use for log files.
+     *
+     * @return the logs directory
+     */
+    File getLogRoot();
+
 }

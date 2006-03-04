@@ -43,13 +43,13 @@ public class FileHandler extends java.util.logging.FileHandler
         }
 
         // only handle substitution if bob.home is set.
-        if (!System.getProperties().contains("bob.home"))
+        if (!System.getProperties().contains("bob.install"))
         {
             return pattern;
         }
 
         // WARNING: The following implementation does not support the escaping of the '%' character.
-        String bobHome = System.getProperty("bob.home");
+        String bobHome = System.getProperty("bob.install");
 
         int index = pattern.indexOf("%b");
         while (index != -1)

@@ -40,6 +40,9 @@
                 <property name="configRoot">
                     <value>master/etc</value>
                 </property>
+                <property name="logRoot">
+                    <value>master/system</value>
+                </property>
                 <property name="templateRoots">
                     <list>
                         <value type="java.io.File">server-core/src/www</value>

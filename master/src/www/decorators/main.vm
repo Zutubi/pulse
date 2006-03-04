@@ -1,11 +1,25 @@
 <!-- page properties are specified using <content tag="selectedTab">navigate</content> -->
-#set ($projectId = $page.getProperty("page.projectId"))
-#set ($projectName = $page.getProperty("page.projectName"))
-#set ($buildId = $page.getProperty("page.buildId"))
-#set ($buildNumber = $page.getProperty("page.buildNumber"))
-#set ($userName = $page.getProperty("page.user.name"))
-#set ($userLogin = $page.getProperty("page.user.login"))
-#set ($helpPage = $page.getProperty("page.helpPage"))
+#if($page.getProperty("page.projectId"))
+    #set ($projectId = $page.getProperty("page.projectId"))
+#end
+#if($page.getProperty("page.projectName"))
+    #set ($projectName = $page.getProperty("page.projectName"))
+#end
+#if($page.getProperty("page.buildId"))
+    #set ($buildId = $page.getProperty("page.buildId"))
+#end
+#if($page.getProperty("page.buildNumber"))
+    #set ($buildNumber = $page.getProperty("page.buildNumber"))
+#end
+#if($page.getProperty("page.user.name"))
+    #set ($userName = $page.getProperty("page.user.name"))
+#end
+#if($page.getProperty("page.user.login"))
+    #set ($userLogin = $page.getProperty("page.user.login"))
+#end
+#if($page.getProperty("page.helpPage"))
+    #set ($helpPage = $page.getProperty("page.helpPage"))
+#end
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
@@ -22,7 +36,7 @@
         <table>
             <tr>
               <td class="logo">
-                  <a href="/default.action">:: cinnabo ::</a>
+                  :: <a href="/default.action">cinnabo</a> ::
 #if($projectId && $projectId != "0")
                   <a href="/currentBuild.action?id=${projectId}">$projectName</a>
 #end
@@ -49,8 +63,10 @@
             </tr>
         </table>
       </div>
-      #set ($selectedTab = $page.getProperty("page.selectedTab"))
 
+#if($page,getProperty("page.selectedTab"))
+    #set ($selectedTab = $page.getProperty("page.selectedTab"))
+#end
       <ul id="nav">
         <li><a #if($selectedTab && $selectedTab == "dashboard")      class="active" #end href="/dashboard.action">dashboard</a></li>
         <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end href="/viewProjects.action">projects</a></li>

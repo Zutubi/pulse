@@ -1,9 +1,9 @@
 package com.cinnamonbob.bootstrap;
 
-import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
-import com.opensymphony.xwork.config.ConfigurationManager;
 import com.cinnamonbob.jetty.JettyManager;
 import com.cinnamonbob.util.logging.Logger;
+import com.opensymphony.xwork.config.ConfigurationManager;
+import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
 
 
 /**
@@ -25,6 +25,7 @@ public class DefaultSetupManager implements SetupManager
         catch (Exception e)
         {
             LOG.severe(e);
+            throw new StartupException("Unable to start Jetty server: " + e.getMessage(), e);
         }
 
         if (configurationManager.getUserPaths() == null)

@@ -1,6 +1,9 @@
 package com.cinnamonbob.bootstrap;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 
 /**
  * This manager handles the first stage of system startup.
@@ -36,6 +39,18 @@ public class SystemBootstrapManager
     public void bootstrapSystem()
     {
         loadBootstrapContext();
+
+        // Now we know where the system path is, add a file handler.
+        try
+        {
+            SystemPaths systemPaths = ConfigUtils.getManager().getSystemPaths();
+            Logger.getLogger("").addHandler(new FileHandler(systemPaths.getLogRoot().getAbsolutePath() + "/cinnabo%u.log"));
+        }
+        catch (IOException e)
+        {
+            throw new StartupException("Unable to configure logging: " + e.getMessage(), e);
+        }
+
         ((StartupManager) ComponentContext.getBean("startupManager")).init();
     }
 

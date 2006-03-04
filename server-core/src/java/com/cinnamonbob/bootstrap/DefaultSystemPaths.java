@@ -15,6 +15,7 @@ public class DefaultSystemPaths implements SystemPaths
     private File systemRoot;
     private File contentRoot;
     private File configRoot;
+    private File logRoot;
     private List<File> templateRoots;
 
     public DefaultSystemPaths(File bobHome)
@@ -47,6 +48,15 @@ public class DefaultSystemPaths implements SystemPaths
             configRoot = new File(getSystemRoot(), "config");
         }
         return configRoot;
+    }
+
+    public File getLogRoot()
+    {
+        if (logRoot == null)
+        {
+            logRoot = new File(getSystemRoot(), "log");
+        }
+        return logRoot;
     }
 
     public List<File> getTemplateRoots()
