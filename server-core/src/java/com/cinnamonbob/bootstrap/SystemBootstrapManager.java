@@ -1,5 +1,7 @@
 package com.cinnamonbob.bootstrap;
 
+import com.cinnamonbob.freemarker.CustomFreemarkerManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.FileHandler;
@@ -50,6 +52,8 @@ public class SystemBootstrapManager
         {
             throw new StartupException("Unable to configure logging: " + e.getMessage(), e);
         }
+
+        CustomFreemarkerManager.initialiseLogging();
 
         ((StartupManager) ComponentContext.getBean("startupManager")).init();
     }

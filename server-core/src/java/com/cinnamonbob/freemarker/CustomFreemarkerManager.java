@@ -19,7 +19,7 @@ public class CustomFreemarkerManager extends FreemarkerManager
 {
     private static final Logger LOG = Logger.getLogger(CustomFreemarkerManager.class);
 
-    static
+    public static void initialiseLogging()
     {
         try
         {
