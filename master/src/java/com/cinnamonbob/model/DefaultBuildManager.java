@@ -1,6 +1,7 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.MasterBuildPaths;
+import com.cinnamonbob.bootstrap.DatabaseBootstrap;
 import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.core.util.FileSystemUtils;
@@ -25,6 +26,8 @@ public class DefaultBuildManager implements BuildManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultBuildManager.class);
 
+    // Forces the dependency in spring (CIB-166)
+    private DatabaseBootstrap databaseBootstrap;
     private BuildResultDao buildResultDao;
     private ArtifactDao artifactDao;
     private ChangelistDao changelistDao;
@@ -276,5 +279,10 @@ public class DefaultBuildManager implements BuildManager
     public void setChangelistDao(ChangelistDao changelistDao)
     {
         this.changelistDao = changelistDao;
+    }
+
+    public void setDatabaseBootstrap(DatabaseBootstrap databaseBootstrap)
+    {
+        this.databaseBootstrap = databaseBootstrap;
     }
 }
