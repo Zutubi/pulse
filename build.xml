@@ -113,6 +113,10 @@
             <fileset dir="master/etc" includes="bob-defaults.properties,logging.properties"/>
         </copy>
 
+        <copy todir="${package.root}/lib">
+            <fileset dir="master/etc" includes="*.xml"/>
+        </copy>
+
        <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
         <exec executable="zip" dir="${package.root}/..">
             <arg line="-r ../${package.name}.zip ${package.name}"/>
