@@ -1,6 +1,7 @@
 package com.cinnamonbob.web.setup;
 
 import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.bootstrap.SimpleConfigurationManager;
 import com.cinnamonbob.bootstrap.StartupManager;
 import com.cinnamonbob.web.ActionSupport;
 
@@ -29,8 +30,15 @@ public class ConfigureBobHomeAction extends ActionSupport
     public String doInput()
     {
         // set the default.
-
-        this.bobHome = "master/home";
+        String install = System.getProperty(SimpleConfigurationManager.BOB_INSTALL);
+        if (install == null)
+        {
+            this.bobHome = "home";
+        }
+        else
+        {
+            this.bobHome = install + File.separatorChar + "home";
+        }
 
         return INPUT;
     }

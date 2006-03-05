@@ -19,7 +19,6 @@
 
         #openSubmit()
             #wwsubmit("name=login" "value=%{getText('login.name')}" "tabindex=4")
-            #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=5")
         #closeSubmit()
     #end
 
