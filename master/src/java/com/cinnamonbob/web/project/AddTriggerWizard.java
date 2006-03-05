@@ -50,7 +50,7 @@ public class AddTriggerWizard extends BaseWizard
         addState(selectState);
         addState(configCron);
         addState(configMonitor);
-        addState(finalState);
+        addFinalState("success", finalState);
     }
 
     public long getProjectId()
