@@ -76,7 +76,7 @@ public class EmailContactPoint extends ContactPoint
 
     private void sendMail(String subject, String body, final ApplicationConfiguration config)
     {
-        if (config.getSmtpHost() == null)
+        if (!TextUtils.stringSet(config.getSmtpHost()))
         {
             LOG.severe("Unable to deliver mail to contact point: SMTP host not configured.");
             return;

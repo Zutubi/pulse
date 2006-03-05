@@ -11,7 +11,11 @@ import com.cinnamonbob.web.wizard.BaseWizard;
 import com.cinnamonbob.web.wizard.BaseWizardState;
 import com.cinnamonbob.web.wizard.Wizard;
 import com.cinnamonbob.web.wizard.WizardCompleteState;
+import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * <class-comment/>
@@ -110,7 +114,7 @@ public class SetupWizard extends BaseWizard
         }
     }
 
-    public class ServerSettingsState extends BaseWizardState
+    public class ServerSettingsState extends BaseWizardState implements Validateable
     {
         private String hostname;
         private String fromAddress;
@@ -121,6 +125,16 @@ public class SetupWizard extends BaseWizard
         public ServerSettingsState(Wizard wizard, String name)
         {
             super(wizard, name);
+
+            try
+            {
+                InetAddress address = InetAddress.getLocalHost();
+                hostname = address.getCanonicalHostName() + ":8080";
+            }
+            catch (UnknownHostException e)
+            {
+                // Oh well, we tried
+            }
         }
 
         public String getNextStateName()
@@ -176,6 +190,14 @@ public class SetupWizard extends BaseWizard
         public void setPassword(String password)
         {
             this.password = password;
+        }
+
+        public void validate()
+        {
+            if (TextUtils.stringSet(smtpHost) && !TextUtils.stringSet(fromAddress))
+            {
+                addFieldError("fromAddress", "from address is required when smtp host is provided");
+            }
         }
     }
 }

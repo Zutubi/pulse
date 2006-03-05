@@ -1,6 +1,8 @@
 package com.cinnamonbob.web.user;
 
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.model.*;
+import com.opensymphony.util.TextUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ public class CreateSubscriptionAction extends UserActionSupport
     private User user;
     private Project project;
     private ContactPoint contactPoint;
+    private ConfigurationManager configurationManager;
 
     public String getCondition()
     {
@@ -103,14 +106,14 @@ public class CreateSubscriptionAction extends UserActionSupport
     public String doInput()
     {
         List<Project> allProjects = projectManager.getAllProjects();
-        if(allProjects.size() == 0)
+        if (allProjects.size() == 0)
         {
             addActionError("No projects available.  Please configure a project before creating a subscription.");
             return ERROR;
         }
 
         user = getUserManager().getUser(userId);
-        if(user == null)
+        if (user == null)
         {
             addActionError("Unknown user '" + userId + "'");
             return ERROR;
@@ -119,19 +122,25 @@ public class CreateSubscriptionAction extends UserActionSupport
         // validate that the userId has configured contact points.
         if (user.getContactPoints().size() == 0)
         {
-            addFieldError("userId", "This userId does not have any contact points available. " +
-                    "Please configure contact points before creating a subscription.");
+            addActionError("You do not have any contact points configured. " +
+                    "Please configure a contact point before creating a subscription.");
+            return ERROR;
+        }
+
+        if (!TextUtils.stringSet(configurationManager.getAppConfig().getSmtpHost()))
+        {
+            addActionError("Unable to create a subscription as this server does not have an SMTP host configured.");
             return ERROR;
         }
 
         projects = new TreeMap<Long, String>();
-        for(Project project: allProjects)
+        for (Project project : allProjects)
         {
             projects.put(project.getId(), project.getName());
         }
 
         contactPoints = new TreeMap<Long, String>();
-        for(ContactPoint contact: user.getContactPoints())
+        for (ContactPoint contact : user.getContactPoints())
         {
             contactPoints.put(contact.getId(), contact.getName());
         }
@@ -156,7 +165,7 @@ public class CreateSubscriptionAction extends UserActionSupport
         project = getProjectManager().getProject(projectId);
         if (project == null)
         {
-            addFieldError("projectId", "Unknown project '"+ projectId +"'");
+            addFieldError("projectId", "Unknown project '" + projectId + "'");
             return;
         }
 
@@ -175,4 +184,8 @@ public class CreateSubscriptionAction extends UserActionSupport
         return SUCCESS;
     }
 
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
 }

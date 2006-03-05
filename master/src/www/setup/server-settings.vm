@@ -10,9 +10,9 @@
 
     #wwtextfield("name=hostname" "label=%{getText('general.host')}" "required=true" "size=40" "tabindex=1")
     #inlineHelp("general.host.help")
-    #wwtextfield("name=fromAddress" "label=%{getText('smtp.from')}" "required=true" "size=40" "tabindex=2")
+    #wwtextfield("name=fromAddress" "label=%{getText('smtp.from')}" "size=40" "tabindex=2")
     #inlineHelp("smtp.from.help")
-    #wwtextfield("name=smtpHost" "label=%{getText('smtp.host')}" "required=true" "size=40" "tabindex=3")
+    #wwtextfield("name=smtpHost" "label=%{getText('smtp.host')}" "size=40" "tabindex=3")
     #inlineHelp("smtp.host.help")
     #wwtextfield("name=smtp.username" "label=%{getText('smtp.username')}" "tabindex=4")
     #inlineHelp("smtp.username.help")
