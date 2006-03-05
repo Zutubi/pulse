@@ -16,9 +16,9 @@
     </configurations>
 
     <dependencies>
-        <dependency org="cinnamonbob" name="local" rev="0.2" conf="local->*"/>
-        <dependency org="cinnamonbob" name="master" rev="0.2" conf="master->*"/>
-        <dependency org="cinnamonbob" name="slave" rev="0.2" conf="slave->*"/>
+        <dependency org="cinnamonbob" name="local" rev="0.3" conf="local->*"/>
+        <dependency org="cinnamonbob" name="master" rev="0.3" conf="master->*"/>
+        <dependency org="cinnamonbob" name="slave" rev="0.3" conf="slave->*"/>
     </dependencies>
 
 </ivy-module>

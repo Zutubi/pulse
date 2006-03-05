@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="cinnamonbob" module="local" revision="0.2" status="integration">
+    <info organisation="cinnamonbob" module="local" revision="0.3" status="integration">
         <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
         <description homepage="http://www.cinnamonbob.com/">
             description....
