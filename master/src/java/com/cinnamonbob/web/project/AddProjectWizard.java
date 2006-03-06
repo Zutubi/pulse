@@ -135,8 +135,8 @@ public class AddProjectWizard extends BaseWizard
         parent.addChild(node);
         buildSpecificationNodeDao.save(parent);
 
-        // schedule the event trigger.
-        Trigger trigger = new EventTrigger(SCMChangeEvent.class, "scm monitor");
+        // schedule the event trigger - unique to this project.
+        Trigger trigger = new EventTrigger(SCMChangeEvent.class, "project "+ project.getId(), "scm event triggers");
         trigger.setProject(project.getId());
         trigger.setTaskClass(BuildProjectTask.class);
         trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, "default");
@@ -148,7 +148,7 @@ public class AddProjectWizard extends BaseWizard
         }
         catch (SchedulingException e)
         {
-            // need to display this error to the user...
+            //CIB-169: need to display this error to the user...
             LOG.severe(e.getMessage(), e);
         }
     }
