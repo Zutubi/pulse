@@ -86,7 +86,6 @@
 
         <retrieve.package conf="local" dest="${package.root}/lib"/>
         <retrieve.package conf="master" dest="${package.root}/lib"/>
-        <retrieve.package conf="master" dest="${package.root}/system/www/WEB-INF/lib"/>
 
         <!-- place holder for package documentation -->
         <copy todir="${package.root}/docs">
@@ -94,10 +93,6 @@
         </copy>
         <copy todir="${package.root}/system/templates">
             <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl"/>
-        </copy>
-        <!-- place holder for the database directory -->
-        <copy todir="${package.root}/system/database">
-            <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
         <!-- place holder for the log directory -->
         <copy todir="${package.root}/system/log">

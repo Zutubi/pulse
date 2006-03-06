@@ -27,7 +27,7 @@ public class ConfigureBobHomeAction extends ActionSupport
         this.bobHome = bobHome;
     }
 
-    public String doInput()
+    public String doInput() throws Exception
     {
         // set the default.
         String install = System.getProperty(SimpleConfigurationManager.BOB_INSTALL);
@@ -39,6 +39,9 @@ public class ConfigureBobHomeAction extends ActionSupport
         {
             this.bobHome = install + File.separatorChar + "home";
         }
+
+        // make the path the shortest possible.
+        this.bobHome = new File(this.bobHome).getCanonicalPath();
 
         return INPUT;
     }
