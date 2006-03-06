@@ -239,8 +239,19 @@ public abstract class BobTestCase extends TestCase
 
     protected File getBobRoot()
     {
-        URL resource = Version.class.getResource("version.properties");
-        return new File(resource.getPath().replaceFirst("core/classes/.*", ""));
+        // First, take a guess at the working directory (which is likely to
+        // work if we are running tests using Ant)
+        File master = new File("master");
+        if(master.isDirectory())
+        {
+            return new File(".");
+        }
+        else
+        {
+            // OK, maybe we can find indirectly via the classpath
+            URL resource = Version.class.getResource("version.properties");
+            return new File(resource.getPath().replaceFirst("core/classes/.*", ""));
+        }
     }
 
     protected void removeDirectory(File dir) throws IOException

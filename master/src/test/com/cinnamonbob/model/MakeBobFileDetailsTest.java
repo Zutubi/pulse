@@ -6,7 +6,7 @@ import java.io.IOException;
 
 /**
  */
-public class MakeBobFileDetailsTest extends TemplateBobFileDetailsTest
+public class MakeBobFileDetailsTest extends TemplateBobFileDetailsTestBase
 {
     private MakeBobFileDetails details;
 

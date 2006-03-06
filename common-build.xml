@@ -12,6 +12,7 @@
         <property name="build.dir" value="${module.root.dir}/build"/>
         <property name="classes.dir" value="${build.dir}/classes"/>
         <property name="test.classes.dir" value="${build.dir}/test.classes"/>
+        <property name="report.dir" value="${build.dir}/reports"/>
 
         <dirname property="current.dir" file="ivy.xml"/>
 
@@ -29,8 +30,10 @@
         <!-- resources / properties definition-->
         <patternset id="resources">
             <include name="**/*.properties"/>
+            <include name="**/*.gif"/>
             <include name="**/*.png"/>
             <include name="**/*.xml"/>
+            <include name="**/*.txt"/>
         </patternset>
 
     </target>
@@ -47,6 +50,8 @@
         <mkdir dir="${classes.dir}"/>
         <mkdir dir="${test.classes.dir}"/>
         <mkdir dir="${module.root.dir}/build/lib"/>
+        <mkdir dir="${report.dir}"/>
+        <mkdir dir="${report.dir}/junit"/>
 
         <!-- resolve dependencies -->
         <resolve conf="external"/>
@@ -84,6 +89,20 @@
 
     <!-- run test cases -->
     <target name="test" depends="init">
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath>
+                <pathelement location="${classes.dir}"/>
+                <pathelement location="${test.classes.dir}"/>
+                <path refid="lib.path"/>
+            </classpath>
+            <formatter type="plain"/>
+            <batchtest todir="${report.dir}/junit">
+                <fileset dir="${test.dir}">
+                    <include name="**/*Test.java"/>
+                    <exclude name="**/Cvs*"/>
+                </fileset>
+            </batchtest>
+        </junit>
     </target>
 
     <!-- package artifacts -->

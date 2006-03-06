@@ -11,7 +11,7 @@ import java.io.InputStream;
 
 /**
  */
-public abstract class TemplateBobFileDetailsTest extends BobTestCase
+public abstract class TemplateBobFileDetailsTestBase extends BobTestCase
 {
     protected File tmpDir;
     protected VelocityEngine engine;
