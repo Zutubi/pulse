@@ -26,10 +26,10 @@
             <li class="task">
                 <a href="admin/userSettings.action">add new users</a> :: at the users view (administration &gt; users tab )
             </li>
+            #end
             <li class="task">
                 <a href="admin/serverSettings.action">configure server settings</a> :: at the server settings view (administration &gt; settings tab)
             </li>
-            #end
             <li class="task">
                 <a href="viewResources.action">add new resources</a> :: at the server resources view (server &gt; resources tab)
             </li>
