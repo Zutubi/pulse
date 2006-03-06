@@ -38,11 +38,11 @@ set _EXECCMD=start "Bob" "%_JAVACMD%"
 
 :doExec
 
-
-rem setup the classpath...
+rem setup the classpath.
 set LOCALCLASSPATH=%CLASSPATH%;"%BOB_HOME%\system\www\WEB-INF\classes"
+set LOCALCLASSPATH=%LOCALCLASSPATH%;"%BOB_HOME%\lib"
 for %%i in ("%BOB_HOME%\lib\*.jar") do call "%BOB_HOME%\bin\lcp.bat" %%i
-set LOCALCLASSPATH=%LOCALCLASSPATH%;"%BOB_HOME%\lib\validators.xml"
+for %%i in ("%BOB_HOME%\lib\*.xml") do call "%BOB_HOME%\bin\lcp.bat" %%i
 
 %_EXECCMD% %BOB_OPTS% -classpath "%LOCALCLASSPATH%" -Dbob.install="%BOB_HOME%" -Djava.util.logging.config.file="%BOB_HOME%\system\config\logging.properties" -Djava.awt.headless=true %*
 
