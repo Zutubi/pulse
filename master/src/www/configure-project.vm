@@ -71,7 +71,7 @@
                         #dynamicCell($trigger.name)
                         #dynamicCell($trigger.type)
                         #dynamicCell($trigger.dataMap.spec)
-                        #editCell("editTrigger.action?id=$trigger.id")
+                        <!--#editCell("editTrigger.action?id=$trigger.id")-->
                         #deleteCell($confirmMessage "deleteTrigger.action?id=$trigger.id")
                     </tr>
 #end
