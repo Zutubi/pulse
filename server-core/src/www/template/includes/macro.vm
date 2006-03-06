@@ -789,10 +789,15 @@
 ##
 ## Shows a list of artifacts for a command
 ##
-#macro(commandArtifacts $result $showFeatures)
+#macro(commandArtifacts $result $showFeatures $showArtifactLink)
     <ul class="artifact">
     #foreach($artifact in $result.artifacts)
-        <li class="file-artifact"><a href="viewArtifact.action?id=$artifact.id&amp;commandId=$result.id">$artifact.title</a>
+        <li class="file-artifact">
+        #if($showArtifactLink)
+            <a href="viewArtifact.action?id=$artifact.id&amp;commandId=$result.id">$artifact.title</a>
+        #else
+            $artifact.title
+        #end
         #if($showFeatures)
             #foreach($level in $featureLevels)
                 #if($artifact.hasMessages($level))
@@ -819,7 +824,7 @@
         #foreach($commandResult in $result.commandResults)
             #if($commandResult.hasArtifacts())
         <li class="artifact">#wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)
-            #commandArtifacts($commandResult false)
+            #commandArtifacts($commandResult false $result.completed())
         </li>
             #end
         #end

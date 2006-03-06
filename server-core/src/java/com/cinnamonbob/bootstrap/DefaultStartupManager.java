@@ -76,7 +76,7 @@ public class DefaultStartupManager implements StartupManager
             }
             catch (Exception e)
             {
-                LOG.warning("Failed to run startup task. Reason: " + e.getMessage(), e);
+                LOG.warning("Failed to run startup task "+name+". Reason: " + e.getMessage(), e);
             }
         }
 
