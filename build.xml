@@ -31,10 +31,6 @@
         <ant inheritAll="false" dir="master" antfile="build.xml" target="build.module"/>
     </target>
 
-    <target name="test.master" depends="build.master">
-        <ant inheritAll="false" dir="master" antfile="build.xml" target="test.module"/>
-    </target>
-
     <target name="build.slave" depends="build.server-core">
         <ant inheritAll="false" dir="slave" antfile="build.xml" target="build.module"/>
     </target>

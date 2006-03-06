@@ -7,7 +7,7 @@ import com.cinnamonbob.scheduling.quartz.TriggerAdapter;
 /**
  * <class-comment/>
  */
-public class CronSchedulerStrategyTest extends BaseSchedulerStrategyTest
+public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
 {
     private org.quartz.Scheduler quartzScheduler = null;
 

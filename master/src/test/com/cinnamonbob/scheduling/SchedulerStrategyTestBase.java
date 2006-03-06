@@ -5,12 +5,12 @@ import junit.framework.TestCase;
 /**
  * <class-comment/>
  */
-public abstract class BaseSchedulerStrategyTest extends TestCase
+public abstract class SchedulerStrategyTestBase extends TestCase
 {
     protected SchedulerStrategy scheduler = null;
     protected TestTriggerHandler triggerHandler = null;
 
-    public BaseSchedulerStrategyTest(String testName)
+    public SchedulerStrategyTestBase(String testName)
     {
         super(testName);
     }

@@ -7,7 +7,7 @@ import com.cinnamonbob.events.EventManager;
 /**
  * <class-comment/>
  */
-public class EventSchedulerStrategyTest extends BaseSchedulerStrategyTest
+public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
 {
     private EventManager eventManager;
 

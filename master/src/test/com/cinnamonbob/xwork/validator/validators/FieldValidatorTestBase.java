@@ -8,12 +8,12 @@ import junit.framework.TestCase;
 /**
  * <class-comment/>
  */
-public abstract class BaseFieldValidatorTest extends TestCase
+public abstract class FieldValidatorTestBase extends TestCase
 {
     protected ValidationAwareSupport validationAware;
     protected FieldValidator validator;
 
-    public BaseFieldValidatorTest(String testName)
+    public FieldValidatorTestBase(String testName)
     {
         super(testName);
     }

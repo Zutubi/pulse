@@ -5,7 +5,7 @@ import com.opensymphony.xwork.validator.FieldValidator;
 /**
  * <class-comment/>
  */
-public class CvsRootValidatorTest extends BaseFieldValidatorTest
+public class CvsRootValidatorTest extends FieldValidatorTestBase
 {
     public CvsRootValidatorTest(String testName)
     {

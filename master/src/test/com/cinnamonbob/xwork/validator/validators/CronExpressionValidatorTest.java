@@ -5,7 +5,7 @@ import com.opensymphony.xwork.validator.FieldValidator;
 /**
  * <class-comment/>
  */
-public class CronExpressionValidatorTest extends BaseFieldValidatorTest
+public class CronExpressionValidatorTest extends FieldValidatorTestBase
 {
 
     public CronExpressionValidatorTest(String testName)
