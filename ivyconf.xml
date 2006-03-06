@@ -17,7 +17,7 @@
                     <artifact pattern="e:/work/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
                 </filesystem>
                 <url name="artifact-repository">
-                    <artifact pattern="http://www.cinnamonbob.com/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
+                    <artifact pattern="http://220.233.100.30/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
                 </url>
             </chain>
         </dual>

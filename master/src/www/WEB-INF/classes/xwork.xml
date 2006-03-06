@@ -32,8 +32,13 @@
         </action>
 
         <action name="preferences" class="com.cinnamonbob.web.user.PreferencesAction">
-            <result name="success" type="velocity">preferences.vm</result>
+            <result name="input" type="velocity">/preferences.vm</result>
+            <result name="success" type="velocity">/preferences.vm</result>
             <result name="error" type="redirect">/</result>
+        </action>
+
+        <action name="preferences!input" class="com.cinnamonbob.web.user.PreferencesAction" method="doInput">
+            <result name="input" type="velocity">/preferences.vm</result>
         </action>
 
         <action name="viewRecipeQueue" class="com.cinnamonbob.web.server.ViewRecipeQueueAction">
@@ -482,7 +487,8 @@
         <action name="createSubscription" class="com.cinnamonbob.web.user.CreateSubscriptionAction">
             <result name="input" type="velocity">create-subscription.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
-            <result name="error" type="redirect">/preferences.action</result>
+            <result name="error" type="chain">preferences!input</result>
+            <!--<result name="error" type="redirect">/preferences.action</result>-->
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 

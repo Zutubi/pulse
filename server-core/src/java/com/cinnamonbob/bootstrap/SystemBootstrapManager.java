@@ -48,7 +48,15 @@ public class SystemBootstrapManager
         try
         {
             SystemPaths systemPaths = ConfigUtils.getManager().getSystemPaths();
-            FileHandler handler = new FileHandler(systemPaths.getLogRoot().getAbsolutePath() + "/cinnabo%u.log");
+            // ensure that the directory exists.
+
+            File logRoot = systemPaths.getLogRoot();
+            if (!logRoot.exists() && !logRoot.mkdirs())
+            {
+                throw new IOException("Unable to create log directory '"+logRoot+"'. Please check that you have " +
+                        "permissions to create this directory.");
+            }
+            FileHandler handler = new FileHandler(logRoot.getAbsolutePath() + "/cinnabo%u.log");
             handler.setLevel(Level.INFO);
             Logger.getLogger("").addHandler(handler);
         }

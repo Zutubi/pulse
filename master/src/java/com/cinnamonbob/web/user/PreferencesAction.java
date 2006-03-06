@@ -18,7 +18,7 @@ public class PreferencesAction extends UserActionSupport
         return user;
     }
 
-    public String execute()
+    public String doInput() throws Exception
     {
         String login = AcegiUtils.getLoggedInUser();
         if (login == null)
@@ -32,8 +32,17 @@ public class PreferencesAction extends UserActionSupport
         {
             return ERROR;
         }
+        return super.doInput();
+    }
 
-        return SUCCESS;
+    public String execute() throws Exception
+    {
+        String result = doInput();
+        if (result.equals(INPUT))
+        {
+            return SUCCESS;
+        }
+        return ERROR;
     }
 
     public void setUserManager(UserManager userManager)

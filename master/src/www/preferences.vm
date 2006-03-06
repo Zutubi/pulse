@@ -10,6 +10,8 @@
 
     #dashboardTabs("preferences")
 
+    #parse("/template/includes/actionerrors.vm")
+
     <table class="columns" width="90%">
         <tr>
             <td class="columns" width="40%">
@@ -52,7 +54,7 @@
                     #set($contact = $subscription.contactPoint)
                     #set($project = $subscription.project)
                     <tr>
-                        #set($confirmMessage = $action.getText("subscription.delete.confirm", [$subscription.name]))
+                        #set($confirmMessage = $action.getText("subscription.delete.confirm", [$project.name]))
                         #dynamicCell($project.name)
                         #dynamicCell($contact.uid)
                         #dynamicCell($subscription.condition)
