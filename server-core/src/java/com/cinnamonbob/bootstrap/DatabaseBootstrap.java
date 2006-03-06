@@ -1,6 +1,8 @@
 package com.cinnamonbob.bootstrap;
 
 import com.cinnamonbob.util.logging.Logger;
+import com.cinnamonbob.util.JDBCUtils;
+import com.cinnamonbob.core.Stoppable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
@@ -10,12 +12,13 @@ import javax.sql.DataSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Hibernate specific bootstrap support that creates the database scheme
  * if it does not already exist in the configured database.
  */
-public class DatabaseBootstrap implements ApplicationContextAware
+public class DatabaseBootstrap implements ApplicationContextAware, Stoppable
 {
     public static final String DEFAULT_SCHEMA_TEST_TABLE = "RESOURCE";
 
@@ -42,16 +45,44 @@ public class DatabaseBootstrap implements ApplicationContextAware
     private boolean schemaExists()
     {
         // does the schema exist? there should be a better way to do this... have a look at the hibernate source...
+        Connection con = null;
+        CallableStatement stmt = null;
         try
         {
-            Connection con = dataSource.getConnection();
-            CallableStatement stmt = con.prepareCall("SELECT COUNT(*) FROM " + schemaTestTable);
+            con = dataSource.getConnection();
+            stmt = con.prepareCall("SELECT COUNT(*) FROM " + schemaTestTable);
             stmt.execute();
             return true;
         }
         catch (SQLException e)
         {
             return false;
+        }
+        finally
+        {
+            JDBCUtils.close(stmt);
+            JDBCUtils.close(con);
+        }
+    }
+
+    public void stop(boolean force)
+    {
+        Connection con = null;
+        Statement stmt = null;
+        try
+        {
+            con = dataSource.getConnection();
+            stmt = con.createStatement();
+            stmt.execute("SHUTDOWN");
+        }
+        catch (SQLException e)
+        {
+            LOG.error(e);
+        }
+        finally
+        {
+            JDBCUtils.close(stmt);
+            JDBCUtils.close(con);
         }
     }
 
