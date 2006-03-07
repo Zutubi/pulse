@@ -26,7 +26,7 @@ public class ServerRecipePaths implements RecipePaths
 
     private File getRecipesRoot()
     {
-        return new File(configurationManager.getSystemPaths().getSystemRoot(), "recipes");
+        return new File(configurationManager.getUserPaths().getHome(), "recipes");
     }
 
     public File getRecipeRoot()

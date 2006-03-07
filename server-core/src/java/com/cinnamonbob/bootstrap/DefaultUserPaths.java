@@ -18,6 +18,11 @@ public class DefaultUserPaths implements UserPaths
         this.bobHome = bobHome;
     }
 
+    public File getHome()
+    {
+        return bobHome;
+    }
+
     public File getUserConfigRoot()
     {
         if (userConfigRoot == null)

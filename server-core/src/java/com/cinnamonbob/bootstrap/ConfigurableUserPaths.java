@@ -7,9 +7,20 @@ import java.io.File;
  */
 public class ConfigurableUserPaths implements UserPaths
 {
+    private File home;
     private File databaseRoot;
     private File projectRoot;
     private File userConfigRoot;
+
+    public File getHome()
+    {
+        return home;
+    }
+
+    public void setHome(File home)
+    {
+        this.home = home;
+    }
 
     public File getDatabaseRoot()
     {
@@ -40,4 +51,5 @@ public class ConfigurableUserPaths implements UserPaths
     {
         this.userConfigRoot = userConfigRoot;
     }
+
 }

@@ -8,6 +8,14 @@ import java.io.File;
 public interface UserPaths
 {
     /**
+     * Thje bob home direcory is the place where all of the users data is
+     * stored.
+     *
+     * @return the home directory for all bob data
+     */
+    File getHome();
+
+    /**
      * The user configuration directory.  Configuration files in this
      * directory are expected to be edited by the user.  A prime example is
      * basic system properties such as the port for the web application.
