@@ -9,7 +9,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    #wwcform("action=contactWizard.action" "heading=%{getText('contact.create')}" "method=post")
+    #wwcform("action=contactWizard.action" "id=contact.create" "heading=%{getText('contact.create')}" "method=post")
         #wwhidden("name=state")
         #wwselect("name=contact" "label=%{getText('contact')}" "list=contacts" "required=true" "tabindex=1")
         #openSubmit()
