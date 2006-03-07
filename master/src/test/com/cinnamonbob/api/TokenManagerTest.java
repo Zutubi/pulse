@@ -6,6 +6,7 @@ import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.persistence.UserDao;
 import com.cinnamonbob.scheduling.persistence.mock.MockUserDao;
 import com.cinnamonbob.test.BobTestCase;
+import com.cinnamonbob.core.util.Constants;
 
 /**
  */
@@ -135,8 +136,8 @@ public class TokenManagerTest extends BobTestCase
 
     public void testExpiry() throws Exception
     {
-        String token = tokenManager.login("jason", "password", 1);
-        Thread.sleep(10);
+        // create a token that expired a minute ago.
+        String token = tokenManager.login("jason", "password", Constants.MINUTE * -1);
 
         assertFalse(tokenManager.logout(token));
     }
@@ -150,7 +151,7 @@ public class TokenManagerTest extends BobTestCase
 
     public void testDetectsStaleTokens() throws Exception
     {
-        String firstToken = tokenManager.login("jason", "password", 1);
+        String firstToken = tokenManager.login("jason", "password", Constants.MINUTE * -1);
         Thread.sleep(10);
 
         for (int i = 0; i < 1000; i++)
