@@ -10,7 +10,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    #wwcform("action=editUser.action" "heading=%{getText('user.edit')}" "method=post")
+    #wwcform("action=editUser.action" "id=user.edit" "heading=%{getText('user.edit')}" "method=post")
         #wwhidden("name=id")
         #wwhidden("name=user.login")
         #wwtextfield("name=user.name" "label=%{getText('user.name')}" "required=true" "tabindex=1")

@@ -36,6 +36,9 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         submitCreateUserForm(login, login, login, login, false);
 
         login(login, login);
+
+        // navigate to the preferences tab.
+        navigateToPreferences();
     }
 
     protected void tearDown() throws Exception
@@ -45,9 +48,6 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
 
     public void testUserPreferences()
     {
-        // navigate to the preferences tab.
-        navigateToPreferences();
-
         // assert tabular data.
         assertTablePresent("user");
         assertTableRowsEqual("user", 1, new String[][]{
@@ -100,8 +100,6 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
 
     public void testContactFormValidation()
     {
-        navigateToPreferences();
-
         clickLinkWithText(CREATE_CONTACT_LINK);
 
         assertFormPresent(CONTACT_CREATE);
@@ -139,12 +137,89 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         assertFormPresent(EMAIL_CREATE);
         assertFormElementEquals(EMAIL_CREATE_NAME, "example");
         assertFormElementEquals(EMAIL_CREATE_EMAIL, "incorrect email address");
+
+        setWorkingForm(EMAIL_CREATE);
+        setFormElement(EMAIL_CREATE_NAME, "example");
+        setFormElement(EMAIL_CREATE_EMAIL, "email@example.com");
+        submit("cancel");
+
+        // assert that the contact was not created.
+        assertTablePresent("contacts");
+        assertTextNotPresent("example");
+        assertTextNotPresent("email@example.com");
+    }
+
+    public void testEditUser()
+    {
+        // assert tabular data.
+        assertTablePresent("user");
+        assertTableRowsEqual("user", 1, new String[][]{
+                new String[]{"login", login},   // login row
+                new String[]{"name", login}     // name row
+        });
+
+        assertLinkPresentWithText("edit");
+        clickLinkWithText("edit");
+
+        assertFormPresent("user.edit");
+        setWorkingForm("user.edit");
+        assertFormElementEquals("user.name", login);
+
+        setFormElement("user.name", "S. O. MeBody");
+        submit("save");
+
+        assertTablePresent("user");
+        assertTableRowsEqual("user", 1, new String[][]{
+                new String[]{"login", login},   // login row
+                new String[]{"name", "S. O. MeBody"}     // name row
+        });
+    }
+
+    public void testCancelEditUser()
+    {
+        // assert tabular data.
+        assertTablePresent("user");
+        assertTableRowsEqual("user", 1, new String[][]{
+                new String[]{"login", login},   // login row
+                new String[]{"name", login}     // name row
+        });
+
+        assertLinkPresentWithText("edit");
+        clickLinkWithText("edit");
+
+        assertFormPresent("user.edit");
+        setWorkingForm("user.edit");
+        setFormElement("user.name", "S. O. MeBody");
+        submit("cancel");
+
+        // assert tabular data.
+        assertTablePresent("user");
+        assertTableRowsEqual("user", 1, new String[][]{
+                new String[]{"login", login},   // login row
+                new String[]{"name", login}     // name row
+        });
+
+    }
+
+    public void testEditUserValidation()
+    {
+        clickLinkWithText("edit");
+
+        assertFormPresent("user.edit");
+        setWorkingForm("user.edit");
+        assertFormElementEquals("user.name", login);
+
+        setFormElement("user.name", "");
+        submit("save");
+
+        // assert validation failed.
+        assertTextPresent("required");
+        assertFormPresent("user.edit");
+        assertFormElementEquals("user.name", "");
     }
 
     public void testSubscriptionFormValidation()
     {
-        navigateToPreferences();
-
         // can not create subscription without project
         // can not create subscription without contacts.
     }
@@ -155,5 +230,4 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         clickLinkWithText("dashboard");
         clickLinkWithText("preferences");
     }
-
 }
