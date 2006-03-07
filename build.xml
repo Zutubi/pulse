@@ -49,7 +49,7 @@
         <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
         <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh"/>
 
-        <retrieve.package conf="local" dest="${package.root}/lib"/>
+        <retrieve.dependencies module="." conf="local" dest="${package.root}/lib"/>
 
         <!-- place holder for package documentation -->
         <copy todir="${package.root}/docs">
@@ -84,8 +84,8 @@
         <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
         <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh" verbose="true"/>
 
-        <retrieve.package conf="local" dest="${package.root}/lib"/>
-        <retrieve.package conf="master" dest="${package.root}/lib"/>
+        <retrieve.dependencies module="." conf="local" dest="${package.root}/lib"/>
+        <retrieve.dependencies module="." conf="master" dest="${package.root}/lib"/>
 
         <!-- place holder for package documentation -->
         <copy todir="${package.root}/docs">
@@ -112,7 +112,7 @@
             <fileset dir="master/etc" includes="*.xml"/>
         </copy>
 
-       <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
+        <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
         <exec executable="zip" dir="${package.root}/..">
             <arg line="-r ../${package.name}.zip ${package.name}"/>
         </exec>
@@ -128,111 +128,48 @@
         </tar>
     </target>
 
-    <target name="package.slave" depends="init, build.local, build.slave">
-
-        <property name="package.root" value="build/package"/>
-        <delete dir="${package.root}"/>
-        <mkdir dir="${package.root}"/>
-
-        <copy todir="${package.root}/bin">
-            <fileset dir="core/src/bin" includes="**/*"/>
-            <fileset dir="local/src/bin" includes="**/*"/>
-            <fileset dir="server-core/src/bin" includes="**/*"/>
-            <fileset dir="slave/src/bin" includes="**/*"/>
-        </copy>
-
-        <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
-        <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh"/>
-
-        <retrieve.package conf="local" dest="${package.root}/lib"/>
-        <retrieve.package conf="slave" dest="${package.root}/lib"/>
-        <retrieve.package conf="slave" dest="${package.root}/system/www/WEB-INF/lib"/>
-
-        <!-- place holder for package documentation -->
-        <copy todir="${package.root}/docs">
-            <fileset dir="etc" includes="delete-me.txt"/>
-        </copy>
-        <!-- /config is for user configuration properties -->
-        <copy todir="${package.root}/config">
-            <fileset dir="master/etc" includes="bob.properties"/>
-        </copy>
-        <!-- place holder for the logs directory -->
-        <copy todir="${package.root}/system/logs">
-            <fileset dir="etc" includes="delete-me.txt"/>
-        </copy>
-        <copy todir="${package.root}/system/www">
-            <fileset dir="slave/src/www" includes="**/*"/>
-        </copy>
-        <!-- /system/config is for system configuration files - not changed unless there is a problem... -->
-        <copy todir="${package.root}/system/config">
-            <fileset dir="master/etc" includes="log.properties"/>
-        </copy>
-
-
-        <zip destfile="build/bob-slave-${bob.version}.zip">
-            <zipfileset dir="build/package" includes="**/*" prefix="bob-slave-${bob.version}"/>
-        </zip>
-
-    </target>
-
-
     <target name="init">
         <property name="project.root.dir" value="."/>
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
     </target>
 
-    <target name="resolve.lib" depends="init">
-    	<resolve.dependencies module="core"/>
-    	<resolve.dependencies module="server-core"/>
-    	<resolve.dependencies module="local"/>
-    	<resolve.dependencies module="master"/>
-    	<resolve.dependencies module="slave"/>
-    </target>
-
+    <!--
+     Refresh the projects lib directory by retrieving the latest module dependencies.
+    -->
     <target name="refresh.lib" depends="clean, init">
 
+        <!-- refreshing the lib directory -->
         <delete dir="lib"/>
-        <mkdir dir="lib"/>
 
-        <ivy:configure file="ivyconf.xml"/>
-        <retrieve.dependencies module="core"/>
-        <retrieve.dependencies module="server-core"/>
-        <retrieve.dependencies module="local"/>
-        <retrieve.dependencies module="master"/>
-        <retrieve.dependencies module="slave"/>
-
+	    <!-- use the default ivy configuration properties. -->
+    	<property file="ivy.properties"/>
+        <ivy:configure/>
+        <retrieve.dependencies module="core" dest="lib"/>
+        <retrieve.dependencies module="server-core" dest="lib"/>
+        <retrieve.dependencies module="local" dest="lib"/>
+        <retrieve.dependencies module="master" dest="lib"/>
+        <retrieve.dependencies module="slave" dest="lib"/>
     </target>
 
+    <!-- 
+     Retrieve the dependencies for the specified module, and place them into the 
+     destination directory.
+    -->
     <macrodef name="retrieve.dependencies">
         <attribute name="module"/>
         <attribute name="conf" default="external"/>
+        <attribute name="dest" default="lib"/>
         <sequential>
+    	    <!-- resolve the modules ivy file. -->
             <ivy:resolve file="@{module}/ivy.xml" conf="@{conf}"/>
-            <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
-            <ivy:retrieve validate="true" conf="@{conf}"/>
-        </sequential>
-    </macrodef>
-
-    <macrodef name="resolve.dependencies">
-        <attribute name="module"/>
-        <attribute name="conf" default="external"/>
-        <sequential>
-            <ivy:resolve file="@{module}/ivy.xml" conf="@{conf}"/>
-            <ivy:retrieve validate="true" conf="@{conf}"/>
-        </sequential>
-    </macrodef>
-
-
-    <macrodef name="retrieve.package">
-        <attribute name="conf"/>
-        <attribute name="dest"/>
-        <sequential>
-            <ivy:resolve file="ivy.xml" conf="@{conf}"/>
             <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
             <ivy:retrieve pattern="@{dest}/[artifact]-[revision].[ext]" validate="true" conf="@{conf}"/>
         </sequential>
     </macrodef>
 
+    <!--
+     Execute the specified target on each of the modules.
+    -->
     <macrodef name="foreach">
         <attribute name="target"/>
         <sequential>
@@ -243,6 +180,5 @@
             <ant inheritAll="false" dir="slave" antfile="build.xml" target="@{target}"/>
         </sequential>
     </macrodef>
-
 
 </project>

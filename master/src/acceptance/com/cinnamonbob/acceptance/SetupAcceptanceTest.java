@@ -39,7 +39,7 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         super.tearDown();
     }
 
-    public void _testSetupProcess()
+    public void testSetupProcess()
     {
         // first we deal with the bob home property configuration.
         beginAt("/");
@@ -49,6 +49,9 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
 
         // ensure that we have a default value for the bobHome property.
         assertFormElementNotEmpty("bobHome");
+
+        // record the default value for later use.
+        String defaultBobHome = getFormValue("bobHome");
 
         // check the validation - an empty bob home.
         setFormElement("bobHome", "");
@@ -61,8 +64,8 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         // check validation - an invalid bob home value.
 
         // enter valid bob home that does not exist.
-        File bobHome = new File(tmpDir, "home");
-        setFormElement("bobHome", bobHome.getAbsolutePath());
+//        File bobHome = new File(tmpDir, "home");
+        setFormElement("bobHome", defaultBobHome);
         submit("next");
 
         // it should prompt for confirmation to create the directory.
