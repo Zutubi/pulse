@@ -119,14 +119,22 @@ public class MakeCommandTest extends BobTestCase
     {
         assertTrue(commandResult.getProperties().containsKey("command line"));
         assertTrue(commandResult.getProperties().get("command line").toString().startsWith("make"));
-        FileInputStream is = new FileInputStream(new File(outputDir, "output.txt"));
-        String output = IOUtils.inputStreamToString(is);
-        for (String content : contents)
+        FileInputStream is = null;
+        try
         {
-            if (!output.contains(content))
+            is = new FileInputStream(new File(outputDir, "output.txt"));
+            String output = IOUtils.inputStreamToString(is);
+            for (String content : contents)
             {
-                fail("Output '" + output + "' does not contain '" + content + "'");
+                if (!output.contains(content))
+                {
+                    fail("Output '" + output + "' does not contain '" + content + "'");
+                }
             }
+        }
+        finally
+        {
+            IOUtils.close(is);
         }
     }
 
