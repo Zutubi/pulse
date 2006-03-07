@@ -7,11 +7,6 @@ import com.cinnamonbob.core.util.RandomUtils;
  */
 public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
 {
-    private static final String FE_LOGIN = "user.login";
-    private static final String FE_NAME = "user.name";
-    private static final String FE_PASSWORD = "user.password";
-    private static final String FE_CONFIRM = "confirm";
-    private static final String FE_ADMIN = "admin";
 
     public UserAdministrationAcceptanceTest()
     {
@@ -26,6 +21,9 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
     {
         super.setUp();
         login("admin", "admin");
+
+        // navigate to user admin tab.
+        navigateToUserAdministration();
     }
 
     protected void tearDown() throws Exception
@@ -35,9 +33,6 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
 
     public void testCreateStandardUser()
     {
-        // navigate to user admin tab.
-        navigateToUserAdministration();
-
         // create random login name.
         String login = RandomUtils.randomString(10);
 
@@ -66,9 +61,6 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
 
     public void testCreateAdminUser()
     {
-        // navigate to user admin tab.
-        navigateToUserAdministration();
-
         // create random login name.
         String login = RandomUtils.randomString(10);
 
@@ -98,9 +90,6 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
 
     public void testCreateUserValidation()
     {
-        // navigate to user admin tab.
-        navigateToUserAdministration();
-
         // create random login name.
         String login = RandomUtils.randomString(10);
 
@@ -110,31 +99,28 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         // should get an error message.
         assertTextPresent("required");
         assertLinkNotPresentWithText(login);
-        assertFormElementEmpty(FE_LOGIN);
-        assertFormElementEquals(FE_NAME, login);
+        assertFormElementEmpty(USER_CREATE_LOGIN);
+        assertFormElementEquals(USER_CREATE_NAME, login);
 
         // check validation - password is required.
         submitCreateUserForm(login, login, "", "", false);
 
         assertTextPresent("required");
         assertLinkNotPresentWithText(login);
-        assertFormElementEquals(FE_LOGIN, login);
-        assertFormElementEquals(FE_NAME, login);
+        assertFormElementEquals(USER_CREATE_LOGIN, login);
+        assertFormElementEquals(USER_CREATE_NAME, login);
 
         // check validation - password and confirmation mismatch
         submitCreateUserForm(login, login, login, "something not very random", false);
 
         assertTextPresent("does not match");
         assertLinkNotPresentWithText(login);
-        assertFormElementEquals(FE_LOGIN, login);
-        assertFormElementEquals(FE_NAME, login);
+        assertFormElementEquals(USER_CREATE_LOGIN, login);
+        assertFormElementEquals(USER_CREATE_NAME, login);
     }
 
     public void testDeleteUser()
     {
-        // navigate to the user admin pages.
-        navigateToUserAdministration();
-
         // create a user to delete - assume that user creation is successful?
         String login = RandomUtils.randomString(10);
         submitCreateUserForm(login, login, login, login, false);
@@ -151,13 +137,37 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         assertLinkNotPresentWithText(login);
     }
 
+    public void testViewUser()
+    {
+        // create user.
+        String login = RandomUtils.randomString(10);
+        submitCreateUserForm(login, login, login, login, false);
+
+        // view user
+        assertLinkPresentWithText(login);
+        clickLinkWithText(login);
+
+        // assert tabular data.
+        assertTablePresent("user");
+        assertTableRowsEqual("user", 1, new String[][]{
+                new String[]{"login", login},   // login row
+                new String[]{"name", login}     // name row
+        });
+
+        // switch to user, create contacts and subscriptions, assert they appear.
+
+        assertTablePresent("contacts");
+
+        assertTablePresent("subscriptions");
+    }
+
     private void assertFormReset()
     {
-        assertFormElementEmpty(FE_LOGIN);
-        assertFormElementEmpty(FE_NAME);
-        assertFormElementEmpty(FE_PASSWORD);
-        assertFormElementEmpty(FE_CONFIRM);
-        assertCheckboxNotSelected(FE_ADMIN);
+        assertFormElementEmpty(USER_CREATE_LOGIN);
+        assertFormElementEmpty(USER_CREATE_NAME);
+        assertFormElementEmpty(USER_CREATE_PASSWORD);
+        assertFormElementEmpty(USER_CREATE_CONFIRM);
+        assertCheckboxNotSelected(USER_CREATE_ADMIN);
     }
 
     private void assertUserExists(String login)
@@ -174,30 +184,5 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         // lookup a user, a more direct method.
         assertTextNotPresent(login);
         assertLinkNotPresentWithText(login);
-    }
-
-    private void submitCreateUserForm(String login, String name, String password, String confirm, boolean admin)
-    {
-        setWorkingForm("user.create");
-        setFormElement(FE_LOGIN, login);
-        setFormElement(FE_NAME, name);
-        setFormElement(FE_PASSWORD, password);
-        setFormElement(FE_CONFIRM, confirm);
-        if (admin)
-        {
-            checkCheckbox(FE_ADMIN, "true");
-        }
-        else
-        {
-            uncheckCheckbox(FE_ADMIN);
-        }
-        submit("save");
-    }
-
-    private void navigateToUserAdministration()
-    {
-        gotoPage("/");
-        clickLinkWithText("administration");
-        clickLinkWithText("users");
     }
 }

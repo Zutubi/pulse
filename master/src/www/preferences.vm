@@ -15,12 +15,12 @@
     <table class="columns" width="90%">
         <tr>
             <td class="columns" width="40%">
-                <table class="fill-content">
+                <table id="user" class="fill-content">
                     #editHeadingRow("user" 2 "/user/editUser!input.action?id=$user.id")
                     #dynamicRow("user.login" $user.login)
                     #dynamicRow("user.name" $user.name)
                 </table>
-                <table class="fill-content">
+                <table id="contacts" class="fill-content">
                     #headingRow("contacts" 4)
                     <tr>
                         #contentHeading("contact.name" 1)
@@ -41,7 +41,7 @@
                 </table>
             </td>
             <td class="columns" width="40%">
-                <table class="fill-content">
+                <table id="subscriptions" class="fill-content">
                     #headingRow("subscriptions" 5)
                     <tr>
                         #contentHeading("subscription.project" 1)

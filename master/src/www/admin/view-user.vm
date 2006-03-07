@@ -7,17 +7,18 @@
         <content tag="action">user.view</content>
     </head>
     <body>    
+
         <h1 class="build-log">:: $user.name ::</h1>
 
         <table class="columns" width="50%">
             <tr>
                 <td class="columns" width="40%">
-                    <table class="fill-content">
+                    <table id="user" class="fill-content">
                         #headingRow("user" 2)
                         #dynamicRow("user.login" $user.login)
                         #dynamicRow("user.name" $user.name)
                     </table>
-                    <table class="fill-content">
+                    <table id="contacts" class="fill-content">
                         #headingRow("contacts" 2)
                         <tr>
                             #contentHeading("contact.name" 1)
@@ -31,7 +32,7 @@
                         </tr>
                         #end
                     </table>
-                    <table class="fill-content">
+                    <table id="subscriptions" class="fill-content">
                         #headingRow("subscriptions" 3)
                         <tr>
                             #contentHeading("subscription.project" 1)

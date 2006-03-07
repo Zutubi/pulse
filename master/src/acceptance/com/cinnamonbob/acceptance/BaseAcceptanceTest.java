@@ -10,6 +10,14 @@ import java.io.IOException;
  */
 public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
 {
+    //---( administrations create user form )---
+    private static final String FO_USER_CREATE = "user.create";
+    protected static final String USER_CREATE_LOGIN = "user.login";
+    protected static final String USER_CREATE_NAME = "user.name";
+    protected static final String USER_CREATE_PASSWORD = "user.password";
+    protected static final String USER_CREATE_CONFIRM = "confirm";
+    protected static final String USER_CREATE_ADMIN = "admin";
+
     public BaseAcceptanceTest()
     {
     }
@@ -41,5 +49,30 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
         setFormElement("j_username", user);
         setFormElement("j_password", password);
         submit("login");
+    }
+
+    protected void submitCreateUserForm(String login, String name, String password, String confirm, boolean admin)
+    {
+        setWorkingForm(FO_USER_CREATE);
+        setFormElement(USER_CREATE_LOGIN, login);
+        setFormElement(USER_CREATE_NAME, name);
+        setFormElement(USER_CREATE_PASSWORD, password);
+        setFormElement(USER_CREATE_CONFIRM, confirm);
+        if (admin)
+        {
+            checkCheckbox(USER_CREATE_ADMIN, "true");
+        }
+        else
+        {
+            uncheckCheckbox(USER_CREATE_ADMIN);
+        }
+        submit("save");
+    }
+
+    protected void navigateToUserAdministration()
+    {
+        gotoPage("/");
+        clickLinkWithText("administration");
+        clickLinkWithText("users");
     }
 }
