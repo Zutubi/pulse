@@ -23,16 +23,13 @@
             <interceptor name="static-params" class="com.opensymphony.xwork.interceptor.StaticParametersInterceptor"/>
             <interceptor name="params" class="com.opensymphony.xwork.interceptor.ParametersInterceptor"/>
             <interceptor name="model-driven" class="com.opensymphony.xwork.interceptor.ModelDrivenInterceptor"/>
-            <interceptor name="component" class="com.opensymphony.xwork.interceptor.component.ComponentInterceptor"/>
             <interceptor name="token" class="com.opensymphony.webwork.interceptor.TokenInterceptor"/>
-            <interceptor name="token-session"
-                         class="com.opensymphony.webwork.interceptor.TokenSessionStoreInterceptor"/>
+            <interceptor name="token-session" class="com.opensymphony.webwork.interceptor.TokenSessionStoreInterceptor"/>
             <interceptor name="validation" class="com.opensymphony.xwork.validator.ValidationInterceptor"/>
             <interceptor name="workflow" class="com.opensymphony.xwork.interceptor.DefaultWorkflowInterceptor"/>
             <interceptor name="servlet-config" class="com.opensymphony.webwork.interceptor.ServletConfigInterceptor"/>
             <interceptor name="prepare" class="com.opensymphony.xwork.interceptor.PrepareInterceptor"/>
-            <interceptor name="conversionError"
-                         class="com.opensymphony.webwork.interceptor.WebWorkConversionErrorInterceptor"/>
+            <interceptor name="conversionError" class="com.opensymphony.webwork.interceptor.WebWorkConversionErrorInterceptor"/>
             <interceptor name="fileUpload" class="com.opensymphony.webwork.interceptor.FileUploadInterceptor"/>
             <interceptor name="execAndWait" class="com.opensymphony.webwork.interceptor.ExecuteAndWaitInterceptor"/>
             <interceptor name="cancel" class="com.cinnamonbob.xwork.interceptor.CancelWorkflowInterceptor"/>

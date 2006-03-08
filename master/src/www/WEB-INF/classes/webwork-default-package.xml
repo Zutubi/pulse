@@ -22,7 +22,6 @@
             <interceptor name="static-params" class="com.opensymphony.xwork.interceptor.StaticParametersInterceptor"/>
             <interceptor name="params" class="com.opensymphony.xwork.interceptor.ParametersInterceptor"/>
             <interceptor name="model-driven" class="com.opensymphony.xwork.interceptor.ModelDrivenInterceptor"/>
-            <interceptor name="component" class="com.opensymphony.xwork.interceptor.component.ComponentInterceptor"/>
             <interceptor name="token" class="com.opensymphony.webwork.interceptor.TokenInterceptor"/>
             <interceptor name="token-session" class="com.opensymphony.webwork.interceptor.TokenSessionStoreInterceptor"/>
             <interceptor name="validation" class="com.opensymphony.xwork.validator.ValidationInterceptor"/>
