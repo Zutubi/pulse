@@ -9,7 +9,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=editCustomDetails.action" "heading=%{getText('edit.custom')}" "method=post")
+#wwcform("action=editCustomDetails.action" "id=custom.edit" "heading=%{getText('edit.custom')}" "method=post")
     #wwhidden("name=id")
     #wwhidden("name=projectId")
 

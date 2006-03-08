@@ -58,7 +58,8 @@ public class EditProjectAction extends ProjectActionSupport implements Preparabl
         }
 
         // check that the requested projects name is not already in use.
-        if (getProjectManager().getProject(project.getName()) != null)
+        Project existingProject = getProjectManager().getProject(project.getName());
+        if (existingProject != null && getId() != existingProject.getId())
         {
             addFieldError("project.name", getText("project.name.exists", Arrays.asList(new String[]{project.getName()})));
         }

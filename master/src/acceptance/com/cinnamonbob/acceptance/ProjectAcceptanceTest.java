@@ -10,6 +10,8 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
     private String projectName;
 
     private static final String FO_PROJECT_BASICS_EDIT = "project.edit";
+    private static final String PROJECT_BASICS_EDIT_NAME = "project.name";
+    private static final String PROJECT_BASICS_EDIT_DESCRIPTION = "project.description";
 
     public ProjectAcceptanceTest()
     {
@@ -57,8 +59,8 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertProjectBasicsEditFormElements(projectName, "");
 
         // check simple edit.
-        setFormElement("project.name", "a temporary name");
-        setFormElement("project.description", "a description for this project.");
+        setFormElement(PROJECT_BASICS_EDIT_NAME, "a temporary name");
+        setFormElement(PROJECT_BASICS_EDIT_DESCRIPTION, "a description for this project.");
         submit("save");
 
         // assert that the changes just made have been persisted.
@@ -68,14 +70,14 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertProjectBasicsEditFormElements("a temporary name", "a description for this project.");
 
         // check validation of field input - name required.
-        setFormElement("project.name", "");
+        setFormElement(PROJECT_BASICS_EDIT_NAME, "");
         submit("save");
 
         assertTextPresent("required");
         assertProjectBasicsEditFormElements("", "a description for this project.");
 
         // check cancel works.
-        setFormElement("project.name", projectName);
+        setFormElement(PROJECT_BASICS_EDIT_NAME, projectName);
         submit("cancel");
 
         // assert that the changes just made have been persisted.
@@ -86,7 +88,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertProjectBasicsEditFormElements("a temporary name", "a description for this project.");
 
         setWorkingForm(FO_PROJECT_BASICS_EDIT);
-        setFormElement("project.name", projectName);
+        setFormElement(PROJECT_BASICS_EDIT_NAME, projectName);
         submit("save");
 
         assertProjectBasicsTable(projectName, "a description for this project.");
@@ -116,7 +118,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
         clickLink("project.basics.edit");
         setWorkingForm(FO_PROJECT_BASICS_EDIT);
-        setFormElement("project.name", projectName);
+        setFormElement(PROJECT_BASICS_EDIT_NAME, projectName);
         submit("save");
 
         // assert that we are still on the edit basics page
@@ -125,26 +127,54 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertTextPresent("select a different project");
     }
 
-    private void assertProjectBasicsEditFormElements(String name, String description)
+    public void testEditCustomSpecifics()
     {
-        assertFormPresent(FO_PROJECT_BASICS_EDIT);
-        setWorkingForm(FO_PROJECT_BASICS_EDIT);
-        assertFormElementEquals("project.name", name);
-        assertFormElementEquals("project.description", description);
+        // verify what we have to start with.
+        assertProjectSpecificsTable("custom", "bob.xml");
+
+        assertLinkPresent("project.specifics.edit");
+        clickLink("project.specifics.edit");
+
+        // assert that the form is pre populated with the expected data.
+        assertProjectSpecificsFormElements("bob.xml");
+
+        setFormElement("details.bobFileName", "custom.xml");
+        submit("save");
+
+        // assert that the data has been updated.
+        assertProjectSpecificsTable("custom", "custom.xml");
     }
 
-    private void assertProjectBasicsTable(String name, String description)
+    public void testEditCustomSpecificsValidation()
     {
-        assertTablePresent("project.basics");
-        assertTableRowsEqual("project.basics", 1, new String[][]{
-                new String[]{"name", name},
-                new String[]{"description", description}
-        });
+        assertProjectSpecificsTable("custom", "bob.xml");
+
+        assertLinkPresent("project.specifics.edit");
+        clickLink("project.specifics.edit");
+
+        assertProjectSpecificsFormElements("bob.xml");
+
+        setFormElement("details.bobFileName", "");
+        submit("save");
+
+        assertTextPresent("required");
+        assertProjectSpecificsFormElements("");
     }
 
-    public void testEditSpecifics()
+    public void testEditCustomSpecificsCancel()
     {
-        // not yet implemented.
+        // test the editing of custom specifics.
+        assertProjectSpecificsTable("custom", "bob.xml");
+
+        assertLinkPresent("project.specifics.edit");
+        clickLink("project.specifics.edit");
+
+        assertProjectSpecificsFormElements("bob.xml");
+
+        setFormElement("details.bobFileName", "custom");
+        submit("cancel");
+
+        assertProjectSpecificsTable("custom", "bob.xml");
     }
 
     public void testEditScm()
@@ -188,4 +218,38 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
     {
         // not yet implemented.
     }
+
+    private void assertProjectSpecificsTable(String type, String file)
+    {
+        assertTablePresent("project.specifics");
+        assertTableRowsEqual("project.specifics", 1, new String[][]{
+                new String[]{"type", type},
+                new String[]{"cinnabo file", file}
+        });
+    }
+
+    private void assertProjectSpecificsFormElements(String file)
+    {
+        assertFormPresent("custom.edit");
+        setWorkingForm("custom.edit");
+        assertFormElementEquals("details.bobFileName", file);
+    }
+
+    private void assertProjectBasicsEditFormElements(String name, String description)
+    {
+        assertFormPresent(FO_PROJECT_BASICS_EDIT);
+        setWorkingForm(FO_PROJECT_BASICS_EDIT);
+        assertFormElementEquals(PROJECT_BASICS_EDIT_NAME, name);
+        assertFormElementEquals(PROJECT_BASICS_EDIT_DESCRIPTION, description);
+    }
+
+    private void assertProjectBasicsTable(String name, String description)
+    {
+        assertTablePresent("project.basics");
+        assertTableRowsEqual("project.basics", 1, new String[][]{
+                new String[]{"name", name},
+                new String[]{"description", description}
+        });
+    }
+
 }
