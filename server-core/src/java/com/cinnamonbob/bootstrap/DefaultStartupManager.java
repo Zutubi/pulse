@@ -41,6 +41,11 @@ public class DefaultStartupManager implements StartupManager
             SetupManager setupManager = (SetupManager) ComponentContext.getBean("setupManager");
             if (!setupManager.setup())
             {
+                // log to the terminal that the system is ready and that you should go to http://localhost:port
+                // to complete the setup. Send it direct to std.err so that we dont get the extra unecessary
+                // logging details from the logging framework, and to ensure that its always there.
+                //TODO: i18n this string...
+                System.err.println("Now go to http://localhost:8080 to complete the setup.");
                 return;
             }
 
