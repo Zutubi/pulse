@@ -18,9 +18,7 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -46,7 +44,7 @@ public class FatController implements EventListener, Stoppable
     private ReentrantLock lock = new ReentrantLock();
     private Condition stoppedCondition = lock.newCondition();
     private boolean stopping = false;
-    private Map<Project, BuildRequestEvent> activeProjects = new HashMap<Project, BuildRequestEvent>();
+    private ProjectQueue projectQueue = new ProjectQueue();
     private Set<BuildController> runningBuilds = new HashSet<BuildController>();
     private Scheduler quartzScheduler;
 
@@ -126,39 +124,39 @@ public class FatController implements EventListener, Stoppable
 
     private void handleBuildRequest(BuildRequestEvent event)
     {
+        if (projectQueue.buildRequested(event))
+        {
+            startBuild(event);
+        }
+    }
+
+    private void startBuild(BuildRequestEvent event)
+    {
         final Project project = event.getProject();
         String specName = event.getSpecification();
 
-        if (activeProjects.containsKey(project))
+        BuildSpecification buildSpec = project.getBuildSpecification(specName);
+        if (buildSpec == null)
         {
-            activeProjects.put(project, event);
+            LOG.warning("Request to build unknown specification '" + specName + "' for project '" + project.getName() + "'");
+            projectQueue.buildCompleted(project);
+            return;
         }
-        else
+
+        lock.lock();
+        try
         {
-            activeProjects.put(project, null);
-
-            BuildSpecification buildSpec = project.getBuildSpecification(specName);
-            if (buildSpec == null)
+            if (!stopping)
             {
-                LOG.warning("Request to build unknown specification '" + specName + "' for project '" + project.getName() + "'");
-                return;
+                RecipeResultCollector collector = new DefaultRecipeResultCollector(project);
+                BuildController controller = new BuildController(project, buildSpec, eventManager, buildManager, recipeQueue, collector, quartzScheduler);
+                controller.run();
+                runningBuilds.add(controller);
             }
-
-            lock.lock();
-            try
-            {
-                if (!stopping)
-                {
-                    RecipeResultCollector collector = new DefaultRecipeResultCollector(project);
-                    BuildController controller = new BuildController(project, buildSpec, eventManager, buildManager, recipeQueue, collector, quartzScheduler);
-                    controller.run();
-                    runningBuilds.add(controller);
-                }
-            }
-            finally
-            {
-                lock.unlock();
-            }
+        }
+        finally
+        {
+            lock.unlock();
         }
     }
 
@@ -200,11 +198,11 @@ public class FatController implements EventListener, Stoppable
             if (!stopping)
             {
                 Project project = event.getResult().getProject();
-                BuildRequestEvent queuedEvent = activeProjects.remove(project);
+                BuildRequestEvent queuedEvent = projectQueue.buildCompleted(project);
 
                 if (queuedEvent != null)
                 {
-                    handleBuildRequest(queuedEvent);
+                    startBuild(queuedEvent);
                 }
             }
         }
