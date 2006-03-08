@@ -24,7 +24,7 @@ fi
 if $cygwin; then
   [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
   [ -n "$BOB_HOME" ] && BOB_HOME=`cygpath --path --unix "$BOB_HOME"`
-  [ -n "$CLASSPATH" ] && CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
+  [ -n "$LOCALCLASSPATH" ] && LOCALCLASSPATH=`cygpath --path --unix "$LOCALCLASSPATH"`
 fi
 
 # Construct the runtime classpath.
@@ -32,14 +32,14 @@ for i in "$BOB_HOME"/system/www/WEB-INF/classes \
          "$BOB_HOME"/lib                        \
          "$BOB_HOME"/lib/*.jar                  \
          "$BOB_HOME"/lib/*.xml; do
-  CLASSPATH="$CLASSPATH":"$i"
+  LOCALCLASSPATH="$LOCALCLASSPATH":"$i"
 done
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
   JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
   BOB_HOME=`cygpath --path --windows "$BOB_HOME"`
-  CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
+  LOCALCLASSPATH=`cygpath --path --windows "$LOCALCLASSPATH"`
 fi
 
 # Sort out the location of the java executable.
@@ -65,4 +65,4 @@ if [ ! -x "$JAVACMD" ] ; then
   exit 1
 fi
 
-exec "$JAVACMD" -classpath "$CLASSPATH" -Dbob.install="$BOB_HOME" -Djava.util.logging.config.file="$BOB_HOME/system/config/logging.properties" -Djava.awt.headless=true $@
+exec "$JAVACMD" -classpath "$LOCALCLASSPATH" -Dbob.install="$BOB_HOME" -Djava.util.logging.config.file="$BOB_HOME/system/config/logging.properties" -Djava.awt.headless=true $@
