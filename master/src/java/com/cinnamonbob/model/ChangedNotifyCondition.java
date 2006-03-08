@@ -8,7 +8,6 @@ import com.cinnamonbob.core.model.Changelist;
  */
 public class ChangedNotifyCondition implements NotifyCondition
 {
-
     /**
      * Create a new condition
      */
@@ -23,13 +22,17 @@ public class ChangedNotifyCondition implements NotifyCondition
     {
         // look for a change.
         BuildScmDetails scmDetails = result.getScmDetails();
-        for (Changelist changelist : scmDetails.getChangelists())
+        if (scmDetails != null && scmDetails.getChangelists() != null)
         {
-            if (changelist.getChanges().size() > 0)
+            for (Changelist changelist : scmDetails.getChangelists())
             {
-                return true;
+                if (changelist.getChanges() != null && changelist.getChanges().size() > 0)
+                {
+                    return true;
+                }
             }
         }
+
         return false;
     }
 }
