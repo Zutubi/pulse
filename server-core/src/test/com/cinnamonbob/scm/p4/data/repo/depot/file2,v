@@ -1,0 +1,37 @@
+head     1.2;
+access   ;
+symbols  ;
+locks    ;comment  @@;
+
+
+1.2
+date     2006.03.08.15.24.56;  author p4;  state Exp;
+branches ;
+next     1.1;
+
+1.1
+date     2006.03.08.15.22.23;  author p4;  state Exp;
+branches ;
+next     ;
+
+
+desc
+@@
+
+
+1.2
+log
+@@
+text
+@content of file2: edited at the same time as file2 in depot2.
+@
+
+
+1.1
+log
+@@
+text
+@d1 1
+a1 1
+content of file2
+@

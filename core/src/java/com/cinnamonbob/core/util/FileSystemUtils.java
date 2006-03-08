@@ -484,4 +484,29 @@ public class FileSystemUtils
         return false;
     }
 
+    public static File composeFile(String ...parts)
+    {
+        String result = composeFilename(parts);
+        return new File(result);
+    }
+
+    public static String composeFilename(String... parts)
+    {
+        String result = "";
+        boolean first = true;
+
+        for (String part : parts)
+        {
+            if (first)
+            {
+                first = false;
+                result = part;
+            }
+            else
+            {
+                result = result + File.separatorChar + part;
+            }
+        }
+        return result;
+    }
 }

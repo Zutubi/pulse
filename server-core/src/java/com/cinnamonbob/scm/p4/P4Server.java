@@ -38,6 +38,7 @@ public class P4Server implements SCMServer
     private static final String FLAG_SHORT = "-s";
     private static final String FLAG_STATUS = "-s";
     private static final String VALUE_SUBMITTED = "submitted";
+    private static final String VALUE_ALL_FILES = "...";
     private static final String ASCII_CHARSET = "US-ASCII";
 
     private ProcessBuilder p4Builder;
@@ -166,7 +167,26 @@ public class P4Server implements SCMServer
 
     public NumericalRevision getLatestRevision() throws SCMException
     {
-        P4Result result = runP4(null, P4_COMMAND, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, FLAG_MAXIMUM, "1");
+        return getLatestRevisionForFiles();
+    }
+
+    private NumericalRevision getLatestRevisionForFiles(String ...files) throws SCMException
+    {
+        String args[] = new String[6 + files.length];
+
+        args[0] = P4_COMMAND;
+        args[1] = COMMAND_CHANGES;
+        args[2] = FLAG_STATUS;
+        args[3] = VALUE_SUBMITTED;
+        args[4] = FLAG_MAXIMUM;
+        args[5] = "1";
+
+        for (int i = 0; i < files.length; i++)
+        {
+            args[6 + i] = files[i];
+        }
+
+        P4Result result = runP4(null, args);
         Matcher matcher = changesPattern.matcher(result.stdout);
 
         if (matcher.find())
@@ -182,12 +202,12 @@ public class P4Server implements SCMServer
     private void populateChanges(StringBuffer stdout, List<Change> changes)
     {
         // Output of p4 sync -f:
-        //   <depot file>#<revision> - refreshing <local file>
-        //   <depot file>#<revision> - refreshing <local file>
+        //   <depot file>#<revision> - (refreshing|added as) <local file>
+        //   <depot file>#<revision> - (refreshing|added as) <local file>
         //   ...
 
         // RE to capture depot file, revision and local file
-        Pattern re = Pattern.compile("^(.+)#([0-9]+) - refreshing (.+)$", Pattern.MULTILINE);
+        Pattern re = Pattern.compile("^(.+)#([0-9]+) - (refreshing|added as) (.+)$", Pattern.MULTILINE);
         Matcher matcher = re.matcher(stdout);
 
         while (matcher.find())
@@ -399,8 +419,15 @@ public class P4Server implements SCMServer
     public String checkout(Revision revision, String file) throws SCMException
     {
         getClientRoot();
-        File bobFile = new File(clientRoot, file);
-        P4Result result = runP4(null, P4_COMMAND, "print", "-q", bobFile.getAbsolutePath() + "@" + revision);
+        File fullFile = new File(clientRoot, file);
+
+        String fileArgument = fullFile.getAbsolutePath();
+        if (revision != null)
+        {
+            fileArgument = fileArgument + "@" + revision;
+        }
+
+        P4Result result = runP4(null, P4_COMMAND, "print", "-q", fileArgument);
         return result.stdout.toString();
     }
 
@@ -438,7 +465,9 @@ public class P4Server implements SCMServer
 
     public boolean hasChangedSince(Revision since) throws SCMException
     {
-        return getLatestRevision().getRevisionNumber() != ((NumericalRevision) since).getRevisionNumber();
+        getClientRoot();
+        String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
+        return getLatestRevisionForFiles(root).getRevisionNumber() > ((NumericalRevision) since).getRevisionNumber();
     }
 
     public static void main(String argv[])

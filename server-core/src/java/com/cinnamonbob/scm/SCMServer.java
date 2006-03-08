@@ -15,7 +15,7 @@ import java.util.List;
 public interface SCMServer
 {
     /**
-     * Returns a summarised for of the location of the source this SCM has
+     * Returns a summarised form of the location of the source this SCM has
      * been configured to check out.  For example, an subversion URL.
      *
      * @return a summarised form of the source location, fit for human consumption
