@@ -36,7 +36,7 @@ public class DefaultBuildManager implements BuildManager
 
     private static final String CLEANUP_NAME = "cleanup";
     private static final String CLEANUP_GROUP = "services";
-    private static final long CLEANUP_FREQUENCY = Constants.DAY;
+    private static final long CLEANUP_FREQUENCY = Constants.HOUR;
 
     public void init()
     {
