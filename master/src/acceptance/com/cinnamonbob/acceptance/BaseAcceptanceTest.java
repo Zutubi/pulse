@@ -34,6 +34,12 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
         getTestContext().setBaseUrl("http://localhost:8080/");
     }
 
+    protected void tearDown() throws Exception
+    {
+        super.tearDown();
+    }
+
+
     protected void removeDirectory(File dir) throws IOException
     {
         if (!FileSystemUtils.removeDirectory(dir))

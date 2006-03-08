@@ -9,7 +9,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=addProject.action" "heading=%{getText('cvs.setup')}" "method=post")
+#wwcform("action=addProject.action" "id=cvs.setup" "heading=%{getText('cvs.setup')}" "method=post")
     #wwhidden("name=state")
 
     #wwtextfield("name=cvs.root" "label=%{getText('cvs.root')}" "required=true" "size=60" "tabindex=1")
