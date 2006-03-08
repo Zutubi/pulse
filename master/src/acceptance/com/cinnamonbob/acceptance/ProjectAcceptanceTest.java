@@ -1,6 +1,10 @@
 package com.cinnamonbob.acceptance;
 
 import com.cinnamonbob.core.util.RandomUtils;
+import com.cinnamonbob.acceptance.forms.ProjectBasicForm;
+import com.cinnamonbob.acceptance.forms.CustomProjectEditForm;
+import com.cinnamonbob.acceptance.forms.CvsEditForm;
+import com.cinnamonbob.acceptance.forms.CleanupPolicyForm;
 
 /**
  * <class-comment/>
@@ -8,10 +12,6 @@ import com.cinnamonbob.core.util.RandomUtils;
 public class ProjectAcceptanceTest extends BaseAcceptanceTest
 {
     private String projectName;
-
-    private static final String FO_PROJECT_BASICS_EDIT = "project.edit";
-    private static final String PROJECT_BASICS_EDIT_NAME = "project.name";
-    private static final String PROJECT_BASICS_EDIT_DESCRIPTION = "project.description";
 
     public ProjectAcceptanceTest()
     {
@@ -49,6 +49,8 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
     public void testEditProjectBasics()
     {
+        ProjectBasicForm form = new ProjectBasicForm(tester);
+
         // not yet implemented.
         assertProjectBasicsTable(projectName, "");
 
@@ -56,56 +58,52 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         clickLink("project.basics.edit");
 
         // assert the initial values are as expected.
-        assertProjectBasicsEditFormElements(projectName, "");
+        form.assertFormElements(projectName, "");
 
         // check simple edit.
-        setFormElement(PROJECT_BASICS_EDIT_NAME, "a temporary name");
-        setFormElement(PROJECT_BASICS_EDIT_DESCRIPTION, "a description for this project.");
-        submit("save");
+        form.saveFormElements("a temporary name", "a description for this project.");
 
         // assert that the changes just made have been persisted.
         assertProjectBasicsTable("a temporary name", "a description for this project.");
 
         clickLink("project.basics.edit");
-        assertProjectBasicsEditFormElements("a temporary name", "a description for this project.");
+        form.assertFormElements("a temporary name", "a description for this project.");
 
         // check validation of field input - name required.
-        setFormElement(PROJECT_BASICS_EDIT_NAME, "");
-        submit("save");
+        form.saveFormElements("", null);
 
         assertTextPresent("required");
-        assertProjectBasicsEditFormElements("", "a description for this project.");
+        form.assertFormElements("", "a description for this project.");
 
         // check cancel works.
-        setFormElement(PROJECT_BASICS_EDIT_NAME, projectName);
-        submit("cancel");
+        form.cancelFormElements(projectName, null);
 
         // assert that the changes just made have been persisted.
         assertProjectBasicsTable("a temporary name", "a description for this project.");
 
         // change the name back.
         clickLink("project.basics.edit");
-        assertProjectBasicsEditFormElements("a temporary name", "a description for this project.");
+        form.assertFormElements("a temporary name", "a description for this project.");
 
-        setWorkingForm(FO_PROJECT_BASICS_EDIT);
-        setFormElement(PROJECT_BASICS_EDIT_NAME, projectName);
-        submit("save");
+        form.saveFormElements(projectName, null);
 
         assertProjectBasicsTable(projectName, "a description for this project.");
 
         // check that we can save without making any changes to the form.
         clickLink("project.basics.edit");
-        assertProjectBasicsEditFormElements(projectName, "a description for this project.");
+        form.assertFormElements(projectName, "a description for this project.");
 
-        setWorkingForm(FO_PROJECT_BASICS_EDIT);
-        submit("save");
+        form.saveFormElements(null, null);
 
-        assertFormNotPresent(FO_PROJECT_BASICS_EDIT);
+        form.assertFormNotPresent();
+
         assertProjectBasicsTable(projectName, "a description for this project.");
     }
 
     public void testEditBasicsValidationProjectNameUnique()
     {
+        ProjectBasicForm form = new ProjectBasicForm(tester);
+
         //check that we can not change the name of the project to an already in use project name.
         // create a new project.
         clickLinkWithText("projects");
@@ -117,18 +115,19 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         submitCustomSetupForm("bob.xml");
 
         clickLink("project.basics.edit");
-        setWorkingForm(FO_PROJECT_BASICS_EDIT);
-        setFormElement(PROJECT_BASICS_EDIT_NAME, projectName);
-        submit("save");
+        form.saveFormElements(projectName, null);
 
         // assert that we are still on the edit basics page
-        assertFormPresent(FO_PROJECT_BASICS_EDIT);
+        form.assertFormPresent();
+
         // assert the error message.
         assertTextPresent("select a different project");
     }
 
     public void testEditCustomSpecifics()
     {
+        CustomProjectEditForm form = new CustomProjectEditForm(tester);
+
         // verify what we have to start with.
         assertProjectSpecificsTable("custom", "bob.xml");
 
@@ -136,10 +135,9 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         clickLink("project.specifics.edit");
 
         // assert that the form is pre populated with the expected data.
-        assertProjectSpecificsFormElements("bob.xml");
+        form.assertFormElements("bob.xml");
 
-        setFormElement("details.bobFileName", "custom.xml");
-        submit("save");
+        form.saveFormElements("custom.xml");
 
         // assert that the data has been updated.
         assertProjectSpecificsTable("custom", "custom.xml");
@@ -147,44 +145,88 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
     public void testEditCustomSpecificsValidation()
     {
+        CustomProjectEditForm form = new CustomProjectEditForm(tester);
+
         assertProjectSpecificsTable("custom", "bob.xml");
 
         assertLinkPresent("project.specifics.edit");
         clickLink("project.specifics.edit");
 
-        assertProjectSpecificsFormElements("bob.xml");
+        form.assertFormElements("bob.xml");
 
-        setFormElement("details.bobFileName", "");
-        submit("save");
+        form.saveFormElements("");
 
         assertTextPresent("required");
-        assertProjectSpecificsFormElements("");
+        form.assertFormElements("");
     }
 
     public void testEditCustomSpecificsCancel()
     {
+        CustomProjectEditForm form = new CustomProjectEditForm(tester);
+
         // test the editing of custom specifics.
         assertProjectSpecificsTable("custom", "bob.xml");
 
         assertLinkPresent("project.specifics.edit");
         clickLink("project.specifics.edit");
 
-        assertProjectSpecificsFormElements("bob.xml");
+        form.assertFormElements("bob.xml");
 
-        setFormElement("details.bobFileName", "custom");
-        submit("cancel");
+        form.cancelFormElements("custom.xml");
 
         assertProjectSpecificsTable("custom", "bob.xml");
     }
 
     public void testEditScm()
     {
-        // not yet implemented.
+        CvsEditForm form = new CvsEditForm(tester);
+
+        assertProjectCvsTable("cvs", "/local [module]");
+
+        assertLinkPresent("project.scm.edit");
+        clickLink("project.scm.edit");
+
+        form.assertFormElements("/local", "module", "", "");
+
+        // change the root and module, verify updates as expected.
+        form.saveFormElements("/loc", "mod", "", "path");
+        assertProjectCvsTable("cvs", "/loc [mod]");
+
+        // check the form again to ensure that the path has been saved.
+        clickLink("project.scm.edit");
+        form.assertFormElements("/loc", "mod", "", "path");
+    }
+
+    public void testEditScmValidation()
+    {
+        CvsEditForm form = new CvsEditForm(tester);
+        clickLink("project.scm.edit");
+        form.assertFormElements("/local", "module", "", "");
+
+        // check that the cvs root is a required field.
+        form.saveFormElements("", "module", "", "");
+        assertTextPresent("required");
+        form.assertFormElements("", "module", "", "");
+
+        // check that the cvs module is a required field.
+        form.saveFormElements("/local", "", "", "");
+        assertTextPresent("required");
+        form.assertFormElements("/local", "", "", "");
+
+        // check that the cvs root is validated correctly.
+        form.saveFormElements("an invalid arg", "mod", "", "");
+        assertTextPresent("required");
+        form.assertFormElements("an invalid arg", "mod", "", "");
     }
 
     public void testEditCleanupPolicy()
     {
-        // not yet implemented.
+/* javascript not playing nice...
+        CleanupPolicyForm form = new CleanupPolicyForm(tester);
+        clickLink("project.cleanup.edit");
+
+        form.assertFormElements("true", "30", "false", "0");
+*/
     }
 
     public void testAddNewTrigger()
@@ -228,21 +270,6 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         });
     }
 
-    private void assertProjectSpecificsFormElements(String file)
-    {
-        assertFormPresent("custom.edit");
-        setWorkingForm("custom.edit");
-        assertFormElementEquals("details.bobFileName", file);
-    }
-
-    private void assertProjectBasicsEditFormElements(String name, String description)
-    {
-        assertFormPresent(FO_PROJECT_BASICS_EDIT);
-        setWorkingForm(FO_PROJECT_BASICS_EDIT);
-        assertFormElementEquals(PROJECT_BASICS_EDIT_NAME, name);
-        assertFormElementEquals(PROJECT_BASICS_EDIT_DESCRIPTION, description);
-    }
-
     private void assertProjectBasicsTable(String name, String description)
     {
         assertTablePresent("project.basics");
@@ -252,4 +279,12 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         });
     }
 
+    private void assertProjectCvsTable(String type, String location)
+    {
+        assertTablePresent("project.scm");
+        assertTableRowsEqual("project.scm", 1, new String[][]{
+                new String[]{"type", type},
+                new String[]{"location", location}
+        });
+    }
 }
