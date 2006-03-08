@@ -11,8 +11,8 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
     private String login;
     private static final String CONTACT_CREATE = "contact.create";
     private static final String CONTACT_CREATE_TYPE = "contact";
-    private static final String EMAIL_CREATE_NAME = "contact.name";
     private static final String EMAIL_CREATE = "email.create";
+    private static final String EMAIL_CREATE_NAME = "contact.name";
     private static final String EMAIL_CREATE_EMAIL = "contact.email";
     private static final String CREATE_CONTACT_LINK = "create contact";
 

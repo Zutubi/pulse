@@ -13,24 +13,24 @@
         <tr>
             <td class="columns" width="40%">
                 <table id="project.basics" class="fill-content">
-                    #editHeadingRow("project.basics" 2 "editProject!input.action?id=$project.id")
+                    #editHeadingRow("project.basics" 2 "editProject!input.action?id=$project.id" "project.basics.edit")
                     #dynamicRow("project.name" $project.name)
                     #dynamicRow("project.description" $project.description)
                 </table>
                 <table id="project.specifics" class="fill-content">
-                    #editHeadingRow("project.specifics" 2 "editBobFileDetails!input.action?id=$project.bobFileDetails.id&amp;projectId=$project.id")
+                    #editHeadingRow("project.specifics" 2 "editBobFileDetails!input.action?id=$project.bobFileDetails.id&amp;projectId=$project.id" "project.specifics.edit")
                     #dynamicRow("project.type" $project.bobFileDetails.type)
 #foreach($property in $project.bobFileDetails.properties.entrySet())
                     #propertyRow($property)
 #end
                 </table>
                 <table id="project.scm" class="fill-content">
-                    #editHeadingRow("project.scm" 2 "editScm!input.action?id=$project.scm.id&amp;projectId=$project.id")
+                    #editHeadingRow("project.scm" 2 "editScm!input.action?id=$project.scm.id&amp;projectId=$project.id" "project.scm.edit")
                     #scmRow($project)
                     #dynamicRow("scm.location" "$project.scm.createServer().location")
                 </table>
                 <table id="project.cleanup" class="fill-content">
-                    #editHeadingRow("project.cleanup" 2 "editCleanupPolicy!input.action?projectId=$project.id")
+                    #editHeadingRow("project.cleanup" 2 "editCleanupPolicy!input.action?projectId=$project.id" "project.cleanup.edit")
                     #dynamicRow("project.work.dirs.deleted" $project.cleanupPolicy.prettyWorkDirDays)
                     #dynamicRow("project.results.deleted" $project.cleanupPolicy.prettyResultDays)
                 </table>

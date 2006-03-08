@@ -28,7 +28,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         login("admin", "admin");
     }
 
-    public void testCreateProject()
+    public void testCreateCustomProject()
     {
         // navigate to project panel.
         beginAt("/");
@@ -36,26 +36,16 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         assertLinkPresentWithText("add new project");
 
         clickLinkWithText("add new project");
-        assertFormPresent("project.basics");
+        assertFormPresent(FO_PROJECT_BASICS);
 
         String projectName = "test project " + RandomUtils.randomString(3);
 
-        setWorkingForm("project.basics");
-        setFormElement("name", projectName);
-        setFormElement("description", "this is a test project created by the automated project wizard acceptance test.");
-        setFormElement("scm", "cvs");
-        setFormElement("type", "custom");
-        submit("next");
+        submitProjectBasicsForm(projectName, "this is a test project created by the automated project wizard acceptance test.", "cvs", "custom");
 
-        assertFormPresent("cvs.setup");
-        setWorkingForm("cvs.setup");
-        setFormElement("cvs.root", "/local");
-        setFormElement("cvs.module", "module");
-        submit("next");
+        submitCvsSetupForm("/local", "module", "", "");
 
-        assertFormPresent("custom.setup");
-        assertFormElementNotEmpty("details.bobFileName");
-        submit("next");
+        assertFormElementNotEmpty(CUSTOM_SETUP_FILE);
+        submitCustomSetupForm("bob.xml");
 
         // assert that all of the expected tables have the expected data.
         assertTablePresent("project.basics");
@@ -98,6 +88,8 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
                 new String[]{"add new trigger", "add new trigger", "add new trigger", "add new trigger"}
         });
 
-
+        // ensure that it appears in your list of projects.
+        clickLinkWithText("projects");
+        assertLinkPresentWithText(projectName);
     }
 }

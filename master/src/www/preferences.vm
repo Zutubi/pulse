@@ -16,7 +16,7 @@
         <tr>
             <td class="columns" width="40%">
                 <table id="user" class="fill-content">
-                    #editHeadingRow("user" 2 "/user/editUser!input.action?id=$user.id")
+                    #editHeadingRow("user" 2 "/user/editUser!input.action?id=$user.id" "user.edit")
                     #dynamicRow("user.login" $user.login)
                     #dynamicRow("user.name" $user.name)
                 </table>

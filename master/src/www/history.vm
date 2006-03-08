@@ -28,7 +28,7 @@
             <td>
 
     <table width="100%" class="content">
-        #actionHeadingRow("recent.builds" 10 "search.builds" "searchBuilds.action?projectId=$project.id" "zoom.gif")
+        #actionHeadingRow("recent.builds" 10 "search.builds" "searchBuilds.action?projectId=$project.id" "zoom.gif" "recent.builds.search")
         <tr>
             #contentHeading("build.id" 1)
             #contentHeading("build.status" 2)

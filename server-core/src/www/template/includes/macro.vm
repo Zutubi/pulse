@@ -245,12 +245,12 @@
 ##
 ## Outputs a heading row for a content table with an action
 ##
-#macro(actionHeadingRow $key $span $actionKey $url $image)
+#macro(actionHeadingRow $key $span $actionKey $url $image $id)
     <tr>
         <th class="heading" colspan="$span">
     #if($actionKey)
             <span class="action">
-                <a href="$url"><img alt="$action.getText($actionKey)" src="/images/$image"/>#wwtext("name=$actionKey")</a>
+                <a #if($id != "")id="$id"#end href="$url"><img alt="$action.getText($actionKey)" src="/images/$image"/>#wwtext("name=$actionKey")</a>
             </span>
     #end
             #wwtext("name=$key")
@@ -262,14 +262,14 @@
 ## Outputs a heading row for a content table
 ##
 #macro(headingRow $key $span)
-    #actionHeadingRow($key $span false false false)
+    #actionHeadingRow($key $span false false false "")
 #end
 
 ##
 ## Outputs a heading row with an edit action
 ##
-#macro(editHeadingRow $key $span $url)
-    #actionHeadingRow($key $span "edit" $url "pencil.gif")
+#macro(editHeadingRow $key $span $url $id)
+    #actionHeadingRow($key $span "edit" $url "pencil.gif" $id)
 #end
 
 ##

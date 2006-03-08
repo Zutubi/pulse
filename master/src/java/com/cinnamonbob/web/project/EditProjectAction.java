@@ -3,6 +3,8 @@ package com.cinnamonbob.web.project;
 import com.cinnamonbob.model.Project;
 import com.opensymphony.xwork.Preparable;
 
+import java.util.Arrays;
+
 /**
  * 
  *
@@ -50,7 +52,16 @@ public class EditProjectAction extends ProjectActionSupport implements Preparabl
             return;
         }
 
-        checkProject();
+        if (checkProject())
+        {
+            return;
+        }
+
+        // check that the requested projects name is not already in use.
+        if (getProjectManager().getProject(project.getName()) != null)
+        {
+            addFieldError("project.name", getText("project.name.exists", Arrays.asList(new String[]{project.getName()})));
+        }
     }
 
     public String doInput()
