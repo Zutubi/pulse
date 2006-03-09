@@ -34,15 +34,20 @@ public class RecipeResult extends Result
     {
         results.add(result);
 
-        switch (result.state)
+        if (state != ResultState.ERROR)
         {
-            case ERROR:
-            case FAILURE:
-                if (state != ResultState.ERROR && state != ResultState.FAILURE)
-                {
-                    failure("Command '" + result.getCommandName() + "' failed");
-                }
-                break;
+            switch (result.state)
+            {
+                case ERROR:
+                    error("Error executing command '" + result.getCommandName() + "'");
+                    break;
+                case FAILURE:
+                    if(state != ResultState.FAILURE)
+                    {
+                        failure("Command '" + result.getCommandName() + "' failed");
+                    }
+                    break;
+            }
         }
     }
 

@@ -211,11 +211,6 @@ public class RecipeController
         return new CopyBootstrapper(url, recipeResult.getId());
     }
 
-    public boolean succeeded()
-    {
-        return recipeResult.succeeded();
-    }
-
     public String getRecipeName()
     {
         return recipeResultNode.getResult().getRecipeNameSafe();
@@ -261,5 +256,10 @@ public class RecipeController
     public RecipeDispatchRequest getDispatchRequest()
     {
         return dispatchRequest;
+    }
+
+    public RecipeResult getResult()
+    {
+        return recipeResult;
     }
 }

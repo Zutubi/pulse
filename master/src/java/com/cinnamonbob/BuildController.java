@@ -318,15 +318,21 @@ public class BuildController implements EventListener
             controller.collect(buildResult);
             executingControllers.remove(node);
 
-            if (controller.succeeded())
+            RecipeResult result = controller.getResult();
+            if (result.succeeded())
             {
                 initialiseNodes(controller.getChildBootstrapper(), node.getChildren());
             }
-            else
+            else if(result.failed())
             {
-                buildResult.failure();
-                buildManager.save(buildResult);
+                buildResult.failure("Recipe " + result.getRecipeNameSafe() + " failed");
             }
+            else if(result.errored())
+            {
+                buildResult.error("Error executing recipe " + result.getRecipeNameSafe());
+            }
+
+            buildManager.save(buildResult);
         }
 
         if (executingControllers.size() == 0)
