@@ -52,10 +52,10 @@
                         #dynamicCell($buildSpec.prettyTimeout)
                         #actionCell("buildspec.trigger" "triggerBuild.action?id=$buildSpec.id&amp;projectId=$project.id" "lightning.gif")
                         #editCell("editBuildSpecification!input.action?projectId=$project.id&amp;id=$buildSpec.id")
-                        #deleteCell($confirmMessage "deleteBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id")
+                        #deleteCell($confirmMessage "deleteBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id" "delete_$!webwork.htmlEncode($buildSpec.name)")
                     </tr>
 #end
-                    #addRow("buildspec.add" 6 "createBuildSpecification!input.action?projectId=$project.id")
+                    #addRow("buildspec.add" 6 "createBuildSpecification!input.action?projectId=$project.id" "project.buildspec.add")
                 </table>
                 <table id="project.triggers" class="fill-content">
                     #headingRow("project.triggers" 4)
@@ -72,10 +72,10 @@
                         #dynamicCell($trigger.type)
                         #dynamicCell($trigger.dataMap.spec)
                         <!--#editCell("editTrigger.action?id=$trigger.id")-->
-                        #deleteCell($confirmMessage "deleteTrigger.action?id=$trigger.id")
+                        #deleteCell($confirmMessage "deleteTrigger.action?id=$trigger.id" "delete_$!webwork.htmlEncode($trigger.name)")
                     </tr>
 #end
-                    #addRow("trigger.add" 4 "addTrigger.action?projectId=$project.id")
+                    #addRow("trigger.add" 4 "addTrigger.action?projectId=$project.id" "project.trigger.add")
                 </table>
             </td>
         </tr>

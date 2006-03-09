@@ -20,9 +20,9 @@
         <tr>
              #dynamicCell($resource.name)
              #editCell("viewResource.action?id=$resource.id")
-             #deleteCell($confirmMessage "deleteResource.action?id=$resource.id")
+             #deleteCell($confirmMessage "deleteResource.action?id=$resource.id" "delete_$!webwork.htmlEncode($resource.name)")
         </tr>
 #end
-        #addRow("resource.add" 3 "createResource!input.action")
+        #addRow("resource.add" 3 "createResource!input.action" "resource.add")
     </table>
 </html>

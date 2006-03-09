@@ -219,18 +219,16 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         form.assertFormElements("an invalid arg", "mod", "", "");
     }
 
-    public void testEditCleanupPolicy()
+    public void testEditCleanupPolicyUpdate()
     {
         CleanupPolicyForm form = new CleanupPolicyForm(tester);
         assertProjectCleanupTable("after 30 days", "never");
 
         clickLink("project.cleanup.edit");
 
-        // check box elements, true => checked, null -> unchecked.
         form.assertFormElements("true", "30", "false", "0");
         // check disabling both.
         form.saveFormElements("false", null, "false", null);
-
         assertProjectCleanupTable("never", "never");
 
         clickLink("project.cleanup.edit");
@@ -238,6 +236,19 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
         form.saveFormElements(null, null, null, null);
         assertProjectCleanupTable("never", "never");
+    }
+
+    public void testEditCleanupPolicyCancel()
+    {
+        CleanupPolicyForm form = new CleanupPolicyForm(tester);
+        assertProjectCleanupTable("after 30 days", "never");
+
+        clickLink("project.cleanup.edit");
+
+        form.assertFormElements("true", "30", "false", "0");
+        form.cancelFormElements("false", null, "false", null);
+
+        assertProjectCleanupTable("after 30 days", "never");
     }
 
     public void testEditCleanupPolicyValidation()
@@ -287,12 +298,49 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
     public void testAddNewTrigger()
     {
-        // not yet implemented.
+        assertProjectTriggerTable(new String[][]{
+                new String[]{projectName + " scm trigger", "event", "default", "delete"}
+        });
+
+        assertLinkPresent("project.trigger.add");
+        clickLink("project.trigger.add");
+
+        // check form is available.
+        assertFormPresent("trigger.type");
+        // select trigger type.
+        submit("next");
+
+        // check form is available.
+        assertFormPresent("trigger.cron.create");
+        setWorkingForm("trigger.cron.create");
+        setFormElement("name", "trigger name");
+        setFormElement("cron", "0 0 0 * * ?");
+        submit("next");
+
+        assertProjectTriggerTable(new String[][]{
+                new String[]{projectName + " scm trigger", "event", "default", "delete"},
+                new String[]{"trigger name", "cron", "default", "delete"}
+        });
     }
 
     public void testDeleteTrigger()
     {
-        // not yet implemented.
+        String triggerName = projectName + " scm trigger";
+        assertProjectTriggerTable(new String[][]{
+                new String[]{triggerName, "event", "default", "delete"}
+        });
+
+        assertLinkPresent("delete_" + triggerName);
+        clickLink("delete_" + triggerName);
+
+        assertProjectTriggerTable(new String[][]{});
+    }
+
+    public void testCreateTriggerValidation()
+    {
+        // ensure that the name remains unique.
+
+        // ensure that you can only create one event trigger.
     }
 
     public void testAddNewBuildSpec()
@@ -351,5 +399,11 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
                 new String[]{"working directories deleted", work},
                 new String[]{"build results deleted", results}
         });
+    }
+
+    private void assertProjectTriggerTable(String[][] rows)
+    {
+        assertTablePresent("project.triggers");
+        assertTableRowsEqual("project.triggers", 2, rows);
     }
 }

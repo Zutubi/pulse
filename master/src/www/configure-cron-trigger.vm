@@ -9,7 +9,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=addTrigger.action" "heading=%{getText('trigger.cron.step')}" "method=post")
+#wwcform("action=addTrigger.action" "id=trigger.cron.create" "heading=%{getText('trigger.cron.step')}" "method=post")
     #wwhidden("name=state")
 
     #wwtextfield("name=name" "label=%{getText('trigger.name')}" "required=true" "tabindex=1")
@@ -20,7 +20,7 @@
     #openSubmit()
         #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=4")
         #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=5")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=5")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=6")
      #closeSubmit()
 #end
 </body>

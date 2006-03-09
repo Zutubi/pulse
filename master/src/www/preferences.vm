@@ -34,10 +34,10 @@
                         #dynamicCell($contact.name)
                         #dynamicCell($contact.uid)
                         #editCell("/user/editContactPoint!default.action?id=$contact.id&user=$user.id")
-                        #deleteCell($confirmMessage "/user/deleteContactPoint.action?id=$contact.id&user=$user.id")
+                        #deleteCell($confirmMessage "/user/deleteContactPoint.action?id=$contact.id&user=$user.id" "delete_$!webwork.htmlEncode($contact.name)")
                     </tr>
                     #end
-                    #addRow("contact.create" 4 "/user/contactWizard.action?userId=$user.id")
+                    #addRow("contact.create" 4 "/user/contactWizard.action?userId=$user.id" "contact.create")
                 </table>
             </td>
             <td class="columns" width="40%">
@@ -59,14 +59,14 @@
                         #dynamicCell($contact.uid)
                         #dynamicCell($subscription.condition)
                         #editCell("/user/editSubscription!input.action?id=$subscription.id&login=$user.login")
-                        #deleteCell($confirmMessage "/user/deleteSubscription.action?id=$subscription.id&login=$user.login")
+                        #deleteCell($confirmMessage "/user/deleteSubscription.action?id=$subscription.id&login=$user.login" "delete_$!webwork.htmlEncode($project.name)_$!webwork.htmlEncode($contact.uid)")
                     </tr>
                 #end
                 <!--
                  can only create subscriptions is the system has configured projects accessible to
                  the user AND the user has configured contact points.
                 -->
-                #addRow("subscription.create" 5 "/user/createSubscription!input.action?userId=$user.id")
+                #addRow("subscription.create" 5 "/user/createSubscription!input.action?userId=$user.id" "subscription.create")
                 </table>
             </td>
         </tr>

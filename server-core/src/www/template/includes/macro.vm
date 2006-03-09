@@ -386,19 +386,9 @@
 #end
 
 ##
-## Outputs a delete cell for a content table
-##
-#macro(deleteCell $message $url)
-    <td class="content">
-        <a href="#" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="/images/delete.gif"/>#wwtext("name=delete")</a>
-    </td>
-##    #actionCell("delete" $url "delete.gif")
-#end
-
-##
 ## Outputs a delete cell for a content table, and uses the specified id for the link.
 ##
-#macro(deleteCellWithId $message $url $id)
+#macro(deleteCell $message $url $id)
     <td class="content">
         <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="/images/delete.gif"/>#wwtext("name=delete")</a>
     </td>
@@ -415,10 +405,10 @@
 ##
 ## Outputs an add row for the tail of a content table
 ##
-#macro(addRow $key $span $url)
+#macro(addRow $key $span $url $id)
     <tr>
         <td class="add" colspan="$span">
-            <a href="$url"><img alt="add" src="/images/add.gif"/> #wwtext("name=$key")</a>
+            <a #if($id != "") id="$id"#end href="$url"><img alt="add" src="/images/add.gif"/> #wwtext("name=$key")</a>
         </td>
     </tr>
 #end
@@ -1005,7 +995,7 @@
         </tr>
     #end
     #if($showAdd)
-        #addRow("add.project" 11 "addProject!input.action")
+        #addRow("add.project" 11 "addProject!input.action" "project.add")
     #end
         </table>
 #end

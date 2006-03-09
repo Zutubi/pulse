@@ -29,7 +29,7 @@
                           #dynamicLinkCell($user.login "viewUser.action?id=$user.id")
                           #dynamicCell($user.name)
                           #editCell("editUser!input.action?id=$user.id")
-                          #deleteCellWithId($confirmMessage "deleteUser.action?id=$user.id" "delete_$user.login")
+                          #deleteCell($confirmMessage "deleteUser.action?id=$user.id" "delete_$!webwork.htmlEncode($user.login)")
                           <!--
                           #actionCell2("password.edit" "editPassword!input.action?id=$user.id")
                           #actionCell2("password.reset" "editPassword!reset.action?id=$user.id")

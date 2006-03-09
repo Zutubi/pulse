@@ -77,12 +77,12 @@ public class AddTriggerWizard extends BaseWizard
         Trigger trigger = null;
         if (CRON_STATE.equals(selectState.getType()))
         {
-            trigger = new CronTrigger(configCron.cron, configCron.getName());
+            trigger = new CronTrigger(configCron.cron, configCron.getName(), project.getName());
             trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, configCron.getSpec());
         }
         else if (MONITOR_STATE.equals(selectState.getType()))
         {
-            trigger = new EventTrigger(SCMChangeEvent.class, configMonitor.getName(), SCMChangeEventFilter.class);
+            trigger = new EventTrigger(SCMChangeEvent.class, configMonitor.getName(), project.getName(), SCMChangeEventFilter.class);
             trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, configMonitor.getSpec());
         }
 
@@ -96,6 +96,7 @@ public class AddTriggerWizard extends BaseWizard
         }
         catch (SchedulingException e)
         {
+            //TODO: need to report this error to the user..
             LOG.severe(e.getMessage(), e);
         }
     }
