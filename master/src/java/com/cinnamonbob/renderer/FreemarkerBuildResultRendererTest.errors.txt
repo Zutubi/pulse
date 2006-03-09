@@ -21,7 +21,7 @@ Error messages:
     * test recipe failure message with the unfortunate need to wrap
       because it is really quite ridiculously long
   - second recipe
-    * Command 'test command' failed
+    * Error executing command 'test command'
   - second recipe :: test command
     * bad stuff happened, so wrap this:
       0000000000000000000000000000000000000000000000000000000000
