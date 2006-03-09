@@ -29,6 +29,9 @@
         <property name="objectFactory">
             <ref bean="objectFactory"/>
         </property>
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
     </bean>
 
     <bean id="configurationManager" class="com.cinnamonbob.bootstrap.SimpleConfigurationManager">

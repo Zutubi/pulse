@@ -4,7 +4,6 @@ import com.cinnamonbob.core.ObjectFactory;
 import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.events.system.SystemStartedEvent;
 import com.cinnamonbob.util.logging.Logger;
-import com.opensymphony.xwork.config.ConfigurationManager;
 import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
 
 import java.util.LinkedList;
@@ -26,6 +25,7 @@ public class DefaultStartupManager implements StartupManager
     private long startTime;
 
     private ObjectFactory objectFactory;
+    private ConfigurationManager configurationManager;
 
     public void init() throws StartupException
     {
@@ -41,12 +41,11 @@ public class DefaultStartupManager implements StartupManager
             SetupManager setupManager = (SetupManager) ComponentContext.getBean("setupManager");
             if (!setupManager.setup())
             {
-                // log to the terminal that the system is ready and that you should go to http://localhost:port
-                // to complete the setup. Send it direct to std.err so that we dont get the extra unecessary
-                // logging details from the logging framework, and to ensure that its always there.
+                // log to the terminal that the system is ready. Bypass the logging framework to ensure that
+                // it is always displayed.
                 //TODO: i18n this string...
-                // lookup the port just in case its been changed.
-                System.err.println("Now go to http://localhost:8080 to complete the setup.");
+                int serverPort = configurationManager.getAppConfig().getServerPort();
+                System.err.println("Now go to http://localhost:"+serverPort+" to complete the setup.");
                 return;
             }
 
@@ -63,8 +62,8 @@ public class DefaultStartupManager implements StartupManager
         try
         {
             com.opensymphony.xwork.config.ConfigurationManager.clearConfigurationProviders();
-            ConfigurationManager.addConfigurationProvider(new XmlConfigurationProvider("xwork.xml"));
-            ConfigurationManager.getConfiguration().reload();
+            com.opensymphony.xwork.config.ConfigurationManager.addConfigurationProvider(new XmlConfigurationProvider("xwork.xml"));
+            com.opensymphony.xwork.config.ConfigurationManager.getConfiguration().reload();
         }
         catch (Throwable t)
         {
@@ -134,5 +133,10 @@ public class DefaultStartupManager implements StartupManager
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

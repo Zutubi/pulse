@@ -17,6 +17,9 @@
                 <value>com.cinnamonbob.ResourceDiscoverer</value>
             </list>
         </property>
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
     </bean>
 
     <bean id="configurationManager" class="com.cinnamonbob.bootstrap.SimpleConfigurationManager">
