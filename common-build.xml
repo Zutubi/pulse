@@ -95,7 +95,7 @@
                 <pathelement location="${test.classes.dir}"/>
                 <path refid="lib.path"/>
             </classpath>
-            <formatter type="plain"/>
+            <formatter type="xml"/>
             <batchtest todir="${report.dir}/junit">
                 <fileset dir="${test.dir}">
                     <include name="**/*Test.java"/>
@@ -104,6 +104,12 @@
                 </fileset>
             </batchtest>
         </junit>
+        <junitreport todir="${report.dir}">
+            <fileset dir="${report.dir}/junit">
+                <include name="*.xml"/>
+            </fileset>
+            <report format="frames" todir="${report.dir}"/>
+        </junitreport>
     </target>
 
     <!-- package artifacts -->
