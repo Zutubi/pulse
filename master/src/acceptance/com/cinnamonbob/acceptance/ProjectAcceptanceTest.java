@@ -307,13 +307,14 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
         // check form is available.
         assertFormPresent("trigger.type");
-        // select trigger type.
+        // default trigger type.
+        // default specification.
+        setFormElement("name", "trigger name");
         submit("next");
 
         // check form is available.
         assertFormPresent("trigger.cron.create");
         setWorkingForm("trigger.cron.create");
-        setFormElement("name", "trigger name");
         setFormElement("cron", "0 0 0 * * ?");
         submit("next");
 
@@ -339,6 +340,41 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
     public void testCreateTriggerValidation()
     {
         // ensure that the name remains unique.
+        String triggerName = projectName + " scm trigger";
+        assertProjectTriggerTable(new String[][]{
+                new String[]{triggerName, "event", "default", "delete"}
+        });
+
+        clickLink("project.trigger.add");
+        assertFormPresent("trigger.type");
+        setFormElement("name", triggerName);
+        // go with the defaults.
+        submit("next");
+
+        // check that we can not create a trigger with an existing name.
+        assertFormPresent("trigger.type");
+        // assert text present..
+
+        // use some random name.
+        setFormElement("name", "trigger "+RandomUtils.randomString(4));
+        submit("next");
+
+        // check form is available.
+        assertFormPresent("trigger.cron.create");
+        setWorkingForm("trigger.cron.create");
+        setFormElement("cron", "0");
+        submit("next");
+
+        // invalid cron string.
+        assertFormPresent("trigger.cron.create");
+        // assert error text present.
+        setWorkingForm("trigger.cron.create");
+        setFormElement("cron", "");
+        submit("next");
+
+        // cron string required.
+        assertFormPresent("trigger.cron.create");
+        assertTextPresent("required");
 
         // ensure that you can only create one event trigger.
     }

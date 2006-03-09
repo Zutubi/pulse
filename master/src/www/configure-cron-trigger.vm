@@ -12,15 +12,13 @@
 #wwcform("action=addTrigger.action" "id=trigger.cron.create" "heading=%{getText('trigger.cron.step')}" "method=post")
     #wwhidden("name=state")
 
-    #wwtextfield("name=name" "label=%{getText('trigger.name')}" "required=true" "tabindex=1")
-    #wwselect("name=spec" "label=%{getText('trigger.spec')}" "list=specs" "tabindex=2")
-    #wwtextfield("name=cron" "label=%{getText('trigger.cron.string')}" "required=true" "tabindex=3")
+    #wwtextfield("name=cron" "label=%{getText('trigger.cron.string')}" "required=true" "tabindex=1")
     #inlineHelp("trigger.cron.string.help")
 
     #openSubmit()
-        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=4")
-        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=5")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=6")
+        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=2")
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=3")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=4")
      #closeSubmit()
 #end
 </body>

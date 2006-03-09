@@ -102,9 +102,9 @@ public class DefaultScheduler implements Scheduler, EventListener
         return triggerDao.findByProject(id);
     }
 
-    public Trigger getTrigger(long id, String name)
+    public Trigger getTrigger(long project, String triggerName)
     {
-        return triggerDao.findByProjectAndName(id, name);
+        return triggerDao.findByProjectAndName(project, triggerName);
     }
 
     public void schedule(Trigger trigger) throws SchedulingException

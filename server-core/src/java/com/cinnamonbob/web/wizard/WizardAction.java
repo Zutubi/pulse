@@ -63,6 +63,8 @@ public class WizardAction extends ActionSupport
     private transient TextProvider textProvider = null;
     private ObjectFactory objectFactory;
 
+    private boolean requiresInitialisation = false;
+
     /**
      * Set the wizard class.
      *
@@ -123,10 +125,32 @@ public class WizardAction extends ActionSupport
         }
     }
 
+    /**
+     * We can not initialise the wizard when we first create it since at that
+     * point, the wizard and the initial state have NOT been through the registered
+     * interceptors - intial values have not been set. Therefore, we use the
+     * requiresInitialisation field to indicate that init is required, and delay
+     * the initialisation until the wizard is called.
+     */
+    private void initIfRequired()
+    {
+        if (wizard == null)
+        {
+            // ensure that the wizard has been retrieved.
+            getWizard();
+        }
+        if (requiresInitialisation)
+        {
+            wizard.initialise();
+            requiresInitialisation = false;
+        }
+    }
+
     public String doInput()
     {
         try
         {
+            initIfRequired();
             // always return to the current state.
             return getCurrentStateName();
         }
@@ -141,6 +165,7 @@ public class WizardAction extends ActionSupport
     {
         try
         {
+            initIfRequired();
             // always return to the previous state.
             return wizard.traverseBackward();
         }
@@ -155,6 +180,7 @@ public class WizardAction extends ActionSupport
     {
         try
         {
+            initIfRequired();
             // always attempt to move to the next state.
             if (getCurrentState().hasErrors())
             {
@@ -178,6 +204,7 @@ public class WizardAction extends ActionSupport
     {
         try
         {
+            initIfRequired();
             // clean out session.
             getWizard().cancel();
             removeWizard();
@@ -209,7 +236,7 @@ public class WizardAction extends ActionSupport
                 return doNext();
             }
 
-            // no post has been made, so default to the current state.
+            initIfRequired();
             return getCurrentStateName();
         }
         catch (RuntimeException e)
@@ -246,7 +273,7 @@ public class WizardAction extends ActionSupport
             if (!session.containsKey(wizardClass))
             {
                 Wizard wizardInstance = objectFactory.buildBean(wizardClass);
-                wizardInstance.initialise();
+                requiresInitialisation = true;
                 session.put(wizardClass, wizardInstance);
             }
             wizard = (Wizard) session.get(wizardClass);
@@ -332,6 +359,11 @@ public class WizardAction extends ActionSupport
 
     public void clearErrors()
     {
-        getCurrentState().clearErrors();
+        WizardState currentState = getCurrentState();
+        // the current state is null before the wizard has been initialised.
+        if (currentState != null)
+        {
+            currentState.clearErrors();
+        }
     }
 }

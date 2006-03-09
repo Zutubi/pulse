@@ -17,7 +17,7 @@ public interface Scheduler extends Stoppable
 
     List<Trigger> getTriggers(long id);
 
-    Trigger getTrigger(long id, String name);
+    Trigger getTrigger(long project, String name);
 
     void schedule(Trigger trigger) throws SchedulingException;
 

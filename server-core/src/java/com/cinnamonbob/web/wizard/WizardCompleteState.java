@@ -19,6 +19,7 @@ public final class WizardCompleteState extends BaseWizardState
 
     public void initialise()
     {
+        super.initialise();
         execute();
     }
 

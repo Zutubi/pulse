@@ -12,6 +12,7 @@ import com.cinnamonbob.web.wizard.BaseWizardState;
 import com.cinnamonbob.web.wizard.Wizard;
 import com.cinnamonbob.web.wizard.WizardCompleteState;
 import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.Validateable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.TreeMap;
  */
 public class AddTriggerWizard extends BaseWizard
 {
-    private static final String MONITOR_STATE = "monitor";
+    private static final String MONITOR_STATE = "success";
     private static final String CRON_STATE = "cron";
 
     private static final Logger LOG = Logger.getLogger(AddTriggerWizard.class);
@@ -35,21 +36,16 @@ public class AddTriggerWizard extends BaseWizard
 
     private SelectTriggerType selectState;
     private ConfigureCronTrigger configCron;
-    private ConfigureMonitorTrigger configMonitor;
     private WizardCompleteState finalState;
 
     public AddTriggerWizard()
     {
         selectState = new SelectTriggerType(this, "select");
         configCron = new ConfigureCronTrigger(this, CRON_STATE);
-        configMonitor = new ConfigureMonitorTrigger(this, MONITOR_STATE);
         finalState = new WizardCompleteState(this, "success");
 
-        initialState = selectState;
-
-        addState(selectState);
+        addInitialState("select", selectState);
         addState(configCron);
-        addState(configMonitor);
         addFinalState("success", finalState);
     }
 
@@ -77,13 +73,13 @@ public class AddTriggerWizard extends BaseWizard
         Trigger trigger = null;
         if (CRON_STATE.equals(selectState.getType()))
         {
-            trigger = new CronTrigger(configCron.cron, configCron.getName(), project.getName());
-            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, configCron.getSpec());
+            trigger = new CronTrigger(configCron.cron, selectState.getName(), project.getName());
+            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, selectState.getSpec());
         }
         else if (MONITOR_STATE.equals(selectState.getType()))
         {
-            trigger = new EventTrigger(SCMChangeEvent.class, configMonitor.getName(), project.getName(), SCMChangeEventFilter.class);
-            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, configMonitor.getSpec());
+            trigger = new EventTrigger(SCMChangeEvent.class, selectState.getName(), project.getName(), SCMChangeEventFilter.class);
+            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, selectState.getSpec());
         }
 
         trigger.setProject(project.getId());
@@ -111,9 +107,12 @@ public class AddTriggerWizard extends BaseWizard
         this.scheduler = scheduler;
     }
 
-    public class SelectTriggerType extends BaseWizardState
+    public class SelectTriggerType extends BaseWizardState implements Validateable
     {
         private Map<String, String> types;
+        private String name;
+        private String spec;
+        private List<String> specs;
 
         private String type;
 
@@ -130,51 +129,6 @@ public class AddTriggerWizard extends BaseWizard
         public void setType(String type)
         {
             this.type = type;
-        }
-
-        public Map<String, String> getTypes()
-        {
-            if (types == null)
-            {
-                types = new TreeMap<String, String>();
-                types.put(MONITOR_STATE, "monitor scm trigger");
-                types.put(CRON_STATE, "cron trigger");
-            }
-            return types;
-        }
-
-        public void validate()
-        {
-            if (!TextUtils.stringSet(type) || !types.containsKey(type))
-            {
-                addFieldError("type", "Invalid type '" + type + "' specified. ");
-            }
-        }
-
-        public String getNextStateName()
-        {
-            if (TextUtils.stringSet(type))
-            {
-                return type;
-            }
-            return super.getStateName();
-        }
-    }
-
-    public abstract class BaseConfigureTrigger extends BaseWizardState
-    {
-        private String name;
-        private String spec;
-        private List<String> specs;
-
-        public BaseConfigureTrigger(Wizard wizard, String name)
-        {
-            super(wizard, name);
-        }
-
-        public String getNextStateName()
-        {
-            return "success";
         }
 
         public String getName()
@@ -197,9 +151,42 @@ public class AddTriggerWizard extends BaseWizard
             this.spec = spec;
         }
 
+        public Map<String, String> getTypes()
+        {
+            if (types == null)
+            {
+                types = new TreeMap<String, String>();
+                types.put(MONITOR_STATE, "monitor scm trigger");
+                types.put(CRON_STATE, "cron trigger");
+            }
+            return types;
+        }
+
+        public List<String> getSpecs()
+        {
+            return specs;
+        }
+
+        public void validate()
+        {
+            if (!TextUtils.stringSet(type) || !types.containsKey(type))
+            {
+                addFieldError("type", "invalid type '" + type + "' specified. ");
+                return;
+            }
+
+            // ensure that the selected name is not already in use for this project.
+            long projectId = ((AddTriggerWizard) getWizard()).getProjectId();
+            if (scheduler.getTrigger(projectId, name) != null)
+            {
+                addFieldError("name", "the name " + name + " is already being used. please use a different name.");
+            }
+        }
+
         @Override
         public void initialise()
         {
+            super.initialise();
             long projectId = ((AddTriggerWizard) getWizard()).getProjectId();
             Project project = projectManager.getProject(projectId);
             if (project == null)
@@ -220,14 +207,17 @@ public class AddTriggerWizard extends BaseWizard
             }
         }
 
-        public List<String> getSpecs()
+        public String getNextStateName()
         {
-            return specs;
+            if (TextUtils.stringSet(type))
+            {
+                return type;
+            }
+            return super.getStateName();
         }
-
     }
 
-    public class ConfigureCronTrigger extends BaseConfigureTrigger
+    public class ConfigureCronTrigger extends BaseWizardState
     {
         private String cron;
 
@@ -245,13 +235,10 @@ public class AddTriggerWizard extends BaseWizard
         {
             this.cron = cron;
         }
-    }
 
-    public class ConfigureMonitorTrigger extends BaseConfigureTrigger
-    {
-        public ConfigureMonitorTrigger(AddTriggerWizard wizard, String stateName)
+        public String getNextStateName()
         {
-            super(wizard, stateName);
+            return "success";
         }
     }
 }

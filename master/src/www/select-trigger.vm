@@ -11,13 +11,14 @@
 
 #wwcform("action=addTrigger.action" "id=trigger.type" "heading=%{getText('trigger.type.step')}" "method=post")
     #wwhidden("name=state")
-    #wwhidden("name=wizard.projectId")
 
-    #wwselect("name=type" "label=%{getText('trigger.type')}" "list=types" "tabindex=1")
+    #wwtextfield("name=name" "label=%{getText('trigger.name')}" "required=true" "tabindex=1")
+    #wwselect("name=type" "label=%{getText('trigger.type')}" "list=types" "tabindex=2")
+    #wwselect("name=spec" "label=%{getText('trigger.spec')}" "list=specs" "tabindex=3")
 
     #openSubmit()
-        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=2")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=3")
+        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=4")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=5")
     #closeSubmit()
 #end
 </body>
