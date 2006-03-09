@@ -1,5 +1,6 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.core.BobException;
 import com.cinnamonbob.core.Bootstrapper;
 
 /**
@@ -61,5 +62,10 @@ public class RecipeRequest
     public void setBobFileSource(String bobFileSource)
     {
         this.bobFileSource = bobFileSource;
+    }
+
+    public void prepare() throws BobException
+    {
+        bootstrapper.prepare();
     }
 }

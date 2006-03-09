@@ -1,6 +1,6 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.core.Bootstrapper;
+import com.cinnamonbob.core.BootstrapperSupport;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.RecipePaths;
 import com.cinnamonbob.core.util.FileSystemUtils;
@@ -17,7 +17,7 @@ import java.util.zip.ZipInputStream;
 
 /**
  */
-public class CopyBootstrapper implements Bootstrapper
+public class CopyBootstrapper extends BootstrapperSupport
 {
     private String url;
     private long previousRecipeId;

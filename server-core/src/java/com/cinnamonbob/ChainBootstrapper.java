@@ -1,5 +1,6 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.core.BobException;
 import com.cinnamonbob.core.Bootstrapper;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.RecipePaths;
@@ -17,6 +18,14 @@ public class ChainBootstrapper implements Bootstrapper
     public ChainBootstrapper(Bootstrapper ...bootstrappers)
     {
         this.bootstrappers.addAll(Arrays.asList(bootstrappers));
+    }
+
+    public void prepare() throws BobException
+    {
+        for (Bootstrapper bootstrapper : bootstrappers)
+        {
+            bootstrapper.prepare();
+        }
     }
 
     public void bootstrap(long recipeId, RecipePaths paths) throws BuildException

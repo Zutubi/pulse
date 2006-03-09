@@ -257,4 +257,9 @@ public class RecipeController
 
         recipeResult.terminate(timeout);
     }
+
+    public RecipeDispatchRequest getDispatchRequest()
+    {
+        return dispatchRequest;
+    }
 }

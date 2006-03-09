@@ -332,7 +332,7 @@ public class RecipeProcessorTest extends BobTestCase implements EventListener
         }
     }
 
-    public class SimpleBootstrapper implements Bootstrapper
+    public class SimpleBootstrapper extends BootstrapperSupport
     {
         public void bootstrap(long recipeId, RecipePaths paths) throws BuildException
         {
@@ -340,7 +340,7 @@ public class RecipeProcessorTest extends BobTestCase implements EventListener
         }
     }
 
-    public class ErrorBootstrapper implements Bootstrapper
+    public class ErrorBootstrapper extends BootstrapperSupport
     {
         private BuildException exception;
 

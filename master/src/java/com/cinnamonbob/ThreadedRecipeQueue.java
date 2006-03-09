@@ -1,5 +1,7 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.core.BobException;
+import com.cinnamonbob.core.Stoppable;
 import com.cinnamonbob.events.Event;
 import com.cinnamonbob.events.EventListener;
 import com.cinnamonbob.events.EventManager;
@@ -8,7 +10,6 @@ import com.cinnamonbob.events.build.RecipeDispatchedEvent;
 import com.cinnamonbob.events.build.RecipeErrorEvent;
 import com.cinnamonbob.events.build.RecipeEvent;
 import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.core.Stoppable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -231,19 +232,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                         // can the request be sent to this service?
                         if (request.getHostRequirements().fulfilledBy(service) && !unavailableServices.contains(service))
                         {
-                            service.build(request.getRequest());
-                            unavailableServices.add(service);
-                            lock.lock();
-                            try
-                            {
-                                executingServices.put(request.getRequest().getId(), service);
-                            }
-                            finally
-                            {
-                                lock.unlock();
-                            }
-                            dispatchedRequests.add(request);
-                            eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest().getId(), service));
+                            dispatchRequest(request, service, unavailableServices, dispatchedRequests);
                             break;
                         }
                     }
@@ -259,9 +248,37 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             }
         }
 
-        executor.shutdown();        
+        executor.shutdown();
         LOG.debug("stopped.");
         isRunning = false;
+    }
+
+    private void dispatchRequest(RecipeDispatchRequest request, BuildService service, List<BuildService> unavailableServices, List<RecipeDispatchRequest> dispatchedRequests)
+    {
+        dispatchedRequests.add(request);
+
+        try
+        {
+            request.getRequest().prepare();
+        }
+        catch (BobException e)
+        {
+            eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), "Error dispatching recipe: " + e.getMessage()));
+            return;
+        }
+
+        service.build(request.getRequest());
+        unavailableServices.add(service);
+        lock.lock();
+        try
+        {
+            executingServices.put(request.getRequest().getId(), service);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+        eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest().getId(), service));
     }
 
     public void stop(boolean force)

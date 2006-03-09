@@ -1,19 +1,19 @@
 package com.cinnamonbob.scm;
 
+import com.cinnamonbob.core.BobException;
+
 /**
  * An error raised during interaction with an SCM server.
- * 
+ *
  * @author jsankey
  */
-public class SCMException extends Exception
+public class SCMException extends BobException
 {
     /**
      * Create a new SCM exception.
-     * 
-     * @param message
-     *        human-readable error message
-     * @param cause
-     *        root cause of the error, or null if there is none
+     *
+     * @param message human-readable error message
+     * @param cause   root cause of the error, or null if there is none
      */
     public SCMException(String message, Throwable cause)
     {
@@ -22,9 +22,8 @@ public class SCMException extends Exception
 
     /**
      * Create a new SCM exception.
-     * 
-     * @param message
-     *      human-readable error message
+     *
+     * @param message human-readable error message
      */
     public SCMException(String message)
     {
@@ -33,7 +32,7 @@ public class SCMException extends Exception
 
     /**
      * Create a new SCM exception.
-     */ 
+     */
     public SCMException()
     {
 
@@ -41,9 +40,8 @@ public class SCMException extends Exception
 
     /**
      * Create a new SCM exception.
-     * 
-     * @param cause
-     *        root cause of the error, or null if there is none
+     *
+     * @param cause root cause of the error, or null if there is none
      */
     public SCMException(Throwable cause)
     {

@@ -1,5 +1,6 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.core.BobException;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.events.Event;
 import com.cinnamonbob.events.EventListener;
@@ -71,6 +72,15 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
         {
             if (request.getHostRequirements().fulfilledBy(service))
             {
+                try
+                {
+                    request.getRequest().prepare();
+                }
+                catch (BobException e)
+                {
+                    throw new BuildException(e);
+                }
+
                 service.build(request.getRequest());
                 eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest().getId(), service));
                 return;

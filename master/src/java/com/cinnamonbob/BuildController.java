@@ -90,59 +90,6 @@ public class BuildController implements EventListener
         return tree;
     }
 
-    private ScmBootstrapper createBuildBootstrapper()
-    {
-        Scm scm = project.getScm();
-        ScmBootstrapper bootstrapper = new ScmBootstrapper(scm);
-
-        try
-        {
-            SCMServer server = scm.createServer();
-            Revision latestRevision = server.getLatestRevision();
-            bootstrapper.setRevision(latestRevision);
-
-            // collect scm changes to be added to the build results.
-            List<Changelist> scmChanges = null;
-
-            try
-            {
-                List<BuildResult> previousBuildResults = buildManager.getLatestCompletedBuildResults(project, specification.getName(), 1);
-
-                if (previousBuildResults.size() == 1)
-                {
-                    BuildScmDetails previousScmDetails = previousBuildResults.get(0).getScmDetails();
-                    if (previousScmDetails != null)
-                    {
-                        Revision previousRevision = previousScmDetails.getRevision();
-                        if (previousRevision != null)
-                        {
-                            scmChanges = server.getChanges(previousRevision, latestRevision, "");
-                            for (Changelist change : scmChanges)
-                            {
-                                change.setResultId(buildResult.getId());
-                            }
-                        }
-                    }
-                }
-            }
-            catch (SCMException e)
-            {
-                LOG.warning("Unable to retrieve changelist details from SCM server: " + e.getMessage(), e);
-            }
-
-            BuildScmDetails scmDetails = new BuildScmDetails(latestRevision, scmChanges);
-            buildResult.setScmDetails(scmDetails);
-        }
-        catch (SCMException e)
-        {
-            throw new BuildException("Could not retrieve latest revision from SCM: " + e.getMessage(), e);
-        }
-
-        buildManager.save(buildResult);
-
-        return bootstrapper;
-    }
-
     private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode, BuildSpecificationNode specNode)
     {
         for (BuildSpecificationNode node : specNode.getChildren())
@@ -212,7 +159,7 @@ public class BuildController implements EventListener
             throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
         }
 
-        ScmBootstrapper initialBootstrapper = createBuildBootstrapper();
+        ScmBootstrapper initialBootstrapper = new ScmBootstrapper(project.getScm());
         BobFileDetails bobFileDetails = project.getBobFileDetails();
         ComponentContext.autowire(bobFileDetails);
         String bobFileSource = bobFileDetails.getBobFile(project, initialBootstrapper.getRevision());
@@ -221,26 +168,6 @@ public class BuildController implements EventListener
 
         // execute the first level of recipe controllers...
         initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
-    }
-
-    private void scheduleTimeout()
-    {
-        String name = getTriggerName();
-        Date time = new Date(System.currentTimeMillis() + specification.getTimeout() * Constants.MINUTE);
-
-        Trigger timeoutTrigger = new SimpleTrigger(name, TIMEOUT_TRIGGER_GROUP, time);
-        timeoutTrigger.setJobName(FatController.TIMEOUT_JOB_NAME);
-        timeoutTrigger.setJobGroup(FatController.TIMEOUT_JOB_GROUP);
-        timeoutTrigger.getJobDataMap().put(TimeoutBuildJob.PARAM_ID, buildResult.getId());
-
-        try
-        {
-            quartzScheduler.scheduleJob(timeoutTrigger);
-        }
-        catch (SchedulerException e)
-        {
-            LOG.severe("Unable to schedule build timeout trigger: " + e.getMessage(), e);
-        }
     }
 
     private String getTriggerName()
@@ -298,7 +225,7 @@ public class BuildController implements EventListener
             // recipes.
             if (!buildResult.commenced() && e instanceof RecipeDispatchedEvent)
             {
-                handleFirstDispatch();
+                handleFirstDispatch(foundNode.getData());
             }
 
             checkNodeStatus(foundNode);
@@ -313,14 +240,73 @@ public class BuildController implements EventListener
      * TODO: this probably needs some review when we go distributed (timeouts
      * at least).
      */
-    private void handleFirstDispatch()
+    private void handleFirstDispatch(RecipeController controller)
     {
+        getChanges((ScmBootstrapper) controller.getDispatchRequest().getRequest().getBootstrapper());
         buildResult.commence(System.currentTimeMillis());
         if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
         {
             scheduleTimeout();
         }
         buildManager.save(buildResult);
+    }
+
+    private void getChanges(ScmBootstrapper bootstrapper)
+    {
+        Scm scm = project.getScm();
+        Revision revision = bootstrapper.getRevision();
+        // collect scm changes to be added to the build results.
+        List<Changelist> scmChanges = null;
+
+        try
+        {
+            SCMServer server = scm.createServer();
+            List<BuildResult> previousBuildResults = buildManager.getLatestCompletedBuildResults(project, specification.getName(), 1);
+
+            if (previousBuildResults.size() == 1)
+            {
+                BuildScmDetails previousScmDetails = previousBuildResults.get(0).getScmDetails();
+                if (previousScmDetails != null)
+                {
+                    Revision previousRevision = previousScmDetails.getRevision();
+                    if (previousRevision != null)
+                    {
+                        scmChanges = server.getChanges(previousRevision, revision, "");
+                        for (Changelist change : scmChanges)
+                        {
+                            change.setResultId(buildResult.getId());
+                        }
+                    }
+                }
+            }
+        }
+        catch (SCMException e)
+        {
+            LOG.warning("Unable to retrieve changelist details from SCM server: " + e.getMessage(), e);
+        }
+
+        BuildScmDetails scmDetails = new BuildScmDetails(revision, scmChanges);
+        buildResult.setScmDetails(scmDetails);
+    }
+
+    private void scheduleTimeout()
+    {
+        String name = getTriggerName();
+        Date time = new Date(System.currentTimeMillis() + specification.getTimeout() * Constants.MINUTE);
+
+        Trigger timeoutTrigger = new SimpleTrigger(name, TIMEOUT_TRIGGER_GROUP, time);
+        timeoutTrigger.setJobName(FatController.TIMEOUT_JOB_NAME);
+        timeoutTrigger.setJobGroup(FatController.TIMEOUT_JOB_GROUP);
+        timeoutTrigger.getJobDataMap().put(TimeoutBuildJob.PARAM_ID, buildResult.getId());
+
+        try
+        {
+            quartzScheduler.scheduleJob(timeoutTrigger);
+        }
+        catch (SchedulerException e)
+        {
+            LOG.severe("Unable to schedule build timeout trigger: " + e.getMessage(), e);
+        }
     }
 
     private void checkNodeStatus(TreeNode<RecipeController> node)
