@@ -92,4 +92,22 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         clickLinkWithText("projects");
         assertLinkPresentWithText(projectName);
     }
+
+    public void testProjectNameUnique()
+    {
+        clickLinkWithText("projects");
+        clickLink("project.add");
+
+        String projectName = "project " + RandomUtils.randomString(5);
+        submitProjectBasicsForm(projectName, "", "cvs", "custom");
+        submitCvsSetupForm("/local", "module", "", "");
+        submitCustomSetupForm("bob.xml");
+        assertTablePresent("project.basics");
+
+        clickLinkWithText("projects");
+        clickLink("project.add");
+
+        submitProjectBasicsForm(projectName, "", "cvs", "custom");
+        assertFormPresent(FO_PROJECT_BASICS);
+    }
 }

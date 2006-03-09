@@ -153,12 +153,6 @@ public class AddTriggerWizard extends BaseWizard
 
         public Map<String, String> getTypes()
         {
-            if (types == null)
-            {
-                types = new TreeMap<String, String>();
-                types.put(MONITOR_STATE, "monitor scm trigger");
-                types.put(CRON_STATE, "cron trigger");
-            }
             return types;
         }
 
@@ -187,6 +181,7 @@ public class AddTriggerWizard extends BaseWizard
         public void initialise()
         {
             super.initialise();
+
             long projectId = ((AddTriggerWizard) getWizard()).getProjectId();
             Project project = projectManager.getProject(projectId);
             if (project == null)
@@ -205,6 +200,35 @@ public class AddTriggerWizard extends BaseWizard
             {
                 addActionError("No build specifications for projectId '" + project.getName() + "'");
             }
+
+            if (types == null)
+            {
+                types = new TreeMap<String, String>();
+                // only add monitor scm trigger option if the project is not already being monitored.
+                boolean addMonitorOption = true;
+                List<Trigger> triggers = scheduler.getTriggers(projectId);
+                outer: for (Trigger trigger : triggers)
+                {
+                    if (trigger instanceof EventTrigger)
+                    {
+                        EventTrigger eventTrigger = (EventTrigger) trigger;
+                        for (Class evt : eventTrigger.getTriggerEvents())
+                        {
+                            if (evt == SCMChangeEvent.class)
+                            {
+                                addMonitorOption = false;
+                                break outer;
+                            }
+                        }
+                    }
+                }
+                if (addMonitorOption)
+                {
+                    types.put(MONITOR_STATE, "monitor scm trigger");
+                }
+                types.put(CRON_STATE, "cron trigger");
+            }
+
         }
 
         public String getNextStateName()

@@ -11,6 +11,7 @@ import com.cinnamonbob.web.wizard.BaseWizardState;
 import com.cinnamonbob.web.wizard.Wizard;
 import com.cinnamonbob.web.wizard.WizardCompleteState;
 import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.Validateable;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -170,7 +171,7 @@ public class AddProjectWizard extends BaseWizard
         return projectId;
     }
 
-    private class ProjectDetails extends BaseWizardState
+    private class ProjectDetails extends BaseWizardState implements Validateable
     {
         private Map<String, String> scms = null;
         private Map<String, String> types = null;
@@ -223,6 +224,13 @@ public class AddProjectWizard extends BaseWizard
             {
                 addActionError("An invalid scm has been requested. Please select one of the options " +
                         "from the drop down list provided.");
+            }
+
+            // is the name being used by another project??
+            if (projectManager.getProject(name) != null)
+            {
+                addFieldError("name", "The name " + name + " is already being used by another project. " +
+                        "Please select a different name.");
             }
         }
 

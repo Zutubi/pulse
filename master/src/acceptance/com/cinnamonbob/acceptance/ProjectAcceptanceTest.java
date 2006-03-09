@@ -377,8 +377,11 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertTextPresent("required");
 
         // ensure that you can only create one event trigger.
+        submit("previous");
+        assertOptionsEqual("type", new String[]{"cron trigger"});
     }
 
+/*
     public void testAddNewBuildSpec()
     {
         // not yet implemented.
@@ -400,6 +403,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
     {
         // not yet implemented.
     }
+*/
 
     private void assertProjectSpecificsTable(String type, String file)
     {
