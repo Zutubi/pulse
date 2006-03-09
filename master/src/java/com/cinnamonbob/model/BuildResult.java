@@ -135,12 +135,4 @@ public class BuildResult extends Result
     {
         this.scmDetails = scmDetails;
     }
-
-    public void recipeDispatched()
-    {
-        if (!stamps.started())
-        {
-            commence(System.currentTimeMillis());
-        }
-    }
 }

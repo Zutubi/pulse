@@ -221,11 +221,6 @@ public class BuildController implements EventListener
 
         // execute the first level of recipe controllers...
         initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
-
-        if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
-        {
-            scheduleTimeout();
-        }
     }
 
     private void scheduleTimeout()
@@ -284,12 +279,6 @@ public class BuildController implements EventListener
 
     private void handleRecipeEvent(RecipeEvent e)
     {
-        if (e instanceof RecipeDispatchedEvent)
-        {
-            buildResult.recipeDispatched();
-            buildManager.save(buildResult);
-        }
-
         RecipeController controller;
         TreeNode<RecipeController> foundNode = null;
 
@@ -305,8 +294,33 @@ public class BuildController implements EventListener
 
         if (foundNode != null)
         {
+            // If we got here we are sure that the event was for one of our
+            // recipes.
+            if (!buildResult.commenced() && e instanceof RecipeDispatchedEvent)
+            {
+                handleFirstDispatch();
+            }
+
             checkNodeStatus(foundNode);
         }
+    }
+
+    /**
+     * Called when the first recipe for this build is successfully
+     * dispatched.  It is at this point that the build is said to have
+     * commenced.
+     * <p/>
+     * TODO: this probably needs some review when we go distributed (timeouts
+     * at least).
+     */
+    private void handleFirstDispatch()
+    {
+        buildResult.commence(System.currentTimeMillis());
+        if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
+        {
+            scheduleTimeout();
+        }
+        buildManager.save(buildResult);
     }
 
     private void checkNodeStatus(TreeNode<RecipeController> node)
