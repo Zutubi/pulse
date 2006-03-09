@@ -259,6 +259,7 @@ public class ThreadedRecipeQueueTest extends TestCase
     {
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
         RecipeRequest request = new RecipeRequest(id, null);
+        request.setBootstrapper(new ChainBootstrapper());
         return new RecipeDispatchRequest(requirements, request, null);
     }
 
