@@ -45,6 +45,7 @@ public class DefaultStartupManager implements StartupManager
                 // to complete the setup. Send it direct to std.err so that we dont get the extra unecessary
                 // logging details from the logging framework, and to ensure that its always there.
                 //TODO: i18n this string...
+                // lookup the port just in case its been changed.
                 System.err.println("Now go to http://localhost:8080 to complete the setup.");
                 return;
             }

@@ -221,12 +221,68 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
     public void testEditCleanupPolicy()
     {
-/* javascript not playing nice...
+        CleanupPolicyForm form = new CleanupPolicyForm(tester);
+        assertProjectCleanupTable("after 30 days", "never");
+
+        clickLink("project.cleanup.edit");
+
+        // check box elements, true => checked, null -> unchecked.
+        form.assertFormElements("true", "30", "false", "0");
+        // check disabling both.
+        form.saveFormElements("false", null, "false", null);
+
+        assertProjectCleanupTable("never", "never");
+
+        clickLink("project.cleanup.edit");
+        form.assertFormElements("false", "0", "false", "0");
+
+        form.saveFormElements(null, null, null, null);
+        assertProjectCleanupTable("never", "never");
+    }
+
+    public void testEditCleanupPolicyValidation()
+    {
+        // check that positive values only
         CleanupPolicyForm form = new CleanupPolicyForm(tester);
         clickLink("project.cleanup.edit");
 
+        // check 0 value.
         form.assertFormElements("true", "30", "false", "0");
-*/
+        form.saveFormElements("true", "0", null, null);
+        assertTextPresent("positive");
+
+        // check negative value
+        form.assertFormElements("true", "0", "false", "0");
+        form.saveFormElements("true", "-3", null, null);
+        assertTextPresent("positive");
+
+        // check no value
+        form.assertFormElements("true", "-3", "false", "0");
+        form.saveFormElements("true", "", null, null);
+        assertTextPresent("positive");
+
+        // repeat the above tests for the result cleanup field.
+
+        // check 0 value.
+        form.assertFormElements("true", "0", "false", "0");
+        form.saveFormElements("false", "0", "true", "0");
+        assertTextPresent("positive");
+
+        // check negative value
+        form.assertFormElements("false", "0", "true", "0");
+        form.saveFormElements(null, null, "true", "-3");
+        assertTextPresent("positive");
+
+        // check no value
+        form.assertFormElements("false", "0", "true", "-3");
+        form.saveFormElements(null, null, "true", "");
+        assertTextPresent("positive");
+
+        // ensure that working directories are cleaned up at least as frequently as results.
+        form.saveFormElements("true", "4", "true", "1");
+        assertTextPresent("least as frequently");
+        form.assertFormElements("true", "4", "true", "1");
+
     }
 
     public void testAddNewTrigger()
@@ -285,6 +341,15 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertTableRowsEqual("project.scm", 1, new String[][]{
                 new String[]{"type", type},
                 new String[]{"location", location}
+        });
+    }
+
+    private void assertProjectCleanupTable(String work, String results)
+    {
+        assertTablePresent("project.cleanup");
+        assertTableRowsEqual("project.cleanup", 1, new String[][]{
+                new String[]{"working directories deleted", work},
+                new String[]{"build results deleted", results}
         });
     }
 }

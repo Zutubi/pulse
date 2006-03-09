@@ -10,7 +10,7 @@ import com.cinnamonbob.model.Project;
 public class EditCleanupPolicyAction extends ProjectActionSupport
 {
     private long projectId;
-    private AgeBuildResultCleanupPolicy policy;
+    private AgeBuildResultCleanupPolicy policy = new AgeBuildResultCleanupPolicy();
     private Project project;
     private boolean enableWorkDirCleanup;
     private boolean enableResultCleanup;
@@ -33,11 +33,6 @@ public class EditCleanupPolicyAction extends ProjectActionSupport
     public AgeBuildResultCleanupPolicy getPolicy()
     {
         return policy;
-    }
-
-    public void setPolicy(AgeBuildResultCleanupPolicy policy)
-    {
-        this.policy = policy;
     }
 
     public boolean getEnableWorkDirCleanup()

@@ -68,4 +68,28 @@ public abstract class BaseForm
             tester.assertFormElementEquals(field, value);
         }
     }
+
+    public void setCheckboxChecked(String name, boolean b)
+    {
+        if (b)
+        {
+            tester.setFormElement(name, "true");
+        }
+        else
+        {
+            tester.uncheckCheckbox(name);
+        }
+    }
+
+    public void assertCheckboxChecked(String name, boolean b)
+    {
+        if (b)
+        {
+            tester.assertFormElementEquals(name, "true");
+        }
+        else
+        {
+            tester.assertFormElementEquals(name, null);
+        }
+    }
 }
