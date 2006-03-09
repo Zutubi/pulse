@@ -82,7 +82,7 @@ public class AddTriggerWizard extends BaseWizard
         }
         else if (MONITOR_STATE.equals(selectState.getType()))
         {
-            trigger = new EventTrigger(SCMChangeEvent.class, configMonitor.getName());
+            trigger = new EventTrigger(SCMChangeEvent.class, configMonitor.getName(), SCMChangeEventFilter.class);
             trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, configMonitor.getSpec());
         }
 

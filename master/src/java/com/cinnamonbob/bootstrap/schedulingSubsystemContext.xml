@@ -60,6 +60,9 @@ triggers.
         <property name="eventManager">
             <ref bean="eventManager"/>
         </property>
+        <property name="objectFactory">
+            <ref bean="objectFactory"/>
+        </property>
     </bean>
 
     <bean id="triggerHandler" class="com.cinnamonbob.scheduling.DefaultTriggerHandler">

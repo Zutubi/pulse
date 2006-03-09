@@ -2,10 +2,7 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildSpecificationNodeDao;
-import com.cinnamonbob.scheduling.EventTrigger;
-import com.cinnamonbob.scheduling.Scheduler;
-import com.cinnamonbob.scheduling.SchedulingException;
-import com.cinnamonbob.scheduling.Trigger;
+import com.cinnamonbob.scheduling.*;
 import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
 import com.cinnamonbob.scm.SCMChangeEvent;
 import com.cinnamonbob.util.logging.Logger;
@@ -136,7 +133,7 @@ public class AddProjectWizard extends BaseWizard
         buildSpecificationNodeDao.save(parent);
 
         // schedule the event trigger - unique to this project.
-        Trigger trigger = new EventTrigger(SCMChangeEvent.class, project.getName() + " scm trigger", "scm event triggers");
+        EventTrigger trigger = new EventTrigger(SCMChangeEvent.class, project.getName() + " scm trigger", "scm event triggers", SCMChangeEventFilter.class);
         trigger.setProject(project.getId());
         trigger.setTaskClass(BuildProjectTask.class);
         trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, "default");

@@ -3,6 +3,7 @@ package com.cinnamonbob.scheduling;
 import com.cinnamonbob.events.DefaultEventManager;
 import com.cinnamonbob.events.Event;
 import com.cinnamonbob.events.EventManager;
+import com.cinnamonbob.spring.SpringObjectFactory;
 
 /**
  * <class-comment/>
@@ -24,6 +25,7 @@ public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
         scheduler = new EventSchedulerStrategy();
         eventManager = new DefaultEventManager();
         ((EventSchedulerStrategy)scheduler).setEventManager(eventManager);
+        ((EventSchedulerStrategy)scheduler).setObjectFactory(new SpringObjectFactory());
         scheduler.setTriggerHandler(triggerHandler);
     }
 
@@ -50,6 +52,20 @@ public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
         assertEquals(1, trigger.getTriggerCount());
     }
 
+    public void testFiltersEvent() throws SchedulingException
+    {
+        EventTrigger trigger = new EventTrigger(TestEvent.class);
+        trigger.setFilterClass(BlockFilter.class);
+        scheduler.schedule(trigger);
+        eventManager.publish(new TestEvent(this));
+        assertFalse(triggerHandler.wasTriggered());
+        assertEquals(0, trigger.getTriggerCount());
+        trigger.setFilterClass(PassFilter.class);
+        eventManager.publish(new TestEvent(this));
+        assertTrue(triggerHandler.wasTriggered());
+        assertEquals(1, trigger.getTriggerCount());
+    }
+
     protected void activateTrigger(Trigger trigger)
     {
         eventManager.publish(new Event(this));
@@ -69,4 +85,5 @@ public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
             super(source);
         }
     }
+
 }

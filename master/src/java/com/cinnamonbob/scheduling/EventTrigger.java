@@ -1,6 +1,8 @@
 package com.cinnamonbob.scheduling;
 
 import com.cinnamonbob.events.Event;
+import com.cinnamonbob.core.ObjectFactory;
+import com.cinnamonbob.util.logging.Logger;
 
 /**
  * The EventTrigger is triggered by the occurance of an event within the system.
@@ -9,11 +11,11 @@ import com.cinnamonbob.events.Event;
  */
 public class EventTrigger extends Trigger
 {
-    private static final Class<Event>[] DEFAULT_TRIGGER_EVENTS = new Class[]{Event.class};
-
-    private Class<Event>[] triggers = DEFAULT_TRIGGER_EVENTS;
-
     static final String TYPE = "event";
+
+    private static final Class<Event>[] DEFAULT_TRIGGER_EVENTS = new Class[]{Event.class};
+    private Class<Event>[] triggers = DEFAULT_TRIGGER_EVENTS;
+    private Class<? extends EventTriggerFilter> filterClass = null;
 
     /**
      * Default no argument constructor required by hibernate. 
@@ -33,10 +35,23 @@ public class EventTrigger extends Trigger
         this(trigger, name, DEFAULT_GROUP);
     }
 
+    public EventTrigger(Class trigger, String name, Class<? extends EventTriggerFilter> filterClass)
+    {
+        this(trigger, name, DEFAULT_GROUP);
+        this.filterClass = filterClass;
+    }
+
     public EventTrigger(Class trigger, String name, String group)
     {
         super(name, group);
         triggers = new Class[]{trigger};
+    }
+
+    public EventTrigger(Class trigger, String name, String group, Class<? extends EventTriggerFilter> filterClass)
+    {
+        super(name, group);
+        triggers = new Class[]{trigger};
+        this.filterClass = filterClass;
     }
 
     public String getType()
@@ -62,5 +77,15 @@ public class EventTrigger extends Trigger
     private void setTriggerEvent(Class event)
     {
         getTriggerEvents()[0] = event;
+    }
+
+    public Class<? extends EventTriggerFilter> getFilterClass()
+    {
+        return filterClass;
+    }
+
+    public void setFilterClass(Class<? extends EventTriggerFilter> filterClass)
+    {
+        this.filterClass = filterClass;
     }
 }

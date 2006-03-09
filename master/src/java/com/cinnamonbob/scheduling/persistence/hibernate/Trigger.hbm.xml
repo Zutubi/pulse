@@ -35,6 +35,7 @@
 
         <subclass name="com.cinnamonbob.scheduling.EventTrigger" discriminator-value="EVENT" dynamic-update="false">
             <property name="triggerEvent" column="TRIGGER_EVENT" type="class"/>
+            <property name="filterClass" column="FILTER_CLASS" type="class"/>
         </subclass>
 
         <subclass name="com.cinnamonbob.scheduling.SimpleTrigger" discriminator-value="SIMPLE" dynamic-update="false">
