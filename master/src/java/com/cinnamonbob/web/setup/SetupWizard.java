@@ -125,16 +125,20 @@ public class SetupWizard extends BaseWizard
         public ServerSettingsState(Wizard wizard, String name)
         {
             super(wizard, name);
+        }
 
+        public void initialise()
+        {
             try
             {
                 InetAddress address = InetAddress.getLocalHost();
-                hostname = address.getCanonicalHostName() + ":8080";
+                hostname = address.getCanonicalHostName() + ":" + configurationManager.getAppConfig().getServerPort();
             }
             catch (UnknownHostException e)
             {
                 // Oh well, we tried
             }
+
         }
 
         public String getNextStateName()

@@ -58,7 +58,7 @@ public class ProfileServlet extends HttpServlet
             return;
         }
 
-        String pathToForward = MessageFormat.format(DISPLAY_PROFILE_PATH, new String[]{String.valueOf(user.getId())});
+        String pathToForward = MessageFormat.format(DISPLAY_PROFILE_PATH, String.valueOf(user.getId()));
 
         httpServletRequest.getRequestDispatcher(pathToForward).forward(httpServletRequest, httpServletResponse);
     }
