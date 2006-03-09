@@ -78,7 +78,7 @@ public class ThreadedRecipeQueueTest extends TestCase
 
     public void testStopStart() throws Exception
     {
-        Thread.yield();
+        Thread.sleep(100);
         queue.stop(true);
         Thread.yield();
 
