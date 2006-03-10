@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 
 public class CvsServerTest extends TestCase
 {
-    private String cvsRoot = ":local:/e/cvsroot";
+    private String cvsRoot = ":local:c:/cvsroot";
 
     private File workdir = null;
 

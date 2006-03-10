@@ -1,9 +1,5 @@
 package com.cinnamonbob.acceptance;
 
-import com.cinnamonbob.core.util.FileSystemUtils;
-
-import java.io.File;
-
 /**
  * A setup test that covers the systems setup procedure.
  */
@@ -14,7 +10,6 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
     private static final String FE_PASSWORD = "admin.password";
     private static final String FE_CONFIRM = "confirm";
 
-    private File tmpDir;
     private static final String FO_ADMIN_CREATE = "admin.create";
     private static final String FE_HOSTNAME = "hostname";
     private static final String FE_FROM = "fromAddress";
@@ -26,16 +21,10 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
     protected void setUp() throws Exception
     {
         super.setUp();
-
-        tmpDir = FileSystemUtils.createTempDirectory(SetupAcceptanceTest.class.getName() + "-", "");
     }
 
     protected void tearDown() throws Exception
     {
-        // an attempt to clean up the installation will fail since the running application
-        // will have open database connections, preventing the database from being deleted.
-        //removeDirectory(tmpDir);
-
         super.tearDown();
     }
 

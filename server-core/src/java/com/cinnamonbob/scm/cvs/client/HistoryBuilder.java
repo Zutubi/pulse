@@ -62,12 +62,49 @@ public class HistoryBuilder implements Builder
         return new HistoryInfo(data);
     }
 
+    /**
+     * Unfortunately, when using the history command, there is no simple way to filter the history
+     * entry by the requested module. For now, we assume that the module is a directory relative to the
+     * root of the repository.
+     *
+     * @param info
+     * @return
+     */
     private boolean matchesRequestedModule(HistoryInfo info)
     {
         if (module == null)
         {
             return true;
         }
-        return info.getPathInRepository().startsWith(module);
+        String pathInRepository = info.getPathInRepository();
+        if(pathInRepository.equals(module))
+        {
+            return true;
+        }
+        // ensure that if the path in repo and module are not exactly the same, then
+        // the module represents a prefix AND that prefix is followed by directories.
+        // This is to ensure that you match module/ and not modulename/
+        if (pathInRepository.startsWith(module) && pathInRepository.length() > module.length())
+        {
+            String next = pathInRepository.substring(module.length(), module.length() + 1);
+            if (next.equals("/") || next.equals("\\"))
+            {
+                return true;
+            }
+        }
+
+        // if the module specifies a file directly, then we need some shenanigans, module == path + 1 + file
+        if (module.startsWith(pathInRepository) &&
+                module.endsWith(info.getFile()) &&
+                (pathInRepository.length() + info.getFile().length() < module.length()))
+        {
+            String middle = module.substring(pathInRepository.length(), module.length() - info.getFile().length());
+            if (middle.equals("/") || middle.equals("\\"))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

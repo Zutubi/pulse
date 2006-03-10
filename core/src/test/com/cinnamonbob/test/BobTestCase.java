@@ -261,4 +261,9 @@ public abstract class BobTestCase extends TestCase
             throw new IOException("Failed to remove " + dir);
         }
     }
+
+    public static void assertEndsWith(String a, String b)
+    {
+        assertTrue("'"+b+"' does not end with '"+a+"'", b.endsWith(a));
+    }
 }

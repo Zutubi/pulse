@@ -38,7 +38,7 @@ public class CvsClient
 
     private static final Logger LOG = Logger.getLogger(CvsClient.class);
 
-    private CVSRoot root;
+    private final CVSRoot root;
 
     private File localPath;
 
@@ -86,9 +86,9 @@ public class CvsClient
         this.revision = revision;
     }
 
-    public void checkout(String file) throws SCMException
+    public void checkout(String module) throws SCMException
     {
-        checkout(file, null);
+        checkout(module, null);
     }
 
     /**
@@ -302,6 +302,17 @@ public class CvsClient
 
     // group by (author,branch,comment)
 
+    /**
+     * Retrieve all of the change lists in the named module in the repository.
+     *
+     * @return
+     * @throws SCMException
+     */
+    public List<Changelist> getChangeLists(String module) throws SCMException
+    {
+        return getChangeLists(null, module);
+    }
+
     public List<Changelist> getChangeLists(Date since, String module) throws SCMException
     {
         List<HistoryInfo> infos = retrieveHistoryInformation(since, module);
@@ -361,10 +372,11 @@ public class CvsClient
 
             // find the firstRevision -> comment, author
             LogInformation logInfo = logInfos.get(fullPath);
-            assert(logInfo != null);
-
-            LocalChange change = new LocalChange(logInfo, histInfo);
-            simpleChanges.add(change);
+            if (logInfo != null) // if it has not been filtered out because its on a different branch (see retrieveLogInformation).
+            {
+                LocalChange change = new LocalChange(logInfo, histInfo);
+                simpleChanges.add(change);
+            }
         }
 
         // group by author, branch, sort by date. this will have the affect of grouping
@@ -482,8 +494,12 @@ public class CvsClient
             {
                 String modifiedFilename = modifiedFiles.get(i);
                 LogInformation logInfo = rlogResponse.get(i);
-                assert(logInfo.getRepositoryFilename().endsWith(modifiedFilename + ",v"));
-                infos.put(modifiedFilename, logInfo);
+                // manually filter out the files on the branch.
+                if (revision == null || logInfo.getSymName(revision) != null)
+                {
+                    assert(logInfo.getRepositoryFilename().endsWith(modifiedFilename + ",v"));
+                    infos.put(modifiedFilename, logInfo);
+                }
             }
             return infos;
         }
@@ -512,6 +528,10 @@ public class CvsClient
 
         public LocalChange(LogInformation log, HistoryInfo history)
         {
+            if (log == null)
+            {
+                throw new IllegalArgumentException("log can not be null.");
+            }
             this.log = log;
             this.history = history;
         }
@@ -547,7 +567,17 @@ public class CvsClient
 
         public String getFilename()
         {
-            return log.getRepositoryFilename();
+            // need to process the filename.
+
+            String filename = log.getRepositoryFilename();
+            // remove the ,v
+            filename = filename.substring(0, filename.length() -2);
+
+            // remove the repo root.
+            root.getRepository();
+            filename = filename.substring(root.getRepository().length());
+
+            return filename;
         }
 
         public Change.Action getAction()
