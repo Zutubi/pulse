@@ -26,3 +26,4 @@
 # spread out over the entire source repository.
 
 module -a unit-test/CvsClientTest/testCheckoutModule/dir1 unit-test/CvsClientTest/testCheckoutModule/dir2
+module2 -a unit-test/CvsClientTest/testHasModuleChangedSince/dir1 unit-test/CvsClientTest/testHasModuleChangedSince/dir2

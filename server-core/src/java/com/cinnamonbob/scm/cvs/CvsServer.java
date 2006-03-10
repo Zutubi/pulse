@@ -156,7 +156,7 @@ public class CvsServer implements SCMServer
         CvsClient client = new CvsClient(cvsRoot);
         if (TextUtils.stringSet(since.getBranch()))
         {
-            client.setRevision(since.getBranch());
+            client.setTag(since.getBranch());
         }
         return client.hasChangedSince(since.getDate(), cvsModule);
     }
@@ -229,7 +229,7 @@ public class CvsServer implements SCMServer
         client.setLocalPath(checkoutDir);
         if (TextUtils.stringSet(branch))
         {
-            client.setRevision(branch);
+            client.setTag(branch);
         }
         client.checkout(serverPath, date);
     }

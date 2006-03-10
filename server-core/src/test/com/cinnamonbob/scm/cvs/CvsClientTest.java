@@ -2,6 +2,8 @@ package com.cinnamonbob.scm.cvs;
 
 import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.core.model.Changelist;
+import com.cinnamonbob.core.model.CvsRevision;
+import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.test.BobTestCase;
@@ -32,10 +34,12 @@ public class CvsClientTest extends BobTestCase
     {
         super.setUp();
 
-        Logger.setLogging("system");
+//        if (com.cinnamonbob.util.logging.Logger.getLogger(CvsClientTest.class).isLoggable(Level.FINEST))
+//        {
+            Logger.setLogging("system");
+//        }
 
         File repositoryRoot = new File(getBobRoot(), "server-core/src/test/com/cinnamonbob/scm/cvs/repository");
-//        File repositoryRoot = new File("c:/repository");
         CVSRoot cvsRoot = CVSRoot.parse(":local:" + repositoryRoot.getCanonicalPath());
         cvs = new CvsClient(cvsRoot);
 
@@ -45,6 +49,8 @@ public class CvsClientTest extends BobTestCase
 
     public void tearDown() throws Exception
     {
+        Logger.setLogging(null);
+
         removeDirectory(workdir);
 
         super.tearDown();
@@ -69,6 +75,7 @@ public class CvsClientTest extends BobTestCase
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt checked in by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt checked in by author a\n");
 
         Change change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsClientTest/testChangeDetails/Attic/file1.txt", change.getFilename());
@@ -79,6 +86,7 @@ public class CvsClientTest extends BobTestCase
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt modified by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt modified by author a\n");
 
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsClientTest/testChangeDetails/Attic/file1.txt", change.getFilename());
@@ -89,6 +97,7 @@ public class CvsClientTest extends BobTestCase
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt deleted by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt deleted by author a\n");
 
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsClientTest/testChangeDetails/Attic/file1.txt", change.getFilename());
@@ -99,6 +108,7 @@ public class CvsClientTest extends BobTestCase
         assertEquals("daniel", changelist.getUser());
         assertEquals("file2.txt checked in by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file2.txt checked in by author a\n");
 
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsClientTest/testChangeDetails/file2.txt", change.getFilename());
@@ -117,11 +127,13 @@ public class CvsClientTest extends BobTestCase
         assertChangelistValues(changelist, "daniel", "file1.txt checked in by author a\n");
         assertEquals(1, changelist.getChanges().size());
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.1");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt checked in by author a\n");
 
         changelist = changes.get(1);
         assertChangelistValues(changelist, "jason", "file2.txt checked in by author b\n");
         assertEquals(1, changelist.getChanges().size());
         assertChangeValues(changelist.getChanges().get(0), "file2.txt", Change.Action.ADD, "1.1");
+        assertCvsRevision(changelist.getRevision(), "jason", "", "file2.txt checked in by author b\n");
     }
 
     public void testChangesByDifferentAuthorsSameFile() throws SCMException
@@ -134,10 +146,12 @@ public class CvsClientTest extends BobTestCase
         Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file1.txt checked in by author a\n");
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.1");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt checked in by author a\n");
 
         changelist = changes.get(1);
         assertChangelistValues(changelist, "jason", "file1.txt modified by author b\n");
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.EDIT, "1.2");
+        assertCvsRevision(changelist.getRevision(), "jason", "", "file1.txt modified by author b\n");
     }
 
     public void testChangesBySameAuthorOverlappingFiles() throws SCMException
@@ -152,19 +166,23 @@ public class CvsClientTest extends BobTestCase
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.1");
         assertChangeValues(changelist.getChanges().get(1), "file2.txt", Change.Action.ADD, "1.1");
         assertChangeValues(changelist.getChanges().get(2), "file3.txt", Change.Action.ADD, "1.1");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt and file2.txt and file3.txt checked in by author a\n");
 
         changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "file1.txt modified by author a\n");
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.EDIT, "1.2");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt modified by author a\n");
 
         changelist = changes.get(2);
         assertChangelistValues(changelist, "daniel", "file2.txt modified by author a\n");
         assertChangeValues(changelist.getChanges().get(0), "file2.txt", Change.Action.EDIT, "1.2");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file2.txt modified by author a\n");
 
         changelist = changes.get(3);
         assertChangelistValues(changelist, "daniel", "file1.txt and file 2.txt modified by author a\n");
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.EDIT, "1.3");
         assertChangeValues(changelist.getChanges().get(1), "file2.txt", Change.Action.EDIT, "1.3");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt and file 2.txt modified by author a\n");
     }
 
     public void testChangesByOverlappingCommits() throws SCMException
@@ -180,16 +198,19 @@ public class CvsClientTest extends BobTestCase
         assertChangeValues(changelist.getChanges().get(1), "file2.txt", Change.Action.ADD, "1.1");
         assertChangeValues(changelist.getChanges().get(2), "file3.txt", Change.Action.ADD, "1.1");
         assertChangeValues(changelist.getChanges().get(3), "file4.txt", Change.Action.ADD, "1.1");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt and file2.txt and file3.txt and file4.txt are checked in by author a\n");
 
         changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "x\n");
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.EDIT, "1.2");
         assertChangeValues(changelist.getChanges().get(1), "file3.txt", Change.Action.EDIT, "1.2");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "x\n");
 
         changelist = changes.get(2);
         assertChangelistValues(changelist, "jason", "y\n");
         assertChangeValues(changelist.getChanges().get(0), "file2.txt", Change.Action.EDIT, "1.2");
         assertChangeValues(changelist.getChanges().get(1), "file4.txt", Change.Action.EDIT, "1.2");
+        assertCvsRevision(changelist.getRevision(), "jason", "", "y\n");
     }
 
     public void testChangesWithRemoval() throws SCMException
@@ -202,18 +223,22 @@ public class CvsClientTest extends BobTestCase
         Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file1.txt checked in by author a\n");
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.1");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt checked in by author a\n");
 
         changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "file1.txt removed by author a\n");
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.DELETE, "1.2");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt removed by author a\n");
 
         changelist = changes.get(2);
         assertChangelistValues(changelist, "daniel", "file1.txt re-checked in by author a\n");
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.3");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt re-checked in by author a\n");
 
         changelist = changes.get(3);
         assertChangelistValues(changelist, "daniel", "file1.txt re-removed by author a\n");
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.DELETE, "1.4");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt re-removed by author a\n");
     }
 
     public void testChangesWithAdd() throws SCMException
@@ -228,6 +253,7 @@ public class CvsClientTest extends BobTestCase
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.1");
         assertChangeValues(changelist.getChanges().get(1), "file2.txt", Change.Action.ADD, "1.1");
         assertChangeValues(changelist.getChanges().get(2), "dir/file3.txt", Change.Action.ADD, "1.1");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt and file2.txt and dir/file3.txt checked in by author a\n");
     }
 
     public void testChangesWithModify() throws SCMException
@@ -240,45 +266,42 @@ public class CvsClientTest extends BobTestCase
         Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file1.txt checked in by author a\n");
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.1");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt checked in by author a\n");
 
         changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "file1.txt modified by author a\n");
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.EDIT, "1.2");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt modified by author a\n");
 
         changelist = changes.get(2);
         assertChangelistValues(changelist, "daniel", "file1.txt modified by author a\n");
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.EDIT, "1.3");
+        assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt modified by author a\n");
     }
 
     public void testChangesWithBranch() throws SCMException
     {
         String module = "unit-test/CvsClientTest/testChangesWithBranch";
-        cvs.setRevision("BRANCH");
+        cvs.setTag("BRANCH");
         List<Changelist> changes = cvs.getChangeLists(module);
-        assertEquals(3, changes.size());
+        assertEquals(2, changes.size());
         assertValidChangeSets(changes);
 
-        // we get the commit message from when the file1.txt was committed to head since the
-        // branching process is just tagging, and does not represent a commit. The message is
-        // retrieved as part of the version of the file, which is 1.1 until a commit on the branch
-        // makes a change. Its a little odd, but thats cvs.
         Changelist changelist = changes.get(0);
-        assertChangelistValues(changelist, "daniel", "file1.txt and file2.txt checked in by author a\n");
-        assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.1");
-
-        changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "file3.txt checked in on BRANCH by author a\n");
         assertChangeValues(changelist.getChanges().get(0), "file3.txt", Change.Action.ADD, "1.1.2.1");
+        assertCvsRevision(changelist.getRevision(), "daniel", "BRANCH", "file3.txt checked in on BRANCH by author a\n");
 
-        changelist = changes.get(2);
+        changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "file1.txt modified on BRANCH by author a\n");
         assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.EDIT, "1.1.2.1");
+        assertCvsRevision(changelist.getRevision(), "daniel", "BRANCH", "file1.txt modified on BRANCH by author a\n");
     }
 
     public void testCheckoutBranch() throws SCMException, IOException
     {
         String module = "unit-test/CvsClientTest/testCheckoutBranch";
-        cvs.setRevision("BRANCH");
+        cvs.setTag("BRANCH");
         cvs.setLocalPath(workdir);
         cvs.checkout(module);
 
@@ -291,7 +314,7 @@ public class CvsClientTest extends BobTestCase
         removeDirectory(workdir);
         workdir = FileSystemUtils.createTempDirectory(CvsClientTest.class.getName(), "");
 
-        cvs.setRevision(null);
+        cvs.setTag(null);
         cvs.setLocalPath(workdir);
         cvs.checkout(module);
 
@@ -336,7 +359,7 @@ public class CvsClientTest extends BobTestCase
     public void testHasBranchChangedSince() throws SCMException, ParseException
     {
         String module = "unit-test/CvsClientTest/testHasBranchChangedSince";
-        cvs.setRevision("BRANCH");
+        cvs.setTag("BRANCH");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         assertTrue(cvs.hasChangedSince(dateFormat.parse("2006-03-10"), module));
         assertFalse(cvs.hasChangedSince(dateFormat.parse("2006-03-11"), module));
@@ -358,9 +381,13 @@ public class CvsClientTest extends BobTestCase
         assertFalse(cvs.hasChangedSince(dateFormat.parse("2006-03-11"), module + "/file1.txt"));
     }
 
-    public void testHasModuleChangedSince() throws SCMException
+    public void testHasModuleChangedSince() throws SCMException, ParseException
     {
-        // module check does not work.
+        String module = "module2";
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        assertTrue(cvs.hasChangedSince(dateFormat.parse("2006-03-10"), module));
+        assertFalse(cvs.hasChangedSince(dateFormat.parse("2006-03-11"), module));
     }
 
     private static void assertChangelistValues(Changelist changelist, String user, String comment)
@@ -376,7 +403,8 @@ public class CvsClientTest extends BobTestCase
         assertEquals(revision, change.getRevision());
     }
 
-    // assert that files are unique.
+// assert that files are unique.
+
     private static void assertValidChangeSets(List<Changelist> changelists)
     {
         for (Changelist changelist : changelists)
@@ -398,5 +426,13 @@ public class CvsClientTest extends BobTestCase
             assertNotNull(change.getRevision());
             assertNotNull(change.getAction());
         }
+    }
+
+    private static void assertCvsRevision(Revision revision, String author, String branch, String comment)
+    {
+        CvsRevision cvsRev = (CvsRevision) revision;
+        assertEquals(author, cvsRev.getAuthor());
+        assertEquals(branch, cvsRev.getBranch());
+        assertEquals(comment, cvsRev.getComment());
     }
 }

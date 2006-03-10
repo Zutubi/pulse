@@ -1,9 +1,14 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.3
+date	2006.03.10.14.49.30;	author daniel;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2006.03.10.04.36.01;	author daniel;	state Exp;
@@ -20,9 +25,9 @@ desc
 @@
 
 
-1.2
+1.3
 log
-@module created referencing dir1 dir2 by author a
+@module2 created referencing dir1 dir2 by author a
 @
 text
 @# Three different line formats are valid:
@@ -53,6 +58,16 @@ text
 # spread out over the entire source repository.
 
 module -a unit-test/CvsClientTest/testCheckoutModule/dir1 unit-test/CvsClientTest/testCheckoutModule/dir2
+module2 -a unit-test/CvsClientTest/testHasModuleChangedSince/dir1 unit-test/CvsClientTest/testHasModuleChangedSince/dir2
+@
+
+
+1.2
+log
+@module created referencing dir1 dir2 by author a
+@
+text
+@d29 1
 @
 
 

@@ -81,5 +81,5 @@ testHasFileChangedSince:
 testHasModuleChangedSince:
     dir1/file1.txt checked in by author a
     dir2/file2.txt checked in by author a
-    module created referencing dir1 dir2 by author a
+    module2 created referencing dir1 dir2 by author a
     dir1/file1.txt modified by author a

@@ -4,7 +4,9 @@ import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.CvsRevision;
 import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.cvs.client.*;
+import com.cinnamonbob.scm.cvs.client.ConnectionFactory;
+import com.cinnamonbob.scm.cvs.client.CvsLogInformationListener;
+import com.cinnamonbob.scm.cvs.client.LoggingListener;
 import com.cinnamonbob.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -14,7 +16,6 @@ import org.netbeans.lib.cvsclient.command.CommandAbortedException;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.GlobalOptions;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
-import org.netbeans.lib.cvsclient.command.history.HistoryCommand;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
 import org.netbeans.lib.cvsclient.command.tag.RtagCommand;
@@ -22,7 +23,6 @@ import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.connection.Connection;
 
 import java.io.File;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -34,15 +34,33 @@ import java.util.*;
  */
 public class CvsClient
 {
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    /**
+     * The date format used when sending dates to the CVS server.
+     * ... is this correct???...
+     */
+    private static final SimpleDateFormat CVSDATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss 'GMT'");
 
+    /**
+     * Logging.
+     */
     private static final Logger LOG = Logger.getLogger(CvsClient.class);
 
+    /**
+     * The $CVSROOT, it defines the details of which cvs repository is being worked with.
+     */
     private final CVSRoot root;
 
+    /**
+     * The local path to the working repository directories. This is required for checkout / update
+     * commands.
+     */
     private File localPath;
 
-    private String revision;
+    /**
+     * The tag is an optional parameter. If specified, all cvs requests will be made with respect
+     * to the specified tag. If not, the default tag, 'HEAD' is assumed.
+     */
+    private String tag;
 
     /**
      * @param cvsRoot
@@ -76,22 +94,30 @@ public class CvsClient
     }
 
     /**
-     * Set the working revision. This revision string can represent either a branch or
-     * a tag.
+     * Set the working tag. This string can represent either a branch or a tag.
      *
-     * @param revision
+     * @param tag
      */
-    public void setRevision(String revision)
+    public void setTag(String tag)
     {
-        this.revision = revision;
+        this.tag = tag;
     }
 
+    /**
+     * Checkout the specified module.
+     *
+     * @param module
+     *
+     * @throws SCMException
+     */
     public void checkout(String module) throws SCMException
     {
         checkout(module, null);
     }
 
     /**
+     * Checkout the specified module, as it was on the specified date. If the date is null,
+     * no date restriction will be applied.
      *
      */
     public void checkout(String module, Date date) throws SCMException
@@ -113,15 +139,22 @@ public class CvsClient
             CheckoutCommand checkout = new CheckoutCommand();
             checkout.setModule(module);
             checkout.setPruneDirectories(true);
+            if (localPath == null)
+            {
+                throw new IllegalArgumentException("Please specify a local path before attempting to checkout.");
+            }
             client.setLocalPath(localPath.getAbsolutePath());
 
-            if (revision != null)
+            // bind the checkout to the specified tag.
+            if (tag != null)
             {
-                checkout.setCheckoutByRevision(revision);
+                checkout.setCheckoutByRevision(tag);
             }
+
+            // bind the checkout to the specified date.
             if (date != null)
             {
-                checkout.setCheckoutByDate(DATE_FORMAT.format(date));
+                checkout.setCheckoutByDate(CVSDATE.format(date));
             }
 
             if (!client.executeCommand(checkout, globalOptions))
@@ -148,6 +181,11 @@ public class CvsClient
         }
     }
 
+    /**
+     * Check the value of the module string.
+     *
+     * @param module
+     */
     private String checkModule(String module)
     {
         if (!TextUtils.stringSet(module))
@@ -184,22 +222,36 @@ public class CvsClient
      */
     public Date getLastUpdate(Date since, String module) throws SCMException
     {
-        List<HistoryInfo> changes = retrieveHistoryInformation(since, module);
+        List<LogInformation.Revision> changes = rlog(since, module);
         if (changes.size() == 0)
         {
             return null;
         }
-        HistoryInfo latestChange = changes.get(changes.size() - 1);
-        return latestChange.getInfoDate();
+        // need to ensure that the log information is ordered by date...
+        LogInformation.Revision latestChange = changes.get(changes.size() - 1);
+        return latestChange.getDate();
     }
 
+    /**
+     * Update is not yet supported.
+     */
     public void update()
     {
         throw new UnsupportedOperationException();
     }
 
-    public void tag(String tag, Date date) throws SCMException
+    /**
+     * Tag the remote repository.
+     *
+     * @param tag
+     * @param module
+     * @param date
+     *
+     * @throws SCMException
+     */
+    public void tag(String tag, String module, Date date) throws SCMException
     {
+        // WARNING: This has not been tested...
         Connection connection = null;
         try
         {
@@ -214,60 +266,12 @@ public class CvsClient
             RtagCommand rtag = new RtagCommand();
             rtag.setTag(tag);
             rtag.setOverrideExistingTag(true);
+            rtag.setModules(new String[]{module});
             if (date != null)
             {
-                rtag.setTagByDate(DATE_FORMAT.format(date));
+                rtag.setTagByDate(CVSDATE.format(date));
             }
-
             client.executeCommand(rtag, globalOptions);
-        }
-        catch (AuthenticationException ae)
-        {
-            throw new SCMException(ae);
-        }
-        catch (CommandAbortedException cae)
-        {
-            throw new SCMException(cae);
-        }
-        catch (CommandException ce)
-        {
-            throw new SCMException(ce);
-        }
-        finally
-        {
-            CvsUtils.close(connection);
-        }
-        throw new UnsupportedOperationException();
-    }
-
-    private List<HistoryInfo> retrieveHistoryInformation(Date since, String module) throws SCMException
-    {
-        Connection connection = null;
-        try
-        {
-            GlobalOptions globalOptions = new GlobalOptions();
-            globalOptions.setCVSRoot(root.toString());
-
-            connection = ConnectionFactory.getConnection(root);
-            connection.open();
-
-            Client client = new Client(connection, new StandardAdminHandler());
-
-            HistoryBuilder builder = new HistoryBuilder();
-            builder.setModule(module);
-            client.getEventManager().addCVSListener(new BuilderAdapter(builder));
-
-            HistoryCommand history = new HistoryCommand();
-            history.setReportCommits(true);
-            history.setForAllUsers(true);
-            if (since != null)
-            {
-                history.setSinceDate(DATE_FORMAT.format(since));
-            }
-
-            client.executeCommand(history, globalOptions);
-
-            return builder.getHistoryInfo();
         }
         catch (AuthenticationException ae)
         {
@@ -288,7 +292,6 @@ public class CvsClient
     }
 
     //-------------------------------------------------------------------------
-
     // change set analysis:
     // - cvs changes are not atomic. therefore,
     //    - a change set does not need to occur at the same time
@@ -313,70 +316,29 @@ public class CvsClient
         return getChangeLists(null, module);
     }
 
+    /**
+     * Retrieve the list of changes in the named module since the specified date.
+     * @param since
+     * @param module
+     * @return
+     * @throws SCMException
+     */
     public List<Changelist> getChangeLists(Date since, String module) throws SCMException
     {
-        List<HistoryInfo> infos = retrieveHistoryInformation(since, module);
-
-        // we are only interested in commits.
-        Iterator<HistoryInfo> i = infos.iterator();
-        while (i.hasNext())
-        {
-            HistoryInfo info = i.next();
-            if (!info.isCommit())
-            {
-                i.remove();
-            }
-        }
-
-        // what file separator is the remote system using? we want to use the same.
-        String fileSeparator = null;
-        for (HistoryInfo info : infos)
-        {
-            String pathInRepository = info.getPathInRepository();
-            if (pathInRepository.indexOf('\\') != -1)
-            {
-                fileSeparator = "\\";
-                break;
-            }
-            else
-            {
-                if (pathInRepository.indexOf('/') != -1)
-                {
-                    fileSeparator = "/";
-                    break;
-                }
-            }
-        }
-
-        // extract the files that have been modified from the history info, and
-        // request full log info so that we can construct the changeset.
-        Set<String> modifiedFiles = new HashSet<String>();
-        for (HistoryInfo info : infos)
-        {
-            String filePath = info.getPathInRepository() + fileSeparator + info.getFile();
-            modifiedFiles.add(filePath);
-        }
-
         // retrieve the log info for all of the files that have been modified.
-        Map<String, LogInformation> logInfos = retrieveLogInformation(new LinkedList<String>(modifiedFiles));
+        List<LogInformation.Revision> logInfos = rlog(since, module);
 
         // extract the individual changes associated with the history data and the associated
         // information.
         List<LocalChange> simpleChanges = new LinkedList<LocalChange>();
-        for (HistoryInfo histInfo : infos)
+
+        for (LogInformation.Revision logInfo : logInfos)
         {
-            String filename = histInfo.getFile();
-            String pathInRepo = histInfo.getPathInRepository();
-
-            String fullPath = pathInRepo + fileSeparator + filename;
-
-            // find the firstRevision -> comment, author
-            LogInformation logInfo = logInfos.get(fullPath);
-            if (logInfo != null) // if it has not been filtered out because its on a different branch (see retrieveLogInformation).
-            {
-                LocalChange change = new LocalChange(logInfo, histInfo);
-                simpleChanges.add(change);
-            }
+            LocalChange o = new LocalChange(logInfo);
+            // is this appropriate? how do we distinguish a branch from a tag?
+            // do we need to?
+            o.setTag(tag);
+            simpleChanges.add(o);
         }
 
         // group by author, branch, sort by date. this will have the affect of grouping
@@ -385,12 +347,13 @@ public class CvsClient
         {
             public int compare(LocalChange changeA, LocalChange changeB)
             {
+                // null author?? - revision miss-match..
                 int comparison = changeA.getAuthor().compareTo(changeB.getAuthor());
                 if (comparison != 0)
                 {
                     return comparison;
                 }
-                comparison = changeA.getBranch().compareTo(changeB.getBranch());
+                comparison = changeA.getTag().compareTo(changeB.getTag());
                 if (comparison != 0)
                 {
                     return comparison;
@@ -443,7 +406,7 @@ public class CvsClient
             // we use the last change because it has the most recent date. all the other information is
             // is common to all the changes.
             LocalChange lastChange = localChanges.get(localChanges.size() - 1);
-            CvsRevision revision = new CvsRevision(lastChange.getAuthor(), lastChange.getBranch(), lastChange.getMessage(), lastChange.getDate());
+            CvsRevision revision = new CvsRevision(lastChange.getAuthor(), lastChange.getTag(), lastChange.getMessage(), lastChange.getDate());
             Changelist changelist = new Changelist(revision);
             for (LocalChange change : localChanges)
             {
@@ -455,7 +418,17 @@ public class CvsClient
         return changelists;
     }
 
-    private Map<String, LogInformation> retrieveLogInformation(List<String> modifiedFiles) throws SCMException
+    /**
+     * This rlog command returns a list of LogInformation.Revision instances that define the
+     * individual files and there revisions that were generated since the specified date in the
+     * named module. These revisions are ordered chronologically.
+     *
+     * @param since
+     * @param module
+     * @return
+     * @throws SCMException
+     */
+    public List<LogInformation.Revision> rlog(Date since, String module) throws SCMException
     {
         Connection connection = null;
         try
@@ -466,7 +439,6 @@ public class CvsClient
             connection = ConnectionFactory.getConnection(root);
             connection.open();
 
-            final Map<String, LogInformation> infos = new HashMap<String, LogInformation>();
             final List<LogInformation> rlogResponse = new LinkedList<LogInformation>();
 
             Client client = new Client(connection, new StandardAdminHandler());
@@ -478,30 +450,49 @@ public class CvsClient
             client.getEventManager().addCVSListener(new CvsLogInformationListener(rlogResponse));
 
             RlogCommand log = new RlogCommand();
-            for (String f : modifiedFiles)
+            log.setModule(module);
+
+            // if a date is specified, then filter the request by that date.
+            if (since != null)
             {
-                log.setModule(f);
+                // since is the lower bound, now is the upper bound.
+                Date now = new Date();
+                log.setDateFilter(CVSDATE.format(since) + "<" + CVSDATE.format(now));
+            }
+
+            // bind to the specified tag, or else use head.
+            if (tag != null)
+            {
+                log.setRevisionFilter(tag);
+            }
+            else
+            {
+                log.setDefaultBranch(true);
             }
 
             client.executeCommand(log, globalOptions);
 
-            // match up the log info with the modified file names.
-            assert(rlogResponse.size() == modifiedFiles.size());
-
-            // the response from the rlog command should be in the same order as
-            // our request, which is defined by the modified files list.
-            for (int i = 0; i < rlogResponse.size(); i++)
+            // extract the returned revisions, and order them chronologically.
+            List<LogInformation.Revision> revisions = new LinkedList<LogInformation.Revision>();
+            for (LogInformation logInfo : rlogResponse)
             {
-                String modifiedFilename = modifiedFiles.get(i);
-                LogInformation logInfo = rlogResponse.get(i);
-                // manually filter out the files on the branch.
-                if (revision == null || logInfo.getSymName(revision) != null)
+                for (Object obj : logInfo.getRevisionList())
                 {
-                    assert(logInfo.getRepositoryFilename().endsWith(modifiedFilename + ",v"));
-                    infos.put(modifiedFilename, logInfo);
+                    LogInformation.Revision rev = (LogInformation.Revision) obj;
+                    revisions.add(rev);
                 }
             }
-            return infos;
+
+            // sort these revisions by date.
+            Collections.sort(revisions, new Comparator<LogInformation.Revision>()
+            {
+                public int compare(LogInformation.Revision o1, LogInformation.Revision o2)
+                {
+                    return o1.getDate().compareTo(o2.getDate());
+                }
+            });
+
+            return revisions;
         }
         catch (AuthenticationException ae)
         {
@@ -523,68 +514,85 @@ public class CvsClient
      */
     private class LocalChange
     {
-        private LogInformation log;
-        private HistoryInfo history;
+        private LogInformation.Revision log;
 
-        public LocalChange(LogInformation log, HistoryInfo history)
+        private String tag;
+
+        public LocalChange(LogInformation.Revision log)
         {
             if (log == null)
             {
-                throw new IllegalArgumentException("log can not be null.");
+                throw new IllegalArgumentException("Log Information cannot be null.");
             }
             this.log = log;
-            this.history = history;
         }
 
         public String getAuthor()
         {
-            return log.getRevision(getRevision()).getAuthor();
+            return log.getAuthor();
         }
 
         public String getRevision()
         {
-            return history.getRevision();
+            return log.getNumber();
         }
 
-        public String getBranch()
+        public String getTag()
         {
-            if (log.getBranch() == null)
+            if (tag == null)
             {
                 return "";
             }
-            return log.getBranch();
+            return tag;
+        }
+
+        public void setTag(String branch)
+        {
+            this.tag = branch;
         }
 
         public Date getDate()
         {
-            return log.getRevision(getRevision()).getDate();
+            return log.getDate();
         }
 
         public String getMessage()
         {
-            return log.getRevision(getRevision()).getMessage();
+            return log.getMessage();
         }
 
         public String getFilename()
         {
             // need to process the filename.
 
-            String filename = log.getRepositoryFilename();
+            String filename = log.getLogInfoHeader().getRepositoryFilename();
+
             // remove the ,v
-            filename = filename.substring(0, filename.length() -2);
+            if (filename.endsWith(",v"))
+                filename = filename.substring(0, filename.length() -2);
 
             // remove the repo root.
-            root.getRepository();
-            filename = filename.substring(root.getRepository().length());
+            if (filename.startsWith(root.getRepository()))
+                filename = filename.substring(root.getRepository().length());
 
             return filename;
         }
 
         public Change.Action getAction()
         {
-            return history.getAction();
+            if (log.getAddedLines() == 0 && log.getRemovedLines() == 0)
+            {
+                if (!log.getState().equalsIgnoreCase("dead"))
+                {
+                    return Change.Action.ADD;
+                }
+                return Change.Action.DELETE;
+            }
+            return Change.Action.EDIT;
         }
+
     }
+
 
     /**
      * Simple value object used to help store data during the changeset analysis process.
@@ -612,7 +620,7 @@ public class CvsClient
 
             LocalChange previousChange = changes.get(0);
             return previousChange.getAuthor().equals(otherChange.getAuthor()) &&
-                    previousChange.getBranch().equals(otherChange.getBranch()) &&
+                    previousChange.getTag().equals(otherChange.getTag()) &&
                     previousChange.getMessage().equals(otherChange.getMessage());
         }
 
@@ -659,6 +667,7 @@ public class CvsClient
         {
             return changes;
         }
+
     }
 
 }
