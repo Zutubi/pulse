@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<project default-recipe="default">
+    <recipe name="default">
+        <command name="build">
+            <ant name="build" targets="build.master"/>
+            <dir-artifact name="core junit" base="core/build/reports/junit/html"/>
+            <dir-artifact name="server-core junit" base="server-core/build/reports/junit/html"/>
+            <dir-artifact name="master junit" base="master/build/reports/junit/html"/>
+        </command>
+    </recipe>
+</project>

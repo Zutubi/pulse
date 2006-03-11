@@ -52,6 +52,8 @@
         <mkdir dir="${module.root.dir}/build/lib"/>
         <mkdir dir="${report.dir}"/>
         <mkdir dir="${report.dir}/junit"/>
+        <mkdir dir="${report.dir}/junit/xml"/>
+        <mkdir dir="${report.dir}/junit/html"/>
 
         <!-- resolve dependencies -->
         <resolve conf="external"/>
@@ -104,10 +106,10 @@
             </batchtest>
         </junit>
         <junitreport todir="${report.dir}">
-            <fileset dir="${report.dir}/junit">
+            <fileset dir="${report.dir}/junit/xml">
                 <include name="*.xml"/>
             </fileset>
-            <report format="frames" todir="${report.dir}"/>
+            <report format="frames" todir="${report.dir}/junit/html"/>
         </junitreport>
     </target>
 
