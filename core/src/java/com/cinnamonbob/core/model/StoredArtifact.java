@@ -1,18 +1,28 @@
 package com.cinnamonbob.core.model;
 
-import java.util.*;
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  */
 public class StoredArtifact extends Entity
 {
+    private static final String[] INDEX_NAMES = {"index.html", "index.htm", "default.html", "default.htm"};
+
     private String name;
     /**
      * Files stored as part of this artifact.  A common special case is just
      * a single file.
      */
     List<StoredFileArtifact> children = new LinkedList<StoredFileArtifact>();
+    /**
+     * If not null, the name of the index file in this artifact.  Used for
+     * browsing the artifact as a HTML report.
+     */
+    private String index;
 
     public StoredArtifact()
     {
@@ -107,7 +117,7 @@ public class StoredArtifact extends Entity
     public List<Feature> getFeatures(Feature.Level level)
     {
         List<Feature> result = new LinkedList<Feature>();
-        for(StoredFileArtifact child: children)
+        for (StoredFileArtifact child : children)
         {
             result.addAll(child.getFeatures(level));
         }
@@ -118,26 +128,73 @@ public class StoredArtifact extends Entity
     public String trimmedPath(StoredFileArtifact artifact)
     {
         String path = artifact.getPath();
-        if(path.startsWith(name))
+        if (path.startsWith(name))
         {
             path = path.substring(name.length());
         }
 
-        if(path.startsWith(File.separator))
+        if (path.startsWith(File.separator))
         {
             path = path.substring(1);
         }
 
-        if(path.startsWith("/"))
+        if (path.startsWith("/"))
         {
             path = path.substring(1);
         }
 
-        if(path.startsWith("\\"))
+        if (path.startsWith("\\"))
         {
             path = path.substring(1);
         }
 
         return path;
     }
+
+    public String getIndex()
+    {
+        return index;
+    }
+
+    public void setIndex(String index)
+    {
+        this.index = index;
+    }
+
+    public StoredFileArtifact findFile(String filePath)
+    {
+        for (StoredFileArtifact a : children)
+        {
+            if (a.getPath().equals(filePath))
+            {
+                return a;
+            }
+        }
+
+        return null;
+    }
+
+    private StoredFileArtifact findFileBase(String file)
+    {
+        return findFile(name + "/" + file);
+    }
+
+    public String findIndexFile()
+    {
+        if (index != null && findFileBase(index) != null)
+        {
+            return index;
+        }
+
+        for (String index : INDEX_NAMES)
+        {
+            if (findFileBase(index) != null)
+            {
+                return index;
+            }
+        }
+
+        return null;
+    }
+
 }

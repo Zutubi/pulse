@@ -802,7 +802,8 @@
     <li class="file-artifact">
     #set($trimmedPath = $artifact.trimmedPath($fileArtifact))
     #if($showArtifactLink)
-        <a href="viewArtifact.action?id=$artifact.id&amp;commandId=$result.id">$trimmedPath</a>
+##        <a href="viewArtifact.action?id=$artifact.id&amp;commandId=$result.id">$trimmedPath</a>
+        <a href="/view/$result.id/$artifact.id/$fileArtifact.path">$trimmedPath</a>
     #else
         $trimmedPath
     #end
@@ -823,12 +824,26 @@
 ## Shows an artifact that is multi file, and possibly too many to display
 ##
 #macro(commandMultiArtifact $artifact $result $showFeatures $showArtifactLink)
-    <li class="dir-artifact">$!webwork.htmlEncode($artifact.name)
-        <ul>
-    #foreach($fileArtifact in $artifact.children)
-        #commandFileArtifact($artifact $fileArtifact $result $showFeatures $showArtifactLink)
+    #set($indexFile = $artifact.findIndexFile())
+    #if($indexFile)
+        #set($artClass = "report-artifact")
+    #else
+        #set($artClass = "dir-artifact")
     #end
+    <li class="$artClass">
+    #if($indexFile)
+        <a href="/view/$result.id/$artifact.id/$artifact.name/">
+    #end
+            $!webwork.htmlEncode($artifact.name)
+    #if($indexFile)
+        </a>
+    #else
+        <ul>
+        #foreach($fileArtifact in $artifact.children)
+            #commandFileArtifact($artifact $fileArtifact $result $showFeatures $showArtifactLink)
+        #end
         </ul>
+    #end
     </li>
 #end
 

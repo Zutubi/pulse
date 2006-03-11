@@ -14,7 +14,9 @@ The beans defined within the security subsystem need not be accessed by other co
 <beans>
 
     <bean id="securityManager" class="com.cinnamonbob.security.AcegiSecurityManager" init-method="init">
-        <property name="jettyManager"><ref bean="jettyManager"/></property>
+        <property name="jettyManager">
+            <ref bean="jettyManager"/>
+        </property>
     </bean>
 
     <!-- ============================================================= -->
@@ -33,25 +35,25 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="userDetailsService">
             <ref bean="userManager"/>
         </property>
-<!-- no password encoding at the moment.
-        <property name="passwordEncoder">
-            <ref local="passwordEncoder"/>
-        </property>
--->
+        <!-- no password encoding at the moment.
+                <property name="passwordEncoder">
+                    <ref local="passwordEncoder"/>
+                </property>
+        -->
     </bean>
 
     <bean id="passwordEncoder" class="org.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
 
-<!-- Use this for an in memory user manager.
-    <bean id="userManager" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
-        <property name="userMap">
-            <value>
-                admin=admin,ROLE_ADMINISTRATOR,ROLE_USER
-                user=user,ROLE_USER
-            </value>
-        </property>
-    </bean>
--->
+    <!-- Use this for an in memory user manager.
+        <bean id="userManager" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
+            <property name="userMap">
+                <value>
+                    admin=admin,ROLE_ADMINISTRATOR,ROLE_USER
+                    user=user,ROLE_USER
+                </value>
+            </property>
+        </bean>
+    -->
 
     <!--
     this filter chain proxy is referenced in web.xml
@@ -238,6 +240,7 @@ The beans defined within the security subsystem need not be accessed by other co
                 /=ROLE_USER
                 /default.action=ROLE_USER
                 /setup/**/*=ROLE_ANONYMOUS,ROLE_USER
+                /view/**/*=ROLE_USER
                 /admin/**/*=ROLE_ADMINISTRATOR
                 /**/*.action*=ROLE_USER
             </value>

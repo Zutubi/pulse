@@ -100,6 +100,11 @@
         </servlet>
     -->
 
+    <servlet>
+        <servlet-name>ViewFileServlet</servlet-name>
+        <servlet-class>com.cinnamonbob.servlet.ViewFileServlet</servlet-class>
+    </servlet>
+
     <!--
     <servlet-mapping>
         <servlet-name>hessian</servlet-name>
@@ -130,6 +135,11 @@
             <url-pattern>/user/*</url-pattern>
         </servlet-mapping>
     -->
+
+    <servlet-mapping>
+        <servlet-name>ViewFileServlet</servlet-name>
+        <url-pattern>/view/*</url-pattern>
+    </servlet-mapping>
 
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>

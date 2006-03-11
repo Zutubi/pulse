@@ -1,6 +1,9 @@
 package com.cinnamonbob.core.model;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class StoredFileArtifact extends Entity
 {
@@ -17,7 +20,7 @@ public class StoredFileArtifact extends Entity
 
     public StoredFileArtifact(String path)
     {
-        this(path, TYPE_PLAIN);
+        this(path, null);
     }
 
     public StoredFileArtifact(String path, String type)

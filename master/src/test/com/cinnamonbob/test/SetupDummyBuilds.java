@@ -1,7 +1,10 @@
 package com.cinnamonbob.test;
 
+import com.cinnamonbob.MasterBuildPaths;
 import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.core.RecipeProcessor;
 import com.cinnamonbob.core.model.*;
+import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 import com.cinnamonbob.model.persistence.ProjectDao;
@@ -9,6 +12,7 @@ import com.cinnamonbob.model.persistence.SlaveDao;
 import com.cinnamonbob.model.persistence.UserDao;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +21,7 @@ import java.util.List;
  */
 public class SetupDummyBuilds implements Runnable
 {
+    private MasterBuildPaths masterBuildPaths = new MasterBuildPaths();
     private SlaveDao slaveDao;
     private ProjectDao projectDao;
     private BuildResultDao buildResultDao;
@@ -273,9 +278,9 @@ public class SetupDummyBuilds implements Runnable
     private void createErrorFeatures(Project project)
     {
         BuildResult result = new BuildResult(project, getSpec(project), 10000);
-
+        buildResultDao.save(result);
         result.commence(new File("/complex/build/output/dir"));
-        RecipeResultNode rootResultNode = createErrorFeaturesRecipe();
+        RecipeResultNode rootResultNode = createErrorFeaturesRecipe(project, result);
         RecipeResultNode childNode = createComplexRecipe("child recipe");
         rootResultNode.addChild(childNode);
         result.getRoot().addChild(rootResultNode);
@@ -378,15 +383,16 @@ public class SetupDummyBuilds implements Runnable
         return node;
     }
 
-    private RecipeResultNode createErrorFeaturesRecipe()
+    private RecipeResultNode createErrorFeaturesRecipe(Project project, BuildResult buildResult)
     {
         RecipeResult recipeResult = new RecipeResult(null);
-
-        recipeResult.commence(new File("/complex/recipe/output/dir"));
+        buildResultDao.save(recipeResult);
+        File recipeDir = masterBuildPaths.getRecipeDir(project, buildResult, recipeResult.getId());
+        recipeResult.commence(recipeDir);
         recipeResult.add(createComplexCommand());
         recipeResult.add(createWarningFeaturesCommand());
         recipeResult.add(createComplexCommand());
-        recipeResult.add(createErrorFeaturesCommand());
+        recipeResult.add(createErrorFeaturesCommand(4, recipeDir));
         recipeResult.complete();
         RecipeResultNode node = new RecipeResultNode(recipeResult);
         node.setHost("[master]");
@@ -451,17 +457,19 @@ public class SetupDummyBuilds implements Runnable
         return result;
     }
 
-    private CommandResult createErrorFeaturesCommand()
+    private CommandResult createErrorFeaturesCommand(int index, File recipeDir)
     {
         CommandResult result = new CommandResult("complex command");
-        result.commence(new File("/complex/command/output/dir"));
+        File commandDir = new File(recipeDir, RecipeProcessor.getCommandDirName(index, result));
+        File outputDir = new File(commandDir, "output");
+        result.commence(outputDir);
         result.getProperties().put("command line", "/usr/local/bin/make -f my/path/to/Makefile build");
         result.getProperties().put("exit code", "0");
         result.addArtifact(createInfoArtifact("command output", "output.txt"));
         result.addArtifact(createWarningArtifact("warnings here", "this/file/is/nested/several/dirs/down"));
         result.addArtifact(createErrorArtifact("errors be here", "this/file/is/nested/several/dirs/down"));
         result.addArtifact(createSimpleArtifact("junit report", "tests/junit.html"));
-        result.addArtifact(createMultifileArtifact("multi ball"));
+        result.addArtifact(createMultifileArtifact(outputDir, "multi ball"));
         result.complete();
         return result;
     }
@@ -518,21 +526,36 @@ public class SetupDummyBuilds implements Runnable
         return new StoredArtifact(name, new StoredFileArtifact(name + "/" + filename, "text/plain"));
     }
 
-    private StoredArtifact createMultifileArtifact(String name)
+    private StoredArtifact createMultifileArtifact(File outputDir, String name)
     {
+        outputDir.mkdirs();
         StoredArtifact artifact = new StoredArtifact(name);
-        for(int i = 0; i < 15; i++)
+        artifact.setIndex("file01.html");
+        for (int i = 0; i < 15; i++)
         {
-            StoredFileArtifact fileArtifact = new StoredFileArtifact(String.format("%s/file%02d", name, i));
-            if(i % 4 == 0)
+            String filename = String.format("file%02d.html", i);
+            StoredFileArtifact fileArtifact = new StoredFileArtifact(name + "/" + filename);
+            if (i % 4 == 0)
             {
                 addErrorFeatures(fileArtifact);
             }
-            else if(i % 6 == 0)
+            else if (i % 6 == 0)
             {
                 addInfoFeatures(fileArtifact);
             }
             artifact.add(fileArtifact);
+
+            File d = new File(outputDir, name);
+            d.mkdir();
+            File f = new File(d, filename);
+            try
+            {
+                FileSystemUtils.createFile(f, String.format("<html><body><h1>this is " + filename + "</h1><a href=\"file%02d.html\">file%02d</a></body></html>", i + 1, i + 1));
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
 
         return artifact;

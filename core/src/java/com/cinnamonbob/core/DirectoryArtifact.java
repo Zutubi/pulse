@@ -4,12 +4,11 @@ import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.core.model.StoredFileArtifact;
 import com.cinnamonbob.core.util.FileSystemUtils;
+import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
-import java.util.List;
 import java.util.LinkedList;
-
-import org.apache.tools.ant.DirectoryScanner;
+import java.util.List;
 
 /**
  * Information about a directory artifact to be captured.
@@ -17,6 +16,7 @@ import org.apache.tools.ant.DirectoryScanner;
 public class DirectoryArtifact extends Artifact
 {
     private File base;
+    private String index;
     private List<Pattern> inclusions;
     private List<Pattern> exclusions;
     private String type = StoredFileArtifact.TYPE_PLAIN;
@@ -35,9 +35,19 @@ public class DirectoryArtifact extends Artifact
         this.base = base;
     }
 
+    public String getIndex()
+    {
+        return index;
+    }
+
+    public void setIndex(String index)
+    {
+        this.index = index;
+    }
+
     public Pattern createInclude()
     {
-        if(inclusions == null)
+        if (inclusions == null)
         {
             inclusions = new LinkedList<Pattern>();
         }
@@ -49,7 +59,7 @@ public class DirectoryArtifact extends Artifact
 
     public Pattern createExclude()
     {
-        if(exclusions == null)
+        if (exclusions == null)
         {
             exclusions = new LinkedList<Pattern>();
         }
@@ -61,7 +71,7 @@ public class DirectoryArtifact extends Artifact
 
     public void capture(CommandResult result, File baseDir, File outputDir)
     {
-        if(base == null)
+        if (base == null)
         {
             base = baseDir;
         }
@@ -72,12 +82,12 @@ public class DirectoryArtifact extends Artifact
 
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(base);
-        if(inclusions != null)
+        if (inclusions != null)
         {
             scanner.setIncludes(flattenPatterns(inclusions));
         }
 
-        if(exclusions != null)
+        if (exclusions != null)
         {
             scanner.setExcludes(flattenPatterns(exclusions));
         }
@@ -85,7 +95,8 @@ public class DirectoryArtifact extends Artifact
         scanner.scan();
 
         StoredArtifact artifact = new StoredArtifact(getName());
-        for(String file: scanner.getIncludedFiles())
+        artifact.setIndex(index);
+        for (String file : scanner.getIncludedFiles())
         {
             File source = new File(base, file);
             captureFile(artifact, source, FileSystemUtils.composeFilename(getName(), file), outputDir, result, type);
@@ -108,7 +119,7 @@ public class DirectoryArtifact extends Artifact
         String[] result = new String[patterns.size()];
         int i = 0;
 
-        for(Pattern p: patterns)
+        for (Pattern p : patterns)
         {
             result[i++] = p.getPattern();
         }

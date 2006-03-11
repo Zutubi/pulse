@@ -10,6 +10,8 @@
 
         <property name="name" column="NAME" type="string" length="255"/>
 
+        <property name="index" column="INDEX" type="string" length="255"/>
+
         <bag name="children" cascade="all-delete-orphan" lazy="false">
             <key column="ARTIFACT_ID" not-null="true"/>
             <one-to-many class="com.cinnamonbob.core.model.StoredFileArtifact"/>

@@ -64,7 +64,7 @@ public class SVNServer implements SCMServer
      * Decodes a change action given a character code from subversion.
      *
      * @param type the action type as returned by the server
-     * @return the corresponding Action valuie
+     * @return the corresponding Action value
      */
     private Change.Action decodeAction(char type)
     {
@@ -76,6 +76,8 @@ public class SVNServer implements SCMServer
                 return Change.Action.DELETE;
             case 'M':
                 return Change.Action.EDIT;
+            case 'R':
+                return Change.Action.MOVE;
             default:
                 return Change.Action.UNKNOWN;
         }

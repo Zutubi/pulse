@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <decorators defaultdir="/decorators">
-
     <!-- No decorator -->
-    <decorator name="none">
-        <pattern>/ajax/*</pattern>        
-    </decorator>
+    <excludes>
+        <pattern>/ajax/*</pattern>
+        <pattern>/view/*</pattern>
+    </excludes>
 
     <decorator name="main" page="main.vm">
         <pattern>/*</pattern>
