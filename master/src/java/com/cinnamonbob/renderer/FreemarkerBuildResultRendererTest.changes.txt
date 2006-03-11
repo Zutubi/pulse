@@ -11,6 +11,8 @@ New changes in this build:
   * 655 by test author:
     short comment
   * 656 by author2:
-    this time we will use a longer comment to make sure that ...
+    this time we will use a longer comment to make sure that the
+    renderer is applying some sort of trimming to the resulting
+    output dadada da dadad ad ad adadad ad ad ada d adada da...
 
 

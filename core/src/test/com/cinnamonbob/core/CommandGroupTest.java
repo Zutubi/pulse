@@ -1,0 +1,229 @@
+package com.cinnamonbob.core;
+
+import com.cinnamonbob.test.BobTestCase;
+import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.ResultState;
+import com.cinnamonbob.core.model.StoredArtifact;
+import com.cinnamonbob.core.model.StoredFileArtifact;
+
+import java.io.File;
+import java.io.IOException;
+
+/**
+ */
+public class CommandGroupTest extends BobTestCase
+{
+    private File baseDirectory;
+    private File outputDirectory;
+
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        baseDirectory = FileSystemUtils.createTempDirectory(ExecutableCommandTest.class.getName(), ".base");
+        outputDirectory = FileSystemUtils.createTempDirectory(ExecutableCommandTest.class.getName(), ".out");
+    }
+
+    public void tearDown() throws Exception
+    {
+        FileSystemUtils.removeDirectory(outputDirectory);
+        FileSystemUtils.removeDirectory(baseDirectory);
+        super.tearDown();
+    }
+
+    public void testSimpleNestedCommand() throws Exception
+    {
+        CommandGroup group = createEchoCommand();
+        testSuccessWithOutput(group, "hello world\n");
+    }
+
+    public void testCaptureFile() throws Exception
+    {
+        File file = new File(baseDirectory, "testfile");
+        fileCaptureHelper(file);
+    }
+
+    public void testCaptureFileRelative() throws Exception
+    {
+        File file = new File("testfile");
+        fileCaptureHelper(file);
+    }
+
+    private void fileCaptureHelper(File file) throws IOException, FileLoadException
+    {
+        File inFile = new File(baseDirectory, "testfile");
+        FileSystemUtils.createFile(inFile, "some data");
+
+        CommandGroup group = createEchoCommand();
+        FileArtifact pa = group.createArtifact();
+        pa.setName("test-artifact");
+        pa.setFile(file);
+        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+
+        // Now check the artifact was captured
+        StoredArtifact artifact = result.getArtifact("test-artifact");
+        assertNotNull(artifact);
+        StoredFileArtifact fileArtifact = artifact.getFile();
+        File expectedFile = new File(outputDirectory, fileArtifact.getPath());
+        assertTrue(expectedFile.isFile());
+        assertEquals("some data", IOUtils.fileToString(expectedFile));
+    }
+
+    public void testCaptureDir() throws Exception
+    {
+        createSomeFiles();
+        CommandGroup group = createEchoCommand();
+        dirHelper(group, "test-dir-artifact");
+
+        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+        // Check the whole directory was captured
+        checkCapturedDir("test-dir-artifact", 4, result);
+    }
+
+    public void testMultiDirCapture() throws Exception
+    {
+        createSomeFiles();
+        CommandGroup group = createEchoCommand();
+        dirHelper(group, "test-dir-artifact");
+        dirHelper(group, "test-dir-artifact2");
+
+        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+
+        // Check the whole directory was captured twice
+        checkCapturedDir("test-dir-artifact", 4, result);
+        checkCapturedDir("test-dir-artifact2", 4, result);
+    }
+
+    private void dirHelper(CommandGroup group, String name) throws IOException
+    {
+        DirectoryArtifact artifact = group.createDirArtifact();
+        artifact.setName(name);
+    }
+
+    public void testDirIncludes() throws Exception
+    {
+        createSomeFiles();
+        CommandGroup group = createEchoCommand();
+        DirectoryArtifact artifact = group.createDirArtifact();
+        artifact.setName("test-dir-artifact");
+        artifact.createInclude().setPattern("**/*.txt");
+        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+
+        checkAllButFoo(result);
+    }
+
+    public void testDirExcludes() throws Exception
+    {
+        createSomeFiles();
+        CommandGroup group = createEchoCommand();
+        DirectoryArtifact artifact = group.createDirArtifact();
+        artifact.setName("test-dir-artifact");
+        artifact.createExclude().setPattern("**/*.foo");
+        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+
+        checkAllButFoo(result);
+    }
+
+    public void testIncludesAndExcludes() throws Exception
+    {
+        createSomeFiles();
+        CommandGroup group = createEchoCommand();
+        DirectoryArtifact artifact = group.createDirArtifact();
+        artifact.setName("test-dir-artifact");
+        artifact.createInclude().setPattern("**/*file*");
+        artifact.createExclude().setPattern("**/*.foo");
+        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+
+        checkAllButFoo(result);
+    }
+
+    public void testBaseDir() throws Exception
+    {
+        baseDirHelper(new File(baseDirectory, "testdir"));
+    }
+
+    public void testBaseDirRelative() throws Exception
+    {
+        baseDirHelper(new File("testdir"));
+    }
+
+    private void baseDirHelper(File base) throws IOException, FileLoadException
+    {
+        createSomeFiles();
+        CommandGroup group = createEchoCommand();
+        DirectoryArtifact artifact = group.createDirArtifact();
+        artifact.setName("test-dir-artifact");
+        artifact.setBase(base);
+        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+
+        checkCapturedDir("test-dir-artifact", 3, new File(baseDirectory, "testdir"), result);
+    }
+
+    private CommandGroup createEchoCommand() throws FileLoadException
+    {
+        CommandGroup group = new CommandGroup();
+        ExecutableCommand command = new ExecutableCommand();
+        command.setWorkingDir(baseDirectory);
+        command.setExe("echo");
+        command.setArgs("hello world");
+        group.add(command);
+        return group;
+    }
+
+    private void createSomeFiles() throws IOException
+    {
+        // Create some files:
+        // ${base.dir}/
+        //   testfile.txt
+        //   testdir/
+        //     file1.txt
+        //     file2.txt
+        //     file3.foo
+        File file = new File(baseDirectory, "testfile.txt");
+        FileSystemUtils.createFile(file, "some data");
+        File nested = new File(baseDirectory, "testdir");
+        assertTrue(nested.mkdir());
+        File nest1 = new File(nested, "file1.txt");
+        FileSystemUtils.createFile(nest1, "file1 data");
+        File nest2 = new File(nested, "file2.txt");
+        FileSystemUtils.createFile(nest2, "file2 data");
+        File nest3 = new File(nested, "file3.foo");
+        FileSystemUtils.createFile(nest3, "file3 data");
+    }
+
+    private CommandResult testSuccessWithOutput(CommandGroup group, String output) throws IOException
+    {
+        CommandResult result = new CommandResult("test");
+        group.execute(baseDirectory, outputDirectory, result);
+        assertEquals(ResultState.SUCCESS, result.getState());
+        StoredArtifact artifact = result.getArtifact(ExecutableCommand.OUTPUT_NAME);
+        File outputFile = new File(outputDirectory, artifact.getFile().getPath());
+        assertEquals(output, IOUtils.fileToString(outputFile));
+
+        return result;
+    }
+
+    private void checkCapturedDir(String name, int count, CommandResult result) throws IOException
+    {
+        checkCapturedDir(name, count, baseDirectory, result);
+    }
+
+    private void checkCapturedDir(String name, int count, File base, CommandResult result) throws IOException
+    {
+        StoredArtifact storedArtifact = result.getArtifact(name);
+        assertNotNull(storedArtifact);
+        assertEquals(count, storedArtifact.getChildren().size());
+        File destDir = new File(outputDirectory, storedArtifact.getName());
+        assertTrue(destDir.isDirectory());
+        assertDirectoriesEqual(base, destDir);
+    }
+
+    private void checkAllButFoo(CommandResult result) throws IOException
+    {
+        // Check all but testdir/file3.foo was captured
+        File file = new File(baseDirectory, FileSystemUtils.composeFilename("testdir", "file3.foo"));
+        assertTrue(file.delete());
+        checkCapturedDir("test-dir-artifact", 3, result);
+    }
+}

@@ -77,16 +77,6 @@ public class CommandResult extends Result
         this.properties = properties;
     }
 
-    public List<String> collectErrors()
-    {
-        List<String> errors = super.collectErrors();
-        for (StoredArtifact artifact : artifacts)
-        {
-            errors.addAll(artifact.collectFeatures(Feature.Level.ERROR));
-        }
-        return errors;
-    }
-
     public boolean hasMessages(Feature.Level level)
     {
         if (super.hasMessages(level))

@@ -1,7 +1,6 @@
 package com.cinnamonbob.test;
 
 import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.core.FileArtifact;
 import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildResultDao;
@@ -462,6 +461,7 @@ public class SetupDummyBuilds implements Runnable
         result.addArtifact(createWarningArtifact("warnings here", "this/file/is/nested/several/dirs/down"));
         result.addArtifact(createErrorArtifact("errors be here", "this/file/is/nested/several/dirs/down"));
         result.addArtifact(createSimpleArtifact("junit report", "tests/junit.html"));
+        result.addArtifact(createMultifileArtifact("multi ball"));
         result.complete();
         return result;
     }
@@ -469,42 +469,72 @@ public class SetupDummyBuilds implements Runnable
     private StoredArtifact createInfoArtifact(String name, String filename)
     {
         StoredArtifact artifact = createSimpleArtifact(name, filename);
-        artifact.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information\nwith a newline in the middle"));
-        artifact.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));
-        artifact.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));
-        artifact.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));
-        artifact.addFeature(new Feature(Feature.Level.INFO, "this, on the other hand, is a useless piece of information that is just here to take up a whole lot of space"));
+        StoredFileArtifact file = artifact.getFile();
+        addInfoFeatures(file);
         return artifact;
+    }
+
+    private void addInfoFeatures(StoredFileArtifact file)
+    {
+        file.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information\nwith a newline in the middle"));
+        file.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));
+        file.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));
+        file.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));
+        file.addFeature(new Feature(Feature.Level.INFO, "this, on the other hand, is a useless piece of information that is just here to take up a whole lot of space"));
     }
 
     private StoredArtifact createWarningArtifact(String name, String filename)
     {
         StoredArtifact artifact = createSimpleArtifact(name, filename);
-        artifact.addFeature(new Feature(Feature.Level.WARNING, "this could be bad"));
-        artifact.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));
-        artifact.addFeature(new Feature(Feature.Level.WARNING, "watch out, behind you!"));
-        artifact.addFeature(new Feature(Feature.Level.INFO, "this, on the other hand, is a useless piece of information that is just here to take up a whole lot of space"));
+        StoredFileArtifact file = artifact.getFile();
+        file.addFeature(new Feature(Feature.Level.WARNING, "this could be bad"));
+        file.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));
+        file.addFeature(new Feature(Feature.Level.WARNING, "watch out, behind you!"));
+        file.addFeature(new Feature(Feature.Level.INFO, "this, on the other hand, is a useless piece of information that is just here to take up a whole lot of space"));
         return artifact;
     }
 
     private StoredArtifact createErrorArtifact(String name, String filename)
     {
         StoredArtifact artifact = createSimpleArtifact(name, filename);
-        artifact.addFeature(new Feature(Feature.Level.ERROR, "dude, i can't help you now"));
-        artifact.addFeature(new Feature(Feature.Level.ERROR, "fatal a saurus"));
-        artifact.addFeature(new Feature(Feature.Level.ERROR, "this aint good"));
-        artifact.addFeature(new Feature(Feature.Level.WARNING, "this could be bad"));
-        artifact.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));
-        artifact.addFeature(new Feature(Feature.Level.WARNING, "watch out, behind you!"));
-        artifact.addFeature(new Feature(Feature.Level.INFO, "this, on the other hand, is a useless piece of information that is just here to take up a whole lot of space"));
+        StoredFileArtifact file = artifact.getFile();
+        addErrorFeatures(file);
         return artifact;
+    }
+
+    private void addErrorFeatures(StoredFileArtifact file)
+    {
+        file.addFeature(new Feature(Feature.Level.ERROR, "dude, i can't help you now"));
+        file.addFeature(new Feature(Feature.Level.ERROR, "fatal a saurus"));
+        file.addFeature(new Feature(Feature.Level.ERROR, "this aint good"));
+        file.addFeature(new Feature(Feature.Level.WARNING, "this could be bad"));
+        file.addFeature(new Feature(Feature.Level.INFO, "this is a useful piece of information"));
+        file.addFeature(new Feature(Feature.Level.WARNING, "watch out, behind you!"));
+        file.addFeature(new Feature(Feature.Level.INFO, "this, on the other hand, is a useless piece of information that is just here to take up a whole lot of space"));
     }
 
     private StoredArtifact createSimpleArtifact(String name, String filename)
     {
-        FileArtifact file = new FileArtifact(name, new File(filename));
-        file.setTitle(name);
-        file.setType("text/plain");
-        return new StoredArtifact(file, filename);
+        return new StoredArtifact(name, new StoredFileArtifact(name + "/" + filename, "text/plain"));
+    }
+
+    private StoredArtifact createMultifileArtifact(String name)
+    {
+        StoredArtifact artifact = new StoredArtifact(name);
+        for(int i = 0; i < 15; i++)
+        {
+            StoredFileArtifact fileArtifact = new StoredFileArtifact(String.format("%s/file%02d", name, i));
+            if(i % 4 == 0)
+            {
+                addErrorFeatures(fileArtifact);
+            }
+            else if(i % 6 == 0)
+            {
+                addInfoFeatures(fileArtifact);
+            }
+            artifact.add(fileArtifact);
+        }
+
+        return artifact;
     }
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<project name="testProject" defaultRecipe="default">
+    <recipe name="default">
+        <command name="doSomething">
+            <executable exe="netstat"/>
+            <artifact type="text/plain" file="output/file"/>
+        </command>
+    </recipe>
+
+</project>

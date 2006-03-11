@@ -353,7 +353,7 @@ ul.info {
     background-color: #eeeeff;
 }
 
-li.error, li.warning, li.info, li.artifact, li.file-artifact, li.task, li.explore {
+li.error, li.warning, li.info, li.artifact, li.file-artifact, li.dir-artifact, li.task, li.explore {
     font-weight: normal;
     list-style: none;
     padding-left: 20px;
@@ -391,6 +391,10 @@ li.explore {
 
 li.file-artifact {
     background: url( images/page.gif ) no-repeat 0 0;
+}
+
+li.dir-artifact {
+    background: url( images/folder.gif ) no-repeat 0 0;
 }
 
 li.header {

@@ -176,18 +176,14 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private CommandResult createArtifactCommand()
     {
-        FileArtifact fa = new FileArtifact("file artifact", new File("/tmp/foo"));
-        fa.setTitle("title");
-        fa.setType("type");
-
         CommandResult result = new CommandResult("command name");
         result.commence(new File("/tmp/commandout"));
         result.success();
-        StoredArtifact artifact = new StoredArtifact(fa, "to file");
+        StoredFileArtifact artifact = new StoredFileArtifact("to file");
         PlainFeature feature = new PlainFeature(Feature.Level.ERROR, "getSummary here", 7);
 
         artifact.addFeature(feature);
-        result.addArtifact(artifact);
+        result.addArtifact(new StoredArtifact("test", artifact));
         return result;
     }
 

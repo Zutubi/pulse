@@ -2,6 +2,7 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.Feature;
+import com.cinnamonbob.core.model.StoredFileArtifact;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.RecipeResultNode;
@@ -58,10 +59,10 @@ public class ViewRecipeAction extends ProjectActionSupport
         {
             for (StoredArtifact a : r.getArtifacts())
             {
-                Iterator<Feature.Level> i = a.getLevels();
-                while (i.hasNext())
+                Iterable<Feature.Level> i = a.getLevels();
+                for (Feature.Level level : i)
                 {
-                    a.getFeatures(i.next()).size();
+                    a.getFeatures(level).size();
                 }
             }
         }

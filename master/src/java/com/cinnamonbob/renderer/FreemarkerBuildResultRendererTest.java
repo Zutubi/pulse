@@ -77,21 +77,17 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
         command = new CommandResult("artifact command");
         command.failure("artifacts let me down");
 
-        FileArtifact fileArtifact = new FileArtifact("first artifact", new File("somefile"));
-        fileArtifact.setTitle("first artifact title which is so long it needs to be wrapped");
-        StoredArtifact artifact = new StoredArtifact(fileArtifact, "test");
+        StoredFileArtifact artifact = new StoredFileArtifact("first-artifact/testpath");
         artifact.addFeature(new Feature(Feature.Level.INFO, "info message"));
         artifact.addFeature(new Feature(Feature.Level.ERROR, "error message"));
         artifact.addFeature(new Feature(Feature.Level.WARNING, "warning message"));
-        command.addArtifact(artifact);
+        command.addArtifact(new StoredArtifact("first-artifact", artifact));
 
-        fileArtifact = new FileArtifact("second artifact", new File("somefile"));
-        fileArtifact.setTitle("second artifact title");
-        artifact = new StoredArtifact(fileArtifact, "test");
+        artifact = new StoredFileArtifact("second-artifact/this/time/a/very/very/very/very/long/pathname/which/will/look/ugly/i/have/no/doubt");
         artifact.addFeature(new Feature(Feature.Level.ERROR, "error 1"));
         artifact.addFeature(new Feature(Feature.Level.ERROR, "error 2"));
         artifact.addFeature(new Feature(Feature.Level.ERROR, "error 3: in this case a longer error message so i can see how the wrapping works on the artifact messages"));
-        command.addArtifact(artifact);
+        command.addArtifact(new StoredArtifact("second-artifact", artifact));
 
         secondResult.add(command);
 
@@ -108,7 +104,7 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
         List<Changelist> changes = new LinkedList<Changelist>();
         Changelist list = new Changelist(new Revision("test author", "short comment", System.currentTimeMillis() - 324252, "655"));
         changes.add(list);
-        list = new Changelist(new Revision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output", System.currentTimeMillis() - 310000, "656"));
+        list = new Changelist(new Revision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output dadada da dadad ad ad adadad ad ad ada d adada dad ad ad d ad ada da d", System.currentTimeMillis() - 310000, "656"));
         changes.add(list);
 
         BuildScmDetails details = new BuildScmDetails(buildRevision, changes);

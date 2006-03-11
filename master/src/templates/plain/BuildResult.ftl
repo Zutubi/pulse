@@ -15,7 +15,7 @@ New changes in this build:
         [#list changes as change]
             [#assign revision = change.revision]
   * ${revision.revisionString} by ${revision.author}:
-    ${renderer.trimmedString(revision.comment, 60)}
+    ${renderer.wrapString(renderer.trimmedString(revision.comment, 180), "    ")}
         [/#list]
     [#else]
 There were no new changes in this build.

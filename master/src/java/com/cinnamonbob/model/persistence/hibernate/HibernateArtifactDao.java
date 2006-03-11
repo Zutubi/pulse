@@ -1,5 +1,6 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
+import com.cinnamonbob.core.model.StoredFileArtifact;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.model.persistence.ArtifactDao;
 

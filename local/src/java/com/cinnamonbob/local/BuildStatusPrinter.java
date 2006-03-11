@@ -135,19 +135,26 @@ public class BuildStatusPrinter implements EventListener
         indenter.indent();
         for (StoredArtifact artifact : artifacts)
         {
-            indenter.println("* " + artifact.getTitle() + " (" + getFilePath(result, artifact.getFile()) + ")");
+            indenter.println("* " + artifact.getName());
+            indenter.indent();
 
-            for (Feature.Level level : Feature.Level.values())
+            for (StoredFileArtifact fileArtifact : artifact.getChildren())
             {
-                List<Feature> features = artifact.getFeatures(level);
-                if (features.size() > 0)
+                indenter.println("* " + getFilePath(result, fileArtifact.getPath()));
+
+                for (Feature.Level level : Feature.Level.values())
                 {
-                    indenter.indent();
-                    showFeatures(level, features);
-                    indenter.dedent();
+                    List<Feature> features = fileArtifact.getFeatures(level);
+                    if (features.size() > 0)
+                    {
+                        indenter.indent();
+                        showFeatures(level, features);
+                        indenter.dedent();
+                    }
                 }
             }
-
+            
+            indenter.dedent();
         }
         indenter.dedent();
     }

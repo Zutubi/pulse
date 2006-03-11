@@ -1,6 +1,7 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.StoredFileArtifact;
 import com.cinnamonbob.core.util.SystemUtils;
 
 import java.io.File;
@@ -86,7 +87,7 @@ public class AntCommand extends ExecutableCommand implements Command, ScopeAware
             {
                 pattern.setExpression("^Build failed|^BUILD FAILED");
                 pattern.setCategory("error");
-                pp.process(outputDir, cmdResult.getArtifact("output"), cmdResult);
+                pp.process(outputDir, cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);
             }
             catch (FileLoadException e)
             {

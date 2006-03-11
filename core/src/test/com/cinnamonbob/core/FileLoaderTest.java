@@ -12,49 +12,8 @@ import java.util.List;
  * 
  *
  */
-public class FileLoaderTest extends BobTestCase
+public class FileLoaderTest extends FileLoaderTestBase
 {
-
-    private FileLoader loader;
-
-    public FileLoaderTest(String testName)
-    {
-        super(testName);
-    }
-
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        ObjectFactory factory = new ObjectFactory();
-        loader = new FileLoader();
-        loader.setObjectFactory(factory);
-
-        // initialise the loader some test objects.
-        loader.register("reference", SimpleReference.class);
-        loader.register("nested", SimpleNestedType.class);
-        loader.register("type", SimpleType.class);
-        loader.register("some-reference", SomeReference.class);
-        loader.register("validateable", SimpleValidateable.class);
-
-        // initialise the loader with some real objects.
-        loader.register("property", Property.class);
-        loader.register("recipe", Recipe.class);
-        loader.register("def", ComponentDefinition.class);
-        loader.register("post-processor", PostProcessorGroup.class);
-        loader.register("command", CommandGroup.class);
-        loader.register("regex", RegexPostProcessor.class);
-        loader.register("executable", ExecutableCommand.class);
-        loader.register("ant", AntCommand.class);
-        loader.register("make", MakeCommand.class);
-        loader.register("dependency", Dependency.class);
-    }
-
-    public void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testSimpleReference() throws Exception
     {
         SimpleRoot root = new SimpleRoot();
@@ -209,17 +168,17 @@ public class FileLoaderTest extends BobTestCase
 
     public void testArtifactNameValidation() throws Exception
     {
-        try
-        {
-            BobFile bf = new BobFile();
-            loader.load(getInput("testArtifactNameValidation"), bf);
-            fail();
-        }
-        catch (ParseException e)
-        {
-            // Error should indicate a duplicate artifact
-            assertTrue(e.getMessage().indexOf("duplicate") >= 0);
-        }
+        errorHelper("testArtifactNameValidation", "duplicate");
+    }
+
+    public void testArtifactInvalidName() throws Exception
+    {
+        errorHelper("testArtifactInvalidName", "alphanumeric");
+    }
+
+    public void testArtifactMissingName() throws Exception
+    {
+        errorHelper("testArtifactMissingName", "Required attribute name not specified");
     }
 
     public void testProcessNoProcessor() throws BobException
@@ -228,21 +187,12 @@ public class FileLoaderTest extends BobTestCase
         {
             BobFile bf = new BobFile();
             loader.load(getInput("testProcessNoProcessor"), bf);
+            fail();
         }
         catch (ParseException e)
         {
             assertTrue(e.getMessage().contains("attribute 'processor' not specified"));
         }
-    }
-
-    public void testProcessDefaultArtifact() throws BobException
-    {
-        BobFile bf = new BobFile();
-        loader.load(getInput("testProcessDefaultArtifact"), bf);
-        Recipe recipe = bf.getRecipes().get(0);
-        CommandGroup command = (CommandGroup) recipe.getCommands().get(0);
-        CommandGroup.ProcessArtifactMapping mapping = command.getMappings().get(0);
-        assertEquals(mapping.getArtifact(), command.getCommand().getArtifactNames().get(0));
     }
 
     //-----------------------------------------------------------------------
@@ -405,25 +355,5 @@ public class FileLoaderTest extends BobTestCase
     public void testRegexPPInvalidRegex() throws BobException
     {
         errorHelper("testRegexPPInvalidRegex", "Unclosed group");
-    }
-
-    //-----------------------------------------------------------------------
-    // Generic helpers
-    //-----------------------------------------------------------------------
-
-    private void errorHelper(String testName, String messageContent)
-    {
-        BobFile bf = new BobFile();
-        try
-        {
-            loader.load(getInput(testName), bf);
-        }
-        catch (BobException e)
-        {
-            if (!e.getMessage().contains(messageContent))
-            {
-                fail("Message '" + e.getMessage() + "' does not contain '" + messageContent + "'");
-            }
-        }
     }
 }

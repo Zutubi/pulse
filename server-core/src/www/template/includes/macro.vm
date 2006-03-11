@@ -690,12 +690,31 @@
 #end
 
 ##
-## Summarises the messages of a given level on an artifact into a nested list
+## Summarises the messages of a given level on a file artifact
 ##
-#macro(artifactMessageSummary $artifact $level)
-    #if($artifact.hasMessages($level))
+#macro(fileArtifactMessageSummary $fileArtifact $level $showHeader)
+    #if($fileArtifact.hasMessages($level))
+        #if($showHeader)
+    <li class="header">#wwtext("name=artifact"): $!webwork.htmlEncode("$fileArtifact.path")
+        #end
+        <ul>
         #foreach($feature in $artifact.getFeatures($level))
             <li class="$level.toString().toLowerCase()">$!webwork.htmlEncode($feature.summary)</li>
+        #end
+        </ul>
+        #if($showHeader)
+    </li>
+        #end
+    #end
+#end
+
+##
+## Summarises the messages of a given level on an artifact into a nested list
+##
+#macro(artifactMessageSummary $artifact $level $showHeader)
+    #if($artifact.hasMessages($level))
+        #foreach($fileArtifact in $artifact.children)
+            #fileArtifactMessageSummary($fileArtifact $level $showHeader)
         #end
     #end
 #end
@@ -707,13 +726,13 @@
     #if($commandResult.hasMessages($level))
         #resultMessageItems($commandResult $level)
         #foreach($artifact in $commandResult.getArtifacts())
-            #if($artifact.hasMessages($level))
-                <li class="header">#wwtext("name=artifact"): $!webwork.htmlEncode("$artifact.title")
-                    <ul>
-                    #artifactMessageSummary($artifact $level)
-                    </ul>
-                </li>
-            #end
+##            #if($artifact.hasMessages($level))
+##                <li class="header">#wwtext("name=artifact"): $!webwork.htmlEncode("$artifact.name")
+##                    <ul>
+                    #artifactMessageSummary($artifact $level true)
+##                    </ul>
+##                </li>
+##            #end
         #end
     #end
 #end
@@ -777,28 +796,49 @@
 #end
 
 ##
+## Shows an artifact that is a single file
+##
+#macro(commandFileArtifact $artifact $fileArtifact $result $showFeatures $showArtifactLink)
+    <li class="file-artifact">
+    #set($trimmedPath = $artifact.trimmedPath($fileArtifact))
+    #if($showArtifactLink)
+        <a href="viewArtifact.action?id=$artifact.id&amp;commandId=$result.id">$trimmedPath</a>
+    #else
+        $trimmedPath
+    #end
+    #if($showFeatures)
+        #foreach($level in $featureLevels)
+            #if($fileArtifact.hasMessages($level))
+    <ul class="$level.toString().toLowerCase()">
+        <li class="header">$level.toString().toLowerCase() #wwtext("name=features")</li>
+        #fileArtifactMessageSummary($fileArtifact $level false)
+    </ul>
+            #end
+        #end
+    #end
+    </li>
+#end
+
+##
+## Shows an artifact that is multi file, and possibly too many to display
+##
+#macro(commandMultiArtifact $artifact $result $showFeatures $showArtifactLink)
+    <li class="dir-artifact">$!webwork.htmlEncode($artifact.name)
+        <ul>
+    #foreach($fileArtifact in $artifact.children)
+        #commandFileArtifact($artifact $fileArtifact $result $showFeatures $showArtifactLink)
+    #end
+        </ul>
+    </li>
+#end
+
+##
 ## Shows a list of artifacts for a command
 ##
 #macro(commandArtifacts $result $showFeatures $showArtifactLink)
     <ul class="artifact">
     #foreach($artifact in $result.artifacts)
-        <li class="file-artifact">
-        #if($showArtifactLink)
-            <a href="viewArtifact.action?id=$artifact.id&amp;commandId=$result.id">$artifact.title</a>
-        #else
-            $artifact.title
-        #end
-        #if($showFeatures)
-            #foreach($level in $featureLevels)
-                #if($artifact.hasMessages($level))
-        <ul class="$level.toString().toLowerCase()">
-            <li class="header">$level.toString().toLowerCase() #wwtext("name=features")</li>
-            #artifactMessageSummary($artifact $level)
-        </ul>
-                #end
-            #end
-        #end
-        </li>
+        #commandMultiArtifact($artifact $result $showFeatures $showArtifactLink)
     #end
     </ul>
 #end

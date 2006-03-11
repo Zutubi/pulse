@@ -13,7 +13,7 @@ import java.net.URL;
 public class LocalBuildTest extends BobTestCase
 {
     File tmpDir;
-    boolean generateMode = false;
+    boolean generateMode = true;
     LocalBuild builder;
 
     @Override

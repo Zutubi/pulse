@@ -10,17 +10,27 @@
 
         <property name="name" column="NAME" type="string" length="255"/>
 
-        <property name="title" column="TITLE" type="string" length="255"/>
-
-        <property name="type" column="TYPE" type="string" length="255"/>
-
-        <property name="file" column="FILE" type="string" length="1023"/>
-
-        <bag name="features" cascade="all-delete-orphan" lazy="false">
+        <bag name="children" cascade="all-delete-orphan" lazy="false">
             <key column="ARTIFACT_ID" not-null="true"/>
-            <one-to-many class="com.cinnamonbob.core.model.Feature"/>
+            <one-to-many class="com.cinnamonbob.core.model.StoredFileArtifact"/>
         </bag>
 
     </class>
 
+    <class name="com.cinnamonbob.core.model.StoredFileArtifact" table="FILE_ARTIFACT" lazy="false">
+
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="path" column="FILE" type="string" length="1023"/>
+
+        <property name="type" column="TYPE" type="string" length="255"/>
+
+        <bag name="features" cascade="all-delete-orphan" lazy="false">
+            <key column="FILE_ARTIFACT_ID" not-null="true"/>
+            <one-to-many class="com.cinnamonbob.core.model.Feature"/>
+        </bag>
+
+    </class>
 </hibernate-mapping>

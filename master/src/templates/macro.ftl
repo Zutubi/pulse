@@ -28,16 +28,28 @@ it.
 [/#function]
 
 <#---------------------------------------------------------------------------
-Shows all messages of the given level on the artifact as a flat list but with
-context.
+Shows all messages of the given level on the file artifact as a flat list but
+with context.
 ---------------------------------------------------------------------------->
-[#macro artifactMessages artifact level context]
+[#macro fileArtifactMessages artifact level context]
     [#if artifact.hasMessages(level)]
-  - ${renderer.wrapString("${context} :: ${artifact.title}", "    ")}
+  - ${renderer.wrapString("${context}", "    ")}
+    ${renderer.wrapString("${artifact.path}", "    ")}
         [#list artifact.getFeatures(level) as feature]
     * ${renderer.wrapString(feature.summary, "      ")}
         [/#list]
     [/#if]
+[/#macro]
+
+<#---------------------------------------------------------------------------
+Shows all messages of the given level on the artifact as a flat list but with
+context.
+---------------------------------------------------------------------------->
+[#macro artifactMessages artifact level context]
+    [#assign fileContext="${context} :: ${artifact.name}"]
+    [#list artifact.children as fileArtifact]
+        [@fileArtifactMessages artifact=fileArtifact level=level context=fileContext/]
+    [/#list]
 [/#macro]
 
 <#---------------------------------------------------------------------------

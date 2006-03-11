@@ -2,7 +2,7 @@ package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.Feature;
-import com.cinnamonbob.core.model.StoredArtifact;
+import com.cinnamonbob.core.model.StoredFileArtifact;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.test.BobTestCase;
 
@@ -23,18 +23,13 @@ public class RegexPostProcessorTest extends BobTestCase
             "xxx abc",
             "abc xxx",
             "abc xxx abc"};
-    private StoredArtifact artifact;
+    private StoredFileArtifact artifact;
     private File tempFile;
     private File tempDir;
 
 
     public void setUp() throws IOException
     {
-        FileArtifact fileArtifact = new FileArtifact();
-        fileArtifact.setName("test name");
-        fileArtifact.setTitle("test title");
-        fileArtifact.setType("text/plain");
-
         tempFile = File.createTempFile("regex-pp-test", null);
         tempDir = tempFile.getParentFile();
         PrintWriter writer = null;
@@ -53,7 +48,7 @@ public class RegexPostProcessorTest extends BobTestCase
             IOUtils.close(writer);
         }
 
-        artifact = new StoredArtifact(fileArtifact, tempFile.getName());
+        artifact = new StoredFileArtifact(tempFile.getName());
     }
 
     public void tearDown()

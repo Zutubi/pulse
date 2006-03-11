@@ -122,7 +122,7 @@ public class AntCommandTest extends BobTestCase
         FileInputStream is = null;
         try
         {
-            is = new FileInputStream(new File(outputDir, "output.txt"));
+            is = new FileInputStream(new File(outputDir, FileSystemUtils.composeFilename(ExecutableCommand.OUTPUT_NAME, "output.txt")));
             String output = IOUtils.inputStreamToString(is);
             for (String content : contents)
             {

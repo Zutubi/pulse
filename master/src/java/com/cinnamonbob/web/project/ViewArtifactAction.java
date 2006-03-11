@@ -1,7 +1,7 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.StoredArtifact;
+import com.cinnamonbob.core.model.StoredFileArtifact;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,7 +17,7 @@ public class ViewArtifactAction extends ProjectActionSupport
     private long id;
     private long commandId;
     private CommandResult commandResult;
-    private StoredArtifact artifact;
+    private StoredFileArtifact artifact;
     private InputStream inputStream;
 
     public long getId()
@@ -40,7 +40,7 @@ public class ViewArtifactAction extends ProjectActionSupport
         this.commandId = commandId;
     }
 
-    public StoredArtifact getArtifact()
+    public StoredFileArtifact getArtifact()
     {
         return artifact;
     }
@@ -53,7 +53,7 @@ public class ViewArtifactAction extends ProjectActionSupport
             addActionError("Unknown command result '" + commandId + "'");
         }
 
-        artifact = getBuildManager().getArtifact(id);
+        artifact = getBuildManager().getArtifact(id).getFile();
         if (artifact == null)
         {
             addActionError("Unknown artifact '" + id + "'");
@@ -62,7 +62,7 @@ public class ViewArtifactAction extends ProjectActionSupport
 
     public String execute()
     {
-        File artifactFile = new File(commandResult.getOutputDir(), artifact.getFile());
+        File artifactFile = new File(commandResult.getOutputDir(), artifact.getPath());
 
         try
         {

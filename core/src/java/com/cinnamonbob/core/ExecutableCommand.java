@@ -1,8 +1,10 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.StoredFileArtifact;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
@@ -21,16 +23,17 @@ public class ExecutableCommand implements Command
 {
     private static final Logger LOG = Logger.getLogger(ExecutableCommand.class);
 
+    public static final String OUTPUT_NAME = "command output";
+
+    private String name;
     private String exe;
     private List<Arg> args = new LinkedList<Arg>();
     private File workingDir;
-
-    private String name;
-
     private List<Environment> env = new LinkedList<Environment>();
+    private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
+
     private Process child;
     private volatile boolean terminated = false;
-
 
     public void execute(File baseDir, File outputDir, CommandResult cmdResult)
     {
@@ -62,6 +65,12 @@ public class ExecutableCommand implements Command
 
         builder.redirectErrorStream(true);
 
+        File outputFileDir = new File(outputDir, "command output");
+        if(!outputFileDir.mkdir())
+        {
+            throw new BuildException("Unable to create directory for output artifact '" + outputFileDir.getAbsolutePath() + "'");
+        }
+
         try
         {
             child = builder.start();
@@ -74,7 +83,7 @@ public class ExecutableCommand implements Command
                 return;
             }
 
-            File outputFile = new File(outputDir, "output.txt");
+            File outputFile = new File(outputFileDir, "output.txt");
             FileOutputStream output = null;
             try
             {
@@ -108,11 +117,14 @@ public class ExecutableCommand implements Command
                 cmdResult.getProperties().put("working directory", builder.directory().getAbsolutePath());
             }
 
-            // TODO awkward to add this stored artifact to the model...
-            FileArtifact outputArtifact = new FileArtifact("output", outputFile);
-            outputArtifact.setTitle("command output");
-            outputArtifact.setType("text/plain");
-            cmdResult.addArtifact(new StoredArtifact(outputArtifact, outputFile.getName()));
+            String path = FileSystemUtils.composeFilename(outputFileDir.getName(), outputFile.getName());
+            StoredFileArtifact fileArtifact = new StoredFileArtifact(path, "text/plain");
+            StoredArtifact artifact = new StoredArtifact("command output", fileArtifact);
+            for(ProcessArtifact p: processes)
+            {
+                p.getProcessor().process(outputDir, fileArtifact, cmdResult);
+            }
+            cmdResult.addArtifact(artifact);
         }
         catch (IOException e)
         {
@@ -126,7 +138,7 @@ public class ExecutableCommand implements Command
 
     public List<String> getArtifactNames()
     {
-        return Arrays.asList("output");
+        return Arrays.asList(OUTPUT_NAME);
     }
 
     public String getExe()
@@ -173,6 +185,13 @@ public class ExecutableCommand implements Command
         Environment setting = new Environment();
         env.add(setting);
         return setting;
+    }
+
+    public ProcessArtifact createProcess()
+    {
+        ProcessArtifact p = new ProcessArtifact();
+        processes.add(p);
+        return p;
     }
 
     private String constructCommandLine(ProcessBuilder builder)

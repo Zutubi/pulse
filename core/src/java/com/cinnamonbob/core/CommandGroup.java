@@ -1,6 +1,7 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.StoredFileArtifact;
 import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.core.validation.Validateable;
@@ -24,10 +25,7 @@ public class CommandGroup implements Command, Validateable
     private String name;
 
     private Command command = null;
-
-    private List<ProcessArtifactMapping> mappings = new LinkedList<ProcessArtifactMapping>();
-
-    private List<FileArtifact> artifacts = new LinkedList<FileArtifact>();
+    private List<Artifact> artifacts = new LinkedList<Artifact>();
 
     public void add(Command cmd) throws FileLoadException
     {
@@ -58,13 +56,6 @@ public class CommandGroup implements Command, Validateable
         return name;
     }
 
-    public ProcessArtifactMapping createProcess()
-    {
-        ProcessArtifactMapping mapping = new ProcessArtifactMapping();
-        mappings.add(mapping);
-        return mapping;
-    }
-
     public FileArtifact createArtifact()
     {
         FileArtifact customArtifact = new FileArtifact();
@@ -72,30 +63,32 @@ public class CommandGroup implements Command, Validateable
         return customArtifact;
     }
 
+    public DirectoryArtifact createDirArtifact()
+    {
+        DirectoryArtifact customArtifact = new DirectoryArtifact();
+        artifacts.add(customArtifact);
+        return customArtifact;
+    }
+
     public void execute(File baseDir, File outputDir, CommandResult result)
     {
         command.execute(baseDir, outputDir, result);
-        collectArtifacts(result, outputDir);
-
-        for (ProcessArtifactMapping m : mappings)
+        for(Artifact artifact: artifacts)
         {
-            StoredArtifact a = result.getArtifact(m.getArtifact());
-
-            if (a != null)
-            {
-                m.getProcessor().process(outputDir, a, result);
-            }
-            else
-            {
-                throw new BuildException("Unable to post-process unknown artifact '" + m.getArtifact() + "'");
-            }
+            artifact.capture(result, baseDir, outputDir);
         }
+    }
+
+    // For testing
+    List<Artifact> getArtifacts()
+    {
+        return artifacts;
     }
 
     public List<String> getArtifactNames()
     {
         List<String> names = new LinkedList<String>();
-        for (FileArtifact artifact : artifacts)
+        for (Artifact artifact : artifacts)
         {
             names.add(artifact.getName());
         }
@@ -104,29 +97,6 @@ public class CommandGroup implements Command, Validateable
         names.addAll(getCommand().getArtifactNames());
 
         return names;
-    }
-
-    private void collectArtifacts(CommandResult result, File outputDir)
-    {
-        for (FileArtifact artifact : artifacts)
-        {
-            // the stored artifacts file name relative to the output directory.
-            String relativeFileName = artifact.getName();
-
-            File toFile = new File(outputDir, relativeFileName);
-
-            File fromFile = artifact.getFile();
-
-            try
-            {
-                IOUtils.copyFile(fromFile, toFile);
-                result.addArtifact(new StoredArtifact(artifact, relativeFileName));
-            }
-            catch (IOException e)
-            {
-                throw new BuildException("Unable to collect artifact '" + artifact.getName() + "'", e);
-            }
-        }
     }
 
     public Command getCommand()
@@ -147,63 +117,6 @@ public class CommandGroup implements Command, Validateable
                         "use unique names for artifacts within a command group.");
             }
             names.add(name);
-        }
-    }
-
-    // Exposed for testing
-    List<ProcessArtifactMapping> getMappings()
-    {
-        return mappings;
-    }
-
-    /**
-     * 
-     */
-    class ProcessArtifactMapping implements Validateable
-    {
-        private String artifact;
-        private PostProcessor processor;
-
-        public void setArtifact(String artifact)
-        {
-            this.artifact = artifact;
-        }
-
-        public void setProcessor(PostProcessor processor)
-        {
-            this.processor = processor;
-        }
-
-        public String getArtifact()
-        {
-            return artifact;
-        }
-
-        public PostProcessor getProcessor()
-        {
-            return processor;
-        }
-
-        public void validate(ValidatorContext context)
-        {
-            if (artifact == null)
-            {
-                // Default to the command's first artifact
-                List<String> artifacts = command.getArtifactNames();
-                if (artifacts.size() > 0)
-                {
-                    artifact = artifacts.get(0);
-                }
-                else
-                {
-                    context.addActionError("No artifact specified and no default artifact for command");
-                }
-            }
-
-            if (processor == null)
-            {
-                context.addActionError("Required attribute 'processor' not specified");
-            }
         }
     }
 }

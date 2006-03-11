@@ -5,7 +5,7 @@
     <title>#wwtext("name=build") $result.number</title>
 </head>
 <body>
-    <a name="top">
+    <a name="top" class="unadorned">
         <h1>:: #wwtext("name=build") $result.number ::</h1>
     </a>
 

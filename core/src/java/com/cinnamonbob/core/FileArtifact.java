@@ -1,32 +1,50 @@
 package com.cinnamonbob.core;
 
+import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.StoredFileArtifact;
+import com.cinnamonbob.core.model.StoredArtifact;
+
 import java.io.*;
 
 /**
- * 
- *
+ * Information about a single file artifact to be captured.
  */
-public class FileArtifact
+public class FileArtifact extends Artifact
 {
     private File file;
-    private String name;
-    private String title;
-    private String type;
-
-    public FileArtifact(String name, File file)
-    {
-        this.name = name;
-        this.file = file;
-    }
+    private String type = StoredFileArtifact.TYPE_PLAIN;
 
     public FileArtifact()
     {
 
     }
 
-    public void setName(String name)
+    public void capture(CommandResult result, File baseDir, File outputDir)
     {
-        this.name = name;
+        StoredArtifact stored = new StoredArtifact(getName());
+        File captureFile;
+        if(file.isAbsolute())
+        {
+            captureFile = file;
+        }
+        else
+        {
+            captureFile = new File(baseDir, file.getPath());
+        }
+        
+        captureFile(stored, captureFile, file.getName(), outputDir, result, type);
+        result.addArtifact(stored);
+    }
+
+    public FileArtifact(String name, File file)
+    {
+        super(name);
+        this.file = file;
+    }
+
+    public File getFile()
+    {
+        return file;
     }
 
     public void setFile(File file)
@@ -34,27 +52,9 @@ public class FileArtifact
         this.file = file;
     }
 
-    public InputStream getContent()
+    public String getType()
     {
-        if (!file.exists())
-        {
-            return new ByteArrayInputStream(new byte[0]);
-        }
-
-        try
-        {
-            return new FileInputStream(file);
-        }
-        catch (FileNotFoundException e)
-        {
-            // will not get here since we have checked that the file exists.
-        }
-        return null;
-    }
-
-    public void setTitle(String title)
-    {
-        this.title = title;
+        return type;
     }
 
     public void setType(String type)
@@ -62,28 +62,4 @@ public class FileArtifact
         this.type = type;
     }
 
-    public void setFromFile(File f)
-    {
-        setFile(f);
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public String getTitle()
-    {
-        return title;
-    }
-
-    public String getType()
-    {
-        return type;
-    }
-
-    public File getFile()
-    {
-        return file;
-    }
 }

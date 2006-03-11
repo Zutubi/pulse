@@ -10,7 +10,7 @@
     <recipe name="default">
         <command name="doSomething">
             <executable exe="netstat"/>
-            <artifact name="output" type="text/plain" from-file="output/file"/>
+            <artifact name="command output" type="text/plain" file="output/file"/>
         </command>
     </recipe>
 

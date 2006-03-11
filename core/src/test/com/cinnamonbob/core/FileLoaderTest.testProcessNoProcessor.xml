@@ -2,8 +2,9 @@
 <project>
     <recipe name="wow">
         <command name="cool">
-            <executable exe="foo"/>
-            <process/>
+            <executable exe="foo">
+                <process/>
+            </executable>
         </command>
     </recipe>
 </project>

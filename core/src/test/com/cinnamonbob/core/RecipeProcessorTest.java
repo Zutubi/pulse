@@ -198,7 +198,7 @@ public class RecipeProcessorTest extends BobTestCase implements EventListener
         String dirName = RecipeProcessor.getCommandDirName(commandIndex, new CommandResult(commandName));
         File outDir = new File(outputDir, dirName);
         assertTrue(outDir.isDirectory());
-        File outFile = new File(outDir, "output.txt");
+        File outFile = new File(outDir, FileSystemUtils.composeFilename(ExecutableCommand.OUTPUT_NAME, "output.txt"));
         assertTrue(outFile.isFile());
         String actualContents = IOUtils.fileToString(outFile);
         assertEquals(contents, actualContents);

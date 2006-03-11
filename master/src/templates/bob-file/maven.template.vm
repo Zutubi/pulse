@@ -21,8 +21,8 @@
 #foreach($target in $targets)
                 <arg>$target</arg>
 #end
+                <process processor="${maven.pp}"/>
             </executable>
-            <process artifact="output" processor="${maven.pp}"/>
         </command>
     </recipe>
 </project>

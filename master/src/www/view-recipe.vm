@@ -48,7 +48,7 @@
         <ul class="artifact">
       #foreach($artifact in $commandResult.artifacts)
           <li class="artifact">
-            <a href="viewArtifact.action?id=$artifact.id&commandId=$commandResult.id">$artifact.title</a> [$artifact.type]
+            <a href="viewArtifact.action?id=$artifact.id&commandId=$commandResult.id">$artifact.name</a> [$artifact.type]
           </li>
         #foreach($level in $artifact.levels)
           #set($levelClass = $level.toString().toLowerCase())

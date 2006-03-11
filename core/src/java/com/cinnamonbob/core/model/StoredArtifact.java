@@ -1,142 +1,143 @@
 package com.cinnamonbob.core.model;
 
-import com.cinnamonbob.core.FileArtifact;
-
 import java.util.*;
+import java.io.File;
 
+/**
+ */
 public class StoredArtifact extends Entity
 {
-    public static final String TYPE_PLAIN = "text/plain";
-
     private String name;
-    private String title;
-    private String type;
-    private String file;
-    private List<Feature> features;
+    /**
+     * Files stored as part of this artifact.  A common special case is just
+     * a single file.
+     */
+    List<StoredFileArtifact> children = new LinkedList<StoredFileArtifact>();
 
     public StoredArtifact()
     {
-
     }
 
-    public StoredArtifact(FileArtifact artifact, String file)
+    public StoredArtifact(String name)
     {
-        name = artifact.getName();
-        title = artifact.getTitle();
-        if (title == null)
-        {
-            title = artifact.getName();
-        }
-        type = artifact.getType();
-        this.file = file;
-        features = new LinkedList<Feature>();
+        this.name = name;
     }
 
+    public StoredArtifact(String name, StoredFileArtifact file)
+    {
+        this.name = name;
+        this.children.add(file);
+    }
 
     public String getName()
     {
         return name;
     }
 
-
-    public String getTitle()
+    private void setName(String name)
     {
-        return title;
+        this.name = name;
     }
 
-    public String getFile()
+    public void add(StoredFileArtifact child)
     {
-        return file;
+        children.add(child);
     }
 
-    public void addFeature(Feature feature)
+    public List<StoredFileArtifact> getChildren()
     {
-        features.add(feature);
+        return children;
+    }
+
+    private void setChildren(List<StoredFileArtifact> children)
+    {
+        this.children = children;
+    }
+
+    public boolean isSingleFile()
+    {
+        return children.size() == 1;
+    }
+
+    public StoredFileArtifact getFile()
+    {
+        return children.get(0);
     }
 
     public boolean hasFeatures()
     {
-        return features.size() != 0;
-    }
-
-    public Iterator<Feature.Level> getLevels()
-    {
-        Set<Feature.Level> levels = new TreeSet<Feature.Level>();
-
-        for (Feature f : features)
+        for (StoredFileArtifact child : children)
         {
-            levels.add(f.getLevel());
+            if (child.hasFeatures())
+            {
+                return true;
+            }
         }
 
-        return levels.iterator();
+        return false;
     }
 
-    public List<Feature> getFeatures(Feature.Level level)
+    public Iterable<Feature.Level> getLevels()
     {
-        List<Feature> result = new LinkedList<Feature>();
-        for (Feature f : features)
+        Set<Feature.Level> result = new TreeSet<Feature.Level>();
+        for (StoredFileArtifact child : children)
         {
-            if (f.getLevel() == level)
+            for (Feature.Level level : child.getLevels())
             {
-                result.add(f);
+                result.add(level);
             }
         }
 
         return result;
     }
 
-    public String getType()
-    {
-        return type;
-    }
-
-    public List<Feature> getFeatures()
-    {
-        return features;
-    }
-
-    private void setFeatures(List<Feature> features)
-    {
-        this.features = features;
-    }
-
-
-    private void setFile(String file)
-    {
-        this.file = file;
-    }
-
-
-    private void setName(String name)
-    {
-        this.name = name;
-    }
-
-
-    private void setTitle(String title)
-    {
-        this.title = title;
-    }
-
-
-    private void setType(String type)
-    {
-        this.type = type;
-    }
-
-    public List<String> collectFeatures(Feature.Level level)
-    {
-        List<String> summaries = new LinkedList<String>();
-        for (Feature f : getFeatures(level))
-        {
-            summaries.add(f.getSummary());
-        }
-
-        return summaries;
-    }
-
     public boolean hasMessages(Feature.Level level)
     {
-        return getFeatures(level).size() > 0;
+        for (StoredFileArtifact child : children)
+        {
+            if (child.hasMessages(level))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public List<Feature> getFeatures(Feature.Level level)
+    {
+        List<Feature> result = new LinkedList<Feature>();
+        for(StoredFileArtifact child: children)
+        {
+            result.addAll(child.getFeatures(level));
+        }
+
+        return result;
+    }
+
+    public String trimmedPath(StoredFileArtifact artifact)
+    {
+        String path = artifact.getPath();
+        if(path.startsWith(name))
+        {
+            path = path.substring(name.length());
+        }
+
+        if(path.startsWith(File.separator))
+        {
+            path = path.substring(1);
+        }
+
+        if(path.startsWith("/"))
+        {
+            path = path.substring(1);
+        }
+
+        if(path.startsWith("\\"))
+        {
+            path = path.substring(1);
+        }
+
+        return path;
     }
 }

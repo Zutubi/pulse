@@ -2,10 +2,13 @@ package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.ResultState;
+import com.cinnamonbob.core.model.Feature;
+import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import junit.framework.TestCase;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * 
@@ -33,8 +36,8 @@ public class ExecutableCommandTest extends TestCase
     public void testExecuteSuccessExpected() throws Exception
     {
         ExecutableCommand command = new ExecutableCommand();
-        command.setExe("dir");
-        command.setArgs(".");
+        command.setExe("echo");
+        command.setArgs("hello world");
         CommandResult result = new CommandResult("success");
         command.execute(baseDirectory, outputDirectory, result);
         assertEquals(result.getState(), ResultState.SUCCESS);
@@ -73,5 +76,31 @@ public class ExecutableCommandTest extends TestCase
         {
             // noop            
         }
+    }
+
+    public void testPostProcess() throws FileLoadException
+    {
+        ExecutableCommand command = new ExecutableCommand();
+        command.setExe("echo");
+        command.setArgs("error: badness");
+
+        ProcessArtifact processArtifact = command.createProcess();
+        RegexPostProcessor processor = new RegexPostProcessor();
+        RegexPattern regex = new RegexPattern();
+        regex.setCategory("error");
+        regex.setExpression("error:.*");
+        processor.addRegexPattern(regex);
+        processArtifact.setProcessor(processor);
+
+        CommandResult cmdResult = new CommandResult("processed");
+        command.execute(baseDirectory, outputDirectory, cmdResult);
+        assertEquals(ResultState.FAILURE, cmdResult.getState());
+
+        StoredArtifact artifact = cmdResult.getArtifact(ExecutableCommand.OUTPUT_NAME);
+        List<Feature> features = artifact.getFeatures(Feature.Level.ERROR);
+        assertEquals(1, features.size());
+        Feature feature = features.get(0);
+        assertEquals(Feature.Level.ERROR, feature.getLevel());
+        assertEquals("error: badness", feature.getSummary());
     }
 }

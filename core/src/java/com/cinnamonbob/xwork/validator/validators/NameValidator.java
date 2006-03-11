@@ -15,7 +15,7 @@ public class NameValidator extends FieldValidatorSupport
         if (obj != null)
         {
             String value = (String) obj;
-            if (value.length() > 0 && !value.matches("[a-zA-Z0-9][-a-zA-Z0-9_.]*"))
+            if (value.length() > 0 && !value.matches("[a-zA-Z0-9][-a-zA-Z0-9_. ]*"))
             {
                 addFieldError(getFieldName(), obj);
             }

@@ -11,7 +11,9 @@ New changes in this build:
   * 655 by test author:
     short comment
   * 656 by author2:
-    this time we will use a longer comment to make sure that ...
+    this time we will use a longer comment to make sure that the
+    renderer is applying some sort of trimming to the resulting
+    output dadada da dadad ad ad adadad ad ad ada d adada da...
 
 Error messages:
   * test error message
@@ -28,16 +30,18 @@ Error messages:
       00000000000
   - second recipe :: artifact command
     * artifacts let me down
-  - second recipe :: artifact command :: first artifact title which
-    is so long it needs to be wrapped
+  - second recipe :: artifact command :: first-artifact
+    first-artifact/testpath
     * error message
-  - second recipe :: artifact command :: second artifact title
+  - second recipe :: artifact command :: second-artifact
+    second-artifact/this/time/a/very/very/very/very/long/pathname/wh
+    ich/will/look/ugly/i/have/no/doubt
     * error 1
     * error 2
     * error 3: in this case a longer error message so i can see how
       the wrapping works on the artifact messages
 
 Warning messages:
-  - second recipe :: artifact command :: first artifact title which
-    is so long it needs to be wrapped
+  - second recipe :: artifact command :: first-artifact
+    first-artifact/testpath
     * warning message
