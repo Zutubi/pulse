@@ -47,6 +47,7 @@ public class BuildController implements EventListener
     private AsynchronousDelegatingListener asyncListener;
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private Scheduler quartzScheduler;
+    private LazyBobFile lazyBobFile = new LazyBobFile();
 
     public BuildController(Project project, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler)
     {
@@ -104,7 +105,7 @@ public class BuildController implements EventListener
             recipeResult.setOutputDir(paths.getOutputDir(project, buildResult, recipeResult.getId()).getAbsolutePath());
 
             RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe());
-            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), recipeRequest, buildResult);
+            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), lazyBobFile, recipeRequest, buildResult);
             RecipeController rc = new RecipeController(childResultNode, dispatchRequest, collector, queue, buildManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
@@ -162,9 +163,7 @@ public class BuildController implements EventListener
         ScmBootstrapper initialBootstrapper = new ScmBootstrapper(project.getScm());
         BobFileDetails bobFileDetails = project.getBobFileDetails();
         ComponentContext.autowire(bobFileDetails);
-        String bobFileSource = bobFileDetails.getBobFile(project, initialBootstrapper.getRevision());
-
-        tree.prepare(buildResult, bobFileSource);
+        tree.prepare(buildResult);
 
         // execute the first level of recipe controllers...
         initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());

@@ -1,14 +1,18 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.core.model.RecipeResult;
+import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.events.DefaultEventManager;
 import com.cinnamonbob.events.build.RecipeCompletedEvent;
 import com.cinnamonbob.events.build.RecipeErrorEvent;
 import com.cinnamonbob.model.BuildHostRequirements;
+import com.cinnamonbob.model.BobFileDetails;
+import com.cinnamonbob.model.Project;
 import junit.framework.TestCase;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -260,7 +264,7 @@ public class ThreadedRecipeQueueTest extends TestCase
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
         RecipeRequest request = new RecipeRequest(id, null);
         request.setBootstrapper(new ChainBootstrapper());
-        return new RecipeDispatchRequest(requirements, request, null);
+        return new RecipeDispatchRequest(requirements, new LazyBobFile("howdy :)"), request, null);
     }
 
     private RecipeDispatchRequest createDispatchRequest(int type)

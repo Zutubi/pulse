@@ -20,14 +20,14 @@ public class BuildTree
         return root;
     }
 
-    public void prepare(final BuildResult buildResult, final String bobFileSource)
+    public void prepare(final BuildResult buildResult)
     {
         apply(new TreeNodeOperation<RecipeController>()
         {
 
             public void apply(TreeNode<RecipeController> node)
             {
-                node.getData().prepare(buildResult, bobFileSource);
+                node.getData().prepare(buildResult);
             }
         });
     }

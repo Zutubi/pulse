@@ -98,7 +98,7 @@
                 <path refid="lib.path"/>
             </classpath>
             <formatter type="xml"/>
-            <batchtest todir="${report.dir}/junit">
+            <batchtest todir="${report.dir}/junit/xml">
                 <fileset dir="${test.dir}">
                     <include name="**/*Test.java"/>
                     <exclude name="**/P4*"/>

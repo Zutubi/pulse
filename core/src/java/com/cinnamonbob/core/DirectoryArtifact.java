@@ -19,7 +19,7 @@ public class DirectoryArtifact extends Artifact
     private String index;
     private List<Pattern> inclusions;
     private List<Pattern> exclusions;
-    private String type = StoredFileArtifact.TYPE_PLAIN;
+    private String type = null;
 
     public DirectoryArtifact()
     {

@@ -46,7 +46,7 @@ public class RecipeControllerTest extends BobTestCase
         rootNode.addChild(childNode);
 
         recipeRequest = new RecipeRequest(rootResult.getId(), rootResult.getRecipeName());
-        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), recipeRequest, null);
+        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new LazyBobFile(), recipeRequest, null);
         recipeController = new RecipeController(rootNode, dispatchRequest, resultCollector, recipeQueue, buildManager);
     }
 

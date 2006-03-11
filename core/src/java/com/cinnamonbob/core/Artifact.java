@@ -55,7 +55,6 @@ public abstract class Artifact
             IOUtils.copyFile(fromFile, toFile);
             StoredFileArtifact fileArtifact = new StoredFileArtifact(path, type);
             artifact.add(fileArtifact);
-            result.addArtifact(artifact);
 
             for(ProcessArtifact process: processes)
             {

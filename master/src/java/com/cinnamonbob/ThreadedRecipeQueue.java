@@ -259,9 +259,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
         try
         {
-            request.getRequest().prepare();
+            request.prepare();
         }
-        catch (BobException e)
+        catch (Exception e)
         {
             eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), "Error dispatching recipe: " + e.getMessage()));
             return;

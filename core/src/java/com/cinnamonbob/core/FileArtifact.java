@@ -12,7 +12,7 @@ import java.io.*;
 public class FileArtifact extends Artifact
 {
     private File file;
-    private String type = StoredFileArtifact.TYPE_PLAIN;
+    private String type = null;
 
     public FileArtifact()
     {
