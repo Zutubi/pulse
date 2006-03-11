@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 
@@ -29,6 +30,8 @@ public class CvsClientTest extends BobTestCase
     private CvsClient cvs;
 
     private File workdir = null;
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat CVSDATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
     public void setUp() throws Exception
     {
@@ -356,38 +359,69 @@ public class CvsClientTest extends BobTestCase
         assertTrue(new File(workdir, "unit-test/CvsClientTest/testCheckoutModule/dir2/file2.txt").exists());
     }
 
+    public void testCheckoutByDate() throws SCMException, ParseException
+    {
+        String module = "unit-test/CvsClientTest/testCheckoutByDate";
+        cvs.setLocalPath(workdir);
+        cvs.checkout(module, DATE_FORMAT.parse("2006-03-11"));
+
+        // check that the selected files exist.
+        assertFalse(new File(workdir, module + "/file1.txt").exists());
+
+        cvs.checkout(module, DATE_FORMAT.parse("2006-03-12"));
+
+        assertTrue(new File(workdir, module + "/file1.txt").exists());
+    }
+
     public void testHasBranchChangedSince() throws SCMException, ParseException
     {
         String module = "unit-test/CvsClientTest/testHasBranchChangedSince";
         cvs.setTag("BRANCH");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        assertTrue(cvs.hasChangedSince(dateFormat.parse("2006-03-10"), module));
-        assertFalse(cvs.hasChangedSince(dateFormat.parse("2006-03-11"), module));
+        assertTrue(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-10"), module));
+        assertFalse(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-11"), module));
     }
 
     public void testHasDirectoryChangedSince() throws SCMException, ParseException
     {
         String module = "unit-test/CvsClientTest/testHasDirectoryChangedSince";
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        assertTrue(cvs.hasChangedSince(dateFormat.parse("2006-03-10"), module + "/dir"));
-        assertFalse(cvs.hasChangedSince(dateFormat.parse("2006-03-11"), module + "/dir"));
+        assertTrue(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-10"), module + "/dir"));
+        assertFalse(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-11"), module + "/dir"));
     }
 
     public void testHasFileChangedSince() throws SCMException, ParseException
     {
         String module = "unit-test/CvsClientTest/testHasFileChangedSince";
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        assertTrue(cvs.hasChangedSince(dateFormat.parse("2006-03-10"), module + "/file1.txt"));
-        assertFalse(cvs.hasChangedSince(dateFormat.parse("2006-03-11"), module + "/file1.txt"));
+        assertTrue(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-10"), module + "/file1.txt"));
+        assertFalse(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-11"), module + "/file1.txt"));
     }
 
     public void testHasModuleChangedSince() throws SCMException, ParseException
     {
         String module = "module2";
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        assertTrue(cvs.hasChangedSince(dateFormat.parse("2006-03-10"), module));
-        assertFalse(cvs.hasChangedSince(dateFormat.parse("2006-03-11"), module));
+        assertTrue(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-10"), module));
+        assertFalse(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-11"), module));
+    }
+
+    public void testFileLastChangedDate() throws SCMException, ParseException
+    {
+        String module = "unit-test/CvsClientTest/testFileLastChangedDate";
+        assertNull(cvs.getLastUpdate(DATE_FORMAT.parse("2006-03-12"), module + "/file1.txt"));
+        Date date = cvs.getLastUpdate(DATE_FORMAT.parse("2006-03-11"), module + "/file1.txt");
+        assertEquals("2006-03-11 02:00:00 GMT", CVSDATE.format(date));
+    }
+
+    public void testDirectoryLastChangedDate() throws SCMException, ParseException
+    {
+        String module = "unit-test/CvsClientTest/testDirectoryLastChangedDate";
+        assertNull(cvs.getLastUpdate(DATE_FORMAT.parse("2006-03-12"), module));
+        Date date = cvs.getLastUpdate(DATE_FORMAT.parse("2006-03-11"), module);
+        assertEquals("2006-03-11 02:30:04 GMT", CVSDATE.format(date));
+    }
+
+    public void testTag() throws Exception
+    {
+        // TODO... need to test this at some stage, tagging is not used at the moment, so delaying the testing.
     }
 
     private static void assertChangelistValues(Changelist changelist, String user, String comment)

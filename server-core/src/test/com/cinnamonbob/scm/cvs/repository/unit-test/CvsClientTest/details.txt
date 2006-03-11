@@ -67,6 +67,9 @@ testCheckoutModule:
     dir1/file1.txt checked in by author a
     dir2/file2.txt checked in by author a
     module created referencing dir1 dir2 by author a
+
+testCheckoutByDate:
+    file1.txt checked in by author a
     
 testHasBranchChangedSince:
     file1.txt checked in on BRANCH by author a
@@ -83,3 +86,12 @@ testHasModuleChangedSince:
     dir2/file2.txt checked in by author a
     module2 created referencing dir1 dir2 by author a
     dir1/file1.txt modified by author a
+    
+testFileLastChangedDate:
+    file1.txt checked in by author a
+    file1.txt is modified by author a (date modified in repository)
+
+testDirectoryLastChangedDate:
+    file1.txt and file2.txt checked in by author a
+    file1.txt is modified by author a (date modified in repository)
+    file2.txt is modified by author a (date modified in repository)

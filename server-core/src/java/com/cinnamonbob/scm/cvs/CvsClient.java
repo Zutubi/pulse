@@ -1,6 +1,7 @@
 package com.cinnamonbob.scm.cvs;
 
 import com.cinnamonbob.core.model.Change;
+import com.cinnamonbob.core.model.Change.Action;
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.CvsRevision;
 import com.cinnamonbob.scm.SCMException;
@@ -347,12 +348,12 @@ public class CvsClient
         {
             public int compare(LocalChange changeA, LocalChange changeB)
             {
-                // null author?? - revision miss-match..
                 int comparison = changeA.getAuthor().compareTo(changeB.getAuthor());
                 if (comparison != 0)
                 {
                     return comparison;
                 }
+                // tags should never be different.
                 comparison = changeA.getTag().compareTo(changeB.getTag());
                 if (comparison != 0)
                 {
@@ -578,17 +579,17 @@ public class CvsClient
             return filename;
         }
 
-        public Change.Action getAction()
+        public Action getAction()
         {
             if (log.getAddedLines() == 0 && log.getRemovedLines() == 0)
             {
                 if (!log.getState().equalsIgnoreCase("dead"))
                 {
-                    return Change.Action.ADD;
+                    return Action.ADD;
                 }
-                return Change.Action.DELETE;
+                return Action.DELETE;
             }
-            return Change.Action.EDIT;
+            return Action.EDIT;
         }
 
     }

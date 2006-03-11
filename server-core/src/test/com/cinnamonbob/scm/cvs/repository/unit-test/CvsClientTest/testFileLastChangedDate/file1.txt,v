@@ -1,0 +1,39 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2006.03.11.02.00.00;	author daniel;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2006.03.11.01.00.00;	author daniel;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@file1.txt is modified by author a (date modified in repository)
+@
+text
+@modified
+@
+
+
+1.1
+log
+@file1.txt checked in by author a
+@
+text
+@d1 1
+@
+
