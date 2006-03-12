@@ -179,6 +179,11 @@ public class StoredArtifact extends Entity
         return findFile(name + "/" + file);
     }
 
+    public boolean hasIndexFile()
+    {
+        return findIndexFile() != null;
+    }
+
     public String findIndexFile()
     {
         if (index != null && findFileBase(index) != null)

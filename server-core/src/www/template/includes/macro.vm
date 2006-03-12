@@ -824,18 +824,18 @@
 ## Shows an artifact that is multi file, and possibly too many to display
 ##
 #macro(commandMultiArtifact $artifact $result $showFeatures $showArtifactLink)
-    #set($indexFile = $artifact.findIndexFile())
-    #if($indexFile)
+    #set($hasIndex = $artifact.hasIndexFile())
+    #if($hasIndex)
         #set($artClass = "report-artifact")
     #else
         #set($artClass = "dir-artifact")
     #end
     <li class="$artClass">
-    #if($indexFile)
+    #if($hasIndex)
         <a href="/view/$result.id/$artifact.id/$artifact.name/">
     #end
             $!webwork.htmlEncode($artifact.name)
-    #if($indexFile)
+    #if($hasIndex)
         </a>
     #else
         <ul>

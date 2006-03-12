@@ -76,6 +76,12 @@ public class ViewFileServlet extends HttpServlet
         if (filePath.equals(artifact.getName()))
         {
             String index = artifact.findIndexFile();
+            if (index == null)
+            {
+                httpServletResponse.sendError(404);
+                return;
+            }
+
             filePath = filePath + "/" + index;
             file = new File(file, index);
         }
