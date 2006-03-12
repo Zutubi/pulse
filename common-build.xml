@@ -91,7 +91,7 @@
 
     <!-- run test cases -->
     <target name="test" depends="init">
-        <junit printsummary="yes" fork="on" haltonfailure="no">
+        <junit printsummary="yes" fork="on" haltonfailure="yes">
             <classpath>
                 <pathelement location="${classes.dir}"/>
                 <pathelement location="${test.classes.dir}"/>
