@@ -2,7 +2,6 @@ package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.StoredArtifact;
-import com.cinnamonbob.core.model.StoredFileArtifact;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import org.apache.tools.ant.DirectoryScanner;
 
@@ -78,6 +77,11 @@ public class DirectoryArtifact extends Artifact
         else if (!base.isAbsolute())
         {
             base = new File(baseDir, base.getPath());
+        }
+
+        if (!baseDir.isDirectory())
+        {
+            throw new BuildException("Directory artifact '" + getName() + "': base '" + base.getAbsolutePath() + "' is not a directory");
         }
 
         DirectoryScanner scanner = new DirectoryScanner();
