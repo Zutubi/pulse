@@ -79,7 +79,7 @@ public class DirectoryArtifact extends Artifact
             base = new File(baseDir, base.getPath());
         }
 
-        if (!baseDir.isDirectory())
+        if (!base.isDirectory())
         {
             throw new BuildException("Directory artifact '" + getName() + "': base '" + base.getAbsolutePath() + "' is not a directory");
         }
