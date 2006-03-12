@@ -57,9 +57,8 @@ public class P4ServerTest extends BobTestCase
         {
             Change change = changes.get(i);
             assertEquals(Change.Action.ADD, change.getAction());
-            assertEquals(Change.Action.ADD, change.getAction());
 
-            // Foolish of me to create file10 which runis lexical ordering :|
+            // Foolish of me to create file10 which ruins lexical ordering :|
             int number;
             if (i == 0)
             {

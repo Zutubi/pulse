@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Date;
+import java.util.logging.Level;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 
@@ -37,10 +38,10 @@ public class CvsClientTest extends BobTestCase
     {
         super.setUp();
 
-//        if (com.cinnamonbob.util.logging.Logger.getLogger(CvsClientTest.class).isLoggable(Level.FINEST))
-//        {
+        if (com.cinnamonbob.util.logging.Logger.getLogger(CvsClientTest.class).isLoggable(Level.FINEST))
+        {
             Logger.setLogging("system");
-//        }
+        }
 
         File repositoryRoot = new File(getBobRoot(), "server-core/src/test/com/cinnamonbob/scm/cvs/repository");
         CVSRoot cvsRoot = CVSRoot.parse(":local:" + repositoryRoot.getCanonicalPath());
@@ -285,8 +286,7 @@ public class CvsClientTest extends BobTestCase
     public void testChangesWithBranch() throws SCMException
     {
         String module = "unit-test/CvsClientTest/testChangesWithBranch";
-        cvs.setTag("BRANCH");
-        List<Changelist> changes = cvs.getChangeLists(module);
+        List<Changelist> changes = cvs.getChangeLists(module, "BRANCH", null, null);
         assertEquals(2, changes.size());
         assertValidChangeSets(changes);
 
@@ -304,9 +304,8 @@ public class CvsClientTest extends BobTestCase
     public void testCheckoutBranch() throws SCMException, IOException
     {
         String module = "unit-test/CvsClientTest/testCheckoutBranch";
-        cvs.setTag("BRANCH");
         cvs.setLocalPath(workdir);
-        cvs.checkout(module);
+        cvs.checkout(module, "BRANCH", null);
 
         // check that the selected files exist.
         assertTrue(new File(workdir, module + "/file1.txt").exists());
@@ -317,7 +316,6 @@ public class CvsClientTest extends BobTestCase
         removeDirectory(workdir);
         workdir = FileSystemUtils.createTempDirectory(CvsClientTest.class.getName(), "");
 
-        cvs.setTag(null);
         cvs.setLocalPath(workdir);
         cvs.checkout(module);
 
@@ -363,12 +361,12 @@ public class CvsClientTest extends BobTestCase
     {
         String module = "unit-test/CvsClientTest/testCheckoutByDate";
         cvs.setLocalPath(workdir);
-        cvs.checkout(module, DATE_FORMAT.parse("2006-03-11"));
+        cvs.checkout(module, null, DATE_FORMAT.parse("2006-03-11"));
 
         // check that the selected files exist.
         assertFalse(new File(workdir, module + "/file1.txt").exists());
 
-        cvs.checkout(module, DATE_FORMAT.parse("2006-03-12"));
+        cvs.checkout(module, null, DATE_FORMAT.parse("2006-03-12"));
 
         assertTrue(new File(workdir, module + "/file1.txt").exists());
     }
@@ -376,46 +374,44 @@ public class CvsClientTest extends BobTestCase
     public void testHasBranchChangedSince() throws SCMException, ParseException
     {
         String module = "unit-test/CvsClientTest/testHasBranchChangedSince";
-        cvs.setTag("BRANCH");
-        assertTrue(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-10"), module));
-        assertFalse(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-11"), module));
+        assertTrue(cvs.hasChangedSince(module, "BRANCH", DATE_FORMAT.parse("2006-03-10")));
+        assertFalse(cvs.hasChangedSince(module, "BRANCH", DATE_FORMAT.parse("2006-03-11")));
     }
 
     public void testHasDirectoryChangedSince() throws SCMException, ParseException
     {
         String module = "unit-test/CvsClientTest/testHasDirectoryChangedSince";
-        assertTrue(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-10"), module + "/dir"));
-        assertFalse(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-11"), module + "/dir"));
+        assertTrue(cvs.hasChangedSince(module + "/dir", null, DATE_FORMAT.parse("2006-03-10")));
+        assertFalse(cvs.hasChangedSince(module + "/dir", null, DATE_FORMAT.parse("2006-03-11")));
     }
 
     public void testHasFileChangedSince() throws SCMException, ParseException
     {
         String module = "unit-test/CvsClientTest/testHasFileChangedSince";
-        assertTrue(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-10"), module + "/file1.txt"));
-        assertFalse(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-11"), module + "/file1.txt"));
+        assertTrue(cvs.hasChangedSince(module + "/file1.txt", null, DATE_FORMAT.parse("2006-03-10")));
+        assertFalse(cvs.hasChangedSince(module + "/file1.txt", null, DATE_FORMAT.parse("2006-03-11")));
     }
 
     public void testHasModuleChangedSince() throws SCMException, ParseException
     {
         String module = "module2";
-
-        assertTrue(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-10"), module));
-        assertFalse(cvs.hasChangedSince(DATE_FORMAT.parse("2006-03-11"), module));
+        assertTrue(cvs.hasChangedSince(module, null, DATE_FORMAT.parse("2006-03-10")));
+        assertFalse(cvs.hasChangedSince(module, null, DATE_FORMAT.parse("2006-03-11")));
     }
 
     public void testFileLastChangedDate() throws SCMException, ParseException
     {
         String module = "unit-test/CvsClientTest/testFileLastChangedDate";
-        assertNull(cvs.getLastUpdate(DATE_FORMAT.parse("2006-03-12"), module + "/file1.txt"));
-        Date date = cvs.getLastUpdate(DATE_FORMAT.parse("2006-03-11"), module + "/file1.txt");
+        assertNull(cvs.getLastUpdate(module + "/file1.txt", null, DATE_FORMAT.parse("2006-03-12")));
+        Date date = cvs.getLastUpdate(module + "/file1.txt", null, DATE_FORMAT.parse("2006-03-11"));
         assertEquals("2006-03-11 02:00:00 GMT", CVSDATE.format(date));
     }
 
     public void testDirectoryLastChangedDate() throws SCMException, ParseException
     {
         String module = "unit-test/CvsClientTest/testDirectoryLastChangedDate";
-        assertNull(cvs.getLastUpdate(DATE_FORMAT.parse("2006-03-12"), module));
-        Date date = cvs.getLastUpdate(DATE_FORMAT.parse("2006-03-11"), module);
+        assertNull(cvs.getLastUpdate(module, null, DATE_FORMAT.parse("2006-03-12")));
+        Date date = cvs.getLastUpdate(module, null, DATE_FORMAT.parse("2006-03-11"));
         assertEquals("2006-03-11 02:30:04 GMT", CVSDATE.format(date));
     }
 

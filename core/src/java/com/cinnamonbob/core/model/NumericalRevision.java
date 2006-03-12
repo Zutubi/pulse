@@ -27,4 +27,9 @@ public class NumericalRevision extends Revision
             return -1;
         }
     }
+
+    public boolean isHead()
+    {
+        return false;
+    }
 }

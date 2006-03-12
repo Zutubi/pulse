@@ -20,10 +20,10 @@ public class CvsRevision extends Revision
 
     }
 
-    public CvsRevision(String author, String branch, String comment, Date date)
+    public CvsRevision(String author, String tag, String comment, Date date)
     {
         setAuthor(author);
-        setBranch(branch);
+        setBranch(tag);
         setComment(comment);
         setDate(date);
 
@@ -35,5 +35,10 @@ public class CvsRevision extends Revision
         buffer.append(":");
         buffer.append((date != null) ? DATE_FORMAT.format(date) : "");
         setRevisionString(buffer.toString());
+    }
+
+    public boolean isHead()
+    {
+        return getAuthor() == null && getBranch() == null && getComment() == null && getDate() == null;
     }
 }
