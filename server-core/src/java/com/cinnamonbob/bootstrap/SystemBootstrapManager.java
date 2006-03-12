@@ -5,9 +5,8 @@ import com.cinnamonbob.freemarker.CustomFreemarkerManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.FileHandler;
-import java.util.logging.Logger;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 /**
  * This manager handles the first stage of system startup.
@@ -53,7 +52,7 @@ public class SystemBootstrapManager
             File logRoot = systemPaths.getLogRoot();
             if (!logRoot.exists() && !logRoot.mkdirs())
             {
-                throw new IOException("Unable to create log directory '"+logRoot+"'. Please check that you have " +
+                throw new IOException("Unable to create log directory '" + logRoot + "'. Please check that you have " +
                         "permissions to create this directory.");
             }
             FileHandler handler = new FileHandler(logRoot.getAbsolutePath() + "/cinnabo%u.log");
@@ -66,6 +65,14 @@ public class SystemBootstrapManager
         }
 
         CustomFreemarkerManager.initialiseLogging();
+
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler()
+        {
+            public void uncaughtException(Thread t, Throwable e)
+            {
+                Logger.getLogger("").log(Level.SEVERE, "Uncaught exception: " + e.getMessage(), e);
+            }
+        });
 
         ((StartupManager) ComponentContext.getBean("startupManager")).init();
     }
