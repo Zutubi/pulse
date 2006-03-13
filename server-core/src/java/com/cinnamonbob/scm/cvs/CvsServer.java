@@ -77,7 +77,7 @@ public class CvsServer implements SCMServer
             String tag = revision.getBranch();
             Date date = revision.getDate();
 
-            internalCheckout(tmpDir, tag, date, file);
+            internalCheckout(file, tmpDir, tag, date);
 
             // read checked out file.
             InputStream in = null;
@@ -159,7 +159,7 @@ public class CvsServer implements SCMServer
         // to prevent problems with people checking in during the checkout.
         Date now = new Date(System.currentTimeMillis());
 
-        internalCheckout(checkoutDir, tag, now, cvsModule);
+        internalCheckout(cvsModule, checkoutDir, tag, now);
         return new CvsRevision(null, tag, null, now);
     }
 
@@ -186,7 +186,7 @@ public class CvsServer implements SCMServer
         {
             checkoutDate = new Date(System.currentTimeMillis());
         }
-        internalCheckout(checkoutDir, cvsRevision.getBranch(), checkoutDate, cvsModule);
+        internalCheckout(cvsModule, checkoutDir, cvsRevision.getBranch(), checkoutDate);
 
         return new CvsRevision(null, revision.getBranch(), null, checkoutDate);
     }
@@ -194,11 +194,12 @@ public class CvsServer implements SCMServer
     /**
      * Internal checkout method. This is where all the action is.
      *
+     * @param module
      * @param checkoutDir (required)
      * @param revision      (optional)
      * @param date        (optional)
      */
-    private void internalCheckout(File checkoutDir, String revision, Date date, String serverPath) throws IOException, SCMException
+    private void internalCheckout(String module, File checkoutDir, String revision, Date date) throws IOException, SCMException
     {
         if (checkoutDir == null)
         {
@@ -216,7 +217,7 @@ public class CvsServer implements SCMServer
         CvsClient client = new CvsClient(cvsRoot);
         client.setLocalPath(checkoutDir);
         client.setPassword(cvsPassword);
-        client.checkout(serverPath, revision, date);
+        client.checkout(module, revision, date);
     }
 
     public Revision getLatestRevision() throws SCMException
@@ -230,5 +231,12 @@ public class CvsServer implements SCMServer
 
         Date now = new Date(System.currentTimeMillis()); // this needs to be GMT 00.
         return new CvsRevision(null, null, null, now);
+    }
+
+    public Date getLatestUpdate(String revision, Date date) throws SCMException
+    {
+        CvsClient client = new CvsClient(cvsRoot);
+        client.setPassword(cvsPassword);
+        return client.getLastUpdate(cvsModule, revision, date);
     }
 }

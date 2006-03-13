@@ -1,15 +1,19 @@
 package com.cinnamonbob.scm;
 
 import com.cinnamonbob.core.model.Revision;
+import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.model.Scm;
 import com.cinnamonbob.model.ScmManager;
+import com.cinnamonbob.model.Cvs;
 import com.cinnamonbob.scheduling.Task;
 import com.cinnamonbob.scheduling.TaskExecutionContext;
 import com.cinnamonbob.util.logging.Logger;
+import com.cinnamonbob.scm.cvs.CvsServer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Date;
 
 /**
  * <class-comment/>
@@ -46,11 +50,28 @@ public class MonitorScms implements Task
                 }
 
                 Revision previous = latestRevisions.get(scm.getId());
+
+                // if scm is cvs, then we implement a quiet period.
                 if (server.hasChangedSince(previous))
                 {
-                    Revision latest = server.getLatestRevision();
-                    eventManager.publish(new SCMChangeEvent(scm, latest, previous));
-                    latestRevisions.put(scm.getId(), latest);
+                    if (scm instanceof Cvs)
+                    {
+                        Date latestUpdate = ((CvsServer)server).getLatestUpdate(null, previous.getDate());
+                        // if that update is more then the quiet period ago, then trigger an event.
+                        long now = System.currentTimeMillis();
+                        if (now - latestUpdate.getTime() > 5 * Constants.MINUTE)
+                        {
+                            Revision latest = server.getLatestRevision();
+                            eventManager.publish(new SCMChangeEvent(scm, latest, previous));
+                            latestRevisions.put(scm.getId(), latest);
+                        }
+                    }
+                    else
+                    {
+                        Revision latest = server.getLatestRevision();
+                        eventManager.publish(new SCMChangeEvent(scm, latest, previous));
+                        latestRevisions.put(scm.getId(), latest);
+                    }
                 }
             }
             catch (SCMException e)
@@ -60,11 +81,21 @@ public class MonitorScms implements Task
         }
     }
 
+    /**
+     * Required resource.
+     *
+     * @param scmManager
+     */
     public void setScmManager(ScmManager scmManager)
     {
         this.scmManager = scmManager;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param eventManager
+     */
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
