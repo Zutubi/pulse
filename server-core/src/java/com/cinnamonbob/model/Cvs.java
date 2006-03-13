@@ -26,6 +26,8 @@ public class Cvs extends Scm
      */
     private static final String MODULE = "cvs.module";
 
+    private static final String QUIET_PERIOD = "cvs.quiet";
+
     public SCMServer createServer() throws SCMException
     {
         return new CvsServer(getRoot(), getModule(), null);
@@ -74,5 +76,19 @@ public class Cvs extends Scm
     public void setPassword(String password)
     {
         getProperties().setProperty(PASS, password);
+    }
+
+    public long getQuietPeriod()
+    {
+        if (getProperties().containsKey(QUIET_PERIOD))
+        {
+            return Long.parseLong(getProperties().getProperty(QUIET_PERIOD));
+        }
+        return 0;
+    }
+
+    public void setQuietPeriod(long milliseconds)
+    {
+        getProperties().setProperty(QUIET_PERIOD, Long.toString(milliseconds));
     }
 }

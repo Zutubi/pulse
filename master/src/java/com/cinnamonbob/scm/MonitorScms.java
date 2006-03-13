@@ -59,7 +59,7 @@ public class MonitorScms implements Task
                         Date latestUpdate = ((CvsServer)server).getLatestUpdate(null, previous.getDate());
                         // if that update is more then the quiet period ago, then trigger an event.
                         long now = System.currentTimeMillis();
-                        if (now - latestUpdate.getTime() > 5 * Constants.MINUTE)
+                        if (now - latestUpdate.getTime() > ((Cvs)scm).getQuietPeriod())
                         {
                             Revision latest = server.getLatestRevision();
                             eventManager.publish(new SCMChangeEvent(scm, latest, previous));

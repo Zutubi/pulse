@@ -19,7 +19,13 @@
     #wwtextfield("name=cvs.path" "label=%{getText('scm.path')}" "size=60" "tabindex=4")
     #inlineHelp("scm.path.help")
 
-    #saveCancel(5)
+    #wwtextfield("name=quiet" "label=%{getText('cvs.quiet')}" "template=controlheader")
+    #wwtextfield("theme=simple" "template=ctext" "name=minutes" "label=%{getText('unit.minutes')}" "size=5" "tabindex=5")
+    #wwtextfield("theme=simple" "template=ctext" "name=seconds" "label=%{getText('unit.seconds')}" "size=5" "tabindex=6")
+    #wwtextfield("name=quiet" "template=controlfooter")
+    #inlineHelp("cvs.quiet.help")
+
+    #saveCancel(7)
  #end
 </body>
 </html>
