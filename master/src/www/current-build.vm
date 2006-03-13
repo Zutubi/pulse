@@ -8,7 +8,6 @@
     <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
 
     #projectTabs("current-build")
-
 #if($currentBuild)
     #showBuild($currentBuild true)
 #else

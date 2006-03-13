@@ -141,6 +141,14 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="browseProjectDir" class="com.cinnamonbob.web.project.BrowseProjectDir">
+            <result name="dir" type="velocity">browse-project-dir.vm</result>
+            <result name="file" type="stream">
+                <param name="contentType">${contentType}</param>
+            </result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="index!default" class="com.cinnamonbob.web.ActionSupport">
             <result name="success" type="velocity">index.vm</result>
         </action>

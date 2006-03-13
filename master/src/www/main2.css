@@ -258,7 +258,8 @@ table.fill-content {
     width: 100%;
 }
 
-h3.heading, div.box, th.heading, th.content, th.content-row, td.content, td.content-centre, td.success, td.failure, td.error, td.pending, td.inprogress, td.terminating, td.add {
+
+h3.heading, div.box, th.heading, th.content, th.content-row, td.content, td.content-centre, td.content-right, td.image, td.success, td.failure, td.error, td.pending, td.inprogress, td.terminating, td.add {
     border: 1px solid #bbb;
     padding: 4px;
 }
@@ -269,6 +270,10 @@ th.heading, th.content, th.content-row, td.content, td.success, td.failure, td.e
 
 td.content-centre {
     text-align: center;
+}
+
+td.content-right {
+    text-align: right;
 }
 
 a img {
@@ -307,6 +312,11 @@ td.terminating {
 
 td.add {
     text-align: right;
+}
+
+td.image {
+    width: 20px;
+    text-align: center;
 }
 
 span.action {
