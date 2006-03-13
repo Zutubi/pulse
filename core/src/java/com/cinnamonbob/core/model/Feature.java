@@ -86,4 +86,9 @@ public class Feature extends Entity
     {
         this.summary = summary;
     }
+
+    public boolean isPlain()
+    {
+        return false;
+    }
 }

@@ -64,6 +64,11 @@ public class ViewArtifactAction extends ProjectActionSupport
         return buildResult;
     }
 
+    public CommandResult getCommandResult()
+    {
+        return commandResult;
+    }
+
     public StoredFileArtifact getArtifact()
     {
         return artifact;
@@ -121,7 +126,7 @@ public class ViewArtifactAction extends ProjectActionSupport
             addActionError("Unknown command result [" + commandId + "]");
         }
 
-        artifact = getBuildManager().getArtifact(id).getFile();
+        artifact = getBuildManager().getFileArtifact(id);
         if (artifact == null)
         {
             addActionError("Unknown artifact [" + id + "]");

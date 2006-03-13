@@ -26,6 +26,8 @@ public interface BuildManager
 
     StoredArtifact getArtifact(long id);
 
+    StoredFileArtifact getFileArtifact(long id);
+
     List<BuildResult> getLatestBuildResultsForProject(Project project, int max);
 
     /**

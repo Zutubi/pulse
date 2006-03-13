@@ -26,9 +26,14 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
 
     public <U extends T> U findByIdAndType(long id, Class<U> type)
     {
+        return (U)findAnyType(id, type);
+    }
+
+    public Object findAnyType(long id, Class type)
+    {
         try
         {
-            return (U) getHibernateTemplate().load(type, Long.valueOf(id));
+            return getHibernateTemplate().load(type, Long.valueOf(id));
         }
         catch (ObjectNotFoundException e)
         {

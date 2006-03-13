@@ -5,7 +5,18 @@
     <title>#wwtext("name=artifact") $!webwork.htmlEncode($artifact.path)</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=artifact") $!webwork.htmlEncode($artifact.path) ::</h1>
+    <h1>:: #wwtext("name=decorated.artifact") ::</h1>
+
+#if($artifact.hasFeatures())
+    <table class="decorated">
+        #headingRow("decorated.features" 1)
+        <tr>
+            <td class="content">
+                #fileArtifactFeatures($buildResult $commandResult $artifact)
+            </td>
+        </tr>
+    </table>
+#end
 
     <table class="decorated">
         <tr><th class="heading" colspan="2">$!webwork.htmlEncode($artifact.path)</th></tr>

@@ -692,14 +692,21 @@
 ##
 ## Summarises the messages of a given level on a file artifact
 ##
-#macro(fileArtifactMessageSummary $fileArtifact $level $showHeader)
+#macro(fileArtifactMessageSummary $build $command $fileArtifact $level $showHeader)
     #if($fileArtifact.hasMessages($level))
         #if($showHeader)
     <li class="header">#wwtext("name=artifact"): $!webwork.htmlEncode("$fileArtifact.path")
         #end
         <ul>
         #foreach($feature in $artifact.getFeatures($level))
-            <li class="$level.toString().toLowerCase()">$!webwork.htmlEncode($feature.summary)</li>
+            <li class="$level.toString().toLowerCase()">
+                <pre class="feature">$!webwork.htmlEncode($feature.summary)</pre>
+            #if($feature.isPlain())
+                <a class="unadorned" href="viewArtifact.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id#$feature.firstLine">
+                    <span class="small">#wwtext("name=jump.to")</span> <img src="/images/go_small.gif"/>
+                </a>
+            #end
+            </li>
         #end
         </ul>
         #if($showHeader)
@@ -711,10 +718,10 @@
 ##
 ## Summarises the messages of a given level on an artifact into a nested list
 ##
-#macro(artifactMessageSummary $artifact $level $showHeader)
+#macro(artifactMessageSummary $build $command $artifact $level $showHeader)
     #if($artifact.hasMessages($level))
         #foreach($fileArtifact in $artifact.children)
-            #fileArtifactMessageSummary($fileArtifact $level $showHeader)
+            #fileArtifactMessageSummary($build $command $fileArtifact $level $showHeader)
         #end
     #end
 #end
@@ -722,14 +729,14 @@
 ##
 ## Summarises the messages of a given level on a command result into a nested list
 ##
-#macro(commandMessageSummary $commandResult $level)
+#macro(commandMessageSummary $build $commandResult $level)
     #if($commandResult.hasMessages($level))
         #resultMessageItems($commandResult $level)
         #foreach($artifact in $commandResult.getArtifacts())
 ##            #if($artifact.hasMessages($level))
 ##                <li class="header">#wwtext("name=artifact"): $!webwork.htmlEncode("$artifact.name")
 ##                    <ul>
-                    #artifactMessageSummary($artifact $level true)
+                    #artifactMessageSummary($build $commandResult $artifact $level true)
 ##                    </ul>
 ##                </li>
 ##            #end
@@ -740,7 +747,7 @@
 ##
 ## Summarises the messages of a given level on a recipe result into a nested list
 ##
-#macro(recipeMessageSummary $recipeResult $level $top)
+#macro(recipeMessageSummary $build $recipeResult $level $top)
     #if($recipeResult.hasMessages($level))
         #if($top)
             <h4>#wwtext("name=${level.toString().toLowerCase()}.messages")</h4>
@@ -752,7 +759,7 @@
             #if($commandResult.hasMessages($level))
                 <li class="header">#wwtext("name=command"): $!webwork.htmlEncode("$commandResult.commandName")
                     <ul>
-                    #commandMessageSummary($commandResult $level)
+                    #commandMessageSummary($build $commandResult $level)
                     </ul>
                 </li>
             #end
@@ -767,13 +774,13 @@
 ##
 ## Summarises the messages of a given level on a recipe result node into a nested list
 ##
-#macro(nodeMessageSummary $node $level)
+#macro(nodeMessageSummary $build $node $level)
     #if($node.hasMessages($level))
         <li class="header">#wwtext("name=recipe"): $!webwork.htmlEncode("$node.result.recipeNameSafe @ $node.hostSafe")
             <ul>
-            #recipeMessageSummary($node.result $level false)
+            #recipeMessageSummary($build $node.result $level false)
             #foreach($child in $node.children)
-                #nodeMessageSummary($child $level)
+                #nodeMessageSummary($build $child $level)
             #end
             </ul>
         </li>
@@ -789,9 +796,23 @@
         <ul class="$level.toString().toLowerCase()">
         #resultMessageItems($buildResult $level)
         #foreach($node in $buildResult.root.children)
-            #nodeMessageSummary($node $level)
+            #nodeMessageSummary($buildResult $node $level)
         #end
         </ul>
+    #end
+#end
+
+##
+## Shows features of all levels for the given artifact
+##
+#macro(fileArtifactFeatures $build $result $fileArtifact)
+    #foreach($level in $featureLevels)
+        #if($fileArtifact.hasMessages($level))
+    <ul class="$level.toString().toLowerCase()">
+        <li class="header">$level.toString().toLowerCase() #wwtext("name=features")</li>
+        #fileArtifactMessageSummary($build $result $fileArtifact $level false)
+    </ul>
+        #end
     #end
 #end
 
@@ -804,20 +825,13 @@
     #if($showArtifactLink)
         <a href="/view/$result.id/$artifact.id/$fileArtifact.path">$trimmedPath</a>
         #if($fileArtifact.canDecorate())
-            [<a href="viewArtifact.action?id=$artifact.id&amp;buildId=$build.id&amp;commandId=$result.id">decorated</a>]
+            [<a href="viewArtifact.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$result.id">decorated</a>]
         #end
     #else
         $trimmedPath
     #end
     #if($showFeatures)
-        #foreach($level in $featureLevels)
-            #if($fileArtifact.hasMessages($level))
-    <ul class="$level.toString().toLowerCase()">
-        <li class="header">$level.toString().toLowerCase() #wwtext("name=features")</li>
-        #fileArtifactMessageSummary($fileArtifact $level false)
-    </ul>
-            #end
-        #end
+        #fileArtifactFeatures($build $result $fileArtifact)
     #end
     </li>
 #end

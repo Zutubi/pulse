@@ -5,9 +5,7 @@ import com.cinnamonbob.bootstrap.DatabaseBootstrap;
 import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.model.persistence.ArtifactDao;
-import com.cinnamonbob.model.persistence.BuildResultDao;
-import com.cinnamonbob.model.persistence.ChangelistDao;
+import com.cinnamonbob.model.persistence.*;
 import com.cinnamonbob.scheduling.Scheduler;
 import com.cinnamonbob.scheduling.SchedulingException;
 import com.cinnamonbob.scheduling.SimpleTrigger;
@@ -30,6 +28,7 @@ public class DefaultBuildManager implements BuildManager
     private DatabaseBootstrap databaseBootstrap;
     private BuildResultDao buildResultDao;
     private ArtifactDao artifactDao;
+    private FileArtifactDao fileArtifactDao;
     private ChangelistDao changelistDao;
     private ProjectManager projectManager;
     private Scheduler scheduler;
@@ -163,6 +162,11 @@ public class DefaultBuildManager implements BuildManager
         return artifactDao.findById(id);
     }
 
+    public StoredFileArtifact getFileArtifact(long id)
+    {
+        return fileArtifactDao.findById(id);
+    }
+
     public long getNextBuildNumber(Project project)
     {
         long number = 1;
@@ -284,5 +288,10 @@ public class DefaultBuildManager implements BuildManager
     public void setDatabaseBootstrap(DatabaseBootstrap databaseBootstrap)
     {
         this.databaseBootstrap = databaseBootstrap;
+    }
+
+    public void setFileArtifactDao(FileArtifactDao fileArtifactDao)
+    {
+        this.fileArtifactDao = fileArtifactDao;
     }
 }

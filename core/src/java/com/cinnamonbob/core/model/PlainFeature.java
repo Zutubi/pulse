@@ -76,4 +76,9 @@ public class PlainFeature extends Feature
     {
         lineNumber = line;
     }
+
+    public boolean isPlain()
+    {
+        return true;
+    }
 }

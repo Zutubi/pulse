@@ -65,6 +65,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public StoredFileArtifact getFileArtifact(long id)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public List<BuildResult> getLatestBuildResultsForProject(Project project, int max)
     {
         throw new RuntimeException("Method not implemented.");

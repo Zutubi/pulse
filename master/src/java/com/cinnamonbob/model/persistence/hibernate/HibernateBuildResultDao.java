@@ -142,17 +142,17 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public CommandResult findCommandResult(long id)
     {
-        return (CommandResult) getHibernateTemplate().load(CommandResult.class, Long.valueOf(id));
+        return (CommandResult) findAnyType(id, CommandResult.class);
     }
 
     public RecipeResultNode findRecipeResultNode(long id)
     {
-        return (RecipeResultNode) getHibernateTemplate().load(RecipeResultNode.class, Long.valueOf(id));
+        return (RecipeResultNode) findAnyType(id, RecipeResultNode.class);
     }
 
     public RecipeResult findRecipeResult(long id)
     {
-        return (RecipeResult) getHibernateTemplate().load(RecipeResult.class, Long.valueOf(id));
+        return (RecipeResult) findAnyType(id, RecipeResult.class);
     }
 
     public int getBuildCount(final Project project, final ResultState[] states, final String spec)
