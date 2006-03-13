@@ -24,13 +24,15 @@ public class CvsServer implements SCMServer
 {
     private String cvsRoot;
     private String cvsModule;
+    private String cvsPassword;
 
     private static final Logger LOG = Logger.getLogger(CvsServer.class);
 
-    public CvsServer(String root, String module)
+    public CvsServer(String root, String module, String password)
     {
         this.cvsRoot = root;
         this.cvsModule = module;
+        this.cvsPassword = password;
     }
 
     public String getLocation()
@@ -114,6 +116,8 @@ public class CvsServer implements SCMServer
         // differences across multiple branches/revisions. For practical reasons, we do not need to...
 
         CvsClient client = new CvsClient(cvsRoot);
+        client.setPassword(cvsPassword);
+//        client.;
 
         // paths...??
 
@@ -136,6 +140,7 @@ public class CvsServer implements SCMServer
         }
 
         CvsClient client = new CvsClient(cvsRoot);
+        client.setPassword(cvsPassword);
         return client.hasChangedSince(cvsModule, since.getBranch(), since.getDate());
     }
 
@@ -210,6 +215,7 @@ public class CvsServer implements SCMServer
 
         CvsClient client = new CvsClient(cvsRoot);
         client.setLocalPath(checkoutDir);
+        client.setPassword(cvsPassword);
         client.checkout(serverPath, revision, date);
     }
 

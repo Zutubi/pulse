@@ -57,6 +57,8 @@ public class CvsClient
      */
     private File localPath;
 
+    private String password;
+
     /**
      * @param cvsRoot
      * @throws IllegalArgumentException if the cvsRoot parameter is invalid.
@@ -86,6 +88,11 @@ public class CvsClient
     public void setLocalPath(File path)
     {
         this.localPath = path;
+    }
+
+    public void setPassword(String password)
+    {
+        this.password = password;
     }
 
     /**
@@ -120,7 +127,7 @@ public class CvsClient
             GlobalOptions globalOptions = new GlobalOptions();
             globalOptions.setCVSRoot(root.toString());
 
-            connection = ConnectionFactory.getConnection(root);
+            connection = ConnectionFactory.getConnection(root, password);
             connection.open();
 
             Client client = new Client(connection, new StandardAdminHandler());
@@ -244,7 +251,7 @@ public class CvsClient
             GlobalOptions globalOptions = new GlobalOptions();
             globalOptions.setCVSRoot(root.toString());
 
-            connection = ConnectionFactory.getConnection(root);
+            connection = ConnectionFactory.getConnection(root, password);
             connection.open();
 
             Client client = new Client(connection, new StandardAdminHandler());
@@ -412,7 +419,7 @@ public class CvsClient
             GlobalOptions globalOptions = new GlobalOptions();
             globalOptions.setCVSRoot(root.toString());
 
-            connection = ConnectionFactory.getConnection(root);
+            connection = ConnectionFactory.getConnection(root, password);
             connection.open();
 
             final List<LogInformation> rlogResponse = new LinkedList<LogInformation>();

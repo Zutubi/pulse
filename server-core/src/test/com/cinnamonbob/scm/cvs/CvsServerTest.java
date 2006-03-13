@@ -59,7 +59,7 @@ public class CvsServerTest extends BobTestCase
     public void testCheckoutRevisionOfFile() throws SCMException, ParseException
     {
         String module = "unit-test/CvsServerTest/testCheckoutRevisionOfFile";
-        CvsServer cvsServer = new CvsServer(cvsRoot, module);
+        CvsServer cvsServer = new CvsServer(cvsRoot, module, null);
 
         CvsRevision byHead = CvsRevision.HEAD;
         assertEquals("file1.txt latests contents", cvsServer.checkout(byHead, module + "/file1.txt").trim());
@@ -78,7 +78,7 @@ public class CvsServerTest extends BobTestCase
     public void testCheckout() throws SCMException, IOException, ParseException
     {
         String module = "unit-test/CvsServerTest/testCheckout";
-        CvsServer cvsServer = new CvsServer(cvsRoot, module);
+        CvsServer cvsServer = new CvsServer(cvsRoot, module, null);
 
         Date before = new Date();
         CvsRevision checkedOutRevision = (CvsRevision) cvsServer.checkout(workdir, CvsRevision.HEAD);

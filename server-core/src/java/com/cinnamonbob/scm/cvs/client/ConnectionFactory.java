@@ -4,6 +4,7 @@ import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.connection.Connection;
 import org.netbeans.lib.cvsclient.connection.LocalConnection;
 import org.netbeans.lib.cvsclient.connection.PServerConnection;
+import com.opensymphony.util.TextUtils;
 
 /**
  * 
@@ -11,24 +12,17 @@ import org.netbeans.lib.cvsclient.connection.PServerConnection;
  */
 public class ConnectionFactory
 {
-    public static Connection getConnection(String cvsRoot)
-    {
-        CVSRoot root = CVSRoot.parse(cvsRoot);
-        return getConnection(root);
-    }
-
-    public static Connection getConnection(CVSRoot cvsRoot)
+    public static Connection getConnection(CVSRoot cvsRoot, String password)
     {
         String method = cvsRoot.getMethod();
         if (CVSRoot.METHOD_EXT.equals(method))
         {
-            //TODO: need to support .cvspasswd file authentication
-            if (cvsRoot.getUserName() == null || cvsRoot.getPassword() == null)
+            SshConnection sshConnection = new SshConnection(cvsRoot);
+            if (TextUtils.stringSet(password))
             {
-                throw new IllegalArgumentException("Authentication details " +
-                        "required in the cvsroot to construct SSH connection.");
+                sshConnection.setPassword(password);
             }
-            return new SshConnection(cvsRoot);
+            return sshConnection;
         }
         else if (CVSRoot.METHOD_PSERVER.equals(method))
         {
