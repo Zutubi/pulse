@@ -57,7 +57,7 @@ public class EditCvsAction extends AbstractEditScmAction implements Preparable
             {
                 if (Integer.parseInt(minutes) < 0)
                 {
-                    addFieldError("quiet", "minutes.invalid.negative");
+                    addFieldError("quiet", "unit.invalid.negative");
                     return;
                 }
             }
@@ -67,13 +67,13 @@ public class EditCvsAction extends AbstractEditScmAction implements Preparable
             {
                 if (Integer.parseInt(seconds) < 0)
                 {
-                    addFieldError("quiet", "seconds.invalid.negative");
+                    addFieldError("quiet", "unit.invalid.negative");
                 }
             }
         }
         catch (NumberFormatException nfe)
         {
-            addFieldError("quiet", "invalid.nan");
+            addFieldError("quiet", "unit.invalid.nan");
         }
     }
 
