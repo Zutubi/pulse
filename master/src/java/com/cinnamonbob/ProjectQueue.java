@@ -16,6 +16,12 @@ import java.util.Map;
  */
 public class ProjectQueue
 {
+    /**
+     * Map from project to queued requests for that project.  The first item
+     * in the list is the executing build for the project.  Behind that are
+     * queued requests for the project, at most one for each build
+     * specification defined.
+     */
     private Map<Project, List<BuildRequestEvent>> requests;
 
     public ProjectQueue()
@@ -95,5 +101,17 @@ public class ProjectQueue
         {
             return null;
         }
+    }
+
+    public Map<Project, List<BuildRequestEvent>> takeSnapshot()
+    {
+        Map<Project, List<BuildRequestEvent>> queue = new HashMap<Project, List<BuildRequestEvent>>();
+        for (Map.Entry<Project, List<BuildRequestEvent>> entry : requests.entrySet())
+        {
+            List<BuildRequestEvent> events = new LinkedList<BuildRequestEvent>(entry.getValue());
+            queue.put(entry.getKey(), events);
+        }
+
+        return queue;
     }
 }

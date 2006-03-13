@@ -195,7 +195,7 @@
 ##
 #macro(serverTabs $selected)
     #openTabs()
-        #serverTab("recipe-queue" "viewRecipeQueue" $selected)
+        #serverTab("status" "viewRecipeQueue" $selected)
         #serverTab("resources" "viewResources" $selected)
         #serverTab("server-info" "viewSystemInfo" $selected)
     #closeTabs()

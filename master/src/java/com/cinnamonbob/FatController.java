@@ -19,6 +19,8 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -215,6 +217,19 @@ public class FatController implements EventListener, Stoppable
     public Class[] getHandledEvents()
     {
         return new Class[]{BuildRequestEvent.class, BuildCompletedEvent.class, BuildTimeoutEvent.class};
+    }
+
+    public Map<Project, List<BuildRequestEvent>> snapshotProjectQueue()
+    {
+        lock.lock();
+        try
+        {
+            return projectQueue.takeSnapshot();
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     public void setBuildManager(BuildManager buildManager)
