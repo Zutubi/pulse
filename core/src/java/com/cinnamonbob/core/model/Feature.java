@@ -10,12 +10,22 @@ public class Feature extends Entity
                     {
                         return "error";
                     }
+
+                    public boolean isGreaterThan(Level level)
+                    {
+                        return level != ERROR;
+                    }
                 },
         INFO
                 {
                     public String getPrettyString()
                     {
                         return "info";
+                    }
+
+                    public boolean isGreaterThan(Level level)
+                    {
+                        return false;
                     }
                 },
         WARNING
@@ -24,8 +34,15 @@ public class Feature extends Entity
                     {
                         return "warning";
                     }
-                }
 
+                    public boolean isGreaterThan(Level level)
+                    {
+                        return level == INFO;
+                    }
+                };
+
+
+        public abstract boolean isGreaterThan(Level level);
     }
 
     private Level level;

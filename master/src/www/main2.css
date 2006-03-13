@@ -241,10 +241,13 @@ td.columns {
     padding-right: 10px;
 }
 
-table.content, table.fill-content {
+table.content, table.fill-content, table.decorated {
     border: 1px solid #bbb;
-    font-size: 80%;
     margin-bottom: 16px;
+}
+
+table.content, table.fill-content {
+    font-size: 80%;
 }
 
 table.fill-content {
@@ -322,7 +325,7 @@ div.box {
 }
 
     /*------------------------------
-    Feature lists
+    Artifact/feature lists
     */
 
 ul {
@@ -406,3 +409,39 @@ li.header {
     margin-top: 4px;
     margin-bottom: 4px;
 }
+
+    /*------------------------------
+    Decorated artifacts
+    */
+
+a.dec {
+    color: #000000;
+    font-weight: normal;
+    border: none;
+}
+
+td.num-none, td.num-error, td.num-warning, td.num-info, td.dec-none, td.dec-error, td.dec-warning, td.dec-info {
+    font-family: monospace;
+    white-space: nowrap;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+td.num-none, td.num-error, td.num-warning, td.num-info {
+    text-align: right;
+    vertical-align: top;
+    border-right: solid 1px #bbb;
+}
+
+td.dec-error, td.num-error {
+    background-color: #ffdddd;
+}
+
+td.dec-warning, td.num-warning {
+    background-color: #fcfcce;
+}
+
+td.dec-info, td.num-info {
+    background-color: #eeeeff;
+}
+

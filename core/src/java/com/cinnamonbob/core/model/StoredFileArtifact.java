@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.net.URLConnection;
 
 public class StoredFileArtifact extends Entity
 {
@@ -101,4 +102,32 @@ public class StoredFileArtifact extends Entity
         this.features = features;
     }
 
+    public boolean canDecorate()
+    {
+        String mimeType;
+
+        if(type == null)
+        {
+            mimeType = URLConnection.guessContentTypeFromName(path);
+        }
+        else
+        {
+            mimeType = type;
+        }
+
+        if(mimeType.equals(TYPE_PLAIN))
+        {
+            return true;
+        }
+
+        for(Feature f: features)
+        {
+            if(f instanceof PlainFeature)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

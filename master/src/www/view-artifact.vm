@@ -1,0 +1,26 @@
+#authorisationTags($principle)
+#buildTags($buildResult.project $buildResult)
+<html>
+<head>
+    <title>#wwtext("name=artifact") $!webwork.htmlEncode($artifact.path)</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=artifact") $!webwork.htmlEncode($artifact.path) ::</h1>
+
+    <table class="decorated">
+        <tr><th class="heading" colspan="2">$!webwork.htmlEncode($artifact.path)</th></tr>
+
+    ## WARNING: this iterator cannot be resued!
+    #foreach($line in $readerIterator)
+        #if($action.notNull($action.getLineLevel($velocityCount)))
+            #set($lineClass = $action.getLineLevel($velocityCount).toString().toLowerCase())
+        #else
+            #set($lineClass = "none")
+        #end
+        <tr>
+            <td class="num-$lineClass"><a href="#$velocityCount" name="$velocityCount">$velocityCount</a></td>
+            <td class="dec-$lineClass">$line</td>
+        </tr>
+    #end
+    </table>
+</html>

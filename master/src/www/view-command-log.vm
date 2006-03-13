@@ -70,7 +70,7 @@
 
         #if($commandResult.hasArtifacts())
     <h3>#wwtext("name=command.artifacts")</h3>
-    #commandArtifacts($commandResult true $recipeResult.completed())
+    #commandArtifacts($result $commandResult true $recipeResult.completed())
         #end
     #end
 #else

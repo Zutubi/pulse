@@ -237,7 +237,7 @@ public abstract class BobTestCase extends TestCase
         return getClass().getResource(getClass().getSimpleName() + "." + testName + ".xml");
     }
 
-    protected File getBobRoot()
+    public static File getBobRoot()
     {
         // First, take a guess at the working directory (which is likely to
         // work if we are running tests using Ant)

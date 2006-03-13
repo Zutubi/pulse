@@ -798,12 +798,14 @@
 ##
 ## Shows an artifact that is a single file
 ##
-#macro(commandFileArtifact $artifact $fileArtifact $result $showFeatures $showArtifactLink)
+#macro(commandFileArtifact $artifact $fileArtifact $build $result $showFeatures $showArtifactLink)
     <li class="file-artifact">
     #set($trimmedPath = $artifact.trimmedPath($fileArtifact))
     #if($showArtifactLink)
-##        <a href="viewArtifact.action?id=$artifact.id&amp;commandId=$result.id">$trimmedPath</a>
         <a href="/view/$result.id/$artifact.id/$fileArtifact.path">$trimmedPath</a>
+        #if($fileArtifact.canDecorate())
+            [<a href="viewArtifact.action?id=$artifact.id&amp;buildId=$build.id&amp;commandId=$result.id">decorated</a>]
+        #end
     #else
         $trimmedPath
     #end
@@ -823,7 +825,7 @@
 ##
 ## Shows an artifact that is multi file, and possibly too many to display
 ##
-#macro(commandMultiArtifact $artifact $result $showFeatures $showArtifactLink)
+#macro(commandMultiArtifact $artifact $build $result $showFeatures $showArtifactLink)
     #set($hasIndex = $artifact.hasIndexFile())
     #if($hasIndex)
         #set($artClass = "report-artifact")
@@ -840,7 +842,7 @@
     #else
         <ul>
         #foreach($fileArtifact in $artifact.children)
-            #commandFileArtifact($artifact $fileArtifact $result $showFeatures $showArtifactLink)
+            #commandFileArtifact($artifact $fileArtifact $build $result $showFeatures $showArtifactLink)
         #end
         </ul>
     #end
@@ -850,10 +852,10 @@
 ##
 ## Shows a list of artifacts for a command
 ##
-#macro(commandArtifacts $result $showFeatures $showArtifactLink)
+#macro(commandArtifacts $build $result $showFeatures $showArtifactLink)
     <ul class="artifact">
     #foreach($artifact in $result.artifacts)
-        #commandMultiArtifact($artifact $result $showFeatures $showArtifactLink)
+        #commandMultiArtifact($artifact $build $result $showFeatures $showArtifactLink)
     #end
     </ul>
 #end
@@ -861,7 +863,7 @@
 ##
 ## Shows a nested list of artifacts for each command in a recipe
 ##
-#macro(recipeArtifacts $result $top)
+#macro(recipeArtifacts $build $result $top)
     #if($result.hasArtifacts())
         #if($top)
     <ul class="artifact">
@@ -869,7 +871,7 @@
         #foreach($commandResult in $result.commandResults)
             #if($commandResult.hasArtifacts())
         <li class="artifact">#wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)
-            #commandArtifacts($commandResult false $result.completed())
+            #commandArtifacts($build $commandResult false $result.completed())
         </li>
             #end
         #end
@@ -886,13 +888,13 @@
 ##
 ## Shows a nested list of artifacts for a recipe result node
 ##
-#macro(recipeNodeArtifacts $node)
+#macro(recipeNodeArtifacts $build $node)
     #if($node.hasArtifacts())
         <li class="artifact">#wwtext("name=recipe") :: $!webwork.htmlEncode($node.result.recipeNameSafe)
             <ul class="artifact">
-            #recipeArtifacts($node.result false)
+            #recipeArtifacts($build $node.result false)
             #foreach($child in $node.children)
-                #recipeNodeArtifacts($child)
+                #recipeNodeArtifacts($build $child)
             #end
             </ul>
         </li>
@@ -907,7 +909,7 @@
     #if($result.hasArtifacts())
     <ul class="artifact">
         #foreach($node in $result.root.children)
-            #recipeNodeArtifacts($node)
+            #recipeNodeArtifacts($result $node)
         #end
     </ul>
     #else

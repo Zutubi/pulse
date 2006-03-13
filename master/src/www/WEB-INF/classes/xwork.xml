@@ -137,9 +137,7 @@
         </action>
 
         <action name="viewArtifact" class="com.cinnamonbob.web.project.ViewArtifactAction">
-            <result name="success" type="stream">
-                <param name="contentType">${contentType}</param>
-            </result>
+            <result name="success" type="velocity">view-artifact.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 

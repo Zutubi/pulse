@@ -5,14 +5,14 @@ import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.core.RecipeProcessor;
 import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 import com.cinnamonbob.model.persistence.ProjectDao;
 import com.cinnamonbob.model.persistence.SlaveDao;
 import com.cinnamonbob.model.persistence.UserDao;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -467,7 +467,7 @@ public class SetupDummyBuilds implements Runnable
         result.getProperties().put("exit code", "0");
         result.addArtifact(createInfoArtifact("command output", "output.txt"));
         result.addArtifact(createWarningArtifact("warnings here", "this/file/is/nested/several/dirs/down"));
-        result.addArtifact(createErrorArtifact("errors be here", "this/file/is/nested/several/dirs/down"));
+        result.addArtifact(createErrorArtifact(outputDir, "errors be here", "errors.txt"));
         result.addArtifact(createSimpleArtifact("junit report", "tests/junit.html"));
         result.addArtifact(createMultifileArtifact(outputDir, "multi ball"));
         result.complete();
@@ -502,12 +502,54 @@ public class SetupDummyBuilds implements Runnable
         return artifact;
     }
 
-    private StoredArtifact createErrorArtifact(String name, String filename)
+    private StoredArtifact createErrorArtifact(File outputDir, String name, String filename)
     {
         StoredArtifact artifact = createSimpleArtifact(name, filename);
         StoredFileArtifact file = artifact.getFile();
-        addErrorFeatures(file);
+        File dir = new File(outputDir, name);
+        dir.mkdirs();
+
+        try
+        {
+            File root = BobTestCase.getBobRoot();
+            File dummy = new File(root, FileSystemUtils.composeFilename("master", "src", "test", "com", "cinnamonbob", "test", "dummyArtifactFile.txt"));
+            File artifactFile = new File(dir, filename);
+            IOUtils.copyFile(dummy, artifactFile);
+            findFeatures(file, artifactFile);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
         return artifact;
+    }
+
+    private void findFeatures(StoredFileArtifact artifact, File file) throws IOException
+    {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        String line;
+        int i = 1;
+
+        while((line = br.readLine()) != null)
+        {
+            if(line.contains("error"))
+            {
+                artifact.addFeature(new PlainFeature(Feature.Level.ERROR, line, i));
+            }
+
+            if(line.contains("warning"))
+            {
+                artifact.addFeature(new PlainFeature(Feature.Level.WARNING, line, i - 1, i + 1, i));
+            }
+
+            if(line.contains("info"))
+            {
+                artifact.addFeature(new PlainFeature(Feature.Level.INFO, line.substring(4), i));
+            }
+
+            i++;
+        }
     }
 
     private void addErrorFeatures(StoredFileArtifact file)

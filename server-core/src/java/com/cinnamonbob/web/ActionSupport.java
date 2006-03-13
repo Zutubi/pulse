@@ -83,4 +83,9 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     {
         return textProvider.getTexts(aBundleName);
     }
+
+    public boolean notNull(Object object)
+    {
+        return object != null;
+    }
 }
