@@ -14,4 +14,5 @@ public interface ResourceRepository
 
     List<String> getResourceNames();
 
+    void addResource(Resource resource);
 }

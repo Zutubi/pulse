@@ -13,7 +13,6 @@ import java.io.File;
 public class ResourceDiscoverer implements Runnable
 {
     private ResourceRepository resourceRepository;
-    private ResourceDao resourceDao;
 
     public void run()
     {
@@ -53,7 +52,7 @@ public class ResourceDiscoverer implements Runnable
                     antResource.addProperty(new Property("ant.lib.dir", antLib.getAbsolutePath()));
                 }
 
-                resourceDao.save(antResource);
+                resourceRepository.addResource(antResource);
             }
         }
     }
@@ -67,7 +66,7 @@ public class ResourceDiscoverer implements Runnable
             {
                 Resource makeResource = new Resource("make");
                 makeResource.addProperty(new Property("make.bin", makeBin.getAbsolutePath()));
-                resourceDao.save(makeResource);
+                resourceRepository.addResource(makeResource);
             }
         }
     }
@@ -100,17 +99,12 @@ public class ResourceDiscoverer implements Runnable
         if (javaBin.isFile())
         {
             javaResource.addProperty(new Property("java.bin", javaBin.getAbsolutePath()));
-            resourceDao.save(javaResource);
+            resourceRepository.addResource(javaResource);
         }
     }
 
     public void setResourceRepository(ResourceRepository resourceRepository)
     {
         this.resourceRepository = resourceRepository;
-    }
-
-    public void setResourceDao(ResourceDao resourceDao)
-    {
-        this.resourceDao = resourceDao;
     }
 }

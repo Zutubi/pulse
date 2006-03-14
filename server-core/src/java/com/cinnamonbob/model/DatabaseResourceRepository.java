@@ -66,4 +66,8 @@ public class DatabaseResourceRepository implements ResourceRepository
         this.resourceDao = resourceDao;
     }
 
+    public void addResource(Resource resource)
+    {
+        resourceDao.save(resource);
+    }
 }
