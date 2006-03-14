@@ -24,7 +24,7 @@ import java.util.TreeMap;
  */
 public class AddTriggerWizard extends BaseWizard
 {
-    private static final String MONITOR_STATE = "success";
+    private static final String MONITOR_STATE = "monitor";
     private static final String CRON_STATE = "cron";
 
     private static final Logger LOG = Logger.getLogger(AddTriggerWizard.class);
@@ -204,28 +204,7 @@ public class AddTriggerWizard extends BaseWizard
             if (types == null)
             {
                 types = new TreeMap<String, String>();
-                // only add monitor scm trigger option if the project is not already being monitored.
-                boolean addMonitorOption = true;
-                List<Trigger> triggers = scheduler.getTriggers(projectId);
-                outer: for (Trigger trigger : triggers)
-                {
-                    if (trigger instanceof EventTrigger)
-                    {
-                        EventTrigger eventTrigger = (EventTrigger) trigger;
-                        for (Class evt : eventTrigger.getTriggerEvents())
-                        {
-                            if (evt == SCMChangeEvent.class)
-                            {
-                                addMonitorOption = false;
-                                break outer;
-                            }
-                        }
-                    }
-                }
-                if (addMonitorOption)
-                {
-                    types.put(MONITOR_STATE, "monitor scm trigger");
-                }
+                types.put(MONITOR_STATE, "monitor scm trigger");
                 types.put(CRON_STATE, "cron trigger");
             }
 
@@ -235,6 +214,10 @@ public class AddTriggerWizard extends BaseWizard
         {
             if (TextUtils.stringSet(type))
             {
+                if (MONITOR_STATE.equals(type))
+                {
+                    return "success";
+                }
                 return type;
             }
             return super.getStateName();

@@ -358,20 +358,22 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
     public void testCreateTriggerValidation()
     {
         // ensure that the name remains unique.
-        String triggerName = projectName + " scm trigger";
+        String triggerName = projectName + " scm trigger"; // this is the default trigger name.
         assertProjectTriggerTable(new String[][]{
                 new String[]{triggerName, "event", "default", "delete"}
         });
 
         clickLink("project.trigger.add");
         assertFormPresent("trigger.type");
+        // check that we can not create a trigger with an existing name.
         setFormElement("name", triggerName);
         // go with the defaults.
         submit("next");
 
-        // check that we can not create a trigger with an existing name.
         assertFormPresent("trigger.type");
         // assert text present..
+
+        assertOptionValuesEqual("type", new String[]{"cron", "monitor"});
 
         // use some random name.
         setFormElement("name", "trigger "+RandomUtils.randomString(4));
@@ -394,9 +396,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertFormPresent("trigger.cron.create");
         assertTextPresent("required");
 
-        // ensure that you can only create one event trigger.
         submit("previous");
-        assertOptionsEqual("type", new String[]{"cron trigger"});
     }
 
 /*
