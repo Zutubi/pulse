@@ -19,6 +19,7 @@ public class ResourceDiscoverer implements Runnable
     {
         discoverAnt();
         discoverMake();
+        discoverJava();
     }
 
     private void discoverAnt()
@@ -68,6 +69,38 @@ public class ResourceDiscoverer implements Runnable
                 makeResource.addProperty(new Property("make.bin", makeBin.getAbsolutePath()));
                 resourceDao.save(makeResource);
             }
+        }
+    }
+
+    private void discoverJava()
+    {
+        if (resourceRepository.hasResource("java"))
+        {
+            return;
+        }
+
+        //TODO: look for java on the path.
+
+        // look for JAVA_HOME in the environment.
+        String home = System.getenv("JAVA_HOME");
+
+        Resource javaResource = new Resource("java");
+        javaResource.addProperty(new Property("java.home", home));
+
+        File javaBin;
+        if (SystemUtils.isWindows())
+        {
+            javaBin = new File(home, "bin/java.exe");
+        }
+        else
+        {
+            javaBin = new File(home, "bin/java");
+        }
+
+        if (javaBin.isFile())
+        {
+            javaResource.addProperty(new Property("java.bin", javaBin.getAbsolutePath()));
+            resourceDao.save(javaResource);
         }
     }
 
