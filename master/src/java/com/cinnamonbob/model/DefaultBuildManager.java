@@ -1,11 +1,15 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.MasterBuildPaths;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.bootstrap.DatabaseBootstrap;
 import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.model.persistence.*;
+import com.cinnamonbob.model.persistence.ArtifactDao;
+import com.cinnamonbob.model.persistence.BuildResultDao;
+import com.cinnamonbob.model.persistence.ChangelistDao;
+import com.cinnamonbob.model.persistence.FileArtifactDao;
 import com.cinnamonbob.scheduling.Scheduler;
 import com.cinnamonbob.scheduling.SchedulingException;
 import com.cinnamonbob.scheduling.SimpleTrigger;
@@ -32,6 +36,7 @@ public class DefaultBuildManager implements BuildManager
     private ChangelistDao changelistDao;
     private ProjectManager projectManager;
     private Scheduler scheduler;
+    private ConfigurationManager configurationManager;
 
     private static final String CLEANUP_NAME = "cleanup";
     private static final String CLEANUP_GROUP = "services";
@@ -239,7 +244,7 @@ public class DefaultBuildManager implements BuildManager
 
     private void cleanupResult(Project project, BuildResult build)
     {
-        MasterBuildPaths paths = new MasterBuildPaths();
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File buildDir = paths.getBuildDir(project, build);
         if (!FileSystemUtils.removeDirectory(buildDir))
         {
@@ -252,7 +257,7 @@ public class DefaultBuildManager implements BuildManager
 
     private void cleanupWork(Project project, BuildResult build)
     {
-        MasterBuildPaths paths = new MasterBuildPaths();
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         cleanupWorkForNodes(paths, project, build, build.getRoot().getChildren());
     }
 
@@ -293,5 +298,10 @@ public class DefaultBuildManager implements BuildManager
     public void setFileArtifactDao(FileArtifactDao fileArtifactDao)
     {
         this.fileArtifactDao = fileArtifactDao;
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

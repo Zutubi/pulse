@@ -1,8 +1,10 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.Bootstrapper;
 import com.cinnamonbob.core.BuildException;
+import com.cinnamonbob.core.ObjectFactory;
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.Revision;
@@ -40,6 +42,7 @@ public class BuildController implements EventListener
     private BuildSpecification specification;
     private EventManager eventManager;
     private BuildManager buildManager;
+    private ConfigurationManager configurationManager;
     private RecipeQueue queue;
     private RecipeResultCollector collector;
     private BuildTree tree;
@@ -65,7 +68,7 @@ public class BuildController implements EventListener
     {
         createBuildTree();
 
-        MasterBuildPaths paths = new MasterBuildPaths();
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File buildDir = paths.getBuildDir(project, buildResult);
         buildResult.queue(buildDir);
         buildManager.save(buildResult);
@@ -101,7 +104,7 @@ public class BuildController implements EventListener
             resultNode.addChild(childResultNode);
             buildManager.save(resultNode);
 
-            MasterBuildPaths paths = new MasterBuildPaths();
+            MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
             recipeResult.setOutputDir(paths.getOutputDir(project, buildResult, recipeResult.getId()).getAbsolutePath());
 
             RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe());
@@ -368,5 +371,10 @@ public class BuildController implements EventListener
     public long getBuildId()
     {
         return buildResult.getId();
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

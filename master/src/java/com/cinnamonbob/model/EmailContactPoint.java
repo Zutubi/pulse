@@ -1,9 +1,8 @@
 package com.cinnamonbob.model;
 
-import com.cinnamonbob.BobServer;
 import com.cinnamonbob.bootstrap.ApplicationConfiguration;
 import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.bootstrap.ConfigUtils;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.renderer.BuildResultRenderer;
 import com.cinnamonbob.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
@@ -50,7 +49,7 @@ public class EmailContactPoint extends ContactPoint
     */
     public void notify(BuildResult result)
     {
-        ApplicationConfiguration config = ConfigUtils.getManager().getAppConfig();
+        ApplicationConfiguration config = lookupConfigManager().getAppConfig();
         String prefix = config.getSmtpPrefix();
 
         if (prefix == null)
@@ -70,8 +69,14 @@ public class EmailContactPoint extends ContactPoint
     {
         StringWriter w = new StringWriter();
         BuildResultRenderer renderer = (BuildResultRenderer) ComponentContext.getBean("buildResultRenderer");
-        renderer.render(BobServer.getHostURL(), result, BuildResultRenderer.TYPE_PLAIN, w);
+        ConfigurationManager configManager = lookupConfigManager();
+        renderer.render(configManager.getAppConfig().getHostName(), result, BuildResultRenderer.TYPE_PLAIN, w);
         return w.toString();
+    }
+
+    private ConfigurationManager lookupConfigManager()
+    {
+        return (ConfigurationManager) ComponentContext.getBean("configurationManager");
     }
 
     private void sendMail(String subject, String body, final ApplicationConfiguration config)

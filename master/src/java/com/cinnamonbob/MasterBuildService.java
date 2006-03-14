@@ -18,15 +18,9 @@ public class MasterBuildService implements BuildService
     private MasterRecipeProcessor masterRecipeProcessor;
     private ConfigurationManager configurationManager;
 
-    public MasterBuildService()
-    {
-        // TODO the dodgy wiring goes on unabated!
-        ComponentContext.autowire(this);
-    }
-
     public String getUrl()
     {
-        return BobServer.getHostURL();
+        return configurationManager.getAppConfig().getHostName();
     }
 
     public void build(RecipeRequest request)

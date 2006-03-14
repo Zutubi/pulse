@@ -12,10 +12,12 @@ public class ObjectFactory
 {
     private final Map<String, Class> classes = new HashMap<String, Class>();
 
-    public Class getClassInstance(String className) throws ClassNotFoundException {
+    public Class getClassInstance(String className) throws ClassNotFoundException
+    {
 
         Class clazz = classes.get(className);
-        if (clazz == null) {
+        if (clazz == null)
+        {
             clazz = ClassLoaderUtil.loadClass(className, this.getClass());
             classes.put(className, clazz);
         }
@@ -23,12 +25,14 @@ public class ObjectFactory
         return clazz;
     }
 
-    public <V> V buildBean(Class clazz) throws Exception {
-        return (V)clazz.newInstance();
+    public <V> V buildBean(Class clazz) throws Exception
+    {
+        return (V) clazz.newInstance();
     }
 
-    public <U> U buildBean(String className) throws Exception {
+    public <U> U buildBean(String className) throws Exception
+    {
         Class clazz = getClassInstance(className);
-        return (U)clazz.newInstance();
+        return (U) clazz.newInstance();
     }
 }

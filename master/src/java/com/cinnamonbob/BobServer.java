@@ -1,15 +1,13 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.bootstrap.*;
-import com.cinnamonbob.model.ProjectManager;
+import com.cinnamonbob.bootstrap.SystemBootstrapManager;
 import com.cinnamonbob.util.logging.Logger;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * The BobServer handles the system initialisation / component
  * bootstrapping.
+ *
+ * @deprecated
  */
 public class BobServer
 {
@@ -33,29 +31,5 @@ public class BobServer
     {
         LOG.info("stop");
         shutdownService.stop();
-    }
-
-    public static String getHostURL()
-    {
-        ApplicationConfiguration config = ConfigUtils.getManager().getAppConfig();
-        if (config.getHostName() != null)
-        {
-            return config.getHostName();
-        }
-        else
-        {
-            InetAddress address;
-            String result = null;
-            try
-            {
-                address = InetAddress.getLocalHost();
-                result = address.getCanonicalHostName();
-            }
-            catch (UnknownHostException e)
-            {
-                LOG.warning("Could not obtain local host name", e);
-            }
-            return result;
-        }
     }
 }

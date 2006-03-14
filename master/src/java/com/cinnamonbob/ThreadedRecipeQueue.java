@@ -1,6 +1,6 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.core.BobException;
+import com.cinnamonbob.core.ObjectFactory;
 import com.cinnamonbob.core.Stoppable;
 import com.cinnamonbob.events.Event;
 import com.cinnamonbob.events.EventListener;
@@ -27,6 +27,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(ThreadedRecipeQueue.class);
+
+    private ObjectFactory objectFactory;
 
     private final ReentrantLock lock = new ReentrantLock();
 
@@ -65,9 +67,17 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public void init()
     {
-        availableServices.add(new MasterBuildService());
-        eventManager.register(this);
-        start();
+        try
+        {
+            MasterBuildService buildService = objectFactory.buildBean(MasterBuildService.class);
+            availableServices.add(buildService);
+            eventManager.register(this);
+            start();
+        }
+        catch (Exception e)
+        {
+            LOG.error(e);
+        }
     }
 
     public void start()
@@ -358,4 +368,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         this.eventManager = eventManager;
     }
 
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
+    }
 }

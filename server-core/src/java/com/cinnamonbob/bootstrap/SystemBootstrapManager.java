@@ -19,6 +19,19 @@ public class SystemBootstrapManager
     public static final String DEFAULT_BOOTSTRAP_CONTEXT = "com/cinnamonbob/bootstrap/bootstrapContext.xml";
     public static final String BOOTSTRAP_CONTEXT_PROPERTY = "bootstrap";
 
+    /**
+     * The name of the configuration manager bean. This bean is REQUIRED in the initial context.
+     */
+    private static final String CONFIGURATION_MANAGER_BEAN = "configurationManager";
+
+    /**
+     * The name of the startup manager bean. This bean is REQUIRED in the initial context.
+     */
+    private static final String STARTUP_MANAGER_BEAN = "startupManager";
+
+    /**
+     * Load the systems bootstrap context.
+     */
     public static void loadBootstrapContext()
     {
         // lookup bootstrap context via the system properties.
@@ -46,7 +59,8 @@ public class SystemBootstrapManager
         // Now we know where the system path is, add a file handler.
         try
         {
-            SystemPaths systemPaths = ConfigUtils.getManager().getSystemPaths();
+            ConfigurationManager configManager = (ConfigurationManager) ComponentContext.getBean(CONFIGURATION_MANAGER_BEAN);
+            SystemPaths systemPaths = configManager.getSystemPaths();
             // ensure that the directory exists.
 
             File logRoot = systemPaths.getLogRoot();
@@ -74,7 +88,7 @@ public class SystemBootstrapManager
             }
         });
 
-        ((StartupManager) ComponentContext.getBean("startupManager")).init();
+        ((StartupManager) ComponentContext.getBean(STARTUP_MANAGER_BEAN)).init();
     }
 
     public static void main(String argv[])

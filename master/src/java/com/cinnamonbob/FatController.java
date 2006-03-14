@@ -1,5 +1,6 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.Stoppable;
 import com.cinnamonbob.events.AsynchronousDelegatingListener;
 import com.cinnamonbob.events.Event;
@@ -41,6 +42,7 @@ public class FatController implements EventListener, Stoppable
     private EventManager eventManager;
     private AsynchronousDelegatingListener asyncListener;
     private BuildManager buildManager;
+    private ConfigurationManager configManager;
     private RecipeQueue recipeQueue;
 
     private ReentrantLock lock = new ReentrantLock();
@@ -150,7 +152,7 @@ public class FatController implements EventListener, Stoppable
         {
             if (!stopping)
             {
-                RecipeResultCollector collector = new DefaultRecipeResultCollector(project);
+                RecipeResultCollector collector = new DefaultRecipeResultCollector(project, configManager);
                 BuildController controller = new BuildController(project, buildSpec, eventManager, buildManager, recipeQueue, collector, quartzScheduler);
                 controller.run();
                 runningBuilds.add(controller);
@@ -250,5 +252,10 @@ public class FatController implements EventListener, Stoppable
     public void setQuartzScheduler(Scheduler quartzScheduler)
     {
         this.quartzScheduler = quartzScheduler;
+    }
+
+    public void setConfigurationManager(ConfigurationManager configManager)
+    {
+        this.configManager = configManager;
     }
 }

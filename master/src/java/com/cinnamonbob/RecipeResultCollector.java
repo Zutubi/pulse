@@ -11,4 +11,5 @@ public interface RecipeResultCollector
     void collect(BuildResult result, long recipeId, BuildService buildService);
 
     void cleanup(BuildResult result, long recipeId, BuildService buildService);
+
 }

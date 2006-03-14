@@ -1,6 +1,6 @@
 package com.cinnamonbob.freemarker;
 
-import com.cinnamonbob.bootstrap.ConfigUtils;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.bootstrap.SystemPaths;
 import com.cinnamonbob.util.logging.Logger;
 import com.opensymphony.webwork.views.freemarker.FreemarkerManager;
@@ -19,6 +19,8 @@ public class CustomFreemarkerManager extends FreemarkerManager
 {
     private static final Logger LOG = Logger.getLogger(CustomFreemarkerManager.class);
 
+    private ConfigurationManager configManager;
+
     public static void initialiseLogging()
     {
         try
@@ -31,9 +33,9 @@ public class CustomFreemarkerManager extends FreemarkerManager
         }
     }
 
-    public static TemplateLoader[] getLoaders(TemplateLoader superLoader)
+    public TemplateLoader[] getLoaders(TemplateLoader superLoader)
     {
-        SystemPaths paths = ConfigUtils.getManager().getSystemPaths();
+        SystemPaths paths = configManager.getSystemPaths();
 
         List<File> templateRoots = paths.getTemplateRoots();
         TemplateLoader loaders[] = new TemplateLoader[templateRoots.size() + 1];
@@ -57,6 +59,12 @@ public class CustomFreemarkerManager extends FreemarkerManager
 
     protected TemplateLoader getTemplateLoader(ServletContext servletContext)
     {
-        return new MultiTemplateLoader(getLoaders(super.getTemplateLoader(servletContext)));
+        TemplateLoader superLoader = super.getTemplateLoader(servletContext);
+        return new MultiTemplateLoader(getLoaders(superLoader));
+    }
+
+    public void setConfigurationManager(ConfigurationManager configManager)
+    {
+         this.configManager = configManager;
     }
 }

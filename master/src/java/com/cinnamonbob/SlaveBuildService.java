@@ -7,6 +7,7 @@ import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.model.Slave;
 import com.cinnamonbob.services.SlaveService;
 import com.cinnamonbob.util.logging.Logger;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class SlaveBuildService implements BuildService
 
     private SlaveService service;
     private Slave slave;
+    private ConfigurationManager configurationManager;
 
     public SlaveBuildService(Slave slave, SlaveService service)
     {
@@ -39,7 +41,7 @@ public class SlaveBuildService implements BuildService
     {
         try
         {
-            service.build(BobServer.getHostURL(), request);
+            service.build(configurationManager.getAppConfig().getHostName(), request);
         }
         catch (HessianRuntimeException e)
         {
@@ -125,5 +127,10 @@ public class SlaveBuildService implements BuildService
         }
 
         return false;
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

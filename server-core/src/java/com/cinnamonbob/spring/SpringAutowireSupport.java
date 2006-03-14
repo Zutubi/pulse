@@ -9,13 +9,12 @@ import org.springframework.context.ConfigurableApplicationContext;
 import com.cinnamonbob.util.logging.Logger;
 
 /**
- * <class-comment/>
+ * Autowire support has been adapted from com.opensymphony.xwork.spring.SpringObjectFactory
  */
 public class SpringAutowireSupport implements ApplicationContextAware
 {
     private static final Logger LOG = Logger.getLogger(SpringAutowireSupport.class);
 
-    // Autowire support taken from com.opensymphony.xwork.spring.SpringObjectFactory
     private AutowireCapableBeanFactory autoWiringFactory;
 
     private int autowireStrategy = AutowireCapableBeanFactory.AUTOWIRE_BY_NAME;

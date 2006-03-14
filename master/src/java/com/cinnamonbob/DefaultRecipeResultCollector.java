@@ -3,6 +3,7 @@ package com.cinnamonbob;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 
 import java.io.File;
 
@@ -11,11 +12,12 @@ import java.io.File;
 public class DefaultRecipeResultCollector implements RecipeResultCollector
 {
     private Project project;
-    private MasterBuildPaths paths = new MasterBuildPaths();
+    private MasterBuildPaths paths;
 
-    public DefaultRecipeResultCollector(Project project)
+    public DefaultRecipeResultCollector(Project project, ConfigurationManager configManager)
     {
         this.project = project;
+        this.paths = new MasterBuildPaths(configManager);
     }
 
     public void prepare(BuildResult result, long recipeId)
@@ -56,5 +58,6 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
             buildService.cleanup(recipeId);
         }
     }
+
 
 }

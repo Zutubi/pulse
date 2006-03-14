@@ -1,7 +1,7 @@
 package com.cinnamonbob.test;
 
 import com.cinnamonbob.MasterBuildPaths;
-import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.RecipeProcessor;
 import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.core.util.FileSystemUtils;
@@ -12,7 +12,10 @@ import com.cinnamonbob.model.persistence.ProjectDao;
 import com.cinnamonbob.model.persistence.SlaveDao;
 import com.cinnamonbob.model.persistence.UserDao;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,23 +24,20 @@ import java.util.List;
  */
 public class SetupDummyBuilds implements Runnable
 {
-    private MasterBuildPaths masterBuildPaths = new MasterBuildPaths();
+    private MasterBuildPaths masterBuildPaths;
     private SlaveDao slaveDao;
     private ProjectDao projectDao;
     private BuildResultDao buildResultDao;
     private UserDao userDao;
+    private ConfigurationManager configManager;
     private Slave slave;
-    private P4 scm;
     private static final int BUILDS_IN_LONG_HISTORY_PROJECT = 100;
 
     public void run()
     {
         Project project;
 
-        slaveDao = (SlaveDao) ComponentContext.getBean("slaveDao");
-        projectDao = (ProjectDao) ComponentContext.getBean("projectDao");
-        buildResultDao = (BuildResultDao) ComponentContext.getBean("buildResultDao");
-        userDao = (UserDao) ComponentContext.getBean("userDao");
+        masterBuildPaths =  new MasterBuildPaths(configManager);
 
         if (projectDao.findAll().size() == 0)
         {
@@ -123,7 +123,7 @@ public class SetupDummyBuilds implements Runnable
         Project project = new Project(name, "A test project with a decently long description to test wrapping etc.");
         project.setBobFileDetails(new CustomBobFileDetails("bob.xml"));
 
-        scm = new P4();
+        P4 scm = new P4();
         scm.setPort(":1666");
         scm.setUser("jsankey");
         scm.setClient("bob");
@@ -601,5 +601,30 @@ public class SetupDummyBuilds implements Runnable
         }
 
         return artifact;
+    }
+
+    public void setSlaveDao(SlaveDao slaveDao)
+    {
+        this.slaveDao = slaveDao;
+    }
+
+    public void setProjectDao(ProjectDao projectDao)
+    {
+        this.projectDao = projectDao;
+    }
+
+    public void setBuildResultDao(BuildResultDao buildResultDao)
+    {
+        this.buildResultDao = buildResultDao;
+    }
+
+    public void setUserDao(UserDao userDao)
+    {
+        this.userDao = userDao;
+    }
+
+    public void setConfigurationManager(ConfigurationManager configManager)
+    {
+        this.configManager = configManager;
     }
 }

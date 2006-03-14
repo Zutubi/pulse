@@ -6,7 +6,7 @@ import com.cinnamonbob.core.model.Property;
 /**
  * Helper base class for file loader tests.
  */
-public class FileLoaderTestBase extends BobTestCase
+public abstract class FileLoaderTestBase extends BobTestCase
 {
     protected FileLoader loader;
 

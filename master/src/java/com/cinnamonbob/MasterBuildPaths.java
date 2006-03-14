@@ -1,6 +1,6 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.bootstrap.ConfigUtils;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
 
@@ -10,9 +10,11 @@ import java.io.File;
  */
 public class MasterBuildPaths
 {
-    public MasterBuildPaths()
-    {
+    private File rootBuildDir;
 
+    public MasterBuildPaths(ConfigurationManager configManager)
+    {
+        rootBuildDir = configManager.getUserPaths().getProjectRoot();
     }
 
     public static String getProjectDirName(Project project)
@@ -22,7 +24,6 @@ public class MasterBuildPaths
 
     public File getProjectDir(Project project)
     {
-        File rootBuildDir = ConfigUtils.getManager().getUserPaths().getProjectRoot();
         return new File(rootBuildDir, getProjectDirName(project));
     }
 
@@ -33,7 +34,7 @@ public class MasterBuildPaths
 
     public static String getBuildDirName(BuildResult result)
     {
-        return String.format("%08d", Long.valueOf(result.getNumber()));
+        return String.format("%08d", result.getNumber());
     }
 
     public File getBuildDir(Project project, BuildResult result)

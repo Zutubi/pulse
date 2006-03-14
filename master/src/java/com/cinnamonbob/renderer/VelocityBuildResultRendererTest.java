@@ -78,6 +78,7 @@ public class VelocityBuildResultRendererTest extends BobTestCase
 
     protected void createAndVerify(String expectedName, String hostUrl, BuildResult result) throws IOException
     {
+        // if this lookup returns null, ensure that the txt files are being copied into the classpath as resources.
         InputStream expectedStream = getInput(expectedName, "txt");
 
         StringWriter writer = new StringWriter();

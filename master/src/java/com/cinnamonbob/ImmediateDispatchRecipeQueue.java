@@ -2,6 +2,7 @@ package com.cinnamonbob;
 
 import com.cinnamonbob.core.BobException;
 import com.cinnamonbob.core.BuildException;
+import com.cinnamonbob.core.ObjectFactory;
 import com.cinnamonbob.events.Event;
 import com.cinnamonbob.events.EventListener;
 import com.cinnamonbob.events.EventManager;
@@ -10,6 +11,7 @@ import com.cinnamonbob.events.build.RecipeDispatchedEvent;
 import com.cinnamonbob.model.Slave;
 import com.cinnamonbob.model.SlaveManager;
 import com.cinnamonbob.util.logging.Logger;
+import com.cinnamonbob.bootstrap.ComponentContext;
 
 import java.net.MalformedURLException;
 import java.util.LinkedList;
@@ -28,6 +30,7 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
     private SlaveManager slaveManager;
     private SlaveProxyFactory slaveProxyFactory;
     private EventManager eventManager;
+    private ObjectFactory objectFactory;
 
     public ImmediateDispatchRecipeQueue()
     {
@@ -36,7 +39,15 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
 
     public void init()
     {
-        buildServices.add(new MasterBuildService());
+        try
+        {
+            MasterBuildService buildService = objectFactory.buildBean(MasterBuildService.class);
+            buildServices.add(buildService);
+        }
+        catch (Exception e)
+        {
+            LOG.error(e);
+        }
 
         for (Slave slave : slaveManager.getAll())
         {
@@ -54,7 +65,9 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
     {
         try
         {
-            return new SlaveBuildService(slave, slaveProxyFactory.createProxy(slave));
+            SlaveBuildService buildService = new SlaveBuildService(slave, slaveProxyFactory.createProxy(slave));
+            ComponentContext.autowire(buildService);
+            return buildService;
         }
         catch (MalformedURLException e)
         {
@@ -140,4 +153,8 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
         this.slaveManager = slaveManager;
     }
 
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
+    }
 }

@@ -1,6 +1,7 @@
 package com.cinnamonbob.bootstrap.velocity;
 
-import com.cinnamonbob.bootstrap.ConfigUtils;
+import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.bootstrap.SystemPaths;
 import com.cinnamonbob.util.logging.Logger;
 import org.apache.commons.collections.ExtendedProperties;
@@ -17,14 +18,23 @@ public class BobTemplateVelocityResourceLoader extends FileResourceLoader
 {
     private static final Logger LOG = Logger.getLogger(BobTemplateVelocityResourceLoader.class);
 
+    private ConfigurationManager configManager;
+
+    public BobTemplateVelocityResourceLoader()
+    {
+        // since velocity does not provide an object creation hook,
+        // we need to handle the autowiring ourselves.
+        ComponentContext.autowire(this);
+    }
+
     /**
      * Retrieve a comma separated list of the systems template paths. These paths
      * are represented as absolute paths.
      *
      */
-    public static String getFullTemplatePath()
+    public String getFullTemplatePath()
     {
-        SystemPaths paths = ConfigUtils.getManager().getSystemPaths();
+        SystemPaths paths = configManager.getSystemPaths();
 
         StringBuffer result = new StringBuffer();
         String sep = "";
@@ -44,4 +54,13 @@ public class BobTemplateVelocityResourceLoader extends FileResourceLoader
         super.init(configuration);
     }
 
+    /**
+     * Required resource.
+     *
+     * @param configManager
+     */
+    public void setConfigurationManager(ConfigurationManager configManager)
+    {
+        this.configManager = configManager;
+    }
 }
