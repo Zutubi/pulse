@@ -1,10 +1,5 @@
 package com.cinnamonbob.scheduling;
 
-import com.cinnamonbob.core.model.Entity;
-
-import java.util.Map;
-import java.util.HashMap;
-
 /**
  * <class-comment/>
  */

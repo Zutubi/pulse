@@ -65,7 +65,25 @@ triggers.
         </property>
     </bean>
 
-    <bean id="triggerHandler" class="com.cinnamonbob.scheduling.DefaultTriggerHandler">
+    <!--
+    wrap the trigger handler in a transaction to ensure that whatever fires the trigger,
+    any changes to the state of the trigger are persisted.
+     -->
+    <bean id="triggerHandler" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="triggerHandlerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="triggerHandlerTarget" class="com.cinnamonbob.scheduling.DefaultTriggerHandler">
         <!-- not sure why this is needs to be wired directly. -->
         <property name="triggerDao">
             <ref bean="triggerDao"/>

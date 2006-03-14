@@ -8,14 +8,14 @@ public class TestTriggerHandler implements TriggerHandler
     private long triggerCount;
     private boolean triggered;
 
-    public void trigger(Trigger trigger) throws SchedulingException
+    public void fire(Trigger trigger) throws SchedulingException
     {
-        trigger(trigger, new TaskExecutionContext());
+        fire(trigger, new TaskExecutionContext());
     }
 
-    public void trigger(Trigger trigger, TaskExecutionContext context) throws SchedulingException
+    public void fire(Trigger trigger, TaskExecutionContext context) throws SchedulingException
     {
-        trigger.trigger();
+        trigger.fire();
         triggerCount++;
         triggered = true;
     }

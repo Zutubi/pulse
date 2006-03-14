@@ -69,11 +69,17 @@ public class EventTrigger extends Trigger
         return triggers;
     }
 
+    /**
+     * Used by hibernate.
+     */
     private Class getTriggerEvent()
     {
         return getTriggerEvents()[0];
     }
 
+    /**
+     * Used by hibernate.
+     */
     private void setTriggerEvent(Class event)
     {
         getTriggerEvents()[0] = event;

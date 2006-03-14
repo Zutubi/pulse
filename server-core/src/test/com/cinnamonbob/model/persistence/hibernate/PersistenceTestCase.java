@@ -43,7 +43,7 @@ public abstract class PersistenceTestCase extends BobTestCase
         super(testName);
     }
 
-    public void setUp() throws Exception
+    protected void setUp() throws Exception
     {
         super.setUp();
 
@@ -66,7 +66,7 @@ public abstract class PersistenceTestCase extends BobTestCase
         sessionFactory = (SessionFactory) context.getBean("sessionFactory");
     }
 
-    public void tearDown() throws Exception
+    protected void tearDown() throws Exception
     {
         sessionFactory.close();
         sessionFactory = null;

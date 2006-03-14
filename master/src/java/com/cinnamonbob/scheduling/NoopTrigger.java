@@ -9,7 +9,6 @@ public class NoopTrigger extends Trigger
 
     public NoopTrigger()
     {
-
     }
 
     public NoopTrigger(String name)

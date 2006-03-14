@@ -34,6 +34,7 @@ public class DefaultScheduler implements Scheduler, EventListener
     public void register(SchedulerStrategy strategy)
     {
         strategies.put(strategy.canHandle(), strategy);
+        strategy.setTriggerHandler(triggerHandler);
     }
 
     public void setStrategies(List<SchedulerStrategy> schedulerStrategies)
@@ -41,7 +42,7 @@ public class DefaultScheduler implements Scheduler, EventListener
         strategies.clear();
         for (SchedulerStrategy strategy : schedulerStrategies)
         {
-            strategies.put(strategy.canHandle(), strategy);
+            register(strategy);
         }
     }
 
@@ -97,9 +98,9 @@ public class DefaultScheduler implements Scheduler, EventListener
         return triggerDao.findAll();
     }
 
-    public List<Trigger> getTriggers(long id)
+    public List<Trigger> getTriggers(long project)
     {
-        return triggerDao.findByProject(id);
+        return triggerDao.findByProject(project);
     }
 
     public Trigger getTrigger(long project, String triggerName)
@@ -126,7 +127,7 @@ public class DefaultScheduler implements Scheduler, EventListener
 
     public void trigger(Trigger trigger) throws SchedulingException
     {
-        triggerHandler.trigger(trigger);
+        triggerHandler.fire(trigger);
     }
 
     /**
@@ -179,6 +180,9 @@ public class DefaultScheduler implements Scheduler, EventListener
         }
         SchedulerStrategy impl = getStrategy(trigger);
         impl.resume(trigger);
+
+        // record any state change.
+        triggerDao.save(trigger);
     }
 
     /**

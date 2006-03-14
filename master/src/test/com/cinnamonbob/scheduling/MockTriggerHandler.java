@@ -7,14 +7,14 @@ public class MockTriggerHandler implements TriggerHandler
 {
     private Task task;
 
-    public void trigger(Trigger trigger) throws SchedulingException
+    public void fire(Trigger trigger) throws SchedulingException
     {
-        trigger(trigger, new TaskExecutionContext());
+        fire(trigger, new TaskExecutionContext());
     }
 
-    public void trigger(Trigger trigger, TaskExecutionContext context) throws SchedulingException
+    public void fire(Trigger trigger, TaskExecutionContext context) throws SchedulingException
     {
-        trigger.trigger();
+        trigger.fire();
         context.setTrigger(trigger);
         task.execute(context);
     }

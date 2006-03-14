@@ -48,7 +48,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         try
         {
             getQuartzScheduler().resumeTrigger(trigger.getName(), trigger.getGroup());
-            trigger.setState(TriggerState.ACTIVE);
+            trigger.setState(TriggerState.SCHEDULED);
         }
         catch (SchedulerException e)
         {
@@ -84,8 +84,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         }
     }
 
-    protected void ensureCallbackRegistered()
-            throws SchedulerException
+    protected void ensureCallbackRegistered() throws SchedulerException
     {
         JobDetail existingJob = getQuartzScheduler().getJobDetail(CALLBACK_JOB_NAME, CALLBACK_JOB_GROUP);
         if (existingJob == null)
@@ -112,7 +111,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
 
             getQuartzScheduler().scheduleJob(quartzTrigger);
 
-            trigger.setState(TriggerState.ACTIVE);
+            trigger.setState(TriggerState.SCHEDULED);
         }
         catch (SchedulerException e)
         {

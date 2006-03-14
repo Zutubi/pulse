@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.Serializable;
 
 /**
  * <class-comment/>
@@ -18,12 +19,14 @@ public abstract class Trigger extends Entity
     public static final String DEFAULT_GROUP = "default";
 
     /**
-     * The name used to identify the trigger instance.
+     * The name used to identify the trigger instance. Along with the group, the
+     * name uniquely identifies a trigger.
      */
     private String name;
 
     /**
-     * The group to which this trigger instance belongs.
+     * The group to which this trigger instance belongs. Along with the name, the
+     * group uniquely identifies a trigger.
      */
     private String group;
 
@@ -47,7 +50,7 @@ public abstract class Trigger extends Entity
      * The datamap, contains arbitrary pieces of data. This data is later made available
      * to the task being executed.
      */
-    private Map<Object, Object> dataMap;
+    private Map<Serializable, Serializable> dataMap;
 
     private Class<? extends Task> taskClass;
 
@@ -90,23 +93,22 @@ public abstract class Trigger extends Entity
     /**
      * Return the type identifier for this type of trigger. This identifier is used to
      * locate the Scheduler Strategies available to handle this trigger.
-     *
      */
     public abstract String getType();
 
-    public Map<Object, Object> getDataMap()
+    public Map<Serializable, Serializable> getDataMap()
     {
         if (dataMap == null)
         {
-            dataMap = new HashMap<Object, Object>();
+            dataMap = new HashMap<Serializable, Serializable>();
         }
         return dataMap;
     }
 
     /**
-     * used by hibernate.
+     * Used by hibernate.
      */
-    private void setDataMap(Map<Object, Object> map)
+    private void setDataMap(Map<Serializable, Serializable> map)
     {
         dataMap = map;
     }
@@ -127,14 +129,14 @@ public abstract class Trigger extends Entity
     }
 
     /**
-     * used by hibernate.
+     * Used by hibernate.
      */
     private void setTriggerCount(long count)
     {
         this.triggerCount = count;
     }
 
-    public void trigger()
+    public void fire()
     {
         triggerCount++;
         previousTriggerTime = Calendar.getInstance().getTime();
@@ -146,7 +148,7 @@ public abstract class Trigger extends Entity
     }
 
     /**
-     * used by hibernate.
+     * Used by hibernate.
      */
     private void setPreviousTriggerTime(Date time)
     {
@@ -159,7 +161,7 @@ public abstract class Trigger extends Entity
     }
 
     /**
-     * used by hibernate.
+     * Used by hibernate.
      */
     private void setName(String name)
     {
@@ -172,7 +174,7 @@ public abstract class Trigger extends Entity
     }
 
     /**
-     * used by hibernate.
+     * Used by hibernate.
      */
     private void setGroup(String group)
     {
@@ -180,7 +182,7 @@ public abstract class Trigger extends Entity
     }
 
     /**
-     * used by hibernate.
+     * Used by hibernate.
      */
     private void setTriggerState(String str)
     {
@@ -188,7 +190,7 @@ public abstract class Trigger extends Entity
     }
 
     /**
-     * used by hibernate.
+     * Used by hibernate.
      */
     private String getTriggerState()
     {
@@ -212,7 +214,7 @@ public abstract class Trigger extends Entity
 
     public boolean isActive()
     {
-        return TriggerState.ACTIVE == getState();
+        return TriggerState.SCHEDULED == getState();
     }
 
     public boolean isScheduled()

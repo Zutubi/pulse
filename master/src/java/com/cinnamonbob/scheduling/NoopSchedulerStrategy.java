@@ -17,7 +17,7 @@ public class NoopSchedulerStrategy implements SchedulerStrategy
 
     public void resume(Trigger trigger) throws SchedulingException
     {
-        trigger.setState(TriggerState.ACTIVE);
+        trigger.setState(TriggerState.SCHEDULED);
     }
 
     public void stop(boolean force)
@@ -27,7 +27,7 @@ public class NoopSchedulerStrategy implements SchedulerStrategy
 
     public void schedule(Trigger trigger) throws SchedulingException
     {
-        trigger.setState(TriggerState.ACTIVE);
+        trigger.setState(TriggerState.SCHEDULED);
     }
 
     public void unschedule(Trigger trigger) throws SchedulingException

@@ -19,15 +19,15 @@ public class CronTrigger extends Trigger
         this(cron, name, DEFAULT_GROUP);
     }
 
-    public String getType()
-    {
-        return TYPE;
-    }
-
     public CronTrigger(String cron, String name, String group)
     {
         super(name, group);
         this.cron = cron;
+    }
+
+    public String getType()
+    {
+        return TYPE;
     }
 
     public String getCron()
@@ -35,7 +35,10 @@ public class CronTrigger extends Trigger
         return cron;
     }
 
-    public void setCron(String cron)
+    /**
+     * Used by hibernate.
+     */
+    private void setCron(String cron)
     {
         this.cron = cron;
     }

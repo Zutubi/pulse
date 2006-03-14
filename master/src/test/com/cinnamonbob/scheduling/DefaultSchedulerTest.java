@@ -77,9 +77,9 @@ public class DefaultSchedulerTest extends TestCase
         scheduler.schedule(new NoopTrigger("b"));
         scheduler.schedule(new NoopTrigger("c"));
 
-        assertEquals(TriggerState.ACTIVE, scheduler.getTrigger("a", Trigger.DEFAULT_GROUP).getState());
-        assertEquals(TriggerState.ACTIVE, scheduler.getTrigger("b", Trigger.DEFAULT_GROUP).getState());
-        assertEquals(TriggerState.ACTIVE, scheduler.getTrigger("c", Trigger.DEFAULT_GROUP).getState());
+        assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("a", Trigger.DEFAULT_GROUP).getState());
+        assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("b", Trigger.DEFAULT_GROUP).getState());
+        assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("c", Trigger.DEFAULT_GROUP).getState());
 
         scheduler.pause(Trigger.DEFAULT_GROUP);
 
@@ -89,15 +89,9 @@ public class DefaultSchedulerTest extends TestCase
 
         scheduler.resume(Trigger.DEFAULT_GROUP);
 
-        assertEquals(TriggerState.ACTIVE, scheduler.getTrigger("a", Trigger.DEFAULT_GROUP).getState());
-        assertEquals(TriggerState.ACTIVE, scheduler.getTrigger("b", Trigger.DEFAULT_GROUP).getState());
-        assertEquals(TriggerState.ACTIVE, scheduler.getTrigger("c", Trigger.DEFAULT_GROUP).getState());
-
-    }
-
-    public void testInitScheduler() throws Exception
-    {
-
+        assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("a", Trigger.DEFAULT_GROUP).getState());
+        assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("b", Trigger.DEFAULT_GROUP).getState());
+        assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("c", Trigger.DEFAULT_GROUP).getState());
 
     }
 }

@@ -46,7 +46,7 @@ public class HibernateTriggerDaoTestCase extends MasterPersistenceTestCase
         Trigger trigger = new NoopTrigger("triggerName", "triggerGroup");
         trigger.getDataMap().put("key", "value");
         trigger.getDataMap().put("class", HibernateTriggerDao.class);
-        trigger.trigger();
+        trigger.fire();
 
         dao.save(trigger);
 

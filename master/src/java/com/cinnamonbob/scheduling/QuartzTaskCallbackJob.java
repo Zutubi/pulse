@@ -24,7 +24,7 @@ public class QuartzTaskCallbackJob implements Job
         try
         {
             Trigger trigger = (Trigger) data.get(TRIGGER_PROP);
-            triggerHandler.trigger(trigger);
+            triggerHandler.fire(trigger);
         }
         catch (SchedulingException e)
         {

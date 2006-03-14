@@ -63,7 +63,7 @@ public class EventSchedulerStrategy implements SchedulerStrategy
 
                     if(accept)
                     {
-                        triggerHandler.trigger(trigger);
+                        triggerHandler.fire(trigger);
                     }
                 }
                 catch (SchedulingException e)
@@ -75,7 +75,7 @@ public class EventSchedulerStrategy implements SchedulerStrategy
         
         activeListenerMap.put(eventTrigger, eventListener);
         eventManager.register(eventListener);
-        trigger.setState(TriggerState.ACTIVE);
+        trigger.setState(TriggerState.SCHEDULED);
     }
 
     public void unschedule(Trigger trigger) throws SchedulingException
@@ -111,7 +111,7 @@ public class EventSchedulerStrategy implements SchedulerStrategy
             EventListener listener = pausedListenerMap.remove(trigger);
             eventManager.register(listener);
             activeListenerMap.put(trigger, listener);
-            trigger.setState(TriggerState.ACTIVE);
+            trigger.setState(TriggerState.SCHEDULED);
         }
     }
 
@@ -128,16 +128,31 @@ public class EventSchedulerStrategy implements SchedulerStrategy
         }
     }
 
+    /**
+     * Required resource.
+     *
+     * @param eventManager
+     */
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param triggerHandler
+     */
     public void setTriggerHandler(TriggerHandler triggerHandler)
     {
         this.triggerHandler = triggerHandler;
     }
 
+    /**
+     * Required resource.
+     * 
+     * @param objectFactory
+     */
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
