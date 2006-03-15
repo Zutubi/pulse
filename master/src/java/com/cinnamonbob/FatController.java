@@ -153,7 +153,7 @@ public class FatController implements EventListener, Stoppable
             if (!stopping)
             {
                 RecipeResultCollector collector = new DefaultRecipeResultCollector(project, configManager);
-                BuildController controller = new BuildController(project, buildSpec, eventManager, buildManager, recipeQueue, collector, quartzScheduler);
+                BuildController controller = new BuildController(project, buildSpec, eventManager, buildManager, recipeQueue, collector, quartzScheduler, configManager);
                 controller.run();
                 runningBuilds.add(controller);
             }

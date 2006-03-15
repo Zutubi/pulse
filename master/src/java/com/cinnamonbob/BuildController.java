@@ -4,7 +4,6 @@ import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.Bootstrapper;
 import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.ObjectFactory;
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.Revision;
@@ -52,7 +51,7 @@ public class BuildController implements EventListener
     private Scheduler quartzScheduler;
     private LazyBobFile lazyBobFile = new LazyBobFile();
 
-    public BuildController(Project project, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler)
+    public BuildController(Project project, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, ConfigurationManager configManager)
     {
         this.project = project;
         this.specification = specification;
@@ -62,6 +61,7 @@ public class BuildController implements EventListener
         this.collector = collector;
         this.quartzScheduler = quartScheduler;
         this.asyncListener = new AsynchronousDelegatingListener(this);
+        this.configurationManager = configManager;
     }
 
     public void run()
@@ -325,11 +325,11 @@ public class BuildController implements EventListener
             {
                 initialiseNodes(controller.getChildBootstrapper(), node.getChildren());
             }
-            else if(result.failed())
+            else if (result.failed())
             {
                 buildResult.failure("Recipe " + result.getRecipeNameSafe() + " failed");
             }
-            else if(result.errored())
+            else if (result.errored())
             {
                 buildResult.error("Error executing recipe " + result.getRecipeNameSafe());
             }
