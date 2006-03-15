@@ -218,7 +218,7 @@ public class AdminClient
 
         public int doExecute() throws XmlRpcException
         {
-            xmlRpcClient.execute("RemoteApi.setpassword", new Object[]{adminToken, user, password});
+            xmlRpcClient.execute("RemoteApi.setPassword", new Object[]{adminToken, user, password});
             return 0;
         }
     }

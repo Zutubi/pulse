@@ -1,6 +1,8 @@
 package com.cinnamonbob.api;
 
 import com.cinnamonbob.ShutdownManager;
+import com.cinnamonbob.model.UserManager;
+import com.cinnamonbob.model.User;
 import com.cinnamonbob.bootstrap.ComponentContext;
 
 /**
@@ -10,6 +12,7 @@ public class RemoteApi
 {
     private TokenManager tokenManager;
     private ShutdownManager shutdownManager;
+    private UserManager userManager;
 
     public RemoteApi()
     {
@@ -38,14 +41,48 @@ public class RemoteApi
         return true;
     }
 
+    public void setPassword(String token, String username, String password) throws AuthenticationException
+    {
+        tokenManager.verifyAdmin(token);
+
+        User user = userManager.getUser(username);
+        if (user == null)
+        {
+            throw new IllegalArgumentException("unknown username '"+username+"'");
+        }
+        
+        user.setPassword(password);
+        userManager.save(user);
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param tokenManager
+     */
     public void setTokenManager(TokenManager tokenManager)
     {
         this.tokenManager = tokenManager;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param shutdownManager
+     */
     public void setShutdownManager(ShutdownManager shutdownManager)
     {
         this.shutdownManager = shutdownManager;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param userManager
+     */
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 
     private class ShutdownRunner implements Runnable
