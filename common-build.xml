@@ -14,6 +14,8 @@
         <property name="test.classes.dir" value="${build.dir}/test.classes"/>
         <property name="report.dir" value="${build.dir}/reports"/>
 
+        <property name="project.repository" value="${project.root.dir}/build/repository"/>
+
         <dirname property="current.dir" file="ivy.xml"/>
 
         <property file="${project.root.dir}/ivy.properties"/>
@@ -134,7 +136,7 @@
             <!-- copy the dependencies into the local directory -->
             <ivy:retrieve validate="true" conf="@{conf}"/>
             <!-- deliver resolved ivy file so that it can be used by dependent modules. -->
-            <ivy:deliver deliverpattern="${project.root.dir}/build/repository/[module]/ivy-[revision].xml"/>
+            <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
         </sequential>
     </macrodef>
 

@@ -4,7 +4,7 @@ testCheckoutRevisionOfFile:
     file1.txt modified by author a with contents 'file1.txt latests contents'
     
 testCheckout
-    file1.txt checked in by author a    
+    file1.txt checked in by author a
     file2.txt checked in by author a
     dir1/file3.txt checked in by author a
     dir2 added by author a
