@@ -6,6 +6,7 @@ import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.UserManager;
 import com.cinnamonbob.security.AcegiUtils;
+import com.cinnamonbob.Version;
 import com.opensymphony.webwork.views.velocity.VelocityManager;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import org.apache.velocity.context.Context;
@@ -38,6 +39,11 @@ public class CustomVelocityManager extends VelocityManager
             User user = getUserManager().getUser(login);
             context.put("principle", user);
         }
+
+        // add version strings.
+        context.put("version_number", Version.getVersion());
+        context.put("build_date", Version.getBuildDate());
+        context.put("build_number", Version.getBuildNumber());
 
         return context;
     }

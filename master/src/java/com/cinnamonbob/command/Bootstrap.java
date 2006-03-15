@@ -1,26 +1,17 @@
 package com.cinnamonbob.command;
 
 import com.cinnamonbob.BobServer;
-import com.cinnamonbob.ShutdownService;
-import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.util.logging.Logger;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
 
 
 /**
- * @author Daniel Ostermeier
+ *
  */
 public class Bootstrap
 {
     private static final Logger LOG = Logger.getLogger(Bootstrap.class);
 
     //TODO: support command the form ... options COMMAND command-options ARGUMENTS
-
-    // server connection details.
-    private String host = "localhost";
 
     public void parse(String args[]) throws Exception
     {
@@ -34,10 +25,6 @@ public class Bootstrap
         if ("start".equals(command))
         {
             start(args);
-        }
-        else if ("stop".equals(command))
-        {
-            stop();
         }
         else
         {
@@ -55,31 +42,4 @@ public class Bootstrap
         BobServer server = new BobServer();
         server.start();
     }
-
-    public void stop()
-    {
-        // connect to the admin port and send the stop command...
-        Socket socket = null;
-        try
-        {
-            socket = new Socket(host, 8081);
-
-            // send the stop command.
-            OutputStream out = socket.getOutputStream();
-            out.write(ShutdownService.Command.SHUTDOWN.getBytes());
-            out.close();
-
-        }
-        catch (IOException e)
-        {
-            LOG.warning("Unable to send stop request", e);
-
-        }
-        finally
-        {
-            IOUtils.close(socket);
-        }
-
-    }
-
 }

@@ -2,6 +2,7 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.MasterBuildPaths;
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.web.DirectoryEntry;
 import com.opensymphony.util.TextUtils;
 
@@ -24,6 +25,8 @@ public class BrowseProjectDir extends ProjectActionSupport
     private List<DirectoryEntry> entries;
     private InputStream inputStream;
     private String contentType;
+
+    private ConfigurationManager configurationManager;
 
     public String getPath()
     {
@@ -119,7 +122,7 @@ public class BrowseProjectDir extends ProjectActionSupport
             return ERROR;
         }
 
-        MasterBuildPaths paths = new MasterBuildPaths();
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File file;
         if(TextUtils.stringSet(path))
         {
@@ -154,4 +157,8 @@ public class BrowseProjectDir extends ProjectActionSupport
         return ERROR;
     }
 
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
 }
