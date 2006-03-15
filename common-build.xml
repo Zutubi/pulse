@@ -59,7 +59,8 @@
 
         <!-- resolve dependencies -->
         <resolve conf="external"/>
-        <resolve conf="internal"/>
+        <resolve conf="release"/>
+        <resolve conf="test"/>
 
     </target>
 

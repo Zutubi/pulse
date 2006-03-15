@@ -41,14 +41,26 @@ public class RemoteApi
         return true;
     }
 
-    public boolean setPassword(String token, String username, String password) throws AuthenticationException
+    /**
+     * Update the specified users password.
+     *
+     * @param token used to authenticate the request.
+     *
+     * @param login name identifying the user whose password is being set.
+     * @param password is the new password.
+     *
+     * @return true if the request was successful, false otherwise.
+     *
+     * @throws AuthenticationException if the token does not authorise administrator access.
+     */
+    public boolean setPassword(String token, String login, String password) throws AuthenticationException
     {
         tokenManager.verifyAdmin(token);
 
-        User user = userManager.getUser(username);
+        User user = userManager.getUser(login);
         if (user == null)
         {
-            throw new IllegalArgumentException("unknown username '"+username+"'");
+            throw new IllegalArgumentException("unknown username '"+login +"'");
         }
 
         user.setPassword(password);

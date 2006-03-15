@@ -11,17 +11,19 @@
 
     <configurations>
         <conf name="external" description="external dependencies"/>
-        <conf name="internal" description="internal dependencies"/>
+        <conf name="release"/>
+        <conf name="test"/>
     </configurations>
 
     <publications>
-        <artifact name="master" type="jar" conf="internal"/>
+        <artifact name="master" type="jar" conf="release"/>
     </publications>
 
     <dependencies>
 
+        <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="release->release"/>
         <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="external->external"/>
-        <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="internal->internal"/>
+        <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="test->test"/>
 
         <!-- command line interface. -->
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external->default"/>

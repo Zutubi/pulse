@@ -11,12 +11,13 @@
 
     <configurations>
         <conf name="external" description="external dependencies"/>
-        <conf name="internal" description="internal dependencies"/>
+        <conf name="release"/>
+        <conf name="test"/>
     </configurations>
 
     <publications>
-        <artifact name="core" type="jar" conf="internal"/>
-        <artifact name="core-test" type="jar" conf="internal"/>
+        <artifact name="core" type="jar" conf="release"/>
+        <artifact name="core-test" type="jar" conf="test"/>
     </publications>
 
     <dependencies>

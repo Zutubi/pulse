@@ -11,18 +11,20 @@
 
     <configurations>
         <conf name="external" description="external dependencies"/>
-        <conf name="internal" description="internal dependencies"/>
+        <conf name="release"/>
+        <conf name="test"/>
     </configurations>
 
     <publications>
-        <artifact name="server-core" type="jar" conf="internal"/>
-        <artifact name="server-core-test" type="jar" conf="internal"/>
+        <artifact name="server-core" type="jar" conf="release"/>
+        <artifact name="server-core-test" type="jar" conf="test"/>
     </publications>
 
     <dependencies>
 
         <dependency org="cinnamonbob" name="core" rev="latest.integration" conf="external->external"/>
-        <dependency org="cinnamonbob" name="core" rev="latest.integration" conf="internal->internal"/>
+        <dependency org="cinnamonbob" name="core" rev="latest.integration" conf="release->release"/>
+        <dependency org="cinnamonbob" name="core" rev="latest.integration" conf="test->test"/>
 
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external->default"/>
         <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external->default"/>

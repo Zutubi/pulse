@@ -11,7 +11,8 @@
 
     <configurations>
         <conf name="external" description="external dependencies"/>
-        <conf name="internal" description="internal dependencies"/>
+        <conf name="release"/>
+        <conf name="test"/>
     </configurations>
 
     <publications>
@@ -20,8 +21,9 @@
 
     <dependencies>
 
+        <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="release->release"/>
         <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="external->external"/>
-        <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="internal->internal"/>
+        <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="test->test"/>
 
     </dependencies>
 
