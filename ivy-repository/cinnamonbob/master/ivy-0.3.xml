@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="cinnamonbob" module="master" release="0.3" status="integration">
+        <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
+        <description homepage="http://www.cinnamonbob.com/">
+            description....
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="external" description="external dependencies"/>
+        <conf name="internal" description="internal dependencies"/>
+    </configurations>
+
+    <publications>
+        <artifact name="master" type="jar" conf="internal"/>
+    </publications>
+
+    <dependencies>
+
+        <dependency org="cinnamonbob" name="server-core" rev="0.3" conf="external->external"/>
+        <dependency org="cinnamonbob" name="server-core" rev="0.3" conf="internal->internal"/>
+
+        <!-- temporal scheduling -->
+        <dependency org="opensymphony" name="quartz" rev="1.5.1" conf="external->default"/>
+
+        <dependency org="displaytag" name="displaytag" rev="1.0" conf="external->default"/>
+
+        <dependency org="sun" name="javamail" rev="1.3.2" conf="external->default"/>
+
+        <!-- external notifications... -->
+        <dependency org="ymsg" name="ymsg" rev="0.61" conf="external->default"/>
+
+        <dependency org="apache" name="xmlrpc" rev="3.0a1" conf="external->default"/>
+
+    </dependencies>
+
+
+</ivy-module>

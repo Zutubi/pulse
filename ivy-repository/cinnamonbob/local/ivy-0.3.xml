@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="cinnamonbob" module="local" release="0.3" status="integration">
+        <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
+        <description homepage="http://www.cinnamonbob.com/">
+            description....
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="external" description="external dependencies"/>
+        <conf name="internal" description="internal dependencies"/>
+        <conf name="release"/>
+    </configurations>
+
+    <publications>
+        <artifact name="local" type="jar" conf="release"/>
+    </publications>
+
+    <dependencies>
+
+        <!-- command line parsing -->
+        <dependency org="apache" name="commons-cli" rev="1.0" conf="external->default"/>
+
+        <dependency org="cinnamonbob" name="core" rev="0.3" conf="internal->internal"/>
+        <dependency org="cinnamonbob" name="core" rev="0.3" conf="external->external"/>
+
+    </dependencies>
+
+
+</ivy-module>
