@@ -8,7 +8,6 @@
 
     <target name="clean">
         <delete dir="build"/>
-        <delete dir=".ivy-cache/cinnamonbob"/>
     </target>
 
     <target name="clean.all" depends="clean">
