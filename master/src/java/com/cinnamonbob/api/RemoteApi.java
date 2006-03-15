@@ -41,7 +41,7 @@ public class RemoteApi
         return true;
     }
 
-    public void setPassword(String token, String username, String password) throws AuthenticationException
+    public boolean setPassword(String token, String username, String password) throws AuthenticationException
     {
         tokenManager.verifyAdmin(token);
 
@@ -50,9 +50,10 @@ public class RemoteApi
         {
             throw new IllegalArgumentException("unknown username '"+username+"'");
         }
-        
+
         user.setPassword(password);
         userManager.save(user);
+        return true;
     }
 
     /**
