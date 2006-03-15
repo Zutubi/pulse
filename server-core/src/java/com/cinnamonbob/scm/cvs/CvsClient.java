@@ -152,12 +152,12 @@ public class CvsClient
 
             if (!client.executeCommand(checkout, globalOptions))
             {
-                throw new SCMException("checkout failed..");
+                throw new SCMException("Execution of checkout command failed. Reason is unknown.");
             }
         }
         catch (AuthenticationException ae)
         {
-            throw new SCMException(ae);
+            throw handleAuthenticationException(ae);
         }
         catch (CommandAbortedException cae)
         {
@@ -171,6 +171,11 @@ public class CvsClient
         {
             CvsUtils.close(connection);
         }
+    }
+
+    private SCMException handleAuthenticationException(AuthenticationException ae)
+    {
+        return new SCMException("Authentication failure. Failed to connect to requested cvs server '"+root+"'", ae);
     }
 
     /**
@@ -268,7 +273,7 @@ public class CvsClient
         }
         catch (AuthenticationException ae)
         {
-            throw new SCMException(ae);
+            throw handleAuthenticationException(ae);
         }
         catch (CommandAbortedException cae)
         {
@@ -485,7 +490,7 @@ public class CvsClient
         }
         catch (AuthenticationException ae)
         {
-            throw new SCMException(ae);
+            throw handleAuthenticationException(ae);
         }
         catch (CommandException ce)
         {
@@ -580,7 +585,6 @@ public class CvsClient
         }
 
     }
-
 
     /**
      * Simple value object used to help store data during the changeset analysis process.

@@ -159,12 +159,12 @@ public class LocalBuildTest extends BobTestCase
         }
     }
 
-    private void cleanExceptionFiles(File dir)
+    private void cleanExceptionFiles(File dir) throws IOException
     {
         File exceptionFile = new File(dir, "exception");
-        if (exceptionFile.exists())
+        if (exceptionFile.exists() && !exceptionFile.delete())
         {
-            exceptionFile.delete();
+            throw new IOException("Failed to delete the file '"+exceptionFile+"'.");
         }
 
         for (String filename : dir.list())

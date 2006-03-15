@@ -23,6 +23,9 @@
         <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="external->external"/>
         <dependency org="cinnamonbob" name="server-core" rev="latest.integration" conf="internal->internal"/>
 
+        <!-- command line interface. -->
+        <dependency org="apache" name="commons-cli" rev="1.0" conf="external->default"/>
+
         <!-- temporal scheduling -->
         <dependency org="opensymphony" name="quartz" rev="1.5.1" conf="external->default"/>
 
