@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="core module" basedir=".">
 
-    <import file="../common-build.xml" />
+    <import file="../common-build.xml"/>
 
     <target name="module-init">
         <property name="module" value="core"/>
         <dirname property="project.root.dir" file="../build.xml"/>
+        <property file="${project.root.dir}/build.properties"/>
+    </target>
+
+    <target name="module-post-test">
+
+        <!-- replace the version.properties variables -->
+        <tstamp>
+            <format property="build.date" pattern="d-MMMM-yyyy"/>
+        </tstamp>
+        <property name="version.properties" value="${classes.dir}/com/cinnamonbob/version.properties"/>
+        <replace file="${version.properties}" token="@VERSION@" value="${bob.version}"/>
+        <replace file="${version.properties}" token="@BUILD_DATE@" value="${build.date}"/>
+        <replace file="${version.properties}" token="@BUILD_NUMBER@" value="${bob.build}"/>
     </target>
 
 </project>

@@ -47,6 +47,7 @@
 
     <!-- prepare for new build -->
     <target name="prepare" depends="init">
+
         <!-- create necessary directories -->
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${classes.dir}"/>
@@ -64,8 +65,17 @@
 
     </target>
 
-    <!-- execute build -->
-    <target name="build" depends="init">
+    <!-- execute the build -->
+    <target name="build" depends="init, module-pre-build, common-build, module-post-build"/>
+
+    <!-- a pre build hook that can be overriden in the modules build.xml -->
+    <target name="module-pre-build"/>
+
+    <!-- a post build hook that can be overriden in the modules build.xml -->
+    <target name="module-post-build"/>
+
+    <!-- execute the common portion of the build. -->
+    <target name="common-build" depends="init">
 
         <javac srcdir="${src.dir}" destdir="${classes.dir}">
             <classpath refid="lib.path"/>
@@ -92,8 +102,14 @@
 
     <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
 
+    <target name="test" depends="init, module-pre-test, common-test, module-post-test"/>
+
+    <target name="module-pre-test"/>
+    
+    <target name="module-post-test"/>
+
     <!-- run test cases -->
-    <target name="test" depends="init">
+    <target name="common-test">
         <junit printsummary="yes" fork="on" haltonfailure="yes">
             <classpath>
                 <pathelement location="${classes.dir}"/>

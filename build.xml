@@ -4,7 +4,7 @@
 <!-- -->
 <project name="Cinnamon Bob" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
 
-    <property name="bob.version" value="dev"/>
+    <property file="build.properties"/>
 
     <target name="clean">
         <delete dir="build"/>
