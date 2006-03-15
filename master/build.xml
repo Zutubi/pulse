@@ -5,7 +5,7 @@
 
     <target name="module-init">
         <property name="module" value="master"/>
-        <property name="project.root.dir" value="../"/>
+        <dirname property="project.root.dir" file="../build.xml"/>
     </target>
 
 </project>
