@@ -28,14 +28,14 @@
             <td>
 
     <table width="100%" class="content">
-        #actionHeadingRow("recent.builds" 10 "search.builds" "searchBuilds.action?projectId=$project.id" "zoom.gif" "recent.builds.search")
+        #actionHeadingRow("recent.builds" 11 "search.builds" "searchBuilds.action?projectId=$project.id" "zoom.gif" "recent.builds.search")
         <tr>
             #contentHeading("build.id" 1)
             #contentHeading("build.status" 2)
             #contentHeading("build.spec" 1)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 4)
+            #contentHeading("actions" 5)
         </tr>
 #if($history.size() > 0)
     #foreach($buildResult in $history)
@@ -50,6 +50,7 @@
             #logCell($project $buildResult)
             #changesCell($project $buildResult)
             #artifactsCell($project $buildResult)
+            #workingCopyCell($project $buildResult)
         </tr>
     #end
     </table>
@@ -122,7 +123,7 @@
         </tr>
 #else
         <tr>
-            <td class="content" colspan="10">
+            <td class="content" colspan="11">
                 #wwtext("name=no.history")
             </td>
         </tr>

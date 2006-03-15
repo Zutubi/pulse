@@ -1,18 +1,18 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.MasterBuildPaths;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.web.DirectoryEntry;
 import com.opensymphony.util.TextUtils;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.List;
-import java.util.LinkedList;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -25,8 +25,8 @@ public class BrowseProjectDir extends ProjectActionSupport
     private List<DirectoryEntry> entries;
     private InputStream inputStream;
     private String contentType;
-
     private ConfigurationManager configurationManager;
+    private boolean foundBase = true;
 
     public String getPath()
     {
@@ -70,13 +70,13 @@ public class BrowseProjectDir extends ProjectActionSupport
 
     private String getParentPath()
     {
-        if(path.endsWith(File.separator))
+        if (path.endsWith(File.separator))
         {
             path = path.substring(0, path.length() - 1);
         }
 
         int index = path.lastIndexOf(File.separatorChar);
-        if(index == -1)
+        if (index == -1)
         {
             return "";
         }
@@ -86,18 +86,23 @@ public class BrowseProjectDir extends ProjectActionSupport
         }
     }
 
+    public boolean isFoundBase()
+    {
+        return foundBase;
+    }
+
     private void createDirectoryEntries(File dir)
     {
         entries = new LinkedList<DirectoryEntry>();
 
-        if(TextUtils.stringSet(path))
+        if (TextUtils.stringSet(path))
         {
             entries.add(new DirectoryEntry(dir.getParentFile(), "..", getParentPath()));
         }
 
         File[] files = dir.listFiles();
         Arrays.sort(files);
-        for(File f: files)
+        for (File f : files)
         {
             entries.add(new DirectoryEntry(f, f.getName(), path + File.separatorChar + f.getName()));
         }
@@ -116,29 +121,41 @@ public class BrowseProjectDir extends ProjectActionSupport
     public String execute()
     {
         buildResult = getBuildManager().getBuildResult(buildId);
-        if(buildResult == null)
+        if (buildResult == null)
         {
             addActionError("Unknown build [" + buildId + "]");
             return ERROR;
         }
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File file;
-        if(TextUtils.stringSet(path))
+        File baseDir = paths.getBaseDir(buildResult.getProject(), buildResult, recipeId);
+
+        // First check if the build is complete and has a working directory
+        // If not, we forward to the same page, which tells the user the bad
+        // news.
+        if (!buildResult.completed() || !baseDir.isDirectory())
         {
-            file = new File(paths.getBaseDir(buildResult.getProject(), buildResult, recipeId), path);
+            foundBase = false;
+            return "dir";
+        }
+
+        File file;
+        if (TextUtils.stringSet(path))
+        {
+            file = new File(baseDir, path);
         }
         else
         {
-            file = paths.getBaseDir(buildResult.getProject(), buildResult, recipeId);
+            file = baseDir;
+            path = "";
         }
 
-        if(file.isDirectory())
+        if (file.isDirectory())
         {
             createDirectoryEntries(file);
             return "dir";
         }
-        else if(file.isFile())
+        else if (file.isFile())
         {
             try
             {

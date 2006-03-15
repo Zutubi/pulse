@@ -180,6 +180,7 @@
         #buildTab($result "command-log" "viewCommandLog" $selected)
         #buildTab($result "changes" "viewChanges" $selected)
         #buildTab($result "artifacts" "viewBuildArtifacts" $selected)
+        #tabItem("working-dir" "browseProjectDir.action?buildId=$result.id&amp;recipeId=" $selected)
     #closeTabs()
 #end
 
@@ -470,6 +471,16 @@
         <a href="viewBuildArtifacts.action?id=$result.id">#wwtext("name=artifacts")</a>
     </td>
 #end
+
+##
+## Outputs an action cell for viewing the working copy for a build
+##
+#macro(workingCopyCell $project $result)
+    <td class="content">
+        <a href="browseProjectDir.action?buildId=$result.id&amp;recipeId=$result.root.children.get(0).result.id">#wwtext("name=working.copy")</a>
+    </td>
+#end
+
 
 ##
 ## Expands to the icon for the given type of SCM.
@@ -940,7 +951,7 @@
     <table>
         <tr><td>
             <table class="content">
-                #headingRow("build.summary" 10)
+                #headingRow("build.summary" 11)
                 <tr>
                     #contentHeading("build.id" 1)
                     #contentHeading("build.status" 2)
@@ -948,7 +959,7 @@
                     #contentHeading("build.when" 1)
                     #contentHeading("build.elapsed" 1)
     #if($showActions)
-                    #contentHeading("actions" 4)
+                    #contentHeading("actions" 5)
     #end
                 </tr>
                 <tr>
@@ -963,6 +974,7 @@
                     #logCell($project $buildResult)
                     #changesCell($project $buildResult)
                     #artifactsCell($project $buildResult)
+                    #workingCopyCell($project $buildResult)
     #end
                 </tr>
             </table>
@@ -1021,7 +1033,7 @@
 ##
 #macro(recentBuilds $projects $showAdd)
     <table class="content">
-        #headingRow("latest.builds" 11)
+        #headingRow("latest.builds" 12)
         <tr>
             #contentHeading("project.name" 1)
             #contentHeading("build.status" 2)
@@ -1029,7 +1041,7 @@
             #contentHeading("build.id" 1)
             #contentHeading("build.spec" 1)
             #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 4)
+            #contentHeading("actions" 5)
         </tr>
 
     #foreach($project in $projects)
@@ -1051,6 +1063,7 @@
             #logCell($project $lastResult)
             #changesCell($project $lastResult)
             #artifactsCell($project $lastResult)
+            #workingCopyCell($project $lastResult)
         #else
             #contentCell("empty.cell")
             #contentCell("not.applicable")
@@ -1062,11 +1075,12 @@
             #contentCell("empty.cell")
             #contentCell("empty.cell")
             #contentCell("empty.cell")
+            #contentCell("empty.cell")
         #end
         </tr>
     #end
     #if($showAdd)
-        #addRow("add.project" 11 "addProject!input.action" "project.add")
+        #addRow("add.project" 12 "addProject!input.action" "project.add")
     #end
         </table>
 #end

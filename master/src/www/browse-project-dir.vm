@@ -7,8 +7,12 @@
 <body>
     <h1>:: #wwtext("name=browse.dir") ::</h1>
 
+    #buildTabs($buildResult "working-dir")
+
+#if($buildResult.completed())
+    #if($foundBase)
     <table class="content">
-        #headingRow($!webwork.htmlEncode($path) 4)
+        #headingRow("$action.getText('path') :: base.dir/$!webwork.htmlEncode($path)" 4)
         <tr>
             <td class="image">&nbsp;</td>
             #contentHeading("name" 1)
@@ -36,4 +40,14 @@
         </tr>
 #end
     </table>
+    #else
+    <p>
+        #wwtext("name=working.dir.cleaned")
+    </p>
+    #end
+#else
+    <p>
+        #wwtext("name=working.dir.pending")
+    </p>
+#end
 </html>

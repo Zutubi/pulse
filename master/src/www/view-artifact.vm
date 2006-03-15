@@ -17,7 +17,7 @@
         </tr>
     </table>
 #end
-
+    
     <table class="decorated">
         <tr><th class="heading" colspan="2">$!webwork.htmlEncode($artifact.path)</th></tr>
 
