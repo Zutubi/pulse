@@ -19,7 +19,7 @@
           </table>
       </div>
       <div id="footer">
-        <strong>:: cinnabo ::</strong>
+        <strong>:: cinnabo ($version_number #$build_number) ::</strong>
         copyright &copy; 2005-2006 zutubi pty ltd
       </div>
     </body>
