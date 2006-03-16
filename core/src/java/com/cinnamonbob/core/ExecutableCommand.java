@@ -1,10 +1,10 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.StoredFileArtifact;
 import com.cinnamonbob.core.model.StoredArtifact;
-import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.core.model.StoredFileArtifact;
 import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
@@ -66,7 +66,7 @@ public class ExecutableCommand implements Command
         builder.redirectErrorStream(true);
 
         File outputFileDir = new File(outputDir, "command output");
-        if(!outputFileDir.mkdir())
+        if (!outputFileDir.mkdir())
         {
             throw new BuildException("Unable to create directory for output artifact '" + outputFileDir.getAbsolutePath() + "'");
         }
@@ -74,15 +74,30 @@ public class ExecutableCommand implements Command
         try
         {
             child = builder.start();
-
-            if (terminated)
+        }
+        catch (IOException e)
+        {
+            // CIB-149: try and make friendlier error messages for common
+            // problems.
+            String message = e.getMessage();
+            if (message.contains("nosuchexe"))
             {
-                // Catches the case where we were asked to terminate before
-                // creating the child process.
-                cmdResult.error("Command terminated");
-                return;
+                message = "No such executable '" + exe + "'";
             }
 
+            throw new BuildException("Unable to create process: " + message, e);
+        }
+
+        if (terminated)
+        {
+            // Catches the case where we were asked to terminate before
+            // creating the child process.
+            cmdResult.error("Command terminated");
+            return;
+        }
+
+        try
+        {
             File outputFile = new File(outputFileDir, "output.txt");
             FileOutputStream output = null;
             try
@@ -120,7 +135,7 @@ public class ExecutableCommand implements Command
             String path = FileSystemUtils.composeFilename(outputFileDir.getName(), outputFile.getName());
             StoredFileArtifact fileArtifact = new StoredFileArtifact(path, "text/plain");
             StoredArtifact artifact = new StoredArtifact("command output", fileArtifact);
-            for(ProcessArtifact p: processes)
+            for (ProcessArtifact p : processes)
             {
                 p.getProcessor().process(outputDir, fileArtifact, cmdResult);
             }
