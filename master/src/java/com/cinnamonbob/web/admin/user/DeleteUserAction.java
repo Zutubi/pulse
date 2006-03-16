@@ -2,44 +2,32 @@ package com.cinnamonbob.web.admin.user;
 
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.web.user.UserActionSupport;
-
-import java.util.Arrays;
+import com.cinnamonbob.security.AcegiUtils;
 
 /**
  * <class-comment/>
  */
 public class DeleteUserAction extends UserActionSupport
 {
-    private long id;
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
     public void validate()
     {
-        if (getUserManager().getUser(id) == null)
+        if (getUser() == null)
         {
-            addFieldError("id", getText("user.id.unknown", Arrays.asList(id)));
+            addUnknownUserActionError();
         }
 
         // check if the user is currently logged in.
-
+        String loggedInUser = AcegiUtils.getLoggedInUser();
+        if (getUser().getLogin().equals(loggedInUser))
+        {
+            addActionError(getText("user.delete.self"));
+        }
     }
 
     public String execute()
     {
-        User user = getUserManager().getUser(id);
-        if (user != null)
-        {
-            getUserManager().delete(user);
-        }
+        User user = getUser();
+        getUserManager().delete(user);
         return SUCCESS;
     }
 }

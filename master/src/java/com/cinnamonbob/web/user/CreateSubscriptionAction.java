@@ -103,7 +103,7 @@ public class CreateSubscriptionAction extends UserActionSupport
         User user = getUser();
         if (user == null)
         {
-            addUnknownUserError();
+            addUnknownUserActionError();
             return ERROR;
         }
 
@@ -146,7 +146,7 @@ public class CreateSubscriptionAction extends UserActionSupport
         User user = getUser();
         if (user == null)
         {
-            addUnknownUserError();
+            addUnknownUserActionError();
             return;
         }
 

@@ -25,7 +25,7 @@
 
             <div class="results">
                 #bodytag( Table "class=simple" "name=results" "pagesize=5" "sort=list")
-                    #tag( Column "property=login" "title=Login" "href=viewUser.action" "paramId=id" "paramProperty=id")
+                    #tag( Column "property=login" "title=Login" "href=viewUser.action" "paramId=userId" "paramProperty=id")
                     #tag( Column "property=name" "title=Name" "sortable=true")
                 #end
             </div>

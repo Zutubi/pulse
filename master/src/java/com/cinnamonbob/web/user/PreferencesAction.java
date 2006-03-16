@@ -1,7 +1,6 @@
 package com.cinnamonbob.web.user;
 
 import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.UserManager;
 import com.cinnamonbob.security.AcegiUtils;
 
 /**
@@ -23,7 +22,7 @@ public class PreferencesAction extends UserActionSupport
         User user = getUser();
         if (user == null)
         {
-            addUnknownUserError();
+            addUnknownUserActionError();
             return ERROR;
         }
         return super.doInput();

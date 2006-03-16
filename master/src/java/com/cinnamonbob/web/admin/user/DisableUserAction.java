@@ -8,21 +8,17 @@ import com.cinnamonbob.model.User;
  */
 public class DisableUserAction extends UserActionSupport
 {
-    private long id;
-
-    public long getId()
+    public void validate()
     {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
+        if (getUser() == null)
+        {
+            addUnknownUserActionError();
+        }
     }
 
     public String execute()
     {
-        User user = getUserManager().getUser(id);
+        User user = getUser();
         if (user != null)
         {
             user.setEnabled(false);

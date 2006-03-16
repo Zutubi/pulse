@@ -9,7 +9,6 @@ import com.cinnamonbob.model.ContactPoint;
 public class DeleteContactPointAction extends UserActionSupport
 {
     private long id;
-    private long user;
 
     public void setId(long id)
     {
@@ -33,14 +32,4 @@ public class DeleteContactPointAction extends UserActionSupport
 
         return SUCCESS;
     }
-/*
-    public void setUser(long user)
-    {
-        this.user = user;
-    }
-
-    public long getUser()
-    {
-        return user;
-    }*/
 }

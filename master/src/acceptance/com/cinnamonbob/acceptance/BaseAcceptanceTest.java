@@ -12,10 +12,10 @@ import java.io.IOException;
 public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
 {
     //---( administrations create user form )---
-    private static final String FO_USER_CREATE = "user.create";
-    protected static final String USER_CREATE_LOGIN = "user.login";
-    protected static final String USER_CREATE_NAME = "user.name";
-    protected static final String USER_CREATE_PASSWORD = "user.password";
+    private static final String FO_USER_CREATE = "newUser.create";
+    protected static final String USER_CREATE_LOGIN = "newUser.login";
+    protected static final String USER_CREATE_NAME = "newUser.name";
+    protected static final String USER_CREATE_PASSWORD = "newUser.password";
     protected static final String USER_CREATE_CONFIRM = "confirm";
     protected static final String USER_CREATE_ADMIN = "admin";
 

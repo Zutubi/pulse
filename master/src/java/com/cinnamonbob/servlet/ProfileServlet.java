@@ -19,7 +19,7 @@ public class ProfileServlet extends HttpServlet
     // This needs review. Where should this servlet direct a user? Can you view another users
     // profile?
 
-    private static final String DISPLAY_PROFILE_PATH = "/admin/viewUser.action?id={0}";
+    private static final String DISPLAY_PROFILE_PATH = "/admin/viewUser.action?userId={0}";
 
     private UserManager userManager;
 

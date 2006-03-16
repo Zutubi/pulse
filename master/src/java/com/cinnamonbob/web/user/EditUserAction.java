@@ -7,18 +7,7 @@ import com.cinnamonbob.model.User;
  */
 public class EditUserAction extends UserActionSupport
 {
-    private long id;
     private User user = new User();
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
 
     public User getUser()
     {
@@ -27,13 +16,13 @@ public class EditUserAction extends UserActionSupport
 
     public String doInput() throws Exception
     {
-        user = getUserManager().getUser(id);
+        user = getUser();
         return super.doInput();
     }
 
     public String execute()
     {
-        User persistentUser = getUserManager().getUser(getId());
+        User persistentUser = getUser();
         persistentUser.setName(user.getName());
         getUserManager().save(persistentUser);
         return SUCCESS;

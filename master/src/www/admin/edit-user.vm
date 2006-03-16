@@ -12,7 +12,7 @@
     #parse("/template/includes/actionerrors.vm")
 
     #wwcform("action=editUser.action" "heading=%{getText('user.edit')}" "method=post")
-        #wwhidden("name=id")
+        #wwhidden("name=userId")
         #wwcheckbox("name=admin" "label=%{getText('user.admin')}" "tabindex=1")
         #openSubmit()
             #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=3")

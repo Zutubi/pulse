@@ -12,13 +12,13 @@ import java.util.Arrays;
  */
 public class CreateUserAction extends UserActionSupport
 {
-    private User user = new User();
+    private User newUser = new User();
     private String confirm;
     private boolean grantAdminPermissions;
 
-    public User getUser()
+    public User getNewUser()
     {
-        return user;
+        return newUser;
     }
 
     public String getConfirm()
@@ -50,30 +50,30 @@ public class CreateUserAction extends UserActionSupport
             return;
         }
         // check the password confirmation.
-        if (!confirm.equals(user.getPassword()))
+        if (!confirm.equals(newUser.getPassword()))
         {
             addFieldError("confirm", getText("user.confirm.mismatch"));
         }
 
         // check that the user does not already exist.
-        if (getUserManager().getUser(user.getLogin()) != null)
+        if (getUserManager().getUser(newUser.getLogin()) != null)
         {
             // login name already in use.
-            addFieldError("user.login", getText("user.login.exists", Arrays.asList(user.getLogin())));
+            addFieldError("newUser.login", getText("user.login.exists", Arrays.asList(newUser.getLogin())));
         }
     }
 
     public String execute() throws Exception
     {
         // ensure that the user has the correct authorities to login.
-        user.add(GrantedAuthority.USER);
+        newUser.add(GrantedAuthority.USER);
         if (grantAdminPermissions)
         {
-            user.add(GrantedAuthority.ADMINISTRATOR);
+            newUser.add(GrantedAuthority.ADMINISTRATOR);
         }
-        user.setEnabled(true);
-        user.setDefaultAction(DefaultAction.WELCOME_ACTION);
-        getUserManager().save(user);
+        newUser.setEnabled(true);
+        newUser.setDefaultAction(DefaultAction.WELCOME_ACTION);
+        getUserManager().save(newUser);
         doReset();
         return SUCCESS;
     }
@@ -81,6 +81,6 @@ public class CreateUserAction extends UserActionSupport
     public void doReset()
     {
         // reset the user details.
-        user = new User();
+        newUser = new User();
     }
 }

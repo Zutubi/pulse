@@ -11,19 +11,7 @@ import com.cinnamonbob.security.AcegiUtils;
  */
 public class EditUserAction extends UserActionSupport
 {
-    private long id;
-
     private boolean admin;
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
 
     public boolean isAdmin()
     {
@@ -37,7 +25,7 @@ public class EditUserAction extends UserActionSupport
 
     public String doInput()
     {
-        User user = getUserManager().getUser(id);
+        User user = getUser();
         admin = user.hasAuthority(ADMINISTRATOR);
         return INPUT;
     }
@@ -47,10 +35,10 @@ public class EditUserAction extends UserActionSupport
         // the currently logged in user can not remove admin permissions from themselves.
         // only another admin can do this, thereby ensuring that there is always at least
         // one admin in the system.
-        User user = getUserManager().getUser(getId());
+        User user = getUser();
 
         String loggedInUser = AcegiUtils.getLoggedInUser();
-        if (user.getLogin().equals(loggedInUser) && (admin == false))
+        if (user.getLogin().equals(loggedInUser) && (!admin))
         {
             addFieldError("admin", getText("admin.permission.self"));
         }
@@ -58,7 +46,7 @@ public class EditUserAction extends UserActionSupport
 
     public String execute()
     {
-        User persistentUser = getUserManager().getUser(getId());
+        User persistentUser = getUser();
         if (admin)
         {
             if (!persistentUser.hasAuthority(ADMINISTRATOR))

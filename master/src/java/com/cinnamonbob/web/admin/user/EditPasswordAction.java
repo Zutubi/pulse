@@ -10,11 +10,6 @@ import com.cinnamonbob.core.util.RandomUtils;
 public class EditPasswordAction extends UserActionSupport
 {
     /**
-     * The id of the users whose password is being updated.
-     */
-    private long id;
-
-    /**
      * The new password.
      */
     private String password;
@@ -23,16 +18,6 @@ public class EditPasswordAction extends UserActionSupport
      * The new password confirmation.
      */
     private String confirm;
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
 
     public String getPassword()
     {
@@ -60,9 +45,9 @@ public class EditPasswordAction extends UserActionSupport
         {
             return;
         }
-        if (getUserManager().getUser(id) == null)
+        if (getUser() == null)
         {
-            addFieldError("id", getText("user.id.unknown"));
+            addUnknownUserFieldError();
             return;
         }
 
@@ -81,7 +66,7 @@ public class EditPasswordAction extends UserActionSupport
      */
     public String doReset()
     {
-        User user = getUserManager().getUser(id);
+        User user = getUser();
 
         // generate random password.
         user.setPassword(RandomUtils.randomString(8));
@@ -96,7 +81,7 @@ public class EditPasswordAction extends UserActionSupport
      */
     public String execute()
     {
-        User user = getUserManager().getUser(id);
+        User user = getUser();
         user.setPassword(password);
         getUserManager().save(user);
 

@@ -137,6 +137,25 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         assertLinkNotPresentWithText(login);
     }
 
+    public void testCanNotDeleteSelf()
+    {
+        // create a user to delete - assume that user creation is successful?
+        String login = RandomUtils.randomString(10);
+        submitCreateUserForm(login, login, login, login, true);
+
+        // login.
+        login(login, login);
+        navigateToUserAdministration();
+
+        assertLinkPresent("delete_" + login);
+
+        clickLink("delete_" + login);
+
+        // assert that we are still there.
+        assertLinkPresent("delete_" + login);
+        assertTextPresent("can not delete");
+    }
+    
     public void testViewUser()
     {
         // create user.

@@ -2,7 +2,7 @@
 #if($actionErrors && $actionErrors.size() > 0)
     #set($actionErrorDetected = true)
 
-    <h3>#wwtext("name=errors.occured")</h3>
+    <!--<h3>#wwtext("name=errors.occured")</h3>-->
 
     <ul class="error">
 #foreach($error in $actionErrors)

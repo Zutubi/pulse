@@ -10,8 +10,6 @@ public class DeleteSubscriptionAction extends UserActionSupport
 {
     private long id;
 
-    private String login;
-
     public long getId()
     {
         return id;
@@ -20,16 +18,6 @@ public class DeleteSubscriptionAction extends UserActionSupport
     public void setId(long id)
     {
         this.id = id;
-    }
-
-    public String getLogin()
-    {
-        return login;
-    }
-
-    public void setLogin(String login)
-    {
-        this.login = login;
     }
 
     public String execute()

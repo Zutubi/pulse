@@ -111,7 +111,7 @@ public class UserActionSupport extends ActionSupport
         return userManager.getUser(userId);
     }
 
-    protected void addUnknownUserError()
+    protected void addUnknownUserActionError()
     {
         if (userId != NONE_SPECIFIED)
         {
@@ -120,6 +120,18 @@ public class UserActionSupport extends ActionSupport
         else if (TextUtils.stringSet(userLogin))
         {
             addActionError("Unknown user '" + userLogin + "'");
+        }
+    }
+
+    protected void addUnknownUserFieldError()
+    {
+        if (userId != NONE_SPECIFIED)
+        {
+            addFieldError("userId", "Unknown user '" + userId + "'");
+        }
+        else if (TextUtils.stringSet(userLogin))
+        {
+            addFieldError("userLogin", "Unknown user '" + userLogin + "'");
         }
     }
 }

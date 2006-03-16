@@ -10,6 +10,8 @@
 
       #adminTabs("users")
 
+      #parse("/template/includes/actionerrors.vm")
+
       <table class="columns" width="90%">
           <tr>
               #wwaction("name=viewUsers" "id=a" "executeResult=false")
@@ -26,23 +28,23 @@
                       <tr>
                           #set($confirmMessage = $action.getText("user.delete.confirm", [$user.name]))
 
-                          #dynamicLinkCell($user.login "viewUser.action?id=$user.id")
+                          #dynamicLinkCell($user.login "viewUser.action?userId=$user.id")
                           #dynamicCell($user.name)
-                          #editCell("editUser!input.action?id=$user.id")
-                          #deleteCell($confirmMessage "deleteUser.action?id=$user.id" "delete_$!webwork.htmlEncode($user.login)")
+                          #editCell("editUser!input.action?userId=$user.id")
+                          #deleteCell($confirmMessage "deleteUser.action?userId=$user.id" "delete_$!webwork.htmlEncode($user.login)")
                           <!--
-                          #actionCell2("password.edit" "editPassword!input.action?id=$user.id")
-                          #actionCell2("password.reset" "editPassword!reset.action?id=$user.id")
+                          #actionCell2("password.edit" "editPassword!input.action?userId=$user.id")
+                          #actionCell2("password.reset" "editPassword!reset.action?userId=$user.id")
                           -->
                       </tr>
                       #end
                   </table>
               </td>
               <td class="columns" width="40%">
-                  #wwcform("action=createUser.action" "name=user.create" "heading=%{getText('user.create')}" "method=post")
-                      #wwtextfield("name=user.login" "label=%{getText('user.login')}" "required=true" "tabindex=1")
-                      #wwtextfield("name=user.name" "label=%{getText('user.name')}" "required=true" "tabindex=2")
-                      #wwpassword("name=user.password" "label=%{getText('user.password')}" "required=true" "tabindex=3")
+                  #wwcform("action=createUser.action" "name=newUser.create" "heading=%{getText('user.create')}" "method=post")
+                      #wwtextfield("name=newUser.login" "label=%{getText('user.login')}" "required=true" "tabindex=1")
+                      #wwtextfield("name=newUser.name" "label=%{getText('user.name')}" "required=true" "tabindex=2")
+                      #wwpassword("name=newUser.password" "label=%{getText('user.password')}" "required=true" "tabindex=3")
                       #wwpassword("name=confirm" "label=%{getText('user.confirm')}" "required=true" "tabindex=4")
                       #wwcheckbox("name=admin" "label=%{getText('user.admin')}" "tabindex=5")
                       #saveCancel(6)

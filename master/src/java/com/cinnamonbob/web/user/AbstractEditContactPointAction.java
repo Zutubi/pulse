@@ -10,7 +10,7 @@ import com.cinnamonbob.model.User;
 public abstract class AbstractEditContactPointAction extends UserActionSupport
 {
     protected long id;
-    protected long user;
+
     public void setId(long id)
     {
         this.id = id;
@@ -20,18 +20,6 @@ public abstract class AbstractEditContactPointAction extends UserActionSupport
     {
         return this.id;
     }
-
-/*
-    public long getUser()
-    {
-        return user;
-    }
-
-    public void setUser(long user)
-    {
-        this.user = user;
-    }
-*/
 
     public void validate()
     {

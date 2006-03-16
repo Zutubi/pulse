@@ -3,9 +3,8 @@ package com.cinnamonbob.web.user;
 import com.cinnamonbob.model.NotifyConditionFactory;
 import com.cinnamonbob.model.Subscription;
 
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -13,7 +12,6 @@ import java.util.HashMap;
 public class EditSubscriptionAction extends UserActionSupport
 {
     private long id;
-    private String login;
 
     private String project;
     private String condition;
@@ -42,16 +40,6 @@ public class EditSubscriptionAction extends UserActionSupport
     public void setId(long id)
     {
         this.id = id;
-    }
-
-    public String getLogin()
-    {
-        return login;
-    }
-
-    public void setLogin(String login)
-    {
-        this.login = login;
     }
 
     public void validate()
