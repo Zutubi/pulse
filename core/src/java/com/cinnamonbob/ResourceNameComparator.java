@@ -1,6 +1,7 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.core.model.Resource;
+import com.cinnamonbob.util.Sort;
 
 import java.util.Comparator;
 
@@ -9,8 +10,10 @@ import java.util.Comparator;
  */
 public class ResourceNameComparator implements Comparator<Resource>
 {
+    private Sort.StringComparator sc = new Sort.StringComparator();
+
     public int compare(Resource r1, Resource r2)
     {
-        return r1.getName().compareTo(r2.getName());
+        return sc.compare(r1.getName(), r2.getName());
     }
 }

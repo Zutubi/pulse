@@ -1,6 +1,7 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.util.Sort;
 
 import java.util.Comparator;
 
@@ -9,8 +10,10 @@ import java.util.Comparator;
  */
 public class ProjectNameComparator implements Comparator<Project>
 {
+    private Sort.StringComparator sc = new Sort.StringComparator();
+
     public int compare(Project p1, Project p2)
     {
-        return p1.getName().compareTo(p2.getName());
+        return sc.compare(p1.getName(), p2.getName());
     }
 }
