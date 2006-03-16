@@ -196,6 +196,21 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         // check the form again to ensure that the path has been saved.
         clickLink("project.scm.edit");
         form.assertFormElements("/loc", "mod", "", "path", "1", "1");
+
+    }
+
+    public void testEditScmPasswordValue()
+    {
+        CvsEditForm form = new CvsEditForm(tester);
+
+        clickLink("project.scm.edit");
+
+        // check that we can set a password and that it is persisted
+        // and visible on subsequent edit.
+        form.saveFormElements("/loc", "mod", "password", "", "", "");
+        assertProjectCvsTable("cvs", "/loc [mod]");
+        clickLink("project.scm.edit");
+        form.assertFormElements("/loc", "mod", "password", "", "", "");
     }
 
     public void testEditScmValidation()
