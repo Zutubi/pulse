@@ -85,7 +85,6 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
                 new String[]{CREATE_CONTACT_LINK, CREATE_CONTACT_LINK, CREATE_CONTACT_LINK, CREATE_CONTACT_LINK}
         });
 
-
         assertTablePresent("subscriptions");
         assertTableRowsEqual("subscriptions", 1, new String[][]{
                 new String[]{"project", CONTACT_CREATE_TYPE, "condition", "actions"},
@@ -222,6 +221,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
     {
         // can not create subscription without project
         // can not create subscription without contacts.
+//        assertLinkNotPresent("subscription.create");
     }
 
     private void navigateToPreferences()

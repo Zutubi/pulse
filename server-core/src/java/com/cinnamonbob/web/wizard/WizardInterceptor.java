@@ -56,7 +56,8 @@ public class WizardInterceptor implements Interceptor
             final Map parameters = ActionContext.getContext().getParameters();
             boolean actionRequested = parameters.containsKey("next") ||
                     parameters.containsKey("previous") ||
-                    parameters.containsKey("cancel");
+                    parameters.containsKey("cancel") ||
+                    parameters.containsKey("submit");
 
             if (actionRequested)
             {

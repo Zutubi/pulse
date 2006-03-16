@@ -11,17 +11,14 @@
 
 #wwcform("action=addProject.action" "id=project.basics" "heading=%{getText('project.basics')}" "method=post")
     #wwhidden("name=state")
+    #wwhidden("name=submit")
 
-    #wwtextfield("name=name" "label=%{getText('project.name')}" "required=true" "tabindex=1")
-    #wwtextfield("name=description" "label=%{getText('project.description')}" "size=60" "tabindex=2")
-    #wwselect("name=scm" "label=%{getText('scm')}" "list=scms" "required=true" "tabindex=3")
-    #wwselect("name=type" "label=%{getText('project.type')}" "list=types" "required=true" "tabindex=4")
+    #wwtextfield("name=name" "label=%{getText('project.name')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=description" "label=%{getText('project.description')}" "size=60" "tabindex=2" "onkeypress=return submitenter(this,event)")
+    #wwselect("name=scm" "label=%{getText('scm')}" "list=scms" "required=true" "tabindex=3" "onkeypress=return submitenter(this,event)")
+    #wwselect("name=type" "label=%{getText('project.type')}" "list=types" "required=true" "tabindex=4" "onkeypress=return submitenter(this,event)")
     #inlineHelp("project.type.help")
-
-    #openSubmit()
-        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=5")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=6")
-    #closeSubmit()
+    #nextCancel(5)
 #end
 </body>
 </html>

@@ -11,22 +11,18 @@
 
 #wwcform("action=addProject.action" "heading=%{getText('svn.setup')}" "method=post")
     #wwhidden("name=state")
+    #wwhidden("name=submit")
 
-    #wwtextfield("name=svn.username" "label=%{getText('svn.username')}" "required=true" "tabindex=1")
-    #wwpassword("name=svn.password" "label=%{getText('svn.password')}" "tabindex=2")
-    #wwtextfield("name=svn.url" "label=%{getText('svn.url')}" "required=true" "size=60" "tabindex=3")
-    #wwtextfield("name=svn.keyfile" "label=%{getText('svn.keyfile')}" "size=60" "tabindex=4")
+    #wwtextfield("name=svn.username" "label=%{getText('svn.username')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #wwpassword("name=svn.password" "label=%{getText('svn.password')}" "tabindex=2" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=svn.url" "label=%{getText('svn.url')}" "required=true" "size=60" "tabindex=3" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=svn.keyfile" "label=%{getText('svn.keyfile')}" "size=60" "tabindex=4" "onkeypress=return submitenter(this,event)")
     #inlineHelp("svn.keyfile.help")
-    #wwpassword("name=svn.passphrase" "label=%{getText('svn.passphrase')}" "tabindex=5")
+    #wwpassword("name=svn.passphrase" "label=%{getText('svn.passphrase')}" "tabindex=5" "onkeypress=return submitenter(this,event)")
     #inlineHelp("svn.passphrase.help")
-    #wwtextfield("name=svn.path" "label=%{getText('scm.path')}" "size=60" "tabindex='6'")
+    #wwtextfield("name=svn.path" "label=%{getText('scm.path')}" "size=60" "tabindex='6'" "onkeypress=return submitenter(this,event)")
     #inlineHelp("scm.path.help")
-
-    #openSubmit()
-        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=7")
-        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=8")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=9")
-    #closeSubmit()
+    #previousNextCancel(7)
 #end
 </body>
 </html>

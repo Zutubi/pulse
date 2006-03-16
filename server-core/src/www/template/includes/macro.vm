@@ -556,6 +556,48 @@
 #end
 
 ##
+## Shows a standard Previous, Next or Cancel row, as used by wizards.
+## param: tabIndex, indicates the first tab index to be used by the row.
+##
+#macro(previousNextCancel $tabIndex)
+    #openSubmit()
+        #set($nextTabIndex = $tabIndex)
+        #set($prevTabIndex = $nextTabIndex + 1)
+        #set($cancelTabIndex = $prevTabIndex + 1)
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=$prevTabIndex")
+        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=$nextTabIndex")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$cancelTabIndex")
+    #closeSubmit()
+#end
+
+##
+## Shows a standard Next or Cancel row, as used by wizards.
+## param: tabIndex, indicates the first tab index to be used by the row.
+##
+#macro(nextCancel $tabIndex)
+    #openSubmit()
+        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=$tabIndex")
+        #set($tabIndex = $tabIndex + 1)
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
+    #closeSubmit()
+#end
+
+##
+## Shows a standard Previous, Finish or Cancel row, as used by wizards.
+## param: tabIndex, indicates the first tab index to be used by the row.
+##
+#macro(previousFinishCancel $tabIndex)
+    #openSubmit()
+        #set($finishTabIndex = $tabIndex)
+        #set($prevTabIndex = $nextTabIndex + 1)
+        #set($cancelTabIndex = $prevTabIndex + 1)
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=$prevTabIndex")
+        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=$finishTabIndex")
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$cancelTabIndex")
+    #closeSubmit()
+#end
+
+##
 ## Outputs a single row for a name-value pair table.  Used for basic entity
 ## details.
 ##

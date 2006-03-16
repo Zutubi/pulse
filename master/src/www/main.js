@@ -13,3 +13,36 @@ function confirmUrl(message, url)
         location.href = url;
     }
 }
+
+// function to select the 'next' submit action in a wizard when
+// enter is pressed in a form field. Without this, the first submit (previous)
+// button would always be selected.
+// How?: it sends a hidden field called submit with the details. 
+function submitenter(field, evt)
+{
+    var keycode;
+    if (window.event)
+    {
+        keycode = window.event.keyCode;
+    }
+    else if (evt)
+    {
+        keycode = evt.which;
+    }
+    else
+    {
+        return true;
+    }
+
+    if (keycode == 13)
+    {
+        // submit the next button.
+        field.form.submit.value="next";
+        field.form.submit();
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}

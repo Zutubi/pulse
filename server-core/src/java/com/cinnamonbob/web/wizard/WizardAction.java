@@ -57,6 +57,13 @@ public class WizardAction extends ActionSupport
     private String previous;
 
     /**
+     * The submit field value is used as an override for the next, previous and
+     * cancel fields, and is set by a javascript function when the user hits enter
+     * on a form. Without this, the first submit button would always be the one used. 
+     */
+    private String submit;
+
+    /**
      * Local text provider, used in to retrieve the i18n text based on the wizard class,
      * not this action class.
      */
@@ -90,19 +97,49 @@ public class WizardAction extends ActionSupport
         this.next = next;
     }
 
+    /**
+     *
+     * @param submit
+     */
+    public void setSubmit(String submit)
+    {
+        this.submit = submit;
+    }
+
     public boolean isCancelSelected()
     {
-        return TextUtils.stringSet(cancel);
+        if (TextUtils.stringSet(submit))
+        {
+            return submit.equals("cancel");
+        }
+        else
+        {
+            return TextUtils.stringSet(cancel);
+        }
     }
 
     public boolean isPreviousSelected()
     {
-        return TextUtils.stringSet(previous);
+        if (TextUtils.stringSet(submit))
+        {
+            return submit.equals("previous");
+        }
+        else
+        {
+            return TextUtils.stringSet(previous);
+        }
     }
 
     public boolean isNextSelected()
     {
-        return TextUtils.stringSet(next);
+        if (TextUtils.stringSet(submit))
+        {
+            return submit.equals("next");
+        }
+        else
+        {
+            return TextUtils.stringSet(next);
+        }
     }
 
     public void validate()
