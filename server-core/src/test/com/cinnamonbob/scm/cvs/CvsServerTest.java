@@ -107,7 +107,7 @@ public class CvsServerTest extends BobTestCase
         FileSystemUtils.cleanOutputDir(workdir);
 
         // test checkout based on date before the files were added to the repository.
-        Revision byDate = new CvsRevision(null, null, null, CVSDATE.parse("2006-03-11 02:00:00"));
+        Revision byDate = new CvsRevision(null, null, null, CVSDATE.parse("2006-03-11 02:30:00"));
         checkedOutRevision = (CvsRevision) cvsServer.checkout(0, workdir, byDate, changes);
         assertNotNull(checkedOutRevision);
 
