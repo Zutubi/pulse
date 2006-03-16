@@ -94,6 +94,7 @@
         <dependency org="apache" name="commons-el" rev="1.0" conf="quickstart->default"/>
         <dependency org="apache" name="commons-io" rev="1.0" conf="quickstart->default"/>
         <dependency org="apache" name="commons-lang" rev="2.1" conf="quickstart->default"/>
+        <dependency org="apache" name="commons-lang" rev="2.1" conf="default->default"/>
         <dependency org="servletapi" name="servletapi" rev="2.4" conf="quickstart->*"/>
         <dependency org="jspapi" name="jsp-api" rev="2.0" conf="quickstart->*"/>
         <dependency org="log4j" name="log4j" rev="1.2.9" conf="quickstart->*"/>
