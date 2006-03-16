@@ -1,12 +1,12 @@
 #set ($actionErrors = $stack.findValue("actionErrors"))
 #if($actionErrors && $actionErrors.size() > 0)
     #set($actionErrorDetected = true)
-    <div class="errorBox">
-    <span class="errorMessage">the following errors occurred</span>
-    <ul>
-        #foreach($error in $actionErrors)
-        <li>$error</li>
-        #end
+
+    <h3>#wwtext("name=errors.occured")</h3>
+
+    <ul class="error">
+#foreach($error in $actionErrors)
+        <li class="error">$!webwork.htmlEncode($error)</li>
+#end
     </ul>
-    </div>
 #end

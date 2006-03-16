@@ -1,6 +1,9 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.core.model.*;
+import com.cinnamonbob.core.model.Changelist;
+import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.Feature;
+import com.cinnamonbob.core.model.StoredArtifact;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.RecipeResultNode;
@@ -45,8 +48,9 @@ public class ViewBuildAction extends ProjectActionSupport
     public String execute()
     {
         result = getBuildManager().getBuildResult(id);
-        if(result == null)
+        if (result == null)
         {
+            addActionError("Unknown build [" + id + "]");
             return ERROR;
         }
 

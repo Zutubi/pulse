@@ -1,10 +1,16 @@
 #authorisationTags($principle)
 <html>
-  <head>
-    <title>error</title>
-  </head>
-  <body>
-    <h1>error</h1>
+<head>
+    <title>#wwtext("name=error")</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=error") ::</h1>
+
 #parse("/template/includes/actionerrors.vm")
-  </body>
+
+    <p>
+        #wwtext("name=error.advice")
+    </p>
+
+</body>
 </html>
