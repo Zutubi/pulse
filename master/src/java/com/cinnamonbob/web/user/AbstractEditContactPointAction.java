@@ -21,6 +21,7 @@ public abstract class AbstractEditContactPointAction extends UserActionSupport
         return this.id;
     }
 
+/*
     public long getUser()
     {
         return user;
@@ -30,6 +31,7 @@ public abstract class AbstractEditContactPointAction extends UserActionSupport
     {
         this.user = user;
     }
+*/
 
     public void validate()
     {
@@ -37,7 +39,7 @@ public abstract class AbstractEditContactPointAction extends UserActionSupport
         {
             return;
         }
-        User user = getUserManager().getUser(getUser());
+        User user = getUser();
         ContactPoint contact = user.getContactPoint(getContact().getName());
         if (contact != null && contact.getId() != id)
         {

@@ -85,6 +85,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
                 new String[]{CREATE_CONTACT_LINK, CREATE_CONTACT_LINK, CREATE_CONTACT_LINK, CREATE_CONTACT_LINK}
         });
 
+
         assertTablePresent("subscriptions");
         assertTableRowsEqual("subscriptions", 1, new String[][]{
                 new String[]{"project", CONTACT_CREATE_TYPE, "condition", "actions"},
@@ -197,7 +198,6 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
                 new String[]{"login", login},   // login row
                 new String[]{"name", login}     // name row
         });
-
     }
 
     public void testEditUserValidation()
@@ -221,7 +221,17 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
     {
         // can not create subscription without project
         // can not create subscription without contacts.
-//        assertLinkNotPresent("subscription.create");
+        assertLinkNotPresent("subscription.create");
+
+        //TODO - replace this string with a reference to the properties file.
+        String msg = "you will need to create a contact point before you can create a subscription";
+
+        assertTablePresent("subscriptions");
+        assertTableRowsEqual("subscriptions", 1, new String[][]{
+                new String[]{"project", CONTACT_CREATE_TYPE, "condition", "actions"},
+                new String[]{msg, msg, msg, msg}
+        });
+
     }
 
     private void navigateToPreferences()

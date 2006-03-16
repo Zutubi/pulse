@@ -33,7 +33,7 @@ public class DeleteContactPointAction extends UserActionSupport
 
         return SUCCESS;
     }
-
+/*
     public void setUser(long user)
     {
         this.user = user;
@@ -42,5 +42,5 @@ public class DeleteContactPointAction extends UserActionSupport
     public long getUser()
     {
         return user;
-    }
+    }*/
 }

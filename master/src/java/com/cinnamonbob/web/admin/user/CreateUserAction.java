@@ -16,7 +16,7 @@ public class CreateUserAction extends UserActionSupport
     private String confirm;
     private boolean grantAdminPermissions;
 
-    public Object getUser()
+    public User getUser()
     {
         return user;
     }

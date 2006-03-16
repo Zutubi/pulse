@@ -16,7 +16,6 @@ public class CreateSubscriptionAction extends UserActionSupport
 {
     private ProjectManager projectManager;
 
-    private long userId;
     private long projectId;
     private long contactPointId;
     private String condition;
@@ -25,7 +24,6 @@ public class CreateSubscriptionAction extends UserActionSupport
     private Map<Long, String> projects;
     private Map<Long, String> contactPoints;
 
-    private User user;
     private Project project;
     private ContactPoint contactPoint;
     private ConfigurationManager configurationManager;
@@ -61,16 +59,6 @@ public class CreateSubscriptionAction extends UserActionSupport
     public ProjectManager getProjectManager()
     {
         return projectManager;
-    }
-
-    public long getUserId()
-    {
-        return userId;
-    }
-
-    public void setUserId(long userId)
-    {
-        this.userId = userId;
     }
 
     public long getProjectId()
@@ -112,10 +100,10 @@ public class CreateSubscriptionAction extends UserActionSupport
             return ERROR;
         }
 
-        user = getUserManager().getUser(userId);
+        User user = getUser();
         if (user == null)
         {
-            addActionError("Unknown user '" + userId + "'");
+            addUnknownUserError();
             return ERROR;
         }
 
@@ -155,10 +143,10 @@ public class CreateSubscriptionAction extends UserActionSupport
             return;
         }
 
-        user = getUserManager().getUser(userId);
+        User user = getUser();
         if (user == null)
         {
-            addActionError("Unknown user '" + userId + "'");
+            addUnknownUserError();
             return;
         }
 

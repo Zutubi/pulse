@@ -9,15 +9,6 @@ import com.cinnamonbob.security.AcegiUtils;
  */
 public class PreferencesAction extends UserActionSupport
 {
-    private UserManager userManager;
-
-    private User user;
-
-    public User getUser()
-    {
-        return user;
-    }
-
     public String doInput() throws Exception
     {
         String login = AcegiUtils.getLoggedInUser();
@@ -26,10 +17,13 @@ public class PreferencesAction extends UserActionSupport
             return ERROR;
         }
 
+        setUserLogin(login);
+
         // load the user from the db.
-        user = userManager.getUser(login);
+        User user = getUser();
         if (user == null)
         {
+            addUnknownUserError();
             return ERROR;
         }
         return super.doInput();
@@ -42,11 +36,6 @@ public class PreferencesAction extends UserActionSupport
         {
             return SUCCESS;
         }
-        return ERROR;
-    }
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
+        return result;
     }
 }

@@ -529,6 +529,15 @@
 #end
 
 ##
+## Outputs a table row containing a message.
+##
+#macro(msgRow $msgKey $colspan)
+    <tr>
+        <td class="msg" colspan="$colspan" >#wwtext("name=$msgKey")</td>
+    </tr>
+#end
+
+##
 ## Opens a row for submission buttons
 ##
 #macro(openSubmit)

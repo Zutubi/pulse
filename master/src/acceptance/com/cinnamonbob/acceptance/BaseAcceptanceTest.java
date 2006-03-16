@@ -1,6 +1,7 @@
 package com.cinnamonbob.acceptance;
 
 import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.xwork.TextProviderSupport;
 
 import java.io.File;
 import java.io.IOException;
