@@ -1,8 +1,10 @@
 package com.cinnamonbob.web.project;
 
+import com.cinnamonbob.ProjectNameComparator;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,6 +35,8 @@ public class ViewProjectsAction extends ProjectActionSupport
     public String execute()
     {
         projects = getProjectManager().getAllProjects();
+        Collections.sort(projects, new ProjectNameComparator());
+
         latestBuilds = new LinkedList<BuildResult>();
 
         for (Project p : projects)

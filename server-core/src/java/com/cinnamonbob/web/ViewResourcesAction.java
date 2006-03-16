@@ -1,8 +1,10 @@
 package com.cinnamonbob.web;
 
+import com.cinnamonbob.ResourceNameComparator;
 import com.cinnamonbob.core.model.Resource;
 import com.cinnamonbob.model.persistence.ResourceDao;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,6 +22,7 @@ public class ViewResourcesAction extends ActionSupport
     public String execute() throws Exception
     {
         resources = resourceDao.findAll();
+        Collections.sort(resources, new ResourceNameComparator());
         return SUCCESS;
     }
 

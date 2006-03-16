@@ -1,10 +1,12 @@
 package com.cinnamonbob.web.user;
 
+import com.cinnamonbob.ProjectNameComparator;
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.security.AcegiUtils;
 import com.cinnamonbob.web.ActionSupport;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -68,6 +70,7 @@ public class DashboardAction extends ActionSupport
         }
 
         projects = projectManager.getAllProjects();
+        Collections.sort(projects, new ProjectNameComparator());
         latestBuilds = new LinkedList<BuildResult>();
 
         for (Project p : projects)
