@@ -16,14 +16,18 @@ public class EditUserAction extends UserActionSupport
 
     public String doInput() throws Exception
     {
-        user = getUser();
+        // load user details.
+        user = super.getUser();
+
         return super.doInput();
     }
 
     public String execute()
     {
-        User persistentUser = getUser();
+        // load user details.
+        User persistentUser = super.getUser();
         persistentUser.setName(user.getName());
+
         getUserManager().save(persistentUser);
         return SUCCESS;
     }

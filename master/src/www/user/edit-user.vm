@@ -12,7 +12,6 @@
 
     #wwcform("action=editUser.action" "id=user.edit" "heading=%{getText('user.edit')}" "method=post")
         #wwhidden("name=userId")
-        #wwhidden("name=user.login")
         #wwtextfield("name=user.name" "label=%{getText('user.name')}" "required=true" "tabindex=1")
         #saveCancel(2)
     #end
