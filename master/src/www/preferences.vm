@@ -33,7 +33,7 @@
                         #set($confirmMessage = $action.getText("contact.delete.confirm", [$contact.name]))
                         #dynamicCell($contact.name)
                         #dynamicCell($contact.uid)
-                        #editCell("/user/editContactPoint!default.action?id=$contact.id&userId=$user.id")
+                        #editCell("/user/editContactPoint!default.action?id=$contact.id&userId=$user.id" "edit_$!webwork.htmlEncode($contact.name)")
                         #deleteCell($confirmMessage "/user/deleteContactPoint.action?id=$contact.id&userId=$user.id" "delete_$!webwork.htmlEncode($contact.name)")
                     </tr>
                     #end
@@ -66,11 +66,7 @@
                  can only create subscriptions is the system has configured projects accessible to
                  the user AND the user has configured contact points.
                 -->
-                #if ($user.contactPoints.size() == 0)
-                    #msgRow("subscription.requires.contact" 5)
-                #else
-                    #addRow("subscription.create" 5 "/user/createSubscription!input.action?userId=$user.id" "subscription.create")
-                #end
+                #addRow("subscription.create" 5 "/user/createSubscription!input.action?userId=$user.id" "subscription.create")
                 </table>
             </td>
         </tr>

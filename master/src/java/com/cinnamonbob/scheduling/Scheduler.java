@@ -6,7 +6,6 @@ import java.util.List;
 
 /**
  * The scheduler defines the scheduling services available to the system.
- *
  */
 public interface Scheduler extends Stoppable
 {
@@ -16,9 +15,8 @@ public interface Scheduler extends Stoppable
      * Retrieve the trigger specified by the id.
      *
      * @param id uniquely identifying the trigger.
-     *
      * @return the trigger instance, or null if the trigger matching
-     * the id could not be found.
+     *         the id could not be found.
      */
     Trigger getTrigger(long id);
 
@@ -28,9 +26,8 @@ public interface Scheduler extends Stoppable
      * Retrieve all of the triggers associated with the specified project
      *
      * @param projectId is the identifier for the project.
-     *
      * @return a list of triggers associated with the specified project, or
-     * an empty list if no triggers are found.
+     *         an empty list if no triggers are found.
      */
     List<Trigger> getTriggers(long projectId);
 
@@ -41,6 +38,8 @@ public interface Scheduler extends Stoppable
     void trigger(Trigger trigger) throws SchedulingException;
 
     void unschedule(Trigger trigger) throws SchedulingException;
+
+    void update(Trigger trigger) throws SchedulingException;
 
     void pause(String group) throws SchedulingException;
 

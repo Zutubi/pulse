@@ -1,8 +1,26 @@
 // Function to toggle the enable state of a control based on the state of a
 // checkbox.
+function getElement(id)
+{
+    if (document.getElementById)
+    {
+        element = document.getElementById(id);
+    }
+    else if (document.all)
+    {
+        element = document.all[id];
+    }
+    else
+    {
+        element = document.layers[id];
+    }
+
+    return element;
+}
+
 function setEnableState(id, checkboxId)
 {
-    element = document.getElementById(id);
+    element = getElement(id);
     element.disabled = !document.getElementById(checkboxId).checked;
 }
 
@@ -37,7 +55,7 @@ function submitenter(field, evt)
     if (keycode == 13)
     {
         // submit the next button.
-        field.form.submit.value="next";
+        field.form.submit.value = "next";
         field.form.submit();
         return false;
     }

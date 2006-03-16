@@ -35,11 +35,13 @@ public class CronTrigger extends Trigger
         return cron;
     }
 
-    /**
-     * Used by hibernate.
-     */
-    private void setCron(String cron)
+    public void setCron(String cron)
     {
         this.cron = cron;
+    }
+
+    public boolean canEdit()
+    {
+        return true;
     }
 }

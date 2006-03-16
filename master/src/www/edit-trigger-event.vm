@@ -1,0 +1,22 @@
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=edit.trigger")</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=edit.trigger") ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editEventTrigger.action" "id=trigger.event.edit" "heading=%{getText('trigger.event.edit')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=projectId")
+
+    #wwtextfield("name=trigger.name" "label=%{getText('trigger.name')}" "required=true" "size=40" "tabindex=1")
+    #wwselect("name=specification" "label=%{getText('trigger.spec')}" "list=specifications" "tabindex=2")
+
+    #saveCancel(3)
+#end
+</body>
+</html>

@@ -353,12 +353,26 @@
 #end
 
 ##
+## Outputs an action cell with an id
+##
+#macro(actionCellId $actionKey $url $image $id)
+    <td class="content">
+        <a href="$url"
+#if($id)
+           id="$id"
+#end
+        >
+            <img alt="$action.getText($actionKey)" src="/images/$image"/>
+            #wwtext("name=$actionKey")
+        </a>
+    </td>
+#end
+
+##
 ## Outputs an action cell for a content table with an image.
 ##
 #macro(actionCell $actionKey $url $image)
-    <td class="content">
-        <a href="$url"><img alt="$action.getText($actionKey)" src="/images/$image"/>#wwtext("name=$actionKey")</a>
-    </td>
+    #actionCellId($actionKey $url $image false)
 #end
 
 ##
@@ -382,8 +396,8 @@
 ##
 ## Outputs an edit cell for a content table
 ##
-#macro(editCell $url)
-    #actionCell("edit" $url "pencil.gif")
+#macro(editCell $url $id)
+    #actionCellId("edit" $url "pencil.gif" $id)
 #end
 
 ##

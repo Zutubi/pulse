@@ -2,11 +2,11 @@ package com.cinnamonbob.scheduling;
 
 import com.cinnamonbob.core.model.Entity;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.io.Serializable;
 
 /**
  * <class-comment/>
@@ -60,7 +60,6 @@ public abstract class Trigger extends Entity
      * The no argument constructor should not be used directly. It is made available so
      * that triggers can be created via the use of newInstance(). A trigger should have
      * at least a name.
-     *
      */
     public Trigger()
     {
@@ -80,8 +79,8 @@ public abstract class Trigger extends Entity
 
     /**
      * Use the specified name and group as the identifiers for this trigger instance.
-     * 
-     * @param name of this trigger instance. This value should not be null.
+     *
+     * @param name  of this trigger instance. This value should not be null.
      * @param group of this trigger instance. This value should not be null.
      */
     public Trigger(String name, String group)
@@ -160,10 +159,7 @@ public abstract class Trigger extends Entity
         return name;
     }
 
-    /**
-     * Used by hibernate.
-     */
-    private void setName(String name)
+    public void setName(String name)
     {
         this.name = name;
     }
@@ -230,5 +226,10 @@ public abstract class Trigger extends Entity
     public void setProject(long projectId)
     {
         this.projectId = projectId;
+    }
+
+    public boolean canEdit()
+    {
+        return false;
     }
 }

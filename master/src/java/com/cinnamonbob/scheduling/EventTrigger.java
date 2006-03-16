@@ -1,13 +1,10 @@
 package com.cinnamonbob.scheduling;
 
 import com.cinnamonbob.events.Event;
-import com.cinnamonbob.core.ObjectFactory;
-import com.cinnamonbob.util.logging.Logger;
 
 /**
  * The EventTrigger is triggered by the occurance of an event within the system.
  * Which event will trigger the event trigger is defined by the triggerEvents property.
- *
  */
 public class EventTrigger extends Trigger
 {
@@ -18,7 +15,7 @@ public class EventTrigger extends Trigger
     private Class<? extends EventTriggerFilter> filterClass = null;
 
     /**
-     * Default no argument constructor required by hibernate. 
+     * Default no argument constructor required by hibernate.
      */
     public EventTrigger()
     {
@@ -93,5 +90,10 @@ public class EventTrigger extends Trigger
     public void setFilterClass(Class<? extends EventTriggerFilter> filterClass)
     {
         this.filterClass = filterClass;
+    }
+
+    public boolean canEdit()
+    {
+        return true;
     }
 }

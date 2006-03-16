@@ -1,10 +1,7 @@
 package com.cinnamonbob.acceptance;
 
+import com.cinnamonbob.acceptance.forms.*;
 import com.cinnamonbob.core.util.RandomUtils;
-import com.cinnamonbob.acceptance.forms.ProjectBasicForm;
-import com.cinnamonbob.acceptance.forms.CustomProjectEditForm;
-import com.cinnamonbob.acceptance.forms.CvsEditForm;
-import com.cinnamonbob.acceptance.forms.CleanupPolicyForm;
 
 /**
  * <class-comment/>
@@ -12,6 +9,10 @@ import com.cinnamonbob.acceptance.forms.CleanupPolicyForm;
 public class ProjectAcceptanceTest extends BaseAcceptanceTest
 {
     private String projectName;
+    private static final String CRON_TRIGGER_NAME = "cron-trigger-name";
+    private static final String CRON_STRING = "0 0 0 * * ?";
+    private static final String SPEC_NAME = "spec-name";
+    private static final String RECIPE_NAME = "recipe-name";
 
     public ProjectAcceptanceTest()
     {
@@ -314,10 +315,28 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
     }
 
+    public void testAddNewBuildSpec()
+    {
+        CreateBuildSpecForm form = new CreateBuildSpecForm(tester);
+
+        assertProjectBuildSpecTable(new String[][]{
+                createBuildSpecRow("default", "[default]", "[never]")
+        });
+
+        assertAndClick("project.buildspec.add");
+        form.assertFormPresent();
+        form.saveFormElements(SPEC_NAME, RECIPE_NAME, "true", "100");
+
+        assertProjectBuildSpecTable(new String[][]{
+                createBuildSpecRow("default", "[default]", "[never]"),
+                createBuildSpecRow(SPEC_NAME, RECIPE_NAME, "100 minutes")
+        });
+    }
+
     public void testAddNewTrigger()
     {
         assertProjectTriggerTable(new String[][]{
-                new String[]{projectName + " scm trigger", "event", "default", "delete"}
+                getTriggerRow(projectName + " scm trigger", "event", "default"),
         });
 
         assertLinkPresent("project.trigger.add");
@@ -327,18 +346,18 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertFormPresent("trigger.type");
         // default trigger type.
         // default specification.
-        setFormElement("name", "trigger name");
+        setFormElement("name", CRON_TRIGGER_NAME);
         submit("next");
 
         // check form is available.
         assertFormPresent("trigger.cron.create");
         setWorkingForm("trigger.cron.create");
-        setFormElement("cron", "0 0 0 * * ?");
+        setFormElement("cron", CRON_STRING);
         submit("next");
 
         assertProjectTriggerTable(new String[][]{
-                new String[]{projectName + " scm trigger", "event", "default", "delete"},
-                new String[]{"trigger name", "cron", "default", "delete"}
+                getTriggerRow(projectName + " scm trigger", "event", "default"),
+                getTriggerRow(CRON_TRIGGER_NAME, "cron", "default"),
         });
     }
 
@@ -346,7 +365,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
     {
         String triggerName = projectName + " scm trigger";
         assertProjectTriggerTable(new String[][]{
-                new String[]{triggerName, "event", "default", "delete"}
+                getTriggerRow(triggerName, "event", "default"),
         });
 
         assertLinkPresent("delete_" + triggerName);
@@ -360,7 +379,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         // ensure that the name remains unique.
         String triggerName = projectName + " scm trigger"; // this is the default trigger name.
         assertProjectTriggerTable(new String[][]{
-                new String[]{triggerName, "event", "default", "delete"}
+                getTriggerRow(triggerName, "event", "default")
         });
 
         clickLink("project.trigger.add");
@@ -376,7 +395,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertOptionValuesEqual("type", new String[]{"cron", "monitor"});
 
         // use some random name.
-        setFormElement("name", "trigger "+RandomUtils.randomString(4));
+        setFormElement("name", "trigger " + RandomUtils.randomString(4));
         submit("next");
 
         // check form is available.
@@ -399,11 +418,113 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         submit("previous");
     }
 
-/*
-    public void testAddNewBuildSpec()
+    private CronTriggerEditForm editCronTriggerHelper()
     {
-        // not yet implemented.
+        // First ensure we have a cron trigger and two build specs
+        testAddNewTrigger();
+        testAddNewBuildSpec();
+
+        CronTriggerEditForm form = new CronTriggerEditForm(tester);
+        clickLink(getEditId(CRON_TRIGGER_NAME));
+
+        form.assertFormPresent();
+        form.assertFormElements(CRON_TRIGGER_NAME, "default", CRON_STRING);
+        assertOptionValuesEqual("specification", new String[]{"default", SPEC_NAME});
+        return form;
     }
+
+    public void testEditCronTrigger()
+    {
+        CronTriggerEditForm form = editCronTriggerHelper();
+        form.saveFormElements("new name", SPEC_NAME, "0 0 1 * * ?");
+
+        assertProjectTriggerTable(new String[][]{
+                getTriggerRow(projectName + " scm trigger", "event", "default"),
+                getTriggerRow("new name", "cron", SPEC_NAME)
+        });
+
+        clickLink(getEditId("new name"));
+
+        form.assertFormPresent();
+        form.assertFormElements("new name", SPEC_NAME, "0 0 1 * * ?");
+    }
+
+    public void testEditCronTriggerCancel()
+    {
+        CronTriggerEditForm form = editCronTriggerHelper();
+        form.cancelFormElements("new name", SPEC_NAME, "0 0 1 * * ?");
+
+        assertProjectTriggerTable(new String[][]{
+                getTriggerRow(projectName + " scm trigger", "event", "default"),
+                getTriggerRow(CRON_TRIGGER_NAME, "cron", "default"),
+        });
+    }
+
+    public void testEditCronTriggerValidation()
+    {
+        CronTriggerEditForm form = editCronTriggerHelper();
+
+        // Try empty name
+        form.saveFormElements("", SPEC_NAME, "0 0 1 * * ?");
+        form.assertFormPresent();
+        assertTextPresent("name is required");
+
+        // Try an empty cron string
+        form.saveFormElements("name", SPEC_NAME, "");
+        form.assertFormPresent();
+        assertTextPresent("cron expression is required");
+
+        // Try an invalid cron string
+        form.saveFormElements("name", SPEC_NAME, "0 0 1 * *");
+        form.assertFormPresent();
+        assertTextPresent("Unexpected end of expression");
+    }
+
+    private EventTriggerEditForm editEventTriggerHelper()
+    {
+        // First ensure we have a two build specs
+        testAddNewBuildSpec();
+
+        EventTriggerEditForm form = new EventTriggerEditForm(tester);
+        assertAndClick(getEditId(projectName + " scm trigger"));
+
+        form.assertFormPresent();
+        form.assertFormElements(projectName + " scm trigger", "default");
+        assertOptionValuesEqual("specification", new String[]{"default", SPEC_NAME});
+        return form;
+    }
+
+    public void testEditEventTrigger()
+    {
+        EventTriggerEditForm form = editEventTriggerHelper();
+        form.saveFormElements("new name", SPEC_NAME);
+
+        assertProjectTriggerTable(new String[][]{
+                getTriggerRow("new name", "event", SPEC_NAME),
+        });
+    }
+
+    public void testEditEventTriggerCancel()
+    {
+        EventTriggerEditForm form = editEventTriggerHelper();
+        form.cancelFormElements("new name", SPEC_NAME);
+
+        assertProjectTriggerTable(new String[][]{
+                getTriggerRow(projectName + " scm trigger", "event", "default"),
+        });
+    }
+
+    public void testEditEventTriggerValidation()
+    {
+        EventTriggerEditForm form = editEventTriggerHelper();
+
+        // Try empty name
+        form.saveFormElements("", SPEC_NAME);
+        form.assertFormPresent();
+        assertTextPresent("name is required");
+    }
+
+/*
 
     public void testDeleteBuildSpec()
     {
@@ -459,9 +580,26 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         });
     }
 
+    private void assertProjectBuildSpecTable(String[][] rows)
+    {
+        assertTablePresent("project.buildspecs");
+        assertTableRowsEqual("project.buildspecs", 2, rows);
+    }
+
+    private String[] createBuildSpecRow(String name, String recipe, String timeout)
+    {
+        return new String[]{name, recipe, timeout, "trigger", "edit", "delete"};
+    }
+
     private void assertProjectTriggerTable(String[][] rows)
     {
         assertTablePresent("project.triggers");
         assertTableRowsEqual("project.triggers", 2, rows);
     }
+
+    private String[] getTriggerRow(String name, String type, String spec)
+    {
+        return new String[]{name, type, spec, "edit", "delete"};
+    }
+
 }

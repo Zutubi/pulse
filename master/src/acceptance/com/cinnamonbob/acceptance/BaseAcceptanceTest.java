@@ -1,7 +1,6 @@
 package com.cinnamonbob.acceptance;
 
 import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.xwork.TextProviderSupport;
 
 import java.io.File;
 import java.io.IOException;
@@ -125,5 +124,16 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
         setFormElement(PROJECT_BASICS_SCM, scm);
         setFormElement(PROJECT_BASICS_TYPE, type);
         submit("next");
+    }
+
+    public void assertAndClick(String name)
+    {
+        assertLinkPresent(name);
+        clickLink(name);
+    }
+
+    public String getEditId(String name)
+    {
+        return "edit_" + name;
     }
 }

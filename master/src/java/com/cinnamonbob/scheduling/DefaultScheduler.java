@@ -144,6 +144,15 @@ public class DefaultScheduler implements Scheduler, EventListener
         triggerDao.delete(trigger);
     }
 
+    public void update(Trigger trigger) throws SchedulingException
+    {
+        assertScheduled(trigger);
+        SchedulerStrategy impl = getStrategy(trigger);
+        impl.unschedule(trigger);
+        triggerDao.save(trigger);
+        impl.schedule(trigger);
+    }
+
     public void pause(String group) throws SchedulingException
     {
         for (Trigger trigger : triggerDao.findByGroup(group))

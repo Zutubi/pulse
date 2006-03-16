@@ -307,6 +307,39 @@
                 /configureProject.action?id=${projectId}}&amp;tab=configuration</result>
         </action>
 
+        <action name="editTrigger" class="com.cinnamonbob.web.project.EditTriggerAction">
+            <result name="cron" type="chain">editCronTrigger!input</result>
+            <result name="event" type="chain">editEventTrigger!input</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editCronTrigger!input" class="com.cinnamonbob.web.project.EditCronTriggerAction" method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-trigger-cron.vm</result>
+        </action>
+
+        <action name="editCronTrigger" class="com.cinnamonbob.web.project.EditCronTriggerAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-trigger-cron.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editEventTrigger!input" class="com.cinnamonbob.web.project.EditEventTriggerAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-trigger-event.vm</result>
+        </action>
+
+        <action name="editEventTrigger" class="com.cinnamonbob.web.project.EditEventTriggerAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-trigger-event.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
         <action name="addProject" class="com.cinnamonbob.web.wizard.WizardAction">
             <interceptor-ref name="wizardStack"/>
             <param name="wizardClass">com.cinnamonbob.web.project.AddProjectWizard</param>

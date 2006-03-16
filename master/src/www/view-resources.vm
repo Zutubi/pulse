@@ -19,7 +19,7 @@
     #set($confirmMessage = $action.getText("resource.confirm.delete", [$resource.name]))
         <tr>
              #dynamicCell($resource.name)
-             #editCell("viewResource.action?id=$resource.id")
+             #editCell("viewResource.action?id=$resource.id" "edit_$!webwork.htmlEncode($resource.name)")
              #deleteCell($confirmMessage "deleteResource.action?id=$resource.id" "delete_$!webwork.htmlEncode($resource.name)")
         </tr>
 #end

@@ -83,9 +83,9 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
 
         assertTablePresent("project.triggers");
         assertTableRowsEqual("project.triggers", 1, new String[][]{
-                new String[]{"name", "type", "spec", "actions"},
-                new String[]{projectName + " scm trigger", "event", "default", "delete"},
-                new String[]{"add new trigger", "add new trigger", "add new trigger", "add new trigger"}
+                new String[]{"name", "type", "spec", "actions", "actions"},
+                new String[]{projectName + " scm trigger", "event", "default", "edit", "delete"},
+                new String[]{"add new trigger", "add new trigger", "add new trigger", "add new trigger", "add new trigger"}
         });
 
         // ensure that it appears in your list of projects.
