@@ -39,9 +39,8 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.stateName != :initial order by id desc");
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project order by id desc");
                 queryObject.setEntity("project", project);
-                queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
                 queryObject.setFirstResult(first);
                 queryObject.setMaxResults(max);
 

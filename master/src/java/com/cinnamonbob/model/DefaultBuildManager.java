@@ -113,7 +113,7 @@ public class DefaultBuildManager implements BuildManager
 
     public void fillHistoryPage(HistoryPage page)
     {
-        fillHistoryPage(page, new ResultState[]{ResultState.ERROR, ResultState.FAILURE, ResultState.IN_PROGRESS, ResultState.TERMINATING, ResultState.SUCCESS}, null);
+        fillHistoryPage(page, new ResultState[]{ResultState.ERROR, ResultState.FAILURE, ResultState.SUCCESS}, null);
     }
 
     public List<String> getBuildSpecifications(Project project)

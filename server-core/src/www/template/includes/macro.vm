@@ -439,6 +439,8 @@
         <img alt="in progress" src="/images/hourglass.gif"/>
     #elseif($result.terminating())
         <img alt="terminating" src="/images/stop.gif"/>
+    #elseif($result.pending())
+        <img alt="pending" src="/images/hourglass.gif"/>
     #elseif($result.errored() || $result.failed())
         <img alt="failure" src="/images/exclamation.gif"/>
     #else

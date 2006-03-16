@@ -19,6 +19,11 @@ public abstract class Result extends Entity
     protected String errorMessage;
     protected String failureMessage;
 
+    public boolean pending()
+    {
+        return ResultState.INITIAL == getState();
+    }
+
     public boolean inProgress()
     {
         return ResultState.IN_PROGRESS == getState();
