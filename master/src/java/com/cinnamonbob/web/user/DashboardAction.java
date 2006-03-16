@@ -7,6 +7,7 @@ import com.cinnamonbob.security.AcegiUtils;
 import com.cinnamonbob.web.ActionSupport;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -87,6 +88,7 @@ public class DashboardAction extends ActionSupport
         }
 
         changelists = buildManager.getLatestChangesForUser(user, 10);
+        Collections.sort(changelists, new ChangelistComparator());
         changeProjects = new LinkedList<Project>();
         changeBuilds = new LinkedList<BuildResult>();
 
@@ -113,5 +115,32 @@ public class DashboardAction extends ActionSupport
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    /**
+     * Compare changelists based on two things:
+     * - sort primarily by build id
+     * - sort secondarily by revision
+     * Note we sort in descending order.
+     */
+    private class ChangelistComparator implements Comparator<Changelist>
+    {
+        public int compare(Changelist c1, Changelist c2)
+        {
+            long id1 = c1.getResultId();
+            long id2 = c2.getResultId();
+
+            if (id1 < id2)
+            {
+                return 1;
+            }
+            else if (id1 > id2)
+            {
+                return -1;
+            }
+
+            // Need to go to the revision.
+            return -c1.getRevision().compareTo(c2.getRevision());
+        }
     }
 }

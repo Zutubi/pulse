@@ -1,7 +1,6 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.model.User;
-import org.hsqldb.lib.Sort;
 
 import java.util.Comparator;
 
@@ -10,10 +9,8 @@ import java.util.Comparator;
  */
 public class UserLoginComparator implements Comparator<User>
 {
-    private Sort.StringComparator sc = new Sort.StringComparator();
-
     public int compare(User u1, User u2)
     {
-        return sc.compare(u1.getLogin(), u2.getLogin());
+        return u1.getLogin().compareTo(u2.getLogin());
     }
 }

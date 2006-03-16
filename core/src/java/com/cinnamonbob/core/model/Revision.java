@@ -6,7 +6,7 @@ import java.util.Date;
  *
  *
  */
-public class Revision extends Entity
+public class Revision extends Entity implements Comparable<Revision>
 {
     private String author;
     private String comment;
@@ -119,5 +119,34 @@ public class Revision extends Entity
     private void setTime(long time)
     {
         this.time = time;
+    }
+
+    public int compareTo(Revision r)
+    {
+        // First try basing on time
+        if (getDate() != null && r.getDate() != null)
+        {
+            int result = getDate().compareTo(getDate());
+            if (result != 0)
+            {
+                return result;
+            }
+        }
+
+        // OK, is the revision string a number?  If so, use it
+        try
+        {
+            long n1 = Long.parseLong(revisionString);
+            long n2 = Long.parseLong(r.revisionString);
+
+            return (int) (n1 - n2);
+        }
+        catch (NumberFormatException e)
+        {
+            // Bummer, not numerical revisions
+        }
+
+        // Oh well, go for lexical ordering then
+        return revisionString.compareTo(r.revisionString);
     }
 }

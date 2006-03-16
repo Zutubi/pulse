@@ -37,7 +37,7 @@ public class SetupDummyBuilds implements Runnable
     {
         Project project;
 
-        masterBuildPaths =  new MasterBuildPaths(configManager);
+        masterBuildPaths = new MasterBuildPaths(configManager);
 
         if (projectDao.findAll().size() == 0)
         {
@@ -182,6 +182,15 @@ public class SetupDummyBuilds implements Runnable
         userRevision.setDate(new Date(System.currentTimeMillis() - 10000));
         list = new Changelist(userRevision);
         list.addChange(new Change("/home/jsankey/some/branched/file/with/a/very/long/filename/to/test/the/display/handling/of/such/things", "1", Change.Action.BRANCH));
+        list.setResultId(result.getId());
+        changelists.add(list);
+
+        userRevision = new NumericalRevision(9103);
+        userRevision.setAuthor("jsankey");
+        userRevision.setComment("short and sweet");
+        userRevision.setDate(new Date(System.currentTimeMillis() - 9000));
+        list = new Changelist(userRevision);
+        list.addChange(new Change("/home/jsankey/some/file", "120", Change.Action.BRANCH));
         list.setResultId(result.getId());
         changelists.add(list);
 
@@ -531,19 +540,19 @@ public class SetupDummyBuilds implements Runnable
         String line;
         int i = 1;
 
-        while((line = br.readLine()) != null)
+        while ((line = br.readLine()) != null)
         {
-            if(line.contains("error"))
+            if (line.contains("error"))
             {
                 artifact.addFeature(new PlainFeature(Feature.Level.ERROR, line, i));
             }
 
-            if(line.contains("warning"))
+            if (line.contains("warning"))
             {
                 artifact.addFeature(new PlainFeature(Feature.Level.WARNING, line, i - 1, i + 1, i));
             }
 
-            if(line.contains("info"))
+            if (line.contains("info"))
             {
                 artifact.addFeature(new PlainFeature(Feature.Level.INFO, line.substring(4), i));
             }
