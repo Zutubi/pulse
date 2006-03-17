@@ -175,7 +175,8 @@ public class CvsClient
 
     private SCMException handleAuthenticationException(AuthenticationException ae)
     {
-        return new SCMException("Authentication failure. Failed to connect to requested cvs server '"+root+"'", ae);
+        return new SCMException("Authentication failure. Failed to connect to requested cvs server '" + root +
+                "'. Cause: " + ae.getMessage(), ae);
     }
 
     /**
@@ -220,7 +221,7 @@ public class CvsClient
      */
     public Date getLastUpdate(String module, String branch, Date since) throws SCMException
     {
-        List<LocalChange> changes = rlog(module, branch, since, null);
+        List<LocalChange> changes = getLocalChanges(module, branch, since, null);
         if (changes.size() == 0)
         {
             return null;
@@ -244,7 +245,6 @@ public class CvsClient
      * @param tag
      * @param module
      * @param date
-     *
      * @throws SCMException
      */
     public void tag(String tag, String module, Date date) throws SCMException
@@ -316,6 +316,7 @@ public class CvsClient
 
     /**
      * Retrieve the list of changes in the named module since the specified date.
+     *
      * @param module
      * @param branch
      * @param from
@@ -325,7 +326,7 @@ public class CvsClient
     public List<Changelist> getChangeLists(String module, String branch, Date from, Date to) throws SCMException
     {
         // retrieve the log info for all of the files that have been modified.
-        List<LocalChange> simpleChanges = rlog(module, branch, from, to);
+        List<LocalChange> simpleChanges = getLocalChanges(module, branch, from, to);
 
         // group by author, branch, sort by date. this will have the affect of grouping
         // all of the changes in a single changeset together, ordered by date.
@@ -404,19 +405,46 @@ public class CvsClient
         return changelists;
     }
 
+    private List<LocalChange> getLocalChanges(String module, String branch, Date from, Date to) throws SCMException
+    {
+        List<LogInformation> rlogResponse = rlog(module, branch, from, to);
+
+        // extract the returned revisions
+        List<LocalChange> revisions = new LinkedList<LocalChange>();
+        for (LogInformation logInfo : rlogResponse)
+        {
+            for (Object obj : logInfo.getRevisionList())
+            {
+                LogInformation.Revision rev = (LogInformation.Revision) obj;
+                LocalChange change = new LocalChange(rev);
+                change.setTag(branch);
+                revisions.add(change);
+            }
+        }
+        // and order them chronologically.
+        Collections.sort(revisions, new Comparator<LocalChange>()
+        {
+            public int compare(LocalChange o1, LocalChange o2)
+            {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
+        return revisions;
+
+    }
+
     /**
-     * This rlog command returns a list of LogInformation.Revision instances that define the
+     * This rlog command returns a list of LocalChange instances that define the
      * individual files and there revisions that were generated from the specified date in the
      * named module. These revisions are ordered chronologically.
      *
      * @param module
      * @param branch
      * @param from
-     *
      * @return
      * @throws SCMException
      */
-    public List<LocalChange> rlog(String module, String branch, Date from, Date to) throws SCMException
+    public List<LogInformation> rlog(String module, String branch, Date from, Date to) throws SCMException
     {
         Connection connection = null;
         try
@@ -466,27 +494,7 @@ public class CvsClient
 
             client.executeCommand(log, globalOptions);
 
-            // extract the returned revisions
-            List<LocalChange> revisions = new LinkedList<LocalChange>();
-            for (LogInformation logInfo : rlogResponse)
-            {
-                for (Object obj : logInfo.getRevisionList())
-                {
-                    LogInformation.Revision rev = (LogInformation.Revision) obj;
-                    LocalChange change = new LocalChange(rev);
-                    change.setTag(branch);
-                    revisions.add(change);
-                }
-            }
-            // and order them chronologically.
-            Collections.sort(revisions, new Comparator<LocalChange>()
-            {
-                public int compare(LocalChange o1, LocalChange o2)
-                {
-                    return o1.getDate().compareTo(o2.getDate());
-                }
-            });
-            return revisions;
+            return rlogResponse;
         }
         catch (AuthenticationException ae)
         {
@@ -562,7 +570,7 @@ public class CvsClient
 
             // remove the ,v
             if (filename.endsWith(",v"))
-                filename = filename.substring(0, filename.length() -2);
+                filename = filename.substring(0, filename.length() - 2);
 
             // remove the repo root.
             if (filename.startsWith(root.getRepository()))

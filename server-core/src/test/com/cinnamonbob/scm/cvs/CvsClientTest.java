@@ -415,9 +415,11 @@ public class CvsClientTest extends BobTestCase
         assertEquals("2006-03-11 02:30:04 GMT", CVSDATE.format(date));
     }
 
-    public void testTag() throws Exception
+    public void testRlog() throws SCMException
     {
-        // TODO... need to test this at some stage, tagging is not used at the moment, so delaying the testing.
+        String module = "unit-test/CvsClientTest/testRlog";
+        List results = cvs.rlog(module, null, null, null);
+        assertEquals(3, results.size());
     }
 
     private static void assertChangelistValues(Changelist changelist, String user, String comment)

@@ -95,3 +95,8 @@ testDirectoryLastChangedDate:
     file1.txt and file2.txt checked in by author a
     file1.txt is modified by author a (date modified in repository)
     file2.txt is modified by author a (date modified in repository)
+
+testRlog:
+    file1.txt checked in by author a
+    dir1/file2.txt checked in by author a
+    dir2/dir3/file3.txt checked in by author a
