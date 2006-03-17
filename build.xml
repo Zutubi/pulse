@@ -34,6 +34,20 @@
         <ant inheritAll="false" dir="slave" antfile="build.xml" target="build.module"/>
     </target>
 
+    <target name="build.all" depends="clean">
+        <foreach target="build.module"/>
+
+        <!-- Generate one mega report -->
+        <property name="report.dir" value="build/reports/junit"/>
+        <mkdir dir="${report.dir}/html"/>
+        <junitreport todir="${report.dir}">
+            <fileset dir=".">
+                <include name="*/${report.dir}/xml/*.xml"/>
+            </fileset>
+            <report format="frames" todir="${report.dir}/html"/>
+        </junitreport>
+    </target>
+
     <target name="package.local" depends="init, build.local">
 
         <property name="package.root" value="build/package"/>
@@ -176,7 +190,7 @@
             <ant inheritAll="false" dir="local" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="server-core" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="master" antfile="build.xml" target="@{target}"/>
-            <ant inheritAll="false" dir="slave" antfile="build.xml" target="@{target}"/>
+            <!--<ant inheritAll="false" dir="slave" antfile="build.xml" target="@{target}"/>-->
         </sequential>
     </macrodef>
 
