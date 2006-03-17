@@ -115,7 +115,7 @@ public class StoredFileArtifact extends Entity
             mimeType = type;
         }
 
-        if(mimeType.equals(TYPE_PLAIN))
+        if(mimeType != null && mimeType.equals(TYPE_PLAIN))
         {
             return true;
         }
