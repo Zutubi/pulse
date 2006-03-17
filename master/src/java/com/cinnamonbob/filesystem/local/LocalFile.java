@@ -59,6 +59,11 @@ public class LocalFile implements File, Comparable
         return file.getName();
     }
 
+    public String getPath()
+    {
+        return file.getPath();
+    }
+
     public int compareTo(Object o)
     {
         return file.compareTo(((LocalFile)o).file);

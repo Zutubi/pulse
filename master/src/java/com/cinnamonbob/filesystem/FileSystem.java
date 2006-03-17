@@ -20,4 +20,6 @@ public interface FileSystem
     File[] list(String path);
 
     File[] list(File dir);
+
+    String getSeparator();
 }

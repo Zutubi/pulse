@@ -127,6 +127,11 @@ public class LocalFileSystem implements FileSystem
         return internalList(((LocalFile)dir).file);
     }
 
+    public String getSeparator()
+    {
+        return File.separator;
+    }
+
     private LocalFile[] internalList(File dir)
     {
         List<LocalFile> listing = new LinkedList<LocalFile>();

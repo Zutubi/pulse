@@ -1,7 +1,5 @@
 package com.cinnamonbob.filesystem;
 
-import com.cinnamonbob.filesystem.local.LocalFile;
-
 /**
  * <class-comment/>
  */
@@ -11,11 +9,13 @@ public interface File
 
     boolean isFile();
 
-    LocalFile getParentFile();
+    File getParentFile();
 
     String getMimeType();
 
     long length();
 
     String getName();
+
+    String getPath();
 }

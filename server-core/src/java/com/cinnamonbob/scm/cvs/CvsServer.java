@@ -10,12 +10,16 @@ import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
 import com.cinnamonbob.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
+import org.netbeans.lib.cvsclient.CVSRoot;
+import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The Cvs Server provides all interactions with a cvs repository.
@@ -45,6 +49,32 @@ public class CvsServer implements SCMServer
         CvsClient client = new CvsClient(cvsRoot);
         client.setPassword(cvsPassword);
         client.testConnection();
+    }
+
+    public List<String> getListing(String module, String branch) throws SCMException
+    {
+        CvsClient client = new CvsClient(cvsRoot);
+        client.setPassword(cvsPassword);
+        List<LogInformation> logs = client.rlog(module, branch, null, null, false);
+
+        CVSRoot root = CVSRoot.parse(cvsRoot);
+
+        List<String> listing = new LinkedList<String>();
+        for (LogInformation log : logs)
+        {
+            String filename = log.getRepositoryFilename();
+
+            // remove the ,v
+            if (filename.endsWith(",v"))
+                filename = filename.substring(0, filename.length() - 2);
+
+            // remove the repo root.
+            if (filename.startsWith(root.getRepository()))
+                filename = filename.substring(root.getRepository().length());
+
+            listing.add(filename);
+        }
+        return listing;
     }
 
     public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException

@@ -3,6 +3,7 @@ package com.cinnamonbob.web.project;
 import com.cinnamonbob.MasterBuildPaths;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.filesystem.File;
+import com.cinnamonbob.filesystem.FileSystem;
 import com.cinnamonbob.filesystem.FileSystemException;
 import com.cinnamonbob.filesystem.local.LocalFileSystem;
 import com.cinnamonbob.model.BuildResult;
@@ -27,6 +28,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
     private String contentType;
     private ConfigurationManager configurationManager;
     private boolean foundBase = true;
+    private String separator;
 
     public String getPath()
     {
@@ -70,12 +72,12 @@ public class BrowseProjectDirAction extends ProjectActionSupport
 
     private String getParentPath()
     {
-        if (path.endsWith(java.io.File.separator))
+        if (path.endsWith(separator))
         {
             path = path.substring(0, path.length() - 1);
         }
 
-        int index = path.lastIndexOf(java.io.File.separatorChar);
+        int index = path.lastIndexOf(separator);
         if (index == -1)
         {
             return "";
@@ -91,7 +93,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         return foundBase;
     }
 
-    private void createDirectoryEntries(LocalFileSystem fs, File dir)
+    private void createDirectoryEntries(FileSystem fs, File dir)
     {
         entries = new LinkedList<DirectoryEntry>();
 
@@ -104,7 +106,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         Arrays.sort(files);
         for (File f : files)
         {
-            entries.add(new DirectoryEntry(f, f.getName(), path + java.io.File.separatorChar + f.getName()));
+            entries.add(new DirectoryEntry(f, f.getName(), path + separator + f.getName()));
         }
     }
 
@@ -140,6 +142,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         }
 
         LocalFileSystem fs = new LocalFileSystem(baseDir);
+        separator = fs.getSeparator();
         try
         {
             File file = fs.getFile(path);
