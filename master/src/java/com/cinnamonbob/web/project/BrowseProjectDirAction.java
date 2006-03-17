@@ -1,14 +1,15 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.MasterBuildPaths;
+import com.cinnamonbob.filesystem.LocalFileSystem;
+import com.cinnamonbob.filesystem.LocalFile;
+import com.cinnamonbob.filesystem.FileSystemException;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.web.DirectoryEntry;
 import com.opensymphony.util.TextUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -91,7 +92,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         return foundBase;
     }
 
-    private void createDirectoryEntries(File dir)
+    private void createDirectoryEntries(LocalFileSystem fs, LocalFile dir)
     {
         entries = new LinkedList<DirectoryEntry>();
 
@@ -100,9 +101,9 @@ public class BrowseProjectDirAction extends ProjectActionSupport
             entries.add(new DirectoryEntry(dir.getParentFile(), "..", getParentPath()));
         }
 
-        File[] files = dir.listFiles();
+        LocalFile[] files = fs.list(dir);
         Arrays.sort(files);
-        for (File f : files)
+        for (LocalFile f : files)
         {
             entries.add(new DirectoryEntry(f, f.getName(), path + File.separatorChar + f.getName()));
         }
@@ -139,35 +140,27 @@ public class BrowseProjectDirAction extends ProjectActionSupport
             return "dir";
         }
 
-        File file;
-        if (TextUtils.stringSet(path))
+        LocalFileSystem fs = new LocalFileSystem(baseDir);
+        try
         {
-            file = new File(baseDir, path);
-        }
-        else
-        {
-            file = baseDir;
-            path = "";
-        }
+            LocalFile file = fs.getFile(path);
 
-        if (file.isDirectory())
-        {
-            createDirectoryEntries(file);
-            return "dir";
-        }
-        else if (file.isFile())
-        {
-            try
+            if (file.isDirectory())
             {
-                inputStream = new FileInputStream(file);
-                contentType = DirectoryEntry.guessMimeType(file.getName(), file);
+                createDirectoryEntries(fs, file);
+                return "dir";
+            }
+            else if (file.isFile())
+            {
+                inputStream = fs.getFileContents(file);
+                contentType = fs.getMimeType(file);
                 return "file";
             }
-            catch (FileNotFoundException e)
-            {
-                addActionError("Unable to open file: " + e.getMessage());
-                return ERROR;
-            }
+        }
+        catch (FileSystemException fse)
+        {
+            addActionError(fse.getMessage());
+            return ERROR;
         }
 
         addActionError("Path '" + path + "' does not exist");
