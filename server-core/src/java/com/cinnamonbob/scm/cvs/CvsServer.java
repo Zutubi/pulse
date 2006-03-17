@@ -40,6 +40,13 @@ public class CvsServer implements SCMServer
         return cvsRoot + " [" + cvsModule + "]";
     }
 
+    public void testConnection() throws SCMException
+    {
+        CvsClient client = new CvsClient(cvsRoot);
+        client.setPassword(cvsPassword);
+        client.testConnection();
+    }
+
     public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
     {
         try
@@ -117,7 +124,6 @@ public class CvsServer implements SCMServer
 
         CvsClient client = new CvsClient(cvsRoot);
         client.setPassword(cvsPassword);
-//        client.;
 
         // paths...??
 

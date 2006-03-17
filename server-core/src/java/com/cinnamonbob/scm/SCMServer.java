@@ -23,6 +23,13 @@ public interface SCMServer
     String getLocation();
 
     /**
+     * Run a check on the connection to the scm server.
+     *
+     * @throws SCMException if there are any problems.
+     */
+    void testConnection() throws SCMException;
+
+    /**
      * Checks out a new working copy to the specified directory.
      *
      * @param id          a unique identifier for this checkout

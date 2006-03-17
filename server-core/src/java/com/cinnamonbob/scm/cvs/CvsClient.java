@@ -107,6 +107,24 @@ public class CvsClient
         checkout(module, null, null);
     }
 
+    public void testConnection() throws SCMException
+    {
+        Connection connection = null;
+        try
+        {
+            connection = ConnectionFactory.getConnection(root, password);
+            connection.verify();
+        }
+        catch (AuthenticationException e)
+        {
+            throw handleAuthenticationException(e);
+        }
+        finally
+        {
+            CvsUtils.close(connection);
+        }
+    }
+
     /**
      * Checkout the specified module, as it was on the specified date. If the date is null,
      * no date restriction will be applied.

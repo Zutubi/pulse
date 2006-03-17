@@ -195,6 +195,18 @@ public class SVNServer implements SCMServer
         return location.toString();
     }
 
+    public void testConnection() throws SCMException
+    {
+        try
+        {
+            repository.testConnection();
+        }
+        catch (SVNException e)
+        {
+            throw new SCMException(e);
+        }
+    }
+
     /**
      * @see SCMServer#checkout(long, File, Revision, List<Change>)
      */
