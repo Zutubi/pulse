@@ -92,4 +92,14 @@ public class Resource extends Entity implements Namespace
         versions.put(v.getValue(), v);
     }
 
+    public int getTotalPropertyCount()
+    {
+        int count = properties.size();
+        for(ResourceVersion v: versions.values())
+        {
+            count += v.getProperties().size();
+        }
+
+        return count;
+    }
 }

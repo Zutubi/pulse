@@ -10,19 +10,51 @@
     #serverTabs("resources")
 
     <table class="content">
-        #headingRow("resources.all" 3)
+        #headingRow("resources.all" 6)
         <tr>
             #contentHeading("resource.name" 1)
+            #contentHeading("version" 1)
+            #contentHeading("property.name" 1)
+            #contentHeading("property.value" 1)
             #contentHeading("actions" 2)
         </tr>
 #foreach($resource in $resources)
     #set($confirmMessage = $action.getText("resource.confirm.delete", [$resource.name]))
+    #set($firstRow = true)
+    #set($totalPropertyCount = $resource.totalPropertyCount)
+    #foreach($property in $resource.properties)
         <tr>
-             #dynamicCell($resource.name)
-             #editCell("viewResource.action?id=$resource.id" "edit_$!webwork.htmlEncode($resource.name)")
-             #deleteCell($confirmMessage "deleteResource.action?id=$resource.id" "delete_$!webwork.htmlEncode($resource.name)")
+         #if($firstRow)
+             #dynamicCellSpan($resource.name $totalPropertyCount)
+             #dynamicCellSpan("[default]" $resource.properties.size())
+         #end
+
+         #dynamicCell($property.name)
+         #dynamicCell($property.value)
+
+         #if($firstRow)
+             #set($firstRow = false)
+             #editCellSpan("viewResource.action?id=$resource.id" "edit_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
+             #deleteCellSpan($confirmMessage "deleteResource.action?id=$resource.id" "delete_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
+         #end
         </tr>
+    #end
+
+    #foreach($version in $resource.versions)
+        #set($firstRow = true)
+        #foreach($property in $version.properties)
+        <tr>
+             #if($firstRow)
+                 #dynamicCellSpan($version.value $version.properties.size())
+                 #set($firstRow = false)
+             #end
+
+             #dynamicCell($property.name)
+             #dynamicCell($property.value)
+        </tr>
+        #end
+    #end
 #end
-        #addRow("resource.add" 3 "createResource!input.action" "resource.add")
+        #addRow("resource.add" 6 "createResource!input.action" "resource.add")
     </table>
 </html>

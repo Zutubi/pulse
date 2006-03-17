@@ -176,6 +176,7 @@ public class StoredArtifact extends Entity
 
     private StoredFileArtifact findFileBase(String file)
     {
+        // Forward slash OK: paths are normalised in these artifacts
         return findFile(name + "/" + file);
     }
 

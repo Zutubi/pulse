@@ -316,6 +316,14 @@
 
 ##
 ## Outputs a cell for a content table with the given dynamic content, which
+## should be escaped, with a row span.
+##
+#macro(dynamicCellSpan $content $span)
+    <td class="content" rowspan="$span">$!webwork.htmlEncode($content)</td>
+#end
+
+##
+## Outputs a cell for a content table with the given dynamic content, which
 ## should be escaped
 ##
 #macro(dynamicCell $content)
@@ -355,8 +363,12 @@
 ##
 ## Outputs an action cell with an id
 ##
-#macro(actionCellId $actionKey $url $image $id)
-    <td class="content">
+#macro(actionCellId $actionKey $url $image $id $span)
+    <td class="content"
+#if($span)
+        rowspan="$span"
+#end
+    >
         <a href="$url"
 #if($id)
            id="$id"
@@ -372,7 +384,7 @@
 ## Outputs an action cell for a content table with an image.
 ##
 #macro(actionCell $actionKey $url $image)
-    #actionCellId($actionKey $url $image false)
+    #actionCellId($actionKey $url $image false false)
 #end
 
 ##
@@ -397,7 +409,14 @@
 ## Outputs an edit cell for a content table
 ##
 #macro(editCell $url $id)
-    #actionCellId("edit" $url "pencil.gif" $id)
+    #actionCellId("edit" $url "pencil.gif" $id false)
+#end
+
+##
+## Outputs an edit cell for a content table with a  row span
+##
+#macro(editCellSpan $url $id $span)
+    #actionCellId("edit" $url "pencil.gif" $id $span)
 #end
 
 ##
@@ -409,6 +428,15 @@
     </td>
 #end
 
+##
+## Outputs a delete cell for a content table, and uses the specified id for
+## the link, with a row span.
+##
+#macro(deleteCellSpan $message $url $id $span)
+    <td class="content" rowspan="$span">
+        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="/images/delete.gif"/>#wwtext("name=delete")</a>
+    </td>
+#end
 
 ##
 ## Outputs a table cell with class based on $cssClass

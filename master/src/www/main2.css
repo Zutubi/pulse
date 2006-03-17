@@ -266,6 +266,7 @@ h3.heading, div.box, th.heading, th.content, th.content-row, td.content, td.cont
 
 th.heading, th.content, th.content-row, td.content, td.success, td.failure, td.error, td.pending, td.inprogress, td.termianting, td.add {
     text-align: left;
+    vertical-align: top;
 }
 
 td.content-centre {
