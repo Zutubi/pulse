@@ -18,4 +18,6 @@
         <pattern category="info" expression="."/>
     </regex>
 
+    <regex name="context" leadingContext="1" trailingContext="2"/>
+
 </project>

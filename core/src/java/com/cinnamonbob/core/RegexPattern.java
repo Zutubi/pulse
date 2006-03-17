@@ -2,11 +2,11 @@ package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.Feature;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.regex.Matcher;
-import java.util.List;
-import java.util.LinkedList;
 
 /**
  *
@@ -44,7 +44,7 @@ public class RegexPattern
         {
             this.category = Feature.Level.valueOf(category.toUpperCase());
         }
-        catch(IllegalArgumentException e)
+        catch (IllegalArgumentException e)
         {
             throw new FileLoadException("Unrecognised regex category '" + category + "'");
         }
@@ -62,7 +62,7 @@ public class RegexPattern
             pattern = Pattern.compile(expression);
             this.expression = expression;
         }
-        catch(PatternSyntaxException e)
+        catch (PatternSyntaxException e)
         {
             throw new FileLoadException(e);
         }
@@ -95,17 +95,17 @@ public class RegexPattern
         String result = null;
 
         Matcher matcher = pattern.matcher(line);
-        if(matcher.matches())
+        if (matcher.matches())
         {
-            for(Exclusion e: exclusions)
+            for (Exclusion e : exclusions)
             {
-                if(e.getPattern().matcher(line).matches())
+                if (e.getPattern().matcher(line).matches())
                 {
                     return null;
                 }
             }
 
-            if(summary == null)
+            if (summary == null)
             {
                 result = line;
             }
@@ -151,7 +151,7 @@ public class RegexPattern
                 pattern = Pattern.compile(expression);
                 this.expression = expression;
             }
-            catch(PatternSyntaxException e)
+            catch (PatternSyntaxException e)
             {
                 throw new FileLoadException(e);
             }

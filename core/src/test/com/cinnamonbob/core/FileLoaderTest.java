@@ -1,9 +1,7 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.core.model.Property;
 import com.cinnamonbob.core.util.SystemUtils;
-import com.cinnamonbob.test.BobTestCase;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -287,73 +285,4 @@ public class FileLoaderTest extends FileLoaderTestBase
     // Regex post processor
     //-----------------------------------------------------------------------
 
-    private RegexPostProcessor regexPPHelper(String ppName) throws BobException
-    {
-        BobFile bf = new BobFile();
-        loader.load(getInput("testRegexPP"), bf);
-
-        Scope globalScope = bf.getGlobalScope();
-        assertTrue(globalScope.containsReference(ppName));
-        assertTrue(globalScope.getReference(ppName) instanceof RegexPostProcessor);
-
-        return (RegexPostProcessor) globalScope.getReference(ppName);
-    }
-
-    public void testRegexPPEmpty() throws BobException
-    {
-        RegexPostProcessor pp = regexPPHelper("empty");
-        assertTrue(pp.getFailOnError());
-        assertFalse(pp.getFailOnWarning());
-        assertEquals(0, pp.getPatterns().size());
-    }
-
-    public void testRegexPPFailOnWarning() throws BobException
-    {
-        RegexPostProcessor pp = regexPPHelper("failOnWarning");
-        assertTrue(pp.getFailOnError());
-        assertTrue(pp.getFailOnWarning());
-        assertEquals(0, pp.getPatterns().size());
-    }
-
-    public void testRegexPPNoFailOnError() throws BobException
-    {
-        RegexPostProcessor pp = regexPPHelper("noFailOnError");
-        assertFalse(pp.getFailOnError());
-        assertFalse(pp.getFailOnWarning());
-        assertEquals(0, pp.getPatterns().size());
-    }
-
-    private void regexPPLevelPattern(String name, Feature.Level level) throws BobException
-    {
-        RegexPostProcessor pp = regexPPHelper(name);
-        assertEquals(1, pp.getPatterns().size());
-        RegexPattern pattern = pp.getPatterns().get(0);
-        assertEquals(level, pattern.getCategory());
-        assertEquals(".", pattern.getPattern().pattern());
-    }
-
-    public void testRegexPPErrorPattern() throws BobException
-    {
-        regexPPLevelPattern("errorPattern", Feature.Level.ERROR);
-    }
-
-    public void testRegexPPWarningPattern() throws BobException
-    {
-        regexPPLevelPattern("warningPattern", Feature.Level.WARNING);
-    }
-
-    public void testRegexPPInfoPattern() throws BobException
-    {
-        regexPPLevelPattern("infoPattern", Feature.Level.INFO);
-    }
-
-    public void testRegexPPUnknownLevel() throws BobException
-    {
-        errorHelper("testRegexPPUnknownLevel", "Unrecognised regex category 'wtf?'");
-    }
-
-    public void testRegexPPInvalidRegex() throws BobException
-    {
-        errorHelper("testRegexPPInvalidRegex", "Unclosed group");
-    }
 }

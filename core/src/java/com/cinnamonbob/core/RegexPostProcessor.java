@@ -1,8 +1,14 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.core.model.*;
+import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.Feature;
+import com.cinnamonbob.core.model.PlainFeature;
+import com.cinnamonbob.core.model.StoredFileArtifact;
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.core.validation.Validateable;
+import com.cinnamonbob.util.CircularBuffer;
 import com.cinnamonbob.util.logging.Logger;
+import com.opensymphony.xwork.validator.ValidatorContext;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,10 +19,10 @@ import java.util.List;
 
 
 /**
- * 
- *
+ * A post processor that does line-by-line searching with regular expressions
+ * to detect features.
  */
-public class RegexPostProcessor implements PostProcessor
+public class RegexPostProcessor implements PostProcessor, Validateable
 {
     private static final Logger LOG = Logger.getLogger(RegexPostProcessor.class.getName());
 
@@ -32,6 +38,14 @@ public class RegexPostProcessor implements PostProcessor
      * command failure.
      */
     private boolean failOnWarning = false;
+    /**
+     * Number of lines of leading context to capture with the summary.
+     */
+    private int leadingContext = 0;
+    /**
+     * Number of lines of trailing context to capture with the summary.
+     */
+    private int trailingContext = 0;
 
 
     public RegexPostProcessor()
@@ -46,6 +60,69 @@ public class RegexPostProcessor implements PostProcessor
     }
 
     public void process(File outputDir, StoredFileArtifact artifact, CommandResult result)
+    {
+        if (leadingContext == 0 && trailingContext == 0)
+        {
+            // Optimise this common case
+            simpleProcess(outputDir, artifact, result);
+        }
+        else
+        {
+            BufferedReader reader = null;
+            try
+            {
+                File file = new File(outputDir, artifact.getPath());
+                reader = new BufferedReader(new FileReader(file));
+                String line;
+                long lineNumber = 0;
+                CircularBuffer<String> trailingBuffer = new CircularBuffer<String>(trailingContext + 1);
+
+                // First fill with the trailing context plus a line to be processed
+                for (int i = 0; i <= trailingContext; i++)
+                {
+                    line = reader.readLine();
+                    if (line == null)
+                    {
+                        break;
+                    }
+
+                    trailingBuffer.append(line);
+                }
+
+                // Now read in the bulk of the lines, processing them as we go.
+                CircularBuffer<String> leadingBuffer = new CircularBuffer<String>(leadingContext);
+                String next;
+
+                while ((next = reader.readLine()) != null)
+                {
+                    lineNumber++;
+                    line = trailingBuffer.getElement(0);
+                    processLine(artifact, result, line, lineNumber, leadingBuffer, trailingBuffer, 1);
+                    leadingBuffer.append(line);
+                    trailingBuffer.append(next);
+                }
+
+                // Finally, exhaust the trailing context
+                for (int i = 0; i < trailingBuffer.getCount(); i++)
+                {
+                    lineNumber++;
+                    line = trailingBuffer.getElement(i);
+                    processLine(artifact, result, line, lineNumber, leadingBuffer, trailingBuffer, i + 1);
+                    leadingBuffer.append(line);
+                }
+            }
+            catch (IOException e)
+            {
+                LOG.warning("I/O error post-processing artifact '" + artifact.getPath() + "': " + e.getMessage());
+            }
+            finally
+            {
+                IOUtils.close(reader);
+            }
+        }
+    }
+
+    private void simpleProcess(File outputDir, StoredFileArtifact artifact, CommandResult result)
     {
         BufferedReader reader = null;
         try
@@ -73,6 +150,11 @@ public class RegexPostProcessor implements PostProcessor
 
     private void processLine(StoredFileArtifact artifact, CommandResult result, String line, long lineNumber)
     {
+        processLine(artifact, result, line, lineNumber, null, null, 0);
+    }
+
+    private void processLine(StoredFileArtifact artifact, CommandResult result, String line, long lineNumber, CircularBuffer<String> leadingContext, CircularBuffer<String> trailingContext, int trailingIndex)
+    {
         for (RegexPattern p : patterns)
         {
             String summary = p.match(line);
@@ -87,7 +169,37 @@ public class RegexPostProcessor implements PostProcessor
                     result.failure("Warning features detected");
                 }
 
-                artifact.addFeature(new PlainFeature(p.getCategory(), summary, lineNumber));
+                if (leadingContext == null)
+                {
+                    artifact.addFeature(new PlainFeature(p.getCategory(), summary, lineNumber));
+                }
+                else
+                {
+                    // Add the context lines to the summary
+                    StringBuilder summaryBuilder = new StringBuilder();
+                    append(summaryBuilder, leadingContext, 0, true);
+                    summaryBuilder.append(summary);
+                    append(summaryBuilder, trailingContext, trailingIndex, false);
+                    artifact.addFeature(new PlainFeature(p.getCategory(), summaryBuilder.toString(), lineNumber - leadingContext.getCount(), lineNumber + trailingContext.getCount() - trailingIndex, lineNumber));
+                }
+            }
+        }
+    }
+
+    private void append(StringBuilder builder, CircularBuffer<String> context, int i, boolean leading)
+    {
+        for (; i < context.getCount(); i++)
+        {
+            if (!leading)
+            {
+                builder.append('\n');
+            }
+
+            builder.append(context.getElement(i));
+
+            if (leading)
+            {
+                builder.append('\n');
             }
         }
     }
@@ -143,6 +255,39 @@ public class RegexPostProcessor implements PostProcessor
     public void setFailOnWarning(boolean failOnWarning)
     {
         this.failOnWarning = failOnWarning;
+    }
+
+    public int getLeadingContext()
+    {
+        return leadingContext;
+    }
+
+    public void setLeadingContext(int leadingContext)
+    {
+        this.leadingContext = leadingContext;
+    }
+
+    public int getTrailingContext()
+    {
+        return trailingContext;
+    }
+
+    public void setTrailingContext(int trailingContext)
+    {
+        this.trailingContext = trailingContext;
+    }
+
+    public void validate(ValidatorContext context)
+    {
+        if (leadingContext < 0)
+        {
+            context.addFieldError("leadingContext", "Leading context count must be non-negative (got " + leadingContext + ")");
+        }
+
+        if (trailingContext < 0)
+        {
+            context.addFieldError("trailingContext", "Trailing context count must be non-negative (got " + trailingContext + ")");
+        }
     }
 
 }

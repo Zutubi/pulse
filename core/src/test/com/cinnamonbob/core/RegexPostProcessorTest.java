@@ -2,6 +2,7 @@ package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.CommandResult;
 import com.cinnamonbob.core.model.Feature;
+import com.cinnamonbob.core.model.PlainFeature;
 import com.cinnamonbob.core.model.StoredFileArtifact;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.test.BobTestCase;
@@ -9,6 +10,7 @@ import com.cinnamonbob.test.BobTestCase;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -156,6 +158,149 @@ public class RegexPostProcessorTest extends BobTestCase
         CommandResult result = simpleFeatures(pp, Feature.Level.WARNING, LINES);
         assertTrue(result.failed());
         assertEquals("Warning features detected", result.getFailureMessage());
+    }
+
+    public void testLeadingContext()
+    {
+        contextHelper(1, 0);
+    }
+
+    public void testTrailingContext()
+    {
+        contextHelper(0, 1);
+    }
+
+    public void testLeadingAndTrailingContext()
+    {
+        contextHelper(1, 1);
+    }
+
+    public void testMultipleLeadingContext()
+    {
+        contextHelper(2, 0);
+    }
+
+    public void testMultipleTrailingContext()
+    {
+        contextHelper(0, 2);
+    }
+
+    public void testMultipleLeadingAndTrailingContext()
+    {
+        contextHelper(2, 2);
+    }
+
+    public void testJustUnderLeadingContext()
+    {
+        contextHelper(LINES.length - 1, 0);
+    }
+
+    public void testJustUnderTrailingContext()
+    {
+        contextHelper(0, LINES.length - 1);
+    }
+
+    public void testJustUnderLEadingAndTrailingContext()
+    {
+        contextHelper(LINES.length - 1, LINES.length - 1);
+    }
+
+    public void testExactLeadingContext()
+    {
+        contextHelper(LINES.length, 0);
+    }
+
+    public void testExactTrailingContext()
+    {
+        contextHelper(0, LINES.length);
+    }
+
+    public void testExactLeadingAndTrailingContext()
+    {
+        contextHelper(LINES.length, LINES.length);
+    }
+
+    public void testJustOverLeadingContext()
+    {
+        contextHelper(LINES.length + 1, 0);
+    }
+
+    public void testJustOverTrailingContext()
+    {
+        contextHelper(0, LINES.length + 1);
+    }
+
+    public void testJustOverLeadingAndTrailingContext()
+    {
+        contextHelper(LINES.length + 1, LINES.length + 1);
+    }
+
+    public void testHugeLeadingContext()
+    {
+        contextHelper(10000, 0);
+    }
+
+    public void testHugeTrailingContext()
+    {
+        contextHelper(0, 10000);
+    }
+
+    public void testHugeLeadingAndTrailingContext()
+    {
+        contextHelper(10000, 10000);
+    }
+
+    private void contextHelper(int leading, int trailing)
+    {
+        RegexPostProcessor pp = createPostProcessor(".*");
+        pp.setLeadingContext(leading);
+        pp.setTrailingContext(trailing);
+        simpleErrors(pp, joinLines(leading, trailing));
+        checkFeatureLines(artifact, leading, trailing);
+    }
+
+    private void checkFeatureLines(StoredFileArtifact artifact, int leading, int trailing)
+    {
+        int lineNumber = 1;
+        for (Feature f : artifact.getFeatures())
+        {
+            PlainFeature pf = (PlainFeature) f;
+            assertEquals(lineNumber, pf.getLineNumber());
+            assertEquals(lineNumber > leading ? lineNumber - leading : 1, pf.getFirstLine());
+            assertEquals(lineNumber + trailing <= LINES.length ? lineNumber + trailing : LINES.length, pf.getLastLine());
+            lineNumber++;
+        }
+    }
+
+    private String[] joinLines(int leading, int trailing)
+    {
+        String[] result = new String[LINES.length];
+
+        for (int i = 0; i < LINES.length; i++)
+        {
+            StringBuilder joined = new StringBuilder();
+            for (int j = i - leading; j < i; j++)
+            {
+                if (j >= 0)
+                {
+                    joined.append(LINES[j]);
+                    joined.append('\n');
+                }
+            }
+
+            joined.append(LINES[i]);
+
+            for (int j = i + 1; j <= i + trailing && j < LINES.length; j++)
+            {
+                joined.append('\n');
+                joined.append(LINES[j]);
+            }
+
+            result[i] = joined.toString();
+        }
+
+        System.out.println("result = " + Arrays.asList(result));
+        return result;
     }
 
     private CommandResult simpleFeatures(RegexPostProcessor pp, Feature.Level level, String... lines)
