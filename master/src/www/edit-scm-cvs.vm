@@ -14,6 +14,7 @@
     #wwhidden("name=projectId")
 
     #wwtextfield("name=cvs.root" "label=%{getText('cvs.root')}" "required=true" "size=60" "tabindex=1")
+    #inlineHelp("cvs.root.help")
     #wwtextfield("name=cvs.module" "label=%{getText('cvs.module')}" "required=true" "tabindex=2")
     #wwpassword("name=cvs.password" "label=%{getText('cvs.password')}" "showPassword=true" "tabindex=3")
     #wwtextfield("name=cvs.path" "label=%{getText('scm.path')}" "size=60" "tabindex=4")

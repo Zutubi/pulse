@@ -85,9 +85,6 @@ triggers.
 
     <bean id="triggerHandlerTarget" class="com.cinnamonbob.scheduling.DefaultTriggerHandler">
         <!-- not sure why this is needs to be wired directly. -->
-        <property name="triggerDao">
-            <ref bean="triggerDao"/>
-        </property>
         <property name="objectFactory">
             <ref bean="objectFactory"/>
         </property>

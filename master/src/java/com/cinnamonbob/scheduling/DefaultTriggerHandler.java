@@ -14,7 +14,6 @@ public class DefaultTriggerHandler implements TriggerHandler
 {
     private static final Logger LOG = Logger.getLogger(DefaultTriggerHandler.class);
 
-    private TriggerDao triggerDao;
     private ObjectFactory objectFactory;
 
     private final Set<String> executingTriggers = new HashSet<String>();
@@ -29,16 +28,16 @@ public class DefaultTriggerHandler implements TriggerHandler
     {
         // do we want to execute this task?
         String triggerKey = trigger.getName() + ":" + trigger.getGroup();
-        if (executingTriggers.contains(triggerKey))
-        {
-            LOG.info("Request to fire trigger '" + triggerKey +
-                    "' ignored since the trigger is already firing.");
-            return;
-        }
         try
         {
             synchronized(executingTriggers)
             {
+                if (executingTriggers.contains(triggerKey))
+                {
+                    LOG.info("Request to fire trigger '" + triggerKey + "' ignored since the trigger is already firing.");
+                    return;
+                }
+                LOG.info("executing trigger " + triggerKey);
                 executingTriggers.add(triggerKey);
             }
 
@@ -62,19 +61,13 @@ public class DefaultTriggerHandler implements TriggerHandler
         {
             synchronized(executingTriggers)
             {
-                executingTriggers.remove(triggerKey);
+                if (!executingTriggers.remove(triggerKey))
+                {
+                    LOG.error("failed to remove trigger key from set.");
+                }
+                LOG.info("finished trigger " + triggerKey);
             }
         }
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param triggerDao
-     */
-    public void setTriggerDao(TriggerDao triggerDao)
-    {
-        this.triggerDao = triggerDao;
     }
 
     /**

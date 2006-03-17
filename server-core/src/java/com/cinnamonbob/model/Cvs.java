@@ -30,7 +30,7 @@ public class Cvs extends Scm
 
     public SCMServer createServer() throws SCMException
     {
-        return new CvsServer(getRoot(), getModule(), null);
+        return new CvsServer(getRoot(), getModule(), getPassword());
     }
 
     /**
