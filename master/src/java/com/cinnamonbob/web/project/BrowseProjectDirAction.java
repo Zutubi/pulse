@@ -21,7 +21,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
 {
     private long buildId;
     private long recipeId;
-    private String path;
+    private String path = "";
     private BuildResult buildResult;
     private List<DirectoryEntry> entries;
     private InputStream inputStream;

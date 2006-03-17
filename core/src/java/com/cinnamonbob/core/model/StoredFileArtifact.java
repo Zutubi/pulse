@@ -1,5 +1,7 @@
 package com.cinnamonbob.core.model;
 
+import com.cinnamonbob.core.util.FileSystemUtils;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +28,7 @@ public class StoredFileArtifact extends Entity
 
     public StoredFileArtifact(String path, String type)
     {
-        this.path = path;
+        setPath(path);
         this.type = type;
         features = new LinkedList<Feature>();
     }
@@ -38,7 +40,8 @@ public class StoredFileArtifact extends Entity
 
     private void setPath(String path)
     {
-        this.path = path;
+        // Normalise to the same path separator used in URLs
+        this.path = FileSystemUtils.normaliseSeparators(path);
     }
 
     public void addFeature(Feature feature)

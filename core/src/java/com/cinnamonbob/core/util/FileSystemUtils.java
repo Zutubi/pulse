@@ -509,4 +509,14 @@ public class FileSystemUtils
         }
         return result;
     }
+
+    public static String normaliseSeparators(String path)
+    {
+        if(File.separatorChar != '/')
+        {
+            path = path.replace(File.separatorChar, '/');
+        }
+
+        return path;
+    }
 }
