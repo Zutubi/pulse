@@ -152,7 +152,7 @@ public class CvsClient
 
             if (!client.executeCommand(checkout, globalOptions))
             {
-                throw new SCMException("Execution of checkout command failed. Reason is unknown.");
+                LOG.error("Execution of checkout command failed. Reason is unknown.");
             }
         }
         catch (AuthenticationException ae)
@@ -407,7 +407,7 @@ public class CvsClient
 
     private List<LocalChange> getLocalChanges(String module, String branch, Date from, Date to) throws SCMException
     {
-        List<LogInformation> rlogResponse = rlog(module, branch, from, to);
+        List<LogInformation> rlogResponse = rlog(module, branch, from, to, false);
 
         // extract the returned revisions
         List<LocalChange> revisions = new LinkedList<LocalChange>();
@@ -441,10 +441,11 @@ public class CvsClient
      * @param module
      * @param branch
      * @param from
+     * @param headersOnly
      * @return
      * @throws SCMException
      */
-    public List<LogInformation> rlog(String module, String branch, Date from, Date to) throws SCMException
+    public List<LogInformation> rlog(String module, String branch, Date from, Date to, boolean headersOnly) throws SCMException
     {
         Connection connection = null;
         try
@@ -465,6 +466,8 @@ public class CvsClient
 
             RlogCommand log = new RlogCommand();
             log.setModule(module);
+            log.setHeaderOnly(headersOnly);
+            log.setNoTags(headersOnly);
 
             String dateFilter = "";
             String del = "<=";

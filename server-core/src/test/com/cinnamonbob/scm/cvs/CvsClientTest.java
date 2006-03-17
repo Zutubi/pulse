@@ -418,8 +418,15 @@ public class CvsClientTest extends BobTestCase
     public void testRlog() throws SCMException
     {
         String module = "unit-test/CvsClientTest/testRlog";
-        List results = cvs.rlog(module, null, null, null);
-        assertEquals(3, results.size());
+        List results = cvs.rlog(module, null, null, null, true);
+        assertEquals(4, results.size());
+    }
+
+    public void testRLogOnBranch() throws SCMException
+    {
+        String module = "unit-test/CvsClientTest/testRlogOnBranch";
+        List results = cvs.rlog(module, "BRANCH", null, null, true);
+        assertEquals(4, results.size());
     }
 
     private static void assertChangelistValues(Changelist changelist, String user, String comment)
