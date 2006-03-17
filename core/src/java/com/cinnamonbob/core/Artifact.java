@@ -16,6 +16,10 @@ import java.util.LinkedList;
 public abstract class Artifact
 {
     private String name;
+    /**
+     * If true, fail the command of the artifact cannot be captured.
+     */
+    private boolean failIfNotPresent = true;
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
 
     public Artifact(String name)
@@ -35,6 +39,16 @@ public abstract class Artifact
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public boolean getFailIfNotPresent()
+    {
+        return failIfNotPresent;
+    }
+
+    public void setFailIfNotPresent(boolean failIfNotPresent)
+    {
+        this.failIfNotPresent = failIfNotPresent;
     }
 
     public ProcessArtifact createProcess()

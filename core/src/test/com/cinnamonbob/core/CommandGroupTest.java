@@ -35,7 +35,7 @@ public class CommandGroupTest extends BobTestCase
     public void testSimpleNestedCommand() throws Exception
     {
         CommandGroup group = createEchoCommand();
-        testSuccessWithOutput(group, "hello world\n");
+        testSuccess(group);
     }
 
     public void testCaptureFile() throws Exception
@@ -50,6 +50,25 @@ public class CommandGroupTest extends BobTestCase
         fileCaptureHelper(file);
     }
 
+    public void testCaptureFileNonExistent() throws Exception
+    {
+        CommandGroup group = createEchoCommand();
+        FileArtifact fa = group.createArtifact();
+        fa.setName("non-existent");
+        fa.setFile(new File("pfffft"));
+        testFailureWithMessage(group, "does not exist");
+    }
+
+    public void testCaptureFileNonExistentNoFail() throws Exception
+    {
+        CommandGroup group = createEchoCommand();
+        FileArtifact fa = group.createArtifact();
+        fa.setName("non-existent");
+        fa.setFile(new File("pfffft"));
+        fa.setFailIfNotPresent(false);
+        testSuccess(group);
+    }
+
     private void fileCaptureHelper(File file) throws IOException, FileLoadException
     {
         File inFile = new File(baseDirectory, "testfile");
@@ -59,7 +78,7 @@ public class CommandGroupTest extends BobTestCase
         FileArtifact pa = group.createArtifact();
         pa.setName("test-artifact");
         pa.setFile(file);
-        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+        CommandResult result = testSuccess(group);
 
         // Now check the artifact was captured
         StoredArtifact artifact = result.getArtifact("test-artifact");
@@ -76,11 +95,32 @@ public class CommandGroupTest extends BobTestCase
         CommandGroup group = createEchoCommand();
         dirHelper(group, "test-dir-artifact");
 
-        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+        CommandResult result = testSuccess(group);
         // Check the whole directory was captured
         checkCapturedDir("test-dir-artifact", 4, result);
     }
 
+    public void testCaptureDirNonExistant() throws Exception
+    {
+        CommandGroup group = createEchoCommand();
+        DirectoryArtifact artifact = group.createDirArtifact();
+        artifact.setName("test-dri-artifact");
+        artifact.setBase(new File("pffft"));
+
+        CommandResult result = testFailureWithMessage(group, "does not exist");
+    }
+
+    public void testCaptureDirNonExistantNoFail() throws Exception
+    {
+        CommandGroup group = createEchoCommand();
+        DirectoryArtifact artifact = group.createDirArtifact();
+        artifact.setName("test-dri-artifact");
+        artifact.setBase(new File("pffft"));
+        artifact.setFailIfNotPresent(false);
+
+        CommandResult result = testSuccess(group);
+    }
+    
     public void testMultiDirCapture() throws Exception
     {
         createSomeFiles();
@@ -88,7 +128,7 @@ public class CommandGroupTest extends BobTestCase
         dirHelper(group, "test-dir-artifact");
         dirHelper(group, "test-dir-artifact2");
 
-        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+        CommandResult result = testSuccess(group);
 
         // Check the whole directory was captured twice
         checkCapturedDir("test-dir-artifact", 4, result);
@@ -108,7 +148,7 @@ public class CommandGroupTest extends BobTestCase
         DirectoryArtifact artifact = group.createDirArtifact();
         artifact.setName("test-dir-artifact");
         artifact.createInclude().setPattern("**/*.txt");
-        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+        CommandResult result = testSuccess(group);
 
         checkAllButFoo(result);
     }
@@ -120,7 +160,7 @@ public class CommandGroupTest extends BobTestCase
         DirectoryArtifact artifact = group.createDirArtifact();
         artifact.setName("test-dir-artifact");
         artifact.createExclude().setPattern("**/*.foo");
-        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+        CommandResult result = testSuccess(group);
 
         checkAllButFoo(result);
     }
@@ -133,7 +173,7 @@ public class CommandGroupTest extends BobTestCase
         artifact.setName("test-dir-artifact");
         artifact.createInclude().setPattern("**/*file*");
         artifact.createExclude().setPattern("**/*.foo");
-        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+        CommandResult result = testSuccess(group);
 
         checkAllButFoo(result);
     }
@@ -155,7 +195,7 @@ public class CommandGroupTest extends BobTestCase
         DirectoryArtifact artifact = group.createDirArtifact();
         artifact.setName("test-dir-artifact");
         artifact.setBase(base);
-        CommandResult result = testSuccessWithOutput(group, "hello world\n");
+        CommandResult result = testSuccess(group);
 
         checkCapturedDir("test-dir-artifact", 3, new File(baseDirectory, "testdir"), result);
     }
@@ -200,6 +240,27 @@ public class CommandGroupTest extends BobTestCase
         StoredArtifact artifact = result.getArtifact(ExecutableCommand.OUTPUT_NAME);
         File outputFile = new File(outputDirectory, artifact.getFile().getPath());
         assertEquals(output, IOUtils.fileToString(outputFile));
+
+        return result;
+    }
+
+    private CommandResult testSuccess(CommandGroup group) throws IOException
+    {
+        return testSuccessWithOutput(group, "hello world\n");
+    }
+
+    private CommandResult testFailureWithMessage(CommandGroup group, String message) throws IOException
+    {
+        CommandResult result = null;
+        try
+        {
+            result = new CommandResult("test");
+            group.execute(baseDirectory, outputDirectory, result);
+        }
+        catch (BuildException e)
+        {
+            assertTrue(e.getMessage().contains(message));
+        }
 
         return result;
     }

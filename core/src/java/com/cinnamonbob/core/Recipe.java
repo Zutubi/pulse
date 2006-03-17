@@ -34,7 +34,20 @@ public class Recipe implements Reference, Namespace
     {
         commands.add(c);
     }
-    
+
+    public Command getCommand(String name)
+    {
+        for(Command c: commands)
+        {
+            if(c.getName().equals(name))
+            {
+                return c;
+            }
+        }
+
+        return null;
+    }
+
     public List<Command> getCommands()
     {
         return Collections.unmodifiableList(commands);

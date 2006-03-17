@@ -79,6 +79,19 @@ public class DirectoryArtifact extends Artifact
             base = new File(baseDir, base.getPath());
         }
 
+        if (!base.exists())
+        {
+            if(getFailIfNotPresent())
+            {
+                throw new BuildException("Capturing artifact '" + getName() + "': base directory '" + base.getAbsolutePath() + "' does not exist");
+            }
+            else
+            {
+                // Don't attempt to capture.
+                return;
+            }
+        }
+
         if (!base.isDirectory())
         {
             throw new BuildException("Directory artifact '" + getName() + "': base '" + base.getAbsolutePath() + "' is not a directory");

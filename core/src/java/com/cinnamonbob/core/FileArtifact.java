@@ -1,7 +1,6 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.StoredFileArtifact;
 import com.cinnamonbob.core.model.StoredArtifact;
 
 import java.io.*;
@@ -31,7 +30,20 @@ public class FileArtifact extends Artifact
         {
             captureFile = new File(baseDir, file.getPath());
         }
-        
+
+        if(!captureFile.exists())
+        {
+            if(getFailIfNotPresent())
+            {
+                throw new BuildException("Capturing artifact '" + getName() + "': file '" + captureFile.getAbsolutePath() + "' does not exist");
+            }
+            else
+            {
+                // Don't attempt to capture.
+                return;
+            }
+        }
+
         captureFile(stored, captureFile, file.getName(), outputDir, result, type);
         result.addArtifact(stored);
     }
