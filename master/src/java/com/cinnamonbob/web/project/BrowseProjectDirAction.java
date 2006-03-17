@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  */
-public class BrowseProjectDir extends ProjectActionSupport
+public class BrowseProjectDirAction extends ProjectActionSupport
 {
     private long buildId;
     private long recipeId;
