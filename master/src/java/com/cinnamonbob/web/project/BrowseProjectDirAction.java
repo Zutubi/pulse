@@ -1,15 +1,14 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.MasterBuildPaths;
-import com.cinnamonbob.filesystem.LocalFileSystem;
-import com.cinnamonbob.filesystem.LocalFile;
-import com.cinnamonbob.filesystem.FileSystemException;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.filesystem.File;
+import com.cinnamonbob.filesystem.FileSystemException;
+import com.cinnamonbob.filesystem.local.LocalFileSystem;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.web.DirectoryEntry;
 import com.opensymphony.util.TextUtils;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -71,12 +70,12 @@ public class BrowseProjectDirAction extends ProjectActionSupport
 
     private String getParentPath()
     {
-        if (path.endsWith(File.separator))
+        if (path.endsWith(java.io.File.separator))
         {
             path = path.substring(0, path.length() - 1);
         }
 
-        int index = path.lastIndexOf(File.separatorChar);
+        int index = path.lastIndexOf(java.io.File.separatorChar);
         if (index == -1)
         {
             return "";
@@ -92,7 +91,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         return foundBase;
     }
 
-    private void createDirectoryEntries(LocalFileSystem fs, LocalFile dir)
+    private void createDirectoryEntries(LocalFileSystem fs, File dir)
     {
         entries = new LinkedList<DirectoryEntry>();
 
@@ -101,11 +100,11 @@ public class BrowseProjectDirAction extends ProjectActionSupport
             entries.add(new DirectoryEntry(dir.getParentFile(), "..", getParentPath()));
         }
 
-        LocalFile[] files = fs.list(dir);
+        File[] files = fs.list(dir);
         Arrays.sort(files);
-        for (LocalFile f : files)
+        for (File f : files)
         {
-            entries.add(new DirectoryEntry(f, f.getName(), path + File.separatorChar + f.getName()));
+            entries.add(new DirectoryEntry(f, f.getName(), path + java.io.File.separatorChar + f.getName()));
         }
     }
 
@@ -129,7 +128,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         }
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File baseDir = paths.getBaseDir(buildResult.getProject(), buildResult, recipeId);
+        java.io.File baseDir = paths.getBaseDir(buildResult.getProject(), buildResult, recipeId);
 
         // First check if the build is complete and has a working directory
         // If not, we forward to the same page, which tells the user the bad
@@ -143,7 +142,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         LocalFileSystem fs = new LocalFileSystem(baseDir);
         try
         {
-            LocalFile file = fs.getFile(path);
+            File file = fs.getFile(path);
 
             if (file.isDirectory())
             {

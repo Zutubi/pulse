@@ -1,4 +1,8 @@
-package com.cinnamonbob.filesystem;
+package com.cinnamonbob.filesystem.local;
+
+import com.cinnamonbob.filesystem.FileNotFoundException;
+import com.cinnamonbob.filesystem.FileSystem;
+import com.cinnamonbob.filesystem.FileSystemException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,12 +55,12 @@ public class LocalFileSystem implements FileSystem
         }
     }
 
-    public InputStream getFileContents(LocalFile file) throws FileSystemException
+    public InputStream getFileContents(com.cinnamonbob.filesystem.File file) throws FileSystemException
     {
-        return internalGetFileContents(file.file);
+        return internalGetFileContents(((LocalFile)file).file);
     }
 
-    public LocalFile getFile(String path) throws FileSystemException
+    public com.cinnamonbob.filesystem.File getFile(String path) throws FileSystemException
     {
         return new LocalFile(this, new File(base, path));
     }
@@ -101,9 +105,9 @@ public class LocalFileSystem implements FileSystem
         return type;
     }
 
-    public String getMimeType(LocalFile file) throws FileNotFoundException
+    public String getMimeType(com.cinnamonbob.filesystem.File file) throws FileNotFoundException
     {
-        return internalGetMimeType(file.file);
+        return internalGetMimeType(((LocalFile)file).file);
     }
 
     /**
@@ -118,9 +122,9 @@ public class LocalFileSystem implements FileSystem
         return internalList(new File(base, path));
     }
 
-    public LocalFile[] list(LocalFile dir)
+    public com.cinnamonbob.filesystem.File[] list(com.cinnamonbob.filesystem.File dir)
     {
-        return internalList(dir.file);
+        return internalList(((LocalFile)dir).file);
     }
 
     private LocalFile[] internalList(File dir)

@@ -1,12 +1,6 @@
 package com.cinnamonbob.web;
 
-import com.cinnamonbob.filesystem.LocalFile;
-import com.cinnamonbob.filesystem.FileNotFoundException;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URLConnection;
+import com.cinnamonbob.filesystem.File;
 
 /**
  */
@@ -18,7 +12,7 @@ public class DirectoryEntry
     private String mimeType;
     private long size;
 
-    public DirectoryEntry(LocalFile file, String name, String path)
+    public DirectoryEntry(File file, String name, String path)
     {
         this.path = path;
         isDirectory = file.isDirectory();
@@ -28,14 +22,7 @@ public class DirectoryEntry
         }
         else
         {
-            try
-            {
-                mimeType = file.getMimeType();
-            }
-            catch (FileNotFoundException e)
-            {
-                e.printStackTrace();
-            }
+            mimeType = file.getMimeType();
         }
         this.name = name;
         size = file.length();
@@ -88,28 +75,4 @@ public class DirectoryEntry
 
         return String.format("%.02f %s", s, units);
     }
-
-    public static String guessMimeType(String name, File file)
-    {
-        String type = URLConnection.guessContentTypeFromName(name);
-        if(type == null)
-        {
-            try
-            {
-                type = URLConnection.guessContentTypeFromStream(new FileInputStream(file));
-            }
-            catch (IOException e)
-            {
-                // Oh well
-            }
-
-            if(type == null)
-            {
-                type = "text/plain";
-            }
-        }
-
-        return type;
-    }
-
 }

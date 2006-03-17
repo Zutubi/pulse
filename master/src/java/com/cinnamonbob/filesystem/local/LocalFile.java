@@ -1,9 +1,12 @@
-package com.cinnamonbob.filesystem;
+package com.cinnamonbob.filesystem.local;
+
+import com.cinnamonbob.filesystem.FileNotFoundException;
+import com.cinnamonbob.filesystem.File;
 
 /**
  * <class-comment/>
  */
-public class LocalFile implements Comparable
+public class LocalFile implements File, Comparable
 {
     protected final java.io.File file;
     protected final LocalFileSystem fileSystem;
@@ -29,9 +32,21 @@ public class LocalFile implements Comparable
         return new LocalFile(fileSystem, file.getParentFile());
     }
 
-    public String getMimeType() throws FileNotFoundException
+    public String getMimeType()
     {
-        return fileSystem.getMimeType(this);
+        try
+        {
+            if (file.exists())
+            {
+                return fileSystem.getMimeType(this);
+            }
+            return null;
+        }
+        catch (FileNotFoundException e)
+        {
+            // programming error. we are the file, we exist.
+            return null;
+        }
     }
 
     public long length()
