@@ -28,19 +28,19 @@ public class DefaultTriggerHandler implements TriggerHandler
     {
         // do we want to execute this task?
         String triggerKey = trigger.getName() + ":" + trigger.getGroup();
+        synchronized(executingTriggers)
+        {
+            if (executingTriggers.contains(triggerKey))
+            {
+                LOG.info("Request to fire trigger '" + triggerKey + "' ignored since the trigger is already firing.");
+                return;
+            }
+            LOG.info("executing trigger " + triggerKey);
+            executingTriggers.add(triggerKey);
+        }
+
         try
         {
-            synchronized(executingTriggers)
-            {
-                if (executingTriggers.contains(triggerKey))
-                {
-                    LOG.info("Request to fire trigger '" + triggerKey + "' ignored since the trigger is already firing.");
-                    return;
-                }
-                LOG.info("executing trigger " + triggerKey);
-                executingTriggers.add(triggerKey);
-            }
-
             context.setTrigger(trigger);
             trigger.fire();
 
@@ -65,7 +65,10 @@ public class DefaultTriggerHandler implements TriggerHandler
                 {
                     LOG.error("failed to remove trigger key from set.");
                 }
-                LOG.info("finished trigger " + triggerKey);
+                else
+                {
+                    LOG.info("finished trigger " + triggerKey);
+                }
             }
         }
     }
