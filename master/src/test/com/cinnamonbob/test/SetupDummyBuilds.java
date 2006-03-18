@@ -173,6 +173,7 @@ public class SetupDummyBuilds implements Runnable
         list.addChange(new Change("/home/jsankey/some/branched/file2", "1", Change.Action.BRANCH));
         list.addChange(new Change("/home/jsankey/some/branched/file3", "1", Change.Action.BRANCH));
         list.addChange(new Change("/home/jsankey/some/branched/file4", "1", Change.Action.BRANCH));
+        list.setProjectId(result.getProject().getId());
         list.setResultId(result.getId());
         changelists.add(list);
 
@@ -182,6 +183,7 @@ public class SetupDummyBuilds implements Runnable
         userRevision.setDate(new Date(System.currentTimeMillis() - 10000));
         list = new Changelist(userRevision);
         list.addChange(new Change("/home/jsankey/some/branched/file/with/a/very/long/filename/to/test/the/display/handling/of/such/things", "1", Change.Action.BRANCH));
+        list.setProjectId(result.getProject().getId());
         list.setResultId(result.getId());
         changelists.add(list);
 
@@ -191,6 +193,7 @@ public class SetupDummyBuilds implements Runnable
         userRevision.setDate(new Date(System.currentTimeMillis() - 9000));
         list = new Changelist(userRevision);
         list.addChange(new Change("/home/jsankey/some/file", "120", Change.Action.BRANCH));
+        list.setProjectId(result.getProject().getId());
         list.setResultId(result.getId());
         changelists.add(list);
 

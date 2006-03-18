@@ -276,6 +276,7 @@ public class BuildController implements EventListener
                         scmChanges = server.getChanges(previousRevision, revision, "");
                         for (Changelist change : scmChanges)
                         {
+                            change.setProjectId(buildResult.getProject().getId());
                             change.setResultId(buildResult.getId());
                         }
                     }

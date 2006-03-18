@@ -1,6 +1,7 @@
 package com.cinnamonbob.model.persistence;
 
 import com.cinnamonbob.core.model.Changelist;
+import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.User;
 
 import java.util.List;
@@ -18,4 +19,13 @@ public interface ChangelistDao extends EntityDao<Changelist>
      * @return a list of the latest changes by the user
      */
     List<Changelist> findLatestByUser(User user, int max);
+
+    /**
+     * Returns a list of up to max changelists against the given project.
+     *
+     * @param project the project to restrict the query to
+     * @param max     the maximum number fo changelists to return
+     * @return a list of latest changes against the project
+     */
+    List<Changelist> findLatestByProject(Project project, int max);
 }

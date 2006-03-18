@@ -1,6 +1,7 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.core.model.Changelist;
+import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.persistence.ChangelistDao;
 import org.hibernate.HibernateException;
@@ -36,6 +37,22 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
                 return queryObject.list();
             }
         });
+    }
 
+    public List<Changelist> findLatestByProject(final Project project, final int max)
+    {
+        return (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from Changelist model where model.projectId = :projectId order by id desc");
+                queryObject.setParameter("projectId", project.getId());
+                queryObject.setMaxResults(max);
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.list();
+            }
+        });
     }
 }

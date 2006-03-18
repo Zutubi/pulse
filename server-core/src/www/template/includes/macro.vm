@@ -158,7 +158,7 @@
 ##
 #macro(projectTabs $selected)
     #openTabs()
-        #projectTab("current-build" "currentBuild" $selected)
+        #projectTab("home" "currentBuild" $selected)
         #projectTab("history" "history" $selected)
         #projectTab("configuration" "configureProject" $selected)
     #closeTabs()

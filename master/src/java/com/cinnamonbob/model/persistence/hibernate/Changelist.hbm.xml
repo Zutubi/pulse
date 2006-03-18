@@ -18,6 +18,8 @@
             <one-to-many class="com.cinnamonbob.core.model.Change"/>
         </list>
 
+        <property name="projectId" type="long"/>
+
         <property name="resultId" type="long"/>
     </class>
 

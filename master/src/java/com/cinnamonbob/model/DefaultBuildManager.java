@@ -201,6 +201,11 @@ public class DefaultBuildManager implements BuildManager
         return changelistDao.findLatestByUser(user, max);
     }
 
+    public List<Changelist> getLatestChangesForProject(Project project, int max)
+    {
+        return changelistDao.findLatestByProject(project, max);
+    }
+
     private void cleanupBuilds(Project project)
     {
         BuildResultCleanupPolicy policy = project.getCleanupPolicy();

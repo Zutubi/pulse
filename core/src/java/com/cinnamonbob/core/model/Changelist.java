@@ -14,6 +14,7 @@ public class Changelist extends Entity
 {
     private Revision revision;
     private List<Change> changes;
+    private long projectId;
     /**
      * Id of the build result this is part of: the BuildResult class is up
      * in master so we can't map it directly.  In any case, this forces lazy
@@ -75,6 +76,16 @@ public class Changelist extends Entity
     private void setRevision(Revision revision)
     {
         this.revision = revision;
+    }
+
+    public long getProjectId()
+    {
+        return projectId;
+    }
+
+    public void setProjectId(long projectId)
+    {
+        this.projectId = projectId;
     }
 
     public long getResultId()

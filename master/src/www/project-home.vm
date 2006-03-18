@@ -1,0 +1,67 @@
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>$!webwork.htmlEncode($project.name)</title>
+</head>
+<body>
+    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+
+    #projectTabs("home")
+
+#if($hasBasics)
+    <table class="content">
+        #headingRow("project.basics" 2)
+    #if($project.description && $project.description.length() > 0)
+        #dynamicRow("project.description" $project.description)
+    #end
+    #if($project.url && $project.url.length() > 0)
+        #dynamicLinkRow("project.url" $project.url $project.url)
+    #end
+    </table>
+#end
+
+    <h2 class="section">#wwtext("name=current.build")</h2>
+
+#if($currentBuild)
+    #showBuild($currentBuild true)
+#else
+    <p>
+        #wwtext("name=never.built")
+    </p>
+#end
+
+    <h2 class="section">#wwtext("name=latest.changes")</h2>
+
+    <table class="content">
+        #headingRow("latest.changes" 7)
+        <tr>
+            #contentHeading("build.id" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("change.revision" 1)
+            #contentHeading("change.when" 1)
+            #contentHeading("change.comment" 1)
+            #contentHeading("actions" 1)
+        </tr>
+#if($latestChanges.size() > 0)
+    #foreach($changelist in $latestChanges)
+        #set($index = $velocityCount - 1)
+        #set($build = $changeBuilds.get($index))
+        #set($cssClass = $build.state.string)
+        <tr>
+            <td class="$cssClass"><a href="viewBuild.action?id=$build.id">$build.number</td>
+            #statusCell($build)
+            #dynamicCell($changelist.revision)
+            #dynamicCell($changelist.prettyDate)
+            #dynamicCell($action.trimmedString($changelist.comment, 60))
+            #linkCell("view" "viewChangelist.action?id=$changelist.id")
+        </tr>
+    #end
+#else
+        <tr>
+            <td class="content" colspan="7">#wwtext("name=no.changes")</td>
+        <tr>
+#end
+    </table>
+
+</html>

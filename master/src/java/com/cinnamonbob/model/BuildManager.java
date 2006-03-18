@@ -73,4 +73,6 @@ public interface BuildManager
      * @return a list of up to max of the most recent changes for the user
      */
     List<Changelist> getLatestChangesForUser(User user, int max);
+
+    List<Changelist> getLatestChangesForProject(Project project, int max);
 }
