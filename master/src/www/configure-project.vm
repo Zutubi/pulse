@@ -16,6 +16,7 @@
                     #editHeadingRow("project.basics" 2 "editProject!input.action?id=$project.id" "project.basics.edit")
                     #dynamicRow("project.name" $project.name)
                     #dynamicRow("project.description" $project.description)
+                    #dynamicLinkRow("project.url" $project.url $project.url)
                 </table>
                 <table id="project.specifics" class="fill-content">
                     #editHeadingRow("project.specifics" 2 "editBobFileDetails!input.action?id=$project.bobFileDetails.id&amp;projectId=$project.id" "project.specifics.edit")

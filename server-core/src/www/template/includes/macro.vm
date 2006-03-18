@@ -338,6 +338,15 @@
     <td class="content"><a href="$url">$!webwork.htmlEncode($content)</a></td>
 #end
 
+##
+## Outputs a name:value pair row where the value needs to be escaped, with a link
+##
+#macro(dynamicLinkRow $key $value $url)
+    <tr>
+        <th class="content-row" #if($span > 1) colspan="$span" #end>#wwtext("name=$key")</th>
+        #dynamicLinkCell($value $url)
+    </tr>
+#end
 
 ##
 ## Outputs a name:value pair row where the value needs to be escaped

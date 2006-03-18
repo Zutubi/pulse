@@ -22,6 +22,7 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
     protected static final String FO_PROJECT_BASICS = "project.basics";
     protected static final String PROJECT_BASICS_NAME = "name";
     protected static final String PROJECT_BASICS_DESCRIPTION = "description";
+    protected static final String PROJECT_BASICS_URL = "url";
     protected static final String PROJECT_BASICS_SCM = "scm";
     protected static final String PROJECT_BASICS_TYPE = "type";
     protected static final String FO_CVS_SETUP = "cvs.setup";
@@ -115,12 +116,13 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
         submit("next");
     }
 
-    protected void submitProjectBasicsForm(String projectName, String description, String scm, String type)
+    protected void submitProjectBasicsForm(String projectName, String description, String url, String scm, String type)
     {
         assertFormPresent(FO_PROJECT_BASICS);
         setWorkingForm(FO_PROJECT_BASICS);
         setFormElement(PROJECT_BASICS_NAME, projectName);
         setFormElement(PROJECT_BASICS_DESCRIPTION, description);
+        setFormElement(PROJECT_BASICS_URL, url);
         setFormElement(PROJECT_BASICS_SCM, scm);
         setFormElement(PROJECT_BASICS_TYPE, type);
         submit("next");

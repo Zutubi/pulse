@@ -9,6 +9,8 @@ import com.cinnamonbob.core.util.RandomUtils;
 public class ProjectAcceptanceTest extends BaseAcceptanceTest
 {
     private String projectName;
+    private static final String DESCRIPTION = "test description";
+    private static final String URL = "http://test/url";
     private static final String CRON_TRIGGER_NAME = "cron-trigger-name";
     private static final String CRON_STRING = "0 0 0 * * ?";
     private static final String SPEC_NAME = "spec-name";
@@ -36,7 +38,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         clickLinkWithText("add new project");
 
         projectName = "project " + RandomUtils.randomString(5);
-        submitProjectBasicsForm(projectName, "", "cvs", "custom");
+        submitProjectBasicsForm(projectName, DESCRIPTION, URL, "cvs", "custom");
         submitCvsSetupForm("/local", "module", "", "");
         submitCustomSetupForm("bob.xml");
         assertTablePresent("project.basics");
@@ -50,55 +52,58 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
     public void testEditProjectBasics()
     {
+        final String TEST_DESCRIPTION = "a description for this project.";
+        final String TEST_NAME = "a temporary name";
+        final String TEST_URL = "http://and/a/url";
+
         ProjectBasicForm form = new ProjectBasicForm(tester);
 
-        // not yet implemented.
-        assertProjectBasicsTable(projectName, "");
+        assertProjectBasicsTable(projectName, DESCRIPTION, URL);
 
         assertLinkPresent("project.basics.edit");
         clickLink("project.basics.edit");
 
         // assert the initial values are as expected.
-        form.assertFormElements(projectName, "");
+        form.assertFormElements(projectName, DESCRIPTION, URL);
 
         // check simple edit.
-        form.saveFormElements("a temporary name", "a description for this project.");
+        form.saveFormElements(TEST_NAME, TEST_DESCRIPTION, TEST_URL);
 
         // assert that the changes just made have been persisted.
-        assertProjectBasicsTable("a temporary name", "a description for this project.");
+        assertProjectBasicsTable(TEST_NAME, TEST_DESCRIPTION, TEST_URL);
 
         clickLink("project.basics.edit");
-        form.assertFormElements("a temporary name", "a description for this project.");
+        form.assertFormElements(TEST_NAME, TEST_DESCRIPTION, TEST_URL);
 
         // check validation of field input - name required.
-        form.saveFormElements("", null);
+        form.saveFormElements("", null, null);
 
         assertTextPresent("required");
-        form.assertFormElements("", "a description for this project.");
+        form.assertFormElements("", TEST_DESCRIPTION, TEST_URL);
 
         // check cancel works.
-        form.cancelFormElements(projectName, null);
+        form.cancelFormElements(projectName, null, null);
 
         // assert that the changes just made have been persisted.
-        assertProjectBasicsTable("a temporary name", "a description for this project.");
+        assertProjectBasicsTable(TEST_NAME, TEST_DESCRIPTION, TEST_URL);
 
         // change the name back.
         clickLink("project.basics.edit");
-        form.assertFormElements("a temporary name", "a description for this project.");
+        form.assertFormElements(TEST_NAME, TEST_DESCRIPTION, TEST_URL);
 
-        form.saveFormElements(projectName, null);
+        form.saveFormElements(projectName, null, null);
 
-        assertProjectBasicsTable(projectName, "a description for this project.");
+        assertProjectBasicsTable(projectName, TEST_DESCRIPTION, TEST_URL);
 
         // check that we can save without making any changes to the form.
         clickLink("project.basics.edit");
-        form.assertFormElements(projectName, "a description for this project.");
+        form.assertFormElements(projectName, TEST_DESCRIPTION, TEST_URL);
 
-        form.saveFormElements(null, null);
+        form.saveFormElements(null, null, null);
 
         form.assertFormNotPresent();
 
-        assertProjectBasicsTable(projectName, "a description for this project.");
+        assertProjectBasicsTable(projectName, TEST_DESCRIPTION, TEST_URL);
     }
 
     public void testEditBasicsValidationProjectNameUnique()
@@ -111,12 +116,12 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         clickLinkWithText("add new project");
 
         String newProject = "project " + RandomUtils.randomString(5);
-        submitProjectBasicsForm(newProject, "", "cvs", "custom");
+        submitProjectBasicsForm(newProject, DESCRIPTION, URL, "cvs", "custom");
         submitCvsSetupForm("/local", "module", "", "");
         submitCustomSetupForm("bob.xml");
 
         clickLink("project.basics.edit");
-        form.saveFormElements(projectName, null);
+        form.saveFormElements(projectName, null, null);
 
         // assert that we are still on the edit basics page
         form.assertFormPresent();
@@ -568,12 +573,13 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         });
     }
 
-    private void assertProjectBasicsTable(String name, String description)
+    private void assertProjectBasicsTable(String name, String description, String url)
     {
         assertTablePresent("project.basics");
         assertTableRowsEqual("project.basics", 1, new String[][]{
                 new String[]{"name", name},
-                new String[]{"description", description}
+                new String[]{"description", description},
+                new String[]{"url", url}
         });
     }
 

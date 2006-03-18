@@ -15,6 +15,7 @@ public class Project extends Entity
 
     private String name;
     private String description;
+    private String url;
     private BobFileDetails bobFileDetails;
     private AgeBuildResultCleanupPolicy cleanupPolicy = new AgeBuildResultCleanupPolicy(DEFAULT_WORK_DIR_DAYS, AgeBuildResultCleanupPolicy.NEVER_CLEAN);
     private Scm scm;
@@ -57,6 +58,16 @@ public class Project extends Entity
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    public String getUrl()
+    {
+        return url;
+    }
+
+    public void setUrl(String url)
+    {
+        this.url = url;
     }
 
     public AgeBuildResultCleanupPolicy getCleanupPolicy()

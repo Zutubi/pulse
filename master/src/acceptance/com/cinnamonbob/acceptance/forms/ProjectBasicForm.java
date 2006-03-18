@@ -10,6 +10,7 @@ public class ProjectBasicForm extends BaseForm
     public static final String FORM_NAME = "project.edit";
     public static final String NAME_FIELD = "project.name";
     public static final String DESCRIPTION_FIELD = "project.description";
+    public static final String URL_FIELD = "project.url";
 
     public ProjectBasicForm(WebTester tester)
     {
@@ -23,6 +24,6 @@ public class ProjectBasicForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{NAME_FIELD, DESCRIPTION_FIELD};
+        return new String[]{NAME_FIELD, DESCRIPTION_FIELD, URL_FIELD};
     }
 }

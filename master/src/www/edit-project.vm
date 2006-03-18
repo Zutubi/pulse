@@ -13,8 +13,9 @@
     #wwhidden("name=id")
     #wwtextfield("name=project.name" "label=%{getText('project.name')}" "required=true"  "tabindex=1")
     #wwtextfield("name=project.description" "label=%{getText('project.description')}" "size=60" "tabindex=2")
+    #wwtextfield("name=project.url" "label=%{getText('project.url')}" "size=60" "tabindex=3")
 
-    #saveCancel(3)
+    #saveCancel(4)
 #end
 </body>
 </html>

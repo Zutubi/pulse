@@ -2,7 +2,10 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildSpecificationNodeDao;
-import com.cinnamonbob.scheduling.*;
+import com.cinnamonbob.scheduling.EventTrigger;
+import com.cinnamonbob.scheduling.SCMChangeEventFilter;
+import com.cinnamonbob.scheduling.Scheduler;
+import com.cinnamonbob.scheduling.SchedulingException;
 import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
 import com.cinnamonbob.scm.SCMChangeEvent;
 import com.cinnamonbob.util.logging.Logger;
@@ -78,6 +81,7 @@ public class AddProjectWizard extends BaseWizard
         Project project = new Project();
         project.setName(projectDetails.getName());
         project.setDescription(projectDetails.getDescription());
+        project.setUrl(projectDetails.getUrl());
 
         // setup scm details.
         Scm scm = null;
@@ -181,6 +185,7 @@ public class AddProjectWizard extends BaseWizard
 
         private String name;
         private String description;
+        private String url;
 
         public ProjectDetails(Wizard wizard, String name)
         {
@@ -267,6 +272,16 @@ public class AddProjectWizard extends BaseWizard
         public void setDescription(String description)
         {
             this.description = description;
+        }
+
+        public String getUrl()
+        {
+            return url;
+        }
+
+        public void setUrl(String url)
+        {
+            this.url = url;
         }
 
         public String getName()

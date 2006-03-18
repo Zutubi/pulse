@@ -40,7 +40,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
 
         String projectName = "test project " + RandomUtils.randomString(3);
 
-        submitProjectBasicsForm(projectName, "this is a test project created by the automated project wizard acceptance test.", "cvs", "custom");
+        submitProjectBasicsForm(projectName, "this is a test project created by the automated project wizard acceptance test.", "http://wizard/url", "cvs", "custom");
 
         submitCvsSetupForm("/local", "module", "", "");
 
@@ -51,7 +51,8 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         assertTablePresent("project.basics");
         assertTableRowsEqual("project.basics", 1, new String[][]{
                 new String[]{"name", projectName},
-                new String[]{"description", "this is a test project created by the automated project wizard acceptance test."}
+                new String[]{"description", "this is a test project created by the automated project wizard acceptance test."},
+                new String[]{"url", "http://wizard/url"}
         });
 
         assertTablePresent("project.specifics");
@@ -99,7 +100,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         clickLink("project.add");
 
         String projectName = "project " + RandomUtils.randomString(5);
-        submitProjectBasicsForm(projectName, "", "cvs", "custom");
+        submitProjectBasicsForm(projectName, "", "", "cvs", "custom");
         submitCvsSetupForm("/local", "module", "", "");
         submitCustomSetupForm("bob.xml");
         assertTablePresent("project.basics");
@@ -107,7 +108,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         clickLinkWithText("projects");
         clickLink("project.add");
 
-        submitProjectBasicsForm(projectName, "", "cvs", "custom");
+        submitProjectBasicsForm(projectName, "", "", "cvs", "custom");
         assertFormPresent(FO_PROJECT_BASICS);
     }
 }

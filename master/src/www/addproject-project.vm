@@ -15,10 +15,11 @@
 
     #wwtextfield("name=name" "label=%{getText('project.name')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
     #wwtextfield("name=description" "label=%{getText('project.description')}" "size=60" "tabindex=2" "onkeypress=return submitenter(this,event)")
-    #wwselect("name=scm" "label=%{getText('scm')}" "list=scms" "required=true" "tabindex=3" "onkeypress=return submitenter(this,event)")
-    #wwselect("name=type" "label=%{getText('project.type')}" "list=types" "required=true" "tabindex=4" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=url" "label=%{getText('project.url')}" "size=60" "tabindex=4" "onkeypress=return submitenter(this,event)")
+    #wwselect("name=scm" "label=%{getText('scm')}" "list=scms" "required=true" "tabindex=5" "onkeypress=return submitenter(this,event)")
+    #wwselect("name=type" "label=%{getText('project.type')}" "list=types" "required=true" "tabindex=6" "onkeypress=return submitenter(this,event)")
     #inlineHelp("project.type.help")
-    #nextCancel(5)
+    #nextCancel(7)
 #end
 </body>
 </html>
