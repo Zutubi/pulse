@@ -119,6 +119,7 @@
         <!-- /config is for user configuration properties -->
         <copy todir="${package.root}/system/config">
             <fileset dir="master/etc" includes="bob-defaults.properties,logging.properties"/>
+            <fileset dir="master/etc" includes="logging/*.properties"/>
         </copy>
 
         <copy todir="${package.root}/lib">
