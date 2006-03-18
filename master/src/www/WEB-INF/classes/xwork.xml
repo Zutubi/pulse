@@ -564,13 +564,17 @@
             <result name="success" type="velocity">server-settings.vm</result>
         </action>
 
-        <action name="userSettings" class="com.cinnamonbob.web.admin.user.ViewUsersAction">
-            <result name="success" type="velocity">manage-users.vm</result>
+        <action name="toggleRecipeQueue" class="com.cinnamonbob.web.admin.ToggleRecipeQueueAction">
+            <result name="success" type="redirect">/viewRecipeQueue.action</result>
         </action>
 
         <!--
         USERS
         -->
+        <action name="userSettings" class="com.cinnamonbob.web.admin.user.ViewUsersAction">
+            <result name="success" type="velocity">manage-users.vm</result>
+        </action>
+
         <action name="viewUser" class="com.cinnamonbob.web.admin.user.ViewUserAction">
             <result name="input" type="velocity">undefined.vm</result>
             <result name="success" type="velocity">view-user.vm</result>

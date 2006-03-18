@@ -260,10 +260,35 @@
 #end
 
 ##
+## Outputs a heading row for a content table with an action, restricted to specific roles
+##
+#macro(restrictedHeadingRow $key $span $roles $actionKey $url $image $id)
+    <tr>
+        <th class="heading" colspan="$span">
+    #authorize("ifAllGranted=$roles")
+            <span class="action">
+                <a #if($id != "")id="$id"#end href="$url"><img alt="$action.getText($actionKey)" src="/images/$image"/>#wwtext("name=$actionKey")</a>
+            </span>
+    #end
+            #wwtext("name=$key")
+        </th>
+    </tr>
+#end
+
+##
 ## Outputs a heading row for a content table
 ##
 #macro(headingRow $key $span)
     #actionHeadingRow($key $span false false false "")
+#end
+
+##
+## Outputs an information row for a content table
+##
+#macro(infoRow $key $span)
+    <tr>
+        <th class="info" colspan="$span">#wwtext("name=$key")</th>
+    </tr>
 #end
 
 ##

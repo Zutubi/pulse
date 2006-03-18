@@ -91,6 +91,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         executor.execute(this);
     }
 
+    public void stop()
+    {
+        stop(true);
+    }
+
     /**
      * Enqueue a new recipe dispatch request.
      *

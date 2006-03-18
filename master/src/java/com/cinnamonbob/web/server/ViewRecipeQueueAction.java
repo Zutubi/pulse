@@ -25,6 +25,11 @@ public class ViewRecipeQueueAction extends ActionSupport
         return projectQueue;
     }
 
+    public boolean getRecipeQueueRunning()
+    {
+        return recipeQueue.isRunning();
+    }
+    
     public List<RecipeDispatchRequest> getRecipeQueueSnapshot()
     {
         return recipeQueueSnapshot;

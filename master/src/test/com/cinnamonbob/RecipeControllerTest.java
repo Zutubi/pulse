@@ -297,6 +297,21 @@ public class RecipeControllerTest extends BobTestCase
             throw new RuntimeException("Method not implemented.");
         }
 
+        public void start()
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public void stop()
+        {
+            throw new RuntimeException("Method not implemented.");            
+        }
+
+        public boolean isRunning()
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
         public boolean hasDispatched(long recipeId)
         {
             return dispatched.containsKey(recipeId);

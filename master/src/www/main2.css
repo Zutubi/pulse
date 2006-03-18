@@ -259,12 +259,12 @@ table.fill-content {
 }
 
 
-h3.heading, div.box, th.heading, th.content, th.content-row, td.content, td.content-centre, td.content-right, td.image, td.success, td.failure, td.error, td.pending, td.inprogress, td.terminating, td.add {
+h3.heading, div.box, th.heading, th.info, th.content, th.content-row, td.content, td.content-centre, td.content-right, td.image, td.success, td.failure, td.error, td.pending, td.inprogress, td.terminating, td.add {
     border: 1px solid #bbb;
     padding: 4px;
 }
 
-th.heading, th.content, th.content-row, td.content, td.success, td.failure, td.error, td.pending, td.inprogress, td.termianting, td.add {
+th.heading, th.info, th.content, th.content-row, td.content, td.success, td.failure, td.error, td.pending, td.inprogress, td.termianting, td.add {
     text-align: left;
     vertical-align: top;
 }
@@ -289,6 +289,11 @@ th.content-row {
 
 h3.heading, th.heading {
     background: #e9e9f5;
+    white-space: nowrap;
+}
+
+th.info {
+    background: #ffffc0;
     white-space: nowrap;
 }
 

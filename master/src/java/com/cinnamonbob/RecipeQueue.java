@@ -17,4 +17,10 @@ public interface RecipeQueue
      * @return true if the request was cancelled, false if it was missed
      */
     boolean cancelRequest(long id);
+
+    void start();
+
+    void stop();
+
+    boolean isRunning();
 }

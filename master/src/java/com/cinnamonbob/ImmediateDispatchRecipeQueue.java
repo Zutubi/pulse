@@ -1,5 +1,6 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.core.BobException;
 import com.cinnamonbob.core.BuildException;
 import com.cinnamonbob.core.ObjectFactory;
@@ -11,7 +12,6 @@ import com.cinnamonbob.events.build.RecipeDispatchedEvent;
 import com.cinnamonbob.model.Slave;
 import com.cinnamonbob.model.SlaveManager;
 import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.bootstrap.ComponentContext;
 
 import java.net.MalformedURLException;
 import java.util.LinkedList;
@@ -112,6 +112,19 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
     public boolean cancelRequest(long id)
     {
         return false;
+    }
+
+    public void start()
+    {
+    }
+
+    public void stop()
+    {
+    }
+
+    public boolean isRunning()
+    {
+        return true;
     }
 
     public void handleEvent(Event evt)
