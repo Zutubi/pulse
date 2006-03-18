@@ -80,6 +80,16 @@ public class ApplicationConfigurationSupport implements ApplicationConfiguration
         config.setProperty(SMTP_PASSWORD, password);
     }
 
+    public String getLogConfig()
+    {
+        return config.getProperty(LOGGING_CONFIG);
+    }
+
+    public void setLogConfig(String logConfig)
+    {
+        config.setProperty(LOGGING_CONFIG, logConfig);
+    }
+
     public String getSmtpPrefix()
     {
         return config.getProperty(SMTP_PREFIX);

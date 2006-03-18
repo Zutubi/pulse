@@ -14,6 +14,12 @@
 
     <bean id="velocityEngine" class="com.cinnamonbob.bootstrap.velocity.VelocityEngineFactoryBean"/>
 
+    <bean id="logConfigurationManager" class="com.cinnamonbob.logging.LogConfigurationManager">
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+    </bean>
+
     <bean id="buildManagerTarget" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"
           init-method="init"/>
 

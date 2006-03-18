@@ -117,12 +117,12 @@ public class LocalFileSystem implements FileSystem
      *
      * @return a list of file handles located at the specified path.
      */
-    public LocalFile[] list(String path)
+    public LocalFile[] list(String path) throws FileSystemException
     {
         return internalList(new File(base, path));
     }
 
-    public com.cinnamonbob.filesystem.File[] list(com.cinnamonbob.filesystem.File dir)
+    public com.cinnamonbob.filesystem.File[] list(com.cinnamonbob.filesystem.File dir) throws FileSystemException
     {
         return internalList(((LocalFile)dir).file);
     }
@@ -132,8 +132,17 @@ public class LocalFileSystem implements FileSystem
         return File.separator;
     }
 
-    private LocalFile[] internalList(File dir)
+    private LocalFile[] internalList(File dir) throws FileSystemException
     {
+        if (!dir.exists())
+        {
+            throw new FileNotFoundException();
+        }
+        if (!dir.isDirectory())
+        {
+            throw new FileSystemException();
+        }
+
         List<LocalFile> listing = new LinkedList<LocalFile>();
 
         File[] files = dir.listFiles();

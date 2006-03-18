@@ -28,6 +28,10 @@ public interface ApplicationConfiguration
 
     public static final String SMTP_PASSWORD = "mail.smtp.password";
 
+    //---( logging configuration )---
+
+    public static final String LOGGING_CONFIG = "log.config";
+
     /**
      * The port on which the http server will listen for connections.
      */
@@ -66,4 +70,7 @@ public interface ApplicationConfiguration
 
     void setSmtpPassword(String password);
 
+    String getLogConfig();
+
+    void setLogConfig(String config);
 }

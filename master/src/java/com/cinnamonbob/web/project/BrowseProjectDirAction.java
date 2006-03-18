@@ -93,7 +93,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         return foundBase;
     }
 
-    private void createDirectoryEntries(FileSystem fs, File dir)
+    private void createDirectoryEntries(FileSystem fs, File dir) throws FileSystemException
     {
         entries = new LinkedList<DirectoryEntry>();
 

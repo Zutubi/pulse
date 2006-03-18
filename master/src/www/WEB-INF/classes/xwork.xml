@@ -651,7 +651,20 @@
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
-    </package>
+        <action name="logConfig" class="com.cinnamonbob.web.admin.LogConfigurationAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="error" type="velocity">configure-logconfig.vm</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
 
+        <action name="editLogConfig" class="com.cinnamonbob.web.admin.LogConfigurationAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">configure-logconfig.vm</result>
+            <result name="error" type="velocity">configure-logconfig.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+    </package>
 
 </xwork>

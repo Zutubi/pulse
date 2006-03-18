@@ -17,6 +17,10 @@
                     #dynamicRow("general.host" $config.hostName)
                     #dynamicRow("general.help.url" $config.helpUrl)
                 </table>
+                <table class="fill-content">
+                    #adminHeadingRow("logging.config" "/admin/editLogConfig!input.action" "/admin/logConfig!reset.action")
+                    #dynamicRow("log.config" $config.logConfig)
+                </table>
             </td>
             <td class="columns" width="40%">
                 <table class="fill-content">
