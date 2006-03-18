@@ -13,5 +13,5 @@ public abstract class BobFileDetails extends Entity
 
     public abstract Properties getProperties();
 
-    public abstract String getBobFile(Project project, Revision revision);
+    public abstract String getBobFile(long id, Project project, Revision revision);
 }

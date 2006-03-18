@@ -269,7 +269,7 @@ public class SVNServer implements SCMServer
         return new NumericalRevision(revisionNumber);
     }
 
-    public String checkout(Revision revision, String file) throws SCMException
+    public String checkout(long id, Revision revision, String file) throws SCMException
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
 

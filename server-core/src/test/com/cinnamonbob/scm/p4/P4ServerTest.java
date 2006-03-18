@@ -90,14 +90,14 @@ public class P4ServerTest extends BobTestCase
     public void testCheckoutFile() throws SCMException
     {
         getServer("depot-client");
-        String content = server.checkout(null, FileSystemUtils.composeFilename("depot", "file2"));
+        String content = server.checkout(1, null, FileSystemUtils.composeFilename("depot", "file2"));
         assertEquals("content of file2: edited at the same time as file2 in depot2.\n", content);
     }
 
     public void testCheckoutFileRevision() throws SCMException
     {
         getServer("depot-client");
-        String content = server.checkout(new NumericalRevision(2), FileSystemUtils.composeFilename("depot", "file2"));
+        String content = server.checkout(1, new NumericalRevision(2), FileSystemUtils.composeFilename("depot", "file2"));
         assertEquals("content of file2\n", content);
     }
 

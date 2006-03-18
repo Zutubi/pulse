@@ -3,9 +3,9 @@
  */
 package com.cinnamonbob.scm.cvs;
 
+import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.core.model.CvsRevision;
 import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.test.BobTestCase;
@@ -62,17 +62,17 @@ public class CvsServerTest extends BobTestCase
         CvsServer cvsServer = new CvsServer(cvsRoot, module, null);
 
         CvsRevision byHead = CvsRevision.HEAD;
-        assertEquals("file1.txt latests contents", cvsServer.checkout(byHead, module + "/file1.txt").trim());
+        assertEquals("file1.txt latests contents", cvsServer.checkout(1, byHead, module + "/file1.txt").trim());
 
         CvsRevision byRevision = new CvsRevision(null, "1.2", null, null);
-        assertEquals("file1.txt revision 1.2 contents", cvsServer.checkout(byRevision, module + "/file1.txt").trim());
+        assertEquals("file1.txt revision 1.2 contents", cvsServer.checkout(1, byRevision, module + "/file1.txt").trim());
 
         byRevision = new CvsRevision(null, "1.1", null, null);
-        assertEquals("file1.txt revision 1.1 contents", cvsServer.checkout(byRevision, module + "/file1.txt").trim());
+        assertEquals("file1.txt revision 1.1 contents", cvsServer.checkout(1, byRevision, module + "/file1.txt").trim());
 
         // checkout the revision of the file based on date.
         Revision byDate = new CvsRevision(null, null, null, CVSDATE.parse("2006-03-11 03:10:07"));
-        assertEquals("file1.txt revision 1.2 contents", cvsServer.checkout(byDate, module + "/file1.txt").trim());
+        assertEquals("file1.txt revision 1.2 contents", cvsServer.checkout(1, byDate, module + "/file1.txt").trim());
     }
 
     public void testCheckout() throws SCMException, IOException, ParseException

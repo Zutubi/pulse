@@ -35,13 +35,13 @@ public class CustomBobFileDetails extends BobFileDetails
         return result;
     }
 
-    public String getBobFile(Project project, Revision revision)
+    public String getBobFile(long id, Project project, Revision revision)
     {
         Scm scm = project.getScm();
 
         try
         {
-            return scm.createServer().checkout(revision, bobFileName);
+            return scm.createServer().checkout(id, revision, bobFileName);
         }
         catch (SCMException e)
         {

@@ -9,6 +9,9 @@ import com.cinnamonbob.model.Project;
 public class BuildRequestEvent extends Event
 {
     private Project project;
+    /**
+     * Only set once the bui
+     */
     private String specification;
     private long queued;
 

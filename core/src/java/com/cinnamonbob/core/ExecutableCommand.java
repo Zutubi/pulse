@@ -80,7 +80,7 @@ public class ExecutableCommand implements Command
             // CIB-149: try and make friendlier error messages for common
             // problems.
             String message = e.getMessage();
-            if (message.contains("nosuchexe"))
+            if (message.contains("nosuchexe") || message.contains("error=2"))
             {
                 message = "No such executable '" + exe + "'";
             }

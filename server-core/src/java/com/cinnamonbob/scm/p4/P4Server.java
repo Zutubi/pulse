@@ -7,6 +7,7 @@ import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.*;
 import java.text.ParseException;
@@ -20,6 +21,8 @@ import java.util.regex.Pattern;
 
 public class P4Server implements SCMServer
 {
+    private static final Logger LOG = Logger.getLogger(P4Server.class);
+
     private static final String ENV_PORT = "P4PORT";
     private static final String ENV_USER = "P4USER";
     private static final String ENV_PASSWORD = "P4PASSWD";
@@ -138,11 +141,22 @@ public class P4Server implements SCMServer
 
     private String updateClient(long id, File toDirectory) throws SCMException
     {
+        if(id == 0)
+        {
+            id = (long)(Math.random() * 100000);
+        }
+
+        if(toDirectory == null)
+        {
+            toDirectory = new File(".");
+        }
+
         P4Result result = runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_OUTPUT);
         String clientSpec = result.stdout.toString();
         String clientName = "bob-temp-" + id;
 
         clientSpec = clientSpec.replaceAll("\nRoot:.*", Matcher.quoteReplacement("\nRoot: " + toDirectory.getAbsolutePath()));
+        clientSpec = clientSpec.replaceAll("\nHost:.*", Matcher.quoteReplacement("\nHost: "));
         clientSpec = clientSpec.replaceAll("\nClient:.*" + templateClient, Matcher.quoteReplacement("\nClient: " + clientName));
         clientSpec = clientSpec.replaceAll("//" + templateClient + "/", Matcher.quoteReplacement("//" + clientName + "/"));
 
@@ -152,38 +166,48 @@ public class P4Server implements SCMServer
         return clientName;
     }
 
-    private void getClientRoot() throws SCMException
+    public NumericalRevision getLatestRevision() throws SCMException
     {
-        P4Result result = runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_OUTPUT);
-        String clientSpec = result.stdout.toString();
-        Pattern re = Pattern.compile("^Root:(.*)", Pattern.MULTILINE);
-        Matcher matcher = re.matcher(clientSpec);
+        String clientName = updateClient(0, null);
 
-        if (matcher.find())
+        try
         {
-            clientRoot = new File(matcher.group(1).trim());
+            return getLatestRevisionForFiles(clientName);
+        }
+        finally
+        {
+            deleteClient(clientName);
         }
     }
 
-    public NumericalRevision getLatestRevision() throws SCMException
+    private void deleteClient(String clientName)
     {
-        return getLatestRevisionForFiles();
+        try
+        {
+            runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_DELETE, clientName);
+        }
+        catch(SCMException e)
+        {
+            LOG.warning("Unable to delete client: " + e.getMessage(), e);
+        }
     }
 
-    private NumericalRevision getLatestRevisionForFiles(String ...files) throws SCMException
+    private NumericalRevision getLatestRevisionForFiles(String clientName, String ...files) throws SCMException
     {
-        String args[] = new String[6 + files.length];
+        String args[] = new String[8 + files.length];
 
         args[0] = P4_COMMAND;
-        args[1] = COMMAND_CHANGES;
-        args[2] = FLAG_STATUS;
-        args[3] = VALUE_SUBMITTED;
-        args[4] = FLAG_MAXIMUM;
-        args[5] = "1";
+        args[1] = FLAG_CLIENT;
+        args[2] = clientName;
+        args[3] = COMMAND_CHANGES;
+        args[4] = FLAG_STATUS;
+        args[5] = VALUE_SUBMITTED;
+        args[6] = FLAG_MAXIMUM;
+        args[7] = "1";
 
         for (int i = 0; i < files.length; i++)
         {
-            args[6 + i] = files[i];
+            args[8 + i] = files[i];
         }
 
         P4Result result = runP4(null, args);
@@ -216,7 +240,7 @@ public class P4Server implements SCMServer
         }
     }
 
-    private Changelist getChangelist(long number) throws SCMException
+    private Changelist getChangelist(String clientName, long number) throws SCMException
     {
         //   Change <number> by <user>@<client> on <date> <time> (*pending*)?
         //
@@ -227,8 +251,8 @@ public class P4Server implements SCMServer
         //   ... <file>#<revision> <action>
         //   ... <file>#<revision> <action>
         //   ...
-        P4Result result = runP4(null, P4_COMMAND, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
-        Pattern splitter = Pattern.compile("\n");
+        P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
+        Pattern splitter = Pattern.compile("\r?\n");
         String[] lines = splitter.split(result.stdout);
 
         if (lines.length < 1)
@@ -237,7 +261,7 @@ public class P4Server implements SCMServer
         }
 
         Pattern re = Pattern.compile("Change ([0-9]+) by (.+)@(.+) on ([0-9/]+ [0-9:]+)( \\*pending\\*)?");
-        Matcher matcher = re.matcher(lines[0]);
+        Matcher matcher = re.matcher(lines[0].trim());
         String user;
         Date date;
 
@@ -415,25 +439,33 @@ public class P4Server implements SCMServer
         }
         finally
         {
-            runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_DELETE, clientName);
+            deleteClient(clientName);
         }
 
         return revision;
     }
 
-    public String checkout(Revision revision, String file) throws SCMException
+    public String checkout(long id, Revision revision, String file) throws SCMException
     {
-        getClientRoot();
-        File fullFile = new File(clientRoot, file);
+        String clientName = updateClient(id, null);
 
-        String fileArgument = fullFile.getAbsolutePath();
-        if (revision != null)
+        try
         {
-            fileArgument = fileArgument + "@" + revision;
-        }
+            File fullFile = new File(clientRoot, file);
 
-        P4Result result = runP4(null, P4_COMMAND, "print", "-q", fileArgument);
-        return result.stdout.toString();
+            String fileArgument = fullFile.getAbsolutePath();
+            if (revision != null)
+            {
+                fileArgument = fileArgument + "@" + revision;
+            }
+
+            P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, "print", "-q", fileArgument);
+            return result.stdout.toString();
+        }
+        finally
+        {
+            deleteClient(clientName);
+        }
     }
 
     public List<Changelist> getChanges(Revision from, Revision to, String... paths) throws SCMException
@@ -443,36 +475,46 @@ public class P4Server implements SCMServer
         long start = ((NumericalRevision) from).getRevisionNumber() + 1;
         long end = ((NumericalRevision) to).getRevisionNumber();
 
-        getClientRoot();
-        if (clientRoot == null)
-        {
-            throw new SCMException("Unable to retrieve client root.");
-        }
+        String clientName = updateClient(0, null);
 
-        if (start <= end)
+        try
         {
-            P4Result p4Result = runP4(null, P4_COMMAND, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, clientRoot.getAbsoluteFile() + "/...@" + Long.toString(start) + "," + Long.toString(end));
-            Matcher matcher = changesPattern.matcher(p4Result.stdout);
-
-            while (matcher.find())
+            if (start <= end)
             {
-                Changelist list = getChangelist(Long.parseLong(matcher.group(1)));
+                P4Result p4Result = runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, clientRoot.getAbsoluteFile() + "/...@" + Long.toString(start) + "," + Long.toString(end));
+                Matcher matcher = changesPattern.matcher(p4Result.stdout);
 
-                if (list != null)
+                while (matcher.find())
                 {
-                    result.add(list);
+                    Changelist list = getChangelist(clientName, Long.parseLong(matcher.group(1)));
+
+                    if (list != null)
+                    {
+                        result.add(list);
+                    }
                 }
             }
-        }
 
-        return result;
+            return result;
+        }
+        finally
+        {
+            deleteClient(clientName);
+        }
     }
 
     public boolean hasChangedSince(Revision since) throws SCMException
     {
-        getClientRoot();
-        String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
-        return getLatestRevisionForFiles(root).getRevisionNumber() > ((NumericalRevision) since).getRevisionNumber();
+        String clientName = updateClient(0, null);
+        try
+        {
+            String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
+            return getLatestRevisionForFiles(clientName, root).getRevisionNumber() > ((NumericalRevision) since).getRevisionNumber();
+        }
+        finally
+        {
+            deleteClient(clientName);
+        }
     }
 
     public static void main(String argv[])

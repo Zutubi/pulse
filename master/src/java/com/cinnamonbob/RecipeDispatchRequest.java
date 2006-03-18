@@ -1,11 +1,11 @@
 package com.cinnamonbob;
 
-import com.cinnamonbob.core.util.TimeStamps;
-import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.core.BobException;
+import com.cinnamonbob.core.model.Revision;
+import com.cinnamonbob.core.util.TimeStamps;
+import com.cinnamonbob.model.BobFileDetails;
 import com.cinnamonbob.model.BuildHostRequirements;
 import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.BobFileDetails;
 
 /**
  * A request to dispatch a recipe to some build hostRequirements, which may be restricted.
@@ -65,7 +65,7 @@ public class RecipeDispatchRequest
             Revision revision = scmBootstrapper.getRevision();
 
             BobFileDetails bobFileDetails = build.getProject().getBobFileDetails();
-            lazyBobFile.setBobFile(bobFileDetails.getBobFile(build.getProject(), revision));
+            lazyBobFile.setBobFile(bobFileDetails.getBobFile(request.getId(), build.getProject(), revision));
         }
 
         request.setBobFileSource(lazyBobFile.getBobFile());

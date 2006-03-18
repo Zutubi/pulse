@@ -46,6 +46,10 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="cancelBuild" class="com.cinnamonbob.web.server.CancelBuildAction">
+            <result name="success" type="redirect">viewRecipeQueue.action</result>
+        </action>
+
         <action name="viewResources" class="com.cinnamonbob.web.ViewResourcesAction">
             <result name="success" type="velocity">view-resources.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>

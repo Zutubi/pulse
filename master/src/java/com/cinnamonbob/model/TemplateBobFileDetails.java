@@ -14,7 +14,7 @@ public abstract class TemplateBobFileDetails extends BobFileDetails
 {
     private VelocityEngine velocityEngine;
 
-    public String getBobFile(Project project, Revision revision)
+    public String getBobFile(long id, Project project, Revision revision)
     {
         try
         {

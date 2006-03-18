@@ -38,7 +38,7 @@ public abstract class TemplateBobFileDetailsTestBase extends BobTestCase
     {
         InputStream expectedStream = getInput(expectedName);
 
-        String got = getDetails().getBobFile(null, null);
+        String got = getDetails().getBobFile(0, null, null);
         String expected = IOUtils.inputStreamToString(expectedStream);
 
         assertEquals(expected, got);

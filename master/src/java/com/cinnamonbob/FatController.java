@@ -167,7 +167,11 @@ public class FatController implements EventListener, Stoppable
     private void handleBuildTimeout(BuildTimeoutEvent event)
     {
         // No worries if we don't find the controller: it may have finished
-        long id = event.getBuildId();
+        terminateBuild(event.getBuildId(), true);
+    }
+
+    public void terminateBuild(long id, boolean timeout)
+    {
         try
         {
             lock.lock();
@@ -175,7 +179,7 @@ public class FatController implements EventListener, Stoppable
             {
                 if (controller.getBuildId() == id)
                 {
-                    controller.handleEvent(new BuildTerminationRequestEvent(this, true));
+                    controller.handleEvent(new BuildTerminationRequestEvent(this, timeout));
                     break;
                 }
             }

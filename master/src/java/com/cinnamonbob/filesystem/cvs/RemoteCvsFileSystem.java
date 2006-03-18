@@ -1,5 +1,6 @@
 package com.cinnamonbob.filesystem.cvs;
 
+import com.cinnamonbob.core.model.CvsRevision;
 import com.cinnamonbob.filesystem.File;
 import com.cinnamonbob.filesystem.FileNotFoundException;
 import com.cinnamonbob.filesystem.FileSystem;
@@ -7,11 +8,13 @@ import com.cinnamonbob.filesystem.FileSystemException;
 import com.cinnamonbob.model.Cvs;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.cvs.CvsServer;
-import com.cinnamonbob.core.model.CvsRevision;
 
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
-import java.util.*;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 /**
  * <class-comment/>
@@ -70,7 +73,7 @@ public class RemoteCvsFileSystem implements FileSystem
     {
         try
         {
-            return new ByteArrayInputStream(server.checkout(CvsRevision.HEAD, file.getPath()).getBytes()) ;
+            return new ByteArrayInputStream(server.checkout(1, CvsRevision.HEAD, file.getPath()).getBytes()) ;
         }
         catch (SCMException e)
         {

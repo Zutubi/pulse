@@ -96,7 +96,7 @@ public class CvsServer implements SCMServer
         }
     }
 
-    public String checkout(Revision revision, String file) throws SCMException
+    public String checkout(long id, Revision revision, String file) throws SCMException
     {
         if (revision == null)
         {
