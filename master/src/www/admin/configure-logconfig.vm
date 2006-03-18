@@ -12,7 +12,7 @@
 
 #wwcform("action=logConfig!save.action" "heading=%{getText('logging.config')}" "method=post")
 
-    #wwselect("name=config" "label=%{getText('log.configs')}" "list=configs" "required=true" "tabindex=1")
+    #wwselect("name=config" "label=%{getText('logging.level')}" "list=configs" "required=true" "tabindex=1")
 
     #saveCancel("5")
 #end

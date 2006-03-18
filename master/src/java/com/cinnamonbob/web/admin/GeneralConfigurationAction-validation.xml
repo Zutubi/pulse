@@ -3,12 +3,12 @@
 <validators>
     <field name="hostName">
         <field-validator type="requiredstring">
-            <message key="general.hostname.error">required field</message>
+            <message key="general.hostname.required">required field</message>
         </field-validator>
     </field>
     <field name="helpUrl">
         <field-validator type="requiredstring">
-            <message key="general.help.url.error">required field</message>
+            <message key="general.help.url.required">required field</message>
         </field-validator>
     </field>
 </validators>

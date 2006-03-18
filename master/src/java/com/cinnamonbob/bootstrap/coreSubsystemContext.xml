@@ -32,5 +32,16 @@ The core subsystem is the first sub-system initialise after bootstrapping.
     <bean id="httpSessionContextIntegrationFilter"
           class="org.acegisecurity.context.HttpSessionContextIntegrationFilter"/>
 
+    <!--
+    ideally, we want to initialise the log configuration manager as soon as possible. the problem
+    is that to locate the correct logging.properties file we need the config manager, which requires
+    spring.
+    Leave it here for now until a solution presents itself.
+    -->
+    <bean id="logConfigurationManager" class="com.cinnamonbob.logging.LogConfigurationManager" init-method="init">
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+    </bean>
 
 </beans>

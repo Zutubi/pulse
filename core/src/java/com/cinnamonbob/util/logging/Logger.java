@@ -9,9 +9,12 @@ public class Logger
 {
     private java.util.logging.Logger delegate;
 
-    protected Logger(java.util.logging.Logger delegate)
+    private String source;
+
+    protected Logger(java.util.logging.Logger delegate, String source)
     {
         this.delegate = delegate;
+        this.source = source;
     }
 
     public static Logger getLogger(Class cls)
@@ -21,12 +24,12 @@ public class Logger
 
     public static Logger getLogger(String name)
     {
-        return new Logger(java.util.logging.Logger.getLogger(name));
+        return new Logger(java.util.logging.Logger.getLogger(name), name);
     }
 
     public void severe(String msg, Throwable t)
     {
-        delegate.log(Level.SEVERE, msg, t);
+        delegate.logp(Level.SEVERE, source, "", msg, t);
     }
 
     public void severe(Throwable t)
@@ -36,12 +39,12 @@ public class Logger
 
     public void severe(String msg)
     {
-        delegate.severe(msg);
+        severe(msg, null);
     }
 
     public void info(String msg, Throwable t)
     {
-        delegate.log(Level.INFO, msg, t);
+        delegate.logp(Level.INFO, source, "", msg, t);
     }
 
     public void info(Throwable t)
@@ -51,12 +54,12 @@ public class Logger
 
     public void info(String msg)
     {
-        delegate.info(msg);
+        info(msg, null);
     }
 
     public void warning(String msg, Throwable t)
     {
-        delegate.log(Level.WARNING, msg, t);
+        delegate.logp(Level.WARNING, source, "", msg, t);
     }
 
     public void warning(Throwable t)
@@ -66,22 +69,22 @@ public class Logger
 
     public void warning(String msg)
     {
-        delegate.warning(msg);
+        warning(msg, null);
     }
 
     public void fine(String msg)
     {
-        delegate.fine(msg);
+        fine(msg, null);
     }
 
     public void finer(String msg)
     {
-        delegate.finer(msg);
+        finer(msg, null);
     }
 
     public void finest(String msg)
     {
-        delegate.finest(msg);
+        finest(msg, null);
     }
 
     public void finest(Throwable t)
@@ -91,7 +94,17 @@ public class Logger
 
     public void finest(String msg, Throwable t)
     {
-        delegate.log(Level.FINEST, msg, t);
+        delegate.logp(Level.FINEST, source, "", msg, t);
+    }
+
+    public void finer(String msg, Throwable t)
+    {
+        delegate.logp(Level.FINER, source, "", msg, t);
+    }
+
+    public void fine(String msg, Throwable t)
+    {
+        delegate.logp(Level.FINE, source, "", msg, t);
     }
 
     public void debug(String msg)

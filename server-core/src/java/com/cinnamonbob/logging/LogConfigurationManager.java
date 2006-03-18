@@ -14,6 +14,12 @@ import java.io.*;
 public class LogConfigurationManager
 {
     private File logConfigDir;
+    private ConfigurationManager configurationManager;
+
+    public void init()
+    {
+        updateConfiguration(configurationManager.getAppConfig().getLogConfig());
+    }
 
     public List<String> getAvailableConfigurations()
     {
@@ -70,7 +76,8 @@ public class LogConfigurationManager
      */
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
-        File configDirectory = configurationManager.getSystemPaths().getConfigRoot();
+        this.configurationManager = configurationManager;
+        File configDirectory = this.configurationManager.getSystemPaths().getConfigRoot();
         logConfigDir = new File(configDirectory, "logging");
     }
 }

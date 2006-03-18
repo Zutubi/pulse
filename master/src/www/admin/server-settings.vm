@@ -19,7 +19,7 @@
                 </table>
                 <table class="fill-content">
                     #adminHeadingRow("logging.config" "/admin/editLogConfig!input.action" "/admin/logConfig!reset.action")
-                    #dynamicRow("log.config" $config.logConfig)
+                    #dynamicRow("logging.level" $config.logConfig)
                 </table>
             </td>
             <td class="columns" width="40%">
