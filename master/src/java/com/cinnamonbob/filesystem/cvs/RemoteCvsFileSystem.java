@@ -18,10 +18,7 @@ import java.util.*;
  */
 public class RemoteCvsFileSystem implements FileSystem
 {
-    private final Cvs cvs;
     private final CvsServer server;
-    private final String module;
-    private final String branch;
 
     private Map<String, RemoteCvsFile> files = new TreeMap<String, RemoteCvsFile>();
 
@@ -29,10 +26,9 @@ public class RemoteCvsFileSystem implements FileSystem
     {
         try
         {
-            this.cvs = cvs;
             this.server = (CvsServer) cvs.createServer();
-            this.module = cvs.getModule();
-            this.branch = null;
+            String module = cvs.getModule();
+            String branch = null;
 
             RemoteCvsFile root = new RemoteCvsFile("", true, null, "");
             files.put("", root);
