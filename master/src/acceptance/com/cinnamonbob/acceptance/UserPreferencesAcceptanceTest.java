@@ -221,6 +221,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
     {
         // can not create subscription without project
         // can not create subscription without contacts.
+        /*
         assertLinkNotPresent("subscription.create");
 
         //TODO - replace this string with a reference to the properties file.
@@ -231,7 +232,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
                 new String[]{"project", CONTACT_CREATE_TYPE, "condition", "actions"},
                 new String[]{msg, msg, msg, msg}
         });
-
+        */
     }
 
     private void navigateToPreferences()

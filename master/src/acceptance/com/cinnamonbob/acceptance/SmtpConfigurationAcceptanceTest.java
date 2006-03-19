@@ -29,7 +29,7 @@ public class SmtpConfigurationAcceptanceTest extends BaseAcceptanceTest
     {
         navigateToSmtpConfiguration();
 
-        clickLinkWithText("reset", 1);
+        clickLink("smtp.reset");
         assertTextPresent("bob@sensorynetworks.com");
         assertTextPresent("smtp.people.net.au");
     }
@@ -46,7 +46,7 @@ public class SmtpConfigurationAcceptanceTest extends BaseAcceptanceTest
         // ensure that we are not starting with the email address we using for this test.
         assertTextNotPresent("someone@somewhere.net");
 
-        clickLinkWithText("edit", 1);
+        clickLink("smtp.edit");
         setFormElement("smtp.from", "someone@somewhere.net");
         submit("save");
 
@@ -59,7 +59,7 @@ public class SmtpConfigurationAcceptanceTest extends BaseAcceptanceTest
         // ensure that we are not starting with the email address we using for this test.
         assertTextNotPresent("cancelled@action.com");
 
-        clickLinkWithText("edit", 1);
+        clickLink("smtp.edit");
         setFormElement("smtp.from", "cancelled@action.com");
         submit("cancel");
 

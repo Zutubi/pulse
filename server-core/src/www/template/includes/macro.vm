@@ -301,15 +301,15 @@
 ##
 ## Outputs a heading row for a content table with a reset and edit action
 ##
-#macro(adminHeadingRow $key $editUrl $resetUrl)
+#macro(adminHeadingRow $key $editUrl $editId $resetUrl $resetId)
     <tr>
         <th class="heading" colspan="2">
             <span class="action">
             #if($editUrl)
-                <a href="$editUrl"><img alt="$action.getText('edit')" src="/images/pencil.gif"/>#wwtext("name=edit")</a>
+                <a #if($editId != "")id="$editId"#end href="$editUrl"><img alt="$action.getText('edit')" src="/images/pencil.gif"/>#wwtext("name=edit")</a>
             #end
             #if($resetUrl)
-                <a href="$resetUrl"><img alt="$action.getText('reset')" src="/images/arrow_rotate_anticlockwise.gif"/>#wwtext("name=reset")</a>
+                <a #if($resetId != "")id="$resetId"#end href="$resetUrl"><img alt="$action.getText('reset')" src="/images/arrow_rotate_anticlockwise.gif"/>#wwtext("name=reset")</a>
             #end
             </span>
             #wwtext("name=$key")

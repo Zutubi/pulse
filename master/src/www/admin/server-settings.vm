@@ -13,18 +13,18 @@
         <tr>
             <td class="columns" width="40%">
                 <table class="fill-content">
-                    #adminHeadingRow("general.config" "/admin/editGeneral!input.action" "/admin/general!reset.action")
+                    #adminHeadingRow("general.config" "/admin/editGeneral!input.action" "general.edit" "/admin/general!reset.action" "general.reset")
                     #dynamicRow("general.host" $config.hostName)
                     #dynamicRow("general.help.url" $config.helpUrl)
                 </table>
                 <table class="fill-content">
-                    #adminHeadingRow("logging.config" "/admin/editLogConfig!input.action" "/admin/logConfig!reset.action")
+                    #adminHeadingRow("logging.config" "/admin/editLogConfig!input.action" "logging.edit" "/admin/logConfig!reset.action" "logging.reset")
                     #dynamicRow("logging.level" $config.logConfig)
                 </table>
             </td>
             <td class="columns" width="40%">
                 <table class="fill-content">
-                    #adminHeadingRow("smtp.config" "/admin/editSmtp!input.action" "/admin/smtp!reset.action")
+                    #adminHeadingRow("smtp.config" "/admin/editSmtp!input.action" "smtp.edit" "/admin/smtp!reset.action" "smtp.reset")
                     #dynamicRow("smtp.host" $config.smtpHost)
                     #dynamicRow("smtp.prefix" $config.smtpPrefix)
                     #dynamicRow("smtp.from" $config.smtpFrom)
