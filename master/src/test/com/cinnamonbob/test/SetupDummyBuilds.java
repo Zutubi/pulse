@@ -248,11 +248,11 @@ public class SetupDummyBuilds implements Runnable
         BuildResult result = new BuildResult(project, getSpec(project), id);
 
         result.commence(new File("/complex/build/output/dir"));
-        RecipeResultNode rootResultNode = createComplexRecipe("root recipe");
+        RecipeResultNode rootResultNode = createCommandFailedRecipe();
         RecipeResultNode childNode = createCommandFailedRecipe();
         rootResultNode.addChild(childNode);
         result.getRoot().addChild(rootResultNode);
-        result.failure();
+        result.failure("my recipe failed me");
         result.complete();
         buildResultDao.save(result);
     }

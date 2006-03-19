@@ -1,6 +1,5 @@
 package com.cinnamonbob.renderer;
 
-import com.cinnamonbob.core.FileArtifact;
 import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.model.BuildResult;
@@ -61,6 +60,7 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
     {
         BuildResult result = createBuildWithChanges();
         result.error("test error message");
+        result.addFeature(Feature.Level.WARNING, "warning message on result");
         RecipeResultNode firstNode = result.getRoot().getChildren().get(0);
         firstNode.getResult().error("test recipe error message");
 

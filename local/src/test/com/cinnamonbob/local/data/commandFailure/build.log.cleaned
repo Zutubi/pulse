@@ -5,11 +5,11 @@
     completed:
     elapsed  :
     result   : error
-    message  :
-      java.io.IOException: java.io.IOException: nosuchexe: not found
+    errors   :
+      Unable to create process: No such executable 'nosuchexe'
 
   completed:
   elapsed  :
-  result   : failure
-  message  :
-    Command 'noice' failed
+  result   : error
+  errors   :
+    Error executing command 'noice'

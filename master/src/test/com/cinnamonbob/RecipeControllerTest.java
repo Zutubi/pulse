@@ -1,6 +1,7 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.events.build.*;
@@ -237,7 +238,7 @@ public class RecipeControllerTest extends BobTestCase
     private void assertErrorDetailsSaved(RecipeErrorEvent error)
     {
         assertEquals(ResultState.ERROR, rootResult.getState());
-        assertEquals(error.getErrorMessage(), rootResult.getErrorMessage());
+        assertEquals(error.getErrorMessage(), rootResult.getFeatures(Feature.Level.ERROR).get(0).getSummary());
         assertSame(rootResult, buildManager.getRecipeResult(rootResult.getId()));
     }
 
@@ -304,7 +305,7 @@ public class RecipeControllerTest extends BobTestCase
 
         public void stop()
         {
-            throw new RuntimeException("Method not implemented.");            
+            throw new RuntimeException("Method not implemented.");
         }
 
         public boolean isRunning()

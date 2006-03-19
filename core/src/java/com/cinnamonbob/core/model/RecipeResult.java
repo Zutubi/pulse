@@ -42,7 +42,7 @@ public class RecipeResult extends Result
                     error("Error executing command '" + result.getCommandName() + "'");
                     break;
                 case FAILURE:
-                    if(state != ResultState.FAILURE)
+                    if (state != ResultState.FAILURE)
                     {
                         failure("Command '" + result.getCommandName() + "' failed");
                     }
@@ -68,26 +68,23 @@ public class RecipeResult extends Result
 
     public void update(RecipeResult result)
     {
-        // Don't unconditionally take state and error messages: take it only
-        // if it may indicate an error which:
-        //   a) we may not have noticed locally; and
-        //   b) is more severe then anything we already know about
+        // Update our state to the worse of our current state and the state
+        // of the incoming result.
         switch (result.state)
         {
             case ERROR:
-                if (state != ResultState.ERROR)
-                {
-                    // More severe: take the error details
-                    error(result.errorMessage);
-                }
+                state = ResultState.ERROR;
                 break;
             case FAILURE:
-                if (state != ResultState.ERROR && state != ResultState.FAILURE)
+                if (state != ResultState.ERROR)
                 {
-                    failure(result.failureMessage);
+                    state = ResultState.FAILURE;
                 }
                 break;
         }
+
+        // Copy across features
+        features.addAll(result.features);
 
         this.stamps.setEndTime(result.stamps.getEndTime());
     }
@@ -152,7 +149,7 @@ public class RecipeResult extends Result
 
     public boolean hasMessages(Feature.Level level)
     {
-        if (super.hasMessages(level))
+        if (hasDirectMessages(level))
         {
             return true;
         }

@@ -13,7 +13,7 @@ import java.net.URL;
 public class LocalBuildTest extends BobTestCase
 {
     File tmpDir;
-    boolean generateMode = true;
+    boolean generateMode = false;
     LocalBuild builder;
 
     @Override
@@ -164,7 +164,7 @@ public class LocalBuildTest extends BobTestCase
         File exceptionFile = new File(dir, "exception");
         if (exceptionFile.exists() && !exceptionFile.delete())
         {
-            throw new IOException("Failed to delete the file '"+exceptionFile+"'.");
+            throw new IOException("Failed to delete the file '" + exceptionFile + "'.");
         }
 
         for (String filename : dir.list())

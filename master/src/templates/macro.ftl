@@ -5,27 +5,10 @@ A macro to show the messages directly on the result object of the given
 level.
 ---------------------------------------------------------------------------->
 [#macro resultMessages result level indent=""]
-    [#if level == errorLevel]
-        [#if result.errorMessage?exists]
-${indent}  * ${renderer.wrapString(result.errorMessage, "${indent}    ")}
-        [/#if]
-        [#if result.failureMessage?exists]
-${indent}  * ${renderer.wrapString(result.failureMessage, "${indent}    ")}
-        [/#if]
-    [/#if]
+    [#list result.getFeatures(level) as feature]
+${indent}  * ${renderer.wrapString(feature.summary, "${indent}    ")}
+    [/#list]
 [/#macro]
-
-<#---------------------------------------------------------------------------
-Returns true iff the given result has messages of the given level directly on
-it.
----------------------------------------------------------------------------->
-[#function hasDirectMessages result level]
-    [#if level == errorLevel]
-        [#return result.errorMessage?exists || result.failureMessage?exists]
-    [#else]
-        [#return false]
-    [/#if]
-[/#function]
 
 <#---------------------------------------------------------------------------
 Shows all messages of the given level on the file artifact as a flat list but
@@ -58,7 +41,7 @@ artifacts as a flat list but with context.
 ---------------------------------------------------------------------------->
 [#macro commandResultMessages result level context]
     [#assign nestedContext = "${context} :: ${result.commandName}"]
-    [#if hasDirectMessages(result, level)]
+    [#if result.hasDirectMessages(level)]
   - ${renderer.wrapString(nestedContext, "    ")}
         [@resultMessages result=result level=level indent="  "/]
     [/#if]
@@ -72,7 +55,7 @@ Shows all messages of the given level on the recipe result and its included
 results as a flat list but with context.
 ---------------------------------------------------------------------------->
 [#macro recipeResultMessages result level context]
-    [#if hasDirectMessages(result, level)]
+    [#if result.hasDirectMessages(level)]
   - ${renderer.wrapString(context, "    ")}
         [@resultMessages result=result level=level indent="  "/]
     [/#if]

@@ -693,30 +693,6 @@
 #end
 
 ##
-## If the given result has an error or failure, outputs a table row with details.
-##
-#macro(errorrow $result)
-  #if($result.errored())
-    #set($resultMessage = $result.errorMessage)
-  #elseif($result.failed())
-    #set($resultMessage = $result.failureMessage)
-  #else
-    #set($resultMessage = false)
-  #end
-
-  #if($resultMessage)
-    <tr>
-      <td class="build-failure" colspan="4">
-        <h4>error message</h4>
-        <ul class="error-message">
-          <li class="error">$resultMessage</li>
-        </ul>
-      </td>
-    </tr>
-  #end
-#end
-
-##
 ## Outputs table rows with a summary of the given result.
 ##
 #macro(resultsummary $result)
@@ -763,68 +739,14 @@
 #end
 
 ##
-## Outputs a nested list of RecipeResult details starting from the given node.
-## If $showCommands is true, command results will also be displayed.
-##
-#macro(showrecipes $node $showCommands $projectId)
-  <ul class="recipe-tree">
-  #foreach($child in $node.children)
-    <li class="recipe-tree">
-      <table>
-    #if($child.result.commenced())
-        <tr>
-          <th colspan="4" class="command-detail">$child.result.recipeNameSafe @ $child.hostSafe <a href="viewRecipe.action?id=$child.id&projectId=$projectId">details</a></th>
-        </tr>
-      #resultsummary($child.result)
-    #else
-        <tr>
-          <th class="build-pending">$child.result.recipeNameSafe @ [pending]  <a href="viewRecipe.action?id=$child.id&projectId=$projectId">details</a></th>
-        <tr>
-    #end
-
-    #if($showCommands && $child.result.commandResults.size() > 0)
-        <tr>
-          <th class="command-detail">command</th>
-          <th class="command-detail">elapsed</th>
-          <th class="command-detail">status</th>
-          <th class="command-detail">primary artifact</th>
-        </tr>
-      #foreach($commandResult in $child.result.commandResults)
-        #classset($commandResult)
-        <tr>
-          <td class="build-$class">$commandResult.commandName</td>
-          <td class="build-$class">$commandResult.stamps.prettyElapsed</td>
-          <td class="build-$class">$commandResult.state.prettyString</td>
-          <td class="build-$class">
-            #if($commandResult.artifacts.size() > 0)
-              #set($artifact = $commandResult.artifacts.get(0))
-                <img alt="text" src="/images/gnome-mime-text.png"/><a href="viewArtifact.action?id=$artifact.id&commandId=$commandResult.id">$artifact.title</a>
-            #else
-              [none]
-            #end
-          </td>
-        </tr>
-        #errorrow($commandResult)
-      #end
-    #end
-      </table>
-    #if($child.children.size() > 0)
-      #showrecipes($child $showCommands $projectId)
-    #end
-  #end
-  </ul>
-#end
-
-##
 ## Outputs list items for messages of a given level directly on the given result
 ##
 #macro(resultMessageItems $result $level)
-    #if($level.toString() == "ERROR")
-        #if($result.errorMessage)
-            <li class="error">$!webwork.htmlEncode($result.errorMessage)</li>
-        #end
-        #if($result.failureMessage)
-            <li class="error">$!webwork.htmlEncode($result.failureMessage)</li>
+    #if($result.hasDirectMessages($level))
+        #foreach($feature in $result.getFeatures($level))
+    <li class="$level.toString().toLowerCase()">
+            $!webwork.htmlEncode($feature.summary)
+    </li>
         #end
     #end
 #end
@@ -873,13 +795,7 @@
     #if($commandResult.hasMessages($level))
         #resultMessageItems($commandResult $level)
         #foreach($artifact in $commandResult.getArtifacts())
-##            #if($artifact.hasMessages($level))
-##                <li class="header">#wwtext("name=artifact"): $!webwork.htmlEncode("$artifact.name")
-##                    <ul>
-                    #artifactMessageSummary($build $commandResult $artifact $level true)
-##                    </ul>
-##                </li>
-##            #end
+            #artifactMessageSummary($build $commandResult $artifact $level true)
         #end
     #end
 #end
@@ -897,7 +813,7 @@
         #resultMessageItems($recipeResult $level)
         #foreach($commandResult in $recipeResult.commandResults)
             #if($commandResult.hasMessages($level))
-                <li class="header">#wwtext("name=command"): $!webwork.htmlEncode("$commandResult.commandName")
+                <li class="header">#wwtext("name=command") :: $!webwork.htmlEncode("$commandResult.commandName")
                     <ul>
                     #commandMessageSummary($build $commandResult $level)
                     </ul>
@@ -916,7 +832,7 @@
 ##
 #macro(nodeMessageSummary $build $node $level)
     #if($node.hasMessages($level))
-        <li class="header">#wwtext("name=recipe"): $!webwork.htmlEncode("$node.result.recipeNameSafe @ $node.hostSafe")
+        <li class="header">#wwtext("name=recipe") :: $!webwork.htmlEncode("$node.result.recipeNameSafe @ $node.hostSafe")
             <ul>
             #recipeMessageSummary($build $node.result $level false)
             #foreach($child in $node.children)

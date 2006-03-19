@@ -6,7 +6,8 @@
     elapsed  :
     result   : success
     artifacts:
-      * command output (out/00000000-noice/output.txt)
+      * command output
+        * out/00000000-noice/command output/output.txt
 
   completed:
   elapsed  :

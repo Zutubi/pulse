@@ -30,7 +30,7 @@
         <property name="type" column="TYPE" type="string" length="255"/>
 
         <bag name="features" cascade="all-delete-orphan" lazy="false">
-            <key column="FILE_ARTIFACT_ID" not-null="true"/>
+            <key column="FILE_ARTIFACT_ID"/>
             <one-to-many class="com.cinnamonbob.core.model.Feature"/>
         </bag>
 

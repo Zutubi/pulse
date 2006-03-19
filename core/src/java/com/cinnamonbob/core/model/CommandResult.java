@@ -79,7 +79,7 @@ public class CommandResult extends Result
 
     public boolean hasMessages(Feature.Level level)
     {
-        if (super.hasMessages(level))
+        if (hasDirectMessages(level))
         {
             return true;
         }

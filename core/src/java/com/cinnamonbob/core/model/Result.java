@@ -10,14 +10,12 @@ import java.util.List;
 
 public abstract class Result extends Entity
 {
-    private static final int MAX_MESSAGE_LENGTH = 1023;
     private static final String EXCEPTION_FILE = "exception";
 
     protected ResultState state = ResultState.INITIAL;
     protected TimeStamps stamps = new TimeStamps();
     protected File outputDir;
-    protected String errorMessage;
-    protected String failureMessage;
+    protected List<Feature> features = new LinkedList<Feature>();
 
     public boolean pending()
     {
@@ -111,26 +109,21 @@ public abstract class Result extends Entity
         state = ResultState.FAILURE;
     }
 
+    public void addFeature(Feature.Level level, String message)
+    {
+        features.add(new Feature(level, message));
+    }
+
     public void failure(String message)
     {
         failure();
-        failureMessage = message;
-
-        if (failureMessage.length() > MAX_MESSAGE_LENGTH)
-        {
-            failureMessage = failureMessage.substring(0, MAX_MESSAGE_LENGTH);
-        }
+        addFeature(Feature.Level.ERROR, message);
     }
 
     public void error(String message)
     {
         state = ResultState.ERROR;
-        errorMessage = message;
-
-        if (errorMessage.length() > MAX_MESSAGE_LENGTH)
-        {
-            errorMessage = errorMessage.substring(0, MAX_MESSAGE_LENGTH);
-        }
+        addFeature(Feature.Level.ERROR, message);
     }
 
     public void terminate(boolean timeout)
@@ -138,11 +131,11 @@ public abstract class Result extends Entity
         state = ResultState.TERMINATING;
         if (timeout)
         {
-            errorMessage = "Timed out";
+            addFeature(Feature.Level.ERROR, "Timed out");
         }
         else
         {
-            errorMessage = "Forcefully terminated";
+            addFeature(Feature.Level.ERROR, "Forcefully terminated");
         }
     }
 
@@ -200,26 +193,6 @@ public abstract class Result extends Entity
         this.stamps = stamps;
     }
 
-    public String getFailureMessage()
-    {
-        return failureMessage;
-    }
-
-    public void setFailureMessage(String failureMessage)
-    {
-        this.failureMessage = failureMessage;
-    }
-
-    public String getErrorMessage()
-    {
-        return errorMessage;
-    }
-
-    private void setErrorMessage(String message)
-    {
-        errorMessage = message;
-    }
-
     public String getExceptionTrace()
     {
         File exceptionFile = new File(outputDir, EXCEPTION_FILE);
@@ -261,33 +234,50 @@ public abstract class Result extends Entity
         }
     }
 
+    public List<Feature> getFeatures()
+    {
+        return features;
+    }
+
+    public List<Feature> getFeatures(Feature.Level level)
+    {
+        List<Feature> result = new LinkedList<Feature>();
+        for (Feature f : features)
+        {
+            if (f.getLevel() == level)
+            {
+                result.add(f);
+            }
+        }
+
+        return result;
+    }
+
+    private void setFeatures(List<Feature> features)
+    {
+        this.features = features;
+    }
+
     public List<String> collectErrors()
     {
         List<String> errors = new LinkedList<String>();
 
-        if (errorMessage != null)
+        for (Feature f : features)
         {
-            errors.add(errorMessage);
-        }
-
-        if (failureMessage != null)
-        {
-            errors.add(failureMessage);
+            if (f.getLevel() == Feature.Level.ERROR)
+            {
+                errors.add(f.getSummary());
+            }
         }
 
         return errors;
     }
 
-    public boolean hasMessages(Feature.Level level)
+    public boolean hasDirectMessages(Feature.Level level)
     {
-        if (level == Feature.Level.ERROR)
+        for (Feature f : features)
         {
-            if (errorMessage != null)
-            {
-                return true;
-            }
-
-            if (failureMessage != null)
+            if (f.getLevel() == level)
             {
                 return true;
             }

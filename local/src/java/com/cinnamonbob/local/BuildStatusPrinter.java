@@ -102,30 +102,32 @@ public class BuildStatusPrinter implements EventListener
 
     private void showMessages(Result result)
     {
-        if (result.errored())
+        if (result.hasDirectMessages(Feature.Level.ERROR))
         {
-            showErrorDetails(result.getErrorMessage());
+            indenter.println("errors   :");
+            showMessages(result, Feature.Level.ERROR);
         }
-        else if (result.failed())
+
+        if (result.hasDirectMessages(Feature.Level.WARNING))
         {
-            showErrorDetails(result.getFailureMessage());
+            indenter.println("warnings :");
+            showMessages(result, Feature.Level.WARNING);
+        }
+
+        if (result.hasDirectMessages(Feature.Level.INFO))
+        {
+            indenter.println("info     :");
+            showMessages(result, Feature.Level.INFO);
         }
     }
 
-    private void showErrorDetails(String message)
+    private void showMessages(Result result, Feature.Level level)
     {
-        indenter.println("message  :");
         indenter.indent();
-
-        if (message != null)
+        for (Feature feature : result.getFeatures(level))
         {
-            indenter.println(message);
+            indenter.println(feature.getSummary());
         }
-        else
-        {
-            indenter.println("<unknown>");
-        }
-
         indenter.dedent();
     }
 
@@ -153,7 +155,7 @@ public class BuildStatusPrinter implements EventListener
                     }
                 }
             }
-            
+
             indenter.dedent();
         }
         indenter.dedent();

@@ -1,9 +1,6 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.Feature;
-import com.cinnamonbob.core.model.PlainFeature;
-import com.cinnamonbob.core.model.StoredFileArtifact;
+import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.core.util.IOUtils;
 import com.cinnamonbob.test.BobTestCase;
 
@@ -132,7 +129,7 @@ public class RegexPostProcessorTest extends BobTestCase
         RegexPostProcessor pp = createPostProcessor(".*");
         CommandResult result = simpleErrors(pp, LINES);
         assertTrue(result.failed());
-        assertEquals("Error features detected", result.getFailureMessage());
+        assertEquals("Error features detected", getFailureMessage(result));
     }
 
     public void testNoFailOnError()
@@ -157,7 +154,7 @@ public class RegexPostProcessorTest extends BobTestCase
         pp.setFailOnWarning(true);
         CommandResult result = simpleFeatures(pp, Feature.Level.WARNING, LINES);
         assertTrue(result.failed());
-        assertEquals("Warning features detected", result.getFailureMessage());
+        assertEquals("Warning features detected", getFailureMessage(result));
     }
 
     public void testLeadingContext()
@@ -322,16 +319,23 @@ public class RegexPostProcessorTest extends BobTestCase
             if (level == Feature.Level.ERROR && pp.getFailOnError())
             {
                 assertTrue(result.failed());
-                assertEquals("Error features detected", result.getFailureMessage());
+                assertEquals("Error features detected", getFailureMessage(result));
             }
             else if (level == Feature.Level.WARNING && pp.getFailOnWarning())
             {
                 assertTrue(result.failed());
-                assertEquals("Warning features detected", result.getFailureMessage());
+                assertEquals("Warning features detected", getFailureMessage(result));
             }
         }
 
         return result;
+    }
+
+    private String getFailureMessage(Result result)
+    {
+        Feature feature = result.getFeatures().get(0);
+        assertEquals(Feature.Level.ERROR, feature.getLevel());
+        return feature.getSummary();
     }
 
     private CommandResult simpleErrors(RegexPostProcessor pp, String... lines)

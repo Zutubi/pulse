@@ -43,17 +43,25 @@
             #classCell($commandResult.stamps.prettyStartTime)
             #classCell($commandResult.stamps.prettyElapsed)
         </tr>
-        #if($commandResult.errored())
+        #if($commandResult.hasDirectMessages($errorLevel))
         <tr>
             <td class="error" colspan="5">
-                $!webwork.htmlEncode($commandResult.errorMessage)
+                <ul>
+            #foreach($feature in $commandResult.getFeatures($errorLevel))
+                    <li class="error">$!webwork.htmlEncode($feature.summary)</li>
+            #end
+                </ul>
             </td>
         </tr>
         #end
-        #if($commandResult.failed())
+        #if($commandResult.hasDirectMessages($warningLevel))
         <tr>
-            <td class="failure" colspan="5">
-                $!webwork.htmlEncode($commandResult.failureMessage)
+            <td class="warning" colspan="5">
+                <ul>
+            #foreach($feature in $commandResult.getFeatures($warningLevel))
+                    <li class="warning">$!webwork.htmlEncode($feature.summary)</li>
+            #end
+                </ul>
             </td>
         </tr>
         #end

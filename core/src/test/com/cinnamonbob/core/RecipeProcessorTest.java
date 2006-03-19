@@ -1,6 +1,7 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.CommandResult;
+import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
@@ -240,13 +241,17 @@ public class RecipeProcessorTest extends BobTestCase implements EventListener
     private void assertCommandFailure(long id, String message)
     {
         CommandCompletedEvent e = assertCommandCompleted(id, ResultState.FAILURE);
-        assertEquals(message, e.getResult().getFailureMessage());
+        Feature feature = e.getResult().getFeatures().get(0);
+        assertEquals(Feature.Level.ERROR, feature.getLevel());
+        assertEquals(message, feature.getSummary());
     }
 
     private void assertCommandError(long id, String message)
     {
         CommandCompletedEvent e = assertCommandCompleted(id, ResultState.ERROR);
-        assertEquals(message, e.getResult().getErrorMessage());
+        Feature feature = e.getResult().getFeatures().get(0);
+        assertEquals(Feature.Level.ERROR, feature.getLevel());
+        assertEquals(message, feature.getSummary());
     }
 
     private RecipeCompletedEvent assertRecipeCompleted(long id, ResultState state)
@@ -262,13 +267,17 @@ public class RecipeProcessorTest extends BobTestCase implements EventListener
     private void assertRecipeError(long id, String message)
     {
         RecipeCompletedEvent e = assertRecipeCompleted(id, ResultState.ERROR);
-        assertEquals(message, e.getResult().getErrorMessage());
+        Feature feature = e.getResult().getFeatures().get(0);
+        assertEquals(Feature.Level.ERROR, feature.getLevel());
+        assertEquals(message, feature.getSummary());
     }
 
     private void assertRecipeFailure(long id, String message)
     {
         RecipeCompletedEvent e = assertRecipeCompleted(id, ResultState.FAILURE);
-        assertEquals(message, e.getResult().getFailureMessage());
+        Feature feature = e.getResult().getFeatures().get(0);
+        assertEquals(Feature.Level.ERROR, feature.getLevel());
+        assertEquals(message, feature.getSummary());
     }
 
     private RecipeEvent assertEvent(long id)

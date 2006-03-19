@@ -97,7 +97,7 @@ public class BuildResult extends Result
 
     public boolean hasMessages(Feature.Level level)
     {
-        if (super.hasMessages(level))
+        if (hasDirectMessages(level))
         {
             return true;
         }
@@ -135,4 +135,5 @@ public class BuildResult extends Result
     {
         this.scmDetails = scmDetails;
     }
+
 }

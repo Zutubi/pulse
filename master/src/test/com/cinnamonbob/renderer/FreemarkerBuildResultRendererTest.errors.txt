@@ -42,6 +42,7 @@ Error messages:
       the wrapping works on the artifact messages
 
 Warning messages:
+  * warning message on result
   - second recipe :: artifact command :: first-artifact
     first-artifact/testpath
     * warning message

@@ -6,7 +6,8 @@
     elapsed  :
     result   : success
     artifacts:
-      * command output (out/00000000-noice/output.txt)
+      * command output
+        * out/00000000-noice/command output/output.txt
 
   [oops]
     commenced:
@@ -14,9 +15,10 @@
     elapsed  :
     result   : success
     artifacts:
-      * command output (out/00000001-oops/output.txt)
-        warning features:
-          * warning: everythings ok
+      * command output
+        * out/00000001-oops/command output/output.txt
+          warning features:
+            * warning: everythings ok
 
   [whoa]
     commenced:
@@ -24,9 +26,10 @@
     elapsed  :
     result   : success
     artifacts:
-      * command output (out/00000002-whoa/output.txt)
-        warning features:
-          * warning: everythings still fine
+      * command output
+        * out/00000002-whoa/command output/output.txt
+          warning features:
+            * warning: everythings still fine
 
   [hey]
     commenced:
@@ -34,9 +37,10 @@
     elapsed  :
     result   : success
     artifacts:
-      * command output (out/00000003-hey/output.txt)
-        info features:
-          * info: informative
+      * command output
+        * out/00000003-hey/command output/output.txt
+          info features:
+            * info: informative
 
   [bzzzt]
     commenced:
@@ -44,7 +48,8 @@
     elapsed  :
     result   : success
     artifacts:
-      * command output (out/00000004-bzzzt/output.txt)
+      * command output
+        * out/00000004-bzzzt/command output/output.txt
 
   completed:
   elapsed  :

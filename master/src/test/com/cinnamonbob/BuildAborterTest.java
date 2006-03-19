@@ -1,5 +1,6 @@
 package com.cinnamonbob;
 
+import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.MockBuildManager;
 import com.cinnamonbob.model.MockProjectManager;
@@ -62,6 +63,6 @@ public class BuildAborterTest extends BobTestCase
         assertFalse(result.completed());
         aborter.run();
         assertTrue(result.errored());
-        assertTrue(result.getErrorMessage().contains("shut down"));
+        assertTrue(result.getFeatures(Feature.Level.ERROR).get(0).getSummary().contains("shut down"));
     }
 }
