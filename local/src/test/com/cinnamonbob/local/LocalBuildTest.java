@@ -35,12 +35,8 @@ public class LocalBuildTest extends BobTestCase
 
     private File getExpectedOutput(String name)
     {
-        URL url = getClass().getResource(getClass().getSimpleName() + ".basic.xml");
-        File xmlFile = new File(url.getFile());
-        File dataDir = new File(xmlFile.getParentFile(), "data");
-        File srcData = new File(dataDir.getAbsolutePath().replace("classes", "src/test"));
-
-        return new File(srcData, name);
+        File root = getBobRoot();
+        return new File(root, FileSystemUtils.composeFilename("local", "src", "test", "com", "cinnamonbob", "local", "data", name));
     }
 
     private String copyFile(String name) throws IOException
