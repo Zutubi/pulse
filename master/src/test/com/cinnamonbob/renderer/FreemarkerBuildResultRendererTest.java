@@ -58,6 +58,16 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
 
     public void testWithErrors() throws IOException
     {
+        errorsHelper("plain");
+    }
+
+    public void testHTMLWithErrors() throws IOException
+    {
+        errorsHelper("html");
+    }
+
+    private void errorsHelper(String type)  throws IOException
+    {
         BuildResult result = createBuildWithChanges();
         result.error("test error message");
         result.addFeature(Feature.Level.WARNING, "warning message on result");
@@ -80,18 +90,18 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
         StoredFileArtifact artifact = new StoredFileArtifact("first-artifact/testpath");
         artifact.addFeature(new Feature(Feature.Level.INFO, "info message"));
         artifact.addFeature(new Feature(Feature.Level.ERROR, "error message"));
-        artifact.addFeature(new Feature(Feature.Level.WARNING, "warning message"));
+        artifact.addFeature(new PlainFeature(Feature.Level.WARNING, "warning message", 19));
         command.addArtifact(new StoredArtifact("first-artifact", artifact));
 
         artifact = new StoredFileArtifact("second-artifact/this/time/a/very/very/very/very/long/pathname/which/will/look/ugly/i/have/no/doubt");
-        artifact.addFeature(new Feature(Feature.Level.ERROR, "error 1"));
+        artifact.addFeature(new PlainFeature(Feature.Level.ERROR, "error 1", 1000000));
         artifact.addFeature(new Feature(Feature.Level.ERROR, "error 2"));
         artifact.addFeature(new Feature(Feature.Level.ERROR, "error 3: in this case a longer error message so i can see how the wrapping works on the artifact messages"));
         command.addArtifact(new StoredArtifact("second-artifact", artifact));
 
         secondResult.add(command);
 
-        createAndVerify("errors", "another.url", result);
+        createAndVerify("errors", type, "another.url", result);
     }
 
     private BuildResult createBuildWithChanges()
@@ -102,9 +112,9 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
         buildRevision.setRevisionString("656");
 
         List<Changelist> changes = new LinkedList<Changelist>();
-        Changelist list = new Changelist(new Revision("test author", "short comment", System.currentTimeMillis() - 324252, "655"));
+        Changelist list = new Changelist(new Revision("test author", "short comment", 324252, "655"));
         changes.add(list);
-        list = new Changelist(new Revision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output dadada da dadad ad ad adadad ad ad ada d adada dad ad ad d ad ada da d", System.currentTimeMillis() - 310000, "656"));
+        list = new Changelist(new Revision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output dadada da dadad ad ad adadad ad ad ada d adada dad ad ad d ad ada da d", 310000, "656"));
         changes.add(list);
 
         BuildScmDetails details = new BuildScmDetails(buildRevision, changes);
@@ -117,7 +127,7 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
         BuildResult result = new BuildResult(new Project("test project", "test description"), "test spec", 101);
         result.setId(11);
         result.setScmDetails(new BuildScmDetails());
-        result.commence(System.currentTimeMillis() - 10000);
+        result.commence(10000);
 
         RecipeResult recipeResult = new RecipeResult("first recipe");
         RecipeResultNode node = new RecipeResultNode(recipeResult);
@@ -132,18 +142,38 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
         result.getRoot().getChildren().get(0).addChild(node);
 
         result.complete();
+        result.getStamps().setEndTime(100000);
         return result;
     }
 
     protected void createAndVerify(String expectedName, String hostUrl, BuildResult result) throws IOException
     {
-        InputStream expectedStream = getInput(expectedName, "txt");
+        createAndVerify(expectedName, "plain", hostUrl, result);
+    }
 
-        StringWriter writer = new StringWriter();
-        renderer.render(hostUrl, result, "plain", writer);
-        String got = writer.getBuffer().toString();
-        String expected = IOUtils.inputStreamToString(expectedStream);
+    protected void createAndVerify(String expectedName, String type, String hostUrl, BuildResult result) throws IOException
+    {
+        String extension = "txt";
+        if(type.equals("html"))
+        {
+            extension = "html";
+        }
 
-        assertEquals(expected, got);
+        InputStream expectedStream = null;
+
+        try
+        {
+            expectedStream = getInput(expectedName, extension);
+
+            StringWriter writer = new StringWriter();
+            renderer.render(hostUrl, result, type, writer);
+            String got = writer.getBuffer().toString();
+            String expected = IOUtils.inputStreamToString(expectedStream);
+            assertEquals(expected, got);
+        }
+        finally
+        {
+            IOUtils.close(expectedStream);
+        }
     }
 }

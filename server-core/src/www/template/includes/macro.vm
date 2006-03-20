@@ -757,7 +757,7 @@
 #macro(fileArtifactMessageSummary $build $command $fileArtifact $level $showHeader)
     #if($fileArtifact.hasMessages($level))
         #if($showHeader)
-    <li class="header">#wwtext("name=artifact"): $!webwork.htmlEncode("$fileArtifact.path")
+    <li class="header">#wwtext("name=artifact") :: $!webwork.htmlEncode("$fileArtifact.path")
         #end
         <ul>
         #foreach($feature in $artifact.getFeatures($level))

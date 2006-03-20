@@ -12,13 +12,9 @@ import java.util.Properties;
 public abstract class ContactPoint extends Entity
 {
     private String name;
-
     private Properties properties;
-
     private String uid;
-
     private User user;
-
     private List<Subscription> subscriptions;
 
     public void setName(String name)

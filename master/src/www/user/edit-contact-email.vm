@@ -14,10 +14,8 @@
         #wwhidden("name=user")
         #wwtextfield("name=contact.name" "label=%{getText('contact.name')}" "required=true" "size=60" "tabindex=1")
         #wwtextfield("name=contact.email" "label=%{getText('contact.email')}" "required=true" "size=60" "tabindex=2")
-        #openSubmit()
-            #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=3")
-            #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=4")
-        #closeSubmit()
+        #wwradio("name=contact.type" "label=%{getText('contact.format')}"  "list={'html', 'plain'}" "tabindex=3")
+        #saveCancel(4)
     #end
 
 </body>

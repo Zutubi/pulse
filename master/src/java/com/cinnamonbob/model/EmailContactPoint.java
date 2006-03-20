@@ -25,12 +25,16 @@ public class EmailContactPoint extends ContactPoint
     private static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
     private static final String SMTP_AUTH_PROPERTY = "mail.smtp.auth";
 
+    private static final String PROPERTY_TYPE = "type";
+
     public EmailContactPoint()
     {
+        setType(BuildResultRenderer.TYPE_HTML);
     }
 
     public EmailContactPoint(String email)
     {
+        this();
         setEmail(email);
     }
 
@@ -42,6 +46,16 @@ public class EmailContactPoint extends ContactPoint
     public void setEmail(String email)
     {
         setUid(email);
+    }
+
+    public String getType()
+    {
+        return (String)getProperties().get(PROPERTY_TYPE);
+    }
+
+    public void setType(String type)
+    {
+        getProperties().put(PROPERTY_TYPE, type);
     }
 
     /* (non-Javadoc)
@@ -70,7 +84,7 @@ public class EmailContactPoint extends ContactPoint
         StringWriter w = new StringWriter();
         BuildResultRenderer renderer = (BuildResultRenderer) ComponentContext.getBean("buildResultRenderer");
         ConfigurationManager configManager = lookupConfigManager();
-        renderer.render(configManager.getAppConfig().getHostName(), result, BuildResultRenderer.TYPE_PLAIN, w);
+        renderer.render(configManager.getAppConfig().getHostName(), result, getType(), w);
         return w.toString();
     }
 
@@ -117,7 +131,7 @@ public class EmailContactPoint extends ContactPoint
 
             msg.setRecipient(Message.RecipientType.TO, new InternetAddress(getEmail()));
             msg.setSubject(subject);
-            msg.setText(body);
+            msg.setContent(body, "text/" + getType());
             msg.setHeader("X-Mailer", "Project-Cinnamon");
             msg.setSentDate(new Date());
 
