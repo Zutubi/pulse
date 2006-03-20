@@ -23,10 +23,10 @@
             <table class="fill-content">
                 #wwcform("action=editPassword.action" "id=password.edit" "heading=%{getText('password.edit')}" "method=post")
                     #wwhidden("name=userId")
-                    #wwpassword("name=current" "label=%{getText('password.current')}" "required=true" "showPassword=true" "tabindex=1")
-                    #wwpassword("name=password" "label=%{getText('password.new')}" "required=true" "tabindex=2")
-                    #wwpassword("name=confirm" "label=%{getText('password.confirm')}" "required=true" "tabindex=3")
-                    #saveCancel(4)
+                    #wwpassword("name=current" "label=%{getText('password.current')}" "required=true" "showPassword=true" "tabindex=4")
+                    #wwpassword("name=password" "label=%{getText('password.new')}" "required=true" "tabindex=5")
+                    #wwpassword("name=confirm" "label=%{getText('password.confirm')}" "required=true" "tabindex=6")
+                    #saveCancel(7)
                 #end
             </table>
         </td>

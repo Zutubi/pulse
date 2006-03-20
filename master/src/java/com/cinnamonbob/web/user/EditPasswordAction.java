@@ -3,7 +3,7 @@ package com.cinnamonbob.web.user;
 import com.cinnamonbob.model.User;
 
 /**
- * Allow a user to edit there password. 
+ * Allow a user to edit there password.
  *
  */
 public class EditPasswordAction extends UserActionSupport
@@ -46,6 +46,12 @@ public class EditPasswordAction extends UserActionSupport
     {
         // ensure that the current password is correct.
         User user = getUser();
+        if (user == null)
+        {
+            addUnknownUserActionError();
+            return;
+        }
+
         if (!user.getPassword().equals(current))
         {
             addFieldError("password", getText("password.current.mismatch"));

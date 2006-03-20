@@ -1,6 +1,7 @@
 package com.cinnamonbob.acceptance;
 
 import com.cinnamonbob.core.util.RandomUtils;
+import com.cinnamonbob.acceptance.forms.admin.EditPasswordForm;
 
 /**
  * <class-comment/>
@@ -155,7 +156,7 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         assertLinkPresent("delete_" + login);
         assertTextPresent("can not delete");
     }
-    
+
     public void testViewUser()
     {
         // create user.
@@ -178,6 +179,50 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         assertTablePresent("contacts");
 
         assertTablePresent("subscriptions");
+    }
+
+    public void testChangeUserPassword()
+    {
+        // create a user.
+        String login = RandomUtils.randomString(7);
+        submitCreateUserForm(login, login, login, login, false);
+
+        assertLinkPresent("edit_" + login);
+        clickLink("edit_" + login);
+
+        EditPasswordForm form = new EditPasswordForm(tester);
+        form.assertFormElements("", "");
+        form.saveFormElements("newPassword", "newPassword");
+
+        // assert that we are back on the manage users
+
+        // now to verify that the password was actually changed.
+        login(login, "newPassword");
+        assertTextPresent("welcome");
+    }
+
+    public void testChangeUserPasswordValidation()
+    {
+        // create a user.
+        String login = RandomUtils.randomString(7);
+        submitCreateUserForm(login, login, login, login, false);
+
+        assertLinkPresent("edit_" + login);
+        clickLink("edit_" + login);
+
+        EditPasswordForm form = new EditPasswordForm(tester);
+        form.assertFormElements("", "", "");
+
+        // check that each field is required.
+        form.saveFormElements("a", "");
+        assertTextPresent("required");
+
+        form.saveFormElements("", "b");
+        assertTextPresent("required");
+
+        // check that the new password and confirm password are correctly checked.
+        form.saveFormElements("a", "b");
+        assertTextPresent("does not match");
     }
 
     private void assertFormReset()

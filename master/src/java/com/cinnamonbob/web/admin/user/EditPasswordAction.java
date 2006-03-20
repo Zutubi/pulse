@@ -51,12 +51,9 @@ public class EditPasswordAction extends UserActionSupport
             return;
         }
 
-        if (password != null && confirm != null)
+        if (!password.equals(confirm))
         {
-            if (password.equals(confirm))
-            {
-                addFieldError("confirm", getText("user.confirm.mismatch"));
-            }
+            addFieldError("confirm", getText("password.confirm.mismatch"));
         }
     }
 

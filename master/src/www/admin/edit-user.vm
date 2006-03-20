@@ -11,14 +11,33 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    #wwcform("action=editUser.action" "heading=%{getText('user.edit')}" "method=post")
-        #wwhidden("name=userId")
-        #wwcheckbox("name=admin" "label=%{getText('user.admin')}" "tabindex=1")
-        #openSubmit()
-            #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=3")
-            #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=4")
-        #closeSubmit()
-    #end
+<table class="columns" width="90%">
+    <tr>
+        <td class="columns" width="40%">
+            <table class="fill-content">
+                #wwcform("action=editUser.action" "heading=%{getText('user.edit')}" "method=post")
+                    #wwhidden("name=userId")
+                    #wwcheckbox("name=admin" "label=%{getText('user.admin')}" "tabindex=1")
+                    #saveCancel(2)
+                #end
+            </table>
+            <table class="fill-content">
+                #wwcform("action=editPassword.action" "id=password.edit" "heading=%{getText('password.edit')}" "method=post")
+                    #wwhidden("name=userId")
+                    #wwpassword("name=password" "label=%{getText('password.new')}" "required=true" "tabindex=4")
+                    #wwpassword("name=confirm" "label=%{getText('password.confirm')}" "required=true" "tabindex=5")
+                    #saveCancel(6)
+                #end
+            </table>
+        </td>
+        <td class="columns" width="40%">
+            <table class="fill-content">
+                &nbsp;
+            </table>
+        </td>
+    </tr>
+</table>
+
 
 </body>
 </html>

@@ -52,7 +52,7 @@ public class CreateUserAction extends UserActionSupport
         // check the password confirmation.
         if (!confirm.equals(newUser.getPassword()))
         {
-            addFieldError("confirm", getText("user.confirm.mismatch"));
+            addFieldError("confirm", getText("password.confirm.mismatch"));
         }
 
         // check that the user does not already exist.

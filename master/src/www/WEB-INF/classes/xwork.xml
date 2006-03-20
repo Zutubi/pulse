@@ -614,7 +614,8 @@
         </action>
 
         <action name="editPassword" class="com.cinnamonbob.web.admin.user.EditPasswordAction">
-            <result name="input" type="velocity">edit-password.vm</result>
+            <result name="input" type="velocity">edit-user.vm</result>
+            <result name="error" type="velocity">edit-user.vm</result>
             <result name="reset" type="redirect">viewUsers.action</result>
             <result name="cancel" type="redirect">viewUsers.action</result>
             <result name="success" type="redirect">viewUsers.action</result>

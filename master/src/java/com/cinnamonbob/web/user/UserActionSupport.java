@@ -6,6 +6,8 @@ import com.cinnamonbob.model.User;
 import com.cinnamonbob.web.ActionSupport;
 import com.opensymphony.util.TextUtils;
 
+import java.util.Arrays;
+
 /**
  *
  * 
@@ -115,11 +117,11 @@ public class UserActionSupport extends ActionSupport
     {
         if (userId != NONE_SPECIFIED)
         {
-            addActionError("Unknown user '" + userId + "'");
+            addActionError(getText("user.unknown", Arrays.asList(userId)));
         }
         else if (TextUtils.stringSet(userLogin))
         {
-            addActionError("Unknown user '" + userLogin + "'");
+            addActionError(getText("user.unknown", Arrays.asList(userLogin)));
         }
     }
 

@@ -8,7 +8,7 @@
     </field>
     <field name="confirm">
         <field-validator type="requiredstring">
-            <message key="user.confirm.required">required field.</message>
+            <message key="password.confirm.required">required field.</message>
         </field-validator>
     </field>
 </validators>
