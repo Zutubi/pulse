@@ -93,10 +93,14 @@ public abstract class Result extends Entity
             state = ResultState.ERROR;
         }
 
-        if (stamps.started())
+        if (!stamps.started())
         {
-            stamps.end();
+            // CIB-234: if an error occurs before starting the stamps, make
+            // sure we still get a start time (otherwise there is no
+            // information about when this result happened!)
+            stamps.setStartTime(System.currentTimeMillis());
         }
+        stamps.end();
     }
 
     public void success()
