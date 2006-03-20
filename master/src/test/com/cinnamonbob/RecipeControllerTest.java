@@ -169,10 +169,9 @@ public class RecipeControllerTest extends BobTestCase
 
         sendError();
 
-        // Never got dispatched
         assertNull(rootNode.getHost());
-        assertFalse(rootResult.getStamps().started());
-        assertFalse(rootResult.getStamps().ended());
+        assertTrue(rootResult.getStamps().started());
+        assertTrue(rootResult.getStamps().ended());
     }
 
     public void testErrorBeforeCommenced()
@@ -182,9 +181,8 @@ public class RecipeControllerTest extends BobTestCase
 
         sendError();
 
-        // Dispatched, but never started
-        assertFalse(rootResult.getStamps().started());
-        assertFalse(rootResult.getStamps().ended());
+        assertTrue(rootResult.getStamps().started());
+        assertTrue(rootResult.getStamps().ended());
     }
 
     public void testErrorAfterCommenced()

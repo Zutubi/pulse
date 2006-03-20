@@ -34,11 +34,12 @@
     <h2 class="section">#wwtext("name=latest.changes")</h2>
 
     <table class="content">
-        #headingRow("latest.changes" 7)
+        #headingRow("latest.changes" 8)
         <tr>
             #contentHeading("build.id" 1)
             #contentHeading("build.status" 2)
             #contentHeading("change.revision" 1)
+            #contentHeading("change.who" 1)
             #contentHeading("change.when" 1)
             #contentHeading("change.comment" 1)
             #contentHeading("actions" 1)
@@ -52,6 +53,7 @@
             <td class="$cssClass"><a href="viewBuild.action?id=$build.id">$build.number</td>
             #statusCell($build)
             #dynamicCell($changelist.revision)
+            #dynamicCell($changelist.user)
             #dynamicCell($changelist.prettyDate)
             #dynamicCell($action.trimmedString($changelist.comment, 60))
             #linkCell("view" "viewChangelist.action?id=$changelist.id")
@@ -59,7 +61,7 @@
     #end
 #else
         <tr>
-            <td class="content" colspan="7">#wwtext("name=no.changes")</td>
+            <td class="content" colspan="8">#wwtext("name=no.changes")</td>
         <tr>
 #end
     </table>
