@@ -1,6 +1,8 @@
 package com.cinnamonbob.acceptance;
 
 import com.cinnamonbob.core.util.RandomUtils;
+import com.cinnamonbob.acceptance.forms.EditUserForm;
+import com.cinnamonbob.acceptance.forms.EditPasswordForm;
 
 /**
  *
@@ -158,15 +160,13 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
                 new String[]{"name", login}     // name row
         });
 
-        assertLinkPresentWithText("edit");
-        clickLinkWithText("edit");
+        assertLinkPresent("user.edit");
+        clickLink("user.edit");
 
-        assertFormPresent("user.edit");
-        setWorkingForm("user.edit");
-        assertFormElementEquals("user.name", login);
+        EditUserForm form = new EditUserForm(tester);
 
-        setFormElement("user.name", "S. O. MeBody");
-        submit("save");
+        form.assertFormElements(login);
+        form.saveFormElements("S. O. MeBody");
 
         assertTablePresent("user");
         assertTableRowsEqual("user", 1, new String[][]{
@@ -184,13 +184,13 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
                 new String[]{"name", login}     // name row
         });
 
-        assertLinkPresentWithText("edit");
-        clickLinkWithText("edit");
+        assertLinkPresent("user.edit");
+        clickLink("user.edit");
 
-        assertFormPresent("user.edit");
-        setWorkingForm("user.edit");
-        setFormElement("user.name", "S. O. MeBody");
-        submit("cancel");
+        EditUserForm form = new EditUserForm(tester);
+
+        form.assertFormElements(login);
+        form.cancelFormElements("S. O. MeBody");
 
         // assert tabular data.
         assertTablePresent("user");
@@ -202,19 +202,62 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
 
     public void testEditUserValidation()
     {
-        clickLinkWithText("edit");
+        clickLink("user.edit");
 
-        assertFormPresent("user.edit");
-        setWorkingForm("user.edit");
-        assertFormElementEquals("user.name", login);
+        EditUserForm form = new EditUserForm(tester);
 
-        setFormElement("user.name", "");
-        submit("save");
+        form.assertFormElements(login);
+        form.saveFormElements("");
 
         // assert validation failed.
+        form.assertFormElements("");
         assertTextPresent("required");
-        assertFormPresent("user.edit");
-        assertFormElementEquals("user.name", "");
+    }
+
+    public void testEditPassword()
+    {
+        assertLinkPresent("user.edit");
+        clickLink("user.edit");
+
+        EditPasswordForm form = new EditPasswordForm(tester);
+        form.assertFormElements("", "", "");
+        form.saveFormElements(login, "newPassword", "newPassword");
+
+        // assert that we are back on the preferences page.
+        assertTablePresent("user");
+        assertLinkPresent("user.edit");
+
+        // now to verify that the password was actually changed.
+        login(login, "newPassword");
+        assertTextPresent("welcome");
+    }
+
+    public void testEditPasswordValidation()
+    {
+        assertLinkPresent("user.edit");
+        clickLink("user.edit");
+
+        EditPasswordForm form = new EditPasswordForm(tester);
+        form.assertFormElements("", "", "");
+
+        // check that each field is required.
+        form.saveFormElements("a", "a", "");
+        assertTextPresent("required");
+
+        form.saveFormElements("b", "", "b");
+        assertTextPresent("required");
+
+        form.saveFormElements("", "c", "c");
+        assertTextPresent("required");
+
+        // check that the current password is correctly checked.
+        form.saveFormElements("incorrect", "a", "a");
+        assertTextPresent("does not match");
+
+        // check that the new password and confirm password are correctly checked.
+        form.saveFormElements(login, "a", "b");
+        assertTextPresent("does not match");
+
     }
 
     public void testSubscriptionFormValidation()

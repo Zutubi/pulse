@@ -482,6 +482,13 @@
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
+        <action name="editPassword" class="com.cinnamonbob.web.user.EditPasswordAction">
+            <result name="input" type="velocity">edit-user.vm</result>
+            <result name="error" type="velocity">edit-user.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
         <action name="contactWizard" class="com.cinnamonbob.web.wizard.WizardAction">
             <interceptor-ref name="wizardStack"/>
             <param name="wizardClass">com.cinnamonbob.web.user.ContactPointWizard</param>

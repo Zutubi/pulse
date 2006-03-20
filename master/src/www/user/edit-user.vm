@@ -10,11 +10,34 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    #wwcform("action=editUser.action" "id=user.edit" "heading=%{getText('user.edit')}" "method=post")
-        #wwhidden("name=userId")
-        #wwtextfield("name=user.name" "label=%{getText('user.name')}" "required=true" "tabindex=1")
-        #saveCancel(2)
-    #end
+<table class="columns" width="90%">
+    <tr>
+        <td class="columns" width="40%">
+            <table class="fill-content">
+                #wwcform("action=editUser.action" "id=user.edit" "heading=%{getText('user.edit')}" "method=post")
+                    #wwhidden("name=userId")
+                    #wwtextfield("name=user.name" "label=%{getText('user.name')}" "required=true" "tabindex=1")
+                    #saveCancel(2)
+                #end
+            </table>
+            <table class="fill-content">
+                #wwcform("action=editPassword.action" "id=password.edit" "heading=%{getText('password.edit')}" "method=post")
+                    #wwhidden("name=userId")
+                    #wwpassword("name=current" "label=%{getText('password.current')}" "required=true" "showPassword=true" "tabindex=1")
+                    #wwpassword("name=password" "label=%{getText('password.new')}" "required=true" "tabindex=2")
+                    #wwpassword("name=confirm" "label=%{getText('password.confirm')}" "required=true" "tabindex=3")
+                    #saveCancel(4)
+                #end
+            </table>
+        </td>
+        <td class="columns" width="40%">
+            <table class="fill-content">
+                &nbsp;
+            </table>
+        </td>
+    </tr>
+</table>
+
 
 </body>
 </html>
