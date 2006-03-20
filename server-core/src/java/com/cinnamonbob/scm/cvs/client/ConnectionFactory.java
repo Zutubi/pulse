@@ -4,6 +4,7 @@ import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.connection.Connection;
 import org.netbeans.lib.cvsclient.connection.LocalConnection;
 import org.netbeans.lib.cvsclient.connection.PServerConnection;
+import org.netbeans.lib.cvsclient.connection.StandardScrambler;
 import com.opensymphony.util.TextUtils;
 
 /**
@@ -26,7 +27,13 @@ public class ConnectionFactory
         }
         else if (CVSRoot.METHOD_PSERVER.equals(method))
         {
-            return new PServerConnection(cvsRoot);
+            PServerConnection pServerConnection = new PServerConnection(cvsRoot);
+            if (TextUtils.stringSet(password))
+            {
+                String encodedPassword = StandardScrambler.getInstance().scramble(password);
+                pServerConnection.setEncodedPassword(encodedPassword);
+            }
+            return pServerConnection;
         }
         else if (CVSRoot.METHOD_LOCAL.equals(method) || method == null)
         {
