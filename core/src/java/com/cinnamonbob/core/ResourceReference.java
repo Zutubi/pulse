@@ -4,12 +4,28 @@ import com.cinnamonbob.core.model.Resource;
 import com.cinnamonbob.core.model.ResourceVersion;
 
 /**
- * <class-comment/>
+ * A resource references adds the named resource to the current scope.
+ *
+ * Sample usage:
+ *
+ *     <resource name="ant" version="1.6.5"/>
+ *
  */
 public class ResourceReference implements ResourceAware, ScopeAware, InitComponent
 {
+    /**
+     * The name of the referenced resource.
+     */
     private String name;
+    /**
+     * The version of the referenced resource.
+     */
     private String version;
+
+    /**
+     * Indicates whether or not the reference resource is required.
+     */
+    private boolean required;
 
     private ResourceRepository repository;
     private Scope scope;
@@ -30,7 +46,11 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
 
         if (resource == null)
         {
-            throw new FileLoadException("Reference to undefined resource '" + name + "'");
+            if (required)
+            {
+                throw new FileLoadException("Reference to undefined resource '" + name + "'");
+            }
+            return;
         }
 
         scope.add(resource.getProperties());
@@ -41,7 +61,11 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
 
             if (resourceVersion == null)
             {
-                throw new FileLoadException("Reference to undefined version '" + version + "' of resource '" + name + "'");
+                if (required)
+                {
+                    throw new FileLoadException("Reference to undefined version '" + version + "' of resource '" + name + "'");
+                }
+                return;
             }
 
             scope.add(resourceVersion.getProperties());
@@ -58,13 +82,40 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
         this.repository = repo;
     }
 
+    /**
+     * The name of the resource being referenced.
+     *
+     * This parameter is required.
+     *
+     * @param name
+     */
     public void setName(String name)
     {
         this.name = name;
     }
 
+    /**
+     * The version of the resource being referenced.
+     *
+     * This parameter is optional
+     *
+     * @param version
+     */
     public void setVersion(String version)
     {
         this.version = version;
+    }
+
+    /**
+     * Indicate whether or not this resource referenced must be resolved. If set to true
+     * and the resource is not located, an exception will be thrown during the build process.
+     *
+     * This parameter is optional, defaults to false.
+     *
+     * @param required
+     */
+    public void setRequired(boolean required)
+    {
+        this.required = required;
     }
 }

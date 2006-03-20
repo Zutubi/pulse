@@ -2,6 +2,8 @@
 <project defaultRecipe="ant build">
     <recipe name="ant build">
         <command name="build">
+            <!-- pull in the ant resource if configured. -->
+            <resource name="ant" required="false"/>
             <ant
                     args="arg1 arg2"
                     >
