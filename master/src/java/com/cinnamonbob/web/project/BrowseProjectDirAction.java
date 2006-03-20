@@ -2,6 +2,7 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.MasterBuildPaths;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.filesystem.File;
 import com.cinnamonbob.filesystem.FileSystem;
 import com.cinnamonbob.filesystem.FileSystemException;
@@ -38,6 +39,17 @@ public class BrowseProjectDirAction extends ProjectActionSupport
     public void setPath(String path)
     {
         this.path = path;
+    }
+
+    public String getDisplayPath()
+    {
+        String result = FileSystemUtils.normaliseSeparators(path);
+        if(result.startsWith("/"))
+        {
+            result = result.substring(1);
+        }
+
+        return result;
     }
 
     public long getBuildId()

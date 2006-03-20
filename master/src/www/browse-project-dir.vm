@@ -12,7 +12,7 @@
 #if($buildResult.completed())
     #if($foundBase)
     <table class="content">
-        #headingRow("$action.getText('path') :: base.dir/$!webwork.htmlEncode($path)" 4)
+        #headingRow("$action.getText('path') :: base.dir/$!webwork.htmlEncode($displayPath)" 4)
         <tr>
             <td class="image">&nbsp;</td>
             #contentHeading("name" 1)
