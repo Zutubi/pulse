@@ -222,6 +222,14 @@ public class TokenManager
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    /**
+     * Init method. Make sure that we have an admin token available for use by
+     * the command line.
+     */
+    public void init()
+    {
         newRandomToken();
     }
 }

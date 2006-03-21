@@ -101,10 +101,7 @@ public class BuildResultRssAction extends ProjectActionSupport
         feed = new SyndFeedImpl();
 
         // set Title, Description and Link
-        feed.setTitle("title");
-        feed.setLink("link");
-        feed.setUri("uri");
-        feed.setDescription("description");
+        feed.setTitle("build results for " + project.getName());
 
         List<SyndEntry> entries = new LinkedList<SyndEntry>();
         for (BuildResult result : page.getResults())
