@@ -133,7 +133,7 @@ public class P4Server implements SCMServer
 
         if (result.stderr.length() > 0)
         {
-            throw new SCMException("p4 process returned error '" + result.stderr.toString() + "'");
+            throw new SCMException("p4 process returned error '" + result.stderr.toString().trim() + "'");
         }
 
         return result;
@@ -141,12 +141,12 @@ public class P4Server implements SCMServer
 
     private String updateClient(long id, File toDirectory) throws SCMException
     {
-        if(id == 0)
+        if (id == 0)
         {
-            id = (long)(Math.random() * 100000);
+            id = (long) (Math.random() * 100000);
         }
 
-        if(toDirectory == null)
+        if (toDirectory == null)
         {
             toDirectory = new File(".");
         }
@@ -186,7 +186,7 @@ public class P4Server implements SCMServer
         {
             runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_DELETE, clientName);
         }
-        catch(SCMException e)
+        catch (SCMException e)
         {
             LOG.warning("Unable to delete client: " + e.getMessage(), e);
         }
@@ -462,6 +462,18 @@ public class P4Server implements SCMServer
             P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, "print", "-q", fileArgument);
             return result.stdout.toString();
         }
+        catch (SCMException e)
+        {
+            if (e.getMessage().contains("no such file") || e.getMessage().contains("not in client view"))
+            {
+                String rev = revision == null ? "head" : revision.getRevisionString();
+                throw new SCMException("File '" + file + "' revision " + rev + " does not exist in the client's view (" + e.getMessage() + ")");
+            }
+            else
+            {
+                throw e;
+            }
+        }
         finally
         {
             deleteClient(clientName);
@@ -519,10 +531,11 @@ public class P4Server implements SCMServer
 
     public static void main(String argv[])
     {
-        P4Server server = new P4Server("localhost:1666", "jsankey", "", "jsankey");
+        P4Server server = new P4Server("localhost:1666", "jsankey", "", "bob-demo");
 
         try
         {
+            server.checkout(1, new NumericalRevision(2), "file");
             List<Changelist> cls = server.getChanges(new NumericalRevision(2), new NumericalRevision(6), "");
 
             for (Changelist l : cls)
