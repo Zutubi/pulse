@@ -1,14 +1,17 @@
 package com.cinnamonbob.web.rss;
 
+import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.HistoryPage;
 import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.BuildResult;
+import com.cinnamonbob.renderer.BuildResultRenderer;
 import com.cinnamonbob.web.project.ProjectActionSupport;
-import com.sun.syndication.feed.synd.*;
 import com.opensymphony.util.TextUtils;
+import com.sun.syndication.feed.synd.*;
 
-import java.util.List;
+import java.io.StringWriter;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <class-comment/>
@@ -20,6 +23,9 @@ public class BuildResultRssAction extends ProjectActionSupport
     private String projectName;
 
     private long projectId = NOT_SPECIFIED;
+
+    private BuildResultRenderer buildResultRenderer;
+    private ConfigurationManager configurationManager;
 
     private SyndFeed feed;
 
@@ -106,7 +112,7 @@ public class BuildResultRssAction extends ProjectActionSupport
             SyndEntry entry = new SyndEntryImpl();
             SyndContent description = new SyndContentImpl();
             description.setType("text/html");
-            description.setValue("Build " + result.getNumber() + ": " + result.getStateName());
+            description.setValue(renderResult(result));
 
             entry.setDescription(description);
             entries.add(entry);
@@ -117,5 +123,24 @@ public class BuildResultRssAction extends ProjectActionSupport
         // return the requested feed type. at the moment,
         // we only support RSS.
         return "rss";
+    }
+
+    private String renderResult(BuildResult result)
+    {
+        StringWriter w = new StringWriter();
+        buildResultRenderer.render(configurationManager.getAppConfig().getHostName(),
+                result,
+                BuildResultRenderer.TYPE_HTML , w);
+        return w.toString();
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+
+    public void setBuildResultRenderer(BuildResultRenderer buildResultRenderer)
+    {
+        this.buildResultRenderer = buildResultRenderer;
     }
 }
