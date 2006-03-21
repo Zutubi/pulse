@@ -33,23 +33,35 @@ public class RssAcceptanceTest extends BaseAcceptanceTest
 
         login("admin", "admin");
 
-        // navigate to the create project wizard.
-        // fill in the form details.
-        clickLinkWithText("projects");
-        clickLinkWithText("add new project");
-
-        projectName = "project " + RandomUtils.randomString(5);
-        submitProjectBasicsForm(projectName, "test desc", "http://url.com", "cvs", "custom");
-        submitCvsSetupForm(":pserver:someone@somehost.com:/cvsroot", "module", "", "");
-        submitCustomSetupForm("bob.xml");
-        assertTablePresent("project.basics");
+        projectName = createTestProject();
     }
 
     protected void tearDown() throws Exception
     {
         // setup code here..
+        projectName = null;
 
         super.tearDown();
+    }
+
+    /**
+     * Create a test project and returns its name.
+     *
+     * @return name identifying the test project.
+     */
+    protected String createTestProject()
+    {
+        // navigate to the create project wizard.
+        // fill in the form details.
+        clickLinkWithText("projects");
+        clickLinkWithText("add new project");
+
+        String projectName = "project " + RandomUtils.randomString(5);
+        submitProjectBasicsForm(projectName, "test project description", "http://test.project.com", "cvs", "custom");
+        submitCvsSetupForm(":pserver:tester@test.project.com:/cvsroot", "module", "", "");
+        submitCustomSetupForm("bob.xml");
+        assertTablePresent("project.basics");
+        return projectName;
     }
 
     public void testRssFeedGenerationSuccessful() throws IOException, FeedException

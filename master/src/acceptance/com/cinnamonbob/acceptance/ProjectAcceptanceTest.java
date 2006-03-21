@@ -77,20 +77,16 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
         // check validation of field input - name required.
         form.saveFormElements("", null, null);
-
         assertTextPresent("required");
         form.assertFormElements("", TEST_DESCRIPTION, TEST_URL);
 
         // check cancel works.
         form.cancelFormElements(projectName, null, null);
-
-        // assert that the changes just made have been persisted.
         assertProjectBasicsTable(TEST_NAME, TEST_DESCRIPTION, TEST_URL);
 
         // change the name back.
         clickLink("project.basics.edit");
         form.assertFormElements(TEST_NAME, TEST_DESCRIPTION, TEST_URL);
-
         form.saveFormElements(projectName, null, null);
 
         assertProjectBasicsTable(projectName, TEST_DESCRIPTION, TEST_URL);
@@ -98,9 +94,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         // check that we can save without making any changes to the form.
         clickLink("project.basics.edit");
         form.assertFormElements(projectName, TEST_DESCRIPTION, TEST_URL);
-
         form.saveFormElements(null, null, null);
-
         form.assertFormNotPresent();
 
         assertProjectBasicsTable(projectName, TEST_DESCRIPTION, TEST_URL);
@@ -116,7 +110,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         clickLinkWithText("add new project");
 
         String newProject = "project " + RandomUtils.randomString(5);
-        submitProjectBasicsForm(newProject, DESCRIPTION, URL, "cvs", "custom");
+        submitProjectBasicsForm(newProject, "test description", "http://test/url", "cvs", "custom");
         submitCvsSetupForm("/local", "module", "", "");
         submitCustomSetupForm("bob.xml");
 

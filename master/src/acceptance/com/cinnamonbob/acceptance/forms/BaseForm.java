@@ -46,6 +46,12 @@ public abstract class BaseForm
         tester.submit("save");
     }
 
+    public void nextFormElements(String... args)
+    {
+        setFormElements(args);
+        tester.submit("next");
+    }
+
     public void cancelFormElements(String... args)
     {
         setFormElements(args);

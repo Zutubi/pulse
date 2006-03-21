@@ -17,7 +17,8 @@ public abstract class ExtendedWebTestCase extends WebTestCase
     }
 
 
-    public void assertFormElementNotEmpty(String formElementName) {
+    public void assertFormElementNotEmpty(String formElementName)
+    {
         assertFormElementPresent(formElementName);
         String formElementValue = getFormValue(formElementName);
         assertNotNull(formElementValue);
