@@ -9,9 +9,9 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    #wwcform("action=editEmailContactPoint.action" "heading=%{getText('email.edit')}" "method=post")
+    #wwcform("action=editEmailContactPoint.action" "id=email.edit" "heading=%{getText('email.edit')}" "method=post")
         #wwhidden("name=id")
-        #wwhidden("name=user")
+        #wwhidden("name=userId")
         #wwtextfield("name=contact.name" "label=%{getText('contact.name')}" "required=true" "size=60" "tabindex=1")
         #wwtextfield("name=contact.email" "label=%{getText('contact.email')}" "required=true" "size=60" "tabindex=2")
         #wwradio("name=contact.type" "label=%{getText('contact.format')}"  "list={'html', 'plain'}" "tabindex=3")

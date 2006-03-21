@@ -8,6 +8,9 @@ import net.sourceforge.jwebunit.WebTester;
 public abstract class BaseForm
 {
     protected final WebTester tester;
+    protected static final int TEXTFIELD = 3;
+    protected static final int CHECKBOX = 4;
+    protected static final int RADIOBOX = 5;
 
     public BaseForm(WebTester tester)
     {
@@ -26,6 +29,16 @@ public abstract class BaseForm
 
     public abstract String getFormName();
     public abstract String[] getFieldNames();
+
+    public int[] getFieldTypes()
+    {
+        int[] types = new int[getFieldNames().length];
+        for (int i = 0; i < types.length; i++)
+        {
+            types[i] = TEXTFIELD;
+        }
+        return types;
+    }
 
     public void saveFormElements(String... args)
     {
@@ -46,13 +59,29 @@ public abstract class BaseForm
     {
         tester.assertFormPresent(getFormName());
         tester.setWorkingForm(getFormName());
-        for (int i = 0; i < getFieldNames().length; i++)
+
+        int[] types = getFieldTypes();
+        for (int i = 0; i < types.length; i++)
         {
-            String field = getFieldNames()[i];
-            String value = values[i];
-            if (value != null)
+            switch (types[i])
             {
-                tester.setFormElement(field, value);
+                case TEXTFIELD:
+                    if (values[i] != null)
+                    {
+                        tester.setFormElement(getFieldNames()[i], values[i]);
+                    }
+                    break;
+                case CHECKBOX:
+                    setCheckboxChecked(getFieldNames()[i], Boolean.valueOf(values[i]));
+                    break;
+                case RADIOBOX:
+                    if (values[i] != null)
+                    {
+                        setRadioboxSelected(getFieldNames()[i], values[i]);
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -61,12 +90,35 @@ public abstract class BaseForm
     {
         tester.assertFormPresent(getFormName());
         tester.setWorkingForm(getFormName());
-        for (int i = 0; i < getFieldNames().length; i++)
+
+        int[] types = getFieldTypes();
+        for (int i = 0; i < types.length; i++)
         {
-            String field = getFieldNames()[i];
-            String value = values[i];
-            tester.assertFormElementEquals(field, value);
+            switch (types[i])
+            {
+                case TEXTFIELD:
+                    tester.assertFormElementEquals(getFieldNames()[i], values[i]);
+                    break;
+                case CHECKBOX:
+                    assertCheckboxChecked(getFieldNames()[i], Boolean.valueOf(values[i]));
+                    break;
+                case RADIOBOX:
+                    assertRadioboxSelected(getFieldNames()[i], values[i]);
+                    break;
+                default:
+                    break;
+            }
         }
+    }
+
+    public void setRadioboxSelected(String fieldName, String selectedOption)
+    {
+        tester.setFormElement(fieldName, selectedOption);
+    }
+
+    public void assertRadioboxSelected(String fieldName, String option)
+    {
+        tester.assertRadioOptionSelected(fieldName, option);
     }
 
     public void setCheckboxChecked(String name, boolean b)

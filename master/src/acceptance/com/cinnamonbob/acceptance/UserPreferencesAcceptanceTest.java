@@ -3,6 +3,7 @@ package com.cinnamonbob.acceptance;
 import com.cinnamonbob.core.util.RandomUtils;
 import com.cinnamonbob.acceptance.forms.EditUserForm;
 import com.cinnamonbob.acceptance.forms.EditPasswordForm;
+import com.cinnamonbob.acceptance.forms.EmailContactForm;
 
 /**
  *
@@ -61,30 +62,6 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         assertTableRowsEqual("contacts", 1, new String[][]{
                 new String[]{"name", "uid", "actions"},
                 new String[]{CREATE_CONTACT_LINK, CREATE_CONTACT_LINK, CREATE_CONTACT_LINK}
-        });
-
-        // test creation of a contact point.
-        assertLinkPresentWithText(CREATE_CONTACT_LINK);
-
-        clickLinkWithText(CREATE_CONTACT_LINK);
-        assertFormPresent(CONTACT_CREATE);
-
-        setWorkingForm(CONTACT_CREATE);
-        setFormElement(CONTACT_CREATE_TYPE, "email");
-        submit("next");
-
-        assertFormPresent(EMAIL_CREATE);
-        setWorkingForm(EMAIL_CREATE);
-        setFormElement(EMAIL_CREATE_NAME, "home");
-        setFormElement(EMAIL_CREATE_EMAIL, "user@example.com");
-        submit("next");
-
-        // assert that the contact appears as expected.
-        assertTablePresent("contacts");
-        assertTableRowsEqual("contacts", 1, new String[][]{
-                new String[]{"name", "uid", "actions", "actions"},               // header row
-                new String[]{"home", "user@example.com", "edit", "delete"},     // name row
-                new String[]{CREATE_CONTACT_LINK, CREATE_CONTACT_LINK, CREATE_CONTACT_LINK, CREATE_CONTACT_LINK}
         });
 
 
@@ -276,6 +253,65 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
                 new String[]{msg, msg, msg, msg}
         });
         */
+    }
+
+    public void testCreateContactPoint()
+    {
+        // test creation of a contact point.
+        assertLinkPresentWithText(CREATE_CONTACT_LINK);
+
+        createEmailContactPoint("home", "user@example.com");
+
+        // assert that the contact appears as expected.
+        assertTablePresent("contacts");
+        assertTableRowsEqual("contacts", 1, new String[][]{
+                new String[]{"name", "uid", "actions", "actions"},               // header row
+                new String[]{"home", "user@example.com", "edit", "delete"},     // name row
+                new String[]{CREATE_CONTACT_LINK, CREATE_CONTACT_LINK, CREATE_CONTACT_LINK, CREATE_CONTACT_LINK}
+        });
+    }
+
+    private void createEmailContactPoint(String name, String email)
+    {
+        clickLinkWithText(CREATE_CONTACT_LINK);
+        assertFormPresent(CONTACT_CREATE);
+
+        setWorkingForm(CONTACT_CREATE);
+        setFormElement(CONTACT_CREATE_TYPE, "email");
+        submit("next");
+
+        assertFormPresent(EMAIL_CREATE);
+        setWorkingForm(EMAIL_CREATE);
+        setFormElement(EMAIL_CREATE_NAME, name);
+        setFormElement(EMAIL_CREATE_EMAIL, email);
+        submit("next");
+    }
+
+    public void testEditContactPoint()
+    {
+        // create a contact point.
+        assertLinkPresentWithText(CREATE_CONTACT_LINK);
+        createEmailContactPoint("home", "user@example.com");
+
+        // edit the contact point.
+        assertLinkPresent("edit_home");
+        clickLink("edit_home");
+
+        EmailContactForm form = new EmailContactForm(tester);
+        form.assertFormElements("home", "user@example.com", "html");
+        form.saveFormElements("newHome", "anotherUser@example.com", "plain");
+
+        // ensure that we have correctly changed the email contact.
+        assertLinkPresent("edit_newHome");
+        assertLinkNotPresent("edit_home");
+
+        // assert that the contact appears as expected.
+        assertTablePresent("contacts");
+        assertTableRowsEqual("contacts", 1, new String[][]{
+                new String[]{"name", "uid", "actions", "actions"},
+                new String[]{"newHome", "anotherUser@example.com", "edit", "delete"},
+                new String[]{CREATE_CONTACT_LINK, CREATE_CONTACT_LINK, CREATE_CONTACT_LINK, CREATE_CONTACT_LINK}
+        });
     }
 
     private void navigateToPreferences()
