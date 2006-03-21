@@ -3,7 +3,8 @@
 <xwork>
     <package name="webwork-default-package">
         <result-types>
-            <result-type name="dispatcher" class="com.opensymphony.webwork.dispatcher.ServletDispatcherResult" default="true"/>
+            <result-type name="dispatcher" class="com.opensymphony.webwork.dispatcher.ServletDispatcherResult"
+                         default="true"/>
             <result-type name="redirect" class="com.opensymphony.webwork.dispatcher.ServletRedirectResult"/>
             <result-type name="velocity" class="com.opensymphony.webwork.dispatcher.VelocityResult"/>
             <result-type name="chain" class="com.opensymphony.xwork.ActionChainResult"/>
@@ -13,6 +14,7 @@
             <result-type name="httpheader" class="com.opensymphony.webwork.dispatcher.HttpHeaderResult"/>
             <result-type name="stream" class="com.opensymphony.webwork.dispatcher.StreamResult"/>
             <result-type name="velocity-xml" class="com.cinnamonbob.xwork.dispatcher.VelocityXmlResult"/>
+            <result-type name="rss" class="com.cinnamonbob.xwork.results.RssResult"/>
         </result-types>
 
         <interceptors>
@@ -23,12 +25,14 @@
             <interceptor name="params" class="com.opensymphony.xwork.interceptor.ParametersInterceptor"/>
             <interceptor name="model-driven" class="com.opensymphony.xwork.interceptor.ModelDrivenInterceptor"/>
             <interceptor name="token" class="com.opensymphony.webwork.interceptor.TokenInterceptor"/>
-            <interceptor name="token-session" class="com.opensymphony.webwork.interceptor.TokenSessionStoreInterceptor"/>
+            <interceptor name="token-session"
+                         class="com.opensymphony.webwork.interceptor.TokenSessionStoreInterceptor"/>
             <interceptor name="validation" class="com.opensymphony.xwork.validator.ValidationInterceptor"/>
             <interceptor name="workflow" class="com.opensymphony.xwork.interceptor.DefaultWorkflowInterceptor"/>
             <interceptor name="servlet-config" class="com.opensymphony.webwork.interceptor.ServletConfigInterceptor"/>
             <interceptor name="prepare" class="com.opensymphony.xwork.interceptor.PrepareInterceptor"/>
-            <interceptor name="conversionError" class="com.opensymphony.webwork.interceptor.WebWorkConversionErrorInterceptor"/>
+            <interceptor name="conversionError"
+                         class="com.opensymphony.webwork.interceptor.WebWorkConversionErrorInterceptor"/>
             <interceptor name="fileUpload" class="com.opensymphony.webwork.interceptor.FileUploadInterceptor"/>
             <interceptor name="execAndWait" class="com.opensymphony.webwork.interceptor.ExecuteAndWaitInterceptor"/>
             <interceptor name="cancel" class="com.cinnamonbob.xwork.interceptor.CancelWorkflowInterceptor"/>
@@ -143,5 +147,13 @@
                 <interceptor-ref name="params"/>
             </interceptor-stack>
         </interceptors>
+
+        <!-- shorthand for rss results. -->
+        <global-results>
+            <result type="rss" name="rss">
+                <param name="location">rss_2.0</param>
+            </result>
+        </global-results>
+
     </package>
 </xwork>

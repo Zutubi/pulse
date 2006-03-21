@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="jdom" revision="1.0" module="jdom" status="release">
+        <license name="JDom License"/>
+        <description homepage="http://www.jdom.org/">
+            Java-based solution for accessing, manipulating, and outputting
+            XML data from Java code.
+        </description>
+    </info>
+
+    <publications>
+        <artifact name="jdom" type="jar"/>
+    </publications>
+
+</ivy-module>

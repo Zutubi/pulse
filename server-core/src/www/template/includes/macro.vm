@@ -318,6 +318,25 @@
 #end
 
 ##
+## Outputs a heading cell for a search table.
+##
+#macro(searchHeadingRow $key $span $searchUrl $searchId $rssUrl $rssId)
+    <tr>
+        <th class="heading" colspan="$span">
+            <span class="action">
+            #if($searchUrl)
+                <a #if($searchId != "")id="$searchId"#end href="$searchUrl"><img alt="$action.getText('search')" src="/images/zoom.gif"/>#wwtext("name=search")</a>
+            #end
+            #if($rssUrl)
+                <a #if($rssId != "")id="$rssId"#end href="$rssUrl"><img alt="$action.getText('rss')" src="/images/rss.gif"/>#wwtext("name=rss")</a>
+            #end
+            </span>
+            #wwtext("name=$key")
+        </th>
+    </tr>
+#end
+
+##
 ## Outputs a heading cell for a content table
 ##
 #macro(contentHeading $key $span)

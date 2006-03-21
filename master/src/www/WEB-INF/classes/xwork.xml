@@ -470,6 +470,8 @@
             <result name="success" type="redirect">/serverStatus.action</result>
         </action>
 
+        <action name="rss" class="com.cinnamonbob.web.rss.BuildResultRssAction"/>
+
     </package>
 
     <package name="user" namespace="/user" extends="webwork-default-package">
