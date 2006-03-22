@@ -10,6 +10,7 @@ import java.io.*;
 
 /**
  * The Log Configuration Manager handles the systems logging configuration.
+ * 
  */
 public class LogConfigurationManager
 {

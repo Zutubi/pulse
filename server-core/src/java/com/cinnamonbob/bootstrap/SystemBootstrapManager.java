@@ -3,8 +3,6 @@ package com.cinnamonbob.bootstrap;
 import com.cinnamonbob.freemarker.CustomFreemarkerManager;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,28 +53,6 @@ public class SystemBootstrapManager
     public void bootstrapSystem()
     {
         loadBootstrapContext();
-
-        // Now we know where the system path is, add a file handler.
-        try
-        {
-            ConfigurationManager configManager = (ConfigurationManager) ComponentContext.getBean(CONFIGURATION_MANAGER_BEAN);
-            SystemPaths systemPaths = configManager.getSystemPaths();
-            // ensure that the directory exists.
-
-            File logRoot = systemPaths.getLogRoot();
-            if (!logRoot.exists() && !logRoot.mkdirs())
-            {
-                throw new IOException("Unable to create log directory '" + logRoot + "'. Please check that you have " +
-                        "permissions to create this directory.");
-            }
-            FileHandler handler = new FileHandler(logRoot.getAbsolutePath() + "/cinnabo%u.log");
-            handler.setLevel(Level.INFO);
-            Logger.getLogger("").addHandler(handler);
-        }
-        catch (IOException e)
-        {
-            throw new StartupException("Unable to configure logging: " + e.getMessage(), e);
-        }
 
         CustomFreemarkerManager.initialiseLogging();
 
