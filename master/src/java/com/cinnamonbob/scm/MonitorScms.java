@@ -1,19 +1,18 @@
 package com.cinnamonbob.scm;
 
 import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.events.EventManager;
+import com.cinnamonbob.model.Cvs;
 import com.cinnamonbob.model.Scm;
 import com.cinnamonbob.model.ScmManager;
-import com.cinnamonbob.model.Cvs;
 import com.cinnamonbob.scheduling.Task;
 import com.cinnamonbob.scheduling.TaskExecutionContext;
-import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.scm.cvs.CvsServer;
+import com.cinnamonbob.util.logging.Logger;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Date;
 
 /**
  * <class-comment/>
@@ -27,16 +26,17 @@ public class MonitorScms implements Task
     private ScmManager scmManager;
     private EventManager eventManager;
 
+    //TODO: Add some form of profiling to monitor the amount of time spent 'checking scms'.
+    //TODO: This could be a resource drain so we also need to make sure that this is
+    //TODO: not run within a transaction and NOT being run more then once at a time.
+
+    //TODO: may be useful to track the amount of time its tacking to 'check scms' and record
+    //TODO: this for profiling...
+
     public void execute(TaskExecutionContext context)
     {
-        //TODO: Add some form of profiling to monitor the amount of time spent 'checking scms'.
-        //TODO: This could be a resource drain so we also need to make sure that this is
-        //TODO: not run within a transaction and NOT being run more then once at a time.
+        LOG.entering(MonitorScms.class.getName(), "execute");
 
-        //TODO: may be useful to track the amount of time its tacking to 'check scms' and record
-        //TODO: this for profiling...
-
-        LOG.info("checking scms for changes.");
         for (Scm scm : scmManager.getActiveScms())
         {
             try
@@ -54,6 +54,7 @@ public class MonitorScms implements Task
                 // if scm is cvs, then we implement a quiet period.
                 if (server.hasChangedSince(previous))
                 {
+                    LOG.finer("server has changed since " + previous);
                     if (scm instanceof Cvs)
                     {
                         Date latestUpdate = ((CvsServer)server).getLatestUpdate(null, previous.getDate());
@@ -62,6 +63,7 @@ public class MonitorScms implements Task
                         if (now - latestUpdate.getTime() > ((Cvs)scm).getQuietPeriod())
                         {
                             Revision latest = server.getLatestRevision();
+                            LOG.finer("publishing scm change event for " + scm + " revision " + latest);
                             eventManager.publish(new SCMChangeEvent(scm, latest, previous));
                             latestRevisions.put(scm.getId(), latest);
                         }
@@ -69,6 +71,7 @@ public class MonitorScms implements Task
                     else
                     {
                         Revision latest = server.getLatestRevision();
+                        LOG.finer("publishing scm change event for " + scm + " revision " + latest);
                         eventManager.publish(new SCMChangeEvent(scm, latest, previous));
                         latestRevisions.put(scm.getId(), latest);
                     }
@@ -76,9 +79,14 @@ public class MonitorScms implements Task
             }
             catch (SCMException e)
             {
-                LOG.severe(e);
+                // there has been a problem communicating with one of the scms. Log the
+                // warning and move on.
+                // This needs to be brought to the attention of the user since its likely to
+                // be the result of a configuration problem.
+                LOG.warning(e.getMessage());
             }
         }
+        LOG.exiting(MonitorScms.class.getName(), "execute");
     }
 
     /**

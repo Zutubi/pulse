@@ -17,7 +17,7 @@ public class FileConfig
     private ConfigurationManager configManager;
     private static final int APPROX_FILESIZE_LIMIT = 1000000;
     private static final int FILE_ROLL_COUNT = 20;
-    private static final boolean APPEND = false;
+    private static final boolean APPEND = true;
 
     public FileConfig() throws IOException
     {

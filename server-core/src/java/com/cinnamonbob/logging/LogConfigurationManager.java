@@ -2,11 +2,14 @@ package com.cinnamonbob.logging;
 
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.util.logging.Logger;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.logging.LogManager;
 import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Enumeration;
+import java.util.logging.LogManager;
 
 /**
  * The Log Configuration Manager handles the systems logging configuration.
@@ -58,6 +61,25 @@ public class LogConfigurationManager
         {
             in = new FileInputStream(configFile);
             LogManager.getLogManager().readConfiguration(in);
+            IOUtils.close(in);
+            in = new FileInputStream(configFile);
+
+            // the loaded configurations are only applied to pre-existing loggers. Therefore,
+            // if we want 'virtual' .level configurations to work, we need to ensure that those
+            // loggers exist.
+            Properties props = new Properties();
+            props.load(in);
+            Enumeration propertyNames = props.propertyNames();
+            while (propertyNames.hasMoreElements())
+            {
+                String propertyName = (String) propertyNames.nextElement();
+                if (propertyName.endsWith(".level"))
+                {
+                    // warm up the logger.
+                    Logger.getLogger(propertyName.substring(0, propertyName.length() - 6));
+                }
+            }
+
         }
         catch (IOException e)
         {

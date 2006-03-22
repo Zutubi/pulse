@@ -77,9 +77,19 @@ public class Logger
         fine(msg, null);
     }
 
+    public void fine(String msg, Throwable t)
+    {
+        delegate.logp(Level.FINE, source, "", msg, t);
+    }
+
     public void finer(String msg)
     {
         finer(msg, null);
+    }
+
+    public void finer(String msg, Throwable t)
+    {
+        delegate.logp(Level.FINER, source, "", msg, t);
     }
 
     public void finest(String msg)
@@ -95,16 +105,6 @@ public class Logger
     public void finest(String msg, Throwable t)
     {
         delegate.logp(Level.FINEST, source, "", msg, t);
-    }
-
-    public void finer(String msg, Throwable t)
-    {
-        delegate.logp(Level.FINER, source, "", msg, t);
-    }
-
-    public void fine(String msg, Throwable t)
-    {
-        delegate.logp(Level.FINE, source, "", msg, t);
     }
 
     public void debug(String msg)
@@ -144,5 +144,20 @@ public class Logger
     public boolean isLoggable(Level level)
     {
         return delegate.isLoggable(level);
+    }
+
+    public void entering(String sourceClass, String sourceMethod)
+    {
+        delegate.entering(sourceClass, sourceMethod);
+    }
+
+    public void exiting(String sourceClass, String sourceMethod)
+    {
+        delegate.exiting(sourceClass, sourceMethod);
+    }
+
+    public void exiting(String sourceClass, String sourceMethod, Object result)
+    {
+        delegate.exiting(sourceClass, sourceMethod, result);
     }
 }

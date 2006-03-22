@@ -26,6 +26,7 @@ import org.netbeans.lib.cvsclient.connection.Connection;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Allows for the system to interact with a cvs repository.
@@ -228,7 +229,16 @@ public class CvsClient
      */
     public boolean hasChangedSince(String module, String branch, Date since) throws SCMException
     {
-        return getLastUpdate(module, branch, since) != null;
+        if (LOG.isLoggable(Level.FINER))
+        {
+            LOG.entering(CvsClient.class.getName(), "hasChangedSince("+module+", "+branch+", "+CVSDATE.format(since)+")");
+        }
+        boolean result = getLastUpdate(module, branch, since) != null;
+        if (LOG.isLoggable(Level.FINER))
+        {
+            LOG.exiting(CvsClient.class.getName(), "hasChangedSince", result);
+        }
+        return result;
     }
 
     /**
