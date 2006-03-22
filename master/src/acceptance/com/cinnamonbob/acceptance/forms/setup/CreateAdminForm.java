@@ -20,6 +20,6 @@ public class CreateAdminForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"bobHome"};
+        return new String[]{"admin.login", "admin.name", "admin.password", "confirm"};
     }
 }
