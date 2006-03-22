@@ -32,14 +32,14 @@ public class LogConfigurationManager
         {
             public boolean accept(File dir, String name)
             {
-                return name.endsWith(".properties");
+                return name.startsWith("logging") && name.endsWith(".properties");
             }
         });
 
         List<String> configs = new LinkedList<String>();
         for (String filename : filenames)
         {
-            configs.add(filename.substring(0, filename.lastIndexOf(".")));
+            configs.add(filename.substring(8, filename.lastIndexOf(".")));
         }
         return configs;
     }
@@ -50,7 +50,7 @@ public class LogConfigurationManager
     public void updateConfiguration(String config)
     {
         // load requested file.
-        File configFile = new File(logConfigDir, config + ".properties");
+        File configFile = new File(logConfigDir, "logging." + config + ".properties");
         if (!configFile.exists() || !configFile.canRead())
         {
             throw new IllegalArgumentException("invalid logging configuration '"+config+"'");
