@@ -17,7 +17,9 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     void save(CommandResult result);
 
-    List<BuildResult> findLatestByProject(final Project project, final int max);
+    List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] specs, long earliestStartTime, long latestStartTime, int first, int max, boolean mostRecentFirst);
+
+    List<BuildResult> findLatestByProject(Project project, int max);
 
     List<BuildResult> findLatestByProject(Project project, int first, int max);
 
@@ -40,4 +42,6 @@ public interface BuildResultDao extends EntityDao<BuildResult>
     int getBuildCount(Project project, ResultState[] states, String spec);
 
     List<String> findAllSpecifications(Project project);
+
+    List<String> findAllSpecificationsForProjects(Project[] projects);
 }

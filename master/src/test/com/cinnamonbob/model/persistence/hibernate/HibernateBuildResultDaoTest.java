@@ -1,6 +1,5 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
-import com.cinnamonbob.core.FileArtifact;
 import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.BuildResultDao;
@@ -13,8 +12,7 @@ import java.util.List;
 
 
 /**
- * 
- *
+ * See also the BuildQueryTest.
  */
 public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 {

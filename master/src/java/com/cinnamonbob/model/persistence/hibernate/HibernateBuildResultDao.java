@@ -21,6 +21,7 @@ import java.util.List;
 public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> implements BuildResultDao
 {
     private static final Logger LOG = Logger.getLogger(HibernateEntityDao.class);
+    private static final String SPEC_QUERY = "select distinct model.buildSpecification from BuildResult model";
 
     @Override
     public Class persistentClass()
@@ -173,13 +174,72 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("select distinct model.buildSpecification from BuildResult model where model.project = :project");
+                Query queryObject = session.createQuery(SPEC_QUERY + " where model.project = :project");
                 queryObject.setEntity("project", project);
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.list();
             }
         });
+    }
 
+    public List<String> findAllSpecificationsForProjects(final Project[] projects)
+    {
+        return (List<String>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject;
+
+                if(projects == null)
+                {
+                    queryObject = session.createQuery(SPEC_QUERY);
+                }
+                else
+                {
+                    queryObject = session.createQuery(SPEC_QUERY + " where model.project in (:projects)");
+                    queryObject.setParameterList("projects", projects);
+                }
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.list();
+            }
+        });
+    }
+
+    public List<BuildResult> queryBuilds(final Project[] projects, final ResultState[] states, final String[] specs, final long earliestStartTime, final long latestStartTime, final int first, final int max, final boolean mostRecentFirst)
+    {
+        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = session.createCriteria(BuildResult.class);
+                addProjectsToCriteria(projects, criteria);
+                addStatesToCriteria(states, criteria);
+                addSpecsToCriteria(specs, criteria);
+                addDatesToCriteria(earliestStartTime, latestStartTime, criteria);
+
+                if(first >= 0)
+                {
+                    criteria.setFirstResult(first);
+                }
+
+                if(max >= 0)
+                {
+                    criteria.setMaxResults(max);
+                }
+                
+                if(mostRecentFirst)
+                {
+                    criteria.addOrder(Order.desc("id"));
+                }
+                else
+                {
+                    criteria.addOrder(Order.asc("id"));
+                }
+
+                return criteria.list();
+            }
+        });
     }
 
     private Criteria getBuildResultCriteria(Session session, Project project, ResultState[] states, String spec)
@@ -187,6 +247,27 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         Criteria criteria = session.createCriteria(BuildResult.class);
         criteria.add(Expression.eq("project", project));
 
+        addStatesToCriteria(states, criteria);
+
+        if (spec != null)
+        {
+            criteria.add(Expression.eq("buildSpecification", spec));
+        }
+
+        SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
+        return criteria;
+    }
+
+    private void addProjectsToCriteria(Project[] projects, Criteria criteria)
+    {
+        if(projects != null)
+        {
+            criteria.add(Expression.in("project", projects));
+        }
+    }
+
+    private void addStatesToCriteria(ResultState[] states, Criteria criteria)
+    {
         if (states != null)
         {
             String[] stateNames = new String[states.length];
@@ -197,14 +278,27 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
             criteria.add(Expression.in("stateName", stateNames));
         }
+    }
 
-        if (spec != null)
+    private void addSpecsToCriteria(String[] specs, Criteria criteria)
+    {
+        if(specs != null)
         {
-            criteria.add(Expression.eq("buildSpecification", spec));
+            criteria.add(Expression.in("buildSpecification", specs));
+        }
+    }
+
+    private void addDatesToCriteria(long earliestStartTime, long latestStartTime, Criteria criteria)
+    {
+        if(earliestStartTime > 0)
+        {
+            criteria.add(Expression.ge("stamps.startTime", earliestStartTime));
         }
 
-        SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
-        return criteria;
+        if(latestStartTime > 0)
+        {
+            criteria.add(Expression.le("stamps.startTime", latestStartTime));
+        }
     }
 
     public void save(RecipeResultNode node)
