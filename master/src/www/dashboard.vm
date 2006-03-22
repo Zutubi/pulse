@@ -31,7 +31,7 @@
         #set($cssClass = $build.state.string)
         <tr>
             <td class="content"><a href="currentBuild.action?id=$project.id">$!webwork.htmlEncode($project.name)</a></td>
-            <td class="$cssClass"><a href="viewBuild.action?id=$build.id">$build.number</td>
+            <td class="${cssClass}-right"><a href="viewBuild.action?id=$build.id">$build.number</td>
             #statusCell($build)
             #rightCell($changelist.revision)
             #dynamicCell($changelist.prettyDate)

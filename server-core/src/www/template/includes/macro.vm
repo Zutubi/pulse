@@ -748,7 +748,7 @@
 ##
 ## Shows a summary for a recipe result
 ##
-#macro(recipeSummary $resultNode $project)
+#macro(recipeSummary $resultNode $build)
     <table class="content">
         #headingRow("recipe" 5)
         <tr>
@@ -762,12 +762,29 @@
             #set($id = $resultNode.id)
             #set($result = $resultNode.result)
             #set($cssClass = $result.state.string)
-            #contentCell($result.recipeNameSafe)
+            #dynamicCell($result.recipeNameSafe)
             #statusCell($result)
             #classCell($result.stamps.prettyStartTime)
             #classCell($result.stamps.prettyElapsed)
-##            #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$project.id")
+##            #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$build.project.id")
         </tr>
+#if($result.commandResults.size() > 0)
+        <tr>
+            #contentHeading("command.name" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
+        </tr>
+    #foreach($command in $result.commandResults)
+        <tr>
+            #set($cssClass = $command.state.string)
+            #dynamicLinkCell($command.commandName "viewCommandLog.action?id=$build.id#command-$velocityCount")
+            #statusCell($command)
+            #classCell($command.stamps.prettyStartTime)
+            #classCell($command.stamps.prettyElapsed)
+        </tr>
+    #end
+#end
     </table>
 #end
 
@@ -1028,7 +1045,7 @@
 #macro(showBuild $buildResult $showActions)
     <table>
         <tr><td>
-            <table class="content">
+            <table class="fill-content">
                 #headingRow("build.summary" 11)
                 <tr>
                     #contentHeading("build.id" 1)
@@ -1059,7 +1076,7 @@
         </td></tr>
     #if($buildResult.hasMessages($errorLevel) || $buildResult.hasMessages($warningLevel))
         <tr><td>
-            <table class="content" width="100%">
+            <table class="fill-content">
                 #headingRow("build.features" 1)
                <tr>
                    <td class="content">
@@ -1076,7 +1093,7 @@
 ##                <tr>
 ##                    <td class="content">
     #if($buildResult.root.children.size() > 0)
-                          #recipeSummary($buildResult.root.children.get(0) $project)
+                          #recipeSummary($buildResult.root.children.get(0) $buildResult)
     #end
 ##                    </td>
 ##                </tr>
