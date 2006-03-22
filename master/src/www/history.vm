@@ -41,7 +41,7 @@
     #foreach($buildResult in $history)
             #set($cssClass = $buildResult.state.string)
         <tr>
-            <td class="content"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
+            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
             #statusCell($buildResult)
             #classCell($buildResult.buildSpecification)
             #classCell($buildResult.stamps.prettyStartTime)
@@ -115,8 +115,8 @@
         #end
                     </td>
                 </tr>
-                <tr><th colspan="5">$action.getText("history.count", ["$historyCount"])</td></tr>
     #end
+                <tr><th colspan="5">$action.getText("history.count", ["$historyCount"])</td></tr>
             </table>
 
             </td>

@@ -1045,7 +1045,7 @@
 #macro(showBuild $buildResult $showActions)
     <table>
         <tr><td>
-            <table class="fill-content">
+            <table class="content">
                 #headingRow("build.summary" 11)
                 <tr>
                     #contentHeading("build.id" 1)
