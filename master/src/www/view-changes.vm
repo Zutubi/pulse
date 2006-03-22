@@ -29,7 +29,7 @@
             #contentHeading("actions" 1)
         </tr>
         <tr>
-            #dynamicCell($change.revision)
+            #rightCell($change.revision)
             #dynamicCell($change.user)
             #dynamicCell($change.prettyDate)
             #dynamicCell($action.trimmedString($change.comment, 60))
@@ -49,7 +49,7 @@
             #end
             #foreach($i in [0..$limit])
                 #set($file = $change.changes.get($i))
-                    <li>$!webwork.htmlEncode($file.filename) #$file.revision - $file.action</li>
+                    <li>$!webwork.htmlEncode($file.filename) #$file.revision - $file.action.toString().toLowerCase()</li>
             #end
             #if($remaining > 0)
                     <li>... ($remaining #wwtext("name=changes.more.files"))</li>

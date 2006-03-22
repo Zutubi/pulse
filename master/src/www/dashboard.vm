@@ -33,7 +33,7 @@
             <td class="content"><a href="currentBuild.action?id=$project.id">$!webwork.htmlEncode($project.name)</a></td>
             <td class="$cssClass"><a href="viewBuild.action?id=$build.id">$build.number</td>
             #statusCell($build)
-            #dynamicCell($changelist.revision)
+            #rightCell($changelist.revision)
             #dynamicCell($changelist.prettyDate)
             #dynamicCell($action.trimmedString($changelist.comment, 60))
             #linkCell("view" "viewChangelist.action?id=$changelist.id")

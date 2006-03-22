@@ -50,9 +50,9 @@
         #set($build = $changeBuilds.get($index))
         #set($cssClass = $build.state.string)
         <tr>
-            <td class="$cssClass"><a href="viewBuild.action?id=$build.id">$build.number</td>
+            <td class="${cssClass}-right"><a href="viewBuild.action?id=$build.id">$build.number</td>
             #statusCell($build)
-            #dynamicCell($changelist.revision)
+            #rightCell($changelist.revision)
             #dynamicCell($changelist.user)
             #dynamicCell($changelist.prettyDate)
             #dynamicCell($action.trimmedString($changelist.comment, 60))

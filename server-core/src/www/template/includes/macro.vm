@@ -351,6 +351,13 @@
 #end
 
 ##
+## Outputs a right-aligned cell for a content table
+##
+#macro(rightCell $cc)
+    <td class="content-right">$cc</td>
+#end
+
+##
 ## Outputs a heading cell for a content table with the given dynamic content,
 ## which should be escaped
 ##
@@ -496,6 +503,13 @@
 ##
 #macro(classCell $content)
     <td class="$cssClass">$!webwork.htmlEncode($content)</td>
+#end
+
+##
+## Outputs a right aligned table cell with class based on $cssClass
+##
+#macro(rightClassCell $content)
+    <td class="${cssClass}-right">$!webwork.htmlEncode($content)</td>
 #end
 
 ##
@@ -1028,7 +1042,7 @@
                 </tr>
                 <tr>
                     #set($cssClass = $buildResult.state.string)
-                    #contentCell($buildResult.number)
+                    #rightCell($buildResult.number)
                     #statusCell($buildResult)
                     #classCell($buildResult.buildSpecification)
                     #classCell($buildResult.stamps.prettyStartTime)
@@ -1120,7 +1134,7 @@
 
             #statusCell($lastResult)
             #classCell($lastResult.stamps.prettyStartTime)
-            #classCell($lastResult.number)
+            #rightClassCell($lastResult.number)
             #classCell($lastResult.buildSpecification)
             #classCell($lastResult.stamps.prettyElapsed)
             #viewCell($project $lastResult)

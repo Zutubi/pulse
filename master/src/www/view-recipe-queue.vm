@@ -56,7 +56,7 @@
         <tr>
             #dynamicLinkCell($project.name "currentBuild.action?id=$project.id")
             #if($action.hasBuild($project))
-                #contentCell($action.getBuild($project).number)
+                #rightCell($action.getBuild($project).number)
             #else
                 #contentCell("build.pending")
             #end
@@ -99,7 +99,7 @@
         #set($project = $build.project)
         <tr>
             #dynamicLinkCell($project.name "currentBuild.action?id=$project.id")
-            #contentCell($build.number)
+            #rightCell($build.number)
             #dynamicCell($build.buildSpecification)
             #contentCell($dispatchRequest.prettyQueueTime)
         </tr>

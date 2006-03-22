@@ -25,8 +25,8 @@
 #foreach($file in $changelist.changes)
         <tr>
             #dynamicCell($file.filename)
-            #dynamicCell($file.revision)
-            #dynamicCell($file.action)
+            #rightCell($file.revision)
+            #dynamicCell($file.action.toString().toLowerCase())
         </tr>
 #end
     </table>
