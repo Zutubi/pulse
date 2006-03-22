@@ -102,8 +102,8 @@ public class BuildResultRssAction extends ProjectActionSupport
 
         // set Title, Description and Link
         feed.setTitle("build results for " + project.getName());
-        feed.setDescription("this feed contains the build results for the " + project.getName() + " project.");
-        feed.setLink(configurationManager.getAppConfig().getHostName());
+        feed.setDescription("this feed contains the latest build results for the " + project.getName() + " project.");
+        feed.setLink("http://" + configurationManager.getAppConfig().getHostName() +"/currentBuild.action?id=" + project.getId());
 
         List<SyndEntry> entries = new LinkedList<SyndEntry>();
         for (BuildResult result : page.getResults())
