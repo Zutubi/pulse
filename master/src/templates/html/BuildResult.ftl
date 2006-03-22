@@ -154,7 +154,7 @@ pre.feature {
             [@linkCell cc="working copy" url="http://${hostname}/browseProjectDir.action?buildId=${result.id?c}&amp;recipeId=${result.root.children[0].result.id?c}"/]
         </tr>
     </table>
-</tr></td>
+</td></tr>
 
 [#if result.scmDetails?exists]
     [#assign changes = result.scmDetails.changelists]
@@ -188,7 +188,7 @@ pre.feature {
         <tr>
     [/#if]
     </table>
-</tr></td>
+</td></tr>
 [/#if]
 
 [#if result.hasMessages(errorLevel) || result.hasMessages(warningLevel)]
@@ -206,7 +206,7 @@ pre.feature {
             </td>
         </tr>
     </table>
-</tr></td>
+</td></tr>
 [/#if]
 </table>
 </body>
