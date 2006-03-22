@@ -53,6 +53,8 @@ public class DefaultTriggerHandlerTest extends BobTestCase
 
         assertEquals(0, a.getTriggerCount());
         fire(a);
+        pause(100);
+
         assertEquals(1, a.getTriggerCount());
         fire(a);
         assertEquals(1, a.getTriggerCount());
@@ -61,7 +63,10 @@ public class DefaultTriggerHandlerTest extends BobTestCase
 
         PauseTestTask.unpause();
 
+        assertEquals(1, a.getTriggerCount());
         fire(a);
+        pause(100);
+
         assertEquals(2, a.getTriggerCount());
 
         PauseTestTask.unpause();
@@ -69,6 +74,7 @@ public class DefaultTriggerHandlerTest extends BobTestCase
 
     private void fire(final Trigger trigger)
     {
+        // we want this thread to execute immediately.
         executor.execute(new Runnable()
         {
             public void run()
@@ -83,15 +89,16 @@ public class DefaultTriggerHandlerTest extends BobTestCase
                 }
             }
         });
+    }
+
+    private void pause(long milliseconds)
+    {
         try
         {
-            // we need to sleep to give the thread firing the trigger a chance
-            // to execute.
-            Thread.sleep(50);
+            Thread.sleep(milliseconds);
         }
         catch (InterruptedException e)
         {
-            e.printStackTrace();
         }
     }
 }
