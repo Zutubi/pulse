@@ -34,5 +34,35 @@
             <one-to-many class="com.cinnamonbob.core.model.Feature"/>
         </bag>
 
+        <bag name="tests" cascade="all-delete-orphan" lazy="false">
+            <key column="FILE_ARTIFACT_ID"/>
+            <one-to-many class="com.cinnamonbob.core.model.TestResult"/>
+        </bag>
+    </class>
+
+    <class name="com.cinnamonbob.core.model.TestResult" table="TEST_RESULT" lazy="false">
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="TYPE" type="string"/>
+
+        <property name="name" column="NAME" type="string"/>
+
+        <property name="duration" column="DURATION" type="long"/>
+
+        <subclass name="com.cinnamonbob.core.model.TestCaseResult" discriminator-value="CASE" dynamic-update="false">
+            <property name="statusName" type="string"/>
+
+            <property name="message" type="string"/>
+        </subclass>
+
+        <subclass name="com.cinnamonbob.core.model.TestSuiteResult" discriminator-value="SUITE" dynamic-update="false">
+            <bag name="children" cascade="all-delete-orphan" lazy="false">
+                <key column="SUITE_ID"/>
+                <one-to-many class="com.cinnamonbob.core.model.TestResult"/>
+            </bag>
+        </subclass>
+
     </class>
 </hibernate-mapping>

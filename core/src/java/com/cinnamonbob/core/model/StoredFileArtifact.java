@@ -2,11 +2,11 @@ package com.cinnamonbob.core.model;
 
 import com.cinnamonbob.core.util.FileSystemUtils;
 
+import java.net.URLConnection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.net.URLConnection;
 
 public class StoredFileArtifact extends Entity
 {
@@ -15,6 +15,7 @@ public class StoredFileArtifact extends Entity
     private String path;
     private String type;
     private List<Feature> features;
+    private List<TestResult> tests;
 
     public StoredFileArtifact()
     {
@@ -31,6 +32,7 @@ public class StoredFileArtifact extends Entity
         setPath(path);
         this.type = type;
         features = new LinkedList<Feature>();
+        tests = new LinkedList<TestResult>();
     }
 
     public String getPath()
@@ -132,5 +134,20 @@ public class StoredFileArtifact extends Entity
         }
 
         return false;
+    }
+
+    public List<TestResult> getTests()
+    {
+        return tests;
+    }
+
+    public void setTests(List<TestResult> tests)
+    {
+        this.tests = tests;
+    }
+
+    public void addTest(TestResult test)
+    {
+        tests.add(test);
     }
 }
