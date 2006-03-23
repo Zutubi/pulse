@@ -28,6 +28,13 @@
         </init-param>
     </filter>
 
+<!--
+    <filter>
+        <filter-name>webwork</filter-name>
+        <filter-class>com.opensymphony.webwork.dispatcher.FilterDispatcher</filter-class>
+    </filter>
+
+-->
     <filter-mapping>
         <filter-name>Acegi Session Filter Chain Proxy</filter-name>
         <url-pattern>/*</url-pattern>
@@ -43,6 +50,13 @@
         <url-pattern>/</url-pattern>
     </filter-mapping>
 
+<!--
+    <filter-mapping>
+        <filter-name>webwork</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+-->
     <!--
     This context loader is required by the acegisecurity component.
     -->

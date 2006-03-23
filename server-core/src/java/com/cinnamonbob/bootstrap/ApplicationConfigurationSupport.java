@@ -1,23 +1,23 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.bootstrap.config.Configuration;
-import com.cinnamonbob.bootstrap.config.ConfigurationSupport;
+import com.cinnamonbob.bootstrap.conf.Config;
+import com.cinnamonbob.bootstrap.conf.ConfigSupport;
 
 /**
  * <class-comment/>
  */
 public class ApplicationConfigurationSupport implements ApplicationConfiguration
 {
-    private final ConfigurationSupport config;
+    private final ConfigSupport config;
 
-    public ApplicationConfigurationSupport(ConfigurationSupport config)
+    public ApplicationConfigurationSupport(ConfigSupport config)
     {
         this.config = config;
     }
 
-    public ApplicationConfigurationSupport(Configuration config)
+    public ApplicationConfigurationSupport(Config config)
     {
-        this.config = new ConfigurationSupport(config);
+        this.config = new ConfigSupport(config);
     }
 
     public int getAdminPort()

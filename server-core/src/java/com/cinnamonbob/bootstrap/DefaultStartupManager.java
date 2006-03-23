@@ -4,7 +4,6 @@ import com.cinnamonbob.core.ObjectFactory;
 import com.cinnamonbob.events.EventManager;
 import com.cinnamonbob.events.system.SystemStartedEvent;
 import com.cinnamonbob.util.logging.Logger;
-import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +24,6 @@ public class DefaultStartupManager implements StartupManager
     private long startTime;
 
     private ObjectFactory objectFactory;
-    private ConfigurationManager configurationManager;
 
     public void init() throws StartupException
     {
@@ -38,14 +36,13 @@ public class DefaultStartupManager implements StartupManager
         {
             ComponentContext.addClassPathContextDefinitions(setupContexts.toArray(new String[setupContexts.size()]));
 
+            // initial Web UI.
+            WebUIState.startStarting();
+
             SetupManager setupManager = (SetupManager) ComponentContext.getBean("setupManager");
-            if (!setupManager.setup())
+            if (!setupManager.isSetup())
             {
-                // log to the terminal that the system is ready. Bypass the logging framework to ensure that
-                // it is always displayed.
-                //TODO: i18n this string...
-                int serverPort = configurationManager.getAppConfig().getServerPort();
-                System.err.println("Now go to http://localhost:"+serverPort+" to complete the setup.");
+                setupManager.setup();
                 return;
             }
 
@@ -59,17 +56,6 @@ public class DefaultStartupManager implements StartupManager
 
     public void startApplication()
     {
-        try
-        {
-            com.opensymphony.xwork.config.ConfigurationManager.clearConfigurationProviders();
-            com.opensymphony.xwork.config.ConfigurationManager.addConfigurationProvider(new XmlConfigurationProvider("xwork.xml"));
-            com.opensymphony.xwork.config.ConfigurationManager.getConfiguration().reload();
-        }
-        catch (Throwable t)
-        {
-            t.printStackTrace();
-        }
-
         ComponentContext.addClassPathContextDefinitions(systemContexts.toArray(new String[systemContexts.size()]));
 
         for (String name : startupRunnables)
@@ -86,6 +72,9 @@ public class DefaultStartupManager implements StartupManager
         }
 
         setSystemStarted(true);
+
+        // allow people to access the site.
+        WebUIState.startMain();
 
         EventManager eventManager = (EventManager) ComponentContext.getBean("eventManager");
         eventManager.publish(new SystemStartedEvent(this));
@@ -133,10 +122,5 @@ public class DefaultStartupManager implements StartupManager
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
-    }
-
-    public void setConfigurationManager(ConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
     }
 }

@@ -1,7 +1,6 @@
-package com.cinnamonbob.bootstrap.config;
+package com.cinnamonbob.bootstrap.conf;
 
 import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
@@ -11,16 +10,16 @@ import java.util.Properties;
 /**
  * <class-comment/>
  */
-public class FileConfiguration implements Configuration, Editable
+public class FileConfig implements Config
 {
-    private static final Logger LOG = Logger.getLogger(FileConfiguration.class);
+    private static final Logger LOG = Logger.getLogger(FileConfig.class);
 
     private final File file;
 
     private Properties props;
     private long lastModified;
 
-    public FileConfiguration(File file)
+    public FileConfig(File file)
     {
         this.file = file;
     }
@@ -93,4 +92,5 @@ public class FileConfiguration implements Configuration, Editable
 
         return props;
     }
+
 }

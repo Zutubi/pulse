@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <bean id="upgradeManager" class="com.cinnamonbob.upgrade.DefaultUpgradeManager" autowire="byName">
+        <property name="tasks">
+            <list>
+                <ref local="taskA"/>
+                <ref local="taskB"/>
+                <ref local="taskC"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="taskA" class="com.cinnamonbob.upgrade.tasks.DummyUpgradeTask">
+        <property name="buildNumber"><value>1</value></property>
+        <property name="description"><value>this is task A.</value></property>
+    </bean>
+
+    <bean id="taskB" class="com.cinnamonbob.upgrade.tasks.DummyUpgradeTask">
+        <property name="buildNumber"><value>5</value></property>
+        <property name="description"><value>this is task B.</value></property>
+    </bean>
+
+    <bean id="taskC" class="com.cinnamonbob.upgrade.tasks.DummyUpgradeTask">
+        <property name="buildNumber"><value>30</value></property>
+        <property name="description"><value>this is task C.</value></property>
+    </bean>
+
+</beans>

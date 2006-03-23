@@ -1,9 +1,9 @@
-package com.cinnamonbob.bootstrap.config;
+package com.cinnamonbob.bootstrap.conf;
 
 /**
  * <class-comment/>
  */
-public interface Configuration
+public interface Config
 {
     String getProperty(String key);
 

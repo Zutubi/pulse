@@ -236,7 +236,7 @@ public class CvsClient
         boolean result = getLastUpdate(module, branch, since) != null;
         if (LOG.isLoggable(Level.FINER))
         {
-            LOG.exiting(CvsClient.class.getName(), "hasChangedSince", result);
+            LOG.exiting(result);
         }
         return result;
     }

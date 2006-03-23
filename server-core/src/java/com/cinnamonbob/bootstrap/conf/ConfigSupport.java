@@ -1,15 +1,15 @@
-package com.cinnamonbob.bootstrap.config;
+package com.cinnamonbob.bootstrap.conf;
 
 import java.io.File;
 
 /**
  * <class-comment/>
  */
-public class ConfigurationSupport implements Configuration
+public class ConfigSupport implements Config
 {
-    private Configuration config;
+    private Config config;
 
-    public ConfigurationSupport(Configuration config)
+    public ConfigSupport(Config config)
     {
         this.config = config;
     }

@@ -86,7 +86,7 @@ public class MonitorScms implements Task
                 LOG.warning(e.getMessage());
             }
         }
-        LOG.exiting(MonitorScms.class.getName(), "execute");
+        LOG.exiting();
     }
 
     /**

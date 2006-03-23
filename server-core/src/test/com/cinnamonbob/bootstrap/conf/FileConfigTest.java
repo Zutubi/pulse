@@ -1,7 +1,7 @@
-package com.cinnamonbob.bootstrap.config;
+package com.cinnamonbob.bootstrap.conf;
 
 import com.cinnamonbob.core.util.IOUtils;
-import junit.framework.TestCase;
+import com.cinnamonbob.test.BobTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,12 +10,12 @@ import java.util.Properties;
 /**
  * <class-comment/>
  */
-public class FileConfigurationTest extends TestCase
+public class FileConfigTest extends BobTestCase
 {
-    private Configuration config = null;
+    private Config config = null;
     private File testProperties;
 
-    public FileConfigurationTest(String testName)
+    public FileConfigTest(String testName)
     {
         super(testName);
     }
@@ -25,14 +25,14 @@ public class FileConfigurationTest extends TestCase
         super.setUp();
 
         // temporary properties file
-        testProperties = File.createTempFile(FileConfigurationTest.class.getName(), ".properties");
+        testProperties = File.createTempFile(FileConfigTest.class.getName(), ".properties");
 
         Properties defaults = new Properties();
         defaults.put("key", "value");
         IOUtils.write(defaults, testProperties);
 
         // add setup code here.
-        config = new FileConfiguration(testProperties);
+        config = new FileConfig(testProperties);
     }
 
     public void tearDown() throws Exception
@@ -80,7 +80,7 @@ public class FileConfigurationTest extends TestCase
     public void testCreationOfPropertiesFile() throws Exception
     {
         assertTrue(testProperties.delete());
-        
+
         config.setProperty("key", "anotherValue");
         assertEquals("anotherValue", config.getProperty("key"));
 

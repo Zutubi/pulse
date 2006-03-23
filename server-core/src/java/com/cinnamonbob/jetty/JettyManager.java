@@ -1,13 +1,9 @@
 package com.cinnamonbob.jetty;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.Stoppable;
 import com.cinnamonbob.util.logging.Logger;
-import org.acegisecurity.util.FilterToBeanProxy;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.Dispatcher;
-import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 import org.mortbay.jetty.servlet.WebApplicationHandler;
 
@@ -21,11 +17,6 @@ import java.io.File;
 public class JettyManager implements Stoppable
 {
     private static final Logger LOG = Logger.getLogger(JettyManager.class);
-
-    /**
-     * The name of the JettyManager bean deployed within Spring.
-     */
-    private static final String BEAN_NAME = "jettyManager";
 
     private Server server;
     private ConfigurationManager configurationManager;
@@ -64,14 +55,28 @@ public class JettyManager implements Stoppable
      */
     public void start() throws Exception
     {
+        if (isStarted())
+        {
+            // server is already running, no need to start it a second time.
+            LOG.warning("Request to start jetty server ignored. Server already started.");
+            return;
+        }
+
         File wwwRoot = configurationManager.getSystemPaths().getContentRoot();
 
         appContext = server.addWebApplication(contextPath, wwwRoot.getAbsolutePath());
 
-        if (!server.isStarted())
-        {
-            server.start();
-        }
+        server.start();
+    }
+
+    /**
+     * Indicates whether or not the jetty server is running.
+     *
+     * @return true if the jetty server has already been started, false otherwise.
+     */
+    public boolean isStarted()
+    {
+        return server.isStarted();
     }
 
     /**

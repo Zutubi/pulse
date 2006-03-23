@@ -1,20 +1,20 @@
-package com.cinnamonbob.bootstrap.config;
+package com.cinnamonbob.bootstrap.conf;
 
 import java.util.Properties;
 
 /**
  * <class-comment/>
  */
-public class PropertiesConfiguration implements Configuration, Editable
+public class PropertiesConfig implements Config
 {
     private final Properties props;
 
-    public PropertiesConfiguration()
+    public PropertiesConfig()
     {
         this(null);
     }
 
-    public PropertiesConfiguration(Properties props)
+    public PropertiesConfig(Properties props)
     {
         if (props == null)
         {

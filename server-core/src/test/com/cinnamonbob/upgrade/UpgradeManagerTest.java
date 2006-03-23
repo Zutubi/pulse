@@ -1,7 +1,8 @@
 package com.cinnamonbob.upgrade;
 
-import junit.framework.*;
+import com.cinnamonbob.Version;
 import com.cinnamonbob.upgrade.tasks.MockUpgradeTask;
+import junit.framework.TestCase;
 
 import java.util.List;
 
@@ -31,24 +32,22 @@ public class UpgradeManagerTest extends TestCase
         super.tearDown();
     }
 
-    public void testNoopUpgrade()
-    {
-        upgradeManager.addTask(new MockUpgradeTask());
-        assertTrue(upgradeManager.isUpgradeRequired());
-        List<UpgradeTask> executedTasks = upgradeManager.executeUpgrade();
-        assertNotNull(executedTasks);
-        assertEquals(1, executedTasks.size());
-        assertFalse(upgradeManager.isUpgradeRequired());
-    }
-
     public void testUpgradeTaskSelection()
     {
         upgradeManager.addTask(new MockUpgradeTask(30));
         upgradeManager.addTask(new MockUpgradeTask(20));
         upgradeManager.addTask(new MockUpgradeTask(40));
 
-        assertTrue(upgradeManager.isUpgradeRequired());
-        List<UpgradeTask> executedTasks = upgradeManager.executeUpgrade();
+        Version fromVersion = new Version("x", "y", "2");
+        Version toVersion = new Version("xx", "yy", "55");
+
+        assertTrue(upgradeManager.isUpgradeRequired(fromVersion, toVersion));
+
+        List<UpgradeTask> preview = upgradeManager.previewUpgrade(fromVersion, toVersion);
+        assertNotNull(preview);
+        assertEquals(3, preview.size());
+
+        List<UpgradeTask> executedTasks = upgradeManager.executeUpgrade(fromVersion, toVersion);
         assertNotNull(executedTasks);
         assertEquals(3, executedTasks.size());
         assertEquals(20, executedTasks.get(0).getBuildNumber());

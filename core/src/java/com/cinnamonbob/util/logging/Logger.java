@@ -9,12 +9,12 @@ public class Logger
 {
     private java.util.logging.Logger delegate;
 
-    private String source;
+    private String sourceClass;
+    private String sourceMethod;
 
-    protected Logger(java.util.logging.Logger delegate, String source)
+    protected Logger(java.util.logging.Logger delegate)
     {
         this.delegate = delegate;
-        this.source = source;
     }
 
     public static Logger getLogger(Class cls)
@@ -24,12 +24,17 @@ public class Logger
 
     public static Logger getLogger(String name)
     {
-        return new Logger(java.util.logging.Logger.getLogger(name), name);
+        return new Logger(java.util.logging.Logger.getLogger(name));
     }
 
     public void severe(String msg, Throwable t)
     {
-        delegate.logp(Level.SEVERE, source, "", msg, t);
+        if (!isLoggable(Level.SEVERE))
+        {
+            return;
+        }
+        inferCaller();
+        delegate.logp(Level.SEVERE, sourceClass, sourceMethod, msg, t);
     }
 
     public void severe(Throwable t)
@@ -44,7 +49,12 @@ public class Logger
 
     public void info(String msg, Throwable t)
     {
-        delegate.logp(Level.INFO, source, "", msg, t);
+        if (!isLoggable(Level.INFO))
+        {
+            return;
+        }
+        inferCaller();
+        delegate.logp(Level.INFO, sourceClass, sourceMethod, msg, t);
     }
 
     public void info(Throwable t)
@@ -59,7 +69,12 @@ public class Logger
 
     public void warning(String msg, Throwable t)
     {
-        delegate.logp(Level.WARNING, source, "", msg, t);
+        if (!isLoggable(Level.WARNING))
+        {
+            return;
+        }
+        inferCaller();
+        delegate.logp(Level.WARNING, sourceClass, sourceMethod, msg, t);
     }
 
     public void warning(Throwable t)
@@ -79,7 +94,12 @@ public class Logger
 
     public void fine(String msg, Throwable t)
     {
-        delegate.logp(Level.FINE, source, "", msg, t);
+        if (!isLoggable(Level.FINE))
+        {
+            return;
+        }
+        inferCaller();
+        delegate.logp(Level.FINE, sourceClass, sourceMethod, msg, t);
     }
 
     public void finer(String msg)
@@ -89,7 +109,12 @@ public class Logger
 
     public void finer(String msg, Throwable t)
     {
-        delegate.logp(Level.FINER, source, "", msg, t);
+        if (!isLoggable(Level.FINER))
+        {
+            return;
+        }
+        inferCaller();
+        delegate.logp(Level.FINER, sourceClass, sourceMethod, msg, t);
     }
 
     public void finest(String msg)
@@ -104,7 +129,12 @@ public class Logger
 
     public void finest(String msg, Throwable t)
     {
-        delegate.logp(Level.FINEST, source, "", msg, t);
+        if (!isLoggable(Level.FINEST))
+        {
+            return;
+        }
+        inferCaller();
+        delegate.logp(Level.FINEST, sourceClass, sourceMethod, msg, t);
     }
 
     public void debug(String msg)
@@ -124,6 +154,7 @@ public class Logger
 
     /**
      * Alias for severe.
+     *
      * @param msg
      */
     public void error(String msg)
@@ -146,18 +177,81 @@ public class Logger
         return delegate.isLoggable(level);
     }
 
-    public void entering(String sourceClass, String sourceMethod)
+    public void entering()
+    {
+        if (!isLoggable(Level.FINER))
+        {
+            return;
+        }
+        inferCaller();
+        entering(sourceClass, sourceMethod);
+    }
+
+    public void entering(String source, String method)
     {
         delegate.entering(sourceClass, sourceMethod);
     }
 
-    public void exiting(String sourceClass, String sourceMethod)
+    public void exiting()
     {
+        if (!isLoggable(Level.FINER))
+        {
+            return;
+        }
+        inferCaller();
         delegate.exiting(sourceClass, sourceMethod);
     }
 
-    public void exiting(String sourceClass, String sourceMethod, Object result)
+    public void exiting(Object result)
     {
+        if (!isLoggable(Level.FINER))
+        {
+            return;
+        }
+        inferCaller();
         delegate.exiting(sourceClass, sourceMethod, result);
     }
+
+    /**
+     * This inferCaller is taken from the LogRecord object. We need to reproduce it here
+     * since by wrapping the Logger we break this method.
+     *
+     */
+    private void inferCaller()
+    {
+        sourceClass = null;
+        sourceMethod = null;
+
+        // Get the stack trace.
+        StackTraceElement stack[] = (new Throwable()).getStackTrace();
+        // First, search back to a method in the Logger class.
+        int ix = 0;
+        while (ix < stack.length)
+        {
+            StackTraceElement frame = stack[ix];
+            String cname = frame.getClassName();
+            if (cname.equals("com.cinnamonbob.util.logging.Logger"))
+            {
+                break;
+            }
+            ix++;
+        }
+        // Now search for the first frame before the "Logger" class.
+        while (ix < stack.length)
+        {
+            StackTraceElement frame = stack[ix];
+            String cname = frame.getClassName();
+            if (!cname.equals("com.cinnamonbob.util.logging.Logger"))
+            {
+                // We've found the relevant frame.
+                sourceClass = cname;
+                sourceMethod = frame.getMethodName();
+                return;
+            }
+            ix++;
+        }
+        // We haven't found a suitable frame, so just punt.  This is
+        // OK as we are only committed to making a "best effort" here.
+    }
+
 }

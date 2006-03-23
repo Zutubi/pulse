@@ -1,9 +1,6 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.jetty.JettyManager;
 import com.cinnamonbob.util.logging.Logger;
-import com.opensymphony.xwork.config.ConfigurationManager;
-import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
 
 
 /**
@@ -13,43 +10,47 @@ public class DefaultSetupManager implements SetupManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultSetupManager.class);
 
-    private com.cinnamonbob.bootstrap.ConfigurationManager configurationManager;
-    private JettyManager jettyManager;
+    /**
+     * The systems configuration manager.
+     */
+    private ConfigurationManager configurationManager;
 
-    public boolean setup()
+    /**
+     * @see com.cinnamonbob.bootstrap.SetupManager#isSetup()
+     */
+    public boolean isSetup()
     {
-        try
+        Home home = configurationManager.getHome();
+        if (home == null || !home.isInitialised())
         {
-            jettyManager.start();
-        }
-        catch (Exception e)
-        {
-            LOG.severe(e);
-            throw new StartupException("Unable to start Jetty server: " + e.getMessage(), e);
-        }
-
-        if (configurationManager.getUserPaths() == null)
-        {
-            // need to show setup workflow.
-            doSetup();
             return false;
         }
         return true;
     }
 
+    public void setup() throws StartupException
+    {
+        // bob home configuration.
+        Home home = configurationManager.getHome();
+        if (home == null || !home.isInitialised())
+        {
+            doSetup();
+            return;
+        }
+
+        // all systems are go, start the application.
+    }
+
     private void doSetup()
     {
-        // specify setup-xwork.xml.
-        try
-        {
-            ConfigurationManager.clearConfigurationProviders();
-            ConfigurationManager.addConfigurationProvider(new XmlConfigurationProvider("setup-xwork.xml"));
-            ConfigurationManager.getConfiguration().reload();
-        }
-        catch (Throwable t)
-        {
-            t.printStackTrace();
-        }
+        // need to ask the user for a bob home value.
+        WebUIState.startSetup();
+
+        // log to the terminal that the system is ready. Bypass the logging framework to ensure that
+        // it is always displayed.
+        //TODO: i18n this string...
+        int serverPort = configurationManager.getAppConfig().getServerPort();
+        System.err.println("Now go to http://localhost:"+serverPort+" to complete the setup.");
     }
 
     /**
@@ -60,10 +61,5 @@ public class DefaultSetupManager implements SetupManager
     public void setConfigurationManager(com.cinnamonbob.bootstrap.ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
-    }
-
-    public void setJettyManager(JettyManager jettyManager)
-    {
-        this.jettyManager = jettyManager;
     }
 }

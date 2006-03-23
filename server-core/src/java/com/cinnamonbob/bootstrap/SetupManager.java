@@ -1,9 +1,21 @@
 package com.cinnamonbob.bootstrap;
 
 /**
- * <class-comment/>
+ * The SetupManager handled the systems setup process.
+ *
  */
 public interface SetupManager
 {
-    boolean setup();
+    /**
+     * Run through the systems setup procedure.
+     *
+     */
+    void setup();
+
+    /**
+     * Indicates whether or not the system has been setup.
+     *
+     * @return true if the system is setup, false otherwise.
+     */
+    boolean isSetup();
 }

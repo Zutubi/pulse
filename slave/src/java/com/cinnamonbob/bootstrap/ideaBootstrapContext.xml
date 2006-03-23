@@ -17,20 +17,9 @@
                 <value>com.cinnamonbob.ResourceDiscoverer</value>
             </list>
         </property>
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
-        </property>
     </bean>
 
     <bean id="configurationManager" class="com.cinnamonbob.bootstrap.SimpleConfigurationManager">
-<!--
-        <property name="defaultProperties">
-            <props>
-                <prop key="webapp.port">8090</prop>
-                <prop key="admin.port">8091</prop>
-            </props>
-        </property>
--->
         <property name="systemPaths">
             <bean class="com.cinnamonbob.bootstrap.ConfigurableSystemPaths">
                 <property name="systemRoot">

@@ -20,4 +20,7 @@ public interface ConfigurationManager
 
     void setBobHome(File bobHome);
 
+    File getBobHome();
+
+    Home getHome();
 }

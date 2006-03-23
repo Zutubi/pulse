@@ -8,6 +8,7 @@
                 <value>com/cinnamonbob/bootstrap/coreSubsystemContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/webserverContext.xml</value>
                 <value>com/cinnamonbob/bootstrap/setupContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/upgradeContext.xml</value>
             </list>
         </property>
         <property name="systemContexts">
@@ -28,9 +29,6 @@
         </property>
         <property name="objectFactory">
             <ref bean="objectFactory"/>
-        </property>
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
         </property>
     </bean>
 

@@ -1,23 +1,17 @@
 package com.cinnamonbob;
 
 import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.util.logging.Logger;
 
+import java.io.*;
 import java.util.Properties;
-import java.io.IOException;
 
 /**
  * This class provides a java interface to the contents of the version.properties
  * file. All access to the contents of that properties file should be handled
  * through ths object.
- *
  */
-public class Version
+public class Version implements Comparable
 {
-    private static final Logger LOG = Logger.getLogger(Version.class);
-
-    private static Properties properties;
-
     /**
      * The resource name relative to the location of this class.
      */
@@ -38,52 +32,133 @@ public class Version
      */
     private static final String BUILD_NUMBER = "build.number";
 
-    private static Properties getProperties()
+    private String versionNumber;
+    private String buildDate;
+    private String buildNumber;
+
+    public Version(String versionNumber, String buildDate, String buildNumber)
     {
-        if (properties == null)
-        {
-            try
-            {
-                properties = IOUtils.read(Version.class.getResourceAsStream(RESOURCE));
-            }
-            catch (IOException e)
-            {
-                properties = new Properties();
-                LOG.error(e);
-            }
-        }
-        return properties;
+        this.versionNumber = versionNumber;
+        this.buildDate = buildDate;
+        this.buildNumber = buildNumber;
     }
 
     /**
      * The version string is a human readable representation of the current version
      * of the system.
-     *
      */
-    public static String getVersion()
+    public String getVersionNumber()
     {
-        return getProperties().getProperty(VERSION_NUMBER);
+        return versionNumber;
     }
 
     /**
      * The build date is a string representing the date that this version of the system
      * was built.
-     *
      */
-    public static String getBuildDate()
+    public String getBuildDate()
     {
-        return getProperties().getProperty(BUILD_DATE);
+        return buildDate;
     }
 
     /**
      * The build number is a machine friendly representation of the current version of the
      * system.
-     * 
      */
-    public static String getBuildNumber()
+    public String getBuildNumber()
     {
-        return getProperties().getProperty(BUILD_NUMBER);
+        return buildNumber;
     }
 
+    public static Version load(InputStream in) throws IOException
+    {
+        Properties properties = IOUtils.read(in);
+        return new Version(properties.getProperty(VERSION_NUMBER),
+                properties.getProperty(BUILD_DATE),
+                properties.getProperty(BUILD_NUMBER)
+        );
+    }
 
+    /**
+     * Write this verison object to the specified output stream.
+     *
+     * @param out
+     *
+     * @throws IOException
+     */
+    public void write(OutputStream out) throws IOException
+    {
+        Properties props = new Properties();
+        props.setProperty(VERSION_NUMBER, getVersionNumber());
+        props.setProperty(BUILD_DATE, getBuildDate());
+        props.setProperty(BUILD_NUMBER, getBuildNumber());
+        props.store(out, null);
+    }
+
+    /**
+     * Helper method for writing this version to a file.
+     * @param f
+     */
+    public void write(File f) throws IOException
+    {
+        OutputStream out = null;
+        try
+        {
+            out = new FileOutputStream(f);
+            write(out);
+        }
+        finally
+        {
+            IOUtils.close(out);
+        }
+    }
+
+    /**
+     * Helper method for reading version from a file.
+     *
+     * @param f
+     *
+     * @return version defined in file, or null.
+     */
+    public static Version load(File f) throws IOException
+    {
+        InputStream in = null;
+        try
+        {
+            in = new FileInputStream(f);
+            return load(in);
+        }
+        finally
+        {
+            IOUtils.close(in);
+        }
+    }
+
+    public static Version getVersion()
+    {
+        InputStream in = null;
+        try
+        {
+            in = Version.class.getResourceAsStream(RESOURCE);
+            return load(in);
+        }
+        catch (IOException e)
+        {
+            return new Version("N/A", "N/A", "N/A");
+        }
+        finally
+        {
+            IOUtils.close(in);
+        }
+    }
+
+    public int compareTo(Object o)
+    {
+        Version otherVersion = (Version) o;
+
+        Integer i = Integer.parseInt(buildNumber);
+        Integer j = Integer.parseInt(otherVersion.buildNumber);
+
+        return i.compareTo(j);
+    }
 }

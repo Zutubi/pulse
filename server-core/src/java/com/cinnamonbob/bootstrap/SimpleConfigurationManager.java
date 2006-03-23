@@ -1,15 +1,12 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.bootstrap.config.CompositeConfiguration;
-import com.cinnamonbob.bootstrap.config.Configuration;
-import com.cinnamonbob.bootstrap.config.FileConfiguration;
-import com.cinnamonbob.bootstrap.config.ReadOnlyConfiguration;
-import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.bootstrap.conf.CompositeConfig;
+import com.cinnamonbob.bootstrap.conf.Config;
+import com.cinnamonbob.bootstrap.conf.FileConfig;
+import com.cinnamonbob.bootstrap.conf.ReadOnlyConfig;
 import com.cinnamonbob.util.logging.Logger;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
 
 /**
  * <class-comment/>
@@ -21,21 +18,22 @@ public class SimpleConfigurationManager implements ConfigurationManager
     private static final Logger LOG = Logger.getLogger(SimpleConfigurationManager.class);
 
     private SystemPaths systemPaths = null;
+    private HomeConfiguration homeConfig;
 
     public ApplicationConfiguration getAppConfig()
     {
         UserPaths paths = getUserPaths();
         if (paths != null)
         {
-            Configuration user = new FileConfiguration(new File(paths.getUserConfigRoot(), "bob.properties"));
-            Configuration defaults = new FileConfiguration(new File(getSystemPaths().getConfigRoot(), "bob-defaults.properties"));
-            Configuration composite = new CompositeConfiguration(user, new ReadOnlyConfiguration(defaults));
+            Config user = new FileConfig(new File(paths.getUserConfigRoot(), "bob.properties"));
+            Config defaults = new FileConfig(new File(getSystemPaths().getConfigRoot(), "bob-defaults.properties"));
+            Config composite = new CompositeConfig(user, new ReadOnlyConfig(defaults));
             return new ApplicationConfigurationSupport(composite);
         }
         else
         {
-            Configuration defaults = new FileConfiguration(new File(getSystemPaths().getConfigRoot(), "bob-defaults.properties"));
-            return new ApplicationConfigurationSupport(new ReadOnlyConfiguration(defaults));
+            Config defaults = new FileConfig(new File(getSystemPaths().getConfigRoot(), "bob-defaults.properties"));
+            return new ApplicationConfigurationSupport(new ReadOnlyConfig(defaults));
         }
     }
 
@@ -44,80 +42,61 @@ public class SimpleConfigurationManager implements ConfigurationManager
         File bobHome = getBobHome();
         if (bobHome != null)
         {
-            return new DefaultUserPaths(bobHome);
+            return new Home(bobHome);
         }
         return null;
     }
 
     public File getBobHome()
     {
-        // check system properties
-        if (System.getProperties().containsKey("bob.home"))
-        {
-            return new File(System.getProperty("bob.home"));
-        }
-        // lookup file.
-        File f = new File(getSystemPaths().getConfigRoot(), "bob-init.properties");
-        if (!f.exists())
-        {
-            return null;
-        }
+        return getHomeConfig().getHomeDirectory();
+    }
 
-        Properties props;
-        try
+    public Home getHome()
+    {
+        return getHomeConfig().getHome();
+    }
+
+    private HomeConfiguration getHomeConfig()
+    {
+        if (homeConfig == null)
         {
-            props = IOUtils.read(f);
+            homeConfig = new HomeConfiguration();
+            homeConfig.setConfigurationManager(this);
         }
-        catch (IOException e)
-        {
-            LOG.severe(e);
-            return null;
-        }
-        if (props.containsKey("bob.home"))
-        {
-            return new File(props.getProperty("bob.home"));
-        }
-        return null;
+        return homeConfig;
     }
 
     public void setBobHome(File f)
     {
-        Properties props = new Properties();
-        props.setProperty("bob.home", f.getAbsolutePath());
-        try
+        HomeConfiguration homeConfig = getHomeConfig();
+        homeConfig.setHomeDirectory(f);
+        if (!homeConfig.getHome().isInitialised())
         {
-            IOUtils.write(props, new File(getSystemPaths().getConfigRoot(), "bob-init.properties"));
+            getHomeConfig().getHome().init();
         }
-        catch (IOException e)
-        {
-            LOG.severe(e);
-        }
-    }
-
-    private SystemPaths initSystemPaths()
-    {
-        String bobInstall = System.getProperty(BOB_INSTALL);
-        if (bobInstall == null || bobInstall.length() == 0)
-        {
-            // fatal error, BOB_INSTALL property needs to exist.
-            throw new StartupException("Required property '" + BOB_INSTALL + "' is not set");
-        }
-
-        File bobRoot = new File(bobInstall);
-        if (!bobRoot.exists() || !bobRoot.isDirectory())
-        {
-            // fatal error, BOB_INSTALL property needs to reference bobs home directory
-            throw new StartupException("Property '" + BOB_INSTALL + "' does not refer to a directory ('" + bobInstall + ")");
-        }
-        // initialise applicationPaths based on bob.home.
-        return new DefaultSystemPaths(bobRoot);
     }
 
     public SystemPaths getSystemPaths()
     {
         if (systemPaths == null)
         {
-            systemPaths = initSystemPaths();
+            String bobInstall = System.getProperty(BOB_INSTALL);
+            if (bobInstall == null || bobInstall.length() == 0)
+            {
+                // fatal error, BOB_INSTALL property needs to exist.
+                throw new StartupException("Required property '" + BOB_INSTALL + "' is not set");
+            }
+
+            File bobRoot = new File(bobInstall);
+            if (!bobRoot.exists() || !bobRoot.isDirectory())
+            {
+                // fatal error, BOB_INSTALL property needs to reference bobs home directory
+                throw new StartupException("Property '" + BOB_INSTALL + "' does not refer to a " +
+                        "directory ('" + bobInstall + ")");
+            }
+            // initialise applicationPaths based on bob.home.
+            systemPaths = new DefaultSystemPaths(bobRoot);
         }
         return systemPaths;
     }
@@ -126,5 +105,4 @@ public class SimpleConfigurationManager implements ConfigurationManager
     {
         this.systemPaths = paths;
     }
-
 }
