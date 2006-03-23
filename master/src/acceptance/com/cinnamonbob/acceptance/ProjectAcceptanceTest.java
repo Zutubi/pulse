@@ -39,7 +39,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
         projectName = "project " + RandomUtils.randomString(5);
         submitProjectBasicsForm(projectName, DESCRIPTION, URL, "cvs", "custom");
-        submitCvsSetupForm(":pserver:someone@somehost.com:/cvsroot", "module", "", "");
+        submitCvsSetupForm("/local", "module", "", "");
         submitCustomSetupForm("bob.xml");
         assertTablePresent("project.basics");
     }
