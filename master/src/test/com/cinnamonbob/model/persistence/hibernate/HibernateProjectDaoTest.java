@@ -1,5 +1,6 @@
 package com.cinnamonbob.model.persistence.hibernate;
 
+import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.model.*;
 import com.cinnamonbob.model.persistence.ProjectDao;
 
@@ -40,18 +41,32 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         assertPropertyEquals(project, otherProject);
     }
 
-    public void testLoadSaveCleanupPolicy()
+    public void testLoadSaveCleanupRule()
+    {
+        cleanupRuleHelper(new CleanupRule(true, new ResultState[] { ResultState.ERROR, ResultState.FAILURE }, 5, CleanupRule.CleanupUnit.BUILDS));
+    }
+
+    public void testLoadSaveCleanupRuleNoStates()
+    {
+        cleanupRuleHelper(new CleanupRule(true, null, 5, CleanupRule.CleanupUnit.BUILDS));
+    }
+
+    public void testLoadSaveCleanupRuleDays()
+    {
+        cleanupRuleHelper(new CleanupRule(false, new ResultState[] { ResultState.SUCCESS }, 11, CleanupRule.CleanupUnit.DAYS));
+    }
+
+    private void cleanupRuleHelper(CleanupRule rule)
     {
         Project project = new Project("yay", "test");
-        AgeBuildResultCleanupPolicy policy = new AgeBuildResultCleanupPolicy(5, 10);
-        project.setCleanupPolicy(policy);
+        project.addCleanupRule(rule);
 
         projectDao.save(project);
         commitAndRefreshTransaction();
 
         Project otherProject = projectDao.findById(project.getId());
-        AgeBuildResultCleanupPolicy otherPolicy = otherProject.getCleanupPolicy();
-        assertEquals(policy, otherPolicy);
+        CleanupRule otherRule = otherProject.getCleanupRule(rule.getId());
+        assertEquals(rule, otherRule);
     }
 
     public void testLoadSaveCustomBobFileSource()

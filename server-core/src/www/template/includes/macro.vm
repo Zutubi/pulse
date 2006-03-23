@@ -351,6 +351,13 @@
 #end
 
 ##
+## Outputs a static cell for a content table
+##
+#macro(staticCell $cc)
+    <td class="content">$cc</td>
+#end
+
+##
 ## Outputs a right-aligned cell for a content table
 ##
 #macro(rightCell $cc)

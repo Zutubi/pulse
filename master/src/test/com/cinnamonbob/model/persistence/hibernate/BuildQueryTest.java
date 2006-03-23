@@ -46,9 +46,9 @@ public class BuildQueryTest extends MasterPersistenceTestCase
     {
         allResults = new LinkedList<BuildResult>();
 
-        createBuild(p1, "default", 1, ResultState.SUCCESS, 10000, 11000);
+        createBuild(p1, "default", 1, ResultState.SUCCESS, 10000, 11000, false);
         createBuild(p2, "default", 1, ResultState.SUCCESS, 11500, 11900);
-        createBuild(p1, "overnight", 2, ResultState.SUCCESS, 12000, 13000);
+        createBuild(p1, "overnight", 2, ResultState.SUCCESS, 12000, 13000, false);
         createBuild(p2, "overnight", 2, ResultState.SUCCESS, 13333, 13999);
         createBuild(p1, "default", 3, ResultState.FAILURE, 14000, 15000);
         createBuild(p2, "borken", 3, ResultState.ERROR, 15000, 15821);
@@ -56,7 +56,7 @@ public class BuildQueryTest extends MasterPersistenceTestCase
         createBuild(p2, "borken", 4, ResultState.ERROR, 17777, 17777);
         createBuild(p1, "default", 5, ResultState.ERROR, 18000, 19000);
         createBuild(p2, "borken", 5, ResultState.ERROR, 19005, 19006);
-        createBuild(p1, "overnight", 6, ResultState.ERROR, 20000, 21000);
+        createBuild(p1, "overnight", 6, ResultState.ERROR, 20000, 21000, false);
         createBuild(p2, "borken", 6, ResultState.ERROR, 21100, 21900);
         createBuild(p1, "default", 7, ResultState.SUCCESS, 22000, 23000);
         createBuild(p2, "default", 7, ResultState.SUCCESS, 23332, 23880);
@@ -68,6 +68,11 @@ public class BuildQueryTest extends MasterPersistenceTestCase
     }
 
     private void createBuild(Project project, String spec, int number, ResultState state, int start, int end)
+    {
+        createBuild(project, spec, number, state, start, end, true);
+    }
+
+    private void createBuild(Project project, String spec, int number, ResultState state, int start, int end, boolean hasWorkDir)
     {
         BuildResult result = new BuildResult(project, spec, number);
         result.commence(start);
@@ -83,6 +88,7 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
         result.complete();
         result.getStamps().setEndTime(end);
+        result.setHasWorkDir(hasWorkDir);
         buildResultDao.save(result);
         allResults.add(0, result);
     }
@@ -125,92 +131,104 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     public void testQueryAll()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 0, 0, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 0, 0, null, -1, -1, true);
         assertEquals(allResults, results);
     }
 
     public void testAllOldestFirst()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 0, 0, -1, -1, false);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 0, 0, null, -1, -1, false);
         assertEquals(getReversed(), results);
     }
 
     public void testProjectP1()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(new Project[]{ p1 }, null, null, 0, 0, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(new Project[]{ p1 }, null, null, 0, 0, null, -1, -1, true);
         assertEquals(getFiltered(p1), results);
     }
 
     public void testProjectBoth()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(new Project[]{ p1, p2 }, null, null, 0, 0, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(new Project[]{ p1, p2 }, null, null, 0, 0, null, -1, -1, true);
         assertEquals(allResults, results);
     }
 
     public void testSuccessful()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, new ResultState[] { ResultState.SUCCESS } , null, 0, 0, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, new ResultState[] { ResultState.SUCCESS } , null, 0, 0, null, -1, -1, true);
         assertEquals(getFiltered(ResultState.SUCCESS), results);
     }
 
     public void testErrorOrFail()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, new ResultState[] { ResultState.ERROR, ResultState.FAILURE } , null, 0, 0, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, new ResultState[] { ResultState.ERROR, ResultState.FAILURE } , null, 0, 0, null, -1, -1, true);
         assertEquals(getFiltered(ResultState.ERROR, ResultState.FAILURE), results);
     }
 
     public void testSpecDefault()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, new String[] { "default" }, 0, 0, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, new String[] { "default" }, 0, 0, null, -1, -1, true);
         assertEquals(getFiltered("default"), results);
     }
 
     public void testSpecOvernight()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, new String[] { "overnight" }, 0, 0, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, new String[] { "overnight" }, 0, 0, null, -1, -1, true);
         assertEquals(getFiltered("overnight"), results);
     }
 
     public void testProjectP1SpecDefault()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(new Project[] { p1 }, null, new String[] { "default" }, 0, 0, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(new Project[] { p1 }, null, new String[] { "default" }, 0, 0, null, -1, -1, true);
         assertEquals(getFiltered(p1, "default"), results);
     }
 
     public void testEarliestTime()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 15000, 0, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 15000, 0, null, -1, -1, true);
         assertEquals(getFiltered(15000, 0), results);
     }
 
     public void testLatestTime()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 0, 15000, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 0, 15000, null, -1, -1, true);
         assertEquals(getFiltered(0, 15000), results);
     }
 
     public void testEarliestAndLatestTime()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 15000, 15000, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 15000, 15000, null, -1, -1, true);
         assertEquals(1, results.size());
         assertEquals(getFiltered(15000, 15000), results);
     }
 
     public void testEarliestTimeBeyond()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 150000, 0, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 150000, 0, null, -1, -1, true);
         assertEquals(0, results.size());
     }
 
     public void testLatestTimeBefore()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 0, 1, -1, -1, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 0, 1, null, -1, -1, true);
         assertEquals(0, results.size());
+    }
+
+    public void testHasWorkDir()
+    {
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 0, 0, true, -1, -1, true);
+        assertEquals(getFiltered(true), results);
+    }
+
+    public void testHasNoWorkDir()
+    {
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 0, 0, false, -1, -1, true);
+        assertEquals(getFiltered(false), results);
     }
 
     public void testPage()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 0, 0, 2, 5, true);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, null, 0, 0, null, 2, 5, true);
         assertEquals(getPaged(2, 5), results);
     }
 
@@ -288,6 +306,16 @@ public class BuildQueryTest extends MasterPersistenceTestCase
                 }
 
                 return true;
+            }
+        });
+    }
+
+    private List<BuildResult> getFiltered(final boolean hasWorkDir)
+    {
+        return new ListUtils<BuildResult>().filter(allResults, new Predicate<BuildResult>() {
+            public boolean satisfied(BuildResult t)
+            {
+                return t.getHasWorkDir() == hasWorkDir;
             }
         });
     }

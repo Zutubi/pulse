@@ -69,8 +69,9 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
 
         assertTablePresent("project.cleanup");
         assertTableRowsEqual("project.cleanup", 1, new String[][]{
-                new String[]{"working directories deleted", "after 30 days"},
-                new String[]{"build results deleted", "never"}
+                new String[]{"what", "with state(s)", "retain for up to", "actions", "actions"},
+                new String[]{"working directories", "any", "10 builds", "edit", "delete"},
+                new String[]{"add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule"},
         });
 
         assertTablePresent("project.buildspecs");

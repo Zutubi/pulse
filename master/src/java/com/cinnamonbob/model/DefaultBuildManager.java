@@ -6,6 +6,9 @@ import com.cinnamonbob.bootstrap.DatabaseBootstrap;
 import com.cinnamonbob.core.model.*;
 import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.events.Event;
+import com.cinnamonbob.events.EventListener;
+import com.cinnamonbob.events.build.BuildCompletedEvent;
 import com.cinnamonbob.model.persistence.ArtifactDao;
 import com.cinnamonbob.model.persistence.BuildResultDao;
 import com.cinnamonbob.model.persistence.ChangelistDao;
@@ -24,7 +27,7 @@ import java.util.List;
  * 
  *
  */
-public class DefaultBuildManager implements BuildManager
+public class DefaultBuildManager implements BuildManager, EventListener
 {
     private static final Logger LOG = Logger.getLogger(DefaultBuildManager.class);
 
@@ -206,44 +209,25 @@ public class DefaultBuildManager implements BuildManager
         return changelistDao.findLatestByProject(project, max);
     }
 
-    private void cleanupBuilds(Project project)
+    private synchronized void cleanupBuilds(Project project)
     {
-        BuildResultCleanupPolicy policy = project.getCleanupPolicy();
-        boolean done = false;
-        int offset = 0;
+        List<CleanupRule> rules = project.getCleanupRules();
 
-        while (!done)
+        for(CleanupRule rule: rules)
         {
-            List<BuildResult> oldBuilds = getOldestBuildsForProject(project, offset, 10);
-
-            if (oldBuilds.size() == 0)
-            {
-                break;
-            }
+            List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao);
 
             for (BuildResult build : oldBuilds)
             {
-                if (policy.canCleanupResult(build))
-                {
-                    cleanupResult(project, build);
-                }
-                else if (policy.canCleanupWorkDir(build))
+                if (rule.getWorkDirOnly())
                 {
                     cleanupWork(project, build);
                 }
                 else
                 {
-                    // We cannot do any more: this is assumes that an older
-                    // result not being cleaned up implies that a younger one
-                    // also will not.  For more complicated policies this may
-                    // break, but in that case we need a better querying strategy
-                    // to avoid having to walk all build results.
-                    done = true;
-                    break;
+                    cleanupResult(project, build);
                 }
             }
-
-            offset += 10;
         }
     }
 
@@ -278,6 +262,17 @@ public class DefaultBuildManager implements BuildManager
 
             cleanupWorkForNodes(paths, project, build, node.getChildren());
         }
+    }
+
+    public void handleEvent(Event evt)
+    {
+        BuildCompletedEvent completedEvent = (BuildCompletedEvent) evt;
+        cleanupBuilds(completedEvent.getResult().getProject());
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[] { BuildCompletedEvent.class };
     }
 
     public void setScheduler(Scheduler scheduler)

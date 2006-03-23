@@ -168,6 +168,23 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
+    public int getBuildCount(final Project project, final ResultState[] states, final Boolean hasWorkDir)
+    {
+        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = getBuildResultCriteria(session, project, states, null);
+                if(hasWorkDir != null)
+                {
+                    criteria.add(Expression.eq("hasWorkDir", hasWorkDir.booleanValue()));
+                }
+                criteria.setProjection(Projections.rowCount());
+                return criteria.uniqueResult();
+            }
+        });
+    }
+
     public List<String> findAllSpecifications(final Project project)
     {
         return (List<String>) getHibernateTemplate().execute(new HibernateCallback()
@@ -206,7 +223,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public List<BuildResult> queryBuilds(final Project[] projects, final ResultState[] states, final String[] specs, final long earliestStartTime, final long latestStartTime, final int first, final int max, final boolean mostRecentFirst)
+    public List<BuildResult> queryBuilds(final Project[] projects, final ResultState[] states, final String[] specs, final long earliestStartTime, final long latestStartTime, final Boolean hasWorkDir, final int first, final int max, final boolean mostRecentFirst)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
@@ -217,6 +234,11 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 addStatesToCriteria(states, criteria);
                 addSpecsToCriteria(specs, criteria);
                 addDatesToCriteria(earliestStartTime, latestStartTime, criteria);
+
+                if(hasWorkDir != null)
+                {
+                    criteria.add(Expression.eq("hasWorkDir", hasWorkDir.booleanValue()));
+                }
 
                 if(first >= 0)
                 {

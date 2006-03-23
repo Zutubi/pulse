@@ -78,9 +78,7 @@ public class AddProjectWizard extends BaseWizard
         super.process();
 
         // initialise new project.
-        Project project = new Project();
-        project.setName(projectDetails.getName());
-        project.setDescription(projectDetails.getDescription());
+        Project project = new Project(projectDetails.getName(), projectDetails.getDescription());
         project.setUrl(projectDetails.getUrl());
 
         // setup scm details.

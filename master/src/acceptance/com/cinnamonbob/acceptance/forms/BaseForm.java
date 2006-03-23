@@ -11,6 +11,7 @@ public abstract class BaseForm
     protected static final int TEXTFIELD = 3;
     protected static final int CHECKBOX = 4;
     protected static final int RADIOBOX = 5;
+    protected static final int SELECT = 6;
 
     public BaseForm(WebTester tester)
     {

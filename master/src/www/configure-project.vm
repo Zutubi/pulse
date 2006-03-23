@@ -31,9 +31,28 @@
                     #dynamicRow("scm.location" "$project.scm.createServer().location")
                 </table>
                 <table id="project.cleanup" class="fill-content">
-                    #editHeadingRow("project.cleanup" 2 "editCleanupPolicy!input.action?projectId=$project.id" "project.cleanup.edit")
-                    #dynamicRow("project.work.dirs.deleted" $project.cleanupPolicy.prettyWorkDirDays)
-                    #dynamicRow("project.results.deleted" $project.cleanupPolicy.prettyResultDays)
+                    #headingRow("project.cleanup" 5)
+                    <tr>
+                        #contentHeading("cleanup.what" 1)
+                        #contentHeading("cleanup.states" 1)
+                        #contentHeading("cleanup.retain" 1)
+                        #contentHeading("actions" 2)
+                    </tr>
+#foreach($rule in $project.cleanupRules)
+    #set($confirmMessage = $action.getText("cleanup.confirm.delete"))
+                    <tr>
+    #if($rule.workDirOnly)
+                        #contentCell("cleanup.work")
+    #else
+                        #contentCell("cleanup.result")
+    #end
+                        #contentCell($rule.prettyStateNames)
+                        #contentCell($rule.prettyWhen)
+                        #editCell("editCleanupRule!input.action?projectId=$project.id&amp;id=$rule.id" "edit_cleanup_$rule.id")
+                        #deleteCell($confirmMessage "deleteCleanupRule.action?projectId=$project.id&amp;id=$rule.id" "delete_cleanup_$rule.id")
+                    </tr>
+#end
+                    #addRow("cleanup.rule.add" 5 "addCleanupRule!input.action?projectId=$project.id" "project.cleanup.add")
                 </table>
             </td>
             <td class="columns" width="40%">

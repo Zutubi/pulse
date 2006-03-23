@@ -1,0 +1,10 @@
+<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
+        "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
+<validators>
+    <field name="limit">
+        <field-validator type="int">
+            <param name="min">1</param>
+            <message key="cleanup.limit.positive">limit must be a positive value</message>
+        </field-validator>
+    </field>
+</validators>

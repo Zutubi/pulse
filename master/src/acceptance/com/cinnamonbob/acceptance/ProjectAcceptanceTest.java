@@ -252,81 +252,123 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         form.assertFormElements("/local", "", "", "", "", "-1");
     }
 
+    public void testAddCleanupPolicy()
+    {
+        CleanupRuleForm form = new CleanupRuleForm(tester, "addCleanupRule");
+
+        assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
+
+        clickLinkWithText("add new cleanup rule");
+
+        form.assertFormElements(null, null, "10", "builds");
+        assertOptionsEqual(CleanupRuleForm.WORK_DIR_ONLY, new String[]{ "whole build results", "working directories only" });
+        assertSelectionValues(CleanupRuleForm.WORK_DIR_ONLY, new String[]{ "true" });
+        assertOptionsEqual(CleanupRuleForm.STATE_NAMES, new String[]{ "error", "failure", "success"});
+        assertSelectionValues(CleanupRuleForm.STATE_NAMES, new String[] {});
+        assertRadioOptionPresent(CleanupRuleForm.BUILD_UNITS, "days");
+
+        tester.selectOption(CleanupRuleForm.WORK_DIR_ONLY, "whole build results");
+        selectMultipleValues(CleanupRuleForm.STATE_NAMES, new String[] { "ERROR", "SUCCESS" });
+        form.saveFormElements(null, null, "2", "days");
+
+        assertProjectCleanupTable(new String[][] {
+                getCleanupRow(true, "any", "10 builds"),
+                getCleanupRow(false, "error, success", "2 days")
+        });
+    }
+
+    public void testAddCleanupPolicyCancel()
+    {
+        CleanupRuleForm form = new CleanupRuleForm(tester, "addCleanupRule");
+
+        assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
+
+        clickLinkWithText("add new cleanup rule");
+
+        form.assertFormElements(null, null, "10", "builds");
+        tester.selectOption(CleanupRuleForm.WORK_DIR_ONLY, "whole build results");
+        selectMultipleValues(CleanupRuleForm.STATE_NAMES, new String[] { "ERROR", "SUCCESS" });
+        form.cancelFormElements(null, null, "2", "days");
+
+        assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
+    }
+
+    public void testAddCleanupPolicyValidation()
+    {
+        CleanupRuleForm form = new CleanupRuleForm(tester, "addCleanupRule");
+
+        assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
+
+        clickLinkWithText("add new cleanup rule");
+
+        form.saveFormElements(null, null, "0", "days");
+        form.assertFormPresent();
+        assertTextPresent("limit must be a positive value");
+    }
+
     public void testEditCleanupPolicyUpdate()
     {
-        CleanupPolicyForm form = new CleanupPolicyForm(tester);
-        assertProjectCleanupTable("after 30 days", "never");
+        CleanupRuleForm form = new CleanupRuleForm(tester, "editCleanupRule");
 
-        clickLink("project.cleanup.edit");
+        assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
 
-        form.assertFormElements("true", "30", "false", "0");
-        // check disabling both.
-        form.saveFormElements("false", null, "false", null);
-        assertProjectCleanupTable("never", "never");
+        clickLinkWithText("edit", 3);
 
-        clickLink("project.cleanup.edit");
-        form.assertFormElements("false", "0", "false", "0");
+        form.assertFormElements(null, null, "10", "builds");
+        assertOptionsEqual(CleanupRuleForm.WORK_DIR_ONLY, new String[]{ "whole build results", "working directories only" });
+        assertSelectionValues(CleanupRuleForm.WORK_DIR_ONLY, new String[]{ "true" });
+        assertOptionsEqual(CleanupRuleForm.STATE_NAMES, new String[]{ "error", "failure", "success"});
+        assertSelectionValues(CleanupRuleForm.STATE_NAMES, new String[] {});
+        assertRadioOptionPresent(CleanupRuleForm.BUILD_UNITS, "days");
 
-        form.saveFormElements(null, null, null, null);
-        assertProjectCleanupTable("never", "never");
+        tester.selectOption(CleanupRuleForm.WORK_DIR_ONLY, "whole build results");
+        selectMultipleValues(CleanupRuleForm.STATE_NAMES, new String[] { "ERROR", "SUCCESS" });
+        form.saveFormElements(null, null, "2", "days");
+
+        assertProjectCleanupTable(new String[][] { getCleanupRow(false, "error, success", "2 days") });
+
+        // Check form is correctly populated again
+        clickLinkWithText("edit", 3);
+
+        form.assertFormElements(null, null, "2", "days");
+        assertSelectionValues(CleanupRuleForm.WORK_DIR_ONLY, new String[]{ "false" });
+        assertSelectionValues(CleanupRuleForm.STATE_NAMES, new String[] { "ERROR", "SUCCESS"});
     }
 
     public void testEditCleanupPolicyCancel()
     {
-        CleanupPolicyForm form = new CleanupPolicyForm(tester);
-        assertProjectCleanupTable("after 30 days", "never");
+        CleanupRuleForm form = new CleanupRuleForm(tester, "editCleanupRule");
 
-        clickLink("project.cleanup.edit");
+        assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
 
-        form.assertFormElements("true", "30", "false", "0");
-        form.cancelFormElements("false", null, "false", null);
+        clickLinkWithText("edit", 3);
 
-        assertProjectCleanupTable("after 30 days", "never");
+        form.assertFormElements(null, null, "10", "builds");
+        tester.selectOption(CleanupRuleForm.WORK_DIR_ONLY, "whole build results");
+        selectMultipleValues(CleanupRuleForm.STATE_NAMES, new String[] { "ERROR", "SUCCESS" });
+        form.cancelFormElements(null, null, "2", "days");
+
+        assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
     }
 
     public void testEditCleanupPolicyValidation()
     {
-        // check that positive values only
-        CleanupPolicyForm form = new CleanupPolicyForm(tester);
-        clickLink("project.cleanup.edit");
+        CleanupRuleForm form = new CleanupRuleForm(tester, "editCleanupRule");
 
-        // check 0 value.
-        form.assertFormElements("true", "30", "false", "0");
-        form.saveFormElements("true", "0", null, null);
-        assertTextPresent("positive");
+        assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
 
-        // check negative value
-        form.assertFormElements("true", "0", "false", "0");
-        form.saveFormElements("true", "-3", null, null);
-        assertTextPresent("positive");
+        clickLinkWithText("edit", 3);
 
-        // check no value
-        form.assertFormElements("true", "-3", "false", "0");
-        form.saveFormElements("true", "", null, null);
-        assertTextPresent("positive");
+        form.saveFormElements(null, null, "0", "days");
+        form.assertFormPresent();
+        assertTextPresent("limit must be a positive value");
+    }
 
-        // repeat the above tests for the result cleanup field.
-
-        // check 0 value.
-        form.assertFormElements("true", "0", "false", "0");
-        form.saveFormElements("false", "0", "true", "0");
-        assertTextPresent("positive");
-
-        // check negative value
-        form.assertFormElements("false", "0", "true", "0");
-        form.saveFormElements(null, null, "true", "-3");
-        assertTextPresent("positive");
-
-        // check no value
-        form.assertFormElements("false", "0", "true", "-3");
-        form.saveFormElements(null, null, "true", "");
-        assertTextPresent("positive");
-
-        // ensure that working directories are cleaned up at least as frequently as results.
-        form.saveFormElements("true", "4", "true", "1");
-        assertTextPresent("least as frequently");
-        form.assertFormElements("true", "4", "true", "1");
-
+    public void testDeleteCleanupPolicy()
+    {
+        assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
+        clickLinkWithText("delete", 0);
+        assertProjectCleanupTable(null);
     }
 
     public void testAddNewBuildSpec()
@@ -586,13 +628,32 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         });
     }
 
-    private void assertProjectCleanupTable(String work, String results)
+    private void assertProjectCleanupTable(String[][] rows)
     {
         assertTablePresent("project.cleanup");
-        assertTableRowsEqual("project.cleanup", 1, new String[][]{
-                new String[]{"working directories deleted", work},
-                new String[]{"build results deleted", results}
-        });
+        if(rows != null)
+        {
+            String[][] allRows = new String[rows.length + 2][5];
+            allRows[0] = new String[]{"what", "with state(s)", "retain for up to", "actions", "actions"};
+            for(int i = 1; i <= rows.length; i++)
+            {
+                allRows[i] = rows[i - 1];
+            }
+            allRows[rows.length + 1] = new String[]{"add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule"};
+            assertTableRowsEqual("project.cleanup", 1, allRows);
+        }
+        else
+        {
+            assertTableRowsEqual("project.cleanup", 1, new String[][] {
+                    new String[] { "what", "with state(s)", "retain for up to", "actions"},
+                    new String[] { "add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule" }
+            });
+        }
+    }
+
+    private String[] getCleanupRow(boolean workDirsOnly, String states, String limit)
+    {
+        return new String[]{workDirsOnly ? "working directories" : "whole build results", states, limit, "edit", "delete"};
     }
 
     private void assertProjectBuildSpecTable(String[][] rows)

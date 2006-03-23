@@ -35,6 +35,7 @@
         <many-to-one name="root" class="com.cinnamonbob.model.RecipeResultNode" column="RECIPE_RESULT_ID"
                      cascade="all"/>
 
+        <property name="hasWorkDir" type="boolean"/>
     </class>
 
     <class name="com.cinnamonbob.model.BuildScmDetails" table="BUILD_SCM_DETAILS" lazy="false">

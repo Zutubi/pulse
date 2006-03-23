@@ -457,9 +457,21 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="editCleanupPolicy" class="com.cinnamonbob.web.project.EditCleanupPolicyAction">
-            <result name="input" type="velocity">edit-cleanup-policy.vm</result>
+        <action name="addCleanupRule" class="com.cinnamonbob.web.project.AddCleanupRuleAction">
+            <result name="input" type="velocity">add-cleanup-rule.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="editCleanupRule" class="com.cinnamonbob.web.project.EditCleanupRuleAction">
+            <result name="input" type="velocity">edit-cleanup-rule.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="deleteCleanupRule" class="com.cinnamonbob.web.project.DeleteCleanupRuleAction">
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>

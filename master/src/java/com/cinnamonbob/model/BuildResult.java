@@ -15,6 +15,10 @@ public class BuildResult extends Result
     private long number;
     private BuildScmDetails scmDetails;
     private RecipeResultNode root;
+    /**
+     * Set to false when the working directory is cleaned up.
+     */
+    private boolean hasWorkDir;
 
     public BuildResult()
     {
@@ -28,6 +32,7 @@ public class BuildResult extends Result
         this.number = number;
         state = ResultState.INITIAL;
         root = new RecipeResultNode(null);
+        hasWorkDir = true;
     }
 
     public Project getProject()
@@ -73,6 +78,16 @@ public class BuildResult extends Result
     private void setRoot(RecipeResultNode root)
     {
         this.root = root;
+    }
+
+    public boolean getHasWorkDir()
+    {
+        return hasWorkDir;
+    }
+
+    public void setHasWorkDir(boolean hasWorkDir)
+    {
+        this.hasWorkDir = hasWorkDir;
     }
 
     public void abortUnfinishedRecipes()

@@ -29,4 +29,24 @@ public abstract class ExtendedWebTestCase extends WebTestCase
     {
         return tester.getDialog().getFormParameterValue(formElementName);
     }
+
+    public String[] getSelectionValues(String formElementName)
+    {
+        return tester.getDialog().getForm().getParameterValues(formElementName);
+    }
+
+    public void selectMultipleValues(String formElementName, String[] values)
+    {
+        tester.getDialog().getForm().setParameter(formElementName, values);
+    }
+
+    public void assertSelectionValues(String formElementName, String[] expected)
+    {
+        String[] got = getSelectionValues(formElementName);
+        assertEquals(expected.length, got.length);
+        for(int i = 0; i < got.length; i++)
+        {
+            assertEquals(expected[i], got[i]);
+        }
+    }
 }

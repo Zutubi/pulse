@@ -18,20 +18,20 @@
                      lazy="false" cascade="all"/>
 
         <bag name="buildSpecifications" cascade="all-delete-orphan" lazy="false">
-            <key column="PROJECTID"/>
+            <key column="PROJECT_ID"/>
             <one-to-many class="com.cinnamonbob.model.BuildSpecification"/>
         </bag>
 
-        <component name="cleanupPolicy" class="com.cinnamonbob.model.AgeBuildResultCleanupPolicy">
-            <property name="workDirDays" column="WORK_DIR_DAYS" type="long"/>
-            <property name="resultDays" column="RESULT_DAYS" type="long"/>
-        </component>
+        <bag name="cleanupRules" cascade="all-delete-orphan" lazy="false">
+            <key column="PROJECT_ID"/>
+            <one-to-many class="com.cinnamonbob.model.CleanupRule"/>
+        </bag>
 
         <many-to-one name="scm" class="com.cinnamonbob.model.Scm" column="SCM" cascade="all"
                      lazy="false"/>
     </class>
 
-    <class name="com.cinnamonbob.model.BobFileDetails" lazy="false">
+    <class name="com.cinnamonbob.model.BobFileDetails" table="BOB_FILE_DETAILS" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -80,6 +80,20 @@
             <property name="targets" column="TARGETS" type="string" length="255"/>
         </subclass>
 
+    </class>
+
+    <class name="com.cinnamonbob.model.CleanupRule" table="CLEANUP_RULE" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="workDirOnly" type="boolean"/>
+
+        <property name="stateNames" type="string"/>
+
+        <property name="limit" type="int"/>
+
+        <property name="unitName" type="string"/>
     </class>
 
     <query name="findByLikeName"><![CDATA[

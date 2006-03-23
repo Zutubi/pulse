@@ -11,13 +11,13 @@ import java.util.List;
  */
 public class Project extends Entity
 {
-    public static final int DEFAULT_WORK_DIR_DAYS = 30;
+    public static final int DEFAULT_WORK_DIR_BUILDS = 10;
 
     private String name;
     private String description;
     private String url;
     private BobFileDetails bobFileDetails;
-    private AgeBuildResultCleanupPolicy cleanupPolicy = new AgeBuildResultCleanupPolicy(DEFAULT_WORK_DIR_DAYS, AgeBuildResultCleanupPolicy.NEVER_CLEAN);
+    private List<CleanupRule> cleanupRules = new LinkedList<CleanupRule>();
     private Scm scm;
 
     private List<BuildSpecification> buildSpecifications;
@@ -28,9 +28,7 @@ public class Project extends Entity
 
     public Project(String name, String description)
     {
-        this.name = name;
-        this.description = description;
-        this.bobFileDetails = new CustomBobFileDetails("bob.xml");
+        this(name, description, new CustomBobFileDetails("bob.xml"));
     }
 
     public Project(String name, String description, BobFileDetails bobFileDetails)
@@ -38,6 +36,7 @@ public class Project extends Entity
         this.name = name;
         this.description = description;
         this.bobFileDetails = bobFileDetails;
+        this.addCleanupRule(new CleanupRule(true, null, DEFAULT_WORK_DIR_BUILDS, CleanupRule.CleanupUnit.BUILDS));
     }
 
     public String getName()
@@ -68,16 +67,6 @@ public class Project extends Entity
     public void setUrl(String url)
     {
         this.url = url;
-    }
-
-    public AgeBuildResultCleanupPolicy getCleanupPolicy()
-    {
-        return cleanupPolicy;
-    }
-
-    public void setCleanupPolicy(AgeBuildResultCleanupPolicy cleanupPolicy)
-    {
-        this.cleanupPolicy = cleanupPolicy;
     }
 
     public Scm getScm()
@@ -135,5 +124,42 @@ public class Project extends Entity
     public void setBobFileDetails(BobFileDetails bobFileDetails)
     {
         this.bobFileDetails = bobFileDetails;
+    }
+
+    public List<CleanupRule> getCleanupRules()
+    {
+        return cleanupRules;
+    }
+
+    private void setCleanupRules(List<CleanupRule> cleanupRules)
+    {
+        this.cleanupRules = cleanupRules;
+    }
+
+    public void addCleanupRule(CleanupRule rule)
+    {
+        cleanupRules.add(rule);
+    }
+
+    public CleanupRule getCleanupRule(long id)
+    {
+        for(CleanupRule rule: cleanupRules)
+        {
+            if(rule.getId() == id)
+            {
+                return rule;
+            }
+        }
+
+        return null;
+    }
+
+    public void removeCleanupRule(long id)
+    {
+        CleanupRule deadRuleWalking = getCleanupRule(id);
+        if(deadRuleWalking != null)
+        {
+            cleanupRules.remove(deadRuleWalking);
+        }
     }
 }
