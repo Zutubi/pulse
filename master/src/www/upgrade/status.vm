@@ -1,17 +1,11 @@
 <html>
 <head>
-    #if(!$monitor.isComplete())
     <meta http-equiv="refresh" content='5;url=#wwurl("includeParams=all")'/>
-    #end
 </head>
 
 <body>
 
-#if(!$monitor.isComplete())
 <h1>Upgrade Progress</h1>
-#else
-<h1>Upgrade Complete</h1>
-#end
 
 <p>
     The upgrade is currently in progress.
@@ -20,6 +14,9 @@
 <p>
 
 <table width=500>
+    <tr>
+        <td colspan="2" nowrap>Percentage complete: $monitor.getPercentageComplete()%</td>
+    </tr>
     <tr width="40%">
         #if ($monitor.isSuccessful())
             #set($styleClass = "okaybar")
@@ -28,10 +25,8 @@
         #else
             #set($styleClass = "clearbar")
         #end
-        #if ($monitor.isComplete())
-            <td width="100%" class="$styleClass">&nbsp;</td>
-        #elseif ($monitor.getPercentageComplete() == 0)
-            <td class="clearbar">&nbsp;</td>
+        #if ($monitor.getPercentageComplete() == 0)
+            <td colspan="2" class="clearbar">&nbsp;</td>
         #else
             <td width="$monitor.getPercentageComplete()%" class="$styleClass"/>
             <td class="clearbar">&nbsp;</td>
@@ -59,12 +54,6 @@
 <p>
     Elapsed time: $monitor.getElaspedTime()
 </p>
-
-#if ($monitor.isComplete())
-<p>
-The upgrade has completed. <a href="/dashboard.action">continue</a>. <a href="preview.action">restart</a>.
-</p>
-#end
 
 </body>
 </html>

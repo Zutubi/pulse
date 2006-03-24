@@ -20,7 +20,7 @@ public class UpgradeProgressMonitor
 
     private boolean error = false;
 
-    private Map<String, UpgradeTaskProgress> taskProgress = new TreeMap<String, UpgradeTaskProgress>();;
+    private Map<String, UpgradeTaskProgress> taskProgress = new TreeMap<String, UpgradeTaskProgress>();
 
     protected void start()
     {

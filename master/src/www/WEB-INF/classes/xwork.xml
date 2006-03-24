@@ -596,7 +596,7 @@
         <action name="execute" class="com.cinnamonbob.web.upgrade.UpgradeExecuteAction">
             <interceptor-ref name="executeAndWaitStack"/>
             <result name="wait" type="velocity">status.vm</result>
-            <result name="success" type="velocity">status.vm</result>
+            <result name="success" type="velocity">complete.vm</result>
         </action>
 
     </package>
