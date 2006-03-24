@@ -564,7 +564,7 @@
     #if($summary.total == 0)
         #wwtext("name=tests.none")
     #else
-        #if($summary.allPassed)
+        #if(!$summary.hasBrokenTests())
         $action.getText("tests.all.passed", ["$summary.total"])
         #else
         $action.getText("tests.some.broken", ["$summary.broken", "$summary.total"])
