@@ -7,11 +7,11 @@
     </recipe>
 
     <post-processor name="my-pp">
-        <regex>
+        <regex.pp>
             <pattern category="info" expression="info:.*"/>
             <pattern category="warning" expression="warning:.*"/>
             <pattern category="error" expression="error:.*"/>
-        </regex>
+        </regex.pp>
     </post-processor>
 
     <recipe name="my-default">

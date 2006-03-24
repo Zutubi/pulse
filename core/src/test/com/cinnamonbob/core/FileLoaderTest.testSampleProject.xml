@@ -5,25 +5,25 @@
     <property name="ant.bin" value="E:/opt/ant/apache-ant-1.6.2/bin/ant"/>
 
     <post-processor name="generic.pp">
-        <regex>
+        <regex.pp>
             <pattern category="error" expression=".*[Ee]rror.*"/>
             <pattern category="warning" expression=".*[Ww]arning.*"/>
-        </regex>
+        </regex.pp>
     </post-processor>
     <post-processor name="ant.pp">
-        <regex>
+        <regex.pp>
             <pattern category="info" expression=".*BUILD.*"/>
-        </regex>
+        </regex.pp>
     </post-processor>
     <post-processor name="svn.pp">
-        <regex>
+        <regex.pp>
             <pattern category="info" expression=".*Checked out revision.*"/>
-        </regex>
+        </regex.pp>
     </post-processor>
     <post-processor name="junit.pp">
-        <regex>
+        <regex.pp>
             <pattern category="info" expression="Tests run.*"/>
-        </regex>
+        </regex.pp>
     </post-processor>
 
 

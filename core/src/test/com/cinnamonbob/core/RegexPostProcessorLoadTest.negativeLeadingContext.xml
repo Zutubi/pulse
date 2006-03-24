@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
 <project>
-    <regex name="oops" leadingContext="-1"/>
+    <regex.pp name="oops" leadingContext="-1"/>
 </project>

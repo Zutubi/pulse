@@ -47,7 +47,8 @@ public class RecipeProcessor
             fileLoader.register("def", ComponentDefinition.class);
             fileLoader.register("post-processor", PostProcessorGroup.class);
             fileLoader.register("command", CommandGroup.class);
-            fileLoader.register("regex", RegexPostProcessor.class);
+            fileLoader.register("junit.pp", JUnitReportPostProcessor.class);
+            fileLoader.register("regex.pp", RegexPostProcessor.class);
             fileLoader.register("ant", AntCommand.class);
             fileLoader.register("executable", ExecutableCommand.class);
             fileLoader.register("make", MakeCommand.class);

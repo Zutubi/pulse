@@ -1,7 +1,7 @@
 package com.cinnamonbob.core;
 
-import com.cinnamonbob.test.BobTestCase;
 import com.cinnamonbob.core.model.Property;
+import com.cinnamonbob.test.BobTestCase;
 
 /**
  * Helper base class for file loader tests.
@@ -31,7 +31,8 @@ public abstract class FileLoaderTestBase extends BobTestCase
         loader.register("def", ComponentDefinition.class);
         loader.register("post-processor", PostProcessorGroup.class);
         loader.register("command", CommandGroup.class);
-        loader.register("regex", RegexPostProcessor.class);
+        loader.register("junit.pp", RegexPostProcessor.class);
+        loader.register("regex.pp", RegexPostProcessor.class);
         loader.register("executable", ExecutableCommand.class);
         loader.register("ant", AntCommand.class);
         loader.register("make", MakeCommand.class);

@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
 <project>
-    <regex name="empty"/>
+    <regex.pp name="empty"/>
 
-    <regex name="noFailOnError" fail-on-error="false"/>
+    <regex.pp name="noFailOnError" fail-on-error="false"/>
 
-    <regex name="failOnWarning" fail-on-warning="true"/>
+    <regex.pp name="failOnWarning" fail-on-warning="true"/>
 
-    <regex name="errorPattern">
+    <regex.pp name="errorPattern">
         <pattern category="error" expression="."/>
-    </regex>
+    </regex.pp>
 
-    <regex name="warningPattern">
+    <regex.pp name="warningPattern">
         <pattern category="warning" expression="."/>
-    </regex>
+    </regex.pp>
 
-    <regex name="infoPattern">
+    <regex.pp name="infoPattern">
         <pattern category="info" expression="."/>
-    </regex>
+    </regex.pp>
 
-    <regex name="context" leadingContext="1" trailingContext="2"/>
+    <regex.pp name="context" leadingContext="1" trailingContext="2"/>
 
 </project>

@@ -2,9 +2,9 @@
 <project name="testProject" defaultRecipe="default">
 
     <post-processor name="connections.pp">
-        <regex>
+        <regex.pp>
             <pattern category="info" expression=".*TCP.*"/>
-        </regex>
+        </regex.pp>
     </post-processor>
 
     <recipe name="default">
