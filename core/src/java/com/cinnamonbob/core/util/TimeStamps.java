@@ -107,10 +107,9 @@ public class TimeStamps
         return getPrettyTime(endTime);
     }
 
-    public String getPrettyElapsed()
+    public static String getPrettyElapsed(long elapsed)
     {
         StringBuffer result = new StringBuffer();
-        long elapsed = getElapsed();
 
         if (elapsed == UNINITIALISED_TIME)
         {
@@ -130,6 +129,12 @@ public class TimeStamps
         }
 
         return result.toString();
+
+    }
+
+    public String getPrettyElapsed()
+    {
+        return getPrettyElapsed(getElapsed());
     }
 
     public boolean equals(Object other)
@@ -143,7 +148,7 @@ public class TimeStamps
         return queueTime == otherStamps.queueTime && startTime == otherStamps.startTime && endTime == otherStamps.endTime;
     }
 
-    private long addElapsedPart(long elapsed, long millisPerPart, String partName, StringBuffer result)
+    private static long addElapsedPart(long elapsed, long millisPerPart, String partName, StringBuffer result)
     {
         if (elapsed >= millisPerPart)
         {

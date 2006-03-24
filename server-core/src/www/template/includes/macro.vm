@@ -179,6 +179,7 @@
         #buildTab($result "summary" "viewBuild" $selected)
         #buildTab($result "command-log" "viewCommandLog" $selected)
         #buildTab($result "changes" "viewChanges" $selected)
+        #buildTab($result "tests" "viewTests" $selected)
         #buildTab($result "artifacts" "viewBuildArtifacts" $selected)
         #tabItem("working-dir" "browseProjectDir.action?buildId=$result.id&amp;recipeId=$result.root.children.get(0).result.id" $selected)
     #closeTabs()
@@ -557,7 +558,7 @@
 ##
 ## Outputs a result test summary cell
 ##
-#macro(testsCell $result)
+#macro(testResultsCell $result)
     <td class="$result.state.string">
         #set($summary = $result.testSummary)
     #if($summary.total == 0)
@@ -595,6 +596,15 @@
 #macro(changesCell $project $result)
     <td class="content">
         <a href="viewChanges.action?id=$result.id">#wwtext("name=changes")</a>
+    </td>
+#end
+
+##
+## Outputs an action cell for viewing tests for a build
+##
+#macro(testsCell $project $result)
+    <td class="content">
+        <a href="viewTests.action?id=$result.id">#wwtext("name=tests")</a>
     </td>
 #end
 
@@ -789,7 +799,7 @@
             #set($cssClass = $recipe.state.string)
             #dynamicCell($recipe.recipeNameSafe)
             #statusCell($recipe)
-            #testsCell($recipe)
+            #testResultsCell($recipe)
             #classCell($recipe.stamps.prettyStartTime)
             #classCell($recipe.stamps.prettyElapsed)
 ##            #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$build.project.id")
@@ -807,7 +817,7 @@
             #set($cssClass = $command.state.string)
             #dynamicLinkCell($command.commandName "viewCommandLog.action?id=$build.id#command-$velocityCount")
             #statusCell($command)
-            #testsCell($command)
+            #testResultsCell($command)
             #classCell($command.stamps.prettyStartTime)
             #classCell($command.stamps.prettyElapsed)
         </tr>
@@ -1188,7 +1198,7 @@
     <table>
         <tr><td>
             <table class="content">
-                #headingRow("build.summary" 12)
+                #headingRow("build.summary" 13)
                 <tr>
                     #contentHeading("build.id" 1)
                     #contentHeading("build.status" 2)
@@ -1197,14 +1207,14 @@
                     #contentHeading("build.when" 1)
                     #contentHeading("build.elapsed" 1)
     #if($showActions)
-                    #contentHeading("actions" 5)
+                    #contentHeading("actions" 6)
     #end
                 </tr>
                 <tr>
                     #set($cssClass = $buildResult.state.string)
                     #rightCell($buildResult.number)
                     #statusCell($buildResult)
-                    #testsCell($buildResult)
+                    #testResultsCell($buildResult)
                     #classCell($buildResult.buildSpecification)
                     #classCell($buildResult.stamps.prettyStartTime)
                     #classCell($buildResult.stamps.prettyElapsed)
@@ -1212,6 +1222,7 @@
                     #viewCell($project $buildResult)
                     #logCell($project $buildResult)
                     #changesCell($project $buildResult)
+                    #testsCell($project $buildResult)
                     #artifactsCell($project $buildResult)
                     #workingCopyCell($project $buildResult)
     #end
@@ -1284,7 +1295,7 @@
 ##
 #macro(recentBuilds $projects $showAdd)
     <table class="content">
-        #headingRow("latest.builds" 13)
+        #headingRow("latest.builds" 14)
         <tr>
             #contentHeading("project.name" 1)
             #contentHeading("build.status" 2)
@@ -1293,7 +1304,7 @@
             #contentHeading("build.id" 1)
             #contentHeading("build.spec" 1)
             #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 5)
+            #contentHeading("actions" 6)
         </tr>
 
     #foreach($project in $projects)
@@ -1307,7 +1318,7 @@
             #set($cssClass = $lastResult.state.string)
 
             #statusCell($lastResult)
-            #testsCell($lastResult)
+            #testResultsCell($lastResult)
             #classCell($lastResult.stamps.prettyStartTime)
             #rightClassCell($lastResult.number)
             #classCell($lastResult.buildSpecification)
@@ -1315,6 +1326,7 @@
             #viewCell($project $lastResult)
             #logCell($project $lastResult)
             #changesCell($project $lastResult)
+            #testsCell($project $lastResult)
             #artifactsCell($project $lastResult)
             #workingCopyCell($project $lastResult)
         #else
@@ -1330,11 +1342,12 @@
             #contentCell("empty.cell")
             #contentCell("empty.cell")
             #contentCell("empty.cell")
+            #contentCell("empty.cell")
         #end
         </tr>
     #end
     #if($showAdd)
-        #addRow("add.project" 13 "addProject!input.action" "project.add")
+        #addRow("add.project" 14 "addProject!input.action" "project.add")
     #end
         </table>
 #end

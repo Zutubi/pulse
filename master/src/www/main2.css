@@ -258,12 +258,12 @@ table.fill-content {
     width: 100%;
 }
 
-h3.heading, div.box, th.heading, th.info, th.content, th.content-row, td.content, td.content-centre, td.content-right, td.image, td.success, td.failure, td.error, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
+h3.heading, div.box, th.heading, th.info, th.content, th.content-row, td.content, td.content-centre, td.content-right, td.content-large, td.image, td.success, td.failure, td.error, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
     border: 1px solid #bbb;
     padding: 4px;
 }
 
-th.heading, th.info, th.content, th.content-row, td.content, td.success, td.failure, td.error, td.pending, td.inprogress, td.terminating, td.add {
+th.heading, th.info, th.content, th.content-row, td.content, td.content-large, td.success, td.failure, td.error, td.pending, td.inprogress, td.terminating, td.add {
     text-align: left;
     vertical-align: top;
 }
@@ -274,6 +274,11 @@ td.content-centre {
 
 td.content-right, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
     text-align: right;
+    vertical-align: top;
+}
+
+td.content-large {
+    font-size: 115%;
 }
 
 a img {

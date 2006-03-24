@@ -1,5 +1,7 @@
 package com.cinnamonbob.core.model;
 
+import com.cinnamonbob.core.util.TimeStamps;
+
 /**
  * Abstract base for test suites and cases.
  */
@@ -50,6 +52,18 @@ public abstract class TestResult extends Entity
     public void setDuration(long duration)
     {
         this.duration = duration;
+    }
+
+    public String getPrettyDuration()
+    {
+        if(duration >= 0)
+        {
+            return TimeStamps.getPrettyElapsed(duration);
+        }
+        else
+        {
+            return "";
+        }
     }
 
     public abstract int getErrors();

@@ -41,7 +41,7 @@
             #set($cssClass = $commandResult.state.string)
             #contentCell($commandResult.commandName)
             #statusCell($commandResult)
-            #testsCell($commandResult)
+            #testResultsCell($commandResult)
             #classCell($commandResult.stamps.prettyStartTime)
             #classCell($commandResult.stamps.prettyElapsed)
         </tr>

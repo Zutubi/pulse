@@ -88,4 +88,9 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     {
         return object != null;
     }
+
+    public String wrapString(String s, int lineLength)
+    {
+        return StringUtils.wrapString(s, lineLength, null);
+    }
 }

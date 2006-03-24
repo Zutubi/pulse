@@ -81,36 +81,57 @@ public class StringUtils
                 break;
             }
 
-            // Need to find a place to trim, starting at i + effectiveLineLength
-            int candidate = i + effectiveLineLength;
+            // Check for existing newlines in this span
             int j;
-            for (j = candidate; j > i; j--)
+            boolean alreadySplit = false;
+            for(j = i + effectiveLineLength; j >= i; j--)
             {
-                if (s.charAt(j) == ' ')
+                if(s.charAt(j) == '\n')
                 {
-                    // OK, found a spot to split
-                    result.append(s.substring(i, j));
-                    result.append('\n');
-                    if (prefix != null)
+                    // Already split at this point, continue from the split
+                    alreadySplit = true;
+                    result.append(s.substring(i, j + 1));
+                    if(prefix != null)
                     {
                         result.append(prefix);
                     }
-
                     i = j + 1;
                     break;
                 }
             }
 
-            if (j == i)
+            if(!alreadySplit)
             {
-                // No space found
-                result.append(s.substring(i, candidate));
-                result.append('\n');
-                if (prefix != null)
+                // Need to find a place to trim, starting at i + effectiveLineLength
+                int candidate = i + effectiveLineLength;
+                for (j = candidate; j > i; j--)
                 {
-                    result.append(prefix);
+                    if (s.charAt(j) == ' ')
+                    {
+                        // OK, found a spot to split
+                        result.append(s.substring(i, j));
+                        result.append('\n');
+                        if (prefix != null)
+                        {
+                            result.append(prefix);
+                        }
+
+                        i = j + 1;
+                        break;
+                    }
                 }
-                i = candidate;
+
+                if (j == i)
+                {
+                    // No space found
+                    result.append(s.substring(i, candidate));
+                    result.append('\n');
+                    if (prefix != null)
+                    {
+                        result.append(prefix);
+                    }
+                    i = candidate;
+                }
             }
 
             if (prefix != null)

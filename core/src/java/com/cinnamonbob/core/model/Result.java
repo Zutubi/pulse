@@ -297,6 +297,11 @@ public abstract class Result extends Entity
 
     public abstract void accumulateTestSummary(TestResultSummary summary);
 
+    public boolean hasTests()
+    {
+        return getTestSummary().getTotal() > 0;
+    }
+
     public boolean hasBrokenTests()
     {
         return getTestSummary().getBroken() > 0;
