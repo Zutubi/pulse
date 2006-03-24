@@ -99,4 +99,12 @@ public class CommandResult extends Result
     {
         return artifacts.size() > 0;
     }
+
+    public void accumulateTestSummary(TestResultSummary summary)
+    {
+        for (StoredArtifact a : artifacts)
+        {
+            a.accumulateTestSummary(summary);
+        }
+    }
 }

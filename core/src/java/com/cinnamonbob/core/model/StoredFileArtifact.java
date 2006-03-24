@@ -111,7 +111,7 @@ public class StoredFileArtifact extends Entity
     {
         String mimeType;
 
-        if(type == null)
+        if (type == null)
         {
             mimeType = URLConnection.guessContentTypeFromName(path);
         }
@@ -120,14 +120,14 @@ public class StoredFileArtifact extends Entity
             mimeType = type;
         }
 
-        if(mimeType != null && mimeType.equals(TYPE_PLAIN))
+        if (mimeType != null && mimeType.equals(TYPE_PLAIN))
         {
             return true;
         }
 
-        for(Feature f: features)
+        for (Feature f : features)
         {
-            if(f instanceof PlainFeature)
+            if (f instanceof PlainFeature)
             {
                 return true;
             }
@@ -149,5 +149,25 @@ public class StoredFileArtifact extends Entity
     public void addTest(TestResult test)
     {
         tests.add(test);
+    }
+
+    public boolean hasBrokenTests()
+    {
+        return getTestSummary().getBroken() > 0;
+    }
+
+    public TestResultSummary getTestSummary()
+    {
+        TestResultSummary summary = new TestResultSummary();
+        accumulateTestSummary(summary);
+        return summary;
+    }
+
+    public void accumulateTestSummary(TestResultSummary summary)
+    {
+        for (TestResult test : tests)
+        {
+            test.accumulateSummary(summary);
+        }
     }
 }

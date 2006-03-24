@@ -29,10 +29,11 @@
         </h2>
 
     <table class="content">
-        #headingRow("summary" 5)
+        #headingRow("summary" 6)
         <tr>
             #contentHeading("command.name" 1)
             #contentHeading("build.status" 2)
+            #contentHeading("build.tests" 1)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
         </tr>
@@ -40,12 +41,13 @@
             #set($cssClass = $commandResult.state.string)
             #contentCell($commandResult.commandName)
             #statusCell($commandResult)
+            #testsCell($commandResult)
             #classCell($commandResult.stamps.prettyStartTime)
             #classCell($commandResult.stamps.prettyElapsed)
         </tr>
         #if($commandResult.hasDirectMessages($errorLevel))
         <tr>
-            <td class="error" colspan="5">
+            <td class="error" colspan="6">
                 <ul>
             #foreach($feature in $commandResult.getFeatures($errorLevel))
                     <li class="error">$!webwork.htmlEncode($feature.summary)</li>
@@ -56,7 +58,7 @@
         #end
         #if($commandResult.hasDirectMessages($warningLevel))
         <tr>
-            <td class="warning" colspan="5">
+            <td class="warning" colspan="6">
                 <ul>
             #foreach($feature in $commandResult.getFeatures($warningLevel))
                     <li class="warning">$!webwork.htmlEncode($feature.summary)</li>

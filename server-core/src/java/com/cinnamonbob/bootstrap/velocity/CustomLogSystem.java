@@ -17,6 +17,7 @@ public class CustomLogSystem implements LogSystem
     public void logVelocityMessage(int level, String message)
     {
         // Ignore it all because Velocity's loggin is b0rked!
+        System.out.println(message);
 //        switch (level)
 //        {
 //            case DEBUG_ID:

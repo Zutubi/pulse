@@ -53,7 +53,27 @@ public abstract class TestResult extends Entity
     }
 
     public abstract int getErrors();
+
     public abstract int getFailures();
+
     public abstract int getTotal();
 
+    public abstract boolean isSuite();
+
+    public boolean hasBrokenTests()
+    {
+        return getSummary().getBroken() > 0;
+    }
+
+    public TestResultSummary getSummary()
+    {
+        return new TestResultSummary(getErrors(), getFailures(), getTotal());
+    }
+
+    public void accumulateSummary(TestResultSummary summary)
+    {
+        summary.addErrors(getErrors());
+        summary.addFailures(getFailures());
+        summary.addTotal(getTotal());
+    }
 }

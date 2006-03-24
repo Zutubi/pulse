@@ -177,4 +177,12 @@ public class RecipeResult extends Result
 
         return false;
     }
+
+    public void accumulateTestSummary(TestResultSummary summary)
+    {
+        for (CommandResult c : results)
+        {
+            c.accumulateTestSummary(summary);
+        }
+    }
 }

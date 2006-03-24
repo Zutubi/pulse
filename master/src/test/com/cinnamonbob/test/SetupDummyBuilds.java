@@ -92,6 +92,9 @@ public class SetupDummyBuilds implements Runnable
             project = setupProject("terminating build");
             createTerminatingBuild(project);
 
+            project = setupProject("test errors");
+            createTestErrors(project);
+
             setupUsers(project);
         }
     }
@@ -311,6 +314,19 @@ public class SetupDummyBuilds implements Runnable
         buildResultDao.save(result);
     }
 
+    private void createTestErrors(Project project)
+    {
+        BuildResult result = new BuildResult(project, getSpec(project), 666);
+
+        buildResultDao.save(result);
+        result.commence(System.currentTimeMillis());
+        RecipeResultNode resultNode = createTestErrorsRecipe(project, result);
+        result.getRoot().addChild(resultNode);
+        result.failure("recipe :: " + resultNode.getResult().getRecipeNameSafe() + " :: some tests broken");
+        result.complete();
+        buildResultDao.save(result);
+    }
+
     private String getSpec(Project project)
     {
         return project.getBuildSpecifications().get(0).getName();
@@ -412,6 +428,19 @@ public class SetupDummyBuilds implements Runnable
         return node;
     }
 
+    private RecipeResultNode createTestErrorsRecipe(Project project, BuildResult buildResult)
+    {
+        RecipeResult recipeResult = new RecipeResult(null);
+        buildResultDao.save(recipeResult);
+        File recipeDir = masterBuildPaths.getRecipeDir(project, buildResult, recipeResult.getId());
+        recipeResult.commence(recipeDir);
+        CommandResult command = createTestErrorsCommand(0, recipeDir);
+        recipeResult.add(command);
+        recipeResult.failure("command :: " + command.getCommandName() + " :: some tests broken");
+        recipeResult.complete();
+        return new RecipeResultNode(recipeResult);
+    }
+
     private CommandResult createComplexCommand()
     {
         CommandResult result = new CommandResult("complex command");
@@ -471,17 +500,27 @@ public class SetupDummyBuilds implements Runnable
 
     private CommandResult createErrorFeaturesCommand(int index, File recipeDir)
     {
-        CommandResult result = new CommandResult("complex command");
+        CommandResult result = new CommandResult("error features command");
         File commandDir = new File(recipeDir, RecipeProcessor.getCommandDirName(index, result));
         File outputDir = new File(commandDir, "output");
         result.commence(outputDir);
-        result.getProperties().put("command line", "/usr/local/bin/make -f my/path/to/Makefile build");
-        result.getProperties().put("exit code", "0");
         result.addArtifact(createInfoArtifact("command output", "output.txt"));
         result.addArtifact(createWarningArtifact("warnings here", "this/file/is/nested/several/dirs/down"));
         result.addArtifact(createErrorArtifact(outputDir, "errors be here", "errors.txt"));
         result.addArtifact(createSimpleArtifact("junit report", "tests/junit.html"));
         result.addArtifact(createMultifileArtifact(outputDir, "multi ball"));
+        result.complete();
+        return result;
+    }
+
+    private CommandResult createTestErrorsCommand(int index, File recipeDir)
+    {
+        CommandResult result = new CommandResult("test errors command");
+        File commandDir = new File(recipeDir, RecipeProcessor.getCommandDirName(index, result));
+        File outputDir = new File(commandDir, "output");
+        result.commence(outputDir);
+        result.addArtifact(createTestErrorsArtifact(outputDir, "test errors artifact", "errors.txt"));
+        result.failure("Some tests broken");
         result.complete();
         return result;
     }
@@ -533,6 +572,40 @@ public class SetupDummyBuilds implements Runnable
         {
             e.printStackTrace();
         }
+
+        return artifact;
+    }
+
+    private StoredArtifact createTestErrorsArtifact(File outputDir, String name, String filename)
+    {
+        StoredArtifact artifact = createSimpleArtifact(name, filename);
+        StoredFileArtifact file = artifact.getFile();
+
+        TestSuiteResult suite = new TestSuiteResult("suite one");
+        suite.add(new TestCaseResult("pass1", 100));
+        suite.add(new TestCaseResult("pass2", 10000));
+        suite.add(new TestCaseResult("fail1", 1, TestCaseResult.Status.FAILURE, "fail1 failure message"));
+        file.addTest(suite);
+
+        suite = new TestSuiteResult("suite two");
+        suite.add(new TestCaseResult("2fail1", 1, TestCaseResult.Status.FAILURE, "2fail1 failure message"));
+        suite.add(new TestCaseResult("2error1", 1, TestCaseResult.Status.ERROR, "2error1 error message"));
+        file.addTest(suite);
+
+        suite = new TestSuiteResult("complex suite");
+        suite.add(new TestCaseResult("cpass1", 100));
+        suite.add(new TestCaseResult("cpass2", 10000));
+        suite.add(new TestCaseResult("cfail1", 1, TestCaseResult.Status.FAILURE, "a very long single line failure message that keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going"));
+        suite.add(new TestCaseResult("cerror1", 1, TestCaseResult.Status.ERROR, "a formatted error message:\n    this is indented\n    and this is indented below it"));
+        suite.add(new TestCaseResult("cerror2", 3245, TestCaseResult.Status.ERROR, "boring error"));
+        suite.add(new TestCaseResult("cpass3", 1050));
+        suite.add(new TestCaseResult("cpass4", 105005050));
+        TestSuiteResult nestedSuite = new TestSuiteResult("nested suite");
+        nestedSuite.add(new TestCaseResult("npass1", 11000));
+        nestedSuite.add(new TestCaseResult("nfail1", 1, TestCaseResult.Status.FAILURE, "nfail1 failure message"));
+        nestedSuite.add(new TestCaseResult("nerror1", 55067, TestCaseResult.Status.ERROR, "nerror1 failure message"));
+        suite.add(nestedSuite);
+        file.addTest(suite);
 
         return artifact;
     }

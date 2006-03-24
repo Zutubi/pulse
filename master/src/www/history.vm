@@ -28,10 +28,11 @@
             <td>
 
     <table width="100%" class="content">
-        #searchHeadingRow("recent.builds" 11 "searchBuilds.action?projectId=$project.id" "search.builds" "rss.action?projectId=$project.id" "rss.builds" )
+        #searchHeadingRow("recent.builds" 12 "searchBuilds.action?projectId=$project.id" "search.builds" "rss.action?projectId=$project.id" "rss.builds" )
         <tr>
             #contentHeading("build.id" 1)
             #contentHeading("build.status" 2)
+            #contentHeading("build.tests" 1)
             #contentHeading("build.spec" 1)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
@@ -43,6 +44,7 @@
         <tr>
             <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
             #statusCell($buildResult)
+            #testsCell($buildResult)
             #classCell($buildResult.buildSpecification)
             #classCell($buildResult.stamps.prettyStartTime)
             #classCell($buildResult.stamps.prettyElapsed)

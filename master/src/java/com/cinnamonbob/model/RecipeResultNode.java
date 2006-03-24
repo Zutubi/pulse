@@ -3,6 +3,7 @@ package com.cinnamonbob.model;
 import com.cinnamonbob.core.model.Entity;
 import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.core.model.RecipeResult;
+import com.cinnamonbob.core.model.TestResultSummary;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -132,5 +133,30 @@ public class RecipeResultNode extends Entity
         }
 
         return false;
+    }
+
+    public boolean hasBrokenTests()
+    {
+        return getTestSummary().getBroken() > 0;
+    }
+
+    public TestResultSummary getTestSummary()
+    {
+        TestResultSummary summary = new TestResultSummary();
+        accumulateTestSummary(summary);
+        return summary;
+    }
+
+    public void accumulateTestSummary(TestResultSummary summary)
+    {
+        if (result != null)
+        {
+            result.accumulateTestSummary(summary);
+        }
+
+        for (RecipeResultNode r : children)
+        {
+            r.accumulateTestSummary(summary);
+        }
     }
 }

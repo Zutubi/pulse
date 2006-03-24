@@ -555,6 +555,23 @@
 #end
 
 ##
+## Outputs a result test summary cell
+##
+#macro(testsCell $result)
+    <td class="$result.state.string">
+        #set($summary = $result.testSummary)
+    #if($summary.total == 0)
+        #wwtext("name=tests.none")
+    #else
+        #if($summary.allPassed)
+        $action.getText("tests.all.passed", ["$summary.total"])
+        #else
+        $action.getText("tests.some.broken", ["$summary.broken", "$summary.total"])
+        #end
+    #end
+#end
+
+##
 ## Outputs an action cell for viewing a build result
 ##
 #macro(viewCell $project $result)
@@ -757,36 +774,40 @@
 ##
 #macro(recipeSummary $resultNode $build)
     <table class="content">
-        #headingRow("recipe" 5)
+        #headingRow("recipe" 6)
         <tr>
             #contentHeading("recipe.name" 1)
             #contentHeading("build.status" 2)
+            #contentHeading("build.tests" 1)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
 ##            #contentHeading("actions" 1)
         </tr>
         <tr>
             #set($id = $resultNode.id)
-            #set($result = $resultNode.result)
-            #set($cssClass = $result.state.string)
-            #dynamicCell($result.recipeNameSafe)
-            #statusCell($result)
-            #classCell($result.stamps.prettyStartTime)
-            #classCell($result.stamps.prettyElapsed)
+            #set($recipe = $resultNode.result)
+            #set($cssClass = $recipe.state.string)
+            #dynamicCell($recipe.recipeNameSafe)
+            #statusCell($recipe)
+            #testsCell($recipe)
+            #classCell($recipe.stamps.prettyStartTime)
+            #classCell($recipe.stamps.prettyElapsed)
 ##            #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$build.project.id")
         </tr>
-#if($result.commandResults.size() > 0)
+#if($recipe.commandResults.size() > 0)
         <tr>
             #contentHeading("command.name" 1)
             #contentHeading("build.status" 2)
+            #contentHeading("build.tests" 1)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
         </tr>
-    #foreach($command in $result.commandResults)
+    #foreach($command in $recipe.commandResults)
         <tr>
             #set($cssClass = $command.state.string)
             #dynamicLinkCell($command.commandName "viewCommandLog.action?id=$build.id#command-$velocityCount")
             #statusCell($command)
+            #testsCell($command)
             #classCell($command.stamps.prettyStartTime)
             #classCell($command.stamps.prettyElapsed)
         </tr>
@@ -817,7 +838,7 @@
     <li class="header">#wwtext("name=artifact") :: $!webwork.htmlEncode("$fileArtifact.path")
         #end
         <ul>
-        #foreach($feature in $artifact.getFeatures($level))
+        #foreach($feature in $fileArtifact.getFeatures($level))
             <li class="$level.toString().toLowerCase()">
                 <pre class="feature">$!webwork.htmlEncode($feature.summary)</pre>
             #if($feature.isPlain())
@@ -826,6 +847,53 @@
                 </a>
             #end
             </li>
+        #end
+        </ul>
+        #if($showHeader)
+    </li>
+        #end
+    #end
+#end
+
+##
+## Summarises broken tests for the given test result
+##
+#macro(testSummary $build $command $fileArtifact $test)
+    #if($test.hasBrokenTests())
+        #if($test.isSuite())
+    <li class="header">#wwtext("name=test.suite") :: $!webwork.htmlEncode($test.name)
+        <ul>
+            #testSuiteSummary($build $command $fileArtifact $test)
+        </ul>
+    </li>
+        #else
+    <li class="error"><b>$test.status.toString().toLowerCase()</b> :: #wwtext("name=test.case") $!webwork.htmlEncode($test.name)
+        <pre class="feature">$!webwork.htmlEncode($test.message)</pre>
+    </li>
+         #end
+    #end
+#end
+
+##
+## Summarises broken tests for the given test suite result
+##
+#macro(testSuiteSummary $build $command $fileArtifact $suite)
+    #foreach($test in $suite.children)
+        #testSummary($build $command $fileArtifact $test)
+    #end
+#end
+
+##
+## Summarises broken tests for the given file artifact into a nested list
+##
+#macro(fileArtifactTestSummary $build $command $fileArtifact $showHeader)
+    #if($fileArtifact.hasBrokenTests())
+        #if($showHeader)
+    <li class="header">#wwtext("name=artifact") :: $!webwork.htmlEncode($fileArtifact.path)
+        #end
+        <ul>
+        #foreach($test in $fileArtifact.tests)
+            #testSummary($build $command $fileArtifact $test)
         #end
         </ul>
         #if($showHeader)
@@ -846,14 +914,34 @@
 #end
 
 ##
+## Summarises broken tests for the given artifact into a nested list
+##
+#macro(artifactTestSummary $build $recipe $command $artifact $showHeader)
+    #if($artifact.hasBrokenTests())
+        #foreach($fileArtifact in $artifact.children)
+            #fileArtifactTestSummary($build $command $fileArtifact $showHeader)
+        #end
+    #end
+#end
+
+##
 ## Summarises the messages of a given level on a command result into a nested list
 ##
 #macro(commandMessageSummary $build $commandResult $level)
     #if($commandResult.hasMessages($level))
         #resultMessageItems($commandResult $level)
-        #foreach($artifact in $commandResult.getArtifacts())
+        #foreach($artifact in $commandResult.artifacts)
             #artifactMessageSummary($build $commandResult $artifact $level true)
         #end
+    #end
+#end
+
+##
+## Summarises broken tests for the given command result into a nested list
+##
+#macro(commandTestSummary $build $recipe $command)
+    #foreach($artifact in $command.artifacts)
+        #artifactTestSummary($build $recipe $command $artifact true)
     #end
 #end
 
@@ -885,6 +973,21 @@
 #end
 
 ##
+## Summarises broken tests for the given recipe result into a nested list
+##
+#macro(recipeTestSummary $build $recipe)
+    #foreach($command in $recipe.commandResults)
+        #if($command.hasBrokenTests())
+    <li class="header">#wwtext("name=command") :: $!webwork.htmlEncode($command.commandName)
+        <ul>
+            #commandTestSummary($build $recipe $command)
+        </ul>
+    </li>
+        #end
+    #end
+#end
+
+##
 ## Summarises the messages of a given level on a recipe result node into a nested list
 ##
 #macro(nodeMessageSummary $build $node $level)
@@ -901,6 +1004,22 @@
 #end
 
 ##
+## Summarises broken tests for the given node into a nested list
+##
+#macro(nodeTestSummary $build $node)
+    #if($node.hasBrokenTests())
+    <li class="header">#wwtext("name=recipe") :: $!webwork.htmlEncode("$node.result.recipeNameSafe @ $node.hostSafe")
+        <ul>
+            #recipeTestSummary($build $node.result)
+        #foreach($child in $node.children)
+            #nodeMessageSummaru($build $child)
+        #end
+        </ul>
+    </il>
+    #end
+#end
+
+##
 ## Summarises the messages of a given level on a build result into a nested list
 ##
 #macro(buildMessageSummary $buildResult $level)
@@ -913,6 +1032,17 @@
         #end
         </ul>
     #end
+#end
+
+##
+## Summarises broken tests for the given build into a nested list
+##
+#macro(buildTestSummary $build)
+    <ul class="error">
+    #foreach($node in $build.root.children)
+        #nodeTestSummary($build $node)
+    #end
+    </ul>
 #end
 
 ##
@@ -945,6 +1075,11 @@
     #end
     #if($showFeatures)
         #fileArtifactFeatures($build $result $fileArtifact)
+        #if($fileArtifact.hasBrokenTests())
+            <ul class="error">
+                <li class="header">#wwtext("name=tests.broken")</li>
+                #fileArtifactTestSummary($build $result $fileArtifact false)
+        #end
     #end
     </li>
 #end
@@ -1053,10 +1188,11 @@
     <table>
         <tr><td>
             <table class="content">
-                #headingRow("build.summary" 11)
+                #headingRow("build.summary" 12)
                 <tr>
                     #contentHeading("build.id" 1)
                     #contentHeading("build.status" 2)
+                    #contentHeading("build.tests" 1)
                     #contentHeading("build.spec" 1)
                     #contentHeading("build.when" 1)
                     #contentHeading("build.elapsed" 1)
@@ -1068,6 +1204,7 @@
                     #set($cssClass = $buildResult.state.string)
                     #rightCell($buildResult.number)
                     #statusCell($buildResult)
+                    #testsCell($buildResult)
                     #classCell($buildResult.buildSpecification)
                     #classCell($buildResult.stamps.prettyStartTime)
                     #classCell($buildResult.stamps.prettyElapsed)
@@ -1089,6 +1226,18 @@
                    <td class="content">
                        #buildMessageSummary($buildResult $errorLevel)
                        #buildMessageSummary($buildResult $warningLevel)
+                   </td>
+               </tr>
+            </table>
+        </td></tr>
+    #end
+    #if($buildResult.hasBrokenTests())
+        <tr><td>
+            <table class="fill-content">
+                #headingRow("tests.broken" 1)
+               <tr>
+                   <td class="content">
+                       #buildTestSummary($buildResult)
                    </td>
                </tr>
             </table>
@@ -1135,10 +1284,11 @@
 ##
 #macro(recentBuilds $projects $showAdd)
     <table class="content">
-        #headingRow("latest.builds" 12)
+        #headingRow("latest.builds" 13)
         <tr>
             #contentHeading("project.name" 1)
             #contentHeading("build.status" 2)
+            #contentHeading("build.tests" 1)
             #contentHeading("last.built" 1)
             #contentHeading("build.id" 1)
             #contentHeading("build.spec" 1)
@@ -1157,6 +1307,7 @@
             #set($cssClass = $lastResult.state.string)
 
             #statusCell($lastResult)
+            #testsCell($lastResult)
             #classCell($lastResult.stamps.prettyStartTime)
             #rightClassCell($lastResult.number)
             #classCell($lastResult.buildSpecification)
@@ -1168,6 +1319,7 @@
             #workingCopyCell($project $lastResult)
         #else
             #contentCell("empty.cell")
+            #contentCell("not.applicable")
             #contentCell("not.applicable")
             #contentCell("built.never")
             #contentCell("not.applicable")
@@ -1182,7 +1334,7 @@
         </tr>
     #end
     #if($showAdd)
-        #addRow("add.project" 12 "addProject!input.action" "project.add")
+        #addRow("add.project" 13 "addProject!input.action" "project.add")
     #end
         </table>
 #end

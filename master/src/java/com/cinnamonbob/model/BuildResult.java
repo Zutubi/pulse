@@ -3,6 +3,7 @@ package com.cinnamonbob.model;
 import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.core.model.Result;
 import com.cinnamonbob.core.model.ResultState;
+import com.cinnamonbob.core.model.TestResultSummary;
 
 import java.util.List;
 
@@ -151,4 +152,8 @@ public class BuildResult extends Result
         this.scmDetails = scmDetails;
     }
 
+    public void accumulateTestSummary(TestResultSummary summary)
+    {
+        root.accumulateTestSummary(summary);
+    }
 }

@@ -49,7 +49,7 @@ public class TestSuiteResult extends TestResult
     {
         int result = 0;
 
-        for(TestResult child: children)
+        for (TestResult child : children)
         {
             result += child.getErrors();
         }
@@ -61,7 +61,7 @@ public class TestSuiteResult extends TestResult
     {
         int result = 0;
 
-        for(TestResult child: children)
+        for (TestResult child : children)
         {
             result += child.getFailures();
         }
@@ -73,11 +73,16 @@ public class TestSuiteResult extends TestResult
     {
         int result = 0;
 
-        for(TestResult child: children)
+        for (TestResult child : children)
         {
             result += child.getTotal();
         }
 
         return result;
+    }
+
+    public boolean isSuite()
+    {
+        return true;
     }
 }

@@ -86,4 +86,9 @@ public class TestCaseResult extends TestResult
     {
         return 1;
     }
+
+    public boolean isSuite()
+    {
+        return false;
+    }
 }
