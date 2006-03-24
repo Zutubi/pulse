@@ -1,11 +1,10 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Svn;
-import com.opensymphony.xwork.Preparable;
 
 /**
  */
-public class EditSvnAction extends AbstractEditScmAction implements Preparable
+public class EditSvnAction extends AbstractEditScmAction
 {
     private Svn scm = new Svn();
 

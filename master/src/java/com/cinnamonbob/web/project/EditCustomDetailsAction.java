@@ -2,7 +2,7 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.BobFileDetails;
 import com.cinnamonbob.model.CustomBobFileDetails;
-import com.opensymphony.xwork.Preparable;
+import com.cinnamonbob.xwork.interceptor.Preparable;
 
 /**
  *

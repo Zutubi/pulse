@@ -4,8 +4,8 @@ import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.HistoryPage;
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.xwork.interceptor.Preparable;
 import com.opensymphony.util.TextUtils;
-import com.opensymphony.xwork.Preparable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -148,6 +148,11 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
     public void setSpec(String spec)
     {
         this.spec = spec;
+    }
+
+    public List<String> getPrepareParameterNames()
+    {
+        return null;
     }
 
     public void prepare() throws Exception

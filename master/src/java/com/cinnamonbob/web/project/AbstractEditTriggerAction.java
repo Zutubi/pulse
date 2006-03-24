@@ -6,8 +6,9 @@ import com.cinnamonbob.scheduling.Scheduler;
 import com.cinnamonbob.scheduling.SchedulingException;
 import com.cinnamonbob.scheduling.Trigger;
 import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
-import com.opensymphony.xwork.Preparable;
+import com.cinnamonbob.xwork.interceptor.Preparable;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public abstract class AbstractEditTriggerAction extends ProjectActionSupport imp
     private Project project;
     private String specification;
     private List<String> specifications;
+    private static final List<String> ID_PARAMS = Arrays.asList("id", "projectId");
 
     public long getId()
     {
@@ -60,6 +62,11 @@ public abstract class AbstractEditTriggerAction extends ProjectActionSupport imp
     public void setSpecification(String specification)
     {
         this.specification = specification;
+    }
+
+    public List<String> getPrepareParameterNames()
+    {
+        return ID_PARAMS;
     }
 
     public void prepare() throws Exception

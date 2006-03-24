@@ -1,9 +1,10 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Project;
-import com.opensymphony.xwork.Preparable;
+import com.cinnamonbob.xwork.interceptor.Preparable;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 
@@ -13,6 +14,8 @@ public class EditProjectAction extends ProjectActionSupport implements Preparabl
 {
     private long id;
     private Project project;// = new Project();
+
+    private static final List<String> ID_PARAMS = Arrays.asList("id");
 
     public void setId(long id)
     {
@@ -38,6 +41,11 @@ public class EditProjectAction extends ProjectActionSupport implements Preparabl
         }
 
         return false;
+    }
+
+    public List<String> getPrepareParameterNames()
+    {
+        return ID_PARAMS;
     }
 
     public void prepare() throws Exception

@@ -1,15 +1,14 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.model.Cvs;
 import com.cinnamonbob.core.util.Constants;
-import com.opensymphony.xwork.Preparable;
+import com.cinnamonbob.model.Cvs;
 import com.opensymphony.util.TextUtils;
 
 /**
  *
  *
  */
-public class EditCvsAction extends AbstractEditScmAction implements Preparable
+public class EditCvsAction extends AbstractEditScmAction
 {
     private Cvs scm = new Cvs();
 

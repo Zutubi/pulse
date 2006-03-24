@@ -2,16 +2,21 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.Scm;
+import com.cinnamonbob.xwork.interceptor.Preparable;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
  *
  */
-public abstract class AbstractEditScmAction extends ProjectActionSupport
+public abstract class AbstractEditScmAction extends ProjectActionSupport implements Preparable
 {
     private long id;
     private long projectId;
     private Project project;
+    private static final List<String> ID_PARAMS = Arrays.asList("id");
 
     public long getId()
     {
@@ -36,6 +41,11 @@ public abstract class AbstractEditScmAction extends ProjectActionSupport
     public Project getProject()
     {
         return project;
+    }
+
+    public List<String> getPrepareParameterNames()
+    {
+        return ID_PARAMS;
     }
 
     public String doInput()

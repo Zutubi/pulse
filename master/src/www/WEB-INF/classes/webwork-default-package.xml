@@ -30,11 +30,12 @@
             <interceptor name="validation" class="com.opensymphony.xwork.validator.ValidationInterceptor"/>
             <interceptor name="workflow" class="com.opensymphony.xwork.interceptor.DefaultWorkflowInterceptor"/>
             <interceptor name="servlet-config" class="com.opensymphony.webwork.interceptor.ServletConfigInterceptor"/>
-            <interceptor name="prepare" class="com.opensymphony.xwork.interceptor.PrepareInterceptor"/>
             <interceptor name="conversionError"
                          class="com.opensymphony.webwork.interceptor.WebWorkConversionErrorInterceptor"/>
             <interceptor name="fileUpload" class="com.opensymphony.webwork.interceptor.FileUploadInterceptor"/>
             <interceptor name="execAndWait" class="com.opensymphony.webwork.interceptor.ExecuteAndWaitInterceptor"/>
+
+            <interceptor name="prepare" class="com.cinnamonbob.xwork.interceptor.PrepareInterceptor"/>
             <interceptor name="cancel" class="com.cinnamonbob.xwork.interceptor.CancelWorkflowInterceptor"/>
             <interceptor name="wizard" class="com.cinnamonbob.web.wizard.WizardInterceptor"/>
 
@@ -106,7 +107,6 @@
             </interceptor-stack>
 
             <interceptor-stack name="crudStack">
-                <interceptor-ref name="params"/>
                 <interceptor-ref name="prepare"/>
                 <interceptor-ref name="servlet-config"/>
                 <interceptor-ref name="chain"/>

@@ -3,8 +3,11 @@ package com.cinnamonbob.web.project;
 import com.cinnamonbob.model.BuildSpecification;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.persistence.BuildSpecificationDao;
+import com.cinnamonbob.xwork.interceptor.Preparable;
 import com.opensymphony.util.TextUtils;
-import com.opensymphony.xwork.Preparable;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  */
@@ -18,6 +21,7 @@ public class EditBuildSpecificationAction extends ProjectActionSupport implement
     private String recipe;
     private boolean timeoutEnabled;
     private int timeout = 60;
+    private static final List<String> PREPARE_PARAMS = Arrays.asList("id", "projectId");
 
     public void setId(long id)
     {
@@ -93,6 +97,11 @@ public class EditBuildSpecificationAction extends ProjectActionSupport implement
         }
 
         return false;
+    }
+
+    public List<String> getPrepareParameterNames()
+    {
+        return PREPARE_PARAMS;
     }
 
     public void prepare() throws Exception

@@ -1,13 +1,12 @@
 package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.model.P4;
-import com.opensymphony.xwork.Preparable;
 
 /**
  *
  *
  */
-public class EditP4Action extends AbstractEditScmAction implements Preparable
+public class EditP4Action extends AbstractEditScmAction
 {
     private P4 scm = new P4();
 

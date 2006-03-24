@@ -3,7 +3,10 @@ package com.cinnamonbob.web.project;
 import com.cinnamonbob.model.BobFileDetails;
 import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.persistence.BobFileDetailsDao;
-import com.opensymphony.xwork.Preparable;
+import com.cinnamonbob.xwork.interceptor.Preparable;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -15,6 +18,7 @@ public abstract class AbstractEditDetailsAction extends ProjectActionSupport imp
     private long projectId;
     private Project project;
     private BobFileDetailsDao bobFileDetailsDao;
+    private static final List<String> PREPARE_PARAMS = Arrays.asList("id", "projectId");
 
     public long getId()
     {
@@ -49,6 +53,11 @@ public abstract class AbstractEditDetailsAction extends ProjectActionSupport imp
     public void setBobFileDetailsDao(BobFileDetailsDao bobFileDetailsDao)
     {
         this.bobFileDetailsDao = bobFileDetailsDao;
+    }
+
+    public List<String> getPrepareParameterNames()
+    {
+        return PREPARE_PARAMS;
     }
 
     public String doInput() throws Exception
