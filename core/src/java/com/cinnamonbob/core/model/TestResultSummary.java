@@ -92,4 +92,20 @@ public class TestResultSummary
     {
         return errors == 0 && failures == 0;
     }
+
+    public int hashCode()
+    {
+        return errors * 10000 + failures * 100 + total;
+    }
+
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof TestResultSummary)
+        {
+            TestResultSummary other = (TestResultSummary) obj;
+            return other.errors == errors && other.failures == failures && other.total == total;
+        }
+
+        return false;
+    }
 }
