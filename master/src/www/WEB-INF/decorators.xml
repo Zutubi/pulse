@@ -17,6 +17,7 @@
 
     <decorator name="setup" page="basic.vm">
         <pattern>/setup/*</pattern>
+        <pattern>/upgrade/*</pattern>
     </decorator>
 
     <decorator name="panel" page="panel.vm"/>

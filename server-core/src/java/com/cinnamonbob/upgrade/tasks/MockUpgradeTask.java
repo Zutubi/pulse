@@ -1,11 +1,11 @@
 package com.cinnamonbob.upgrade.tasks;
 
-import com.cinnamonbob.upgrade.UpgradeTask;
-import com.cinnamonbob.upgrade.UpgradeException;
 import com.cinnamonbob.upgrade.UpgradeContext;
+import com.cinnamonbob.upgrade.UpgradeException;
+import com.cinnamonbob.upgrade.UpgradeTask;
 
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * <class-comment/>
@@ -36,6 +36,11 @@ public class MockUpgradeTask implements UpgradeTask
     public String getDescription()
     {
         return "This is the mock upgrade task, useful for testing purposes only. ";
+    }
+
+    public String getName()
+    {
+        return "Mock upgrade";
     }
 
     public List<String> getErrors()

@@ -8,23 +8,68 @@
                 <ref local="taskA"/>
                 <ref local="taskB"/>
                 <ref local="taskC"/>
+                <ref local="taskD"/>
+                <ref local="taskE"/>
+                <ref local="taskF"/>
+                <ref local="taskG"/>
+                <ref local="taskH"/>
             </list>
         </property>
     </bean>
 
     <bean id="taskA" class="com.cinnamonbob.upgrade.tasks.DummyUpgradeTask">
         <property name="buildNumber"><value>1</value></property>
+        <property name="name"><value>Task A</value></property>
         <property name="description"><value>this is task A.</value></property>
     </bean>
 
     <bean id="taskB" class="com.cinnamonbob.upgrade.tasks.DummyUpgradeTask">
         <property name="buildNumber"><value>5</value></property>
+        <property name="name"><value>Task B</value></property>
         <property name="description"><value>this is task B.</value></property>
     </bean>
 
     <bean id="taskC" class="com.cinnamonbob.upgrade.tasks.DummyUpgradeTask">
         <property name="buildNumber"><value>30</value></property>
-        <property name="description"><value>this is task C.</value></property>
+        <property name="name"><value>Task C</value></property>
+        <property name="description"><value>this is task C, and it has a much longer description then the other tasks because the programmer creating this task was a little on the verbose side.</value></property>
     </bean>
+
+    <bean id="taskD" class="com.cinnamonbob.upgrade.tasks.DummyUpgradeTask">
+        <property name="buildNumber"><value>90</value></property>
+        <property name="name"><value>Task D</value></property>
+        <property name="description"><value>this is task D.</value></property>
+        <property name="sleep"><value>3500</value></property>
+    </bean>
+
+    <bean id="taskE" class="com.cinnamonbob.upgrade.tasks.DummyUpgradeTask">
+        <property name="buildNumber"><value>91</value></property>
+        <property name="name"><value>Task E</value></property>
+        <property name="description"><value>this is task E.</value></property>
+        <property name="sleep"><value>3500</value></property>
+    </bean>
+
+    <bean id="taskF" class="com.cinnamonbob.upgrade.tasks.DummyUpgradeTask">
+        <property name="buildNumber"><value>91</value></property>
+        <property name="name"><value>Task F</value></property>
+        <property name="description"><value>this is task F.</value></property>
+        <property name="sleep"><value>3500</value></property>
+        <property name="fail"><value>true</value></property>
+    </bean>
+
+    <bean id="taskG" class="com.cinnamonbob.upgrade.tasks.DummyUpgradeTask">
+        <property name="buildNumber"><value>91</value></property>
+        <property name="name"><value>Task G</value></property>
+        <property name="description"><value>this is task G.</value></property>
+        <property name="fail"><value>true</value></property>
+        <property name="haltOnError"><value>true</value></property>
+    </bean>
+
+    <bean id="taskH" class="com.cinnamonbob.upgrade.tasks.DummyUpgradeTask">
+        <property name="buildNumber"><value>91</value></property>
+        <property name="name"><value>Task H</value></property>
+        <property name="description"><value>this is task H.</value></property>
+    </bean>
+
 
 </beans>

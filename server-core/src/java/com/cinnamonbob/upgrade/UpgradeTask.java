@@ -29,6 +29,8 @@ public interface UpgradeTask
      */
     String getDescription();
 
+    String getName();
+
     //---------------
     // The following methods require a little bit more thought. How would we display the
     // errors? Under what sort of failure conditions will halting still leave the

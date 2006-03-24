@@ -1,6 +1,6 @@
 package com.cinnamonbob.upgrade;
 
-import com.cinnamonbob.Version;
+import com.cinnamonbob.bootstrap.Home;
 
 import java.util.List;
 
@@ -13,20 +13,17 @@ public interface UpgradeManager
      * Returns true if the execution of upgrade tasks is required, false otherwise.
      *
      */
-    boolean isUpgradeRequired(Version fromVersion, Version toVersion);
+    boolean isUpgradeRequired(Home home);
+
+    void prepareUpgrade(Home home);
+
+    List<UpgradeTask> previewUpgrade();
 
     /**
      * Execute the required upgrade tasks.
      *
-     * @return a list of executed upgrade tasks.
      */
-    List<UpgradeTask> executeUpgrade(Version fromVersion, Version toVersion);
+    void executeUpgrade();
 
-    /**
-     * Retrieve the list of upgrade tasks that need to be executed to satisfy the upgrade
-     * requirements.
-     *
-     * @return a list of upgrade tasks.
-     */
-    List<UpgradeTask> previewUpgrade(Version fromVersion, Version toVersion);
+    UpgradeProgressMonitor getUpgradeMonitor();
 }

@@ -35,23 +35,18 @@ public class UpgradeManagerTest extends TestCase
     public void testUpgradeTaskSelection()
     {
         upgradeManager.addTask(new MockUpgradeTask(30));
-        upgradeManager.addTask(new MockUpgradeTask(20));
         upgradeManager.addTask(new MockUpgradeTask(40));
+        upgradeManager.addTask(new MockUpgradeTask(20));
 
         Version fromVersion = new Version("x", "y", "2");
-        Version toVersion = new Version("xx", "yy", "55");
+        Version toVersion = new Version("xx", "yy", "35");
 
         assertTrue(upgradeManager.isUpgradeRequired(fromVersion, toVersion));
 
-        List<UpgradeTask> preview = upgradeManager.previewUpgrade(fromVersion, toVersion);
+        List<UpgradeTask> preview = upgradeManager.determineRequiredUpgradeTasks(fromVersion, toVersion);
         assertNotNull(preview);
-        assertEquals(3, preview.size());
-
-        List<UpgradeTask> executedTasks = upgradeManager.executeUpgrade(fromVersion, toVersion);
-        assertNotNull(executedTasks);
-        assertEquals(3, executedTasks.size());
-        assertEquals(20, executedTasks.get(0).getBuildNumber());
-        assertEquals(30, executedTasks.get(1).getBuildNumber());
-        assertEquals(40, executedTasks.get(2).getBuildNumber());
+        assertEquals(2, preview.size());
+        assertEquals(20, preview.get(0).getBuildNumber());
+        assertEquals(30, preview.get(1).getBuildNumber());
     }
 }

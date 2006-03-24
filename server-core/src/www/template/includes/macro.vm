@@ -710,6 +710,17 @@
 #end
 
 ##
+## Shows a standard Continue or Cancel submit row, given the first tab index.
+##
+#macro(continueCancel $tabIndex)
+    #openSubmit()
+        #wwsubmit("name=continue" "value=%{getText('continue.name')}" "tabindex=$tabIndex")
+        #set($tabIndex = $tabIndex + 1)
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
+    #closeSubmit()
+#end
+
+##
 ## Shows a standard Previous, Next or Cancel row, as used by wizards.
 ## param: tabIndex, indicates the first tab index to be used by the row.
 ##

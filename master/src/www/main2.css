@@ -474,3 +474,15 @@ td.dec-info, td.num-info {
     background-color: #eeeeff;
 }
 
+td.okaybar {
+    background: #eeeeff; border: 1px solid #9c9c9c; padding: 0px;
+}
+td.errorbar {
+    background: #c00000; border: 1px solid #9c9c9c; padding: 0px;
+}
+td.warningbar {
+    background: #f0c000; border: 1px solid #9c9c9c; padding: 0px;
+}
+td.clearbar {
+    background: #ffffff; border: 1px solid #9c9c9c; padding: 0px;
+}

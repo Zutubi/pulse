@@ -1,17 +1,17 @@
 package com.cinnamonbob.upgrade.tasks;
 
-import com.cinnamonbob.upgrade.UpgradeTask;
-import com.cinnamonbob.upgrade.UpgradeException;
 import com.cinnamonbob.upgrade.UpgradeContext;
-import org.springframework.core.io.ClassPathResource;
-import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+import com.cinnamonbob.upgrade.UpgradeException;
+import com.cinnamonbob.upgrade.UpgradeTask;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+import org.springframework.core.io.ClassPathResource;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.util.Properties;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * <class-comment/>
@@ -39,6 +39,11 @@ public class MigrateSchemaUpgradeTask implements UpgradeTask
     public String getDescription()
     {
         return "The schema upgrade associated with build " + buildNumber;
+    }
+
+    public String getName()
+    {
+        return "schema upgrade";
     }
 
     public List<String> getErrors()
