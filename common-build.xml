@@ -126,7 +126,7 @@
                 </fileset>
             </batchtest>
         </junit>
-        <junitreport todir="${report.dir}">
+        <junitreport todir="${report.dir}/junit">
             <fileset dir="${report.dir}/junit/xml">
                 <include name="*.xml"/>
             </fileset>
