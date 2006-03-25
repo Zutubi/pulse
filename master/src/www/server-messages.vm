@@ -27,9 +27,9 @@
         #set($cssClass = "info")
     #end
         <tr>
-            <td class="$cssClass" width="20%">$action.getPrettyTime($record.millis)</td>
-            <td class="$cssClass" width="10%"><img alt="failure" src="/images/${image}.gif"/> $record.level.toString().toLowerCase()</td>
-            <td class="$cssClass" width="10%">#wwtext("name=count") :: $record.count</td>
+            <td class="$cssClass" width="26%">$action.getPrettyDate($record.millis) ($action.getPrettyTime($record.millis))</td>
+            <td class="$cssClass" width="9%"><img alt="failure" src="/images/${image}.gif"/> $record.level.toString().toLowerCase()</td>
+            <td class="$cssClass" width="9%">#wwtext("name=count") :: $record.count</td>
             <td class="$cssClass">$!webwork.htmlEncode("$record.sourceClassName :: $record.sourceMethodName")</td>
         </tr>
     #if($record.message)

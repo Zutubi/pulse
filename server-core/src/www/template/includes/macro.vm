@@ -812,7 +812,7 @@
             #dynamicCell($recipe.recipeNameSafe)
             #statusCell($recipe)
             #testResultsCell($recipe)
-            #classCell($recipe.stamps.prettyStartTime)
+            #classCell("$recipe.stamps.prettyStartDate ($recipe.stamps.prettyStartTime)")
             #classCell($recipe.stamps.prettyElapsed)
 ##            #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$build.project.id")
         </tr>
@@ -830,7 +830,7 @@
             #dynamicLinkCell($command.commandName "viewCommandLog.action?id=$build.id#command-$velocityCount")
             #statusCell($command)
             #testResultsCell($command)
-            #classCell($command.stamps.prettyStartTime)
+            #classCell("$command.stamps.prettyStartDate ($command.stamps.prettyStartTime)")
             #classCell($command.stamps.prettyElapsed)
         </tr>
     #end
@@ -1228,7 +1228,7 @@
                     #statusCell($buildResult)
                     #testResultsCell($buildResult)
                     #classCell($buildResult.buildSpecification)
-                    #classCell($buildResult.stamps.prettyStartTime)
+                    #classCell("$buildResult.stamps.prettyStartDate ($buildResult.stamps.prettyStartTime)")
                     #classCell($buildResult.stamps.prettyElapsed)
     #if($showActions)
                     #viewCell($project $buildResult)

@@ -95,6 +95,11 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         return TimeStamps.getPrettyTime(time);
     }
     
+    public String getPrettyDate(long time)
+    {
+        return TimeStamps.getPrettyDate(time);
+    }
+
     public String wrapString(String s, int lineLength)
     {
         return StringUtils.wrapString(s, lineLength, null);

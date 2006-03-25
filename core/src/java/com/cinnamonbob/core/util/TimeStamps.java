@@ -107,29 +107,116 @@ public class TimeStamps
         return getPrettyTime(endTime);
     }
 
+    public String getPrettyQueueDate()
+    {
+        return getPrettyDate(queueTime);
+    }
+
+    public String getPrettyStartDate()
+    {
+        return getPrettyDate(startTime);
+    }
+
+    public String getPrettyEndDate()
+    {
+        return getPrettyDate(endTime);
+    }
+
     public static String getPrettyElapsed(long elapsed)
     {
+        return getPrettyElapsed(elapsed, -1);
+    }
+
+    public static String getPrettyElapsed(long elapsed, int maxUnits)
+    {
         StringBuffer result = new StringBuffer();
+        int unitsAdded = 0;
+        long newElapsed;
 
         if (elapsed == UNINITIALISED_TIME)
         {
             return "n/a";
         }
 
-        elapsed = addElapsedPart(elapsed, Constants.HOUR, "hour", result);
-        elapsed = addElapsedPart(elapsed, Constants.MINUTE, "minute", result);
-
-        if (elapsed < Constants.SECOND && result.length() == 0)
+        if(maxUnits < 0 || unitsAdded < maxUnits)
         {
-            result.append("< 1 second");
+            newElapsed = addElapsedPart(elapsed, Constants.YEAR, "year", result);
+            if(newElapsed >= 0)
+            {
+                elapsed = newElapsed;
+                unitsAdded++;
+            }
         }
-        else
+
+        if(maxUnits < 0 || unitsAdded < maxUnits)
         {
-            addElapsedPart(elapsed, Constants.SECOND, "second", result);
+            newElapsed = addElapsedPart(elapsed, Constants.WEEK, "week", result);
+            if(newElapsed >= 0)
+            {
+                elapsed = newElapsed;
+                unitsAdded++;
+            }
+            else if(unitsAdded > 0)
+            {
+                unitsAdded++;
+            }
+        }
+
+        if(maxUnits < 0 || unitsAdded < maxUnits)
+        {
+            newElapsed = addElapsedPart(elapsed, Constants.DAY, "day", result);
+            if(newElapsed >= 0)
+            {
+                elapsed = newElapsed;
+                unitsAdded++;
+            }
+            else if(unitsAdded > 0)
+            {
+                unitsAdded++;
+            }
+        }
+
+        if(maxUnits < 0 || unitsAdded < maxUnits)
+        {
+            newElapsed = addElapsedPart(elapsed, Constants.HOUR, "hour", result);
+            if(newElapsed >= 0)
+            {
+                elapsed = newElapsed;
+                unitsAdded++;
+            }
+            else if(unitsAdded > 0)
+            {
+                unitsAdded++;
+            }
+        }
+
+        if(maxUnits < 0 || unitsAdded < maxUnits)
+        {
+            newElapsed = addElapsedPart(elapsed, Constants.MINUTE, "min", result);
+            if(newElapsed >= 0)
+            {
+                elapsed = newElapsed;
+                unitsAdded++;
+            }
+            else if(unitsAdded > 0)
+            {
+                unitsAdded++;
+            }
+        }
+
+        if(maxUnits < 0 || unitsAdded < maxUnits)
+        {
+            if (elapsed < Constants.SECOND && result.length() == 0)
+            {
+                result.append("< 1 sec");
+            }
+            else
+            {
+                addElapsedPart(elapsed, Constants.SECOND, "sec", result);
+            }
         }
 
         return result.toString();
-
     }
 
     public String getPrettyElapsed()
@@ -156,7 +243,7 @@ public class TimeStamps
 
             if (result.length() > 0)
             {
-                result.append(", ");
+                result.append(" ");
             }
 
             result.append(Long.toString(part));
@@ -168,13 +255,25 @@ public class TimeStamps
                 result.append('s');
             }
 
-            elapsed %= millisPerPart;
+            return elapsed % millisPerPart;
         }
 
-        return elapsed;
+        return -1;
     }
 
     public static String getPrettyTime(long time)
+    {
+        if (time == UNINITIALISED_TIME)
+        {
+            return "n/a";
+        }
+        else
+        {
+            return getPrettyElapsed(System.currentTimeMillis() - time, 2) + " ago";
+        }
+    }
+
+    public static String getPrettyDate(long time)
     {
         if (time == UNINITIALISED_TIME)
         {
@@ -195,4 +294,5 @@ public class TimeStamps
     {
         return endTime != UNINITIALISED_TIME;
     }
+
 }

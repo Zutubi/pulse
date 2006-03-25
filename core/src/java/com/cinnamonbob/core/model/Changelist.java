@@ -1,6 +1,7 @@
 package com.cinnamonbob.core.model;
 
-import java.text.DateFormat;
+import com.cinnamonbob.core.util.TimeStamps;
+
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,7 +51,7 @@ public class Changelist extends Entity
 
     public String getPrettyDate()
     {
-        return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(getRevision().getDate());
+        return TimeStamps.getPrettyTime(getRevision().getDate().getTime());
     }
 
     public String getUser()
