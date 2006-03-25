@@ -1,5 +1,6 @@
 package com.cinnamonbob.web;
 
+import com.cinnamonbob.logging.CustomLogRecord;
 import com.cinnamonbob.logging.ServerMessagesHandler;
 
 import java.io.PrintWriter;
@@ -7,7 +8,6 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 /**
  * Looks up recent server log messages for the server->messages page.
@@ -15,7 +15,7 @@ import java.util.logging.LogRecord;
 public class ServerMessagesAction extends ActionSupport
 {
     private ServerMessagesHandler serverMessagesHandler;
-    private List<LogRecord> records;
+    private List<CustomLogRecord> records;
     private PagingSupport pagingSupport = new PagingSupport(10);
 
     public void setStartPage(int page)
@@ -23,7 +23,7 @@ public class ServerMessagesAction extends ActionSupport
         pagingSupport.setStartPage(page);
     }
 
-    public List<LogRecord> getRecords()
+    public List<CustomLogRecord> getRecords()
     {
         return records;
     }
@@ -33,22 +33,22 @@ public class ServerMessagesAction extends ActionSupport
         return pagingSupport;
     }
 
-    public boolean isError(LogRecord record)
+    public boolean isError(CustomLogRecord record)
     {
         return record.getLevel() == Level.SEVERE;
     }
 
-    public boolean isWarning(LogRecord record)
+    public boolean isWarning(CustomLogRecord record)
     {
         return record.getLevel() == Level.WARNING;
     }
 
-    public boolean hasThrowable(LogRecord record)
+    public boolean hasThrowable(CustomLogRecord record)
     {
         return record.getThrown() != null;
     }
-    
-    public String getStackTrace(LogRecord record)
+
+    public String getStackTrace(CustomLogRecord record)
     {
         Throwable t = record.getThrown();
         if(t != null)
@@ -69,6 +69,7 @@ public class ServerMessagesAction extends ActionSupport
         Collections.reverse(records);
         pagingSupport.setTotalItems(records.size());
         records = records.subList(pagingSupport.getStartOffset(), pagingSupport.getEndOffset());
+
         return SUCCESS;
     }
 

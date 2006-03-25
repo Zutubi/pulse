@@ -17,7 +17,7 @@ public class ServerMessagesHandler extends Handler
 {
     private static final int DEFAULT_CAPACITY = 100;
 
-    private CircularBuffer<LogRecord> records = new CircularBuffer<LogRecord>(DEFAULT_CAPACITY);
+    private CircularBuffer<CustomLogRecord> records = new CircularBuffer<CustomLogRecord>(DEFAULT_CAPACITY);
 
     public void init()
     {
@@ -29,7 +29,21 @@ public class ServerMessagesHandler extends Handler
     {
         if(record.getLevel() == Level.WARNING || record.getLevel() == Level.SEVERE)
         {
-            records.append(record);
+            synchronized(records)
+            {
+                if(records.getCount() > 0)
+                {
+                    CustomLogRecord previous = records.getElement(records.getCount() - 1);
+                    if(nullSafeEquals(previous.getMessage(), record.getMessage()) &&
+                       nullSafeEquals(previous.getThrown(), record.getThrown()))
+                    {
+                        previous.repeated();
+                        return;
+                    }
+                }
+            }
+
+            records.append(new CustomLogRecord(record));
         }
     }
 
@@ -42,13 +56,33 @@ public class ServerMessagesHandler extends Handler
         records.clear();
     }
 
-    public Iterator<LogRecord> iterator()
+    public Iterator<CustomLogRecord> iterator()
     {
         return records.takeSnapshot().iterator();
     }
 
-    public List<LogRecord> takeSnapshot()
+    public List<CustomLogRecord> takeSnapshot()
     {
         return records.takeSnapshot();
+    }
+
+    private boolean nullSafeEquals(Throwable t1, Throwable t2)
+    {
+        if(t1 == null)
+        {
+            return t2 == null;
+        }
+
+        return t1.getClass() == t2.getClass() && nullSafeEquals(t1.getMessage(), t2.getMessage());
+    }
+
+    private boolean nullSafeEquals(String s1, String s2)
+    {
+        if(s1 == null)
+        {
+            return s2 == null;
+        }
+
+        return s1.equals(s2);
     }
 }

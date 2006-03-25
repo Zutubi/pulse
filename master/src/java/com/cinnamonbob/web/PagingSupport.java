@@ -108,11 +108,11 @@ public class PagingSupport
 
     public int getEndOffset()
     {
-        int offset = getStartOffset() + itemsPerPage - 1;
+        int offset = getStartOffset() + itemsPerPage;
 
-        if(offset > totalItems - 1)
+        if(offset > totalItems)
         {
-            offset = totalItems - 1;
+            offset = totalItems;
         }
 
         return offset;

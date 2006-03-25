@@ -29,6 +29,7 @@
         <tr>
             <td class="$cssClass" width="20%">$action.getPrettyTime($record.millis)</td>
             <td class="$cssClass" width="10%"><img alt="failure" src="/images/${image}.gif"/> $record.level.toString().toLowerCase()</td>
+            <td class="$cssClass" width="10%">#wwtext("name=count") :: $record.count</td>
             <td class="$cssClass">$!webwork.htmlEncode("$record.sourceClassName :: $record.sourceMethodName")</td>
         </tr>
     #if($record.message)
@@ -48,9 +49,10 @@
     </table>
 #end
 
+#if($records.size() > 0)
     <table class="fill-content">
         #pagingRow("serverMessages.action?" $pagingSupport)
         <tr><th colspan="5">$action.getText("messages.count", ["$pagingSupport.totalItems"])</td></tr>
     </table>
-
+#end
 </html>
