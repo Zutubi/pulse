@@ -255,7 +255,7 @@ table.content, table.fill-content {
 }
 
 table.fill-content {
-    width: 100%;
+    width: 98%;
 }
 
 h3.heading, div.box, th.heading, th.info, th.content, th.content-row, td.content, td.content-centre, td.content-right, td.content-large, td.image, td.success, td.failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
