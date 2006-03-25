@@ -70,7 +70,7 @@
 
     #if($result.hasTests())
         #set($recipe = $result.root.children.get(0).result)
-    <table class="content">
+    <table class="fill-content">
         #headingRow("test.results" 5)
         <tr>
             #contentHeading("test.name" 1)

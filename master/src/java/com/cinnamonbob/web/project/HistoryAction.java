@@ -4,6 +4,7 @@ import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.HistoryPage;
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.web.PagingSupport;
 import com.cinnamonbob.xwork.interceptor.Preparable;
 import com.opensymphony.util.TextUtils;
 
@@ -27,9 +28,7 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
     private long id;
     private Project project;
     private List<BuildResult> history;
-    private int startPage;
-    private int itemsPerPage = 10;
-    private int historyCount;
+    private PagingSupport pagingSupport = new PagingSupport(10);
 
     private Map<String, ResultState[]> nameToStates;
     private String stateFilter = STATE_ANY;
@@ -47,72 +46,19 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
         this.id = id;
     }
 
+    public void setStartPage(int page)
+    {
+        pagingSupport.setStartPage(page);
+    }
+
     public Project getProject()
     {
         return project;
     }
 
-    public int getStartPage()
+    public PagingSupport getPagingSupport()
     {
-        return startPage;
-    }
-
-    public void setStartPage(int startPage)
-    {
-        this.startPage = startPage;
-    }
-
-    public int getItemsPerPage()
-    {
-        return itemsPerPage;
-    }
-
-    public int getHistoryCount()
-    {
-        return historyCount;
-    }
-
-    public int getPageCount()
-    {
-        return (historyCount + itemsPerPage - 1) / itemsPerPage;
-    }
-
-    public int getPageRangeStart()
-    {
-        int offset = SURROUNDING_PAGES / 2;
-
-        if (startPage + offset + 1 > getPageCount())
-        {
-            // show more to the left
-            offset += startPage + offset + 1 - getPageCount();
-        }
-
-        int start = startPage - offset;
-        if (start < 0)
-        {
-            start = 0;
-        }
-
-        return start;
-    }
-
-    public int getPageRangeEnd()
-    {
-        int offset = SURROUNDING_PAGES / 2;
-
-        if (startPage - offset < 0)
-        {
-            // show more to the right
-            offset += offset - startPage;
-        }
-
-        int end = startPage + offset;
-        if (end >= getPageCount())
-        {
-            end = getPageCount() - 1;
-        }
-
-        return end;
+        return pagingSupport;
     }
 
     public List<BuildResult> getHistory()
@@ -185,13 +131,13 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
         specs.add("");
         specs.addAll(getBuildManager().getBuildSpecifications(project));
 
-        if (startPage < 0)
+        if (pagingSupport.getStartPage() < 0)
         {
-            addActionError("Invalid start page '" + startPage + "'");
+            addActionError("Invalid start page '" + pagingSupport.getStartPage() + "'");
             return ERROR;
         }
 
-        HistoryPage page = new HistoryPage(project, startPage * itemsPerPage, itemsPerPage);
+        HistoryPage page = new HistoryPage(project, pagingSupport.getStartOffset(), pagingSupport.getItemsPerPage());
 
         if (stateFilter.equals(STATE_ANY) && !TextUtils.stringSet(spec))
         {
@@ -221,11 +167,11 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
         }
 
         history = page.getResults();
-        historyCount = page.getTotalBuilds();
+        pagingSupport.setTotalItems(page.getTotalBuilds());
 
-        if (historyCount < startPage * itemsPerPage)
+        if (!pagingSupport.isStartPageValid())
         {
-            addActionError("Start page '" + startPage + "' is past the end of the results");
+            addActionError("Start page '" + pagingSupport.getStartPage() + "' is past the end of the results");
             return ERROR;
         }
 

@@ -11,6 +11,7 @@ import com.cinnamonbob.model.persistence.BuildResultDao;
 import com.cinnamonbob.model.persistence.ProjectDao;
 import com.cinnamonbob.model.persistence.SlaveDao;
 import com.cinnamonbob.model.persistence.UserDao;
+import com.cinnamonbob.util.logging.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,6 +25,8 @@ import java.util.List;
  */
 public class SetupDummyBuilds implements Runnable
 {
+    private static Logger LOG = Logger.getLogger(SetupDummyBuilds.class);
+
     private MasterBuildPaths masterBuildPaths;
     private SlaveDao slaveDao;
     private ProjectDao projectDao;
@@ -96,7 +99,56 @@ public class SetupDummyBuilds implements Runnable
             createTestErrors(project);
 
             setupUsers(project);
+            createLogMessages();
         }
+    }
+
+    private void createLogMessages()
+    {
+        for(int i = 0; i < 100; i++)
+        {
+            LOG.warning(String.format("%03d: some goon is filling your buffer", i));
+        }
+
+        LOG.debug("some debug message");
+        LOG.fine("a fine message");
+        LOG.warning("a warning message");
+        LOG.severe("a severe message");
+        LOG.severe("a longer severe message a longer severe message a longer severe message a longer severe message a longer severe message a longer severe message a longer severe message");
+        LOG.warning("a warning:\n    formatted messages\n    may be closer than expected");
+
+        try
+        {
+            throwMeSomething("with a message like this");
+        }
+        catch(RuntimeException e)
+        {
+            LOG.warning("got a throwable", e);
+        }
+
+        try
+        {
+            throwMeSomething("with a message like this");
+        }
+        catch(RuntimeException e)
+        {
+            LOG.error("testing out the error method on our own custom logger too to see if it is any different to using the severe method on a regular logger (it shouldn't be, it is just an alias!)", e);
+        }
+    }
+
+    private void throwMeSomething(String s)
+    {
+        throwMeSomethingDeep(s);
+    }
+
+    private void throwMeSomethingDeep(String s)
+    {
+        throwMeSomethingDeeper(s);
+    }
+
+    private void throwMeSomethingDeeper(String s)
+    {
+        throw new RuntimeException(s);
     }
 
     private void setupSlave()

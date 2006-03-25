@@ -1,6 +1,7 @@
 package com.cinnamonbob.web;
 
 import com.cinnamonbob.core.util.StringUtils;
+import com.cinnamonbob.core.util.TimeStamps;
 import com.cinnamonbob.security.AcegiUtils;
 import com.cinnamonbob.xwork.TextProviderSupport;
 import com.cinnamonbob.xwork.interceptor.Cancelable;
@@ -89,6 +90,11 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         return object != null;
     }
 
+    public String getPrettyTime(long time)
+    {
+        return TimeStamps.getPrettyTime(time);
+    }
+    
     public String wrapString(String s, int lineLength)
     {
         return StringUtils.wrapString(s, lineLength, null);

@@ -161,4 +161,6 @@
 
     <bean id="tokenManager" class="com.cinnamonbob.api.TokenManager" autowire="byName" init-method="init"/>
 
+    <bean id="serverMessagesHandler" class="com.cinnamonbob.logging.ServerMessagesHandler" init-method="init"/>
+    
 </beans>

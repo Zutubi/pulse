@@ -64,62 +64,8 @@
             <td>
 
             <table width="100%" class="content">
-    #if($pageCount > 1)
-        #set($getParams = "id=$project.id&amp;stateFilter=$stateFilter&amp;spec=$spec")
-        #set($nextPage = $startPage + 1)
-        #set($previousPage = $startPage - 1)
-        #set($lastPage = $pageCount - 1)
-                <tr>
-                    <td class="content-centre">
-        #if($startPage > 0)
-                        <a href="history.action?$getParams" class="unadorned">
-        #end
-                            #image("images/resultset_first.gif" "page.latest") #wwtext("name=page.latest")
-        #if($startPage > 0)
-                        </a>
-        #end
-                    </td>
-                    <td class="content-centre">
-        #if($startPage > 0)
-                        <a href="history.action?$getParams&amp;startPage=$previousPage" class="unadorned">
-        #end
-                            #image("images/resultset_previous.gif" "page.newer") #wwtext("name=page.newer")
-        #if($startPage > 0)
-                        </a>
-        #end
-                    </td>
-                    <td class="content-centre">
-        #foreach($pageIndex in [$pageRangeStart..$pageRangeEnd])
-            #set($pageNumber = $pageIndex + 1)
-                        &nbsp;
-            #if($pageIndex != $startPage)
-                        <a href="history.action?$getParams&amp;startPage=$pageIndex">
-            #end
-                            $pageNumber#if($pageIndex != $startPage)</a>#end
-        #end
-                        &nbsp;
-                    </td>
-                    <td class="content-centre">
-        #if($startPage < $lastPage)
-                        <a href="history.action?$getParams&amp;startPage=$nextPage" class="unadorned">
-        #end
-                            #wwtext("name=page.older") #image("images/resultset_next.gif" "page.older")
-        #if($startPage < $lastPage)
-                        </a>
-        #end
-                    </td>
-                    <td class="content-centre">
-        #if($startPage < $lastPage)
-                        <a href="history.action?$getParams&amp;startPage=$lastPage" class="unadorned">
-        #end
-                            #wwtext("name=page.oldest") #image("images/resultset_last.gif" "page.oldeset")
-        #if($startPage < $lastPage)
-                        </a>
-        #end
-                    </td>
-                </tr>
-    #end
-                <tr><th colspan="5">$action.getText("history.count", ["$historyCount"])</td></tr>
+                #pagingRow("history.action?id=$project.id&amp;stateFilter=$stateFilter&amp;spec=$spec&amp;" $pagingSupport)
+                <tr><th colspan="5">$action.getText("history.count", ["$pagingSupport.totalItems"])</td></tr>
             </table>
 
             </td>

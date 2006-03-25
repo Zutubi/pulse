@@ -199,6 +199,7 @@
     #openTabs()
         #serverTab("status" "viewRecipeQueue" $selected)
         #serverTab("resources" "viewResources" $selected)
+        #serverTab("server-messages" "serverMessages" $selected)
         #serverTab("server-info" "viewSystemInfo" $selected)
     #closeTabs()
 #end
@@ -560,11 +561,11 @@
 ##
 #macro(testResultsCell $result)
     <td class="$result.state.string">
-        #set($summary = $result.testSummary)
+    #set($summary = $result.testSummary)
     #if($summary.total == 0)
         #wwtext("name=tests.none")
     #else
-        #if(!$summary.hasBrokenTests())
+        #if($summary.allPassed())
         $action.getText("tests.all.passed", ["$summary.total"])
         #else
         $action.getText("tests.some.broken", ["$summary.broken", "$summary.total"])
@@ -1361,4 +1362,65 @@
         #addRow("add.project" 14 "addProject!input.action" "project.add")
     #end
         </table>
+#end
+
+##
+## Shows a table row with pages and previous/next etc links.  Pager should be
+## an instance of paging support.
+##
+#macro(pagingRow $url $pager)
+    #if($pager.pageCount > 1)
+        #set($nextPage = $pager.startPage + 1)
+        #set($previousPage = $pager.startPage - 1)
+        #set($lastPage = $pager.pageCount - 1)
+                <tr>
+                    <td class="content-centre">
+        #if($pager.startPage > 0)
+                        <a href="${url}startPage=0" class="unadorned">
+        #end
+                            #image("images/resultset_first.gif" "page.latest") #wwtext("name=page.latest")
+        #if($pager.startPage > 0)
+                        </a>
+        #end
+                    </td>
+                    <td class="content-centre">
+        #if($pager.startPage > 0)
+                        <a href="${url}startPage=$previousPage" class="unadorned">
+        #end
+                            #image("images/resultset_previous.gif" "page.newer") #wwtext("name=page.newer")
+        #if($pager.startPage > 0)
+                        </a>
+        #end
+                    </td>
+                    <td class="content-centre">
+        #foreach($pageIndex in [$pager.pageRangeStart..$pager.pageRangeEnd])
+            #set($pageNumber = $pageIndex + 1)
+                        &nbsp;
+            #if($pageIndex != $pager.startPage)
+                        <a href="${url}startPage=$pageIndex">
+            #end
+                            $pageNumber#if($pageIndex != $pager.startPage)</a>#end
+        #end
+                        &nbsp;
+                    </td>
+                    <td class="content-centre">
+        #if($pager.startPage < $lastPage)
+                        <a href="${url}startPage=$nextPage" class="unadorned">
+        #end
+                            #wwtext("name=page.older") #image("images/resultset_next.gif" "page.older")
+        #if($pager.startPage < $lastPage)
+                        </a>
+        #end
+                    </td>
+                    <td class="content-centre">
+        #if($pager.startPage < $lastPage)
+                        <a href="${url}startPage=$lastPage" class="unadorned">
+        #end
+                            #wwtext("name=page.oldest") #image("images/resultset_last.gif" "page.oldeset")
+        #if($pager.startPage < $lastPage)
+                        </a>
+        #end
+                    </td>
+                </tr>
+    #end
 #end

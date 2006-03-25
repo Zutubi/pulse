@@ -1,6 +1,8 @@
 package com.cinnamonbob.util;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Not a classic ring buffer, just a fixed size buffer that information can
@@ -14,9 +16,7 @@ public class CircularBuffer<T> implements Iterable<T>
 
     public CircularBuffer(int capacity)
     {
-        buffer = (T[]) new Object[capacity + 1];
-        index = capacity > 0 ? 1 : 0;
-        count = 0;
+        initialise(capacity);
     }
 
     public int getCount()
@@ -29,7 +29,7 @@ public class CircularBuffer<T> implements Iterable<T>
         return buffer.length - 1;
     }
 
-    public void append(T t)
+    public synchronized void append(T t)
     {
         buffer[index++] = t;
         if (index >= buffer.length)
@@ -43,7 +43,7 @@ public class CircularBuffer<T> implements Iterable<T>
         }
     }
 
-    public T getElement(int i)
+    public synchronized T getElement(int i)
     {
         int actualIndex;
 
@@ -62,6 +62,29 @@ public class CircularBuffer<T> implements Iterable<T>
     public Iterator<T> iterator()
     {
         return new CircularBufferIterator();
+    }
+
+    public synchronized void clear()
+    {
+        initialise(getCapacity());
+    }
+
+    public synchronized List<T> takeSnapshot()
+    {
+        List<T> result = new LinkedList<T>();
+        for(T t: this)
+        {
+            result.add(t);
+        }
+
+        return result;
+    }
+
+    private void initialise(int capacity)
+    {
+        buffer = (T[]) new Object[capacity + 1];
+        index = capacity > 0 ? 1 : 0;
+        count = 0;
     }
 
     private class CircularBufferIterator implements Iterator<T>

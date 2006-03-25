@@ -101,6 +101,11 @@
             <result name="success" type="redirect">viewResource.action?id=${resourceId}</result>
         </action>
 
+        <action name="serverMessages" class="com.cinnamonbob.web.ServerMessagesAction">
+            <result name="success" type="velocity">server-messages.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+        
         <action name="viewProjects" class="com.cinnamonbob.web.project.ViewProjectsAction">
             <result name="success" type="velocity">view-projects.vm</result>
         </action>
