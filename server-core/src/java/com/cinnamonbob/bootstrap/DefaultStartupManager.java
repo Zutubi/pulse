@@ -24,6 +24,7 @@ public class DefaultStartupManager implements StartupManager
     private long startTime;
 
     private ObjectFactory objectFactory;
+    private ConfigurationManager configurationManager;
 
     public void init() throws StartupException
     {
@@ -36,15 +37,15 @@ public class DefaultStartupManager implements StartupManager
         {
             ComponentContext.addClassPathContextDefinitions(setupContexts.toArray(new String[setupContexts.size()]));
 
-            // initial Web UI.
-            WebUIState.startStarting();
-
-            SetupManager setupManager = (SetupManager) ComponentContext.getBean("setupManager");
-            if (!setupManager.isSetup())
+            if (configurationManager.requiresSetup())
             {
+                SetupManager setupManager = (SetupManager) ComponentContext.getBean("setupManager");
                 setupManager.setup();
                 return;
             }
+
+            // initial Web UI.
+            WebUIState.startStarting();
 
             startApplication();
         }
@@ -78,6 +79,9 @@ public class DefaultStartupManager implements StartupManager
 
         EventManager eventManager = (EventManager) ComponentContext.getBean("eventManager");
         eventManager.publish(new SystemStartedEvent(this));
+
+        // TODO: Record the start date in the home directory.
+        // This is reported when a home directories information is presented during upgrade.
     }
 
     private void setSystemStarted(boolean b)
@@ -119,8 +123,23 @@ public class DefaultStartupManager implements StartupManager
         return startTime;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param objectFactory
+     */
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param configurationManager
+     */
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

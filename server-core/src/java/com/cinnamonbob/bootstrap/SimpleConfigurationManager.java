@@ -57,6 +57,30 @@ public class SimpleConfigurationManager implements ConfigurationManager
         return getHomeConfig().getHome();
     }
 
+    public boolean requiresSetup()
+    {
+        // At the moment, this is nice and simple. Do we have a home configured?
+        // and if so, is it valid.
+        Home home = getHome();
+        if (home == null)
+        {
+            return true;
+        }
+        if (!home.isInitialised())
+        {
+            return true;
+        }
+
+        return false;
+
+        // In future, we may want to add further checks here to handle cases where
+        // the setup process has failed. ie:
+        // a) ensure that the database has been configured - checking a simple property in
+        //    the config will do.
+        // b) that an admin user exists...
+        // c) .. whatever else comes up...
+    }
+
     private HomeConfiguration getHomeConfig()
     {
         if (homeConfig == null)

@@ -17,6 +17,12 @@
                 <value>com.cinnamonbob.ResourceDiscoverer</value>
             </list>
         </property>
+        <property name="objectFactory">
+            <ref local="objectFactory"/>
+        </property>
+        <property name="configurationManager">
+            <ref local="configurationManager"/>
+        </property>
     </bean>
 
     <bean id="configurationManager" class="com.cinnamonbob.bootstrap.SimpleConfigurationManager">
@@ -42,5 +48,7 @@
     </bean>
 
     <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
+
+    <bean id="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory"/>
 
 </beans>

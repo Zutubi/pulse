@@ -28,7 +28,10 @@
             </list>
         </property>
         <property name="objectFactory">
-            <ref bean="objectFactory"/>
+            <ref local="objectFactory"/>
+        </property>
+        <property name="configurationManager">
+            <ref local="configurationManager"/>
         </property>
     </bean>
 
@@ -58,6 +61,6 @@
         </property>
     </bean>
 
-    <bean name="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory"/>
+    <bean id="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory"/>
 
 </beans>

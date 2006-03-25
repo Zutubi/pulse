@@ -2,8 +2,6 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation"></bean>
-
     <bean id="startupManager" class="com.cinnamonbob.bootstrap.DefaultStartupManager">
         <property name="systemContexts">
             <list>
@@ -19,11 +17,19 @@
                 <value>com.cinnamonbob.ResourceDiscoverer</value>
             </list>
         </property>
+        <property name="objectFactory">
+            <ref local="objectFactory"/>
+        </property>
+        <property name="configurationManager">
+            <ref local="configurationManager"/>
+        </property>
     </bean>
 
     <bean id="configurationManager" class="com.cinnamonbob.bootstrap.SimpleConfigurationManager" init-method="init">
     </bean>
 
     <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
+
+    <bean id="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory"/>
 
 </beans>
