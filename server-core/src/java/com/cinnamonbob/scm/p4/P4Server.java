@@ -415,7 +415,7 @@ public class P4Server implements SCMServer
 
     public void testConnection() throws SCMException
     {
-        //TODO: run some form of check on the configuration...
+        runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_OUTPUT);
     }
 
     public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
