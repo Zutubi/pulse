@@ -20,7 +20,7 @@
 
     <dependencies>
         <dependency org="nekohtml" name="nekohtml" rev="0.8.1"/>
-        <dependency org="httpunit" name="httpunit" rev="1.5.4"/>
+        <dependency org="httpunit" name="httpunit" rev="1.6"/>
         <dependency org="mozilla" name="js" rev="1.6R2"/>
         <dependency org="apache" name="xerces" rev="2.6.2"/>
     </dependencies>
