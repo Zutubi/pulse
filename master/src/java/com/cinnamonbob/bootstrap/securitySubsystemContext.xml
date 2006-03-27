@@ -63,6 +63,7 @@ The beans defined within the security subsystem need not be accessed by other co
             <value>
                 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
                 PATTERN_TYPE_APACHE_ANT
+                /ajax/**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,ajaxSecurityEnforcementFilter,switchUserProcessingFilter
                 /**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,securityEnforcementFilter,switchUserProcessingFilter
             </value>
         </property>
@@ -122,6 +123,8 @@ The beans defined within the security subsystem need not be accessed by other co
             <value>false</value>
         </property>
     </bean>
+
+    <bean id="ajaxEntryPoint" class="com.cinnamonbob.security.AjaxAuthenticationEntryPoint"/>
 
     <bean id="httpRequestAccessDecisionManager" class="org.acegisecurity.vote.AffirmativeBased">
         <property name="allowIfAllAbstainDecisions">
@@ -213,6 +216,15 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
         <property name="authenticationEntryPoint">
             <ref local="authenticationProcessingFilterEntryPoint"/>
+        </property>
+    </bean>
+
+    <bean id="ajaxSecurityEnforcementFilter" class="org.acegisecurity.intercept.web.SecurityEnforcementFilter">
+        <property name="filterSecurityInterceptor">
+            <ref local="filterInvocationInterceptor"/>
+        </property>
+        <property name="authenticationEntryPoint">
+            <ref local="ajaxEntryPoint"/>
         </property>
     </bean>
 
