@@ -180,6 +180,7 @@
         #buildTab($result "command-log" "viewCommandLog" $selected)
         #buildTab($result "changes" "viewChanges" $selected)
         #buildTab($result "tests" "viewTests" $selected)
+        #buildTab($result "build-file" "viewBuildFile" $selected)
         #buildTab($result "artifacts" "viewBuildArtifacts" $selected)
         #tabItem("working-dir" "browseProjectDir.action?buildId=$result.id&amp;recipeId=$result.root.children.get(0).result.id" $selected)
     #closeTabs()
@@ -609,6 +610,15 @@
 #macro(testsCell $project $result)
     <td class="content">
         <a href="viewTests.action?id=$result.id">#wwtext("name=tests")</a>
+    </td>
+#end
+
+##
+## Outputs an action cell for viewing the build file for a build
+##
+#macro(buildFileCell $project $result)
+    <td class="content">
+        <a href="viewBuildFile.action?id=$result.id">#wwtext("name=cinnabo.file")</a>
     </td>
 #end
 

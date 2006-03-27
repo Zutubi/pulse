@@ -36,7 +36,7 @@ public class ServerRecipePaths implements RecipePaths
 
     public File getBaseDir()
     {
-        return new File(getRecipeRoot(), "work");
+        return new File(getRecipeRoot(), "base");
     }
 
     public File getOutputDir()

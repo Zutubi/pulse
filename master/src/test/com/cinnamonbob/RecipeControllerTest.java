@@ -79,7 +79,7 @@ public class RecipeControllerTest extends BobTestCase
 
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
-        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, rootResult.getId(), buildService);
+        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest(rootResult.getId(), "test"), buildService);
         assertTrue(recipeController.handleRecipeEvent(event));
         assertEquals(buildService.getHostName(), rootNode.getHost());
 

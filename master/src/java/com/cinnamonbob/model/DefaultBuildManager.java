@@ -246,6 +246,8 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     private void cleanupWork(Project project, BuildResult build)
     {
+        build.setHasWorkDir(false);
+        buildResultDao.save(build);
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         cleanupWorkForNodes(paths, project, build, build.getRoot().getChildren());
     }

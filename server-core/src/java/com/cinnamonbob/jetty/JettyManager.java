@@ -6,8 +6,10 @@ import com.cinnamonbob.util.logging.Logger;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 import org.mortbay.jetty.servlet.WebApplicationHandler;
+import org.mortbay.util.MultiException;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * The Jetty Manager provides access to the runtime configuration of the jetty server, and hence
@@ -66,7 +68,20 @@ public class JettyManager implements Stoppable
 
         appContext = server.addWebApplication(contextPath, wwwRoot.getAbsolutePath());
 
-        server.start();
+        try
+        {
+            server.start();
+        }
+        catch(MultiException e)
+        {
+            for(Exception nested: (List<Exception>)e.getExceptions())
+            {
+                LOG.severe("Unable to start server: " + nested.getMessage(), nested);
+            }
+
+            // This is fatal.
+            System.exit(1);
+        }
     }
 
     /**

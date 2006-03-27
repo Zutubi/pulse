@@ -135,6 +135,18 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="viewBuildFile" class="com.cinnamonbob.web.project.ViewBuildFileAction">
+            <result name="success" type="velocity">view-build-file.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="downloadBuildFile" class="com.cinnamonbob.web.project.DownloadBuildFileAction">
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+            </result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="viewRecipe" class="com.cinnamonbob.web.project.ViewRecipeAction">
             <result name="success" type="velocity">view-recipe.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>

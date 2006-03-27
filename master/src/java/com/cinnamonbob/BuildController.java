@@ -9,6 +9,7 @@ import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.core.util.TreeNode;
+import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.events.AsynchronousDelegatingListener;
 import com.cinnamonbob.events.Event;
 import com.cinnamonbob.events.EventListener;
@@ -25,6 +26,8 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -227,7 +230,7 @@ public class BuildController implements EventListener
             // recipes.
             if (!buildResult.commenced() && e instanceof RecipeDispatchedEvent)
             {
-                handleFirstDispatch(foundNode.getData());
+                handleFirstDispatch(foundNode.getData(), (RecipeDispatchedEvent) e);
             }
 
             checkNodeStatus(foundNode);
@@ -242,8 +245,17 @@ public class BuildController implements EventListener
      * TODO: this probably needs some review when we go distributed (timeouts
      * at least).
      */
-    private void handleFirstDispatch(RecipeController controller)
+    private void handleFirstDispatch(RecipeController controller, RecipeDispatchedEvent event)
     {
+        try
+        {
+            FileSystemUtils.createFile(new File(buildResult.getOutputDir(), BuildResult.CINNABO_FILE), event.getRequest().getBobFileSource());
+        }
+        catch(IOException e)
+        {
+            LOG.warning("Unable to save cinnabo file for build: " + e.getMessage(), e);
+        }
+
         getChanges((ScmBootstrapper) controller.getDispatchRequest().getRequest().getBootstrapper());
         buildResult.commence(System.currentTimeMillis());
         if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)

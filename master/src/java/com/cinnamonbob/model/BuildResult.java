@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class BuildResult extends Result
 {
+    public static final String CINNABO_FILE = "cinnabo.xml";
+
     private Project project;
     private String buildSpecification;
     private long number;

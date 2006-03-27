@@ -1,0 +1,17 @@
+#authorisationTags($principle)
+#buildTags($project $result)
+<html>
+<head>
+    <title>#wwtext("name=build") $result.number</title>
+    <link href="/highlight.css" rel="stylesheet" type="text/css" media="screen"/>
+</head>
+<body>
+    <h1>:: #wwtext("name=build") $result.number ::</h1>
+
+    #buildTabs($result "build-file")
+
+    <h3 class="heading">#wwtext("name=cinnabo.file") &nbsp;<a href="downloadBuildFile.action?id=$result.id"><img src="/images/arrow_down.gif"/>#wwtext("name=download")</a></h3>
+    <div class="box">
+        $highlightedFile
+    </div>
+</html>

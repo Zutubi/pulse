@@ -28,7 +28,7 @@
             <td>
 
     <table width="100%" class="content">
-        #searchHeadingRow("recent.builds" 13 "searchBuilds.action?projectId=$project.id" "search.builds" "rss.action?projectId=$project.id" "rss.builds" )
+        #searchHeadingRow("recent.builds" 14 "searchBuilds.action?projectId=$project.id" "search.builds" "rss.action?projectId=$project.id" "rss.builds" )
         <tr>
             #contentHeading("build.id" 1)
             #contentHeading("build.status" 2)
@@ -36,7 +36,7 @@
             #contentHeading("build.spec" 1)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 6)
+            #contentHeading("actions" 7)
         </tr>
 #if($history.size() > 0)
     #foreach($buildResult in $history)
@@ -52,6 +52,7 @@
             #logCell($project $buildResult)
             #changesCell($project $buildResult)
             #testsCell($project $buildResult)
+            #buildFileCell($project $buildResult)
             #artifactsCell($project $buildResult)
             #workingCopyCell($project $buildResult)
         </tr>
@@ -72,7 +73,7 @@
         </tr>
 #else
         <tr>
-            <td class="content" colspan="11">
+            <td class="content" colspan="14">
                 #wwtext("name=no.history")
             </td>
         </tr>

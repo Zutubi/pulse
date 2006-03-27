@@ -293,7 +293,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         {
             lock.unlock();
         }
-        eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest().getId(), service));
+
+        eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest(), service));
     }
 
     public void stop(boolean force)

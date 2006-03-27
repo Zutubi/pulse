@@ -95,7 +95,7 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
                 }
 
                 service.build(request.getRequest());
-                eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest().getId(), service));
+                eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest(), service));
                 return;
             }
         }
