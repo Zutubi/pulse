@@ -81,4 +81,15 @@ public class PlainFeature extends Feature
     {
         return true;
     }
+
+    public boolean equals(Object o)
+    {
+        if (o instanceof PlainFeature)
+        {
+            PlainFeature other = (PlainFeature) o;
+            return super.equals(o) && other.firstLine == firstLine && other.lineNumber == lineNumber && other.lastLine == lastLine;
+        }
+
+        return super.equals(o);
+    }
 }

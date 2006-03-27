@@ -115,7 +115,18 @@ public abstract class Result extends Entity
 
     public void addFeature(Feature.Level level, String message)
     {
-        features.add(new Feature(level, message));
+        Feature feature = new Feature(level, message);
+
+        // Eliminate duplicates
+        for (Feature f : features)
+        {
+            if (feature.equals(f))
+            {
+                return;
+            }
+        }
+
+        features.add(feature);
     }
 
     public void failure(String message)

@@ -91,4 +91,20 @@ public class Feature extends Entity
     {
         return false;
     }
+
+    public boolean equals(Object o)
+    {
+        if (o instanceof Feature)
+        {
+            Feature other = (Feature) o;
+            return other.level == level && other.summary.equals(summary);
+        }
+
+        return false;
+    }
+
+    public int hashCode()
+    {
+        return summary.hashCode();
+    }
 }
