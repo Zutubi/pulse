@@ -565,11 +565,13 @@
     #if($summary.total == 0)
         #wwtext("name=tests.none")
     #else
+        <a href="viewTests.action?id=$result.id">
         #if($summary.allPassed())
-        $action.getText("tests.all.passed", ["$summary.total"])
+            $action.getText("tests.all.passed", ["$summary.total"])
         #else
-        $action.getText("tests.some.broken", ["$summary.broken", "$summary.total"])
+            $action.getText("tests.some.broken", ["$summary.broken", "$summary.total"])
         #end
+        </a>
     #end
 #end
 
@@ -1214,9 +1216,9 @@
                 #headingRow("build.summary" 13)
                 <tr>
                     #contentHeading("build.id" 1)
+                    #contentHeading("build.spec" 1)
                     #contentHeading("build.status" 2)
                     #contentHeading("build.tests" 1)
-                    #contentHeading("build.spec" 1)
                     #contentHeading("build.when" 1)
                     #contentHeading("build.elapsed" 1)
     #if($showActions)
@@ -1226,9 +1228,9 @@
                 <tr>
                     #set($cssClass = $buildResult.state.string)
                     #rightCell($buildResult.number)
+                    #classCell($buildResult.buildSpecification)
                     #statusCell($buildResult)
                     #testResultsCell($buildResult)
-                    #classCell($buildResult.buildSpecification)
                     #classCell("$buildResult.stamps.prettyStartDate ($buildResult.stamps.prettyStartTime)")
                     #classCell($buildResult.stamps.prettyElapsed)
     #if($showActions)
@@ -1254,7 +1256,7 @@
     #if($buildResult.hasBrokenTests())
         <tr><td>
             <table class="fill-content">
-                #headingRow("test.results" 5)
+                #headingRow("test.failures" 5)
                 <tr>
                     #contentHeading("test.name" 1)
                     #contentHeading("test.status" 2)
@@ -1309,11 +1311,11 @@
         #headingRow("latest.builds" 10)
         <tr>
             #contentHeading("project.name" 1)
+            #contentHeading("build.id" 1)
+            #contentHeading("build.spec" 1)
             #contentHeading("build.status" 2)
             #contentHeading("build.tests" 1)
             #contentHeading("last.built" 1)
-            #contentHeading("build.id" 1)
-            #contentHeading("build.spec" 1)
             #contentHeading("build.elapsed" 1)
             #contentHeading("actions" 2)
         </tr>
@@ -1328,21 +1330,21 @@
             #set($lastResult = $latestBuilds.get($index))
             #set($cssClass = $lastResult.state.string)
 
+            <td class="content-right"><a href="viewBuild.action?id=$lastResult.id">$lastResult.number</a></td>
+            #classCell($lastResult.buildSpecification)
             #statusCell($lastResult)
             #testResultsCell($lastResult)
             #classCell($lastResult.stamps.prettyStartTime)
-            #rightClassCell($lastResult.number)
-            #classCell($lastResult.buildSpecification)
             #classCell($lastResult.stamps.prettyElapsed)
             #viewCell($project $lastResult)
             #changesCell($project $lastResult)
         #else
+            #contentCell("not.applicable")
+            #contentCell("not.applicable")
             #contentCell("empty.cell")
             #contentCell("not.applicable")
             #contentCell("not.applicable")
             #contentCell("built.never")
-            #contentCell("not.applicable")
-            #contentCell("not.applicable")
             #contentCell("not.applicable")
             #contentCell("empty.cell")
             #contentCell("empty.cell")

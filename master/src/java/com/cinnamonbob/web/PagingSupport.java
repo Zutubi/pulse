@@ -98,7 +98,8 @@ public class PagingSupport
 
     public boolean isStartPageValid()
     {
-        return startPage * itemsPerPage < totalItems;
+        /* Page zero is always valid, it is up to the UI to handle this case gracefully. */
+        return startPage == 0 || startPage * itemsPerPage < totalItems;
     }
 
     public int getStartOffset()
@@ -110,7 +111,7 @@ public class PagingSupport
     {
         int offset = getStartOffset() + itemsPerPage;
 
-        if(offset > totalItems)
+        if (offset > totalItems)
         {
             offset = totalItems;
         }
