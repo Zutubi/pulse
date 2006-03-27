@@ -9,65 +9,6 @@
 
     #buildTabs($result "tests")
 
-#macro(testStatusCell $test)
-    #if($test.errors > 0)
-    <td class="error">
-        <img alt="failure" src="/images/exclamation.gif"/>
-    </td>
-    <td class="error">
-        #wwtext("name=test.error")
-    </td>
-    #elseif($test.failures > 0)
-    <td class="failure">
-        <img alt="failure" src="/images/exclamation.gif"/>
-    </td>
-    <td class="failure">
-        #wwtext("name=test.failure")
-    </td>
-    #else
-    <td class="success">
-        <img alt="success" src="/images/accept.gif"/>
-    </td>
-    <td class="success">
-        #wwtext("name=test.passed")
-    </td>
-    #end
-#end
-
-#macro(showTest $test $indent)
-    #if($test.hasBrokenTests())
-        #set($cssClass = "failure")
-    #else
-        #set($cssClass = "success")
-    #end
-    <tr>
-        <td class="$cssClass">
-             ${indent}$!webwork.htmlEncode($test.name)
-         </td>
-        #testStatusCell($test)
-    #if($test.isSuite())
-        #staticCell($action.getText("test.suite.details", ["$test.total", "$test.errors", "$test.failures"]))
-    #else
-        #if($test.message)
-        <td class="content-large">
-            <pre>$action.wrapString($!webwork.htmlEncode($test.message), 80)</pre>
-        </td>
-        #else
-            #contentCell("empty.cell")
-        #end
-    #end
-        <td class="content" width="10%">
-            $test.prettyDuration
-        </td>
-    </tr>
-
-    #if($test.isSuite())
-        #foreach($child in $test.children)
-            #showTest($child "$indent&nbsp;&nbsp;&nbsp;&nbsp;")
-        #end
-    #end
-#end
-
     #if($result.hasTests())
         #set($recipe = $result.root.children.get(0).result)
     <table class="fill-content">
@@ -78,17 +19,7 @@
             #contentHeading("test.details" 1)
             #contentHeading("test.duration" 1)
         </tr>
-        #foreach($command in $recipe.commandResults)
-            #if($command.hasTests())
-                #foreach($artifact in $command.artifacts)
-                    #foreach($fileArtifact in $artifact.children)
-                        #foreach($test in $fileArtifact.tests)
-                            #showTest($test "")
-                        #end
-                    #end
-                #end
-            #end
-        #end
+        #showRecipeTests($recipe true)
     </table>
     #else
     <p>

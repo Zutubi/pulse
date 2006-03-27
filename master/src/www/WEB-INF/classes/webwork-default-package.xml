@@ -38,6 +38,7 @@
             <interceptor name="prepare" class="com.cinnamonbob.xwork.interceptor.PrepareInterceptor"/>
             <interceptor name="cancel" class="com.cinnamonbob.xwork.interceptor.CancelWorkflowInterceptor"/>
             <interceptor name="wizard" class="com.cinnamonbob.web.wizard.WizardInterceptor"/>
+            <interceptor name="ajax" class="com.cinnamonbob.web.AjaxInterceptor"/>
 
             <!-- Basic stack -->
             <interceptor-stack name="defaultStack">
@@ -145,6 +146,11 @@
 
             <interceptor-stack name="paramsStack">
                 <interceptor-ref name="params"/>
+            </interceptor-stack>
+
+            <interceptor-stack name="ajaxStack">
+                <interceptor-ref name="completeStack"/>
+                <interceptor-ref name="ajax"/>
             </interceptor-stack>
         </interceptors>
 

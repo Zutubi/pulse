@@ -30,8 +30,7 @@ body {
 #header td {
     color: #fff;
     background: #a0a0c0;
-    padding: 0;
-    padding: 4px;
+    padding: 2px;
 }
 
 #header td.logo {
@@ -71,7 +70,7 @@ body {
 
 #nav a {
     float: left;
-    padding: 5px 7px;
+    padding: 4px 7px;
     text-decoration: none;
     border-bottom: none;
     color: #fff;
@@ -160,6 +159,11 @@ span.hidden {
 
 h1, h2 {
     color: #bbb;
+}
+
+h1 {
+    margin-top: 6px;
+    font-size: 150%;
 }
 
 h2 {
@@ -258,12 +262,12 @@ table.fill-content {
     width: 98%;
 }
 
-h3.heading, div.box, th.heading, th.info, th.content, th.content-row, td.content, td.content-centre, td.content-right, td.content-large, td.image, td.success, td.failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
+h3.heading, div.box, th.heading, th.info, th.content, th.content-row, td.content, td.content-centre, td.content-right, td.content-large, td.image, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
     border: 1px solid #bbb;
     padding: 4px;
 }
 
-th.heading, th.info, th.content, th.content-row, td.content, td.content-large, td.success, td.failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add {
+th.heading, th.info, th.content, th.content-row, td.content, td.content-large, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add {
     text-align: left;
     vertical-align: top;
 }
@@ -324,7 +328,7 @@ td.inprogress, td.inprogress-right {
     color: #039;
 }
 
-td.terminating, td.terminating-right {
+td.terminating, td.terminating-right, td.test-failure {
     color: #b22;
 }
 

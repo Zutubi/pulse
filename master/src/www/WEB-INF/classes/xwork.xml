@@ -722,4 +722,13 @@
 
     </package>
 
+    <package name="ajax" namespace="/ajax" extends="webwork-default-package">
+        <default-interceptor-ref name="ajaxStack"/>
+
+        <action name="dashboardPanel" class="com.cinnamonbob.web.user.DashboardAction">
+            <result name="success" type="velocity">dashboard-panel.vm</result>
+            <result name="error" type="redirect">/</result>
+        </action>
+    </package>
+
 </xwork>

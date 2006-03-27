@@ -817,6 +817,7 @@
 ##            #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$build.project.id")
         </tr>
 #if($recipe.commandResults.size() > 0)
+        #headingRow("commands" 6)
         <tr>
             #contentHeading("command.name" 1)
             #contentHeading("build.status" 2)
@@ -1219,7 +1220,7 @@
                     #contentHeading("build.when" 1)
                     #contentHeading("build.elapsed" 1)
     #if($showActions)
-                    #contentHeading("actions" 6)
+                    #contentHeading("actions" 2)
     #end
                 </tr>
                 <tr>
@@ -1232,11 +1233,7 @@
                     #classCell($buildResult.stamps.prettyElapsed)
     #if($showActions)
                     #viewCell($project $buildResult)
-                    #logCell($project $buildResult)
                     #changesCell($project $buildResult)
-                    #testsCell($project $buildResult)
-                    #artifactsCell($project $buildResult)
-                    #workingCopyCell($project $buildResult)
     #end
                 </tr>
             </table>
@@ -1257,12 +1254,14 @@
     #if($buildResult.hasBrokenTests())
         <tr><td>
             <table class="fill-content">
-                #headingRow("tests.broken" 1)
-               <tr>
-                   <td class="content">
-                       #buildTestSummary($buildResult)
-                   </td>
-               </tr>
+                #headingRow("test.results" 5)
+                <tr>
+                    #contentHeading("test.name" 1)
+                    #contentHeading("test.status" 2)
+                    #contentHeading("test.details" 1)
+                    #contentHeading("test.duration" 1)
+                </tr>
+                #showRecipeTests($buildResult.root.children.get(0).result false)
             </table>
         </td></tr>
     #end
@@ -1307,7 +1306,7 @@
 ##
 #macro(recentBuilds $projects $showAdd)
     <table class="content">
-        #headingRow("latest.builds" 14)
+        #headingRow("latest.builds" 10)
         <tr>
             #contentHeading("project.name" 1)
             #contentHeading("build.status" 2)
@@ -1316,7 +1315,7 @@
             #contentHeading("build.id" 1)
             #contentHeading("build.spec" 1)
             #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 6)
+            #contentHeading("actions" 2)
         </tr>
 
     #foreach($project in $projects)
@@ -1336,11 +1335,7 @@
             #classCell($lastResult.buildSpecification)
             #classCell($lastResult.stamps.prettyElapsed)
             #viewCell($project $lastResult)
-            #logCell($project $lastResult)
             #changesCell($project $lastResult)
-            #testsCell($project $lastResult)
-            #artifactsCell($project $lastResult)
-            #workingCopyCell($project $lastResult)
         #else
             #contentCell("empty.cell")
             #contentCell("not.applicable")
@@ -1351,15 +1346,11 @@
             #contentCell("not.applicable")
             #contentCell("empty.cell")
             #contentCell("empty.cell")
-            #contentCell("empty.cell")
-            #contentCell("empty.cell")
-            #contentCell("empty.cell")
-            #contentCell("empty.cell")
         #end
         </tr>
     #end
     #if($showAdd)
-        #addRow("add.project" 14 "addProject!input.action" "project.add")
+        #addRow("add.project" 10 "addProject!input.action" "project.add")
     #end
         </table>
 #end
@@ -1423,4 +1414,102 @@
                     </td>
                 </tr>
     #end
+#end
+
+##
+## Outputs a status cell for a test result
+##
+#macro(testStatusCell $test)
+    #if($test.errors > 0)
+    <td class="test-failure">
+        <img alt="failure" src="/images/exclamation.gif"/>
+    </td>
+    <td class="test-failure">
+        #wwtext("name=test.error")
+    </td>
+    #elseif($test.failures > 0)
+    <td class="test-failure">
+        <img alt="failure" src="/images/exclamation.gif"/>
+    </td>
+    <td class="test-failure">
+        #wwtext("name=test.failure")
+    </td>
+    #else
+    <td class="success">
+        <img alt="success" src="/images/accept.gif"/>
+    </td>
+    <td class="success">
+        #wwtext("name=test.passed")
+    </td>
+    #end
+#end
+
+##
+## Shows a single test with any nested tests (if it is a suite).
+##
+#macro(showTest $test $indent $showPassed)
+    #if($showPassed || $test.hasBrokenTests())
+        #if($test.hasBrokenTests())
+            #set($cssClass = "test-failure")
+        #else
+            #set($cssClass = "success")
+        #end
+        <tr>
+            <td class="$cssClass">
+                 ${indent}$!webwork.htmlEncode($test.name)
+             </td>
+            #testStatusCell($test)
+        #if($test.isSuite())
+            #staticCell($action.getText("test.suite.details", ["$test.total", "$test.errors", "$test.failures"]))
+        #else
+            #if($test.message)
+            <td class="content-large">
+                <pre>$action.wrapString($!webwork.htmlEncode($test.message), 80)</pre>
+            </td>
+            #else
+                #contentCell("empty.cell")
+            #end
+        #end
+            <td class="content" width="10%">
+                $test.prettyDuration
+            </td>
+        </tr>
+
+        #if($test.isSuite())
+            #foreach($child in $test.children)
+                #showTest($child "$indent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" $showPassed)
+            #end
+        #end
+    #end
+#end
+
+##
+## Shows the test summary view for all tests in the given recipe.
+##
+#macro(showRecipeTests $recipe $showPassed)
+    #foreach($command in $recipe.commandResults)
+        #if($command.hasTests())
+            #foreach($artifact in $command.artifacts)
+                #foreach($fileArtifact in $artifact.children)
+                    #foreach($test in $fileArtifact.tests)
+                        #showTest($test "" $showPassed)
+                    #end
+                #end
+            #end
+        #end
+    #end
+#end
+
+##
+## Inserts javascript for an auto-updating panel.  Assumes we don't care
+## about errors.
+##
+#macro(updater $url $panelId $interval)
+    var updater = new Ajax.PeriodicalUpdater(
+                      {success: "$panelId"},
+                      "$url",
+                      {
+                          method: 'get',
+                          frequency: $interval
+                      });
 #end

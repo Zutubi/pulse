@@ -24,14 +24,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
   	<head>
+        <meta http-equiv="Pragma" content="no-cache">
+        <meta http-equiv="Expires" content="-1">
 		<title>:: cinnabo :: #if ($title) $title #end</title>
-		<link href="$base/main2.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link href="$base/main2.css" rel="stylesheet" type="text/css" media="screen"/>
 		<link href="$base/form2.css" rel="stylesheet" type="text/css" media="screen"/>
         <script type="text/javascript" src="/main.js"></script>
 		$head
 	</head>
 
-      <body>
+      <body
+#if($page.getProperty("page.onLoad"))
+          onload="$page.getProperty('page.onLoad')"
+#end
+      >
       <div id="header">
         <table>
             <tr>
