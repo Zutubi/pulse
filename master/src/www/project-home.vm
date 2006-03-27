@@ -3,6 +3,10 @@
 <html>
 <head>
     <title>$!webwork.htmlEncode($project.name)</title>
+    <script type="text/javascript" src="/prototype.js"></script>
+    <script type="text/javascript">
+        #updater("/ajax/projectHomePanel.action?id=$project.id" "panel" 60)
+    </script>
 </head>
 <body>
     <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
@@ -21,49 +25,7 @@
     </table>
 #end
 
-    <h2 class="section">#wwtext("name=current.build")</h2>
-
-#if($currentBuild)
-    #showBuild($currentBuild true)
-#else
-    <p>
-        #wwtext("name=never.built")
-    </p>
-#end
-
-    <h2 class="section">#wwtext("name=latest.changes")</h2>
-
-    <table class="content">
-        #headingRow("latest.changes" 8)
-        <tr>
-            #contentHeading("build.id" 1)
-            #contentHeading("build.status" 2)
-            #contentHeading("change.revision" 1)
-            #contentHeading("change.who" 1)
-            #contentHeading("change.when" 1)
-            #contentHeading("change.comment" 1)
-            #contentHeading("actions" 1)
-        </tr>
-#if($latestChanges.size() > 0)
-    #foreach($changelist in $latestChanges)
-        #set($index = $velocityCount - 1)
-        #set($build = $changeBuilds.get($index))
-        #set($cssClass = $build.state.string)
-        <tr>
-            <td class="${cssClass}-right"><a href="viewBuild.action?id=$build.id">$build.number</td>
-            #statusCell($build)
-            #rightCell($changelist.revision)
-            #dynamicCell($changelist.user)
-            #dynamicCell($changelist.prettyDate)
-            #dynamicCell($action.trimmedString($changelist.comment, 60))
-            #linkCell("view" "viewChangelist.action?id=$changelist.id")
-        </tr>
-    #end
-#else
-        <tr>
-            <td class="content" colspan="8">#wwtext("name=no.changes")</td>
-        <tr>
-#end
-    </table>
-
+    <div id="panel">
+        #parse("ajax/project-home-panel.vm")
+    </div>
 </html>

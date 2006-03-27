@@ -105,7 +105,7 @@
             <result name="success" type="velocity">server-messages.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
-        
+
         <action name="viewProjects" class="com.cinnamonbob.web.project.ViewProjectsAction">
             <result name="success" type="velocity">view-projects.vm</result>
         </action>
@@ -728,6 +728,26 @@
         <action name="dashboardPanel" class="com.cinnamonbob.web.user.DashboardAction">
             <result name="success" type="velocity">dashboard-panel.vm</result>
             <result name="error" type="redirect">/</result>
+        </action>
+
+        <action name="viewProjectsPanel" class="com.cinnamonbob.web.project.ViewProjectsAction">
+            <result name="success" type="velocity">view-projects-panel.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="projectHomePanel" class="com.cinnamonbob.web.project.ProjectHomeAction">
+            <result name="success" type="velocity">project-home-panel.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewBuildPanel" class="com.cinnamonbob.web.project.ViewBuildAction">
+            <result name="success" type="velocity">view-build-panel.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewRecipeQueuePanel" class="com.cinnamonbob.web.server.ViewRecipeQueueAction">
+            <result name="success" type="velocity">view-recipe-queue-panel.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
         </action>
     </package>
 

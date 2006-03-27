@@ -2,12 +2,17 @@
 <content tag="selectedTab">projects</content>
 <content tag="helpPage">Projects+View</content>
 <html>
-    <head>
-        <title>#wwtext("name=projects")</title>
-    </head>
-    <body>
-        <h1>:: #wwtext("name=projects") ::</h1>
-
-        #recentBuilds($projects true)
-    </body>
+<head>
+    <title>#wwtext("name=projects")</title>
+    <script type="text/javascript" src="/prototype.js"></script>
+    <script type="text/javascript">
+        #updater("/ajax/viewProjectsPanel.action" "panel" 60)
+    </script>
+</head>
+<body>
+    <h1>:: #wwtext("name=projects") ::</h1>
+    <div id="panel">
+        #parse("ajax/view-projects-panel.vm")
+    </div>
+</body>
 </html>
