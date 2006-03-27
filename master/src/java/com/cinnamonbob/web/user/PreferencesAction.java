@@ -8,6 +8,19 @@ import com.cinnamonbob.security.AcegiUtils;
  */
 public class PreferencesAction extends UserActionSupport
 {
+    public String getRefreshInterval()
+    {
+        long refreshInterval = getUser().getRefreshInterval();
+        if (refreshInterval == User.REFRESH_DISABLED)
+        {
+            return "never";
+        }
+        else
+        {
+            return "every " + refreshInterval + " seconds";
+        }
+    }
+
     public String doInput() throws Exception
     {
         String login = AcegiUtils.getLoggedInUser();

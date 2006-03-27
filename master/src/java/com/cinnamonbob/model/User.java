@@ -13,6 +13,8 @@ import java.util.List;
  */
 public class User extends Entity implements UserDetails
 {
+    public static int REFRESH_DISABLED = 0;
+
     /**
      * The login name is used to identify this user.
      */
@@ -38,8 +40,16 @@ public class User extends Entity implements UserDetails
      * dashboard, but can be a welcome page when they first sign up.
      */
     private String defaultAction = DefaultAction.DASHBOARD_ACTION;
-
+    /**
+     * Contact points configured by the user for notifications.
+     */
     private List<ContactPoint> contactPoints;
+    /**
+     * Number of seconds between refreshes of "live" content, or 0 if the
+     * user disables refreshing.
+     */
+    private int refreshInterval = 60;
+
     private List<GrantedAuthority> authorities;
 
     public User()
@@ -262,5 +272,15 @@ public class User extends Entity implements UserDetails
     public boolean isCredentialsNonExpired()
     {
         return true;
+    }
+
+    public int getRefreshInterval()
+    {
+        return refreshInterval;
+    }
+
+    public void setRefreshInterval(int refreshInterval)
+    {
+        this.refreshInterval = refreshInterval;
     }
 }

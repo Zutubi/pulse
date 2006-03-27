@@ -19,6 +19,8 @@
 
         <property name="defaultAction" type="string" length="63"/>
 
+        <property name="refreshInterval" type="int"/>
+
         <bag name="grantedAuthorities" inverse="true" cascade="all,delete-orphan" lazy="false">
             <key column="USERID"/>
             <one-to-many class="com.cinnamonbob.model.GrantedAuthority"/>

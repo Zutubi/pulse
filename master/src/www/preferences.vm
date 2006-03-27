@@ -20,6 +20,13 @@
                     #dynamicRow("user.login" $user.login)
                     #dynamicRow("user.name" $user.name)
                 </table>
+                <table id="settings" class="fill-content">
+                    #editHeadingRow("settings" 2 "user/editUserSettings!input.action?userId=$user.id" "user.settings")
+                    #dynamicRow("user.default.page" $user.defaultAction)
+                    #dynamicRow("user.refresh.live.content" $refreshInterval)
+                </table>
+            </td>
+            <td class="columns" width="40%">
                 <table id="contacts" class="fill-content">
                     #headingRow("contacts" 4)
                     <tr>
@@ -39,8 +46,6 @@
                     #end
                     #addRow("contact.create" 4 "/user/contactWizard.action?userId=$user.id" "contact.create")
                 </table>
-            </td>
-            <td class="columns" width="40%">
                 <table id="subscriptions" class="fill-content">
                     #headingRow("subscriptions" 5)
                     <tr>

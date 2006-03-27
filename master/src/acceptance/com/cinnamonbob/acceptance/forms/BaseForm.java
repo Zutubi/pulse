@@ -21,6 +21,15 @@ public abstract class BaseForm
     public void assertFormPresent()
     {
         tester.assertFormPresent(getFormName());
+        String[] names = getFieldNames();
+        for (String name : names)
+        {
+            String[] selectValues = getSelectOptions(name);
+            if (selectValues != null)
+            {
+                tester.assertOptionsEqual(name, selectValues);
+            }
+        }
     }
 
     public void assertFormNotPresent()
@@ -29,6 +38,7 @@ public abstract class BaseForm
     }
 
     public abstract String getFormName();
+
     public abstract String[] getFieldNames();
 
     public int[] getFieldTypes()
@@ -39,6 +49,11 @@ public abstract class BaseForm
             types[i] = TEXTFIELD;
         }
         return types;
+    }
+
+    public String[] getSelectOptions(String name)
+    {
+        return null;
     }
 
     public void saveFormElements(String... args)
@@ -73,6 +88,7 @@ public abstract class BaseForm
             switch (types[i])
             {
                 case TEXTFIELD:
+                case SELECT:
                     if (values[i] != null)
                     {
                         tester.setFormElement(getFieldNames()[i], values[i]);
@@ -112,6 +128,12 @@ public abstract class BaseForm
                 case RADIOBOX:
                     assertRadioboxSelected(getFieldNames()[i], values[i]);
                     break;
+                case SELECT:
+                    // Can set to null to ignore (e.g. multiselect where this doesn't work)
+                    if (values[i] != null)
+                    {
+                        tester.assertFormElementEquals(getFieldNames()[i], values[i]);
+                    }
                 default:
                     break;
             }

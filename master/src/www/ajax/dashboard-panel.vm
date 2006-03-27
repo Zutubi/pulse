@@ -30,6 +30,6 @@
 #else
         <tr>
             <td class="content" colspan="8">#wwtext("name=no.changes")</td>
-        <tr>
+        </tr>
 #end
     </table>

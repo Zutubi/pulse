@@ -2,6 +2,8 @@
 // checkbox.
 function getElement(id)
 {
+    var element;
+
     if (document.getElementById)
     {
         element = document.getElementById(id);
@@ -20,7 +22,7 @@ function getElement(id)
 
 function setEnableState(id, checkboxId)
 {
-    element = getElement(id);
+    var element = getElement(id);
     element.disabled = !document.getElementById(checkboxId).checked;
 }
 

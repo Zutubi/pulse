@@ -540,7 +540,7 @@
     #if($result.succeeded())
         <img alt="success" src="/images/accept.gif"/>
     #elseif($result.inProgress())
-        <img alt="in progress" src="/images/hourglass.gif"/>
+        <img alt="in progress" src="/images/inprogress.gif"/>
     #elseif($result.terminating())
         <img alt="terminating" src="/images/stop.gif"/>
     #elseif($result.pending())
@@ -573,6 +573,7 @@
         #end
         </a>
     #end
+    </td>
 #end
 
 ##
@@ -1506,12 +1507,14 @@
 ## Inserts javascript for an auto-updating panel.  Assumes we don't care
 ## about errors.
 ##
-#macro(updater $url $panelId $interval)
+#macro(updater $url $panelId $user)
+    #if($user.refreshInterval != 0)
     var updater = new Ajax.PeriodicalUpdater(
                       {success: "$panelId"},
                       "$url",
                       {
                           method: 'get',
-                          frequency: $interval
+                          frequency: $user.refreshInterval
                       });
+    #end
 #end

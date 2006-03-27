@@ -5,7 +5,7 @@
     <title>$!webwork.htmlEncode($project.name)</title>
     <script type="text/javascript" src="/prototype.js"></script>
     <script type="text/javascript">
-        #updater("/ajax/projectHomePanel.action?id=$project.id" "panel" 60)
+        #updater("/ajax/projectHomePanel.action?id=$project.id" "panel" $principle)
     </script>
 </head>
 <body>

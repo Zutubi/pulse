@@ -1,9 +1,10 @@
 package com.cinnamonbob.acceptance;
 
-import com.cinnamonbob.core.util.RandomUtils;
-import com.cinnamonbob.acceptance.forms.EditUserForm;
 import com.cinnamonbob.acceptance.forms.EditPasswordForm;
+import com.cinnamonbob.acceptance.forms.EditUserForm;
 import com.cinnamonbob.acceptance.forms.EmailContactForm;
+import com.cinnamonbob.acceptance.forms.UserSettingsForm;
+import com.cinnamonbob.core.util.RandomUtils;
 
 /**
  *
@@ -57,6 +58,8 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
                 new String[]{"login", login},   // login row
                 new String[]{"name", login}     // name row
         });
+
+        assertSettingsTable("welcome", "every 60 seconds");
 
         assertTablePresent("contacts");
         assertTableRowsEqual("contacts", 1, new String[][]{
@@ -234,6 +237,59 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         // check that the new password and confirm password are correctly checked.
         form.saveFormElements(login, "a", "b");
         assertTextPresent("does not match");
+
+    }
+
+    public void testEditSettings()
+    {
+        assertAndClick("user.settings");
+
+        UserSettingsForm form = new UserSettingsForm(tester);
+        form.assertFormPresent();
+
+        form.assertFormElements("welcome", "true", "60");
+        form.saveFormElements("dashboard", "false", "60");
+
+        assertSettingsTable("dashboard", "never");
+
+        assertAndClick("user.settings");
+        form.assertFormPresent();
+        form.assertFormElements("dashboard", "false", "60");
+    }
+
+    public void testEditSettingsCancel()
+    {
+        assertAndClick("user.settings");
+
+        UserSettingsForm form = new UserSettingsForm(tester);
+        form.assertFormPresent();
+
+        form.assertFormElements("welcome", "true", "60");
+        form.cancelFormElements("dashboard", "false", null);
+
+        assertSettingsTable("welcome", "every 60 seconds");
+    }
+
+    public void testEditSettingsValidation()
+    {
+        assertAndClick("user.settings");
+
+        UserSettingsForm form = new UserSettingsForm(tester);
+        form.assertFormPresent();
+
+        form.assertFormElements("welcome", "true", "60");
+        form.saveFormElements("dashboard", "true", "0");
+        form.assertFormPresent();
+        assertTextPresent("refresh interval must be a positive number");
+    }
+
+    private void assertSettingsTable(String defaultAction, String refreshInterval)
+    {
+        assertTablePresent("settings");
+        assertTableRowsEqual("settings", 1, new String[][]{
+                new String[]{"default page", defaultAction},
+                new String[]{"refresh live content", refreshInterval}
+        });
 
     }
 
