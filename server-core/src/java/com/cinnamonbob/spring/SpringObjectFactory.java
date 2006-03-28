@@ -10,15 +10,11 @@ public class SpringObjectFactory extends ObjectFactory
 {
     public <W> W buildBean(Class clazz) throws Exception
     {
-        W bean = (W) super.buildBean(clazz);
-        ComponentContext.autowire(bean);
-        return bean;
+        return (W) ComponentContext.createBean(clazz);
     }
 
     public <V> V buildBean(String className) throws Exception
     {
-        V bean = (V) super.buildBean(className);
-        ComponentContext.autowire(bean);
-        return bean;
+        return (V) buildBean(getClassInstance(className));
     }
 }

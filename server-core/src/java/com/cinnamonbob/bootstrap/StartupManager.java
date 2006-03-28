@@ -13,5 +13,5 @@ public interface StartupManager
 
     long getStartTime();
 
-    void startApplication();
+    void startApplication() throws Exception;
 }

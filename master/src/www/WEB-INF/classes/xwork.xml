@@ -7,7 +7,7 @@
         <default-interceptor-ref name="completeStack"/>
 
         <action name="default" class="com.cinnamonbob.web.DefaultAction">
-            <result name="setupAdmin" type="redirect">/setup/setupWizard.action</result>
+            <!--<result name="setupAdmin" type="redirect">/setup/setupWizard.action</result>-->
             <result name="dashboard" type="redirect">/dashboard.action</result>
             <result name="welcome" type="velocity">/welcome.vm</result>
         </action>
@@ -602,6 +602,7 @@
 
     </package>
 
+<!--
     <package name="setup" namespace="/setup" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
@@ -614,21 +615,7 @@
             <result name="cancel" type="redirect">/</result>
         </action>
     </package>
-
-    <package name="upgrade" namespace="/upgrade" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack"/>
-
-        <action name="preview" class="com.cinnamonbob.web.upgrade.UpgradePreviewAction">
-            <result name="success" type="velocity">preview.vm</result>
-        </action>
-
-        <action name="execute" class="com.cinnamonbob.web.upgrade.UpgradeExecuteAction">
-            <interceptor-ref name="executeAndWaitStack"/>
-            <result name="wait" type="velocity">status.vm</result>
-            <result name="success" type="velocity">complete.vm</result>
-        </action>
-
-    </package>
+-->
 
     <package name="admin" namespace="/admin" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>

@@ -18,8 +18,7 @@ public abstract class MasterPersistenceTestCase extends PersistenceTestCase
     {
         return new String[]{
                 "com/cinnamonbob/bootstrap/testBootstrapContext.xml",
-                "com/cinnamonbob/bootstrap/testApplicationContext.xml",
-                "com/cinnamonbob/bootstrap/databaseContext.xml"
+                "com/cinnamonbob/bootstrap/context/hibernateContext.xml"
         };
     }
 }

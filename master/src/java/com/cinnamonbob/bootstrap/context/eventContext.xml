@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--
+The event subsystem context contains the event manager and related event configurations.
+
+This context exports:
+
+    eventManager: the systems event manager.
+
+-->
+<beans>
+
+    <bean id="eventManager" class="com.cinnamonbob.events.DefaultEventManager">
+        <constructor-arg index="0" ref="eventDispatcher"/>
+    </bean>
+
+    <bean id="eventDispatcher" class="com.cinnamonbob.events.SynchronousDispatcher"/>
+
+</beans>

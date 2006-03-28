@@ -95,10 +95,6 @@ public class SimpleConfigurationManager implements ConfigurationManager
     {
         HomeConfiguration homeConfig = getHomeConfig();
         homeConfig.setHomeDirectory(f);
-        if (!homeConfig.getHome().isInitialised())
-        {
-            getHomeConfig().getHome().init();
-        }
     }
 
     public SystemPaths getSystemPaths()

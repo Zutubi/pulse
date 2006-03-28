@@ -12,14 +12,45 @@
 
     </package>
 
+
     <package name="setup" namespace="/setup" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
         <action name="setup" class="com.cinnamonbob.web.setup.ConfigureBobHomeAction">
             <result name="input" type="velocity">/setup/configure-bobhome.vm</result>
-            <result name="success" type="redirect">/setup/setupWizard.action</result>
+            <result name="setup" type="redirect">/setup/setupWizard.action</result>
+            <result name="upgrade" type="redirect">/upgrade/preview.action</result>
+        </action>
+
+        <action name="setupWizard" class="com.cinnamonbob.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.cinnamonbob.web.setup.SetupWizard</param>
+            <result name="admin" type="velocity">/setup/create-admin.vm</result>
+            <result name="settings" type="velocity">/setup/server-settings.vm</result>
+            <result name="success" type="redirect">/</result>
+            <result name="cancel" type="redirect">/default.action</result>
+        </action>
+    </package>
+
+
+    <package name="upgrade" namespace="/upgrade" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="preview" class="com.cinnamonbob.web.upgrade.UpgradePreviewAction">
+            <result name="success" type="velocity">preview.vm</result>
+        </action>
+
+        <action name="execute" class="com.cinnamonbob.web.upgrade.UpgradeExecuteAction">
+            <interceptor-ref name="executeAndWaitStack"/>
+            <result name="wait" type="velocity">status.vm</result>
+            <result name="success" type="velocity">complete.vm</result>
+        </action>
+
+        <action name="continue" class="com.cinnamonbob.web.upgrade.PostUpgradeAction">
+            <result name="success" type="redirect">/</result>
         </action>
 
     </package>
+
 
 </xwork>

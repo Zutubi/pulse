@@ -3,21 +3,20 @@
 <beans>
 
     <bean id="startupManager" class="com.cinnamonbob.bootstrap.DefaultStartupManager">
-        <property name="setupContexts">
+        <property name="coreContexts">
             <list>
-                <value>com/cinnamonbob/bootstrap/coreSubsystemContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/webserverContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/setupContext.xml</value>
+                <!--<value>com/cinnamonbob/bootstrap/context/loggingContext.xml</value>-->
+                <value>com/cinnamonbob/bootstrap/context/webserverContext.xml</value>
             </list>
         </property>
-        <property name="systemContexts">
+        <property name="appContexts">
             <list>
-                <value>com/cinnamonbob/bootstrap/securitySubsystemContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/databaseBootstrapContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/coreDatabaseContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/databaseContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/schedulingSubsystemContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/applicationContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/mainSubsystemContext.xml</value>
+            </list>
+        </property>
+        <property name="configContexts">
+            <list>
+                <value>com/cinnamonbob/bootstrap/configSubsystemContext.xml</value>
             </list>
         </property>
         <property name="startupRunnables">
@@ -26,11 +25,11 @@
                 <value>com.cinnamonbob.ResourceDiscoverer</value>
             </list>
         </property>
-        <property name="objectFactory">
-            <ref local="objectFactory"/>
-        </property>
         <property name="configurationManager">
             <ref local="configurationManager"/>
+        </property>
+        <property name="objectFactory">
+            <ref local="objectFactory"/>
         </property>
     </bean>
 
@@ -61,5 +60,7 @@
     </bean>
 
     <bean id="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory"/>
+
+    <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 
 </beans>

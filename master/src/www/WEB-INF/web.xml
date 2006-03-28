@@ -5,12 +5,19 @@
     <display-name>CinnamonBob</display-name>
     <description>Continuous Integration Web UI</description>
 
+    <!--
+    This filter must be placed before any filter that replies upon knowing the security/user related information.
+
+    This filter is placed at the start of the chain so that a Context can be setup in the SecurityContextHolder at the
+    beginning of a web request, and any changes to the Context can be copied to the HttpSession when the web request
+    ends (ready for use with the next web request).
+    -->
     <filter>
-        <filter-name>Acegi Session Filter Chain Proxy</filter-name>
-        <filter-class>com.cinnamonbob.spring.web.context.FilterToBeanProxy</filter-class>
+        <filter-name>Acegi Session Filter</filter-name>
+        <filter-class>com.cinnamonbob.spring.FilterWrapper</filter-class>
         <init-param>
-            <param-name>targetBean</param-name>
-            <param-value>httpSessionContextIntegrationFilterProxy</param-value>
+            <param-name>delegateClassName</param-name>
+            <param-value>org.acegisecurity.context.HttpSessionContextIntegrationFilter</param-value>
         </init-param>
     </filter>
 
@@ -28,7 +35,7 @@
         </init-param>
     </filter>
 
-<!--
+<!-- webwork 2.2 filter dispatcher support.
     <filter>
         <filter-name>webwork</filter-name>
         <filter-class>com.opensymphony.webwork.dispatcher.FilterDispatcher</filter-class>
@@ -36,7 +43,7 @@
 
 -->
     <filter-mapping>
-        <filter-name>Acegi Session Filter Chain Proxy</filter-name>
+        <filter-name>Acegi Session Filter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
@@ -50,21 +57,13 @@
         <url-pattern>/</url-pattern>
     </filter-mapping>
 
-<!--
+<!-- webwork 2.2 filter dispatcher support.
     <filter-mapping>
         <filter-name>webwork</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
 -->
-    <!--
-    This context loader is required by the acegisecurity component.
-    -->
-    <!--
-        <listener>
-            <listener-class>com.cinnamonbob.spring.web.context.ContextLoaderListener</listener-class>
-        </listener>
-    -->
 
     <!--
     If the System property 'xwork.reload.bundles' is specified, the following listener to set

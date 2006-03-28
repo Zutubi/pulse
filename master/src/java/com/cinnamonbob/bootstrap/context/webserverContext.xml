@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--
+The webserver subsystem context contains the jetty webserver configuration, and provides access to
+managers used to interact with the web context.
+
+This context exports:
+
+    jettyManager: The manager for the webserver. This manager provides access to interacting with
+                  the web context.
+-->
+<beans>
+
+    <bean id="jettyManager" class="com.cinnamonbob.jetty.JettyManager">
+        <property name="jettyServer">
+            <ref local="jettyServer"/>
+        </property>
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+    </bean>
+
+    <bean id="jettyServer" class="com.cinnamonbob.jetty.JettyServerFactoryBean" destroy-method="shutdown">
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+    </bean>
+
+    <bean id="webManager" class="com.cinnamonbob.bootstrap.WebManager">
+        <property name="jettyManager">
+            <ref local="jettyManager"/>
+        </property>
+    </bean>
+
+</beans>

@@ -45,7 +45,7 @@
     Total time: $monitor.getElaspedTime()
 </p>
 
-The upgrade has completed. <a href="/dashboard.action">continue</a> or <a href="preview.action">restart</a>.
+The upgrade has completed. <a href="continue.action">continue</a> or <a href="preview.action">restart</a>.
 
 </body>
 </html>

@@ -1,8 +1,8 @@
 package com.cinnamonbob.web.setup;
 
 import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.bootstrap.SetupManager;
 import com.cinnamonbob.bootstrap.SimpleConfigurationManager;
-import com.cinnamonbob.bootstrap.StartupManager;
 import com.cinnamonbob.web.ActionSupport;
 
 import java.io.File;
@@ -13,7 +13,8 @@ import java.io.File;
 public class ConfigureBobHomeAction extends ActionSupport
 {
     private ConfigurationManager configurationManager;
-    private StartupManager startupManager;
+
+    private SetupManager setupManager;
 
     private String bobHome;
 
@@ -50,10 +51,18 @@ public class ConfigureBobHomeAction extends ActionSupport
     {
         configurationManager.setBobHome(new File(bobHome));
 
-        // startup manager . continue..
-        startupManager.startApplication();
+        // next we need to know if we need to upgrade or setup.
+        if (configurationManager.requiresSetup())
+        {
+            // need to setup the database
+            setupManager.executePostBobHomeSetup();
 
-        return SUCCESS;
+            return "setup";
+        }
+        else
+        {
+            return "upgrade";
+        }
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)
@@ -61,8 +70,8 @@ public class ConfigureBobHomeAction extends ActionSupport
         this.configurationManager = configurationManager;
     }
 
-    public void setStartupManager(StartupManager startupManager)
+    public void setSetupManager(SetupManager setupManager)
     {
-        this.startupManager = startupManager;
+        this.setupManager = setupManager;
     }
 }

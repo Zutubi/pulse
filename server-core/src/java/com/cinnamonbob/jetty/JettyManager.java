@@ -53,9 +53,8 @@ public class JettyManager implements Stoppable
      * Start the embedded jetty server (to handle Http requests) and deploy the
      * default web application.
      *
-     * @throws Exception
      */
-    public void start() throws Exception
+    public void start()
     {
         if (isStarted())
         {
@@ -66,10 +65,9 @@ public class JettyManager implements Stoppable
 
         File wwwRoot = configurationManager.getSystemPaths().getContentRoot();
 
-        appContext = server.addWebApplication(contextPath, wwwRoot.getAbsolutePath());
-
         try
         {
+            appContext = server.addWebApplication(contextPath, wwwRoot.getAbsolutePath());
             server.start();
         }
         catch(MultiException e)
@@ -78,6 +76,13 @@ public class JettyManager implements Stoppable
             {
                 LOG.severe("Unable to start server: " + nested.getMessage(), nested);
             }
+
+            // This is fatal.
+            System.exit(1);
+        }
+        catch (Exception e)
+        {
+            LOG.severe("Unable to start server: " + e.getMessage(), e);
 
             // This is fatal.
             System.exit(1);

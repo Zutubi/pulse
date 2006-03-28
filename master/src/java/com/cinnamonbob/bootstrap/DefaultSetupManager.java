@@ -1,65 +1,66 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.util.logging.Logger;
-
+import java.util.List;
 
 /**
  * <class-comment/>
  */
 public class DefaultSetupManager implements SetupManager
 {
-    private static final Logger LOG = Logger.getLogger(DefaultSetupManager.class);
-
-    /**
-     * The systems configuration manager.
-     */
     private ConfigurationManager configurationManager;
+    private StartupManager startupManager;
+
+    private List<String> daoContexts;
+    private List<String> setupContexts;
+
+    public void setDaoContexts(List<String> daoContexts)
+    {
+        this.daoContexts = daoContexts;
+    }
+
+    public void setSetupContexts(List<String> setupContexts)
+    {
+        this.setupContexts = setupContexts;
+    }
+
+    public void executePostBobHomeSetup()
+    {
+        Home home = configurationManager.getHome();
+        home.init();
+
+        // load database context.
+        ComponentContext.addClassPathContextDefinitions(daoContexts.toArray(new String[daoContexts.size()]));
+
+        // create the database based on the hibernate configuration.
+        DatabaseBootstrap dbBootstrap = (DatabaseBootstrap) ComponentContext.getBean("databaseBootstrap");
+        dbBootstrap.initialiseDatabase();
+
+        // load the setup contexts containing the beans required to continue the setup process.
+        ComponentContext.addClassPathContextDefinitions(setupContexts.toArray(new String[setupContexts.size()]));
+    }
+
+    public void setupComplete() throws Exception
+    {
+        startupManager.startApplication();
+    }
 
     /**
-     * @see com.cinnamonbob.bootstrap.SetupManager#isSetup()
+     * Required resources.
+     *
+     * @param configurationManager
      */
-    public boolean isSetup()
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
-        Home home = configurationManager.getHome();
-        if (home == null || !home.isInitialised())
-        {
-            return false;
-        }
-        return true;
-    }
-
-    public void setup() throws StartupException
-    {
-        // bob home configuration.
-        Home home = configurationManager.getHome();
-        if (home == null || !home.isInitialised())
-        {
-            doSetup();
-            return;
-        }
-
-        // all systems are go, start the application.
-    }
-
-    private void doSetup()
-    {
-        // need to ask the user for a bob home value.
-        WebUIState.startSetup();
-
-        // log to the terminal that the system is ready. Bypass the logging framework to ensure that
-        // it is always displayed.
-        //TODO: i18n this string...
-        int serverPort = configurationManager.getAppConfig().getServerPort();
-        System.err.println("Now go to http://localhost:"+serverPort+" to complete the setup.");
+        this.configurationManager = configurationManager;
     }
 
     /**
      * Required resource.
      *
-     * @param configurationManager
+     * @param startupManager
      */
-    public void setConfigurationManager(com.cinnamonbob.bootstrap.ConfigurationManager configurationManager)
+    public void setStartupManager(StartupManager startupManager)
     {
-        this.configurationManager = configurationManager;
+        this.startupManager = startupManager;
     }
 }

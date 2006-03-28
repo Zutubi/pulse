@@ -1,12 +1,12 @@
 package com.cinnamonbob.spring;
 
+import com.cinnamonbob.util.logging.Logger;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import com.cinnamonbob.util.logging.Logger;
 
 /**
  * Autowire support has been adapted from com.opensymphony.xwork.spring.SpringObjectFactory
@@ -55,6 +55,8 @@ public class SpringAutowireSupport implements ApplicationContextAware
     }
 
     /**
+     * Autowire an existing object based on the current application context.
+     *
      * @param bean
      */
     public Object autoWireBean(Object bean)
@@ -64,6 +66,23 @@ public class SpringAutowireSupport implements ApplicationContextAware
 
         if (bean instanceof ApplicationContextAware)
             ((ApplicationContextAware) bean).setApplicationContext(context);
+
+        return bean;
+    }
+
+    public Object createWiredBean(Class beanClass) throws Exception
+    {
+        if (autoWiringFactory == null)
+            throw new UnsupportedOperationException("Unable to create beans at this stage.");
+
+        Object bean = autoWiringFactory.autowire(beanClass, autowireStrategy, false);
+
+        if (bean instanceof ApplicationContextAware)
+            ((ApplicationContextAware) bean).setApplicationContext(context);
+
+        // not sure why spring does not call these methods itself...
+        if (bean instanceof InitializingBean)
+            ((InitializingBean)bean).afterPropertiesSet();
 
         return bean;
     }

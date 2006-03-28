@@ -8,8 +8,7 @@ public abstract class ServerCorePersistenceTestCase extends PersistenceTestCase
     {
         return new String[]{
                 "com/cinnamonbob/bootstrap/testBootstrapContext.xml",
-                "com/cinnamonbob/bootstrap/coreTestApplicationContext.xml",
-                "com/cinnamonbob/bootstrap/coreDatabaseContext.xml"
+                "com/cinnamonbob/bootstrap/context/hibernateContext.xml"
         };
     }
 }

@@ -15,9 +15,11 @@
         <pattern>/login*</pattern>
     </decorator>
 
-    <decorator name="setup" page="basic.vm">
+    <decorator name="basoc" page="basic.vm">
         <pattern>/setup/*</pattern>
         <pattern>/upgrade/*</pattern>
+        <pattern>/startup/*</pattern>
+        <pattern>/shutdown/*</pattern>
     </decorator>
 
     <decorator name="panel" page="panel.vm"/>

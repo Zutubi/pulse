@@ -1,7 +1,7 @@
 package com.cinnamonbob.scheduling;
 
-import com.cinnamonbob.model.persistence.hibernate.PersistenceTestCase;
 import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.model.persistence.hibernate.PersistenceTestCase;
 import com.cinnamonbob.scheduling.persistence.TriggerDao;
 
 /**
@@ -38,7 +38,7 @@ public class DefaultTriggerHandlerPersistenceTest extends PersistenceTestCase
     {
         return new String[]{"com/cinnamonbob/bootstrap/testBootstrapContext.xml",
                 "com/cinnamonbob/scheduling/DefaultTriggerHandlerPersistenceTestContext.xml",
-                "com/cinnamonbob/bootstrap/schedulingSubsystemContext.xml"};
+                "com/cinnamonbob/bootstrap/context/schedulingContext.xml"};
     }
 
     /**

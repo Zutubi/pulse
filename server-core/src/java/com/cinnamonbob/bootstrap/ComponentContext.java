@@ -14,6 +14,13 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
  */
 public class ComponentContext
 {
+    // Some implementation notes:
+    // a) there are times when an IllegalStateException will be generated because ComponentContext.getBean
+    //    is called while context.getDelegate().refresh() is running. In this case, resist the urge to
+    //    isolate the loading/refresh of the context from making the context available by splitting the
+    //    new FileSystemContext and setDelegate calls. It causes other problems with acegi not being able
+    //    to initialise itself due to a ComponentContext.getContext() call that looks up a component.
+
     private static final DelegatingApplicationContext context = new DelegatingApplicationContext();
 
     public static ApplicationContext getContext()
@@ -21,7 +28,7 @@ public class ComponentContext
         return context;
     }
 
-    public static void addFileContextDefinitions(String[] definitions)
+    public static void addFileContextDefinitions(String... definitions)
     {
         if (definitions != null && definitions.length > 0)
         {
@@ -30,7 +37,7 @@ public class ComponentContext
         }
     }
 
-    public static void addClassPathContextDefinitions(String[] definitions)
+    public static void addClassPathContextDefinitions(String... definitions)
     {
         if (definitions != null && definitions.length > 0)
         {
@@ -50,12 +57,22 @@ public class ComponentContext
 
     public static void autowire(Object bean)
     {
-        if (context.getDelegate() != null)
+        if (context.getDelegate() == null)
         {
-            SpringAutowireSupport support = new SpringAutowireSupport();
-            support.setApplicationContext(context);
-            support.autoWireBean(bean);
+            // there is no context to use for the autowiring, so no work
+            // can be done.
+            return;
         }
+        SpringAutowireSupport support = new SpringAutowireSupport();
+        support.setApplicationContext(context);
+        support.autoWireBean(bean);
+    }
+
+    public static <U> U createBean(Class beanClass) throws Exception
+    {
+        SpringAutowireSupport support = new SpringAutowireSupport();
+        support.setApplicationContext(context);
+        return (U) support.createWiredBean(beanClass);
     }
 
     public static void closeAll()

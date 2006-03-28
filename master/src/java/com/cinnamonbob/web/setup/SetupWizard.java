@@ -2,6 +2,7 @@ package com.cinnamonbob.web.setup;
 
 import com.cinnamonbob.bootstrap.ApplicationConfiguration;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.cinnamonbob.bootstrap.SetupManager;
 import com.cinnamonbob.model.GrantedAuthority;
 import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.UserManager;
@@ -27,6 +28,7 @@ public class SetupWizard extends BaseWizard
     private UserManager userManager;
     private ConfigurationManager configurationManager;
     private ServerSettingsState serverSettingsState;
+    private SetupManager setupManager;
 
     public SetupWizard()
     {
@@ -62,16 +64,45 @@ public class SetupWizard extends BaseWizard
 
         // login as the admin user.
         AcegiUtils.loginAs(admin);
+
+        try
+        {
+            setupManager.setupComplete();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * Required resource.
+     *
+     * @param userManager
+     */
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param configurationManager
+     */
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param setupManager
+     */
+    public void setSetupManager(SetupManager setupManager)
+    {
+        this.setupManager = setupManager;
     }
 
     public class CreateAdminState extends BaseWizardState implements Validateable
@@ -197,7 +228,7 @@ public class SetupWizard extends BaseWizard
         }
 
         public void validate()
-        {
+        {            
             if (TextUtils.stringSet(smtpHost) && !TextUtils.stringSet(fromAddress))
             {
                 addFieldError("fromAddress", "from address is required when smtp host is provided");
