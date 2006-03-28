@@ -71,7 +71,11 @@
                  can only create subscriptions is the system has configured projects accessible to
                  the user AND the user has configured contact points.
                 -->
-                #addRow("subscription.create" 5 "/user/createSubscription!input.action?userId=$user.id" "subscription.create")
+                #if($user.contactPoints.size() > 0)
+                    #addRow("subscription.create" 5 "/user/createSubscription!input.action?userId=$user.id" "subscription.create")
+                #else
+                    <td class="content" colspan="5">#wwtext("name=subscription.requires.contact")</td>
+                #end
                 </table>
             </td>
         </tr>

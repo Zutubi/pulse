@@ -19,6 +19,8 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
     private static final String EMAIL_CREATE_NAME = "contact.name";
     private static final String EMAIL_CREATE_EMAIL = "contact.email";
     private static final String CREATE_CONTACT_LINK = "create contact";
+    //TODO - replace this string with a reference to the properties file.
+    private static final String CONTACT_REQUIRED = "you must create a contact point before you can create a subscription";
 
     public UserPreferencesAcceptanceTest()
     {
@@ -71,13 +73,11 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         assertTablePresent("subscriptions");
         assertTableRowsEqual("subscriptions", 1, new String[][]{
                 new String[]{"project", CONTACT_CREATE_TYPE, "condition", "actions"},
-                new String[]{"create subscription", "create subscription", "create subscription", "create subscription"}
+                new String[]{CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED}
         });
 
-
-        assertLinkPresentWithText("create subscription");
-
         // can not create subscriptions unless there are projects to subscribe to.
+        assertLinkNotPresentWithText("create subscription");
     }
 
     public void testContactFormValidation()
@@ -297,18 +297,13 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
     {
         // can not create subscription without project
         // can not create subscription without contacts.
-        /*
         assertLinkNotPresent("subscription.create");
-
-        //TODO - replace this string with a reference to the properties file.
-        String msg = "you will need to create a contact point before you can create a subscription";
 
         assertTablePresent("subscriptions");
         assertTableRowsEqual("subscriptions", 1, new String[][]{
                 new String[]{"project", CONTACT_CREATE_TYPE, "condition", "actions"},
-                new String[]{msg, msg, msg, msg}
+                new String[]{CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED}
         });
-        */
     }
 
     public void testCreateContactPoint()
