@@ -1,6 +1,6 @@
 package com.cinnamonbob.command;
 
-import com.cinnamonbob.BobServer;
+import com.cinnamonbob.bootstrap.SystemBootstrapManager;
 import com.cinnamonbob.util.logging.Logger;
 
 
@@ -39,7 +39,7 @@ public class Bootstrap
 
     public void start(String argv[]) throws Exception
     {
-        BobServer server = new BobServer();
-        server.start();
+        SystemBootstrapManager bootstrap = new SystemBootstrapManager();
+        bootstrap.bootstrapSystem();
     }
 }
