@@ -74,7 +74,7 @@
         #restrictedHeadingRow("recipe.queue" 4 "ROLE_ADMINISTRATOR" "queue.pause" "/admin/toggleRecipeQueue.action" "control_pause_blue.gif" false)
 #else
         #restrictedHeadingRow("recipe.queue" 4 "ROLE_ADMINISTRATOR" "queue.resume" "/admin/toggleRecipeQueue.action" "control_play_blue.gif" false)
-        #infoRow("queue.paused" 4)
+        #noteRow("queue.paused" 4)
 #end
         <tr>
             #contentHeading("project" 1)

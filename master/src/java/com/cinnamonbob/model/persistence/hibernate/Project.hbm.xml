@@ -14,6 +14,8 @@
 
         <property name="url" column="URL" type="string" length="512"/>
 
+        <property name="stateName" column="STATE" type="string" length="31"/>
+
         <many-to-one name="bobFileDetails" class="com.cinnamonbob.model.BobFileDetails" column="BOB_FILE_DETAILS"
                      lazy="false" cascade="all"/>
 

@@ -288,9 +288,9 @@
 ##
 ## Outputs an information row for a content table
 ##
-#macro(infoRow $key $span)
+#macro(noteRow $key $span)
     <tr>
-        <th class="info" colspan="$span">#wwtext("name=$key")</th>
+        <th class="note" colspan="$span">#wwtext("name=$key")</th>
     </tr>
 #end
 

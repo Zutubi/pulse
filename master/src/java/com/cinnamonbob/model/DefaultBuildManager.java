@@ -114,6 +114,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findLatestByProject(project, max);
     }
 
+    public int getBuildCount(Project project, ResultState[] states, String spec)
+    {
+        return buildResultDao.getBuildCount(project, states, spec);
+    }
+
     public void fillHistoryPage(HistoryPage page)
     {
         fillHistoryPage(page, new ResultState[]{ResultState.ERROR, ResultState.FAILURE, ResultState.SUCCESS}, null);
@@ -213,7 +218,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
     {
         List<CleanupRule> rules = project.getCleanupRules();
 
-        for(CleanupRule rule: rules)
+        for (CleanupRule rule : rules)
         {
             List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao);
 
@@ -274,7 +279,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { BuildCompletedEvent.class };
+        return new Class[]{BuildCompletedEvent.class};
     }
 
     public void setScheduler(Scheduler scheduler)

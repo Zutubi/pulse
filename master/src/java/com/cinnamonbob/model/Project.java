@@ -11,6 +11,27 @@ import java.util.List;
  */
 public class Project extends Entity
 {
+    public enum State
+    {
+        /**
+         * There is a build running for this project.
+         */
+        BUILDING,
+        /**
+         * No builds running for the project at the moment.
+         */
+        IDLE,
+        /**
+         * Currently paused: triggers will be ignored while in this state.
+         */
+        PAUSED,
+        /**
+         * Project is building, but will be paused when the current build
+         * is completed.
+         */
+        PAUSING
+    }
+
     public static final int DEFAULT_WORK_DIR_BUILDS = 10;
 
     private String name;
@@ -19,6 +40,8 @@ public class Project extends Entity
     private BobFileDetails bobFileDetails;
     private List<CleanupRule> cleanupRules = new LinkedList<CleanupRule>();
     private Scm scm;
+    private State state = State.IDLE;
+
 
     private List<BuildSpecification> buildSpecifications;
 
@@ -143,9 +166,9 @@ public class Project extends Entity
 
     public CleanupRule getCleanupRule(long id)
     {
-        for(CleanupRule rule: cleanupRules)
+        for (CleanupRule rule : cleanupRules)
         {
-            if(rule.getId() == id)
+            if (rule.getId() == id)
             {
                 return rule;
             }
@@ -157,9 +180,73 @@ public class Project extends Entity
     public void removeCleanupRule(long id)
     {
         CleanupRule deadRuleWalking = getCleanupRule(id);
-        if(deadRuleWalking != null)
+        if (deadRuleWalking != null)
         {
             cleanupRules.remove(deadRuleWalking);
         }
+    }
+
+    public State getState()
+    {
+        return state;
+    }
+
+    private String getStateName()
+    {
+        return state.toString();
+    }
+
+    private void setStateName(String stateName)
+    {
+        state = State.valueOf(stateName);
+    }
+
+    public synchronized boolean isPaused()
+    {
+        return state == State.PAUSED || state == State.PAUSING;
+    }
+
+    public synchronized void buildCommenced()
+    {
+        state = State.BUILDING;
+    }
+
+    public synchronized void buildCompleted()
+    {
+        if (state == State.PAUSING)
+        {
+            state = State.PAUSED;
+        }
+        else
+        {
+            state = State.IDLE;
+        }
+    }
+
+    public synchronized void pause()
+    {
+        switch (state)
+        {
+            case BUILDING:
+                state = State.PAUSING;
+                break;
+            case IDLE:
+                state = State.PAUSED;
+                break;
+        }
+    }
+
+    public synchronized void resume()
+    {
+        switch (state)
+        {
+            case PAUSED:
+                state = State.IDLE;
+                break;
+            case PAUSING:
+                state = State.BUILDING;
+                break;
+        }
+
     }
 }

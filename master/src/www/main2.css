@@ -18,6 +18,7 @@ body {
     padding: 0;
     margin: 0;
     border-bottom: 1px solid #99a;
+    font-size: 14;
 }
 
 #header table {
@@ -59,6 +60,7 @@ body {
     border-top: 1px solid #ccd;
     border-bottom: 2px solid #99a;
     background: #aac /*url(../img/nav-bg-blue.gif) repeat-x top left*/;
+    font-size: 14;
 }
 
 #nav li {
@@ -91,6 +93,7 @@ body {
     padding: 0 1%;
     list-style: none;
     border-bottom: 1px solid #bbb;
+    font-size: 14;
 }
 
 #innernav li {
@@ -220,6 +223,14 @@ hr {
     font-size: 80%;
 }
 
+img {
+    vertical-align: text-top;
+}
+
+img.centre {
+    vertical-align: baseline;
+}
+
     /*------------------------------
     Content
     */
@@ -262,12 +273,12 @@ table.fill-content {
     width: 98%;
 }
 
-h3.heading, div.box, th.heading, th.info, th.content, th.content-row, td.content, td.content-centre, td.content-right, td.content-large, td.image, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
+h3.heading, div.box, th.heading, th.note, th.content, th.content-row, td.content, td.content-centre, td.content-right, td.content-large, td.image, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
     border: 1px solid #bbb;
     padding: 4px;
 }
 
-th.heading, th.info, th.content, th.content-row, td.content, td.content-large, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add {
+th.heading, th.note, th.content, th.content-row, td.content, td.content-large, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add {
     text-align: left;
     vertical-align: top;
 }
@@ -300,7 +311,7 @@ h3.heading, th.heading {
     white-space: nowrap;
 }
 
-th.info {
+.note {
     background: #ffffc0;
     white-space: nowrap;
 }
@@ -487,14 +498,25 @@ td.dec-info, td.num-info {
 }
 
 td.okaybar {
-    background: #eeeeff; border: 1px solid #9c9c9c; padding: 0px;
+    background: #eeeeff;
+    border: 1px solid #9c9c9c;
+    padding: 0px;
 }
+
 td.errorbar {
-    background: #c00000; border: 1px solid #9c9c9c; padding: 0px;
+    background: #c00000;
+    border: 1px solid #9c9c9c;
+    padding: 0px;
 }
+
 td.warningbar {
-    background: #f0c000; border: 1px solid #9c9c9c; padding: 0px;
+    background: #f0c000;
+    border: 1px solid #9c9c9c;
+    padding: 0px;
 }
+
 td.clearbar {
-    background: #ffffff; border: 1px solid #9c9c9c; padding: 0px;
+    background: #ffffff;
+    border: 1px solid #9c9c9c;
+    padding: 0px;
 }

@@ -213,6 +213,11 @@
             <result name="error" type="redirect">viewProjects.action</result>
         </action>
 
+        <action name="projectState" class="com.cinnamonbob.web.project.ProjectStateAction">
+            <result name="success" type="redirect">/currentBuild.action?id=${id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="history" class="com.cinnamonbob.web.project.HistoryAction">
             <result name="success" type="velocity">history.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>

@@ -30,6 +30,8 @@ public interface BuildManager
 
     List<BuildResult> getLatestBuildResultsForProject(Project project, int max);
 
+    public int getBuildCount(Project project, ResultState[] states, String spec);
+
     /**
      * Fills out the list in the given history page based on the page offset.
      * Results in the initial state are NOT included.

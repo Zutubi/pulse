@@ -13,18 +13,6 @@
 
     #projectTabs("home")
 
-#if($hasBasics)
-    <table class="content">
-        #headingRow("project.basics" 2)
-    #if($project.description && $project.description.length() > 0)
-        #dynamicRow("project.description" $project.description)
-    #end
-    #if($project.url && $project.url.length() > 0)
-        #dynamicLinkRow("project.url" $project.url $project.url)
-    #end
-    </table>
-#end
-
     <div id="panel">
         #parse("ajax/project-home-panel.vm")
     </div>

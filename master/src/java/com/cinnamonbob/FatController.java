@@ -13,6 +13,7 @@ import com.cinnamonbob.events.build.BuildTimeoutEvent;
 import com.cinnamonbob.model.BuildManager;
 import com.cinnamonbob.model.BuildSpecification;
 import com.cinnamonbob.model.Project;
+import com.cinnamonbob.model.ProjectManager;
 import com.cinnamonbob.scheduling.quartz.TimeoutBuildJob;
 import com.cinnamonbob.util.logging.Logger;
 import org.quartz.JobDetail;
@@ -51,6 +52,7 @@ public class FatController implements EventListener, Stoppable
     private ProjectQueue projectQueue = new ProjectQueue();
     private Set<BuildController> runningBuilds = new HashSet<BuildController>();
     private Scheduler quartzScheduler;
+    private ProjectManager projectManager;
 
     public FatController()
     {
@@ -128,6 +130,12 @@ public class FatController implements EventListener, Stoppable
 
     private void handleBuildRequest(BuildRequestEvent event)
     {
+        if (event.getProject().isPaused())
+        {
+            // Ignore build requests while project is paused
+            return;
+        }
+
         if (projectQueue.buildRequested(event))
         {
             startBuild(event);
@@ -152,6 +160,7 @@ public class FatController implements EventListener, Stoppable
         {
             if (!stopping)
             {
+                projectManager.buildCommenced(project);
                 RecipeResultCollector collector = new DefaultRecipeResultCollector(project, configManager);
                 BuildController controller = new BuildController(project, buildSpec, eventManager, buildManager, recipeQueue, collector, quartzScheduler, configManager);
                 controller.run();
@@ -195,6 +204,9 @@ public class FatController implements EventListener, Stoppable
         lock.lock();
         try
         {
+            // Look up the project to avoid stale data
+            Project project = projectManager.getProject(event.getResult().getProject().getId());
+
             BuildController controller = (BuildController) event.getSource();
             runningBuilds.remove(controller);
 
@@ -203,9 +215,10 @@ public class FatController implements EventListener, Stoppable
                 stoppedCondition.signalAll();
             }
 
+            projectManager.buildCompleted(project);
+
             if (!stopping)
             {
-                Project project = event.getResult().getProject();
                 BuildRequestEvent queuedEvent = projectQueue.buildCompleted(project);
 
                 if (queuedEvent != null)
@@ -261,5 +274,10 @@ public class FatController implements EventListener, Stoppable
     public void setConfigurationManager(ConfigurationManager configManager)
     {
         this.configManager = configManager;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

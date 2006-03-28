@@ -36,4 +36,12 @@ public interface ProjectManager extends EntityManager<Project>
      *          while deleting it
      */
     void deleteBuildSpecification(long projectId, long specId);
+
+    void buildCommenced(Project project);
+
+    void buildCompleted(Project project);
+
+    void pauseProject(Project project);
+
+    void resumeProject(Project project);
 }

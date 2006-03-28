@@ -92,6 +92,30 @@ public class DefaultProjectManager implements ProjectManager
         buildSpecificationDao.delete(spec);
     }
 
+    public void buildCommenced(Project project)
+    {
+        project.buildCommenced();
+        projectDao.save(project);
+    }
+
+    public void buildCompleted(Project project)
+    {
+        project.buildCompleted();
+        projectDao.save(project);
+    }
+
+    public void pauseProject(Project project)
+    {
+        project.pause();
+        projectDao.save(project);
+    }
+
+    public void resumeProject(Project project)
+    {
+        project.resume();
+        projectDao.save(project);
+    }
+
     public void setProjectDao(ProjectDao dao)
     {
         projectDao = dao;
