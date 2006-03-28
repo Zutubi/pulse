@@ -1,7 +1,7 @@
 package com.cinnamonbob.acceptance;
 
-import junit.framework.TestSuite;
 import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * <class-comment/>
@@ -23,6 +23,7 @@ public class AcceptanceTestSuite
         suite.addTestSuite(SmtpConfigurationAcceptanceTest.class);
         suite.addTestSuite(UserAdministrationAcceptanceTest.class);
         suite.addTestSuite(UserPreferencesAcceptanceTest.class);
+        suite.addTestSuite(WebAppAcceptanceTest.class);
         return suite;
     }
 }
