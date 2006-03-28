@@ -200,6 +200,13 @@
             <result name="success" type="velocity">find-project.vm</result>
         </action>
 
+        <action name="deleteProject" class="com.cinnamonbob.web.project.DeleteProjectAction">
+            <result name="input" type="velocity">confirm-project-delete.vm</result>
+            <result name="success" type="redirect">/viewProjects.action</result>
+            <result name="cancel" type="redirect">/currentBuild.action?id=${id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="editProject" class="com.cinnamonbob.web.project.EditProjectAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-project.vm</result>
@@ -602,20 +609,20 @@
 
     </package>
 
-<!--
-    <package name="setup" namespace="/setup" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack"/>
+    <!--
+        <package name="setup" namespace="/setup" extends="webwork-default-package">
+            <default-interceptor-ref name="completeStack"/>
 
-        <action name="setupWizard" class="com.cinnamonbob.web.wizard.WizardAction">
-            <interceptor-ref name="wizardStack"/>
-            <param name="wizardClass">com.cinnamonbob.web.setup.SetupWizard</param>
-            <result name="admin" type="velocity">/setup/create-admin.vm</result>
-            <result name="settings" type="velocity">/setup/server-settings.vm</result>
-            <result name="success" type="redirect">/</result>
-            <result name="cancel" type="redirect">/</result>
-        </action>
-    </package>
--->
+            <action name="setupWizard" class="com.cinnamonbob.web.wizard.WizardAction">
+                <interceptor-ref name="wizardStack"/>
+                <param name="wizardClass">com.cinnamonbob.web.setup.SetupWizard</param>
+                <result name="admin" type="velocity">/setup/create-admin.vm</result>
+                <result name="settings" type="velocity">/setup/server-settings.vm</result>
+                <result name="success" type="redirect">/</result>
+                <result name="cancel" type="redirect">/</result>
+            </action>
+        </package>
+    -->
 
     <package name="admin" namespace="/admin" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>

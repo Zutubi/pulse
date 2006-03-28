@@ -44,4 +44,6 @@ public interface ProjectManager extends EntityManager<Project>
     void pauseProject(Project project);
 
     void resumeProject(Project project);
+
+    void delete(long projectId);
 }

@@ -5,7 +5,6 @@ import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.model.BuildManager;
 import com.cinnamonbob.model.BuildResult;
 import com.cinnamonbob.model.Project;
-import com.opensymphony.util.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -90,9 +89,9 @@ public class ProjectHomeAction extends ProjectActionSupport
         return getPercent(getErrorBuilds(), totalBuilds);
     }
 
-    public boolean getHasBasics()
+    public boolean getCanDelete()
     {
-        return TextUtils.stringSet(project.getDescription()) || TextUtils.stringSet(project.getUrl());
+        return project.getState() == Project.State.PAUSED || project.getState() == Project.State.IDLE;
     }
 
     public BuildResult getCurrentBuild()

@@ -13,6 +13,8 @@
 
     #projectTabs("home")
 
+    #parse("/template/includes/actionerrors.vm")
+    
     <div id="panel">
         #parse("ajax/project-home-panel.vm")
     </div>

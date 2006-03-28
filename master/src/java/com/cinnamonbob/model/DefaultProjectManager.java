@@ -21,6 +21,7 @@ public class DefaultProjectManager implements ProjectManager
     private BuildSpecificationDao buildSpecificationDao;
     private TriggerDao triggerDao;
     private Scheduler scheduler;
+    private BuildManager buildManager;
 
     public void save(Project project)
     {
@@ -49,7 +50,17 @@ public class DefaultProjectManager implements ProjectManager
 
     public void delete(Project entity)
     {
+        buildManager.deleteAllBuilds(entity);
         projectDao.delete(entity);
+    }
+
+    public void delete(long projectId)
+    {
+        Project project = getProject(projectId);
+        if (project != null)
+        {
+            delete(project);
+        }
     }
 
     public void initialise()
@@ -136,4 +147,8 @@ public class DefaultProjectManager implements ProjectManager
         this.scheduler = scheduler;
     }
 
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
+    }
 }

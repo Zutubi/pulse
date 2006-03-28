@@ -77,4 +77,6 @@ public interface BuildManager
     List<Changelist> getLatestChangesForUser(User user, int max);
 
     List<Changelist> getLatestChangesForProject(Project project, int max);
+
+    void deleteAllBuilds(Project project);
 }

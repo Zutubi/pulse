@@ -1,0 +1,25 @@
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>$!webwork.htmlEncode($project.name)</title>
+</head>
+<body>
+    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=deleteProject.action" "heading=%{getText('delete.project')}" "method=post")
+    #wwhidden("name=id")
+   <tr>
+       <td class="warning" colspan="2">
+           <img src="/images/error.gif"/>
+           $!webwork.htmlEncode($action.getText("project.confirm.delete", [$project.name, $totalBuilds]))
+       </td>
+   </tr>
+   #openSubmit()
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=1")
+        #wwsubmit("name=ok" "value=%{getText('ok.name')}" "tabindex=2")
+    #closeSubmit()
+#end
+</html>

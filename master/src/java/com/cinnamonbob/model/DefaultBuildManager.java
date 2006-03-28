@@ -214,6 +214,30 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return changelistDao.findLatestByProject(project, max);
     }
 
+    public void deleteAllBuilds(Project project)
+    {
+        int offset = 0;
+        List<BuildResult> results;
+
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        File projectDir = paths.getProjectDir(project);
+        if (!FileSystemUtils.removeDirectory(projectDir))
+        {
+            LOG.warning("Unable to remove project directory '" + projectDir.getAbsolutePath() + "'");
+        }
+
+        do
+        {
+            results = buildResultDao.findOldestByProject(project, offset, 100);
+            for (BuildResult r : results)
+            {
+                buildResultDao.delete(r);
+            }
+            offset += results.size();
+        }
+        while (results.size() > 0);
+    }
+
     private synchronized void cleanupBuilds(Project project)
     {
         List<CleanupRule> rules = project.getCleanupRules();

@@ -142,4 +142,9 @@ public class MockBuildManager implements BuildManager
     {
         throw new RuntimeException("Method not implemented.");
     }
+
+    public void deleteAllBuilds(Project project)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
 }

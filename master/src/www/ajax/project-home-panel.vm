@@ -39,7 +39,6 @@
                     </td>
                 </tr>
             </table>
-#if($hasBasics)
         </td><td class="columns"  width="45%">
             <table class="fill-content">
                 #headingRow("project.basics" 2)
@@ -49,8 +48,19 @@
             #if($project.url && $project.url.length() > 0)
                 #dynamicLinkRow("project.url" $project.url $project.url)
             #end
+                <tr>
+                    <th class="content-row">#wwtext("name=actions")</th>
+                    <td class="content">
+            #if($canDelete)
+                        <a href="deleteProject!input.action?id=$project.id">
+                            <img src="/images/delete.gif"/> #wwtext("name=delete.project")
+                        </a>
+            #else
+                        #wwtext("name=project.actions.building")
+            #end
+                    </td>
+                </tr>
             </table>
-#end
       </td></tr>
     </table>
 
