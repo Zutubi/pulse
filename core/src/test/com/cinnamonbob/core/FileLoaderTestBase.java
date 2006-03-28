@@ -31,6 +31,7 @@ public abstract class FileLoaderTestBase extends BobTestCase
         loader.register("def", ComponentDefinition.class);
         loader.register("post-processor", PostProcessorGroup.class);
         loader.register("command", CommandGroup.class);
+        loader.register("ant.pp", AntPostProcessor.class);
         loader.register("junit.pp", RegexPostProcessor.class);
         loader.register("regex.pp", RegexPostProcessor.class);
         loader.register("executable", ExecutableCommand.class);

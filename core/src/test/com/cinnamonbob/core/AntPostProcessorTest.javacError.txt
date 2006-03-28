@@ -1,0 +1,15 @@
+Buildfile: build.xml
+
+prepare:
+
+compile:
+    [javac] Compiling 1 source file to /home/jsankey/svn/oro/trunk/classes
+    [javac] /home/jsankey/svn/oro/trunk/src/java/org/apache/oro/io/RegexFilenameFilter.java:41: ';' expected
+    [javac]   PatternMatcher _matcher;
+    [javac]   ^
+    [javac] 1 error
+
+BUILD FAILED
+/home/jsankey/svn/oro/trunk/build.xml:127: Compile failed; see the compiler error output for details.
+
+Total time: 1 second

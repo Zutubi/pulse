@@ -50,6 +50,11 @@ public class RegexPattern
         }
     }
 
+    public void setCategory(Feature.Level category)
+    {
+        this.category = category;
+    }
+
     public String getExpression()
     {
         return expression;
@@ -83,6 +88,11 @@ public class RegexPattern
         return pattern;
     }
 
+    public void setPattern(Pattern pattern)
+    {
+        this.pattern = pattern;
+    }
+
     public Exclusion createExclude()
     {
         Exclusion exclusion = new Exclusion();
@@ -95,11 +105,11 @@ public class RegexPattern
         String result = null;
 
         Matcher matcher = pattern.matcher(line);
-        if (matcher.matches())
+        if (matcher.find())
         {
             for (Exclusion e : exclusions)
             {
-                if (e.getPattern().matcher(line).matches())
+                if (e.getPattern().matcher(line).find())
                 {
                     return null;
                 }

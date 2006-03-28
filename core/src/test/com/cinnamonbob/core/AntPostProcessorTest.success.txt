@@ -1,0 +1,22 @@
+Buildfile: build.xml
+
+prepare:
+    [mkdir] Created dir: /home/jsankey/svn/oro/trunk/classes
+    [mkdir] Created dir: /home/jsankey/svn/oro/trunk/classes/META-INF
+     [copy] Copying 2 files to /home/jsankey/svn/oro/trunk/classes/META-INF
+    [mkdir] Created dir: /home/jsankey/svn/oro/trunk/classes/tests
+
+compile:
+    [javac] Compiling 76 source files to /home/jsankey/svn/oro/trunk/classes
+
+jar:
+      [jar] Building jar: /home/jsankey/svn/oro/trunk/jakarta-oro-2.1-dev-1.jar
+      [jar] Building jar: /home/jsankey/svn/oro/trunk/jakarta-oro-core-2.1-dev-1.jar
+      [jar] Building jar: /home/jsankey/svn/oro/trunk/jakarta-oro-awk-2.1-dev-1.jar
+      [jar] Building jar: /home/jsankey/svn/oro/trunk/jakarta-oro-glob-2.1-dev-1.jar
+      [jar] Building jar: /home/jsankey/svn/oro/trunk/jakarta-oro-java-2.1-dev-1.jar
+      [jar] Building jar: /home/jsankey/svn/oro/trunk/jakarta-oro-perl5-2.1-dev-1.jar
+      [jar] Building jar: /home/jsankey/svn/oro/trunk/jakarta-oro-util-2.1-dev-1.jar
+
+BUILD SUCCESSFUL
+Total time: 3 seconds

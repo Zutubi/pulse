@@ -62,28 +62,28 @@ public class RegexPostProcessorTest extends BobTestCase
 
     public void testMatchXXX()
     {
-        simpleErrors("xxx", "xxx");
+        simpleErrors("^xxx$", "xxx");
     }
 
     public void testStartsXXX()
     {
-        simpleErrors("xxx.*", "xxx", "xxx abc");
+        simpleErrors("^xxx.*", "xxx", "xxx abc");
     }
 
     public void testEndsXXX()
     {
-        simpleErrors(".*xxx", "xxx", "abc xxx");
+        simpleErrors(".*xxx$", "xxx", "abc xxx");
     }
 
     public void testFloatingXXX()
     {
-        simpleErrors(".*xxx.*", "xxx", "xxx abc", "abc xxx", "abc xxx abc");
+        simpleErrors("xxx", "xxx", "xxx abc", "abc xxx", "abc xxx abc");
     }
 
     public void testCustomSummary()
     {
         RegexPostProcessor pp = new RegexPostProcessor("test-pp");
-        RegexPattern pattern = new RegexPattern(Feature.Level.ERROR, Pattern.compile("xxx"));
+        RegexPattern pattern = new RegexPattern(Feature.Level.ERROR, Pattern.compile("^xxx$"));
         pattern.setSummary("custom");
         pp.addRegexPattern(pattern);
 
@@ -93,7 +93,7 @@ public class RegexPostProcessorTest extends BobTestCase
     public void testCustomSummaryGroups()
     {
         RegexPostProcessor pp = new RegexPostProcessor("test-pp");
-        RegexPattern pattern = new RegexPattern(Feature.Level.ERROR, Pattern.compile("x(x)x"));
+        RegexPattern pattern = new RegexPattern(Feature.Level.ERROR, Pattern.compile("^x(x)x$"));
         pattern.setSummary("$1");
         pp.addRegexPattern(pattern);
 
@@ -102,25 +102,25 @@ public class RegexPostProcessorTest extends BobTestCase
 
     public void testExcludeAll()
     {
-        RegexPostProcessor pp = createExclusionProcessor(".*xxx.*", ".*");
+        RegexPostProcessor pp = createExclusionProcessor("xxx", ".*");
         simpleErrors(pp);
     }
 
     public void testExcludeSame()
     {
-        RegexPostProcessor pp = createExclusionProcessor(".*xxx", ".*xxx");
+        RegexPostProcessor pp = createExclusionProcessor(".*xxx$", ".*xxx$");
         simpleErrors(pp);
     }
 
     public void testExcludeSome()
     {
-        RegexPostProcessor pp = createExclusionProcessor(".*xxx", "xxx");
+        RegexPostProcessor pp = createExclusionProcessor(".*xxx$", "^xxx$");
         simpleErrors(pp, "abc xxx");
     }
 
     public void testMultipleExclusions()
     {
-        RegexPostProcessor pp = createExclusionProcessor(".*", "xxx", ".*abc.*");
+        RegexPostProcessor pp = createExclusionProcessor(".*", "^xxx$", "abc");
         simpleErrors(pp, "first line", "second line");
     }
 

@@ -234,7 +234,12 @@ public abstract class BobTestCase extends TestCase
 
     protected URL getInputURL(String testName)
     {
-        return getClass().getResource(getClass().getSimpleName() + "." + testName + ".xml");
+        return getInputURL(testName, ".xml");
+    }
+
+    protected URL getInputURL(String testName, String extension)
+    {
+        return getClass().getResource(getClass().getSimpleName() + "." + testName + extension);
     }
 
     public static File getBobRoot()
@@ -242,7 +247,7 @@ public abstract class BobTestCase extends TestCase
         // First, take a guess at the working directory (which is likely to
         // work if we are running tests using Ant)
         File master = new File("master");
-        if(master.isDirectory())
+        if (master.isDirectory())
         {
             return new File(".");
         }
@@ -264,6 +269,6 @@ public abstract class BobTestCase extends TestCase
 
     public static void assertEndsWith(String a, String b)
     {
-        assertTrue("'"+b+"' does not end with '"+a+"'", b.endsWith(a));
+        assertTrue("'" + b + "' does not end with '" + a + "'", b.endsWith(a));
     }
 }
