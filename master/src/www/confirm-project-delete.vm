@@ -9,12 +9,16 @@
 
     #parse("/template/includes/actionerrors.vm")
 
+    <div style="width: 50%">
 #wwcform("action=deleteProject.action" "heading=%{getText('delete.project')}" "method=post")
     #wwhidden("name=id")
    <tr>
-       <td class="warning" colspan="2">
-           <img src="/images/error.gif"/>
+       <td class="content" colspan="2">
+           <ul class="warning">
+               <li class="warning">
            $!webwork.htmlEncode($action.getText("project.confirm.delete", [$project.name, $totalBuilds]))
+               </li>
+           </ul>
        </td>
    </tr>
    #openSubmit()
@@ -22,4 +26,5 @@
         #wwsubmit("name=ok" "value=%{getText('ok.name')}" "tabindex=2")
     #closeSubmit()
 #end
+    </div>
 </html>
