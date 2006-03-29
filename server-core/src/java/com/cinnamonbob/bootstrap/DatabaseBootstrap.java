@@ -1,12 +1,12 @@
 package com.cinnamonbob.bootstrap;
 
-import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.util.JDBCUtils;
 import com.cinnamonbob.core.Stoppable;
+import com.cinnamonbob.util.JDBCUtils;
+import com.cinnamonbob.util.logging.Logger;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
-import org.springframework.beans.BeansException;
 
 import javax.sql.DataSource;
 import java.sql.CallableStatement;
@@ -73,7 +73,7 @@ public class DatabaseBootstrap implements ApplicationContextAware, Stoppable
         {
             con = dataSource.getConnection();
             stmt = con.createStatement();
-            stmt.execute("SHUTDOWN");
+            stmt.execute("SHUTDOWN COMPACT");
         }
         catch (SQLException e)
         {
