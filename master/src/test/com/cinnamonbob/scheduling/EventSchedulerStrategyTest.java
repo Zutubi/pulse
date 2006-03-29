@@ -1,9 +1,9 @@
 package com.cinnamonbob.scheduling;
 
+import com.cinnamonbob.core.ObjectFactory;
 import com.cinnamonbob.events.DefaultEventManager;
 import com.cinnamonbob.events.Event;
 import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.spring.SpringObjectFactory;
 
 /**
  * <class-comment/>
@@ -25,7 +25,7 @@ public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
         scheduler = new EventSchedulerStrategy();
         eventManager = new DefaultEventManager();
         ((EventSchedulerStrategy)scheduler).setEventManager(eventManager);
-        ((EventSchedulerStrategy)scheduler).setObjectFactory(new SpringObjectFactory());
+        ((EventSchedulerStrategy)scheduler).setObjectFactory(new ObjectFactory());
         scheduler.setTriggerHandler(triggerHandler);
     }
 
