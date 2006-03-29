@@ -5,10 +5,10 @@
     <bean id="upgradeManager" class="com.cinnamonbob.upgrade.DefaultUpgradeManager" autowire="byName">
         <property name="tasks">
             <list>
+                <!--
                 <ref local="taskA"/>
                 <ref local="taskB"/>
                 <ref local="taskC"/>
-<!--
                 <ref local="taskD"/>
                 <ref local="taskE"/>
                 <ref local="taskF"/>
@@ -19,6 +19,7 @@
         </property>
     </bean>
 
+<!-- dummy data...
     <bean id="taskA" class="com.cinnamonbob.upgrade.tasks.DummyUpgradeTask">
         <property name="buildNumber"><value>1</value></property>
         <property name="name"><value>Task A</value></property>
@@ -72,6 +73,6 @@
         <property name="name"><value>Task H</value></property>
         <property name="description"><value>this is task H.</value></property>
     </bean>
-
+-->
 
 </beans>
