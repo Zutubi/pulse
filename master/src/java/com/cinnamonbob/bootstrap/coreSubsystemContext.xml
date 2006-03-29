@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--
+
+-->
+<beans>
+
+    <bean id="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory"/>
+
+    <!-- token manager required for scripted access to the remote api. -->
+    <bean id="tokenManager" class="com.cinnamonbob.api.TokenManager" autowire="byName" init-method="init"/>
+
+    <!-- TODO: services should register themselves with the shutdown manager as they are started. -->
+    <!--
+    the shutdown manager at this point only needs to shutdown jetty.
+    -->
+    <bean id="shutdownManager" class="com.cinnamonbob.ShutdownManager">
+        <property name="stoppables">
+            <list>
+                <ref bean="jettyManager"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
+
+    <import resource="classpath:/com/cinnamonbob/bootstrap/context/loggingContext.xml"/>
+    <import resource="classpath:/com/cinnamonbob/bootstrap/context/webserverContext.xml"/>
+
+</beans>

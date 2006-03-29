@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
+ *
  */
 public class TokenManager
 {
@@ -49,6 +50,8 @@ public class TokenManager
 
     public synchronized String login(String username, String password, long expiry) throws AuthenticationException
     {
+        checkTokenAccessEnabled();
+
         if (++loginCount % 1000 == 0)
         {
             checkForExpiredTokens();
@@ -129,6 +132,8 @@ public class TokenManager
 
     private synchronized User verifyToken(String token) throws AuthenticationException
     {
+        checkTokenAccessEnabled();
+
         if (!validTokens.contains(token))
         {
             throw new AuthenticationException("Invalid token");
@@ -214,11 +219,21 @@ public class TokenManager
         }
     }
 
+    /**
+     * Required resource.
+     *
+     * @param userManager
+     */
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param configurationManager
+     */
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
@@ -231,5 +246,13 @@ public class TokenManager
     public void init()
     {
         newRandomToken();
+    }
+
+    private void checkTokenAccessEnabled() throws AuthenticationException
+    {
+        if (userManager == null)
+        {
+            throw new AuthenticationException("Token based login disabled.");
+        }
     }
 }

@@ -5,8 +5,7 @@
     <bean id="startupManager" class="com.cinnamonbob.bootstrap.DefaultStartupManager">
         <property name="coreContexts">
             <list>
-                <!--<value>com/cinnamonbob/bootstrap/context/loggingContext.xml</value>-->
-                <value>com/cinnamonbob/bootstrap/context/webserverContext.xml</value>
+                <value>com/cinnamonbob/bootstrap/coreSubsystemContext.xml</value>
             </list>
         </property>
         <property name="appContexts">

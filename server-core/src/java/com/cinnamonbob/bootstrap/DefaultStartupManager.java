@@ -170,6 +170,8 @@ public class DefaultStartupManager implements StartupManager
         webManager.deploySetup();
 
         // let the user know that they should continue / complete the setup process via the Web UI.
+        int serverPort = configurationManager.getAppConfig().getServerPort();
+        System.err.println("Now go to http://localhost:"+serverPort+" to complete the setup.");
     }
 
     /**

@@ -3,12 +3,33 @@ package com.cinnamonbob.upgrade;
 import java.util.List;
 
 /**
- * <class-comment/>
+ * The upgrade task interface.
+ *
+ * @author Daniel Ostermeier
  */
 public interface UpgradeTask
 {
     /**
+     * Get a human readable name of this upgrade task. This name must uniquely identify this
+     * task.
+     *
+     * @return the upgrade task name.
+     */
+    String getName();
+
+    /**
+     * Get a human readable description of what this upgrade task does. This will be
+     * displayed to the user to inform them of what is happening.
+     *
+     * @return a short descriptive message
+     */
+    String getDescription();
+
+    /**
      * Return the build number that will trigger this upgrade task.
+     *
+     * For example: If the setting this to 301 will cause this task to
+     * be executed on all installations with build version 300 and below (inclusive).
      */
     int getBuildNumber();
 
@@ -20,21 +41,6 @@ public interface UpgradeTask
      * @throws UpgradeException
      */
     void execute(UpgradeContext context) throws UpgradeException;
-
-    /**
-     * Get a human readable description of what this upgrade task does. This will be
-     * displayed to the user to inform them of what is happening.
-     *
-     * @return a short descriptive message
-     */
-    String getDescription();
-
-    String getName();
-
-    //---------------
-    // The following methods require a little bit more thought. How would we display the
-    // errors? Under what sort of failure conditions will halting still leave the
-    // application in a stable state? (resource issues...)
 
     /**
      * The list of errors that this upgrade task encountered during execution.
