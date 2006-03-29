@@ -1,0 +1,9 @@
+#if($actionErrors && $actionErrors.size() > 0)
+    <ul class="error">
+    #foreach($error in $actionErrors)
+        <li class="error">$!webwork.htmlEncode($error)</li>
+    #end
+    </ul>
+#else
+    <img src="/images/accept.gif"/> #wwtext("name=settings.ok")
+#end

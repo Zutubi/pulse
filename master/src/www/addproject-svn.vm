@@ -3,6 +3,8 @@
 <html>
 <head>
     <title>#wwtext("name=add.project")</title>
+    <script type="text/javascript" src="/prototype.js"></script>
+    #svnTestScript("addProject")
 </head>
 <body>
     <h1>:: #wwtext("name=add.project") ::</h1>
@@ -22,6 +24,9 @@
     #inlineHelp("svn.passphrase.help")
     #wwtextfield("name=svn.path" "label=%{getText('scm.path')}" "size=60" "tabindex='6'" "onkeypress=return submitenter(this,event)")
     #inlineHelp("scm.path.help")
+
+    #scmTestRow()
+
     #previousNextCancel(7)
 #end
 </body>

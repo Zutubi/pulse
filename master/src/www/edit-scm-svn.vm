@@ -3,6 +3,8 @@
 <html>
 <head>
     <title>#wwtext("name=edit.svn")</title>
+    <script type="text/javascript" src="/prototype.js"></script>
+    #svnTestScript("editSvn")
 </head>
 <body>
     <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
@@ -22,6 +24,8 @@
     #inlineHelp("svn.passphrase.help")
     #wwtextfield("name=svn.path" "label=%{getText('scm.path')}" "size=60" "tabindex='6'")
     #inlineHelp("scm.path.help")
+
+    #scmTestRow()
 
     #saveCancel(7)
  #end

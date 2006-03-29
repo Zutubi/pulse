@@ -785,6 +785,18 @@
             <result name="success" type="velocity">view-recipe-queue-panel.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
+
+        <action name="testCVS" class="com.cinnamonbob.web.ajax.TestCVSAction">
+            <result name="success" type="velocity">test-scm.vm</result>
+        </action>
+
+        <action name="testP4" class="com.cinnamonbob.web.ajax.TestP4Action">
+            <result name="success" type="velocity">test-scm.vm</result>
+        </action>
+
+        <action name="testSvn" class="com.cinnamonbob.web.ajax.TestSvnAction">
+            <result name="success" type="velocity">test-scm.vm</result>
+        </action>
     </package>
 
 </xwork>

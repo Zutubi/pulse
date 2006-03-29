@@ -3,6 +3,8 @@
 <html>
 <head>
     <title>#wwtext("name=add.project")</title>
+    <script type="text/javascript" src="/prototype.js"></script>
+    #cvsTestScript("cvs.setup")
 </head>
 
 <body>
@@ -19,6 +21,9 @@
     #wwpassword("name=cvs.password" "label=%{getText('cvs.password')}" "tabindex=3" "onkeypress=return submitenter(this,event)")
     #wwtextfield("name=cvs.path" "label=%{getText('scm.path')}" "size=60" "tabindex=4" "onkeypress=return submitenter(this,event)")
     #inlineHelp("scm.path.help")
+
+    #scmTestRow()
+
     #previousNextCancel(5)
 #end
 </body>

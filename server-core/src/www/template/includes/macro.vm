@@ -1567,3 +1567,126 @@
 #end
     </table>
 #end
+
+##
+## Shows a testing message in the div with the given id
+##
+#macro(testInProgress $divid)
+    $("$divid").innerHTML = "<img src='/images/inprogress.gif'/> $action.getText('testing')";
+#end
+
+##
+## Function to report an ajax request error in the div with the given id
+##
+#macro(ajaxError $divid)
+    function reportError()
+    {
+        $("$divid").innerHTML = "<ul class='error'><li class='error'>$action.getText('request.failed')</li></ul>";
+    }
+#end
+
+##
+## A row in an SCM settings form with a link to test the settings
+##
+#macro(scmTestRow)
+    <tr>
+        <td>
+            &nbsp;
+        </td>
+        <td style="padding: 6px; padding-top: 10px;">
+            <p>
+                <a href="#" onclick="testScm()">#wwtext("name=settings.test")</a>
+            </p>
+            <div id="scm">
+            </div>
+        </td>
+    </tr>
+#end
+
+##
+## Fragment of script to test a perforce connection
+##
+#macro(p4TestScript $form)
+    <script type="text/javascript">
+        function testScm()
+        {
+            #testInProgress("scm")
+
+            var port = escape($F("${form}_p4_port"));
+            var user = escape($F("${form}_p4_user"));
+            var password = escape($F("${form}_p4_password"));
+            var client = escape($F("${form}_p4_client"));
+            var params = "port=" + port + "&user=" + user + "&password=" + password + "&client=" + client;
+
+            var updater = new Ajax.Updater({success: 'scm'},
+                                           "ajax/testP4.action",
+                                           {
+                                               method: 'get',
+                                               parameters: params,
+                                               onFailure: reportError
+                                           });
+
+            #ajaxError("scm")
+        }
+
+    </script>
+#end
+
+##
+## Fragment of script to test a subversion connection
+##
+#macro(svnTestScript $form)
+    <script type="text/javascript">
+        function testScm()
+        {
+            #testInProgress("scm")
+
+            var username = escape($F("${form}_svn_username"));
+            var password = escape($F("${form}_svn_password"));
+            var url = $F("${form}_svn_url").replace("+", "%2B");
+            var keyfile = escape($F("${form}_svn_keyfile"));
+            var passphrase = escape($F("${form}_svn_passphrase"));
+            var params = "username=" + username + "&password=" + password + "&url=" + url + "&keyfile=" + keyfile + "&passphrase=" + passphrase;
+
+            var updater = new Ajax.Updater({success: 'scm'},
+                                           "ajax/testSvn.action",
+                                           {
+                                               method: 'get',
+                                               parameters: params,
+                                               onFailure: reportError
+                                           });
+
+            #ajaxError("scm")
+        }
+
+    </script>
+#end
+
+##
+## Fragment of script to test a CVS connection
+##
+#macro(cvsTestScript $form)
+    <script type="text/javascript">
+        function testScm()
+        {
+            #testInProgress("scm")
+
+            var root = escape($F("${form}_cvs_root"));
+            var module = escape($F("${form}_cvs_module"));
+            var password = escape($F("${form}_cvs_password"));
+            var params = "root=" + root + "&password=" + password + "&module=" + module;
+
+            var updater = new Ajax.Updater({success: 'scm'},
+                                           "ajax/testCVS.action",
+                                           {
+                                               method: 'get',
+                                               parameters: params,
+                                               onFailure: reportError
+                                           });
+
+            #ajaxError("scm")
+        }
+
+    </script>
+#end
+

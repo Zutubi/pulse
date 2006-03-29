@@ -3,6 +3,8 @@
 <html>
 <head>
     <title>#wwtext("name=edit.p4")</title>
+    <script type="text/javascript" src="/prototype.js"></script>
+    #p4TestScript("editP4")
 </head>
 <body>
     <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
@@ -21,6 +23,8 @@
     #inlineHelp("p4.client.help")
     #wwtextfield("name=p4.path" "label=%{getText('scm.path')}" "size=60" "tabindex=5")
     #inlineHelp("scm.path.help")
+
+    #scmTestRow()
 
     #saveCancel(6)
  #end

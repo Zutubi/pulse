@@ -3,6 +3,8 @@
 <html>
 <head>
     <title>#wwtext("name=edit.cvs")</title>
+    <script type="text/javascript" src="/prototype.js"></script>
+    #cvsTestScript("cvs.edit")
 </head>
 <body>
     <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
@@ -25,6 +27,8 @@
     #wwtextfield("theme=simple" "template=ctext" "name=seconds" "label=%{getText('unit.seconds')}" "size=5" "tabindex=6")
     #wwtextfield("name=quiet" "template=controlfooter")
     #inlineHelp("cvs.quiet.help")
+
+    #scmTestRow()
 
     #saveCancel(7)
  #end

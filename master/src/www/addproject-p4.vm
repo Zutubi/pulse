@@ -3,6 +3,8 @@
 <html>
 <head>
     <title>#wwtext("name=add.project")</title>
+    <script type="text/javascript" src="/prototype.js"></script>
+    #p4TestScript("addProject")
 </head>
 <body>
     <h1>:: #wwtext("name=add.project") ::</h1>
@@ -21,6 +23,9 @@
     #inlineHelp("p4.client.help")
     #wwtextfield("name=p4.path" "label=%{getText('scm.path')}" "size=60" "tabindex=5")
     #inlineHelp("scm.path.help")
+
+    #scmTestRow()
+
     #previousNextCancel(6)
  #end
 </body>

@@ -31,6 +31,7 @@ public class P4Server implements SCMServer
     private static final String P4_COMMAND = "p4";
     private static final String COMMAND_CHANGES = "changes";
     private static final String COMMAND_CLIENT = "client";
+    private static final String COMMAND_CLIENTS = "clients";
     private static final String COMMAND_DIRS = "dirs";
     private static final String COMMAND_DESCRIBE = "describe";
     private static final String COMMAND_FILES = "files";
@@ -136,7 +137,7 @@ public class P4Server implements SCMServer
 
             if (result.stderr.length() > 0)
             {
-                message += ", error '" + result.stderr.toString() + "'";
+                message += ", error '" + result.stderr.toString().trim() + "'";
             }
 
             throw new SCMException(message);
@@ -741,7 +742,18 @@ public class P4Server implements SCMServer
 
     public void testConnection() throws SCMException
     {
-        runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_OUTPUT);
+        P4Result result = runP4(null, P4_COMMAND, COMMAND_CLIENTS);
+        String [] lines = lineSplitterPattern.split(result.stdout);
+        for (String line : lines)
+        {
+            String [] parts = line.split(" ");
+            if (parts.length > 1 && parts[1].equals(templateClient))
+            {
+                return;
+            }
+        }
+
+        throw new SCMException("Client '" + templateClient + "' does not exist");
     }
 
     public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
