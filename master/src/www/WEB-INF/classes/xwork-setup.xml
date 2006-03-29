@@ -20,6 +20,7 @@
             <result name="input" type="velocity">/setup/configure-bobhome.vm</result>
             <result name="setup" type="redirect">/setup/setupWizard.action</result>
             <result name="upgrade" type="redirect">/upgrade/preview.action</result>
+            <result name="success" type="redirect">/</result>
         </action>
 
         <action name="setupWizard" class="com.cinnamonbob.web.wizard.WizardAction">
@@ -43,6 +44,7 @@
         <action name="execute" class="com.cinnamonbob.web.upgrade.UpgradeExecuteAction">
             <interceptor-ref name="executeAndWaitStack"/>
             <result name="wait" type="velocity">status.vm</result>
+            <result name="cancel" type="redirect">/setup/setup!input.action</result>
             <result name="success" type="velocity">complete.vm</result>
         </action>
 

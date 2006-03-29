@@ -46,6 +46,7 @@
                 <interceptor-ref name="prepare"/>
                 <interceptor-ref name="static-params"/>
                 <interceptor-ref name="params"/>
+                <interceptor-ref name="cancel"/>
                 <interceptor-ref name="conversionError"/>
             </interceptor-stack>
 

@@ -1,33 +1,102 @@
 package com.cinnamonbob.upgrade;
 
 import com.cinnamonbob.Version;
+import com.cinnamonbob.bootstrap.Home;
 
 import java.util.List;
 
 /**
- * <class-comment/>
+ * The upgrade context object contains information relating to the upgrade that is
+ * being executed. In particular, this includes the versions, tasks and home directory.
+ *
+ * @author Daniel Ostermeier
  */
 public class DefaultUpgradeContext implements UpgradeContext
 {
-    private int from;
-    private int to;
+    /**
+     * The version from which we are upgrading.
+     */
+    private Version from;
 
+    /**
+     * The version to which we are upgrading.
+     */
+    private Version to;
+
+    /**
+     * The list of upgrade tasks that will be executed during this upgrade.
+     */
     private List<UpgradeTask> tasks = null;
+
+    /**
+     * The home directory that is being upgraded.
+     */
+    private Home home;
 
     public DefaultUpgradeContext(Version from, Version to)
     {
-        this.from = Integer.parseInt(from.getBuildNumber());
-        this.to = Integer.parseInt(to.getBuildNumber());
+        this.from = from;
+        this.to = to;
     }
 
-    public int getFromBuild()
+    /**
+     * Get the version we are upgrading from. This is typically the version of the
+     * target home directory.
+     *
+     * @return version
+     */
+    public Version getFrom()
     {
         return from;
     }
 
-    public int getToBuild()
+    /**
+     * Retrieve the version we are upgrading to. This is typically the version of the
+     * software installation.
+     *
+     * @return version
+     */
+    public Version getTo()
     {
         return to;
+    }
+
+    /**
+     * Retrieve the build number of for the version we are upgrading from. If this build
+     * number is invalid, we return Integer.MAX_VALUE
+     *
+     * @return build number
+     */
+    public int getFromBuild()
+    {
+        try
+        {
+            return Integer.parseInt(from.getBuildNumber());
+        }
+        catch (NumberFormatException e)
+        {
+            // an invalid build number indicates: do not attempt an upgrade
+            return Integer.MAX_VALUE;
+        }
+    }
+
+    /**
+     * Retrieve the build number of for the version we are upgrading to. If this build
+     * number is invalid, we return Integer.MIN_VALUE
+     *
+     * @return build number
+     */
+    public int getToBuild()
+    {
+        try
+        {
+            return Integer.parseInt(from.getBuildNumber());
+        }
+        catch (NumberFormatException e)
+        {
+            // an invalid build number indicates: do not attempt an upgrade
+            return Integer.MIN_VALUE;
+        }
     }
 
     public void setTasks(List<UpgradeTask> tasks)
@@ -35,8 +104,29 @@ public class DefaultUpgradeContext implements UpgradeContext
         this.tasks = tasks;
     }
 
+    /**
+     * Get the list of upgrade tasks that are going to be executed
+     * as part of this upgrade.
+     *
+     * @return a list of upgarde tasks.
+     */
     public List<UpgradeTask> getTasks()
     {
         return tasks;
+    }
+
+    /**
+     * Get the home directory that is being upgraded.
+     *
+     * @return home directory.
+     */
+    public Home getHome()
+    {
+        return home;
+    }
+
+    public void setHome(Home home)
+    {
+        this.home = home;
     }
 }

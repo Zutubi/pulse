@@ -5,7 +5,11 @@ package com.cinnamonbob.bootstrap;
  */
 public interface SetupManager
 {
-    void executePostBobHomeSetup();
+    void prepareSetup();
 
-    void setupComplete() throws Exception;
+    void setupComplete();
+
+    boolean systemRequiresSetup();
+
+    boolean systemRequiresUpgrade();
 }

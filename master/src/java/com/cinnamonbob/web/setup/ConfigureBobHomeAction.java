@@ -28,6 +28,17 @@ public class ConfigureBobHomeAction extends ActionSupport
         this.bobHome = bobHome;
     }
 
+    public void validate()
+    {
+        // attempt to create the home directory. If this fails, we need to ask the
+        // user for another directory.
+        File home = new File(bobHome);
+        if (!home.exists() && !home.mkdirs())
+        {
+            addFieldError("bobHome", getText(""));
+        }
+    }
+
     public String doInput() throws Exception
     {
         // set the default.
@@ -49,19 +60,26 @@ public class ConfigureBobHomeAction extends ActionSupport
 
     public String execute()
     {
-        configurationManager.setBobHome(new File(bobHome));
+        File home = new File(bobHome);
+        configurationManager.setBobHome(home);
 
         // next we need to know if we need to upgrade or setup.
-        if (configurationManager.requiresSetup())
+        if (setupManager.systemRequiresSetup())
         {
             // need to setup the database
-            setupManager.executePostBobHomeSetup();
+            setupManager.prepareSetup();
 
             return "setup";
         }
-        else
+        else if (setupManager.systemRequiresUpgrade())
         {
             return "upgrade";
+        }
+        else
+        {
+            // this may take a little while, need to provide some user feedback.
+            setupManager.setupComplete();
+            return SUCCESS;
         }
     }
 

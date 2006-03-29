@@ -25,6 +25,8 @@ public class DefaultUpgradeManager implements UpgradeManager
 
     private UpgradeProgressMonitor monitor;
 
+    private Home upgradeTarget;
+
     /**
      * Register an upgrade task with this upgrade manager.
      *
@@ -182,6 +184,11 @@ public class DefaultUpgradeManager implements UpgradeManager
                     monitor.start(task);
                     task.execute(context);
                     monitor.complete(task);
+
+                    // for each successful upgrade, we record the associated build
+                    // number and record it, so that we do not execute this task a
+                    // second time.
+
                 }
                 else
                 {

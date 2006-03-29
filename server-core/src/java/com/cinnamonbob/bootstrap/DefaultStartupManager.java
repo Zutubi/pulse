@@ -124,7 +124,7 @@ public class DefaultStartupManager implements StartupManager
         {
             starting = true;
 
-            // make sure that we dont load the webserver context multiple times.
+            // load the core context, common to all of the system configurations.
             ComponentContext.addClassPathContextDefinitions(coreContexts.toArray(new String[coreContexts.size()]));
 
             if (configurationManager.requiresSetup())
@@ -133,9 +133,8 @@ public class DefaultStartupManager implements StartupManager
             }
             else
             {
-                startApp();
+                startApplication();
             }
-
         }
         catch (Exception e)
         {
@@ -150,9 +149,14 @@ public class DefaultStartupManager implements StartupManager
         // make sure that we dont 'unload/shutdown' the web server.
 
         // now we start the application proper.
-        startApp();
+        startApplication();
     }
 
+    /**
+     * Start the configuration context.
+     *
+     * @throws Exception
+     */
     private void startConfiguration() throws Exception
     {
         // startup the web server.
@@ -168,7 +172,11 @@ public class DefaultStartupManager implements StartupManager
         // let the user know that they should continue / complete the setup process via the Web UI.
     }
 
-    private void startApp() throws Exception
+    /**
+     * Start the main application context.
+     *
+     */
+    public void startApplication()
     {
         // loading here will take some time. So, we need to provide some feedback to the
         // user about what is going on. We do this by loading a temporary webapp that contains a startup ui.
@@ -257,10 +265,5 @@ public class DefaultStartupManager implements StartupManager
     public long getStartTime()
     {
         return startTime;
-    }
-
-    public void startApplication() throws Exception
-    {
-        startApp();
     }
 }

@@ -1,6 +1,11 @@
 package com.cinnamonbob.upgrade.tasks;
 
+import com.cinnamonbob.Version;
+import com.cinnamonbob.bootstrap.Home;
 import com.cinnamonbob.upgrade.UpgradeContext;
+import com.cinnamonbob.upgrade.UpgradeTask;
+
+import java.util.List;
 
 /**
  * <class-comment/>
@@ -28,5 +33,25 @@ public class MockUpgradeContext implements UpgradeContext
     public void setToBuild(int toBuild)
     {
         this.toBuild = toBuild;
+    }
+
+    public List<UpgradeTask> getTasks()
+    {
+        return null;
+    }
+
+    public Home getHome()
+    {
+        return null;
+    }
+
+    public Version getFrom()
+    {
+        return null;
+    }
+
+    public Version getTo()
+    {
+        return null;
     }
 }

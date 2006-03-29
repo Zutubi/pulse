@@ -1,5 +1,7 @@
 package com.cinnamonbob.bootstrap;
 
+import com.cinnamonbob.upgrade.UpgradeManager;
+
 import java.util.List;
 
 /**
@@ -9,6 +11,7 @@ public class DefaultSetupManager implements SetupManager
 {
     private ConfigurationManager configurationManager;
     private StartupManager startupManager;
+    private UpgradeManager upgradeManager;
 
     private List<String> daoContexts;
     private List<String> setupContexts;
@@ -23,9 +26,16 @@ public class DefaultSetupManager implements SetupManager
         this.setupContexts = setupContexts;
     }
 
-    public void executePostBobHomeSetup()
+    /**
+     * Prepare for the setup processing.
+     *
+     */
+    public void prepareSetup()
     {
         Home home = configurationManager.getHome();
+        if (home == null || home.getHome() == null)
+            throw new IllegalStateException("");
+
         home.init();
 
         // load database context.
@@ -39,9 +49,35 @@ public class DefaultSetupManager implements SetupManager
         ComponentContext.addClassPathContextDefinitions(setupContexts.toArray(new String[setupContexts.size()]));
     }
 
-    public void setupComplete() throws Exception
+    /**
+     * The setup processing is complete. We can now start the application.
+     */
+    public void setupComplete()
     {
+        if (systemRequiresSetup() || systemRequiresUpgrade())
+            throw new IllegalStateException();
+
         startupManager.startApplication();
+    }
+
+    /**
+     * Check if the setup processing is required.
+     *
+     * @return true if the system requires setup, false otherwise.
+     */
+    public boolean systemRequiresSetup()
+    {
+        return !configurationManager.getHome().isInitialised();
+    }
+
+    /**
+     * Check if upgrading is required.
+     *
+     * @return true if the system home requires an upgrade, false otherwise.
+     */
+    public boolean systemRequiresUpgrade()
+    {
+        return upgradeManager.isUpgradeRequired(configurationManager.getHome());
     }
 
     /**
@@ -62,5 +98,15 @@ public class DefaultSetupManager implements SetupManager
     public void setStartupManager(StartupManager startupManager)
     {
         this.startupManager = startupManager;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param upgradeManager
+     */
+    public void setUpgradeManager(UpgradeManager upgradeManager)
+    {
+        this.upgradeManager = upgradeManager;
     }
 }

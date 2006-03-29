@@ -30,8 +30,7 @@ public class Home implements UserPaths
             return false;
         }
 
-        File version = getVersionFile();
-        return version.exists();
+        return getVersionFile().exists();
     }
 
     public void init()
