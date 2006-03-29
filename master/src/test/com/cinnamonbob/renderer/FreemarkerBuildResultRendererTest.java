@@ -167,13 +167,18 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
 
             StringWriter writer = new StringWriter();
             renderer.render(hostUrl, result, type, writer);
-            String got = writer.getBuffer().toString();
-            String expected = IOUtils.inputStreamToString(expectedStream);
+            String got = replaceTimestamps(writer.getBuffer().toString());
+            String expected = replaceTimestamps(IOUtils.inputStreamToString(expectedStream));
             assertEquals(expected, got);
         }
         finally
         {
             IOUtils.close(expectedStream);
         }
+    }
+
+    private String replaceTimestamps(String str)
+    {
+        return str.replaceAll(">.*ago<", "@@@@");
     }
 }
