@@ -103,28 +103,46 @@ public class DefaultProjectManager implements ProjectManager
         buildSpecificationDao.delete(spec);
     }
 
-    public void buildCommenced(Project project)
+    public void buildCommenced(long projectId)
     {
-        project.buildCommenced();
-        projectDao.save(project);
+        Project project = getProject(projectId);
+        if (project != null)
+        {
+            project.buildCommenced();
+            projectDao.save(project);
+        }
     }
 
-    public void buildCompleted(Project project)
+    public void buildCompleted(long projectId)
     {
-        project.buildCompleted();
-        projectDao.save(project);
+        Project project = getProject(projectId);
+        if (project != null)
+        {
+            project.buildCompleted();
+            projectDao.save(project);
+        }
     }
 
-    public void pauseProject(Project project)
+    public Project pauseProject(long projectId)
     {
-        project.pause();
-        projectDao.save(project);
+        Project project = getProject(projectId);
+        if (project != null)
+        {
+            project.pause();
+            projectDao.save(project);
+        }
+
+        return project;
     }
 
-    public void resumeProject(Project project)
+    public void resumeProject(long projectId)
     {
-        project.resume();
-        projectDao.save(project);
+        Project project = getProject(projectId);
+        if (project != null)
+        {
+            project.resume();
+            projectDao.save(project);
+        }
     }
 
     public void setProjectDao(ProjectDao dao)

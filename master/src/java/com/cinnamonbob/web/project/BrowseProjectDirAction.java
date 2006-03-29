@@ -2,55 +2,19 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.MasterBuildPaths;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.filesystem.File;
-import com.cinnamonbob.filesystem.FileSystem;
-import com.cinnamonbob.filesystem.FileSystemException;
 import com.cinnamonbob.filesystem.local.LocalFileSystem;
 import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.web.DirectoryEntry;
-import com.opensymphony.util.TextUtils;
-
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  */
-public class BrowseProjectDirAction extends ProjectActionSupport
+public class BrowseProjectDirAction extends AbstractBrowseDirAction
 {
     private long buildId;
     private long recipeId;
-    private String path = "";
     private BuildResult buildResult;
-    private List<DirectoryEntry> entries;
-    private InputStream inputStream;
-    private String contentType;
     private ConfigurationManager configurationManager;
     private boolean foundBase = true;
-    private String separator;
 
-    public String getPath()
-    {
-        return path;
-    }
-
-    public void setPath(String path)
-    {
-        this.path = path;
-    }
-
-    public String getDisplayPath()
-    {
-        String result = FileSystemUtils.normaliseSeparators(path);
-        if(result.startsWith("/"))
-        {
-            result = result.substring(1);
-        }
-
-        return result;
-    }
 
     public long getBuildId()
     {
@@ -77,62 +41,12 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         return buildResult;
     }
 
-    public List<DirectoryEntry> getEntries()
-    {
-        return entries;
-    }
-
-    private String getParentPath()
-    {
-        if (path.endsWith(separator))
-        {
-            path = path.substring(0, path.length() - 1);
-        }
-
-        int index = path.lastIndexOf(separator);
-        if (index == -1)
-        {
-            return "";
-        }
-        else
-        {
-            return path.substring(0, index);
-        }
-    }
-
-    public boolean isFoundBase()
+    public boolean getFoundBase()
     {
         return foundBase;
     }
 
-    private void createDirectoryEntries(FileSystem fs, File dir) throws FileSystemException
-    {
-        entries = new LinkedList<DirectoryEntry>();
-
-        if (TextUtils.stringSet(path))
-        {
-            entries.add(new DirectoryEntry(dir.getParentFile(), "..", getParentPath()));
-        }
-
-        File[] files = fs.list(dir);
-        Arrays.sort(files);
-        for (File f : files)
-        {
-            entries.add(new DirectoryEntry(f, f.getName(), path + separator + f.getName()));
-        }
-    }
-
-    public InputStream getInputStream()
-    {
-        return inputStream;
-    }
-
-    public String getContentType()
-    {
-        return contentType;
-    }
-
-    public String execute()
+    public String execute() throws Exception
     {
         buildResult = getBuildManager().getBuildResult(buildId);
         if (buildResult == null)
@@ -153,32 +67,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
             return "dir";
         }
 
-        LocalFileSystem fs = new LocalFileSystem(baseDir);
-        separator = fs.getSeparator();
-        try
-        {
-            File file = fs.getFile(path);
-
-            if (file.isDirectory())
-            {
-                createDirectoryEntries(fs, file);
-                return "dir";
-            }
-            else if (file.isFile())
-            {
-                inputStream = fs.getFileContents(file);
-                contentType = fs.getMimeType(file);
-                return "file";
-            }
-        }
-        catch (FileSystemException fse)
-        {
-            addActionError(fse.getMessage());
-            return ERROR;
-        }
-
-        addActionError("Path '" + path + "' does not exist");
-        return ERROR;
+        return super.execute(new LocalFileSystem(baseDir));
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)

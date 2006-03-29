@@ -1,0 +1,11 @@
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>$!webwork.htmlEncode($path)</title>
+</head>
+<body>
+    <h1>:: #wwtext("name=scm.browse") ::</h1>
+
+    #showDirectoryListing("$!webwork.htmlEncode($location)" "browseProjectScm.action?id=$project.id")
+</html>

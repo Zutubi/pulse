@@ -7,6 +7,7 @@ import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.core.model.CvsRevision;
 import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.filesystem.remote.RemoteFile;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.test.BobTestCase;
 import org.netbeans.lib.cvsclient.util.Logger;
@@ -17,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 public class CvsServerTest extends BobTestCase
 {
@@ -114,6 +116,45 @@ public class CvsServerTest extends BobTestCase
         assertFalse(new File(workdir, module + "/file1.txt").exists());
         assertFalse(new File(workdir, module + "/file2.txt").exists());
         assertFalse(new File(workdir, module + "/dir1/file3.txt").exists());
+    }
+
+    public void testListRoot() throws SCMException
+    {
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null);
+        List<RemoteFile> files = cvsServer.getListing("");
+        assertEquals(1, files.size());
+        assertEquals("unit-test", files.get(0).getPath());
+        assertTrue(files.get(0).isDirectory());
+    }
+
+    public void testListing() throws SCMException
+    {
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null);
+        List<RemoteFile> files = cvsServer.getListing("unit-test/CvsClientTest/testRlog");
+        assertEquals(4, files.size());
+
+        String [] expectedNames = new String[]{"file1.txt", "Attic", "dir1", "dir2"};
+        Boolean [] expectedTypes = new Boolean[]{false, true, true, true};
+        for (int i = 0; i < expectedNames.length; i++)
+        {
+            assertEquals(expectedNames[i], files.get(i).getName());
+            assertEquals((boolean) expectedTypes[i], files.get(i).isDirectory());
+        }
+    }
+
+    public void testListingNonExistent()
+    {
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null);
+        try
+        {
+            cvsServer.getListing("nosuchpath");
+            fail();
+        }
+        catch (SCMException e)
+        {
+            assertTrue(e.getMessage().contains("does not exist"));
+        }
+
     }
 
 /*

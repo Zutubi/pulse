@@ -1,0 +1,59 @@
+package com.cinnamonbob.web.project;
+
+import com.cinnamonbob.filesystem.remote.RemoteScmFileSystem;
+import com.cinnamonbob.model.Project;
+
+/**
+ */
+public class BrowseProjectScmAction extends AbstractBrowseDirAction
+{
+    private long id;
+    private Project project;
+    private String location;
+
+    public long getId()
+    {
+        return id;
+    }
+
+    public void setId(long id)
+    {
+        this.id = id;
+    }
+
+    public Project getProject()
+    {
+        return project;
+    }
+
+    public String getLocation()
+    {
+        return location;
+    }
+
+    public boolean getShowSizes()
+    {
+        return false;
+    }
+
+    public String execute()
+    {
+        project = getProjectManager().getProject(id);
+        if (project == null)
+        {
+            addActionError("Unknown project [" + id + "]");
+            return ERROR;
+        }
+
+        try
+        {
+            location = project.getScm().createServer().getLocation();
+            return super.execute(new RemoteScmFileSystem(project.getScm()));
+        }
+        catch (Exception e)
+        {
+            addActionError("Error browsing SCM: " + e.getMessage());
+            return ERROR;
+        }
+    }
+}

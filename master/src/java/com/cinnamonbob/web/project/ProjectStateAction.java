@@ -41,11 +41,11 @@ public class ProjectStateAction extends ProjectActionSupport
 
         if (pause)
         {
-            getProjectManager().pauseProject(project);
+            getProjectManager().pauseProject(project.getId());
         }
         else
         {
-            getProjectManager().resumeProject(project);
+            getProjectManager().resumeProject(project.getId());
         }
 
         return SUCCESS;

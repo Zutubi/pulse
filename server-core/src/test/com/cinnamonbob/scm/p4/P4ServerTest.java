@@ -4,6 +4,7 @@ import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.NumericalRevision;
 import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.filesystem.remote.RemoteFile;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.test.BobTestCase;
 
@@ -138,6 +139,58 @@ public class P4ServerTest extends BobTestCase
         List<Changelist> changes = server.getChanges(new NumericalRevision(1), new NumericalRevision(7), "");
         assertEquals(1, changes.size());
         assertEquals(4, ((NumericalRevision) changes.get(0).getRevision()).getRevisionNumber());
+    }
+
+    public void testListNonExistent() throws SCMException
+    {
+        getServer("test-client");
+        try
+        {
+            server.getListing("depot4");
+            fail();
+        }
+        catch (SCMException e)
+        {
+            assertTrue(e.getMessage().contains("does not exist"));
+        }
+    }
+
+    public void testListRoot() throws SCMException
+    {
+        getServer("test-client");
+        List<RemoteFile> files = server.getListing("");
+        assertEquals(2, files.size());
+        RemoteFile f = files.get(0);
+        assertEquals("depot", f.getName());
+        assertTrue(f.isDirectory());
+
+        f = files.get(1);
+        assertEquals("depot2", f.getName());
+        assertEquals("depot2", f.getPath());
+        assertTrue(f.isDirectory());
+    }
+
+    public void testListPath() throws SCMException
+    {
+        getServer("test-client");
+        List<RemoteFile> files = server.getListing("depot2");
+        assertEquals(10, files.size());
+
+        RemoteFile f;
+        f = files.get(0);
+        assertEquals("test-branch", f.getName());
+        assertEquals("depot2/test-branch", f.getPath());
+        assertTrue(f.isDirectory());
+
+        for (int i = 1; i < 10; i++)
+        {
+            f = files.get(i);
+            assertTrue(f.isFile());
+            assertEquals("file" + i, f.getName());
+            assertEquals("depot2/file" + i, f.getPath());
+            assertEquals("text/plain", f.getMimeType());
+        }
+
     }
 
     private void getServer(String client)

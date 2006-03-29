@@ -29,6 +29,10 @@
                     #editHeadingRow("project.scm" 2 "editScm!input.action?id=$project.scm.id&amp;projectId=$project.id" "project.scm.edit")
                     #scmRow($project)
                     #dynamicRow("scm.location" "$project.scm.createServer().location")
+                    <tr>
+                        <th class="content-row">#wwtext("name=actions")</th>
+                        #linkCell("scm.browse" "browseProjectScm.action?id=$project.id")
+                    </tr>
                 </table>
                 <table id="project.cleanup" class="fill-content">
                     #headingRow("project.cleanup" 5)

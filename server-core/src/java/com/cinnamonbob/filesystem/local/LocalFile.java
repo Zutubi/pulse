@@ -1,7 +1,7 @@
 package com.cinnamonbob.filesystem.local;
 
-import com.cinnamonbob.filesystem.FileNotFoundException;
 import com.cinnamonbob.filesystem.File;
+import com.cinnamonbob.filesystem.FileNotFoundException;
 
 /**
  * <class-comment/>
@@ -61,11 +61,18 @@ public class LocalFile implements File, Comparable
 
     public String getPath()
     {
-        return file.getPath();
+        String path = file.getPath();
+        String basePath = fileSystem.getBase().getAbsolutePath() + fileSystem.getSeparator();
+        if (path.startsWith(basePath))
+        {
+            path = path.substring(basePath.length());
+        }
+
+        return path;
     }
 
     public int compareTo(Object o)
     {
-        return file.compareTo(((LocalFile)o).file);
+        return file.compareTo(((LocalFile) o).file);
     }
 }

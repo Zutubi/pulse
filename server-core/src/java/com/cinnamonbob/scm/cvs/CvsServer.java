@@ -6,6 +6,8 @@ import com.cinnamonbob.core.model.CvsRevision;
 import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.core.util.IOUtils;
+import com.cinnamonbob.filesystem.remote.CachingRemoteFile;
+import com.cinnamonbob.filesystem.remote.RemoteFile;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
 import com.cinnamonbob.util.logging.Logger;
@@ -17,9 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * The Cvs Server provides all interactions with a cvs repository.
@@ -51,32 +51,6 @@ public class CvsServer implements SCMServer
         client.testConnection();
     }
 
-    public List<String> getListing(String module, String branch) throws SCMException
-    {
-        CvsClient client = new CvsClient(cvsRoot);
-        client.setPassword(cvsPassword);
-        List<LogInformation> logs = client.rlog(module, branch, null, null, false);
-
-        CVSRoot root = CVSRoot.parse(cvsRoot);
-
-        List<String> listing = new LinkedList<String>();
-        for (LogInformation log : logs)
-        {
-            String filename = log.getRepositoryFilename();
-
-            // remove the ,v
-            if (filename.endsWith(",v"))
-                filename = filename.substring(0, filename.length() - 2);
-
-            // remove the repo root.
-            if (filename.startsWith(root.getRepository()))
-                filename = filename.substring(root.getRepository().length());
-
-            listing.add(filename);
-        }
-        return listing;
-    }
-
     public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
     {
         try
@@ -98,13 +72,14 @@ public class CvsServer implements SCMServer
 
     public String checkout(long id, Revision revision, String file) throws SCMException
     {
-        if (revision == null)
-        {
-            throw new IllegalArgumentException("can not checkout a null revision of file '" + file + "'.");
-        }
         if (!TextUtils.stringSet(file))
         {
             throw new IllegalArgumentException("You need to specify a file to checkout.");
+        }
+
+        if (revision == null)
+        {
+            revision = getLatestRevision();
         }
 
         File tmpDir = null;
@@ -185,7 +160,7 @@ public class CvsServer implements SCMServer
      *
      * @param checkoutDir (required) if this directory does not exist, an attempt will be
      *                    made to create it.
-     * @param tag      (optional)
+     * @param tag         (optional)
      * @return
      * @throws SCMException
      */
@@ -232,7 +207,7 @@ public class CvsServer implements SCMServer
      *
      * @param module
      * @param checkoutDir (required)
-     * @param revision      (optional)
+     * @param revision    (optional)
      * @param date        (optional)
      */
     private void internalCheckout(String module, File checkoutDir, String revision, Date date) throws IOException, SCMException
@@ -256,7 +231,7 @@ public class CvsServer implements SCMServer
         client.checkout(module, revision, date);
     }
 
-    public Revision getLatestRevision() throws SCMException
+    public CvsRevision getLatestRevision() throws SCMException
     {
         // this assumes that we are not dealing with a branch. If that were the case, then
         // we would need to include the branch details in the revision.
@@ -269,10 +244,95 @@ public class CvsServer implements SCMServer
         return new CvsRevision(null, null, null, now);
     }
 
+    public RemoteFile getFile(String path) throws SCMException
+    {
+        Map<String, CachingRemoteFile> cachedListing = CvsFileCache.getInstance().lookup(this);
+        if (cachedListing.containsKey(path))
+        {
+            return cachedListing.get(path);
+        }
+        else
+        {
+            throw new SCMException("Path '" + path + "' does not exist");
+        }
+    }
+
+    public List<RemoteFile> getListing(String path) throws SCMException
+    {
+        Map<String, CachingRemoteFile> cachedListing = CvsFileCache.getInstance().lookup(this);
+        if (cachedListing.containsKey(path))
+        {
+            return cachedListing.get(path).list();
+        }
+        else
+        {
+            throw new SCMException("Path '" + path + "' does not exist");
+        }
+    }
+
     public Date getLatestUpdate(String revision, Date date) throws SCMException
     {
         CvsClient client = new CvsClient(cvsRoot);
         client.setPassword(cvsPassword);
         return client.getLastUpdate(cvsModule, revision, date);
+    }
+
+    void populateCache(CvsFileCache.CacheItem item) throws SCMException
+    {
+        item.cachedRevision = getLatestRevision();
+        item.cachedListing = new TreeMap<String, CachingRemoteFile>();
+
+        CvsClient client = new CvsClient(cvsRoot);
+        client.setPassword(cvsPassword);
+        List<LogInformation> logs = client.rlog(cvsModule, null, null, null, false);
+
+        CVSRoot root = CVSRoot.parse(cvsRoot);
+
+        CachingRemoteFile rootFile = new CachingRemoteFile("", true, null, "");
+        item.cachedListing.put("", rootFile);
+
+        for (LogInformation log : logs)
+        {
+            String filename = log.getRepositoryFilename();
+
+            // remove the ,v
+            if (filename.endsWith(",v"))
+            {
+                filename = filename.substring(0, filename.length() - 2);
+            }
+
+            // remove the repo root.
+            if (filename.startsWith(root.getRepository()))
+            {
+                filename = filename.substring(root.getRepository().length());
+            }
+
+            // break this up into files and directories.
+            StringTokenizer tokens = new StringTokenizer(filename, "/", false);
+            String path = "";
+            CachingRemoteFile parent = rootFile;
+            while (tokens.hasMoreTokens())
+            {
+                String name = tokens.nextToken();
+                if (path.length() > 0 && !path.endsWith("/"))
+                {
+                    path += "/";
+                }
+
+                path += name;
+
+                if (!item.cachedListing.containsKey(path))
+                {
+                    CachingRemoteFile f = new CachingRemoteFile(name, tokens.hasMoreTokens(), parent, path);
+                    if (parent != null)
+                    {
+                        parent.addChild(f);
+                    }
+                    item.cachedListing.put(path, f);
+                }
+                parent = item.cachedListing.get(path);
+            }
+        }
+
     }
 }

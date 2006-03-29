@@ -4,6 +4,7 @@ import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.NumericalRevision;
 import com.cinnamonbob.core.model.Revision;
+import com.cinnamonbob.filesystem.remote.RemoteFile;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
 import org.tmatesoft.svn.core.ISVNWorkspace;
@@ -57,7 +58,14 @@ public class SVNServer implements SCMServer
      */
     private long convertRevision(Revision revision)
     {
-        return ((NumericalRevision) revision).getRevisionNumber();
+        if (revision == null)
+        {
+            return ISVNWorkspace.HEAD;
+        }
+        else
+        {
+            return ((NumericalRevision) revision).getRevisionNumber();
+        }
     }
 
     /**
@@ -350,6 +358,69 @@ public class SVNServer implements SCMServer
         {
             throw convertException(e);
         }
+    }
+
+    public RemoteFile getFile(String path) throws SCMException
+    {
+        try
+        {
+            boolean directory = false;
+
+            SVNNodeKind kind = repository.checkPath(path, ISVNWorkspace.HEAD);
+            if (kind == SVNNodeKind.DIR)
+            {
+                directory = true;
+            }
+
+            return new RemoteFile(directory, null, path);
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
+    }
+
+    public List<RemoteFile> getListing(String path) throws SCMException
+    {
+        LinkedList<SVNDirEntry> files = new LinkedList<SVNDirEntry>();
+        try
+        {
+            repository.getDir(path, ISVNWorkspace.HEAD, null, files);
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
+
+        List<RemoteFile> result = new LinkedList<RemoteFile>();
+        String pathPrefix = "";
+        if (path.length() > 0)
+        {
+            pathPrefix = path + "/";
+        }
+
+        for (SVNDirEntry e : files)
+        {
+            boolean isDir;
+
+            if (e.getKind() == SVNNodeKind.DIR)
+            {
+                isDir = true;
+            }
+            else if (e.getKind() == SVNNodeKind.FILE)
+            {
+                isDir = false;
+            }
+            else
+            {
+                continue;
+            }
+
+            RemoteFile f = new RemoteFile(e.getName(), isDir, null, pathPrefix + e.getName());
+            result.add(f);
+        }
+
+        return result;
     }
 
     //=======================================================================

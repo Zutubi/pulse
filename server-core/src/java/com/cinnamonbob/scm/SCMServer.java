@@ -3,6 +3,7 @@ package com.cinnamonbob.scm;
 import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.Revision;
+import com.cinnamonbob.filesystem.remote.RemoteFile;
 
 import java.io.File;
 import java.util.List;
@@ -85,4 +86,23 @@ public interface SCMServer
      * @throws SCMException
      */
     Revision getLatestRevision() throws SCMException;
+
+    /**
+     * Returns details of a file or directory in the repository.
+     *
+     * @param path path to the file, relative to this connection's root
+     * @return the file details
+     */
+    RemoteFile getFile(String path) throws SCMException;
+
+    /**
+     * Returns a list of all files/directories in the given path (which
+     * should specify a directory).  This function is NOT recursive.
+     *
+     * @param path the path to list (relative to the root of the connection,
+     *             i.e. an empty string is valid and means "list the root").
+     * @return a list of files and directories contained within the given
+     *         path
+     */
+    List<RemoteFile> getListing(String path) throws SCMException;
 }

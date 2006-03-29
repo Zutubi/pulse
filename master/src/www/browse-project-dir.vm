@@ -11,35 +11,7 @@
 
 #if($buildResult.completed())
     #if($foundBase)
-    <table class="content">
-        #headingRow("$action.getText('path') :: base.dir/$!webwork.htmlEncode($displayPath)" 4)
-        <tr>
-            <td class="image">&nbsp;</td>
-            #contentHeading("name" 1)
-            #contentHeading("type" 1)
-            #contentHeading("size" 1)
-        </tr>
-#foreach($entry in $entries)
-        <tr>
-            <td class="image">
-    #if($entry.isDirectory())
-                <img src="/images/folder.gif"/>
-    #else
-                <img src="/images/page.gif"/>
-    #end
-            </td>
-            #dynamicLinkCell($entry.name "browseProjectDir.action?buildId=$buildResult.id&amp;recipeId=$recipeId&path=$entry.path")
-            #contentCell($entry.mimeType)
-            <td class="content-right">
-    #if($entry.isDirectory())
-                &nbsp;
-    #else
-                $entry.prettySize
-    #end
-            </td>
-        </tr>
-#end
-    </table>
+        #showDirectoryListing("base.dir" "browseProjectDir.action?buildId=$buildResult.id&amp;recipeId=$recipeId")
     #else
     <p>
         #wwtext("name=working.dir.cleaned")

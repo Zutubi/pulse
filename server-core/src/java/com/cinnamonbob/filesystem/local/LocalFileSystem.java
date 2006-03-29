@@ -26,8 +26,8 @@ public class LocalFileSystem implements FileSystem
 
     /**
      * Retrieve the specified file
-     * @param path
      *
+     * @param path
      * @return an input stream containing the contents of the file.
      */
     public InputStream getFileContents(String path) throws FileSystemException
@@ -57,7 +57,7 @@ public class LocalFileSystem implements FileSystem
 
     public InputStream getFileContents(com.cinnamonbob.filesystem.File file) throws FileSystemException
     {
-        return internalGetFileContents(((LocalFile)file).file);
+        return internalGetFileContents(((LocalFile) file).file);
     }
 
     public com.cinnamonbob.filesystem.File getFile(String path) throws FileSystemException
@@ -69,7 +69,6 @@ public class LocalFileSystem implements FileSystem
      * Attempt to determine the mime type of the requested file.
      *
      * @param path
-     *
      * @return the files mime type, or null if it could not be determined.
      */
     public String getMimeType(String path) throws FileSystemException
@@ -85,7 +84,7 @@ public class LocalFileSystem implements FileSystem
         }
 
         String type = URLConnection.guessContentTypeFromName(file.getName());
-        if(type == null)
+        if (type == null)
         {
             try
             {
@@ -96,7 +95,7 @@ public class LocalFileSystem implements FileSystem
                 // Oh well
             }
 
-            if(type == null)
+            if (type == null)
             {
                 type = "text/plain";
             }
@@ -107,14 +106,13 @@ public class LocalFileSystem implements FileSystem
 
     public String getMimeType(com.cinnamonbob.filesystem.File file) throws FileNotFoundException
     {
-        return internalGetMimeType(((LocalFile)file).file);
+        return internalGetMimeType(((LocalFile) file).file);
     }
 
     /**
      * Retrieve a listing of the specified path.
      *
      * @param path
-     *
      * @return a list of file handles located at the specified path.
      */
     public LocalFile[] list(String path) throws FileSystemException
@@ -124,7 +122,7 @@ public class LocalFileSystem implements FileSystem
 
     public com.cinnamonbob.filesystem.File[] list(com.cinnamonbob.filesystem.File dir) throws FileSystemException
     {
-        return internalList(((LocalFile)dir).file);
+        return internalList(((LocalFile) dir).file);
     }
 
     public String getSeparator()
@@ -151,5 +149,10 @@ public class LocalFileSystem implements FileSystem
             listing.add(new LocalFile(this, file));
         }
         return listing.toArray(new LocalFile[listing.size()]);
+    }
+
+    public File getBase()
+    {
+        return base;
     }
 }

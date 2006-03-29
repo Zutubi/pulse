@@ -37,13 +37,13 @@ public interface ProjectManager extends EntityManager<Project>
      */
     void deleteBuildSpecification(long projectId, long specId);
 
-    void buildCommenced(Project project);
+    void buildCommenced(long projectId);
 
-    void buildCompleted(Project project);
+    void buildCompleted(long projectId);
 
-    void pauseProject(Project project);
+    Project pauseProject(long projectId);
 
-    void resumeProject(Project project);
+    void resumeProject(long projectId);
 
     void delete(long projectId);
 }

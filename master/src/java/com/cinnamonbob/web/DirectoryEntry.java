@@ -12,11 +12,11 @@ public class DirectoryEntry
     private String mimeType;
     private long size;
 
-    public DirectoryEntry(File file, String name, String path)
+    public DirectoryEntry(File file, String name)
     {
-        this.path = path;
+        this.path = file.getPath();
         isDirectory = file.isDirectory();
-        if(isDirectory)
+        if (isDirectory)
         {
             mimeType = "directory";
         }
@@ -58,12 +58,12 @@ public class DirectoryEntry
         double s;
         String units;
 
-        if(size > 1024 * 1024)
+        if (size > 1024 * 1024)
         {
             s = size / (1024 * 1024.0);
             units = "MB";
         }
-        else if(size > 1024)
+        else if (size > 1024)
         {
             s = size / 1024.0;
             units = "kB";

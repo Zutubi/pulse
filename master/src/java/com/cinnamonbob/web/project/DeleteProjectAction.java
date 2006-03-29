@@ -74,7 +74,7 @@ public class DeleteProjectAction extends ProjectActionSupport
 
         if (ok != null)
         {
-            getProjectManager().pauseProject(project);
+            project = getProjectManager().pauseProject(project.getId());
             if (project.getState() != Project.State.PAUSED)
             {
                 addActionError("The project is currently building.  Please wait for the project to pause and try again.");
