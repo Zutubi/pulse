@@ -1,10 +1,20 @@
 <html>
 <head>
     <meta http-equiv="refresh" content='5;url=/'/>
+    <title>#wwtext("name=startup.heading")</title>
 </head>
+
 <body>
 
-<h1>The system is currently starting up and will be available shortly.</h1>
+<h1>:: #wwtext("name=startup.heading") ::</h1>
+
+<p>
+    The system is currently starting up and will be available shortly.
+</p>
+<p>
+    This page should refresh periodically. If it doesn't, click <a href="/">here</a> to refresh this page.
+</p>
+
 
 </body>
 </html>
