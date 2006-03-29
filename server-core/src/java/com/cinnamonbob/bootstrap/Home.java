@@ -33,7 +33,7 @@ public class Home implements UserPaths
         return getVersionFile().exists();
     }
 
-    public void init()
+    public void init() throws IOException
     {
         // create the home directory.
         if (!bobHome.exists() && !bobHome.mkdirs())
@@ -43,14 +43,12 @@ public class Home implements UserPaths
 
         // write the version file.
         Version systemVersion = Version.getVersion();
-        try
-        {
-            systemVersion.write(getVersionFile());
-        }
-        catch (IOException e)
-        {
-            throw new StartupException("Failed to write the version details into the home directory: " + bobHome + ".");
-        }
+        updateVersion(systemVersion);
+    }
+
+    public void updateVersion(Version version) throws IOException
+    {
+        version.write(getVersionFile());
     }
 
     public Version getHomeVersion()

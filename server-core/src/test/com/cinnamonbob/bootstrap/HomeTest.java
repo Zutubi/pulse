@@ -5,6 +5,7 @@ import com.cinnamonbob.core.util.FileSystemUtils;
 import com.cinnamonbob.test.BobTestCase;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * <class-comment/>
@@ -37,7 +38,7 @@ public class HomeTest extends BobTestCase
         super.tearDown();
     }
 
-    public void testInitialiseHome()
+    public void testInitialiseHome() throws IOException
     {
         Home home = new Home(homeDir);
 
@@ -55,7 +56,7 @@ public class HomeTest extends BobTestCase
         assertTrue(new File(homeDir, "version.properties").exists());
     }
 
-    public void testVersionDetails()
+    public void testVersionDetails() throws IOException
     {
         Home home = new Home(homeDir);
         home.init();

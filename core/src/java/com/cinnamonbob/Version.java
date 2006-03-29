@@ -32,6 +32,8 @@ public class Version implements Comparable
      */
     private static final String BUILD_NUMBER = "build.number";
 
+    public static final int INVALID = -1;
+
     private String versionNumber;
     private String buildDate;
     private String buildNumber;
@@ -68,6 +70,18 @@ public class Version implements Comparable
     public String getBuildNumber()
     {
         return buildNumber;
+    }
+
+    public int getIntBuildNumber()
+    {
+        try
+        {
+            return Integer.parseInt(buildNumber);
+        }
+        catch (NumberFormatException e)
+        {
+            return INVALID;
+        }
     }
 
     public static Version load(InputStream in) throws IOException

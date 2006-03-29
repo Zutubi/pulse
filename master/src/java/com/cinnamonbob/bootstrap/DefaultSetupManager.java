@@ -2,6 +2,7 @@ package com.cinnamonbob.bootstrap;
 
 import com.cinnamonbob.upgrade.UpgradeManager;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -36,7 +37,14 @@ public class DefaultSetupManager implements SetupManager
         if (home == null || home.getHome() == null)
             throw new IllegalStateException("");
 
-        home.init();
+        try
+        {
+            home.init();
+        }
+        catch (IOException e)
+        {
+            throw new StartupException("Failed to initialise home directory.");
+        }
 
         // load database context.
         ComponentContext.addClassPathContextDefinitions(daoContexts.toArray(new String[daoContexts.size()]));

@@ -2,7 +2,9 @@ package com.cinnamonbob.upgrade;
 
 import com.cinnamonbob.Version;
 import com.cinnamonbob.bootstrap.Home;
+import com.cinnamonbob.util.logging.Logger;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +14,8 @@ import java.util.List;
  */
 public class DefaultUpgradeManager implements UpgradeManager
 {
+    private static final Logger LOG = Logger.getLogger(DefaultUpgradeManager.class);
+
     /**
      * The registered upgrade tasks.
      */
@@ -87,8 +91,14 @@ public class DefaultUpgradeManager implements UpgradeManager
     {
         List<UpgradeTask> requiredTasks = new LinkedList<UpgradeTask>();
 
-        int from = Integer.parseInt(fromVersion.getBuildNumber());
-        int to = Integer.parseInt(toVersion.getBuildNumber());
+        // if either build versions are invalid, then we do not attempt an upgrade.
+        if (!checkVersions(fromVersion, toVersion))
+        {
+            return requiredTasks;
+        }
+
+        int from = fromVersion.getIntBuildNumber();
+        int to = toVersion.getIntBuildNumber();
 
         for (UpgradeTask task : upgradeTasks)
         {
@@ -99,6 +109,21 @@ public class DefaultUpgradeManager implements UpgradeManager
         }
         Collections.sort(requiredTasks, new UpgradeTaskComparator());
         return requiredTasks;
+    }
+
+    private boolean checkVersions(Version from, Version to)
+    {
+        if (from.getIntBuildNumber() == Version.INVALID)
+        {
+            LOG.warning("invalid from version build number detected: '"+from.getBuildNumber()+"'");
+            return false;
+        }
+        if (to.getIntBuildNumber() == Version.INVALID)
+        {
+            LOG.warning("invalid 'to' version build number detected: '"+to.getBuildNumber()+"'");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -144,6 +169,8 @@ public class DefaultUpgradeManager implements UpgradeManager
         currentContext.setTasks(tasks);
 
         monitor = new UpgradeProgressMonitor();
+
+        upgradeTarget = home;
     }
 
     /**
@@ -184,11 +211,6 @@ public class DefaultUpgradeManager implements UpgradeManager
                     monitor.start(task);
                     task.execute(context);
                     monitor.complete(task);
-
-                    // for each successful upgrade, we record the associated build
-                    // number and record it, so that we do not execute this task a
-                    // second time.
-
                 }
                 else
                 {
@@ -204,6 +226,21 @@ public class DefaultUpgradeManager implements UpgradeManager
                 }
             }
         }
+
+        monitor.setPercentageComplete(99);
+
+        // commit the upgrade by updating the home version details.
+        try
+        {
+            upgradeTarget.updateVersion(context.getTo());
+        }
+        catch (IOException e)
+        {
+            // record this error for the user...
+            LOG.severe(e);
+        }
+
+        monitor.setPercentageComplete(100);
         monitor.stop();
     }
 

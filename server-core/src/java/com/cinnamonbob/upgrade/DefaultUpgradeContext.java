@@ -63,40 +63,24 @@ public class DefaultUpgradeContext implements UpgradeContext
 
     /**
      * Retrieve the build number of for the version we are upgrading from. If this build
-     * number is invalid, we return Integer.MAX_VALUE
+     * number is invalid, we return Version.INVALID
      *
      * @return build number
      */
     public int getFromBuild()
     {
-        try
-        {
-            return Integer.parseInt(from.getBuildNumber());
-        }
-        catch (NumberFormatException e)
-        {
-            // an invalid build number indicates: do not attempt an upgrade
-            return Integer.MAX_VALUE;
-        }
+        return from.getIntBuildNumber();
     }
 
     /**
      * Retrieve the build number of for the version we are upgrading to. If this build
-     * number is invalid, we return Integer.MIN_VALUE
+     * number is invalid, we return Version.INVALID
      *
      * @return build number
      */
     public int getToBuild()
     {
-        try
-        {
-            return Integer.parseInt(from.getBuildNumber());
-        }
-        catch (NumberFormatException e)
-        {
-            // an invalid build number indicates: do not attempt an upgrade
-            return Integer.MIN_VALUE;
-        }
+        return to.getIntBuildNumber();
     }
 
     public void setTasks(List<UpgradeTask> tasks)
