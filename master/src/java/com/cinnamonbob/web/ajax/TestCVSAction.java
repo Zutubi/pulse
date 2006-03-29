@@ -1,16 +1,15 @@
 package com.cinnamonbob.web.ajax;
 
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.cvs.CvsServer;
-import com.cinnamonbob.web.ActionSupport;
-import com.opensymphony.util.TextUtils;
+import com.cinnamonbob.model.Cvs;
+import com.cinnamonbob.model.Scm;
 
 /**
  * An ajax request to test CVS settings and send a fragment of HTML
  * with results.
  */
-public class TestCVSAction extends ActionSupport
+public class TestCVSAction extends BaseTestScmAction
 {
+
     private String root;
     private String module;
     private String password;
@@ -30,40 +29,12 @@ public class TestCVSAction extends ActionSupport
         this.password = password;
     }
 
-    public String execute()
+    public Scm getScm()
     {
-        if (!TextUtils.stringSet(root))
-        {
-            addActionError("root is required");
-        }
-
-        if (!TextUtils.stringSet(module))
-        {
-            addActionError("module is required");
-        }
-
-        if (!TextUtils.stringSet(password))
-        {
-            password = null;
-        }
-
-        if (hasErrors())
-        {
-            // We are just testing, we always succeed in testing, even if the
-            // result is a test failure!
-            return SUCCESS;
-        }
-
-        try
-        {
-            CvsServer server = new CvsServer(root, module, password);
-            server.testConnection();
-        }
-        catch (SCMException e)
-        {
-            addActionError(e.getMessage());
-        }
-
-        return SUCCESS;
+        Cvs cvsConnection = new Cvs();
+        cvsConnection.setRoot(root);
+        cvsConnection.setModule(module);
+        cvsConnection.setPassword(password);
+        return cvsConnection;
     }
 }

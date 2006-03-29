@@ -1,15 +1,13 @@
 package com.cinnamonbob.web.ajax;
 
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.p4.P4Server;
-import com.cinnamonbob.web.ActionSupport;
-import com.opensymphony.util.TextUtils;
+import com.cinnamonbob.model.P4;
+import com.cinnamonbob.model.Scm;
 
 /**
  * An ajax request to test perforce settings and send a fragment of HTML
  * with results.
  */
-public class TestP4Action extends ActionSupport
+public class TestP4Action extends BaseTestScmAction
 {
     private String port;
     private String user;
@@ -36,45 +34,13 @@ public class TestP4Action extends ActionSupport
         this.client = client;
     }
 
-    public String execute()
+    public Scm getScm()
     {
-        if (!TextUtils.stringSet(port))
-        {
-            addActionError("port is required");
-        }
-
-        if (!TextUtils.stringSet(user))
-        {
-            addActionError("user is required");
-        }
-
-        if (!TextUtils.stringSet(client))
-        {
-            addActionError("client is required");
-        }
-
-        if (!TextUtils.stringSet(password))
-        {
-            password = null;
-        }
-
-        if (hasErrors())
-        {
-            // We are just testing, we always succeed in testing, even if the
-            // result is a test failure!
-            return SUCCESS;
-        }
-
-        try
-        {
-            P4Server server = new P4Server(port, user, password, client);
-            server.testConnection();
-        }
-        catch (SCMException e)
-        {
-            addActionError(e.getMessage());
-        }
-
-        return SUCCESS;
+        P4 perforceConnection = new P4();
+        perforceConnection.setPort(port);
+        perforceConnection.setUser(user);
+        perforceConnection.setClient(client);
+        perforceConnection.setPassword(password);
+        return perforceConnection;
     }
 }
