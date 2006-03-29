@@ -170,8 +170,8 @@ public class Version implements Comparable
     {
         Version otherVersion = (Version) o;
 
-        Integer i = Integer.parseInt(buildNumber);
-        Integer j = Integer.parseInt(otherVersion.buildNumber);
+        Integer i = getIntBuildNumber();
+        Integer j = otherVersion.getIntBuildNumber();
 
         return i.compareTo(j);
     }
