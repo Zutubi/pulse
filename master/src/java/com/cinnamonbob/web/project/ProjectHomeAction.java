@@ -89,7 +89,7 @@ public class ProjectHomeAction extends ProjectActionSupport
         return getPercent(getErrorBuilds(), totalBuilds);
     }
 
-    public boolean getCanDelete()
+    public boolean getProjectNotBuilding()
     {
         return project.getState() == Project.State.PAUSED || project.getState() == Project.State.IDLE;
     }

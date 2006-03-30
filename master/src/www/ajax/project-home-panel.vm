@@ -39,7 +39,6 @@
                     </td>
                 </tr>
             </table>
-        </td><td class="columns"  width="45%">
             <table class="fill-content">
                 #headingRow("project.basics" 2)
             #if($project.description && $project.description.length() > 0)
@@ -51,7 +50,7 @@
                 <tr>
                     <th class="content-row">#wwtext("name=actions")</th>
                     <td class="content">
-            #if($canDelete)
+            #if($projectNotBuilding)
                         <a href="deleteProject!input.action?id=$project.id">
                             <img src="/images/delete.gif"/> #wwtext("name=delete.project")
                         </a>
@@ -61,7 +60,23 @@
                     </td>
                 </tr>
             </table>
-      </td></tr>
+        </td>
+        <td class="columns"  width="45%">
+            <table id="project.buildspecs" class="fill-content">
+                #headingRow("project.buildspecs" 2)
+                <tr>
+                    #contentHeading("buildspec.name" 1)
+                    #contentHeading("actions" 1)
+                </tr>
+    #foreach($buildSpec in $project.buildSpecifications)
+                <tr>
+                    #dynamicCell($buildSpec.name)
+                    #actionCell("buildspec.trigger" "triggerBuild.action?id=$buildSpec.id&amp;projectId=$project.id" "lightning.gif")
+                </tr>
+    #end
+            </table>
+
+        </td></tr>
     </table>
 
     <h2 class="section">#wwtext("name=current.build")</h2>

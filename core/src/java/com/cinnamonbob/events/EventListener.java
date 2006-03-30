@@ -1,7 +1,5 @@
 package com.cinnamonbob.events;
 
-import com.cinnamonbob.events.Event;
-
 /**
  * <class-comment/>
  */
