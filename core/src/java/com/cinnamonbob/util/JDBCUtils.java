@@ -2,13 +2,14 @@ package com.cinnamonbob.util;
 
 import com.cinnamonbob.util.logging.Logger;
 
+import javax.sql.DataSource;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.List;
-import java.util.LinkedList;
 import java.sql.*;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <class-comment/>
@@ -96,22 +97,57 @@ public class JDBCUtils
         return statements.toArray(new String[statements.size()]);
     }
 
-    public static boolean tableExists(Connection con, String tableName)
+    public static void execute(DataSource ds, String sql) throws SQLException
+    {
+        Connection con = null;
+        try
+        {
+            con = ds.getConnection();
+            execute(con, sql);
+        }
+        finally
+        {
+            JDBCUtils.close(con);
+        }
+    }
+
+    public static void execute(Connection con, String sql) throws SQLException
     {
         CallableStatement stmt = null;
         try
         {
-            stmt = con.prepareCall("SELECT COUNT(*) FROM " + tableName);
+            stmt = con.prepareCall(sql);
             stmt.execute();
+        }
+        finally
+        {
+            JDBCUtils.close(stmt);
+        }
+    }
+
+    public static boolean tableExists(DataSource ds, String tableName)
+    {
+        try
+        {
+            JDBCUtils.execute(ds, "SELECT COUNT(*) FROM " + tableName);
             return true;
         }
         catch (SQLException e)
         {
             return false;
         }
-        finally
+    }
+
+    public static boolean tableExists(Connection con, String tableName)
+    {
+        try
         {
-            JDBCUtils.close(stmt);
+            JDBCUtils.execute(con, "SELECT COUNT(*) FROM " + tableName);
+            return true;
+        }
+        catch (SQLException e)
+        {
+            return false;
         }
     }
 

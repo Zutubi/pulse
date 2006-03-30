@@ -9,10 +9,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  * Hibernate specific bootstrap support that creates the database scheme
@@ -39,50 +36,35 @@ public class DatabaseBootstrap implements ApplicationContextAware, Stoppable
         {
             LocalSessionFactoryBean factoryBean = (LocalSessionFactoryBean) context.getBean("&sessionFactory");
             factoryBean.createDatabaseSchema();
+
+            // add custom configuration of the hsql database here.
+            try
+            {
+                // the delay between data being written to the database, and it being flushed
+                // to disk. Default is 20.
+                JDBCUtils.execute(dataSource, "SET WRITE_DELAY 5");
+            }
+            catch (SQLException e)
+            {
+                LOG.error(e);
+            }
         }
     }
 
     private boolean schemaExists()
     {
-        // does the schema exist? there should be a better way to do this... have a look at the hibernate source...
-        Connection con = null;
-        CallableStatement stmt = null;
-        try
-        {
-            con = dataSource.getConnection();
-            stmt = con.prepareCall("SELECT COUNT(*) FROM " + schemaTestTable);
-            stmt.execute();
-            return true;
-        }
-        catch (SQLException e)
-        {
-            return false;
-        }
-        finally
-        {
-            JDBCUtils.close(stmt);
-            JDBCUtils.close(con);
-        }
+        return JDBCUtils.tableExists(dataSource, schemaTestTable);
     }
 
     public void stop(boolean force)
     {
-        Connection con = null;
-        Statement stmt = null;
         try
         {
-            con = dataSource.getConnection();
-            stmt = con.createStatement();
-            stmt.execute("SHUTDOWN COMPACT");
+            JDBCUtils.execute(dataSource, "SHUTDOWN COMPACT");
         }
         catch (SQLException e)
         {
             LOG.error(e);
-        }
-        finally
-        {
-            JDBCUtils.close(stmt);
-            JDBCUtils.close(con);
         }
     }
 
@@ -99,5 +81,29 @@ public class DatabaseBootstrap implements ApplicationContextAware, Stoppable
     public void setApplicationContext(ApplicationContext context) throws BeansException
     {
         this.context = context;
+    }
+
+    public void setReferentialIntegrity(boolean b)
+    {
+        try
+        {
+            JDBCUtils.execute(dataSource, "SET REFERENTIAL INTEGRITY " + ((b) ? "TRUE" : "FALSE"));
+        }
+        catch (SQLException e)
+        {
+            LOG.error(e);
+        }
+    }
+
+    public void compactDatabase()
+    {
+        try
+        {
+            JDBCUtils.execute(dataSource, "CHECKPOINT DEFRAG");
+        }
+        catch (SQLException e)
+        {
+            LOG.error(e);
+        }
     }
 }
