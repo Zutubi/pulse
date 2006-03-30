@@ -120,5 +120,11 @@
     <bean id="tokenManager" class="com.cinnamonbob.api.TokenManager" autowire="byName" init-method="init"/>
 
     <bean id="serverMessagesHandler" class="com.cinnamonbob.logging.ServerMessagesHandler" init-method="init"/>
-    
+
+    <bean id="notifyConditionFactory" class="com.cinnamonbob.model.NotifyConditionFactory">
+        <property name="objectFactory">
+            <ref bean="objectFactory"/>
+        </property>
+    </bean>
+
 </beans>

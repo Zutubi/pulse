@@ -56,6 +56,7 @@ public class DefaultScheduler implements Scheduler, EventListener
                 strategy.setTriggerHandler(triggerHandler);
             }
 
+            // initialise the persisted triggers.
             for (Trigger trigger : triggerDao.findAll())
             {
                 SchedulerStrategy strategy = getStrategy(trigger);

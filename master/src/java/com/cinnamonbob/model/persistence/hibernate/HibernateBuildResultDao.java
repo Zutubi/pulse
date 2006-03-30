@@ -52,6 +52,24 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
+    public BuildResult findPreviousBuildResult(final BuildResult result)
+    {
+        return (BuildResult)getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.id < :id order by id desc");
+                queryObject.setEntity("project", result.getProject());
+                queryObject.setLong("id", result.getId());
+                queryObject.setMaxResults(1);
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.uniqueResult();
+            }
+        });
+    }
+
     public List<BuildResult> findLatestCompleted(final Project project, final String spec, final int max)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()

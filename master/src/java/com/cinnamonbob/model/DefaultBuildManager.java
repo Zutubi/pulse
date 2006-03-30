@@ -238,6 +238,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         while (results.size() > 0);
     }
 
+    public BuildResult getPreviousBuildResult(BuildResult result)
+    {
+        return buildResultDao.findPreviousBuildResult(result);
+    }
+
     private synchronized void cleanupBuilds(Project project)
     {
         List<CleanupRule> rules = project.getCleanupRules();

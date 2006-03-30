@@ -100,6 +100,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public BuildResult getPreviousBuildResult(BuildResult result)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public BuildResult getLatestBuildResult(Project project)
     {
         BuildResult result = null;

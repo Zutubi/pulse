@@ -1,11 +1,10 @@
 package com.cinnamonbob.jetty;
 
 import com.cinnamonbob.bootstrap.ConfigurationManager;
-import org.mortbay.jetty.Server;
-import org.mortbay.http.SocketListener;
-import org.springframework.beans.factory.FactoryBean;
-
 import com.cinnamonbob.util.logging.Logger;
+import org.mortbay.http.SocketListener;
+import org.mortbay.jetty.Server;
+import org.springframework.beans.factory.FactoryBean;
 
 /**
  * 
@@ -15,28 +14,28 @@ public class JettyServerFactoryBean implements FactoryBean
 {
     private static final Logger LOG = Logger.getLogger(JettyServerFactoryBean.class);
 
-    private static Server SERVER;
+    private static Server instance;
 
     private ConfigurationManager configManager = null;
 
     public Object getObject() throws Exception
     {
-        if (SERVER == null)
+        if (instance == null)
         {
             synchronized(this)
             {
-                if (SERVER == null)
+                if (instance == null)
                 {
-                    SERVER = new Server();
+                    instance = new Server();
 
                     // configuration of the server depends upon the configmanager.
                     SocketListener listener = new SocketListener();
                     listener.setPort(configManager.getAppConfig().getServerPort());
-                    SERVER.addListener(listener);
+                    instance.addListener(listener);
                 }
             }
         }
-        return SERVER;
+        return instance;
     }
 
     public Class getObjectType()
@@ -58,11 +57,14 @@ public class JettyServerFactoryBean implements FactoryBean
     {
         try
         {
-            SERVER.stop();
+            if (instance.isStarted())
+            {
+                instance.stop();
+            }
         } 
         catch (InterruptedException e)
         {
-            e.printStackTrace();
+            LOG.error(e);
         }
     }
 }

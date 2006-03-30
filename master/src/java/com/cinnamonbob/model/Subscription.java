@@ -20,7 +20,16 @@ public class Subscription extends Entity
      */
     private String condition;
 
+    /**
+     * The project to which this subscription is associated
+     */
     private Project project;
+
+    /**
+     * A reference to the systems notify condition factory, used for instantiating
+     * the subscriptions condition.
+     */
+    private NotifyConditionFactory notifyFactory;
 
     //=======================================================================
     // Construction
@@ -80,23 +89,11 @@ public class Subscription extends Entity
     }
 
     /**
-     * Indicates if the conditions for notifying the contact point are
-     * satisfied by the given build model.
-     *
-     * @param result the build model to test the properties of
-     * @return true iff the contact point should be notified for this model
-     */
-    public boolean conditionSatisfied(BuildResult result)
-    {
-        NotifyCondition nc = NotifyConditionFactory.getInstance(condition);
-        return nc.satisfied(result);
-    }
-
-    /**
      * Sets the given condition as that which must be satisfied before the
      * contact point should be notified.
      *
-     * @param condition the condition to set
+     * @param condition the condition to set. See NotifyConditionFactory for valid condition
+     * values.
      */
     public void setCondition(String condition)
     {
@@ -106,5 +103,34 @@ public class Subscription extends Entity
     public String getCondition()
     {
         return this.condition;
+    }
+
+    /**
+     * Indicates if the conditions for notifying the contact point are
+     * satisfied by the given build model.
+     *
+     * @param result the build model to test the properties of
+     * @return true iff the contact point should be notified for this model
+     */
+    public boolean conditionSatisfied(BuildResult result)
+    {
+        NotifyCondition nc = notifyFactory.createCondition(condition);
+        return nc.satisfied(result);
+    }
+
+    public void notify(BuildResult result)
+    {
+        getContactPoint().notify(result);
+    }
+
+    /**
+     * The notify condition factory is a required resource, and used when checking
+     * if the subscriptions 'nofitication condition' has been satisfied.
+     *
+     * @param notifyFactory
+     */
+    public void setNotifyConditionFactory(NotifyConditionFactory notifyFactory)
+    {
+        this.notifyFactory = notifyFactory;
     }
 }

@@ -273,6 +273,25 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(0, oldest.size());
     }
 
+    public void testGetPreviousBuildResult()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildResult resultA = new BuildResult(p1, null, 1);
+        buildResultDao.save(resultA);
+        BuildResult resultB = new BuildResult(p1, null, 2);
+        buildResultDao.save(resultB);
+        BuildResult resultC = new BuildResult(p1, null, 3);
+        buildResultDao.save(resultC);
+
+        commitAndRefreshTransaction();
+
+        assertNull(buildResultDao.findPreviousBuildResult(resultA));
+        assertEquals(resultA, buildResultDao.findPreviousBuildResult(resultB));
+        assertEquals(resultB, buildResultDao.findPreviousBuildResult(resultC));
+    }
+
     public void testGetLatestCompletedSimple()
     {
         Project p1 = new Project();

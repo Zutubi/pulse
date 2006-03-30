@@ -47,6 +47,7 @@ public class CreateSubscriptionAction extends UserActionSupport
             conditions.put(NotifyConditionFactory.ALL_CHANGED, getText("condition.allchanged"));
             conditions.put(NotifyConditionFactory.ALL_FAILED, getText("condition.allfailed"));
             conditions.put(NotifyConditionFactory.ALL_CHANGED_OR_FAILED, getText("condition.allchangedorfailed"));
+            conditions.put(NotifyConditionFactory.ALL_FAILED_AND_FIRST_SUCCESS, getText("condition.allfailedandfirstsuccess"));
         }
         return conditions;
     }

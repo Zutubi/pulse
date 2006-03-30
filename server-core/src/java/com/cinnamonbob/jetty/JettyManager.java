@@ -111,11 +111,18 @@ public class JettyManager implements Stoppable
         return appContext;
     }
 
+    /**
+     * Stop the jetty server.
+     * @param force
+     */
     public void stop(boolean force)
     {
         try
         {
-            server.stop(true);
+            if (server.isStarted())
+            {
+                server.stop(true);
+            }
         }
         catch (InterruptedException e)
         {

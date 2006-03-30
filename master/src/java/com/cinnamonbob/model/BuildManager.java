@@ -63,6 +63,15 @@ public interface BuildManager
 
     BuildResult getByProjectAndNumber(final Project project, final long number);
 
+    /**
+     * Retrieve the build result that occured immediately before the specified build result.
+     *
+     * @param result
+     *
+     * @return a build result or null if the specified build result is the first.
+     */
+    BuildResult getPreviousBuildResult(BuildResult result);
+
     long getNextBuildNumber(Project project);
 
     void cleanupBuilds();
