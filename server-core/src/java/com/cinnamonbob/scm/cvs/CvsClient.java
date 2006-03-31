@@ -38,9 +38,12 @@ public class CvsClient
 {
     /**
      * The date format used when sending dates to the CVS server.
-     * ... is this correct???...
      */
-    private static final SimpleDateFormat CVSDATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss 'GMT'");
+    private static final SimpleDateFormat CVSDATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    static {
+        // cvs servers talk in GMT.
+        CVSDATE.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
 
     /**
      * Logging.

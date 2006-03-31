@@ -12,13 +12,10 @@ import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Date;
-import java.util.logging.Level;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Level;
 
 /**
  * 
@@ -32,7 +29,11 @@ public class CvsClientTest extends BobTestCase
 
     private File workdir = null;
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
     private static final SimpleDateFormat CVSDATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    static {
+        CVSDATE.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
 
     public void setUp() throws Exception
     {
@@ -395,8 +396,8 @@ public class CvsClientTest extends BobTestCase
     public void testHasModuleChangedSince() throws SCMException, ParseException
     {
         String module = "module2";
-        assertTrue(cvs.hasChangedSince(module, null, DATE_FORMAT.parse("2006-03-10")));
-        assertFalse(cvs.hasChangedSince(module, null, DATE_FORMAT.parse("2006-03-11")));
+        assertTrue(cvs.hasChangedSince(module, null, CVSDATE.parse("2006-03-10 14:00:00 GMT")));
+        assertFalse(cvs.hasChangedSince(module, null, CVSDATE.parse("2006-03-10 16:00:00 GMT")));
     }
 
     public void testFileLastChangedDate() throws SCMException, ParseException
