@@ -22,6 +22,7 @@ public class DefaultProjectManager implements ProjectManager
     private TriggerDao triggerDao;
     private Scheduler scheduler;
     private BuildManager buildManager;
+    private SubscriptionManager subscriptionManager;
 
     public void save(Project project)
     {
@@ -51,6 +52,7 @@ public class DefaultProjectManager implements ProjectManager
     public void delete(Project entity)
     {
         buildManager.deleteAllBuilds(entity);
+        subscriptionManager.deleteAllSubscriptions(entity);
         projectDao.delete(entity);
     }
 
@@ -168,5 +170,10 @@ public class DefaultProjectManager implements ProjectManager
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setSubscriptionManager(SubscriptionManager subscriptionManager)
+    {
+        this.subscriptionManager = subscriptionManager;
     }
 }

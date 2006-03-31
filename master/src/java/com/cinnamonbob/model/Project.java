@@ -42,7 +42,6 @@ public class Project extends Entity
     private Scm scm;
     private State state = State.IDLE;
 
-
     private List<BuildSpecification> buildSpecifications;
 
     public Project()

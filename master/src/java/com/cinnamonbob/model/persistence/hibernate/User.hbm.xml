@@ -22,12 +22,12 @@
         <property name="refreshInterval" type="int"/>
 
         <bag name="grantedAuthorities" inverse="true" cascade="all,delete-orphan" lazy="false">
-            <key column="USERID"/>
+            <key column="USER_ID"/>
             <one-to-many class="com.cinnamonbob.model.GrantedAuthority"/>
         </bag>
 
         <bag name="contactPoints" inverse="true" cascade="all" lazy="false">
-            <key column="USERID"/>
+            <key column="USER_ID"/>
             <one-to-many class="com.cinnamonbob.model.ContactPoint"/>
         </bag>
 
@@ -39,7 +39,7 @@
             <generator class="hilo"/>
         </id>
 
-        <many-to-one name="user" column="USERID" class="com.cinnamonbob.model.User" insert="true" lazy="false"/>
+        <many-to-one name="user" column="USER_ID" class="com.cinnamonbob.model.User" insert="true" lazy="false"/>
 
         <property name="authority" column="AUTHORITY" type="string" not-null="true" length="255"/>
 
@@ -80,10 +80,10 @@
         <property name="properties" column="PROPERTIES" type="com.cinnamonbob.util.PropertiesType" not-null="false"
                   length="4095"/>
 
-        <many-to-one name="user" column="USERID" class="com.cinnamonbob.model.User" insert="true" lazy="false"/>
+        <many-to-one name="user" column="USER_ID" class="com.cinnamonbob.model.User" insert="true" lazy="false"/>
 
-        <bag name="subscriptions" inverse="true" cascade="all" lazy="false">
-            <key column="CONTACTID"/>
+        <bag name="subscriptions" inverse="true" cascade="all,delete-orphan" lazy="false">
+            <key column="CONTACT_ID"/>
             <one-to-many class="com.cinnamonbob.model.Subscription"/>
         </bag>
 
@@ -106,10 +106,10 @@
 
         <property name="condition" column="CONDITION" type="string" length="255"/>
 
-        <many-to-one name="project" column="PROJECTID" class="com.cinnamonbob.model.Project" insert="true"
+        <many-to-one name="project" column="PROJECT_ID" class="com.cinnamonbob.model.Project" insert="true"
                      lazy="false"/>
 
-        <many-to-one name="contactPoint" column="CONTACTID" class="com.cinnamonbob.model.ContactPoint" insert="true"
+        <many-to-one name="contactPoint" column="CONTACT_ID" class="com.cinnamonbob.model.ContactPoint" insert="true"
                      lazy="false"/>
 
     </class>
@@ -117,6 +117,11 @@
     <query name="subscription.findByProject"><![CDATA[
         from Subscription s
         where s.project = :project
+    ]]></query>
+
+    <query name="subscription.deleteByProject"><![CDATA[
+        delete Subscription
+        where project = :project
     ]]></query>
 
 </hibernate-mapping>

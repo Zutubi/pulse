@@ -29,8 +29,8 @@
             <one-to-many class="com.cinnamonbob.model.CleanupRule"/>
         </bag>
 
-        <many-to-one name="scm" class="com.cinnamonbob.model.Scm" column="SCM" cascade="all"
-                     lazy="false"/>
+        <many-to-one name="scm" class="com.cinnamonbob.model.Scm" column="SCM" cascade="all" lazy="false"/>
+
     </class>
 
     <class name="com.cinnamonbob.model.BobFileDetails" table="BOB_FILE_DETAILS" lazy="false">

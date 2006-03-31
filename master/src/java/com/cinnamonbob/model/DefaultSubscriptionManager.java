@@ -38,4 +38,9 @@ public class DefaultSubscriptionManager implements SubscriptionManager
     {
         return subscriptionDao.findByProject(project);
     }
+
+    public void deleteAllSubscriptions(Project project)
+    {
+        subscriptionDao.deleteByProject(project);
+    }
 }

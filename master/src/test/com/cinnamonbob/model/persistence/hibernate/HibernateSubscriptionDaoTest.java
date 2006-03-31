@@ -51,16 +51,10 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
 
     public void testFindByProject()
     {
-
         ContactPoint contactPoint = new EmailContactPoint();
-        contactDao.save(contactPoint);
         Project project = new Project();
-        projectDao.save(project);
-
         Subscription subscription = new Subscription(project, contactPoint);
-        subDao.save(subscription);
-
-        commitAndRefreshTransaction();
+        save(contactPoint, project, subscription);
 
         List<Subscription> subscriptions = subDao.findByProject(project);
         assertNotNull(subscriptions);
@@ -68,5 +62,51 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
         Subscription otherSubscription = subscriptions.get(0);
         assertEquals(project, otherSubscription.getProject());
         assertEquals(contactPoint, otherSubscription.getContactPoint());
+    }
+
+    public void testDeleteSubscription()
+    {
+        ContactPoint contactPoint = new EmailContactPoint();
+        Project project = new Project();
+        Subscription subscription = new Subscription(project, contactPoint);
+        save(contactPoint, project, subscription);
+
+        subDao.delete(subscription);
+        commitAndRefreshTransaction();
+
+        assertNotNull(contactDao.findById(contactPoint.getId()));
+        assertNotNull(projectDao.findById(project.getId()));
+        assertNull(subDao.findById(subscription.getId()));
+    }
+
+    public void testDeleteByProject()
+    {
+        ContactPoint contactPoint = new EmailContactPoint();
+        Project project = new Project();
+        Subscription subscription = new Subscription(project, contactPoint);
+        save(contactPoint, project, subscription);
+
+        Subscription subscriptionB = new Subscription(project, contactPoint);
+        save(subscriptionB);
+
+        assertEquals(2, subDao.deleteByProject(project));
+        commitAndRefreshTransaction();
+
+        assertNull(subDao.findById(subscription.getId()));
+        assertNull(subDao.findById(subscriptionB.getId()));
+    }
+
+    private void save(ContactPoint c, Project p, Subscription s)
+    {
+        contactDao.save(c);
+        projectDao.save(p);
+        subDao.save(s);
+        commitAndRefreshTransaction();
+    }
+
+    private void save(Subscription s)
+    {
+        subDao.save(s);
+        commitAndRefreshTransaction();
     }
 }

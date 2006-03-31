@@ -2,7 +2,9 @@ package com.cinnamonbob.model.persistence.hibernate;
 
 import com.cinnamonbob.core.model.ResultState;
 import com.cinnamonbob.model.*;
+import com.cinnamonbob.model.persistence.ContactPointDao;
 import com.cinnamonbob.model.persistence.ProjectDao;
+import com.cinnamonbob.model.persistence.SubscriptionDao;
 
 import java.util.TreeMap;
 
@@ -13,16 +15,22 @@ import java.util.TreeMap;
 public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 {
     private ProjectDao projectDao;
+    private SubscriptionDao subscriptionDao;
+    private ContactPointDao contactDao;
 
     public void setUp() throws Exception
     {
         super.setUp();
         projectDao = (ProjectDao) context.getBean("projectDao");
+        subscriptionDao = (SubscriptionDao) context.getBean("subscriptionDao");
+        contactDao = (ContactPointDao) context.getBean("contactPointDao");
     }
 
     public void tearDown() throws Exception
     {
         projectDao = null;
+        subscriptionDao = null;
+        contactDao = null;
         super.tearDown();
     }
 
@@ -140,6 +148,5 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         commitAndRefreshTransaction();
         assertNotNull(projectDao.findByName("nameA"));
     }
-
 }
 
