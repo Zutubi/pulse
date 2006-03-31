@@ -8,8 +8,8 @@ import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.RecipeResult;
 import com.cinnamonbob.core.model.Revision;
 import com.cinnamonbob.core.util.Constants;
-import com.cinnamonbob.core.util.TreeNode;
 import com.cinnamonbob.core.util.FileSystemUtils;
+import com.cinnamonbob.core.util.TreeNode;
 import com.cinnamonbob.events.AsynchronousDelegatingListener;
 import com.cinnamonbob.events.Event;
 import com.cinnamonbob.events.EventListener;
@@ -26,7 +26,6 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
@@ -360,7 +359,12 @@ public class BuildController implements EventListener
     {
         try
         {
-            quartzScheduler.unscheduleJob(getTriggerName(), TIMEOUT_TRIGGER_GROUP);
+            // during a system shutdown, the scheduler is shutdown before the
+            // builds are completed. This makes it unnecessary to unschedule the job.
+            if (!quartzScheduler.isShutdown())
+            {
+                quartzScheduler.unscheduleJob(getTriggerName(), TIMEOUT_TRIGGER_GROUP);
+            }
         }
         catch (SchedulerException e)
         {
