@@ -46,3 +46,4 @@ Warning messages:
   - second recipe :: artifact command :: first-artifact
     first-artifact/testpath
     * warning message
+

@@ -66,7 +66,56 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
         errorsHelper("html");
     }
 
-    private void errorsHelper(String type)  throws IOException
+    public void testWithFailures() throws IOException
+    {
+        BuildResult result = createSuccessfulBuild();
+        result.failure("test failed tests");
+
+        RecipeResultNode firstNode = result.getRoot().getChildren().get(0);
+        firstNode.getResult().failure("tests failed dude");
+
+        RecipeResultNode nestedNode = firstNode.getChildren().get(0);
+        nestedNode.getResult().failure("tests failed nested dude");
+
+        RecipeResultNode secondNode = result.getRoot().getChildren().get(1);
+        RecipeResult secondResult = secondNode.getResult();
+
+        CommandResult command = new CommandResult("failing tests");
+        command.failure("tests let me down");
+
+        StoredFileArtifact artifact = new StoredFileArtifact("first-artifact/testpath");
+        TestSuiteResult rootSuite = new TestSuiteResult("root test suite");
+        rootSuite.add(new TestCaseResult("1 passed"));
+        rootSuite.add(new TestCaseResult("2 failed", 0, TestCaseResult.Status.FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
+        rootSuite.add(new TestCaseResult("3 error", 0, TestCaseResult.Status.ERROR, "short error"));
+        rootSuite.add(new TestCaseResult("4 passed"));
+
+        TestSuiteResult nestedSuite = new TestSuiteResult("nested suite");
+        nestedSuite.add(new TestCaseResult("n1 failed", 0, TestCaseResult.Status.FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
+        nestedSuite.add(new TestCaseResult("n2 error", 0, TestCaseResult.Status.ERROR, "short error"));
+        nestedSuite.add(new TestCaseResult("n3 passed"));
+        rootSuite.add(nestedSuite);
+
+        TestSuiteResult nestedPassSuite = new TestSuiteResult("you shouldn't see this!");
+        nestedPassSuite.add(new TestCaseResult("nps"));
+        rootSuite.add(nestedPassSuite);
+
+        TestSuiteResult nestedEmptySuite = new TestSuiteResult("mmmm, boundary conditions");
+        rootSuite.add(nestedEmptySuite);
+
+        artifact.addTest(rootSuite);
+        command.addArtifact(new StoredArtifact("first-artifact", artifact));
+
+        artifact = new StoredFileArtifact("second-artifact/this/time/a/very/very/very/very/long/pathname/which/will/look/ugly/i/have/no/doubt");
+        artifact.addTest(new TestCaseResult("test case at top level", 0, TestCaseResult.Status.FAILURE, "and i failed"));
+        command.addArtifact(new StoredArtifact("second-artifact", artifact));
+
+        secondResult.add(command);
+
+        createAndVerify("failures", "plain", "host.url", result);
+    }
+
+    private void errorsHelper(String type) throws IOException
     {
         BuildResult result = createBuildWithChanges();
         result.error("test error message");
@@ -154,7 +203,7 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
     protected void createAndVerify(String expectedName, String type, String hostUrl, BuildResult result) throws IOException
     {
         String extension = "txt";
-        if(type.equals("html"))
+        if (type.equals("html"))
         {
             extension = "html";
         }

@@ -29,7 +29,7 @@ Shows all messages of the given level on the artifact as a flat list but with
 context.
 ---------------------------------------------------------------------------->
 [#macro artifactMessages artifact level context]
-    [#assign fileContext="${context} :: ${artifact.name}"]
+    [#local fileContext="${context} :: ${artifact.name}"]
     [#list artifact.children as fileArtifact]
         [@fileArtifactMessages artifact=fileArtifact level=level context=fileContext/]
     [/#list]
@@ -40,7 +40,7 @@ Shows all messages of the given level on the command result and its included
 artifacts as a flat list but with context.
 ---------------------------------------------------------------------------->
 [#macro commandResultMessages result level context]
-    [#assign nestedContext = "${context} :: ${result.commandName}"]
+    [#local nestedContext = "${context} :: ${result.commandName}"]
     [#if result.hasDirectMessages(level)]
   - ${renderer.wrapString(nestedContext, "    ")}
         [@resultMessages result=result level=level indent="  "/]
@@ -71,9 +71,9 @@ results as a flat list but with context.
 [#macro recipeNodeMessages node level context=""]
     [#if node.hasMessages(level)]
         [#if context?length &gt; 0]
-            [#assign nestedContext = "${context} :: ${node.result.recipeNameSafe}"]
+            [#local nestedContext = "${context} :: ${node.result.recipeNameSafe}"]
         [#else]
-            [#assign nestedContext = node.result.recipeNameSafe]
+            [#local nestedContext = node.result.recipeNameSafe]
         [/#if]
         [@recipeResultMessages result=node.result level=level context=nestedContext/]
         [#list node.children as child]
@@ -96,6 +96,92 @@ ${level?lower_case?cap_first} messages:
     [/#if]
 [/#macro]
 
+<#---------------------------------------------------------------------------
+A macro to show failed test results as a flat plain text list.
+---------------------------------------------------------------------------->
+[#macro showTestFailures test suiteContext=""]
+    [#if test.hasBrokenTests()]
+        [#if test.isSuite()]
+            [#local testStatus = test.name]
+        [#else]
+            [#local testStatus = "${test.name} (${test.status?lower_case})"]
+        [/#if]
+        [#if suiteContext?length &gt; 0]
+            [#local testContext = "${suiteContext} :: ${testStatus}"]
+        [#else]
+            [#local testContext = testStatus]
+        [/#if]
+    * ${renderer.wrapString(testContext, "      ")}
+        [#if test.isSuite()]
+      ${renderer.wrapString("total: ${test.total}, errors: ${test.errors}, failures: ${test.failures}", "      ")}
+            [#list test.children as child]
+                [@showTestFailures test=child suiteContext=testContext/]
+            [/#list]
+        [#else]
+            [#if test.message?exists]
+      ${renderer.wrapString(test.message, "      ")}
+            [/#if]
+        [/#if]
+    [/#if]
+[/#macro]
+
+<#---------------------------------------------------------------------------
+A macro to show the failed tests for a file artifact flat plain text list.
+---------------------------------------------------------------------------->
+[#macro fileArtifactFailedTests artifact]
+    [#list artifact.tests as test]
+        [@showTestFailures test=test/]
+    [/#list]
+[/#macro]
+
+<#---------------------------------------------------------------------------
+A macro to show the failed tests in a recipe as a flat plain text list.
+---------------------------------------------------------------------------->
+[#macro recipeFailedTests result context]
+    [#list result.commandResults as command]
+        [#local commandContext = "${context} :: ${command.commandName}"]
+        [#list command.artifacts as artifact]
+            [#local artifactContext="${commandContext} :: ${artifact.name}"]
+            [#list artifact.children as fileArtifact]
+                [#if fileArtifact.hasBrokenTests()]
+  - ${renderer.wrapString(artifactContext, "    ")}
+    ${renderer.wrapString("${fileArtifact.path}", "    ")}
+                    [@fileArtifactFailedTests artifact=fileArtifact/]
+                [/#if]
+            [/#list]
+        [/#list]
+    [/#list]
+[/#macro]
+
+<#---------------------------------------------------------------------------
+A macro to show the failed tests in a recipe node as a flat plain text list.
+---------------------------------------------------------------------------->
+[#macro recipeNodeFailedTests node context=""]
+    [#if context?length &gt; 0]
+        [#local nestedContext = "${context} :: ${node.result.recipeNameSafe}"]
+    [#else]
+        [#local nestedContext = node.result.recipeNameSafe]
+    [/#if]
+    [#if node.result?exists]
+        [@recipeFailedTests result=node.result context=nestedContext/]
+    [/#if]
+    [#list node.children as child]
+        [@recipeNodeFailedTests node=child context=nestedContext/]
+    [/#list]
+[/#macro]
+
+<#---------------------------------------------------------------------------
+A macro to show the failed tests in a build as a flat plain text list.
+---------------------------------------------------------------------------->
+[#macro buildFailedTests result]
+    [#local summary = result.testSummary]
+    [#if !summary.allPassed()]
+Broken tests (total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures}):
+        [#list result.root.children as child]
+            [@recipeNodeFailedTests node=child/]
+        [/#list]
+    [/#if]
+[/#macro]
 
 <#---------------------------------------------------------------------------
 A macro to show the messages directly on the result object of the given
