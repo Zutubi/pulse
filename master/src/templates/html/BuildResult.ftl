@@ -50,7 +50,7 @@ table.content {
     width: 100%;
 }
 
-th.heading, th.content, td.content, td.content-right, td.failure, td.error, td.success {
+th.heading, th.content, td.content, td.content-right, td.failure, td.error, td.test-failure, td.success {
     border: 1px solid #bbb;
     padding: 4px;
     text-align: left;
@@ -66,11 +66,15 @@ td.success {
     background: #ffffff;
 }
 
-td.failure, td.error {
+td.failure, td.error, td.test-failure {
     color: #b22;
     font-weight: bold;
+}
+
+td.failure, td.error {
     background: #fff0f0;
 }
+
 
 ul {
     margin-left: 20px;
@@ -138,7 +142,7 @@ pre.feature {
             [@contentHeader cc="spec"/]
             [@contentHeader cc="when"/]
             [@contentHeader cc="elapsed"/]
-            <th class="content" colspan="5" style="border: 1px solid #bbb; padding: 4px; text-align: left;">actions</th>
+            <th class="content" colspan="3" style="border: 1px solid #bbb; padding: 4px; text-align: left;">actions</th>
         </tr>
         <tr>
             [#assign class = result.state.string]
@@ -148,10 +152,8 @@ pre.feature {
             [@classCell cc=result.stamps.prettyStartTime/]
             [@classCell cc=result.stamps.prettyElapsed/]
             [@linkCell cc="view" url="http://${hostname}/viewBuild.action?id=${result.id?c}"/]
-            [@linkCell cc="log" url="http://${hostname}/viewCommandLog.action?id=${result.id?c}"/]
-            [@linkCell cc="changes" url="http://${hostname}/viewChanges.action?id=${result.id?c}"/]
             [@linkCell cc="artifacts" url="http://${hostname}/viewBuildArtifacts.action?id=${result.id?c}"/]
-            [@linkCell cc="working copy" url="http://${hostname}/browseProjectDir.action?buildId=${result.id?c}&amp;recipeId=${result.root.children[0].result.id?c}"/]
+            [@linkCell cc="tests" url="http://${hostname}/viewTests.action?buildId=${result.id?c}"/]
         </tr>
     </table>
 </td></tr>
@@ -205,6 +207,23 @@ pre.feature {
                 [@buildMessagesHTML result=result level=warningLevel/]
             </td>
         </tr>
+    </table>
+</td></tr>
+[/#if]
+
+[#assign testSummary = result.testSummary]
+[#if !testSummary.allPassed()]
+<tr><td>
+    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px; width: 100%;">
+        <th class="heading" colspan="3" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
+            broken tests (total: ${testSummary.total}, errors: ${testSummary.errors}, failures: ${testSummary.failures})
+        </th>
+        <tr>
+            [@contentHeader cc="test"/]
+            [@contentHeader cc="status"/]
+            [@contentHeader cc="details"/]
+        </tr>
+        [@buildFailedTestsHTML result=result/]
     </table>
 </td></tr>
 [/#if]

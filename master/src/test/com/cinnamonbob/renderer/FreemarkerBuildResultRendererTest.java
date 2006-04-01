@@ -68,6 +68,54 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
 
     public void testWithFailures() throws IOException
     {
+        failuresHelper("plain");
+    }
+
+    public void testHTMLWithFailures() throws IOException
+    {
+        failuresHelper("html");
+    }
+
+    private void errorsHelper(String type) throws IOException
+    {
+        BuildResult result = createBuildWithChanges();
+        result.error("test error message");
+        result.addFeature(Feature.Level.WARNING, "warning message on result");
+        RecipeResultNode firstNode = result.getRoot().getChildren().get(0);
+        firstNode.getResult().error("test recipe error message");
+
+        RecipeResultNode nestedNode = firstNode.getChildren().get(0);
+        nestedNode.getResult().failure("test recipe failure message with the unfortunate need to wrap because it is really quite ridiculously long");
+
+        RecipeResultNode secondNode = result.getRoot().getChildren().get(1);
+        RecipeResult secondResult = secondNode.getResult();
+
+        CommandResult command = new CommandResult("test command");
+        command.error("bad stuff happened, so wrap this: 000000000000000000000000000000000000000000000000000000000000000000000");
+        secondResult.add(command);
+
+        command = new CommandResult("artifact command");
+        command.failure("artifacts let me down");
+
+        StoredFileArtifact artifact = new StoredFileArtifact("first-artifact/testpath");
+        artifact.addFeature(new Feature(Feature.Level.INFO, "info message"));
+        artifact.addFeature(new Feature(Feature.Level.ERROR, "error message"));
+        artifact.addFeature(new PlainFeature(Feature.Level.WARNING, "warning message", 19));
+        command.addArtifact(new StoredArtifact("first-artifact", artifact));
+
+        artifact = new StoredFileArtifact("second-artifact/this/time/a/very/very/very/very/long/pathname/which/will/look/ugly/i/have/no/doubt");
+        artifact.addFeature(new PlainFeature(Feature.Level.ERROR, "error 1", 1000000));
+        artifact.addFeature(new Feature(Feature.Level.ERROR, "error 2"));
+        artifact.addFeature(new Feature(Feature.Level.ERROR, "error 3: in this case a longer error message so i can see how the wrapping works on the artifact messages"));
+        command.addArtifact(new StoredArtifact("second-artifact", artifact));
+
+        secondResult.add(command);
+
+        createAndVerify("errors", type, "another.url", result);
+    }
+
+    private void failuresHelper(String type) throws IOException
+    {
         BuildResult result = createSuccessfulBuild();
         result.failure("test failed tests");
 
@@ -112,45 +160,7 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
 
         secondResult.add(command);
 
-        createAndVerify("failures", "plain", "host.url", result);
-    }
-
-    private void errorsHelper(String type) throws IOException
-    {
-        BuildResult result = createBuildWithChanges();
-        result.error("test error message");
-        result.addFeature(Feature.Level.WARNING, "warning message on result");
-        RecipeResultNode firstNode = result.getRoot().getChildren().get(0);
-        firstNode.getResult().error("test recipe error message");
-
-        RecipeResultNode nestedNode = firstNode.getChildren().get(0);
-        nestedNode.getResult().failure("test recipe failure message with the unfortunate need to wrap because it is really quite ridiculously long");
-
-        RecipeResultNode secondNode = result.getRoot().getChildren().get(1);
-        RecipeResult secondResult = secondNode.getResult();
-
-        CommandResult command = new CommandResult("test command");
-        command.error("bad stuff happened, so wrap this: 000000000000000000000000000000000000000000000000000000000000000000000");
-        secondResult.add(command);
-
-        command = new CommandResult("artifact command");
-        command.failure("artifacts let me down");
-
-        StoredFileArtifact artifact = new StoredFileArtifact("first-artifact/testpath");
-        artifact.addFeature(new Feature(Feature.Level.INFO, "info message"));
-        artifact.addFeature(new Feature(Feature.Level.ERROR, "error message"));
-        artifact.addFeature(new PlainFeature(Feature.Level.WARNING, "warning message", 19));
-        command.addArtifact(new StoredArtifact("first-artifact", artifact));
-
-        artifact = new StoredFileArtifact("second-artifact/this/time/a/very/very/very/very/long/pathname/which/will/look/ugly/i/have/no/doubt");
-        artifact.addFeature(new PlainFeature(Feature.Level.ERROR, "error 1", 1000000));
-        artifact.addFeature(new Feature(Feature.Level.ERROR, "error 2"));
-        artifact.addFeature(new Feature(Feature.Level.ERROR, "error 3: in this case a longer error message so i can see how the wrapping works on the artifact messages"));
-        command.addArtifact(new StoredArtifact("second-artifact", artifact));
-
-        secondResult.add(command);
-
-        createAndVerify("errors", type, "another.url", result);
+        createAndVerify("failures", type, "host.url", result);
     }
 
     private BuildResult createBuildWithChanges()
@@ -228,6 +238,6 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
 
     private String replaceTimestamps(String str)
     {
-        return str.replaceAll(">.*ago<", "@@@@");
+        return str.replaceAll("\n.*ago<", "@@@@");
     }
 }

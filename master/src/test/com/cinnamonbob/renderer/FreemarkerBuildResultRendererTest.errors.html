@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-    <title>project :: test project :: build 101</title>
-    <style type="text/css">
-    <!--
+<title>project :: test project :: build 101</title>
+<style type="text/css">
+<!--
 body {
     font: sans-serif;
 }
@@ -49,7 +49,7 @@ table.content {
     width: 100%;
 }
 
-th.heading, th.content, td.content, td.content-right, td.failure, td.error, td.success {
+th.heading, th.content, td.content, td.content-right, td.failure, td.error, td.test-failure, td.success {
     border: 1px solid #bbb;
     padding: 4px;
     text-align: left;
@@ -65,9 +65,12 @@ td.success {
     background: #ffffff;
 }
 
-td.failure, td.error {
+td.failure, td.error, td.test-failure {
     color: #b22;
     font-weight: bold;
+}
+
+td.failure, td.error {
     background: #fff0f0;
 }
 
@@ -114,71 +117,98 @@ pre.feature {
     margin-top: 8px;
     margin-bottom: 0px;
 }
-    -->
-    </style>
+
+-->
+</style>
 </head>
+
 <body>
-    <h1 style="font-size: 150%; color: #bbb">
-        project ::
-        <a href="http://another.url/currentBuild.action?id=0">test project</a> ::
-        <a href="http://another.url/viewBuild.action?id=11">build 101</a>
-    </h1>
+<h1 style="font-size: 150%; color: #bbb">
+    project ::
+    <a href="http://another.url/currentBuild.action?id=0">test project</a> ::
+    <a href="http://another.url/viewBuild.action?id=11">build 101</a>
+</h1>
 <table>
 <tr><td>
     <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px; width: 100%;">
         <tr>
-            <th class="heading" colspan="11" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
+            <th class="heading" colspan="11"
+                style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
                 summary
             </th>
         </tr>
         <tr>
-    <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">id</th>
-    <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">status</th>
-    <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">spec</th>
-    <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">when</th>
-    <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">elapsed</th>
-            <th class="content" colspan="5" style="border: 1px solid #bbb; padding: 4px; text-align: left;">actions</th>
+            <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                id</th>
+            <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                status</th>
+            <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                spec</th>
+            <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                when</th>
+            <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                elapsed</th>
+            <th class="content" colspan="3" style="border: 1px solid #bbb; padding: 4px; text-align: left;">actions</th>
         </tr>
         <tr>
-    <td class="error" style="border: 1px solid #bbb; padding: 4px; text-align: left;">101</td>
-    <td class="error" style="border: 1px solid #bbb; padding: 4px; text-align: left;">error</td>
-    <td class="error" style="border: 1px solid #bbb; padding: 4px; text-align: left;">test spec</td>
-    <td class="error" style="border: 1px solid #bbb; padding: 4px; text-align: left;">36 years ago</td>
-    <td class="error" style="border: 1px solid #bbb; padding: 4px; text-align: left;">1 min 30 secs</td>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;"><a href="http://another.url/viewBuild.action?id=11">view</a></td>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;"><a href="http://another.url/viewCommandLog.action?id=11">log</a></td>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;"><a href="http://another.url/viewChanges.action?id=11">changes</a></td>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;"><a href="http://another.url/viewBuildArtifacts.action?id=11">artifacts</a></td>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;"><a href="http://another.url/browseProjectDir.action?buildId=11&amp;recipeId=0">working copy</a></td>
+            <td class="error" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                101</td>
+            <td class="error" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                error</td>
+            <td class="error" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                test spec</td>
+            <td class="error" style="border: 1px solid #bbb; padding: 4px; text-align: left;">@@@@/td>
+            <td class="error" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                1 min 30 secs</td>
+            <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                <a href="http://another.url/viewBuild.action?id=11">view</a></td>
+            <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                <a href="http://another.url/viewBuildArtifacts.action?id=11">artifacts</a></td>
+            <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                <a href="http://another.url/viewTests.action?buildId=11">tests</a></td>
         </tr>
     </table>
 </td></tr>
 
 <tr><td>
     <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px; width: 100%;">
-        <th class="heading" colspan="5" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
+        <th class="heading" colspan="5"
+            style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
             changes
         </th>
         <tr>
-    <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">revision</th>
-    <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">who</th>
-    <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">when</th>
-    <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">comment</th>
-    <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">actions</th>
+            <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                revision</th>
+            <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                who</th>
+            <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                when</th>
+            <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                comment</th>
+            <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                actions</th>
         </tr>
         <tr>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">655</td>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">test author</td>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">36 years ago</td>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">short comment</td>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;"><a href="http://another.url/viewChangelist.action?id=0">view</a></td>
+            <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                655</td>
+            <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                test author</td>
+            <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">@@@@/td>
+            <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                short comment</td>
+            <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                <a href="http://another.url/viewChangelist.action?id=0">view</a></td>
         </tr>
         <tr>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">656</td>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">author2</td>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">36 years ago</td>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">this time we will use a longer comment to make sure that ...</td>
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;"><a href="http://another.url/viewChangelist.action?id=0">view</a></td>
+            <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                656</td>
+            <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                author2</td>
+            <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">@@@@/td>
+            <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                this time we will use a longer comment to make sure that ...</td>
+            <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+                <a href="http://another.url/viewChangelist.action?id=0">view</a></td>
         </tr>
     </table>
 </td></tr>
@@ -186,85 +216,95 @@ pre.feature {
 <tr><td>
     <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px; width: 100%;">
         <tr>
-        <th class="heading" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
-            features
-        </th>
+            <th class="heading"
+                style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
+                features
+            </th>
         <tr>
         <tr>
             <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
-<h3 style="font-size: 100%">error messages</h3>
-<ul class="error">
-<li class="error"><pre class="feature">test error message</pre></li>
-<li class="header">recipe :: first recipe
-    <ul>
-<li class="error"><pre class="feature">test recipe error message</pre></li>
-<li class="header">recipe :: nested recipe
-    <ul>
-<li class="error"><pre class="feature">test recipe failure message with the unfortunate need to wrap because it is really quite ridiculously long</pre></li>
-    </ul>
-</li>
-    </ul>
-</li>
-<li class="header">recipe :: second recipe
-    <ul>
-<li class="error"><pre class="feature">Error executing command 'test command'</pre></li>
-<li class="header">command :: test command
-    <ul>
-<li class="error"><pre class="feature">bad stuff happened, so wrap this: 000000000000000000000000000000000000000000000000000000000000000000000</pre></li>
-    </ul>
-</li>
-<li class="header">command :: artifact command
-    <ul>
-<li class="error"><pre class="feature">artifacts let me down</pre></li>
-<li class="header">artifact :: first-artifact/testpath
-    <ul>
-        <li class="error"><pre class="feature">error message</pre>
-        </li>
-    </ul>
-</li>
-<li class="header">artifact :: second-artifact/this/time/a/very/very/very/very/long/pathname/which/will/look/ugly/i/have/no/doubt
-    <ul>
-        <li class="error"><pre class="feature">error 1</pre>
-                <a class="unadorned" href="http://another.url/viewArtifact.action?id=0&amp;buildId=11&amp;commandId=0#1000000">
-                    <span class="small">jump to &gt;&gt;</span>
-                </a>
-        </li>
-        <li class="error"><pre class="feature">error 2</pre>
-        </li>
-        <li class="error"><pre class="feature">error 3: in this case a longer error message so i can see how the wrapping works on the artifact messages</pre>
-        </li>
-    </ul>
-</li>
-    </ul>
-</li>
-    </ul>
-</li>
-</ul>
-<h3 style="font-size: 100%">warning messages</h3>
-<ul class="warning">
-<li class="warning"><pre class="feature">warning message on result</pre></li>
-<li class="header">recipe :: second recipe
-    <ul>
-<li class="header">command :: artifact command
-    <ul>
-<li class="header">artifact :: first-artifact/testpath
-    <ul>
-        <li class="warning"><pre class="feature">warning message</pre>
-                <a class="unadorned" href="http://another.url/viewArtifact.action?id=0&amp;buildId=11&amp;commandId=0#19">
-                    <span class="small">jump to &gt;&gt;</span>
-                </a>
-        </li>
-    </ul>
-</li>
-    </ul>
-</li>
-    </ul>
-</li>
-</ul>
+                <h3 style="font-size: 100%">error messages</h3>
+                <ul class="error">
+                    <li class="error"><pre class="feature">test error message</pre></li>
+                    <li class="header">recipe :: first recipe
+                        <ul>
+                            <li class="error"><pre class="feature">test recipe error message</pre></li>
+                            <li class="header">recipe :: nested recipe
+                                <ul>
+                                    <li class="error"><pre class="feature">test recipe failure message with the
+                                        unfortunate need to wrap because it is really quite ridiculously long</pre></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="header">recipe :: second recipe
+                        <ul>
+                            <li class="error"><pre class="feature">Error executing command 'test command'</pre></li>
+                            <li class="header">command :: test command
+                                <ul>
+                                    <li class="error"><pre class="feature">bad stuff happened, so wrap this:
+                                        000000000000000000000000000000000000000000000000000000000000000000000</pre></li>
+                                </ul>
+                            </li>
+                            <li class="header">command :: artifact command
+                                <ul>
+                                    <li class="error"><pre class="feature">artifacts let me down</pre></li>
+                                    <li class="header">artifact :: first-artifact/testpath
+                                        <ul>
+                                            <li class="error"><pre class="feature">error message</pre>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="header">artifact ::
+                                        second-artifact/this/time/a/very/very/very/very/long/pathname/which/will/look/ugly/i/have/no/doubt
+                                        <ul>
+                                            <li class="error"><pre class="feature">error 1</pre>
+                                                <a class="unadorned"
+                                                   href="http://another.url/viewArtifact.action?id=0&amp;buildId=11&amp;commandId=0#1000000">
+                                                    <span class="small">jump to &gt;&gt;</span>
+                                                </a>
+                                            </li>
+                                            <li class="error"><pre class="feature">error 2</pre>
+                                            </li>
+                                            <li class="error"><pre class="feature">error 3: in this case a longer error
+                                                message so i can see how the wrapping works on the artifact
+                                                messages</pre>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3 style="font-size: 100%">warning messages</h3>
+                <ul class="warning">
+                    <li class="warning"><pre class="feature">warning message on result</pre></li>
+                    <li class="header">recipe :: second recipe
+                        <ul>
+                            <li class="header">command :: artifact command
+                                <ul>
+                                    <li class="header">artifact :: first-artifact/testpath
+                                        <ul>
+                                            <li class="warning"><pre class="feature">warning message</pre>
+                                                <a class="unadorned"
+                                                   href="http://another.url/viewArtifact.action?id=0&amp;buildId=11&amp;commandId=0#19">
+                                                    <span class="small">jump to &gt;&gt;</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </td>
         </tr>
     </table>
 </td></tr>
+
 </table>
 </body>
 </html>

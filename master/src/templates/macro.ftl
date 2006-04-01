@@ -285,30 +285,93 @@ results as a HTML nested list.
     [/#if]
 [/#macro]
 
+[#macro showTestHTML test indent=""]
+    [#if test.hasBrokenTests()]
+        <tr>
+        [#assign class = "test-failure"]
+            [@classCell cc="${indent}${test.name?html}"/]
+        [#if test.isSuite()]
+            [@contentCell cc="&nbsp;"/]
+            [@contentCell cc="total: ${test.total}, errors: ${test.errors}, failures: ${test.failures}"/]
+        [#else]
+            [@classCell cc=test.status?lower_case/]
+            [#if test.message?exists]
+                [@openCell/]
+                    <pre>${test.message?html}</pre>
+                </td>
+            [#else]
+                [@contentCell cc="&nbsp;"/]
+            [/#if]
+        [/#if]
+        </tr>
+    [#if test.isSuite()]
+            [#list test.children as child]
+                [@showTestHTML test=child indent="${indent}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/]
+            [/#list]
+        [/#if]
+    [/#if]
+[/#macro]
+
+[#macro recipeFailedTestsHTML recipe]
+    [#list recipe.commandResults as command]
+        [#list command.artifacts as artifact]
+            [#list artifact.children as fileArtifact]
+                [#list fileArtifact.tests as test]
+                    [@showTestHTML test=test/]
+                [/#list]
+            [/#list]
+        [/#list]
+    [/#list]
+[/#macro]
+
+[#macro recipeNodeFailedTestsHTML node]
+    [@recipeFailedTestsHTML recipe=node.result/]
+    [#list node.children as child]
+        [@recipeNodeFailedTestsHTML node=child/]
+    [/#list]
+[/#macro]
+
+[#macro buildFailedTestsHTML result]
+    [#list result.root.children as child]
+        [@recipeNodeFailedTestsHTML node=child/]
+    [/#list]
+[/#macro]
+
+[#macro openCell type="td" class="content"]
+    <${type} class="${class}" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+[/#macro]
+
 <#---------------------------------------------------------------------------
 A content header cell
 ---------------------------------------------------------------------------->
 [#macro contentHeader cc]
-    <th class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">${cc}</th>
+    [@openCell type="th"/]${cc}</th>
+[/#macro]
+
+<#---------------------------------------------------------------------------
+A content cell
+---------------------------------------------------------------------------->
+[#macro contentCell cc]
+    [@openCell/]${cc}</td>
 [/#macro]
 
 <#---------------------------------------------------------------------------
 A content cell with content escaped HTML-wise
 ---------------------------------------------------------------------------->
 [#macro dynamicCell cc]
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;">${cc?html}</td>
+    [@openCell/]${cc?html}</td>
 [/#macro]
 
 <#---------------------------------------------------------------------------
 A content cell with CSS class set to the value of $class
 ---------------------------------------------------------------------------->
 [#macro classCell cc]
-    <td class="${class}" style="border: 1px solid #bbb; padding: 4px; text-align: left;">${cc}</td>
+    [@openCell class="${class}"/]${cc}</td>
 [/#macro]
 
 <#---------------------------------------------------------------------------
 A content cell with a link
 ---------------------------------------------------------------------------->
 [#macro linkCell cc url]
-    <td class="content" style="border: 1px solid #bbb; padding: 4px; text-align: left;"><a href="${url}">${cc}</a></td>
+    [@openCell/]<a href="${url}">${cc}</a></td>
 [/#macro]
