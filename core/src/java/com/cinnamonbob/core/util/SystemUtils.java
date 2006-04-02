@@ -45,4 +45,16 @@ public class SystemUtils
 
         return null;
     }
+
+    public static String getLineSeparator()
+    {
+        if(isWindows())
+        {
+            return "\r\n";
+        }
+        else
+        {
+            return "\n";
+        }
+    }
 }

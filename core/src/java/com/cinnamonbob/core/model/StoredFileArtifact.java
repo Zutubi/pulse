@@ -51,6 +51,11 @@ public class StoredFileArtifact extends Entity
         features.add(feature);
     }
 
+    public void addFeatures(List<Feature> features)
+    {
+        this.features.addAll(features);
+    }
+
     public boolean hasFeatures()
     {
         return features.size() != 0;
@@ -170,4 +175,5 @@ public class StoredFileArtifact extends Entity
             test.accumulateSummary(summary);
         }
     }
+
 }

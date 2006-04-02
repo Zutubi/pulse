@@ -247,11 +247,40 @@ public class RegexPostProcessorTest extends BobTestCase
         contextHelper(10000, 10000);
     }
 
+    public void testJoinOverlapping()
+    {
+        RegexPostProcessor pp = createPostProcessor("xxx");
+        pp.setTrailingContext(1);
+        simpleErrors(pp, "xxx\nxxx abc\nabc xxx\nabc xxx abc");
+    }
+
+    public void testJoinDoubleOverlapping()
+    {
+        RegexPostProcessor pp = createPostProcessor("xxx");
+        pp.setTrailingContext(2);
+        simpleErrors(pp, "xxx\nxxx abc\nabc xxx\nabc xxx abc");
+    }
+
+    public void testNotJoinAdjacent()
+    {
+        RegexPostProcessor pp = createPostProcessor("xxx abc");
+        pp.setTrailingContext(1);
+        simpleErrors(pp, "xxx abc\nabc xxx", "abc xxx abc");
+    }
+
+    public void testJoinSeparated()
+    {
+        RegexPostProcessor pp = createPostProcessor("xxx abc");
+        pp.setTrailingContext(2);
+        simpleErrors(pp, "xxx abc\nabc xxx\nabc xxx abc");
+    }
+
     private void contextHelper(int leading, int trailing)
     {
         RegexPostProcessor pp = createPostProcessor(".*");
         pp.setLeadingContext(leading);
         pp.setTrailingContext(trailing);
+        pp.setJoinOverlapping(false);
         simpleErrors(pp, joinLines(leading, trailing));
         checkFeatureLines(artifact, leading, trailing);
     }

@@ -38,6 +38,11 @@ public class RegexPattern
         return category;
     }
 
+    public void setCategory(Feature.Level level)
+    {
+        this.category = level;
+    }
+
     public void setCategory(String category) throws FileLoadException
     {
         try
@@ -48,11 +53,6 @@ public class RegexPattern
         {
             throw new FileLoadException("Unrecognised regex category '" + category + "'");
         }
-    }
-
-    public void setCategory(Feature.Level category)
-    {
-        this.category = category;
     }
 
     public String getExpression()

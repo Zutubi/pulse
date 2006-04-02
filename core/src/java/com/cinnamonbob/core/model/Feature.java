@@ -82,7 +82,7 @@ public class Feature extends Entity
         level = Level.valueOf(name);
     }
 
-    private void setSummary(String summary)
+    public void setSummary(String summary)
     {
         this.summary = summary;
     }
