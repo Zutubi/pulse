@@ -147,6 +147,13 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="downloadProjectBuildFile" class="com.cinnamonbob.web.project.DownloadProjectBuildFileAction">
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+            </result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="viewRecipe" class="com.cinnamonbob.web.project.ViewRecipeAction">
             <result name="success" type="velocity">view-recipe.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
@@ -516,6 +523,13 @@
         <action name="deleteCleanupRule" class="com.cinnamonbob.web.project.DeleteCleanupRuleAction">
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="convertToCustomProject" class="com.cinnamonbob.web.project.ConvertToCustomProjectAction">
+            <result name="input" type="velocity">convert-to-custom-project.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${id}</result>
         </action>
 
         <action name="shutdownServer" class="com.cinnamonbob.web.ShutdownServerAction">

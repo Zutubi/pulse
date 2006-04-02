@@ -2,6 +2,7 @@ package com.cinnamonbob.web.project;
 
 import com.cinnamonbob.core.model.Feature;
 import com.cinnamonbob.model.BuildManager;
+import com.cinnamonbob.model.Project;
 import com.cinnamonbob.model.ProjectManager;
 import com.cinnamonbob.model.ScmManager;
 import com.cinnamonbob.scheduling.Scheduler;
@@ -78,5 +79,16 @@ public class ProjectActionSupport extends ActionSupport
         levels.add(Feature.Level.WARNING);
         levels.add(Feature.Level.INFO);
         return levels;
+    }
+
+    public Project lookupProject(long id)
+    {
+        Project p = projectManager.getProject(id);
+        if(p == null)
+        {
+            addActionError("Unknown project [" + id + "]");
+        }
+
+        return p;
     }
 }

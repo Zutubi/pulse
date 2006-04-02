@@ -347,6 +347,13 @@
 #end
 
 ##
+## Outputs a row heading cell for a content table
+##
+#macro(contentRowHeading $key)
+    <th class="content-row">#wwtext("name=$key")</th>
+#end
+
+##
 ## Outputs a regular cell for a content table
 ##
 #macro(contentCell $key)

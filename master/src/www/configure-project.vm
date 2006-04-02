@@ -24,13 +24,19 @@
 #foreach($property in $project.bobFileDetails.properties.entrySet())
                     #propertyRow($property)
 #end
+#if(!$project.bobFileDetails.type.equals("custom"))
+                    <tr>
+                        #contentRowHeading("actions")
+                        #linkCell("convert.to.custom" "convertToCustomProject!input.action?id=$project.id")
+                    </tr>
+#end
                 </table>
                 <table id="project.scm" class="fill-content">
                     #editHeadingRow("project.scm" 2 "editScm!input.action?id=$project.scm.id&amp;projectId=$project.id" "project.scm.edit")
                     #scmRow($project)
                     #dynamicRow("scm.location" "$project.scm.createServer().location")
                     <tr>
-                        <th class="content-row">#wwtext("name=actions")</th>
+                        #contentRowHeading("actions")
                         #linkCell("scm.browse" "browseProjectScm.action?id=$project.id")
                     </tr>
                 </table>
