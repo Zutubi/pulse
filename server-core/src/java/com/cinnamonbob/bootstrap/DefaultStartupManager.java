@@ -206,6 +206,10 @@ public class DefaultStartupManager implements StartupManager
         // send a message to the rest of the system that all is good to go.
         EventManager eventManager = (EventManager) ComponentContext.getBean("eventManager");
         eventManager.publish(new SystemStartedEvent(this));
+
+        // let the user know that the system is now up and running.
+        int serverPort = configurationManager.getAppConfig().getServerPort();
+        System.err.println("The server is now available at http://localhost:"+serverPort+".");
     }
 
     private void runStartupTasks()

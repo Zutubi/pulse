@@ -8,6 +8,16 @@ import java.io.IOException;
 /**
  * The home object provides an interface to the configured home directory,
  * its layout and its data.
+ *
+ * The home directory is layed out as follows:
+ *
+ *      home/
+ *          config/: user configuration files
+ *          database/: the embedded HSQL database
+ *          projects/: build artifacts
+ *
+ *          bob.config.properties: core configuration properties, contain version and license details amongst other things
+ *
  */
 public class Home implements UserPaths
 {
@@ -17,6 +27,7 @@ public class Home implements UserPaths
     private File userConfigRoot;
     private File projectRoot;
     private File databaseRoot;
+    private static final String CONFIG_FILE_NAME = "bob.config.properties";
 
     public Home(File homeDir)
     {
@@ -69,7 +80,7 @@ public class Home implements UserPaths
 
     private File getVersionFile()
     {
-        return new File(bobHome, "version.properties");
+        return new File(bobHome, CONFIG_FILE_NAME);
     }
 
     public File getHome()
