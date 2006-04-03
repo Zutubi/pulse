@@ -2,12 +2,13 @@ package com.cinnamonbob.web.wizard;
 
 import com.opensymphony.xwork.LocaleProvider;
 import com.opensymphony.xwork.Validateable;
+import com.opensymphony.xwork.ValidationAware;
 
 /**
  * 
  *
  */
-public interface Wizard extends Validateable
+public interface Wizard extends Validateable, ValidationAware
 {
     /**
      * Retrieve the current state of the wizard.
@@ -68,4 +69,6 @@ public interface Wizard extends Validateable
     String restart();
 
     void setLocaleProvider(LocaleProvider provider);
+
+    void clearErrors();
 }

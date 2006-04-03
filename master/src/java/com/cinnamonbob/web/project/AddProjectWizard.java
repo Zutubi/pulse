@@ -136,6 +136,7 @@ public class AddProjectWizard extends BaseWizard
         catch (SchedulingException e)
         {
             //CIB-169: need to display this error to the user...
+            addActionError(e.getMessage());
             LOG.severe(e.getMessage(), e);
         }
     }

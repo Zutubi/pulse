@@ -1,8 +1,7 @@
 package com.cinnamonbob.web.wizard;
 
-import com.opensymphony.xwork.ValidationAware;
-import com.opensymphony.xwork.ValidationAwareSupport;
 import com.cinnamonbob.util.logging.Logger;
+import com.opensymphony.xwork.ValidationAware;
 
 import java.util.Collection;
 import java.util.Map;
@@ -10,14 +9,12 @@ import java.util.Map;
 /**
  * <class-comment/>
  */
-public abstract class BaseWizardState implements WizardState
+public abstract class BaseWizardState implements WizardState, ValidationAware
 {
     private static final Logger LOG = Logger.getLogger(BaseWizardState.class);
 
     private final String stateName;
     private Wizard wizard;
-
-    private final ValidationAware validationAware = new ValidationAwareSupport();
 
     public BaseWizardState(Wizard wizard, String name)
     {
@@ -27,7 +24,7 @@ public abstract class BaseWizardState implements WizardState
 
     public void initialise()
     {
-        clearErrors();
+        wizard.clearErrors();
     }
 
     public void execute()
@@ -45,83 +42,74 @@ public abstract class BaseWizardState implements WizardState
         return stateName;
     }
 
-    public void clearErrors()
-    {
-        validationAware.setActionErrors(null);
-        validationAware.setFieldErrors(null);
-        validationAware.setActionMessages(null);
-    }
-
     public final Wizard getWizard()
     {
         return wizard;
     }
 
-    // ---( Implement the ValidationAware interface. )---
-
-    public void addActionError(String anErrorMessage)
-    {
-        LOG.severe("addActionError: " + anErrorMessage);
-        validationAware.addActionError(anErrorMessage);
-    }
-
-    public void addActionMessage(String aMessage)
-    {
-        validationAware.addActionMessage(aMessage);
-    }
-
-    public void addFieldError(String fieldName, String errorMessage)
-    {
-        validationAware.addFieldError(fieldName, errorMessage);
-    }
-
-    public Collection getActionMessages()
-    {
-        return validationAware.getActionMessages();
-    }
-
-    public boolean hasActionErrors()
-    {
-        return validationAware.hasActionErrors();
-    }
-
-    public boolean hasActionMessages()
-    {
-        return validationAware.hasActionMessages();
-    }
-
-    public boolean hasFieldErrors()
-    {
-        return validationAware.hasFieldErrors();
-    }
-
     public void setActionErrors(Collection errorMessages)
     {
-        validationAware.setActionErrors(errorMessages);
-    }
-
-    public void setActionMessages(Collection messages)
-    {
-        validationAware.setActionMessages(messages);
-    }
-
-    public void setFieldErrors(Map errorMap)
-    {
-        validationAware.setFieldErrors(errorMap);
+        getWizard().setActionErrors(errorMessages);
     }
 
     public Collection getActionErrors()
     {
-        return validationAware.getActionErrors();
+        return getWizard().getActionErrors();
+    }
+
+    public void setActionMessages(Collection messages)
+    {
+        getWizard().setActionMessages(messages);
+    }
+
+    public Collection getActionMessages()
+    {
+        return getWizard().getActionMessages();
+    }
+
+    public void setFieldErrors(Map errorMap)
+    {
+        getWizard().setFieldErrors(errorMap);
     }
 
     public Map getFieldErrors()
     {
-        return validationAware.getFieldErrors();
+        return getWizard().getFieldErrors();
+    }
+
+    public void addActionError(String anErrorMessage)
+    {
+        getWizard().addActionError(anErrorMessage);
+    }
+
+    public void addActionMessage(String aMessage)
+    {
+        getWizard().addActionMessage(aMessage);
+    }
+
+    public void addFieldError(String fieldName, String errorMessage)
+    {
+        getWizard().addFieldError(fieldName, errorMessage);
+    }
+
+    public boolean hasActionErrors()
+    {
+        return getWizard().hasActionErrors();
+    }
+
+    public boolean hasActionMessages()
+    {
+        return getWizard().hasActionMessages();
     }
 
     public boolean hasErrors()
     {
-        return validationAware.hasErrors();
+        return getWizard().hasErrors();
     }
+
+    public boolean hasFieldErrors()
+    {
+        return getWizard().hasFieldErrors();
+    }
+
 }

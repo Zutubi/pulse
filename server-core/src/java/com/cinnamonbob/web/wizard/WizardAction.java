@@ -228,7 +228,7 @@ public class WizardAction extends ActionSupport
         {
             initIfRequired();
             // always attempt to move to the next state.
-            if (getCurrentState().hasErrors())
+            if (wizard.hasErrors())
             {
                 return getCurrentStateName();
             }
@@ -418,7 +418,7 @@ public class WizardAction extends ActionSupport
         // the current state is null before the wizard has been initialised.
         if (currentState != null)
         {
-            currentState.clearErrors();
+            getWizard().clearErrors();
         }
     }
 }

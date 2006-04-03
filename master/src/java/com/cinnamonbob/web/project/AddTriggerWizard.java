@@ -92,7 +92,7 @@ public class AddTriggerWizard extends BaseWizard
         }
         catch (SchedulingException e)
         {
-            //TODO: need to report this error to the user..
+            addActionError(e.getMessage());
             LOG.severe(e.getMessage(), e);
         }
     }

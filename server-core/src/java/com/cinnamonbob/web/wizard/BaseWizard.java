@@ -2,12 +2,11 @@ package com.cinnamonbob.web.wizard;
 
 import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.xwork.TextProviderSupport;
-import com.opensymphony.xwork.LocaleProvider;
-import com.opensymphony.xwork.TextProvider;
-import com.opensymphony.xwork.Validateable;
+import com.opensymphony.xwork.*;
 import com.opensymphony.xwork.validator.DefaultActionValidatorManager;
 import com.opensymphony.xwork.validator.ValidationException;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -54,6 +53,7 @@ public class BaseWizard implements Wizard
      */
     private DefaultActionValidatorManager validationManager = new DefaultActionValidatorManager();
 
+    private final ValidationAware validationAware = new ValidationAwareSupport();
 
     private TextProvider textProvider;
     private LocaleProvider localeProvider;
@@ -186,7 +186,7 @@ public class BaseWizard implements Wizard
     public String traverseForward()
     {
         // we can not progress to the next state until validation is successful.
-        if (currentState.hasErrors())
+        if (hasErrors())
         {
             return currentState.getStateName();
         }
@@ -199,14 +199,14 @@ public class BaseWizard implements Wizard
         String nextState = currentState.getNextStateName();
         if (nextState == null)
         {
-            currentState.addActionError("Unknown next state: " + nextState);
+            addActionError("Unknown next state: " + nextState);
             return currentState.getStateName();
         }
 
         // move on to the next state.
         currentState = getState(nextState);
 
-        currentState.clearErrors();
+        clearErrors();
         currentState.initialise();
 
         return currentState.getStateName();
@@ -245,8 +245,8 @@ public class BaseWizard implements Wizard
     {
         // Since this state persists over multiple requests, we need to ensure that
         // we reset its error state before starting the validation.
-        currentState.clearErrors();
-        assert !currentState.hasErrors();
+        clearErrors();
+        assert !hasErrors();
 
         try
         {
@@ -258,7 +258,7 @@ public class BaseWizard implements Wizard
         }
         catch (ValidationException e)
         {
-            currentState.addActionError(e.getMessage());
+            addActionError(e.getMessage());
         }
     }
 
@@ -271,7 +271,7 @@ public class BaseWizard implements Wizard
     {
         this.localeProvider = localeProvider;
     }
-    
+
     protected TextProvider getTextProvider()
     {
         if (textProvider == null)
@@ -281,4 +281,78 @@ public class BaseWizard implements Wizard
         return textProvider;
     }
 
+    // ---( Implement the ValidationAware interface. )---
+
+    public void addActionError(String anErrorMessage)
+    {
+        LOG.severe("addActionError: " + anErrorMessage);
+        validationAware.addActionError(anErrorMessage);
+    }
+
+    public void addActionMessage(String aMessage)
+    {
+        validationAware.addActionMessage(aMessage);
+    }
+
+    public void addFieldError(String fieldName, String errorMessage)
+    {
+        validationAware.addFieldError(fieldName, errorMessage);
+    }
+
+    public Collection getActionMessages()
+    {
+        return validationAware.getActionMessages();
+    }
+
+    public boolean hasActionErrors()
+    {
+        return validationAware.hasActionErrors();
+    }
+
+    public boolean hasActionMessages()
+    {
+        return validationAware.hasActionMessages();
+    }
+
+    public boolean hasFieldErrors()
+    {
+        return validationAware.hasFieldErrors();
+    }
+
+    public void setActionErrors(Collection errorMessages)
+    {
+        validationAware.setActionErrors(errorMessages);
+    }
+
+    public void setActionMessages(Collection messages)
+    {
+        validationAware.setActionMessages(messages);
+    }
+
+    public void setFieldErrors(Map errorMap)
+    {
+        validationAware.setFieldErrors(errorMap);
+    }
+
+    public Collection getActionErrors()
+    {
+        return validationAware.getActionErrors();
+    }
+
+    public Map getFieldErrors()
+    {
+        return validationAware.getFieldErrors();
+    }
+
+    public boolean hasErrors()
+    {
+        return validationAware.hasErrors();
+    }
+
+    public void clearErrors()
+    {
+        setActionErrors(null);
+        setFieldErrors(null);
+        setActionMessages(null);
+    }
 }
