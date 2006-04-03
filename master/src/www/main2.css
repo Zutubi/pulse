@@ -277,6 +277,10 @@ h3.heading, div.box, th.heading, th.note, th.content, th.content-row, td.content
     padding: 4px;
 }
 
+th {
+    white-space: nowrap;
+}
+
 th.heading, th.note, th.content, th.content-row, td.content, td.content-large, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add {
     text-align: left;
     vertical-align: top;
