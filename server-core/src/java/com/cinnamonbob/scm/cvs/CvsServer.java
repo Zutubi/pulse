@@ -51,12 +51,21 @@ public class CvsServer implements SCMServer
     {
         CvsClient client = new CvsClient(cvsRoot);
         client.setPassword(cvsPassword);
+        // first we check the connection to the cvs repository. This covers
+        // the cvs root and authentication.
         client.testConnection();
 
         // check that the module is valid.
+        checkModuleIsValid(client);
+    }
+
+    private void checkModuleIsValid(CvsClient client)
+            throws SCMException
+    {
+        File tmpDir = null;
         try
         {
-            File tmpDir = FileSystemUtils.createTempDirectory("cvs", "checkout", tmpSpace);
+            tmpDir = FileSystemUtils.createTempDirectory("cvs", "checkout", tmpSpace);
 
             client.setLocalPath(tmpDir);
             client.setPassword(cvsPassword);
@@ -71,6 +80,10 @@ public class CvsServer implements SCMServer
         catch (IOException e)
         {
             throw new SCMException(e);
+        }
+        finally
+        {
+            FileSystemUtils.removeDirectory(tmpDir);
         }
     }
 
