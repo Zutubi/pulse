@@ -19,6 +19,6 @@ public class CvsEditForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"cvs.root", "cvs.module", "cvs.password", "cvs.path", "minutes", "seconds"};
+        return new String[]{"cvs.root", "cvs.module", "cvs.password", "cvs.branch", "cvs.path", "minutes", "seconds"};
     }
 }
