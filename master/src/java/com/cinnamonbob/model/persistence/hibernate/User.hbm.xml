@@ -31,6 +31,10 @@
             <one-to-many class="com.cinnamonbob.model.ContactPoint"/>
         </bag>
 
+        <bag name="aliases" lazy="false" table="USER_ALIASES">
+            <key column="USER_ID"/>
+            <element type="string" column="ALIAS" not-null="true"/>
+        </bag>
     </class>
 
     <class name="com.cinnamonbob.model.GrantedAuthority" table="AUTHORITIES" lazy="false">

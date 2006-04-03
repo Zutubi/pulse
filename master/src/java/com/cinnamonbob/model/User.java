@@ -52,12 +52,21 @@ public class User extends Entity implements UserDetails
 
     private List<GrantedAuthority> authorities;
 
+    /**
+     * A list of login aliases for the user: logins in other tools that bob
+     * may be interacting with (e.g. SCMs).
+     */
+    private List<String> aliases;
+
+
     public User()
     {
+        aliases = new LinkedList<String>();
     }
 
     public User(String login, String name)
     {
+        this();
         this.login = login;
         this.name = name;
     }
@@ -283,4 +292,38 @@ public class User extends Entity implements UserDetails
     {
         this.refreshInterval = refreshInterval;
     }
+
+    public List<String> getAliases()
+    {
+        return aliases;
+    }
+
+    private void setAliases(List<String> aliases)
+    {
+        this.aliases = aliases;
+    }
+
+    public void addAlias(String alias)
+    {
+        aliases.add(alias);
+    }
+
+    public boolean removeAlias(String alias)
+    {
+        return aliases.remove(alias);
+    }
+
+    public void removeAlias(int index)
+    {
+        if (index <= aliases.size())
+        {
+            aliases.remove(index);
+        }
+    }
+
+    public boolean hasAlias(String alias)
+    {
+        return aliases.contains(alias);
+    }
+
 }

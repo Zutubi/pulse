@@ -1,10 +1,9 @@
 package com.cinnamonbob.acceptance;
 
-import com.cinnamonbob.acceptance.forms.EditPasswordForm;
-import com.cinnamonbob.acceptance.forms.EditUserForm;
-import com.cinnamonbob.acceptance.forms.EmailContactForm;
-import com.cinnamonbob.acceptance.forms.UserSettingsForm;
+import com.cinnamonbob.acceptance.forms.*;
 import com.cinnamonbob.core.util.RandomUtils;
+import net.sourceforge.jwebunit.ExpectedRow;
+import net.sourceforge.jwebunit.ExpectedTable;
 
 /**
  *
@@ -60,6 +59,8 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
                 new String[]{"login", login},   // login row
                 new String[]{"name", login}     // name row
         });
+
+        assertAliasesTable();
 
         assertSettingsTable("welcome", "every 60 seconds");
 
@@ -237,7 +238,53 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         // check that the new password and confirm password are correctly checked.
         form.saveFormElements(login, "a", "b");
         assertTextPresent("does not match");
+    }
 
+    public void testAddAlias()
+    {
+        assertAndClick("alias.add");
+
+        AddAliasForm form = new AddAliasForm(tester);
+        form.assertFormPresent();
+
+        form.saveFormElements("alias1");
+
+        assertAliasesTable("alias1");
+    }
+
+    public void testAddAliasValidation()
+    {
+        testAddAlias();
+
+        assertAndClick("alias.add");
+
+        AddAliasForm form = new AddAliasForm(tester);
+        form.assertFormPresent();
+
+        form.saveFormElements("");
+        form.assertFormPresent();
+        assertTextPresent("alias is required");
+
+        form.saveFormElements("alias1");
+        form.assertFormPresent();
+        assertTextPresent("you have already configured an alias with the same value");
+    }
+
+    public void testAddAliasCancel()
+    {
+        assertAndClick("alias.add");
+
+        AddAliasForm form = new AddAliasForm(tester);
+        form.assertFormPresent();
+        form.cancelFormElements("aliasCancelled");
+        assertAliasesTable();
+    }
+
+    public void testDeleteAlias()
+    {
+        testAddAlias();
+        assertAndClick("deleteAlias1");
+        assertAliasesTable();
     }
 
     public void testEditSettings()
@@ -281,6 +328,21 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         form.saveFormElements("dashboard", "true", "0");
         form.assertFormPresent();
         assertTextPresent("refresh interval must be a positive number");
+    }
+
+    private void assertAliasesTable(String ...aliases)
+    {
+        assertTablePresent("aliases");
+        ExpectedTable expectedTable = new ExpectedTable();
+        expectedTable.appendRow(new ExpectedRow(new String[]{"aliases", "aliases"}));
+        expectedTable.appendRow(new ExpectedRow(new String[]{"alias", "actions"}));
+        for (String alias : aliases)
+        {
+            expectedTable.appendRow(new ExpectedRow(new String[]{alias, "delete"}));
+        }
+        expectedTable.appendRow(new ExpectedRow(new String[]{"add new alias", "add new alias"}));
+
+        assertTableEquals("aliases", expectedTable);
     }
 
     private void assertSettingsTable(String defaultAction, String refreshInterval)

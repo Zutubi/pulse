@@ -1,0 +1,20 @@
+#authorisationTags($principle)
+<content tag="selectedTab">dashboard</content>
+<html>
+<head>
+    <title>#wwtext("name=alias.create")</title>
+</head>
+<body>
+
+    <h1>:: #wwtext("name=alias.create") ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+    #wwcform("action=addAlias.action" "heading=%{getText('alias.create')}" "method=post" "id=alias.create")
+        #wwhidden("name=userId")
+
+        #wwtextfield("name=alias" "label=%{getText('alias')}" "required=true" "tabindex=1")
+        #saveCancel(2)
+    #end
+</body>
+</html>

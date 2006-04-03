@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -28,8 +29,11 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from Changelist model where model.revision.author = :login order by id desc");
-                queryObject.setParameter("login", user.getLogin());
+                Query queryObject = session.createQuery("from Changelist model where model.revision.author in (:logins) order by id desc");
+                List<String> allLogins = new LinkedList<String>();
+                allLogins.add(user.getLogin());
+                allLogins.addAll(user.getAliases());
+                queryObject.setParameterList("logins", allLogins);
                 queryObject.setMaxResults(max);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());

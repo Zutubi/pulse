@@ -530,6 +530,17 @@
 #end
 
 ##
+## Outputs a content row for the tail of a content table
+##
+#macro(contentRow $key $span)
+    <tr>
+        <td class="content" colspan="$span">
+            #wwtext("name=$key")
+        </td>
+    </tr>
+#end
+
+##
 ## Outputs an add row for the tail of a content table
 ##
 #macro(addRow $key $span $url $id)

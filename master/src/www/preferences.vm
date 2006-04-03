@@ -20,6 +20,21 @@
                     #dynamicRow("user.login" $user.login)
                     #dynamicRow("user.name" $user.name)
                 </table>
+                <table id="aliases" class="fill-content">
+                    #headingRow("aliases" 2)
+                    <tr>
+                        #contentHeading("alias" 1)
+                        #contentHeading("actions" 1)
+                    </tr>
+#foreach($alias in $user.aliases)
+    #set($confirmMessage = $action.getText("alias.delete.confirm", [$!webwork.htmlEncode($alias)]))
+                    <tr>
+                        #dynamicCell($alias)
+                        #deleteCell($confirmMessage "/user/deleteAlias.action?userId=$user.id&index=$velocityCount" "deleteAlias$velocityCount")
+                    </tr>
+#end
+                    #addRow("alias.add" 2 "/user/addAlias!input.action?userId=$user.id" "alias.add")
+                </table>
                 <table id="settings" class="fill-content">
                     #editHeadingRow("settings" 2 "user/editUserSettings!input.action?userId=$user.id" "user.settings")
                     #dynamicRow("user.default.page" $user.defaultAction)
@@ -35,15 +50,15 @@
                         #contentHeading("actions" 2)
                     </tr>
 
-                    #foreach ($contact in $user.contactPoints)
+#foreach ($contact in $user.contactPoints)
                     <tr>
-                        #set($confirmMessage = $action.getText("contact.delete.confirm", [$contact.name]))
+    #set($confirmMessage = $action.getText("contact.delete.confirm", [$contact.name]))
                         #dynamicCell($contact.name)
                         #dynamicCell($contact.uid)
                         #editCell("/user/editContactPoint!default.action?id=$contact.id&userId=$user.id" "edit_$!webwork.htmlEncode($contact.name)")
                         #deleteCell($confirmMessage "/user/deleteContactPoint.action?id=$contact.id&userId=$user.id" "delete_$!webwork.htmlEncode($contact.name)")
                     </tr>
-                    #end
+#end
                     #addRow("contact.create" 4 "/user/contactWizard.action?userId=$user.id" "contact.create")
                 </table>
                 <table id="subscriptions" class="fill-content">
@@ -55,27 +70,27 @@
                         #contentHeading("actions" 2)
                     </tr>
 
-                #foreach ($subscription in $user.subscriptions)
-                    #set($contact = $subscription.contactPoint)
-                    #set($project = $subscription.project)
+#foreach ($subscription in $user.subscriptions)
+    #set($contact = $subscription.contactPoint)
+    #set($project = $subscription.project)
+    #set($confirmMessage = $action.getText("subscription.delete.confirm", [$project.name]))
                     <tr>
-                        #set($confirmMessage = $action.getText("subscription.delete.confirm", [$project.name]))
                         #dynamicCell($project.name)
                         #dynamicCell($contact.uid)
                         #dynamicCell($subscription.condition)
                         #editCell("/user/editSubscription!input.action?id=$subscription.id&login=$user.login")
                         #deleteCell($confirmMessage "/user/deleteSubscription.action?id=$subscription.id&login=$user.login" "delete_$!webwork.htmlEncode($project.name)_$!webwork.htmlEncode($contact.uid)")
                     </tr>
-                #end
+#end
                 <!--
                  can only create subscriptions is the system has configured projects accessible to
                  the user AND the user has configured contact points.
                 -->
-                #if($user.contactPoints.size() > 0)
+#if($user.contactPoints.size() > 0)
                     #addRow("subscription.create" 5 "/user/createSubscription!input.action?userId=$user.id" "subscription.create")
-                #else
+#else
                     <td class="content" colspan="5">#wwtext("name=subscription.requires.contact")</td>
-                #end
+#end
                 </table>
             </td>
         </tr>

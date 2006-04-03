@@ -559,6 +559,18 @@
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
+        <action name="addAlias" class="com.cinnamonbob.web.user.AddAliasAction">
+            <result name="input" type="velocity">add-alias.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="deleteAlias" class="com.cinnamonbob.web.user.DeleteAliasAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
         <action name="editUserSettings" class="com.cinnamonbob.web.user.EditUserSettingsAction">
             <result name="input" type="velocity">edit-user-settings.vm</result>
             <result name="error" type="velocity">edit-user-settings.vm</result>

@@ -3,10 +3,13 @@ package com.cinnamonbob.model.persistence.hibernate;
 import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.CvsRevision;
+import com.cinnamonbob.core.model.NumericalRevision;
+import com.cinnamonbob.model.User;
 import com.cinnamonbob.model.persistence.ChangelistDao;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 
@@ -49,5 +52,52 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
         Change otherChange = otherList.getChanges().get(0);
         assertPropertyEquals(change, otherChange);
+    }
+
+    public void testLatestByUser()
+    {
+        changelistDao.save(createChangelist(1, "login1"));
+        changelistDao.save(createChangelist(2, "login2"));
+        changelistDao.save(createChangelist(3, "login1"));
+        changelistDao.save(createChangelist(4, "login1"));
+        changelistDao.save(createChangelist(5, "login2"));
+
+        commitAndRefreshTransaction();
+
+        List<Changelist> changes = changelistDao.findLatestByUser(new User("login1", "Login One"), 10);
+        assertEquals(3, changes.size());
+        assertEquals("4", changes.get(0).getRevision().getRevisionString());
+        assertEquals("3", changes.get(1).getRevision().getRevisionString());
+        assertEquals("1", changes.get(2).getRevision().getRevisionString());
+    }
+
+    public void testLatestByUserAlias()
+    {
+        changelistDao.save(createChangelist(1, "login1"));
+        changelistDao.save(createChangelist(2, "login2"));
+        changelistDao.save(createChangelist(3, "login1"));
+        changelistDao.save(createChangelist(4, "alias1"));
+        changelistDao.save(createChangelist(5, "alias2"));
+        changelistDao.save(createChangelist(6, "alias3"));
+
+        commitAndRefreshTransaction();
+
+        User user = new User("login1", "Login One");
+        user.addAlias("alias1");
+        user.addAlias("alias3");
+
+        List<Changelist> changes = changelistDao.findLatestByUser(user, 10);
+        assertEquals(4, changes.size());
+        assertEquals("6", changes.get(0).getRevision().getRevisionString());
+        assertEquals("4", changes.get(1).getRevision().getRevisionString());
+        assertEquals("3", changes.get(2).getRevision().getRevisionString());
+        assertEquals("1", changes.get(3).getRevision().getRevisionString());
+    }
+
+    private Changelist createChangelist(long number, String login)
+    {
+        NumericalRevision revision = new NumericalRevision(number);
+        revision.setAuthor(login);
+        return new Changelist(revision);
     }
 }
