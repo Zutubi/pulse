@@ -54,7 +54,7 @@
     </div>
 
     <p>
-        <a href="dismissWelcome.action"><img alt="$!webwork.getText('delete')" src="images/delete.gif".>dismiss this page forever</a>
+        <a href="dismissWelcome.action"><img alt="$!webwork.getText('delete')" src="images/delete.gif">dismiss this page</a>
     </p>
 </body>
 </html>

@@ -34,6 +34,15 @@ public class DatabaseBootstrap implements ApplicationContextAware, Stoppable
     {
         if (!schemaExists())
         {
+            try
+            {
+                JDBCUtils.execute(dataSource, "SET PROPERTY \"hsqldb.default_table_type\" 'cached'");
+            }
+            catch (SQLException e)
+            {
+                LOG.error(e);
+            }
+
             LocalSessionFactoryBean factoryBean = (LocalSessionFactoryBean) context.getBean("&sessionFactory");
             factoryBean.createDatabaseSchema();
 
