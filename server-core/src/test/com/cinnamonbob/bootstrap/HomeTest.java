@@ -53,7 +53,7 @@ public class HomeTest extends BobTestCase
 
         assertTrue(home.isInitialised());
         assertTrue(homeDir.exists());
-        assertTrue(new File(homeDir, "version.properties").exists());
+        assertTrue(new File(homeDir, Home.CONFIG_FILE_NAME).exists());
     }
 
     public void testVersionDetails() throws IOException

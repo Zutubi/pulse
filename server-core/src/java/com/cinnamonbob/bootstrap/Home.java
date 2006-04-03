@@ -27,7 +27,7 @@ public class Home implements UserPaths
     private File userConfigRoot;
     private File projectRoot;
     private File databaseRoot;
-    private static final String CONFIG_FILE_NAME = "bob.config.properties";
+    public static final String CONFIG_FILE_NAME = "bob.config.properties";
 
     public Home(File homeDir)
     {
