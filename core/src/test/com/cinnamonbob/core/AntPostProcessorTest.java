@@ -67,7 +67,7 @@ public class AntPostProcessorTest extends BobTestCase
     public void testJavacError() throws Exception
     {
         createAndProcessArtifact("javacError");
-        assertEquals(2, artifact.getFeatures(Feature.Level.ERROR).size());
+        assertEquals(1, artifact.getFeatures(Feature.Level.ERROR).size());
         List<Feature> features = artifact.getFeatures(Feature.Level.ERROR);
         Feature feature = features.get(0);
         assertEquals("\n" +
@@ -76,14 +76,6 @@ public class AntPostProcessorTest extends BobTestCase
                 "compile:\n" +
                 "    [javac] Compiling 1 source file to /home/jsankey/svn/oro/trunk/classes\n" +
                 "    [javac] /home/jsankey/svn/oro/trunk/src/java/org/apache/oro/io/RegexFilenameFilter.java:41: ';' expected\n" +
-                "    [javac]   PatternMatcher _matcher;\n" +
-                "    [javac]   ^\n" +
-                "    [javac] 1 error\n" +
-                "\n" +
-                "BUILD FAILED",
-                feature.getSummary());
-        feature = features.get(1);
-        assertEquals("    [javac] /home/jsankey/svn/oro/trunk/src/java/org/apache/oro/io/RegexFilenameFilter.java:41: ';' expected\n" +
                 "    [javac]   PatternMatcher _matcher;\n" +
                 "    [javac]   ^\n" +
                 "    [javac] 1 error\n" +
