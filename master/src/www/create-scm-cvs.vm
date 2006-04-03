@@ -17,7 +17,8 @@
         #tag (TextField "name='cvs.path'" "label='scm.path'" "tabindex='2'")
         #tag (TextField "required='true'" "name='cvs.root'" "tabindex='3'")
         #tag (TextField "name='cvs.module'" "tabindex='4'")
-        #tag (Password "name='cvs.password'" "tabindex='5'")
+        #tag (TextField "name='cvs.branch'" "tabindex='5'")
+        #tag (Password "name='cvs.password'" "tabindex='6'")
     </fieldset>
 
     <fieldset class="submit">

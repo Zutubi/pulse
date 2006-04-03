@@ -63,7 +63,7 @@ public class CvsServerTest extends BobTestCase
     public void testCheckoutFileAtHead() throws SCMException
     {
         String module = "unit-test/CvsServerTest/testCheckoutRevisionOfFile";
-        CvsServer cvsServer = new CvsServer(cvsRoot, module, null);
+        CvsServer cvsServer = new CvsServer(cvsRoot, module, null, null);
 
         CvsRevision byHead = CvsRevision.HEAD;
         assertEquals("file1.txt latests contents", cvsServer.checkout(1, byHead, module + "/file1.txt").trim());
@@ -72,7 +72,7 @@ public class CvsServerTest extends BobTestCase
     public void testCheckoutFileByRevision() throws SCMException
     {
         String module = "unit-test/CvsServerTest/testCheckoutRevisionOfFile";
-        CvsServer cvsServer = new CvsServer(cvsRoot, module, null);
+        CvsServer cvsServer = new CvsServer(cvsRoot, module, null, null);
 
         CvsRevision byRevision = new CvsRevision(null, "1.2", null, null);
         assertEquals("file1.txt revision 1.2 contents", cvsServer.checkout(1, byRevision, module + "/file1.txt").trim());
@@ -84,7 +84,7 @@ public class CvsServerTest extends BobTestCase
     public void testCheckoutFileByDate() throws SCMException, ParseException
     {
         String module = "unit-test/CvsServerTest/testCheckoutRevisionOfFile";
-        CvsServer cvsServer = new CvsServer(cvsRoot, module, null);
+        CvsServer cvsServer = new CvsServer(cvsRoot, module, null, null);
 
         // checkout the revision of the file based on date.
         Revision byDate = new CvsRevision(null, null, null, CVSDATE.parse("2006-03-11 03:10:07"));
@@ -94,7 +94,7 @@ public class CvsServerTest extends BobTestCase
     public void testCheckoutHead() throws SCMException, IOException, ParseException
     {
         String module = "unit-test/CvsServerTest/testCheckout";
-        CvsServer cvsServer = new CvsServer(cvsRoot, module, null);
+        CvsServer cvsServer = new CvsServer(cvsRoot, module, null, null);
 
         Date before = new Date();
         CvsRevision checkedOutRevision = (CvsRevision) cvsServer.checkout(workdir, CvsRevision.HEAD);
@@ -112,7 +112,7 @@ public class CvsServerTest extends BobTestCase
     public void testCheckoutByDate() throws SCMException, IOException, ParseException
     {
         String module = "unit-test/CvsServerTest/testCheckout";
-        CvsServer cvsServer = new CvsServer(cvsRoot, module, null);
+        CvsServer cvsServer = new CvsServer(cvsRoot, module, null, null);
 
         // test checkout based on date before the files were added to the repository.
         Revision byDate = new CvsRevision(null, null, null, CVSDATE.parse("2006-03-11 02:30:00"));
@@ -127,7 +127,7 @@ public class CvsServerTest extends BobTestCase
 
     public void testListRoot() throws SCMException
     {
-        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null);
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
         List<RemoteFile> files = cvsServer.getListing("");
         assertEquals(1, files.size());
         assertEquals("unit-test", files.get(0).getPath());
@@ -136,7 +136,7 @@ public class CvsServerTest extends BobTestCase
 
     public void testListing() throws SCMException
     {
-        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null);
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
         List<RemoteFile> files = cvsServer.getListing("unit-test/CvsClientTest/testRlog");
         assertEquals(4, files.size());
 
@@ -151,7 +151,7 @@ public class CvsServerTest extends BobTestCase
 
     public void testListingNonExistent()
     {
-        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null);
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
         try
         {
             cvsServer.getListing("nosuchpath");
@@ -166,7 +166,7 @@ public class CvsServerTest extends BobTestCase
 
     public void testTestConnection()
     {
-        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null);
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
         try
         {
             cvsServer.testConnection();
@@ -179,7 +179,7 @@ public class CvsServerTest extends BobTestCase
 
     public void testTestConnectionInvalidModule()
     {
-        CvsServer cvsServer = new CvsServer(cvsRoot, "some invalid module here", null);
+        CvsServer cvsServer = new CvsServer(cvsRoot, "some invalid module here", null, null);
         try
         {
             cvsServer.testConnection();

@@ -19,7 +19,6 @@ import org.netbeans.lib.cvsclient.command.GlobalOptions;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
-import org.netbeans.lib.cvsclient.command.tag.RtagCommand;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.connection.Connection;
 
@@ -40,7 +39,8 @@ public class CvsClient
      * The date format used when sending dates to the CVS server.
      */
     private static final SimpleDateFormat CVSDATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-    static {
+    static
+    {
         // cvs servers talk in GMT.
         CVSDATE.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
@@ -61,6 +61,9 @@ public class CvsClient
      */
     private File localPath;
 
+    /**
+     *
+     */
     private String password;
 
     /**
@@ -155,8 +158,7 @@ public class CvsClient
             GlobalOptions globalOptions = new GlobalOptions();
             globalOptions.setCVSRoot(root.toString());
 
-            connection = ConnectionFactory.getConnection(root, password);
-            connection.open();
+            connection = openConnection();
 
             Client client = new Client(connection, new StandardAdminHandler());
             client.getEventManager().addCVSListener(new LoggingListener());
@@ -274,56 +276,6 @@ public class CvsClient
     public void update()
     {
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Tag the remote repository.
-     *
-     * @param tag
-     * @param module
-     * @param date
-     * @throws SCMException
-     */
-    public void tag(String tag, String module, Date date) throws SCMException
-    {
-        // WARNING: This has not been tested...
-        Connection connection = null;
-        try
-        {
-            GlobalOptions globalOptions = new GlobalOptions();
-            globalOptions.setCVSRoot(root.toString());
-
-            connection = ConnectionFactory.getConnection(root, password);
-            connection.open();
-
-            Client client = new Client(connection, new StandardAdminHandler());
-
-            RtagCommand rtag = new RtagCommand();
-            rtag.setTag(tag);
-            rtag.setOverrideExistingTag(true);
-            rtag.setModules(new String[]{module});
-            if (date != null)
-            {
-                rtag.setTagByDate(CVSDATE.format(date));
-            }
-            client.executeCommand(rtag, globalOptions);
-        }
-        catch (AuthenticationException ae)
-        {
-            throw handleAuthenticationException(ae);
-        }
-        catch (CommandAbortedException cae)
-        {
-            throw new SCMException(cae);
-        }
-        catch (CommandException ce)
-        {
-            throw new SCMException(ce);
-        }
-        finally
-        {
-            CvsUtils.close(connection);
-        }
     }
 
     //-------------------------------------------------------------------------
@@ -490,8 +442,7 @@ public class CvsClient
             GlobalOptions globalOptions = new GlobalOptions();
             globalOptions.setCVSRoot(root.toString());
 
-            connection = ConnectionFactory.getConnection(root, password);
-            connection.open();
+            connection = openConnection();
 
             final List<LogInformation> rlogResponse = new LinkedList<LogInformation>();
 
@@ -548,6 +499,13 @@ public class CvsClient
         {
             CvsUtils.close(connection);
         }
+    }
+
+    private Connection openConnection() throws AuthenticationException, CommandAbortedException
+    {
+        Connection connection = ConnectionFactory.getConnection(root, password);
+        connection.open();
+        return connection;
     }
 
     /**

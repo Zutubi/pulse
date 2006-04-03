@@ -57,7 +57,7 @@ public class MonitorScms implements Task
                     LOG.finer("server has changed since " + previous);
                     if (scm instanceof Cvs)
                     {
-                        Date latestUpdate = ((CvsServer)server).getLatestUpdate(null, previous.getDate());
+                        Date latestUpdate = ((CvsServer)server).getLatestUpdate(previous);
                         // if that update is more then the quiet period ago, then trigger an event.
                         long now = System.currentTimeMillis();
                         if (now - latestUpdate.getTime() > ((Cvs)scm).getQuietPeriod())

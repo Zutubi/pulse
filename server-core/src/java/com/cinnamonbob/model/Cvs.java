@@ -27,13 +27,18 @@ public class Cvs extends Scm
      */
     private static final String MODULE = "cvs.module";
 
+    /**
+     * The cvs quiet period property string.
+     */
     private static final String QUIET_PERIOD = "cvs.quiet";
+
+    private static final String BRANCH = "cvs.branch";
 
     public SCMServer createServer() throws SCMException
     {
         // use a manual autowire here since this object itself is not wired, and so
         // does not have access to the object factory.
-        CvsServer server = new CvsServer(getRoot(), getModule(), getPassword());
+        CvsServer server = new CvsServer(getRoot(), getModule(), getPassword(), getBranch());
         ComponentContext.autowire(server);
         return server;
     }
@@ -83,6 +88,23 @@ public class Cvs extends Scm
         getProperties().setProperty(PASS, password);
     }
 
+    public String getBranch()
+    {
+        return getProperties().getProperty(BRANCH);
+    }
+
+    public void setBranch(String branch)
+    {
+        getProperties().setProperty(BRANCH, branch);
+    }
+
+    /**
+     * The quiet period is an amount of time (in milliseconds) after a cvs checkin that
+     * the scm monitoring process will wait before generating an scm change event. During this
+     * period is is required that no other checkins / changes are made in cvs.
+     *
+     * @return time in milliseconds.
+     */
     public long getQuietPeriod()
     {
         if (getProperties().containsKey(QUIET_PERIOD))

@@ -30,16 +30,18 @@ public class CvsServer implements SCMServer
     private String cvsRoot;
     private String cvsModule;
     private String cvsPassword;
+    private String cvsBranch;
 
     private File tmpSpace;
 
     private static final Logger LOG = Logger.getLogger(CvsServer.class);
 
-    public CvsServer(String root, String module, String password)
+    public CvsServer(String root, String module, String password, String branch)
     {
         this.cvsRoot = root;
         this.cvsModule = module;
         this.cvsPassword = password;
+        this.cvsBranch = branch;
     }
 
     public String getLocation()
@@ -276,8 +278,8 @@ public class CvsServer implements SCMServer
         // cvs is not atomic, so take the current time and restrict the checkout to 'now'
         // to prevent problems with people checking in during the checkout.
 
-        Date now = new Date(System.currentTimeMillis()); // this needs to be GMT 00.
-        return new CvsRevision(null, null, null, now);
+        Date now = new Date(System.currentTimeMillis());
+        return new CvsRevision(null, cvsBranch, null, now);
     }
 
     public RemoteFile getFile(String path) throws SCMException
@@ -306,11 +308,32 @@ public class CvsServer implements SCMServer
         }
     }
 
-    public Date getLatestUpdate(String revision, Date date) throws SCMException
+    public Date getLatestUpdate(Revision since) throws SCMException
     {
         CvsClient client = new CvsClient(cvsRoot);
         client.setPassword(cvsPassword);
-        return client.getLastUpdate(cvsModule, revision, date);
+        return client.getLastUpdate(cvsModule, since.getBranch(), since.getDate());
+    }
+
+    /**
+     * Configure the temporary space root. This defaults to the users temporary directories.
+     *
+     */
+    public void setTemporarySpace(File file)
+    {
+        this.tmpSpace = file;
+    }
+
+    /**
+     * The configuration manager is required to provide access to the system temporary root directory.
+     *
+     * @param configurationManager
+     *
+     * @see CvsServer#setTemporarySpace(java.io.File)
+     */
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        setTemporarySpace(configurationManager.getSystemPaths().getTmpRoot());
     }
 
     void populateCache(CvsFileCache.CacheItem item) throws SCMException
@@ -372,26 +395,4 @@ public class CvsServer implements SCMServer
             }
         }
     }
-
-    /**
-     * Configure the temporary space root. This defaults to the users temporary directories.
-     *
-     */
-    public void setTemporarySpace(File file)
-    {
-        this.tmpSpace = file;
-    }
-
-    /**
-     * The configuration manager is required to provide access to the system temporary root directory.
-     *
-     * @param configurationManager
-     *
-     * @see CvsServer#setTemporarySpace(java.io.File)
-     */
-    public void setConfigurationManager(ConfigurationManager configurationManager)
-    {
-        setTemporarySpace(configurationManager.getSystemPaths().getTmpRoot());
-    }
-
 }
