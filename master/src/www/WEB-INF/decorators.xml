@@ -4,6 +4,7 @@
     <!-- No decorator -->
     <excludes>
         <pattern>/ajax/*</pattern>
+        <pattern>/popups/*</pattern>
         <pattern>/view/*</pattern>
     </excludes>
 

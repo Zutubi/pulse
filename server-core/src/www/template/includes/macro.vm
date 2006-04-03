@@ -1550,7 +1550,7 @@
 ##
 ## Shows a directory listing on a browsing page
 ##
-#macro(showDirectoryListing $root $url)
+#macro(showDirectoryListing $root $url $dirAction $fileAction)
     <table class="content">
         #headingRow("$action.getText('path') :: ${root}/$!webwork.htmlEncode($displayPath)" 4)
         <tr>
@@ -1560,18 +1560,29 @@
     #if($showSizes)
             #contentHeading("size" 1)
     #end
+    #if($fileAction || $dirAction)
+            #contentHeading("actions" 1)
+    #end
         </tr>
 #foreach($entry in $entries)
         <tr>
-            <td class="image">
     #if($entry.isDirectory())
+            <td class="image">
                 <img src="/images/folder.gif"/>
-    #else
-                <img src="/images/page.gif"/>
-    #end
             </td>
-            #dynamicLinkCell($entry.name "${url}&amp;path=$entry.path")
+            #dynamicLinkCell($entry.name "${url}path=$entry.path")
             #contentCell($entry.mimeType)
+    #elseif(!$dirAction)
+            <td class="image">
+                <img src="/images/page.gif"/>
+            </td>
+        #if($fileAction)
+            #dynamicCell($!webwork.htmlEncode($entry.name))
+        #else
+            #dynamicLinkCell($entry.name "${url}path=$entry.path")
+        #end
+            #contentCell($entry.mimeType)
+    #end
     #if($showSizes)
             <td class="content-right">
         #if($entry.isDirectory())
@@ -1580,6 +1591,21 @@
                 $entry.prettySize
         #end
             </td>
+    #end
+    #if($entry.isDirectory())
+        #if($dirAction && $entry.name != "..")
+            <td class="content">
+                <a href="#" onclick="${dirAction}('$entry.path'); return false;">#wwtext("name=select")</a>
+            </td>
+        #elseif($fileAction)
+            #contentCell("empty.cell")
+        #end
+    #elseif(!$dirAction)
+        #if($fileAction)
+            <td class="content">
+                <a href="#" onclick="${fileAction}('$entry.path'); return false;">#wwtext("name=select")</a>
+            </td>
+        #end
     #end
         </tr>
 #end

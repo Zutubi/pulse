@@ -82,20 +82,7 @@ public class AddProjectWizard extends BaseWizard
         project.setUrl(projectDetails.getUrl());
 
         // setup scm details.
-        Scm scm = null;
-        String scmType = projectDetails.getScm();
-        if ("cvs".equals(scmType))
-        {
-            scm = cvsDetails.getCvs();
-        }
-        else if ("svn".equals(scmType))
-        {
-            scm = svnDetails.getSvn();
-        }
-        else if ("p4".equals(scmType))
-        {
-            scm = p4Details.getP4();
-        }
+        Scm scm = getScm();
         project.setScm(scm);
 
         // configure bob file.
@@ -151,6 +138,25 @@ public class AddProjectWizard extends BaseWizard
             //CIB-169: need to display this error to the user...
             LOG.severe(e.getMessage(), e);
         }
+    }
+
+    public Scm getScm()
+    {
+        Scm scm = null;
+        String scmType = projectDetails.getScm();
+        if ("cvs".equals(scmType))
+        {
+            scm = cvsDetails.getCvs();
+        }
+        else if ("svn".equals(scmType))
+        {
+            scm = svnDetails.getSvn();
+        }
+        else if ("p4".equals(scmType))
+        {
+            scm = p4Details.getP4();
+        }
+        return scm;
     }
 
     public void setScheduler(Scheduler scheduler)

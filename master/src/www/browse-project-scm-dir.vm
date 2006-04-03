@@ -7,5 +7,5 @@
 <body>
     <h1>:: #wwtext("name=scm.browse") ::</h1>
 
-    #showDirectoryListing("$!webwork.htmlEncode($location)" "browseProjectScm.action?id=$project.id")
+    #showDirectoryListing("$!webwork.htmlEncode($location)" "browseProjectScm.action?id=$project.id&amp;" false false)
 </html>

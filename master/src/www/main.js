@@ -66,3 +66,14 @@ function submitenter(field, evt)
         return true;
     }
 }
+
+// Function for opening an SCM browse window used on several forms\
+//   - selectDir: set to true for selecting a directory, false for a file
+//   - elementId: ID of textbox to set the value of to the selected path
+//   - extraArgs: optional extra arguments for param string (e.g. "&prefix=foo")
+function openBrowseWindow(selectDir, elementId, extraArgs)
+{
+    var browseWindow = window.open("/popups/browseScm.action?selectDir=" + selectDir + "&elementId=" + elementId + extraArgs, "browse scm", 'status=yes,resizable=yes,top=100,left=100,width=600,height=600,scrollbars=yes');
+    browseWindow.opener = self;
+    browseWindow.focus();
+}

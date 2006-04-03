@@ -3,6 +3,15 @@
 <html>
 <head>
     <title>#wwtext("name=edit.custom")</title>
+    <script type="text/javascript" src="/prototype.js"></script>
+    <script type="text/javascript">
+    <!--
+    	function openFileWindow()
+    	{
+    	    openBrowseWindow(false, "custom.edit_details_bobFileName", "&id=$project.id");
+    	}
+    -->
+    </script>
 </head>
 <body>
     <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
@@ -13,7 +22,7 @@
     #wwhidden("name=id")
     #wwhidden("name=projectId")
 
-    #wwtextfield("name=details.bobFileName" "label=%{getText('bob.filename')}" "required=true" "size=40" "tabindex=1")
+    #wwtextfield("name=details.bobFileName" "label=%{getText('bob.filename')}" "after= <a href='#' onclick='openFileWindow(); return false;'>browse</a>" "required=true" "size=40" "tabindex=1")
     #inlineHelp("bob.filename.help")
     
     #saveCancel(2)

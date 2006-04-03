@@ -22,12 +22,10 @@
     #inlineHelp("svn.keyfile.help")
     #wwpassword("name=svn.passphrase" "label=%{getText('svn.passphrase')}" "tabindex=5" "onkeypress=return submitenter(this,event)")
     #inlineHelp("svn.passphrase.help")
-    #wwtextfield("name=svn.path" "label=%{getText('scm.path')}" "size=60" "tabindex='6'" "onkeypress=return submitenter(this,event)")
-    #inlineHelp("scm.path.help")
 
     #scmTestRow()
 
-    #previousNextCancel(7)
+    #previousNextCancel(6)
 #end
 </body>
 </html>
