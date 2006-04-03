@@ -182,7 +182,7 @@ public class CvsClient
 
             if (!client.executeCommand(checkout, globalOptions))
             {
-                LOG.error("Execution of checkout command failed. Reason is unknown.");
+                throw new SCMException("Execution of checkout command failed. Reason is unknown.");
             }
         }
         catch (AuthenticationException ae)
