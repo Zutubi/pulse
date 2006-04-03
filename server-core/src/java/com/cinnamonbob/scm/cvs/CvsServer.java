@@ -48,7 +48,7 @@ public class CvsServer implements SCMServer
     {
         CvsClient client = new CvsClient(cvsRoot);
         client.setPassword(cvsPassword);
-        client.testConnection();
+        client.testConnection(cvsModule);
     }
 
     public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException

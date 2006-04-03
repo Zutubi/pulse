@@ -111,8 +111,9 @@ public class CvsClient
         checkout(module, null, null);
     }
 
-    public void testConnection() throws SCMException
+    public void testConnection(String module) throws SCMException
     {
+        // test connection to cvs server.
         Connection connection = null;
         try
         {
@@ -127,6 +128,9 @@ public class CvsClient
         {
             CvsUtils.close(connection);
         }
+
+        // test defined module.
+
     }
 
     /**

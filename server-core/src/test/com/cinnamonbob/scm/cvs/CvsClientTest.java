@@ -430,6 +430,30 @@ public class CvsClientTest extends BobTestCase
         assertEquals(4, results.size());
     }
 
+    public void testTestConnection()
+    {
+        // tset a valid module.
+        try
+        {
+            cvs.testConnection("unit-test");
+        }
+        catch (SCMException e)
+        {
+            fail("did not expect an exception.");
+        }
+
+        // test an invalid module.
+        try
+        {
+            cvs.testConnection("some unknown module");
+            fail("expected an exception.");
+        }
+        catch (SCMException e)
+        {
+            // noop
+        }
+    }
+
     private static void assertChangelistValues(Changelist changelist, String user, String comment)
     {
         assertEquals(user, changelist.getUser());
