@@ -53,8 +53,8 @@ public class RecipeProcessorTest extends BobTestCase implements EventListener
 
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.removeDirectory(baseDir);
-        FileSystemUtils.removeDirectory(outputDir);
+        removeDirectory(baseDir);
+        removeDirectory(outputDir);
         recipeProcessor = null;
         eventManager = null;
         events = null;
@@ -171,6 +171,11 @@ public class RecipeProcessorTest extends BobTestCase implements EventListener
         semaphore.release();
         assertNoMoreEvents();
         thread.join();
+
+        // there are some file resources that are not being cleaned up in time for the
+        // remove directory call in the tearDown. So, we sleep briefly here to give the
+        // terminated child process (?) a chance to release its resources.
+        Thread.sleep(100);
     }
 
     public void testTerminateDuringCommand() throws Exception
@@ -192,6 +197,11 @@ public class RecipeProcessorTest extends BobTestCase implements EventListener
         semaphore.release();
         assertNoMoreEvents();
         thread.join();
+
+        // there are some file resources that are not being cleaned up in time for the
+        // remove directory call in the tearDown. So, we sleep briefly here to give the
+        // terminated child process (?) a chance to release its resources.
+        Thread.sleep(100);
     }
 
     private void assertOutputFile(int commandIndex, String commandName, String contents) throws IOException
