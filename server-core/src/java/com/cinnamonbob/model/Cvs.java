@@ -1,5 +1,6 @@
 package com.cinnamonbob.model;
 
+import com.cinnamonbob.bootstrap.ComponentContext;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
 import com.cinnamonbob.scm.cvs.CvsServer;
@@ -30,7 +31,11 @@ public class Cvs extends Scm
 
     public SCMServer createServer() throws SCMException
     {
-        return new CvsServer(getRoot(), getModule(), getPassword());
+        // use a manual autowire here since this object itself is not wired, and so
+        // does not have access to the object factory.
+        CvsServer server = new CvsServer(getRoot(), getModule(), getPassword());
+        ComponentContext.autowire(server);
+        return server;
     }
 
     /**

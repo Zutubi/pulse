@@ -1,5 +1,6 @@
 package com.cinnamonbob.scm.cvs;
 
+import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.core.model.Change;
 import com.cinnamonbob.core.model.Changelist;
 import com.cinnamonbob.core.model.CvsRevision;
@@ -30,6 +31,8 @@ public class CvsServer implements SCMServer
     private String cvsModule;
     private String cvsPassword;
 
+    private File tmpSpace;
+
     private static final Logger LOG = Logger.getLogger(CvsServer.class);
 
     public CvsServer(String root, String module, String password)
@@ -48,7 +51,27 @@ public class CvsServer implements SCMServer
     {
         CvsClient client = new CvsClient(cvsRoot);
         client.setPassword(cvsPassword);
-        client.testConnection(cvsModule);
+        client.testConnection();
+
+        // check that the module is valid.
+        try
+        {
+            File tmpDir = FileSystemUtils.createTempDirectory("cvs", "checkout", tmpSpace);
+
+            client.setLocalPath(tmpDir);
+            client.setPassword(cvsPassword);
+            client.checkout(cvsModule, null, null, false);
+
+            // check that something was checked out.
+            if (tmpDir.list().length == 0)
+            {
+                throw new SCMException("failed to locate the module " + cvsModule);
+            }
+        }
+        catch (IOException e)
+        {
+            throw new SCMException(e);
+        }
     }
 
     public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
@@ -85,7 +108,7 @@ public class CvsServer implements SCMServer
         File tmpDir = null;
         try
         {
-            tmpDir = FileSystemUtils.createTempDirectory("CvsServer", "checkout");
+            tmpDir = FileSystemUtils.createTempDirectory("cvs", "checkout", tmpSpace);
             String tag = revision.getBranch();
             Date date = revision.getDate();
 
@@ -286,6 +309,8 @@ public class CvsServer implements SCMServer
         client.setPassword(cvsPassword);
         List<LogInformation> logs = client.rlog(cvsModule, null, null, null, false);
 
+        // Replace the cvs.rlog call with a non-recursive checkout of the requested directory
+
         CVSRoot root = CVSRoot.parse(cvsRoot);
 
         CachingRemoteFile rootFile = new CachingRemoteFile("", true, null, "");
@@ -333,6 +358,27 @@ public class CvsServer implements SCMServer
                 parent = item.cachedListing.get(path);
             }
         }
-
     }
+
+    /**
+     * Configure the temporary space root. This defaults to the users temporary directories.
+     *
+     */
+    public void setTemporarySpace(File file)
+    {
+        this.tmpSpace = file;
+    }
+
+    /**
+     * The configuration manager is required to provide access to the system temporary root directory.
+     *
+     * @param configurationManager
+     *
+     * @see CvsServer#setTemporarySpace(java.io.File)
+     */
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        setTemporarySpace(configurationManager.getSystemPaths().getTmpRoot());
+    }
+
 }

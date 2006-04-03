@@ -112,10 +112,18 @@ public class FileSystemUtils
         }
     }
 
-
     public static File createTempDirectory(String prefix, String suffix) throws IOException
     {
-        File file = File.createTempFile(prefix, suffix);
+        return createTempDirectory(prefix, suffix, null);
+    }
+
+    public static File createTempDirectory(String prefix, String suffix, File base) throws IOException
+    {
+        if (base != null && !base.exists() && !base.mkdirs())
+        {
+            throw new IOException();
+        }
+        File file = File.createTempFile(prefix, suffix, base);
         if (!file.exists())
         {
             throw new IOException();

@@ -12,6 +12,7 @@ public class ConfigurableSystemPaths implements SystemPaths
     private File contentRoot;
     private File configRoot;
     private File logRoot;
+    private File tmpRoot;
     private List<File> templateRoots;
 
     public File getSystemRoot()
@@ -39,6 +40,11 @@ public class ConfigurableSystemPaths implements SystemPaths
         return templateRoots;
     }
 
+    public File getTmpRoot()
+    {
+        return tmpRoot;
+    }
+
     public void setTemplateRoots(List<File> templateRoots)
     {
         this.templateRoots = templateRoots;
@@ -62,5 +68,10 @@ public class ConfigurableSystemPaths implements SystemPaths
     public void setLogRoot(File logRoot)
     {
         this.logRoot = logRoot;
+    }
+
+    public void setTmpRoot(File tmpRoot)
+    {
+        this.tmpRoot = tmpRoot;
     }
 }

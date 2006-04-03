@@ -37,6 +37,12 @@
                 <property name="configRoot">
                     <value>slave/src/etc</value>
                 </property>
+                <property name="logRoot">
+                    <value>master/system/log</value>
+                </property>
+                <property name="tmpRoot">
+                    <value>master/system/tmp</value>
+                </property>
                 <property name="templateRoots">
                     <list>
                         <value type="java.io.File">server-core/src/www</value>

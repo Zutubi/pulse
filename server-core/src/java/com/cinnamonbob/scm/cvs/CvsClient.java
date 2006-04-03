@@ -111,7 +111,7 @@ public class CvsClient
         checkout(module, null, null);
     }
 
-    public void testConnection(String module) throws SCMException
+    public void testConnection() throws SCMException
     {
         // test connection to cvs server.
         Connection connection = null;
@@ -128,9 +128,6 @@ public class CvsClient
         {
             CvsUtils.close(connection);
         }
-
-        // test defined module.
-
     }
 
     /**
@@ -144,6 +141,11 @@ public class CvsClient
      * @throws SCMException
      */
     public void checkout(String module, String revision, Date date) throws SCMException
+    {
+        checkout(module, revision, date, true);
+    }
+
+    public void checkout(String module, String revision, Date date, boolean recursive) throws SCMException
     {
         module = checkModule(module);
 
@@ -162,7 +164,7 @@ public class CvsClient
 
             CheckoutCommand checkout = new CheckoutCommand();
             checkout.setModule(module);
-            checkout.setPruneDirectories(true);
+            checkout.setRecursive(recursive);
 
             // bind the checkout to the specified tag.
             if (revision != null)

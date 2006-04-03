@@ -435,23 +435,34 @@ public class CvsClientTest extends BobTestCase
         // tset a valid module.
         try
         {
-            cvs.testConnection("unit-test");
+            cvs.testConnection();
         }
         catch (SCMException e)
         {
             fail("did not expect an exception.");
         }
+    }
 
-        // test an invalid module.
+    public void testTestConnectionWithInvalidRoot()
+    {
+        CVSRoot cvsRoot = CVSRoot.parse(":local:/some/invalid/path");
         try
         {
-            cvs.testConnection("some unknown module");
+            new CvsClient(cvsRoot).testConnection();
             fail("expected an exception.");
         }
         catch (SCMException e)
         {
-            // noop
+            // noop, exception was expected.
         }
+    }
+
+    public void testCheckoutWithoutRecursion() throws SCMException
+    {
+        cvs.setLocalPath(workdir);
+        cvs.checkout("unit-test", null, null, false);
+        assertTrue(new File(workdir, "unit-test").exists());
+        assertFalse(new File(workdir, "unit-test/CvsServerTest").exists());
     }
 
     private static void assertChangelistValues(Changelist changelist, String user, String comment)

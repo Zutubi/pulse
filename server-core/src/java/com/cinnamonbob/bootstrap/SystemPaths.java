@@ -49,4 +49,10 @@ public interface SystemPaths
      */
     File getLogRoot();
 
+    /**
+     * Returns the root directory of the systems temporary space.
+     *
+     * @return the directory used for temporary files.
+     */
+    File getTmpRoot();
 }

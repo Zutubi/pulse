@@ -36,7 +36,10 @@
                     <value>master/etc</value>
                 </property>
                 <property name="logRoot">
-                    <value>master/system</value>
+                    <value>master/system/log</value>
+                </property>
+                <property name="tmpRoot">
+                    <value>master/system/tmp</value>
                 </property>
                 <property name="templateRoots">
                     <list>
