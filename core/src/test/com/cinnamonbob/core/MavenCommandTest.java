@@ -57,4 +57,14 @@ public class MavenCommandTest extends BaseCommandTest
         command.setWorkingDir(baseDir);
         successRun(command, "BUILD SUCCESSFUL", "build target", "test target", "_Apache_", "v. 1.0.2");
     }
+
+    public void testExtraArgument() throws IOException
+    {
+        copyBuildFile("basic");
+        MavenCommand command = new MavenCommand();
+        command.setTargets("mybuild");
+        command.setWorkingDir(baseDir);
+        command.addArguments("-X");
+        successRun(command, "Loading plugin", "'maven-j2ee-plugin-1.5.1'", "build target", "_Apache_", "v. 1.0.2");
+    }
 }
