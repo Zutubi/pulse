@@ -1,7 +1,7 @@
 package com.cinnamonbob.web.wizard;
 
-import com.cinnamonbob.web.ActionSupport;
 import com.cinnamonbob.core.ObjectFactory;
+import com.cinnamonbob.web.ActionSupport;
 import com.opensymphony.xwork.ActionContext;
 import junit.framework.TestCase;
 
@@ -12,7 +12,6 @@ import java.util.HashMap;
  */
 public class WizardActionTest extends TestCase
 {
-
     public WizardActionTest(String string)
     {
         super(string);
