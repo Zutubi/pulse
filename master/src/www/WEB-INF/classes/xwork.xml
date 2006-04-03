@@ -106,6 +106,12 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="internalError" class="com.cinnamonbob.web.InternalErrorAction">
+            <result name="success" type="velocity">internal-error.vm</result>
+            <!-- sheesh, that's harsh -->
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="viewProjects" class="com.cinnamonbob.web.project.ViewProjectsAction">
             <result name="success" type="velocity">view-projects.vm</result>
         </action>

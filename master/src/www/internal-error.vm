@@ -1,0 +1,19 @@
+<html>
+<head>
+    <link href="$base/main2.css" rel="stylesheet" type="text/css" media="screen"/>
+    <title>#wwtext("name=internal.error")</title>
+</head>
+<body style="margin: 10px">
+    <h1 style="color: #c04040">:: #wwtext("name=internal.error") ::</h1>
+
+    <p class="error">
+        #wwtext("name=internal.error.blurb")
+    </p>
+
+    <h2 class="section">#wwtext("name=errors")</h2>
+
+#foreach($record in $records)
+    #serverMessage($record)
+#end
+</body>
+</html>

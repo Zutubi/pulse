@@ -15,38 +15,7 @@
     </table>
 
 #foreach($record in $records)
-    <table class="fill-content">
-    #if($action.isError($record))
-        #set($image = "exclamation")
-        #set($cssClass = "error")
-    #elseif($action.isWarning($record))
-        #set($image = "error")
-        #set($cssClass = "warning")
-    #else
-        #set($image = "information")
-        #set($cssClass = "info")
-    #end
-        <tr>
-            <td class="$cssClass" width="26%">$action.getPrettyDate($record.millis) ($action.getPrettyTime($record.millis))</td>
-            <td class="$cssClass" width="9%"><img alt="failure" src="/images/${image}.gif"/> $record.level.toString().toLowerCase()</td>
-            <td class="$cssClass" width="9%">#wwtext("name=count") :: $record.count</td>
-            <td class="$cssClass">$!webwork.htmlEncode("$record.sourceClassName :: $record.sourceMethodName")</td>
-        </tr>
-    #if($record.message)
-        <tr>
-            <td class="content-large" colspan="4">
-                <pre>$!webwork.htmlEncode($record.message)</pre>
-            </td>
-        </tr>
-    #end
-    #if($action.hasThrowable($record))
-        <tr>
-            <td class="content-large" colspan="4">
-                <pre>$!webwork.htmlEncode($action.getStackTrace($record))</pre>
-            </td>
-        </tr>
-    #end
-    </table>
+    #serverMessage($record)
 #end
 
 #if($records.size() > 0)

@@ -35,13 +35,13 @@
         </init-param>
     </filter>
 
-<!-- webwork 2.2 filter dispatcher support.
-    <filter>
-        <filter-name>webwork</filter-name>
-        <filter-class>com.opensymphony.webwork.dispatcher.FilterDispatcher</filter-class>
-    </filter>
+    <!-- webwork 2.2 filter dispatcher support.
+        <filter>
+            <filter-name>webwork</filter-name>
+            <filter-class>com.opensymphony.webwork.dispatcher.FilterDispatcher</filter-class>
+        </filter>
 
--->
+    -->
     <filter-mapping>
         <filter-name>Acegi Session Filter</filter-name>
         <url-pattern>/*</url-pattern>
@@ -57,13 +57,13 @@
         <url-pattern>/</url-pattern>
     </filter-mapping>
 
-<!-- webwork 2.2 filter dispatcher support.
-    <filter-mapping>
-        <filter-name>webwork</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+    <!-- webwork 2.2 filter dispatcher support.
+        <filter-mapping>
+            <filter-name>webwork</filter-name>
+            <url-pattern>/*</url-pattern>
+        </filter-mapping>
 
--->
+    -->
 
     <!--
     If the System property 'xwork.reload.bundles' is specified, the following listener to set
@@ -161,11 +161,9 @@
     <!--
     Custom error pages.
     -->
-<!-- page needs to be implemented.
     <error-page>
         <error-code>500</error-code>
-        <location>/500.vm</location>
+        <location>/internalError.action</location>
     </error-page>
--->
 
 </web-app>
