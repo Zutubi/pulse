@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<project defaultRecipe="default">
+    <recipe name="default">
+        <command name="build">
+            <executable exe="ant"/>
+        </command>
+    </recipe>
+
+    <recipe name="don't load!">
+        <resource name="i do not exist"/>
+    </recipe>
+</project>

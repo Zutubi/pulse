@@ -25,7 +25,7 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
     /**
      * Indicates whether or not the reference resource is required.
      */
-    private boolean required;
+    private boolean required = true;
 
     private ResourceRepository repository;
     private Scope scope;

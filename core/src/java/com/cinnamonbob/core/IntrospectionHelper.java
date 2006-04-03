@@ -168,7 +168,7 @@ public class IntrospectionHelper
      */
     private interface AttributeSetter
     {
-        void set(Object parent, String value, Scope scope)
+        void set(Object parent, String value, boolean resolveReferences, Scope scope)
                 throws InvocationTargetException, IllegalAccessException, FileLoadException;
     }
 
@@ -209,11 +209,10 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, Scope scope)
+                public void set(Object parent, String value, boolean resolveReferences, Scope scope)
                         throws InvocationTargetException, IllegalAccessException, FileLoadException
                 {
-
-                    method.invoke(parent, VariableHelper.replaceVariables(value, scope));
+                    method.invoke(parent, VariableHelper.replaceVariables(value, resolveReferences, scope));
                 }
             };
 
@@ -223,7 +222,7 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, Scope scope)
+                public void set(Object parent, String value, boolean resolveReferences, Scope scope)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     method.invoke(parent, toBoolean(value));
@@ -237,7 +236,7 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, Scope scope)
+                public void set(Object parent, String value, boolean resolveReferences, Scope scope)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     if (value.length() == 0)
@@ -254,7 +253,7 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, Scope scope)
+                public void set(Object parent, String value, boolean resolveReferences, Scope scope)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     try
@@ -271,7 +270,7 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, Scope scope)
+                public void set(Object parent, String value, boolean resolveReferences, Scope scope)
                         throws InvocationTargetException, IllegalAccessException, FileLoadException
                 {
                     // lookup the type object within the projects references.
@@ -327,11 +326,11 @@ public class IntrospectionHelper
 
                 return new AttributeSetter()
                 {
-                    public void set(Object parent, String value, Scope scope) throws InvocationTargetException, IllegalAccessException, FileLoadException
+                    public void set(Object parent, String value, boolean resolveReferences, Scope scope) throws InvocationTargetException, IllegalAccessException, FileLoadException
                     {
                         try
                         {
-                            Object attribute = c.newInstance(VariableHelper.replaceVariables(value, scope));
+                            Object attribute = c.newInstance(VariableHelper.replaceVariables(value, resolveReferences, scope));
                             method.invoke(parent, attribute);
                         } catch (InstantiationException ie)
                         {
@@ -386,7 +385,7 @@ public class IntrospectionHelper
         return nestedCreators.get(name).create(parent);
     }
 
-    public void set(String name, Object parent, String value, Scope scope)
+    public void set(String name, Object parent, String value, boolean resolveReferences, Scope scope)
             throws IllegalAccessException, InvocationTargetException, FileLoadException
     {
         AttributeSetter setter = attributeSetters.get(name);
@@ -394,7 +393,7 @@ public class IntrospectionHelper
         {
             throw new FileLoadException("Unrecognised attribute '" + name + "'.");
         }
-        attributeSetters.get(name).set(parent, value, scope);
+        attributeSetters.get(name).set(parent, value, resolveReferences, scope);
     }
     
     public void add(String name, Object parent, Object arg) throws IllegalAccessException, InvocationTargetException

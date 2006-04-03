@@ -39,6 +39,7 @@ public abstract class FileLoaderTestBase extends BobTestCase
         loader.register("ant", AntCommand.class);
         loader.register("make", MakeCommand.class);
         loader.register("dependency", Dependency.class);
+        loader.register("resource", ResourceReference.class);
     }
 
     public void tearDown() throws Exception

@@ -26,7 +26,7 @@ public class VariableHelperTest extends TestCase
 
         try
         {
-            result = VariableHelper.replaceVariables(input, scope);
+            result = VariableHelper.replaceVariables(input, true, scope);
         }
         catch (BobException e)
         {
@@ -39,7 +39,7 @@ public class VariableHelperTest extends TestCase
 
     private void successTest(String in, String out) throws Exception
     {
-        String result = VariableHelper.replaceVariables(in, scope);
+        String result = VariableHelper.replaceVariables(in, true, scope);
         assertEquals(out, result);
     }
 

@@ -21,7 +21,7 @@ import java.util.Map;
 public class FileLoader
 {
     private final Map<String, Class> typeDefinitions = new HashMap<String, Class>();
-
+    private TypeLoadPredicate predicate = null;
     private ObjectFactory factory;
     private ResourceRepository repository;
 
@@ -34,6 +34,11 @@ public class FileLoader
     {
         setObjectFactory(factory);
         setResourceRepository(repository);
+    }
+
+    public void setPredicate(TypeLoadPredicate predicate)
+    {
+        this.predicate = predicate;
     }
 
     /**
@@ -90,7 +95,7 @@ public class FileLoader
                 ((ScopeAware) root).setScope(globalScope);
             }
 
-            mapAttributesToProperties(rootElement, root, globalScope);
+            mapAttributesToProperties(rootElement, root, true, globalScope);
 
             for (int index = 0; index < rootElement.getChildCount(); index++)
             {
@@ -99,7 +104,7 @@ public class FileLoader
                 {
                     continue;
                 }
-                loadType((Element) node, root, globalScope);
+                loadType((Element) node, root, true, globalScope);
             }
         }
         finally
@@ -108,7 +113,7 @@ public class FileLoader
         }
     }
 
-    private void loadType(Element e, Object parent, Scope scope) throws BobException
+    private void loadType(Element e, Object parent, boolean resolveReferences, Scope scope) throws BobException
     {
         IntrospectionHelper parentHelper = IntrospectionHelper.getHelper(parent.getClass(), typeDefinitions);
         String name = e.getLocalName();
@@ -130,10 +135,15 @@ public class FileLoader
                 type = create(name);
             }
 
+            if(predicate != null)
+            {
+                resolveReferences = resolveReferences && predicate.resolveReferences(type, e);
+            }
+
             IntrospectionHelper typeHelper = IntrospectionHelper.getHelper(type.getClass(), typeDefinitions);
 
             // initialise attributes
-            mapAttributesToProperties(e, type, scope);
+            mapAttributesToProperties(e, type, resolveReferences, scope);
 
             // interface based initialisation.
             if (Reference.class.isAssignableFrom(type.getClass()))
@@ -165,23 +175,27 @@ public class FileLoader
                 ((InitComponent) type).initBeforeChildren();
             }
 
-            // initialise sub-elements.
-            for (int index = 0; index < e.getChildCount(); index++)
+            boolean loadType = predicate == null ? true : predicate.loadType(type, e);
+            if(loadType)
             {
-                Node node = e.getChild(index);
-
-                if (node instanceof Element)
+                // initialise sub-elements.
+                for (int index = 0; index < e.getChildCount(); index++)
                 {
-                    Element element = (Element) node;
-                    // process type.
-                    loadType(element, type, scope);
+                    Node node = e.getChild(index);
 
-                }
-                else if (node instanceof Text)
-                {
-                    if (typeHelper.hasAddText())
+                    if (node instanceof Element)
                     {
-                        typeHelper.addText(type, node.getValue());
+                        Element element = (Element) node;
+                        // process type.
+                        loadType(element, type, resolveReferences, scope);
+
+                    }
+                    else if (node instanceof Text)
+                    {
+                        if (typeHelper.hasAddText())
+                        {
+                            typeHelper.addText(type, node.getValue());
+                        }
                     }
                 }
             }
@@ -202,7 +216,10 @@ public class FileLoader
             }
 
             // Apply declarative validation
-            CommandValidationManager.validate(type, name);
+            if(loadType)
+            {
+                CommandValidationManager.validate(type, name);
+            }
         }
         catch (InvocationTargetException ex)
         {
@@ -288,7 +305,7 @@ public class FileLoader
         return name;
     }
 
-    private void mapAttributesToProperties(Element source, Object target, Scope scope) throws FileLoadException
+    private void mapAttributesToProperties(Element source, Object target, boolean resolveReferences, Scope scope) throws FileLoadException
     {
         IntrospectionHelper helper = IntrospectionHelper.getHelper(target.getClass(), typeDefinitions);
 
@@ -299,7 +316,7 @@ public class FileLoader
             try
             {
                 String propertyName = convertLocalNameToPropertyName(a.getLocalName());
-                helper.set(propertyName, target, a.getValue(), scope);
+                helper.set(propertyName, target, a.getValue(), resolveReferences, scope);
             }
             catch (InvocationTargetException e)
             {

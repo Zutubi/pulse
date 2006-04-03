@@ -210,9 +210,14 @@ public class VariableHelper
      * @throws FileLoadException
      *
      */
-    public static String replaceVariables(String input, Scope properties)
+    public static String replaceVariables(String input, boolean resolveReferences, Scope properties)
             throws FileLoadException
     {
+        if(!resolveReferences)
+        {
+            return input;
+        }
+
         StringBuilder result = new StringBuilder();
 
         List<Token> tokens = tokenise(input);

@@ -84,7 +84,7 @@ public class RecipeProcessor
         {
             bootstrapper.bootstrap(recipeId, paths);
 
-            BobFile bobFile = loadBobFile(paths.getBaseDir(), bobFileSource);
+            BobFile bobFile = loadBobFile(paths.getBaseDir(), bobFileSource, recipeName);
             Recipe recipe;
 
             if (recipeName == null)
@@ -189,7 +189,7 @@ public class RecipeProcessor
         }
     }
 
-    private BobFile loadBobFile(File baseDir, String bobFileSource) throws BuildException
+    private BobFile loadBobFile(File baseDir, String bobFileSource, String recipeName) throws BuildException
     {
         List<Reference> properties = new LinkedList<Reference>();
         Property property = new Property("base.dir", baseDir.getAbsolutePath());
@@ -201,6 +201,7 @@ public class RecipeProcessor
         {
             stream = new ByteArrayInputStream(bobFileSource.getBytes());
             BobFile result = new BobFile();
+            fileLoader.setPredicate(new RecipeLoadPredicate(result, recipeName));
             fileLoader.load(stream, result, properties);
             return result;
         }

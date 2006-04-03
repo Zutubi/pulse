@@ -193,6 +193,42 @@ public class FileLoaderTest extends FileLoaderTestBase
         }
     }
 
+    public void testSpecificRecipe() throws BobException
+    {
+        BobFile bf = new BobFile();
+        loader.setPredicate(new RecipeLoadPredicate(bf, "default"));
+        loader.load(getInput("testSpecificRecipe"), bf);
+        assertEquals(2, bf.getRecipes().size());
+        assertNotNull(bf.getRecipe("default"));
+        assertNotNull(bf.getRecipe("don't load!"));
+    }
+
+    public void testSpecificRecipeDefault() throws BobException
+    {
+        BobFile bf = new BobFile();
+        loader.setPredicate(new RecipeLoadPredicate(bf, null));
+        loader.load(getInput("testSpecificRecipe"), bf);
+        assertEquals(2, bf.getRecipes().size());
+        assertNotNull(bf.getRecipe("default"));
+        assertNotNull(bf.getRecipe("don't load!"));
+    }
+
+    public void testSpecificRecipeError() throws BobException
+    {
+        try
+        {
+            BobFile bf = new BobFile();
+            loader.setPredicate(new RecipeLoadPredicate(bf, "don't load!"));
+            loader.load(getInput("testSpecificRecipe"), bf);
+            fail();
+        }
+        catch (BobException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
     //-----------------------------------------------------------------------
     // Ant command
     //-----------------------------------------------------------------------
@@ -280,9 +316,4 @@ public class FileLoaderTest extends FileLoaderTestBase
         MakeCommand command = makeCommandHelper(3);
         assertEquals("mymakefile", command.getMakefile());
     }
-
-    //-----------------------------------------------------------------------
-    // Regex post processor
-    //-----------------------------------------------------------------------
-
 }
