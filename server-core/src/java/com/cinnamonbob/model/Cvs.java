@@ -1,9 +1,11 @@
 package com.cinnamonbob.model;
 
 import com.cinnamonbob.bootstrap.ComponentContext;
+import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.scm.SCMException;
 import com.cinnamonbob.scm.SCMServer;
 import com.cinnamonbob.scm.cvs.CvsServer;
+import com.opensymphony.util.TextUtils;
 
 /**
  * The CVS object defines the configuration properties required to communicate with a
@@ -117,5 +119,42 @@ public class Cvs extends Scm
     public void setQuietPeriod(long milliseconds)
     {
         getProperties().setProperty(QUIET_PERIOD, Long.toString(milliseconds));
+    }
+
+    public void setQuietPeriod(String minutes, String seconds)
+    {
+        // convert the mins / secs to long and set.
+        long quietPeriod = 0;
+        if (TextUtils.stringSet(minutes))
+        {
+            quietPeriod += Integer.parseInt(minutes) * Constants.MINUTE;
+        }
+        if (TextUtils.stringSet(seconds))
+        {
+            quietPeriod += Integer.parseInt(seconds) * Constants.SECOND;
+        }
+        setQuietPeriod(quietPeriod);
+    }
+
+    public String getQuietPeriodMinutes()
+    {
+        long quietPeriod = getQuietPeriod();
+        long mins = (quietPeriod / Constants.MINUTE);
+        if (mins > 0)
+        {
+            return Long.toString(mins);
+        }
+        return null;
+    }
+
+    public String getQuietPeriodSeconds()
+    {
+        long quietPeriod = getQuietPeriod();
+        long secs = (quietPeriod % Constants.MINUTE) / Constants.SECOND;
+        if (secs > 0)
+        {
+            return Long.toString(secs);
+        }
+        return null;
     }
 }

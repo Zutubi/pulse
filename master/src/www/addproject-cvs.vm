@@ -19,12 +19,19 @@
     #wwtextfield("name=cvs.root" "label=%{getText('cvs.root')}" "required=true" "size=60" "tabindex=1" "onkeypress=return submitenter(this,event)")
     #inlineHelp("cvs.root.help")
     #wwtextfield("name=cvs.module" "label=%{getText('cvs.module')}" "required=true" "tabindex=2" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("cvs.module.help")
     #wwpassword("name=cvs.password" "label=%{getText('cvs.password')}" "tabindex=3" "onkeypress=return submitenter(this,event)")
     #wwtextfield("name=cvs.branch" "label=%{getText('cvs.branch')}" "tabindex=4" "onkeypress=return submitenter(this,event)")
 
+    #wwtextfield("name=quiet" "label=%{getText('cvs.quiet')}" "template=controlheader")
+    #wwtextfield("theme=simple" "template=ctext" "name=minutes" "label=%{getText('unit.minutes')}" "size=5" "tabindex=5" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("theme=simple" "template=ctext" "name=seconds" "label=%{getText('unit.seconds')}" "size=5" "tabindex=6" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=quiet" "template=controlfooter")
+    #inlineHelp("cvs.quiet.help")
+
     #scmTestRow()
 
-    #previousNextCancel(4)
+    #previousNextCancel(7)
 #end
 </body>
 </html>

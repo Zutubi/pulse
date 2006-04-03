@@ -68,8 +68,17 @@ public class WizardAction extends ActionSupport
      * not this action class.
      */
     private transient TextProvider textProvider = null;
+
+    /**
+     * The system object factory.
+     */
     private ObjectFactory objectFactory;
 
+    /**
+     * Indicate whether or not lazy initialisation of the wizard is required. We can not
+     * initialise the wizard when it is created since not all of the interceptors will have been
+     * executed at that point. We need to wait until the action is being processed.
+     */
     private boolean requiresInitialisation = false;
 
     /**
@@ -258,6 +267,8 @@ public class WizardAction extends ActionSupport
     {
         try
         {
+            initIfRequired();
+
             if (isCancelSelected())
             {
                 return doCancel();
@@ -273,7 +284,6 @@ public class WizardAction extends ActionSupport
                 return doNext();
             }
 
-            initIfRequired();
             return getCurrentStateName();
         }
         catch (RuntimeException e)
@@ -310,6 +320,7 @@ public class WizardAction extends ActionSupport
             if (!session.containsKey(wizardClass))
             {
                 Wizard wizardInstance = objectFactory.buildBean(wizardClass);
+                wizardInstance.setLocaleProvider(this);
                 requiresInitialisation = true;
                 session.put(wizardClass, wizardInstance);
             }
@@ -323,6 +334,11 @@ public class WizardAction extends ActionSupport
         }
     }
 
+    /**
+     * The object factory is required to handle the wizard instantiation.
+     *
+     * @param objectFactory
+     */
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
@@ -351,6 +367,8 @@ public class WizardAction extends ActionSupport
     {
         return getCurrentStateName();
     }
+
+    //---( custom handling of the TextProvider interface )---
 
     /**
      * Override the text provider to use the wizard class for lookups.

@@ -299,9 +299,12 @@ public class AddProjectWizard extends BaseWizard
         }
     }
 
-    private class CvsDetails extends BaseWizardState
+    private class CvsDetails extends BaseWizardState implements Validateable
     {
         private Cvs cvs = new Cvs();
+
+        private String minutes;
+        private String seconds;
 
         public CvsDetails(Wizard wizard, String name)
         {
@@ -313,9 +316,61 @@ public class AddProjectWizard extends BaseWizard
             return cvs;
         }
 
+        public String getMinutes()
+        {
+            return minutes;
+        }
+
+        public void setMinutes(String minutes)
+        {
+            this.minutes = minutes;
+        }
+
+        public String getSeconds()
+        {
+            return seconds;
+        }
+
+        public void setSeconds(String seconds)
+        {
+            this.seconds = seconds;
+        }
+
         public String getNextStateName()
         {
+            // record the specified minutes / seconds.
+            cvs.setQuietPeriod(minutes, seconds);
+
             return ((AddProjectWizard) getWizard()).projectDetails.getType();
+        }
+
+        public void validate()
+        {
+            try
+            {
+                // check the minutes field.
+                if (TextUtils.stringSet(minutes))
+                {
+                    if (Integer.parseInt(minutes) < 0)
+                    {
+                        addFieldError("quiet", getTextProvider().getText("unit.invalid.negative"));
+                        return;
+                    }
+                }
+
+                // check the seconds field.
+                if (TextUtils.stringSet(seconds))
+                {
+                    if (Integer.parseInt(seconds) < 0)
+                    {
+                        addFieldError("quiet", getTextProvider().getText("unit.invalid.negative"));
+                    }
+                }
+            }
+            catch (NumberFormatException nfe)
+            {
+                addFieldError("quiet", getTextProvider().getText("unit.invalid.nan"));
+            }
         }
     }
 
@@ -471,9 +526,9 @@ public class AddProjectWizard extends BaseWizard
                 details.setTargets(null);
             }
 
-            if (!TextUtils.stringSet(details.getBaseDir()))
+            if (!TextUtils.stringSet(details.getWorkingDir()))
             {
-                details.setBaseDir(null);
+                details.setWorkingDir(null);
             }
         }
     }

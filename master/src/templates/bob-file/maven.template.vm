@@ -14,9 +14,9 @@
     <recipe name="maven build">
         <command name="build">
             <executable exe="maven.bat" working-dir="${base.dir}">
-#if($baseDir)
+#if($workingDir)
                 <arg>-d</arg>
-                <arg>$!baseDir</arg>
+                <arg>$!workingDir</arg>
 #end
 #if($arguments)
                 <arg>$!arguments</arg>

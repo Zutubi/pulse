@@ -19,9 +19,9 @@ public class EditMavenDetailsAction extends AbstractEditDetailsAction
 
     public BobFileDetails getDetails()
     {
-        if (!TextUtils.stringSet(details.getBaseDir()))
+        if (!TextUtils.stringSet(details.getWorkingDir()))
         {
-            details.setBaseDir(null);
+            details.setWorkingDir(null);
         }
 
         if (!TextUtils.stringSet(details.getTargets()))

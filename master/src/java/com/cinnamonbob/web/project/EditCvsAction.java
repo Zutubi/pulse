@@ -1,6 +1,5 @@
 package com.cinnamonbob.web.project;
 
-import com.cinnamonbob.core.util.Constants;
 import com.cinnamonbob.model.Cvs;
 import com.opensymphony.util.TextUtils;
 
@@ -34,17 +33,8 @@ public class EditCvsAction extends AbstractEditScmAction
     {
         scm = (Cvs) getScmManager().getScm(getId());
 
-        long quietPeriod = scm.getQuietPeriod();
-        long mins = (quietPeriod / Constants.MINUTE);
-        if (mins > 0)
-        {
-            minutes = Long.toString(mins);
-        }
-        long secs = (quietPeriod % Constants.MINUTE) / Constants.SECOND;
-        if (secs > 0)
-        {
-            seconds = Long.toString(secs);
-        }
+        minutes = scm.getQuietPeriodMinutes();
+        seconds = scm.getQuietPeriodSeconds();
     }
 
     public void validate()
@@ -56,7 +46,7 @@ public class EditCvsAction extends AbstractEditScmAction
             {
                 if (Integer.parseInt(minutes) < 0)
                 {
-                    addFieldError("quiet", "unit.invalid.negative");
+                    addFieldError("quiet", getText("unit.invalid.negative"));
                     return;
                 }
             }
@@ -66,29 +56,19 @@ public class EditCvsAction extends AbstractEditScmAction
             {
                 if (Integer.parseInt(seconds) < 0)
                 {
-                    addFieldError("quiet", "unit.invalid.negative");
+                    addFieldError("quiet", getText("unit.invalid.negative"));
                 }
             }
         }
         catch (NumberFormatException nfe)
         {
-            addFieldError("quiet", "unit.invalid.nan");
+            addFieldError("quiet", getText("unit.invalid.nan"));
         }
     }
 
     public String execute()
     {
-        // convert the mins / secs to long and set.
-        long quietPeriod = 0;
-        if (TextUtils.stringSet(minutes))
-        {
-            quietPeriod += Integer.parseInt(minutes) * Constants.MINUTE;
-        }
-        if (TextUtils.stringSet(seconds))
-        {
-            quietPeriod += Integer.parseInt(seconds) * Constants.SECOND;
-        }
-        getScm().setQuietPeriod(quietPeriod);
+        getCvs().setQuietPeriod(minutes, seconds);
 
         return super.execute();
     }

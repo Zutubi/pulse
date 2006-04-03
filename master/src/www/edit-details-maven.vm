@@ -13,8 +13,8 @@
     #wwhidden("name=id")
     #wwhidden("name=projectId")
 
-    #wwtextfield("name=details.baseDir" "label=%{getText('maven.base.dir')}" "tabindex=1")
-    #inlineHelp("maven.base.dir.help")
+    #wwtextfield("name=details.workingDir" "label=%{getText('maven.working.dir')}" "size=40" "tabindex=1")
+    #inlineHelp("maven.working.dir.help")
     #wwtextfield("name=details.targets" "label=%{getText('maven.targets')}" "size=40" "tabindex=2")
     #inlineHelp("maven.targets.help")
     #wwtextfield("name=details.arguments" "label=%{getText('maven.args')}" "size=40" "tabindex=3")

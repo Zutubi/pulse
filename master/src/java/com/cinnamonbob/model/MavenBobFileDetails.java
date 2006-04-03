@@ -15,7 +15,7 @@ public class MavenBobFileDetails extends TemplateBobFileDetails
      */
     private String targets;
 
-    private String baseDir;
+    private String workingDir;
 
     private String arguments;
 
@@ -34,9 +34,9 @@ public class MavenBobFileDetails extends TemplateBobFileDetails
                 context.put("targets", arg);
             }
         }
-        if (TextUtils.stringSet(baseDir))
+        if (TextUtils.stringSet(workingDir))
         {
-            context.put("baseDir", baseDir.trim());
+            context.put("workDir", workingDir.trim());
         }
 
         if (TextUtils.stringSet(arguments))
@@ -61,9 +61,9 @@ public class MavenBobFileDetails extends TemplateBobFileDetails
             result.put("targets", targets);
         }
 
-        if (TextUtils.stringSet(baseDir))
+        if (TextUtils.stringSet(workingDir))
         {
-            result.put("baseDir", baseDir);
+            result.put("working directory", workingDir);
         }
 
         if (TextUtils.stringSet(arguments))
@@ -84,14 +84,14 @@ public class MavenBobFileDetails extends TemplateBobFileDetails
         this.targets = targets;
     }
 
-    public String getBaseDir()
+    public String getWorkingDir()
     {
-        return baseDir;
+        return workingDir;
     }
 
-    public void setBaseDir(String baseDir)
+    public void setWorkingDir(String workingDir)
     {
-        this.baseDir = baseDir;
+        this.workingDir = workingDir;
     }
 
     public String getArguments()

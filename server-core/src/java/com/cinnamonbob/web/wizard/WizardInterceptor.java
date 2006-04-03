@@ -67,7 +67,7 @@ public class WizardInterceptor implements Interceptor
                 String expectedState = wizardAction.getCurrentState().getStateName();
                 if (!expectedState.equals(actualState))
                 {
-                    if (!wizardAction.getWizard().goBackTo(actualState))
+                    if (!wizardAction.getWizard().traverseBackwardTo(actualState))
                     {
                         shortCircuit = wizardAction.getWizard().restart();
                     }

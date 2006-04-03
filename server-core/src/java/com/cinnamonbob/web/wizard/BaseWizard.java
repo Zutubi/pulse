@@ -2,6 +2,8 @@ package com.cinnamonbob.web.wizard;
 
 import com.cinnamonbob.util.logging.Logger;
 import com.cinnamonbob.xwork.TextProviderSupport;
+import com.opensymphony.xwork.LocaleProvider;
+import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.Validateable;
 import com.opensymphony.xwork.validator.DefaultActionValidatorManager;
 import com.opensymphony.xwork.validator.ValidationException;
@@ -52,9 +54,13 @@ public class BaseWizard implements Wizard
      */
     private DefaultActionValidatorManager validationManager = new DefaultActionValidatorManager();
 
+
+    private TextProvider textProvider;
+    private LocaleProvider localeProvider;
+
     /**
-     * Required no-arg constructor. A no-arg constructor should be created by subclasses
-     * initialise the wizard states.
+     * Required no-arg constructor. A no-arg constructor should be implemented by subclasses
+     * to initialise the wizard states.
      */
     public BaseWizard()
     {
@@ -129,6 +135,9 @@ public class BaseWizard implements Wizard
 
     }
 
+    /**
+     * Handle initialisation of this wizard.
+     */
     public void initialise()
     {
         currentState = initialState;
@@ -144,7 +153,7 @@ public class BaseWizard implements Wizard
      * @return true if the wizard has been rewound to the requested state, false if no change
      * has occured..
      */
-    public boolean goBackTo(String requestedState)
+    public boolean traverseBackwardTo(String requestedState)
     {
         if (getState(requestedState) == null)
         {
@@ -219,6 +228,8 @@ public class BaseWizard implements Wizard
 
     /**
      * Restart this wizard.
+     *
+     * @return the wizards initial state name.
      */
     public String restart()
     {
@@ -249,6 +260,25 @@ public class BaseWizard implements Wizard
         {
             currentState.addActionError(e.getMessage());
         }
+    }
+
+    /**
+     * Specify the wizards locale provider.
+     *
+     * @param localeProvider
+     */
+    public void setLocaleProvider(LocaleProvider localeProvider)
+    {
+        this.localeProvider = localeProvider;
+    }
+    
+    protected TextProvider getTextProvider()
+    {
+        if (textProvider == null)
+        {
+            textProvider = new TextProviderSupport(getClass(), localeProvider);
+        }
+        return textProvider;
     }
 
 }
