@@ -1,32 +1,13 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.test.BobTestCase;
 
-import java.io.*;
+import java.io.IOException;
 
 /**
  */
-public class AntCommandTest extends BobTestCase
+public class AntCommandTest extends BaseCommandTest
 {
-    File baseDir;
-    File outputDir;
-
-    public void setUp() throws IOException
-    {
-        baseDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".base");
-        outputDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".out");
-    }
-
-    public void tearDown() throws IOException
-    {
-        removeDirectory(baseDir);
-        removeDirectory(outputDir);
-    }
-
     public void testBasicDefault() throws IOException
     {
         copyBuildFile("basic");
@@ -93,67 +74,18 @@ public class AntCommandTest extends BobTestCase
         failedRun(command, "Buildfile: nope.xml does not exist!");
     }
 
-    private void failedRun(AntCommand command, String message) throws IOException
+    protected String getBuildFileName()
     {
-        CommandResult commandResult = runCommand(command);
-        assertEquals(ResultState.FAILURE, commandResult.getState());
-        checkOutput(commandResult, message);
+        return "build.xml";
     }
 
-    private void successRun(AntCommand command, String ...contents) throws IOException
+    protected String getBuildFileExt()
     {
-        CommandResult commandResult = runCommand(command);
-        assertEquals(ResultState.SUCCESS, commandResult.getState());
-        checkOutput(commandResult, contents);
+        return "xml";
     }
 
-    private CommandResult runCommand(AntCommand command)
+    protected void checkOutput(CommandResult commandResult, String ...contents) throws IOException
     {
-        command.setWorkingDir(baseDir);
-        CommandResult commandResult = new CommandResult("test");
-        command.execute(baseDir, outputDir, commandResult);
-        return commandResult;
-    }
-
-    private void checkOutput(CommandResult commandResult, String ...contents) throws IOException
-    {
-        assertTrue(commandResult.getProperties().containsKey("command line"));
-        assertTrue(commandResult.getProperties().get("command line").toString().startsWith("ant"));
-        FileInputStream is = null;
-        try
-        {
-            is = new FileInputStream(new File(outputDir, FileSystemUtils.composeFilename(ExecutableCommand.OUTPUT_NAME, "output.txt")));
-            String output = IOUtils.inputStreamToString(is);
-            for (String content : contents)
-            {
-                assertTrue(output.contains(content));
-            }
-        }
-        finally
-        {
-            IOUtils.close(is);
-        }
-    }
-
-    private void copyBuildFile(String name) throws IOException
-    {
-        copyBuildFile(name, "build.xml");
-    }
-
-    private void copyBuildFile(String name, String filename) throws IOException
-    {
-        InputStream is = null;
-        FileOutputStream os = null;
-        try
-        {
-            is = getInput(name);
-            os = new FileOutputStream(new File(baseDir, filename));
-            IOUtils.joinStreams(is, os);
-        }
-        finally
-        {
-            IOUtils.close(is);
-            IOUtils.close(os);
-        }
+        super.checkOutput(commandResult, contents);
     }
 }

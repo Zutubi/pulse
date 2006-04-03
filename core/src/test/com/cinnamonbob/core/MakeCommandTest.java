@@ -1,31 +1,13 @@
 package com.cinnamonbob.core;
 
 import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.test.BobTestCase;
 
-import java.io.*;
+import java.io.IOException;
 
 /**
  */
-public class MakeCommandTest extends BobTestCase
+public class MakeCommandTest extends BaseCommandTest
 {
-    File baseDir;
-    File outputDir;
-
-    public void setUp() throws IOException
-    {
-        baseDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".work");
-        outputDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".out");
-    }
-
-    public void tearDown() throws IOException
-    {
-        removeDirectory(baseDir);
-        removeDirectory(outputDir);
-    }
 
     public void testBasicDefault() throws IOException
     {
@@ -93,70 +75,20 @@ public class MakeCommandTest extends BobTestCase
         failedRun(command, "make: nope.makefile: No such file or directory");
     }
 
-    private void failedRun(ExecutableCommand command, String message) throws IOException
+    protected String getBuildFileName()
     {
-        CommandResult commandResult = runCommand(command);
-        assertEquals(ResultState.FAILURE, commandResult.getState());
-        checkOutput(commandResult, message);
+        return "Makefile";
     }
 
-    private void successRun(ExecutableCommand command, String ...contents) throws IOException
+    protected String getBuildFileExt()
     {
-        CommandResult commandResult = runCommand(command);
-        assertEquals(ResultState.SUCCESS, commandResult.getState());
-        checkOutput(commandResult, contents);
+        return "txt";
     }
 
-    private CommandResult runCommand(ExecutableCommand command)
-    {
-        command.setWorkingDir(baseDir);
-        CommandResult commandResult = new CommandResult("test");
-        command.execute(baseDir, outputDir, commandResult);
-        return commandResult;
-    }
-
-    private void checkOutput(CommandResult commandResult, String ...contents) throws IOException
+    protected void checkOutput(CommandResult commandResult, String ...contents) throws IOException
     {
         assertTrue(commandResult.getProperties().containsKey("command line"));
         assertTrue(commandResult.getProperties().get("command line").toString().startsWith("make"));
-        FileInputStream is = null;
-        try
-        {
-            is = new FileInputStream(new File(outputDir, FileSystemUtils.composeFilename(ExecutableCommand.OUTPUT_NAME, "output.txt")));
-            String output = IOUtils.inputStreamToString(is);
-            for (String content : contents)
-            {
-                if (!output.contains(content))
-                {
-                    fail("Output '" + output + "' does not contain '" + content + "'");
-                }
-            }
-        }
-        finally
-        {
-            IOUtils.close(is);
-        }
-    }
-
-    private void copyBuildFile(String name) throws IOException
-    {
-        copyBuildFile(name, "Makefile");
-    }
-
-    private void copyBuildFile(String name, String filename) throws IOException
-    {
-        InputStream is = null;
-        OutputStream os = null;
-        try
-        {
-            is = getInput(name, "txt");
-            os = new FileOutputStream(new File(baseDir, filename));
-            IOUtils.joinStreams(is, os);
-        }
-        finally
-        {
-            IOUtils.close(is);
-            IOUtils.close(os);
-        }
+        super.checkOutput(commandResult, contents);
     }
 }
