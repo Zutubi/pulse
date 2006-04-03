@@ -17,6 +17,8 @@ public class MavenBobFileDetails extends TemplateBobFileDetails
 
     private String baseDir;
 
+    private String arguments;
+
     protected String getTemplateName()
     {
         return "maven.template.vm";
@@ -36,6 +38,12 @@ public class MavenBobFileDetails extends TemplateBobFileDetails
         {
             context.put("baseDir", baseDir.trim());
         }
+
+        if (TextUtils.stringSet(arguments))
+        {
+            context.put("arguments", arguments);
+        }
+
     }
 
     public String getType()
@@ -56,6 +64,11 @@ public class MavenBobFileDetails extends TemplateBobFileDetails
         if (TextUtils.stringSet(baseDir))
         {
             result.put("baseDir", baseDir);
+        }
+
+        if (TextUtils.stringSet(arguments))
+        {
+            result.put("arguments", arguments);
         }
 
         return result;
@@ -79,5 +92,15 @@ public class MavenBobFileDetails extends TemplateBobFileDetails
     public void setBaseDir(String baseDir)
     {
         this.baseDir = baseDir;
+    }
+
+    public String getArguments()
+    {
+        return arguments;
+    }
+
+    public void setArguments(String arguments)
+    {
+        this.arguments = arguments;
     }
 }

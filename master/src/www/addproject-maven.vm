@@ -13,11 +13,14 @@
     #wwhidden("name=state")
     #wwhidden("name=submit")
 
-    #wwtextfield("name=details.targets" "label=%{getText('maven.targets')}" "tabindex=1" "onkeypress=return submitenter(this,event)")
-    #inlineHelp("maven.targets.help")
-    #wwtextfield("name=details.baseDir" "label=%{getText('maven.base.dir')}" "size=40" "tabindex=2" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=details.baseDir" "label=%{getText('maven.base.dir')}" "size=40" "tabindex=1" "onkeypress=return submitenter(this,event)")
     #inlineHelp("maven.base.dir.help")
-    #previousFinishCancel(3)
+    #wwtextfield("name=details.targets" "label=%{getText('maven.targets')}" "tabindex=2" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("maven.targets.help")
+    #wwtextfield("name=details.arguments" "label=%{getText('maven.args')}" "size=40" "tabindex=3" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("maven.args.help")
+    #previousFinishCancel(4)
+
  #end
 </body>
 </html>

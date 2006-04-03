@@ -17,6 +17,7 @@
     #wwhidden("name=submit")
 
     #wwtextfield("name=cvs.root" "label=%{getText('cvs.root')}" "required=true" "size=60" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("cvs.root.help")
     #wwtextfield("name=cvs.module" "label=%{getText('cvs.module')}" "required=true" "tabindex=2" "onkeypress=return submitenter(this,event)")
     #wwpassword("name=cvs.password" "label=%{getText('cvs.password')}" "tabindex=3" "onkeypress=return submitenter(this,event)")
     #wwtextfield("name=cvs.branch" "label=%{getText('cvs.branch')}" "tabindex=4" "onkeypress=return submitenter(this,event)")

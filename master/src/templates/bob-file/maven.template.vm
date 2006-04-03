@@ -18,6 +18,9 @@
                 <arg>-d</arg>
                 <arg>$!baseDir</arg>
 #end
+#if($arguments)
+                <arg>$!arguments</arg>
+#end
 #foreach($target in $targets)
                 <arg>$target</arg>
 #end

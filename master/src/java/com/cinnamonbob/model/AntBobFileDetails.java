@@ -1,5 +1,6 @@
 package com.cinnamonbob.model;
 
+import com.opensymphony.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
 import java.util.Map;
@@ -138,22 +139,22 @@ public class AntBobFileDetails extends TemplateBobFileDetails
         // TODO i18n
         Properties result = new Properties();
 
-        if (buildFile != null)
+        if (TextUtils.stringSet(buildFile))
         {
             result.put("build file", buildFile);
         }
 
-        if (targets != null)
+        if (TextUtils.stringSet(targets))
         {
             result.put("targets", targets);
         }
 
-        if (arguments != null)
+        if (TextUtils.stringSet(arguments))
         {
             result.put("arguments", arguments);
         }
 
-        if (workingDir != null)
+        if (TextUtils.stringSet(workingDir))
         {
             result.put("working directory", workingDir);
         }

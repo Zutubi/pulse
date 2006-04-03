@@ -17,8 +17,10 @@
     #inlineHelp("maven.base.dir.help")
     #wwtextfield("name=details.targets" "label=%{getText('maven.targets')}" "size=40" "tabindex=2")
     #inlineHelp("maven.targets.help")
+    #wwtextfield("name=details.arguments" "label=%{getText('maven.args')}" "size=40" "tabindex=3")
+    #inlineHelp("maven.args.help")
 
-    #saveCancel(3)
+    #saveCancel(4)
  #end
 </body>
 </html>

@@ -363,7 +363,7 @@
             <result name="cancel" type="redirect">
                 /configureProject.action?id=${projectId}&amp;tab=configuration</result>
             <result name="success" type="redirect">
-                /configureProject.action?id=${projectId}}&amp;tab=configuration</result>
+                /configureProject.action?id=${projectId}&amp;tab=configuration</result>
         </action>
 
         <action name="editTrigger" class="com.cinnamonbob.web.project.EditTriggerAction">

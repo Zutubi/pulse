@@ -80,6 +80,7 @@
         <subclass name="com.cinnamonbob.model.MavenBobFileDetails" discriminator-value="MAVEN" lazy="false">
             <property name="baseDir" column="BASE_DIR" type="string" length="255"/>
             <property name="targets" column="TARGETS" type="string" length="255"/>
+            <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
         </subclass>
 
     </class>
