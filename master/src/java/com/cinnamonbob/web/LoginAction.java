@@ -1,13 +1,11 @@
 package com.cinnamonbob.web;
 
-import com.opensymphony.xwork.ActionContext;
 import com.cinnamonbob.util.logging.Logger;
+import com.opensymphony.xwork.ActionContext;
+import org.acegisecurity.AuthenticationException;
+import org.acegisecurity.ui.AbstractProcessingFilter;
 
 import java.util.Map;
-
-import org.acegisecurity.ui.AbstractProcessingFilter;
-import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.userdetails.User;
 
 /**
  * This login action is to provide mapping support between how Acegi expects the
@@ -69,7 +67,10 @@ public class LoginAction extends ActionSupport
         {
             AuthenticationException ae = (AuthenticationException) session.get(AbstractProcessingFilter.ACEGI_SECURITY_LAST_EXCEPTION_KEY);
             username = (String)ae.getAuthentication().getPrincipal();
-            addActionError(ae.getMessage());
+
+            LOG.info("Authentication failure: '" + username + "' " + ae.getMessage());
+
+            addActionError(getText("login.badcredentials"));
         }
     }
 

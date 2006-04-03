@@ -50,8 +50,8 @@ The beans defined within the security subsystem need not be accessed by other co
             <value>
                 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
                 PATTERN_TYPE_APACHE_ANT
-                /ajax/**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,ajaxSecurityEnforcementFilter,switchUserProcessingFilter
-                /**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,securityEnforcementFilter,switchUserProcessingFilter
+                /ajax/**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,ajaxSecurityEnforcementFilter
+                /**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,securityEnforcementFilter
             </value>
         </property>
     </bean>
