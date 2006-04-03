@@ -200,6 +200,7 @@ public class FileLoaderTest extends FileLoaderTestBase
         loader.load(getInput("testSpecificRecipe"), bf);
         assertEquals(2, bf.getRecipes().size());
         assertNotNull(bf.getRecipe("default"));
+        assertNotNull(bf.getRecipe("default").getCommand("build"));
         assertNotNull(bf.getRecipe("don't load!"));
     }
 
@@ -210,6 +211,7 @@ public class FileLoaderTest extends FileLoaderTestBase
         loader.load(getInput("testSpecificRecipe"), bf);
         assertEquals(2, bf.getRecipes().size());
         assertNotNull(bf.getRecipe("default"));
+        assertNotNull(bf.getRecipe("default").getCommand("build"));
         assertNotNull(bf.getRecipe("don't load!"));
     }
 

@@ -7,24 +7,24 @@ import nu.xom.Element;
  */
 public class RecipeLoadPredicate implements TypeLoadPredicate
 {
+    private BobFile bobFile;
     private String recipeName;
 
     public RecipeLoadPredicate(BobFile bobFile, String recipeName)
     {
-        if(recipeName == null)
-        {
-            this.recipeName = bobFile.getDefaultRecipe();
-        }
-        else
-        {
-            this.recipeName = recipeName;
-        }
+        this.bobFile = bobFile;
+        this.recipeName = recipeName;
     }
 
     public boolean loadType(Object type, Element element)
     {
         if(type instanceof Recipe)
         {
+            if(recipeName == null)
+            {
+                recipeName = bobFile.getDefaultRecipe();
+            }
+
             if(recipeName == null)
             {
                 return false;
