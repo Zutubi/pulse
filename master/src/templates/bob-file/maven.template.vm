@@ -13,19 +13,21 @@
 
     <recipe name="maven build">
         <command name="build">
-            <executable exe="maven.bat" working-dir="${base.dir}">
+            <!-- pull in the maven resource if configured. -->
+            <resource name="maven" required="false"/>
+            <maven
 #if($workingDir)
-                <arg>-d</arg>
-                <arg>$!workingDir</arg>
+                working-dir="${base.dir}/$workingDir"
+#end
+#if($targets)
+                targets="$targets"
 #end
 #if($arguments)
-                <arg>$!arguments</arg>
+                args="$arguments"
 #end
-#foreach($target in $targets)
-                <arg>$target</arg>
-#end
+            >
                 <process processor="${maven.pp}"/>
-            </executable>
+            </maven>
         </command>
     </recipe>
 </project>
