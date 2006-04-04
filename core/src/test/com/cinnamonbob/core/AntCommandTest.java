@@ -6,7 +6,7 @@ import java.io.IOException;
 
 /**
  */
-public class AntCommandTest extends BaseCommandTest
+public class AntCommandTest extends CommandTestBase
 {
     public void testBasicDefault() throws IOException
     {

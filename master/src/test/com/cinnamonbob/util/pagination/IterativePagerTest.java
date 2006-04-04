@@ -1,16 +1,16 @@
 package com.cinnamonbob.util.pagination;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
-public class IterativePagerTestCase extends TestCase
+public class IterativePagerTest extends TestCase
 {
     private List<Integer> data = null;
     private IterativePager pager = null;
 
-    public IterativePagerTestCase(String testName)
+    public IterativePagerTest(String testName)
     {
         super(testName);
     }

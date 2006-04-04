@@ -11,16 +11,16 @@ import java.io.*;
 /**
  * <class-comment/>
  */
-public abstract class BaseCommandTest extends BobTestCase
+public abstract class CommandTestBase extends BobTestCase
 {
     File baseDir;
     File outputDir;
 
-    public BaseCommandTest()
+    public CommandTestBase()
     {
     }
 
-    public BaseCommandTest(String name)
+    public CommandTestBase(String name)
     {
         super(name);
     }
@@ -35,6 +35,11 @@ public abstract class BaseCommandTest extends BobTestCase
     {
         removeDirectory(baseDir);
         removeDirectory(outputDir);
+    }
+
+    public void test()
+    {
+        // a dummy test method so that junit does not complain... sigh.
     }
 
     protected void failedRun(ExecutableCommand command, String message) throws IOException

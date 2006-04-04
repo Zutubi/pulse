@@ -6,7 +6,7 @@ import java.io.IOException;
 
 /**
  */
-public class MakeCommandTest extends BaseCommandTest
+public class MakeCommandTest extends CommandTestBase
 {
 
     public void testBasicDefault() throws IOException

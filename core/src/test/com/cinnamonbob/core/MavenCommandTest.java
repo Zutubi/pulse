@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * <class-comment/>
  */
-public class MavenCommandTest extends BaseCommandTest
+public class MavenCommandTest extends CommandTestBase
 {
     public MavenCommandTest()
     {
