@@ -1,11 +1,10 @@
 package com.cinnamonbob.scheduling;
 
 import com.cinnamonbob.core.ObjectFactory;
-import com.cinnamonbob.scheduling.persistence.TriggerDao;
 import com.cinnamonbob.util.logging.Logger;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The default trigger handler handles the details of firing a trigger.

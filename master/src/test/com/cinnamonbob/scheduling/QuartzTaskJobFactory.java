@@ -2,11 +2,11 @@ package com.cinnamonbob.scheduling;
 
 import org.quartz.Job;
 import org.quartz.SchedulerException;
-import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.spi.JobFactory;
+import org.quartz.spi.TriggerFiredBundle;
 
 /**
- * <class-comment/>
+ * This is used for testing purposes only.
  */
 public class QuartzTaskJobFactory implements JobFactory
 {

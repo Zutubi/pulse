@@ -15,7 +15,7 @@ public class QuartzAdminAction extends ActionSupport
         return scheduler;
     }
 
-    public void setScheduler(Scheduler scheduler)
+    public void setQuartzScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
     }

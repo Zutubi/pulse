@@ -19,6 +19,8 @@ public class QuartzTaskCallbackJob implements Job
 
     public void execute(JobExecutionContext context) throws JobExecutionException
     {
+        LOG.entering();
+
         // notify schedule manager that this trigger has been activated.
         JobDataMap data = context.getMergedJobDataMap();
         try
@@ -30,6 +32,8 @@ public class QuartzTaskCallbackJob implements Job
         {
             throw new JobExecutionException(e);
         }
+
+        LOG.exiting();
     }
 
     public void setTriggerHandler(TriggerHandler triggerHandler)
