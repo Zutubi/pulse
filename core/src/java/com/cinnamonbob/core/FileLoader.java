@@ -175,7 +175,7 @@ public class FileLoader
                 ((InitComponent) type).initBeforeChildren();
             }
 
-            boolean loadType = predicate == null ? true : predicate.loadType(type, e);
+            boolean loadType = predicate == null || predicate.loadType(type, e);
             if(loadType)
             {
                 // initialise sub-elements.

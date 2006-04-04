@@ -52,6 +52,7 @@ public class RecipeProcessor
             fileLoader.register("make.pp", MakePostProcessor.class);
             fileLoader.register("regex.pp", RegexPostProcessor.class);
             fileLoader.register("ant", AntCommand.class);
+            fileLoader.register("maven", MavenCommand.class);
             fileLoader.register("executable", ExecutableCommand.class);
             fileLoader.register("make", MakeCommand.class);
             fileLoader.register("resource", ResourceReference.class);

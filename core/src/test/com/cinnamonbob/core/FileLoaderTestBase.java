@@ -38,6 +38,7 @@ public abstract class FileLoaderTestBase extends BobTestCase
         loader.register("executable", ExecutableCommand.class);
         loader.register("ant", AntCommand.class);
         loader.register("make", MakeCommand.class);
+        loader.register("maven", MavenCommand.class);
         loader.register("dependency", Dependency.class);
         loader.register("resource", ResourceReference.class);
     }

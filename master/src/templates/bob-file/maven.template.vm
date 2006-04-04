@@ -2,13 +2,13 @@
 <project defaultRecipe="maven build">
 
     <post-processor name="maven.pp">
-        <regex>
+        <regex.pp>
             <!-- maven returns a 0 exit code regardless of the state of the build.. -->
             <pattern category="error" expression=".*BUILD FAILED.*"/>
             <pattern category="error" expression="Basedir.*does not exist"/>
             <!-- notify about any exceptions in the logs. -->
             <pattern category="warning" expression=".*Exception.*"/>
-        </regex>
+        </regex.pp>
     </post-processor>
 
     <recipe name="maven build">
