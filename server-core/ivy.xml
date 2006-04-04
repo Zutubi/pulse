@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="cinnamonbob" module="server-core" status="integration">
+    <info organisation="cinnamonbob" module="server-core" revision="0.4" status="release">
         <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
         <description homepage="http://www.cinnamonbob.com/">
             description....
@@ -22,9 +22,9 @@
 
     <dependencies>
 
-        <dependency org="cinnamonbob" name="core" rev="latest.integration" conf="external->external"/>
-        <dependency org="cinnamonbob" name="core" rev="latest.integration" conf="release->release"/>
-        <dependency org="cinnamonbob" name="core" rev="latest.integration" conf="test->test"/>
+        <dependency org="cinnamonbob" name="core" rev="0.4" conf="external->external"/>
+        <dependency org="cinnamonbob" name="core" rev="0.4" conf="release->release"/>
+        <dependency org="cinnamonbob" name="core" rev="0.4" conf="test->test"/>
 
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external->default"/>
         <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external->default"/>

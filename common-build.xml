@@ -121,6 +121,7 @@
             <batchtest todir="${report.dir}/junit/xml">
                 <fileset dir="${test.dir}">
                     <include name="**/*Test.java"/>
+                    <exclude name="**/BaseCommandTest.java"/>
                     <exclude name="**/P4*"/>
                     <exclude name="**/Cvs*"/>
                 </fileset>
