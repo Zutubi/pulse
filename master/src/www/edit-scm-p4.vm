@@ -18,7 +18,7 @@
     #wwtextfield("name=p4.port" "label=%{getText('p4.port')}" "required=true" "tabindex=1")
     #inlineHelp("p4.port.help")
     #wwtextfield("name=p4.user" "label=%{getText('p4.user')}" "required='true'" "tabindex=2")
-    #wwpassword("name=p4.password" "label=%{getText('p4.password')}" "tabindex=3")
+    #wwpassword("name=p4.password" "label=%{getText('p4.password')}" "showPassword=true" "tabindex=3")
     #wwtextfield("name=p4.client" "label=%{getText('p4.client')}" "required=true" "tabindex=4")
     #inlineHelp("p4.client.help")
     #wwtextfield("name=p4.path" "label=%{getText('scm.path')}" "size=60" "tabindex=5")
