@@ -10,12 +10,10 @@
 
 #wwcform("action=setup.action" "heading=%{getText('bobHome.setup')}" "name=setup.bobHome" "method=post")
 
-    #wwtextfield("name=bobHome" "label=%{getText('bobHome.field')}" "required=true" "size=60" "tabindex=1")
+    #wwtextfield("name=bobHome" "label=%{getText('bobHome.field')}" "required=true" "size=60" "tabindex=1" "onkeypress=return submitenter(this,event)")
     #inlineHelp("bobHome.help")
 
-    #openSubmit()
-        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=2")
-    #closeSubmit()
+    #next(2)
 #end
 
 </body>

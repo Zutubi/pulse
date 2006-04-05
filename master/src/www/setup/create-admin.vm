@@ -11,14 +11,12 @@
 #wwcform("action=setupWizard.action" "heading=%{getText('admin.create')}" "name=admin.create" "method=post")
     #wwhidden("name=state")
 
-    #wwtextfield("name=admin.login" "label=%{getText('admin.login')}" "required=true" "tabindex=1")
-    #wwtextfield("name=admin.name" "label=%{getText('admin.name')}" "required=true" "tabindex=2")
-    #wwpassword("name=admin.password" "label=%{getText('admin.password')}" "required=true" "tabindex=3")
-    #wwpassword("name=confirm" "label=%{getText('admin.confirm')}" "required=true" "tabindex=4")
+    #wwtextfield("name=admin.login" "label=%{getText('admin.login')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=admin.name" "label=%{getText('admin.name')}" "required=true" "tabindex=2" "onkeypress=return submitenter(this,event)")
+    #wwpassword("name=admin.password" "label=%{getText('admin.password')}" "required=true" "tabindex=3" "onkeypress=return submitenter(this,event)")
+    #wwpassword("name=confirm" "label=%{getText('admin.confirm')}" "required=true" "tabindex=4" "onkeypress=return submitenter(this,event)")
 
-    #openSubmit()
-        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=5")
-    #closeSubmit()
+    #next(5)    
 #end
 
 </body>
