@@ -153,7 +153,7 @@ pre.feature {
             [@classCell cc=result.stamps.prettyElapsed/]
             [@linkCell cc="view" url="http://${hostname}/viewBuild.action?id=${result.id?c}"/]
             [@linkCell cc="artifacts" url="http://${hostname}/viewBuildArtifacts.action?id=${result.id?c}"/]
-            [@linkCell cc="tests" url="http://${hostname}/viewTests.action?buildId=${result.id?c}"/]
+            [@linkCell cc="tests" url="http://${hostname}/viewTests.action?id=${result.id?c}"/]
         </tr>
     </table>
 </td></tr>
