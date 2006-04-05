@@ -322,6 +322,10 @@ public class FileLoader
             {
                 throw new FileLoadException(e.getCause().getMessage());
             }
+            catch (UnknownAttributeException e)
+            {
+                throw new FileLoadException("Unrecognised attribute '" + a.getLocalName() + "'.");
+            }
             catch (Exception e)
             {
                 throw new FileLoadException(e.getMessage());

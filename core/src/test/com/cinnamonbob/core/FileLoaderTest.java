@@ -230,6 +230,21 @@ public class FileLoaderTest extends FileLoaderTestBase
         }
     }
 
+    public void testUnknownAttribute()
+    {
+        try
+        {
+            loader.load(getInput("testUnknownAttribute"), new SimpleType());
+            fail();
+        }
+        catch (BobException e)
+        {
+            if (!e.getMessage().contains("bad-attribute"))
+            {
+                fail();
+            }
+        }
+    }
 
     //-----------------------------------------------------------------------
     // Ant command

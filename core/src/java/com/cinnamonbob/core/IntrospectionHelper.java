@@ -386,12 +386,12 @@ public class IntrospectionHelper
     }
 
     public void set(String name, Object parent, String value, boolean resolveReferences, Scope scope)
-            throws IllegalAccessException, InvocationTargetException, FileLoadException
+            throws IllegalAccessException, InvocationTargetException, ParseException, FileLoadException
     {
         AttributeSetter setter = attributeSetters.get(name);
         if (setter == null)
         {
-            throw new FileLoadException("Unrecognised attribute '" + name + "'.");
+            throw new UnknownAttributeException("Unrecognised attribute '" + name + "'.");
         }
         attributeSetters.get(name).set(parent, value, resolveReferences, scope);
     }
