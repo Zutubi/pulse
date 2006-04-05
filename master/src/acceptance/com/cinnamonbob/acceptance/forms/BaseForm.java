@@ -41,6 +41,17 @@ public abstract class BaseForm
 
     public abstract String[] getFieldNames();
 
+    /**
+     * Returns the type identifiers for the form fields. The default implementation
+     * returns an array of TEXTFIELD identifiers.
+     *
+     * @return an array of form field identifiers.
+     *
+     * @see BaseForm#TEXTFIELD
+     * @see BaseForm#CHECKBOX
+     * @see BaseForm#RADIOBOX
+     * @see BaseForm#SELECT
+     */
     public int[] getFieldTypes()
     {
         int[] types = new int[getFieldNames().length];

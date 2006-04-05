@@ -61,6 +61,7 @@ public class SetupWizard extends BaseWizard
         config.setSmtpHost(serverSettingsState.getSmtpHost());
         config.setSmtpUsername(serverSettingsState.getUsername());
         config.setSmtpPassword(serverSettingsState.getPassword());
+        config.setSmtpPrefix(serverSettingsState.getPrefix());
 
         // login as the admin user.
         AcegiUtils.loginAs(admin);
@@ -105,10 +106,16 @@ public class SetupWizard extends BaseWizard
         this.setupManager = setupManager;
     }
 
+    /**
+     * The create admin user page.
+     */
     public class CreateAdminState extends BaseWizardState implements Validateable
     {
         private User admin = new User();
 
+        /**
+         * The password confirmation field, must match the admin.getPassword() value
+         */
         private String confirm;
 
         public CreateAdminState(Wizard wizard, String name)
@@ -120,13 +127,18 @@ public class SetupWizard extends BaseWizard
         {
             if (!confirm.equals(admin.getPassword()))
             {
-                addFieldError("confirm", "confirmed password does not match password, please re-enter your password");
+                addFieldError("confirm", getTextProvider().getText("admin.password.confirm.mismatch"));
             }
         }
 
+        /**
+         * The next page is always the settings page.
+         *
+         * @return the server settings state name.
+         */
         public String getNextStateName()
         {
-            return "settings";
+            return serverSettingsState.getStateName();
         }
 
         public User getAdmin()
@@ -134,11 +146,21 @@ public class SetupWizard extends BaseWizard
             return admin;
         }
 
+        /**
+         * Getter for the password confirmation field.
+         *
+         * @return current value.
+         */
         public String getConfirm()
         {
             return confirm;
         }
 
+        /**
+         * Setter for the password confirmation field.
+         *
+         * @param confirm
+         */
         public void setConfirm(String confirm)
         {
             this.confirm = confirm;
@@ -152,6 +174,7 @@ public class SetupWizard extends BaseWizard
         private String smtpHost;
         private String username;
         private String password;
+        private String prefix;
 
         public ServerSettingsState(Wizard wizard, String name)
         {
@@ -169,7 +192,6 @@ public class SetupWizard extends BaseWizard
             {
                 // Oh well, we tried
             }
-
         }
 
         public String getNextStateName()
@@ -233,6 +255,16 @@ public class SetupWizard extends BaseWizard
             {
                 addFieldError("fromAddress", "from address is required when smtp host is provided");
             }
+        }
+
+        public String getPrefix()
+        {
+            return prefix;
+        }
+
+        public void setPrefix(String prefix)
+        {
+            this.prefix = prefix;
         }
     }
 }

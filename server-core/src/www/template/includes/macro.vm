@@ -795,6 +795,19 @@
 #end
 
 ##
+## Shows a standard Previous, Finish row, as used by wizards.
+## param: tabIndex, indicates the first tab index to be used by the row.
+##
+#macro(previousFinish $tabIndex)
+    #openSubmit()
+        #set($finishTabIndex = $tabIndex)
+        #set($prevTabIndex = $nextTabIndex + 1)
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=$prevTabIndex")
+        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=$finishTabIndex")
+    #closeSubmit()
+#end
+
+##
 ## Outputs a single row for a name-value pair table.  Used for basic entity
 ## details.
 ##

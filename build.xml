@@ -14,6 +14,13 @@
         <foreach target="clean"/>
     </target>
 
+    <target name="clean.dev">
+        <delete dir="home"/>
+        <delete dir="master/system"/>
+        <delete file="master/etc/admin.token"/>
+        <delete file="master/etc/bob-init.properties"/>
+    </target>
+
     <target name="build.core">
         <ant inheritAll="false" dir="core" antfile="build.xml" target="build.module"/>
     </target>
