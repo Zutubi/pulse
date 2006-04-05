@@ -18,10 +18,7 @@
     #wwtextfield("name=project" "label=%{getText('subscription.project')}" "disabled=true" "tabindex=1")
     #wwtextfield("name=contactPoint" "label=%{getText('subscription.contact')}" "disabled=true" "tabindex=2")
     #wwselect("name=condition" "label=%{getText('subscription.condition')}" "list=conditions" "required=true" "tabindex=3")
-    #openSubmit()
-        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=4")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=5")
-    #closeSubmit()
+    #saveCancel(4)
 #end
 
 </body>

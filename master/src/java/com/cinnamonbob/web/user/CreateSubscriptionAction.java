@@ -1,9 +1,11 @@
 package com.cinnamonbob.web.user;
 
+import com.cinnamonbob.ProjectNameComparator;
 import com.cinnamonbob.bootstrap.ConfigurationManager;
 import com.cinnamonbob.model.*;
 import com.opensymphony.util.TextUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -21,7 +23,7 @@ public class CreateSubscriptionAction extends UserActionSupport
     private String condition;
 
     private Map<String, String> conditions;
-    private Map<Long, String> projects;
+    private List<Project> projects;
     private Map<Long, String> contactPoints;
 
     private Project project;
@@ -82,7 +84,7 @@ public class CreateSubscriptionAction extends UserActionSupport
         this.contactPointId = contactPointId;
     }
 
-    public Map<Long, String> getProjects()
+    public List<Project> getProjects()
     {
         return projects;
     }
@@ -94,12 +96,14 @@ public class CreateSubscriptionAction extends UserActionSupport
 
     public String doInput()
     {
-        List<Project> allProjects = projectManager.getAllProjects();
-        if (allProjects.size() == 0)
+        projects = projectManager.getAllProjects();
+        if (projects.size() == 0)
         {
             addActionError("No projects available.  Please configure a project before creating a subscription.");
             return ERROR;
         }
+
+        Collections.sort(projects, new ProjectNameComparator());
 
         User user = getUser();
         if (user == null)
@@ -120,12 +124,6 @@ public class CreateSubscriptionAction extends UserActionSupport
         {
             addActionError("Unable to create a subscription as this server does not have an SMTP host configured.");
             return ERROR;
-        }
-
-        projects = new TreeMap<Long, String>();
-        for (Project project : allProjects)
-        {
-            projects.put(project.getId(), project.getName());
         }
 
         contactPoints = new TreeMap<Long, String>();

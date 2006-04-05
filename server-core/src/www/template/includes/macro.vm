@@ -780,6 +780,18 @@
 #end
 
 ##
+## Shows a standard Create or Cancel row.
+## param: tabIndex, indicates the first tab index to be used by the row.
+##
+#macro(createCancel $tabIndex)
+    #openSubmit()
+        #wwsubmit("name=create" "value=%{getText('create.name')}" "tabindex=$tabIndex")
+        #set($tabIndex = $tabIndex + 1)
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
+    #closeSubmit()
+#end
+
+##
 ## Shows a standard Previous, Finish or Cancel row, as used by wizards.
 ## param: tabIndex, indicates the first tab index to be used by the row.
 ##

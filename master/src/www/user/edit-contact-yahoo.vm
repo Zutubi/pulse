@@ -14,10 +14,7 @@
         #wwhidden("name=user")
         #wwtextfield("name=contact.name" "label=%{getText('contact.name')}" "required=true" "tabindex=1")
         #wwtextfield("name=contact.yahooId" "label=%{getText('contact.yahooId')}" "required=true" "tabindex=2")
-        #openSubmit()
-            #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=3")
-            #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=4")
-        #closeSubmit()
+        #saveCancel(3)
     #end
 
 </body>

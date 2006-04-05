@@ -14,13 +14,10 @@
     #wwcform("action=createSubscription.action" "heading=%{getText('subscription.create')}" "method=post")
         #wwhidden("name=userId")
 
-        #wwselect("name=projectId" "label=%{getText('subscription.project')}" "list=projects" "required=true" "tabindex=1")
+        #wwselect("name=projectId" "label=%{getText('subscription.project')}" "list=projects" "listKey=id" "listValue=name" "required=true" "tabindex=1")
         #wwselect("name=contactPointId" "label=%{getText('subscription.contact')}" "list=contactPoints" "required=true" "tabindex=2")
         #wwselect("name=condition" "label=%{getText('subscription.condition')}" "list=conditions" "required=true" "tabindex=3")
-        #openSubmit()
-            #wwsubmit("name=create" "value=%{getText('create.name')}" "tabindex=4")
-            #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=5")
-        #closeSubmit()
+        #createCancel(4)
     #end
 
 </body>
