@@ -98,7 +98,7 @@ public class ViewRecipeQueueAction extends ActionSupport
         for(Project p: projectQueue.keySet())
         {
             BuildResult result = buildManager.getLatestBuildResult(p);
-            if(result.inProgress())
+            if(result != null && result.inProgress())
             {
                 latestBuilds.put(p, result);
             }
