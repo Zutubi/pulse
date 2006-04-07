@@ -578,13 +578,13 @@
 ##
 ## Outputs a result test summary cell
 ##
-#macro(testResultsCell $result)
+#macro(testResultsCell $build $result)
     <td class="$result.state.string">
     #set($summary = $result.testSummary)
     #if($summary.total == 0)
         #wwtext("name=tests.none")
     #else
-        <a href="viewTests.action?id=$result.id">
+        <a href="viewTests.action?id=$build.id">
         #if($summary.allPassed())
             $action.getText("tests.all.passed", ["$summary.total"])
         #else
@@ -877,7 +877,7 @@
             #set($cssClass = $recipe.state.string)
             #dynamicCell($recipe.recipeNameSafe)
             #statusCell($recipe)
-            #testResultsCell($recipe)
+            #testResultsCell($build $recipe)
             #classCell("$recipe.stamps.prettyStartDate ($recipe.stamps.prettyStartTime)")
             #classCell($recipe.stamps.prettyElapsed)
 ##            #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$build.project.id")
@@ -896,7 +896,7 @@
             #set($cssClass = $command.state.string)
             #dynamicLinkCell($command.commandName "viewCommandLog.action?id=$build.id#command-$velocityCount")
             #statusCell($command)
-            #testResultsCell($command)
+            #testResultsCell($build $command)
             #classCell("$command.stamps.prettyStartDate ($command.stamps.prettyStartTime)")
             #classCell($command.stamps.prettyElapsed)
         </tr>
@@ -1294,7 +1294,7 @@
                     #rightCell($buildResult.number)
                     #classCell($buildResult.buildSpecification)
                     #statusCell($buildResult)
-                    #testResultsCell($buildResult)
+                    #testResultsCell($buildResult $buildResult)
                     #classCell("$buildResult.stamps.prettyStartDate ($buildResult.stamps.prettyStartTime)")
                     #classCell($buildResult.stamps.prettyElapsed)
     #if($showActions)
@@ -1397,7 +1397,7 @@
             <td class="content-right"><a href="viewBuild.action?id=$lastResult.id">$lastResult.number</a></td>
             #classCell($lastResult.buildSpecification)
             #statusCell($lastResult)
-            #testResultsCell($lastResult)
+            #testResultsCell($lastResult $lastResult)
             #classCell($lastResult.stamps.prettyStartTime)
             #classCell($lastResult.stamps.prettyElapsed)
             #viewCell($project $lastResult)

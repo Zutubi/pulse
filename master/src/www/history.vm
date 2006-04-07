@@ -44,7 +44,7 @@
         <tr>
             <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
             #statusCell($buildResult)
-            #testResultsCell($buildResult)
+            #testResultsCell($buildResult $buildResult)
             #classCell($buildResult.buildSpecification)
             #classCell($buildResult.stamps.prettyStartTime)
             #classCell($buildResult.stamps.prettyElapsed)
