@@ -14,7 +14,7 @@ import java.util.regex.PatternSyntaxException;
  */
 public class RegexPattern
 {
-    private Feature.Level category;
+    private Feature.Level category = Feature.Level.ERROR;
     private String expression;
     private String summary;
     private Pattern pattern;
