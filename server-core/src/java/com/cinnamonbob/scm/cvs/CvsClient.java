@@ -21,6 +21,8 @@ import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.connection.Connection;
+import org.netbeans.lib.cvsclient.event.CVSAdapter;
+import org.netbeans.lib.cvsclient.event.MessageEvent;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -126,6 +128,55 @@ public class CvsClient
         catch (AuthenticationException e)
         {
             throw handleAuthenticationException(e);
+        }
+        finally
+        {
+            CvsUtils.close(connection);
+        }
+    }
+
+    public String getServerVersion() throws SCMException
+    {
+        Connection connection = null;
+        try
+        {
+            GlobalOptions globalOptions = new GlobalOptions();
+            globalOptions.setCVSRoot(root.toString());
+
+            connection = openConnection();
+
+            Client client = new Client(connection, new StandardAdminHandler());
+            final String[] version = new String[1];
+            client.getEventManager().addCVSListener(new CVSAdapter()
+            {
+                public void messageSent(MessageEvent e)
+                {
+                    if (!e.isError())
+                    {
+                        version[0] = e.getMessage();
+                    }
+                }
+            });
+
+            VersionCommand versionCommand = new VersionCommand();
+
+            if (!client.executeCommand(versionCommand, globalOptions))
+            {
+                throw new SCMException("failed to retrieve the cvs server version details.");
+            }
+            return version[0];
+        }
+        catch (AuthenticationException ae)
+        {
+            throw handleAuthenticationException(ae);
+        }
+        catch (CommandAbortedException cae)
+        {
+            throw new SCMException(cae);
+        }
+        catch (CommandException ce)
+        {
+            throw new SCMException(ce);
         }
         finally
         {
@@ -568,11 +619,15 @@ public class CvsClient
 
             // remove the ,v
             if (filename.endsWith(",v"))
+            {
                 filename = filename.substring(0, filename.length() - 2);
+            }
 
             // remove the repo root.
             if (filename.startsWith(root.getRepository()))
+            {
                 filename = filename.substring(root.getRepository().length());
+            }
 
             return filename;
         }

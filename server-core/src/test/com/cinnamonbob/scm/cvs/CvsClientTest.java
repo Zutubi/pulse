@@ -465,6 +465,13 @@ public class CvsClientTest extends BobTestCase
         assertFalse(new File(workdir, "unit-test/CvsServerTest").exists());
     }
 
+    public void testServerVersion() throws SCMException
+    {
+        String serverVersion = cvs.getServerVersion();
+        assertNotNull(serverVersion);
+        assertTrue(serverVersion + " does not contain 'CVS'.", serverVersion.contains("CVS"));
+    }
+
     private static void assertChangelistValues(Changelist changelist, String user, String comment)
     {
         assertEquals(user, changelist.getUser());
