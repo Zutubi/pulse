@@ -1,8 +1,8 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.*;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.test.BobTestCase;
 
 import java.io.File;
 import java.util.List;
@@ -28,20 +28,20 @@ public class JUnitReportPostProcessorTest extends BobTestCase
     public void testSimple()
     {
         File root = getBobRoot();
-        File outputDir = new File(root, FileSystemUtils.composeFilename("core", "src", "test", "com", "cinnamonbob", "core"));
+        File outputDir = new File(root, FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "core"));
 
         StoredFileArtifact artifact = new StoredFileArtifact(getClass().getSimpleName() + ".simple.xml");
         pp.process(outputDir, artifact, new CommandResult("test"));
 
         List<TestResult> tests = artifact.getTests();
         assertEquals(3, tests.size());
-        checkWarning(tests.get(0), "com.cinnamonbob.junit.EmptyTest", 91, "No tests found");
-        checkWarning(tests.get(1), "com.cinnamonbob.junit.NonConstructableTest", 100, "no public constructor");
+        checkWarning(tests.get(0), "com.zutubi.pulse.junit.EmptyTest", 91, "No tests found");
+        checkWarning(tests.get(1), "com.zutubi.pulse.junit.NonConstructableTest", 100, "no public constructor");
 
         TestResult result = artifact.getTests().get(2);
         assertTrue(result instanceof TestSuiteResult);
         TestSuiteResult suite = (TestSuiteResult) result;
-        assertEquals("com.cinnamonbob.junit.SimpleTest", suite.getName());
+        assertEquals("com.zutubi.pulse.junit.SimpleTest", suite.getName());
         assertEquals(90, suite.getDuration());
 
         List<TestResult> children = suite.getChildren();
@@ -49,10 +49,10 @@ public class JUnitReportPostProcessorTest extends BobTestCase
         checkCase((TestCaseResult) children.get(0), "testSimple", TestCaseResult.Status.PASS, 0, null);
         checkCase((TestCaseResult) children.get(1), "testAssertionFailure", TestCaseResult.Status.FAILURE, 10,
                 "junit.framework.AssertionFailedError: expected:<1> but was:<2>\n" +
-                "\tat com.cinnamonbob.junit.SimpleTest.testAssertionFailure(Unknown Source)");
+                "\tat com.zutubi.pulse.junit.SimpleTest.testAssertionFailure(Unknown Source)");
         checkCase((TestCaseResult) children.get(2), "testThrowException", TestCaseResult.Status.ERROR, 10,
                 "java.lang.RuntimeException: random message\n" +
-                "\tat com.cinnamonbob.junit.SimpleTest.testThrowException(Unknown Source)");
+                "\tat com.zutubi.pulse.junit.SimpleTest.testThrowException(Unknown Source)");
     }
 
     private void checkCase(TestCaseResult caseResult, String name, TestCaseResult.Status status, long duration, String message)

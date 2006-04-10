@@ -1,7 +1,7 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.model.ContactPoint;
-import com.cinnamonbob.model.persistence.ContactPointDao;
+import com.zutubi.pulse.model.ContactPoint;
+import com.zutubi.pulse.model.persistence.ContactPointDao;
 
 /**
  *

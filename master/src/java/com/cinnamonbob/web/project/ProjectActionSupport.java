@@ -1,12 +1,12 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.core.model.Feature;
-import com.cinnamonbob.model.BuildManager;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.ProjectManager;
-import com.cinnamonbob.model.ScmManager;
-import com.cinnamonbob.scheduling.Scheduler;
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.ScmManager;
+import com.zutubi.pulse.scheduling.Scheduler;
+import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.LinkedList;
 import java.util.List;

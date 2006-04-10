@@ -1,6 +1,6 @@
-package com.cinnamonbob.core.model;
+package com.zutubi.pulse.core.model;
 
-import com.cinnamonbob.core.util.TimeStamps;
+import com.zutubi.pulse.core.util.TimeStamps;
 
 /**
  * Abstract base for test suites and cases.

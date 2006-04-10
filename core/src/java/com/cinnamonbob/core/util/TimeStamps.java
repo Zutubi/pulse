@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.util;
+package com.zutubi.pulse.core.util;
 
 import java.text.DateFormat;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package com.cinnamonbob.acceptance;
+package com.zutubi.pulse.acceptance;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

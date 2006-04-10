@@ -1,8 +1,8 @@
-package com.cinnamonbob.web;
+package com.zutubi.pulse.web;
 
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.UserManager;
-import com.cinnamonbob.security.AcegiUtils;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.security.AcegiUtils;
 
 /**
  * An action to change the users default page to their dashboard once they

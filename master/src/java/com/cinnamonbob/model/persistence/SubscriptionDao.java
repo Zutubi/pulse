@@ -1,7 +1,7 @@
-package com.cinnamonbob.model.persistence;
+package com.zutubi.pulse.model.persistence;
 
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.Subscription;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.Subscription;
 
 import java.util.List;
 

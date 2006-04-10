@@ -5,7 +5,7 @@
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="mappingResources">
             <list>
-                <value>com/cinnamonbob/scheduling/persistence/hibernate/Trigger.hbm.xml</value>
+                <value>com/zutubi/pulse/scheduling/persistence/hibernate/Trigger.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">
@@ -27,7 +27,7 @@
         </property>
     </bean>
 
-    <bean id="triggerDaoTarget" class="com.cinnamonbob.scheduling.persistence.hibernate.HibernateTriggerDao">
+    <bean id="triggerDaoTarget" class="com.zutubi.pulse.scheduling.persistence.hibernate.HibernateTriggerDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>

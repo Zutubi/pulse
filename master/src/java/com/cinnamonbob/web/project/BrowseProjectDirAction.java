@@ -1,9 +1,9 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.MasterBuildPaths;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.filesystem.local.LocalFileSystem;
-import com.cinnamonbob.model.BuildResult;
+import com.zutubi.pulse.MasterBuildPaths;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.filesystem.local.LocalFileSystem;
+import com.zutubi.pulse.model.BuildResult;
 
 /**
  */

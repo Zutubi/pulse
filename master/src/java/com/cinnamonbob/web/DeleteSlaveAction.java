@@ -1,6 +1,6 @@
-package com.cinnamonbob.web;
+package com.zutubi.pulse.web;
 
-import com.cinnamonbob.model.SlaveManager;
+import com.zutubi.pulse.model.SlaveManager;
 
 /**
  * <class-comment/>

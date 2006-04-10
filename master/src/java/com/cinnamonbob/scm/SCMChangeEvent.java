@@ -1,8 +1,8 @@
-package com.cinnamonbob.scm;
+package com.zutubi.pulse.scm;
 
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.model.Scm;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.model.Scm;
 
 /**
  * This event indicates that a change has been detected in an SCM.

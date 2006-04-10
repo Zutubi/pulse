@@ -1,10 +1,10 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.core.model.*;
-import com.cinnamonbob.model.*;
-import com.cinnamonbob.model.persistence.BuildResultDao;
-import com.cinnamonbob.model.persistence.BuildSpecificationDao;
-import com.cinnamonbob.model.persistence.ProjectDao;
+import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.persistence.BuildResultDao;
+import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
+import com.zutubi.pulse.model.persistence.ProjectDao;
 
 import java.io.File;
 import java.util.Calendar;

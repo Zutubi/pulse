@@ -1,4 +1,4 @@
-package com.cinnamonbob.util.pagination;
+package com.zutubi.pulse.util.pagination;
 
 import java.util.List;
 

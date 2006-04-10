@@ -1,7 +1,7 @@
-package com.cinnamonbob.web;
+package com.zutubi.pulse.web;
 
-import com.cinnamonbob.logging.CustomLogRecord;
-import com.cinnamonbob.logging.ServerMessagesHandler;
+import com.zutubi.pulse.logging.CustomLogRecord;
+import com.zutubi.pulse.logging.ServerMessagesHandler;
 
 import java.util.Collections;
 import java.util.List;

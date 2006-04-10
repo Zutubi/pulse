@@ -1,12 +1,12 @@
-package com.cinnamonbob.renderer;
+package com.zutubi.pulse.renderer;
 
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.BuildScmDetails;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.BuildScmDetails;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.test.BobTestCase;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.File;

@@ -1,7 +1,7 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.model.persistence.AnyTypeDao;
-import com.cinnamonbob.model.persistence.ObjectHandle;
+import com.zutubi.pulse.model.persistence.AnyTypeDao;
+import com.zutubi.pulse.model.persistence.ObjectHandle;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.EntityMode;

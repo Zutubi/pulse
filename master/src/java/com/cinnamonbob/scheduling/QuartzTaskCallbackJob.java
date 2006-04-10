@@ -1,6 +1,6 @@
-package com.cinnamonbob.scheduling;
+package com.zutubi.pulse.scheduling;
 
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.util.logging.Logger;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;

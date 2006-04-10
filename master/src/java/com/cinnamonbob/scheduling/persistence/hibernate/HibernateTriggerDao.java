@@ -1,8 +1,8 @@
-package com.cinnamonbob.scheduling.persistence.hibernate;
+package com.zutubi.pulse.scheduling.persistence.hibernate;
 
-import com.cinnamonbob.model.persistence.hibernate.HibernateEntityDao;
-import com.cinnamonbob.scheduling.Trigger;
-import com.cinnamonbob.scheduling.persistence.TriggerDao;
+import com.zutubi.pulse.model.persistence.hibernate.HibernateEntityDao;
+import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.scheduling.persistence.TriggerDao;
 
 import java.util.List;
 

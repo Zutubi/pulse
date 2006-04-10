@@ -1,8 +1,8 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.Property;
-import com.cinnamonbob.core.model.Resource;
-import com.cinnamonbob.core.model.ResourceVersion;
+import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.model.ResourceVersion;
 
 import java.io.InputStream;
 

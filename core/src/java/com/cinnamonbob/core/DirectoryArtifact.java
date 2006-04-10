@@ -1,8 +1,8 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.StoredArtifact;
-import com.cinnamonbob.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;

@@ -5,16 +5,16 @@
 -->
 <beans>
 
-    <bean id="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory"/>
+    <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
     <!-- token manager required for scripted access to the remote api. -->
-    <bean id="tokenManager" class="com.cinnamonbob.api.TokenManager" autowire="byName" init-method="init"/>
+    <bean id="tokenManager" class="com.zutubi.pulse.api.TokenManager" autowire="byName" init-method="init"/>
 
     <!-- TODO: services should register themselves with the shutdown manager as they are started. -->
     <!--
     the shutdown manager at this point only needs to shutdown jetty.
     -->
-    <bean id="shutdownManager" class="com.cinnamonbob.ShutdownManager">
+    <bean id="shutdownManager" class="com.zutubi.pulse.ShutdownManager">
         <property name="stoppables">
             <list>
                 <ref bean="jettyManager"/>
@@ -24,7 +24,7 @@
 
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 
-    <import resource="classpath:/com/cinnamonbob/bootstrap/context/loggingContext.xml"/>
-    <import resource="classpath:/com/cinnamonbob/bootstrap/context/webserverContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/loggingContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/webserverContext.xml"/>
 
 </beans>

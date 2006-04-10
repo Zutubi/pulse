@@ -30,9 +30,9 @@
     </resolvers>
 
     <modules>
-        <!-- we know where all of the cinnamonbob packages are located, no
+        <!-- we know where all of the pulse packages are located, no
              point searching through the others -->
-        <module organisation="cinnamonbob" name=".*" resolver="build"/>
+        <module organisation="zutubi" name=".*" resolver="build"/>
     </modules>
 
 </ivyconf>

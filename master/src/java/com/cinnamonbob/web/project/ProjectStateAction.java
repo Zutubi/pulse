@@ -1,6 +1,6 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.model.Project;
+import com.zutubi.pulse.model.Project;
 
 /**
  * An action to change the state of a project (e.g. to pause it);

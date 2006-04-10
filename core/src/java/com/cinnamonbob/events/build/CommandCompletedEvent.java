@@ -1,6 +1,6 @@
-package com.cinnamonbob.events.build;
+package com.zutubi.pulse.events.build;
 
-import com.cinnamonbob.core.model.CommandResult;
+import com.zutubi.pulse.core.model.CommandResult;
 
 /**
  */

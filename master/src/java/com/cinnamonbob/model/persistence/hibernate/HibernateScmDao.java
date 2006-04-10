@@ -1,7 +1,7 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.model.Scm;
-import com.cinnamonbob.model.persistence.ScmDao;
+import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.model.persistence.ScmDao;
 
 /**
  * 

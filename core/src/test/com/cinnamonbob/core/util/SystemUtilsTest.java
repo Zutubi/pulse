@@ -1,6 +1,6 @@
-package com.cinnamonbob.core.util;
+package com.zutubi.pulse.core.util;
 
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.test.BobTestCase;
 
 import java.io.File;
 

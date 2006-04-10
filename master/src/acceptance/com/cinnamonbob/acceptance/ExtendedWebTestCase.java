@@ -1,4 +1,4 @@
-package com.cinnamonbob.acceptance;
+package com.zutubi.pulse.acceptance;
 
 import net.sourceforge.jwebunit.WebTestCase;
 

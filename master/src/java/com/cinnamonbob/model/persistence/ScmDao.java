@@ -1,6 +1,6 @@
-package com.cinnamonbob.model.persistence;
+package com.zutubi.pulse.model.persistence;
 
-import com.cinnamonbob.model.Scm;
+import com.zutubi.pulse.model.Scm;
 
 /**
  * 

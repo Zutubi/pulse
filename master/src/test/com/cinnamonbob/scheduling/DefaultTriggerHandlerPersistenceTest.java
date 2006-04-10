@@ -1,8 +1,8 @@
-package com.cinnamonbob.scheduling;
+package com.zutubi.pulse.scheduling;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.model.persistence.hibernate.PersistenceTestCase;
-import com.cinnamonbob.scheduling.persistence.TriggerDao;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.model.persistence.hibernate.PersistenceTestCase;
+import com.zutubi.pulse.scheduling.persistence.TriggerDao;
 
 /**
  * <class-comment/>
@@ -36,9 +36,9 @@ public class DefaultTriggerHandlerPersistenceTest extends PersistenceTestCase
 
     protected String[] getConfigLocations()
     {
-        return new String[]{"com/cinnamonbob/bootstrap/testBootstrapContext.xml",
-                "com/cinnamonbob/scheduling/DefaultTriggerHandlerPersistenceTestContext.xml",
-                "com/cinnamonbob/bootstrap/context/schedulingContext.xml"};
+        return new String[]{"com/zutubi/pulse/bootstrap/testBootstrapContext.xml",
+                "com/zutubi/pulse/scheduling/DefaultTriggerHandlerPersistenceTestContext.xml",
+                "com/zutubi/pulse/bootstrap/context/schedulingContext.xml"};
     }
 
     /**

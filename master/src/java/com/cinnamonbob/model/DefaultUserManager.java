@@ -1,7 +1,7 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.model.persistence.ContactPointDao;
-import com.cinnamonbob.model.persistence.UserDao;
+import com.zutubi.pulse.model.persistence.ContactPointDao;
+import com.zutubi.pulse.model.persistence.UserDao;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
 import org.springframework.dao.DataAccessException;

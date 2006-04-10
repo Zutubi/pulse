@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.ajax;
+package com.zutubi.pulse.web.ajax;
 
-import com.cinnamonbob.model.Cvs;
-import com.cinnamonbob.model.Scm;
+import com.zutubi.pulse.model.Cvs;
+import com.zutubi.pulse.model.Scm;
 
 /**
  * An ajax request to test CVS settings and send a fragment of HTML

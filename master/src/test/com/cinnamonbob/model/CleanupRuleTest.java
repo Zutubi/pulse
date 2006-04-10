@@ -1,11 +1,11 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.core.util.Constants;
-import com.cinnamonbob.model.persistence.BuildResultDao;
-import com.cinnamonbob.model.persistence.ProjectDao;
-import com.cinnamonbob.model.persistence.hibernate.MasterPersistenceTestCase;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.util.Constants;
+import com.zutubi.pulse.model.persistence.BuildResultDao;
+import com.zutubi.pulse.model.persistence.ProjectDao;
+import com.zutubi.pulse.model.persistence.hibernate.MasterPersistenceTestCase;
 
 import java.util.Arrays;
 import java.util.List;

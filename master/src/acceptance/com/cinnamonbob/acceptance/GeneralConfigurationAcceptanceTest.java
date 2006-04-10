@@ -1,4 +1,4 @@
-package com.cinnamonbob.acceptance;
+package com.zutubi.pulse.acceptance;
 
 /**
  * <class-comment/>
@@ -32,7 +32,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
 
         clickLinkWithText("reset");
         assertTextPresent("localhost:8080");
-        assertTextPresent("http://www.cinnamonbob.com:8080/display/CIB");
+        assertTextPresent("http://www.pulse.com:8080/display/CIB");
     }
 
     public void testEdit() throws Exception

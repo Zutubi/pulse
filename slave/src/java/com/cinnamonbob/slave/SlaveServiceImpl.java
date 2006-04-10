@@ -1,10 +1,10 @@
-package com.cinnamonbob.slave;
+package com.zutubi.pulse.slave;
 
-import com.cinnamonbob.RecipeRequest;
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.services.SlaveService;
-import com.cinnamonbob.slave.command.CleanupRecipeCommand;
-import com.cinnamonbob.slave.command.RecipeCommand;
+import com.zutubi.pulse.RecipeRequest;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
+import com.zutubi.pulse.slave.command.RecipeCommand;
 
 /**
  */

@@ -1,6 +1,6 @@
-package com.cinnamonbob.web.user;
+package com.zutubi.pulse.web.user;
 
-import com.cinnamonbob.model.YahooContactPoint;
+import com.zutubi.pulse.model.YahooContactPoint;
 
 /**
  *

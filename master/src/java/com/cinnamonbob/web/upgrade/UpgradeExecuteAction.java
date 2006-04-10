@@ -1,6 +1,6 @@
-package com.cinnamonbob.web.upgrade;
+package com.zutubi.pulse.web.upgrade;
 
-import com.cinnamonbob.upgrade.UpgradeProgressMonitor;
+import com.zutubi.pulse.upgrade.UpgradeProgressMonitor;
 
 /**
  * <class-comment/>

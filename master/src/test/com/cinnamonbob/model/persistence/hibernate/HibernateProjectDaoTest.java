@@ -1,10 +1,10 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.model.*;
-import com.cinnamonbob.model.persistence.ContactPointDao;
-import com.cinnamonbob.model.persistence.ProjectDao;
-import com.cinnamonbob.model.persistence.SubscriptionDao;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.persistence.ContactPointDao;
+import com.zutubi.pulse.model.persistence.ProjectDao;
+import com.zutubi.pulse.model.persistence.SubscriptionDao;
 
 import java.util.TreeMap;
 

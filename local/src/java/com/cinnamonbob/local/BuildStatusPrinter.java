@@ -1,11 +1,11 @@
-package com.cinnamonbob.local;
+package com.zutubi.pulse.local;
 
-import com.cinnamonbob.core.model.*;
-import com.cinnamonbob.core.util.ForkOutputStream;
-import com.cinnamonbob.core.util.TimeStamps;
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.events.EventListener;
-import com.cinnamonbob.events.build.*;
+import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.util.ForkOutputStream;
+import com.zutubi.pulse.core.util.TimeStamps;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.build.*;
 
 import java.io.File;
 import java.io.OutputStream;

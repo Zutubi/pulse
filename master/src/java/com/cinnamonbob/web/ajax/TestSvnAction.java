@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.ajax;
+package com.zutubi.pulse.web.ajax;
 
-import com.cinnamonbob.model.Scm;
-import com.cinnamonbob.model.Svn;
+import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.model.Svn;
 
 /**
  * An ajax request to test subversion settings and send a fragment of HTML

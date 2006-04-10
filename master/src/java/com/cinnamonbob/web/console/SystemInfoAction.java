@@ -1,8 +1,8 @@
-package com.cinnamonbob.web.console;
+package com.zutubi.pulse.web.console;
 
-import com.cinnamonbob.bootstrap.StartupManager;
-import com.cinnamonbob.core.util.Constants;
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.bootstrap.StartupManager;
+import com.zutubi.pulse.core.util.Constants;
+import com.zutubi.pulse.web.ActionSupport;
 
 import java.text.DateFormat;
 import java.text.MessageFormat;

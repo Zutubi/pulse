@@ -1,4 +1,4 @@
-package com.cinnamonbob.util;
+package com.zutubi.pulse.util;
 
 /**
  * Convenience class to help with asserting the correct state of the system.

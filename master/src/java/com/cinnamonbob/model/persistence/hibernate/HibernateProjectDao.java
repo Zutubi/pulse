@@ -1,11 +1,11 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.model.AntBobFileDetails;
-import com.cinnamonbob.model.CustomBobFileDetails;
-import com.cinnamonbob.model.MakeBobFileDetails;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.persistence.ProjectDao;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.model.AntBobFileDetails;
+import com.zutubi.pulse.model.CustomBobFileDetails;
+import com.zutubi.pulse.model.MakeBobFileDetails;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.persistence.ProjectDao;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;
 

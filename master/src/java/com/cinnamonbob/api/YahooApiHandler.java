@@ -1,4 +1,4 @@
-package com.cinnamonbob.api;
+package com.zutubi.pulse.api;
 
 import ymsg.network.Session;
 import ymsg.network.event.*;

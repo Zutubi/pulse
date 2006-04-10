@@ -2,7 +2,7 @@
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>
 
-    <display-name>CinnamonBob</display-name>
+    <display-name>Pulse</display-name>
     <description>Continuous Integration Web UI</description>
 
     <!--
@@ -14,7 +14,7 @@
     -->
     <filter>
         <filter-name>Acegi Session Filter</filter-name>
-        <filter-class>com.cinnamonbob.spring.FilterWrapper</filter-class>
+        <filter-class>com.zutubi.pulse.spring.FilterWrapper</filter-class>
         <init-param>
             <param-name>delegateClassName</param-name>
             <param-value>org.acegisecurity.context.HttpSessionContextIntegrationFilter</param-value>
@@ -28,7 +28,7 @@
 
     <filter>
         <filter-name>redirect</filter-name>
-        <filter-class>com.cinnamonbob.servlet.RedirectServletFilter</filter-class>
+        <filter-class>com.zutubi.pulse.servlet.RedirectServletFilter</filter-class>
         <init-param>
             <param-name>destination</param-name>
             <param-value>default.action</param-value>
@@ -71,7 +71,7 @@
     and debugging.
     -->
     <listener>
-        <listener-class>com.cinnamonbob.xwork.servlet.ReloadResourceContextListener</listener-class>
+        <listener-class>com.zutubi.pulse.xwork.servlet.ReloadResourceContextListener</listener-class>
     </listener>
 
     <servlet>
@@ -83,21 +83,21 @@
     <!--
     <servlet>
         <servlet-name>hessian</servlet-name>
-        <servlet-class>com.cinnamonbob.hessian.CustomHessianServlet</servlet-class>
+        <servlet-class>com.zutubiian.CustomHessianServlet</servlet-class>
         <init-param>
             <param-name>home-class</param-name>
-            <param-value>com.cinnamonbob.MasterServiceImpl</param-value>
+            <param-value>com.zutubierServiceImpl</param-value>
         </init-param>
         <init-param>
             <param-name>home-api</param-name>
-            <param-value>com.cinnamonbob.services.MasterService</param-value>
+            <param-value>com.zutubiices.MasterService</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet>
         <servlet-name>download</servlet-name>
-        <servlet-class>com.cinnamonbob.servlet.DownloadResultsServlet</servlet-class>
+        <servlet-class>com.zutubilet.DownloadResultsServlet</servlet-class>
     </servlet>
     -->
 
@@ -109,13 +109,13 @@
     <!--
         <servlet>
             <servlet-name>UserProfileServlet</servlet-name>
-            <servlet-class>com.cinnamonbob.servlet.ProfileServlet</servlet-class>
+            <servlet-class>com.zutubilet.ProfileServlet</servlet-class>
         </servlet>
     -->
 
     <servlet>
         <servlet-name>ViewFileServlet</servlet-name>
-        <servlet-class>com.cinnamonbob.servlet.ViewFileServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servlet.ViewFileServlet</servlet-class>
     </servlet>
 
     <!--

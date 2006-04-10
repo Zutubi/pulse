@@ -1,6 +1,6 @@
-package com.cinnamonbob.renderer;
+package com.zutubi.pulse.renderer;
 
-import com.cinnamonbob.model.BuildResult;
+import com.zutubi.pulse.model.BuildResult;
 
 import java.io.Writer;
 

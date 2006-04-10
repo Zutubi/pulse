@@ -1,6 +1,6 @@
-package com.cinnamonbob.util;
+package com.zutubi.pulse.util;
 
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.util.logging.Logger;
 
 import javax.sql.DataSource;
 import java.io.BufferedReader;

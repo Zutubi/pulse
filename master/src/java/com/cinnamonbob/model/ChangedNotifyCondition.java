@@ -1,6 +1,6 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.model.Changelist;
+import com.zutubi.pulse.core.model.Changelist;
 
 /**
  * 
@@ -16,7 +16,7 @@ public class ChangedNotifyCondition implements NotifyCondition
     }
 
     /**
-     * @see NotifyCondition#satisfied(com.cinnamonbob.model.BuildResult)
+     * @see NotifyCondition#satisfied(com.zutubi.pulse.model.BuildResult)
      */
     public boolean satisfied(BuildResult result)
     {

@@ -1,8 +1,8 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.filesystem.remote.RemoteScmFileSystem;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.Scm;
+import com.zutubi.pulse.filesystem.remote.RemoteScmFileSystem;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.Scm;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 

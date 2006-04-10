@@ -1,7 +1,7 @@
-package com.cinnamonbob.web;
+package com.zutubi.pulse.web;
 
-import com.cinnamonbob.model.UserManager;
-import com.cinnamonbob.security.AcegiUtils;
+import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.security.AcegiUtils;
 
 /**
  * The default action controls the page presented to the user when they first arrive at the

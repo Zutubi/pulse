@@ -1,12 +1,12 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.model.BuildSpecification;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.scheduling.Scheduler;
-import com.cinnamonbob.scheduling.SchedulingException;
-import com.cinnamonbob.scheduling.Trigger;
-import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
-import com.cinnamonbob.xwork.interceptor.Preparable;
+import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.scheduling.Scheduler;
+import com.zutubi.pulse.scheduling.SchedulingException;
+import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
+import com.zutubi.pulse.xwork.interceptor.Preparable;
 
 import java.util.Arrays;
 import java.util.LinkedList;

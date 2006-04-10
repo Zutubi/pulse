@@ -1,8 +1,8 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.test.BobTestCase;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.File;

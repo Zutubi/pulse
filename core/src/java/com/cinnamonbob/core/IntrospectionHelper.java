@@ -1,4 +1,4 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

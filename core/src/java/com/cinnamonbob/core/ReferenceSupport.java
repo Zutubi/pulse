@@ -1,4 +1,4 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
 /**
  * A base class to simplify references implemented in the common way.

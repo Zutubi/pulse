@@ -1,7 +1,7 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.model.persistence.FileArtifactDao;
-import com.cinnamonbob.core.model.StoredFileArtifact;
+import com.zutubi.pulse.model.persistence.FileArtifactDao;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
 
 /**
  */

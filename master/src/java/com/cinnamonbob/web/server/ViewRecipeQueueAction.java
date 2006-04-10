@@ -1,13 +1,13 @@
-package com.cinnamonbob.web.server;
+package com.zutubi.pulse.web.server;
 
-import com.cinnamonbob.FatController;
-import com.cinnamonbob.RecipeDispatchRequest;
-import com.cinnamonbob.RecipeQueue;
-import com.cinnamonbob.events.build.BuildRequestEvent;
-import com.cinnamonbob.model.BuildManager;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.FatController;
+import com.zutubi.pulse.RecipeDispatchRequest;
+import com.zutubi.pulse.RecipeQueue;
+import com.zutubi.pulse.events.build.BuildRequestEvent;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.HashMap;
 import java.util.LinkedList;

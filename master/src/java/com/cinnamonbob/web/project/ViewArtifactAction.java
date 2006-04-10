@@ -1,11 +1,11 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.StoredFileArtifact;
-import com.cinnamonbob.core.model.Feature;
-import com.cinnamonbob.core.model.PlainFeature;
-import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.model.BuildResult;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.PlainFeature;
+import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.model.BuildResult;
 
 import java.io.*;
 import java.util.Map;

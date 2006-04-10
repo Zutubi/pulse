@@ -1,8 +1,8 @@
-package com.cinnamonbob.scheduling.quartz;
+package com.zutubi.pulse.scheduling.quartz;
 
-import com.cinnamonbob.FatController;
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.events.build.BuildTimeoutEvent;
+import com.zutubi.pulse.FatController;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.build.BuildTimeoutEvent;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;

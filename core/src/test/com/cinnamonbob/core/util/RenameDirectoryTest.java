@@ -1,11 +1,11 @@
-package com.cinnamonbob.core.util;
+package com.zutubi.pulse.core.util;
 
 import junit.framework.*;
 
 import java.io.File;
 import java.io.IOException;
 
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.test.BobTestCase;
 
 /**
  * Test case for the rename functionality of the FileSystemUtils.

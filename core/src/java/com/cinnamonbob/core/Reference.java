@@ -1,4 +1,4 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
 /**
  * Types that define the reference interface can be referenced anywhere within the

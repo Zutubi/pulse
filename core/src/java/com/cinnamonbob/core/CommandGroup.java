@@ -1,15 +1,11 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.StoredFileArtifact;
-import com.cinnamonbob.core.model.StoredArtifact;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.core.validation.Validateable;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.validation.Validateable;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.validator.ValidatorContext;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;

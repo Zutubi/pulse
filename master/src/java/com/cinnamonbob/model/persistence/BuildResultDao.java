@@ -1,11 +1,11 @@
-package com.cinnamonbob.model.persistence;
+package com.zutubi.pulse.model.persistence;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.RecipeResultNode;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.RecipeResultNode;
 
 import java.util.List;
 

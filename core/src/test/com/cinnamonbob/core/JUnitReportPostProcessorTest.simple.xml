@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuites>
-  <testsuite errors="0" failures="1" id="0" name="EmptyTest" package="com.cinnamonbob.junit" tests="1" time="0.091">
+  <testsuite errors="0" failures="1" id="0" name="EmptyTest" package="com.zutubi.pulse.junit" tests="1" time="0.091">
   
     <properties>
     
@@ -136,7 +136,7 @@
 
       <testcase classname="junit.framework.TestSuite$1" name="warning" time="0.01">
     
-      <failure message="No tests found in com.cinnamonbob.junit.EmptyTest" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: No tests found in com.cinnamonbob.junit.EmptyTest
+      <failure message="No tests found in com.zutubi.pulse.junit.EmptyTest" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: No tests found in com.zutubi.pulse.junit.EmptyTest
 </failure>
 
       </testcase>
@@ -146,7 +146,7 @@
       <system-err></system-err>
 
   </testsuite>
-  <testsuite errors="0" failures="1" id="1" name="NonConstructableTest" package="com.cinnamonbob.junit" tests="1" time="0.1">
+  <testsuite errors="0" failures="1" id="1" name="NonConstructableTest" package="com.zutubi.pulse.junit" tests="1" time="0.1">
   
     <properties>
     
@@ -282,7 +282,7 @@
 
       <testcase classname="junit.framework.TestSuite$1" name="warning" time="0.01">
     
-      <failure message="Class com.cinnamonbob.junit.NonConstructableTest has no public constructor TestCase(String name) or TestCase()" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: Class com.cinnamonbob.junit.NonConstructableTest has no public constructor TestCase(String name) or TestCase()
+      <failure message="Class com.zutubi.pulse.junit.NonConstructableTest has no public constructor TestCase(String name) or TestCase()" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: Class com.zutubi.pulse.junit.NonConstructableTest has no public constructor TestCase(String name) or TestCase()
 </failure>
 
       </testcase>
@@ -292,7 +292,7 @@
       <system-err></system-err>
 
   </testsuite>
-  <testsuite errors="1" failures="1" id="2" name="SimpleTest" package="com.cinnamonbob.junit" tests="3" time="0.09">
+  <testsuite errors="1" failures="1" id="2" name="SimpleTest" package="com.zutubi.pulse.junit" tests="3" time="0.09">
   
     <properties>
     
@@ -426,20 +426,20 @@
 
       </properties>
 
-      <testcase classname="com.cinnamonbob.junit.SimpleTest" name="testSimple" time="0.0"></testcase>
+      <testcase classname="com.zutubi.pulse.junit.SimpleTest" name="testSimple" time="0.0"></testcase>
 
-      <testcase classname="com.cinnamonbob.junit.SimpleTest" name="testAssertionFailure" time="0.01">
+      <testcase classname="com.zutubi.pulse.junit.SimpleTest" name="testAssertionFailure" time="0.01">
     
       <failure message="expected:&lt;1&gt; but was:&lt;2&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;1&gt; but was:&lt;2&gt;
-	at com.cinnamonbob.junit.SimpleTest.testAssertionFailure(Unknown Source)
+	at com.zutubi.pulse.junit.SimpleTest.testAssertionFailure(Unknown Source)
 </failure>
 
       </testcase>
 
-      <testcase classname="com.cinnamonbob.junit.SimpleTest" name="testThrowException" time="0.01">
+      <testcase classname="com.zutubi.pulse.junit.SimpleTest" name="testThrowException" time="0.01">
     
       <error message="random message" type="java.lang.RuntimeException">java.lang.RuntimeException: random message
-	at com.cinnamonbob.junit.SimpleTest.testThrowException(Unknown Source)
+	at com.zutubi.pulse.junit.SimpleTest.testThrowException(Unknown Source)
 </error>
 
       </testcase>

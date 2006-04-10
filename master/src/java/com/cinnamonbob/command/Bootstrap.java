@@ -1,7 +1,7 @@
-package com.cinnamonbob.command;
+package com.zutubi.pulse.command;
 
-import com.cinnamonbob.bootstrap.SystemBootstrapManager;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
+import com.zutubi.pulse.util.logging.Logger;
 
 
 /**

@@ -1,9 +1,9 @@
-package com.cinnamonbob.slave;
+package com.zutubi.pulse.slave;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.bootstrap.SystemBootstrapManager;
-import com.cinnamonbob.jetty.JettyManager;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
+import com.zutubi.pulse.jetty.JettyManager;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  */

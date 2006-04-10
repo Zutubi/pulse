@@ -1,6 +1,6 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.model.persistence.SubscriptionDao;
+import com.zutubi.pulse.model.persistence.SubscriptionDao;
 
 import java.util.List;
 

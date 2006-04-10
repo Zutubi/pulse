@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.admin;
+package com.zutubi.pulse.web.admin;
 
-import com.cinnamonbob.RecipeQueue;
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.RecipeQueue;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
  * Toggles the state of the recipe queue.

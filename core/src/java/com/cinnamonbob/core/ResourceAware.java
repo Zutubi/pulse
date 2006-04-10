@@ -1,4 +1,4 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
 /**
  * Objects that implement ResourceAware have access to the resource

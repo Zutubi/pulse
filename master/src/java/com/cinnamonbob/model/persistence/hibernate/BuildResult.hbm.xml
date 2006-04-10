@@ -2,13 +2,13 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.cinnamonbob.model.BuildResult" table="BUILD_RESULT" lazy="false">
+    <class name="com.zutubi.pulse.model.BuildResult" table="BUILD_RESULT" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
 
-        <property name="stamps" type="com.cinnamonbob.util.TimeStampsType">
+        <property name="stamps" type="com.zutubi.pulse.util.TimeStampsType">
             <column name="QUEUE" sql-type="BIGINT"/>
             <column name="START" sql-type="BIGINT"/>
             <column name="FINISH" sql-type="BIGINT"/>
@@ -20,42 +20,42 @@
 
         <bag name="features" cascade="all-delete-orphan" lazy="false">
             <key column="BUILD_RESULT_ID"/>
-            <one-to-many class="com.cinnamonbob.core.model.Feature"/>
+            <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
         </bag>
 
         <property name="number" column="NUMBER" type="long" not-null="true"/>
 
-        <many-to-one name="project" column="PROJECT" class="com.cinnamonbob.model.Project" cascade="none"/>
+        <many-to-one name="project" column="PROJECT" class="com.zutubi.pulse.model.Project" cascade="none"/>
 
         <property name="buildSpecification" column="BUILD_SPEC" type="string" length="255"/>
 
-        <many-to-one name="scmDetails" class="com.cinnamonbob.model.BuildScmDetails" column="SCM_DETAILS"
+        <many-to-one name="scmDetails" class="com.zutubi.pulse.model.BuildScmDetails" column="SCM_DETAILS"
                      cascade="all" lazy="false"/>
 
-        <many-to-one name="root" class="com.cinnamonbob.model.RecipeResultNode" column="RECIPE_RESULT_ID"
+        <many-to-one name="root" class="com.zutubi.pulse.model.RecipeResultNode" column="RECIPE_RESULT_ID"
                      cascade="all"/>
 
         <property name="hasWorkDir" type="boolean"/>
     </class>
 
-    <class name="com.cinnamonbob.model.BuildScmDetails" table="BUILD_SCM_DETAILS" lazy="false">
+    <class name="com.zutubi.pulse.model.BuildScmDetails" table="BUILD_SCM_DETAILS" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
 
-        <many-to-one name="revision" class="com.cinnamonbob.core.model.Revision" column="REVISION_ID" cascade="all"
+        <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all"
                      unique="true"/>
 
         <list name="changelists" cascade="all-delete-orphan" lazy="false">
             <key column="BUILD_SCM_DETAILS_ID"/>
             <index column="ORDINAL"/>
-            <one-to-many class="com.cinnamonbob.core.model.Changelist"/>
+            <one-to-many class="com.zutubi.pulse.core.model.Changelist"/>
         </list>
 
     </class>
 
-    <class name="com.cinnamonbob.model.RecipeResultNode" table="RECIPE_RESULT_NODE" lazy="false">
+    <class name="com.zutubi.pulse.model.RecipeResultNode" table="RECIPE_RESULT_NODE" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -63,24 +63,24 @@
 
         <property name="host" type="string" length="255"/>
 
-        <many-to-one name="result" class="com.cinnamonbob.core.model.RecipeResult" column="RECIPE_RESULT_ID"
+        <many-to-one name="result" class="com.zutubi.pulse.core.model.RecipeResult" column="RECIPE_RESULT_ID"
                      cascade="all" unique="true"/>
 
         <list name="children" cascade="all-delete-orphan" lazy="false">
             <key column="PARENT_ID"/>
             <index column="ORDINAL"/>
-            <one-to-many class="com.cinnamonbob.model.RecipeResultNode"/>
+            <one-to-many class="com.zutubi.pulse.model.RecipeResultNode"/>
         </list>
 
     </class>
 
-    <class name="com.cinnamonbob.core.model.RecipeResult" table="RECIPE_RESULT" lazy="false">
+    <class name="com.zutubi.pulse.core.model.RecipeResult" table="RECIPE_RESULT" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
 
-        <property name="stamps" type="com.cinnamonbob.util.TimeStampsType">
+        <property name="stamps" type="com.zutubi.pulse.util.TimeStampsType">
             <column name="QUEUE" sql-type="BIGINT"/>
             <column name="START" sql-type="BIGINT"/>
             <column name="FINISH" sql-type="BIGINT"/>
@@ -92,7 +92,7 @@
 
         <bag name="features" cascade="all-delete-orphan" lazy="false">
             <key column="RECIPE_RESULT_ID"/>
-            <one-to-many class="com.cinnamonbob.core.model.Feature"/>
+            <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
         </bag>
 
         <property name="recipeName" column="RECIPE_NAME" type="string" length="255"/>
@@ -100,7 +100,7 @@
         <list name="commandResults" cascade="all-delete-orphan" lazy="false">
             <key column="RECIPE_RESULT_ID"/>
             <index column="ORDINAL"/>
-            <one-to-many class="com.cinnamonbob.core.model.CommandResult"/>
+            <one-to-many class="com.zutubi.pulse.core.model.CommandResult"/>
         </list>
 
     </class>

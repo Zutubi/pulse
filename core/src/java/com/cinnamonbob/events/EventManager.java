@@ -1,7 +1,7 @@
-package com.cinnamonbob.events;
+package com.zutubi.pulse.events;
 
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.events.EventListener;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
 
 /**
  *

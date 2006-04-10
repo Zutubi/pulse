@@ -1,4 +1,4 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
 /**
  * Describes an interface for making notifications conditional based on

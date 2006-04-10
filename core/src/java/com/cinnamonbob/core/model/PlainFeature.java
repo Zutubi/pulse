@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.model;
+package com.zutubi.pulse.core.model;
 
 /**
  * A PlainFeature is a feture discovered by analysing an artifact as plain

@@ -1,7 +1,7 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.Property;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.test.BobTestCase;
 
 /**
  * Helper base class for file loader tests.

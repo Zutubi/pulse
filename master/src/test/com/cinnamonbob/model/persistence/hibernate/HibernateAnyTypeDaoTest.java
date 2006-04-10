@@ -1,14 +1,14 @@
 /**
  * <class-comment/>
  */
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.core.model.Entity;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.persistence.AnyTypeDao;
-import com.cinnamonbob.model.persistence.ObjectHandle;
+import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.persistence.AnyTypeDao;
+import com.zutubi.pulse.model.persistence.ObjectHandle;
 
 import java.util.LinkedList;
 import java.util.List;

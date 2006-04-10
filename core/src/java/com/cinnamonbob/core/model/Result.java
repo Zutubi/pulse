@@ -1,8 +1,8 @@
-package com.cinnamonbob.core.model;
+package com.zutubi.pulse.core.model;
 
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.core.util.TimeStamps;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.core.util.TimeStamps;
 
 import java.io.*;
 import java.util.LinkedList;

@@ -1,6 +1,6 @@
-package com.cinnamonbob.core.model;
+package com.zutubi.pulse.core.model;
 
-import com.cinnamonbob.core.Namespace;
+import com.zutubi.pulse.core.Namespace;
 
 import java.util.Map;
 import java.util.TreeMap;

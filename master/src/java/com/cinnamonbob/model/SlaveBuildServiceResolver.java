@@ -1,9 +1,9 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.BuildService;
-import com.cinnamonbob.SlaveBuildService;
-import com.cinnamonbob.SlaveProxyFactory;
-import com.cinnamonbob.core.BobRuntimeException;
+import com.zutubi.pulse.BuildService;
+import com.zutubi.pulse.SlaveBuildService;
+import com.zutubi.pulse.SlaveProxyFactory;
+import com.zutubi.pulse.core.BobRuntimeException;
 
 import java.net.MalformedURLException;
 

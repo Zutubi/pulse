@@ -1,7 +1,7 @@
-package com.cinnamonbob.scheduling.persistence.mock;
+package com.zutubi.pulse.scheduling.persistence.mock;
 
-import com.cinnamonbob.core.model.Entity;
-import com.cinnamonbob.model.persistence.EntityDao;
+import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.model.persistence.EntityDao;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

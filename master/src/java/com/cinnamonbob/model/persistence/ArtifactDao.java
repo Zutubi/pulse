@@ -1,6 +1,6 @@
-package com.cinnamonbob.model.persistence;
+package com.zutubi.pulse.model.persistence;
 
-import com.cinnamonbob.core.model.StoredArtifact;
+import com.zutubi.pulse.core.model.StoredArtifact;
 
 public interface ArtifactDao extends EntityDao<StoredArtifact>
 {

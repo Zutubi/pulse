@@ -1,8 +1,8 @@
-package com.cinnamonbob.web.admin.user;
+package com.zutubi.pulse.web.admin.user;
 
-import com.cinnamonbob.UserLoginComparator;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.web.user.UserActionSupport;
+import com.zutubi.pulse.UserLoginComparator;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.web.user.UserActionSupport;
 
 import java.util.Collections;
 import java.util.List;

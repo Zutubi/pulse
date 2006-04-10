@@ -1,6 +1,6 @@
-package com.cinnamonbob.core.model;
+package com.zutubi.pulse.core.model;
 
-import com.cinnamonbob.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 
 import java.net.URLConnection;
 import java.util.LinkedList;

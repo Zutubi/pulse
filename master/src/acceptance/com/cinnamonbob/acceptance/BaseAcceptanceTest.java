@@ -1,7 +1,7 @@
-package com.cinnamonbob.acceptance;
+package com.zutubi.pulse.acceptance;
 
-import com.cinnamonbob.acceptance.forms.CvsForm;
-import com.cinnamonbob.core.util.FileSystemUtils;
+import com.zutubi.pulse.acceptance.forms.CvsForm;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;

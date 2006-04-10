@@ -1,9 +1,9 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.model.BuildSpecification;
-import com.cinnamonbob.model.ProjectManager;
-import com.cinnamonbob.model.persistence.BuildSpecificationDao;
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
  *

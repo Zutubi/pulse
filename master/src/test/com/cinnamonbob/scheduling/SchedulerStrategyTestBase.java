@@ -1,4 +1,4 @@
-package com.cinnamonbob.scheduling;
+package com.zutubi.pulse.scheduling;
 
 import junit.framework.TestCase;
 

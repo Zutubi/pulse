@@ -1,8 +1,8 @@
-package com.cinnamonbob.scheduling.persistence.mock;
+package com.zutubi.pulse.scheduling.persistence.mock;
 
 
-import com.cinnamonbob.scheduling.Trigger;
-import com.cinnamonbob.scheduling.persistence.TriggerDao;
+import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.scheduling.persistence.TriggerDao;
 
 import java.util.List;
 

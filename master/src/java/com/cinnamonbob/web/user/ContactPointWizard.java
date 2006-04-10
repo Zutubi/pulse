@@ -1,10 +1,10 @@
-package com.cinnamonbob.web.user;
+package com.zutubi.pulse.web.user;
 
-import com.cinnamonbob.model.*;
-import com.cinnamonbob.web.wizard.BaseWizard;
-import com.cinnamonbob.web.wizard.BaseWizardState;
-import com.cinnamonbob.web.wizard.Wizard;
-import com.cinnamonbob.web.wizard.WizardCompleteState;
+import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.web.wizard.BaseWizard;
+import com.zutubi.pulse.web.wizard.BaseWizardState;
+import com.zutubi.pulse.web.wizard.Wizard;
+import com.zutubi.pulse.web.wizard.WizardCompleteState;
 
 import java.util.Map;
 import java.util.TreeMap;

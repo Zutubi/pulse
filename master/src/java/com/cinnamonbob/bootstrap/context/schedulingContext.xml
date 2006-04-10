@@ -21,11 +21,11 @@ This context requires:
 
     <bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="configLocation">
-            <value>classpath:com/cinnamonbob/bootstrap/quartz/quartz.properties</value>
+            <value>classpath:com/zutubi/pulse/bootstrap/quartz/quartz.properties</value>
         </property>
     </bean>
 
-    <bean id="quartzJobFactory" class="com.cinnamonbob.bootstrap.quartz.SpringJobFactory" init-method="init">
+    <bean id="quartzJobFactory" class="com.zutubi.pulse.bootstrap.quartz.SpringJobFactory" init-method="init">
         <property name="scheduler">
             <ref local="quartzScheduler"/>
         </property>
@@ -35,7 +35,7 @@ This context requires:
     </bean>
 
     <!-- We don't initialise the scheduler here: it must wait for the startup event. -->
-    <bean id="schedulerTarget" class="com.cinnamonbob.scheduling.DefaultScheduler" autowire="byName">
+    <bean id="schedulerTarget" class="com.zutubi.pulse.scheduling.DefaultScheduler" autowire="byName">
         <property name="strategies">
             <list>
                 <ref local="cronSchedulerStrategy"/>
@@ -58,18 +58,18 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="cronSchedulerStrategy" class="com.cinnamonbob.scheduling.CronSchedulerStrategy">
+    <bean id="cronSchedulerStrategy" class="com.zutubi.pulse.scheduling.CronSchedulerStrategy">
         <property name="quartzScheduler">
             <ref local="quartzScheduler"/>
         </property>
     </bean>
-    <bean id="simpleSchedulerStrategy" class="com.cinnamonbob.scheduling.SimpleSchedulerStrategy">
+    <bean id="simpleSchedulerStrategy" class="com.zutubi.pulse.scheduling.SimpleSchedulerStrategy">
         <property name="quartzScheduler">
             <ref local="quartzScheduler"/>
         </property>
     </bean>
 
-    <bean id="eventSchedulerStrategy" class="com.cinnamonbob.scheduling.EventSchedulerStrategy">
+    <bean id="eventSchedulerStrategy" class="com.zutubi.pulse.scheduling.EventSchedulerStrategy">
         <property name="eventManager">
             <ref bean="eventManager"/>
         </property>
@@ -96,7 +96,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="triggerHandlerTarget" class="com.cinnamonbob.scheduling.DefaultTriggerHandler">
+    <bean id="triggerHandlerTarget" class="com.zutubi.pulse.scheduling.DefaultTriggerHandler">
         <!-- not sure why this is needs to be wired directly. -->
         <property name="objectFactory">
             <ref bean="objectFactory"/>

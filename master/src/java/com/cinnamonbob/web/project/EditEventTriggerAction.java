@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.scheduling.EventTrigger;
-import com.cinnamonbob.scheduling.Trigger;
+import com.zutubi.pulse.scheduling.EventTrigger;
+import com.zutubi.pulse.scheduling.Trigger;
 
 /**
  */

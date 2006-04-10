@@ -1,4 +1,4 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
 import java.util.Collections;
 import java.util.List;

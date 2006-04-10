@@ -1,6 +1,6 @@
-package com.cinnamonbob.events.build;
+package com.zutubi.pulse.events.build;
 
-import com.cinnamonbob.events.Event;
+import com.zutubi.pulse.events.Event;
 
 /**
  * Raised to request that all running builds be forcefully terminated.

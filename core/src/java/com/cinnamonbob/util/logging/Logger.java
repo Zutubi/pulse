@@ -1,4 +1,4 @@
-package com.cinnamonbob.util.logging;
+package com.zutubi.pulse.util.logging;
 
 import java.util.logging.Level;
 
@@ -230,7 +230,7 @@ public class Logger
         {
             StackTraceElement frame = stack[ix];
             String cname = frame.getClassName();
-            if (cname.equals("com.cinnamonbob.util.logging.Logger"))
+            if (cname.equals("com.zutubi.pulse.util.logging.Logger"))
             {
                 break;
             }
@@ -241,7 +241,7 @@ public class Logger
         {
             StackTraceElement frame = stack[ix];
             String cname = frame.getClassName();
-            if (!cname.equals("com.cinnamonbob.util.logging.Logger"))
+            if (!cname.equals("com.zutubi.pulse.util.logging.Logger"))
             {
                 // We've found the relevant frame.
                 sourceClass = cname;

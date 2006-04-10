@@ -1,6 +1,6 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.model.BuildResult;
+import com.zutubi.pulse.model.BuildResult;
 
 import java.io.FileInputStream;
 import java.io.File;

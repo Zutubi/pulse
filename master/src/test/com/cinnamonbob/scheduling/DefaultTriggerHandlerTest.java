@@ -1,8 +1,8 @@
-package com.cinnamonbob.scheduling;
+package com.zutubi.pulse.scheduling;
 
-import com.cinnamonbob.core.ObjectFactory;
-import com.cinnamonbob.scheduling.persistence.mock.MockTriggerDao;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.scheduling.persistence.mock.MockTriggerDao;
+import com.zutubi.pulse.test.BobTestCase;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

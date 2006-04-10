@@ -1,9 +1,9 @@
-package com.cinnamonbob.scheduling.tasks;
+package com.zutubi.pulse.scheduling.tasks;
 
-import com.cinnamonbob.model.BuildManager;
-import com.cinnamonbob.scheduling.Task;
-import com.cinnamonbob.scheduling.TaskExecutionContext;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.scheduling.Task;
+import com.zutubi.pulse.scheduling.TaskExecutionContext;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  * <class-comment/>

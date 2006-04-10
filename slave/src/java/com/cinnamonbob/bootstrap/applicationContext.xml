@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation">
+    <bean id="initContext" class="com.zutubi.pulse.bootstrap.SpringContextInitialisation">
         <property name="initBeans">
             <list>
                 <ref bean="threadPool"/>
@@ -10,24 +10,24 @@
         </property>
     </bean>
 
-    <bean id="databaseBootstrap" class="com.cinnamonbob.bootstrap.DatabaseBootstrap" init-method="initialiseDatabase">
+    <bean id="databaseBootstrap" class="com.zutubi.pulse.bootstrap.DatabaseBootstrap" init-method="initialiseDatabase">
         <property name="dataSource">
             <ref bean="dataSource"/>
         </property>
     </bean>
 
-    <bean id="threadPool" class="com.cinnamonbob.slave.SlaveThreadPool" autowire="byName"/>
+    <bean id="threadPool" class="com.zutubi.pulse.slave.SlaveThreadPool" autowire="byName"/>
 
-    <bean id="slaveRecipeProcessor" class="com.cinnamonbob.slave.SlaveRecipeProcessor" autowire="byName"/>
+    <bean id="slaveRecipeProcessor" class="com.zutubi.pulse.slave.SlaveRecipeProcessor" autowire="byName"/>
 
-    <bean id="recipeProcessor" class="com.cinnamonbob.core.RecipeProcessor" autowire="byName" init-method="init"/>
+    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
 
-    <bean id="eventManager" class="com.cinnamonbob.events.DefaultEventManager" autowire="byName"/>
+    <bean id="eventManager" class="com.zutubi.pulse.events.DefaultEventManager" autowire="byName"/>
 
-    <bean id="fileResourceRepository" class="com.cinnamonbob.core.FileResourceRepository" autowire="byName"
+    <bean id="fileResourceRepository" class="com.zutubi.pulse.core.FileResourceRepository" autowire="byName"
           init-method="initialise"/>
 
-    <bean id="resourceRepository" class="com.cinnamonbob.model.DatabaseResourceRepository" autowire="byName">
+    <bean id="resourceRepository" class="com.zutubi.pulse.model.DatabaseResourceRepository" autowire="byName">
         <property name="parent">
             <ref bean="fileResourceRepository"/>
         </property>
@@ -42,10 +42,10 @@
         </property>
     </bean>
 
-    <bean id="customSerialiserFactory" class="com.cinnamonbob.hessian.CustomSerialiserFactory"/>
+    <bean id="customSerialiserFactory" class="com.zutubi.pulse.hessian.CustomSerialiserFactory"/>
 
-    <bean id="hessianProxyFactory" class="com.cinnamonbob.hessian.CustomHessianProxyFactory" autowire="byName"/>
+    <bean id="hessianProxyFactory" class="com.zutubi.pulse.hessian.CustomHessianProxyFactory" autowire="byName"/>
 
-    <bean id="masterProxyFactory" class="com.cinnamonbob.slave.MasterProxyFactory" autowire="byName"/>
+    <bean id="masterProxyFactory" class="com.zutubi.pulse.slave.MasterProxyFactory" autowire="byName"/>
 
 </beans>

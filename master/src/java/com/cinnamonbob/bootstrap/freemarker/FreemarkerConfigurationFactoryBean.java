@@ -1,8 +1,8 @@
-package com.cinnamonbob.bootstrap.freemarker;
+package com.zutubi.pulse.bootstrap.freemarker;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.util.logging.Logger;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;

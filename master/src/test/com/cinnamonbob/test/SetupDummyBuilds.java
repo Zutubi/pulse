@@ -1,17 +1,17 @@
-package com.cinnamonbob.test;
+package com.zutubi.pulse.test;
 
-import com.cinnamonbob.MasterBuildPaths;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.RecipeProcessor;
-import com.cinnamonbob.core.model.*;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.model.*;
-import com.cinnamonbob.model.persistence.BuildResultDao;
-import com.cinnamonbob.model.persistence.ProjectDao;
-import com.cinnamonbob.model.persistence.SlaveDao;
-import com.cinnamonbob.model.persistence.UserDao;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.MasterBuildPaths;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.core.RecipeProcessor;
+import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.persistence.BuildResultDao;
+import com.zutubi.pulse.model.persistence.ProjectDao;
+import com.zutubi.pulse.model.persistence.SlaveDao;
+import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -615,7 +615,7 @@ public class SetupDummyBuilds implements Runnable
         try
         {
             File root = BobTestCase.getBobRoot();
-            File dummy = new File(root, FileSystemUtils.composeFilename("master", "src", "test", "com", "cinnamonbob", "test", "dummyArtifactFile.txt"));
+            File dummy = new File(root, FileSystemUtils.composeFilename("master", "src", "test", "com", "pulse", "test", "dummyArtifactFile.txt"));
             File artifactFile = new File(dir, filename);
             IOUtils.copyFile(dummy, artifactFile);
             findFeatures(file, artifactFile);

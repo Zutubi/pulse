@@ -1,6 +1,6 @@
-package com.cinnamonbob.util;
+package com.zutubi.pulse.util;
 
-import com.cinnamonbob.core.util.TimeStamps;
+import com.zutubi.pulse.core.util.TimeStamps;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.SessionImplementor;

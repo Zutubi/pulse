@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.user;
+package com.zutubi.pulse.web.user;
 
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.web.DefaultAction;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.web.DefaultAction;
 
 import java.util.LinkedList;
 import java.util.List;

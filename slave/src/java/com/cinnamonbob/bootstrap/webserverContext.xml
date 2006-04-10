@@ -11,7 +11,7 @@ setup is not complete.
 
     <!-- is the initContext really needed? It appears that singletons are initialised anyways
     without being referenced...-->
-    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation">
+    <bean id="initContext" class="com.zutubi.pulse.bootstrap.SpringContextInitialisation">
         <property name="initBeans">
             <list>
                 <ref bean="jettyManager"/>
@@ -19,13 +19,13 @@ setup is not complete.
         </property>
     </bean>
 
-    <bean id="jettyServer" class="com.cinnamonbob.jetty.JettyServerFactoryBean" destroy-method="shutdown">
+    <bean id="jettyServer" class="com.zutubi.pulse.jetty.JettyServerFactoryBean" destroy-method="shutdown">
         <property name="configurationManager">
             <ref bean="configurationManager"/>
         </property>
     </bean>
 
-    <bean id="jettyManager" class="com.cinnamonbob.jetty.JettyManager" init-method="deployWebapp">
+    <bean id="jettyManager" class="com.zutubi.pulse.jetty.JettyManager" init-method="deployWebapp">
         <property name="jettyServer">
             <ref bean="jettyServer"/>
         </property>

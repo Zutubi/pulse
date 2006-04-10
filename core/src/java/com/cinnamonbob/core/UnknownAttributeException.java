@@ -1,4 +1,4 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
 /**
  * Unknown attribute exception is a type of parse exception that deals specifically

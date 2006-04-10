@@ -1,6 +1,6 @@
-package com.cinnamonbob.core.model;
+package com.zutubi.pulse.core.model;
 
-import com.cinnamonbob.core.Reference;
+import com.zutubi.pulse.core.Reference;
 
 
 /**

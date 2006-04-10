@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.upgrade;
+package com.zutubi.pulse.web.upgrade;
 
-import com.cinnamonbob.upgrade.UpgradeManager;
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.upgrade.UpgradeManager;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
  * <class-comment/>

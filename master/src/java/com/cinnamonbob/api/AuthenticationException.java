@@ -1,4 +1,4 @@
-package com.cinnamonbob.api;
+package com.zutubi.pulse.api;
 
 /**
  * Thrown when the credentials specified do not provide access to the

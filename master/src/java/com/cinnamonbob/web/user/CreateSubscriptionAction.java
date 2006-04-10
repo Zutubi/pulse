@@ -1,8 +1,8 @@
-package com.cinnamonbob.web.user;
+package com.zutubi.pulse.web.user;
 
-import com.cinnamonbob.ProjectNameComparator;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.model.*;
+import com.zutubi.pulse.ProjectNameComparator;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.model.*;
 import com.opensymphony.util.TextUtils;
 
 import java.util.Collections;

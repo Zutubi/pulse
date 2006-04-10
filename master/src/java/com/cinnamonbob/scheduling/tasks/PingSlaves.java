@@ -1,14 +1,14 @@
-package com.cinnamonbob.scheduling.tasks;
+package com.zutubi.pulse.scheduling.tasks;
 
-import com.cinnamonbob.SlaveProxyFactory;
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.events.SlaveAvailableEvent;
-import com.cinnamonbob.model.Slave;
-import com.cinnamonbob.model.SlaveManager;
-import com.cinnamonbob.scheduling.Task;
-import com.cinnamonbob.scheduling.TaskExecutionContext;
-import com.cinnamonbob.services.SlaveService;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.SlaveProxyFactory;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.SlaveAvailableEvent;
+import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.model.SlaveManager;
+import com.zutubi.pulse.scheduling.Task;
+import com.zutubi.pulse.scheduling.TaskExecutionContext;
+import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  * <class-comment/>

@@ -1,6 +1,6 @@
-package com.cinnamonbob.model.persistence;
+package com.zutubi.pulse.model.persistence;
 
-import com.cinnamonbob.model.User;
+import com.zutubi.pulse.model.User;
 
 import java.util.List;
 

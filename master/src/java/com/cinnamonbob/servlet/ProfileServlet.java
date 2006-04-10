@@ -1,8 +1,8 @@
-package com.cinnamonbob.servlet;
+package com.zutubi.pulse.servlet;
 
-import com.cinnamonbob.model.UserManager;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.bootstrap.ComponentContext;
+import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;

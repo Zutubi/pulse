@@ -1,7 +1,7 @@
-package com.cinnamonbob.core.validation;
+package com.zutubi.pulse.core.validation;
 
 import com.opensymphony.xwork.validator.ValidatorContext;
-import com.cinnamonbob.core.FileLoadException;
+import com.zutubi.pulse.core.FileLoadException;
 
 import java.util.List;
 

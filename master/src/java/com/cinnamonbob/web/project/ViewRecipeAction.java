@@ -1,13 +1,10 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.Feature;
-import com.cinnamonbob.core.model.StoredFileArtifact;
-import com.cinnamonbob.core.model.StoredArtifact;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.RecipeResultNode;
-
-import java.util.Iterator;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.RecipeResultNode;
 
 /**
  * 

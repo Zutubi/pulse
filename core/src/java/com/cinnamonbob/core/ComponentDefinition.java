@@ -1,4 +1,4 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
 /**
  * Used internally by the ProjectConfigurationLoader to dynamically

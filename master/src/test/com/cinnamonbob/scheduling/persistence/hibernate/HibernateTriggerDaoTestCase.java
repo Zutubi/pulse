@@ -1,12 +1,12 @@
 /**
  * <class-comment/>
  */
-package com.cinnamonbob.scheduling.persistence.hibernate;
+package com.zutubi.pulse.scheduling.persistence.hibernate;
 
-import com.cinnamonbob.model.persistence.hibernate.MasterPersistenceTestCase;
-import com.cinnamonbob.scheduling.NoopTrigger;
-import com.cinnamonbob.scheduling.Trigger;
-import com.cinnamonbob.scheduling.persistence.TriggerDao;
+import com.zutubi.pulse.model.persistence.hibernate.MasterPersistenceTestCase;
+import com.zutubi.pulse.scheduling.NoopTrigger;
+import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.scheduling.persistence.TriggerDao;
 
 import java.util.List;
 
@@ -36,8 +36,8 @@ public class HibernateTriggerDaoTestCase extends MasterPersistenceTestCase
 
     protected String[] getConfigLocations()
     {
-        return new String[]{"com/cinnamonbob/bootstrap/testBootstrapContext.xml",
-                "com/cinnamonbob/scheduling/persistence/hibernate/HibernateTriggerDaoContext.xml"
+        return new String[]{"com/zutubi/pulse/bootstrap/testBootstrapContext.xml",
+                "com/zutubi/pulse/scheduling/persistence/hibernate/HibernateTriggerDaoContext.xml"
         };
     }
 

@@ -13,7 +13,7 @@ The beans defined within the security subsystem need not be accessed by other co
 -->
 <beans>
 
-    <bean id="securityManager" class="com.cinnamonbob.security.AcegiSecurityManager" init-method="init">
+    <bean id="securityManager" class="com.zutubi.pulse.security.AcegiSecurityManager" init-method="init">
         <property name="jettyManager">
             <ref bean="jettyManager"/>
         </property>
@@ -111,7 +111,7 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
     </bean>
 
-    <bean id="ajaxEntryPoint" class="com.cinnamonbob.security.AjaxAuthenticationEntryPoint"/>
+    <bean id="ajaxEntryPoint" class="com.zutubi.pulse.security.AjaxAuthenticationEntryPoint"/>
 
     <bean id="httpRequestAccessDecisionManager" class="org.acegisecurity.vote.AffirmativeBased">
         <property name="allowIfAllAbstainDecisions">

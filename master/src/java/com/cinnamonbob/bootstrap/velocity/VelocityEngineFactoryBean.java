@@ -1,6 +1,6 @@
-package com.cinnamonbob.bootstrap.velocity;
+package com.zutubi.pulse.bootstrap.velocity;
 
-import com.cinnamonbob.bootstrap.StartupException;
+import com.zutubi.pulse.bootstrap.StartupException;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.FactoryBean;
 

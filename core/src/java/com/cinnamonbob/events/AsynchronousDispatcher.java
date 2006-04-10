@@ -1,6 +1,6 @@
-package com.cinnamonbob.events;
+package com.zutubi.pulse.events;
 
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;

@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.util;
+package com.zutubi.pulse.core.util;
 
 import java.io.OutputStream;
 import java.io.IOException;

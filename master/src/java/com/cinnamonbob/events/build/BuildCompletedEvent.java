@@ -1,6 +1,6 @@
-package com.cinnamonbob.events.build;
+package com.zutubi.pulse.events.build;
 
-import com.cinnamonbob.model.BuildResult;
+import com.zutubi.pulse.model.BuildResult;
 
 /**
  * This event is raised by the build processor when a build is completed.

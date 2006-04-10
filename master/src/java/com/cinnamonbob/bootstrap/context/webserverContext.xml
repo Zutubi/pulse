@@ -11,7 +11,7 @@ This context exports:
 -->
 <beans>
 
-    <bean id="jettyManager" class="com.cinnamonbob.jetty.JettyManager">
+    <bean id="jettyManager" class="com.zutubi.pulse.jetty.JettyManager">
         <property name="jettyServer">
             <ref local="jettyServer"/>
         </property>
@@ -20,13 +20,13 @@ This context exports:
         </property>
     </bean>
 
-    <bean id="jettyServer" class="com.cinnamonbob.jetty.JettyServerFactoryBean" destroy-method="shutdown">
+    <bean id="jettyServer" class="com.zutubi.pulse.jetty.JettyServerFactoryBean" destroy-method="shutdown">
         <property name="configurationManager">
             <ref bean="configurationManager"/>
         </property>
     </bean>
 
-    <bean id="webManager" class="com.cinnamonbob.bootstrap.WebManager">
+    <bean id="webManager" class="com.zutubi.pulse.bootstrap.WebManager">
         <property name="jettyManager">
             <ref local="jettyManager"/>
         </property>

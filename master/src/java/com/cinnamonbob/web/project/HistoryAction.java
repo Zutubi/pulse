@@ -1,11 +1,11 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.HistoryPage;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.web.PagingSupport;
-import com.cinnamonbob.xwork.interceptor.Preparable;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.HistoryPage;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.web.PagingSupport;
+import com.zutubi.pulse.xwork.interceptor.Preparable;
 import com.opensymphony.util.TextUtils;
 
 import java.util.LinkedList;

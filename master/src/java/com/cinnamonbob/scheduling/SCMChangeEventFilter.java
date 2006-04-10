@@ -1,9 +1,9 @@
-package com.cinnamonbob.scheduling;
+package com.zutubi.pulse.scheduling;
 
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.scm.SCMChangeEvent;
-import com.cinnamonbob.model.ProjectManager;
-import com.cinnamonbob.model.Project;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.scm.SCMChangeEvent;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.Project;
 
 /**
  * A filter to ensure a trigger only fires for the SCM of the matching

@@ -1,9 +1,9 @@
-package com.cinnamonbob.model.persistence;
+package com.zutubi.pulse.model.persistence;
 
-import com.cinnamonbob.model.AntBobFileDetails;
-import com.cinnamonbob.model.CustomBobFileDetails;
-import com.cinnamonbob.model.MakeBobFileDetails;
-import com.cinnamonbob.model.Project;
+import com.zutubi.pulse.model.AntBobFileDetails;
+import com.zutubi.pulse.model.CustomBobFileDetails;
+import com.zutubi.pulse.model.MakeBobFileDetails;
+import com.zutubi.pulse.model.Project;
 
 import java.util.List;
 

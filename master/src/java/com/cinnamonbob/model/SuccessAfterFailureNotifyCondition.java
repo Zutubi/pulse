@@ -1,4 +1,4 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
 /**
  * This notify condition triggers when the received build result is the first

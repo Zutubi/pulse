@@ -1,18 +1,18 @@
-package com.cinnamonbob.slave;
+package com.zutubi.pulse.slave;
 
-import com.cinnamonbob.ChainBootstrapper;
-import com.cinnamonbob.RecipeRequest;
-import com.cinnamonbob.ServerBootstrapper;
-import com.cinnamonbob.ServerRecipePaths;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.Bootstrapper;
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.RecipeProcessor;
-import com.cinnamonbob.events.EventListener;
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.events.build.RecipeErrorEvent;
-import com.cinnamonbob.services.MasterService;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.ChainBootstrapper;
+import com.zutubi.pulse.RecipeRequest;
+import com.zutubi.pulse.ServerBootstrapper;
+import com.zutubi.pulse.ServerRecipePaths;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.RecipeProcessor;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.build.RecipeErrorEvent;
+import com.zutubi.pulse.services.MasterService;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.MalformedURLException;
 

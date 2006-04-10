@@ -2,9 +2,9 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="velocityEngine" class="com.cinnamonbob.bootstrap.velocity.VelocityEngineFactoryBean"/>
+    <bean id="velocityEngine" class="com.zutubi.pulse.bootstrap.velocity.VelocityEngineFactoryBean"/>
 
-    <bean id="buildManagerTarget" class="com.cinnamonbob.model.DefaultBuildManager" autowire="byName"
+    <bean id="buildManagerTarget" class="com.zutubi.pulse.model.DefaultBuildManager" autowire="byName"
           init-method="init"/>
 
     <bean id="buildManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -22,7 +22,7 @@
     </bean>
 
 
-    <bean id="projectManagerTarget" class="com.cinnamonbob.model.DefaultProjectManager" autowire="byName"
+    <bean id="projectManagerTarget" class="com.zutubi.pulse.model.DefaultProjectManager" autowire="byName"
           init-method="initialise"/>
     <bean id="projectManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
@@ -38,7 +38,7 @@
         </property>
     </bean>
 
-    <bean id="subscriptionManagerTarget" class="com.cinnamonbob.model.DefaultSubscriptionManager" autowire="byName"/>
+    <bean id="subscriptionManagerTarget" class="com.zutubi.pulse.model.DefaultSubscriptionManager" autowire="byName"/>
     <bean id="subscriptionManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
@@ -53,7 +53,7 @@
         </property>
     </bean>
 
-    <bean id="scmManagerTarget" class="com.cinnamonbob.model.DefaultScmManager" autowire="byName" init-method="init"/>
+    <bean id="scmManagerTarget" class="com.zutubi.pulse.model.DefaultScmManager" autowire="byName" init-method="init"/>
     <bean id="scmManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
@@ -69,23 +69,23 @@
     </bean>
 
 
-    <bean id="fileResourceRepository" class="com.cinnamonbob.core.FileResourceRepository" autowire="byName"
+    <bean id="fileResourceRepository" class="com.zutubi.pulse.core.FileResourceRepository" autowire="byName"
           init-method="initialise"/>
 
-    <bean id="resourceRepository" class="com.cinnamonbob.model.DatabaseResourceRepository" autowire="byName">
+    <bean id="resourceRepository" class="com.zutubi.pulse.model.DatabaseResourceRepository" autowire="byName">
         <property name="parent">
             <ref bean="fileResourceRepository"/>
         </property>
     </bean>
 
-    <bean id="recipeProcessor" class="com.cinnamonbob.core.RecipeProcessor" autowire="byName" init-method="init"/>
+    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
 
-    <bean id="masterRecipeProcessor" class="com.cinnamonbob.MasterRecipeProcessor" autowire="byName"/>
+    <bean id="masterRecipeProcessor" class="com.zutubi.pulse.MasterRecipeProcessor" autowire="byName"/>
 
-    <bean id="freemarkerConfiguration" class="com.cinnamonbob.bootstrap.freemarker.FreemarkerConfigurationFactoryBean"
+    <bean id="freemarkerConfiguration" class="com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean"
           autowire="byName"/>
 
-    <bean id="buildResultRenderer" class="com.cinnamonbob.renderer.FreemarkerBuildResultRenderer" autowire="byName"/>
+    <bean id="buildResultRenderer" class="com.zutubi.pulse.renderer.FreemarkerBuildResultRenderer" autowire="byName"/>
 
     <bean id="userConfigRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
         <property name="targetBeanName">
@@ -96,15 +96,15 @@
         </property>
     </bean>
 
-    <bean id="slaveProxyFactory" class="com.cinnamonbob.SlaveProxyFactory" autowire="byName"/>
+    <bean id="slaveProxyFactory" class="com.zutubi.pulse.SlaveProxyFactory" autowire="byName"/>
 
-    <bean id="fatController" class="com.cinnamonbob.FatController" autowire="byName" init-method="init"/>
+    <bean id="fatController" class="com.zutubi.pulse.FatController" autowire="byName" init-method="init"/>
 
-    <bean id="recipeQueue" class="com.cinnamonbob.ThreadedRecipeQueue" autowire="byName" init-method="init"/>
+    <bean id="recipeQueue" class="com.zutubi.pulse.ThreadedRecipeQueue" autowire="byName" init-method="init"/>
 
-    <bean id="resultNotifier" class="com.cinnamonbob.ResultNotifier" autowire="byName"/>
+    <bean id="resultNotifier" class="com.zutubi.pulse.ResultNotifier" autowire="byName"/>
 
-    <bean id="shutdownManager" class="com.cinnamonbob.ShutdownManager">
+    <bean id="shutdownManager" class="com.zutubi.pulse.ShutdownManager">
         <property name="stoppables">
             <list>
                 <ref bean="scheduler"/>
@@ -117,11 +117,11 @@
         </property>
     </bean>
 
-    <bean id="tokenManager" class="com.cinnamonbob.api.TokenManager" autowire="byName" init-method="init"/>
+    <bean id="tokenManager" class="com.zutubi.pulse.api.TokenManager" autowire="byName" init-method="init"/>
 
-    <bean id="serverMessagesHandler" class="com.cinnamonbob.logging.ServerMessagesHandler" init-method="init"/>
+    <bean id="serverMessagesHandler" class="com.zutubi.pulse.logging.ServerMessagesHandler" init-method="init"/>
 
-    <bean id="notifyConditionFactory" class="com.cinnamonbob.model.NotifyConditionFactory">
+    <bean id="notifyConditionFactory" class="com.zutubi.pulse.model.NotifyConditionFactory">
         <property name="objectFactory">
             <ref bean="objectFactory"/>
         </property>

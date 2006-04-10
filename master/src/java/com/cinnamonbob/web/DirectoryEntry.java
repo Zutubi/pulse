@@ -1,6 +1,6 @@
-package com.cinnamonbob.web;
+package com.zutubi.pulse.web;
 
-import com.cinnamonbob.filesystem.File;
+import com.zutubi.pulse.filesystem.File;
 
 /**
  */

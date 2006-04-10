@@ -1,10 +1,10 @@
-package com.cinnamonbob.web.user;
+package com.zutubi.pulse.web.user;
 
-import com.cinnamonbob.ProjectNameComparator;
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.model.*;
-import com.cinnamonbob.security.AcegiUtils;
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.ProjectNameComparator;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.Collections;
 import java.util.Comparator;

@@ -1,4 +1,4 @@
-package com.cinnamonbob.util;
+package com.zutubi.pulse.util;
 
 import org.hibernate.HibernateException;
 import org.hibernate.type.MutableType;

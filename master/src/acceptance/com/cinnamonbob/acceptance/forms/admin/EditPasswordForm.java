@@ -1,6 +1,6 @@
-package com.cinnamonbob.acceptance.forms.admin;
+package com.zutubi.pulse.acceptance.forms.admin;
 
-import com.cinnamonbob.acceptance.forms.BaseForm;
+import com.zutubi.pulse.acceptance.forms.BaseForm;
 import net.sourceforge.jwebunit.WebTester;
 
 /**

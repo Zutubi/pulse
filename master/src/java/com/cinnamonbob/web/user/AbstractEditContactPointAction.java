@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.user;
+package com.zutubi.pulse.web.user;
 
-import com.cinnamonbob.model.ContactPoint;
-import com.cinnamonbob.model.User;
+import com.zutubi.pulse.model.ContactPoint;
+import com.zutubi.pulse.model.User;
 
 /**
  *

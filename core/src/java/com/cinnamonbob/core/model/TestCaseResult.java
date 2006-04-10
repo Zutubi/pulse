@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.model;
+package com.zutubi.pulse.core.model;
 
 /**
  * Represents the result of a single test case.

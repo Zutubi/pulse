@@ -1,13 +1,13 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.core.util.ListUtils;
-import com.cinnamonbob.core.util.Predicate;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.persistence.BuildResultDao;
-import com.cinnamonbob.model.persistence.BuildSpecificationDao;
-import com.cinnamonbob.model.persistence.ProjectDao;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.util.ListUtils;
+import com.zutubi.pulse.core.util.Predicate;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.persistence.BuildResultDao;
+import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
+import com.zutubi.pulse.model.persistence.ProjectDao;
 
 import java.util.Arrays;
 import java.util.Collections;

@@ -1,8 +1,8 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.Entity;
-import com.cinnamonbob.core.model.Revision;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.Revision;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -1,10 +1,9 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.core.model.StoredFileArtifact;
-import com.cinnamonbob.core.model.StoredArtifact;
-import com.cinnamonbob.model.persistence.ArtifactDao;
+import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.model.persistence.ArtifactDao;
 
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.util.logging.Logger;
 
 public class HibernateArtifactDao extends HibernateEntityDao<StoredArtifact> implements ArtifactDao
 {

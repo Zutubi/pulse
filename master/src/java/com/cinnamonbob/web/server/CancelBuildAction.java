@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.server;
+package com.zutubi.pulse.web.server;
 
-import com.cinnamonbob.FatController;
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.FatController;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
  */

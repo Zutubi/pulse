@@ -1,6 +1,6 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.test.BobTestCase;
 
 /**
  * <class-comment/>

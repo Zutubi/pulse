@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.user;
+package com.zutubi.pulse.web.user;
 
-import com.cinnamonbob.model.NotifyConditionFactory;
-import com.cinnamonbob.model.Subscription;
+import com.zutubi.pulse.model.NotifyConditionFactory;
+import com.zutubi.pulse.model.Subscription;
 
 import java.util.HashMap;
 import java.util.Map;

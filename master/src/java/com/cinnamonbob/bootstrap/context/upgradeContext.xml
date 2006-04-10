@@ -5,6 +5,6 @@
 -->
 <beans>
 
-    <bean id="upgradeManager" class="com.cinnamonbob.upgrade.DefaultUpgradeManager" autowire="byName"/>
+    <bean id="upgradeManager" class="com.zutubi.pulse.upgrade.DefaultUpgradeManager" autowire="byName"/>
 
 </beans>

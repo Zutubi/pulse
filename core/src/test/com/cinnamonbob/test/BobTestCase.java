@@ -1,8 +1,8 @@
-package com.cinnamonbob.test;
+package com.zutubi.pulse.test;
 
-import com.cinnamonbob.Version;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.core.util.IOUtils;
+import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.IOUtils;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 

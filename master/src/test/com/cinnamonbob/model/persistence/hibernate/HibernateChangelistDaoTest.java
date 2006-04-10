@@ -1,11 +1,11 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.core.model.Change;
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.CvsRevision;
-import com.cinnamonbob.core.model.NumericalRevision;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.persistence.ChangelistDao;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.persistence.ChangelistDao;
 
 import java.util.Calendar;
 import java.util.Date;

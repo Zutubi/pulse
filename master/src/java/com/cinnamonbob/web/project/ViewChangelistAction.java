@@ -1,10 +1,10 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.persistence.BuildResultDao;
-import com.cinnamonbob.model.persistence.ChangelistDao;
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.persistence.BuildResultDao;
+import com.zutubi.pulse.model.persistence.ChangelistDao;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
  */

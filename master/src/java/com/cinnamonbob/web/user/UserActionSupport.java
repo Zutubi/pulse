@@ -1,9 +1,9 @@
-package com.cinnamonbob.web.user;
+package com.zutubi.pulse.web.user;
 
-import com.cinnamonbob.model.SubscriptionManager;
-import com.cinnamonbob.model.UserManager;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.model.SubscriptionManager;
+import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.web.ActionSupport;
 import com.opensymphony.util.TextUtils;
 
 import java.util.Arrays;

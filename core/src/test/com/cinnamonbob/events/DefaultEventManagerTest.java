@@ -1,11 +1,11 @@
-package com.cinnamonbob.events;
+package com.zutubi.pulse.events;
 
 import junit.framework.TestCase;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import com.cinnamonbob.events.DefaultEventManager;
+import com.zutubi.pulse.events.DefaultEventManager;
 
 /**
  * <class-comment/>

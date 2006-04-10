@@ -1,4 +1,4 @@
-package com.cinnamonbob.slave;
+package com.zutubi.pulse.slave;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

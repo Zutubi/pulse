@@ -2,19 +2,19 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="startupManager" class="com.cinnamonbob.bootstrap.DefaultStartupManager">
+    <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager">
         <property name="systemContexts">
             <list>
-                <value>com/cinnamonbob/bootstrap/databaseBootstrapContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/coreDatabaseContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/applicationContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/webserverContext.xml</value>
-                <value>com/cinnamonbob/bootstrap/webworkContext.xml</value>
+                <value>com/zutubi/pulse/bootstrap/databaseBootstrapContext.xml</value>
+                <value>com/zutubi/pulse/bootstrap/coreDatabaseContext.xml</value>
+                <value>com/zutubi/pulse/bootstrap/applicationContext.xml</value>
+                <value>com/zutubi/pulse/bootstrap/webserverContext.xml</value>
+                <value>com/zutubi/pulse/bootstrap/webworkContext.xml</value>
             </list>
         </property>
         <property name="startupRunnables">
             <list>
-                <value>com.cinnamonbob.ResourceDiscoverer</value>
+                <value>com.zutubi.pulse.ResourceDiscoverer</value>
             </list>
         </property>
         <property name="objectFactory">
@@ -25,9 +25,9 @@
         </property>
     </bean>
 
-    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.SimpleConfigurationManager">
+    <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleConfigurationManager">
         <property name="systemPaths">
-            <bean class="com.cinnamonbob.bootstrap.ConfigurableSystemPaths">
+            <bean class="com.zutubi.pulse.bootstrap.ConfigurableSystemPaths">
                 <property name="systemRoot">
                     <value>slave/system</value>
                 </property>
@@ -53,8 +53,8 @@
         </property>
     </bean>
 
-    <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
+    <bean id="dataSource" class="com.zutubi.pulse.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
 
-    <bean id="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory"/>
+    <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
 </beans>

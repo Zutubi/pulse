@@ -9,6 +9,6 @@
     <validator name="url" class="com.opensymphony.xwork.validator.validators.URLValidator"/>
     <validator name="visitor" class="com.opensymphony.xwork.validator.validators.VisitorFieldValidator"/>
     <validator name="conversion" class="com.opensymphony.xwork.validator.validators.ConversionErrorFieldValidator"/>
-    <validator name="integral" class="com.cinnamonbob.xwork.validator.validators.IntegralValidator"/>
-    <validator name="name" class="com.cinnamonbob.xwork.validator.validators.NameValidator"/>
+    <validator name="integral" class="com.zutubi.pulse.xwork.validator.validators.IntegralValidator"/>
+    <validator name="name" class="com.zutubi.pulse.xwork.validator.validators.NameValidator"/>
 </validators>

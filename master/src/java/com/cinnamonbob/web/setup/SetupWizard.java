@@ -1,17 +1,17 @@
-package com.cinnamonbob.web.setup;
+package com.zutubi.pulse.web.setup;
 
-import com.cinnamonbob.bootstrap.ApplicationConfiguration;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.bootstrap.SetupManager;
-import com.cinnamonbob.model.GrantedAuthority;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.UserManager;
-import com.cinnamonbob.security.AcegiUtils;
-import com.cinnamonbob.web.DefaultAction;
-import com.cinnamonbob.web.wizard.BaseWizard;
-import com.cinnamonbob.web.wizard.BaseWizardState;
-import com.cinnamonbob.web.wizard.Wizard;
-import com.cinnamonbob.web.wizard.WizardCompleteState;
+import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.SetupManager;
+import com.zutubi.pulse.model.GrantedAuthority;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.web.DefaultAction;
+import com.zutubi.pulse.web.wizard.BaseWizard;
+import com.zutubi.pulse.web.wizard.BaseWizardState;
+import com.zutubi.pulse.web.wizard.Wizard;
+import com.zutubi.pulse.web.wizard.WizardCompleteState;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
 

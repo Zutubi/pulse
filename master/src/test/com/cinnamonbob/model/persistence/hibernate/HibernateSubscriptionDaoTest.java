@@ -1,12 +1,12 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.model.ContactPoint;
-import com.cinnamonbob.model.EmailContactPoint;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.Subscription;
-import com.cinnamonbob.model.persistence.ContactPointDao;
-import com.cinnamonbob.model.persistence.ProjectDao;
-import com.cinnamonbob.model.persistence.SubscriptionDao;
+import com.zutubi.pulse.model.ContactPoint;
+import com.zutubi.pulse.model.EmailContactPoint;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.Subscription;
+import com.zutubi.pulse.model.persistence.ContactPointDao;
+import com.zutubi.pulse.model.persistence.ProjectDao;
+import com.zutubi.pulse.model.persistence.SubscriptionDao;
 
 import java.util.List;
 

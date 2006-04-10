@@ -1,9 +1,9 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.model.Entity;
-import com.cinnamonbob.core.model.Feature;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.core.model.TestResultSummary;
+import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.TestResultSummary;
 
 import java.util.LinkedList;
 import java.util.List;

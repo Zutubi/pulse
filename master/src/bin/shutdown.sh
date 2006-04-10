@@ -1,3 +1,3 @@
 #! /bin/sh
 
-`dirname $0`/common.sh com.cinnamonbob.api.clients.AdminClient shutdown $@
+`dirname $0`/common.sh com.zutubi.pulse.api.clients.AdminClient shutdown $@

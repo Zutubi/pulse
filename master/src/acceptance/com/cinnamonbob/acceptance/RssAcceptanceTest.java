@@ -1,6 +1,6 @@
-package com.cinnamonbob.acceptance;
+package com.zutubi.pulse.acceptance;
 
-import com.cinnamonbob.core.util.RandomUtils;
+import com.zutubi.pulse.core.util.RandomUtils;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;

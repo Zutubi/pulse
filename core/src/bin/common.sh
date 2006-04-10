@@ -65,4 +65,4 @@ if [ ! -x "$JAVACMD" ] ; then
   exit 1
 fi
 
-exec "$JAVACMD" -classpath "$LOCALCLASSPATH" -Dbob.install="$BOB_HOME" -Djava.util.logging.config.class=com.cinnamonbob.logging.ConsoleConfig -Djava.awt.headless=true $@
+exec "$JAVACMD" -classpath "$LOCALCLASSPATH" -Dbob.install="$BOB_HOME" -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig -Djava.awt.headless=true $@

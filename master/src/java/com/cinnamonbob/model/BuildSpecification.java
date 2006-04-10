@@ -1,6 +1,6 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.model.Entity;
+import com.zutubi.pulse.core.model.Entity;
 
 /**
  * Describes the steps (recipes) required for a build, and where they should

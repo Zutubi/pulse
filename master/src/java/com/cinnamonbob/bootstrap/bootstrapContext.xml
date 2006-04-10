@@ -2,26 +2,26 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="startupManager" class="com.cinnamonbob.bootstrap.DefaultStartupManager">
+    <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager">
         <property name="coreContexts">
             <list>
-                <value>com/cinnamonbob/bootstrap/coreSubsystemContext.xml</value>
+                <value>com/zutubi/pulse/bootstrap/coreSubsystemContext.xml</value>
             </list>
         </property>
         <property name="appContexts">
             <list>
-                <value>com/cinnamonbob/bootstrap/mainSubsystemContext.xml</value>
+                <value>com/zutubi/pulse/bootstrap/mainSubsystemContext.xml</value>
             </list>
         </property>
         <property name="configContexts">
             <list>
-                <value>com/cinnamonbob/bootstrap/configSubsystemContext.xml</value>
+                <value>com/zutubi/pulse/bootstrap/configSubsystemContext.xml</value>
             </list>
         </property>
         <property name="startupRunnables">
             <list>
-                <value>com.cinnamonbob.BuildAborter</value>
-                <value>com.cinnamonbob.ResourceDiscoverer</value>
+                <value>com.zutubi.pulse.BuildAborter</value>
+                <value>com.zutubi.pulse.ResourceDiscoverer</value>
             </list>
         </property>
         <property name="configurationManager">
@@ -32,9 +32,9 @@
         </property>
     </bean>
 
-    <bean id="configurationManager" class="com.cinnamonbob.bootstrap.SimpleConfigurationManager"/>
+    <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleConfigurationManager"/>
 
-    <bean id="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory"/>
+    <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 

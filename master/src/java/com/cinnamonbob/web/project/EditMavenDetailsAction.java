@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.model.BobFileDetails;
-import com.cinnamonbob.model.MavenBobFileDetails;
+import com.zutubi.pulse.model.BobFileDetails;
+import com.zutubi.pulse.model.MavenBobFileDetails;
 import com.opensymphony.util.TextUtils;
 
 /**

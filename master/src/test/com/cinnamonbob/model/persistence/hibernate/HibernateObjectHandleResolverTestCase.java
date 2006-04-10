@@ -1,8 +1,8 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.persistence.ObjectHandle;
-import com.cinnamonbob.model.persistence.ProjectDao;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.persistence.ObjectHandle;
+import com.zutubi.pulse.model.persistence.ProjectDao;
 import org.hibernate.SessionFactory;
 
 /**

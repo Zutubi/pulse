@@ -1,13 +1,13 @@
-package com.cinnamonbob.api;
+package com.zutubi.pulse.api;
 
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.util.Constants;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.core.util.RandomUtils;
-import com.cinnamonbob.model.GrantedAuthority;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.UserManager;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.core.util.Constants;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.RandomUtils;
+import com.zutubi.pulse.model.GrantedAuthority;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 

@@ -1,7 +1,7 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.Resource;
-import com.cinnamonbob.core.model.ResourceVersion;
+import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.model.ResourceVersion;
 
 /**
  * A resource references adds the named resource to the current scope.

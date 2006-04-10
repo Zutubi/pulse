@@ -1,6 +1,6 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 
 import java.io.IOException;
 

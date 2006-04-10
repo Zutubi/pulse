@@ -1,9 +1,9 @@
-package com.cinnamonbob.web.setup;
+package com.zutubi.pulse.web.setup;
 
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.bootstrap.SetupManager;
-import com.cinnamonbob.bootstrap.SimpleConfigurationManager;
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.SetupManager;
+import com.zutubi.pulse.bootstrap.SimpleConfigurationManager;
+import com.zutubi.pulse.web.ActionSupport;
 
 import java.io.File;
 

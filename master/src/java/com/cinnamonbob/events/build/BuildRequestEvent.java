@@ -1,8 +1,8 @@
-package com.cinnamonbob.events.build;
+package com.zutubi.pulse.events.build;
 
-import com.cinnamonbob.core.util.TimeStamps;
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.model.Project;
+import com.zutubi.pulse.core.util.TimeStamps;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.model.Project;
 
 /**
  */

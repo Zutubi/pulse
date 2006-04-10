@@ -1,10 +1,10 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.bootstrap.ApplicationConfiguration;
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.renderer.BuildResultRenderer;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.renderer.BuildResultRenderer;
+import com.zutubi.pulse.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 
 import javax.mail.*;
@@ -59,7 +59,7 @@ public class EmailContactPoint extends ContactPoint
     }
 
     /* (non-Javadoc)
-    * @see com.cinnamonbob.core.ContactPoint#notify(com.cinnamonbob.core.model.RecipeResult)
+    * @see com.zutubi.pulse.core.ContactPoint#notify(com.zutubi.pulse.core.model.RecipeResult)
     */
     public void notify(BuildResult result)
     {

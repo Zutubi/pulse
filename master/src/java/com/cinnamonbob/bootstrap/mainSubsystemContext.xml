@@ -2,13 +2,13 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <import resource="classpath:/com/cinnamonbob/bootstrap/context/databaseContext.xml"/>
-    <import resource="classpath:/com/cinnamonbob/bootstrap/context/hibernateContext.xml"/>
-    <import resource="classpath:/com/cinnamonbob/bootstrap/context/eventContext.xml"/>
-    <import resource="classpath:/com/cinnamonbob/bootstrap/context/schedulingContext.xml"/>
-    <import resource="classpath:/com/cinnamonbob/bootstrap/context/userContext.xml"/>
-    <import resource="classpath:/com/cinnamonbob/bootstrap/context/builderContext.xml"/>
-    <import resource="classpath:/com/cinnamonbob/bootstrap/context/securityContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/databaseContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/hibernateContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/eventContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/schedulingContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/userContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/builderContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/securityContext.xml"/>
 
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
     

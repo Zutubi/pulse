@@ -1,8 +1,8 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.model.EmailContactPoint;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.persistence.UserDao;
+import com.zutubi.pulse.model.EmailContactPoint;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.persistence.UserDao;
 
 import java.util.List;
 

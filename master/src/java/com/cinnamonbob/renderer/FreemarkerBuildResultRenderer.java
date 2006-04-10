@@ -1,9 +1,9 @@
-package com.cinnamonbob.renderer;
+package com.zutubi.pulse.renderer;
 
-import com.cinnamonbob.core.model.Feature;
-import com.cinnamonbob.core.util.StringUtils;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.util.StringUtils;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.util.logging.Logger;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 

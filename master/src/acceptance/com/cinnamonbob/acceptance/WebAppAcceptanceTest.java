@@ -1,4 +1,4 @@
-package com.cinnamonbob.acceptance;
+package com.zutubi.pulse.acceptance;
 
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.HttpException;

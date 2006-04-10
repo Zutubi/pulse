@@ -1,14 +1,14 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.persistence.UserDao;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.persistence.UserDao;
 import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import java.util.List;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  * 

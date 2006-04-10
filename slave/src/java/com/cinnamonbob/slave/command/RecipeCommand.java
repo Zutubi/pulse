@@ -1,7 +1,7 @@
-package com.cinnamonbob.slave.command;
+package com.zutubi.pulse.slave.command;
 
-import com.cinnamonbob.RecipeRequest;
-import com.cinnamonbob.slave.SlaveRecipeProcessor;
+import com.zutubi.pulse.RecipeRequest;
+import com.zutubi.pulse.slave.SlaveRecipeProcessor;
 
 /**
  */

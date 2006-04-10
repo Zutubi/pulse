@@ -11,6 +11,6 @@ This context exports:
 -->
 <beans>
 
-    <bean id="dataSource" class="com.cinnamonbob.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
+    <bean id="dataSource" class="com.zutubi.pulse.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
 
 </beans>

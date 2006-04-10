@@ -1,9 +1,9 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.core.model.*;
-import com.cinnamonbob.model.persistence.ArtifactDao;
-import com.cinnamonbob.model.persistence.FileArtifactDao;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.model.persistence.ArtifactDao;
+import com.zutubi.pulse.model.persistence.FileArtifactDao;
 
 /**
  */

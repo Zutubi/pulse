@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.model.CleanupRule;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.model.CleanupRule;
 
 import java.util.LinkedList;
 

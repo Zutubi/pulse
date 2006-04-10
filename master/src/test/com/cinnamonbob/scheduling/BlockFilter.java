@@ -1,6 +1,6 @@
-package com.cinnamonbob.scheduling;
+package com.zutubi.pulse.scheduling;
 
-import com.cinnamonbob.events.Event;
+import com.zutubi.pulse.events.Event;
 
 /**
  */

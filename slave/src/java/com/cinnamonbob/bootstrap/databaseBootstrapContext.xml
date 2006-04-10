@@ -2,12 +2,12 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="initContext" class="com.cinnamonbob.bootstrap.SpringContextInitialisation"></bean>
+    <bean id="initContext" class="com.zutubi.pulse.bootstrap.SpringContextInitialisation"></bean>
 
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="mappingResources">
             <list>
-                <value>com/cinnamonbob/model/persistence/hibernate/Resource.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Resource.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">

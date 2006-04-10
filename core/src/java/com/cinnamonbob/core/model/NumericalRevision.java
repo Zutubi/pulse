@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.model;
+package com.zutubi.pulse.core.model;
 
 /**
  * A subversion revision, which is just a revision number.

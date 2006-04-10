@@ -1,4 +1,4 @@
-package com.cinnamonbob.util.logging;
+package com.zutubi.pulse.util.logging;
 
 import java.io.IOException;
 

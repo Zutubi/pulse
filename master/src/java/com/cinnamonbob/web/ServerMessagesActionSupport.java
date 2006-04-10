@@ -1,6 +1,6 @@
-package com.cinnamonbob.web;
+package com.zutubi.pulse.web;
 
-import com.cinnamonbob.logging.CustomLogRecord;
+import com.zutubi.pulse.logging.CustomLogRecord;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

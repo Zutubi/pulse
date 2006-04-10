@@ -1,4 +1,4 @@
-package com.cinnamonbob.scheduling.quartz;
+package com.zutubi.pulse.scheduling.quartz;
 
 import org.quartz.TriggerListener;
 import org.quartz.JobExecutionContext;

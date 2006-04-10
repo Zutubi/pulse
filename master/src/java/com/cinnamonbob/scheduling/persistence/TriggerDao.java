@@ -1,7 +1,7 @@
-package com.cinnamonbob.scheduling.persistence;
+package com.zutubi.pulse.scheduling.persistence;
 
-import com.cinnamonbob.model.persistence.EntityDao;
-import com.cinnamonbob.scheduling.Trigger;
+import com.zutubi.pulse.model.persistence.EntityDao;
+import com.zutubi.pulse.scheduling.Trigger;
 
 import java.util.List;
 

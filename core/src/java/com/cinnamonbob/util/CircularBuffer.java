@@ -1,4 +1,4 @@
-package com.cinnamonbob.util;
+package com.zutubi.pulse.util;
 
 import java.util.Iterator;
 import java.util.LinkedList;

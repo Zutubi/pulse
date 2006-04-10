@@ -19,19 +19,19 @@ This context requires:
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="mappingResources">
             <list>
-                <value>com/cinnamonbob/model/persistence/hibernate/BuildResult.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/BuildSpecification.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Changelist.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/CommandResult.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Feature.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Project.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Resource.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Revision.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Scm.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Slave.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
-                <value>com/cinnamonbob/scheduling/persistence/hibernate/Trigger.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/User.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/BuildResult.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/BuildSpecification.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Changelist.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/CommandResult.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Feature.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Project.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Resource.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Revision.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Scm.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Slave.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
+                <value>com/zutubi/pulse/scheduling/persistence/hibernate/Trigger.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/User.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">
@@ -53,9 +53,9 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="databaseBootstrap" class="com.cinnamonbob.bootstrap.DatabaseBootstrap" autowire="byName"/>
+    <bean id="databaseBootstrap" class="com.zutubi.pulse.bootstrap.DatabaseBootstrap" autowire="byName"/>
 
-    <bean id="anyTypeDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateAnyTypeDao">
+    <bean id="anyTypeDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateAnyTypeDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -75,7 +75,7 @@ This context requires:
     </bean>
 
 
-    <bean id="artifactDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateArtifactDao">
+    <bean id="artifactDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateArtifactDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -95,7 +95,7 @@ This context requires:
     </bean>
 
 
-    <bean id="bobFileDetailsDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateBobFileDetailsDao">
+    <bean id="bobFileDetailsDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateBobFileDetailsDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -115,7 +115,7 @@ This context requires:
     </bean>
 
 
-    <bean id="buildResultDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateBuildResultDao">
+    <bean id="buildResultDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateBuildResultDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -136,7 +136,7 @@ This context requires:
 
 
     <bean id="buildSpecificationDaoTarget"
-          class="com.cinnamonbob.model.persistence.hibernate.HibernateBuildSpecificationDao">
+          class="com.zutubi.pulse.model.persistence.hibernate.HibernateBuildSpecificationDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -157,7 +157,7 @@ This context requires:
 
 
     <bean id="buildSpecificationNodeDaoTarget"
-          class="com.cinnamonbob.model.persistence.hibernate.HibernateBuildSpecificationNodeDao">
+          class="com.zutubi.pulse.model.persistence.hibernate.HibernateBuildSpecificationNodeDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -178,7 +178,7 @@ This context requires:
     </bean>
 
 
-    <bean id="changelistDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateChangelistDao">
+    <bean id="changelistDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateChangelistDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -198,7 +198,7 @@ This context requires:
     </bean>
 
 
-    <bean id="contactPointDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateContactPointDao">
+    <bean id="contactPointDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateContactPointDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -218,7 +218,7 @@ This context requires:
     </bean>
 
 
-    <bean id="fileArtifactDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateFileArtifactDao">
+    <bean id="fileArtifactDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateFileArtifactDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -238,7 +238,7 @@ This context requires:
     </bean>
 
 
-    <bean id="projectDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateProjectDao">
+    <bean id="projectDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateProjectDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -258,7 +258,7 @@ This context requires:
     </bean>
 
 
-    <bean id="resourceDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateResourceDao">
+    <bean id="resourceDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateResourceDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -278,7 +278,7 @@ This context requires:
     </bean>
 
 
-    <bean id="resourceVersionDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateResourceVersionDao">
+    <bean id="resourceVersionDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateResourceVersionDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -298,7 +298,7 @@ This context requires:
     </bean>
 
 
-    <bean id="scmDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateScmDao">
+    <bean id="scmDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateScmDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -318,7 +318,7 @@ This context requires:
     </bean>
 
 
-    <bean id="slaveDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateSlaveDao">
+    <bean id="slaveDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateSlaveDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -338,7 +338,7 @@ This context requires:
     </bean>
 
 
-    <bean id="subscriptionDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateSubscriptionDao">
+    <bean id="subscriptionDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateSubscriptionDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -357,7 +357,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="triggerDaoTarget" class="com.cinnamonbob.scheduling.persistence.hibernate.HibernateTriggerDao">
+    <bean id="triggerDaoTarget" class="com.zutubi.pulse.scheduling.persistence.hibernate.HibernateTriggerDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -377,7 +377,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="userDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateUserDao">
+    <bean id="userDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateUserDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>

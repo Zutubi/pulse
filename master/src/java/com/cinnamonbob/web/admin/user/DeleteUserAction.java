@@ -1,8 +1,8 @@
-package com.cinnamonbob.web.admin.user;
+package com.zutubi.pulse.web.admin.user;
 
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.web.user.UserActionSupport;
-import com.cinnamonbob.security.AcegiUtils;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.web.user.UserActionSupport;
+import com.zutubi.pulse.security.AcegiUtils;
 
 /**
  * <class-comment/>

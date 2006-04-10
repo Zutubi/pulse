@@ -1,4 +1,4 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
 import org.hibernate.LockMode;
 import org.hibernate.Session;
@@ -16,8 +16,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.cinnamonbob.model.persistence.ObjectHandleResolver;
-import com.cinnamonbob.model.persistence.ObjectHandle;
+import com.zutubi.pulse.model.persistence.ObjectHandleResolver;
+import com.zutubi.pulse.model.persistence.ObjectHandle;
 
 /**
  * @author Daniel Ostermeier

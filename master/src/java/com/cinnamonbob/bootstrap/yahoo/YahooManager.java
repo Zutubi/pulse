@@ -1,8 +1,8 @@
-package com.cinnamonbob.bootstrap.yahoo;
+package com.zutubi.pulse.bootstrap.yahoo;
 
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.BobException;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 import ymsg.network.LoginRefusedException;
 import ymsg.network.Session;

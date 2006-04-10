@@ -6,41 +6,41 @@
     <package name="default" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="slaveStatus" class="com.cinnamonbob.slave.web.SlaveStatusAction">
+        <action name="slaveStatus" class="com.zutubi.pulse.slave.web.SlaveStatusAction">
             <result name="success" type="velocity">slave-status.vm</result>
         </action>
 
-        <action name="viewResource" class="com.cinnamonbob.web.ViewResourceAction">
+        <action name="viewResource" class="com.zutubi.pulse.web.ViewResourceAction">
             <result name="input" type="velocity">generic-error.vm</result>
             <result name="success" type="velocity">view-resource.vm</result>
         </action>
 
-        <action name="createResource!default" class="com.cinnamonbob.web.CreateResourceAction" method="doDefault">
+        <action name="createResource!default" class="com.zutubi.pulse.web.CreateResourceAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-resource.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="createResource" class="com.cinnamonbob.web.CreateResourceAction">
+        <action name="createResource" class="com.zutubi.pulse.web.CreateResourceAction">
             <result name="input" type="velocity">create-resource.vm</result>
             <result name="cancel" type="velocity">server-status.vm</result>
             <result name="error" type="velocity">create-resource.vm</result>
             <result name="success" type="redirect">/viewResource.action?id=${resource.id}</result>
         </action>
 
-        <action name="deleteResource" class="com.cinnamonbob.web.DeleteResourceAction">
+        <action name="deleteResource" class="com.zutubi.pulse.web.DeleteResourceAction">
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/slaveStatus.action</result>
         </action>
 
-        <action name="createResourceVersion!default" class="com.cinnamonbob.web.CreateResourceVersionAction"
+        <action name="createResourceVersion!default" class="com.zutubi.pulse.web.CreateResourceVersionAction"
                 method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-resource-version.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="createResourceVersion" class="com.cinnamonbob.web.CreateResourceVersionAction">
+        <action name="createResourceVersion" class="com.zutubi.pulse.web.CreateResourceVersionAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">create-resource-version.vm</result>
             <result name="cancel" type="redirect">/viewResource.action?id=${resourceId}</result>
@@ -48,25 +48,25 @@
             <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
         </action>
 
-        <action name="deleteResourceVersion" class="com.cinnamonbob.web.DeleteResourceVersionAction">
+        <action name="deleteResourceVersion" class="com.zutubi.pulse.web.DeleteResourceVersionAction">
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
         </action>
 
-        <action name="createProperty!default" class="com.cinnamonbob.web.CreatePropertyAction" method="doDefault">
+        <action name="createProperty!default" class="com.zutubi.pulse.web.CreatePropertyAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-property.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="createProperty" class="com.cinnamonbob.web.CreatePropertyAction">
+        <action name="createProperty" class="com.zutubi.pulse.web.CreatePropertyAction">
             <result name="input" type="velocity">create-property.vm</result>
             <result name="cancel" type="redirect">viewResource.action?id=${resourceId}</result>
             <result name="error" type="velocity">create-property.vm</result>
             <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
         </action>
 
-        <action name="deleteProperty" class="com.cinnamonbob.web.DeletePropertyAction">
+        <action name="deleteProperty" class="com.zutubi.pulse.web.DeletePropertyAction">
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
         </action>

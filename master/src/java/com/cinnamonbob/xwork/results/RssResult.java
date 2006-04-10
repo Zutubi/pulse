@@ -1,4 +1,4 @@
-package com.cinnamonbob.xwork.results;
+package com.zutubi.pulse.xwork.results;
 
 import com.opensymphony.webwork.dispatcher.WebWorkResultSupport;
 import com.opensymphony.webwork.ServletActionContext;

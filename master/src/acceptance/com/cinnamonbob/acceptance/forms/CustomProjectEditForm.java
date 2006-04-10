@@ -1,4 +1,4 @@
-package com.cinnamonbob.acceptance.forms;
+package com.zutubi.pulse.acceptance.forms;
 
 import net.sourceforge.jwebunit.WebTester;
 

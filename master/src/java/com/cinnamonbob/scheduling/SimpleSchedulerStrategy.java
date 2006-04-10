@@ -1,4 +1,4 @@
-package com.cinnamonbob.scheduling;
+package com.zutubi.pulse.scheduling;
 
 /**
  * Startegy for scheduling simple triggers, by creating Quartz SimpleTrigger

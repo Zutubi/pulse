@@ -1,9 +1,9 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.model.BuildSpecification;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.persistence.BuildSpecificationDao;
-import com.cinnamonbob.xwork.interceptor.Preparable;
+import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
+import com.zutubi.pulse.xwork.interceptor.Preparable;
 import com.opensymphony.util.TextUtils;
 
 import java.util.Arrays;

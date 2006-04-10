@@ -1,4 +1,4 @@
-package com.cinnamonbob.model.persistence;
+package com.zutubi.pulse.model.persistence;
 
 import java.util.List;
 

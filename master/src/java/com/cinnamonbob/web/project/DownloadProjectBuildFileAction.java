@@ -1,9 +1,9 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.model.BobFileDetails;
-import com.cinnamonbob.model.Project;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.model.BobFileDetails;
+import com.zutubi.pulse.model.Project;
 import org.apache.tools.ant.filters.StringInputStream;
 
 import java.io.InputStream;

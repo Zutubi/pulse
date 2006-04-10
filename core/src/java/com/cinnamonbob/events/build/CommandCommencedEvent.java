@@ -1,4 +1,4 @@
-package com.cinnamonbob.events.build;
+package com.zutubi.pulse.events.build;
 
 /**
  */

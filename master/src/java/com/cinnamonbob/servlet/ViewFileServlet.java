@@ -1,11 +1,11 @@
-package com.cinnamonbob.servlet;
+package com.zutubi.pulse.servlet;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.StoredArtifact;
-import com.cinnamonbob.core.model.StoredFileArtifact;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.model.BuildManager;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.model.BuildManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

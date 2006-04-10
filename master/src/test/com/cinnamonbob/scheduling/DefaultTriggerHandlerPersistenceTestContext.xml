@@ -2,16 +2,16 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="eventManager" class="com.cinnamonbob.events.DefaultEventManager">
+    <bean id="eventManager" class="com.zutubi.pulse.events.DefaultEventManager">
         <constructor-arg index="0" ref="eventDispatcher"/>
     </bean>
 
-    <bean id="eventDispatcher" class="com.cinnamonbob.events.SynchronousDispatcher"/>
+    <bean id="eventDispatcher" class="com.zutubi.pulse.events.SynchronousDispatcher"/>
 
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="mappingResources">
             <list>
-                <value>com/cinnamonbob/scheduling/persistence/hibernate/Trigger.hbm.xml</value>
+                <value>com/zutubi/pulse/scheduling/persistence/hibernate/Trigger.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">
@@ -33,9 +33,9 @@
         </property>
     </bean>
 
-    <bean name="objectFactory" class="com.cinnamonbob.spring.SpringObjectFactory"/>
+    <bean name="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
-    <bean id="triggerDaoTarget" class="com.cinnamonbob.scheduling.persistence.hibernate.HibernateTriggerDao">
+    <bean id="triggerDaoTarget" class="com.zutubi.pulse.scheduling.persistence.hibernate.HibernateTriggerDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>

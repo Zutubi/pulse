@@ -1,6 +1,6 @@
-package com.cinnamonbob.scheduling;
+package com.zutubi.pulse.scheduling;
 
-import com.cinnamonbob.core.model.Entity;
+import com.zutubi.pulse.core.model.Entity;
 
 import java.io.Serializable;
 import java.util.Calendar;

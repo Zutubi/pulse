@@ -1,6 +1,6 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.model.Cvs;
+import com.zutubi.pulse.model.Cvs;
 import com.opensymphony.util.TextUtils;
 
 /**

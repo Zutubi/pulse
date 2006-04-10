@@ -1,7 +1,7 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.Property;
-import com.cinnamonbob.core.util.SystemUtils;
+import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.core.util.SystemUtils;
 
 import java.util.LinkedList;
 import java.util.List;

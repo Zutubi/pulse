@@ -1,4 +1,4 @@
-package com.cinnamonbob.api.clients;
+package com.zutubi.pulse.api.clients;
 
 import org.apache.commons.cli.*;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
@@ -12,11 +12,11 @@ import java.net.MalformedURLException;
 import java.io.IOException;
 import java.io.File;
 
-import com.cinnamonbob.bootstrap.SystemBootstrapManager;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.api.TokenManager;
-import com.cinnamonbob.core.util.IOUtils;
+import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.api.TokenManager;
+import com.zutubi.pulse.core.util.IOUtils;
 
 /**
  * <class-comment/>

@@ -13,8 +13,8 @@
             <result-type name="freemarker" class="com.opensymphony.webwork.views.freemarker.FreemarkerResult"/>
             <result-type name="httpheader" class="com.opensymphony.webwork.dispatcher.HttpHeaderResult"/>
             <result-type name="stream" class="com.opensymphony.webwork.dispatcher.StreamResult"/>
-            <result-type name="velocity-xml" class="com.cinnamonbob.xwork.dispatcher.VelocityXmlResult"/>
-            <result-type name="rss" class="com.cinnamonbob.xwork.results.RssResult"/>
+            <result-type name="velocity-xml" class="com.zutubi.pulse.xwork.dispatcher.VelocityXmlResult"/>
+            <result-type name="rss" class="com.zutubi.pulse.xwork.results.RssResult"/>
         </result-types>
 
         <interceptors>
@@ -35,10 +35,10 @@
             <interceptor name="fileUpload" class="com.opensymphony.webwork.interceptor.FileUploadInterceptor"/>
             <interceptor name="execAndWait" class="com.opensymphony.webwork.interceptor.ExecuteAndWaitInterceptor"/>
 
-            <interceptor name="prepare" class="com.cinnamonbob.xwork.interceptor.PrepareInterceptor"/>
-            <interceptor name="cancel" class="com.cinnamonbob.xwork.interceptor.CancelWorkflowInterceptor"/>
-            <interceptor name="wizard" class="com.cinnamonbob.web.wizard.WizardInterceptor"/>
-            <interceptor name="ajax" class="com.cinnamonbob.web.AjaxInterceptor"/>
+            <interceptor name="prepare" class="com.zutubi.pulse.xwork.interceptor.PrepareInterceptor"/>
+            <interceptor name="cancel" class="com.zutubi.pulse.xwork.interceptor.CancelWorkflowInterceptor"/>
+            <interceptor name="wizard" class="com.zutubi.pulse.web.wizard.WizardInterceptor"/>
+            <interceptor name="ajax" class="com.zutubi.pulse.web.AjaxInterceptor"/>
 
             <!-- Basic stack -->
             <interceptor-stack name="defaultStack">

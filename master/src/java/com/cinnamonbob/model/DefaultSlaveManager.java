@@ -1,10 +1,10 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.util.Constants;
-import com.cinnamonbob.model.persistence.SlaveDao;
-import com.cinnamonbob.scheduling.*;
-import com.cinnamonbob.scheduling.tasks.PingSlaves;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.util.Constants;
+import com.zutubi.pulse.model.persistence.SlaveDao;
+import com.zutubi.pulse.scheduling.*;
+import com.zutubi.pulse.scheduling.tasks.PingSlaves;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;
 

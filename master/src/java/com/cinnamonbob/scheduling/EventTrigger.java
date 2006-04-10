@@ -1,6 +1,6 @@
-package com.cinnamonbob.scheduling;
+package com.zutubi.pulse.scheduling;
 
-import com.cinnamonbob.events.Event;
+import com.zutubi.pulse.events.Event;
 
 /**
  * The EventTrigger is triggered by the occurance of an event within the system.

@@ -1,9 +1,9 @@
-package com.cinnamonbob.local;
+package com.zutubi.pulse.local;
 
-import com.cinnamonbob.core.BobException;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.test.BobTestCase;
 
 import java.io.*;
 import java.net.URL;
@@ -36,7 +36,7 @@ public class LocalBuildTest extends BobTestCase
     private File getExpectedOutput(String name)
     {
         File root = getBobRoot();
-        return new File(root, FileSystemUtils.composeFilename("local", "src", "test", "com", "cinnamonbob", "local", "data", name));
+        return new File(root, FileSystemUtils.composeFilename("local", "src", "test", "com", "zutubi", "pulse", "local", "data", name));
     }
 
     private String copyFile(String name) throws IOException

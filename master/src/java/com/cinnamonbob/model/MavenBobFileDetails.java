@@ -1,4 +1,4 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
 import com.opensymphony.util.TextUtils;
 import org.apache.velocity.VelocityContext;

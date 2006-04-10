@@ -1,14 +1,14 @@
-package com.cinnamonbob.scm;
+package com.zutubi.pulse.scm;
 
-import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.model.Cvs;
-import com.cinnamonbob.model.Scm;
-import com.cinnamonbob.model.ScmManager;
-import com.cinnamonbob.scheduling.Task;
-import com.cinnamonbob.scheduling.TaskExecutionContext;
-import com.cinnamonbob.scm.cvs.CvsServer;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.model.Cvs;
+import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.model.ScmManager;
+import com.zutubi.pulse.scheduling.Task;
+import com.zutubi.pulse.scheduling.TaskExecutionContext;
+import com.zutubi.pulse.scm.cvs.CvsServer;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.Date;
 import java.util.HashMap;

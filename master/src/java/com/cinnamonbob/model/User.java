@@ -1,7 +1,7 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.model.Entity;
-import com.cinnamonbob.web.DefaultAction;
+import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.web.DefaultAction;
 import org.acegisecurity.userdetails.UserDetails;
 
 import java.util.LinkedList;

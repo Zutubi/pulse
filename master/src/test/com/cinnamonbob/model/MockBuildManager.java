@@ -1,6 +1,6 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.model.*;
+import com.zutubi.pulse.core.model.*;
 
 import java.util.List;
 import java.util.Map;

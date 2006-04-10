@@ -1,6 +1,6 @@
-package com.cinnamonbob.bootstrap;
+package com.zutubi.pulse.bootstrap;
 
-import com.cinnamonbob.upgrade.UpgradeManager;
+import com.zutubi.pulse.upgrade.UpgradeManager;
 
 import java.io.IOException;
 import java.util.List;

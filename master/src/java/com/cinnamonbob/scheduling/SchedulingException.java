@@ -1,6 +1,6 @@
-package com.cinnamonbob.scheduling;
+package com.zutubi.pulse.scheduling;
 
-import com.cinnamonbob.core.BobException;
+import com.zutubi.pulse.core.BobException;
 
 /**
  * <class-comment/>

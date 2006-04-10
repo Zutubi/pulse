@@ -1,9 +1,9 @@
-package com.cinnamonbob.api;
+package com.zutubi.pulse.api;
 
-import com.cinnamonbob.ShutdownManager;
-import com.cinnamonbob.model.UserManager;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.bootstrap.ComponentContext;
+import com.zutubi.pulse.ShutdownManager;
+import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 
 /**
  * Implements a simple API for remote monitoring and control.

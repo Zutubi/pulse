@@ -1,10 +1,10 @@
-package com.cinnamonbob.slave;
+package com.zutubi.pulse.slave;
 
 import com.caucho.hessian.client.HessianRuntimeException;
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.events.build.RecipeErrorEvent;
-import com.cinnamonbob.services.MasterService;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.events.build.RecipeErrorEvent;
+import com.zutubi.pulse.services.MasterService;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.MalformedURLException;
 

@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.cinnamonbob.core.model.CommandResult" table="COMMAND_RESULT" lazy="false">
+    <class name="com.zutubi.pulse.core.model.CommandResult" table="COMMAND_RESULT" lazy="false">
 
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -10,7 +10,7 @@
 
         <property name="commandName" column="COMMAND_NAME" type="string" length="255"/>
 
-        <property name="stamps" type="com.cinnamonbob.util.TimeStampsType">
+        <property name="stamps" type="com.zutubi.pulse.util.TimeStampsType">
             <column name="QUEUE" sql-type="BIGINT"/>
             <column name="START" sql-type="BIGINT"/>
             <column name="FINISH" sql-type="BIGINT"/>
@@ -22,15 +22,15 @@
 
         <bag name="features" cascade="all-delete-orphan" lazy="false">
             <key column="COMMAND_RESULT_ID"/>
-            <one-to-many class="com.cinnamonbob.core.model.Feature"/>
+            <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
         </bag>
 
-        <property name="properties" column="PROPERTIES" type="com.cinnamonbob.util.PropertiesType" length="4096"/>
+        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.util.PropertiesType" length="4096"/>
 
         <list name="artifacts" cascade="all-delete-orphan" lazy="false">
             <key column="COMMAND_RESULT_ID"/>
             <index column="ORDINAL"/>
-            <one-to-many class="com.cinnamonbob.core.model.StoredArtifact"/>
+            <one-to-many class="com.zutubi.pulse.core.model.StoredArtifact"/>
         </list>
 
     </class>

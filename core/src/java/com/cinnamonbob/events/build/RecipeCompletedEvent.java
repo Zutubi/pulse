@@ -1,6 +1,6 @@
-package com.cinnamonbob.events.build;
+package com.zutubi.pulse.events.build;
 
-import com.cinnamonbob.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.RecipeResult;
 
 /**
  * This event is raised by the recipe processor when a recipe is completed.

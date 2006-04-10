@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.ajax;
+package com.zutubi.pulse.web.ajax;
 
-import com.cinnamonbob.model.P4;
-import com.cinnamonbob.model.Scm;
+import com.zutubi.pulse.model.P4;
+import com.zutubi.pulse.model.Scm;
 
 /**
  * An ajax request to test perforce settings and send a fragment of HTML

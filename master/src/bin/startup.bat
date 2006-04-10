@@ -13,7 +13,7 @@ goto end
 
 :haveBob
 
-call "%BOB_HOME%"\bin\common.bat com.cinnamonbob.command.Bootstrap start %*
+call "%BOB_HOME%"\bin\common.bat com.zutubi.pulse.command.Bootstrap start %*
 
 :end
 rem all done

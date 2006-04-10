@@ -1,9 +1,9 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.model.*;
-import com.cinnamonbob.model.persistence.BuildSpecificationNodeDao;
-import com.cinnamonbob.web.ActionSupport;
-import com.cinnamonbob.xwork.interceptor.Cancelable;
+import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.persistence.BuildSpecificationNodeDao;
+import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.xwork.interceptor.Cancelable;
 
 import java.util.List;
 import java.util.Map;

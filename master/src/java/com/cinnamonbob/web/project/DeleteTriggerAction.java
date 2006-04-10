@@ -1,8 +1,8 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.scheduling.Trigger;
-import com.cinnamonbob.scheduling.SchedulingException;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.scheduling.SchedulingException;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  *

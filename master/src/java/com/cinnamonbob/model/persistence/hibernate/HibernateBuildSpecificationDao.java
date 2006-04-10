@@ -1,7 +1,7 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.model.BuildSpecification;
-import com.cinnamonbob.model.persistence.BuildSpecificationDao;
+import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 
 /**
  * <class-comment/>

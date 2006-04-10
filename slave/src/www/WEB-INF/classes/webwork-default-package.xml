@@ -13,7 +13,7 @@
             <result-type name="freemarker" class="com.opensymphony.webwork.views.freemarker.FreemarkerResult"/>
             <result-type name="httpheader" class="com.opensymphony.webwork.dispatcher.HttpHeaderResult"/>
             <result-type name="stream" class="com.opensymphony.webwork.dispatcher.StreamResult"/>
-            <result-type name="velocity-xml" class="com.cinnamonbob.xwork.dispatcher.VelocityXmlResult"/>
+            <result-type name="velocity-xml" class="com.zutubi.pulse.xwork.dispatcher.VelocityXmlResult"/>
         </result-types>
 
         <interceptors>
@@ -32,7 +32,7 @@
             <interceptor name="conversionError" class="com.opensymphony.webwork.interceptor.WebWorkConversionErrorInterceptor"/>
             <interceptor name="fileUpload" class="com.opensymphony.webwork.interceptor.FileUploadInterceptor"/>
             <interceptor name="execAndWait" class="com.opensymphony.webwork.interceptor.ExecuteAndWaitInterceptor"/>
-            <interceptor name="cancel" class="com.cinnamonbob.xwork.interceptor.CancelWorkflowInterceptor"/>
+            <interceptor name="cancel" class="com.zutubi.pulse.xwork.interceptor.CancelWorkflowInterceptor"/>
 
             <!-- Basic stack -->
             <interceptor-stack name="defaultStack">

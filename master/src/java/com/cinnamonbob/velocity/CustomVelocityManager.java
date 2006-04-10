@@ -1,12 +1,12 @@
-package com.cinnamonbob.velocity;
+package com.zutubi.pulse.velocity;
 
-import com.cinnamonbob.Version;
-import com.cinnamonbob.bootstrap.ApplicationConfiguration;
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.UserManager;
-import com.cinnamonbob.security.AcegiUtils;
+import com.zutubi.pulse.Version;
+import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.security.AcegiUtils;
 import com.opensymphony.webwork.views.velocity.VelocityManager;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import org.apache.velocity.context.Context;

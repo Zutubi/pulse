@@ -1,8 +1,8 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.model.BobFileDetails;
-import com.cinnamonbob.model.CustomBobFileDetails;
-import com.cinnamonbob.xwork.interceptor.Preparable;
+import com.zutubi.pulse.model.BobFileDetails;
+import com.zutubi.pulse.model.CustomBobFileDetails;
+import com.zutubi.pulse.xwork.interceptor.Preparable;
 
 /**
  *

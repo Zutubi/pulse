@@ -1,9 +1,9 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.Property;
-import com.cinnamonbob.core.model.Resource;
-import com.cinnamonbob.core.model.ResourceVersion;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.model.ResourceVersion;
+import com.zutubi.pulse.test.BobTestCase;
 
 import java.util.List;
 import java.util.Map;

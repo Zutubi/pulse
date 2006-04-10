@@ -1,6 +1,6 @@
-package com.cinnamonbob.local;
+package com.zutubi.pulse.local;
 
-import com.cinnamonbob.core.RecipePaths;
+import com.zutubi.pulse.core.RecipePaths;
 
 import java.io.File;
 

@@ -1,10 +1,10 @@
-package com.cinnamonbob.slave;
+package com.zutubi.pulse.slave;
 
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.events.EventListener;
-import com.cinnamonbob.events.build.RecipeEvent;
-import com.cinnamonbob.services.MasterService;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.build.RecipeEvent;
+import com.zutubi.pulse.services.MasterService;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  */

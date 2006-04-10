@@ -1,6 +1,6 @@
-package com.cinnamonbob.velocity;
+package com.zutubi.pulse.velocity;
 
-import com.cinnamonbob.security.AcegiUtils;
+import com.zutubi.pulse.security.AcegiUtils;
 import junit.framework.TestCase;
 import org.acegisecurity.GrantedAuthority;
 import org.acegisecurity.userdetails.UserDetails;
@@ -27,7 +27,7 @@ public class AuthorizeDirectiveTest extends TestCase
 
         // initialise velocity.
         velocity = new VelocityEngine();
-        velocity.addProperty("userdirective", "com.cinnamonbob.velocity.AuthorizeDirective");
+        velocity.addProperty("userdirective", "com.zutubi.pulse.velocity.AuthorizeDirective");
         velocity.init();
     }
 

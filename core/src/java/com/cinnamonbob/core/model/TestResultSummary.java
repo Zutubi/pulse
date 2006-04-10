@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.model;
+package com.zutubi.pulse.core.model;
 
 /**
  * Provides a small amoutn of summary information for a group of tests

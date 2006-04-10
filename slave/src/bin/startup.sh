@@ -1,3 +1,3 @@
 #! /bin/sh
 
-`dirname $0`/common.sh com.cinnamonbob.slave.SlaveServer
+`dirname $0`/common.sh com.zutubi.pulse.slave.SlaveServer

@@ -6,77 +6,77 @@
     <package name="default" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="default" class="com.cinnamonbob.web.DefaultAction">
+        <action name="default" class="com.zutubi.pulse.web.DefaultAction">
             <!--<result name="setupAdmin" type="redirect">/setup/setupWizard.action</result>-->
             <result name="dashboard" type="redirect">/dashboard.action</result>
             <result name="welcome" type="velocity">/welcome.vm</result>
         </action>
 
-        <action name="login" class="com.cinnamonbob.web.LoginAction">
+        <action name="login" class="com.zutubi.pulse.web.LoginAction">
             <result name="cancel" type="redirect">/</result>
             <result name="input" type="velocity">login.vm</result>
             <result name="success" type="velocity">login.vm</result>
         </action>
 
-        <action name="logout" class="com.cinnamonbob.web.LogoutAction">
+        <action name="logout" class="com.zutubi.pulse.web.LogoutAction">
             <result name="success" type="redirect">/</result>
         </action>
 
-        <action name="dismissWelcome" class="com.cinnamonbob.web.DismissWelcomeAction">
+        <action name="dismissWelcome" class="com.zutubi.pulse.web.DismissWelcomeAction">
             <result name="success" type="redirect">/default.action</result>
         </action>
 
-        <action name="dashboard" class="com.cinnamonbob.web.user.DashboardAction">
+        <action name="dashboard" class="com.zutubi.pulse.web.user.DashboardAction">
             <result name="success" type="velocity">dashboard.vm</result>
             <result name="error" type="redirect">/</result>
         </action>
 
-        <action name="preferences" class="com.cinnamonbob.web.user.PreferencesAction">
+        <action name="preferences" class="com.zutubi.pulse.web.user.PreferencesAction">
             <result name="input" type="velocity">/preferences.vm</result>
             <result name="success" type="velocity">/preferences.vm</result>
             <result name="error" type="redirect">/</result>
         </action>
 
-        <action name="preferences!input" class="com.cinnamonbob.web.user.PreferencesAction" method="doInput">
+        <action name="preferences!input" class="com.zutubi.pulse.web.user.PreferencesAction" method="doInput">
             <result name="input" type="velocity">/preferences.vm</result>
         </action>
 
-        <action name="viewRecipeQueue" class="com.cinnamonbob.web.server.ViewRecipeQueueAction">
+        <action name="viewRecipeQueue" class="com.zutubi.pulse.web.server.ViewRecipeQueueAction">
             <result name="success" type="velocity">view-recipe-queue.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="cancelBuild" class="com.cinnamonbob.web.server.CancelBuildAction">
+        <action name="cancelBuild" class="com.zutubi.pulse.web.server.CancelBuildAction">
             <result name="success" type="redirect">viewRecipeQueue.action</result>
         </action>
 
-        <action name="viewResources" class="com.cinnamonbob.web.ViewResourcesAction">
+        <action name="viewResources" class="com.zutubi.pulse.web.ViewResourcesAction">
             <result name="success" type="velocity">view-resources.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="serverStatus" class="com.cinnamonbob.web.ServerStatusAction">
+        <action name="serverStatus" class="com.zutubi.pulse.web.ServerStatusAction">
             <result name="success" type="velocity">server-status.vm</result>
         </action>
 
-        <action name="viewResource" class="com.cinnamonbob.web.ViewResourceAction">
+        <action name="viewResource" class="com.zutubi.pulse.web.ViewResourceAction">
             <result name="input" type="velocity">view-resource.vm</result>
             <result name="success" type="velocity">view-resource.vm</result>
         </action>
 
-        <action name="createResource" class="com.cinnamonbob.web.CreateResourceAction">
+        <action name="createResource" class="com.zutubi.pulse.web.CreateResourceAction">
             <result name="input" type="velocity">create-resource.vm</result>
             <result name="cancel" type="redirect">/viewResources.action</result>
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/viewResource.action?id=${resource.id}</result>
         </action>
 
-        <action name="deleteResource" class="com.cinnamonbob.web.DeleteResourceAction">
+        <action name="deleteResource" class="com.zutubi.pulse.web.DeleteResourceAction">
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/viewResources.action</result>
         </action>
 
-        <action name="createResourceVersion" class="com.cinnamonbob.web.CreateResourceVersionAction">
+        <action name="createResourceVersion" class="com.zutubi.pulse.web.CreateResourceVersionAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">create-resource-version.vm</result>
             <result name="cancel" type="redirect">viewResource.action?id=${resourceId}</result>
@@ -84,29 +84,29 @@
             <result name="success" type="redirect">viewResource.action?id=${resourceId}</result>
         </action>
 
-        <action name="deleteResourceVersion" class="com.cinnamonbob.web.DeleteResourceVersionAction">
+        <action name="deleteResourceVersion" class="com.zutubi.pulse.web.DeleteResourceVersionAction">
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">viewResource.action?id=${resourceId}</result>
         </action>
 
-        <action name="createProperty" class="com.cinnamonbob.web.CreatePropertyAction">
+        <action name="createProperty" class="com.zutubi.pulse.web.CreatePropertyAction">
             <result name="input" type="velocity">create-property.vm</result>
             <result name="cancel" type="redirect">viewResource.action?id=${resourceId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">viewResource.action?id=${resourceId}</result>
         </action>
 
-        <action name="deleteProperty" class="com.cinnamonbob.web.DeletePropertyAction">
+        <action name="deleteProperty" class="com.zutubi.pulse.web.DeletePropertyAction">
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">viewResource.action?id=${resourceId}</result>
         </action>
 
-        <action name="serverMessages" class="com.cinnamonbob.web.ServerMessagesAction">
+        <action name="serverMessages" class="com.zutubi.pulse.web.ServerMessagesAction">
             <result name="success" type="velocity">server-messages.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="internalError" class="com.cinnamonbob.web.InternalErrorAction">
+        <action name="internalError" class="com.zutubi.pulse.web.InternalErrorAction">
             <result name="success" type="velocity">internal-error.vm</result>
             <result name="input" type="velocity">internal-error.vm</result>
             <result name="cancel" type="velocity">internal-error.vm</result>
@@ -114,75 +114,75 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewProjects" class="com.cinnamonbob.web.project.ViewProjectsAction">
+        <action name="viewProjects" class="com.zutubi.pulse.web.project.ViewProjectsAction">
             <result name="success" type="velocity">view-projects.vm</result>
         </action>
 
-        <action name="viewBuild" class="com.cinnamonbob.web.project.ViewBuildAction">
+        <action name="viewBuild" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-build.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewChanges" class="com.cinnamonbob.web.project.ViewBuildAction">
+        <action name="viewChanges" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-changes.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewTests" class="com.cinnamonbob.web.project.ViewBuildAction">
+        <action name="viewTests" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-tests.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewCommandLog" class="com.cinnamonbob.web.project.ViewBuildAction">
+        <action name="viewCommandLog" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-command-log.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewBuildArtifacts" class="com.cinnamonbob.web.project.ViewBuildAction">
+        <action name="viewBuildArtifacts" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-artifacts.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewBuildFile" class="com.cinnamonbob.web.project.ViewBuildFileAction">
+        <action name="viewBuildFile" class="com.zutubi.pulse.web.project.ViewBuildFileAction">
             <result name="success" type="velocity">view-build-file.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="downloadBuildFile" class="com.cinnamonbob.web.project.DownloadBuildFileAction">
+        <action name="downloadBuildFile" class="com.zutubi.pulse.web.project.DownloadBuildFileAction">
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
             </result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="downloadProjectBuildFile" class="com.cinnamonbob.web.project.DownloadProjectBuildFileAction">
+        <action name="downloadProjectBuildFile" class="com.zutubi.pulse.web.project.DownloadProjectBuildFileAction">
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
             </result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewRecipe" class="com.cinnamonbob.web.project.ViewRecipeAction">
+        <action name="viewRecipe" class="com.zutubi.pulse.web.project.ViewRecipeAction">
             <result name="success" type="velocity">view-recipe.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewChangelist" class="com.cinnamonbob.web.project.ViewChangelistAction">
+        <action name="viewChangelist" class="com.zutubi.pulse.web.project.ViewChangelistAction">
             <result name="success" type="velocity">view-changelist.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="triggerBuild" class="com.cinnamonbob.web.project.TriggerBuildAction">
+        <action name="triggerBuild" class="com.zutubi.pulse.web.project.TriggerBuildAction">
             <result name="success" type="redirect">currentBuild.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewArtifact" class="com.cinnamonbob.web.project.ViewArtifactAction">
+        <action name="viewArtifact" class="com.zutubi.pulse.web.project.ViewArtifactAction">
             <result name="success" type="velocity">view-artifact.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="browseProjectDir" class="com.cinnamonbob.web.project.BrowseProjectDirAction">
+        <action name="browseProjectDir" class="com.zutubi.pulse.web.project.BrowseProjectDirAction">
             <result name="dir" type="velocity">browse-project-dir.vm</result>
             <result name="file" type="stream">
                 <param name="contentType">${contentType}</param>
@@ -190,7 +190,7 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="browseProjectScm" class="com.cinnamonbob.web.project.BrowseProjectScmAction">
+        <action name="browseProjectScm" class="com.zutubi.pulse.web.project.BrowseProjectScmAction">
             <result name="dir" type="velocity">browse-project-scm-dir.vm</result>
             <result name="file" type="stream">
                 <param name="contentType">${contentType}</param>
@@ -198,39 +198,39 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="index!default" class="com.cinnamonbob.web.ActionSupport">
+        <action name="index!default" class="com.zutubi.pulse.web.ActionSupport">
             <result name="success" type="velocity">index.vm</result>
         </action>
 
-        <action name="createProject!default" class="com.cinnamonbob.web.project.CreateProjectAction" method="doDefault">
+        <action name="createProject!default" class="com.zutubi.pulse.web.project.CreateProjectAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-project.vm</result>
         </action>
 
-        <action name="createProject" class="com.cinnamonbob.web.project.CreateProjectAction">
+        <action name="createProject" class="com.zutubi.pulse.web.project.CreateProjectAction">
             <result name="input" type="velocity">create-project.vm</result>
             <result name="cancel" type="velocity">undefined.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${id}</result>
         </action>
 
-        <action name="findProjects!default" class="com.cinnamonbob.web.ActionSupport">
+        <action name="findProjects!default" class="com.zutubi.pulse.web.ActionSupport">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">find-project.vm</result>
         </action>
 
-        <action name="findProjects" class="com.cinnamonbob.web.project.FindProjectsAction">
+        <action name="findProjects" class="com.zutubi.pulse.web.project.FindProjectsAction">
             <result name="input" type="velocity">find-project.vm</result>
             <result name="success" type="velocity">find-project.vm</result>
         </action>
 
-        <action name="deleteProject" class="com.cinnamonbob.web.project.DeleteProjectAction">
+        <action name="deleteProject" class="com.zutubi.pulse.web.project.DeleteProjectAction">
             <result name="input" type="velocity">confirm-project-delete.vm</result>
             <result name="success" type="redirect">/viewProjects.action</result>
             <result name="cancel" type="redirect">/currentBuild.action?id=${id}</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="editProject" class="com.cinnamonbob.web.project.EditProjectAction">
+        <action name="editProject" class="com.zutubi.pulse.web.project.EditProjectAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-project.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${id}</result>
@@ -238,27 +238,27 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="currentBuild" class="com.cinnamonbob.web.project.ProjectHomeAction">
+        <action name="currentBuild" class="com.zutubi.pulse.web.project.ProjectHomeAction">
             <result name="success" type="velocity">project-home.vm</result>
             <result name="error" type="redirect">viewProjects.action</result>
         </action>
 
-        <action name="projectState" class="com.cinnamonbob.web.project.ProjectStateAction">
+        <action name="projectState" class="com.zutubi.pulse.web.project.ProjectStateAction">
             <result name="success" type="redirect">/currentBuild.action?id=${id}</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="history" class="com.cinnamonbob.web.project.HistoryAction">
+        <action name="history" class="com.zutubi.pulse.web.project.HistoryAction">
             <result name="success" type="velocity">history.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="configureProject" class="com.cinnamonbob.web.project.ConfigureProjectAction">
+        <action name="configureProject" class="com.zutubi.pulse.web.project.ConfigureProjectAction">
             <result name="success" type="velocity">configure-project.vm</result>
             <result name="error" type="redirect">viewProjects.action</result>
         </action>
 
-        <action name="editScm" class="com.cinnamonbob.web.project.EditScmAction">
+        <action name="editScm" class="com.zutubi.pulse.web.project.EditScmAction">
             <result name="svn" type="chain">editSvn!input</result>
             <result name="cvs" type="chain">editCvs!input</result>
             <result name="p4" type="chain">editP4!input</result>
@@ -266,12 +266,12 @@
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editSvn!input" class="com.cinnamonbob.web.project.EditSvnAction" method="doInput">
+        <action name="editSvn!input" class="com.zutubi.pulse.web.project.EditSvnAction" method="doInput">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-scm-svn.vm</result>
         </action>
 
-        <action name="editSvn" class="com.cinnamonbob.web.project.EditSvnAction">
+        <action name="editSvn" class="com.zutubi.pulse.web.project.EditSvnAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-scm-svn.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
@@ -279,12 +279,12 @@
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editCvs!input" class="com.cinnamonbob.web.project.EditCvsAction" method="doInput">
+        <action name="editCvs!input" class="com.zutubi.pulse.web.project.EditCvsAction" method="doInput">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-scm-cvs.vm</result>
         </action>
 
-        <action name="editCvs" class="com.cinnamonbob.web.project.EditCvsAction">
+        <action name="editCvs" class="com.zutubi.pulse.web.project.EditCvsAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-scm-cvs.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
@@ -292,19 +292,19 @@
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editP4!input" class="com.cinnamonbob.web.project.EditP4Action" method="doInput">
+        <action name="editP4!input" class="com.zutubi.pulse.web.project.EditP4Action" method="doInput">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-scm-p4.vm</result>
         </action>
 
-        <action name="editP4" class="com.cinnamonbob.web.project.EditP4Action">
+        <action name="editP4" class="com.zutubi.pulse.web.project.EditP4Action">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-scm-p4.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
-        <action name="editBobFileDetails" class="com.cinnamonbob.web.project.EditBobFileDetailsAction">
+        <action name="editBobFileDetails" class="com.zutubi.pulse.web.project.EditBobFileDetailsAction">
             <result name="custom" type="chain">editCustomDetails!input</result>
             <result name="ant" type="chain">editAntDetails!input</result>
             <result name="make" type="chain">editMakeDetails!input</result>
@@ -313,13 +313,13 @@
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editCustomDetails!input" class="com.cinnamonbob.web.project.EditCustomDetailsAction"
+        <action name="editCustomDetails!input" class="com.zutubi.pulse.web.project.EditCustomDetailsAction"
                 method="doInput">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-details-custom.vm</result>
         </action>
 
-        <action name="editCustomDetails" class="com.cinnamonbob.web.project.EditCustomDetailsAction">
+        <action name="editCustomDetails" class="com.zutubi.pulse.web.project.EditCustomDetailsAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-details-custom.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
@@ -327,12 +327,12 @@
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editAntDetails!input" class="com.cinnamonbob.web.project.EditAntDetailsAction" method="doInput">
+        <action name="editAntDetails!input" class="com.zutubi.pulse.web.project.EditAntDetailsAction" method="doInput">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-details-ant.vm</result>
         </action>
 
-        <action name="editAntDetails" class="com.cinnamonbob.web.project.EditAntDetailsAction">
+        <action name="editAntDetails" class="com.zutubi.pulse.web.project.EditAntDetailsAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-details-ant.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
@@ -340,12 +340,12 @@
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editMakeDetails!input" class="com.cinnamonbob.web.project.EditMakeDetailsAction" method="doInput">
+        <action name="editMakeDetails!input" class="com.zutubi.pulse.web.project.EditMakeDetailsAction" method="doInput">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-details-make.vm</result>
         </action>
 
-        <action name="editMakeDetails" class="com.cinnamonbob.web.project.EditMakeDetailsAction">
+        <action name="editMakeDetails" class="com.zutubi.pulse.web.project.EditMakeDetailsAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-details-make.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
@@ -353,13 +353,13 @@
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editMavenDetails!input" class="com.cinnamonbob.web.project.EditMavenDetailsAction"
+        <action name="editMavenDetails!input" class="com.zutubi.pulse.web.project.EditMavenDetailsAction"
                 method="doInput">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-details-maven.vm</result>
         </action>
 
-        <action name="editMavenDetails" class="com.cinnamonbob.web.project.EditMavenDetailsAction">
+        <action name="editMavenDetails" class="com.zutubi.pulse.web.project.EditMavenDetailsAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-details-maven.vm</result>
             <result name="cancel" type="redirect">
@@ -368,19 +368,19 @@
                 /configureProject.action?id=${projectId}&amp;tab=configuration</result>
         </action>
 
-        <action name="editTrigger" class="com.cinnamonbob.web.project.EditTriggerAction">
+        <action name="editTrigger" class="com.zutubi.pulse.web.project.EditTriggerAction">
             <result name="cron" type="chain">editCronTrigger!input</result>
             <result name="event" type="chain">editEventTrigger!input</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editCronTrigger!input" class="com.cinnamonbob.web.project.EditCronTriggerAction" method="doInput">
+        <action name="editCronTrigger!input" class="com.zutubi.pulse.web.project.EditCronTriggerAction" method="doInput">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-trigger-cron.vm</result>
         </action>
 
-        <action name="editCronTrigger" class="com.cinnamonbob.web.project.EditCronTriggerAction">
+        <action name="editCronTrigger" class="com.zutubi.pulse.web.project.EditCronTriggerAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-trigger-cron.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
@@ -388,22 +388,22 @@
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editEventTrigger!input" class="com.cinnamonbob.web.project.EditEventTriggerAction"
+        <action name="editEventTrigger!input" class="com.zutubi.pulse.web.project.EditEventTriggerAction"
                 method="doInput">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-trigger-event.vm</result>
         </action>
 
-        <action name="editEventTrigger" class="com.cinnamonbob.web.project.EditEventTriggerAction">
+        <action name="editEventTrigger" class="com.zutubi.pulse.web.project.EditEventTriggerAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-trigger-event.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
-        <action name="addProject" class="com.cinnamonbob.web.wizard.WizardAction">
+        <action name="addProject" class="com.zutubi.pulse.web.wizard.WizardAction">
             <interceptor-ref name="wizardStack"/>
-            <param name="wizardClass">com.cinnamonbob.web.project.AddProjectWizard</param>
+            <param name="wizardClass">com.zutubi.pulse.web.project.AddProjectWizard</param>
             <result name="project" type="velocity">addproject-project.vm</result>
             <result name="cvs" type="velocity">addproject-cvs.vm</result>
             <result name="svn" type="velocity">addproject-svn.vm</result>
@@ -416,9 +416,9 @@
             <result name="cancel" type="redirect">/viewProjects.action</result>
         </action>
 
-        <action name="addTrigger" class="com.cinnamonbob.web.wizard.WizardAction">
+        <action name="addTrigger" class="com.zutubi.pulse.web.wizard.WizardAction">
             <interceptor-ref name="wizardStack"/>
-            <param name="wizardClass">com.cinnamonbob.web.project.AddTriggerWizard</param>
+            <param name="wizardClass">com.zutubi.pulse.web.project.AddTriggerWizard</param>
             <result name="select" type="velocity">select-trigger.vm</result>
             <result name="monitor" type="velocity">configure-monitor-trigger.vm</result>
             <result name="cron" type="velocity">configure-cron-trigger.vm</result>
@@ -426,82 +426,82 @@
             <result name="cancel" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
         </action>
 
-        <action name="deleteTrigger" class="com.cinnamonbob.web.project.DeleteTriggerAction">
+        <action name="deleteTrigger" class="com.zutubi.pulse.web.project.DeleteTriggerAction">
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
-        <action name="viewTriggers" class="com.cinnamonbob.web.scheduling.ViewTriggersAction">
+        <action name="viewTriggers" class="com.zutubi.pulse.web.scheduling.ViewTriggersAction">
             <result name="success" type="velocity">view-triggers.vm</result>
         </action>
 
-        <action name="viewSystemInfo" class="com.cinnamonbob.web.console.SystemInfoAction">
+        <action name="viewSystemInfo" class="com.zutubi.pulse.web.console.SystemInfoAction">
             <result name="success" type="velocity">view-systeminfo.vm</result>
         </action>
 
-        <action name="garbageCollect" class="com.cinnamonbob.web.console.GarbageCollectAction">
+        <action name="garbageCollect" class="com.zutubi.pulse.web.console.GarbageCollectAction">
             <result name="success" type="redirect">/viewSystemInfo.action</result>
         </action>
 
-        <action name="quartzSystemInfo" class="com.cinnamonbob.web.console.QuartzAdminAction">
+        <action name="quartzSystemInfo" class="com.zutubi.pulse.web.console.QuartzAdminAction">
             <result name="success" type="velocity">view-quartz.vm</result>
         </action>
 
-        <action name="createSlave!default" class="com.cinnamonbob.web.CreateSlaveAction" method="doDefault">
+        <action name="createSlave!default" class="com.zutubi.pulse.web.CreateSlaveAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-slave.vm</result>
         </action>
 
-        <action name="createSlave" class="com.cinnamonbob.web.CreateSlaveAction">
+        <action name="createSlave" class="com.zutubi.pulse.web.CreateSlaveAction">
             <result name="input" type="velocity">create-slave.vm</result>
             <result name="cancel" type="velocity">undefined.vm</result>
             <result name="error" type="velocity">create-slave.vm</result>
             <result name="success" type="redirect">/serverStatus.action</result>
         </action>
 
-        <action name="editSlave!default" class="com.cinnamonbob.web.EditSlaveAction" method="doDefault">
+        <action name="editSlave!default" class="com.zutubi.pulse.web.EditSlaveAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">edit-slave.vm</result>
         </action>
 
-        <action name="editSlave" class="com.cinnamonbob.web.EditSlaveAction">
+        <action name="editSlave" class="com.zutubi.pulse.web.EditSlaveAction">
             <result name="error" type="velocity">edit-slave.vm</result>
             <result name="input" type="velocity">edit-slave.vm</result>
             <result name="cancel" type="redirect">/serverStatus.action</result>
             <result name="success" type="redirect">/serverStatus.action</result>
         </action>
 
-        <action name="deleteSlave" class="com.cinnamonbob.web.DeleteSlaveAction">
+        <action name="deleteSlave" class="com.zutubi.pulse.web.DeleteSlaveAction">
             <result name="error" type="redirect">/serverStatus.action</result>
             <result name="success" type="redirect">/serverStatus.action</result>
         </action>
 
-        <action name="createBuildSpecification" class="com.cinnamonbob.web.project.CreateBuildSpecificationAction">
+        <action name="createBuildSpecification" class="com.zutubi.pulse.web.project.CreateBuildSpecificationAction">
             <result name="input" type="velocity">create-build-specification.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="error" type="velocity">create-build-specification.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
-        <action name="editBuildSpecification" class="com.cinnamonbob.web.project.EditBuildSpecificationAction">
+        <action name="editBuildSpecification" class="com.zutubi.pulse.web.project.EditBuildSpecificationAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-build-specification.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
-        <action name="deleteBuildSpecification" class="com.cinnamonbob.web.project.DeleteBuildSpecificationAction">
+        <action name="deleteBuildSpecification" class="com.zutubi.pulse.web.project.DeleteBuildSpecificationAction">
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="createBuildSpecificationNode!default"
-                class="com.cinnamonbob.web.project.CreateBuildSpecificationNodeAction" method="doDefault">
+                class="com.zutubi.pulse.web.project.CreateBuildSpecificationNodeAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-build-specification-node.vm</result>
         </action>
 
         <action name="createBuildSpecificationNode"
-                class="com.cinnamonbob.web.project.CreateBuildSpecificationNodeAction">
+                class="com.zutubi.pulse.web.project.CreateBuildSpecificationNodeAction">
             <result name="input" type="velocity">create-build-specification-node.vm</result>
             <result name="cancel" type="redirect">
                 /viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
@@ -509,86 +509,86 @@
             <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
         </action>
 
-        <action name="viewBuildSpecification" class="com.cinnamonbob.web.project.ViewBuildSpecificationAction">
+        <action name="viewBuildSpecification" class="com.zutubi.pulse.web.project.ViewBuildSpecificationAction">
             <result name="success" type="velocity">view-build-specification.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="addCleanupRule" class="com.cinnamonbob.web.project.AddCleanupRuleAction">
+        <action name="addCleanupRule" class="com.zutubi.pulse.web.project.AddCleanupRuleAction">
             <result name="input" type="velocity">add-cleanup-rule.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
-        <action name="editCleanupRule" class="com.cinnamonbob.web.project.EditCleanupRuleAction">
+        <action name="editCleanupRule" class="com.zutubi.pulse.web.project.EditCleanupRuleAction">
             <result name="input" type="velocity">edit-cleanup-rule.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
-        <action name="deleteCleanupRule" class="com.cinnamonbob.web.project.DeleteCleanupRuleAction">
+        <action name="deleteCleanupRule" class="com.zutubi.pulse.web.project.DeleteCleanupRuleAction">
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
-        <action name="convertToCustomProject" class="com.cinnamonbob.web.project.ConvertToCustomProjectAction">
+        <action name="convertToCustomProject" class="com.zutubi.pulse.web.project.ConvertToCustomProjectAction">
             <result name="input" type="velocity">convert-to-custom-project.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${id}</result>
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${id}</result>
         </action>
 
-        <action name="shutdownServer" class="com.cinnamonbob.web.ShutdownServerAction">
+        <action name="shutdownServer" class="com.zutubi.pulse.web.ShutdownServerAction">
             <interceptor-ref name="paramsStack"/>
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/serverStatus.action</result>
         </action>
 
-        <action name="rss" class="com.cinnamonbob.web.rss.BuildResultRssAction"/>
+        <action name="rss" class="com.zutubi.pulse.web.rss.BuildResultRssAction"/>
 
     </package>
 
     <package name="user" namespace="/user" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="editUser" class="com.cinnamonbob.web.user.EditUserAction">
+        <action name="editUser" class="com.zutubi.pulse.web.user.EditUserAction">
             <result name="input" type="velocity">edit-user.vm</result>
             <result name="error" type="velocity">edit-user.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="editPassword" class="com.cinnamonbob.web.user.EditPasswordAction">
+        <action name="editPassword" class="com.zutubi.pulse.web.user.EditPasswordAction">
             <result name="input" type="velocity">edit-user.vm</result>
             <result name="error" type="velocity">edit-user.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="addAlias" class="com.cinnamonbob.web.user.AddAliasAction">
+        <action name="addAlias" class="com.zutubi.pulse.web.user.AddAliasAction">
             <result name="input" type="velocity">add-alias.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="deleteAlias" class="com.cinnamonbob.web.user.DeleteAliasAction">
+        <action name="deleteAlias" class="com.zutubi.pulse.web.user.DeleteAliasAction">
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="editUserSettings" class="com.cinnamonbob.web.user.EditUserSettingsAction">
+        <action name="editUserSettings" class="com.zutubi.pulse.web.user.EditUserSettingsAction">
             <result name="input" type="velocity">edit-user-settings.vm</result>
             <result name="error" type="velocity">edit-user-settings.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="contactWizard" class="com.cinnamonbob.web.wizard.WizardAction">
+        <action name="contactWizard" class="com.zutubi.pulse.web.wizard.WizardAction">
             <interceptor-ref name="wizardStack"/>
-            <param name="wizardClass">com.cinnamonbob.web.user.ContactPointWizard</param>
+            <param name="wizardClass">com.zutubi.pulse.web.user.ContactPointWizard</param>
             <result name="select" type="velocity">create-contact.vm</result>
             <result name="email" type="velocity">create-contact-email.vm</result>
             <result name="yahoo" type="velocity">create-contact-yahoo.vm</result>
@@ -596,42 +596,42 @@
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="deleteContactPoint" class="com.cinnamonbob.web.user.DeleteContactPointAction">
+        <action name="deleteContactPoint" class="com.zutubi.pulse.web.user.DeleteContactPointAction">
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="editContactPoint" class="com.cinnamonbob.web.user.EditContactPointAction">
+        <action name="editContactPoint" class="com.zutubi.pulse.web.user.EditContactPointAction">
             <result name="email" type="chain">editEmailContactPoint!input</result>
             <result name="yahoo" type="chain">editYahooContactPoint!input</result>
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editEmailContactPoint!input" class="com.cinnamonbob.web.user.EditEmailContactPointAction"
+        <action name="editEmailContactPoint!input" class="com.zutubi.pulse.web.user.EditEmailContactPointAction"
                 method="doInput">
             <interceptor-ref name="defaultStack"/>
             <result name="input" type="velocity">edit-contact-email.vm</result>
         </action>
 
-        <action name="editEmailContactPoint" class="com.cinnamonbob.web.user.EditEmailContactPointAction">
+        <action name="editEmailContactPoint" class="com.zutubi.pulse.web.user.EditEmailContactPointAction">
             <result name="input" type="velocity">edit-contact-email.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editYahooContactPoint!input" class="com.cinnamonbob.web.user.EditYahooContactPointAction"
+        <action name="editYahooContactPoint!input" class="com.zutubi.pulse.web.user.EditYahooContactPointAction"
                 method="doInput">
             <interceptor-ref name="defaultStack"/>
             <result name="input" type="velocity">edit-contact-yahoo.vm</result>
         </action>
 
-        <action name="editYahooContactPoint" class="com.cinnamonbob.web.user.EditYahooContactPointAction">
+        <action name="editYahooContactPoint" class="com.zutubi.pulse.web.user.EditYahooContactPointAction">
             <result name="input" type="velocity">edit-contact-yahoo.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="createSubscription" class="com.cinnamonbob.web.user.CreateSubscriptionAction">
+        <action name="createSubscription" class="com.zutubi.pulse.web.user.CreateSubscriptionAction">
             <result name="input" type="velocity">create-subscription.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="error" type="chain">preferences!input</result>
@@ -639,11 +639,11 @@
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="deleteSubscription" class="com.cinnamonbob.web.user.DeleteSubscriptionAction">
+        <action name="deleteSubscription" class="com.zutubi.pulse.web.user.DeleteSubscriptionAction">
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="editSubscription" class="com.cinnamonbob.web.user.EditSubscriptionAction">
+        <action name="editSubscription" class="com.zutubi.pulse.web.user.EditSubscriptionAction">
             <result name="input" type="velocity">edit-subscription.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
@@ -655,9 +655,9 @@
         <package name="setup" namespace="/setup" extends="webwork-default-package">
             <default-interceptor-ref name="completeStack"/>
 
-            <action name="setupWizard" class="com.cinnamonbob.web.wizard.WizardAction">
+            <action name="setupWizard" class="com.zutubiwizard.WizardAction">
                 <interceptor-ref name="wizardStack"/>
-                <param name="wizardClass">com.cinnamonbob.web.setup.SetupWizard</param>
+                <param name="wizardClass">com.zutubisetup.SetupWizard</param>
                 <result name="admin" type="velocity">/setup/create-admin.vm</result>
                 <result name="settings" type="velocity">/setup/server-settings.vm</result>
                 <result name="success" type="redirect">/</result>
@@ -671,7 +671,7 @@
         a simple redirect to ensure that if the startup requests '/startup/starting.action'
         from this xwork config, it handles it gracefully.
          -->
-        <action name="starting" class="com.cinnamonbob.web.ActionSupport">
+        <action name="starting" class="com.zutubi.pulse.web.ActionSupport">
             <result name="success" type="redirect">/</result>
         </action>
     </package>
@@ -679,50 +679,50 @@
     <package name="admin" namespace="/admin" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="serverSettings" class="com.cinnamonbob.web.admin.ServerSettingsAction">
+        <action name="serverSettings" class="com.zutubi.pulse.web.admin.ServerSettingsAction">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">server-settings.vm</result>
         </action>
 
-        <action name="toggleRecipeQueue" class="com.cinnamonbob.web.admin.ToggleRecipeQueueAction">
+        <action name="toggleRecipeQueue" class="com.zutubi.pulse.web.admin.ToggleRecipeQueueAction">
             <result name="success" type="redirect">/viewRecipeQueue.action</result>
         </action>
 
         <!--
         USERS
         -->
-        <action name="userSettings" class="com.cinnamonbob.web.admin.user.ViewUsersAction">
+        <action name="userSettings" class="com.zutubi.pulse.web.admin.user.ViewUsersAction">
             <result name="success" type="velocity">manage-users.vm</result>
         </action>
 
-        <action name="viewUser" class="com.cinnamonbob.web.admin.user.ViewUserAction">
+        <action name="viewUser" class="com.zutubi.pulse.web.admin.user.ViewUserAction">
             <result name="input" type="velocity">undefined.vm</result>
             <result name="success" type="velocity">view-user.vm</result>
         </action>
 
-        <action name="viewUsers" class="com.cinnamonbob.web.admin.user.ViewUsersAction">
+        <action name="viewUsers" class="com.zutubi.pulse.web.admin.user.ViewUsersAction">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">manage-users.vm</result>
         </action>
 
-        <action name="createUser" class="com.cinnamonbob.web.admin.user.CreateUserAction">
+        <action name="createUser" class="com.zutubi.pulse.web.admin.user.CreateUserAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">manage-users.vm</result>
             <result name="cancel" type="redirect">userSettings.action</result>
             <result name="success" type="redirect">userSettings.action</result>
         </action>
 
-        <action name="deleteUser" class="com.cinnamonbob.web.admin.user.DeleteUserAction">
+        <action name="deleteUser" class="com.zutubi.pulse.web.admin.user.DeleteUserAction">
             <result name="input" type="velocity">manage-users.vm</result>
             <result name="success" type="redirect">viewUsers.action</result>
         </action>
 
-        <action name="disableUser" class="com.cinnamonbob.web.admin.user.DisableUserAction">
+        <action name="disableUser" class="com.zutubi.pulse.web.admin.user.DisableUserAction">
             <result name="input" type="velocity">undefined.vm</result>
             <result name="success" type="redirect">viewUsers.action</result>
         </action>
 
-        <action name="editPassword" class="com.cinnamonbob.web.admin.user.EditPasswordAction">
+        <action name="editPassword" class="com.zutubi.pulse.web.admin.user.EditPasswordAction">
             <result name="input" type="velocity">edit-user.vm</result>
             <result name="error" type="velocity">edit-user.vm</result>
             <result name="reset" type="redirect">viewUsers.action</result>
@@ -730,7 +730,7 @@
             <result name="success" type="redirect">viewUsers.action</result>
         </action>
 
-        <action name="editUser" class="com.cinnamonbob.web.admin.user.EditUserAction">
+        <action name="editUser" class="com.zutubi.pulse.web.admin.user.EditUserAction">
             <result name="input" type="velocity">edit-user.vm</result>
             <result name="cancel" type="redirect">viewUsers.action</result>
             <result name="success" type="redirect">viewUsers.action</result>
@@ -742,19 +742,19 @@
                     <result name="success" type="velocity">find-user.vm</result>
                 </action>
 
-                <action name="findUsers" class="com.cinnamonbob.web.user.FindUsersAction">
+                <action name="findUsers" class="com.zutubiuser.FindUsersAction">
                     <result name="input" type="velocity">find-user.vm</result>
                     <result name="success" type="velocity">find-user.vm</result>
                 </action>
         -->
 
-        <action name="smtp" class="com.cinnamonbob.web.admin.SmtpConfigurationAction">
+        <action name="smtp" class="com.zutubi.pulse.web.admin.SmtpConfigurationAction">
             <interceptor-ref name="defaultStack"/>
             <result name="error" type="velocity">configure-smtpconfig.vm</result>
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
-        <action name="editSmtp" class="com.cinnamonbob.web.admin.SmtpConfigurationAction">
+        <action name="editSmtp" class="com.zutubi.pulse.web.admin.SmtpConfigurationAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">configure-smtpconfig.vm</result>
             <result name="error" type="velocity">configure-smtpconfig.vm</result>
@@ -762,13 +762,13 @@
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
-        <action name="general" class="com.cinnamonbob.web.admin.GeneralConfigurationAction">
+        <action name="general" class="com.zutubi.pulse.web.admin.GeneralConfigurationAction">
             <interceptor-ref name="defaultStack"/>
             <result name="error" type="velocity">configure-generalconfig.vm</result>
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
-        <action name="editGeneral" class="com.cinnamonbob.web.admin.GeneralConfigurationAction">
+        <action name="editGeneral" class="com.zutubi.pulse.web.admin.GeneralConfigurationAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">configure-generalconfig.vm</result>
             <result name="error" type="velocity">configure-generalconfig.vm</result>
@@ -776,13 +776,13 @@
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
-        <action name="logConfig" class="com.cinnamonbob.web.admin.LogConfigurationAction">
+        <action name="logConfig" class="com.zutubi.pulse.web.admin.LogConfigurationAction">
             <interceptor-ref name="defaultStack"/>
             <result name="error" type="velocity">configure-logconfig.vm</result>
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
-        <action name="editLogConfig" class="com.cinnamonbob.web.admin.LogConfigurationAction">
+        <action name="editLogConfig" class="com.zutubi.pulse.web.admin.LogConfigurationAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">configure-logconfig.vm</result>
             <result name="error" type="velocity">configure-logconfig.vm</result>
@@ -795,40 +795,40 @@
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">
         <default-interceptor-ref name="ajaxStack"/>
 
-        <action name="dashboardPanel" class="com.cinnamonbob.web.user.DashboardAction">
+        <action name="dashboardPanel" class="com.zutubi.pulse.web.user.DashboardAction">
             <result name="success" type="velocity">dashboard-panel.vm</result>
             <result name="error" type="redirect">/</result>
         </action>
 
-        <action name="viewProjectsPanel" class="com.cinnamonbob.web.project.ViewProjectsAction">
+        <action name="viewProjectsPanel" class="com.zutubi.pulse.web.project.ViewProjectsAction">
             <result name="success" type="velocity">view-projects-panel.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="projectHomePanel" class="com.cinnamonbob.web.project.ProjectHomeAction">
+        <action name="projectHomePanel" class="com.zutubi.pulse.web.project.ProjectHomeAction">
             <result name="success" type="velocity">project-home-panel.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewBuildPanel" class="com.cinnamonbob.web.project.ViewBuildAction">
+        <action name="viewBuildPanel" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-build-panel.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewRecipeQueuePanel" class="com.cinnamonbob.web.server.ViewRecipeQueueAction">
+        <action name="viewRecipeQueuePanel" class="com.zutubi.pulse.web.server.ViewRecipeQueueAction">
             <result name="success" type="velocity">view-recipe-queue-panel.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="testCVS" class="com.cinnamonbob.web.ajax.TestCVSAction">
+        <action name="testCVS" class="com.zutubi.pulse.web.ajax.TestCVSAction">
             <result name="success" type="velocity">test-scm.vm</result>
         </action>
 
-        <action name="testP4" class="com.cinnamonbob.web.ajax.TestP4Action">
+        <action name="testP4" class="com.zutubi.pulse.web.ajax.TestP4Action">
             <result name="success" type="velocity">test-scm.vm</result>
         </action>
 
-        <action name="testSvn" class="com.cinnamonbob.web.ajax.TestSvnAction">
+        <action name="testSvn" class="com.zutubi.pulse.web.ajax.TestSvnAction">
             <result name="success" type="velocity">test-scm.vm</result>
         </action>
     </package>
@@ -836,7 +836,7 @@
     <package name="popups" namespace="/popups" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="browseScm" class="com.cinnamonbob.web.project.BrowseScmAction">
+        <action name="browseScm" class="com.zutubi.pulse.web.project.BrowseScmAction">
             <result name="dir" type="velocity">browse-scm-dir.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>

@@ -1,8 +1,8 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.Subscription;
-import com.cinnamonbob.model.persistence.SubscriptionDao;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.Subscription;
+import com.zutubi.pulse.model.persistence.SubscriptionDao;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;

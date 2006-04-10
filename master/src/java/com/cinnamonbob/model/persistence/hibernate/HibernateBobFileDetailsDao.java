@@ -1,7 +1,7 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.model.BobFileDetails;
-import com.cinnamonbob.model.persistence.BobFileDetailsDao;
+import com.zutubi.pulse.model.BobFileDetails;
+import com.zutubi.pulse.model.persistence.BobFileDetailsDao;
 
 /**
  */

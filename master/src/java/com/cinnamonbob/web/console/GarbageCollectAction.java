@@ -1,6 +1,6 @@
-package com.cinnamonbob.web.console;
+package com.zutubi.pulse.web.console;
 
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
  * Trigger the system garbage collection.

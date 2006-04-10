@@ -1,7 +1,7 @@
-package com.cinnamonbob.slave.web;
+package com.zutubi.pulse.slave.web;
 
-import com.cinnamonbob.core.model.Resource;
-import com.cinnamonbob.model.persistence.ResourceDao;
+import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.model.persistence.ResourceDao;
 import com.opensymphony.xwork.ActionSupport;
 
 import java.util.List;

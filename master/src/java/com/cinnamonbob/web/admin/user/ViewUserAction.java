@@ -1,6 +1,6 @@
-package com.cinnamonbob.web.admin.user;
+package com.zutubi.pulse.web.admin.user;
 
-import com.cinnamonbob.web.user.UserActionSupport;
+import com.zutubi.pulse.web.user.UserActionSupport;
 
 /**
  * 

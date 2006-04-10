@@ -1,11 +1,11 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.Feature;
-import com.cinnamonbob.core.model.StoredFileArtifact;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.test.BobTestCase;
 
 import java.io.File;
 import java.io.IOException;

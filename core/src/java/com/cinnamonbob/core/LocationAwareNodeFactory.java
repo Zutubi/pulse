@@ -1,4 +1,4 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
 import nu.xom.NodeFactory;
 import nu.xom.Element;

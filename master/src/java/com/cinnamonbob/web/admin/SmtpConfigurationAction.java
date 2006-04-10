@@ -1,8 +1,8 @@
-package com.cinnamonbob.web.admin;
+package com.zutubi.pulse.web.admin;
 
-import com.cinnamonbob.web.ActionSupport;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.bootstrap.ApplicationConfiguration;
+import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
 
 /**
  * <class-comment/>

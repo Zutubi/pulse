@@ -1,4 +1,4 @@
-package com.cinnamonbob.xwork.validator.validators;
+package com.zutubi.pulse.xwork.validator.validators;
 
 import com.opensymphony.xwork.ValidationAwareSupport;
 import com.opensymphony.xwork.validator.DelegatingValidatorContext;

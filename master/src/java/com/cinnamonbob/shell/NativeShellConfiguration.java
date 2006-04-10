@@ -1,4 +1,4 @@
-package com.cinnamonbob.shell;
+package com.zutubi.pulse.shell;
 
 import java.util.Properties;
 import java.io.IOException;

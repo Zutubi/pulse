@@ -1,8 +1,8 @@
-package com.cinnamonbob.scheduling;
+package com.zutubi.pulse.scheduling;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
-import com.cinnamonbob.scheduling.quartz.TriggerAdapter;
+import com.zutubi.pulse.scheduling.quartz.TriggerAdapter;
 
 /**
  * <class-comment/>

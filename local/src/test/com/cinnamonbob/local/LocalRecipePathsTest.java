@@ -1,4 +1,4 @@
-package com.cinnamonbob.local;
+package com.zutubi.pulse.local;
 
 import junit.framework.TestCase;
 

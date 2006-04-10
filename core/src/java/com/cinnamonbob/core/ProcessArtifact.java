@@ -1,6 +1,6 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.validation.Validateable;
+import com.zutubi.pulse.core.validation.Validateable;
 import com.opensymphony.xwork.validator.ValidatorContext;
 import com.opensymphony.xwork.validator.ValidationException;
 

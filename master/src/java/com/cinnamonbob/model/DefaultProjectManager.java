@@ -1,13 +1,13 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.BobRuntimeException;
-import com.cinnamonbob.model.persistence.BuildSpecificationDao;
-import com.cinnamonbob.model.persistence.ProjectDao;
-import com.cinnamonbob.scheduling.Scheduler;
-import com.cinnamonbob.scheduling.SchedulingException;
-import com.cinnamonbob.scheduling.Trigger;
-import com.cinnamonbob.scheduling.persistence.TriggerDao;
-import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
+import com.zutubi.pulse.core.BobRuntimeException;
+import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
+import com.zutubi.pulse.model.persistence.ProjectDao;
+import com.zutubi.pulse.scheduling.Scheduler;
+import com.zutubi.pulse.scheduling.SchedulingException;
+import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.scheduling.persistence.TriggerDao;
+import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 
 import java.util.List;
 

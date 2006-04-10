@@ -13,7 +13,7 @@ goto end
 
 :haveBob
 
-call "%BOB_HOME%"\bin\common.bat com.cinnamonbob.api.clients.AdminClient %*
+call "%BOB_HOME%"\bin\common.bat com.zutubi.pulse.api.clients.AdminClient %*
 
 :end
 rem all done

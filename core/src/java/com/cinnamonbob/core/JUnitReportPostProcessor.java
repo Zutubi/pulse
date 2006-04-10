@@ -1,7 +1,7 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.*;
-import com.cinnamonbob.core.util.IOUtils;
+import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.util.IOUtils;
 import nu.xom.*;
 
 import java.io.File;

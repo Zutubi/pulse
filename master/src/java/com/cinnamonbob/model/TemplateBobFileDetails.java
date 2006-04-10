@@ -1,7 +1,7 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.model.Revision;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.model.Revision;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 

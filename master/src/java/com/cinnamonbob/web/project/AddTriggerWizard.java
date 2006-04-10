@@ -1,16 +1,16 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.model.BuildSpecification;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.ProjectManager;
-import com.cinnamonbob.scheduling.*;
-import com.cinnamonbob.scheduling.tasks.BuildProjectTask;
-import com.cinnamonbob.scm.SCMChangeEvent;
-import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.web.wizard.BaseWizard;
-import com.cinnamonbob.web.wizard.BaseWizardState;
-import com.cinnamonbob.web.wizard.Wizard;
-import com.cinnamonbob.web.wizard.WizardCompleteState;
+import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.scheduling.*;
+import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
+import com.zutubi.pulse.scm.SCMChangeEvent;
+import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.web.wizard.BaseWizard;
+import com.zutubi.pulse.web.wizard.BaseWizardState;
+import com.zutubi.pulse.web.wizard.Wizard;
+import com.zutubi.pulse.web.wizard.WizardCompleteState;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
 

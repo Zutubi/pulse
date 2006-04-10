@@ -2,20 +2,20 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.cinnamonbob.core.model.Changelist" table="CHANGELIST" lazy="false">
+    <class name="com.zutubi.pulse.core.model.Changelist" table="CHANGELIST" lazy="false">
 
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
 
         <!-- the local side of a one-one...  -->
-        <many-to-one name="revision" class="com.cinnamonbob.core.model.Revision" column="REVISION_ID" cascade="all"
+        <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all"
                      unique="true"/>
 
         <list name="changes" cascade="all-delete-orphan" lazy="false">
             <key column="CHANGELIST_ID"/>
             <index column="ORDINAL"/>
-            <one-to-many class="com.cinnamonbob.core.model.Change"/>
+            <one-to-many class="com.zutubi.pulse.core.model.Change"/>
         </list>
 
         <property name="projectId" type="long"/>
@@ -23,7 +23,7 @@
         <property name="resultId" type="long"/>
     </class>
 
-    <class name="com.cinnamonbob.core.model.Change" table="CHANGE" lazy="false">
+    <class name="com.zutubi.pulse.core.model.Change" table="CHANGE" lazy="false">
 
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>

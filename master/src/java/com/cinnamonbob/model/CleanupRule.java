@@ -1,9 +1,9 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.model.Entity;
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.core.util.Constants;
-import com.cinnamonbob.model.persistence.BuildResultDao;
+import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.util.Constants;
+import com.zutubi.pulse.model.persistence.BuildResultDao;
 
 import java.util.LinkedList;
 import java.util.List;

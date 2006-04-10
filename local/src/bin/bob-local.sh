@@ -1,3 +1,3 @@
 #! /bin/sh
 
-`dirname $0`/common.sh com.cinnamonbob.local.LocalBuild $@
+`dirname $0`/common.sh com.zutubi.pulse.local.LocalBuild $@

@@ -1,9 +1,9 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.persistence.ChangelistDao;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.persistence.ChangelistDao;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;

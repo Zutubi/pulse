@@ -1,8 +1,8 @@
-package com.cinnamonbob.web.admin;
+package com.zutubi.pulse.web.admin;
 
-import com.cinnamonbob.web.ActionSupport;
-import com.cinnamonbob.logging.LogConfigurationManager;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.logging.LogConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 
 import java.util.List;
 

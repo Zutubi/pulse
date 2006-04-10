@@ -1,7 +1,7 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.BobRuntimeException;
-import com.cinnamonbob.core.ObjectFactory;
+import com.zutubi.pulse.core.BobRuntimeException;
+import com.zutubi.pulse.core.ObjectFactory;
 
 import java.util.HashMap;
 import java.util.LinkedList;

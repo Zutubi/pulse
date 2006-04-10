@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.validation;
+package com.zutubi.pulse.core.validation;
 
 import com.opensymphony.xwork.LocaleProvider;
 

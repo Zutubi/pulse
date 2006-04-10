@@ -1,9 +1,9 @@
-package com.cinnamonbob.shell;
+package com.zutubi.pulse.shell;
 
-import com.cinnamonbob.core.util.Constants;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.core.util.RandomUtils;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.util.Constants;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.core.util.RandomUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
 import java.util.HashMap;

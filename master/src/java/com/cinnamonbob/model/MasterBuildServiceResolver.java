@@ -1,7 +1,7 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.BuildService;
-import com.cinnamonbob.MasterBuildService;
+import com.zutubi.pulse.BuildService;
+import com.zutubi.pulse.MasterBuildService;
 
 /**
  * <class-comment/>

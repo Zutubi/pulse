@@ -1,8 +1,8 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.ProjectNameComparator;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.Project;
+import com.zutubi.pulse.ProjectNameComparator;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
 
 import java.util.Collections;
 import java.util.LinkedList;

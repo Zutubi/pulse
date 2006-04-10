@@ -29,7 +29,7 @@
 
     <recipe name="default">
         <command name="sync">
-            <executable exe="svn" args="checkout svn+ssh://daniel@www.cinnamonbob.com/usr/local/svn-repo/bob"
+            <executable exe="svn" args="checkout svn+ssh://some.host.com/usr/local/svn-repo/bob"
                         working-dir="${base.dir}">
                 <process processor="${svn.pp}"/>
             </executable>

@@ -1,7 +1,7 @@
-package com.cinnamonbob.events.build;
+package com.zutubi.pulse.events.build;
 
-import com.cinnamonbob.BuildService;
-import com.cinnamonbob.RecipeRequest;
+import com.zutubi.pulse.BuildService;
+import com.zutubi.pulse.RecipeRequest;
 
 /**
  * Raised when a recipe has been dispatched to a build host.

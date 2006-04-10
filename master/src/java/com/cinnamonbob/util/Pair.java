@@ -1,4 +1,4 @@
-package com.cinnamonbob.util;
+package com.zutubi.pulse.util;
 
 /**
  * A simple pair of arbitrary objects.

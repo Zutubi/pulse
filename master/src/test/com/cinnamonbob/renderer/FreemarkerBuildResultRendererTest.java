@@ -1,12 +1,12 @@
-package com.cinnamonbob.renderer;
+package com.zutubi.pulse.renderer;
 
-import com.cinnamonbob.core.model.*;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.BuildScmDetails;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.RecipeResultNode;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.BuildScmDetails;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.test.BobTestCase;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 

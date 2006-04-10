@@ -1,10 +1,10 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.filesystem.File;
-import com.cinnamonbob.filesystem.FileSystem;
-import com.cinnamonbob.filesystem.FileSystemException;
-import com.cinnamonbob.web.DirectoryEntry;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.filesystem.File;
+import com.zutubi.pulse.filesystem.FileSystem;
+import com.zutubi.pulse.filesystem.FileSystemException;
+import com.zutubi.pulse.web.DirectoryEntry;
 import com.opensymphony.util.TextUtils;
 
 import java.io.InputStream;

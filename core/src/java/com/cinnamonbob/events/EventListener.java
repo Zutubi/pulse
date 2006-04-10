@@ -1,4 +1,4 @@
-package com.cinnamonbob.events;
+package com.zutubi.pulse.events;
 
 /**
  * <class-comment/>

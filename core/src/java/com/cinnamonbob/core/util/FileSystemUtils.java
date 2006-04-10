@@ -1,6 +1,6 @@
-package com.cinnamonbob.core.util;
+package com.zutubi.pulse.core.util;
 
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
 import java.util.zip.ZipEntry;

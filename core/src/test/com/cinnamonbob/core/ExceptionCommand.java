@@ -1,6 +1,6 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.CommandResult;
+import com.zutubi.pulse.core.model.CommandResult;
 
 import java.io.File;
 

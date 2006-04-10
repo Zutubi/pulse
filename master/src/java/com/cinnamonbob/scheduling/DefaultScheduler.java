@@ -1,11 +1,11 @@
-package com.cinnamonbob.scheduling;
+package com.zutubi.pulse.scheduling;
 
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.events.EventListener;
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.events.system.SystemStartedEvent;
-import com.cinnamonbob.scheduling.persistence.TriggerDao;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.SystemStartedEvent;
+import com.zutubi.pulse.scheduling.persistence.TriggerDao;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;
 import java.util.Map;

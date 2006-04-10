@@ -1,9 +1,9 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.events.build.BuildRequestEvent;
-import com.cinnamonbob.model.BuildSpecification;
-import com.cinnamonbob.model.Project;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.build.BuildRequestEvent;
+import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.model.Project;
 
 import java.util.List;
 

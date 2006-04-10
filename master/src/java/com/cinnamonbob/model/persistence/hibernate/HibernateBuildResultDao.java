@@ -1,13 +1,13 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.RecipeResultNode;
-import com.cinnamonbob.model.persistence.BuildResultDao;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.persistence.BuildResultDao;
+import com.zutubi.pulse.util.logging.Logger;
 import org.hibernate.*;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;

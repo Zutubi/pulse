@@ -1,11 +1,11 @@
-package com.cinnamonbob.web.rss;
+package com.zutubi.pulse.web.rss;
 
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.HistoryPage;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.renderer.BuildResultRenderer;
-import com.cinnamonbob.web.project.ProjectActionSupport;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.HistoryPage;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.renderer.BuildResultRenderer;
+import com.zutubi.pulse.web.project.ProjectActionSupport;
 import com.opensymphony.util.TextUtils;
 import com.sun.syndication.feed.synd.*;
 

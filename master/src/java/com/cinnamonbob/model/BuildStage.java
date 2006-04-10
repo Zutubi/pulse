@@ -1,6 +1,6 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.RecipeResult;
 
 /**
  */

@@ -1,9 +1,9 @@
-package com.cinnamonbob.web.ajax;
+package com.zutubi.pulse.web.ajax;
 
-import com.cinnamonbob.model.Scm;
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.SCMServer;
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.web.ActionSupport;
 import com.opensymphony.xwork.validator.DefaultActionValidatorManager;
 import com.opensymphony.xwork.validator.DelegatingValidatorContext;
 import com.opensymphony.xwork.validator.ValidationException;

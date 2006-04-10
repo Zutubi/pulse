@@ -1,9 +1,9 @@
-package com.cinnamonbob.web.admin.user;
+package com.zutubi.pulse.web.admin.user;
 
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.GrantedAuthority;
-import com.cinnamonbob.web.user.UserActionSupport;
-import com.cinnamonbob.web.DefaultAction;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.GrantedAuthority;
+import com.zutubi.pulse.web.user.UserActionSupport;
+import com.zutubi.pulse.web.DefaultAction;
 
 import java.util.Arrays;
 

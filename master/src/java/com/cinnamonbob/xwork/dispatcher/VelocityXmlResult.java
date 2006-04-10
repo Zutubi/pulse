@@ -1,4 +1,4 @@
-package com.cinnamonbob.xwork.dispatcher;
+package com.zutubi.pulse.xwork.dispatcher;
 
 import com.opensymphony.webwork.dispatcher.VelocityResult;
 

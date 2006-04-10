@@ -21,7 +21,7 @@ This context requires:
     spring.
     Leave it here for now until a solution presents itself.
     -->
-    <bean id="logConfigurationManager" class="com.cinnamonbob.logging.LogConfigurationManager" init-method="init">
+    <bean id="logConfigurationManager" class="com.zutubi.pulse.logging.LogConfigurationManager" init-method="init">
         <property name="configurationManager">
             <ref bean="configurationManager"/>
         </property>

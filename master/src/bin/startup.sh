@@ -1,3 +1,3 @@
 #! /bin/sh
 
-`dirname $0`/common.sh com.cinnamonbob.command.Bootstrap start
+`dirname $0`/common.sh com.zutubi.pulse.command.Bootstrap start

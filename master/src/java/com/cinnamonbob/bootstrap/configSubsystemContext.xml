@@ -2,21 +2,21 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="setupManager" class="com.cinnamonbob.bootstrap.DefaultSetupManager" autowire="byName">
+    <bean id="setupManager" class="com.zutubi.pulse.bootstrap.DefaultSetupManager" autowire="byName">
         <property name="daoContexts">
             <list>
-                <value>classpath:/com/cinnamonbob/bootstrap/context/databaseContext.xml</value>
-                <value>classpath:/com/cinnamonbob/bootstrap/context/hibernateContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/databaseContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/hibernateContext.xml</value>
             </list>
         </property>
         <property name="setupContexts">
             <list>
-                <value>classpath:/com/cinnamonbob/bootstrap/context/userContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/userContext.xml</value>
             </list>
         </property>
     </bean>
 
-    <import resource="classpath:/com/cinnamonbob/bootstrap/context/upgradeContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/upgradeContext.xml"/>
 
     <!-- this spring object factory will ensure that WebWork Actions are autowired. -->
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>

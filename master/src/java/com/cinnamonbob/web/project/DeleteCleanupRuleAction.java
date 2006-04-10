@@ -1,6 +1,6 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.model.Project;
+import com.zutubi.pulse.model.Project;
 
 /**
  */

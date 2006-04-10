@@ -1,6 +1,6 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.Feature;
+import com.zutubi.pulse.core.model.Feature;
 
 import java.util.LinkedList;
 import java.util.List;

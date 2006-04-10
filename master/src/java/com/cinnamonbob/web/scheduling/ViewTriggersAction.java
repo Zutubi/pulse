@@ -1,8 +1,8 @@
-package com.cinnamonbob.web.scheduling;
+package com.zutubi.pulse.web.scheduling;
 
-import com.cinnamonbob.web.ActionSupport;
-import com.cinnamonbob.scheduling.Scheduler;
-import com.cinnamonbob.scheduling.Trigger;
+import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.scheduling.Scheduler;
+import com.zutubi.pulse.scheduling.Trigger;
 
 import java.util.List;
 

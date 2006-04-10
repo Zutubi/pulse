@@ -1,9 +1,9 @@
-package com.cinnamonbob.scheduling;
+package com.zutubi.pulse.scheduling;
 
-import com.cinnamonbob.core.ObjectFactory;
-import com.cinnamonbob.events.DefaultEventManager;
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.events.EventManager;
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.events.DefaultEventManager;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventManager;
 
 /**
  * <class-comment/>

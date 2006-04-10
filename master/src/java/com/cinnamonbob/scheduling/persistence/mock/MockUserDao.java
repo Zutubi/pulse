@@ -1,7 +1,7 @@
-package com.cinnamonbob.scheduling.persistence.mock;
+package com.zutubi.pulse.scheduling.persistence.mock;
 
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.persistence.UserDao;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.persistence.UserDao;
 
 import java.util.List;
 

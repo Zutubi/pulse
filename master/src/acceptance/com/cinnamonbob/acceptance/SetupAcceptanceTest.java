@@ -1,8 +1,8 @@
-package com.cinnamonbob.acceptance;
+package com.zutubi.pulse.acceptance;
 
-import com.cinnamonbob.acceptance.forms.setup.CreateAdminForm;
-import com.cinnamonbob.acceptance.forms.setup.ServerSettingsForm;
-import com.cinnamonbob.acceptance.forms.setup.SetBobHomeForm;
+import com.zutubi.pulse.acceptance.forms.setup.CreateAdminForm;
+import com.zutubi.pulse.acceptance.forms.setup.ServerSettingsForm;
+import com.zutubi.pulse.acceptance.forms.setup.SetBobHomeForm;
 
 /**
  * A setup test that covers the systems setup procedure.

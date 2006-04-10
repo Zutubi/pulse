@@ -1,9 +1,9 @@
-package com.cinnamonbob.slave.command;
+package com.zutubi.pulse.slave.command;
 
-import com.cinnamonbob.ServerRecipePaths;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.ServerRecipePaths;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
 

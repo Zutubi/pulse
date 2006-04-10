@@ -1,4 +1,4 @@
-package com.cinnamonbob.bootstrap.yahoo;
+package com.zutubi.pulse.bootstrap.yahoo;
 
 import ymsg.network.event.*;
 

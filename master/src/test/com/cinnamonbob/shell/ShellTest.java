@@ -1,7 +1,7 @@
 /**
  * <class-comment/>
  */
-package com.cinnamonbob.shell;
+package com.zutubi.pulse.shell;
 
 import junit.framework.*;
 

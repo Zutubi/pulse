@@ -1,7 +1,7 @@
-package com.cinnamonbob.acceptance;
+package com.zutubi.pulse.acceptance;
 
-import com.cinnamonbob.acceptance.forms.*;
-import com.cinnamonbob.core.util.RandomUtils;
+import com.zutubi.pulse.acceptance.forms.*;
+import com.zutubi.pulse.core.util.RandomUtils;
 
 /**
  * <class-comment/>

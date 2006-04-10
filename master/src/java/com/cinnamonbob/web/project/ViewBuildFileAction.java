@@ -1,17 +1,11 @@
-package com.cinnamonbob.web.project;
+package com.zutubi.pulse.web.project;
 
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.Feature;
-import com.cinnamonbob.core.model.StoredArtifact;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.model.RecipeResultNode;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
 import com.uwyn.jhighlight.highlighter.XmlHighlighter;
 import com.uwyn.jhighlight.renderer.XmlXhtmlRenderer;
 
-import java.util.List;
 import java.io.*;
 
 /**

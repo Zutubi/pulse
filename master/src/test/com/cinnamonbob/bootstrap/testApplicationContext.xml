@@ -5,19 +5,19 @@
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="mappingResources">
             <list>
-                <value>com/cinnamonbob/model/persistence/hibernate/BuildResult.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/BuildSpecification.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Changelist.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/CommandResult.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Feature.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Project.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Resource.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Revision.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Scm.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/Slave.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
-                <value>com/cinnamonbob/scheduling/persistence/hibernate/Trigger.hbm.xml</value>
-                <value>com/cinnamonbob/model/persistence/hibernate/User.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/BuildResult.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/BuildSpecification.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Changelist.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/CommandResult.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Feature.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Project.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Resource.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Revision.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Scm.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Slave.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
+                <value>com/zutubi/pulse/scheduling/persistence/hibernate/Trigger.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/User.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">

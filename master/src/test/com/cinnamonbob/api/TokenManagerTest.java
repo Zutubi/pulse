@@ -1,12 +1,12 @@
-package com.cinnamonbob.api;
+package com.zutubi.pulse.api;
 
-import com.cinnamonbob.model.DefaultUserManager;
-import com.cinnamonbob.model.GrantedAuthority;
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.model.persistence.UserDao;
-import com.cinnamonbob.scheduling.persistence.mock.MockUserDao;
-import com.cinnamonbob.test.BobTestCase;
-import com.cinnamonbob.core.util.Constants;
+import com.zutubi.pulse.model.DefaultUserManager;
+import com.zutubi.pulse.model.GrantedAuthority;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.scheduling.persistence.mock.MockUserDao;
+import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.core.util.Constants;
 
 /**
  */

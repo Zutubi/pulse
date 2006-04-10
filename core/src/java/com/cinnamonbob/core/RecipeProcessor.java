@@ -1,15 +1,15 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.Property;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.events.build.CommandCommencedEvent;
-import com.cinnamonbob.events.build.CommandCompletedEvent;
-import com.cinnamonbob.events.build.RecipeCommencedEvent;
-import com.cinnamonbob.events.build.RecipeCompletedEvent;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.build.CommandCommencedEvent;
+import com.zutubi.pulse.events.build.CommandCompletedEvent;
+import com.zutubi.pulse.events.build.RecipeCommencedEvent;
+import com.zutubi.pulse.events.build.RecipeCompletedEvent;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

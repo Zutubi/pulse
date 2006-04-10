@@ -13,7 +13,7 @@ goto end
 
 :haveBob
 
-call "%BOB_HOME%"\bin\common.bat com.cinnamonbob.local.LocalBuild %*
+call "%BOB_HOME%"\bin\common.bat com.zutubi.pulse.local.LocalBuild %*
 
 :end
 rem all done

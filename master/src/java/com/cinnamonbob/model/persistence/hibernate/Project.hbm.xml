@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.cinnamonbob.model.Project" table="PROJECT" lazy="false">
+    <class name="com.zutubi.pulse.model.Project" table="PROJECT" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -16,24 +16,24 @@
 
         <property name="stateName" column="STATE" type="string" length="31"/>
 
-        <many-to-one name="bobFileDetails" class="com.cinnamonbob.model.BobFileDetails" column="BOB_FILE_DETAILS"
+        <many-to-one name="bobFileDetails" class="com.zutubi.pulse.model.BobFileDetails" column="BOB_FILE_DETAILS"
                      lazy="false" cascade="all"/>
 
         <bag name="buildSpecifications" cascade="all-delete-orphan" lazy="false">
             <key column="PROJECT_ID"/>
-            <one-to-many class="com.cinnamonbob.model.BuildSpecification"/>
+            <one-to-many class="com.zutubi.pulse.model.BuildSpecification"/>
         </bag>
 
         <bag name="cleanupRules" cascade="all-delete-orphan" lazy="false">
             <key column="PROJECT_ID"/>
-            <one-to-many class="com.cinnamonbob.model.CleanupRule"/>
+            <one-to-many class="com.zutubi.pulse.model.CleanupRule"/>
         </bag>
 
-        <many-to-one name="scm" class="com.cinnamonbob.model.Scm" column="SCM" cascade="all" lazy="false"/>
+        <many-to-one name="scm" class="com.zutubi.pulse.model.Scm" column="SCM" cascade="all" lazy="false"/>
 
     </class>
 
-    <class name="com.cinnamonbob.model.BobFileDetails" table="BOB_FILE_DETAILS" lazy="false">
+    <class name="com.zutubi.pulse.model.BobFileDetails" table="BOB_FILE_DETAILS" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -41,11 +41,11 @@
 
         <discriminator column="SOURCE_TYPE" type="string" length="63"/>
 
-        <subclass name="com.cinnamonbob.model.CustomBobFileDetails" discriminator-value="CUSTOM" lazy="false">
+        <subclass name="com.zutubi.pulse.model.CustomBobFileDetails" discriminator-value="CUSTOM" lazy="false">
             <property name="bobFileName" column="BOB_FILE_NAME" type="string" length="255"/>
         </subclass>
 
-        <subclass name="com.cinnamonbob.model.AntBobFileDetails" discriminator-value="ANT" lazy="false">
+        <subclass name="com.zutubi.pulse.model.AntBobFileDetails" discriminator-value="ANT" lazy="false">
             <property name="buildFile" column="BUILD_FILE" type="string" length="255"/>
 
             <property name="targets" column="TARGETS" type="string" length="255"/>
@@ -61,7 +61,7 @@
             </map>
         </subclass>
 
-        <subclass name="com.cinnamonbob.model.MakeBobFileDetails" discriminator-value="MAKE" lazy="false">
+        <subclass name="com.zutubi.pulse.model.MakeBobFileDetails" discriminator-value="MAKE" lazy="false">
             <property name="makefile" column="MAKEFILE" type="string" length="255"/>
 
             <property name="targets" column="TARGETS" type="string" length="255"/>
@@ -77,7 +77,7 @@
             </map>
         </subclass>
 
-        <subclass name="com.cinnamonbob.model.MavenBobFileDetails" discriminator-value="MAVEN" lazy="false">
+        <subclass name="com.zutubi.pulse.model.MavenBobFileDetails" discriminator-value="MAVEN" lazy="false">
             <property name="workingDir" column="BASE_DIR" type="string" length="255"/>
             <property name="targets" column="TARGETS" type="string" length="255"/>
             <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
@@ -85,7 +85,7 @@
 
     </class>
 
-    <class name="com.cinnamonbob.model.CleanupRule" table="CLEANUP_RULE" lazy="false">
+    <class name="com.zutubi.pulse.model.CleanupRule" table="CLEANUP_RULE" lazy="false">
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>

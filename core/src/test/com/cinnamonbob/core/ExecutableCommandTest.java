@@ -1,10 +1,10 @@
-package com.cinnamonbob.core;
+package com.zutubi.pulse.core;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.core.model.Feature;
-import com.cinnamonbob.core.model.StoredArtifact;
-import com.cinnamonbob.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import junit.framework.TestCase;
 
 import java.io.File;

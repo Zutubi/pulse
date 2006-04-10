@@ -1,4 +1,4 @@
-package com.cinnamonbob.core.model;
+package com.zutubi.pulse.core.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
