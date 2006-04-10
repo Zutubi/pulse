@@ -2,9 +2,9 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="cinnamonbob" module="server-core" status="integration">
-        <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
-        <description homepage="http://www.cinnamonbob.com/">
+    <info organisation="zutubi" module="pulse-server-core" status="integration">
+        <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
+        <description homepage="http://www.zutubi.com/">
             description....
         </description>
     </info>
@@ -22,9 +22,9 @@
 
     <dependencies>
 
-        <dependency org="cinnamonbob" name="core" rev="latest.integration" conf="external->external"/>
-        <dependency org="cinnamonbob" name="core" rev="latest.integration" conf="release->release"/>
-        <dependency org="cinnamonbob" name="core" rev="latest.integration" conf="test->test"/>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="external->external"/>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="release->release"/>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="test->test"/>
 
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external->default"/>
         <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external->default"/>

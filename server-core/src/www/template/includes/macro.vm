@@ -663,9 +663,9 @@
 ## Expands to the icon for the given type of SCM.
 ##
 #macro(scmIcon $scm)
-    #if ($scm.class.name == 'com.cinnamonbob.model.Svn')<img alt="svn" src="/images/svn_16.png"/>#end
-    #if ($scm.class.name == 'com.cinnamonbob.model.Cvs')<img alt="cvs" src="/images/cvs_16.png"/>#end
-    #if ($scm.class.name == 'com.cinnamonbob.model.P4')<img alt="p4" src="/images/p4_16.png"/>#end
+    #if ($scm.class.name == 'com.zutubi.pulse.model.Svn')<img alt="svn" src="/images/svn_16.png"/>#end
+    #if ($scm.class.name == 'com.zutubi.pulse.model.Cvs')<img alt="cvs" src="/images/cvs_16.png"/>#end
+    #if ($scm.class.name == 'com.zutubi.pulse.model.P4')<img alt="p4" src="/images/p4_16.png"/>#end
 #end
 
 ##
@@ -673,9 +673,9 @@
 ##
 #macro(scmDetail $project)
     #scmIcon($project.scm)
-    #if ($project.scm.class.name == 'com.cinnamonbob.model.Svn') subversion #end
-    #if ($project.scm.class.name == 'com.cinnamonbob.model.Cvs') cvs #end
-    #if ($project.scm.class.name == 'com.cinnamonbob.model.P4') perforce #end
+    #if ($project.scm.class.name == 'com.zutubi.pulse.model.Svn') subversion #end
+    #if ($project.scm.class.name == 'com.zutubi.pulse.model.Cvs') cvs #end
+    #if ($project.scm.class.name == 'com.zutubi.pulse.model.P4') perforce #end
 #end
 
 ##
@@ -1347,8 +1347,8 @@
 #end
 
 #macro( contactPointIcon $contact)
-    #if ($contact.class.name == 'com.cinnamonbob.model.EmailContactPoint')<img alt="email" src="/images/email_16.png"/>#end
-    #if ($contact.class.name == 'com.cinnamonbob.model.YahooContactPoint')<img alt="yahoo" src="/images/yahoo_16.png"/>#end
+    #if ($contact.class.name == 'com.zutubi.pulse.model.EmailContactPoint')<img alt="email" src="/images/email_16.png"/>#end
+    #if ($contact.class.name == 'com.zutubi.pulse.model.YahooContactPoint')<img alt="yahoo" src="/images/yahoo_16.png"/>#end
 #end
 
 <!--- quartz trigger state -->
