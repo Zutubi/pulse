@@ -44,7 +44,7 @@ public class CvsClientTest extends BobTestCase
             Logger.setLogging("system");
         }
 
-        File repositoryRoot = new File(getBobRoot(), "server-core/src/test/com/zutubi.pulse/scm/cvs/repository");
+        File repositoryRoot = new File(getBobRoot(), "server-core/src/test/com/zutubi/pulse/scm/cvs/repository");
         CVSRoot cvsRoot = CVSRoot.parse(":local:" + repositoryRoot.getCanonicalPath());
         cvs = new CvsClient(cvsRoot);
 

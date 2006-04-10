@@ -37,7 +37,7 @@ public class CvsServerTest extends BobTestCase
         Logger.setLogging("system");
 
         // test repository root.
-        File repositoryRoot = new File(getBobRoot(), "server-core/src/test/com/zutubi.pulse/scm/cvs/repository");
+        File repositoryRoot = new File(getBobRoot(), "server-core/src/test/com/zutubi/pulse/scm/cvs/repository");
         cvsRoot = ":local:" + repositoryRoot.getCanonicalPath();
 
         // cleanup the working directory.

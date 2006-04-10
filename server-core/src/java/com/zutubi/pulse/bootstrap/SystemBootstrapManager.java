@@ -14,7 +14,7 @@ public class SystemBootstrapManager
     /**
      * The default bootstrapContext file.
      */
-    public static final String DEFAULT_BOOTSTRAP_CONTEXT = "com/zutubi.pulse/bootstrap/bootstrapContext.xml";
+    public static final String DEFAULT_BOOTSTRAP_CONTEXT = "com/zutubi/pulse/bootstrap/bootstrapContext.xml";
     public static final String BOOTSTRAP_CONTEXT_PROPERTY = "bootstrap";
 
     /**
