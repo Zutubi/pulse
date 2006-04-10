@@ -1,7 +1,7 @@
-package com.cinnamonbob.bootstrap;
+package com.zutubi.pulse.bootstrap;
 
-import com.cinnamonbob.bootstrap.conf.Config;
-import com.cinnamonbob.bootstrap.conf.ConfigSupport;
+import com.zutubi.pulse.bootstrap.conf.Config;
+import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
 
 /**
  * <class-comment/>

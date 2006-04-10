@@ -1,8 +1,8 @@
-package com.cinnamonbob.web;
+package com.zutubi.pulse.web;
 
-import com.cinnamonbob.ShutdownService;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.util.IOUtils;
+import com.zutubi.pulse.ShutdownService;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;

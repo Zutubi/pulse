@@ -1,8 +1,8 @@
-package com.cinnamonbob.upgrade;
+package com.zutubi.pulse.upgrade;
 
-import com.cinnamonbob.Version;
-import com.cinnamonbob.bootstrap.Home;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.Version;
+import com.zutubi.pulse.bootstrap.Home;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.IOException;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
 /**
  */

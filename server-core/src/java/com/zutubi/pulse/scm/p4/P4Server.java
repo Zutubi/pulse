@@ -1,14 +1,14 @@
-package com.cinnamonbob.scm.p4;
+package com.zutubi.pulse.scm.p4;
 
-import com.cinnamonbob.core.model.Change;
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.NumericalRevision;
-import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.filesystem.remote.RemoteFile;
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.SCMServer;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.filesystem.remote.RemoteFile;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
 import java.text.ParseException;

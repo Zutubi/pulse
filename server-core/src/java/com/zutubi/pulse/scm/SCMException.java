@@ -1,6 +1,6 @@
-package com.cinnamonbob.scm;
+package com.zutubi.pulse.scm;
 
-import com.cinnamonbob.core.BobException;
+import com.zutubi.pulse.core.BobException;
 
 /**
  * An error raised during interaction with an SCM server.

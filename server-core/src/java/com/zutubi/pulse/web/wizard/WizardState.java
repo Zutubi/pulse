@@ -1,4 +1,4 @@
-package com.cinnamonbob.web.wizard;
+package com.zutubi.pulse.web.wizard;
 
 /**
  * <class-comment/>

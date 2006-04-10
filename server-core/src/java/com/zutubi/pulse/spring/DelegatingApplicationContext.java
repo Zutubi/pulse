@@ -1,4 +1,4 @@
-package com.cinnamonbob.spring;
+package com.zutubi.pulse.spring;
 
 import org.springframework.context.*;
 import org.springframework.beans.BeansException;

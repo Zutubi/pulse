@@ -1,12 +1,12 @@
-package com.cinnamonbob.hessian;
+package com.zutubi.pulse.hessian;
 
 import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
 import com.caucho.hessian.io.SerializerFactory;
 import com.caucho.hessian.server.HessianSkeleton;
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.core.ObjectFactory;
-import com.cinnamonbob.spring.SpringObjectFactory;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.spring.SpringObjectFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;

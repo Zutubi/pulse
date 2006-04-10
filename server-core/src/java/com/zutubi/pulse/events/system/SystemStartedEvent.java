@@ -1,4 +1,4 @@
-package com.cinnamonbob.events.system;
+package com.zutubi.pulse.events.system;
 
 /**
  * An event raised just after the system has started.  Used to kick off the

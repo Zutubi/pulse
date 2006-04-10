@@ -1,7 +1,7 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.BobException;
-import com.cinnamonbob.core.Bootstrapper;
+import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.Bootstrapper;
 
 /**
  * A request to execute a specific recipe.  Includes details about how to

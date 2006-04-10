@@ -1,4 +1,4 @@
-package com.cinnamonbob.security;
+package com.zutubi.pulse.security;
 
 /**
  * <class-comment/>

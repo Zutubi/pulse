@@ -1,12 +1,12 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.Feature;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.core.model.ResultState;
-import com.cinnamonbob.events.build.*;
-import com.cinnamonbob.model.*;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.test.BobTestCase;
 
 import java.io.File;
 import java.util.*;

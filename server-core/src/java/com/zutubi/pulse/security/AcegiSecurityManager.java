@@ -1,8 +1,8 @@
-package com.cinnamonbob.security;
+package com.zutubi.pulse.security;
 
-import com.cinnamonbob.jetty.JettyManager;
-import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.spring.web.context.FilterToBeanProxy;
+import com.zutubi.pulse.jetty.JettyManager;
+import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.spring.web.context.FilterToBeanProxy;
 import org.mortbay.jetty.servlet.WebApplicationHandler;
 import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.Dispatcher;

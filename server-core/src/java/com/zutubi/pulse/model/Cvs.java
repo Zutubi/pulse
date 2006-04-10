@@ -1,10 +1,10 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.core.util.Constants;
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.SCMServer;
-import com.cinnamonbob.scm.cvs.CvsServer;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.util.Constants;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.cvs.CvsServer;
 import com.opensymphony.util.TextUtils;
 
 /**

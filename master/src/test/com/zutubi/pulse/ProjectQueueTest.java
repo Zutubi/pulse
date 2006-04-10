@@ -1,8 +1,8 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.events.build.BuildRequestEvent;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.events.build.BuildRequestEvent;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.test.BobTestCase;
 
 /**
  */

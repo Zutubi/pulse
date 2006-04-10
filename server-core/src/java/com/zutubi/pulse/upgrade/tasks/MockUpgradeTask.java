@@ -1,8 +1,8 @@
-package com.cinnamonbob.upgrade.tasks;
+package com.zutubi.pulse.upgrade.tasks;
 
-import com.cinnamonbob.upgrade.UpgradeContext;
-import com.cinnamonbob.upgrade.UpgradeException;
-import com.cinnamonbob.upgrade.UpgradeTask;
+import com.zutubi.pulse.upgrade.UpgradeContext;
+import com.zutubi.pulse.upgrade.UpgradeException;
+import com.zutubi.pulse.upgrade.UpgradeTask;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.cinnamonbob.web.wizard;
+package com.zutubi.pulse.web.wizard;
 
 import com.opensymphony.xwork.LocaleProvider;
 import com.opensymphony.xwork.Validateable;

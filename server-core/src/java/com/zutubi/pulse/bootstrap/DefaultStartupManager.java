@@ -1,9 +1,9 @@
-package com.cinnamonbob.bootstrap;
+package com.zutubi.pulse.bootstrap;
 
-import com.cinnamonbob.core.ObjectFactory;
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.events.system.SystemStartedEvent;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.SystemStartedEvent;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;

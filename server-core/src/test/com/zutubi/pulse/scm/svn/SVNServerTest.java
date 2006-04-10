@@ -1,4 +1,4 @@
-package com.cinnamonbob.scm.svn;
+package com.zutubi.pulse.scm.svn;
 
 import junit.framework.TestCase;
 

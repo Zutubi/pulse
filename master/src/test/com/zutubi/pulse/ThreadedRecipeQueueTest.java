@@ -1,13 +1,13 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.events.DefaultEventManager;
-import com.cinnamonbob.events.build.RecipeCompletedEvent;
-import com.cinnamonbob.events.build.RecipeErrorEvent;
-import com.cinnamonbob.model.BuildHostRequirements;
-import com.cinnamonbob.model.BobFileDetails;
-import com.cinnamonbob.model.Project;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.events.DefaultEventManager;
+import com.zutubi.pulse.events.build.RecipeCompletedEvent;
+import com.zutubi.pulse.events.build.RecipeErrorEvent;
+import com.zutubi.pulse.model.BuildHostRequirements;
+import com.zutubi.pulse.model.BobFileDetails;
+import com.zutubi.pulse.model.Project;
 import junit.framework.TestCase;
 
 import java.io.File;

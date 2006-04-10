@@ -1,4 +1,4 @@
-package com.cinnamonbob.scm.cvs.client;
+package com.zutubi.pulse.scm.cvs.client;
 
 import org.netbeans.lib.cvsclient.event.CVSAdapter;
 import org.netbeans.lib.cvsclient.event.FileInfoEvent;

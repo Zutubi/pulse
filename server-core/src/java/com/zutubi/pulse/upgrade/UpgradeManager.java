@@ -1,6 +1,6 @@
-package com.cinnamonbob.upgrade;
+package com.zutubi.pulse.upgrade;
 
-import com.cinnamonbob.bootstrap.Home;
+import com.zutubi.pulse.bootstrap.Home;
 
 import java.util.List;
 

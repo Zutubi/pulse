@@ -1,10 +1,10 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.BootstrapperSupport;
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.RecipePaths;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.core.util.IOUtils;
+import com.zutubi.pulse.core.BootstrapperSupport;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;

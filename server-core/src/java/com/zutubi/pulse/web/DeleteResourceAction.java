@@ -1,7 +1,7 @@
-package com.cinnamonbob.web;
+package com.zutubi.pulse.web;
 
-import com.cinnamonbob.core.model.Resource;
-import com.cinnamonbob.model.persistence.ResourceDao;
+import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.model.persistence.ResourceDao;
 
 /**
  * <class-comment/>

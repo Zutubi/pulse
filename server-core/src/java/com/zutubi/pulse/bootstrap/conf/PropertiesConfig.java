@@ -1,4 +1,4 @@
-package com.cinnamonbob.bootstrap.conf;
+package com.zutubi.pulse.bootstrap.conf;
 
 import java.util.Properties;
 

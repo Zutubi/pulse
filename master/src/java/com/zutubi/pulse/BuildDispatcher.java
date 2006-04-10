@@ -1,4 +1,4 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
 /**
  * This interface allows the implementation of multiple dispatch strategies.

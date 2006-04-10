@@ -1,4 +1,4 @@
-package com.cinnamonbob.license;
+package com.zutubi.pulse.license;
 
 /**
  * <class-comment/>

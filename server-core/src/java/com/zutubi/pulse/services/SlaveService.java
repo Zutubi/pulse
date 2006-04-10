@@ -1,6 +1,6 @@
-package com.cinnamonbob.services;
+package com.zutubi.pulse.services;
 
-import com.cinnamonbob.RecipeRequest;
+import com.zutubi.pulse.RecipeRequest;
 
 /**
  */

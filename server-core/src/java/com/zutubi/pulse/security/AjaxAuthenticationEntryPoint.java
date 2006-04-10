@@ -1,4 +1,4 @@
-package com.cinnamonbob.security;
+package com.zutubi.pulse.security;
 
 import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.intercept.web.AuthenticationEntryPoint;

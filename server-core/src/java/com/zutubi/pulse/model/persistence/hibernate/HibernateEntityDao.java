@@ -1,7 +1,7 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.core.model.Entity;
-import com.cinnamonbob.model.persistence.EntityDao;
+import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.model.persistence.EntityDao;
 import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;

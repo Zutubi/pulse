@@ -1,11 +1,11 @@
-package com.cinnamonbob.scm.cvs.client;
+package com.zutubi.pulse.scm.cvs.client;
 
 import org.netbeans.lib.cvsclient.event.BinaryMessageEvent;
 import org.netbeans.lib.cvsclient.event.CVSAdapter;
 import org.netbeans.lib.cvsclient.event.EnhancedMessageEvent;
 import org.netbeans.lib.cvsclient.event.MessageEvent;
 
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  *

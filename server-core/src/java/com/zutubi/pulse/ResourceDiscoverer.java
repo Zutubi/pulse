@@ -1,10 +1,10 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.ResourceRepository;
-import com.cinnamonbob.core.model.Property;
-import com.cinnamonbob.core.model.Resource;
-import com.cinnamonbob.core.util.SystemUtils;
-import com.cinnamonbob.model.persistence.ResourceDao;
+import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.util.SystemUtils;
+import com.zutubi.pulse.model.persistence.ResourceDao;
 
 import java.io.File;
 

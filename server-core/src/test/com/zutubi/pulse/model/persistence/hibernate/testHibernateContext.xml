@@ -5,7 +5,7 @@
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="mappingResources">
             <list>
-                <value>com/cinnamonbob/model/persistence/hibernate/Resource.hbm.xml</value>
+                <value>com/zutubi.pulse/model/persistence/hibernate/Resource.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">
@@ -28,7 +28,7 @@
     </bean>
 
 
-    <bean id="resourceDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateResourceDao">
+    <bean id="resourceDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateResourceDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -48,7 +48,7 @@
     </bean>
 
 
-    <bean id="resourceVersionDaoTarget" class="com.cinnamonbob.model.persistence.hibernate.HibernateResourceVersionDao">
+    <bean id="resourceVersionDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateResourceVersionDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>

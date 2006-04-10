@@ -1,9 +1,9 @@
-package com.cinnamonbob.bootstrap.velocity;
+package com.zutubi.pulse.bootstrap.velocity;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.bootstrap.SystemPaths;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.SystemPaths;
+import com.zutubi.pulse.util.logging.Logger;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.runtime.resource.loader.FileResourceLoader;
 

@@ -1,12 +1,12 @@
-package com.cinnamonbob.scm.cvs;
+package com.zutubi.pulse.scm.cvs;
 
-import com.cinnamonbob.core.model.Change;
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.CvsRevision;
-import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.test.BobTestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.util.Logger;
 
@@ -39,12 +39,12 @@ public class CvsClientTest extends BobTestCase
     {
         super.setUp();
 
-        if (com.cinnamonbob.util.logging.Logger.getLogger(CvsClientTest.class).isLoggable(Level.FINEST))
+        if (com.zutubi.pulse.util.logging.Logger.getLogger(CvsClientTest.class).isLoggable(Level.FINEST))
         {
             Logger.setLogging("system");
         }
 
-        File repositoryRoot = new File(getBobRoot(), "server-core/src/test/com/cinnamonbob/scm/cvs/repository");
+        File repositoryRoot = new File(getBobRoot(), "server-core/src/test/com/zutubi.pulse/scm/cvs/repository");
         CVSRoot cvsRoot = CVSRoot.parse(":local:" + repositoryRoot.getCanonicalPath());
         cvs = new CvsClient(cvsRoot);
 

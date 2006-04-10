@@ -1,6 +1,6 @@
-package com.cinnamonbob.webwork.velocity;
+package com.zutubi.pulse.webwork.velocity;
 
-import com.cinnamonbob.webwork.components.CustomForm;
+import com.zutubi.pulse.webwork.components.CustomForm;
 import com.opensymphony.webwork.components.Component;
 import com.opensymphony.webwork.views.velocity.components.AbstractDirective;
 import com.opensymphony.xwork.util.OgnlValueStack;

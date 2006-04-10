@@ -1,4 +1,4 @@
-package com.cinnamonbob.bootstrap.velocity;
+package com.zutubi.pulse.bootstrap.velocity;
 
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.LogSystem;

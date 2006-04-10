@@ -1,6 +1,6 @@
-package com.cinnamonbob.bootstrap;
+package com.zutubi.pulse.bootstrap;
 
-import com.cinnamonbob.freemarker.CustomFreemarkerManager;
+import com.zutubi.pulse.freemarker.CustomFreemarkerManager;
 
 import java.io.File;
 import java.util.logging.Level;
@@ -14,7 +14,7 @@ public class SystemBootstrapManager
     /**
      * The default bootstrapContext file.
      */
-    public static final String DEFAULT_BOOTSTRAP_CONTEXT = "com/cinnamonbob/bootstrap/bootstrapContext.xml";
+    public static final String DEFAULT_BOOTSTRAP_CONTEXT = "com/zutubi.pulse/bootstrap/bootstrapContext.xml";
     public static final String BOOTSTRAP_CONTEXT_PROPERTY = "bootstrap";
 
     /**

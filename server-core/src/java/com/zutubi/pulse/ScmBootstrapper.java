@@ -1,13 +1,13 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.BobException;
-import com.cinnamonbob.core.Bootstrapper;
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.RecipePaths;
-import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.model.Scm;
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.SCMServer;
+import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
 
 import java.io.File;
 

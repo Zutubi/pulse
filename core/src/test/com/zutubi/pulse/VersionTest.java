@@ -1,6 +1,6 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.test.BobTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -1,15 +1,15 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.ObjectFactory;
-import com.cinnamonbob.core.Stoppable;
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.events.EventListener;
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.events.build.RecipeCompletedEvent;
-import com.cinnamonbob.events.build.RecipeDispatchedEvent;
-import com.cinnamonbob.events.build.RecipeErrorEvent;
-import com.cinnamonbob.events.build.RecipeEvent;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.build.RecipeCompletedEvent;
+import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.events.build.RecipeErrorEvent;
+import com.zutubi.pulse.events.build.RecipeEvent;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;

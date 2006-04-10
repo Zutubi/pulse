@@ -1,8 +1,8 @@
-package com.cinnamonbob.web;
+package com.zutubi.pulse.web;
 
-import com.cinnamonbob.ResourceNameComparator;
-import com.cinnamonbob.core.model.Resource;
-import com.cinnamonbob.model.persistence.ResourceDao;
+import com.zutubi.pulse.ResourceNameComparator;
+import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.model.persistence.ResourceDao;
 
 import java.util.Collections;
 import java.util.List;

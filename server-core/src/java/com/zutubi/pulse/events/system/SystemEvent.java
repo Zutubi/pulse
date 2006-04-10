@@ -1,6 +1,6 @@
-package com.cinnamonbob.events.system;
+package com.zutubi.pulse.events.system;
 
-import com.cinnamonbob.events.Event;
+import com.zutubi.pulse.events.Event;
 
 /**
  * Parent for all system events.  These are events that indicate a change in

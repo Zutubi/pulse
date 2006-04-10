@@ -1,8 +1,8 @@
-package com.cinnamonbob.upgrade.tasks;
+package com.zutubi.pulse.upgrade.tasks;
 
-import com.cinnamonbob.model.persistence.hibernate.PersistenceTestCase;
-import com.cinnamonbob.upgrade.UpgradeTask;
-import com.cinnamonbob.util.JDBCUtils;
+import com.zutubi.pulse.model.persistence.hibernate.PersistenceTestCase;
+import com.zutubi.pulse.upgrade.UpgradeTask;
+import com.zutubi.pulse.util.JDBCUtils;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -35,8 +35,8 @@ public class MigrateSchemaUpgradeTaskTest extends PersistenceTestCase
 
     protected String[] getConfigLocations()
     {
-        return new String[]{"com/cinnamonbob/bootstrap/testBootstrapContext.xml",
-                "com/cinnamonbob/upgrade/tasks/testSchemaUpgradeTaskContext.xml"};
+        return new String[]{"com/zutubi.pulse/bootstrap/testBootstrapContext.xml",
+                "com/zutubi.pulse/upgrade/tasks/testSchemaUpgradeTaskContext.xml"};
     }
 
     public void testAddTableWithColumn() throws Exception
@@ -46,7 +46,7 @@ public class MigrateSchemaUpgradeTaskTest extends PersistenceTestCase
         // before, test that table is not there.
         assertFalse(checkTableExists("TEST"));
 
-        upgrade = newSchemaUpgrade("com/cinnamonbob/upgrade/tasks/testSchemaMigration-v1.hbm.xml");
+        upgrade = newSchemaUpgrade("com/zutubi.pulse/upgrade/tasks/testSchemaMigration-v1.hbm.xml");
         upgrade.execute(new MockUpgradeContext());
 
         // after, tet that table is there.
@@ -61,13 +61,13 @@ public class MigrateSchemaUpgradeTaskTest extends PersistenceTestCase
         // before, test that table is not there.
         assertFalse(checkTableExists("TEST"));
 
-        upgrade = newSchemaUpgrade("com/cinnamonbob/upgrade/tasks/testSchemaMigration-v1.hbm.xml");
+        upgrade = newSchemaUpgrade("com/zutubi.pulse/upgrade/tasks/testSchemaMigration-v1.hbm.xml");
         upgrade.execute(new MockUpgradeContext());
 
         // after, tet that table is there.
         assertFalse(checkColumnExists("TEST", "NEW_COLUMN"));
 
-        upgrade = newSchemaUpgrade("com/cinnamonbob/upgrade/tasks/testSchemaMigration-v2.hbm.xml");
+        upgrade = newSchemaUpgrade("com/zutubi.pulse/upgrade/tasks/testSchemaMigration-v2.hbm.xml");
         upgrade.execute(new MockUpgradeContext());
 
         assertTrue(checkColumnExists("TEST", "NEW_COLUMN"));

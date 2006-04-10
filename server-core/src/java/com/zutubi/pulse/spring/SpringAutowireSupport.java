@@ -1,6 +1,6 @@
-package com.cinnamonbob.spring;
+package com.zutubi.pulse.spring;
 
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.util.logging.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;

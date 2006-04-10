@@ -1,10 +1,10 @@
-package com.cinnamonbob.web;
+package com.zutubi.pulse.web;
 
-import com.cinnamonbob.core.util.StringUtils;
-import com.cinnamonbob.core.util.TimeStamps;
-import com.cinnamonbob.security.AcegiUtils;
-import com.cinnamonbob.xwork.TextProviderSupport;
-import com.cinnamonbob.xwork.interceptor.Cancelable;
+import com.zutubi.pulse.core.util.StringUtils;
+import com.zutubi.pulse.core.util.TimeStamps;
+import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.xwork.TextProviderSupport;
+import com.zutubi.pulse.xwork.interceptor.Cancelable;
 import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
 

@@ -1,9 +1,9 @@
-package com.cinnamonbob.upgrade.tasks;
+package com.zutubi.pulse.upgrade.tasks;
 
-import com.cinnamonbob.Version;
-import com.cinnamonbob.bootstrap.Home;
-import com.cinnamonbob.upgrade.UpgradeContext;
-import com.cinnamonbob.upgrade.UpgradeTask;
+import com.zutubi.pulse.Version;
+import com.zutubi.pulse.bootstrap.Home;
+import com.zutubi.pulse.upgrade.UpgradeContext;
+import com.zutubi.pulse.upgrade.UpgradeTask;
 
 import java.util.List;
 

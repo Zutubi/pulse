@@ -1,7 +1,7 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.RecipePaths;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.core.RecipePaths;
 
 import java.io.File;
 

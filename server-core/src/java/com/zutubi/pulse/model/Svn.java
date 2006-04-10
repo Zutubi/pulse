@@ -1,8 +1,8 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.SCMServer;
-import com.cinnamonbob.scm.svn.SVNServer;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.svn.SVNServer;
 
 /**
  * 

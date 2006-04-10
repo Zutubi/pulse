@@ -1,6 +1,6 @@
-package com.cinnamonbob.upgrade;
+package com.zutubi.pulse.upgrade;
 
-import com.cinnamonbob.core.BobException;
+import com.zutubi.pulse.core.BobException;
 
 /**
  * <class-comment/>

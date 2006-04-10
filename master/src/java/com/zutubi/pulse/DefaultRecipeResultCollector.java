@@ -1,9 +1,9 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 
 import java.io.File;
 

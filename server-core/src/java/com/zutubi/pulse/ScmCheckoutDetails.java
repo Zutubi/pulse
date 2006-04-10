@@ -1,7 +1,7 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.model.Scm;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.model.Scm;
 
 /**
  * Simple value type carrying details required for SCM checkout.

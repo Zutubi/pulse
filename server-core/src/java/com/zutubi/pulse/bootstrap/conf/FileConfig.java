@@ -1,7 +1,7 @@
-package com.cinnamonbob.bootstrap.conf;
+package com.zutubi.pulse.bootstrap.conf;
 
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;

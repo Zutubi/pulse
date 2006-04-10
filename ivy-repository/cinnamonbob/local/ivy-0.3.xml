@@ -2,9 +2,9 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="cinnamonbob" module="local" revision="0.3" status="release">
-        <ivyauthor name="cinnamonbob" url="http://www.cinnamonbob.com/"/>
-        <description homepage="http://www.cinnamonbob.com/">
+    <info organisation="zutubi.pulse" module="local" revision="0.3" status="release">
+        <ivyauthor name="zutubi.pulse" url="http://www.zutubi.pulse.com/"/>
+        <description homepage="http://www.zutubi.pulse.com/">
             description....
         </description>
     </info>
@@ -24,8 +24,8 @@
         <!-- command line parsing -->
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external->default"/>
 
-        <dependency org="cinnamonbob" name="core" rev="0.3" conf="internal->internal"/>
-        <dependency org="cinnamonbob" name="core" rev="0.3" conf="external->external"/>
+        <dependency org="zutubi.pulse" name="core" rev="0.3" conf="internal->internal"/>
+        <dependency org="zutubi.pulse" name="core" rev="0.3" conf="external->external"/>
 
     </dependencies>
 

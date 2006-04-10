@@ -1,6 +1,6 @@
-package com.cinnamonbob.upgrade;
+package com.zutubi.pulse.upgrade;
 
-import com.cinnamonbob.core.util.TimeStamps;
+import com.zutubi.pulse.core.util.TimeStamps;
 
 import java.util.Collections;
 import java.util.LinkedList;

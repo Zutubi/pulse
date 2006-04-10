@@ -1,4 +1,4 @@
-package com.cinnamonbob.scm.cvs.client;
+package com.zutubi.pulse.scm.cvs.client;
 
 import com.sshtools.j2ssh.SshClient;
 import com.sshtools.j2ssh.authentication.AuthenticationProtocolState;

@@ -1,7 +1,7 @@
-package com.cinnamonbob.upgrade;
+package com.zutubi.pulse.upgrade;
 
-import com.cinnamonbob.Version;
-import com.cinnamonbob.upgrade.tasks.MockUpgradeTask;
+import com.zutubi.pulse.Version;
+import com.zutubi.pulse.upgrade.tasks.MockUpgradeTask;
 import junit.framework.TestCase;
 
 import java.util.List;

@@ -1,6 +1,6 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.model.BuildResult;
+import com.zutubi.pulse.model.BuildResult;
 
 /**
  */

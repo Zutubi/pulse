@@ -1,6 +1,6 @@
-package com.cinnamonbob.web.wizard;
+package com.zutubi.pulse.web.wizard;
 
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.util.logging.Logger;
 import com.opensymphony.xwork.ValidationAware;
 
 import java.util.Collection;

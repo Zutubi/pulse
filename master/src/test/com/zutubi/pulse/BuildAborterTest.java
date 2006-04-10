@@ -1,11 +1,11 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.model.Feature;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.MockBuildManager;
-import com.cinnamonbob.model.MockProjectManager;
-import com.cinnamonbob.model.Project;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.MockBuildManager;
+import com.zutubi.pulse.model.MockProjectManager;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.test.BobTestCase;
 
 /**
  */

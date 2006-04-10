@@ -1,4 +1,4 @@
-package com.cinnamonbob.xwork;
+package com.zutubi.pulse.xwork;
 
 import com.opensymphony.xwork.LocaleProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;

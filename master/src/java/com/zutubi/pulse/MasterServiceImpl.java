@@ -1,9 +1,9 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.services.MasterService;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.services.MasterService;
 
 /**
  */

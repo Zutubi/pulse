@@ -1,4 +1,4 @@
-package com.cinnamonbob.upgrade.tasks;
+package com.zutubi.pulse.upgrade.tasks;
 
 import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.HibernateException;

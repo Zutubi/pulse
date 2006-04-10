@@ -1,12 +1,12 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.BobException;
-import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.core.util.TimeStamps;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.model.BobFileDetails;
-import com.cinnamonbob.model.BuildHostRequirements;
-import com.cinnamonbob.model.BuildResult;
+import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.util.TimeStamps;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.model.BobFileDetails;
+import com.zutubi.pulse.model.BuildHostRequirements;
+import com.zutubi.pulse.model.BuildResult;
 import nu.xom.Document;
 import nu.xom.Builder;
 import nu.xom.ParsingException;

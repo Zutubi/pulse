@@ -1,4 +1,4 @@
-package com.cinnamonbob.webwork.components;
+package com.zutubi.pulse.webwork.components;
 
 import com.opensymphony.webwork.components.Form;
 import com.opensymphony.xwork.util.OgnlValueStack;

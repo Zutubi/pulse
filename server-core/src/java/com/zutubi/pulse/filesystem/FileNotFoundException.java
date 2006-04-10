@@ -1,4 +1,4 @@
-package com.cinnamonbob.filesystem;
+package com.zutubi.pulse.filesystem;
 
 /**
  * <class-comment/>

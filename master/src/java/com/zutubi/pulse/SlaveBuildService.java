@@ -1,13 +1,13 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
 import com.caucho.hessian.client.HessianRuntimeException;
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.model.Slave;
-import com.cinnamonbob.services.SlaveService;
-import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 
 import java.io.File;
 import java.io.IOException;

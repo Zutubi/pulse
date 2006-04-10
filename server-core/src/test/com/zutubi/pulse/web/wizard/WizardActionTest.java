@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.wizard;
+package com.zutubi.pulse.web.wizard;
 
-import com.cinnamonbob.core.ObjectFactory;
-import com.cinnamonbob.web.ActionSupport;
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.web.ActionSupport;
 import com.opensymphony.xwork.ActionContext;
 import junit.framework.TestCase;
 

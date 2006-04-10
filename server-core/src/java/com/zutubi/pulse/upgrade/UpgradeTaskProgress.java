@@ -1,4 +1,4 @@
-package com.cinnamonbob.upgrade;
+package com.zutubi.pulse.upgrade;
 
 /**
  * <class-comment/>

@@ -1,8 +1,8 @@
-package com.cinnamonbob.bootstrap;
+package com.zutubi.pulse.bootstrap;
 
-import com.cinnamonbob.Version;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.test.BobTestCase;
 
 import java.io.File;
 import java.io.IOException;

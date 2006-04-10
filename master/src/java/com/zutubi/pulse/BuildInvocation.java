@@ -1,9 +1,9 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.events.build.RecipeCommencedEvent;
-import com.cinnamonbob.events.build.RecipeCompletedEvent;
-import com.cinnamonbob.model.BuildManager;
-import com.cinnamonbob.model.BuildSpecification;
+import com.zutubi.pulse.events.build.RecipeCommencedEvent;
+import com.zutubi.pulse.events.build.RecipeCompletedEvent;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildSpecification;
 
 public class BuildInvocation
 {

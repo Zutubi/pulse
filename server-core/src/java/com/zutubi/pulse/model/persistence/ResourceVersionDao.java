@@ -1,6 +1,6 @@
-package com.cinnamonbob.model.persistence;
+package com.zutubi.pulse.model.persistence;
 
-import com.cinnamonbob.core.model.ResourceVersion;
+import com.zutubi.pulse.core.model.ResourceVersion;
 
 /**
  */

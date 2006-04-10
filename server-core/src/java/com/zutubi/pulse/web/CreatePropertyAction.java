@@ -1,11 +1,11 @@
-package com.cinnamonbob.web;
+package com.zutubi.pulse.web;
 
-import com.cinnamonbob.core.FileLoadException;
-import com.cinnamonbob.core.model.Property;
-import com.cinnamonbob.core.model.Resource;
-import com.cinnamonbob.core.model.ResourceVersion;
-import com.cinnamonbob.model.persistence.ResourceDao;
-import com.cinnamonbob.model.persistence.ResourceVersionDao;
+import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.model.ResourceVersion;
+import com.zutubi.pulse.model.persistence.ResourceDao;
+import com.zutubi.pulse.model.persistence.ResourceVersionDao;
 
 /**
  * 

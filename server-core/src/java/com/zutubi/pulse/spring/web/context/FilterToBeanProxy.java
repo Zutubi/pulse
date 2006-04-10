@@ -1,10 +1,10 @@
-package com.cinnamonbob.spring.web.context;
+package com.zutubi.pulse.spring.web.context;
 
 import org.springframework.context.ApplicationContext;
 
 import javax.servlet.FilterConfig;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 
 /**
  * <class-comment/>

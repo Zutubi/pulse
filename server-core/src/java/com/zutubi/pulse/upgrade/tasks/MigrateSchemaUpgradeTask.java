@@ -1,8 +1,8 @@
-package com.cinnamonbob.upgrade.tasks;
+package com.zutubi.pulse.upgrade.tasks;
 
-import com.cinnamonbob.upgrade.UpgradeContext;
-import com.cinnamonbob.upgrade.UpgradeException;
-import com.cinnamonbob.upgrade.UpgradeTask;
+import com.zutubi.pulse.upgrade.UpgradeContext;
+import com.zutubi.pulse.upgrade.UpgradeException;
+import com.zutubi.pulse.upgrade.UpgradeTask;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.springframework.core.io.ClassPathResource;
@@ -67,7 +67,7 @@ public class MigrateSchemaUpgradeTask implements UpgradeTask
             // properties are defined.
             Properties props = new Properties();
             props.put("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
-            props.put("hibernate.connection.provider_class", "com.cinnamonbob.upgrade.tasks.HackyUpgradeTaskConnectionProvider");
+            props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyUpgradeTaskConnectionProvider");
 
             // slight hack to provide hibernate with access to the configured datasource.
             HackyUpgradeTaskConnectionProvider.dataSource = dataSource;

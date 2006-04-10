@@ -1,9 +1,9 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.BobException;
-import com.cinnamonbob.core.Bootstrapper;
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.RecipePaths;
+import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.RecipePaths;
 
 import java.util.Arrays;
 import java.util.LinkedList;

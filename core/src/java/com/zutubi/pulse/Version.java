@@ -1,6 +1,6 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.util.IOUtils;
+import com.zutubi.pulse.core.util.IOUtils;
 
 import java.io.*;
 import java.util.Properties;

@@ -7,7 +7,7 @@
         <!--
             <property name="mappingResources">
                 <list>
-                    <value>com/cinnamonbob/model/persistence/hibernate/Resource.hbm.xml</value>
+                    <value>com/zutubi.pulse/model/persistence/hibernate/Resource.hbm.xml</value>
                 </list>
             </property>
         -->

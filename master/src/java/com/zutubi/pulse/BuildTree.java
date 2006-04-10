@@ -1,8 +1,8 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.util.TreeNode;
-import com.cinnamonbob.core.util.TreeNodeOperation;
-import com.cinnamonbob.model.BuildResult;
+import com.zutubi.pulse.core.util.TreeNode;
+import com.zutubi.pulse.core.util.TreeNodeOperation;
+import com.zutubi.pulse.model.BuildResult;
 
 /**
  */

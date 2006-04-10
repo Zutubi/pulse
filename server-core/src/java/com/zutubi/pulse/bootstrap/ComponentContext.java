@@ -1,7 +1,7 @@
-package com.cinnamonbob.bootstrap;
+package com.zutubi.pulse.bootstrap;
 
-import com.cinnamonbob.spring.DelegatingApplicationContext;
-import com.cinnamonbob.spring.SpringAutowireSupport;
+import com.zutubi.pulse.spring.DelegatingApplicationContext;
+import com.zutubi.pulse.spring.SpringAutowireSupport;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

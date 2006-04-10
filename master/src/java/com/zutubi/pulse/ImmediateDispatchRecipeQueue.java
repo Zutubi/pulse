@@ -1,17 +1,17 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.core.BobException;
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.ObjectFactory;
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.events.EventListener;
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.events.SlaveAvailableEvent;
-import com.cinnamonbob.events.build.RecipeDispatchedEvent;
-import com.cinnamonbob.model.Slave;
-import com.cinnamonbob.model.SlaveManager;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.SlaveAvailableEvent;
+import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.model.SlaveManager;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.MalformedURLException;
 import java.util.LinkedList;

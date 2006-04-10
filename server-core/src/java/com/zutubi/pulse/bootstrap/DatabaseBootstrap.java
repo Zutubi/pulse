@@ -1,8 +1,8 @@
-package com.cinnamonbob.bootstrap;
+package com.zutubi.pulse.bootstrap;
 
-import com.cinnamonbob.core.Stoppable;
-import com.cinnamonbob.util.JDBCUtils;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.util.logging.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

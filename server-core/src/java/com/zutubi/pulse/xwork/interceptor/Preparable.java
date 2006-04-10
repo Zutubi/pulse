@@ -1,4 +1,4 @@
-package com.cinnamonbob.xwork.interceptor;
+package com.zutubi.pulse.xwork.interceptor;
 
 import java.util.List;
 

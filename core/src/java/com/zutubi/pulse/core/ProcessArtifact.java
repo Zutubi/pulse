@@ -1,8 +1,7 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.validation.Validateable;
 import com.opensymphony.xwork.validator.ValidatorContext;
-import com.opensymphony.xwork.validator.ValidationException;
+import com.zutubi.pulse.core.validation.Validateable;
 
 /**
  * A reference to a post-processor.

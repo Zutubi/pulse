@@ -1,9 +1,9 @@
-package com.cinnamonbob.model.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.bootstrap.DatabaseBootstrap;
-import com.cinnamonbob.test.BobTestCase;
-import com.cinnamonbob.util.JDBCUtils;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.DatabaseBootstrap;
+import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.util.JDBCUtils;
 import org.hibernate.SessionFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;

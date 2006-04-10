@@ -1,4 +1,4 @@
-package com.cinnamonbob.bootstrap;
+package com.zutubi.pulse.bootstrap;
 
 /**
  * <class-comment/>

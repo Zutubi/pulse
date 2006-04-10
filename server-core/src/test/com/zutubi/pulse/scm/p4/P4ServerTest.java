@@ -1,12 +1,12 @@
-package com.cinnamonbob.scm.p4;
+package com.zutubi.pulse.scm.p4;
 
-import com.cinnamonbob.core.model.Change;
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.NumericalRevision;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.filesystem.remote.RemoteFile;
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.filesystem.remote.RemoteFile;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.test.BobTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -221,6 +221,6 @@ public class P4ServerTest extends BobTestCase
 
     private File getDataRoot()
     {
-        return new File(getBobRoot(), FileSystemUtils.composeFilename("server-core", "src", "test", "com", "cinnamonbob", "scm", "p4", "data"));
+        return new File(getBobRoot(), FileSystemUtils.composeFilename("server-core", "src", "test", "com", "zutubi.pulse", "scm", "p4", "data"));
     }
 }

@@ -1,14 +1,14 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.Bootstrapper;
-import com.cinnamonbob.core.BuildException;
-import com.cinnamonbob.core.model.CommandResult;
-import com.cinnamonbob.core.model.RecipeResult;
-import com.cinnamonbob.events.build.*;
-import com.cinnamonbob.model.BuildManager;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.RecipeResultNode;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  *

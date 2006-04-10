@@ -1,9 +1,9 @@
-package com.cinnamonbob.scm.cvs;
+package com.zutubi.pulse.scm.cvs;
 
-import com.cinnamonbob.core.model.CvsRevision;
-import com.cinnamonbob.core.util.Constants;
-import com.cinnamonbob.filesystem.remote.CachingRemoteFile;
-import com.cinnamonbob.scm.SCMException;
+import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.core.util.Constants;
+import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
+import com.zutubi.pulse.scm.SCMException;
 
 import java.util.Map;
 import java.util.TreeMap;

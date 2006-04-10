@@ -1,8 +1,8 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.model.Entity;
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.SCMServer;
+import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
 
 import java.util.Properties;
 

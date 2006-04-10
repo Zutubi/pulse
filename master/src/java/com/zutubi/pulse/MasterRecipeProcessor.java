@@ -1,10 +1,10 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.core.RecipeProcessor;
-import com.cinnamonbob.core.Stoppable;
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.core.RecipeProcessor;
+import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

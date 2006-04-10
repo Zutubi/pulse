@@ -1,7 +1,7 @@
-package com.cinnamonbob.filesystem.local;
+package com.zutubi.pulse.filesystem.local;
 
-import com.cinnamonbob.filesystem.File;
-import com.cinnamonbob.filesystem.FileNotFoundException;
+import com.zutubi.pulse.filesystem.File;
+import com.zutubi.pulse.filesystem.FileNotFoundException;
 
 /**
  * <class-comment/>

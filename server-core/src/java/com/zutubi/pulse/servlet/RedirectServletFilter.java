@@ -1,4 +1,4 @@
-package com.cinnamonbob.servlet;
+package com.zutubi.pulse.servlet;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;

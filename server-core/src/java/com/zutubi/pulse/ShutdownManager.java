@@ -1,6 +1,6 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.Stoppable;
+import com.zutubi.pulse.core.Stoppable;
 
 import java.util.List;
 

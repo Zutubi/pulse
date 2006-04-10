@@ -1,9 +1,9 @@
-package com.cinnamonbob.scm;
+package com.zutubi.pulse.scm;
 
-import com.cinnamonbob.core.model.Change;
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.filesystem.remote.RemoteFile;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.filesystem.remote.RemoteFile;
 
 import java.io.File;
 import java.util.List;

@@ -1,7 +1,7 @@
-package com.cinnamonbob.logging;
+package com.zutubi.pulse.logging;
 
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 
 import java.util.logging.*;
 import java.io.File;

@@ -1,8 +1,8 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.hessian.CustomHessianProxyFactory;
-import com.cinnamonbob.model.Slave;
-import com.cinnamonbob.services.SlaveService;
+import com.zutubi.pulse.hessian.CustomHessianProxyFactory;
+import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.services.SlaveService;
 
 import java.net.MalformedURLException;
 import java.net.URL;

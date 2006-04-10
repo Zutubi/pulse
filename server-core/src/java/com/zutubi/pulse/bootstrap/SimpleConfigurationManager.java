@@ -1,10 +1,10 @@
-package com.cinnamonbob.bootstrap;
+package com.zutubi.pulse.bootstrap;
 
-import com.cinnamonbob.bootstrap.conf.CompositeConfig;
-import com.cinnamonbob.bootstrap.conf.Config;
-import com.cinnamonbob.bootstrap.conf.FileConfig;
-import com.cinnamonbob.bootstrap.conf.ReadOnlyConfig;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.conf.CompositeConfig;
+import com.zutubi.pulse.bootstrap.conf.Config;
+import com.zutubi.pulse.bootstrap.conf.FileConfig;
+import com.zutubi.pulse.bootstrap.conf.ReadOnlyConfig;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
 

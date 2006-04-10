@@ -1,12 +1,12 @@
-package com.cinnamonbob.filesystem.remote;
+package com.zutubi.pulse.filesystem.remote;
 
-import com.cinnamonbob.filesystem.File;
-import com.cinnamonbob.filesystem.FileNotFoundException;
-import com.cinnamonbob.filesystem.FileSystem;
-import com.cinnamonbob.filesystem.FileSystemException;
-import com.cinnamonbob.model.Scm;
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.SCMServer;
+import com.zutubi.pulse.filesystem.File;
+import com.zutubi.pulse.filesystem.FileNotFoundException;
+import com.zutubi.pulse.filesystem.FileSystem;
+import com.zutubi.pulse.filesystem.FileSystemException;
+import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

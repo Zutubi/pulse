@@ -1,4 +1,4 @@
-package com.cinnamonbob.bootstrap;
+package com.zutubi.pulse.bootstrap;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.BeansException;

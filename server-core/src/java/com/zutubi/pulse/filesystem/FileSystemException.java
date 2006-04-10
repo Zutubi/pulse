@@ -1,6 +1,6 @@
-package com.cinnamonbob.filesystem;
+package com.zutubi.pulse.filesystem;
 
-import com.cinnamonbob.core.BobException;
+import com.zutubi.pulse.core.BobException;
 
 /**
  * <class-comment/>

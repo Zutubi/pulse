@@ -1,8 +1,8 @@
-package com.cinnamonbob.model;
+package com.zutubi.pulse.model;
 
-import com.cinnamonbob.core.ResourceRepository;
-import com.cinnamonbob.core.model.Resource;
-import com.cinnamonbob.model.persistence.ResourceDao;
+import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.model.persistence.ResourceDao;
 
 import java.util.LinkedList;
 import java.util.List;

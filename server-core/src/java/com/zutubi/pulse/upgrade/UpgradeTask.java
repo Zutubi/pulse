@@ -1,4 +1,4 @@
-package com.cinnamonbob.upgrade;
+package com.zutubi.pulse.upgrade;
 
 import java.util.List;
 

@@ -1,14 +1,14 @@
-package com.cinnamonbob.scm.cvs;
+package com.zutubi.pulse.scm.cvs;
 
-import com.cinnamonbob.core.model.Change;
-import com.cinnamonbob.core.model.Change.Action;
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.CvsRevision;
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.cvs.client.ConnectionFactory;
-import com.cinnamonbob.scm.cvs.client.CvsLogInformationListener;
-import com.cinnamonbob.scm.cvs.client.LoggingListener;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Change.Action;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.cvs.client.ConnectionFactory;
+import com.zutubi.pulse.scm.cvs.client.CvsLogInformationListener;
+import com.zutubi.pulse.scm.cvs.client.LoggingListener;
+import com.zutubi.pulse.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;

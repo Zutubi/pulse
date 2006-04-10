@@ -1,4 +1,4 @@
-package com.cinnamonbob.hessian;
+package com.zutubi.pulse.hessian;
 
 import com.caucho.hessian.io.AbstractDeserializer;
 import com.caucho.hessian.io.AbstractHessianInput;

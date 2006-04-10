@@ -1,12 +1,12 @@
-package com.cinnamonbob.scm.svn;
+package com.zutubi.pulse.scm.svn;
 
-import com.cinnamonbob.core.model.Change;
-import com.cinnamonbob.core.model.Changelist;
-import com.cinnamonbob.core.model.NumericalRevision;
-import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.filesystem.remote.RemoteFile;
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.scm.SCMServer;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.filesystem.remote.RemoteFile;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
 import org.tmatesoft.svn.core.ISVNWorkspace;
 import org.tmatesoft.svn.core.ISVNWorkspaceListener;
 import org.tmatesoft.svn.core.SVNWorkspaceManager;

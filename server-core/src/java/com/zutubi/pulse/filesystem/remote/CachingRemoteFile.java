@@ -1,4 +1,4 @@
-package com.cinnamonbob.filesystem.remote;
+package com.zutubi.pulse.filesystem.remote;
 
 import java.util.LinkedList;
 import java.util.List;

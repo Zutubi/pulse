@@ -1,6 +1,6 @@
-package com.cinnamonbob.logging;
+package com.zutubi.pulse.logging;
 
-import com.cinnamonbob.util.CircularBuffer;
+import com.zutubi.pulse.util.CircularBuffer;
 
 import java.util.Iterator;
 import java.util.List;

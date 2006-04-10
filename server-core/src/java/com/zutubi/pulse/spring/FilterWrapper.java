@@ -1,7 +1,7 @@
-package com.cinnamonbob.spring;
+package com.zutubi.pulse.spring;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.core.ObjectFactory;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.ObjectFactory;
 import com.opensymphony.util.TextUtils;
 
 import javax.servlet.*;

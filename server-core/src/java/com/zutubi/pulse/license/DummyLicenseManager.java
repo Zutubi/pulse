@@ -1,4 +1,4 @@
-package com.cinnamonbob.license;
+package com.zutubi.pulse.license;
 
 /**
  * Temporary place holder.

@@ -1,7 +1,7 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.model.User;
-import com.cinnamonbob.util.Sort;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.util.Sort;
 
 import java.util.Comparator;
 

@@ -1,4 +1,4 @@
-package com.cinnamonbob.xwork.interceptor;
+package com.zutubi.pulse.xwork.interceptor;
 
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.interceptor.Interceptor;

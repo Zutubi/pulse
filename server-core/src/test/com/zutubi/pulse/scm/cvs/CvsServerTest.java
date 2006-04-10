@@ -1,15 +1,15 @@
 /**
  * <class-comment/>
  */
-package com.cinnamonbob.scm.cvs;
+package com.zutubi.pulse.scm.cvs;
 
-import com.cinnamonbob.core.model.Change;
-import com.cinnamonbob.core.model.CvsRevision;
-import com.cinnamonbob.core.model.Revision;
-import com.cinnamonbob.core.util.FileSystemUtils;
-import com.cinnamonbob.filesystem.remote.RemoteFile;
-import com.cinnamonbob.scm.SCMException;
-import com.cinnamonbob.test.BobTestCase;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.filesystem.remote.RemoteFile;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.test.BobTestCase;
 import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
@@ -37,7 +37,7 @@ public class CvsServerTest extends BobTestCase
         Logger.setLogging("system");
 
         // test repository root.
-        File repositoryRoot = new File(getBobRoot(), "server-core/src/test/com/cinnamonbob/scm/cvs/repository");
+        File repositoryRoot = new File(getBobRoot(), "server-core/src/test/com/zutubi.pulse/scm/cvs/repository");
         cvsRoot = ":local:" + repositoryRoot.getCanonicalPath();
 
         // cleanup the working directory.

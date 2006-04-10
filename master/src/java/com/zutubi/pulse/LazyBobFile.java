@@ -1,6 +1,6 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.model.Revision;
+import com.zutubi.pulse.core.model.Revision;
 
 /**
  * An instance of a bob file for a single build that is resolved lazily.  As

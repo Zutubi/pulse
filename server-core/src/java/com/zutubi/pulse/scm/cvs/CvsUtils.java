@@ -1,4 +1,4 @@
-package com.cinnamonbob.scm.cvs;
+package com.zutubi.pulse.scm.cvs;
 
 import org.netbeans.lib.cvsclient.connection.Connection;
 

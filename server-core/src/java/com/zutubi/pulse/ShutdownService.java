@@ -1,7 +1,7 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.core.util.IOUtils;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.cinnamonbob.web;
+package com.zutubi.pulse.web;
 
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.xwork.ActionInvocation;

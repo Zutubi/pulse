@@ -1,4 +1,4 @@
-package com.cinnamonbob.logging;
+package com.zutubi.pulse.logging;
 
 import java.util.ResourceBundle;
 import java.util.logging.Level;

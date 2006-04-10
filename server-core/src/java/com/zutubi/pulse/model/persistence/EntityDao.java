@@ -1,6 +1,6 @@
-package com.cinnamonbob.model.persistence;
+package com.zutubi.pulse.model.persistence;
 
-import com.cinnamonbob.core.model.Entity;
+import com.zutubi.pulse.core.model.Entity;
 
 import java.util.List;
 

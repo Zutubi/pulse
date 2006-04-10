@@ -1,8 +1,8 @@
-package com.cinnamonbob.web.wizard;
+package com.zutubi.pulse.web.wizard;
 
-import com.cinnamonbob.core.ObjectFactory;
-import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.xwork.TextProviderSupport;
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ActionSupport;
@@ -16,8 +16,8 @@ import java.util.ResourceBundle;
 /**
  * Usage:
  * <p/>
- * <action name="wizard" class="com.cinnamonbob.web.wizard.WizardAction">
- * <param name="wizard">com.cinnamonbob.web.wizard.example.ExampleWizard</param>
+ * <action name="wizard" class="com.zutubi.pulse.web.wizard.WizardAction">
+ * <param name="wizard">com.zutubi.pulse.web.wizard.example.ExampleWizard</param>
  * <result name="a" type="velocity">example-a.vm</result>
  * <result name="b" type="velocity">example-b.vm</result>
  * <result name="success" type="redirect">/wizard-finished.action</result>

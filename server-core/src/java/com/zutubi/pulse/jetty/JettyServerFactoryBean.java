@@ -1,7 +1,7 @@
-package com.cinnamonbob.jetty;
+package com.zutubi.pulse.jetty;
 
-import com.cinnamonbob.bootstrap.ConfigurationManager;
-import com.cinnamonbob.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.util.logging.Logger;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
 import org.springframework.beans.factory.FactoryBean;

@@ -1,7 +1,7 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.events.build.BuildRequestEvent;
-import com.cinnamonbob.model.Project;
+import com.zutubi.pulse.events.build.BuildRequestEvent;
+import com.zutubi.pulse.model.Project;
 
 import java.util.HashMap;
 import java.util.LinkedList;

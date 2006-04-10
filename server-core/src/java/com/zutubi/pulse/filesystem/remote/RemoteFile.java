@@ -1,6 +1,6 @@
-package com.cinnamonbob.filesystem.remote;
+package com.zutubi.pulse.filesystem.remote;
 
-import com.cinnamonbob.filesystem.File;
+import com.zutubi.pulse.filesystem.File;
 
 /**
  * <class-comment/>

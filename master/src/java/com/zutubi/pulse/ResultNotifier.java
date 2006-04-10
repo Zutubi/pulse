@@ -1,14 +1,14 @@
-package com.cinnamonbob;
+package com.zutubi.pulse;
 
-import com.cinnamonbob.bootstrap.ComponentContext;
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.events.EventListener;
-import com.cinnamonbob.events.EventManager;
-import com.cinnamonbob.events.build.BuildCompletedEvent;
-import com.cinnamonbob.model.BuildResult;
-import com.cinnamonbob.model.ContactPoint;
-import com.cinnamonbob.model.Subscription;
-import com.cinnamonbob.model.SubscriptionManager;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.build.BuildCompletedEvent;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.ContactPoint;
+import com.zutubi.pulse.model.Subscription;
+import com.zutubi.pulse.model.SubscriptionManager;
 
 import java.util.HashSet;
 import java.util.List;

@@ -1,7 +1,7 @@
-package com.cinnamonbob.events;
+package com.zutubi.pulse.events;
 
-import com.cinnamonbob.events.Event;
-import com.cinnamonbob.core.model.RecipeResult;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.core.model.RecipeResult;
 
 /**
  * An Event sent from slave to master, carrying info about the slave it

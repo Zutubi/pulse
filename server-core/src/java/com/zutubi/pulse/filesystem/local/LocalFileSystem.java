@@ -1,8 +1,8 @@
-package com.cinnamonbob.filesystem.local;
+package com.zutubi.pulse.filesystem.local;
 
-import com.cinnamonbob.filesystem.FileNotFoundException;
-import com.cinnamonbob.filesystem.FileSystem;
-import com.cinnamonbob.filesystem.FileSystemException;
+import com.zutubi.pulse.filesystem.FileNotFoundException;
+import com.zutubi.pulse.filesystem.FileSystem;
+import com.zutubi.pulse.filesystem.FileSystemException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,12 +55,12 @@ public class LocalFileSystem implements FileSystem
         }
     }
 
-    public InputStream getFileContents(com.cinnamonbob.filesystem.File file) throws FileSystemException
+    public InputStream getFileContents(com.zutubi.pulse.filesystem.File file) throws FileSystemException
     {
         return internalGetFileContents(((LocalFile) file).file);
     }
 
-    public com.cinnamonbob.filesystem.File getFile(String path) throws FileSystemException
+    public com.zutubi.pulse.filesystem.File getFile(String path) throws FileSystemException
     {
         return new LocalFile(this, new File(base, path));
     }
@@ -104,7 +104,7 @@ public class LocalFileSystem implements FileSystem
         return type;
     }
 
-    public String getMimeType(com.cinnamonbob.filesystem.File file) throws FileNotFoundException
+    public String getMimeType(com.zutubi.pulse.filesystem.File file) throws FileNotFoundException
     {
         return internalGetMimeType(((LocalFile) file).file);
     }
@@ -120,7 +120,7 @@ public class LocalFileSystem implements FileSystem
         return internalList(new File(base, path));
     }
 
-    public com.cinnamonbob.filesystem.File[] list(com.cinnamonbob.filesystem.File dir) throws FileSystemException
+    public com.zutubi.pulse.filesystem.File[] list(com.zutubi.pulse.filesystem.File dir) throws FileSystemException
     {
         return internalList(((LocalFile) dir).file);
     }

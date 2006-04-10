@@ -1,7 +1,7 @@
-package com.cinnamonbob.web.wizard;
+package com.zutubi.pulse.web.wizard;
 
-import com.cinnamonbob.util.logging.Logger;
-import com.cinnamonbob.xwork.TextProviderSupport;
+import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.opensymphony.xwork.*;
 import com.opensymphony.xwork.validator.DefaultActionValidatorManager;
 import com.opensymphony.xwork.validator.ValidationException;
