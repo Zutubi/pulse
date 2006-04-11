@@ -1,18 +1,16 @@
 package com.zutubi.pulse.scm.cvs;
 
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Change.Action;
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.cvs.client.ConnectionFactory;
 import com.zutubi.pulse.scm.cvs.client.CvsLogInformationListener;
 import com.zutubi.pulse.scm.cvs.client.LoggingListener;
 import com.zutubi.pulse.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
 import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
+import org.netbeans.lib.cvsclient.command.Command;
 import org.netbeans.lib.cvsclient.command.CommandAbortedException;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.GlobalOptions;
@@ -22,11 +20,15 @@ import org.netbeans.lib.cvsclient.command.log.RlogCommand;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.connection.Connection;
 import org.netbeans.lib.cvsclient.event.CVSAdapter;
+import org.netbeans.lib.cvsclient.event.CVSListener;
 import org.netbeans.lib.cvsclient.event.MessageEvent;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TimeZone;
 import java.util.logging.Level;
 
 /**
@@ -38,12 +40,12 @@ import java.util.logging.Level;
 public class CvsClient
 {
     /**
-     * The date format used when sending dates to the CVS server.
+     * The date format used when sending dates to the CVS server. Cvs servers talk in GMT.
      */
     private static final SimpleDateFormat CVSDATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+
     static
     {
-        // cvs servers talk in GMT.
         CVSDATE.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
@@ -68,6 +70,8 @@ public class CvsClient
      */
     private String password;
 
+    private LogAnalyser logAnalyser;
+
     /**
      * @param cvsRoot
      * @throws IllegalArgumentException if the cvsRoot parameter is invalid.
@@ -80,6 +84,7 @@ public class CvsClient
     public CvsClient(CVSRoot root)
     {
         this.root = root;
+        this.logAnalyser = new LogAnalyser(root);
 
         //TODO: Integrate the following logging into the systems logging. This information
         //      will be very useful in tracking problems with the cvs client integration.
@@ -108,7 +113,6 @@ public class CvsClient
      * Default checkout.
      *
      * @param module
-     *
      * @throws SCMException
      */
     public void checkout(String module) throws SCMException
@@ -116,6 +120,11 @@ public class CvsClient
         checkout(module, null, null);
     }
 
+    /**
+     * Test the connection to the cvs server.
+     *
+     * @throws SCMException
+     */
     public void testConnection() throws SCMException
     {
         // test connection to cvs server.
@@ -137,52 +146,25 @@ public class CvsClient
 
     public String getServerVersion() throws SCMException
     {
-        Connection connection = null;
-        try
+        VersionCommand versionCommand = new VersionCommand();
+
+        final String[] version = new String[1];
+        if (!executeCommand(versionCommand, new CVSAdapter()
         {
-            GlobalOptions globalOptions = new GlobalOptions();
-            globalOptions.setCVSRoot(root.toString());
-
-            connection = openConnection();
-
-            Client client = new Client(connection, new StandardAdminHandler());
-            final String[] version = new String[1];
-            client.getEventManager().addCVSListener(new CVSAdapter()
+            public void messageSent(MessageEvent e)
             {
-                public void messageSent(MessageEvent e)
+                if (!e.isError())
                 {
-                    if (!e.isError())
-                    {
-                        version[0] = e.getMessage();
-                    }
+                    version[0] = e.getMessage();
                 }
-            });
-
-            VersionCommand versionCommand = new VersionCommand();
-
-            if (!client.executeCommand(versionCommand, globalOptions))
-            {
-                throw new SCMException("failed to retrieve the cvs server version details.");
             }
-            return version[0];
-        }
-        catch (AuthenticationException ae)
+        }))
         {
-            throw handleAuthenticationException(ae);
+            throw new SCMException("failed to retrieve the cvs server version details.");
         }
-        catch (CommandAbortedException cae)
-        {
-            throw new SCMException(cae);
-        }
-        catch (CommandException ce)
-        {
-            throw new SCMException(ce);
-        }
-        finally
-        {
-            CvsUtils.close(connection);
-        }
+        return version[0];
     }
+
 
     /**
      * Checkout the specified module, as it was on the specified date. If the date is null,
@@ -191,7 +173,6 @@ public class CvsClient
      * @param module
      * @param revision
      * @param date
-     *
      * @throws SCMException
      */
     public void checkout(String module, String revision, Date date) throws SCMException
@@ -203,54 +184,25 @@ public class CvsClient
     {
         module = checkModule(module);
 
-        Connection connection = null;
-        try
+        CheckoutCommand checkout = new CheckoutCommand();
+        checkout.setModule(module);
+        checkout.setRecursive(recursive);
+
+        // bind the checkout to the specified tag.
+        if (revision != null)
         {
-            GlobalOptions globalOptions = new GlobalOptions();
-            globalOptions.setCVSRoot(root.toString());
-
-            connection = openConnection();
-
-            Client client = new Client(connection, new StandardAdminHandler());
-            client.getEventManager().addCVSListener(new LoggingListener());
-            client.setLocalPath(localPath.getAbsolutePath());
-
-            CheckoutCommand checkout = new CheckoutCommand();
-            checkout.setModule(module);
-            checkout.setRecursive(recursive);
-
-            // bind the checkout to the specified tag.
-            if (revision != null)
-            {
-                checkout.setCheckoutByRevision(revision);
-            }
-
-            // bind the checkout to the specified date.
-            if (date != null)
-            {
-                checkout.setCheckoutByDate(CVSDATE.format(date));
-            }
-
-            if (!client.executeCommand(checkout, globalOptions))
-            {
-                throw new SCMException("Execution of checkout command failed. Reason is unknown.");
-            }
+            checkout.setCheckoutByRevision(revision);
         }
-        catch (AuthenticationException ae)
+
+        // bind the checkout to the specified date.
+        if (date != null)
         {
-            throw handleAuthenticationException(ae);
+            checkout.setCheckoutByDate(CVSDATE.format(date));
         }
-        catch (CommandAbortedException cae)
+
+        if (!executeCommand(checkout, new LoggingListener()))
         {
-            throw new SCMException(cae);
-        }
-        catch (CommandException ce)
-        {
-            throw new SCMException(ce);
-        }
-        finally
-        {
-            CvsUtils.close(connection);
+            throw new SCMException("Execution of checkout command failed. Reason is unknown.");
         }
     }
 
@@ -293,7 +245,7 @@ public class CvsClient
     {
         if (LOG.isLoggable(Level.FINER))
         {
-            LOG.entering(CvsClient.class.getName(), "hasChangedSince("+module+", "+branch+", "+CVSDATE.format(since)+")");
+            LOG.entering(CvsClient.class.getName(), "hasChangedSince(" + module + ", " + branch + ", " + CVSDATE.format(since) + ")");
         }
         boolean result = getLastUpdate(module, branch, since) != null;
         if (LOG.isLoggable(Level.FINER))
@@ -311,14 +263,9 @@ public class CvsClient
      */
     public Date getLastUpdate(String module, String branch, Date since) throws SCMException
     {
-        List<LocalChange> changes = getLocalChanges(module, branch, since, null);
-        if (changes.size() == 0)
-        {
-            return null;
-        }
-        // need to ensure that the log information is ordered by date...
-        LocalChange latestChange = changes.get(changes.size() - 1);
-        return latestChange.getDate();
+        List<LogInformation> rlogResponse = rlog(module, branch, since, null, false);
+
+        return logAnalyser.latestUpdate(rlogResponse);
     }
 
     /**
@@ -328,20 +275,6 @@ public class CvsClient
     {
         throw new UnsupportedOperationException();
     }
-
-    //-------------------------------------------------------------------------
-    // change set analysis:
-    // - cvs changes are not atomic. therefore,
-    //    - a change set does not need to occur at the same time
-    //    - multiple changesets can be interlevered.
-    // characteristics of changesets:
-    // - a) single author.
-    // - b) single commit statement.
-    // - c) each file appears only once.
-    // - d) changeset bound to a single branch.
-    // - e) contiguous block of time.
-
-    // group by (author,branch,comment)
 
     /**
      * Retrieve all of the change lists in the named module in the repository.
@@ -366,115 +299,13 @@ public class CvsClient
     public List<Changelist> getChangeLists(String module, String branch, Date from, Date to) throws SCMException
     {
         // retrieve the log info for all of the files that have been modified.
-        List<LocalChange> simpleChanges = getLocalChanges(module, branch, from, to);
-
-        // group by author, branch, sort by date. this will have the affect of grouping
-        // all of the changes in a single changeset together, ordered by date.
-        Collections.sort(simpleChanges, new Comparator<LocalChange>()
-        {
-            public int compare(LocalChange changeA, LocalChange changeB)
-            {
-                int comparison = changeA.getAuthor().compareTo(changeB.getAuthor());
-                if (comparison != 0)
-                {
-                    return comparison;
-                }
-                // tags should never be different.
-                comparison = changeA.getTag().compareTo(changeB.getTag());
-                if (comparison != 0)
-                {
-                    return comparison;
-                }
-                return changeA.getDate().compareTo(changeB.getDate());
-            }
-        });
-
-        // create change sets by author. ie: each change set object will contain
-        // all of the changes made by a particular author.
-        List<LocalChangeSet> changeSets = new LinkedList<LocalChangeSet>();
-        LocalChangeSet changeSet = null;
-        for (LocalChange change : simpleChanges)
-        {
-            if (changeSet == null)
-            {
-                changeSet = new LocalChangeSet(change);
-            }
-            else
-            {
-                if (changeSet.belongsTo(change))
-                {
-                    changeSet.add(change);
-                }
-                else
-                {
-                    changeSets.add(changeSet);
-                    changeSet = new LocalChangeSet(change);
-                }
-            }
-        }
-        if (changeSet != null)
-        {
-            changeSets.add(changeSet);
-        }
-
-        // refine the changesets, splitting it up according to file names. ie: duplicate filenames
-        // should trigger a new changeset.
-        List<LocalChangeSet> refinedSets = new LinkedList<LocalChangeSet>();
-        for (LocalChangeSet set : changeSets)
-        {
-            refinedSets.addAll(set.refine());
-        }
-
-        // now that we have the changeset information, lets create the final product.
-        List<Changelist> changelists = new LinkedList<Changelist>();
-        for (LocalChangeSet set : refinedSets)
-        {
-            List<LocalChange> localChanges = set.getChanges();
-            // we use the last change because it has the most recent date. all the other information is
-            // is common to all the changes.
-            LocalChange lastChange = localChanges.get(localChanges.size() - 1);
-            CvsRevision rev = new CvsRevision(lastChange.getAuthor(), lastChange.getTag(), lastChange.getMessage(), lastChange.getDate());
-            Changelist changelist = new Changelist(rev);
-            for (LocalChange change : localChanges)
-            {
-                changelist.addChange(new Change(change.getFilename(), change.getRevision(), change.getAction()));
-            }
-            changelists.add(changelist);
-        }
-
-        return changelists;
-    }
-
-    private List<LocalChange> getLocalChanges(String module, String branch, Date from, Date to) throws SCMException
-    {
         List<LogInformation> rlogResponse = rlog(module, branch, from, to, false);
-
-        // extract the returned revisions
-        List<LocalChange> revisions = new LinkedList<LocalChange>();
-        for (LogInformation logInfo : rlogResponse)
-        {
-            for (Object obj : logInfo.getRevisionList())
-            {
-                LogInformation.Revision rev = (LogInformation.Revision) obj;
-                LocalChange change = new LocalChange(rev);
-                change.setTag(branch);
-                revisions.add(change);
-            }
-        }
-        // and order them chronologically.
-        Collections.sort(revisions, new Comparator<LocalChange>()
-        {
-            public int compare(LocalChange o1, LocalChange o2)
-            {
-                return o1.getDate().compareTo(o2.getDate());
-            }
-        });
-        return revisions;
-
+        
+        return logAnalyser.extract(rlogResponse);
     }
 
     /**
-     * This rlog command returns a list of LocalChange instances that define the
+     * This rlog command returns a list of Revision instances that define the
      * individual files and there revisions that were generated from the specified date in the
      * named module. These revisions are ordered chronologically.
      *
@@ -487,6 +318,57 @@ public class CvsClient
      */
     public List<LogInformation> rlog(String module, String branch, Date from, Date to, boolean headersOnly) throws SCMException
     {
+        final List<LogInformation> rlogResponse = new LinkedList<LogInformation>();
+
+        RlogCommand log = new RlogCommand();
+        log.setModule(module);
+
+//        log.setHeaderOnly(headersOnly);
+//        log.setNoTags(headersOnly);
+
+        String dateFilter = "";
+        String del = "<=";
+        if (from != null)
+        {
+            dateFilter = CVSDATE.format(from) + del;
+            del = "";
+        }
+        if (to != null)
+        {
+            dateFilter += del + CVSDATE.format(to);
+        }
+        if (TextUtils.stringSet(dateFilter))
+        {
+            log.setDateFilter(dateFilter);
+        }
+
+        if (TextUtils.stringSet(branch))
+        {
+            // branch..
+            log.setRevisionFilter(branch);
+        }
+        else
+        {
+            log.setDefaultBranch(true); // work with head.
+        }
+
+        executeCommand(log, new CvsLogInformationListener(rlogResponse));
+
+        return rlogResponse;
+    }
+
+    /**
+     * Execute the cvs command.
+     *
+     * @param command to be executed on the configured cvs connection.
+     * @param responseListener
+     *
+     * @return true if the command is successful, false otherwise.
+     *
+     * @throws SCMException
+     */
+    public boolean executeCommand(Command command, CVSListener responseListener) throws SCMException
+    {
         Connection connection = null;
         try
         {
@@ -495,52 +377,25 @@ public class CvsClient
 
             connection = openConnection();
 
-            final List<LogInformation> rlogResponse = new LinkedList<LogInformation>();
-
-            // the local path is not important for the RLogCommand, but needs to exist... go figure..
-            // should we try setting the real local path if it exists?
             Client client = new Client(connection, new StandardAdminHandler());
-            client.setLocalPath("/some/made/up/path");
-            client.getEventManager().addCVSListener(new CvsLogInformationListener(rlogResponse));
-
-            RlogCommand log = new RlogCommand();
-            log.setModule(module);
-            log.setHeaderOnly(headersOnly);
-            log.setNoTags(headersOnly);
-
-            String dateFilter = "";
-            String del = "<=";
-            if (from != null)
+            if (responseListener != null)
             {
-                dateFilter = CVSDATE.format(from) + del;
-                del = "";
+                client.getEventManager().addCVSListener(responseListener);
             }
-            if (to != null)
+            if (localPath != null)
             {
-                dateFilter += del + CVSDATE.format(to);
-            }
-            if (TextUtils.stringSet(dateFilter))
-            {
-                log.setDateFilter(dateFilter);
+                client.setLocalPath(localPath.getAbsolutePath());
             }
 
-            if (TextUtils.stringSet(branch))
-            {
-                // branch..
-                log.setRevisionFilter(branch);
-            }
-            else
-            {
-                log.setDefaultBranch(true); // work with head.
-            }
-
-            client.executeCommand(log, globalOptions);
-
-            return rlogResponse;
+            return client.executeCommand(command, globalOptions);
         }
         catch (AuthenticationException ae)
         {
             throw handleAuthenticationException(ae);
+        }
+        catch (CommandAbortedException cae)
+        {
+            throw new SCMException(cae);
         }
         catch (CommandException ce)
         {
@@ -558,169 +413,4 @@ public class CvsClient
         connection.open();
         return connection;
     }
-
-    /**
-     * Simple value object used to help store data during the changeset analysis process.
-     */
-    public class LocalChange
-    {
-        private LogInformation.Revision log;
-
-        private String tag;
-
-        public LocalChange(LogInformation.Revision log)
-        {
-            if (log == null)
-            {
-                throw new IllegalArgumentException("Log Information cannot be null.");
-            }
-            this.log = log;
-        }
-
-        public String getAuthor()
-        {
-            return log.getAuthor();
-        }
-
-        public String getRevision()
-        {
-            return log.getNumber();
-        }
-
-        public String getTag()
-        {
-            if (tag == null)
-            {
-                return "";
-            }
-            return tag;
-        }
-
-        public void setTag(String branch)
-        {
-            this.tag = branch;
-        }
-
-        public Date getDate()
-        {
-            return log.getDate();
-        }
-
-        public String getMessage()
-        {
-            return log.getMessage();
-        }
-
-        public String getFilename()
-        {
-            // need to process the filename.
-
-            String filename = log.getLogInfoHeader().getRepositoryFilename();
-
-            // remove the ,v
-            if (filename.endsWith(",v"))
-            {
-                filename = filename.substring(0, filename.length() - 2);
-            }
-
-            // remove the repo root.
-            if (filename.startsWith(root.getRepository()))
-            {
-                filename = filename.substring(root.getRepository().length());
-            }
-
-            return filename;
-        }
-
-        public Action getAction()
-        {
-            if (log.getAddedLines() == 0 && log.getRemovedLines() == 0)
-            {
-                if (!log.getState().equalsIgnoreCase("dead"))
-                {
-                    return Action.ADD;
-                }
-                return Action.DELETE;
-            }
-            return Action.EDIT;
-        }
-
-    }
-
-    /**
-     * Simple value object used to help store data during the changeset analysis process.
-     */
-    private class LocalChangeSet
-    {
-        private final List<LocalChange> changes = new LinkedList<LocalChange>();
-
-        LocalChangeSet(LocalChange c)
-        {
-            changes.add(c);
-        }
-
-        void add(LocalChange c)
-        {
-            changes.add(c);
-        }
-
-        boolean belongsTo(LocalChange otherChange)
-        {
-            if (changes.size() == 0)
-            {
-                return true;
-            }
-
-            LocalChange previousChange = changes.get(0);
-            return previousChange.getAuthor().equals(otherChange.getAuthor()) &&
-                    previousChange.getTag().equals(otherChange.getTag()) &&
-                    previousChange.getMessage().equals(otherChange.getMessage());
-        }
-
-        /**
-         *
-         */
-        public List<LocalChangeSet> refine()
-        {
-            Map<String, String> filenames = new HashMap<String, String>();
-            List<LocalChangeSet> changesets = new LinkedList<LocalChangeSet>();
-
-            LocalChangeSet changeSet = null;
-            for (LocalChange change : changes)
-            {
-                if (filenames.containsKey(change.getFilename()))
-                {
-                    // time for a new changeset.
-                    filenames.clear();
-                    changesets.add(changeSet);
-                    filenames.put(change.getFilename(), change.getFilename());
-                    changeSet = new LocalChangeSet(change);
-                }
-                else
-                {
-                    filenames.put(change.getFilename(), change.getFilename());
-                    if (changeSet == null)
-                    {
-                        changeSet = new LocalChangeSet(change);
-                    }
-                    else
-                    {
-                        changeSet.add(change);
-                    }
-                }
-            }
-            if (changeSet != null)
-            {
-                changesets.add(changeSet);
-            }
-            return changesets;
-        }
-
-        public List<LocalChange> getChanges()
-        {
-            return changes;
-        }
-
-    }
-
 }

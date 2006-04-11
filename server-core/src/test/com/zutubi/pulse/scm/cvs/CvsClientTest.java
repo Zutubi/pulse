@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.logging.Level;
 
 /**
- * 
+ *
  *
  */
 public class CvsClientTest extends BobTestCase
@@ -50,6 +50,7 @@ public class CvsClientTest extends BobTestCase
 
         // cleanup the working directory.
         workdir = FileSystemUtils.createTempDirectory(CvsClientTest.class.getName(), "");
+        cvs.setLocalPath(workdir);
     }
 
     public void tearDown() throws Exception

@@ -33,7 +33,6 @@ public class VersionCommand extends BasicCommand
         {
             e.printStackTrace();
         }
-
     }
 
     public void execute(ClientServices client, EventManager em) throws CommandException, AuthenticationException
