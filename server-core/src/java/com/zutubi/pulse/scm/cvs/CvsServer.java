@@ -1,5 +1,6 @@
 package com.zutubi.pulse.scm.cvs;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
@@ -9,17 +10,15 @@ import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.IOUtils;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
+import com.zutubi.pulse.model.Cvs;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -27,56 +26,85 @@ import java.util.*;
  */
 public class CvsServer implements SCMServer
 {
-    private String cvsRoot;
-    private String cvsModule;
-    private String cvsPassword;
-    private String cvsBranch;
-
     private File tmpSpace;
 
     private static final Logger LOG = Logger.getLogger(CvsServer.class);
 
+    private CvsWorker cvs;
+
     public CvsServer(String root, String module, String password, String branch)
     {
-        this.cvsRoot = root;
-        this.cvsModule = module;
-        this.cvsPassword = password;
-        this.cvsBranch = branch;
+        cvs = new CvsWorker();
+        cvs.setBranch(branch);
+        cvs.setModule(module);
+        cvs.setRoot(root);
+        cvs.setPassword(password);
+    }
+
+    public CvsServer(Cvs cvs)
+    {
+        this(cvs.getRoot(), cvs.getModule(), cvs.getPassword(), cvs.getBranch());
     }
 
     public String getLocation()
     {
-        return cvsRoot + " [" + cvsModule + "]";
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(getRoot()).append("[").append(getModule()).append("]");
+        return buffer.toString();
     }
 
+    public String getRoot()
+    {
+        return cvs.getRoot();
+    }
+
+    public String getPassword()
+    {
+        return cvs.getPassword();
+    }
+
+    public String getModule()
+    {
+        return cvs.getModule();
+    }
+
+    public String getBranch()
+    {
+        return cvs.getBranch();
+    }
+
+    /**
+     * Run some diagnostics on the cvs configuration.
+     *
+     * @throws SCMException
+     */
     public void testConnection() throws SCMException
     {
-        CvsClient client = new CvsClient(cvsRoot);
-        client.setPassword(cvsPassword);
-        // first we check the connection to the cvs repository. This covers
-        // the cvs root and authentication.
-        client.testConnection();
+        // Check the connection to the cvs repository. This covers the cvs root and authentication.
+        cvs.testConnection();
 
-        // check that the module is valid.
-        checkModuleIsValid(client);
+        // Check that the module is valid.
+        checkModuleIsValid();
     }
 
-    private void checkModuleIsValid(CvsClient client)
-            throws SCMException
+    /**
+     * Check that the module is valid.
+     *
+     * @throws SCMException
+     */
+    private void checkModuleIsValid() throws SCMException
     {
         File tmpDir = null;
         try
         {
-            tmpDir = FileSystemUtils.createTempDirectory("cvs", "checkout", tmpSpace);
+            tmpDir = createTemporaryDirectory();
 
-            client.setLocalPath(tmpDir);
-            client.setPassword(cvsPassword);
-            client.checkout(cvsModule, null, null, false);
+            cvs.checkout(tmpDir, CvsRevision.HEAD, getModule());
 
             // check that something was checked out.
             if (tmpDir.list().length == 0)
             {
-                throw new SCMException("failed to locate the module " + cvsModule);
+                throw new SCMException("failed to locate the module " + getModule());
             }
         }
         catch (IOException e)
@@ -85,27 +113,30 @@ public class CvsServer implements SCMServer
         }
         finally
         {
+            // and lets not forget to clean up after ourselves.
             FileSystemUtils.removeDirectory(tmpDir);
         }
     }
 
+    private File createTemporaryDirectory() throws IOException
+    {
+        return FileSystemUtils.createTempDirectory("cvs", "checkout", tmpSpace);
+    }
+
     public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
     {
-        try
+        if (revision == null)
         {
-            Revision checkedOutRevision = checkout(toDirectory, revision);
-            if (changes != null)
-            {
-                // in future, look into running an rlog command here.
-                throw new RuntimeException("gathering the revisions of all the files checked " +
-                        "out is not yet implemented.");
-            }
-            return checkedOutRevision;
+            throw new IllegalArgumentException("Revision is a required argument.");
         }
-        catch (IOException e)
+        if (!(revision instanceof CvsRevision))
         {
-            throw new SCMException(e);
+            throw new IllegalArgumentException("Unsupported revision type: " + revision.getClass() + ".");
         }
+
+        cvs.checkout(toDirectory, (CvsRevision)revision);
+
+        return revision;
     }
 
     public String checkout(long id, Revision revision, String file) throws SCMException
@@ -123,28 +154,17 @@ public class CvsServer implements SCMServer
         File tmpDir = null;
         try
         {
-            tmpDir = FileSystemUtils.createTempDirectory("cvs", "checkout", tmpSpace);
-            String tag = revision.getBranch();
-            Date date = revision.getDate();
+            tmpDir = createTemporaryDirectory();
 
-            internalCheckout(file, tmpDir, tag, date);
+            cvs.checkout(tmpDir, (CvsRevision)revision, file);
 
             // read checked out file.
-            InputStream in = null;
-            try
+            File checkedOutFile = new File(tmpDir, file);
+            if (!checkedOutFile.exists())
             {
-                File checkedOutFile = new File(tmpDir, file);
-                if (!checkedOutFile.exists())
-                {
-                    throw new SCMException("Unable to checkout file '" + file + "' from cvs[" + cvsRoot + "].");
-                }
-                in = new FileInputStream(checkedOutFile);
-                return IOUtils.inputStreamToString(in);
+                throw new SCMException("Unable to checkout file '" + file + "' from cvs[" + getRoot() + "].");
             }
-            finally
-            {
-                IOUtils.close(in);
-            }
+            return IOUtils.fileToString(checkedOutFile);
         }
         catch (IOException e)
         {
@@ -160,17 +180,25 @@ public class CvsServer implements SCMServer
         }
     }
 
+    /**
+     * Retreive the list of changes between the two specified revisions.
+     *
+     * @param from
+     * @param to
+     *
+     * @param paths are ignored.
+     *
+     * @return a list of changelist instances.
+     *
+     * @throws SCMException
+     */
     public List<Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException
     {
         // assert that the branch for both revisions is the same. We do not support retrieving
         // differences across multiple branches/revisions. For practical reasons, we do not need to...
+        
 
-        CvsClient client = new CvsClient(cvsRoot);
-        client.setPassword(cvsPassword);
-
-        // paths...??
-
-        return client.getChangeLists(cvsModule, from.getBranch(), from.getDate(), to.getDate());
+        return cvs.getChangesBetween((CvsRevision)from, (CvsRevision)to);
     }
 
     /**
@@ -188,98 +216,12 @@ public class CvsServer implements SCMServer
             throw new IllegalArgumentException("since revision date can not be null.");
         }
 
-        CvsClient client = new CvsClient(cvsRoot);
-        client.setPassword(cvsPassword);
-        return client.hasChangedSince(cvsModule, since.getBranch(), since.getDate());
-    }
-
-    /**
-     * Checkout the latest of the specified tag to the specified directory.
-     *
-     * @param checkoutDir (required) if this directory does not exist, an attempt will be
-     *                    made to create it.
-     * @param tag         (optional)
-     * @return
-     * @throws SCMException
-     */
-    public Revision checkout(File checkoutDir, String tag) throws SCMException, IOException
-    {
-        // cvs is not atomic, so take the current time and restrict the checkout to 'now'
-        // to prevent problems with people checking in during the checkout.
-        Date now = new Date(System.currentTimeMillis());
-
-        internalCheckout(cvsModule, checkoutDir, tag, now);
-        return new CvsRevision(null, tag, null, now);
-    }
-
-    /**
-     * @param checkoutDir (required)
-     * @param revision    (required)
-     * @return
-     * @throws SCMException
-     * @throws IOException
-     */
-    public Revision checkout(File checkoutDir, Revision revision) throws SCMException, IOException
-    {
-        if (revision == null)
-        {
-            throw new IllegalArgumentException("Revision is a required argument.");
-        }
-        if (!(revision instanceof CvsRevision))
-        {
-            throw new IllegalArgumentException("Unsupported revision type: " + revision.getClass() + ".");
-        }
-        CvsRevision cvsRevision = (CvsRevision) revision;
-        Date checkoutDate = cvsRevision.getDate();
-        if (checkoutDate == null)
-        {
-            checkoutDate = new Date(System.currentTimeMillis());
-        }
-        internalCheckout(cvsModule, checkoutDir, cvsRevision.getBranch(), checkoutDate);
-
-        return new CvsRevision(null, revision.getBranch(), null, checkoutDate);
-    }
-
-    /**
-     * Internal checkout method. This is where all the action is.
-     *
-     * @param module
-     * @param checkoutDir (required)
-     * @param revision    (optional)
-     * @param date        (optional)
-     */
-    private void internalCheckout(String module, File checkoutDir, String revision, Date date) throws IOException, SCMException
-    {
-        if (checkoutDir == null)
-        {
-            throw new IllegalArgumentException("checkoutDir is a required paramenter.");
-        }
-        if (!checkoutDir.exists() && !checkoutDir.mkdirs())
-        {
-            throw new IOException("Failed to create checkout directory: " + checkoutDir);
-        }
-        if (!checkoutDir.isDirectory())
-        {
-            throw new IllegalArgumentException("checkoutDir must refer to a directory.");
-        }
-
-        CvsClient client = new CvsClient(cvsRoot);
-        client.setLocalPath(checkoutDir);
-        client.setPassword(cvsPassword);
-        client.checkout(module, revision, date);
+        return cvs.getLatestChange((CvsRevision)since) != null;
     }
 
     public CvsRevision getLatestRevision() throws SCMException
     {
-        // this assumes that we are not dealing with a branch. If that were the case, then
-        // we would need to include the branch details in the revision.
-        // Question: do the other scms care about branches? SVN does not, what about P4?
-
-        // cvs is not atomic, so take the current time and restrict the checkout to 'now'
-        // to prevent problems with people checking in during the checkout.
-
-        Date now = new Date(System.currentTimeMillis());
-        return new CvsRevision(null, cvsBranch, null, now);
+        return cvs.getLatestChange();
     }
 
     public RemoteFile getFile(String path) throws SCMException
@@ -308,13 +250,6 @@ public class CvsServer implements SCMServer
         }
     }
 
-    public Date getLatestUpdate(Revision since) throws SCMException
-    {
-        CvsClient client = new CvsClient(cvsRoot);
-        client.setPassword(cvsPassword);
-        return client.getLastUpdate(cvsModule, since.getBranch(), since.getDate());
-    }
-
     /**
      * Configure the temporary space root. This defaults to the users temporary directories.
      *
@@ -341,13 +276,11 @@ public class CvsServer implements SCMServer
         item.cachedRevision = getLatestRevision();
         item.cachedListing = new TreeMap<String, CachingRemoteFile>();
 
-        CvsClient client = new CvsClient(cvsRoot);
-        client.setPassword(cvsPassword);
-        List<LogInformation> logs = client.rlog(cvsModule, null, null, null, false);
+        CvsClient client = new CvsClient(getRoot());
+        client.setPassword(getPassword());
+        List<LogInformation> logs = client.rlog(getModule(), null, null, null, false);
 
-        // Replace the cvs.rlog call with a non-recursive checkout of the requested directory
-
-        CVSRoot root = CVSRoot.parse(cvsRoot);
+        CVSRoot root = CVSRoot.parse(getRoot());
 
         CachingRemoteFile rootFile = new CachingRemoteFile("", true, null, "");
         item.cachedListing.put("", rootFile);

@@ -1,11 +1,9 @@
 package com.zutubi.pulse.scm.cvs;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.cvs.client.ConnectionFactory;
-import com.zutubi.pulse.scm.cvs.client.CvsLogInformationListener;
-import com.zutubi.pulse.scm.cvs.client.LoggingListener;
+import com.zutubi.pulse.scm.cvs.client.LogCommandListener;
 import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
@@ -14,14 +12,11 @@ import org.netbeans.lib.cvsclient.command.Command;
 import org.netbeans.lib.cvsclient.command.CommandAbortedException;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.GlobalOptions;
-import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.connection.Connection;
-import org.netbeans.lib.cvsclient.event.CVSAdapter;
 import org.netbeans.lib.cvsclient.event.CVSListener;
-import org.netbeans.lib.cvsclient.event.MessageEvent;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -29,7 +24,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.logging.Level;
 
 /**
  * Allows for the system to interact with a cvs repository.
@@ -89,7 +83,12 @@ public class CvsClient
         //TODO: Integrate the following logging into the systems logging. This information
         //      will be very useful in tracking problems with the cvs client integration.
         //      It will likely require patching the cvsclient.util.Logger code.
-        //org.netbeans.lib.cvsclient.util.Logger.setLogging("system");
+//        org.netbeans.lib.cvsclient.util.Logger.setLogging("system");
+    }
+
+    public CVSRoot getRoot()
+    {
+        return root;
     }
 
     /**
@@ -107,17 +106,6 @@ public class CvsClient
     public void setPassword(String password)
     {
         this.password = password;
-    }
-
-    /**
-     * Default checkout.
-     *
-     * @param module
-     * @throws SCMException
-     */
-    public void checkout(String module) throws SCMException
-    {
-        checkout(module, null, null);
     }
 
     /**
@@ -144,164 +132,10 @@ public class CvsClient
         }
     }
 
-    public String getServerVersion() throws SCMException
-    {
-        VersionCommand versionCommand = new VersionCommand();
-
-        final String[] version = new String[1];
-        if (!executeCommand(versionCommand, new CVSAdapter()
-        {
-            public void messageSent(MessageEvent e)
-            {
-                if (!e.isError())
-                {
-                    version[0] = e.getMessage();
-                }
-            }
-        }))
-        {
-            throw new SCMException("failed to retrieve the cvs server version details.");
-        }
-        return version[0];
-    }
-
-
-    /**
-     * Checkout the specified module, as it was on the specified date. If the date is null,
-     * no date restriction will be applied.
-     *
-     * @param module
-     * @param revision
-     * @param date
-     * @throws SCMException
-     */
-    public void checkout(String module, String revision, Date date) throws SCMException
-    {
-        checkout(module, revision, date, true);
-    }
-
-    public void checkout(String module, String revision, Date date, boolean recursive) throws SCMException
-    {
-        module = checkModule(module);
-
-        CheckoutCommand checkout = new CheckoutCommand();
-        checkout.setModule(module);
-        checkout.setRecursive(recursive);
-
-        // bind the checkout to the specified tag.
-        if (revision != null)
-        {
-            checkout.setCheckoutByRevision(revision);
-        }
-
-        // bind the checkout to the specified date.
-        if (date != null)
-        {
-            checkout.setCheckoutByDate(CVSDATE.format(date));
-        }
-
-        if (!executeCommand(checkout, new LoggingListener()))
-        {
-            throw new SCMException("Execution of checkout command failed. Reason is unknown.");
-        }
-    }
-
     private SCMException handleAuthenticationException(AuthenticationException ae)
     {
         return new SCMException("Authentication failure. Failed to connect to requested cvs server '" + root +
                 "'. Cause: " + ae.getMessage(), ae);
-    }
-
-    /**
-     * Check the value of the module string.
-     *
-     * @param module
-     */
-    private String checkModule(String module)
-    {
-        if (!TextUtils.stringSet(module))
-        {
-            throw new IllegalArgumentException("Command requires a module.");
-        }
-
-        // HACK: cvs client has trouble absolute references, hanging if they are invalid.
-        // Therefore, do not allow them.
-        while (module.startsWith("/"))
-        {
-            module = module.substring(1);
-        }
-        return module;
-    }
-
-    /**
-     * Check if the repository has been updated since the since specified. Note, the
-     * updates are restricted to those that imply a change to the source. That is, commit,
-     * add and remove operations.
-     *
-     * @param since
-     * @return true if the cvs repository has been updated.
-     */
-    public boolean hasChangedSince(String module, String branch, Date since) throws SCMException
-    {
-        if (LOG.isLoggable(Level.FINER))
-        {
-            LOG.entering(CvsClient.class.getName(), "hasChangedSince(" + module + ", " + branch + ", " + CVSDATE.format(since) + ")");
-        }
-        boolean result = getLastUpdate(module, branch, since) != null;
-        if (LOG.isLoggable(Level.FINER))
-        {
-            LOG.exiting(result);
-        }
-        return result;
-    }
-
-    /**
-     * @param branch
-     * @param since
-     * @return null indicates no change since the specified date
-     * @throws SCMException
-     */
-    public Date getLastUpdate(String module, String branch, Date since) throws SCMException
-    {
-        List<LogInformation> rlogResponse = rlog(module, branch, since, null, false);
-
-        return logAnalyser.latestUpdate(rlogResponse);
-    }
-
-    /**
-     * Update is not yet supported.
-     */
-    public void update()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Retrieve all of the change lists in the named module in the repository.
-     *
-     * @return
-     * @throws SCMException
-     */
-    public List<Changelist> getChangeLists(String module) throws SCMException
-    {
-        return getChangeLists(module, null, null, null);
-    }
-
-    /**
-     * Retrieve the list of changes in the named module since the specified date.
-     *
-     * @param module
-     * @param branch
-     * @param from
-     * @return
-     * @throws SCMException
-     */
-    public List<Changelist> getChangeLists(String module, String branch, Date from, Date to) throws SCMException
-    {
-        // retrieve the log info for all of the files that have been modified.
-        List<LogInformation> rlogResponse = rlog(module, branch, from, to, false);
-        
-        return logAnalyser.extract(rlogResponse);
     }
 
     /**
@@ -322,9 +156,7 @@ public class CvsClient
 
         RlogCommand log = new RlogCommand();
         log.setModule(module);
-
-//        log.setHeaderOnly(headersOnly);
-//        log.setNoTags(headersOnly);
+        log.setSuppressHeader(true);
 
         String dateFilter = "";
         String del = "<=";
@@ -352,19 +184,22 @@ public class CvsClient
             log.setDefaultBranch(true); // work with head.
         }
 
-        executeCommand(log, new CvsLogInformationListener(rlogResponse));
+        executeCommand(log, new LogCommandListener(rlogResponse));
 
         return rlogResponse;
+    }
+
+    public boolean executeCommand(Command command) throws SCMException
+    {
+        return executeCommand(command, null);
     }
 
     /**
      * Execute the cvs command.
      *
-     * @param command to be executed on the configured cvs connection.
+     * @param command          to be executed on the configured cvs connection.
      * @param responseListener
-     *
      * @return true if the command is successful, false otherwise.
-     *
      * @throws SCMException
      */
     public boolean executeCommand(Command command, CVSListener responseListener) throws SCMException

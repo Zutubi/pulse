@@ -7,10 +7,9 @@ import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.model.ScmManager;
 import com.zutubi.pulse.scheduling.Task;
 import com.zutubi.pulse.scheduling.TaskExecutionContext;
-import com.zutubi.pulse.scm.cvs.CvsServer;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.util.Pair;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +24,8 @@ public class MonitorScms implements Task
 
     private ScmManager scmManager;
     private EventManager eventManager;
+
+    private static final Map<Long, Pair<Long, Revision>> waiting = new HashMap<Long, Pair<Long, Revision>>();
 
     //TODO: Add some form of profiling to monitor the amount of time spent 'checking scms'.
     //TODO: This could be a resource drain so we also need to make sure that this is
@@ -51,24 +52,52 @@ public class MonitorScms implements Task
 
                 Revision previous = latestRevisions.get(scm.getId());
 
-                // if scm is cvs, then we implement a quiet period.
-                if (server.hasChangedSince(previous))
+                // We need to move this CVS specific code into the cvs implementation specific code.
+                if (scm instanceof Cvs)
                 {
-                    LOG.finer("server has changed since " + previous);
-                    if (scm instanceof Cvs)
+                    Cvs cvs = (Cvs) scm;
+                    // are we waiting
+                    if (waiting.containsKey(scm.getId()))
                     {
-                        Date latestUpdate = ((CvsServer)server).getLatestUpdate(previous);
-                        // if that update is more then the quiet period ago, then trigger an event.
-                        long now = System.currentTimeMillis();
-                        if (now - latestUpdate.getTime() > ((Cvs)scm).getQuietPeriod())
+                        long quietTime = waiting.get(scm.getId()).first;
+                        if (quietTime < System.currentTimeMillis())
                         {
-                            Revision latest = server.getLatestRevision();
-                            LOG.finer("publishing scm change event for " + scm + " revision " + latest);
-                            eventManager.publish(new SCMChangeEvent(scm, latest, previous));
-                            latestRevisions.put(scm.getId(), latest);
+                            if (server.hasChangedSince(waiting.get(scm.getId()).second))
+                            {
+                                // there has been a commit during the 'quiet period', lets reset the timer.
+                                Revision latest = server.getLatestRevision();
+                                waiting.put(scm.getId(), new Pair<Long, Revision>(System.currentTimeMillis() + cvs.getQuietPeriod(), latest));
+                            }
+                            else
+                            {
+                                // there have been no commits during the 'quiet period', trigger a change.
+                                Revision latest = server.getLatestRevision();
+                                eventManager.publish(new SCMChangeEvent(scm, latest, previous));
+                                latestRevisions.put(scm.getId(), latest);
+                                waiting.remove(scm.getId());
+                            }
                         }
                     }
                     else
+                    {
+                        if (server.hasChangedSince(previous))
+                        {
+                            Revision latest = server.getLatestRevision();
+                            if (cvs.getQuietPeriod() != 0)
+                            {
+                                waiting.put(scm.getId(), new Pair<Long, Revision>(System.currentTimeMillis() + cvs.getQuietPeriod(), latest));
+                            }
+                            else
+                            {
+                                eventManager.publish(new SCMChangeEvent(scm, latest, previous));
+                                latestRevisions.put(scm.getId(), latest);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (server.hasChangedSince(previous))
                     {
                         Revision latest = server.getLatestRevision();
                         LOG.finer("publishing scm change event for " + scm + " revision " + latest);

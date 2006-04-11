@@ -40,4 +40,14 @@ public class VersionBuilder implements Builder
             eventManager.fireCVSEvent(new MessageEvent(this, versionStr, false));
         }
     }
+
+    public String getVersionStr()
+    {
+        return versionStr;
+    }
+
+    public void reset()
+    {
+        versionStr = null;
+    }
 }

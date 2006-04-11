@@ -3,9 +3,6 @@
  */
 package com.zutubi.pulse.scm.cvs;
 
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.CvsRevision;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
@@ -13,12 +10,7 @@ import com.zutubi.pulse.test.BobTestCase;
 import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 public class CvsServerTest extends BobTestCase
 {
@@ -54,77 +46,6 @@ public class CvsServerTest extends BobTestCase
         super.tearDown();
     }
 
-    private static final SimpleDateFormat CVSDATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    static
-    {
-        CVSDATE.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
-
-    public void testCheckoutFileAtHead() throws SCMException
-    {
-        String module = "unit-test/CvsServerTest/testCheckoutRevisionOfFile";
-        CvsServer cvsServer = new CvsServer(cvsRoot, module, null, null);
-
-        CvsRevision byHead = CvsRevision.HEAD;
-        assertEquals("file1.txt latests contents", cvsServer.checkout(1, byHead, module + "/file1.txt").trim());
-    }
-
-    public void testCheckoutFileByRevision() throws SCMException
-    {
-        String module = "unit-test/CvsServerTest/testCheckoutRevisionOfFile";
-        CvsServer cvsServer = new CvsServer(cvsRoot, module, null, null);
-
-        CvsRevision byRevision = new CvsRevision(null, "1.2", null, null);
-        assertEquals("file1.txt revision 1.2 contents", cvsServer.checkout(1, byRevision, module + "/file1.txt").trim());
-
-        byRevision = new CvsRevision(null, "1.1", null, null);
-        assertEquals("file1.txt revision 1.1 contents", cvsServer.checkout(1, byRevision, module + "/file1.txt").trim());
-    }
-
-    public void testCheckoutFileByDate() throws SCMException, ParseException
-    {
-        String module = "unit-test/CvsServerTest/testCheckoutRevisionOfFile";
-        CvsServer cvsServer = new CvsServer(cvsRoot, module, null, null);
-
-        // checkout the revision of the file based on date.
-        Revision byDate = new CvsRevision(null, null, null, CVSDATE.parse("2006-03-11 03:10:07"));
-        assertEquals("file1.txt revision 1.2 contents", cvsServer.checkout(1, byDate, module + "/file1.txt").trim());
-    }
-
-    public void testCheckoutHead() throws SCMException, IOException, ParseException
-    {
-        String module = "unit-test/CvsServerTest/testCheckout";
-        CvsServer cvsServer = new CvsServer(cvsRoot, module, null, null);
-
-        Date before = new Date();
-        CvsRevision checkedOutRevision = (CvsRevision) cvsServer.checkout(workdir, CvsRevision.HEAD);
-        Date after = new Date();
-        assertNotNull(checkedOutRevision.getDate());
-        assertTrue(before.compareTo(checkedOutRevision.getDate()) <= 0);
-        assertTrue(checkedOutRevision.getDate().compareTo(after) <= 0);
-
-        assertTrue(new File(workdir, module + "/file1.txt").exists());
-        assertTrue(new File(workdir, module + "/file2.txt").exists());
-        assertTrue(new File(workdir, module + "/dir1/file3.txt").exists());
-        assertTrue(new File(workdir, module + "/dir2").exists()); // empty directories are not pruned.
-
-    }
-    public void testCheckoutByDate() throws SCMException, IOException, ParseException
-    {
-        String module = "unit-test/CvsServerTest/testCheckout";
-        CvsServer cvsServer = new CvsServer(cvsRoot, module, null, null);
-
-        // test checkout based on date before the files were added to the repository.
-        Revision byDate = new CvsRevision(null, null, null, CVSDATE.parse("2006-03-11 02:30:00"));
-        List<Change> changes = null;
-        CvsRevision checkedOutRevision = (CvsRevision) cvsServer.checkout(0, workdir, byDate, changes);
-        assertNotNull(checkedOutRevision);
-
-        assertFalse(new File(workdir, module + "/file1.txt").exists());
-        assertFalse(new File(workdir, module + "/file2.txt").exists());
-        assertFalse(new File(workdir, module + "/dir1/file3.txt").exists());
-    }
-
     public void testListRoot() throws SCMException
     {
         CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
@@ -145,7 +66,7 @@ public class CvsServerTest extends BobTestCase
         for (int i = 0; i < expectedNames.length; i++)
         {
             assertEquals(expectedNames[i], files.get(i).getName());
-            assertEquals((boolean) expectedTypes[i], files.get(i).isDirectory());
+            assertEquals(expectedTypes[i], Boolean.valueOf(files.get(i).isDirectory()));
         }
     }
 

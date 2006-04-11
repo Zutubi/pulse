@@ -9,7 +9,9 @@ import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import java.util.*;
 
 /**
- * <class-comment/>
+ * The log analyser helps process the cvs log output.
+ *
+ * @author Daniel Ostermeier
  */
 public class LogAnalyser
 {
@@ -42,7 +44,7 @@ public class LogAnalyser
             return null;
         }
         // need to ensure that the log information is ordered by date...
-        LogAnalyser.Revision latestChange = revisions.get(revisions.size() - 1);
+        Revision latestChange = revisions.get(revisions.size() - 1);
         return latestChange.getDate();
     }
 

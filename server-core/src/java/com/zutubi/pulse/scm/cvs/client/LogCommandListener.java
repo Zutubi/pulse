@@ -11,16 +11,16 @@ import java.util.LinkedList;
  *
  *
  */
-public class CvsLogInformationListener extends CVSAdapter
+public class LogCommandListener extends CVSAdapter
 {
     private List<LogInformation> infos;
 
-    public CvsLogInformationListener()
+    public LogCommandListener()
     {
         infos = new LinkedList<LogInformation>();
     }
 
-    public CvsLogInformationListener(List<LogInformation> infos)
+    public LogCommandListener(List<LogInformation> infos)
     {
         this.infos = infos;
     }

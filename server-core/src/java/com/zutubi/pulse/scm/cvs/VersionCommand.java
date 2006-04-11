@@ -12,12 +12,13 @@ import java.lang.reflect.Constructor;
 
 /**
  * Execute the cvs version command to retrieve the version of the CVS version.
- *
+ * <p/>
  * The version command has no options.
  */
 public class VersionCommand extends BasicCommand
 {
     public static CommandRequest VERSION;
+
     static
     {
         try
@@ -43,14 +44,17 @@ public class VersionCommand extends BasicCommand
         // if we need to add options to the command, they would be added here...
 
         requests.add(VERSION);
-        try {
+        try
+        {
             client.processRequests(requests);
             requests.clear();
         }
-        catch (CommandException ex) {
+        catch (CommandException ex)
+        {
             throw ex;
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             throw new CommandException(ex, ex.getLocalizedMessage());
         }
     }
@@ -61,7 +65,7 @@ public class VersionCommand extends BasicCommand
      */
     protected boolean assumeLocalPathWhenUnspecified()
     {
-      return false;
+        return false;
     }
 
     public String getCVSCommand()
@@ -77,17 +81,37 @@ public class VersionCommand extends BasicCommand
         return toReturn.toString();
     }
 
+    /**
+     * The Version command does not support any options.
+     *
+     * @param opt
+     * @param optArg
+     * @return false since this command does not support any options.
+     */
     public boolean setCVSCommand(char opt, String optArg)
     {
         // no options to set.
         return false;
     }
 
+    /**
+     * Reset this CVS command instance.
+     */
     public void resetCVSCommand()
     {
-        // no options to reset.
+        if (builder != null)
+        {
+            ((VersionBuilder) builder).reset();
+        }
     }
 
+    /**
+     * Get the list of options that are allowed for this command. In the case of
+     * this command, we return an empty string since the version command does not
+     * support any options.
+     *
+     * @return a single of letters that represent the allowable command options.
+     */
     public String getOptString()
     {
         return "";
@@ -96,5 +120,10 @@ public class VersionCommand extends BasicCommand
     public Builder createBuilder(EventManager eventMan)
     {
         return new VersionBuilder(eventMan, this);
+    }
+
+    public String getVersion()
+    {
+        return ((VersionBuilder) builder).getVersionStr();
     }
 }

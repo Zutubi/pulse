@@ -40,7 +40,7 @@ public class Cvs extends Scm
     {
         // use a manual autowire here since this object itself is not wired, and so
         // does not have access to the object factory.
-        CvsServer server = new CvsServer(getRoot(), getModule(), getPassword(), getBranch());
+        CvsServer server = new CvsServer(this);
         ComponentContext.autowire(server);
         return server;
     }
