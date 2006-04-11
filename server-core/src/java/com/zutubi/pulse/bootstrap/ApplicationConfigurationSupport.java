@@ -109,4 +109,44 @@ public class ApplicationConfigurationSupport implements ApplicationConfiguration
     {
         config.setProperty(SMTP_USERNAME, username);
     }
+
+    public String getJabberHost()
+    {
+        return config.getProperty(JABBER_HOST);
+    }
+
+    public void setJabberHost(String host)
+    {
+        config.setProperty(JABBER_HOST, host);
+    }
+
+    public int getJabberPort()
+    {
+        return config.getInt(JABBER_PORT);
+    }
+
+    public void setJabberPort(int port)
+    {
+        config.setInt(JABBER_PORT, port);
+    }
+
+    public String getJabberUsername()
+    {
+        return config.getProperty(JABBER_USERNAME);
+    }
+
+    public void setJabberUsername(String username)
+    {
+        config.setProperty(JABBER_USERNAME, username);
+    }
+
+    public String getJabberPassword()
+    {
+        return config.getProperty(JABBER_PASSWORD);
+    }
+
+    public void setJabberPassword(String password)
+    {
+        config.setProperty(JABBER_PASSWORD, password);
+    }
 }

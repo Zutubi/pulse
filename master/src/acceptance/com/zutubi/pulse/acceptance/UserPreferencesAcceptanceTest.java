@@ -427,6 +427,92 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         });
     }
 
+    private JabberContactForm jabberSetup()
+    {
+        assertAndClick("contact.create");
+
+        CreateContactForm contactForm = new CreateContactForm(tester);
+        contactForm.assertFormPresent();
+        assertOptionsEqual("contact", new String[]{ "email", "jabber" });
+        contactForm.nextFormElements("jabber");
+
+        JabberContactForm jabberForm = new JabberContactForm(tester, true);
+        jabberForm.assertFormPresent();
+        return jabberForm;
+    }
+
+    public void testAddJabberContactPoint()
+    {
+        JabberContactForm jabberForm = jabberSetup();
+        jabberForm.saveFormElements("myjabber", "jabbername");
+        assertContactsTable("myjabber", "jabbername");
+    }
+
+    public void testAddJabberContactValidation()
+    {
+        JabberContactForm jabberForm = jabberSetup();
+        jabberForm.saveFormElements("", "");
+        jabberForm.assertFormPresent();
+        assertTextPresent("name is required");
+        assertTextPresent("username is required");
+    }
+
+    public void testAddJabberContactCancel()
+    {
+        JabberContactForm jabberForm = jabberSetup();
+        jabberForm.cancelFormElements("hello", "sailor");
+        assertTablePresent("contacts");
+        assertTextNotPresent("sailor");
+    }
+
+    public void testEditJabberContact()
+    {
+        testAddJabberContactPoint();
+        assertAndClick("edit_myjabber");
+        JabberContactForm form = new JabberContactForm(tester, false);
+        form.assertFormPresent();
+        form.saveFormElements("newjabber", "newuid");
+        assertContactsTable("newjabber", "newuid");
+    }
+
+    public void testEditJabberContactValidation()
+    {
+        testAddJabberContactPoint();
+        assertAndClick("edit_myjabber");
+        JabberContactForm form = new JabberContactForm(tester, false);
+        form.assertFormPresent();
+        form.saveFormElements("", "");
+        form.assertFormPresent();
+        assertTextPresent("name is required");
+        assertTextPresent("username is required");
+    }
+
+    public void testEditJabberContactCancel()
+    {
+        testAddJabberContactPoint();
+        assertAndClick("edit_myjabber");
+        JabberContactForm form = new JabberContactForm(tester, false);
+        form.assertFormPresent();
+        form.cancelFormElements("newjabber", "newuid");
+        assertContactsTable("myjabber", "jabbername");
+    }
+
+    public void testDeleteJabberContact()
+    {
+        testAddJabberContactPoint();
+        assertAndClick("delete_myjabber");
+        assertTablePresent("contacts");
+        assertTextNotPresent("myjabber");
+    }
+
+    private void assertContactsTable(String name, String uid)
+    {
+        ExpectedTable expectedTable = new ExpectedTable();
+        expectedTable.appendRow(new ExpectedRow(new String[]{"name", "uid", "actions", "actions"}));
+        expectedTable.appendRow(new ExpectedRow(new String[]{name, uid, "edit", "delete"}));
+        assertTableRowsEqual("contacts", 1, expectedTable);
+    }
+
     private void navigateToPreferences()
     {
         gotoPage("/");

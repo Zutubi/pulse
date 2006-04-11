@@ -31,6 +31,13 @@
                     #dynamicRow("smtp.username" $config.smtpUsername)
                     <!-- Probably best we don't show the password -->
                 </table>
+                <table id="jabber.config" class="fill-content">
+                    #adminHeadingRow("jabber.config" "/admin/editJabber!input.action" "jabber.edit" "/admin/jabber!reset.action" "jabber.reset")
+                    #dynamicRow("jabber.host" $config.jabberHost)
+                    #dynamicRow("jabber.port" $config.jabberPort)
+                    #dynamicRow("jabber.username" $config.jabberUsername)
+                    <!-- Probably best we don't show the password -->
+                </table>
             </td>
         </tr>
     </table>

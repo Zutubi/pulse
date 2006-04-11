@@ -591,7 +591,7 @@
             <param name="wizardClass">com.zutubi.pulse.web.user.ContactPointWizard</param>
             <result name="select" type="velocity">create-contact.vm</result>
             <result name="email" type="velocity">create-contact-email.vm</result>
-            <result name="yahoo" type="velocity">create-contact-yahoo.vm</result>
+            <result name="jabber" type="velocity">create-contact-jabber.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>
@@ -602,7 +602,7 @@
 
         <action name="editContactPoint" class="com.zutubi.pulse.web.user.EditContactPointAction">
             <result name="email" type="chain">editEmailContactPoint!input</result>
-            <result name="yahoo" type="chain">editYahooContactPoint!input</result>
+            <result name="jabber" type="chain">editJabberContactPoint!input</result>
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
@@ -619,14 +619,14 @@
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editYahooContactPoint!input" class="com.zutubi.pulse.web.user.EditYahooContactPointAction"
+        <action name="editJabberContactPoint!input" class="com.zutubi.pulse.web.user.EditJabberContactPointAction"
                 method="doInput">
             <interceptor-ref name="defaultStack"/>
-            <result name="input" type="velocity">edit-contact-yahoo.vm</result>
+            <result name="input" type="velocity">edit-contact-jabber.vm</result>
         </action>
 
-        <action name="editYahooContactPoint" class="com.zutubi.pulse.web.user.EditYahooContactPointAction">
-            <result name="input" type="velocity">edit-contact-yahoo.vm</result>
+        <action name="editJabberContactPoint" class="com.zutubi.pulse.web.user.EditJabberContactPointAction">
+            <result name="input" type="velocity">edit-contact-jabber.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>
@@ -758,6 +758,20 @@
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">configure-smtpconfig.vm</result>
             <result name="error" type="velocity">configure-smtpconfig.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="jabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="error" type="velocity">configure-jabberconfig.vm</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="editJabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">configure-jabberconfig.vm</result>
+            <result name="error" type="velocity">configure-jabberconfig.vm</result>
             <result name="cancel" type="redirect">/admin/serverSettings.action</result>
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>

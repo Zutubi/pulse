@@ -54,9 +54,12 @@ public class SmtpConfigurationAcceptanceTest extends BaseAcceptanceTest
         assertTextNotPresent("someone@somewhere.net");
 
         clickLink("smtp.edit");
+        setFormElement("smtp.host", "myhost");
         setFormElement("smtp.from", "someone@somewhere.net");
         submit("save");
 
+        assertTablePresent("smtp.config");
+        assertTextPresent("myhost");
         assertTextPresent("someone@somewhere.net");
     }
 

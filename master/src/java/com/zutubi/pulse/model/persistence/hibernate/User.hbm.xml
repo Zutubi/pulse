@@ -95,10 +95,13 @@
 
         </subclass>
 
-        <subclass name="com.zutubi.pulse.model.YahooContactPoint" discriminator-value="YAHOO">
+        <subclass name="com.zutubi.pulse.model.JabberContactPoint" discriminator-value="JABBER">
 
         </subclass>
 
+        <subclass name="com.zutubi.pulse.model.YahooContactPoint" discriminator-value="YAHOO">
+
+        </subclass>
     </class>
 
     <!-- Subscription. -->

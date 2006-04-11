@@ -28,6 +28,16 @@ public interface ApplicationConfiguration
 
     public static final String SMTP_PASSWORD = "mail.smtp.password";
 
+    //---( jabber configuration )---
+
+    public static final String JABBER_HOST = "jabber.host";
+
+    public static final String JABBER_PORT = "jabber.port";
+
+    public static final String JABBER_USERNAME = "jabber.username";
+
+    public static final String JABBER_PASSWORD = "jabber.password";
+
     //---( logging configuration )---
 
     public static final String LOGGING_CONFIG = "log.config";
@@ -70,7 +80,24 @@ public interface ApplicationConfiguration
 
     void setSmtpPassword(String password);
 
+    String getJabberHost();
+
+    void setJabberHost(String host);
+
+    int getJabberPort();
+
+    void setJabberPort(int port);
+
+    String getJabberUsername();
+
+    void setJabberUsername(String username);
+
+    String getJabberPassword();
+
+    void setJabberPassword(String password);
+
     String getLogConfig();
 
     void setLogConfig(String config);
+
 }

@@ -19,19 +19,19 @@ public class ContactPointWizard extends BaseWizard
     private UserManager userManager;
 
     private EmailContactState email;
-    private YahooContactState yahoo;
+    private JabberContactState jabber;
     private SelectContactState select;
     private WizardCompleteState complete;
 
     public ContactPointWizard()
     {
         select = new SelectContactState(this, "select");
-        yahoo = new YahooContactState(this, "yahoo");
+        jabber = new JabberContactState(this, "jabber");
         email = new EmailContactState(this, "email");
         complete = new WizardCompleteState(this, "success");
 
         addInitialState("select", select);
-        addState(yahoo);
+        addState(jabber);
         addState(email);
         addFinalState("success", complete);
     }
@@ -66,9 +66,9 @@ public class ContactPointWizard extends BaseWizard
         // handle the creation of the contact point.
         User user = userManager.getUser(userId);
         ContactPoint contact = null;
-        if (select.getContact().equals("yahoo"))
+        if (select.getContact().equals("jabber"))
         {
-            contact = yahoo.getContact();
+            contact = jabber.getContact();
         }
         else if (select.getContact().equals("email"))
         {
@@ -95,7 +95,7 @@ public class ContactPointWizard extends BaseWizard
             {
                 contacts = new TreeMap<String, String>();
                 contacts.put("email", "email"); //TODO: externalise these strings..
-                contacts.put("yahoo", "yahoo id");
+                contacts.put("jabber", "jabber");
             }
             return contacts;
         }
@@ -116,11 +116,11 @@ public class ContactPointWizard extends BaseWizard
         }
     }
 
-    public class YahooContactState extends BaseWizardState
+    public class JabberContactState extends BaseWizardState
     {
-        private YahooContactPoint contact = new YahooContactPoint();
+        private JabberContactPoint contact = new JabberContactPoint();
 
-        public YahooContactState(Wizard wizard, String name)
+        public JabberContactState(Wizard wizard, String name)
         {
             super(wizard, name);
         }
@@ -130,7 +130,7 @@ public class ContactPointWizard extends BaseWizard
             return "success";
         }
 
-        public YahooContactPoint getContact()
+        public JabberContactPoint getContact()
         {
             return contact;
         }

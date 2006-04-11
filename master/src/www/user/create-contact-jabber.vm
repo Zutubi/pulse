@@ -2,17 +2,17 @@
 <content tag="selectedTab">dashboard</content>
 <html>
 <head>
-    <title>#wwtext("name=yahoo.create")</title>
+    <title>#wwtext("name=jabber.create")</title>
 </head>
 <body>
-<h1>:: #wwtext("name=yahoo.create") ::</h1>
+<h1>:: #wwtext("name=jabber.create") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
 
-    #wwcform("action=contactWizard.action" "heading=%{getText('yahoo.create')}" "method=post")
+    #wwcform("action=contactWizard.action" "heading=%{getText('jabber.create')}" "id=jabber.create" "method=post")
         #wwhidden("name=state")
         #wwtextfield("name=contact.name" "label=%{getText('contact.name')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
-        #wwtextfield("name=contact.yahooId" "label=%{getText('contact.yahooId')}" "required=true" "tabindex=2" "onkeypress=return submitenter(this,event)")
+        #wwtextfield("name=contact.username" "label=%{getText('contact.jabber.username')}" "required=true" "tabindex=2" "onkeypress=return submitenter(this,event)")
         #previousFinishCancel(3)
     #end
 

@@ -64,7 +64,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         assertTablePresent("project.scm");
         assertTableRowsEqual("project.scm", 1, new String[][]{
                 new String[]{"type", "cvs"},
-                new String[]{"location", "/local [module]"}
+                new String[]{"location", "/local[module]"}
         });
 
         assertTablePresent("project.cleanup");

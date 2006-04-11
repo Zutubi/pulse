@@ -181,7 +181,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
     {
         CvsForm.Edit form = new CvsForm.Edit(tester);
 
-        assertProjectCvsTable("cvs", "/local [module]");
+        assertProjectCvsTable("cvs", "/local[module]");
 
         assertLinkPresent("project.scm.edit");
         clickLink("project.scm.edit");
@@ -190,7 +190,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
         // change the root and module, verify updates as expected.
         form.saveFormElements("/loc", "mod", "", "", "1", "1");
-        assertProjectCvsTable("cvs", "/loc [mod]");
+        assertProjectCvsTable("cvs", "/loc[mod]");
 
         // check the form again to ensure that the path has been saved.
         clickLink("project.scm.edit");
@@ -207,7 +207,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         // check that we can set a password and that it is persisted
         // and visible on subsequent edit.
         form.saveFormElements("/loc", "mod", "password", "", "", "");
-        assertProjectCvsTable("cvs", "/loc [mod]");
+        assertProjectCvsTable("cvs", "/loc[mod]");
         clickLink("project.scm.edit");
         form.assertFormElements("/loc", "mod", "password", "", "", "");
     }

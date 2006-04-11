@@ -1348,7 +1348,7 @@
 
 #macro( contactPointIcon $contact)
     #if ($contact.class.name == 'com.zutubi.pulse.model.EmailContactPoint')<img alt="email" src="/images/email_16.png"/>#end
-    #if ($contact.class.name == 'com.zutubi.pulse.model.YahooContactPoint')<img alt="yahoo" src="/images/yahoo_16.png"/>#end
+    #if ($contact.class.name == 'com.zutubi.pulse.model.YahooContactPoint')<img alt="jabber" src="/images/yahoo_16.png"/>#end
 #end
 
 <!--- quartz trigger state -->

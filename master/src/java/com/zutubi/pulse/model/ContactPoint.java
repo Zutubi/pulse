@@ -41,6 +41,11 @@ public abstract class ContactPoint extends Entity
         return this.properties;
     }
 
+    protected String getStringProperty(String name)
+    {
+        return (String) getProperties().get(name);
+    }
+    
     public String getUid()
     {
         return uid;

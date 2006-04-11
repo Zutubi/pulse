@@ -111,6 +111,7 @@
                 <ref bean="fatController"/>
                 <ref bean="recipeQueue"/>
                 <ref bean="masterRecipeProcessor"/>
+                <ref bean="jabberManager"/>
                 <ref bean="jettyManager"/>
                 <ref bean="databaseBootstrap"/>
             </list>
@@ -127,4 +128,6 @@
         </property>
     </bean>
 
+    <bean id="jabberManager" class="com.zutubi.pulse.jabber.JabberManager" autowire="byName" init-method="init"/>
+    
 </beans>

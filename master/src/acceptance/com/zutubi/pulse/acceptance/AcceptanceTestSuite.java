@@ -21,6 +21,7 @@ public class AcceptanceTestSuite
         suite.addTestSuite(ProjectWizardAcceptanceTest.class);
         suite.addTestSuite(RssAcceptanceTest.class);
         suite.addTestSuite(SmtpConfigurationAcceptanceTest.class);
+        suite.addTestSuite(JabberConfigurationAcceptanceTest.class);
         suite.addTestSuite(UserAdministrationAcceptanceTest.class);
         suite.addTestSuite(UserPreferencesAcceptanceTest.class);
         suite.addTestSuite(WebAppAcceptanceTest.class);
