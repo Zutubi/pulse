@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.user;
 
 import com.zutubi.pulse.ProjectNameComparator;
+import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.model.*;
 import com.opensymphony.util.TextUtils;
@@ -29,6 +30,7 @@ public class CreateSubscriptionAction extends UserActionSupport
     private Project project;
     private ContactPoint contactPoint;
     private ConfigurationManager configurationManager;
+    private JabberManager jabberManager;
 
     public String getCondition()
     {
@@ -120,9 +122,9 @@ public class CreateSubscriptionAction extends UserActionSupport
             return ERROR;
         }
 
-        if (!TextUtils.stringSet(configurationManager.getAppConfig().getSmtpHost()))
+        if (!TextUtils.stringSet(configurationManager.getAppConfig().getSmtpHost()) && jabberManager.getConnection() == null)
         {
-            addActionError("Unable to create a subscription as this server does not have an SMTP host configured.");
+            addActionError("Unable to create a subscription as this server does not have an SMTP or Jabber host configured.");
             return ERROR;
         }
 
@@ -174,5 +176,10 @@ public class CreateSubscriptionAction extends UserActionSupport
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setJabberManager(JabberManager jabberManager)
+    {
+        this.jabberManager = jabberManager;
     }
 }
