@@ -1,0 +1,39 @@
+head	1.1;
+access;
+symbols
+	BRANCH:1.1.0.2;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2006.03.10.03.04.17;	author daniel;	state dead;
+branches
+	1.1.2.1;
+next	;
+
+1.1.2.1
+date	2006.03.10.03.04.17;	author daniel;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@file file3.txt was initially added on branch BRANCH.
+@
+text
+@@
+
+
+1.1.2.1
+log
+@file3.txt checked in on BRANCH by author a
+@
+text
+@@
+

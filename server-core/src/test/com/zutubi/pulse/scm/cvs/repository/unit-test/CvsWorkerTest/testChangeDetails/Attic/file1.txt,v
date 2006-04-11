@@ -1,0 +1,52 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2006.03.10.00.59.35;	author daniel;	state dead;
+branches;
+next	1.2;
+
+1.2
+date	2006.03.10.00.59.04;	author daniel;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2006.03.10.00.58.13;	author daniel;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@file1.txt deleted by author a
+@
+text
+@modified
+@
+
+
+1.2
+log
+@file1.txt modified by author a
+@
+text
+@@
+
+
+1.1
+log
+@file1.txt checked in by author a
+@
+text
+@d1 1
+@
+
