@@ -32,7 +32,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
 
         clickLinkWithText("reset");
         assertTextPresent("localhost:8080");
-        assertTextPresent("http://www.pulse.com:8080/display/CIB");
+        assertTextPresent("http://confluence.zutubi.com/display/CIB");
     }
 
     public void testEdit() throws Exception

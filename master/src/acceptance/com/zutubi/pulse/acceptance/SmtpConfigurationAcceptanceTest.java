@@ -30,8 +30,15 @@ public class SmtpConfigurationAcceptanceTest extends BaseAcceptanceTest
         navigateToSmtpConfiguration();
 
         clickLink("smtp.reset");
-        assertTextPresent("bob@sensorynetworks.com");
-        assertTextPresent("smtp.people.net.au");
+
+        assertTablePresent("smtp.config");
+        assertTableRowsEqual("smtp.config", 1, new String[][]{
+                new String[]{"smtp host"},
+                new String[]{"subject prefix"},
+                new String[]{"from"},
+                new String[]{"username"}
+        });
+
     }
 
     private void navigateToSmtpConfiguration()
