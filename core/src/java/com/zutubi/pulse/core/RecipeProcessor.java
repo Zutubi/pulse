@@ -200,6 +200,12 @@ public class RecipeProcessor
 
         try
         {
+            // CIB-286: special case empty file for better reporting
+            if(bobFileSource.trim().length() == 0)
+            {
+                throw new ParseException("File is empty");
+            }
+
             stream = new ByteArrayInputStream(bobFileSource.getBytes());
             BobFile result = new BobFile();
             fileLoader.setPredicate(new RecipeLoadPredicate(result, recipeName));
@@ -208,7 +214,7 @@ public class RecipeProcessor
         }
         catch (Exception e)
         {
-            throw new BuildException(e);
+            throw new BuildException("Unable to parse pulse file: " + e.getMessage(), e);
         }
         finally
         {

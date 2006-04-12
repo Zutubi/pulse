@@ -31,7 +31,7 @@ public class CustomBobFileDetails extends BobFileDetails
     {
         // TODO i18n
         Properties result = new Properties();
-        result.put("cinnabo file", bobFileName);
+        result.put("pulse file", bobFileName);
         return result;
     }
 
@@ -45,7 +45,7 @@ public class CustomBobFileDetails extends BobFileDetails
         }
         catch (SCMException e)
         {
-            throw new BuildException("Unable to retrieve bob file from SCM: " + e.getMessage());
+            throw new BuildException("Unable to retrieve pulse file from SCM: " + e.getMessage());
         }
     }
 
