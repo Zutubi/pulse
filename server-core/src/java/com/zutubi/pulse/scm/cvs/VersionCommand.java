@@ -119,11 +119,11 @@ public class VersionCommand extends BasicCommand
 
     public Builder createBuilder(EventManager eventMan)
     {
-        return new VersionBuilder(eventMan, this);
+        return new VersionBuilder();
     }
 
     public String getVersion()
     {
-        return ((VersionBuilder) builder).getVersionStr();
+        return ((VersionBuilder) builder).getServerVersion();
     }
 }

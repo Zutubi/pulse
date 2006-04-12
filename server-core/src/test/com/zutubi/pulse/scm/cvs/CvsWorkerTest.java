@@ -519,13 +519,6 @@ public class CvsWorkerTest extends BobTestCase
         assertEquals("2006-03-11 02:00:00 GMT", SERVER_DATE.format(rev.getDate()));
     }
 
-    public void testServerVersion() throws SCMException
-    {
-        String serverVersion = cvs.getServerVersion();
-        assertNotNull(serverVersion);
-        assertTrue(serverVersion + " does not contain 'CVS'.", serverVersion.contains("CVS"));
-    }
-
     public void testRepositoryListing() throws SCMException
     {
         cvs.setModule("unit-test");

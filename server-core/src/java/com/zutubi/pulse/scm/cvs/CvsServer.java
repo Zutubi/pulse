@@ -39,6 +39,9 @@ public class CvsServer implements SCMServer
         cvs.setModule(module);
         cvs.setRoot(root);
         cvs.setPassword(password);
+
+//        org.netbeans.lib.cvsclient.util.Logger.setLogging("system");
+
     }
 
     public CvsServer(Cvs cvs)
@@ -196,7 +199,7 @@ public class CvsServer implements SCMServer
     {
         // assert that the branch for both revisions is the same. We do not support retrieving
         // differences across multiple branches/revisions. For practical reasons, we do not need to...
-        
+
 
         return cvs.getChangesBetween((CvsRevision)from, (CvsRevision)to);
     }
