@@ -402,6 +402,28 @@ public class AddProjectWizard extends BaseWizard
         public P4Details(Wizard wizard, String name)
         {
             super(wizard, name);
+
+            String value = System.getenv("P4PORT");
+            if(value == null)
+            {
+                p4.setPort("perforce:1666");
+            }
+            else
+            {
+                p4.setPort(value);
+            }
+
+            value = System.getenv("P4USER");
+            if(value != null)
+            {
+                p4.setUser(value);
+            }
+
+            value = System.getenv("P4CLIENT");
+            if(value != null)
+            {
+                p4.setClient(value);
+            }
         }
 
         public P4 getP4()
