@@ -27,6 +27,7 @@
         </action>
 
         <action name="dashboard" class="com.zutubi.pulse.web.user.DashboardAction">
+            <interceptor-ref name="ajaxStack"/>
             <result name="success" type="velocity">dashboard.vm</result>
             <result name="error" type="redirect">/</result>
         </action>
@@ -42,6 +43,7 @@
         </action>
 
         <action name="viewRecipeQueue" class="com.zutubi.pulse.web.server.ViewRecipeQueueAction">
+            <interceptor-ref name="ajaxStack"/>
             <result name="success" type="velocity">view-recipe-queue.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
@@ -115,10 +117,12 @@
         </action>
 
         <action name="viewProjects" class="com.zutubi.pulse.web.project.ViewProjectsAction">
+            <interceptor-ref name="ajaxStack"/>
             <result name="success" type="velocity">view-projects.vm</result>
         </action>
 
         <action name="viewBuild" class="com.zutubi.pulse.web.project.ViewBuildAction">
+            <interceptor-ref name="ajaxStack"/>
             <result name="success" type="velocity">view-build.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
@@ -239,6 +243,7 @@
         </action>
 
         <action name="currentBuild" class="com.zutubi.pulse.web.project.ProjectHomeAction">
+            <interceptor-ref name="ajaxStack"/>
             <result name="success" type="velocity">project-home.vm</result>
             <result name="error" type="redirect">viewProjects.action</result>
         </action>
