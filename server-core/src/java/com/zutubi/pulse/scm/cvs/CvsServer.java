@@ -13,6 +13,7 @@ import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.model.Cvs;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.cvs.client.CvsClient;
 import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;

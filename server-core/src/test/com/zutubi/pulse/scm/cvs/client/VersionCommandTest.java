@@ -1,7 +1,8 @@
-package com.zutubi.pulse.scm.cvs;
+package com.zutubi.pulse.scm.cvs.client;
 
-import com.zutubi.pulse.test.BobTestCase;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.cvs.client.CvsClient;
+import com.zutubi.pulse.test.BobTestCase;
 
 import java.io.File;
 

@@ -6,6 +6,8 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.cvs.client.LogCommandListener;
 import com.zutubi.pulse.scm.cvs.client.LogDirectoryBuilder;
+import com.zutubi.pulse.scm.cvs.client.VersionCommand;
+import com.zutubi.pulse.scm.cvs.client.CvsClient;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;

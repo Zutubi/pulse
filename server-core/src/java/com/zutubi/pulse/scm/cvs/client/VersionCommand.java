@@ -1,4 +1,4 @@
-package com.zutubi.pulse.scm.cvs;
+package com.zutubi.pulse.scm.cvs.client;
 
 import org.netbeans.lib.cvsclient.ClientServices;
 import org.netbeans.lib.cvsclient.command.BasicCommand;
