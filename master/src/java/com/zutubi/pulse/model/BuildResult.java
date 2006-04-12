@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class BuildResult extends Result
 {
-    public static final String CINNABO_FILE = "cinnabo.xml";
+    public static final String PULSE_FILE = "pulse.xml";
 
     private Project project;
     private String buildSpecification;

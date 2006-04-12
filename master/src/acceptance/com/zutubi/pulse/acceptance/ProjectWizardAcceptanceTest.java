@@ -58,7 +58,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         assertTablePresent("project.specifics");
         assertTableRowsEqual("project.specifics", 1, new String[][]{
                 new String[]{"type", "custom"},
-                new String[]{"cinnabo file", "bob.xml"}
+                new String[]{"pulse file", "bob.xml"}
         });
 
         assertTablePresent("project.scm");

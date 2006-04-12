@@ -636,7 +636,7 @@
 ##
 #macro(buildFileCell $project $result)
     <td class="content">
-        <a href="viewBuildFile.action?id=$result.id">#wwtext("name=cinnabo.file")</a>
+        <a href="viewBuildFile.action?id=$result.id">#wwtext("name=pulse.file")</a>
     </td>
 #end
 

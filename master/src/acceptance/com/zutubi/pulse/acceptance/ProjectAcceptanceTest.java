@@ -679,7 +679,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertTablePresent("project.specifics");
         assertTableRowsEqual("project.specifics", 1, new String[][]{
                 new String[]{"type", type},
-                new String[]{"cinnabo file", file}
+                new String[]{"pulse file", file}
         });
     }
 

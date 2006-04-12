@@ -248,11 +248,11 @@ public class BuildController implements EventListener
     {
         try
         {
-            FileSystemUtils.createFile(new File(buildResult.getOutputDir(), BuildResult.CINNABO_FILE), event.getRequest().getBobFileSource());
+            FileSystemUtils.createFile(new File(buildResult.getOutputDir(), BuildResult.PULSE_FILE), event.getRequest().getBobFileSource());
         }
         catch(IOException e)
         {
-            LOG.warning("Unable to save cinnabo file for build: " + e.getMessage(), e);
+            LOG.warning("Unable to save pulse file for build: " + e.getMessage(), e);
         }
 
         getChanges((ScmBootstrapper) controller.getDispatchRequest().getRequest().getBootstrapper());

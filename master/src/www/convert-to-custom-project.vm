@@ -13,7 +13,7 @@
     #wwhidden("name=id")
 
     <tr>
-        <th class="label">#wwtext("name=cinnabo.file"): </th>
+        <th class="label">#wwtext("name=pulse.file"): </th>
         <td class="field"><a href="downloadProjectBuildFile.action?id=$id">#wwtext("name=download")</a></td>
     </tr>
     #inlineHelp("bob.file.download.help")

@@ -63,10 +63,10 @@ public class ViewBuildFileAction extends ProjectActionSupport
 
         try
         {
-            is = new FileInputStream(new File(result.getOutputDir(), BuildResult.CINNABO_FILE));
+            is = new FileInputStream(new File(result.getOutputDir(), BuildResult.PULSE_FILE));
             os = new ByteArrayOutputStream();
             XmlXhtmlRenderer renderer = new XmlXhtmlRenderer();
-            renderer.highlight(BuildResult.CINNABO_FILE, is, os, null, true);
+            renderer.highlight(BuildResult.PULSE_FILE, is, os, null, true);
             highlightedFile = os.toString();
         }
         catch (IOException e)

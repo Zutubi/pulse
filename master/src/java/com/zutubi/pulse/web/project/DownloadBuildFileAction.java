@@ -47,7 +47,7 @@ public class DownloadBuildFileAction extends ProjectActionSupport
 
         try
         {
-            File file = new File(result.getOutputDir(), BuildResult.CINNABO_FILE);
+            File file = new File(result.getOutputDir(), BuildResult.PULSE_FILE);
             contentLength = file.length();
             inputStream = new FileInputStream(file);
         }

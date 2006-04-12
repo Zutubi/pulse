@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public class FileConfig
 {
-    private static final String FILE_NAME = "cinnabo%u.%g.log";
+    private static final String FILE_NAME = "pulse%u.%g.log";
 
     private ConfigurationManager configManager;
     private static final int APPROX_FILESIZE_LIMIT = 1000000;

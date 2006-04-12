@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
   	<head>
-		<title>:: cinnabo :: #if ($title) $title #end</title>
+		<title>:: pulse :: #if ($title) $title #end</title>
 		<link href="$base/main2.css" rel="stylesheet" type="text/css" media="screen"/>
 		<link href="$base/form2.css" rel="stylesheet" type="text/css" media="screen"/>
         <script type="text/javascript" src="/main.js"></script>
@@ -19,7 +19,7 @@
           </table>
       </div>
       <div id="footer">
-        <strong>:: cinnabo ($version_number #$build_number) ::</strong>
+        <strong>:: pulse ($version_number #$build_number) ::</strong>
         copyright &copy; 2005-2006 zutubi pty ltd
       </div>
     </body>
