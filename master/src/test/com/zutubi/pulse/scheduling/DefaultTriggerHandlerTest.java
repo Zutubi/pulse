@@ -53,7 +53,7 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
 
         assertEquals(0, a.getTriggerCount());
         fire(a);
-        pause(100);
+        pause(300);
 
         assertEquals(1, a.getTriggerCount());
         fire(a);
@@ -65,7 +65,7 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
 
         assertEquals(1, a.getTriggerCount());
         fire(a);
-        pause(100);
+        pause(300);
 
         assertEquals(2, a.getTriggerCount());
 
