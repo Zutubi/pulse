@@ -8,10 +8,12 @@
 
         <property name="src.dir" value="${module.root.dir}/src/java"/>
         <property name="test.dir" value="${module.root.dir}/src/test"/>
+        <property name="accept.dir" value="${module.root.dir}/src/acceptance"/>
 
         <property name="build.dir" value="${module.root.dir}/build"/>
         <property name="classes.dir" value="${build.dir}/classes"/>
         <property name="test.classes.dir" value="${build.dir}/test.classes"/>
+        <property name="accept.classes.dir" value="${build.dir}/accept.classes"/>
         <property name="report.dir" value="${build.dir}/reports"/>
 
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
@@ -53,6 +55,7 @@
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${classes.dir}"/>
         <mkdir dir="${test.classes.dir}"/>
+        <mkdir dir="${accept.classes.dir}"/>
         <mkdir dir="${module.root.dir}/build/lib"/>
         <mkdir dir="${report.dir}"/>
         <mkdir dir="${report.dir}/junit"/>
@@ -95,6 +98,17 @@
 
         <copy todir="${test.classes.dir}" overwrite="true">
             <fileset dir="${test.dir}">
+                <patternset refid="resources"/>
+            </fileset>
+        </copy>
+
+        <javac srcdir="${accept.dir}" destdir="${accept.classes.dir}" debug="true">
+            <classpath refid="lib.path"/>
+            <classpath location="${classes.dir}"/>
+        </javac>
+
+        <copy todir="${accept.classes.dir}" overwrite="true">
+            <fileset dir="${accept.dir}">
                 <patternset refid="resources"/>
             </fileset>
         </copy>

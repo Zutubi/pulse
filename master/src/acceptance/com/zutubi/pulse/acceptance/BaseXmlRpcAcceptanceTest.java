@@ -26,9 +26,17 @@ public class BaseXmlRpcAcceptanceTest extends TestCase
     {
         super.setUp();
 
+        int port = 8080;
+
+        String portProperty = System.getProperty("pulse.port");
+        if(portProperty != null)
+        {
+            port = Integer.parseInt(portProperty);
+        }
+
         // test configuration.
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-            config.setServerURL(new URL("http", "localhost", 8080, "/xmlrpc"));
+            config.setServerURL(new URL("http", "localhost", port, "/xmlrpc"));
 
         xmlRpcClient = new XmlRpcClient();
         xmlRpcClient.setConfig(config);

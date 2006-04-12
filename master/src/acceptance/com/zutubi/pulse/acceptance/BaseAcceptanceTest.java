@@ -29,6 +29,8 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
     protected static final String FO_CUSTOM_SETUP = "custom.setup";
     protected static final String CUSTOM_SETUP_FILE = "details.pulseFileName";
 
+    protected String port;
+
     public BaseAcceptanceTest()
     {
     }
@@ -42,7 +44,14 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
     {
         super.setUp();
 
-        getTestContext().setBaseUrl("http://localhost:8080/");
+
+        port = System.getProperty("pulse.port");
+        if(port == null)
+        {
+            port = "8080";
+        }
+
+        getTestContext().setBaseUrl("http://localhost:" + port + "/");
     }
 
     protected void tearDown() throws Exception

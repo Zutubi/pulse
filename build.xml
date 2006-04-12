@@ -149,6 +149,44 @@
         </tar>
     </target>
 
+    <target name="accept.master" depends="package.master">
+        <property name="build.dir" value="master/build"/>
+        <property name="report.dir" value="build/reports/junit"/>
+        <mkdir dir="${report.dir}/xml"/>
+        <mkdir dir="${report.dir}/html"/>
+
+        <exec executable="./acceptance-test-prep.sh">
+            <arg line="build/pulse-${pulse.version}.tgz"/>
+        </exec>
+        <junit printsummary="yes" fork="on" failureProperty="test.failed" errorProperty="test.failed">
+            <sysproperty key="pulse.port" value="8889"/>
+            <classpath>
+                <pathelement location="${build.dir}/classes"/>
+                <pathelement location="${build.dir}/accept.classes"/>
+                <fileset dir="${build.dir}/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+            <formatter type="xml"/>
+            <batchtest todir="${report.dir}/xml">
+                <fileset dir="master/src/acceptance">
+                    <include name="**/AcceptanceTestSuite.java"/>
+                </fileset>
+            </batchtest>
+            <!--<test name="com.zutubi.pulse.acceptance.AcceptanceTestSuite"/>-->
+        </junit>
+        <junitreport todir="${report.dir}">
+            <fileset dir="${report.dir}/xml">
+                <include name="*.xml"/>
+            </fileset>
+            <report format="frames" todir="${report.dir}/html"/>
+        </junitreport>
+        <exec executable="./acceptance-test-post.sh">
+            <arg line="${pulse.version}"/>
+        </exec>
+        <fail message="One or more acceptance tests failed.  See the reports (${report.dir}) for details." if="test.failed"/>
+    </target>
+
     <target name="init">
         <property name="project.root.dir" value="."/>
         <property name="project.repository" value="${project.root.dir}/build/repository"/>

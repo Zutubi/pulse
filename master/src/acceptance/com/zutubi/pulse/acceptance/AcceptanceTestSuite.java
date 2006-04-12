@@ -8,7 +8,7 @@ import junit.framework.TestSuite;
  */
 public class AcceptanceTestSuite
 {
-    public static Test suite()
+    public static Test suite() throws InterruptedException
     {
         TestSuite suite = new TestSuite();
         // need to run this one first as it runs through the installation setup.

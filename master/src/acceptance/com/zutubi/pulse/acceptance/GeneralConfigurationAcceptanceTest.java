@@ -31,7 +31,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
         navigateToGeneralConfiguration();
 
         clickLinkWithText("reset");
-        assertTextPresent("localhost:8080");
+        assertTextPresent("localhost:" + port);
         assertTextPresent("http://confluence.zutubi.com/display/CIB");
     }
 
