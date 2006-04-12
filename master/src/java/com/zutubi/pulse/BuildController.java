@@ -227,9 +227,9 @@ public class BuildController implements EventListener
         {
             // If we got here we are sure that the event was for one of our
             // recipes.
-            if (!buildResult.commenced() && e instanceof RecipeDispatchedEvent)
+            if (!buildResult.commenced() && e instanceof RecipeCommencedEvent)
             {
-                handleFirstDispatch(foundNode.getData(), (RecipeDispatchedEvent) e);
+                handleFirstCommenced(foundNode.getData());
             }
 
             checkNodeStatus(foundNode);
@@ -238,25 +238,27 @@ public class BuildController implements EventListener
 
     /**
      * Called when the first recipe for this build is successfully
-     * dispatched.  It is at this point that the build is said to have
+     * commenced.  It is at this point that the build is said to have
      * commenced.
      * <p/>
      * TODO: this probably needs some review when we go distributed (timeouts
      * at least).
      */
-    private void handleFirstDispatch(RecipeController controller, RecipeDispatchedEvent event)
+    private void handleFirstCommenced(RecipeController controller)
     {
+        RecipeRequest request = controller.getDispatchRequest().getRequest();
+
         try
         {
-            FileSystemUtils.createFile(new File(buildResult.getOutputDir(), BuildResult.PULSE_FILE), event.getRequest().getBobFileSource());
+            FileSystemUtils.createFile(new File(buildResult.getOutputDir(), BuildResult.PULSE_FILE), request.getBobFileSource());
         }
         catch(IOException e)
         {
             LOG.warning("Unable to save pulse file for build: " + e.getMessage(), e);
         }
 
-        getChanges((ScmBootstrapper) controller.getDispatchRequest().getRequest().getBootstrapper());
-        buildResult.commence(System.currentTimeMillis());
+        getChanges((ScmBootstrapper) request.getBootstrapper());
+        buildResult.commence(controller.getResult().getStamps().getStartTime());
         if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
         {
             scheduleTimeout();
