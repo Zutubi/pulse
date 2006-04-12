@@ -88,7 +88,7 @@
 
     <target name="package.master" depends="init, build.local, build.master">
 
-        <property name="package.name" value="pulse-master-${pulse.version}"/>
+        <property name="package.name" value="pulse-${pulse.version}"/>
         <property name="package.root" value="build/package/${package.name}"/>
 
         <delete dir="${package.root}"/>
