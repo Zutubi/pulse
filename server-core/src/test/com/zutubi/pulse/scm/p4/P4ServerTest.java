@@ -43,7 +43,7 @@ public class P4ServerTest extends BobTestCase
     public void testGetLatestRevision() throws SCMException
     {
         getServer("test-client");
-        assertEquals(7, server.getLatestRevision().getRevisionNumber());
+        assertEquals(8, server.getLatestRevision().getRevisionNumber());
     }
 
     public void testCheckoutHead() throws Exception
@@ -51,7 +51,7 @@ public class P4ServerTest extends BobTestCase
         getServer("depot-client");
         List<Change> changes = new LinkedList<Change>();
         NumericalRevision revision = (NumericalRevision) server.checkout(randomInt(), tmpDir, null, changes);
-        assertEquals(7, revision.getRevisionNumber());
+        assertEquals(8, revision.getRevisionNumber());
 
         assertEquals(10, changes.size());
         for (int i = 0; i < 10; i++)
@@ -177,20 +177,59 @@ public class P4ServerTest extends BobTestCase
         assertEquals(10, files.size());
 
         RemoteFile f;
-        f = files.get(0);
-        assertEquals("test-branch", f.getName());
-        assertEquals("depot2/test-branch", f.getPath());
-        assertTrue(f.isDirectory());
-
-        for (int i = 1; i < 10; i++)
+        for (int i = 0; i < 9; i++)
         {
             f = files.get(i);
             assertTrue(f.isFile());
-            assertEquals("file" + i, f.getName());
-            assertEquals("depot2/file" + i, f.getPath());
+            assertEquals("file" + (i + 1), f.getName());
+            assertEquals("depot2/file" + (i + 1), f.getPath());
             assertEquals("text/plain", f.getMimeType());
         }
 
+        f = files.get(9);
+        assertEquals("test-branch", f.getName());
+        assertEquals("depot2/test-branch", f.getPath());
+        assertTrue(f.isDirectory());
+    }
+
+    public void testListComplexClient() throws SCMException
+    {
+        getServer("complex-client");
+        List<RemoteFile> files = server.getListing("");
+        assertEquals(1, files.size());
+        RemoteFile remoteFile = files.get(0);
+        assertEquals("src", remoteFile.getName());
+        assertTrue(remoteFile.isDirectory());
+    }
+
+    public void testListComplexSrc() throws SCMException
+    {
+        getServer("complex-client");
+        List<RemoteFile> files = server.getListing("src");
+        assertEquals(2, files.size());
+
+        RemoteFile remoteFile = files.get(0);
+        assertEquals("host", remoteFile.getName());
+        assertTrue(remoteFile.isDirectory());
+
+        remoteFile = files.get(1);
+        assertEquals("libraries", remoteFile.getName());
+        assertTrue(remoteFile.isDirectory());
+    }
+
+    public void testListComplexSnuth() throws SCMException
+    {
+        getServer("complex-client");
+        List<RemoteFile> files = server.getListing("src/libraries/snuth");
+        assertEquals(2, files.size());
+
+        RemoteFile remoteFile = files.get(0);
+        assertEquals("Makefile", remoteFile.getName());
+        assertFalse(remoteFile.isDirectory());
+
+        remoteFile = files.get(1);
+        assertEquals("source.c", remoteFile.getName());
+        assertFalse(remoteFile.isDirectory());
     }
 
     private void getServer(String client)
@@ -221,6 +260,6 @@ public class P4ServerTest extends BobTestCase
 
     private File getDataRoot()
     {
-        return new File(getBobRoot(), FileSystemUtils.composeFilename("server-core", "src", "test", "com", "zutubi.pulse", "scm", "p4", "data"));
+        return new File(getBobRoot(), FileSystemUtils.composeFilename("server-core", "src", "test", "com", "zutubi", "pulse", "scm", "p4", "data"));
     }
 }

@@ -5,10 +5,11 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.util.IOUtils;
-import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.CachingSCMServer;
+import com.zutubi.pulse.scm.SCMFileCache;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 
 import java.io.*;
 import java.text.ParseException;
@@ -16,11 +17,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class P4Server implements SCMServer
+public class P4Server extends CachingSCMServer
 {
     private static final Logger LOG = Logger.getLogger(P4Server.class);
 
@@ -44,6 +46,7 @@ public class P4Server implements SCMServer
     private static final String FLAG_INPUT = "-i";
     private static final String FLAG_MAXIMUM = "-m";
     private static final String FLAG_OUTPUT = "-o";
+    private static final String FLAG_PREVIEW = "-n";
     private static final String FLAG_SHORT = "-s";
     private static final String FLAG_STATUS = "-s";
     private static final String VALUE_SUBMITTED = "submitted";
@@ -56,6 +59,7 @@ public class P4Server implements SCMServer
     private File clientRoot;
     private String port;
     private Pattern lineSplitterPattern;
+    private Pattern syncPattern;
 
     private class P4Result
     {
@@ -180,7 +184,18 @@ public class P4Server implements SCMServer
 
     public NumericalRevision getLatestRevision() throws SCMException
     {
-        String clientName = updateClient(0, null);
+        return getLatestRevision(null);
+    }
+
+    private NumericalRevision getLatestRevision(String clientName) throws SCMException
+    {
+        boolean cleanup = false;
+
+        if(clientName == null)
+        {
+            clientName = updateClient(0, null);
+            cleanup = true;
+        }
 
         try
         {
@@ -188,41 +203,42 @@ public class P4Server implements SCMServer
         }
         finally
         {
-            deleteClient(clientName);
+            if(cleanup)
+            {
+                deleteClient(clientName);
+            }
         }
     }
 
-    public RemoteFile getFile(String path) throws SCMException
+    public void populate(SCMFileCache.CacheItem item) throws SCMException
     {
-        if (path.length() == 0)
-        {
-            // Special case this as trying to ask P4 about it is a pain.
-            return new RemoteFile(true, null, "");
-        }
+        item.cachedRevision = getLatestRevision();
+        item.cachedListing = new TreeMap<String, CachingRemoteFile>();
+
+        CachingRemoteFile rootFile = new CachingRemoteFile("", true, null, "");
+        item.cachedListing.put("", rootFile);
 
         String clientName = updateClient(0, null);
 
         try
         {
-            String searchPath = clientRoot.getAbsolutePath();
-            if (path.length() > 0)
+            P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, FLAG_PREVIEW);
+            Matcher matcher = syncPattern.matcher(result.stdout);
+            while(matcher.find())
             {
-                searchPath = searchPath + "/" + path;
-            }
+                String localFile = matcher.group(4);
+                if(localFile.startsWith(clientRoot.getAbsolutePath()))
+                {
+                    localFile = localFile.substring((int) clientRoot.getAbsolutePath().length());
+                }
 
-            P4Result result = runP4Dirs(clientName, searchPath);
-            if (result.stderr.length() == 0)
-            {
-                return new RemoteFile(true, null, path);
-            }
+                if(localFile.startsWith("/") || localFile.startsWith("\\"))
+                {
+                    localFile = localFile.substring(1);
+                }
 
-            result = runP4Files(clientName, searchPath);
-            if (result.stderr.length() == 0)
-            {
-                return new RemoteFile(false, null, path);
+                addToCache(localFile, rootFile, item);
             }
-
-            throw new SCMException("Path '" + path + "' does not exist");
         }
         finally
         {
@@ -230,131 +246,170 @@ public class P4Server implements SCMServer
         }
     }
 
-    public List<RemoteFile> getListing(String path) throws SCMException
-    {
-        String clientName = updateClient(0, null);
 
-        try
-        {
-            String pathPrefix = "";
-            if (path.length() > 0)
-            {
-                pathPrefix = path + "/";
-            }
-
-            List<RemoteFile> files = new LinkedList<RemoteFile>();
-
-            // OK, find child directories
-            String searchPath = clientRoot.getAbsolutePath() + "/" + pathPrefix + "*";
-            P4Result result = runP4Dirs(clientName, searchPath);
-
-            // Lines have the form:
-            //    <depot path>
-            // No extra info: directories are not versioned
-            String[] lines = lineSplitterPattern.split(result.stdout);
-            for (String line : lines)
-            {
-                if (line.length() == 0)
-                {
-                    continue;
-                }
-
-                int index = line.lastIndexOf('/');
-                if (index < 0)
-                {
-                    index = 0;
-                }
-
-                if (index >= line.length())
-                {
-                    continue;
-                }
-
-                String name = line.substring(index + 1);
-                files.add(new RemoteFile(name, true, null, pathPrefix + name));
-            }
-
-            result = runP4Files(clientName, searchPath);
-
-            // Lines have the form:
-            //     <depot path>#<revision> - <action/change info> (<type>)
-            // We care only about the depot path and type
-            Pattern linePattern = Pattern.compile("^(.+)#[0-9]+ - (.*) \\((.+)\\)$", Pattern.MULTILINE);
-            Matcher matcher = linePattern.matcher(result.stdout);
-            while (matcher.find())
-            {
-                if (matcher.group(2).contains("delete"))
-                {
-                    // Latest revision was delete: ignore this file.
-                    continue;
-                }
-
-                String depotPath = matcher.group(1);
-                int index = depotPath.lastIndexOf('/');
-                if (index < 0)
-                {
-                    index = 0;
-                }
-
-                if (index >= depotPath.length())
-                {
-                    continue;
-                }
-
-                String name = depotPath.substring(index + 1);
-
-                RemoteFile file = new RemoteFile(name, false, null, pathPrefix + name);
-                if (!matcher.group(3).contains("text"))
-                {
-                    file.setMimeType("application/x-octet-stream");
-                }
-
-                files.add(file);
-            }
-
-            if (files.size() == 0)
-            {
-                // No such thing as an empty directory in Perforce: this is
-                // how we can detect a bogus path.
-                throw new SCMException("Path '" + path + "' does not exist");
-            }
-
-            return files;
-        }
-        finally
-        {
-            deleteClient(clientName);
-        }
-    }
-
-    private P4Result runP4Files(String clientName, String searchPath)
-            throws SCMException
-    {
-        P4Result result;
-        result = runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_FILES, searchPath);
-        // As above, ignore just this message.
-        String stderr = result.stderr.toString();
-        if (stderr.length() > 0 && !stderr.contains("no such file(s).") && !stderr.contains("not in client view"))
-        {
-            throw new SCMException("p4 process returned error: " + stderr);
-        }
-        return result;
-    }
-
-    private P4Result runP4Dirs(String clientName, String searchPath)
-            throws SCMException
-    {
-        P4Result result = runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_DIRS, FLAG_CLIENT_VIEW, searchPath);
-
-        // When there are no child directories p4 gives an error message, so
-        // ignore just this message.
-        String stderr = result.stderr.toString();
-        if (stderr.length() > 0 && !stderr.contains("no such file(s).") && !stderr.contains("not in client view"))
-        {
-            throw new SCMException("p4 process returned error: " + stderr);
-        }
-        return result;
-    }
+//    public RemoteFile getFile(String path) throws SCMException
+//    {
+//        if (path.length() == 0)
+//        {
+//            // Special case this as trying to ask P4 about it is a pain.
+//            return new RemoteFile(true, null, "");
+//        }
+//
+//        String clientName = updateClient(0, null);
+//
+//        try
+//        {
+//            String searchPath = clientRoot.getAbsolutePath();
+//            if (path.length() > 0)
+//            {
+//                searchPath = searchPath + "/" + path;
+//            }
+//
+//            P4Result result = runP4Dirs(clientName, searchPath);
+//            if (result.stderr.length() == 0)
+//            {
+//                return new RemoteFile(true, null, path);
+//            }
+//
+//            result = runP4Files(clientName, searchPath);
+//            if (result.stderr.length() == 0)
+//            {
+//                return new RemoteFile(false, null, path);
+//            }
+//
+//            throw new SCMException("Path '" + path + "' does not exist");
+//        }
+//        finally
+//        {
+//            deleteClient(clientName);
+//        }
+//    }
+//
+//    public List<RemoteFile> getListing(String path) throws SCMException
+//    {
+//        String clientName = updateClient(0, null);
+//
+//        try
+//        {
+//            String pathPrefix = "";
+//            if (path.length() > 0)
+//            {
+//                pathPrefix = path + "/";
+//            }
+//
+//            List<RemoteFile> files = new LinkedList<RemoteFile>();
+//
+//            // OK, find child directories
+//            String searchPath = clientRoot.getAbsolutePath() + "/" + pathPrefix + "*";
+//            P4Result result = runP4Dirs(clientName, searchPath);
+//
+//            // Lines have the form:
+//            //    <depot path>
+//            // No extra info: directories are not versioned
+//            String[] lines = lineSplitterPattern.split(result.stdout);
+//            for (String line : lines)
+//            {
+//                if (line.length() == 0)
+//                {
+//                    continue;
+//                }
+//
+//                int index = line.lastIndexOf('/');
+//                if (index < 0)
+//                {
+//                    index = 0;
+//                }
+//
+//                if (index >= line.length())
+//                {
+//                    continue;
+//                }
+//
+//                String name = line.substring(index + 1);
+//                files.add(new RemoteFile(name, true, null, pathPrefix + name));
+//            }
+//
+//            result = runP4Files(clientName, searchPath);
+//
+//            // Lines have the form:
+//            //     <depot path>#<revision> - <action/change info> (<type>)
+//            // We care only about the depot path and type
+//            Pattern linePattern = Pattern.compile("^(.+)#[0-9]+ - (.*) \\((.+)\\)$", Pattern.MULTILINE);
+//            Matcher matcher = linePattern.matcher(result.stdout);
+//            while (matcher.find())
+//            {
+//                if (matcher.group(2).contains("delete"))
+//                {
+//                    // Latest revision was delete: ignore this file.
+//                    continue;
+//                }
+//
+//                String depotPath = matcher.group(1);
+//                int index = depotPath.lastIndexOf('/');
+//                if (index < 0)
+//                {
+//                    index = 0;
+//                }
+//
+//                if (index >= depotPath.length())
+//                {
+//                    continue;
+//                }
+//
+//                String name = depotPath.substring(index + 1);
+//
+//                RemoteFile file = new RemoteFile(name, false, null, pathPrefix + name);
+//                if (!matcher.group(3).contains("text"))
+//                {
+//                    file.setMimeType("application/x-octet-stream");
+//                }
+//
+//                files.add(file);
+//            }
+//
+//            if (files.size() == 0)
+//            {
+//                // No such thing as an empty directory in Perforce: this is
+//                // how we can detect a bogus path.
+//                throw new SCMException("Path '" + path + "' does not exist");
+//            }
+//
+//            return files;
+//        }
+//        finally
+//        {
+//            deleteClient(clientName);
+//        }
+//    }
+//
+//    private P4Result runP4Files(String clientName, String searchPath)
+//            throws SCMException
+//    {
+//        P4Result result;
+//        result = runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_FILES, searchPath);
+//        // As above, ignore just this message.
+//        String stderr = result.stderr.toString();
+//        if (stderr.length() > 0 && !stderr.contains("no such file(s).") && !stderr.contains("not in client view"))
+//        {
+//            throw new SCMException("p4 process returned error: " + stderr);
+//        }
+//        return result;
+//    }
+//
+//    private P4Result runP4Dirs(String clientName, String searchPath)
+//            throws SCMException
+//    {
+//        P4Result result = runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_DIRS, FLAG_CLIENT_VIEW, searchPath);
+//
+//        // When there are no child directories p4 gives an error message, so
+//        // ignore just this message.
+//        String stderr = result.stderr.toString();
+//        if (stderr.length() > 0 && !stderr.contains("no such file(s).") && !stderr.contains("not in client view"))
+//        {
+//            throw new SCMException("p4 process returned error: " + stderr);
+//        }
+//        return result;
+//    }
 
 // Should be nailed, but just in case we need to actually go through the
 // mapping to get things right, here is an aborted attempt to do so
@@ -552,14 +607,8 @@ public class P4Server implements SCMServer
 
     private void populateChanges(StringBuffer stdout, List<Change> changes)
     {
-        // Output of p4 sync -f:
-        //   <depot file>#<revision> - (refreshing|added as) <local file>
-        //   <depot file>#<revision> - (refreshing|added as) <local file>
-        //   ...
-
         // RE to capture depot file, revision and local file
-        Pattern re = Pattern.compile("^(.+)#([0-9]+) - (refreshing|added as) (.+)$", Pattern.MULTILINE);
-        Matcher matcher = re.matcher(stdout);
+        Matcher matcher = syncPattern.matcher(stdout);
 
         while (matcher.find())
         {
@@ -719,6 +768,13 @@ public class P4Server implements SCMServer
         p4Builder = new ProcessBuilder();
         templateClient = client;
         this.port = port;
+
+        // Output of p4 sync -f:
+        //   <depot file>#<revision> - (refreshing|added as) <local file>
+        //   <depot file>#<revision> - (refreshing|added as) <local file>
+        //   ...
+        syncPattern = Pattern.compile("^(.+)#([0-9]+) - (refreshing|added as) (.+)$", Pattern.MULTILINE);
+
         // Output of p4 changes -s submitted -m 1:
         //   Change <number> on <date> by <user>@<client>
         changesPattern = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.+)'$", Pattern.MULTILINE);
@@ -764,7 +820,7 @@ public class P4Server implements SCMServer
         {
             if (revision == null)
             {
-                revision = getLatestRevision();
+                revision = getLatestRevision(clientName);
             }
 
             long number = ((NumericalRevision) revision).getRevisionNumber();

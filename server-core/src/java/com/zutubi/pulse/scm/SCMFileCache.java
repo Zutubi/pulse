@@ -1,9 +1,11 @@
-package com.zutubi.pulse.scm.cvs;
+package com.zutubi.pulse.scm;
 
 import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.util.Constants;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.cvs.CvsServer;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -12,50 +14,50 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  */
-public class CvsFileCache
+public class SCMFileCache
 {
     private static Lock instanceLock = new ReentrantLock();
-    private static CvsFileCache INSTANCE = null;
+    private static SCMFileCache INSTANCE = null;
 
     private Map<String, CacheItem> cache;
     private Lock lock = new ReentrantLock();
 
-    private CvsFileCache()
+    private SCMFileCache()
     {
         cache = new TreeMap<String, CacheItem>();
     }
 
-    public static CvsFileCache getInstance()
+    public static SCMFileCache getInstance()
     {
         instanceLock.lock();
         if (INSTANCE == null)
         {
-            INSTANCE = new CvsFileCache();
+            INSTANCE = new SCMFileCache();
         }
         instanceLock.unlock();
         return INSTANCE;
     }
 
-    public Map<String, CachingRemoteFile> lookup(CvsServer server) throws SCMException
+    public Map<String, CachingRemoteFile> lookup(SCMCachePopulator populator) throws SCMException
     {
         CacheItem item;
 
         lock.lock();
         try
         {
-            String uid = getUID(server);
+            String uid = populator.getUID();
             if (cache.containsKey(uid))
             {
                 item = cache.get(uid);
-                if (aged(item) && server.hasChangedSince(item.cachedRevision))
+                if (populator.requiresRefresh(item.cachedRevision))
                 {
-                    server.populateCache(item);
+                    populator.populate(item);
                 }
             }
             else
             {
                 item = new CacheItem();
-                server.populateCache(item);
+                populator.populate(item);
                 cache.put(uid, item);
             }
         }
@@ -67,19 +69,14 @@ public class CvsFileCache
         return item.cachedListing;
     }
 
-    private boolean aged(CacheItem item)
-    {
-        return System.currentTimeMillis() - item.cachedRevision.getDate().getTime() > Constants.MINUTE * 5;
-    }
-
     private String getUID(CvsServer server)
     {
         return server.getLocation();
     }
 
-    class CacheItem
+    public class CacheItem
     {
         public Map<String, CachingRemoteFile> cachedListing;
-        public CvsRevision cachedRevision;
+        public Revision cachedRevision;
     }
 }

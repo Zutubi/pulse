@@ -8,11 +8,11 @@ import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.core.util.Constants;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.model.Cvs;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.scm.cvs.client.CvsClient;
 import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * The Cvs Server provides all interactions with a cvs repository.
  */
-public class CvsServer implements SCMServer
+public class CvsServer extends CachingSCMServer
 {
     private File tmpSpace;
 
@@ -228,32 +228,6 @@ public class CvsServer implements SCMServer
         return cvs.getLatestChange();
     }
 
-    public RemoteFile getFile(String path) throws SCMException
-    {
-        Map<String, CachingRemoteFile> cachedListing = CvsFileCache.getInstance().lookup(this);
-        if (cachedListing.containsKey(path))
-        {
-            return cachedListing.get(path);
-        }
-        else
-        {
-            throw new SCMException("Path '" + path + "' does not exist");
-        }
-    }
-
-    public List<RemoteFile> getListing(String path) throws SCMException
-    {
-        Map<String, CachingRemoteFile> cachedListing = CvsFileCache.getInstance().lookup(this);
-        if (cachedListing.containsKey(path))
-        {
-            return cachedListing.get(path).list();
-        }
-        else
-        {
-            throw new SCMException("Path '" + path + "' does not exist");
-        }
-    }
-
     /**
      * Configure the temporary space root. This defaults to the users temporary directories.
      *
@@ -275,7 +249,7 @@ public class CvsServer implements SCMServer
         setTemporarySpace(configurationManager.getSystemPaths().getTmpRoot());
     }
 
-    void populateCache(CvsFileCache.CacheItem item) throws SCMException
+    public void populate(SCMFileCache.CacheItem item) throws SCMException
     {
         item.cachedRevision = getLatestRevision();
         item.cachedListing = new TreeMap<String, CachingRemoteFile>();
@@ -306,30 +280,19 @@ public class CvsServer implements SCMServer
             }
 
             // break this up into files and directories.
-            StringTokenizer tokens = new StringTokenizer(filename, "/", false);
-            String path = "";
-            CachingRemoteFile parent = rootFile;
-            while (tokens.hasMoreTokens())
-            {
-                String name = tokens.nextToken();
-                if (path.length() > 0 && !path.endsWith("/"))
-                {
-                    path += "/";
-                }
+            addToCache(filename, rootFile, item);
+        }
+    }
 
-                path += name;
-
-                if (!item.cachedListing.containsKey(path))
-                {
-                    CachingRemoteFile f = new CachingRemoteFile(name, tokens.hasMoreTokens(), parent, path);
-                    if (parent != null)
-                    {
-                        parent.addChild(f);
-                    }
-                    item.cachedListing.put(path, f);
-                }
-                parent = item.cachedListing.get(path);
-            }
+    public boolean requiresRefresh(Revision revision) throws SCMException
+    {
+        if(System.currentTimeMillis() - revision.getDate().getTime() > Constants.MINUTE * 5)
+        {
+            return super.requiresRefresh(revision);
+        }
+        else
+        {
+            return false;
         }
     }
 }
