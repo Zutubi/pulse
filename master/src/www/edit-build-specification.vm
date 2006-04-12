@@ -9,19 +9,19 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=editBuildSpecification.action" "heading=%{getText('edit.spec')}" "method=post")
+#wwcform("action=editBuildSpecification.action" "heading=%{getText('edit.spec')}" "id=spec.edit" "method=post")
     #wwhidden("name=id")
     #wwhidden("name=projectId")
 
     #wwtextfield("name=spec.name" "label=%{getText('spec.name')}" "required=true"  "tabindex=1")
     #wwtextfield("name=recipe" "label=%{getText('recipe')}" "tabindex=2")
     #inlineHelp("spec.recipe.help")
-    #wwcheckbox("name=timeoutEnabled" "label=%{getText('enable.timeout')}" "fieldValue=true" "onclick=setEnableState('editBuildSpecification_timeout', 'editBuildSpecification_timeoutEnabled')" "tabindex=3")
+    #wwcheckbox("name=timeoutEnabled" "label=%{getText('enable.timeout')}" "fieldValue=true" "onclick=setEnableState('spec.edit_timeout', 'spec.edit_timeoutEnabled')" "tabindex=3")
     #set($minutes = $action.getText('spec.timeout.minutes'))
     #wwtextfield("name=timeout" "label=%{getText('spec.timeout')}" "size=6" "after=$minutes" "tabindex=4")
 
     <script type="text/javascript">
-        setEnableState('editBuildSpecification_timeout', 'editBuildSpecification_timeoutEnabled');
+        setEnableState('spec.edit_timeout', 'spec.edit_timeoutEnabled');
     </script>
 
     #saveCancel(5)

@@ -78,21 +78,13 @@ public class CreateBuildSpecificationAction extends ProjectActionSupport
     public void validate()
     {
         project = getProjectManager().getProject(projectId);
-
-        if (hasErrors())
-        {
-            // do not attempt to validate unless all other validation rules have
-            // completed successfully.
-            return;
-        }
-
         if (project == null)
         {
             addActionError("Unknown project [" + projectId + "]");
             return;
         }
 
-        if (project.getBuildSpecification(spec.getName()) != null)
+        if (TextUtils.stringSet(spec.getName()) && project.getBuildSpecification(spec.getName()) != null)
         {
             addFieldError("spec.name", "A build specification with name '" + spec.getName() + "' already exists in this project.");
         }

@@ -112,11 +112,6 @@ public class EditBuildSpecificationAction extends ProjectActionSupport implement
 
     public void validate()
     {
-        if (hasErrors())
-        {
-            return;
-        }
-
         if (checkSpec())
         {
             return;
@@ -128,10 +123,13 @@ public class EditBuildSpecificationAction extends ProjectActionSupport implement
             return;
         }
 
-        BuildSpecification specOfName = project.getBuildSpecification(spec.getName());
-        if (specOfName != null && specOfName.getId() != id)
+        if (TextUtils.stringSet(spec.getName()))
         {
-            addFieldError("spec.name", "A build specification with name '" + spec.getName() + "' already exists in this project.");
+            BuildSpecification specOfName = project.getBuildSpecification(spec.getName());
+            if (specOfName != null && specOfName.getId() != id)
+            {
+                addFieldError("spec.name", "A build specification with name '" + spec.getName() + "' already exists in this project.");
+            }
         }
 
         if (timeoutEnabled)
@@ -149,6 +147,8 @@ public class EditBuildSpecificationAction extends ProjectActionSupport implement
         {
             return ERROR;
         }
+
+        recipe = spec.getRoot().getChildren().get(0).getStage().getRecipe();
 
         timeoutEnabled = spec.getTimeout() != BuildSpecification.TIMEOUT_NEVER;
         if (timeoutEnabled)

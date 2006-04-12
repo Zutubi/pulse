@@ -373,7 +373,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
     public void testAddNewBuildSpec()
     {
-        CreateBuildSpecForm form = new CreateBuildSpecForm(tester);
+        BuildSpecForm form = new BuildSpecForm(tester, true);
 
         assertProjectBuildSpecTable(new String[][]{
                 createBuildSpecRow("default", "[default]", "[never]")
@@ -387,6 +387,80 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
                 createBuildSpecRow("default", "[default]", "[never]"),
                 createBuildSpecRow(SPEC_NAME, RECIPE_NAME, "100 minutes")
         });
+    }
+
+    public void testAddBuildSpecValidation()
+    {
+        BuildSpecForm form = new BuildSpecForm(tester, true);
+
+        assertProjectBuildSpecTable(new String[][]{
+                createBuildSpecRow("default", "[default]", "[never]")
+        });
+
+        assertAndClick("project.buildspec.add");
+        form.assertFormPresent();
+        form.saveFormElements("", "", "true", "-100");
+        form.assertFormPresent();
+
+        assertTextPresent("name is required");
+        assertTextPresent("Timeout must be a positive value");
+    }
+
+    public void testAddBuildSpecDuplicate()
+    {
+        BuildSpecForm form = new BuildSpecForm(tester, true);
+
+        assertAndClick("project.buildspec.add");
+        form.assertFormPresent();
+        form.saveFormElements("default", "", "true", "100");
+        form.assertFormPresent();
+
+        assertTextPresent("'default' already exists");
+    }
+
+    public void testEditBuildSpec()
+    {
+        testAddNewBuildSpec();
+        assertAndClick("edit_" + SPEC_NAME);
+
+        BuildSpecForm form = new BuildSpecForm(tester, false);
+        form.assertFormPresent();
+        form.assertFormElements(SPEC_NAME, RECIPE_NAME, "true", "100");
+        form.saveFormElements(SPEC_NAME + "edited", RECIPE_NAME + "edited", null, null);
+
+        assertProjectBuildSpecTable(new String[][]{
+                createBuildSpecRow("default", "[default]", "[never]"),
+                createBuildSpecRow(SPEC_NAME + "edited", RECIPE_NAME + "edited", "100 minutes")
+        });
+    }
+
+    public void testEditBuildSpecValidation()
+    {
+        testAddNewBuildSpec();
+        assertAndClick("edit_" + SPEC_NAME);
+
+        BuildSpecForm form = new BuildSpecForm(tester, false);
+        form.assertFormPresent();
+        form.assertFormElements(SPEC_NAME, RECIPE_NAME, "true", "100");
+        form.saveFormElements("", "", "true", "-100");
+        form.assertFormPresent();
+
+        assertTextPresent("name is required");
+        assertTextPresent("Timeout must be a positive value");
+    }
+
+    public void testEditBuildSpecDuplicate()
+    {
+        testAddNewBuildSpec();
+        assertAndClick("edit_" + SPEC_NAME);
+
+        BuildSpecForm form = new BuildSpecForm(tester, false);
+        form.assertFormPresent();
+        form.assertFormElements(SPEC_NAME, RECIPE_NAME, "true", "100");
+        form.saveFormElements("default", "", "true", "100");
+        form.assertFormPresent();
+
+        assertTextPresent("'default' already exists");
     }
 
     public void testAddNewTrigger()

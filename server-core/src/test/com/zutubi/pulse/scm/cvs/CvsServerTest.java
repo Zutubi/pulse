@@ -58,7 +58,7 @@ public class CvsServerTest extends BobTestCase
     public void testListing() throws SCMException
     {
         CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
-        List<RemoteFile> files = cvsServer.getListing("unit-test/CvsClientTest/testRlog");
+        List<RemoteFile> files = cvsServer.getListing("unit-test/CvsWorkerTest/testRlog");
         assertEquals(4, files.size());
 
         String [] expectedNames = new String[]{"file1.txt", "Attic", "dir1", "dir2"};
