@@ -35,7 +35,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
     public void testLoadSave() throws Exception
     {
         Date date = Calendar.getInstance().getTime();
-        CvsRevision revision = new CvsRevision("bob", "MAIN", "test changelist", date);
+        CvsRevision revision = new CvsRevision("pulse", "MAIN", "test changelist", date);
         Changelist list = new Changelist(revision);
         Change change = new Change("some/random/file", "23", Change.Action.EDIT);
 

@@ -209,7 +209,7 @@ public class YahooApiHandler
 //                }
 //
 //            });
-////            yahooSession.login("bob_cinnamon", "c1nnam0n");
+////            yahooSession.login("pulse_cinnamon", "c1nnam0n");
 //            yahooSession.login("cinnamon_robert", "c1nnam0n");
 //            yahooSession.sendMessage(getYahooId(), "new build has finished.");
 //        }

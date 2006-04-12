@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class DefaultSystemPaths implements SystemPaths
 {
-    private final File bobInstall;
+    private final File pulseInstall;
 
     private File systemRoot;
     private File contentRoot;
@@ -19,16 +19,16 @@ public class DefaultSystemPaths implements SystemPaths
     private List<File> templateRoots;
     private File tmpRoot;
 
-    public DefaultSystemPaths(File bobHome)
+    public DefaultSystemPaths(File pulseHome)
     {
-        this.bobInstall = bobHome;
+        this.pulseInstall = pulseHome;
     }
 
     public File getSystemRoot()
     {
         if (systemRoot == null)
         {
-            systemRoot = new File(bobInstall, "system");
+            systemRoot = new File(pulseInstall, "system");
         }
         return systemRoot;
     }

@@ -6,16 +6,16 @@ import java.io.InputStream;
 
 /**
  */
-public class InMemoryBobFileSource implements BobFileSource
+public class InMemoryPulseFileSource implements PulseFileSource
 {
     public String data;
 
-    public InMemoryBobFileSource(String data)
+    public InMemoryPulseFileSource(String data)
     {
         this.data = data;
     }
 
-    public InputStream getBobFile(File baseDir)
+    public InputStream getPulseFile(File baseDir)
     {
         return new ByteArrayInputStream(data.getBytes());
     }

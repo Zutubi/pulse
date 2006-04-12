@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.CustomBobFileDetails;
+import com.zutubi.pulse.model.CustomPulseFileDetails;
 import com.zutubi.pulse.model.Project;
 
 /**
@@ -8,7 +8,7 @@ import com.zutubi.pulse.model.Project;
 public class ConvertToCustomProjectAction extends ProjectActionSupport
 {
     private long id;
-    private CustomBobFileDetails details = new CustomBobFileDetails();
+    private CustomPulseFileDetails details = new CustomPulseFileDetails();
     private Project project;
 
     public long getId()
@@ -21,7 +21,7 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
         this.id = id;
     }
 
-    public CustomBobFileDetails getDetails()
+    public CustomPulseFileDetails getDetails()
     {
         return details;
     }
@@ -49,7 +49,7 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
 
     public String execute()
     {
-        project.setBobFileDetails(details);
+        project.setPulseFileDetails(details);
         getProjectManager().save(project);
 
         return SUCCESS;

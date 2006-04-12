@@ -1,16 +1,16 @@
 package com.zutubi.pulse.local;
 
-import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.IOUtils;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.*;
 import java.net.URL;
 
 /**
  */
-public class LocalBuildTest extends BobTestCase
+public class LocalBuildTest extends PulseTestCase
 {
     File tmpDir;
     boolean generateMode = false;
@@ -35,14 +35,14 @@ public class LocalBuildTest extends BobTestCase
 
     private File getExpectedOutput(String name)
     {
-        File root = getBobRoot();
+        File root = getPulseRoot();
         return new File(root, FileSystemUtils.composeFilename("local", "src", "test", "com", "zutubi", "pulse", "local", "data", name));
     }
 
     private String copyFile(String name) throws IOException
     {
-        URL bobURL = getInputURL(name);
-        File srcFile = new File(bobURL.getFile());
+        URL pulseURL = getInputURL(name);
+        File srcFile = new File(pulseURL.getFile());
         File destFile = new File(tmpDir, srcFile.getName());
 
         IOUtils.copyFile(srcFile, destFile);
@@ -54,14 +54,14 @@ public class LocalBuildTest extends BobTestCase
         simpleCase("basic");
     }
 
-    public void testInvalidBaseDir() throws BobException
+    public void testInvalidBaseDir() throws PulseException
     {
         File baseDir = new File("/no/such/dir");
         try
         {
-            builder.runBuild(baseDir, "bob.xml", "my-default", null, "out");
+            builder.runBuild(baseDir, "pulse.xml", "my-default", null, "out");
         }
-        catch (BobException e)
+        catch (PulseException e)
         {
             assertEquals("Base directory '" + baseDir.getAbsolutePath() + "' does not exist", e.getMessage());
             return;
@@ -70,25 +70,25 @@ public class LocalBuildTest extends BobTestCase
         assertTrue("Expected exception", false);
     }
 
-    public void testInvalidBobFile() throws BobException, IOException
+    public void testInvalidPulseFile() throws PulseException, IOException
     {
         try
         {
-            builder.runBuild(tmpDir, "no-such-bob.xml", "my-default", null, "out");
+            builder.runBuild(tmpDir, "no-such-pulse.xml", "my-default", null, "out");
             fail();
         }
-        catch (BobException e)
+        catch (PulseException e)
         {
-            assertTrue(e.getMessage().contains("Unable to load bob file"));
+            assertTrue(e.getMessage().contains("Unable to load pulse file"));
         }
     }
 
-    public void testLoadResources() throws IOException, BobException
+    public void testLoadResources() throws IOException, PulseException
     {
-        String bobFile = copyFile("resourceload");
+        String pulseFile = copyFile("resourceload");
         String resourceFile = getInputURL("resources").getFile();
 
-        builder.runBuild(tmpDir, bobFile, null, resourceFile, "out");
+        builder.runBuild(tmpDir, pulseFile, null, resourceFile, "out");
         compareOutput("resourceload");
     }
 
@@ -97,10 +97,10 @@ public class LocalBuildTest extends BobTestCase
         simpleCase("commandFailure");
     }
 
-    private void simpleCase(String name) throws IOException, BobException
+    private void simpleCase(String name) throws IOException, PulseException
     {
-        String bobFile = copyFile(name);
-        builder.runBuild(tmpDir, bobFile, "my-default", null, "out");
+        String pulseFile = copyFile(name);
+        builder.runBuild(tmpDir, pulseFile, "my-default", null, "out");
         compareOutput(name);
     }
 

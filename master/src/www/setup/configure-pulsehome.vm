@@ -1,0 +1,20 @@
+<html>
+<head>
+    <title>#wwtext("name=pulseHome.setup")</title>
+</head>
+
+<body>
+    <h1>:: #wwtext("name=pulseHome.setup") ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=setup.action" "heading=%{getText('pulseHome.setup')}" "name=setup.pulseHome" "method=post")
+
+    #wwtextfield("name=pulseHome" "label=%{getText('pulseHome.field')}" "required=true" "size=60" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("pulseHome.help")
+
+    #next(2)
+#end
+
+</body>
+</html>

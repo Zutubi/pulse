@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.BobFileDetails;
+import com.zutubi.pulse.model.PulseFileDetails;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.persistence.BobFileDetailsDao;
+import com.zutubi.pulse.model.persistence.PulseFileDetailsDao;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 
 import java.util.Arrays;
@@ -17,7 +17,7 @@ public abstract class AbstractEditDetailsAction extends ProjectActionSupport imp
     private long id;
     private long projectId;
     private Project project;
-    private BobFileDetailsDao bobFileDetailsDao;
+    private PulseFileDetailsDao pulseFileDetailsDao;
     private static final List<String> PREPARE_PARAMS = Arrays.asList("id", "projectId");
 
     public long getId()
@@ -45,14 +45,14 @@ public abstract class AbstractEditDetailsAction extends ProjectActionSupport imp
         return project;
     }
 
-    public BobFileDetailsDao getBobFileDetailsDao()
+    public PulseFileDetailsDao getPulseFileDetailsDao()
     {
-        return bobFileDetailsDao;
+        return pulseFileDetailsDao;
     }
 
-    public void setBobFileDetailsDao(BobFileDetailsDao bobFileDetailsDao)
+    public void setPulseFileDetailsDao(PulseFileDetailsDao pulseFileDetailsDao)
     {
-        this.bobFileDetailsDao = bobFileDetailsDao;
+        this.pulseFileDetailsDao = pulseFileDetailsDao;
     }
 
     public List<String> getPrepareParameterNames()
@@ -82,9 +82,9 @@ public abstract class AbstractEditDetailsAction extends ProjectActionSupport imp
             return INPUT;
         }
 
-        getBobFileDetailsDao().save(getDetails());
+        getPulseFileDetailsDao().save(getDetails());
         return SUCCESS;
     }
 
-    public abstract BobFileDetails getDetails();
+    public abstract PulseFileDetails getDetails();
 }

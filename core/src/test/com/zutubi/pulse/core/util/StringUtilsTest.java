@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.util;
 
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  */
-public class StringUtilsTest extends BobTestCase
+public class StringUtilsTest extends PulseTestCase
 {
     public void testTrimStringShort()
     {

@@ -1,13 +1,13 @@
 package com.zutubi.pulse.scm;
 
-import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.PulseException;
 
 /**
  * An error raised during interaction with an SCM server.
  *
  * @author jsankey
  */
-public class SCMException extends BobException
+public class SCMException extends PulseException
 {
     /**
      * Create a new SCM exception.

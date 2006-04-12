@@ -85,8 +85,8 @@ public class AddProjectWizard extends BaseWizard
         Scm scm = getScm();
         project.setScm(scm);
 
-        // configure bob file.
-        BobFileDetails details = null;
+        // configure pulse file.
+        PulseFileDetails details = null;
         String projectType = projectDetails.getType();
         if ("ant".equals(projectType))
         {
@@ -104,7 +104,7 @@ public class AddProjectWizard extends BaseWizard
         {
             details = mavenDetails.getDetails();
         }
-        project.setBobFileDetails(details);
+        project.setPulseFileDetails(details);
 
         BuildSpecification buildSpec = new BuildSpecification("default");
         project.addBuildSpecification(buildSpec);
@@ -439,7 +439,7 @@ public class AddProjectWizard extends BaseWizard
 
     private class AntDetails extends BaseWizardState
     {
-        private AntBobFileDetails details = new AntBobFileDetails("build.xml", null, null, null, null);
+        private AntPulseFileDetails details = new AntPulseFileDetails("build.xml", null, null, null, null);
 
         public AntDetails(Wizard wizard, String name)
         {
@@ -451,7 +451,7 @@ public class AddProjectWizard extends BaseWizard
             return ((AddProjectWizard) getWizard()).completeState.getStateName();
         }
 
-        public AntBobFileDetails getDetails()
+        public AntPulseFileDetails getDetails()
         {
             return details;
         }
@@ -482,7 +482,7 @@ public class AddProjectWizard extends BaseWizard
 
     private class MakeDetails extends BaseWizardState
     {
-        private MakeBobFileDetails details = new MakeBobFileDetails("Makefile", null, null, null, null);
+        private MakePulseFileDetails details = new MakePulseFileDetails("Makefile", null, null, null, null);
 
         public MakeDetails(Wizard wizard, String name)
         {
@@ -494,7 +494,7 @@ public class AddProjectWizard extends BaseWizard
             return ((AddProjectWizard) getWizard()).completeState.getStateName();
         }
 
-        public MakeBobFileDetails getDetails()
+        public MakePulseFileDetails getDetails()
         {
             return details;
         }
@@ -525,7 +525,7 @@ public class AddProjectWizard extends BaseWizard
 
     private class MavenDetails extends BaseWizardState
     {
-        private MavenBobFileDetails details = new MavenBobFileDetails();
+        private MavenPulseFileDetails details = new MavenPulseFileDetails();
 
         public MavenDetails(Wizard wizard, String name)
         {
@@ -537,7 +537,7 @@ public class AddProjectWizard extends BaseWizard
             return ((AddProjectWizard) getWizard()).completeState.getStateName();
         }
 
-        public BobFileDetails getDetails()
+        public PulseFileDetails getDetails()
         {
             return details;
         }
@@ -558,7 +558,7 @@ public class AddProjectWizard extends BaseWizard
 
     private class CustomDetails extends BaseWizardState
     {
-        private BobFileDetails details = new CustomBobFileDetails("bob.xml");
+        private PulseFileDetails details = new CustomPulseFileDetails("pulse.xml");
 
         public CustomDetails(Wizard wizard, String name)
         {
@@ -570,7 +570,7 @@ public class AddProjectWizard extends BaseWizard
             return ((AddProjectWizard) getWizard()).completeState.getStateName();
         }
 
-        public BobFileDetails getDetails()
+        public PulseFileDetails getDetails()
         {
             return details;
         }

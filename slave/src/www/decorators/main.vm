@@ -7,7 +7,7 @@
 	</head>
 
     <body>
-        <div id="header">:: cinnamon bob :: #if($navProject) <a href="manageProject.action?id=$navProject">$navProjectName</a>#end</div>
+        <div id="header">:: pulse :: #if($navProject) <a href="manageProject.action?id=$navProject">$navProjectName</a>#end</div>
         <div id="navbar">
             <ul>
                 <li><a href="slaveStatus.action">slave</a></li>
@@ -19,7 +19,7 @@
         </div>
 
         <div id="footer">
-            <b>:: project cinnamon bob ::</b>
+            <b>:: pulse ::</b>
             copyright &copy; 2005-2006 daniel ostermeier and jason sankey
         </div>
     </body>

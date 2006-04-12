@@ -8,7 +8,7 @@
     <!--
     	function openFileWindow()
     	{
-    	    openBrowseWindow(false, "custom.edit_details_bobFileName", "&id=$project.id");
+    	    openBrowseWindow(false, "custom.edit_details_pulseFileName", "&id=$project.id");
     	}
     -->
     </script>
@@ -22,8 +22,8 @@
     #wwhidden("name=id")
     #wwhidden("name=projectId")
 
-    #wwtextfield("name=details.bobFileName" "label=%{getText('bob.filename')}" "after= <a href='#' onclick='openFileWindow(); return false;'>browse</a>" "required=true" "size=40" "tabindex=1")
-    #inlineHelp("bob.filename.help")
+    #wwtextfield("name=details.pulseFileName" "label=%{getText('pulse.filename')}" "after= <a href='#' onclick='openFileWindow(); return false;'>browse</a>" "required=true" "size=40" "tabindex=1")
+    #inlineHelp("pulse.filename.help")
     
     #saveCancel(2)
  #end

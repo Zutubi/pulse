@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  */
-public class P4ServerTest extends BobTestCase
+public class P4ServerTest extends PulseTestCase
 {
     P4Server server;
     private File tmpDir;
@@ -260,6 +260,6 @@ public class P4ServerTest extends BobTestCase
 
     private File getDataRoot()
     {
-        return new File(getBobRoot(), FileSystemUtils.composeFilename("server-core", "src", "test", "com", "zutubi", "pulse", "scm", "p4", "data"));
+        return new File(getPulseRoot(), FileSystemUtils.composeFilename("server-core", "src", "test", "com", "zutubi", "pulse", "scm", "p4", "data"));
     }
 }

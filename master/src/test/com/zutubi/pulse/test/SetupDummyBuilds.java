@@ -176,12 +176,12 @@ public class SetupDummyBuilds implements Runnable
     private Project setupProject(String name)
     {
         Project project = new Project(name, "A test project with a decently long description to test wrapping etc.");
-        project.setBobFileDetails(new CustomBobFileDetails("bob.xml"));
+        project.setPulseFileDetails(new CustomPulseFileDetails("pulse.xml"));
 
         P4 scm = new P4();
         scm.setPort(":1666");
         scm.setUser("jsankey");
-        scm.setClient("bob");
+        scm.setClient("pulse");
         project.setScm(scm);
 
         BuildSpecification simpleSpec = new BuildSpecification("simple");
@@ -614,7 +614,7 @@ public class SetupDummyBuilds implements Runnable
 
         try
         {
-            File root = BobTestCase.getBobRoot();
+            File root = PulseTestCase.getPulseRoot();
             File dummy = new File(root, FileSystemUtils.composeFilename("master", "src", "test", "com", "pulse", "test", "dummyArtifactFile.txt"));
             File artifactFile = new File(dir, filename);
             IOUtils.copyFile(dummy, artifactFile);

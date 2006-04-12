@@ -4,7 +4,7 @@ package com.zutubi.pulse.core;
  * 
  *
  */
-public class FileLoadException extends BobException
+public class FileLoadException extends PulseException
 {
     /**
      * @param errorMessage

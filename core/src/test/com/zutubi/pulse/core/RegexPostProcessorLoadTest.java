@@ -6,9 +6,9 @@ import com.zutubi.pulse.core.model.Feature;
  */
 public class RegexPostProcessorLoadTest extends FileLoaderTestBase
 {
-    private RegexPostProcessor helper(String ppName) throws BobException
+    private RegexPostProcessor helper(String ppName) throws PulseException
     {
-        BobFile bf = new BobFile();
+        PulseFile bf = new PulseFile();
         loader.load(getInput("basic"), bf);
 
         Scope globalScope = bf.getGlobalScope();
@@ -18,7 +18,7 @@ public class RegexPostProcessorLoadTest extends FileLoaderTestBase
         return (RegexPostProcessor) globalScope.getReference(ppName);
     }
 
-    public void testEmpty() throws BobException
+    public void testEmpty() throws PulseException
     {
         RegexPostProcessor pp = helper("empty");
         assertTrue(pp.getFailOnError());
@@ -26,7 +26,7 @@ public class RegexPostProcessorLoadTest extends FileLoaderTestBase
         assertEquals(0, pp.getPatterns().size());
     }
 
-    public void testFailOnWarning() throws BobException
+    public void testFailOnWarning() throws PulseException
     {
         RegexPostProcessor pp = helper("failOnWarning");
         assertTrue(pp.getFailOnError());
@@ -34,7 +34,7 @@ public class RegexPostProcessorLoadTest extends FileLoaderTestBase
         assertEquals(0, pp.getPatterns().size());
     }
 
-    public void testNoFailOnError() throws BobException
+    public void testNoFailOnError() throws PulseException
     {
         RegexPostProcessor pp = helper("noFailOnError");
         assertFalse(pp.getFailOnError());
@@ -42,7 +42,7 @@ public class RegexPostProcessorLoadTest extends FileLoaderTestBase
         assertEquals(0, pp.getPatterns().size());
     }
 
-    private void levelPattern(String name, Feature.Level level) throws BobException
+    private void levelPattern(String name, Feature.Level level) throws PulseException
     {
         RegexPostProcessor pp = helper(name);
         assertEquals(1, pp.getPatterns().size());
@@ -51,44 +51,44 @@ public class RegexPostProcessorLoadTest extends FileLoaderTestBase
         assertEquals(".", pattern.getPattern().pattern());
     }
 
-    public void testErrorPattern() throws BobException
+    public void testErrorPattern() throws PulseException
     {
         levelPattern("errorPattern", Feature.Level.ERROR);
     }
 
-    public void testWarningPattern() throws BobException
+    public void testWarningPattern() throws PulseException
     {
         levelPattern("warningPattern", Feature.Level.WARNING);
     }
 
-    public void testInfoPattern() throws BobException
+    public void testInfoPattern() throws PulseException
     {
         levelPattern("infoPattern", Feature.Level.INFO);
     }
 
-    public void testContext() throws BobException
+    public void testContext() throws PulseException
     {
         RegexPostProcessor pp = helper("context");
         assertEquals(1, pp.getLeadingContext());
         assertEquals(2, pp.getTrailingContext());
     }
 
-    public void testUnknownLevel() throws BobException
+    public void testUnknownLevel() throws PulseException
     {
         errorHelper("unknownLevel", "Unrecognised regex category 'wtf?'");
     }
 
-    public void testRegexPPInvalidRegex() throws BobException
+    public void testRegexPPInvalidRegex() throws PulseException
     {
         errorHelper("invalidRegex", "Unclosed group");
     }
 
-    public void testNegativeLeadingContext() throws BobException
+    public void testNegativeLeadingContext() throws PulseException
     {
         errorHelper("negativeLeadingContext", "Leading context count must be non-negative (got -1)");
     }
 
-    public void testNegativeTrailingContext() throws BobException
+    public void testNegativeTrailingContext() throws PulseException
     {
         errorHelper("negativeTrailingContext", "Trailing context count must be non-negative (got -2)");
     }

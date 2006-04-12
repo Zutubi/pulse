@@ -27,7 +27,7 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
     protected static final String PROJECT_BASICS_SCM = "scm";
     protected static final String PROJECT_BASICS_TYPE = "type";
     protected static final String FO_CUSTOM_SETUP = "custom.setup";
-    protected static final String CUSTOM_SETUP_FILE = "details.bobFileName";
+    protected static final String CUSTOM_SETUP_FILE = "details.pulseFileName";
 
     public BaseAcceptanceTest()
     {

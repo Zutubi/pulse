@@ -8,7 +8,7 @@ import java.util.Properties;
 /**
  * <class-comment/>
  */
-public class MavenBobFileDetails extends TemplateBobFileDetails
+public class MavenPulseFileDetails extends TemplatePulseFileDetails
 {
     /**
      * Space-separated list of target names (persists more efficiently)

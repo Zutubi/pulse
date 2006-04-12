@@ -4,9 +4,9 @@ package com.zutubi.pulse.core;
  */
 public class MakePostProcessorLoadTest extends FileLoaderTestBase
 {
-    private MakePostProcessor helper(String ppName) throws BobException
+    private MakePostProcessor helper(String ppName) throws PulseException
     {
-        BobFile bf = new BobFile();
+        PulseFile bf = new PulseFile();
         loader.load(getInput("basic"), bf);
 
         Scope globalScope = bf.getGlobalScope();
@@ -16,7 +16,7 @@ public class MakePostProcessorLoadTest extends FileLoaderTestBase
         return (MakePostProcessor) globalScope.getReference(ppName);
     }
 
-    public void testBasic() throws BobException
+    public void testBasic() throws PulseException
     {
         MakePostProcessor pp = helper("basic");
         assertEquals(true, pp.getFailOnError());

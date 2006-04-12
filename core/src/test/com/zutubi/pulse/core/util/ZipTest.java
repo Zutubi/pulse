@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.util;
 
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.*;
 import java.util.Map;
@@ -11,7 +11,7 @@ import java.util.zip.ZipInputStream;
 
 /**
  */
-public class ZipTest extends BobTestCase
+public class ZipTest extends PulseTestCase
 {
     File tmpDir;
     File inDir;

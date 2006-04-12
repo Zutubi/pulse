@@ -1,7 +1,7 @@
 package com.zutubi.pulse.bootstrap.conf;
 
 import com.zutubi.pulse.core.util.IOUtils;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.util.Properties;
 /**
  * <class-comment/>
  */
-public class FileConfigTest extends BobTestCase
+public class FileConfigTest extends PulseTestCase
 {
     private Config config = null;
     private File testProperties;

@@ -2,14 +2,14 @@ package com.zutubi.pulse.scm.cvs.client;
 
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.cvs.client.CvsClient;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
 
 /**
  * <class-comment/>
  */
-public class VersionCommandTest extends BobTestCase
+public class VersionCommandTest extends PulseTestCase
 {
     private CvsClient client;
 
@@ -26,7 +26,7 @@ public class VersionCommandTest extends BobTestCase
     {
         super.setUp();
 
-        File repositoryRoot = new File(getBobRoot(), "server-core/src/test/com/zutubi/pulse/scm/cvs/repository");
+        File repositoryRoot = new File(getPulseRoot(), "server-core/src/test/com/zutubi/pulse/scm/cvs/repository");
         String cvsRoot = ":local:" + repositoryRoot.getCanonicalPath();
         client = new CvsClient(cvsRoot);
 

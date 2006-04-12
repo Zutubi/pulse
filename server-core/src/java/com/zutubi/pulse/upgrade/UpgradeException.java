@@ -1,11 +1,11 @@
 package com.zutubi.pulse.upgrade;
 
-import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.PulseException;
 
 /**
  * <class-comment/>
  */
-public class UpgradeException extends BobException
+public class UpgradeException extends PulseException
 {
     public UpgradeException()
     {

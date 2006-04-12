@@ -58,7 +58,7 @@ public class FileResourceRepository implements ResourceRepository
         }
     }
 
-    public void refresh() throws IllegalAccessException, IOException, BobException, InvocationTargetException
+    public void refresh() throws IllegalAccessException, IOException, PulseException, InvocationTargetException
     {
         if (resourceDef.exists())
         {

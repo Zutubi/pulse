@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.opensymphony.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
 import java.util.Map;
@@ -8,9 +9,9 @@ import java.util.TreeMap;
 
 /**
  */
-public class MakeBobFileDetails extends TemplateBobFileDetails
+public class AntPulseFileDetails extends TemplatePulseFileDetails
 {
-    private String makefile;
+    private String buildFile;
     /**
      * Space-separated list of target names (persists more efficiently)
      */
@@ -25,18 +26,18 @@ public class MakeBobFileDetails extends TemplateBobFileDetails
     private String workingDir;
     private Map<String, String> environment;
 
-    public MakeBobFileDetails()
+    public AntPulseFileDetails()
     {
-        makefile = null;
+        buildFile = null;
         targets = null;
         arguments = null;
         workingDir = null;
         environment = new TreeMap<String, String>();
     }
 
-    public MakeBobFileDetails(String buildFile, String targets, String arguments, String workingDir, Map<String, String> environment)
+    public AntPulseFileDetails(String buildFile, String targets, String arguments, String workingDir, Map<String, String> environment)
     {
-        this.makefile = buildFile;
+        this.buildFile = buildFile;
         this.targets = targets;
         this.arguments = arguments;
         this.workingDir = workingDir;
@@ -45,14 +46,14 @@ public class MakeBobFileDetails extends TemplateBobFileDetails
 
     protected String getTemplateName()
     {
-        return "make.template.vm";
+        return "ant.template.vm";
     }
 
     protected void populateContext(VelocityContext context)
     {
-        if (makefile != null)
+        if (buildFile != null)
         {
-            context.put("makefile", makefile);
+            context.put("buildFile", buildFile);
         }
 
         if (targets != null)
@@ -73,14 +74,14 @@ public class MakeBobFileDetails extends TemplateBobFileDetails
         context.put("environment", environment);
     }
 
-    public String getMakefile()
+    public String getBuildFile()
     {
-        return makefile;
+        return buildFile;
     }
 
-    public void setMakefile(String makefile)
+    public void setBuildFile(String buildFile)
     {
-        this.makefile = makefile;
+        this.buildFile = buildFile;
     }
 
     public String getTargets()
@@ -130,7 +131,7 @@ public class MakeBobFileDetails extends TemplateBobFileDetails
 
     public String getType()
     {
-        return "make";
+        return "ant";
     }
 
     public Properties getProperties()
@@ -138,24 +139,24 @@ public class MakeBobFileDetails extends TemplateBobFileDetails
         // TODO i18n
         Properties result = new Properties();
 
-        if (makefile != null)
+        if (TextUtils.stringSet(buildFile))
         {
-            result.put("makefile", makefile);
+            result.put("build file", buildFile);
         }
 
-        if (targets != null)
+        if (TextUtils.stringSet(targets))
         {
             result.put("targets", targets);
         }
 
-        if (workingDir != null)
-        {
-            result.put("working directory", workingDir);
-        }
-
-        if (arguments != null)
+        if (TextUtils.stringSet(arguments))
         {
             result.put("arguments", arguments);
+        }
+
+        if (TextUtils.stringSet(workingDir))
+        {
+            result.put("working directory", workingDir);
         }
 
         String env = getEnvironmentString();

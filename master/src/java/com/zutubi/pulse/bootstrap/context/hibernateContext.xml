@@ -95,17 +95,17 @@ This context requires:
     </bean>
 
 
-    <bean id="bobFileDetailsDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateBobFileDetailsDao">
+    <bean id="pulseFileDetailsDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernatePulseFileDetailsDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
     </bean>
-    <bean id="bobFileDetailsDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <bean id="pulseFileDetailsDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <ref bean="bobFileDetailsDaoTarget"/>
+            <ref bean="pulseFileDetailsDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>

@@ -16,9 +16,9 @@
             <format property="build.date" pattern="d-MMMM-yyyy"/>
         </tstamp>
         <property name="version.properties" value="${classes.dir}/com/zutubi/pulse/version.properties"/>
-        <replace file="${version.properties}" token="@VERSION@" value="${bob.version}"/>
+        <replace file="${version.properties}" token="@VERSION@" value="${pulse.version}"/>
         <replace file="${version.properties}" token="@BUILD_DATE@" value="${build.date}"/>
-        <replace file="${version.properties}" token="@BUILD_NUMBER@" value="${bob.build}"/>
+        <replace file="${version.properties}" token="@BUILD_NUMBER@" value="${pulse.build}"/>
     </target>
 
 </project>

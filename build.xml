@@ -2,7 +2,7 @@
 <!-- -->
 <!-- -->
 <!-- -->
-<project name="Cinnamon Bob" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
+<project name="Pulse" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
 
     <property file="build.properties"/>
 
@@ -18,7 +18,7 @@
         <delete dir="home"/>
         <delete dir="master/system"/>
         <delete file="master/etc/admin.token"/>
-        <delete file="master/etc/bob-init.properties"/>
+        <delete file="master/etc/pulse-init.properties"/>
     </target>
 
     <target name="build.core">
@@ -80,15 +80,15 @@
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
 
-        <zip destfile="build/bob-local-${bob.version}.zip">
-            <zipfileset dir="build/package" includes="**/*" prefix="bob-local-${bob.version}"/>
+        <zip destfile="build/pulse-local-${pulse.version}.zip">
+            <zipfileset dir="build/package" includes="**/*" prefix="pulse-local-${pulse.version}"/>
         </zip>
 
     </target>
 
     <target name="package.master" depends="init, build.local, build.master">
 
-        <property name="package.name" value="bob-master-${bob.version}"/>
+        <property name="package.name" value="pulse-master-${pulse.version}"/>
         <property name="package.root" value="build/package/${package.name}"/>
 
         <delete dir="${package.root}"/>
@@ -125,7 +125,7 @@
 
         <!-- /config is for user configuration properties -->
         <copy todir="${package.root}/system/config">
-            <fileset dir="master/etc" includes="bob-defaults.properties,logging.properties"/>
+            <fileset dir="master/etc" includes="pulse-defaults.properties,logging.properties"/>
             <fileset dir="master/etc" includes="logging/*.properties"/>
         </copy>
 

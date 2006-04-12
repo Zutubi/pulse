@@ -6,20 +6,20 @@ import net.sourceforge.jwebunit.WebTester;
 /**
  * <class-comment/>
  */
-public class SetBobHomeForm extends BaseForm
+public class SetPulseHomeForm extends BaseForm
 {
-    public SetBobHomeForm(WebTester tester)
+    public SetPulseHomeForm(WebTester tester)
     {
         super(tester);
     }
 
     public String getFormName()
     {
-        return "setup.bobHome";
+        return "setup.pulseHome";
     }
 
     public String[] getFieldNames()
     {
-        return new String[]{"bobHome"};
+        return new String[]{"pulseHome"};
     }
 }

@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.PlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  */
-public class MakePostProcessorTest extends BobTestCase
+public class MakePostProcessorTest extends PulseTestCase
 {
     public void testCommandError() throws URISyntaxException
     {

@@ -1,18 +1,14 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.model.BuildHostRequirements;
-import com.zutubi.pulse.model.BobFileDetails;
-import com.zutubi.pulse.model.Project;
 import junit.framework.TestCase;
 
 import java.io.File;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -264,7 +260,7 @@ public class ThreadedRecipeQueueTest extends TestCase
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
         RecipeRequest request = new RecipeRequest(id, null);
         request.setBootstrapper(new ChainBootstrapper());
-        return new RecipeDispatchRequest(requirements, new LazyBobFile("howdy :)"), request, null);
+        return new RecipeDispatchRequest(requirements, new LazyPulseFile("howdy :)"), request, null);
     }
 
     private RecipeDispatchRequest createDispatchRequest(int type)

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.AntBobFileDetails;
-import com.zutubi.pulse.model.BobFileDetails;
+import com.zutubi.pulse.model.AntPulseFileDetails;
+import com.zutubi.pulse.model.PulseFileDetails;
 import com.opensymphony.util.TextUtils;
 
 /**
@@ -9,14 +9,14 @@ import com.opensymphony.util.TextUtils;
  */
 public class EditAntDetailsAction extends AbstractEditDetailsAction
 {
-    private AntBobFileDetails details = new AntBobFileDetails();
+    private AntPulseFileDetails details = new AntPulseFileDetails();
 
     public void prepare()
     {
-        details = getBobFileDetailsDao().findByIdAndType(getId(), AntBobFileDetails.class);
+        details = getPulseFileDetailsDao().findByIdAndType(getId(), AntPulseFileDetails.class);
     }
 
-    public BobFileDetails getDetails()
+    public PulseFileDetails getDetails()
     {
         if (!TextUtils.stringSet(details.getBuildFile()))
         {

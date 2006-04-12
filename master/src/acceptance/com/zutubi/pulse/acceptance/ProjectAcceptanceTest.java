@@ -40,7 +40,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         projectName = "project " + RandomUtils.randomString(5);
         submitProjectBasicsForm(projectName, DESCRIPTION, URL, "cvs", "custom");
         submitCvsSetupForm("/local", "module", "", "");
-        submitCustomSetupForm("bob.xml");
+        submitCustomSetupForm("pulse.xml");
         assertTablePresent("project.basics");
     }
 
@@ -112,7 +112,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         String newProject = "project " + RandomUtils.randomString(5);
         submitProjectBasicsForm(newProject, "test description", "http://test/url", "cvs", "custom");
         submitCvsSetupForm("/local", "module", "", "");
-        submitCustomSetupForm("bob.xml");
+        submitCustomSetupForm("pulse.xml");
 
         clickLink("project.basics.edit");
         form.saveFormElements(projectName, null, null);
@@ -129,13 +129,13 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         CustomProjectEditForm form = new CustomProjectEditForm(tester);
 
         // verify what we have to start with.
-        assertProjectSpecificsTable("custom", "bob.xml");
+        assertProjectSpecificsTable("custom", "pulse.xml");
 
         assertLinkPresent("project.specifics.edit");
         clickLink("project.specifics.edit");
 
         // assert that the form is pre populated with the expected data.
-        form.assertFormElements("bob.xml");
+        form.assertFormElements("pulse.xml");
 
         form.saveFormElements("custom.xml");
 
@@ -147,12 +147,12 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
     {
         CustomProjectEditForm form = new CustomProjectEditForm(tester);
 
-        assertProjectSpecificsTable("custom", "bob.xml");
+        assertProjectSpecificsTable("custom", "pulse.xml");
 
         assertLinkPresent("project.specifics.edit");
         clickLink("project.specifics.edit");
 
-        form.assertFormElements("bob.xml");
+        form.assertFormElements("pulse.xml");
 
         form.saveFormElements("");
 
@@ -165,16 +165,16 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         CustomProjectEditForm form = new CustomProjectEditForm(tester);
 
         // test the editing of custom specifics.
-        assertProjectSpecificsTable("custom", "bob.xml");
+        assertProjectSpecificsTable("custom", "pulse.xml");
 
         assertLinkPresent("project.specifics.edit");
         clickLink("project.specifics.edit");
 
-        form.assertFormElements("bob.xml");
+        form.assertFormElements("pulse.xml");
 
         form.cancelFormElements("custom.xml");
 
-        assertProjectSpecificsTable("custom", "bob.xml");
+        assertProjectSpecificsTable("custom", "pulse.xml");
     }
 
     public void testEditScm()

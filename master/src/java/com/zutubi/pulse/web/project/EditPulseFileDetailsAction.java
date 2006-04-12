@@ -1,16 +1,16 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.BobFileDetails;
-import com.zutubi.pulse.model.persistence.BobFileDetailsDao;
+import com.zutubi.pulse.model.PulseFileDetails;
+import com.zutubi.pulse.model.persistence.PulseFileDetailsDao;
 
 /**
  *
  *
  */
-public class EditBobFileDetailsAction extends ProjectActionSupport
+public class EditPulseFileDetailsAction extends ProjectActionSupport
 {
     private long id;
-    private BobFileDetailsDao bobFileDetailsDao;
+    private PulseFileDetailsDao pulseFileDetailsDao;
 
     public long getId()
     {
@@ -24,7 +24,7 @@ public class EditBobFileDetailsAction extends ProjectActionSupport
 
     public String doInput()
     {
-        BobFileDetails details = bobFileDetailsDao.findById(id);
+        PulseFileDetails details = pulseFileDetailsDao.findById(id);
         if (details == null)
         {
             addActionError("Unknown project details '" + id + "'");
@@ -39,8 +39,8 @@ public class EditBobFileDetailsAction extends ProjectActionSupport
         return SUCCESS;
     }
 
-    public void setBobFileDetailsDao(BobFileDetailsDao bobFileDetailsDao)
+    public void setPulseFileDetailsDao(PulseFileDetailsDao pulseFileDetailsDao)
     {
-        this.bobFileDetailsDao = bobFileDetailsDao;
+        this.pulseFileDetailsDao = pulseFileDetailsDao;
     }
 }

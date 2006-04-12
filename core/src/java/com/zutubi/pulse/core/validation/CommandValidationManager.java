@@ -8,7 +8,7 @@ import com.opensymphony.xwork.validator.ValidatorContext;
 
 /**
  * This class provides a wrapper around the xwork validation framework allowing it to
- * be used by all of the components that make up a bob file.
+ * be used by all of the components that make up a pulse file.
  */
 public class CommandValidationManager
 {

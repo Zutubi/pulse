@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipePaths;
@@ -20,7 +20,7 @@ public class ChainBootstrapper implements Bootstrapper
         this.bootstrappers.addAll(Arrays.asList(bootstrappers));
     }
 
-    public void prepare() throws BobException
+    public void prepare() throws PulseException
     {
         for (Bootstrapper bootstrapper : bootstrappers)
         {

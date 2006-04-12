@@ -2,7 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.IOUtils;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.File;
@@ -11,7 +11,7 @@ import java.io.InputStream;
 
 /**
  */
-public abstract class TemplateBobFileDetailsTestBase extends BobTestCase
+public abstract class TemplatePulseFileDetailsTestBase extends PulseTestCase
 {
     protected File tmpDir;
     protected VelocityEngine engine;
@@ -20,8 +20,8 @@ public abstract class TemplateBobFileDetailsTestBase extends BobTestCase
     {
         super.setUp();
         engine = new VelocityEngine();
-        File bobRoot = new File(getBobRoot(), "master/src/templates");
-        engine.setProperty("file.resource.loader.path", bobRoot.getAbsolutePath());
+        File pulseRoot = new File(getPulseRoot(), "master/src/templates");
+        engine.setProperty("file.resource.loader.path", pulseRoot.getAbsolutePath());
         engine.init();
         getDetails().setVelocityEngine(engine);
         tmpDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
@@ -38,11 +38,11 @@ public abstract class TemplateBobFileDetailsTestBase extends BobTestCase
     {
         InputStream expectedStream = getInput(expectedName);
 
-        String got = getDetails().getBobFile(0, null, null);
+        String got = getDetails().getPulseFile(0, null, null);
         String expected = IOUtils.inputStreamToString(expectedStream);
 
         assertEquals(expected, got);
     }
 
-    public abstract TemplateBobFileDetails getDetails();
+    public abstract TemplatePulseFileDetails getDetails();
 }

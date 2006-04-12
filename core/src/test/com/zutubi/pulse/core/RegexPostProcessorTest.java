@@ -2,7 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.util.IOUtils;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 /**
  * Tests for RegexPostProcessor.
  */
-public class RegexPostProcessorTest extends BobTestCase
+public class RegexPostProcessorTest extends PulseTestCase
 {
     private static final String[] LINES = {"first line",
             "second line",

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.BobRuntimeException;
+import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.scheduling.Scheduler;
@@ -75,7 +75,7 @@ public class DefaultProjectManager implements ProjectManager
 
         if (spec == null)
         {
-            throw new BobRuntimeException("Unknown build specification [" + specId + "]");
+            throw new PulseRuntimeException("Unknown build specification [" + specId + "]");
         }
 
         List<Trigger> triggers = triggerDao.findByProject(projectId);
@@ -96,7 +96,7 @@ public class DefaultProjectManager implements ProjectManager
                     }
                     catch (SchedulingException e)
                     {
-                        throw new BobRuntimeException("Unable to unschedule trigger [" + trigger.getId() + "]");
+                        throw new PulseRuntimeException("Unable to unschedule trigger [" + trigger.getId() + "]");
                     }
                 }
             }

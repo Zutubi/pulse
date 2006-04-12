@@ -1,6 +1,5 @@
 package com.zutubi.pulse.model;
 
-import com.opensymphony.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
 import java.util.Map;
@@ -9,9 +8,9 @@ import java.util.TreeMap;
 
 /**
  */
-public class AntBobFileDetails extends TemplateBobFileDetails
+public class MakePulseFileDetails extends TemplatePulseFileDetails
 {
-    private String buildFile;
+    private String makefile;
     /**
      * Space-separated list of target names (persists more efficiently)
      */
@@ -26,18 +25,18 @@ public class AntBobFileDetails extends TemplateBobFileDetails
     private String workingDir;
     private Map<String, String> environment;
 
-    public AntBobFileDetails()
+    public MakePulseFileDetails()
     {
-        buildFile = null;
+        makefile = null;
         targets = null;
         arguments = null;
         workingDir = null;
         environment = new TreeMap<String, String>();
     }
 
-    public AntBobFileDetails(String buildFile, String targets, String arguments, String workingDir, Map<String, String> environment)
+    public MakePulseFileDetails(String buildFile, String targets, String arguments, String workingDir, Map<String, String> environment)
     {
-        this.buildFile = buildFile;
+        this.makefile = buildFile;
         this.targets = targets;
         this.arguments = arguments;
         this.workingDir = workingDir;
@@ -46,14 +45,14 @@ public class AntBobFileDetails extends TemplateBobFileDetails
 
     protected String getTemplateName()
     {
-        return "ant.template.vm";
+        return "make.template.vm";
     }
 
     protected void populateContext(VelocityContext context)
     {
-        if (buildFile != null)
+        if (makefile != null)
         {
-            context.put("buildFile", buildFile);
+            context.put("makefile", makefile);
         }
 
         if (targets != null)
@@ -74,14 +73,14 @@ public class AntBobFileDetails extends TemplateBobFileDetails
         context.put("environment", environment);
     }
 
-    public String getBuildFile()
+    public String getMakefile()
     {
-        return buildFile;
+        return makefile;
     }
 
-    public void setBuildFile(String buildFile)
+    public void setMakefile(String makefile)
     {
-        this.buildFile = buildFile;
+        this.makefile = makefile;
     }
 
     public String getTargets()
@@ -131,7 +130,7 @@ public class AntBobFileDetails extends TemplateBobFileDetails
 
     public String getType()
     {
-        return "ant";
+        return "make";
     }
 
     public Properties getProperties()
@@ -139,24 +138,24 @@ public class AntBobFileDetails extends TemplateBobFileDetails
         // TODO i18n
         Properties result = new Properties();
 
-        if (TextUtils.stringSet(buildFile))
+        if (makefile != null)
         {
-            result.put("build file", buildFile);
+            result.put("makefile", makefile);
         }
 
-        if (TextUtils.stringSet(targets))
+        if (targets != null)
         {
             result.put("targets", targets);
         }
 
-        if (TextUtils.stringSet(arguments))
-        {
-            result.put("arguments", arguments);
-        }
-
-        if (TextUtils.stringSet(workingDir))
+        if (workingDir != null)
         {
             result.put("working directory", workingDir);
+        }
+
+        if (arguments != null)
+        {
+            result.put("arguments", arguments);
         }
 
         String env = getEnvironmentString();

@@ -2,18 +2,18 @@
 
 @setlocal
 
-set DEFAULT_BOB_HOME=%~dp0..
-if "%BOB_HOME%"=="" set BOB_HOME=%DEFAULT_BOB_HOME%
+set DEFAULT_PULSE_HOME=%~dp0..
+if "%PULSE_HOME%"=="" set PULSE_HOME=%DEFAULT_PULSE_HOME%
 
-if exist "%BOB_HOME%\bin\common.bat" goto haveBob
+if exist "%PULSE_HOME%\bin\common.bat" goto havePulse
 
-echo Could not find "%BOB_HOME%\bin\common.bat", please
-echo set BOB_HOME
+echo Could not find "%PULSE_HOME%\bin\common.bat", please
+echo set PULSE_HOME
 goto end
 
-:haveBob
+:havePulse
 
-call "%BOB_HOME%"\bin\common.bat com.zutubi.pulse.api.clients.AdminClient %*
+call "%PULSE_HOME%"\bin\common.bat com.zutubi.pulse.api.clients.AdminClient %*
 
 :end
 rem all done

@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  */
-public class CommandResultTest extends BobTestCase
+public class CommandResultTest extends PulseTestCase
 {
     public void testCIB249()
     {

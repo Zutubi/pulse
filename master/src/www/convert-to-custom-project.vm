@@ -16,9 +16,9 @@
         <th class="label">#wwtext("name=pulse.file"): </th>
         <td class="field"><a href="downloadProjectBuildFile.action?id=$id">#wwtext("name=download")</a></td>
     </tr>
-    #inlineHelp("bob.file.download.help")
-    #wwtextfield("name=details.bobFileName" "label=%{getText('bob.filename')}" "required=true" "size=40" "tabindex=1")
-    #inlineHelp("bob.checked.in.filename.help")
+    #inlineHelp("pulse.file.download.help")
+    #wwtextfield("name=details.pulseFileName" "label=%{getText('pulse.filename')}" "required=true" "size=40" "tabindex=1")
+    #inlineHelp("pulse.checked.in.filename.help")
 
     #saveCancel(2)
 #end

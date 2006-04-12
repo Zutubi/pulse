@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipePaths;
@@ -25,7 +25,7 @@ public class ScmBootstrapper implements Bootstrapper
         this.scm = scm;
     }
 
-    public void prepare() throws BobException
+    public void prepare() throws PulseException
     {
         // If we do have not yet have one, get the revision.
         if (revision == null)

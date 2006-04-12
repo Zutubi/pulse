@@ -2,7 +2,7 @@ package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.DatabaseBootstrap;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.JDBCUtils;
 import org.hibernate.SessionFactory;
 import org.springframework.context.ApplicationContext;
@@ -22,7 +22,7 @@ import java.sql.Statement;
  * 
  *
  */
-public abstract class PersistenceTestCase extends BobTestCase
+public abstract class PersistenceTestCase extends PulseTestCase
 {
     protected ApplicationContext context = null;
 

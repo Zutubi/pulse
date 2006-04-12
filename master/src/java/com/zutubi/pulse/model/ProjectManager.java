@@ -30,7 +30,7 @@ public interface ProjectManager extends EntityManager<Project>
      * @param projectId the identifier of the project to delete the
      *                  specification from
      * @param specId    the identifier of the specification to delete
-     * @throws com.zutubi.pulse.core.BobRuntimeException
+     * @throws com.zutubi.pulse.core.PulseRuntimeException
      *          if there is no
      *          specification with the given identifier, or an error occurs
      *          while deleting it

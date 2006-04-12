@@ -8,7 +8,7 @@ import net.sourceforge.jwebunit.WebTester;
 public class CustomProjectEditForm extends BaseForm
 {
     public static String FORM_NAME = "custom.edit";
-    public static String FIELD_FILE = "details.bobFileName";
+    public static String FIELD_FILE = "details.pulseFileName";
 
     public CustomProjectEditForm(WebTester tester)
     {

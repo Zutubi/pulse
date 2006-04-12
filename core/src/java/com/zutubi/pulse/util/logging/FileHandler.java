@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * Filehandler implementation that provides additional patterns.
  * <ul>
- * <li> %b   the bob.home system property.</li>
+ * <li> %b   the pulse.home system property.</li>
  * </ul>
  */
 public class FileHandler extends java.util.logging.FileHandler
@@ -42,19 +42,19 @@ public class FileHandler extends java.util.logging.FileHandler
             return pattern;
         }
 
-        // only handle substitution if bob.home is set.
-        if (!System.getProperties().contains("bob.install"))
+        // only handle substitution if pulse.home is set.
+        if (!System.getProperties().contains("pulse.install"))
         {
             return pattern;
         }
 
         // WARNING: The following implementation does not support the escaping of the '%' character.
-        String bobHome = System.getProperty("bob.install");
+        String pulseHome = System.getProperty("pulse.install");
 
         int index = pattern.indexOf("%b");
         while (index != -1)
         {
-            pattern = pattern.substring(0, index) + bobHome + pattern.substring(index + 2);
+            pattern = pattern.substring(0, index) + pulseHome + pattern.substring(index + 2);
             index = pattern.indexOf("%b");
         }
         return pattern;

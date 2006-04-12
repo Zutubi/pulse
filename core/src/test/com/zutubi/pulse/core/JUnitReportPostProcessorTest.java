@@ -2,14 +2,14 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
 import java.util.List;
 
 /**
  */
-public class JUnitReportPostProcessorTest extends BobTestCase
+public class JUnitReportPostProcessorTest extends PulseTestCase
 {
     private JUnitReportPostProcessor pp;
 
@@ -27,7 +27,7 @@ public class JUnitReportPostProcessorTest extends BobTestCase
 
     public void testSimple()
     {
-        File root = getBobRoot();
+        File root = getPulseRoot();
         File outputDir = new File(root, FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "core"));
 
         StoredFileArtifact artifact = new StoredFileArtifact(getClass().getSimpleName() + ".simple.xml");

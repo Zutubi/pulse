@@ -1,7 +1,7 @@
 package com.zutubi.pulse.bootstrap.yahoo;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 import ymsg.network.LoginRefusedException;
@@ -20,7 +20,7 @@ public class YahooManager
     private static final String YAHOO_ID = "yahoo.id";
     private static final String YAHOO_PASSWORD = "yahoo.password";
 
-    private boolean bobIsloggedIn;
+    private boolean pulseIsloggedIn;
 
     private Throwable problem;
 
@@ -33,9 +33,9 @@ public class YahooManager
         this.configManager = configManager;
     }
 
-    public void login() throws BobException
+    public void login() throws PulseException
     {
-        if (bobIsloggedIn)
+        if (pulseIsloggedIn)
         {
             return;
         }
@@ -46,14 +46,14 @@ public class YahooManager
         // if id and password are not configured, then do not attempt to log in.
         if (!TextUtils.stringSet(yahooId) || !TextUtils.stringSet(yahooPassword))
         {
-            // bob service is not configured.
+            // pulse service is not configured.
             return;
         }
 
         try
         {
             getSession().login(yahooId, yahooPassword);
-            bobIsloggedIn = true;
+            pulseIsloggedIn = true;
         }
         catch (IOException e)
         {
@@ -69,14 +69,14 @@ public class YahooManager
 
     public void logout()
     {
-        if (!bobIsloggedIn)
+        if (!pulseIsloggedIn)
         {
             return;
         }
         try
         {
             getSession().logout();
-            bobIsloggedIn = false;
+            pulseIsloggedIn = false;
         }
         catch (IOException e)
         {
@@ -87,7 +87,7 @@ public class YahooManager
 
     public boolean isLoggedIn()
     {
-        return bobIsloggedIn;
+        return pulseIsloggedIn;
     }
 
     private Session getSession()

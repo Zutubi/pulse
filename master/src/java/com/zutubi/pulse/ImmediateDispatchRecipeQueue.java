@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.events.Event;
@@ -89,7 +89,7 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
                 {
                     request.getRequest().prepare();
                 }
-                catch (BobException e)
+                catch (PulseException e)
                 {
                     throw new BuildException(e);
                 }

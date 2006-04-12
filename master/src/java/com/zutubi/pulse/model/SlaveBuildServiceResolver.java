@@ -3,7 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.BuildService;
 import com.zutubi.pulse.SlaveBuildService;
 import com.zutubi.pulse.SlaveProxyFactory;
-import com.zutubi.pulse.core.BobRuntimeException;
+import com.zutubi.pulse.core.PulseRuntimeException;
 
 import java.net.MalformedURLException;
 
@@ -33,7 +33,7 @@ public class SlaveBuildServiceResolver extends AbstractBuildServiceResolver
         }
         catch (MalformedURLException e)
         {
-            throw new BobRuntimeException("Error contacting slave '" + slave.getName() + "': " + e.getMessage(), e);
+            throw new PulseRuntimeException("Error contacting slave '" + slave.getName() + "': " + e.getMessage(), e);
         }
     }
 

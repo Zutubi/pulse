@@ -68,7 +68,7 @@ public class FileLoaderTest extends FileLoaderTestBase
 
     public void testSampleProject() throws Exception
     {
-        BobFile bf = new BobFile();
+        PulseFile bf = new PulseFile();
         List<Reference> properties = new LinkedList<Reference>();
         Property property = new Property("base.dir", "/whatever");
         properties.add(property);
@@ -78,7 +78,7 @@ public class FileLoaderTest extends FileLoaderTestBase
 
     public void testDependency() throws Exception
     {
-        BobFile bf = new BobFile();
+        PulseFile bf = new PulseFile();
         loader.load(getInput("testDependency"), bf);
 
         assertNotNull(bf.getDependencies());
@@ -95,7 +95,7 @@ public class FileLoaderTest extends FileLoaderTestBase
 
     private List<ExecutableCommand.Arg> executableArgsHelper(int commandIndex) throws Exception
     {
-        BobFile bf = new BobFile();
+        PulseFile bf = new PulseFile();
         loader.load(getInput("testExecutableArgs"), bf);
 
         List<Recipe> recipes = bf.getRecipes();
@@ -154,7 +154,7 @@ public class FileLoaderTest extends FileLoaderTestBase
     {
         try
         {
-            BobFile bf = new BobFile();
+            PulseFile bf = new PulseFile();
             loader.load(getInput("testValidateable"), bf);
             fail();
         }
@@ -179,11 +179,11 @@ public class FileLoaderTest extends FileLoaderTestBase
         errorHelper("testArtifactMissingName", "Required attribute name not specified");
     }
 
-    public void testProcessNoProcessor() throws BobException
+    public void testProcessNoProcessor() throws PulseException
     {
         try
         {
-            BobFile bf = new BobFile();
+            PulseFile bf = new PulseFile();
             loader.load(getInput("testProcessNoProcessor"), bf);
             fail();
         }
@@ -193,9 +193,9 @@ public class FileLoaderTest extends FileLoaderTestBase
         }
     }
 
-    public void testSpecificRecipe() throws BobException
+    public void testSpecificRecipe() throws PulseException
     {
-        BobFile bf = new BobFile();
+        PulseFile bf = new PulseFile();
         loader.setPredicate(new RecipeLoadPredicate(bf, "default"));
         loader.load(getInput("testSpecificRecipe"), bf);
         assertEquals(2, bf.getRecipes().size());
@@ -204,9 +204,9 @@ public class FileLoaderTest extends FileLoaderTestBase
         assertNotNull(bf.getRecipe("don't load!"));
     }
 
-    public void testSpecificRecipeDefault() throws BobException
+    public void testSpecificRecipeDefault() throws PulseException
     {
-        BobFile bf = new BobFile();
+        PulseFile bf = new PulseFile();
         loader.setPredicate(new RecipeLoadPredicate(bf, null));
         loader.load(getInput("testSpecificRecipe"), bf);
         assertEquals(2, bf.getRecipes().size());
@@ -215,16 +215,16 @@ public class FileLoaderTest extends FileLoaderTestBase
         assertNotNull(bf.getRecipe("don't load!"));
     }
 
-    public void testSpecificRecipeError() throws BobException
+    public void testSpecificRecipeError() throws PulseException
     {
         try
         {
-            BobFile bf = new BobFile();
+            PulseFile bf = new PulseFile();
             loader.setPredicate(new RecipeLoadPredicate(bf, "don't load!"));
             loader.load(getInput("testSpecificRecipe"), bf);
             fail();
         }
-        catch (BobException e)
+        catch (PulseException e)
         {
             e.printStackTrace();
         }
@@ -237,7 +237,7 @@ public class FileLoaderTest extends FileLoaderTestBase
             loader.load(getInput("testUnknownAttribute"), new SimpleType());
             fail();
         }
-        catch (BobException e)
+        catch (PulseException e)
         {
             if (!e.getMessage().contains("bad-attribute"))
             {
@@ -252,7 +252,7 @@ public class FileLoaderTest extends FileLoaderTestBase
 
     private AntCommand antCommandHelper(int commandIndex) throws Exception
     {
-        BobFile bf = new BobFile();
+        PulseFile bf = new PulseFile();
         loader.load(getInput("testAntCommand"), bf);
 
         List<Recipe> recipes = bf.getRecipes();
@@ -296,7 +296,7 @@ public class FileLoaderTest extends FileLoaderTestBase
 
     private MakeCommand makeCommandHelper(int commandIndex) throws Exception
     {
-        BobFile bf = new BobFile();
+        PulseFile bf = new PulseFile();
         loader.load(getInput("testMakeCommand"), bf);
 
         List<Recipe> recipes = bf.getRecipes();

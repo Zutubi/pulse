@@ -13,7 +13,7 @@ import java.io.File;
  */
 public class SimpleConfigurationManager implements ConfigurationManager
 {
-    public static final String BOB_INSTALL = "bob.install";
+    public static final String PULSE_INSTALL = "pulse.install";
 
     private static final Logger LOG = Logger.getLogger(SimpleConfigurationManager.class);
 
@@ -25,29 +25,29 @@ public class SimpleConfigurationManager implements ConfigurationManager
         UserPaths paths = getUserPaths();
         if (paths != null)
         {
-            Config user = new FileConfig(new File(paths.getUserConfigRoot(), "bob.properties"));
-            Config defaults = new FileConfig(new File(getSystemPaths().getConfigRoot(), "bob-defaults.properties"));
+            Config user = new FileConfig(new File(paths.getUserConfigRoot(), "pulse.properties"));
+            Config defaults = new FileConfig(new File(getSystemPaths().getConfigRoot(), "pulse-defaults.properties"));
             Config composite = new CompositeConfig(user, new ReadOnlyConfig(defaults));
             return new ApplicationConfigurationSupport(composite);
         }
         else
         {
-            Config defaults = new FileConfig(new File(getSystemPaths().getConfigRoot(), "bob-defaults.properties"));
+            Config defaults = new FileConfig(new File(getSystemPaths().getConfigRoot(), "pulse-defaults.properties"));
             return new ApplicationConfigurationSupport(new ReadOnlyConfig(defaults));
         }
     }
 
     public UserPaths getUserPaths()
     {
-        File bobHome = getBobHome();
-        if (bobHome != null)
+        File pulseHome = getPulseHome();
+        if (pulseHome != null)
         {
-            return new Home(bobHome);
+            return new Home(pulseHome);
         }
         return null;
     }
 
-    public File getBobHome()
+    public File getPulseHome()
     {
         return getHomeConfig().getHomeDirectory();
     }
@@ -91,7 +91,7 @@ public class SimpleConfigurationManager implements ConfigurationManager
         return homeConfig;
     }
 
-    public void setBobHome(File f)
+    public void setPulseHome(File f)
     {
         HomeConfiguration homeConfig = getHomeConfig();
         homeConfig.setHomeDirectory(f);
@@ -101,22 +101,22 @@ public class SimpleConfigurationManager implements ConfigurationManager
     {
         if (systemPaths == null)
         {
-            String bobInstall = System.getProperty(BOB_INSTALL);
-            if (bobInstall == null || bobInstall.length() == 0)
+            String pulseInstall = System.getProperty(PULSE_INSTALL);
+            if (pulseInstall == null || pulseInstall.length() == 0)
             {
-                // fatal error, BOB_INSTALL property needs to exist.
-                throw new StartupException("Required property '" + BOB_INSTALL + "' is not set");
+                // fatal error, PULSE_INSTALL property needs to exist.
+                throw new StartupException("Required property '" + PULSE_INSTALL + "' is not set");
             }
 
-            File bobRoot = new File(bobInstall);
-            if (!bobRoot.exists() || !bobRoot.isDirectory())
+            File pulseRoot = new File(pulseInstall);
+            if (!pulseRoot.exists() || !pulseRoot.isDirectory())
             {
-                // fatal error, BOB_INSTALL property needs to reference bobs home directory
-                throw new StartupException("Property '" + BOB_INSTALL + "' does not refer to a " +
-                        "directory ('" + bobInstall + ")");
+                // fatal error, PULSE_INSTALL property needs to reference pulse's home directory
+                throw new StartupException("Property '" + PULSE_INSTALL + "' does not refer to a " +
+                        "directory ('" + pulseInstall + ")");
             }
-            // initialise applicationPaths based on bob.home.
-            systemPaths = new DefaultSystemPaths(bobRoot);
+            // initialise applicationPaths based on pulse.home.
+            systemPaths = new DefaultSystemPaths(pulseRoot);
         }
         return systemPaths;
     }

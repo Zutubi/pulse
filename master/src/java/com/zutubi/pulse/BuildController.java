@@ -51,7 +51,7 @@ public class BuildController implements EventListener
     private AsynchronousDelegatingListener asyncListener;
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private Scheduler quartzScheduler;
-    private LazyBobFile lazyBobFile = new LazyBobFile();
+    private LazyPulseFile lazyPulseFile = new LazyPulseFile();
 
     public BuildController(Project project, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, ConfigurationManager configManager)
     {
@@ -110,7 +110,7 @@ public class BuildController implements EventListener
             recipeResult.setOutputDir(paths.getOutputDir(project, buildResult, recipeResult.getId()).getAbsolutePath());
 
             RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe());
-            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), lazyBobFile, recipeRequest, buildResult);
+            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), lazyPulseFile, recipeRequest, buildResult);
             RecipeController rc = new RecipeController(childResultNode, dispatchRequest, collector, queue, buildManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
@@ -166,8 +166,8 @@ public class BuildController implements EventListener
         }
 
         ScmBootstrapper initialBootstrapper = new ScmBootstrapper(project.getScm());
-        BobFileDetails bobFileDetails = project.getBobFileDetails();
-        ComponentContext.autowire(bobFileDetails);
+        PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
+        ComponentContext.autowire(pulseFileDetails);
         tree.prepare(buildResult);
 
         // execute the first level of recipe controllers...
@@ -250,7 +250,7 @@ public class BuildController implements EventListener
 
         try
         {
-            FileSystemUtils.createFile(new File(buildResult.getOutputDir(), BuildResult.PULSE_FILE), request.getBobFileSource());
+            FileSystemUtils.createFile(new File(buildResult.getOutputDir(), BuildResult.PULSE_FILE), request.getPulseFileSource());
         }
         catch(IOException e)
         {

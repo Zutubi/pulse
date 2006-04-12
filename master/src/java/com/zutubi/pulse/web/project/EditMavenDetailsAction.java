@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.BobFileDetails;
-import com.zutubi.pulse.model.MavenBobFileDetails;
+import com.zutubi.pulse.model.PulseFileDetails;
+import com.zutubi.pulse.model.MavenPulseFileDetails;
 import com.opensymphony.util.TextUtils;
 
 /**
@@ -10,14 +10,14 @@ import com.opensymphony.util.TextUtils;
  */
 public class EditMavenDetailsAction extends AbstractEditDetailsAction
 {
-    private MavenBobFileDetails details = new MavenBobFileDetails();
+    private MavenPulseFileDetails details = new MavenPulseFileDetails();
 
     public void prepare()
     {
-        details = getBobFileDetailsDao().findByIdAndType(getId(), MavenBobFileDetails.class);
+        details = getPulseFileDetailsDao().findByIdAndType(getId(), MavenPulseFileDetails.class);
     }
 
-    public BobFileDetails getDetails()
+    public PulseFileDetails getDetails()
     {
         if (!TextUtils.stringSet(details.getWorkingDir()))
         {

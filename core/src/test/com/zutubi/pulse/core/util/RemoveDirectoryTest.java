@@ -1,13 +1,13 @@
 package com.zutubi.pulse.core.util;
 
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
  */
-public class RemoveDirectoryTest extends BobTestCase
+public class RemoveDirectoryTest extends PulseTestCase
 {
     public void testRemoveNonExistant()
     {

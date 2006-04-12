@@ -7,12 +7,12 @@ import nu.xom.Element;
  */
 public class RecipeLoadPredicate implements TypeLoadPredicate
 {
-    private BobFile bobFile;
+    private PulseFile pulseFile;
     private String recipeName;
 
-    public RecipeLoadPredicate(BobFile bobFile, String recipeName)
+    public RecipeLoadPredicate(PulseFile pulseFile, String recipeName)
     {
-        this.bobFile = bobFile;
+        this.pulseFile = pulseFile;
         this.recipeName = recipeName;
     }
 
@@ -22,7 +22,7 @@ public class RecipeLoadPredicate implements TypeLoadPredicate
         {
             if(recipeName == null)
             {
-                recipeName = bobFile.getDefaultRecipe();
+                recipeName = pulseFile.getDefaultRecipe();
             }
 
             if(recipeName == null)

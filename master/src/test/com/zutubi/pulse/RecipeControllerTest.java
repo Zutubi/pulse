@@ -6,14 +6,14 @@ import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
 import java.util.*;
 
 /**
  */
-public class RecipeControllerTest extends BobTestCase
+public class RecipeControllerTest extends PulseTestCase
 {
     private MockRecipeResultCollector resultCollector;
     private MockRecipeQueue recipeQueue;
@@ -47,7 +47,7 @@ public class RecipeControllerTest extends BobTestCase
         rootNode.addChild(childNode);
 
         recipeRequest = new RecipeRequest(rootResult.getId(), rootResult.getRecipeName());
-        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new LazyBobFile(), recipeRequest, null);
+        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new LazyPulseFile(), recipeRequest, null);
         recipeController = new RecipeController(rootNode, dispatchRequest, resultCollector, recipeQueue, buildManager);
     }
 

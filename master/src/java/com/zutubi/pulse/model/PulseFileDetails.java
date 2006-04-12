@@ -7,11 +7,11 @@ import java.util.Properties;
 
 /**
  */
-public abstract class BobFileDetails extends Entity
+public abstract class PulseFileDetails extends Entity
 {
     public abstract String getType();
 
     public abstract Properties getProperties();
 
-    public abstract String getBobFile(long id, Project project, Revision revision);
+    public abstract String getPulseFile(long id, Project project, Revision revision);
 }

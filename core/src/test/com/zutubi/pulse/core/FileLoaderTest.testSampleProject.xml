@@ -29,7 +29,7 @@
 
     <recipe name="default">
         <command name="sync">
-            <executable exe="svn" args="checkout svn+ssh://some.host.com/usr/local/svn-repo/bob"
+            <executable exe="svn" args="checkout svn+ssh://some.host.com/usr/local/svn-repo/pulse"
                         working-dir="${base.dir}">
                 <process processor="${svn.pp}"/>
             </executable>
@@ -38,10 +38,10 @@
             </artifact>
         </command>
         <command name="build">
-            <executable exe="${ant.bin}" args="build" working-dir="${base.dir}/bob/trunk"/>
+            <executable exe="${ant.bin}" args="build" working-dir="${base.dir}/pulse/trunk"/>
         </command>
         <command name="test">
-            <executable exe="${ant.bin}" args="test" working-dir="${base.dir}/bob/trunk">
+            <executable exe="${ant.bin}" args="test" working-dir="${base.dir}/pulse/trunk">
                 <environment name="CLASSPATH" value="E:/opt/java/jdk1.5.0/bin/java"/>
             </executable>
             <artifact name="junit.report.txt" type="text/plain">

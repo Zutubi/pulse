@@ -1,11 +1,11 @@
 package com.zutubi.pulse.filesystem;
 
-import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.PulseException;
 
 /**
  * <class-comment/>
  */
-public class FileSystemException extends BobException
+public class FileSystemException extends PulseException
 {
     public FileSystemException(String errorMessage)
     {

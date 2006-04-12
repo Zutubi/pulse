@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Action to view the user's dashboard: their own Bob "homepage".
+ * Action to view the user's dashboard: their own Pulse "homepage".
  */
 public class DashboardAction extends ActionSupport
 {

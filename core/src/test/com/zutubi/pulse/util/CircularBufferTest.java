@@ -1,10 +1,10 @@
 package com.zutubi.pulse.util;
 
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  */
-public class CircularBufferTest extends BobTestCase
+public class CircularBufferTest extends PulseTestCase
 {
     private CircularBuffer<String> buffer;
 

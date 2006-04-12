@@ -28,7 +28,7 @@ public class VariableHelperTest extends TestCase
         {
             result = VariableHelper.replaceVariables(input, true, scope);
         }
-        catch (BobException e)
+        catch (PulseException e)
         {
             assertEquals(expectedError, e.getMessage());
             return;

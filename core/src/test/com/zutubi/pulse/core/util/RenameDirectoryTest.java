@@ -1,16 +1,14 @@
 package com.zutubi.pulse.core.util;
 
-import junit.framework.*;
-
 import java.io.File;
 import java.io.IOException;
 
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  * Test case for the rename functionality of the FileSystemUtils.
  */
-public class RenameDirectoryTest extends BobTestCase
+public class RenameDirectoryTest extends PulseTestCase
 {
 
     private File tmpDir = null;

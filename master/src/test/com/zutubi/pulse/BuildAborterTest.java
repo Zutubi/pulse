@@ -5,11 +5,11 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.MockBuildManager;
 import com.zutubi.pulse.model.MockProjectManager;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  */
-public class BuildAborterTest extends BobTestCase
+public class BuildAborterTest extends PulseTestCase
 {
     private MockProjectManager projectManager;
     private MockBuildManager buildManager;

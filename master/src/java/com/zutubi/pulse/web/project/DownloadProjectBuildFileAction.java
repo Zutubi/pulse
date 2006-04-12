@@ -2,14 +2,14 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.model.BobFileDetails;
+import com.zutubi.pulse.model.PulseFileDetails;
 import com.zutubi.pulse.model.Project;
 import org.apache.tools.ant.filters.StringInputStream;
 
 import java.io.InputStream;
 
 /**
- * An action to download the current bob file for a project.
+ * An action to download the current pulse file for a project.
  */
 public class DownloadProjectBuildFileAction extends ProjectActionSupport
 {
@@ -47,11 +47,11 @@ public class DownloadProjectBuildFileAction extends ProjectActionSupport
 
         try
         {
-            BobFileDetails bobFileDetails = project.getBobFileDetails();
-            ComponentContext.autowire(bobFileDetails);
-            String bobFile = bobFileDetails.getBobFile(0, project, null);
-            inputStream = new StringInputStream(bobFile);
-            contentLength = bobFile.length();
+            PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
+            ComponentContext.autowire(pulseFileDetails);
+            String pulseFile = pulseFileDetails.getPulseFile(0, project, null);
+            inputStream = new StringInputStream(pulseFile);
+            contentLength = pulseFile.length();
         }
         catch(BuildException e)
         {

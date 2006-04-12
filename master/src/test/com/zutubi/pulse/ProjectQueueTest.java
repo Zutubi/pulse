@@ -2,11 +2,11 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  */
-public class ProjectQueueTest extends BobTestCase
+public class ProjectQueueTest extends PulseTestCase
 {
     private ProjectQueue queue = new ProjectQueue();
     private Project p1;

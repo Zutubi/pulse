@@ -6,7 +6,7 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.BuildScmDetails;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 
@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  */
-public class FreemarkerBuildResultRendererTest extends BobTestCase
+public class FreemarkerBuildResultRendererTest extends PulseTestCase
 {
     FreemarkerBuildResultRenderer renderer;
 
@@ -28,10 +28,10 @@ public class FreemarkerBuildResultRendererTest extends BobTestCase
         super.setUp();
         renderer = new FreemarkerBuildResultRenderer();
 
-        File bobRoot = new File(getBobRoot(), "master/src/templates");
+        File pulseRoot = new File(getPulseRoot(), "master/src/templates");
 
         Configuration freemarkerConfiguration = new Configuration();
-        freemarkerConfiguration.setDirectoryForTemplateLoading(bobRoot);
+        freemarkerConfiguration.setDirectoryForTemplateLoading(pulseRoot);
         freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper());
         freemarkerConfiguration.addAutoInclude("macro.ftl");
         renderer.setFreemarkerConfiguration(freemarkerConfiguration);

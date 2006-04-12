@@ -18,9 +18,9 @@ public interface ConfigurationManager
 
     SystemPaths getSystemPaths();
 
-    void setBobHome(File bobHome);
+    void setPulseHome(File pulseHome);
 
-    File getBobHome();
+    File getPulseHome();
 
     Home getHome();
 

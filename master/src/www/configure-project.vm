@@ -19,12 +19,12 @@
                     #dynamicLinkRow("project.url" $project.url $project.url)
                 </table>
                 <table id="project.specifics" class="fill-content">
-                    #editHeadingRow("project.specifics" 2 "editBobFileDetails!input.action?id=$project.bobFileDetails.id&amp;projectId=$project.id" "project.specifics.edit")
-                    #dynamicRow("project.type" $project.bobFileDetails.type)
-#foreach($property in $project.bobFileDetails.properties.entrySet())
+                    #editHeadingRow("project.specifics" 2 "editPulseFileDetails!input.action?id=$project.pulseFileDetails.id&amp;projectId=$project.id" "project.specifics.edit")
+                    #dynamicRow("project.type" $project.pulseFileDetails.type)
+#foreach($property in $project.pulseFileDetails.properties.entrySet())
                     #propertyRow($property)
 #end
-#if(!$project.bobFileDetails.type.equals("custom"))
+#if(!$project.pulseFileDetails.type.equals("custom"))
                     <tr>
                         #contentRowHeading("actions")
                         #linkCell("convert.to.custom" "convertToCustomProject!input.action?id=$project.id")

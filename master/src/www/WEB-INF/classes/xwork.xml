@@ -304,7 +304,7 @@
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
-        <action name="editBobFileDetails" class="com.zutubi.pulse.web.project.EditBobFileDetailsAction">
+        <action name="editPulseFileDetails" class="com.zutubi.pulse.web.project.EditPulseFileDetailsAction">
             <result name="custom" type="chain">editCustomDetails!input</result>
             <result name="ant" type="chain">editAntDetails!input</result>
             <result name="make" type="chain">editMakeDetails!input</result>

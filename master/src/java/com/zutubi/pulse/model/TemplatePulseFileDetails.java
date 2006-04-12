@@ -10,23 +10,23 @@ import java.io.StringWriter;
 
 /**
  */
-public abstract class TemplateBobFileDetails extends BobFileDetails
+public abstract class TemplatePulseFileDetails extends PulseFileDetails
 {
     private VelocityEngine velocityEngine;
 
-    public String getBobFile(long id, Project project, Revision revision)
+    public String getPulseFile(long id, Project project, Revision revision)
     {
         try
         {
             VelocityContext context = new VelocityContext();
             populateContext(context);
             StringWriter stringWriter = new StringWriter(1024);
-            velocityEngine.mergeTemplate("bob-file" + File.separatorChar + getTemplateName(), context, stringWriter);
+            velocityEngine.mergeTemplate("pulse-file" + File.separatorChar + getTemplateName(), context, stringWriter);
             return stringWriter.getBuffer().toString();
         }
         catch (Exception e)
         {
-            throw new BuildException("Loading template bob file: " + e.getMessage(), e);
+            throw new BuildException("Loading template pulse file: " + e.getMessage(), e);
         }
     }
 

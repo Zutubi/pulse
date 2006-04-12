@@ -6,13 +6,13 @@ package com.zutubi.pulse.scm.cvs;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
 import java.util.List;
 
-public class CvsServerTest extends BobTestCase
+public class CvsServerTest extends PulseTestCase
 {
     private String cvsRoot = null;
     private File workdir = null;
@@ -29,7 +29,7 @@ public class CvsServerTest extends BobTestCase
         Logger.setLogging("system");
 
         // test repository root.
-        File repositoryRoot = new File(getBobRoot(), "server-core/src/test/com/zutubi/pulse/scm/cvs/repository");
+        File repositoryRoot = new File(getPulseRoot(), "server-core/src/test/com/zutubi/pulse/scm/cvs/repository");
         cvsRoot = ":local:" + repositoryRoot.getCanonicalPath();
 
         // cleanup the working directory.

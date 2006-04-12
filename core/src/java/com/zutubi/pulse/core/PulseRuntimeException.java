@@ -4,12 +4,12 @@ package com.zutubi.pulse.core;
  * 
  *
  */
-public class BobRuntimeException extends RuntimeException
+public class PulseRuntimeException extends RuntimeException
 {
     /**
      * @param errorMessage
      */
-    public BobRuntimeException(String errorMessage)
+    public PulseRuntimeException(String errorMessage)
     {
         super(errorMessage);
     }
@@ -17,7 +17,7 @@ public class BobRuntimeException extends RuntimeException
     /**
      * 
      */
-    public BobRuntimeException()
+    public PulseRuntimeException()
     {
         super();
     }
@@ -25,7 +25,7 @@ public class BobRuntimeException extends RuntimeException
     /**
      * @param cause
      */
-    public BobRuntimeException(Throwable cause)
+    public PulseRuntimeException(Throwable cause)
     {
         super(cause);
     }
@@ -34,7 +34,7 @@ public class BobRuntimeException extends RuntimeException
      * @param errorMessage
      * @param cause
      */
-    public BobRuntimeException(String errorMessage, Throwable cause)
+    public PulseRuntimeException(String errorMessage, Throwable cause)
     {
         super(errorMessage, cause);
     }

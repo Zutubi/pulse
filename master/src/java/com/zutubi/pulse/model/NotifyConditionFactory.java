@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.BobRuntimeException;
+import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.core.ObjectFactory;
 
 import java.util.HashMap;
@@ -62,7 +62,7 @@ public class NotifyConditionFactory
         }
         catch (Exception e)
         {
-            throw new BobRuntimeException(e);
+            throw new PulseRuntimeException(e);
         }
     }
 }

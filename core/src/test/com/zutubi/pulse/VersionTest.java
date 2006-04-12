@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * <class-comment/>
  */
-public class VersionTest extends BobTestCase
+public class VersionTest extends PulseTestCase
 {
     public VersionTest(String testName)
     {

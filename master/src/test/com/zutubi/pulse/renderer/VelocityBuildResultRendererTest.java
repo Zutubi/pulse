@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.util.IOUtils;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.BuildScmDetails;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.File;
@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  */
-public class VelocityBuildResultRendererTest extends BobTestCase
+public class VelocityBuildResultRendererTest extends PulseTestCase
 {
     VelocityBuildResultRenderer renderer;
 
@@ -27,10 +27,10 @@ public class VelocityBuildResultRendererTest extends BobTestCase
         super.setUp();
         renderer = new VelocityBuildResultRenderer();
 
-        File bobRoot = new File(getBobRoot(), "master/src/templates");
+        File pulseRoot = new File(getPulseRoot(), "master/src/templates");
 
         VelocityEngine engine = new VelocityEngine();
-        engine.setProperty("file.resource.loader.path", bobRoot.getAbsolutePath());
+        engine.setProperty("file.resource.loader.path", pulseRoot.getAbsolutePath());
 //        engine.setProperty("velocimacro.library", "plain-macro.vm");
         engine.init();
         renderer.setVelocityEngine(engine);

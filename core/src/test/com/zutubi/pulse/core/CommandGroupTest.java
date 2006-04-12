@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.IOUtils;
 import com.zutubi.pulse.core.model.CommandResult;
@@ -13,7 +13,7 @@ import java.io.IOException;
 
 /**
  */
-public class CommandGroupTest extends BobTestCase
+public class CommandGroupTest extends PulseTestCase
 {
     private File baseDirectory;
     private File outputDirectory;

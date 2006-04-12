@@ -7,7 +7,7 @@ import java.util.List;
 /**
  *
  */
-public class BobFile implements Namespace, ScopeAware
+public class PulseFile implements Namespace, ScopeAware
 {
     private String defaultRecipe;
     private String name;

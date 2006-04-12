@@ -1,11 +1,11 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.PulseException;
 
 /**
  * <class-comment/>
  */
-public class SchedulingException extends BobException
+public class SchedulingException extends PulseException
 {
     /**
      * @param errorMessage

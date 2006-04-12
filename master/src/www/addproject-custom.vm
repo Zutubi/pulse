@@ -8,7 +8,7 @@
     <!--
     	function openFileWindow()
     	{
-    	    openBrowseWindow(false, "custom.setup_details_bobFileName", "");
+    	    openBrowseWindow(false, "custom.setup_details_pulseFileName", "");
     	}
     -->
     </script>
@@ -22,8 +22,8 @@
     #wwhidden("name=state")
     #wwhidden("name=submit")
 
-    #wwtextfield("name=details.bobFileName" "label=%{getText('bob.filename')}" "after= <a href='#' onclick='openFileWindow(); return false;'>browse</a>" "required=true" "size=40" "tabindex=1" "onkeypress=return submitenter(this,event)")
-    #inlineHelp("bob.filename.help")
+    #wwtextfield("name=details.pulseFileName" "label=%{getText('pulse.filename')}" "after= <a href='#' onclick='openFileWindow(); return false;'>browse</a>" "required=true" "size=40" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("pulse.filename.help")
     #previousFinishCancel(2)
  #end
 </body>

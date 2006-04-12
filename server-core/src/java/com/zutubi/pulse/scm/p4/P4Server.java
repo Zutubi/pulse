@@ -169,7 +169,7 @@ public class P4Server extends CachingSCMServer
 
         P4Result result = runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_OUTPUT);
         String clientSpec = result.stdout.toString();
-        String clientName = "bob-temp-" + id;
+        String clientName = "pulse-temp-" + id;
 
         clientSpec = clientSpec.replaceAll("\nRoot:.*", Matcher.quoteReplacement("\nRoot: " + toDirectory.getAbsolutePath()));
         clientSpec = clientSpec.replaceAll("\nHost:.*", Matcher.quoteReplacement("\nHost: "));
@@ -925,7 +925,7 @@ public class P4Server extends CachingSCMServer
 
     public static void main(String argv[])
     {
-        P4Server server = new P4Server("localhost:1666", "jsankey", "", "bob-demo");
+        P4Server server = new P4Server("localhost:1666", "jsankey", "", "pulse-demo");
 
         try
         {

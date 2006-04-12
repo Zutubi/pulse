@@ -77,28 +77,28 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         assertEquals(rule, otherRule);
     }
 
-    public void testLoadSaveCustomBobFileSource()
+    public void testLoadSaveCustomPulseFileSource()
     {
-        CustomBobFileDetails details = new CustomBobFileDetails("hello");
+        CustomPulseFileDetails details = new CustomPulseFileDetails("hello");
 
         projectDao.save(details);
         commitAndRefreshTransaction();
 
-        CustomBobFileDetails otherDetails = projectDao.findCustomBobFileSource(details.getId());
+        CustomPulseFileDetails otherDetails = projectDao.findCustomPulseFileSource(details.getId());
         assertPropertyEquals(details, otherDetails);
     }
 
-    public void testLoadSaveAntBobFileDetails()
+    public void testLoadSaveAntPulseFileDetails()
     {
         TreeMap<String, String> environment = new TreeMap<String, String>();
         environment.put("PATH", "/bin");
 
-        AntBobFileDetails details = new AntBobFileDetails("build.xml", "build test", "arg1", "workdir", environment);
+        AntPulseFileDetails details = new AntPulseFileDetails("build.xml", "build test", "arg1", "workdir", environment);
 
         projectDao.save(details);
         commitAndRefreshTransaction();
 
-        AntBobFileDetails otherDetails = projectDao.findAntBobFileSource(details.getId());
+        AntPulseFileDetails otherDetails = projectDao.findAntPulseFileSource(details.getId());
         assertEquals(details.getBuildFile(), otherDetails.getBuildFile());
         assertEquals(details.getTargets(), otherDetails.getTargets());
         assertEquals(details.getArguments(), otherDetails.getArguments());
@@ -109,17 +109,17 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         }
     }
 
-    public void testLoadSaveMakeBobFileDetails()
+    public void testLoadSaveMakePulseFileDetails()
     {
         TreeMap<String, String> environment = new TreeMap<String, String>();
         environment.put("PATH", "/bin");
 
-        MakeBobFileDetails details = new MakeBobFileDetails("Makefile", "build test", "arg1", "workdir", environment);
+        MakePulseFileDetails details = new MakePulseFileDetails("Makefile", "build test", "arg1", "workdir", environment);
 
         projectDao.save(details);
         commitAndRefreshTransaction();
 
-        MakeBobFileDetails otherDetails = projectDao.findMakeBobFileSource(details.getId());
+        MakePulseFileDetails otherDetails = projectDao.findMakePulseFileSource(details.getId());
         assertEquals(details.getMakefile(), otherDetails.getMakefile());
         assertEquals(details.getTargets(), otherDetails.getTargets());
         assertEquals(details.getArguments(), otherDetails.getArguments());

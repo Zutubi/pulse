@@ -2,7 +2,7 @@ package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * <class-comment/>
  */
-public class HomeTest extends BobTestCase
+public class HomeTest extends PulseTestCase
 {
     private File homeDir;
 

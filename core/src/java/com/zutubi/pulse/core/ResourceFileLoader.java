@@ -11,13 +11,13 @@ import java.io.InputStream;
  */
 public class ResourceFileLoader
 {
-    public static FileResourceRepository load(InputStream input) throws BobException
+    public static FileResourceRepository load(InputStream input) throws PulseException
     {
         FileResourceRepository repository = new FileResourceRepository();
         return load(input, repository);
     }
 
-    public static FileResourceRepository load(InputStream input, FileResourceRepository repository) throws BobException
+    public static FileResourceRepository load(InputStream input, FileResourceRepository repository) throws PulseException
     {
         FileLoader loader = createLoader();
         loader.load(input, repository);

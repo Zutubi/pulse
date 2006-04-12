@@ -37,7 +37,7 @@ public class Project extends Entity
     private String name;
     private String description;
     private String url;
-    private BobFileDetails bobFileDetails;
+    private PulseFileDetails pulseFileDetails;
     private List<CleanupRule> cleanupRules = new LinkedList<CleanupRule>();
     private Scm scm;
     private State state = State.IDLE;
@@ -50,14 +50,14 @@ public class Project extends Entity
 
     public Project(String name, String description)
     {
-        this(name, description, new CustomBobFileDetails("bob.xml"));
+        this(name, description, new CustomPulseFileDetails("pulse.xml"));
     }
 
-    public Project(String name, String description, BobFileDetails bobFileDetails)
+    public Project(String name, String description, PulseFileDetails pulseFileDetails)
     {
         this.name = name;
         this.description = description;
-        this.bobFileDetails = bobFileDetails;
+        this.pulseFileDetails = pulseFileDetails;
         this.addCleanupRule(new CleanupRule(true, null, DEFAULT_WORK_DIR_BUILDS, CleanupRule.CleanupUnit.BUILDS));
     }
 
@@ -138,14 +138,14 @@ public class Project extends Entity
         return buildSpecifications.remove(buildSpecification);
     }
 
-    public BobFileDetails getBobFileDetails()
+    public PulseFileDetails getPulseFileDetails()
     {
-        return bobFileDetails;
+        return pulseFileDetails;
     }
 
-    public void setBobFileDetails(BobFileDetails bobFileDetails)
+    public void setPulseFileDetails(PulseFileDetails pulseFileDetails)
     {
-        this.bobFileDetails = bobFileDetails;
+        this.pulseFileDetails = pulseFileDetails;
     }
 
     public List<CleanupRule> getCleanupRules()

@@ -1,13 +1,13 @@
 package com.zutubi.pulse.core.util;
 
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
  */
-public class FileSystemUtilsTest extends BobTestCase
+public class FileSystemUtilsTest extends PulseTestCase
 {
     public void testGetPermissions()
     {

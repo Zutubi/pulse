@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  * <class-comment/>
  */
-public class ResourceReferenceTest extends BobTestCase
+public class ResourceReferenceTest extends PulseTestCase
 {
     public void setUp() throws Exception
     {

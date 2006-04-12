@@ -4,14 +4,14 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.IOUtils;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.*;
 
 /**
  * <class-comment/>
  */
-public abstract class CommandTestBase extends BobTestCase
+public abstract class CommandTestBase extends PulseTestCase
 {
     File baseDir;
     File outputDir;

@@ -1,12 +1,12 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.zutubi.pulse.core.BobRuntimeException;
+import com.zutubi.pulse.core.PulseRuntimeException;
 
 /**
  * 
  *
  */
-public class StartupException extends BobRuntimeException
+public class StartupException extends PulseRuntimeException
 {
     public StartupException()
     {

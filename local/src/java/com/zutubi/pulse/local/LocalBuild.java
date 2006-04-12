@@ -17,18 +17,18 @@ public class LocalBuild
     @SuppressWarnings({"ACCESS_STATIC_VIA_INSTANCE"})
     public static void main(String argv[])
     {
-        String bobFile = "bob.xml";
+        String pulseFile = "pulse.xml";
         String resourcesFile = null;
-        String outputDir = "bob.out";
+        String outputDir = "pulse.out";
         String recipe = null;
 
         Options options = new Options();
 
-        // TODO: rename bob file as appropriate
-        options.addOption(OptionBuilder.withLongOpt("bob-file")
+        // TODO: rename pulse file as appropriate
+        options.addOption(OptionBuilder.withLongOpt("pulse-file")
                 .withArgName("file")
                 .hasArg()
-                .withDescription("use specified bob file [default: bob.xml]")
+                .withDescription("use specified pulse file [default: pulse.xml]")
                 .create('b'));
 
         options.addOption(OptionBuilder.withLongOpt("resources-file")
@@ -40,7 +40,7 @@ public class LocalBuild
         options.addOption(OptionBuilder.withLongOpt("output-dir")
                 .withArgName("dir")
                 .hasArg()
-                .withDescription("write output to specified directory [default: bob.out]")
+                .withDescription("write output to specified directory [default: pulse.out]")
                 .create('o'));
 
         CommandLineParser parser = new PosixParser();
@@ -50,7 +50,7 @@ public class LocalBuild
             CommandLine commandLine = parser.parse(options, argv, true);
             if (commandLine.hasOption('b'))
             {
-                bobFile = commandLine.getOptionValue('b');
+                pulseFile = commandLine.getOptionValue('b');
             }
 
             if (commandLine.hasOption('r'))
@@ -71,7 +71,7 @@ public class LocalBuild
 
             LocalBuild b = new LocalBuild();
             File baseDir = new File(System.getProperty("user.dir"));
-            b.runBuild(baseDir, bobFile, recipe, resourcesFile, outputDir);
+            b.runBuild(baseDir, pulseFile, recipe, resourcesFile, outputDir);
         }
         catch (Exception e)
         {
@@ -79,7 +79,7 @@ public class LocalBuild
         }
     }
 
-    private FileResourceRepository createRepository(String resourcesFile) throws BobException
+    private FileResourceRepository createRepository(String resourcesFile) throws PulseException
     {
         if (resourcesFile == null)
         {
@@ -94,7 +94,7 @@ public class LocalBuild
         }
         catch (FileNotFoundException e)
         {
-            throw new BobException("Unable to open resources file '" + resourcesFile + "'");
+            throw new PulseException("Unable to open resources file '" + resourcesFile + "'");
         }
         finally
         {
@@ -108,25 +108,25 @@ public class LocalBuild
      * relative to the current working directory.
      *
      * @param baseDir       the base directory in which to execute the build
-     * @param bobFileName   the name of the bobfile to load
+     * @param pulseFileName the name of the pulsefile to load
      * @param recipe        the recipe to execute, may be null to indicate the default
-     *                      recipe in the given bobfile
+     *                      recipe in the given pulsefile
      * @param resourcesFile the resources file to load prior to building , or null if no
      *                      resources are to be loaded
      * @param outputDir     the name of the output directory to capture output
      *                      and save results to
-     * @throws BobException
+     * @throws PulseException
      */
-    public void runBuild(File baseDir, String bobFileName, String recipe, String resourcesFile, String outputDir) throws BobException
+    public void runBuild(File baseDir, String pulseFileName, String recipe, String resourcesFile, String outputDir) throws PulseException
     {
-        printPrologue(bobFileName, resourcesFile, outputDir);
+        printPrologue(pulseFileName, resourcesFile, outputDir);
 
         FileResourceRepository repository = createRepository(resourcesFile);
         RecipePaths paths = new LocalRecipePaths(baseDir, outputDir);
 
         if (!paths.getBaseDir().isDirectory())
         {
-            throw new BobException("Base directory '" + paths.getBaseDir().getAbsolutePath() + "' does not exist");
+            throw new PulseException("Base directory '" + paths.getBaseDir().getAbsolutePath() + "' does not exist");
         }
 
         File logFile = new File(baseDir, "build.log");
@@ -143,11 +143,11 @@ public class LocalBuild
             processor.setEventManager(manager);
             processor.setResourceRepository(repository);
             processor.init();
-            processor.build(0, paths, bootstrapper, loadBobFile(baseDir, bobFileName), recipe);
+            processor.build(0, paths, bootstrapper, loadPulseFile(baseDir, pulseFileName), recipe);
         }
         catch (FileNotFoundException e)
         {
-            throw new BobException("Unable to create log file '" + logFile.getPath() + "': " + e.getMessage());
+            throw new PulseException("Unable to create log file '" + logFile.getPath() + "': " + e.getMessage());
         }
         finally
         {
@@ -157,32 +157,32 @@ public class LocalBuild
         printEpilogue(logFile);
     }
 
-    private String loadBobFile(File baseDir, String bobFileName) throws BobException
+    private String loadPulseFile(File baseDir, String pulseFileName) throws PulseException
     {
-        File bobFile = new File(baseDir, bobFileName);
-        FileInputStream bobFileInputStream = null;
+        File pulseFile = new File(baseDir, pulseFileName);
+        FileInputStream pulseFileInputStream = null;
         String result;
 
         try
         {
-            bobFileInputStream = new FileInputStream(bobFile);
-            result = IOUtils.inputStreamToString(bobFileInputStream);
+            pulseFileInputStream = new FileInputStream(pulseFile);
+            result = IOUtils.inputStreamToString(pulseFileInputStream);
         }
         catch (IOException e)
         {
-            throw new BobException("Unable to load bob file '" + bobFile.getPath() + "': " + e.getMessage());
+            throw new PulseException("Unable to load pulse file '" + pulseFile.getPath() + "': " + e.getMessage());
         }
         finally
         {
-            IOUtils.close(bobFileInputStream);
+            IOUtils.close(pulseFileInputStream);
         }
 
         return result;
     }
 
-    private void printPrologue(String bobFile, String resourcesFile, String outputDir)
+    private void printPrologue(String pulseFile, String resourcesFile, String outputDir)
     {
-        System.out.println("bobfile         : '" + bobFile + "'");
+        System.out.println("pulsefile       : '" + pulseFile + "'");
         System.out.println("output directory: '" + outputDir + "'");
 
         if (resourcesFile != null)

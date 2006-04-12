@@ -16,27 +16,27 @@ import java.io.IOException;
  *          database/: the embedded HSQL database
  *          projects/: build artifacts
  *
- *          bob.config.properties: core configuration properties, contain version and license details amongst other things
+ *          pulse.config.properties: core configuration properties, contain version and license details amongst other things
  *
  */
 public class Home implements UserPaths
 {
-    private final File bobHome;
+    private final File pulseHome;
 
     private Version homeVersion;
     private File userConfigRoot;
     private File projectRoot;
     private File databaseRoot;
-    public static final String CONFIG_FILE_NAME = "bob.config.properties";
+    public static final String CONFIG_FILE_NAME = "pulse.config.properties";
 
     public Home(File homeDir)
     {
-        this.bobHome = homeDir;
+        this.pulseHome = homeDir;
     }
 
     public boolean isInitialised()
     {
-        if (!bobHome.exists())
+        if (!pulseHome.exists())
         {
             return false;
         }
@@ -47,9 +47,9 @@ public class Home implements UserPaths
     public void init() throws IOException
     {
         // create the home directory.
-        if (!bobHome.exists() && !bobHome.mkdirs())
+        if (!pulseHome.exists() && !pulseHome.mkdirs())
         {
-            throw new StartupException("Failed to create the configured home directory: "+bobHome +".");
+            throw new StartupException("Failed to create the configured home directory: "+pulseHome +".");
         }
 
         // write the version file.
@@ -80,19 +80,19 @@ public class Home implements UserPaths
 
     private File getVersionFile()
     {
-        return new File(bobHome, CONFIG_FILE_NAME);
+        return new File(pulseHome, CONFIG_FILE_NAME);
     }
 
     public File getHome()
     {
-        return bobHome;
+        return pulseHome;
     }
 
     public File getUserConfigRoot()
     {
         if (userConfigRoot == null)
         {
-            userConfigRoot = new File(bobHome, "config");
+            userConfigRoot = new File(pulseHome, "config");
         }
         return userConfigRoot;
     }
@@ -101,7 +101,7 @@ public class Home implements UserPaths
     {
         if (databaseRoot == null)
         {
-            databaseRoot = new File(bobHome, "database");
+            databaseRoot = new File(pulseHome, "database");
         }
         return databaseRoot;
     }
@@ -110,7 +110,7 @@ public class Home implements UserPaths
     {
         if (projectRoot == null)
         {
-            projectRoot = new File(bobHome, "projects");
+            projectRoot = new File(pulseHome, "projects");
         }
         return projectRoot;
     }

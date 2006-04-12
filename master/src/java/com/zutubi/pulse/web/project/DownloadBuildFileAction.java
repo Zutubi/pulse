@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.io.IOException;
 
 /**
- * An action to download the bob file used in a specific build.
+ * An action to download the pulse file used in a specific build.
  */
 public class DownloadBuildFileAction extends ProjectActionSupport
 {

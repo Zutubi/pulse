@@ -13,14 +13,14 @@ import java.util.*;
 /**
  * Base class for test cases.
  */
-public abstract class BobTestCase extends TestCase
+public abstract class PulseTestCase extends TestCase
 {
-    public BobTestCase()
+    public PulseTestCase()
     {
 
     }
 
-    public BobTestCase(String name)
+    public PulseTestCase(String name)
     {
         super(name);
     }
@@ -242,7 +242,7 @@ public abstract class BobTestCase extends TestCase
         return getClass().getResource(getClass().getSimpleName() + "." + testName + extension);
     }
 
-    public static File getBobRoot()
+    public static File getPulseRoot()
     {
         // First, take a guess at the working directory (which is likely to
         // work if we are running tests using Ant)

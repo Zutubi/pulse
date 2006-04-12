@@ -14,13 +14,13 @@ import java.io.File;
  * directories to lookup velocity templates.
  *
  */
-public class BobTemplateVelocityResourceLoader extends FileResourceLoader
+public class PulseTemplateVelocityResourceLoader extends FileResourceLoader
 {
-    private static final Logger LOG = Logger.getLogger(BobTemplateVelocityResourceLoader.class);
+    private static final Logger LOG = Logger.getLogger(PulseTemplateVelocityResourceLoader.class);
 
     private ConfigurationManager configManager;
 
-    public BobTemplateVelocityResourceLoader()
+    public PulseTemplateVelocityResourceLoader()
     {
         // since velocity does not provide an object creation hook,
         // we need to handle the autowiring ourselves.

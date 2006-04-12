@@ -6,13 +6,13 @@ import java.io.IOException;
 
 /**
  */
-public class AntBobFileDetailsTest extends TemplateBobFileDetailsTestBase
+public class MakePulseFileDetailsTest extends TemplatePulseFileDetailsTestBase
 {
-    private AntBobFileDetails details;
+    private MakePulseFileDetails details;
 
     protected void setUp() throws Exception
     {
-        details = new AntBobFileDetails();
+        details = new MakePulseFileDetails();
         super.setUp();
     }
 
@@ -22,7 +22,7 @@ public class AntBobFileDetailsTest extends TemplateBobFileDetailsTestBase
         FileSystemUtils.removeDirectory(tmpDir);
     }
 
-    public TemplateBobFileDetails getDetails()
+    public TemplatePulseFileDetails getDetails()
     {
         return details;
     }
@@ -34,8 +34,8 @@ public class AntBobFileDetailsTest extends TemplateBobFileDetailsTestBase
 
     public void testExplicitBuildFile() throws IOException
     {
-        details.setBuildFile("test.xml");
-        createAndVerify("explicitBuildFile");
+        details.setMakefile("test.makefile");
+        createAndVerify("explicitMakefile");
     }
 
     public void testEnvironment() throws IOException
@@ -50,7 +50,6 @@ public class AntBobFileDetailsTest extends TemplateBobFileDetailsTestBase
         details.setTargets("build test");
         createAndVerify("explicitTargets");
     }
-
 
     public void testExplicitWorkingDir() throws IOException
     {

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.BobFileDetails;
-import com.zutubi.pulse.model.CustomBobFileDetails;
+import com.zutubi.pulse.model.PulseFileDetails;
+import com.zutubi.pulse.model.CustomPulseFileDetails;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 
 /**
@@ -10,14 +10,14 @@ import com.zutubi.pulse.xwork.interceptor.Preparable;
  */
 public class EditCustomDetailsAction extends AbstractEditDetailsAction implements Preparable
 {
-    private CustomBobFileDetails details = new CustomBobFileDetails();
+    private CustomPulseFileDetails details = new CustomPulseFileDetails();
 
     public void prepare()
     {
-        details = getBobFileDetailsDao().findByIdAndType(getId(), CustomBobFileDetails.class);
+        details = getPulseFileDetailsDao().findByIdAndType(getId(), CustomPulseFileDetails.class);
     }
 
-    public BobFileDetails getDetails()
+    public PulseFileDetails getDetails()
     {
         return details;
     }

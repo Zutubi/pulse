@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.BobException;
+import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.Bootstrapper;
 
 /**
@@ -19,9 +19,9 @@ public class RecipeRequest
      */
     private Bootstrapper bootstrapper;
     /**
-     * Source used to retrieve the bob file.
+     * Source used to retrieve the pulse file.
      */
-    private String bobFileSource;
+    private String pulseFileSource;
     /**
      * The name of the recipe to execute, or null to execute the default.
      */
@@ -44,9 +44,9 @@ public class RecipeRequest
         return bootstrapper;
     }
 
-    public String getBobFileSource()
+    public String getPulseFileSource()
     {
-        return bobFileSource;
+        return pulseFileSource;
     }
 
     public String getRecipeName()
@@ -59,12 +59,12 @@ public class RecipeRequest
         this.bootstrapper = bootstrapper;
     }
 
-    public void setBobFileSource(String bobFileSource)
+    public void setPulseFileSource(String pulseFileSource)
     {
-        this.bobFileSource = bobFileSource;
+        this.pulseFileSource = pulseFileSource;
     }
 
-    public void prepare() throws BobException
+    public void prepare() throws PulseException
     {
         bootstrapper.prepare();
     }

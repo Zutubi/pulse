@@ -53,7 +53,7 @@ public class User extends Entity implements UserDetails
     private List<GrantedAuthority> authorities;
 
     /**
-     * A list of login aliases for the user: logins in other tools that bob
+     * A list of login aliases for the user: logins in other tools that pulse
      * may be interacting with (e.g. SCMs).
      */
     private List<String> aliases;

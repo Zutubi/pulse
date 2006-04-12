@@ -2,16 +2,16 @@
 
 @setlocal
 
-set DEFAULT_BOB_HOME=%~dp0..
-if "%BOB_HOME%"=="" set BOB_HOME=%DEFAULT_BOB_HOME%
+set DEFAULT_PULSE_HOME=%~dp0..
+if "%PULSE_HOME%"=="" set PULSE_HOME=%DEFAULT_PULSE_HOME%
 
-if exist "%BOB_HOME%\bin\common.bat" goto haveBob
+if exist "%PULSE_HOME%\bin\common.bat" goto havePulse
 
-echo Could not find "%BOB_HOME%\bin\common.bat", please
-echo set BOB_HOME
+echo Could not find "%PULSE_HOME%\bin\common.bat", please
+echo set PULSE_HOME
 goto end
 
-:haveBob
+:havePulse
 
 set _JAVACMD=%JAVACMD%
 
@@ -34,17 +34,17 @@ if "%1" == "start" goto doStart
 goto doExec
 
 :doStart
-set _EXECCMD=start "Bob" "%_JAVACMD%"
+set _EXECCMD=start "Pulse" "%_JAVACMD%"
 
 :doExec
 
 rem setup the classpath.
-set LOCALCLASSPATH=%CLASSPATH%;"%BOB_HOME%\system\www\WEB-INF\classes"
-set LOCALCLASSPATH=%LOCALCLASSPATH%;"%BOB_HOME%\lib"
-for %%i in ("%BOB_HOME%\lib\*.jar") do call "%BOB_HOME%\bin\lcp.bat" %%i
-for %%i in ("%BOB_HOME%\lib\*.xml") do call "%BOB_HOME%\bin\lcp.bat" %%i
+set LOCALCLASSPATH=%CLASSPATH%;"%PULSE_HOME%\system\www\WEB-INF\classes"
+set LOCALCLASSPATH=%LOCALCLASSPATH%;"%PULSE_HOME%\lib"
+for %%i in ("%PULSE_HOME%\lib\*.jar") do call "%PULSE_HOME%\bin\lcp.bat" %%i
+for %%i in ("%PULSE_HOME%\lib\*.xml") do call "%PULSE_HOME%\bin\lcp.bat" %%i
 
-%_EXECCMD% %BOB_OPTS% -classpath "%LOCALCLASSPATH%" -Dbob.install="%BOB_HOME%" -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig -Djava.awt.headless=true %*
+%_EXECCMD% %PULSE_OPTS% -classpath "%LOCALCLASSPATH%" -Dpulse.install="%PULSE_HOME%" -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig -Djava.awt.headless=true %*
 
 rem if "%1" == "start" goto end
 rem if errorlevel 1 pause

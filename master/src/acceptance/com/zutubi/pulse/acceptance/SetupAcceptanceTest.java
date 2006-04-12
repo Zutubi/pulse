@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.setup.CreateAdminForm;
 import com.zutubi.pulse.acceptance.forms.setup.ServerSettingsForm;
-import com.zutubi.pulse.acceptance.forms.setup.SetBobHomeForm;
+import com.zutubi.pulse.acceptance.forms.setup.SetPulseHomeForm;
 
 /**
  * A setup test that covers the systems setup procedure.
@@ -26,11 +26,11 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
 
     public void testSetupProcess()
     {
-        // first we deal with the bob home property configuration.
+        // first we deal with the pulse home property configuration.
         beginAt("/");
 
-        // step one. setting the bob home variable.
-        checkSetBobHome();
+        // step one. setting the pulse home variable.
+        checkSetPulseHome();
 
         // step two. creating the administration user.
         checkCreateAdmin();
@@ -104,26 +104,26 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         createAdminForm.nextFormElements("admin", "A. D. Ministrator", "admin", "admin");
     }
 
-    private void checkSetBobHome()
+    private void checkSetPulseHome()
     {
-        SetBobHomeForm bobHomeForm = new SetBobHomeForm(tester);
+        SetPulseHomeForm pulseHomeForm = new SetPulseHomeForm(tester);
 
-        bobHomeForm.assertFormPresent();
+        pulseHomeForm.assertFormPresent();
 
-        // ensure that we have a default value for the bobHome property.
-        assertFormElementNotEmpty("bobHome");
+        // ensure that we have a default value for the pulseHome property.
+        assertFormElementNotEmpty("pulseHome");
         // record the default value for later use.
-        String defaultBobHome = getFormValue("bobHome");
+        String defaultPulseHome = getFormValue("pulseHome");
 
-        // check the validation - an empty bob home.
-        bobHomeForm.nextFormElements("");
+        // check the validation - an empty pulse home.
+        pulseHomeForm.nextFormElements("");
         // assert that we are still on the same page.
-        bobHomeForm.assertFormElements("");
+        pulseHomeForm.assertFormElements("");
 
-        // check validation - an invalid bob home value.
+        // check validation - an invalid pulse home value.
 
-        // enter valid bob home that does not exist.
-        bobHomeForm.nextFormElements(defaultBobHome);
+        // enter valid pulse home that does not exist.
+        pulseHomeForm.nextFormElements(defaultPulseHome);
 
         // it should prompt for confirmation to create the directory....
     }

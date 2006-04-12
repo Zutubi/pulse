@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 /**
  */
-public interface BobFileSource
+public interface PulseFileSource
 {
-    public InputStream getBobFile(File baseDir);
+    public InputStream getPulseFile(File baseDir);
 }

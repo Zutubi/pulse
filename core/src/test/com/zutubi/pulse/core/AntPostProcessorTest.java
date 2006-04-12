@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.IOUtils;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Tests for RegexPostProcessor.
  */
-public class AntPostProcessorTest extends BobTestCase
+public class AntPostProcessorTest extends PulseTestCase
 {
     private AntPostProcessor pp;
     private StoredFileArtifact artifact;

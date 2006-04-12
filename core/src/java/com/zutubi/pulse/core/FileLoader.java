@@ -51,17 +51,17 @@ public class FileLoader
         this.factory = factory;
     }
 
-    public void load(File file, Object root) throws BobException, IOException, IllegalAccessException, InvocationTargetException
+    public void load(File file, Object root) throws PulseException, IOException, IllegalAccessException, InvocationTargetException
     {
         load(new FileInputStream(file), root);
     }
 
-    public void load(InputStream input, Object root) throws BobException
+    public void load(InputStream input, Object root) throws PulseException
     {
         load(input, root, null);
     }
 
-    public void load(InputStream input, Object root, List<Reference> references) throws BobException
+    public void load(InputStream input, Object root, List<Reference> references) throws PulseException
     {
         try
         {
@@ -113,7 +113,7 @@ public class FileLoader
         }
     }
 
-    private void loadType(Element e, Object parent, boolean resolveReferences, Scope scope) throws BobException
+    private void loadType(Element e, Object parent, boolean resolveReferences, Scope scope) throws PulseException
     {
         IntrospectionHelper parentHelper = IntrospectionHelper.getHelper(parent.getClass(), typeDefinitions);
         String name = e.getLocalName();

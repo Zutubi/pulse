@@ -2,7 +2,7 @@ package com.zutubi.pulse.core;
 
 /**
  * Types that define the reference interface can be referenced anywhere within the
- * bob file using the syntax ${name}, where name is the value returned by the getName
+ * pulse file using the syntax ${name}, where name is the value returned by the getName
  * method.
  *
  * Examples:

@@ -4,7 +4,7 @@ package com.zutubi.pulse.core;
  * 
  *
  */
-public class BuildException extends BobRuntimeException
+public class BuildException extends PulseRuntimeException
 {
     /**
      * @param errorMessage

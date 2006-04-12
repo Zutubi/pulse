@@ -19,13 +19,13 @@ public class AntPostProcessor extends RegexPostProcessor
         // Ant gives different failure messages in different cases, for
         // example:
         //
-        // jsankey@shiny:~/svn/bob/trunk$ ant -f nosuchfile
+        // jsankey@shiny:~/svn/pulse/trunk$ ant -f nosuchfile
         // Buildfile: nosuchfile does not exist!
         // Build failed
         //
         // versus:
         //
-        // jsankey@shiny:~/svn/bob/trunk$ ant nosuchtarget
+        // jsankey@shiny:~/svn/pulse/trunk$ ant nosuchtarget
         // Buildfile: build.xml
         //
         // BUILD FAILED

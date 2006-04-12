@@ -1,8 +1,8 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.model.AntBobFileDetails;
-import com.zutubi.pulse.model.CustomBobFileDetails;
-import com.zutubi.pulse.model.MakeBobFileDetails;
+import com.zutubi.pulse.model.AntPulseFileDetails;
+import com.zutubi.pulse.model.CustomPulseFileDetails;
+import com.zutubi.pulse.model.MakePulseFileDetails;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.util.logging.Logger;
@@ -32,33 +32,33 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
         return findByNamedQuery("findByLikeName", "name", name);
     }
 
-    public void save(CustomBobFileDetails details)
+    public void save(CustomPulseFileDetails details)
     {
         getHibernateTemplate().saveOrUpdate(details);
     }
 
-    public CustomBobFileDetails findCustomBobFileSource(long id)
+    public CustomPulseFileDetails findCustomPulseFileSource(long id)
     {
-        return (CustomBobFileDetails) getHibernateTemplate().load(CustomBobFileDetails.class, id);
+        return (CustomPulseFileDetails) getHibernateTemplate().load(CustomPulseFileDetails.class, id);
     }
 
-    public void save(AntBobFileDetails source)
+    public void save(AntPulseFileDetails source)
     {
         getHibernateTemplate().saveOrUpdate(source);
     }
 
-    public void save(MakeBobFileDetails source)
+    public void save(MakePulseFileDetails source)
     {
         getHibernateTemplate().saveOrUpdate(source);
     }
 
-    public AntBobFileDetails findAntBobFileSource(long id)
+    public AntPulseFileDetails findAntPulseFileSource(long id)
     {
-        return (AntBobFileDetails) getHibernateTemplate().load(AntBobFileDetails.class, id);
+        return (AntPulseFileDetails) getHibernateTemplate().load(AntPulseFileDetails.class, id);
     }
 
-    public MakeBobFileDetails findMakeBobFileSource(long id)
+    public MakePulseFileDetails findMakePulseFileSource(long id)
     {
-        return (MakeBobFileDetails) getHibernateTemplate().load(MakeBobFileDetails.class, id);
+        return (MakePulseFileDetails) getHibernateTemplate().load(MakePulseFileDetails.class, id);
     }
 }

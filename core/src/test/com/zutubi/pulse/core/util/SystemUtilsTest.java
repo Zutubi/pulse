@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core.util;
 
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
 
 /**
  */
-public class SystemUtilsTest extends BobTestCase
+public class SystemUtilsTest extends PulseTestCase
 {
     public void testFindInPathNonExistant()
     {

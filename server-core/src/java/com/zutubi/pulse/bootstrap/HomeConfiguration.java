@@ -14,7 +14,7 @@ public class HomeConfiguration implements HomeResolver
 {
     private static final Logger LOG = Logger.getLogger(HomeConfiguration.class);
 
-    private static final String FILENAME = "bob-init.properties";
+    private static final String FILENAME = "pulse-init.properties";
 
     private Config systemProps = null;
     private Config initProps = null;
@@ -24,7 +24,7 @@ public class HomeConfiguration implements HomeResolver
     /**
      * The home property.
      */
-    private static final String HOME_PROPERTY_NAME = "bob.home";
+    private static final String HOME_PROPERTY_NAME = "pulse.home";
 
     public Home getHome()
     {

@@ -69,7 +69,7 @@ public class RecipeProcessor
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    public void build(long recipeId, RecipePaths paths, Bootstrapper bootstrapper, String bobFileSource, String recipeName)
+    public void build(long recipeId, RecipePaths paths, Bootstrapper bootstrapper, String pulseFileSource, String recipeName)
     {
         // This result holds only the recipe details (stamps, state etc), not
         // the command results.  A full recipe result with command results is
@@ -85,19 +85,19 @@ public class RecipeProcessor
         {
             bootstrapper.bootstrap(recipeId, paths);
 
-            BobFile bobFile = loadBobFile(paths.getBaseDir(), bobFileSource, recipeName);
+            PulseFile pulseFile = loadPulseFile(paths.getBaseDir(), pulseFileSource, recipeName);
             Recipe recipe;
 
             if (recipeName == null)
             {
-                recipeName = bobFile.getDefaultRecipe();
+                recipeName = pulseFile.getDefaultRecipe();
                 if (recipeName == null)
                 {
                     throw new BuildException("Please specify a default recipe for your project.");
                 }
             }
 
-            recipe = bobFile.getRecipe(recipeName);
+            recipe = pulseFile.getRecipe(recipeName);
             if (recipe == null)
             {
                 throw new BuildException("Undefined recipe '" + recipeName + "'");
@@ -190,7 +190,7 @@ public class RecipeProcessor
         }
     }
 
-    private BobFile loadBobFile(File baseDir, String bobFileSource, String recipeName) throws BuildException
+    private PulseFile loadPulseFile(File baseDir, String pulseFileSource, String recipeName) throws BuildException
     {
         List<Reference> properties = new LinkedList<Reference>();
         Property property = new Property("base.dir", baseDir.getAbsolutePath());
@@ -201,13 +201,13 @@ public class RecipeProcessor
         try
         {
             // CIB-286: special case empty file for better reporting
-            if(bobFileSource.trim().length() == 0)
+            if(pulseFileSource.trim().length() == 0)
             {
                 throw new ParseException("File is empty");
             }
 
-            stream = new ByteArrayInputStream(bobFileSource.getBytes());
-            BobFile result = new BobFile();
+            stream = new ByteArrayInputStream(pulseFileSource.getBytes());
+            PulseFile result = new PulseFile();
             fileLoader.setPredicate(new RecipeLoadPredicate(result, recipeName));
             fileLoader.load(stream, result, properties);
             return result;

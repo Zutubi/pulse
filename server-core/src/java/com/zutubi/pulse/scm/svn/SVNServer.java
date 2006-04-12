@@ -431,7 +431,7 @@ public class SVNServer implements SCMServer
     {
         try
         {
-            SVNServer server = new SVNServer("svn+ssh://jason@www.anyhews.net/usr/local/svn-repo/bob/trunk", argv[0], argv[1]);
+            SVNServer server = new SVNServer("svn+ssh://jason@www.anyhews.net/usr/local/svn-repo/pulse/trunk", argv[0], argv[1]);
             //server.checkout(new File("/home/jsankey/svntest"), new SVNRevision(ISVNWorkspace.HEAD));
             List<Changelist> cls = server.getChanges(new NumericalRevision(47), new NumericalRevision(ISVNWorkspace.HEAD), "");
 

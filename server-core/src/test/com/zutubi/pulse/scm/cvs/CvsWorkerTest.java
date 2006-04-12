@@ -8,7 +8,7 @@ import com.zutubi.pulse.core.util.Constants;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.IOUtils;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
@@ -20,7 +20,7 @@ import java.util.*;
 /**
  * <class-comment/>
  */
-public class CvsWorkerTest extends BobTestCase
+public class CvsWorkerTest extends PulseTestCase
 {
     /**
      * Local time, formatted based on the EST timezone.
@@ -65,7 +65,7 @@ public class CvsWorkerTest extends BobTestCase
         Logger.setLogging("system");
 
         // test repository root.
-        File repositoryRoot = new File(getBobRoot(), "server-core/src/test/com/zutubi/pulse/scm/cvs/repository");
+        File repositoryRoot = new File(getPulseRoot(), "server-core/src/test/com/zutubi/pulse/scm/cvs/repository");
         String cvsRoot = ":local:" + repositoryRoot.getCanonicalPath();
 
         cvs = new CvsWorker();

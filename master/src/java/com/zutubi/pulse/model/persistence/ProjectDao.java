@@ -1,8 +1,8 @@
 package com.zutubi.pulse.model.persistence;
 
-import com.zutubi.pulse.model.AntBobFileDetails;
-import com.zutubi.pulse.model.CustomBobFileDetails;
-import com.zutubi.pulse.model.MakeBobFileDetails;
+import com.zutubi.pulse.model.AntPulseFileDetails;
+import com.zutubi.pulse.model.CustomPulseFileDetails;
+import com.zutubi.pulse.model.MakePulseFileDetails;
 import com.zutubi.pulse.model.Project;
 
 import java.util.List;
@@ -17,15 +17,15 @@ public interface ProjectDao extends EntityDao<Project>
 
     List<Project> findByLikeName(String name);
 
-    void save(CustomBobFileDetails details);
+    void save(CustomPulseFileDetails details);
 
-    CustomBobFileDetails findCustomBobFileSource(long id);
+    CustomPulseFileDetails findCustomPulseFileSource(long id);
 
-    void save(AntBobFileDetails source);
+    void save(AntPulseFileDetails source);
 
-    void save(MakeBobFileDetails source);
+    void save(MakePulseFileDetails source);
 
-    AntBobFileDetails findAntBobFileSource(long id);
+    AntPulseFileDetails findAntPulseFileSource(long id);
 
-    MakeBobFileDetails findMakeBobFileSource(long id);
+    MakePulseFileDetails findMakePulseFileSource(long id);
 }

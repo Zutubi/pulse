@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.BobFileDetails;
-import com.zutubi.pulse.model.MakeBobFileDetails;
+import com.zutubi.pulse.model.PulseFileDetails;
+import com.zutubi.pulse.model.MakePulseFileDetails;
 import com.opensymphony.util.TextUtils;
 
 /**
@@ -9,14 +9,14 @@ import com.opensymphony.util.TextUtils;
  */
 public class EditMakeDetailsAction extends AbstractEditDetailsAction
 {
-    private MakeBobFileDetails details = new MakeBobFileDetails();
+    private MakePulseFileDetails details = new MakePulseFileDetails();
 
     public void prepare()
     {
-        details = getBobFileDetailsDao().findByIdAndType(getId(), MakeBobFileDetails.class);
+        details = getPulseFileDetailsDao().findByIdAndType(getId(), MakePulseFileDetails.class);
     }
 
-    public BobFileDetails getDetails()
+    public PulseFileDetails getDetails()
     {
         if (!TextUtils.stringSet(details.getMakefile()))
         {

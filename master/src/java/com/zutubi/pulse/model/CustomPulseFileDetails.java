@@ -8,18 +8,18 @@ import java.util.Properties;
 
 /**
  */
-public class CustomBobFileDetails extends BobFileDetails
+public class CustomPulseFileDetails extends PulseFileDetails
 {
-    private String bobFileName;
+    private String pulseFileName;
 
-    public CustomBobFileDetails()
+    public CustomPulseFileDetails()
     {
 
     }
 
-    public CustomBobFileDetails(String bobFileName)
+    public CustomPulseFileDetails(String pulseFileName)
     {
-        this.bobFileName = bobFileName;
+        this.pulseFileName = pulseFileName;
     }
 
     public String getType()
@@ -31,17 +31,17 @@ public class CustomBobFileDetails extends BobFileDetails
     {
         // TODO i18n
         Properties result = new Properties();
-        result.put("pulse file", bobFileName);
+        result.put("pulse file", pulseFileName);
         return result;
     }
 
-    public String getBobFile(long id, Project project, Revision revision)
+    public String getPulseFile(long id, Project project, Revision revision)
     {
         Scm scm = project.getScm();
 
         try
         {
-            return scm.createServer().checkout(id, revision, bobFileName);
+            return scm.createServer().checkout(id, revision, pulseFileName);
         }
         catch (SCMException e)
         {
@@ -49,14 +49,14 @@ public class CustomBobFileDetails extends BobFileDetails
         }
     }
 
-    public String getBobFileName()
+    public String getPulseFileName()
     {
-        return bobFileName;
+        return pulseFileName;
     }
 
-    public void setBobFileName(String bobFileName)
+    public void setPulseFileName(String pulseFileName)
     {
-        this.bobFileName = bobFileName;
+        this.pulseFileName = pulseFileName;
     }
 
 }

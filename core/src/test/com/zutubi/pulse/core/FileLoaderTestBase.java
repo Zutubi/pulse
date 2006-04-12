@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.Property;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  * Helper base class for file loader tests.
  */
-public abstract class FileLoaderTestBase extends BobTestCase
+public abstract class FileLoaderTestBase extends PulseTestCase
 {
     protected FileLoader loader;
 
@@ -52,9 +52,9 @@ public abstract class FileLoaderTestBase extends BobTestCase
     // Generic helpers
     //-----------------------------------------------------------------------
 
-    protected BobFile load(String name) throws BobException
+    protected PulseFile load(String name) throws PulseException
     {
-        BobFile bf = new BobFile();
+        PulseFile bf = new PulseFile();
         loader.load(getInput(name), bf);
         return bf;
     }
@@ -66,7 +66,7 @@ public abstract class FileLoaderTestBase extends BobTestCase
             load(testName);
             fail();
         }
-        catch (BobException e)
+        catch (PulseException e)
         {
             if (!e.getMessage().contains(messageContent))
             {

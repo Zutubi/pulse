@@ -45,7 +45,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         submitCvsSetupForm("/local", "module", "", "");
 
         assertFormElementNotEmpty(CUSTOM_SETUP_FILE);
-        submitCustomSetupForm("bob.xml");
+        submitCustomSetupForm("pulse.xml");
 
         // assert that all of the expected tables have the expected data.
         assertTablePresent("project.basics");
@@ -58,7 +58,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         assertTablePresent("project.specifics");
         assertTableRowsEqual("project.specifics", 1, new String[][]{
                 new String[]{"type", "custom"},
-                new String[]{"pulse file", "bob.xml"}
+                new String[]{"pulse file", "pulse.xml"}
         });
 
         assertTablePresent("project.scm");
@@ -103,7 +103,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         String projectName = "project " + RandomUtils.randomString(5);
         submitProjectBasicsForm(projectName, "", "", "cvs", "custom");
         submitCvsSetupForm("/local", "module", "", "");
-        submitCustomSetupForm("bob.xml");
+        submitCustomSetupForm("pulse.xml");
         assertTablePresent("project.basics");
 
         clickLinkWithText("projects");

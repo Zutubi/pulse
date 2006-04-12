@@ -6,9 +6,9 @@
             <message>project:</message>
         </field-validator>
     </field>
-    <field name="bobFileName">
+    <field name="pulseFileName">
         <field-validator type="requiredstring">
-            <message>bob file is required</message>
+            <message>pulse file is required</message>
         </field-validator>
     </field>
 </validators>

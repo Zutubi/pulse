@@ -3,7 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
-import com.zutubi.pulse.test.BobTestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * <class-comment/>
  */
-public class ResourceRepositoryTest extends BobTestCase
+public class ResourceRepositoryTest extends PulseTestCase
 {
     private FileResourceRepository repo = null;
 

@@ -28,9 +28,9 @@ public class CommandGroupLoadTest extends FileLoaderTestBase
         assertFalse(a.getFailIfNotPresent());
     }
 
-    private CommandGroup loadGroup(String name, String commandName) throws BobException
+    private CommandGroup loadGroup(String name, String commandName) throws PulseException
     {
-        BobFile bf = load(name);
+        PulseFile bf = load(name);
         assertEquals(1, bf.getRecipes().size());
         Recipe recipe = bf.getRecipes().get(0);
         Command command = recipe.getCommand(commandName);

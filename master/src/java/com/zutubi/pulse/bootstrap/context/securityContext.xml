@@ -94,7 +94,7 @@ The beans defined within the security subsystem need not be accessed by other co
 
     <bean id="basicProcessingFilterEntryPoint" class="org.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
         <property name="realmName">
-            <value>Bob Realm</value>
+            <value>Pulse Realm</value>
         </property>
     </bean>
 
@@ -143,14 +143,14 @@ The beans defined within the security subsystem need not be accessed by other co
             <ref bean="userManager"/>
         </property>
         <property name="key">
-            <value>bob</value>
+            <value>pulse</value>
         </property>
     </bean>
 
     <bean id="rememberMeAuthenticationProvider"
           class="org.acegisecurity.providers.rememberme.RememberMeAuthenticationProvider">
         <property name="key">
-            <value>bob</value>
+            <value>pulse</value>
         </property>
     </bean>
 

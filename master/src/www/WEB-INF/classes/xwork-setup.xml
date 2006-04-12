@@ -16,8 +16,8 @@
     <package name="setup" namespace="/setup" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="setup" class="com.zutubi.pulse.web.setup.ConfigureBobHomeAction">
-            <result name="input" type="velocity">/setup/configure-bobhome.vm</result>
+        <action name="setup" class="com.zutubi.pulse.web.setup.ConfigurePulseHomeAction">
+            <result name="input" type="velocity">/setup/configure-pulsehome.vm</result>
             <result name="setup" type="redirect">/setup/setupWizard.action</result>
             <result name="upgrade" type="redirect">/upgrade/preview.action</result>
             <result name="success" type="redirect">/</result>

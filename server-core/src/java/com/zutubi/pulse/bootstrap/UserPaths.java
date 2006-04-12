@@ -8,10 +8,10 @@ import java.io.File;
 public interface UserPaths
 {
     /**
-     * Thje bob home direcory is the place where all of the users data is
+     * The pulse home direcory is the place where all of the users data is
      * stored.
      *
-     * @return the home directory for all bob data
+     * @return the home directory for all pulse data
      */
     File getHome();
 

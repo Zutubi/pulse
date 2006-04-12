@@ -10,58 +10,58 @@ import java.io.File;
 /**
  * <class-comment/>
  */
-public class ConfigureBobHomeAction extends ActionSupport
+public class ConfigurePulseHomeAction extends ActionSupport
 {
     private ConfigurationManager configurationManager;
 
     private SetupManager setupManager;
 
-    private String bobHome;
+    private String pulseHome;
 
-    public String getBobHome()
+    public String getPulseHome()
     {
-        return bobHome;
+        return pulseHome;
     }
 
-    public void setBobHome(String bobHome)
+    public void setPulseHome(String pulseHome)
     {
-        this.bobHome = bobHome;
+        this.pulseHome = pulseHome;
     }
 
     public void validate()
     {
         // attempt to create the home directory. If this fails, we need to ask the
         // user for another directory.
-        File home = new File(bobHome);
+        File home = new File(pulseHome);
         if (!home.exists() && !home.mkdirs())
         {
-            addFieldError("bobHome", getText(""));
+            addFieldError("pulseHome", getText(""));
         }
     }
 
     public String doInput() throws Exception
     {
         // set the default.
-        String install = System.getProperty(SimpleConfigurationManager.BOB_INSTALL);
+        String install = System.getProperty(SimpleConfigurationManager.PULSE_INSTALL);
         if (install == null)
         {
-            this.bobHome = "home";
+            this.pulseHome = "home";
         }
         else
         {
-            this.bobHome = install + File.separatorChar + "home";
+            this.pulseHome = install + File.separatorChar + "home";
         }
 
         // make the path the shortest possible.
-        this.bobHome = new File(this.bobHome).getCanonicalPath();
+        this.pulseHome = new File(this.pulseHome).getCanonicalPath();
 
         return INPUT;
     }
 
     public String execute()
     {
-        File home = new File(bobHome);
-        configurationManager.setBobHome(home);
+        File home = new File(pulseHome);
+        configurationManager.setPulseHome(home);
 
         // next we need to know if we need to upgrade or setup.
         if (setupManager.systemRequiresSetup())
