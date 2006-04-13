@@ -5,8 +5,6 @@ package com.zutubi.pulse.logging;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import org.netbeans.lib.cvsclient.util.LoggedDataOutputStream;
-import org.netbeans.lib.cvsclient.util.LoggedDataInputStream;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +51,7 @@ public class FileConfig
         Logger rootLogger = Logger.getLogger("");
         rootLogger.addHandler(fileHandler);
 
+/*
         // setup the CVS file logger.
         FileHandler outputHandler = new FileHandler(logRoot.getCanonicalPath() + File.separator + "cvs%u.%g.out.log");
         outputHandler.setLevel(Level.ALL);
@@ -69,6 +68,7 @@ public class FileConfig
         Logger inputStreamLogger = Logger.getLogger(LoggedDataInputStream.class.getName());
         inputStreamLogger.addHandler(inputHandler);
         inputStreamLogger.setUseParentHandlers(false);
+*/
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)
