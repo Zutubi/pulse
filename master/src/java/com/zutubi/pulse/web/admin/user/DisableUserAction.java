@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.web.admin.user;
 
 import com.zutubi.pulse.web.user.UserActionSupport;

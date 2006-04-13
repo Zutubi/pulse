@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.acceptance;
 
 import com.meterware.httpunit.GetMethodWebRequest;

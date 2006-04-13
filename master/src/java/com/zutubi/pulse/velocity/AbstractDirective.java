@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.velocity;
 
 import org.apache.velocity.runtime.directive.Directive;

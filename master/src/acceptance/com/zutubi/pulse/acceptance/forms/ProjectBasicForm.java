@@ -1,3 +1,6 @@
+/********************************************************************************
+  @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.acceptance.forms;
 
 import net.sourceforge.jwebunit.WebTester;

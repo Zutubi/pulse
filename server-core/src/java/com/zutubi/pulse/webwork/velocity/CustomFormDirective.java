@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.webwork.velocity;
 
 import com.zutubi.pulse.webwork.components.CustomForm;

@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.scheduling.persistence.hibernate;
 
 import com.zutubi.pulse.model.persistence.hibernate.HibernateEntityDao;

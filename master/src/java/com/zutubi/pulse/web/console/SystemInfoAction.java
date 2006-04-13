@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.web.console;
 
 import com.zutubi.pulse.bootstrap.StartupManager;

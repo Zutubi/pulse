@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.scheduling.persistence;
 
 import com.zutubi.pulse.model.persistence.EntityDao;

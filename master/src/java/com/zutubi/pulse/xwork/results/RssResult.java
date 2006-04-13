@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.xwork.results;
 
 import com.opensymphony.webwork.dispatcher.WebWorkResultSupport;

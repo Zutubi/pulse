@@ -13,6 +13,7 @@
         <property name="build.dir" value="${module.root.dir}/build"/>
         <property name="classes.dir" value="${build.dir}/classes"/>
         <property name="test.classes.dir" value="${build.dir}/test.classes"/>
+        <property name="process.src.dir" value="${build.dir}/src"/>
         <property name="accept.classes.dir" value="${build.dir}/accept.classes"/>
         <property name="report.dir" value="${build.dir}/reports"/>
 
@@ -61,6 +62,8 @@
         <mkdir dir="${report.dir}/junit"/>
         <mkdir dir="${report.dir}/junit/xml"/>
         <mkdir dir="${report.dir}/junit/html"/>
+
+        <mkdir dir="${process.src.dir}"/>
 
         <!-- resolve dependencies -->
         <resolve conf="external"/>
@@ -113,6 +116,20 @@
             </fileset>
         </copy>
 
+        <copy todir="${process.src.dir}" overwrite="true">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+            <fileset dir="${test.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+        </copy>
+
+        <!-- process copyright. -->
+        <replace dir="${process.src.dir}" token="@COPYRIGHT@" value="${copyright.statement}">
+            <include name="**/*.java"/>
+        </replace>
+
     </target>
 
     <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
@@ -155,6 +172,7 @@
     <target name="package" depends="init">
         <jar file="${module.root.dir}/build/${module}.jar" basedir="${classes.dir}"/>
         <jar file="${module.root.dir}/build/${module}-test.jar" basedir="${test.classes.dir}"/>
+        <jar file="${module.root.dir}/build/${module}-src.jar" basedir="${process.src.dir}"/>
     </target>
 
     <target name="publish" depends="init">

@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.bootstrap.yahoo;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;

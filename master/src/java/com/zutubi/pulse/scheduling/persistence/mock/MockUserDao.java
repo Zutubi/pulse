@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.scheduling.persistence.mock;
 
 import com.zutubi.pulse.model.User;

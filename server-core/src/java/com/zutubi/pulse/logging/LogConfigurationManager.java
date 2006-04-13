@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.logging;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
@@ -13,7 +16,7 @@ import java.util.logging.LogManager;
 
 /**
  * The Log Configuration Manager handles the systems logging configuration.
- * 
+ *
  */
 public class LogConfigurationManager
 {

@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.zutubi.pulse.acceptance.forms.BaseForm;

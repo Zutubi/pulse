@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.scheduling.tasks;
 
 import com.zutubi.pulse.events.EventManager;

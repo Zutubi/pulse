@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.scm.cvs.client;
 
 import org.netbeans.lib.cvsclient.event.CVSAdapter;

@@ -1,3 +1,6 @@
+/********************************************************************************
+  @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.command;
 
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;

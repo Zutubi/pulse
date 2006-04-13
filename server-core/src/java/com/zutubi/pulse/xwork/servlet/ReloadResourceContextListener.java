@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.xwork.servlet;
 
 import com.opensymphony.xwork.util.LocalizedTextUtil;

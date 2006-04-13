@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.upgrade.UpgradeContext;

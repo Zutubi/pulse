@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.servlet;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;

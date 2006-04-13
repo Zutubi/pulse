@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.webwork.components;
 
 import com.opensymphony.webwork.components.Form;

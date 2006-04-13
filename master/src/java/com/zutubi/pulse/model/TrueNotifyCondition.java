@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.model;
 
 public class TrueNotifyCondition implements NotifyCondition

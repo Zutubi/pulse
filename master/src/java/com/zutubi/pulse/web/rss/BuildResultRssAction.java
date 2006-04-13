@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.web.rss;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;

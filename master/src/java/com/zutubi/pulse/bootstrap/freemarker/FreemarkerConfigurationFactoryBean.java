@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.bootstrap.freemarker;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;

@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.upgrade.tasks;
 
 import org.hibernate.connection.ConnectionProvider;

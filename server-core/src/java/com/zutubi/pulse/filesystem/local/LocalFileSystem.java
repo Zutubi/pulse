@@ -1,3 +1,6 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.filesystem.local;
 
 import com.zutubi.pulse.filesystem.FileNotFoundException;
