@@ -758,12 +758,11 @@
 ##
 #macro(previousNextCancel $tabIndex)
     #openSubmit()
-        #set($nextTabIndex = $tabIndex)
-        #set($prevTabIndex = $nextTabIndex + 1)
-        #set($cancelTabIndex = $prevTabIndex + 1)
-        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=$prevTabIndex")
-        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=$nextTabIndex")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$cancelTabIndex")
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=$tabIndex")
+        #set($tabIndex = $tabIndex + 1)
+        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=$tabIndex")
+        #set($tabIndex = $tabIndex + 1)
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
     #closeSubmit()
 #end
 
@@ -807,12 +806,11 @@
 ##
 #macro(previousFinishCancel $tabIndex)
     #openSubmit()
-        #set($finishTabIndex = $tabIndex)
-        #set($prevTabIndex = $nextTabIndex + 1)
-        #set($cancelTabIndex = $prevTabIndex + 1)
-        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=$prevTabIndex")
-        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=$finishTabIndex")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$cancelTabIndex")
+        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=$tabIndex")
+        #set($tabIndex = $tabIndex + 1)
+        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=$tabIndex")
+        #set($tabIndex = $tabIndex + 1)
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
     #closeSubmit()
 #end
 
@@ -822,8 +820,8 @@
 ##
 #macro(previousFinish $tabIndex)
     #openSubmit()
-        #set($finishTabIndex = $tabIndex)
-        #set($prevTabIndex = $nextTabIndex + 1)
+        #set($prevTabIndex = $tabIndex)
+        #set($finishTabIndex = $tabIndex + 1)
         #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=$prevTabIndex")
         #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=$finishTabIndex")
     #closeSubmit()
