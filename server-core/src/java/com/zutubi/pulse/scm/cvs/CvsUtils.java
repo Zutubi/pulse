@@ -1,5 +1,6 @@
 package com.zutubi.pulse.scm.cvs;
 
+import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.connection.Connection;
 
 import java.io.IOException;
@@ -10,6 +11,8 @@ import java.io.IOException;
  */
 public class CvsUtils
 {
+    private static final Logger LOG = Logger.getLogger(CvsUtils.class);
+
     /**
      * Helper method to close the connection. 
      *
@@ -26,7 +29,9 @@ public class CvsUtils
         }
         catch (IOException e)
         {
-            //noop.
+            // Programmatically, we dont care about this exception. That doesnt mean we
+            // dont want to know when there are problems.
+            LOG.info(e);
         }
     }
 }

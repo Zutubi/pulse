@@ -8,8 +8,6 @@ import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.event.EventManager;
 import org.netbeans.lib.cvsclient.request.CommandRequest;
 
-import java.lang.reflect.Constructor;
-
 /**
  * Execute the cvs version command to retrieve the version of the CVS version.
  * <p/>
@@ -17,25 +15,6 @@ import java.lang.reflect.Constructor;
  */
 public class VersionCommand extends BasicCommand
 {
-    public static CommandRequest VERSION;
-
-    static
-    {
-        try
-        {
-            // time to create a command request with the 'version\n' string.
-            // Unfortunately, the command request has a private constructor, so
-            // this is necessary.
-            Constructor c = CommandRequest.class.getDeclaredConstructor(String.class);
-            c.setAccessible(true);
-            VERSION = (CommandRequest) c.newInstance("version\n");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
     public void execute(ClientServices client, EventManager em) throws CommandException, AuthenticationException
     {
         client.ensureConnection();
@@ -43,7 +22,7 @@ public class VersionCommand extends BasicCommand
 
         // if we need to add options to the command, they would be added here...
 
-        requests.add(VERSION);
+        requests.add(CommandRequest.VERSION);
         try
         {
             client.processRequests(requests);

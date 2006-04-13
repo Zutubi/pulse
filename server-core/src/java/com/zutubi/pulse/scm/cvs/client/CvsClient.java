@@ -2,10 +2,8 @@ package com.zutubi.pulse.scm.cvs.client;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.cvs.client.ConnectionFactory;
-import com.zutubi.pulse.scm.cvs.client.LogCommandListener;
-import com.zutubi.pulse.scm.cvs.LogAnalyser;
 import com.zutubi.pulse.scm.cvs.CvsUtils;
+import com.zutubi.pulse.scm.cvs.LogAnalyser;
 import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;

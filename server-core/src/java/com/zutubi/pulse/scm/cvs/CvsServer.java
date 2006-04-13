@@ -6,13 +6,14 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.util.Constants;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.IOUtils;
-import com.zutubi.pulse.core.util.Constants;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
-import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.model.Cvs;
-import com.zutubi.pulse.scm.*;
+import com.zutubi.pulse.scm.CachingSCMServer;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMFileCache;
 import com.zutubi.pulse.scm.cvs.client.CvsClient;
 import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -20,7 +21,8 @@ import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.TreeMap;
 
 /**
  * The Cvs Server provides all interactions with a cvs repository.
@@ -40,9 +42,6 @@ public class CvsServer extends CachingSCMServer
         cvs.setModule(module);
         cvs.setRoot(root);
         cvs.setPassword(password);
-
-//        org.netbeans.lib.cvsclient.util.Logger.setLogging("system");
-
     }
 
     public CvsServer(Cvs cvs)
