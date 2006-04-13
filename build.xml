@@ -86,7 +86,7 @@
 
     </target>
 
-    <target name="package.master" depends="init, build.local, build.master">
+    <target name="package.master" depends="init, clean, build.local, build.master">
 
         <property name="package.name" value="pulse-${pulse.version}"/>
         <property name="package.root" value="build/package/${package.name}"/>
@@ -176,8 +176,9 @@
             <!--<test name="com.zutubi.pulse.acceptance.AcceptanceTestSuite"/>-->
         </junit>
         <junitreport todir="${report.dir}">
-            <fileset dir="${report.dir}/xml">
-                <include name="*.xml"/>
+            <fileset dir=".">
+                <include name="*/${report.dir}/xml/*.xml"/>
+                <include name="${report.dir}/xml/*.xml"/>
             </fileset>
             <report format="frames" todir="${report.dir}/html"/>
         </junitreport>
