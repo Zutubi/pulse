@@ -3,8 +3,8 @@
  ********************************************************************************/
 package com.zutubi.pulse.web;
 
-import com.zutubi.pulse.core.util.StringUtils;
-import com.zutubi.pulse.core.util.TimeStamps;
+import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;

@@ -6,9 +6,9 @@ package com.zutubi.pulse.servlet;
 import com.zutubi.pulse.ServerRecipePaths;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.pulse.core.util.IOUtils;
-import com.zutubi.pulse.core.util.RandomUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;

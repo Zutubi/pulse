@@ -3,7 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.util.Constants;
+import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.model.persistence.SlaveDao;
 import com.zutubi.pulse.scheduling.*;
 import com.zutubi.pulse.scheduling.tasks.PingSlaves;

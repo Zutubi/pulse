@@ -4,7 +4,7 @@
 package com.zutubi.pulse.renderer;
 
 import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.util.StringUtils;
+import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.util.logging.Logger;
 import freemarker.template.Configuration;

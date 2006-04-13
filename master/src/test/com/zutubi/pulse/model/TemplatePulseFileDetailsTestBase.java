@@ -3,8 +3,8 @@
  ********************************************************************************/
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.test.PulseTestCase;
 import org.apache.velocity.app.VelocityEngine;
 

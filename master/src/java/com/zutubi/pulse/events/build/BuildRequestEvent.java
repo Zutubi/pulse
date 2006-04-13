@@ -3,7 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.events.build;
 
-import com.zutubi.pulse.core.util.TimeStamps;
+import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.model.Project;
 

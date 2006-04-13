@@ -4,8 +4,8 @@
 package com.zutubi.pulse.local;
 
 import com.zutubi.pulse.core.PulseException;
-import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.*;

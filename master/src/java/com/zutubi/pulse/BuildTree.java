@@ -3,8 +3,8 @@
  ********************************************************************************/
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.util.TreeNode;
-import com.zutubi.pulse.core.util.TreeNodeOperation;
+import com.zutubi.pulse.util.TreeNode;
+import com.zutubi.pulse.util.TreeNodeOperation;
 import com.zutubi.pulse.model.BuildResult;
 
 /**

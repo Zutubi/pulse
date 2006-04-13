@@ -4,9 +4,9 @@
 package com.zutubi.pulse.api;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.core.util.Constants;
-import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.pulse.core.util.RandomUtils;
+import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;

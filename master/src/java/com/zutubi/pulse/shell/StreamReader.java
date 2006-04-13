@@ -3,7 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.shell;
 
-import com.zutubi.pulse.core.util.Constants;
+import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;

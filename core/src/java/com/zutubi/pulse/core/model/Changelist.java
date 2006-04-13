@@ -3,7 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.core.util.TimeStamps;
+import com.zutubi.pulse.util.TimeStamps;
 
 import java.util.Date;
 import java.util.LinkedList;

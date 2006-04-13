@@ -3,7 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.core.validation.CommandValidationManager;
 import com.opensymphony.xwork.validator.ValidationException;
 import nu.xom.*;

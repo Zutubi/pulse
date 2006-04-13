@@ -5,8 +5,8 @@ package com.zutubi.pulse;
 
 import com.caucho.hessian.client.HessianRuntimeException;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.util.logging.Logger;

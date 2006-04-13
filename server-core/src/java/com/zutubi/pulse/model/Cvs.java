@@ -4,7 +4,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.core.util.Constants;
+import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.scm.cvs.CvsServer;

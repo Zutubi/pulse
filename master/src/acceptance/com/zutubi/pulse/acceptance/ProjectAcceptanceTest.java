@@ -4,7 +4,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.*;
-import com.zutubi.pulse.core.util.RandomUtils;
+import com.zutubi.pulse.util.RandomUtils;
 
 /**
  * <class-comment/>

@@ -3,7 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.IOException;
 

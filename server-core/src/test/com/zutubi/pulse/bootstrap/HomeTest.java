@@ -4,7 +4,7 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;

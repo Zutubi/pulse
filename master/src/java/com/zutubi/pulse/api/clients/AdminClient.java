@@ -19,7 +19,7 @@ import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.api.TokenManager;
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.IOUtils;
 
 /**
  * <class-comment/>

@@ -6,7 +6,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.CommandCommencedEvent;
 import com.zutubi.pulse.events.build.CommandCompletedEvent;

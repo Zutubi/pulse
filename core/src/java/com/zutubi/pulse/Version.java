@@ -3,7 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.IOUtils;
 
 import java.io.*;
 import java.util.Properties;

@@ -4,8 +4,8 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.util.ListUtils;
-import com.zutubi.pulse.core.util.Predicate;
+import com.zutubi.pulse.util.ListUtils;
+import com.zutubi.pulse.util.Predicate;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.BuildResultDao;

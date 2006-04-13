@@ -5,7 +5,7 @@ package com.zutubi.pulse.web;
 
 import com.zutubi.pulse.ShutdownService;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.IOUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;

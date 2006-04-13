@@ -3,10 +3,9 @@
  ********************************************************************************/
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;

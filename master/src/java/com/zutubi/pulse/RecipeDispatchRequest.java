@@ -5,8 +5,8 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.util.TimeStamps;
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.model.PulseFileDetails;
 import com.zutubi.pulse.model.BuildHostRequirements;
 import com.zutubi.pulse.model.BuildResult;

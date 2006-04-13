@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.PlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.core.validation.Validateable;
 import com.zutubi.pulse.util.CircularBuffer;
 import com.zutubi.pulse.util.logging.Logger;

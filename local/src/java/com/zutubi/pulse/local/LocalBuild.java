@@ -4,7 +4,7 @@
 package com.zutubi.pulse.local;
 
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.EventManager;
 import org.apache.commons.cli.*;

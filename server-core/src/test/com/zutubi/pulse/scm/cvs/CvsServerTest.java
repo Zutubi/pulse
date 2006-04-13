@@ -6,7 +6,7 @@
  */
 package com.zutubi.pulse.scm.cvs;
 
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;

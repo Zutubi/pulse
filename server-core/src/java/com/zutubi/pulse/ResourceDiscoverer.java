@@ -6,8 +6,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.core.util.SystemUtils;
-import com.zutubi.pulse.model.persistence.ResourceDao;
+import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;
 

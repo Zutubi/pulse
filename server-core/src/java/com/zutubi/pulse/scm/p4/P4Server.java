@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.CachingSCMServer;
 import com.zutubi.pulse.scm.SCMFileCache;

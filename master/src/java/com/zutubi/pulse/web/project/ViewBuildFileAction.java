@@ -3,10 +3,9 @@
  ********************************************************************************/
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.uwyn.jhighlight.highlighter.XmlHighlighter;
 import com.uwyn.jhighlight.renderer.XmlXhtmlRenderer;
 
 import java.io.*;

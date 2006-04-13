@@ -4,7 +4,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;

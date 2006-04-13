@@ -3,7 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.bootstrap.conf;
 
-import com.zutubi.pulse.core.util.IOUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;

@@ -4,8 +4,8 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.util.IOUtils;
-import com.zutubi.pulse.core.util.TimeStamps;
+import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.TimeStamps;
 
 import java.io.*;
 import java.util.LinkedList;

@@ -5,7 +5,7 @@ package com.zutubi.pulse.web.admin.user;
 
 import com.zutubi.pulse.web.user.UserActionSupport;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.core.util.RandomUtils;
+import com.zutubi.pulse.util.RandomUtils;
 
 /**
  * <class-comment/>

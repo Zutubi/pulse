@@ -1,7 +1,7 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.core.util;
+package com.zutubi.pulse.util;
 
 import java.util.LinkedList;
 import java.util.List;

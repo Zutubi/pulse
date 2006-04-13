@@ -1,7 +1,7 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.core.util;
+package com.zutubi.pulse.util;
 
 import com.zutubi.pulse.util.logging.Logger;
 

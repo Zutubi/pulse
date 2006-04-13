@@ -3,9 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.scm;
 
-import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.util.Constants;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.cvs.CvsServer;

@@ -3,7 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.core.util.TimeStamps;
+import com.zutubi.pulse.util.TimeStamps;
 
 /**
  * Abstract base for test suites and cases.

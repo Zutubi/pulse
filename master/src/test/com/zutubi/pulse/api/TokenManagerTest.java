@@ -9,7 +9,7 @@ import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.UserDao;
 import com.zutubi.pulse.scheduling.persistence.mock.MockUserDao;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.core.util.Constants;
+import com.zutubi.pulse.util.Constants;
 
 /**
  */

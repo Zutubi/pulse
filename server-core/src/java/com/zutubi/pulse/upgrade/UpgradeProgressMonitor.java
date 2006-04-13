@@ -3,7 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.upgrade;
 
-import com.zutubi.pulse.core.util.TimeStamps;
+import com.zutubi.pulse.util.TimeStamps;
 
 import java.util.Collections;
 import java.util.LinkedList;

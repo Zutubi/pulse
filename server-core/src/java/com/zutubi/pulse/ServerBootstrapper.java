@@ -6,7 +6,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.BootstrapperSupport;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipePaths;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.IOException;
 
