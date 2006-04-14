@@ -1,17 +1,17 @@
 <html>
 <head>
-    <title>#wwtext("name=pulseHome.setup")</title>
+    <title>#wwtext("name=home.setup")</title>
 </head>
 
 <body>
-    <h1>:: #wwtext("name=pulseHome.setup") ::</h1>
+    <h1>:: #wwtext("name=home.setup") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=setup.action" "heading=%{getText('pulseHome.setup')}" "name=setup.pulseHome" "method=post")
+#wwcform("action=setup.action" "heading=%{getText('home.setup')}" "name=setup.home" "method=post")
 
-    #wwtextfield("name=pulseHome" "label=%{getText('pulseHome.field')}" "required=true" "size=60" "tabindex=1" "onkeypress=return submitenter(this,event)")
-    #inlineHelp("pulseHome.help")
+    #wwtextfield("name=home" "label=%{getText('home.field')}" "required=true" "size=60" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("home.help")
 
     #next(2)
 #end

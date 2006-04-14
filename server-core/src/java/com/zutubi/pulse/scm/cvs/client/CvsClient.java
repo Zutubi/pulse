@@ -6,7 +6,7 @@ package com.zutubi.pulse.scm.cvs.client;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.cvs.CvsUtils;
-import com.zutubi.pulse.scm.cvs.LogAnalyser;
+import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
@@ -67,8 +67,6 @@ public class CvsClient
      */
     private String password;
 
-    private LogAnalyser logAnalyser;
-
     /**
      * @param cvsRoot
      * @throws IllegalArgumentException if the cvsRoot parameter is invalid.
@@ -81,7 +79,6 @@ public class CvsClient
     public CvsClient(CVSRoot root)
     {
         this.root = root;
-        this.logAnalyser = new LogAnalyser(root);
 
         //TODO: Integrate the following logging into the systems logging. This information
         //      will be very useful in tracking problems with the cvs client integration.
@@ -225,7 +222,16 @@ public class CvsClient
                 client.setLocalPath(localPath.getAbsolutePath());
             }
 
-            return client.executeCommand(command, globalOptions);
+            LOG.info("Executing cvs command: " + command.getCVSCommand());
+            long time = System.currentTimeMillis();
+            try
+            {
+                return client.executeCommand(command, globalOptions);
+            }
+            finally
+            {
+                LOG.info("Elapsed time: " + ((System.currentTimeMillis() - time)/ Constants.SECOND) + " second(s)");
+            }
         }
         catch (AuthenticationException ae)
         {

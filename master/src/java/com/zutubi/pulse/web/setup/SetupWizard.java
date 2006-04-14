@@ -26,20 +26,23 @@ import java.net.UnknownHostException;
  */
 public class SetupWizard extends BaseWizard
 {
+    private LicenseState licenseState;
     private CreateAdminState createAdminState;
-
-    private UserManager userManager;
-    private ConfigurationManager configurationManager;
     private ServerSettingsState serverSettingsState;
+
+    private ConfigurationManager configurationManager;
+    private UserManager userManager;
     private SetupManager setupManager;
 
     public SetupWizard()
     {
         // create the admin user.
+        licenseState = new LicenseState(this, "license");
         createAdminState = new CreateAdminState(this, "admin");
         serverSettingsState = new ServerSettingsState(this, "settings");
 
-        addInitialState("admin", createAdminState);
+        addInitialState("license", licenseState);
+        addState("admin", createAdminState);
         addState("settings", serverSettingsState);
         addFinalState("success", new WizardCompleteState(this, "success"));
     }
@@ -47,6 +50,9 @@ public class SetupWizard extends BaseWizard
     public void process()
     {
         super.process();
+
+        // record the license details.
+
 
         // create the admin user.
         User admin = createAdminState.getAdmin();
@@ -107,6 +113,39 @@ public class SetupWizard extends BaseWizard
     public void setSetupManager(SetupManager setupManager)
     {
         this.setupManager = setupManager;
+    }
+
+    public class LicenseState extends BaseWizardState implements Validateable
+    {
+        private String license;
+
+        public LicenseState(Wizard wizard, String name)
+        {
+            super(wizard, name);
+        }
+
+        public String getLicense()
+        {
+            return license;
+        }
+
+        public void setLicense(String license)
+        {
+            this.license = license;
+        }
+
+        public String getNextStateName()
+        {
+            return createAdminState.getStateName();
+        }
+
+        public void validate()
+        {
+            if (license.contains("invalid"))
+            {
+                addFieldError("license", getTextProvider().getText("license.invalid"));
+            }
+        }
     }
 
     /**

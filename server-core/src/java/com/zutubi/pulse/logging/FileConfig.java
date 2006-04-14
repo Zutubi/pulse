@@ -50,25 +50,6 @@ public class FileConfig
 
         Logger rootLogger = Logger.getLogger("");
         rootLogger.addHandler(fileHandler);
-
-/*
-        // setup the CVS file logger.
-        FileHandler outputHandler = new FileHandler(logRoot.getCanonicalPath() + File.separator + "cvs%u.%g.out.log");
-        outputHandler.setLevel(Level.ALL);
-        outputHandler.setFormatter(new NoFormatter());
-
-        Logger outputStreamLogger = Logger.getLogger(LoggedDataOutputStream.class.getName());
-        outputStreamLogger.addHandler(outputHandler);
-        outputStreamLogger.setUseParentHandlers(false);
-
-        FileHandler inputHandler = new FileHandler(logRoot.getCanonicalPath() + File.separator + "cvs%u.%g.in.log");
-        inputHandler.setLevel(Level.ALL);
-        inputHandler.setFormatter(new NoFormatter());
-
-        Logger inputStreamLogger = Logger.getLogger(LoggedDataInputStream.class.getName());
-        inputStreamLogger.addHandler(inputHandler);
-        inputStreamLogger.setUseParentHandlers(false);
-*/
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)

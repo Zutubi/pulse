@@ -11,6 +11,7 @@ import com.zutubi.pulse.scm.cvs.client.LogCommandListener;
 import com.zutubi.pulse.scm.cvs.client.LogDirectoryBuilder;
 import com.zutubi.pulse.scm.cvs.client.VersionCommand;
 import com.zutubi.pulse.scm.cvs.client.CvsClient;
+import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
@@ -24,6 +25,8 @@ import java.io.File;
  */
 public class CvsWorker
 {
+    private static final Logger LOG = Logger.getLogger(CvsWorker.class);
+
     private static final SimpleDateFormat SERVER_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
     static
@@ -113,6 +116,8 @@ public class CvsWorker
      */
     public CvsRevision getLatestChange() throws SCMException
     {
+        LOG.entering();
+
         // We jump through hoops to handle the possible time difference between the hosts.
 
         Calendar cal = Calendar.getInstance();
@@ -137,7 +142,9 @@ public class CvsWorker
         // that the latest calendar time will give us a reasonable starting point.
 
         // need to ensure that the specified date is server centric.
-        return new CvsRevision("", branch, "", cal.getTime());
+        CvsRevision result = new CvsRevision("", branch, "", cal.getTime());
+        LOG.exiting(result);
+        return result;
     }
 
     /**
@@ -146,6 +153,7 @@ public class CvsWorker
      */
     public CvsRevision getLatestChange(CvsRevision since) throws SCMException
     {
+        LOG.entering();
         CvsClient client = getClient();
         LogAnalyser analyser = getAnalyser();
 
@@ -158,15 +166,19 @@ public class CvsWorker
         client.executeCommand(log, new LogCommandListener(response));
 
         Date date = analyser.latestUpdate(response);
+        CvsRevision result = null;
         if (date != null)
         {
-            return new CvsRevision("", branch, "", date);
+            result = new CvsRevision("", branch, "", date);
         }
-        return null;
+        LOG.exiting(result);
+        return result;
     }
 
     public List<Changelist> getChangesBetween(CvsRevision from, CvsRevision to) throws SCMException
     {
+        LOG.entering();
+
         // branches variables should all be the same. if not, then we are dealing with tags
         // and should be handled.
 
@@ -192,7 +204,9 @@ public class CvsWorker
         List<LogInformation> response = new LinkedList<LogInformation>();
         getClient().executeCommand(rlog, new LogCommandListener(response));
 
-        return getAnalyser().extract(response);
+        List<Changelist> changelists = getAnalyser().extract(response);
+        LOG.exiting(changelists.size());
+        return changelists;
     }
 
     /**
@@ -201,13 +215,14 @@ public class CvsWorker
      */
     public CvsRevision checkout(File workdir, CvsRevision revision) throws SCMException
     {
+        LOG.entering();
         CheckoutCommand checkout = newCheckoutCommand(revision);
 
         CvsClient client = getClient();
         client.setLocalPath(workdir);
 
         client.executeCommand(checkout);
-
+        LOG.exiting(revision);
         return revision;
     }
 
@@ -217,6 +232,7 @@ public class CvsWorker
      */
     public CvsRevision checkout(File workdir, CvsRevision revision, String file) throws SCMException
     {
+        LOG.entering();
         CheckoutCommand checkout = newCheckoutCommand(revision);
         checkout.setRecursive(false);
         checkout.setModule(file);
@@ -231,12 +247,14 @@ public class CvsWorker
         client.setLocalPath(workdir);
 
         client.executeCommand(checkout);
-
+        LOG.exiting(revision);
         return revision;
     }
 
     public List<String> getListing() throws SCMException
     {
+        LOG.entering();
+
         RlogCommand log = newRlogCommand();
         log.setDateFilter(SERVER_DATE.format(new Date()) + "<");
 
@@ -245,7 +263,9 @@ public class CvsWorker
 
         getClient().executeCommand(log);
 
-        return builder.getDirectories();
+        List<String> directories = builder.getDirectories();
+        LOG.exiting(directories.size());
+        return directories;
     }
 
     /**

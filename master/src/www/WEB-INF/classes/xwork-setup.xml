@@ -26,10 +26,11 @@
         <action name="setupWizard" class="com.zutubi.pulse.web.wizard.WizardAction">
             <interceptor-ref name="wizardStack"/>
             <param name="wizardClass">com.zutubi.pulse.web.setup.SetupWizard</param>
+            <result name="license" type="velocity">/setup/configure-license.vm</result>
             <result name="admin" type="velocity">/setup/create-admin.vm</result>
             <result name="settings" type="velocity">/setup/server-settings.vm</result>
-            <result name="success" type="redirect">/</result>
             <result name="cancel" type="redirect">/default.action</result>
+            <result name="success" type="redirect">/</result>
         </action>
     </package>
 

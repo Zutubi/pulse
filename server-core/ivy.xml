@@ -57,7 +57,7 @@
 
         <!-- scm support -->
         <dependency org="javasvn" name="javasvn" rev="0.8.8.1" conf="external->default"/>
-        <dependency org="netbeans" name="javacvs" rev="20060412" conf="external->default"/>
+        <dependency org="netbeans" name="javacvs" rev="11nov2005" conf="external->default"/>
         <dependency org="jssh" name="jssh" rev="0.2.7" conf="external->default"/>
 
     </dependencies>

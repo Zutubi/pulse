@@ -19,26 +19,26 @@ public class ConfigurePulseHomeAction extends ActionSupport
 
     private SetupManager setupManager;
 
-    private String pulseHome;
+    private String home;
 
-    public String getPulseHome()
+    public String getHome()
     {
-        return pulseHome;
+        return home;
     }
 
-    public void setPulseHome(String pulseHome)
+    public void setHome(String home)
     {
-        this.pulseHome = pulseHome;
+        this.home = home;
     }
 
     public void validate()
     {
         // attempt to create the home directory. If this fails, we need to ask the
         // user for another directory.
-        File home = new File(pulseHome);
+        File home = new File(this.home);
         if (!home.exists() && !home.mkdirs())
         {
-            addFieldError("pulseHome", getText(""));
+            addFieldError("home", getText(""));
         }
     }
 
@@ -48,22 +48,22 @@ public class ConfigurePulseHomeAction extends ActionSupport
         String install = System.getProperty(SimpleConfigurationManager.PULSE_INSTALL);
         if (install == null)
         {
-            this.pulseHome = "home";
+            this.home = "home";
         }
         else
         {
-            this.pulseHome = install + File.separatorChar + "home";
+            this.home = install + File.separatorChar + "home";
         }
 
         // make the path the shortest possible.
-        this.pulseHome = new File(this.pulseHome).getCanonicalPath();
+        this.home = new File(this.home).getCanonicalPath();
 
         return INPUT;
     }
 
     public String execute()
     {
-        File home = new File(pulseHome);
+        File home = new File(this.home);
         configurationManager.setPulseHome(home);
 
         // next we need to know if we need to upgrade or setup.

@@ -15,10 +15,17 @@
 <#if !parameters.singleRow?exists>
 <tr>
 </#if>
-    <th <#if hasFieldErrors>
-        class="error-label"<#t/>
+
+<#if parameters.labelCssClass?exists>
+    <#assign labelClass = parameters.labelCssClass?html/>
 <#else>
-        class="label"<#t/>
+    <#assign labelClass = "label"/>
+</#if>
+
+    <th <#if hasFieldErrors>
+        class="error-${labelClass}"<#t/>
+<#else>
+        class="${labelClass}"<#t/>
 </#if>
     ><#t/>
 <#if parameters.label?exists>

@@ -6,6 +6,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.setup.CreateAdminForm;
 import com.zutubi.pulse.acceptance.forms.setup.ServerSettingsForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseHomeForm;
+import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
 
 /**
  * A setup test that covers the systems setup procedure.
@@ -35,13 +36,16 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         // step one. setting the pulse home variable.
         checkSetPulseHome();
 
-        // step two. creating the administration user.
+        // step two. setting the license details.
+        checkLicenseDetails();
+
+        // step three. creating the administration user.
         checkCreateAdmin();
 
         // check that any attempts to bypass the setup fail.
         //beginAt("/");
 
-        // step three. configuring the server essentials.
+        // step four. configuring the server essentials.
         checkServerSettings();
 
         // one complete, we should see the home page, and it should contain the following:
@@ -77,6 +81,24 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         settingsForm.nextFormElements("localhost:8080", "some.smtp.host.com", "from@some.host.com", "username", "password", "prefix");
     }
 
+    private void checkLicenseDetails()
+    {
+        PulseLicenseForm licenseForm = new PulseLicenseForm(tester);
+
+        licenseForm.assertFormPresent();
+
+        // check that license validation works.
+        licenseForm.nextFormElements("this is an invalid license string...");
+
+        // assert that we are still on the license page, with all of the correct details.
+        licenseForm.assertFormPresent();
+        licenseForm.assertFormElements("this is an invalid license string...");
+        assertTextPresent("invalid");
+
+        // enter a valid license.
+        licenseForm.nextFormElements("this is a valid license string...");
+    }
+
     private void checkCreateAdmin()
     {
         CreateAdminForm createAdminForm = new CreateAdminForm(tester);
@@ -109,24 +131,24 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
 
     private void checkSetPulseHome()
     {
-        SetPulseHomeForm pulseHomeForm = new SetPulseHomeForm(tester);
+        SetPulseHomeForm homeForm = new SetPulseHomeForm(tester);
 
-        pulseHomeForm.assertFormPresent();
+        homeForm.assertFormPresent();
 
         // ensure that we have a default value for the pulseHome property.
-        assertFormElementNotEmpty("pulseHome");
+        assertFormElementNotEmpty("home");
         // record the default value for later use.
-        String defaultPulseHome = getFormValue("pulseHome");
+        String defaultHome = getFormValue("home");
 
         // check the validation - an empty pulse home.
-        pulseHomeForm.nextFormElements("");
+        homeForm.nextFormElements("");
         // assert that we are still on the same page.
-        pulseHomeForm.assertFormElements("");
+        homeForm.assertFormElements("");
 
         // check validation - an invalid pulse home value.
 
         // enter valid pulse home that does not exist.
-        pulseHomeForm.nextFormElements(defaultPulseHome);
+        homeForm.nextFormElements(defaultHome);
 
         // it should prompt for confirmation to create the directory....
     }

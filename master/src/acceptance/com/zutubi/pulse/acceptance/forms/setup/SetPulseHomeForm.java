@@ -18,11 +18,11 @@ public class SetPulseHomeForm extends BaseForm
 
     public String getFormName()
     {
-        return "setup.pulseHome";
+        return "setup.home";
     }
 
     public String[] getFieldNames()
     {
-        return new String[]{"pulseHome"};
+        return new String[]{"home"};
     }
 }
