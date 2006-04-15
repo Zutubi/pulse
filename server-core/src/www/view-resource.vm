@@ -15,10 +15,10 @@
     <tr>
         #dynamicCell($property.name)
         #dynamicCell($property.value)
-        #deleteCell($confirmMessage "deleteProperty.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)" "delete_$!webwork.htmlEncode($property.name)")
+        #deleteCell($confirmMessage "/admin/deleteProperty.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)" "delete_$!webwork.htmlEncode($property.name)")
     <tr>
     #end
-    #addRow("property.add" 3 "createProperty!input.action?resourceId=$resource.id$versionLink" "property.add")
+    #addRow("property.add" 3 "/admin/createProperty!input.action?resourceId=$resource.id$versionLink" "property.add")
 #end
 
 <html>
@@ -29,7 +29,8 @@
     <h1>:: #wwtext("name=resource") $!webwork.htmlEncode($resource.name) ::</h1>
 
     <table class="content">
-        #addRow("version.add" 1 "createResourceVersion!input.action?resourceId=$resource.id" "version.add")
+        <tr><td class="content"><a href="/viewResources.action">#wwtext("name=resources.return")</td></tr>
+        #addRow("version.add" 1 "/admin/createResourceVersion!input.action?resourceId=$resource.id" "version.add")
     </table>
 
     <h2 class="section">#wwtext("name=defaults")</h2>
@@ -41,7 +42,7 @@
 #foreach($version in $resource.versions.values())
     #set($confirmMessage = $action.getText("version.confirm.delete", [$version.value]))
     <h2 class="section">
-        #wwtext("name=version") $!webwork.htmlEncode($version.value) [<a href="#" class="unadorned" onclick="confirmUrl('$confirmMessage', 'deleteResourceVersion.action?id=$version.id&amp;resourceId=$resource.id')"><img alt="$action.getText('delete')" src="images/delete.gif"/></a>]
+        #wwtext("name=version") $!webwork.htmlEncode($version.value) [<a href="#" class="unadorned" onclick="confirmUrl('$confirmMessage', '/admin/deleteResourceVersion.action?id=$version.id&amp;resourceId=$resource.id')"><img alt="$action.getText('delete')" src="images/delete.gif"/></a>]
     </h2>
     <table class="content">
         #headingRow("properties" 3)

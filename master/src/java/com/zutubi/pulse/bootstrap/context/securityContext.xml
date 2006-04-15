@@ -262,6 +262,12 @@ The beans defined within the security subsystem need not be accessed by other co
             <value>org.acegisecurity.acl.basic.SimpleAclEntry.READ</value>
         </property>
     </bean>
+    <bean id="org.acegisecurity.acl.basic.SimpleAclEntry.WRITE"
+          class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+        <property name="staticField">
+            <value>org.acegisecurity.acl.basic.SimpleAclEntry.WRITE</value>
+        </property>
+    </bean>
     <bean id="org.acegisecurity.acl.basic.SimpleAclEntry.DELETE"
           class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
         <property name="staticField">
@@ -269,7 +275,95 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
     </bean>
 
+    <!-- Access control list manager -->
+    <bean id="aclManager" class="org.acegisecurity.acl.AclProviderManager">
+      <property name="providers">
+         <list>
+            <ref local="basicAclProvider"/>
+         </list>
+      </property>
+   </bean>
+
+    <bean id="basicAclProvider" class="org.acegisecurity.acl.basic.BasicAclProvider">
+        <property name="basicAclDao" ref="projectAclDao"/>
+    </bean>
+
     <!-- An access decision voter that reads ROLE_* configuration settings -->
     <bean id="roleVoter" class="org.acegisecurity.vote.RoleVoter"/>
+
+    <!-- Voters for Project ACLs. -->
+    <bean id="projectReadVoter" class="org.acegisecurity.vote.BasicAclEntryVoter">
+       <property name="processConfigAttribute"><value>ACL_PROJECT_READ</value></property>
+       <property name="processDomainObjectClass"><value>com.zutubi.pulse.model.Project</value></property>
+       <property name="aclManager"><ref bean="aclManager"/></property>
+       <property name="requirePermission">
+         <list>
+           <ref bean="org.acegisecurity.acl.basic.SimpleAclEntry.ADMINISTRATION"/>
+           <ref bean="org.acegisecurity.acl.basic.SimpleAclEntry.READ"/>
+         </list>
+       </property>
+    </bean>
+
+    <bean id="projectDeleteVoter" class="org.acegisecurity.vote.BasicAclEntryVoter">
+       <property name="processConfigAttribute"><value>ACL_PROJECT_DELETE</value></property>
+       <property name="processDomainObjectClass"><value>com.zutubi.pulse.model.Project</value></property>
+       <property name="aclManager"><ref bean="aclManager"/></property>
+       <property name="requirePermission">
+         <list>
+           <ref bean="org.acegisecurity.acl.basic.SimpleAclEntry.ADMINISTRATION"/>
+           <ref bean="org.acegisecurity.acl.basic.SimpleAclEntry.DELETE"/>
+         </list>
+       </property>
+    </bean>
+
+    <bean id="projectWriteVoter" class="org.acegisecurity.vote.BasicAclEntryVoter">
+       <property name="processConfigAttribute"><value>ACL_PROJECT_WRITE</value></property>
+       <property name="processDomainObjectClass"><value>com.zutubi.pulse.model.Project</value></property>
+       <property name="aclManager"><ref bean="aclManager"/></property>
+       <property name="requirePermission">
+         <list>
+           <ref bean="org.acegisecurity.acl.basic.SimpleAclEntry.ADMINISTRATION"/>
+           <ref bean="org.acegisecurity.acl.basic.SimpleAclEntry.WRITE"/>
+         </list>
+       </property>
+    </bean>
+
+    <bean id="projectAdminVoter" class="org.acegisecurity.vote.BasicAclEntryVoter">
+       <property name="processConfigAttribute"><value>ACL_PROJECT_ADMIN</value></property>
+       <property name="processDomainObjectClass"><value>com.zutubi.pulse.model.Project</value></property>
+       <property name="aclManager"><ref bean="aclManager"/></property>
+       <property name="requirePermission">
+         <list>
+           <ref bean="org.acegisecurity.acl.basic.SimpleAclEntry.ADMINISTRATION"/>
+         </list>
+       </property>
+    </bean>
+
+    <!-- Decision manager for access to entitites. -->
+    <bean id="projectAccessDecisionManager" class="org.acegisecurity.vote.AffirmativeBased">
+      <property name="allowIfAllAbstainDecisions"><value>false</value></property>
+      <property name="decisionVoters">
+         <list>
+            <ref bean="roleVoter"/>
+            <ref local="projectReadVoter"/>
+            <ref local="projectDeleteVoter"/>
+            <ref local="projectWriteVoter"/>
+            <ref local="projectAdminVoter"/>
+         </list>
+      </property>
+   </bean>
+
+    <bean id="annotationAttributes" class="org.acegisecurity.annotation.SecurityAnnotationAttributes"/>
+
+    <bean id="methodObjectDefinitionSource" class="org.acegisecurity.intercept.method.MethodDefinitionAttributes">
+      <property name="attributes"><ref local="annotationAttributes"/></property>
+    </bean>
+
+    <bean id="securityInterceptor" class="org.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+      <property name="validateConfigAttributes"><value>false</value></property>
+      <property name="authenticationManager"><ref bean="authenticationManager"/></property>
+      <property name="accessDecisionManager"><ref bean="projectAccessDecisionManager"/></property>
+      <property name="objectDefinitionSource"><ref bean="methodObjectDefinitionSource"/></property>
+    </bean>
 
 </beans>

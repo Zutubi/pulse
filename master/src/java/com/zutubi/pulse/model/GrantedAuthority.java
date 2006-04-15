@@ -55,4 +55,16 @@ public class GrantedAuthority extends Entity implements org.acegisecurity.Grante
     {
         this.user = user;
     }
+
+    public boolean equals(Object other)
+    {
+        if(other instanceof String)
+        {
+            // Acegi GrantedAuthorityEffectiveAclsResolver calls into us with
+            // the role string
+            return other.equals(authority);
+        }
+
+        return super.equals(other);
+    }
 }

@@ -12,100 +12,182 @@
     <table class="columns" width="90%">
         <tr>
             <td class="columns" width="40%">
+
+            <!-- Project basics -->
                 <table id="project.basics" class="fill-content">
-                    #editHeadingRow("project.basics" 2 "editProject!input.action?id=$project.id" "project.basics.edit")
+                    #aclEditHeadingRow("project.basics" 2 "editProject!input.action?id=$project.id" "project.basics.edit" "project")
                     #dynamicRow("project.name" $project.name)
                     #dynamicRow("project.description" $project.description)
                     #dynamicLinkRow("project.url" $project.url $project.url)
                 </table>
+
+            <!-- Type-specific details -->
+
                 <table id="project.specifics" class="fill-content">
-                    #editHeadingRow("project.specifics" 2 "editPulseFileDetails!input.action?id=$project.pulseFileDetails.id&amp;projectId=$project.id" "project.specifics.edit")
+                    #aclEditHeadingRow("project.specifics" 2 "editPulseFileDetails!input.action?id=$project.pulseFileDetails.id&amp;projectId=$project.id" "project.specifics.edit" "project")
                     #dynamicRow("project.type" $project.pulseFileDetails.type)
 #foreach($property in $project.pulseFileDetails.properties.entrySet())
                     #propertyRow($property)
 #end
-#if(!$project.pulseFileDetails.type.equals("custom"))
+#acl("domainObject=project" "hasPermission=4,1")
+    #if(!$project.pulseFileDetails.type.equals("custom"))
                     <tr>
                         #contentRowHeading("actions")
                         #linkCell("convert.to.custom" "convertToCustomProject!input.action?id=$project.id")
                     </tr>
+    #end
 #end
                 </table>
+
+            <!-- SCM configuration -->
+
                 <table id="project.scm" class="fill-content">
-                    #editHeadingRow("project.scm" 2 "editScm!input.action?id=$project.scm.id&amp;projectId=$project.id" "project.scm.edit")
+                    #aclEditHeadingRow("project.scm" 2 "editScm!input.action?id=$project.scm.id&amp;projectId=$project.id" "project.scm.edit" "project")
                     #scmRow($project)
                     #dynamicRow("scm.location" "$project.scm.createServer().location")
+#acl("domainObject=project" "hasPermission=4,1")
                     <tr>
                         #contentRowHeading("actions")
                         #linkCell("scm.browse" "browseProjectScm.action?id=$project.id")
                     </tr>
-                </table>
-                <table id="project.cleanup" class="fill-content">
-                    #headingRow("project.cleanup" 5)
-                    <tr>
-                        #contentHeading("cleanup.what" 1)
-                        #contentHeading("cleanup.states" 1)
-                        #contentHeading("cleanup.retain" 1)
-                        #contentHeading("actions" 2)
-                    </tr>
-#foreach($rule in $project.cleanupRules)
-    #set($confirmMessage = $action.getText("cleanup.confirm.delete"))
-                    <tr>
-    #if($rule.workDirOnly)
-                        #contentCell("cleanup.work")
-    #else
-                        #contentCell("cleanup.result")
-    #end
-                        #contentCell($rule.prettyStateNames)
-                        #contentCell($rule.prettyWhen)
-                        #editCell("editCleanupRule!input.action?projectId=$project.id&amp;id=$rule.id" "edit_cleanup_$rule.id")
-                        #deleteCell($confirmMessage "deleteCleanupRule.action?projectId=$project.id&amp;id=$rule.id" "delete_cleanup_$rule.id")
-                    </tr>
 #end
-                    #addRow("cleanup.rule.add" 5 "addCleanupRule!input.action?projectId=$project.id" "project.cleanup.add")
+                </table>
+
+            <!-- Project administrators -->
+
+                <table id="project.admins" class="fill-content">
+                    #headingRow("project.admins" 2)
+                    <tr>
+                        #contentHeading("project.admin" 1)
+#acl("domainObject=project" "hasPermission=4,1")
+                        #contentHeading("actions" 1)
+#end
+                    </tr>
+#if($projectAdmins.size() > 0)
+    #foreach($admin in $projectAdmins)
+        #set($confirmMessage = $action.getText("project.admin.confirm.delete", [$admin.name]))
+                    <tr>
+                        #dynamicCell($admin.name)
+        #acl("domainObject=project" "hasPermission=4,1")
+                        #removeCell($confirmMessage "deleteProjectAdmin.action?projectId=$project.id&amp;login=$admin.login" "delete_admin_$admin")
+        #end
+                    </tr>
+    #end
+#else
+                    #contentRow("project.admins.none" 2)
+#end
+#acl("domainObject=project" "hasPermission=4,1")
+                    #addRow("project.admin.add" 2 "addProjectAdmins!input.action?projectId=$project.id" "project.admin.add")
+#end
                 </table>
             </td>
+
+            <!-- ********** Right hand column ********** -->
+
             <td class="columns" width="40%">
+
+            <!-- Build specifications -->
+
                 <table id="project.buildspecs" class="fill-content">
                     #headingRow("project.buildspecs" 6)
                     <tr>
                         #contentHeading("buildspec.name" 1)
                         #contentHeading("recipe" 1)
                         #contentHeading("buildspec.timeout" 1)
+#acl("domainObject=project" "hasPermission=4,1")
                         #contentHeading("actions" 3)
+#end
                     </tr>
-#foreach($buildSpec in $project.buildSpecifications)
-    #set($confirmMessage = $action.getText("buildspec.confirm.delete", [$buildSpec.name]))
+#if($project.buildSpecifications.size() > 0)
+    #foreach($buildSpec in $project.buildSpecifications)
+        #set($confirmMessage = $action.getText("buildspec.confirm.delete", [$buildSpec.name]))
                     <tr>
                         #dynamicCell($buildSpec.name)
                         #dynamicCell($buildSpec.root.children.get(0).stage.recipeSafe)
                         #dynamicCell($buildSpec.prettyTimeout)
+        #acl("domainObject=project" "hasPermission=4,1")
                         #actionCell("buildspec.trigger" "triggerBuild.action?id=$buildSpec.id&amp;projectId=$project.id" "lightning.gif")
                         #editCell("editBuildSpecification!input.action?projectId=$project.id&amp;id=$buildSpec.id" "edit_$!webwork.htmlEncode($buildSpec.name)")
                         #deleteCell($confirmMessage "deleteBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id" "delete_$!webwork.htmlEncode($buildSpec.name)")
+        #end
                     </tr>
+    #end
+#else
+                    #contentRow("buildspec.none" 6)
 #end
+#acl("domainObject=project" "hasPermission=4,1")
                     #addRow("buildspec.add" 6 "createBuildSpecification!input.action?projectId=$project.id" "project.buildspec.add")
+#end
                 </table>
+
+                <!-- Triggers -->
+
                 <table id="project.triggers" class="fill-content">
                     #headingRow("project.triggers" 5)
                     <tr>
                         #contentHeading("trigger.name" 1)
                         #contentHeading("trigger.type" 1)
                         #contentHeading("trigger.spec" 1)
+#acl("domainObject=project" "hasPermission=4,1")
                         #contentHeading("actions" 2)
+#end
                     </tr>
-#foreach($trigger in $triggers)
-    #set($confirmMessage = $action.getText("trigger.confirm.delete", [$trigger.name]))
+#if($triggers.size() > 0)
+    #foreach($trigger in $triggers)
+        #set($confirmMessage = $action.getText("trigger.confirm.delete", [$trigger.name]))
                     <tr>
                         #dynamicCell($trigger.name)
                         #dynamicCell($trigger.type)
                         #dynamicCell($trigger.dataMap.spec)
+        #acl("domainObject=project" "hasPermission=4,1")
                         #editCell("editTrigger!input.action?id=$trigger.id&amp;projectId=$project.id" "edit_$!webwork.htmlEncode($trigger.name)")
                         #deleteCell($confirmMessage "deleteTrigger.action?id=$trigger.id" "delete_$!webwork.htmlEncode($trigger.name)")
+        #end
                     </tr>
+    #end
+#else
+                    #contentRow("triggers.none" 5)
 #end
+#acl("domainObject=project" "hasPermission=4,1")
                     #addRow("trigger.add" 5 "addTrigger.action?projectId=$project.id" "project.trigger.add")
+#end
+                </table>
+
+                <!-- Cleanup rules -->
+
+                <table id="project.cleanup" class="fill-content">
+                    #headingRow("project.cleanup" 5)
+                    <tr>
+                        #contentHeading("cleanup.what" 1)
+                        #contentHeading("cleanup.states" 1)
+                        #contentHeading("cleanup.retain" 1)
+#acl("domainObject=project" "hasPermission=4,1")
+                        #contentHeading("actions" 2)
+#end
+                    </tr>
+#if($project.cleanupRules.size() > 0)
+    #foreach($rule in $project.cleanupRules)
+        #set($confirmMessage = $action.getText("cleanup.confirm.delete"))
+                    <tr>
+        #if($rule.workDirOnly)
+                        #contentCell("cleanup.work")
+        #else
+                        #contentCell("cleanup.result")
+        #end
+                        #contentCell($rule.prettyStateNames)
+                        #contentCell($rule.prettyWhen)
+        #acl("domainObject=project" "hasPermission=4,1")
+                        #editCell("editCleanupRule!input.action?projectId=$project.id&amp;id=$rule.id" "edit_cleanup_$rule.id")
+                        #deleteCell($confirmMessage "deleteCleanupRule.action?projectId=$project.id&amp;id=$rule.id" "delete_cleanup_$rule.id")
+        #end
+                    </tr>
+    #end
+#else
+                    #contentRow("cleanup.none" 5)
+#end
+#acl("domainObject=project" "hasPermission=4,1")
+                    #addRow("cleanup.rule.add" 5 "addCleanupRule!input.action?projectId=$project.id" "project.cleanup.add")
+#end
                 </table>
             </td>
         </tr>

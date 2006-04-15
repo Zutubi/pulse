@@ -315,7 +315,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
         assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
 
-        clickLinkWithText("edit", 3);
+        clickLinkWithText("edit", 5);
 
         form.assertFormElements(null, null, "10", "builds");
         assertOptionsEqual(CleanupRuleForm.WORK_DIR_ONLY, new String[]{ "whole build results", "working directories only" });
@@ -331,7 +331,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertProjectCleanupTable(new String[][] { getCleanupRow(false, "error, success", "2 days") });
 
         // Check form is correctly populated again
-        clickLinkWithText("edit", 3);
+        clickLinkWithText("edit", 5);
 
         form.assertFormElements(null, null, "2", "days");
         assertSelectionValues(CleanupRuleForm.WORK_DIR_ONLY, new String[]{ "false" });
@@ -344,7 +344,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
         assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
 
-        clickLinkWithText("edit", 3);
+        clickLinkWithText("edit", 5);
 
         form.assertFormElements(null, null, "10", "builds");
         tester.selectOption(CleanupRuleForm.WORK_DIR_ONLY, "whole build results");
@@ -360,7 +360,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
         assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
 
-        clickLinkWithText("edit", 3);
+        clickLinkWithText("edit", 5);
 
         form.saveFormElements(null, null, "0", "days");
         form.assertFormPresent();
@@ -370,7 +370,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
     public void testDeleteCleanupPolicy()
     {
         assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
-        clickLinkWithText("delete", 0);
+        clickLinkWithText("delete", 2);
         assertProjectCleanupTable(null);
     }
 
@@ -723,6 +723,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         {
             assertTableRowsEqual("project.cleanup", 1, new String[][] {
                     new String[] { "what", "with state(s)", "retain for up to", "actions"},
+                    new String[] { "no rules configured", "no rules configured", "no rules configured", "no rules configured"},
                     new String[] { "add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule" }
             });
         }

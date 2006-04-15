@@ -36,7 +36,9 @@
             #contentHeading("build.id" 1)
             #contentHeading("build.spec" 1)
             #contentHeading("queue.when" 1)
+#acl("domainObject=project" "hasPermission=4,1")
             #contentHeading("actions" 1)
+#end
         </tr>
 #if($action.hasActiveBuilds())
     #foreach($project in $projectQueue.keySet())
@@ -51,11 +53,13 @@
             #end
             #dynamicCell($requestEvent.specification)
             #contentCell($requestEvent.prettyQueueTime)
+#acl("domainObject=project" "hasPermission=4,1")
             #if($action.hasBuild($project))
                 #actionCell("cancel" "cancelBuild.action?buildId=$action.getBuild($project).id" "cancel.gif")
             #else
                 #contentCell("empty.cell")
             #end
+#end
         </tr>
         #end
     #end

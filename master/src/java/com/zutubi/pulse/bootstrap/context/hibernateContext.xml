@@ -257,6 +257,24 @@ This context requires:
         </property>
     </bean>
 
+    <bean id="projectAclDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateProjectAclDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+    <bean id="projectAclDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="projectAclDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
 
     <bean id="resourceDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateResourceDao">
         <property name="sessionFactory">

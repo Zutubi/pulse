@@ -66,43 +66,6 @@
             <result name="success" type="velocity">view-resource.vm</result>
         </action>
 
-        <action name="createResource" class="com.zutubi.pulse.web.CreateResourceAction">
-            <result name="input" type="velocity">create-resource.vm</result>
-            <result name="cancel" type="redirect">/viewResources.action</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/viewResource.action?id=${resource.id}</result>
-        </action>
-
-        <action name="deleteResource" class="com.zutubi.pulse.web.DeleteResourceAction">
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/viewResources.action</result>
-        </action>
-
-        <action name="createResourceVersion" class="com.zutubi.pulse.web.CreateResourceVersionAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">create-resource-version.vm</result>
-            <result name="cancel" type="redirect">viewResource.action?id=${resourceId}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">viewResource.action?id=${resourceId}</result>
-        </action>
-
-        <action name="deleteResourceVersion" class="com.zutubi.pulse.web.DeleteResourceVersionAction">
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">viewResource.action?id=${resourceId}</result>
-        </action>
-
-        <action name="createProperty" class="com.zutubi.pulse.web.CreatePropertyAction">
-            <result name="input" type="velocity">create-property.vm</result>
-            <result name="cancel" type="redirect">viewResource.action?id=${resourceId}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">viewResource.action?id=${resourceId}</result>
-        </action>
-
-        <action name="deleteProperty" class="com.zutubi.pulse.web.DeletePropertyAction">
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">viewResource.action?id=${resourceId}</result>
-        </action>
-
         <action name="serverMessages" class="com.zutubi.pulse.web.ServerMessagesAction">
             <result name="success" type="velocity">server-messages.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
@@ -538,6 +501,18 @@
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
+        <action name="addProjectAdmins" class="com.zutubi.pulse.web.project.AddProjectAdminsAction">
+            <result name="input" type="velocity">add-project-admins.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="deleteProjectAdmin" class="com.zutubi.pulse.web.project.DeleteProjectAdminAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
         <action name="convertToCustomProject" class="com.zutubi.pulse.web.project.ConvertToCustomProjectAction">
             <result name="input" type="velocity">convert-to-custom-project.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${id}</result>
@@ -807,6 +782,43 @@
             <result name="error" type="velocity">configure-logconfig.vm</result>
             <result name="cancel" type="redirect">/admin/serverSettings.action</result>
             <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="createResource" class="com.zutubi.pulse.web.admin.CreateResourceAction">
+            <result name="input" type="velocity">create-resource.vm</result>
+            <result name="cancel" type="redirect">/viewResources.action</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?id=${resource.id}</result>
+        </action>
+
+        <action name="deleteResource" class="com.zutubi.pulse.web.admin.DeleteResourceAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResources.action</result>
+        </action>
+
+        <action name="createResourceVersion" class="com.zutubi.pulse.web.admin.CreateResourceVersionAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">create-resource-version.vm</result>
+            <result name="cancel" type="redirect">/viewResource.action?id=${resourceId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+        </action>
+
+        <action name="deleteResourceVersion" class="com.zutubi.pulse.web.admin.DeleteResourceVersionAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+        </action>
+
+        <action name="createProperty" class="com.zutubi.pulse.web.admin.CreatePropertyAction">
+            <result name="input" type="velocity">create-property.vm</result>
+            <result name="cancel" type="redirect">/viewResource.action?id=${resourceId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+        </action>
+
+        <action name="deleteProperty" class="com.zutubi.pulse.web.admin.DeletePropertyAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
         </action>
 
     </package>

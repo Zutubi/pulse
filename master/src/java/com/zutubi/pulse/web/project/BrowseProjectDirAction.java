@@ -58,6 +58,8 @@ public class BrowseProjectDirAction extends AbstractBrowseDirAction
             return ERROR;
         }
 
+        getProjectManager().checkWrite(buildResult.getProject());
+
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         java.io.File baseDir = paths.getBaseDir(buildResult.getProject(), buildResult, recipeId);
 

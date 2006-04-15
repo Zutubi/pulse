@@ -4,15 +4,19 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.scheduling.Trigger;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import org.acegisecurity.acl.basic.AclObjectIdentity;
+import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
 /**
  * 
  *
  */
-public class Project extends Entity
+public class Project extends Entity implements AclObjectIdentity, AclObjectIdentityAware
 {
     public enum State
     {
@@ -47,6 +51,8 @@ public class Project extends Entity
 
     private List<BuildSpecification> buildSpecifications;
 
+    private List<ProjectAclEntry> aclEntries;
+
     public Project()
     {
     }
@@ -62,6 +68,8 @@ public class Project extends Entity
         this.description = description;
         this.pulseFileDetails = pulseFileDetails;
         this.addCleanupRule(new CleanupRule(true, null, DEFAULT_WORK_DIR_BUILDS, CleanupRule.CleanupUnit.BUILDS));
+
+        aclEntries = new LinkedList<ProjectAclEntry>();
     }
 
     public String getName()
@@ -249,6 +257,59 @@ public class Project extends Entity
                 state = State.BUILDING;
                 break;
         }
+    }
 
+    public AclObjectIdentity getAclObjectIdentity()
+    {
+        return this;
+    }
+
+    public List<ProjectAclEntry> getAclEntries()
+    {
+        return aclEntries;
+    }
+
+    private void setAclEntries(List<ProjectAclEntry> aclEntries)
+    {
+        this.aclEntries = aclEntries;
+    }
+
+    public boolean hasAdmin(String login)
+    {
+        for(ProjectAclEntry acl: aclEntries)
+        {
+            if(acl.getRecipient().equals(login))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void addAdmin(String login)
+    {
+        if(!hasAdmin(login))
+        {
+            aclEntries.add(new ProjectAclEntry(login, this, ProjectAclEntry.WRITE));
+        }
+    }
+
+    public void removeAdmin(String login)
+    {
+        ProjectAclEntry remove = null;
+        for(ProjectAclEntry entry: aclEntries)
+        {
+            if(entry.getRecipient().equals(login))
+            {
+                remove = entry;
+                break;
+            }
+        }
+
+        if(remove != null)
+        {
+            aclEntries.remove(remove);
+        }
     }
 }

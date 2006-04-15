@@ -1,7 +1,7 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.web;
+package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.model.Property;
@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
 import com.zutubi.pulse.model.persistence.ResourceDao;
 import com.zutubi.pulse.model.persistence.ResourceVersionDao;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
  * 

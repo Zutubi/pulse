@@ -48,7 +48,7 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void deleteBuildSpecification(long projectId, long specId)
+    public void deleteBuildSpecification(Project project, long specId)
     {
         throw new RuntimeException("Method not implemented.");
     }
@@ -63,17 +63,17 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public Project pauseProject(long projectId)
+    public Project pauseProject(Project project)
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void resumeProject(long projectId)
+    public void resumeProject(Project project)
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void delete(long projectId)
+    public void checkWrite(Project project)
     {
         throw new RuntimeException("Method not implemented.");
     }

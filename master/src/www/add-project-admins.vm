@@ -1,0 +1,20 @@
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=project.admin.add")</title>
+</head>
+<body>
+    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=addProjectAdmins.action" "heading=%{getText('project.admin.add')}" "method=post")
+    #wwhidden("name=projectId")
+
+    #wwselect("name=admins" "label=%{getText('project.new.admins')}" "list=users" "multiple=true" "size=10" "tabindex=1")
+
+    #saveCancel(2)
+#end
+</body>
+</html>

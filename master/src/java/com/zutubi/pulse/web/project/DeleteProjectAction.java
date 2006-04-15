@@ -77,16 +77,14 @@ public class DeleteProjectAction extends ProjectActionSupport
 
         if (ok != null)
         {
-            project = getProjectManager().pauseProject(project.getId());
+            project = getProjectManager().pauseProject(project);
             if (project.getState() != Project.State.PAUSED)
             {
                 addActionError("The project is currently building.  Please wait for the project to pause and try again.");
                 return "cancel";
             }
 
-            // We can't use the project entity we have loaded above to delete
-            // the project, as the project manager will use a new session.
-            getProjectManager().delete(project.getId());
+            getProjectManager().delete(project);
             return SUCCESS;
         }
         else

@@ -5,6 +5,7 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -19,6 +20,7 @@ public class DeleteBuildSpecificationAction extends ActionSupport
     private BuildSpecification specification;
     private BuildSpecificationDao buildSpecificationDao;
     private ProjectManager projectManager;
+    private Project project;
 
     public long getId()
     {
@@ -47,11 +49,17 @@ public class DeleteBuildSpecificationAction extends ActionSupport
         {
             addActionError("Unknown specification [" + id + "]");
         }
+
+        project = projectManager.getProject(projectId);
+        if (project == null)
+        {
+            addActionError("Unknown project [" + id + "]");
+        }
     }
 
     public String execute()
     {
-        projectManager.deleteBuildSpecification(projectId, id);
+        projectManager.deleteBuildSpecification(project, id);
         return SUCCESS;
     }
 

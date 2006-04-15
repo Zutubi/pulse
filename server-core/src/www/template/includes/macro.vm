@@ -182,7 +182,9 @@
         #buildTab($result "tests" "viewTests" $selected)
         #buildTab($result "build-file" "viewBuildFile" $selected)
         #buildTab($result "artifacts" "viewBuildArtifacts" $selected)
+#acl("domainObject=project" "hasPermission=4,1")
         #tabItem("working-dir" "browseProjectDir.action?buildId=$result.id&amp;recipeId=$result.root.children.get(0).result.id" $selected)
+#end
     #closeTabs()
 #end
 
@@ -279,6 +281,23 @@
 #end
 
 ##
+## Outputs a heading row for a content table with an action, restricted to
+## users that have write access to the domain object.
+##
+#macro(aclActionHeadingRow $key $span $actionKey $url $image $id $domainObject)
+    <tr>
+        <th class="heading" colspan="$span">
+    #acl("domainObject=$domainObject" "hasPermission=4,1")
+            <span class="action">
+                <a #if($id != "")id="$id"#end href="$url"><img alt="$action.getText($actionKey)" src="/images/$image"/>#wwtext("name=$actionKey")</a>
+            </span>
+    #end
+            #wwtext("name=$key")
+        </th>
+    </tr>
+#end
+
+##
 ## Outputs a heading row for a content table
 ##
 #macro(headingRow $key $span)
@@ -299,6 +318,14 @@
 ##
 #macro(editHeadingRow $key $span $url $id)
     #actionHeadingRow($key $span "edit" $url "pencil.gif" $id)
+#end
+
+##
+## Outputs a heading row with an edit action if the user has write access to
+## the given object
+##
+#macro(aclEditHeadingRow $key $span $url $id $domainObject)
+    #aclActionHeadingRow($key $span "edit" $url "pencil.gif" $id $domainObject)
 #end
 
 ##
@@ -501,7 +528,16 @@
 ##
 #macro(deleteCell $message $url $id)
     <td class="content">
-        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="/images/delete.gif"/>#wwtext("name=delete")</a>
+        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="/images/delete.gif"/> #wwtext("name=delete")</a>
+    </td>
+#end
+
+##
+## Outputs a remove cell for a content table, and uses the specified id for the link.
+##
+#macro(removeCell $message $url $id)
+    <td class="content">
+        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('remove')" src="/images/delete.gif"/> #wwtext("name=remove")</a>
     </td>
 #end
 
@@ -511,7 +547,7 @@
 ##
 #macro(deleteCellSpan $message $url $id $span)
     <td class="content" rowspan="$span">
-        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="/images/delete.gif"/>#wwtext("name=delete")</a>
+        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="/images/delete.gif"/> #wwtext("name=delete")</a>
     </td>
 #end
 
@@ -1414,7 +1450,9 @@
         </tr>
     #end
     #if($showAdd)
+#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
         #addRow("add.project" 10 "addProject!input.action" "project.add")
+#end
     #end
         </table>
 #end

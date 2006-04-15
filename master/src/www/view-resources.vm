@@ -16,45 +16,77 @@
             #contentHeading("version" 1)
             #contentHeading("property.name" 1)
             #contentHeading("property.value" 1)
+#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
             #contentHeading("actions" 2)
+#end
         </tr>
-#foreach($resource in $resources)
-    #set($confirmMessage = $action.getText("resource.confirm.delete", [$resource.name]))
-    #set($firstRow = true)
-    #set($totalPropertyCount = $resource.totalPropertyCount)
-    #foreach($property in $resource.properties)
-        <tr>
-         #if($firstRow)
-             #dynamicCellSpan($resource.name $totalPropertyCount)
-             #dynamicCellSpan("[default]" $resource.properties.size())
-         #end
-
-         #dynamicCell($property.name)
-         #dynamicCell($property.value)
-
-         #if($firstRow)
-             #set($firstRow = false)
-             #editCellSpan("viewResource.action?id=$resource.id" "edit_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
-             #deleteCellSpan($confirmMessage "deleteResource.action?id=$resource.id" "delete_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
-         #end
-        </tr>
-    #end
-
-    #foreach($version in $resource.versions)
+#if($resources.size() > 0)
+    #foreach($resource in $resources)
+        #set($confirmMessage = $action.getText("resource.confirm.delete", [$resource.name]))
         #set($firstRow = true)
-        #foreach($property in $version.properties)
-        <tr>
-             #if($firstRow)
-                 #dynamicCellSpan($version.value $version.properties.size())
-                 #set($firstRow = false)
-             #end
+        #set($totalPropertyCount = $resource.totalPropertyCount + $resource.emptyVersionCount)
 
-             #dynamicCell($property.name)
-             #dynamicCell($property.value)
+        #if($resource.properties.size() > 0)
+            #foreach($property in $resource.properties)
+        <tr>
+                #if($firstRow)
+                    #dynamicCellSpan($resource.name $totalPropertyCount)
+                    #dynamicCellSpan("[default]" $resource.properties.size())
+                #end
+
+                    #dynamicCell($property.name)
+                    #dynamicCell($property.value)
+
+                #if($firstRow)
+                    #set($firstRow = false)
+                    #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+                        #editCellSpan("/viewResource.action?id=$resource.id" "edit_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
+                        #deleteCellSpan($confirmMessage "/admin/deleteResource.action?id=$resource.id" "delete_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
+                    #end
+                #end
+        </tr>
+            #end
+        #else
+        <tr>
+                    #dynamicCellSpan($resource.name $totalPropertyCount)
+                    #dynamicCell("[default]")
+                    #contentCell("empty.cell")
+                    #contentCell("empty.cell")
+                    #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+                        #editCellSpan("/viewResource.action?id=$resource.id" "edit_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
+                        #deleteCellSpan($confirmMessage "/admin/deleteResource.action?id=$resource.id" "delete_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
+                    #end
         </tr>
         #end
+
+        #foreach($version in $resource.versions)
+            #set($firstRow = true)
+            #if($version.properties.size() > 0)
+                #foreach($property in $version.properties)
+        <tr>
+                    #if($firstRow)
+                        #dynamicCellSpan($version.value $version.properties.size())
+                        #set($firstRow = false)
+                    #end
+
+                        #dynamicCell($property.name)
+                        #dynamicCell($property.value)
+                #end
+        </tr>
+            #else
+        <tr>
+                      #dynamicCell($version.value)
+                      #contentCell("empty.cell")
+                      #contentCell("empty.cell")
+        </tr>
+            #end
+        #end
     #end
+#else
+        #contentRow("resources.none" 6)
 #end
-        #addRow("resource.add" 6 "createResource!input.action" "resource.add")
+#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+        #addRow("resource.add" 6 "/admin/createResource!input.action" "resource.add")
+#end
     </table>
 </html>

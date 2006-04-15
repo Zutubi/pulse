@@ -46,7 +46,7 @@
                             </td>
                         </table>
                     </td>
-                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free", ["$percentageFree"]) (<a href="garbageCollect.action">gc</a>)</td>
+                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free", ["$percentageFree"]) #authorize("ifAllGranted=ROLE_ADMINISTRATOR") (<a href="garbageCollect.action">gc</a>) #end </td>
                 </tr>
             </table>
         </td>

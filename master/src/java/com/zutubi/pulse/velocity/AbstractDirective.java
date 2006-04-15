@@ -43,14 +43,7 @@ public abstract class AbstractDirective extends Directive
     {
         StringWriter bodyContent = new StringWriter(1024);
         
-        int bodyNode = 1;
-/*
-        if (node.jjtGetNumChildren() == 3)
-        {
-            bodyNode = 2;
-        }
-*/
-
+        int bodyNode = node.jjtGetNumChildren() - 1;
         node.jjtGetChild(bodyNode).render(context, bodyContent);
 
         return bodyContent.toString();

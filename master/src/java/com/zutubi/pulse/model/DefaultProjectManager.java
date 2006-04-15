@@ -14,6 +14,8 @@ import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 
 import java.util.List;
 
+import org.acegisecurity.annotation.Secured;
+
 /**
  * 
  *
@@ -52,28 +54,57 @@ public class DefaultProjectManager implements ProjectManager
         return projectDao.findByLikeName(name);
     }
 
-    public void delete(Project entity)
+    private void deleteProject(Project entity)
     {
         buildManager.deleteAllBuilds(entity);
         subscriptionManager.deleteAllSubscriptions(entity);
         projectDao.delete(entity);
     }
 
-    public void delete(long projectId)
+    public void delete(Project project)
     {
-        Project project = getProject(projectId);
+        project = getProject(project.getId());
         if (project != null)
         {
-            delete(project);
+            deleteProject(project);
         }
+    }
+
+    @Secured({"ACL_PROJECT_WRITE"})
+    public void checkWrite(Project project)
+    {
+//        boolean accessAllowed = false;
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if(authentication != null)
+//        {
+//            AclEntry[] acls = aclManager.getAcls(project, authentication);
+//            for(AclEntry acl: acls)
+//            {
+//                if(acl instanceof BasicAclEntry)
+//                {
+//                    BasicAclEntry basic = (BasicAclEntry) acl;
+//                    if(basic.isPermitted(SimpleAclEntry.WRITE))
+//                    {
+//                        accessAllowed = true;
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+//
+//        if(!accessAllowed)
+//        {
+//            throw new AccessDeniedException("Access denied");
+//        }
     }
 
     public void initialise()
     {
     }
 
-    public void deleteBuildSpecification(long projectId, long specId)
+    public void deleteBuildSpecification(Project project, long specId)
     {
+        project = projectDao.findById(project.getId());
         BuildSpecification spec = buildSpecificationDao.findById(specId);
 
         if (spec == null)
@@ -81,7 +112,7 @@ public class DefaultProjectManager implements ProjectManager
             throw new PulseRuntimeException("Unknown build specification [" + specId + "]");
         }
 
-        List<Trigger> triggers = triggerDao.findByProject(projectId);
+        List<Trigger> triggers = triggerDao.findByProject(project.getId());
         for (Trigger trigger : triggers)
         {
             // Check the trigger's class to see if it is a build trigger, and
@@ -105,6 +136,7 @@ public class DefaultProjectManager implements ProjectManager
             }
         }
 
+        project.remove(spec);
         buildSpecificationDao.delete(spec);
     }
 
@@ -128,9 +160,9 @@ public class DefaultProjectManager implements ProjectManager
         }
     }
 
-    public Project pauseProject(long projectId)
+    public Project pauseProject(Project project)
     {
-        Project project = getProject(projectId);
+        project = getProject(project.getId());
         if (project != null)
         {
             project.pause();
@@ -140,9 +172,9 @@ public class DefaultProjectManager implements ProjectManager
         return project;
     }
 
-    public void resumeProject(long projectId)
+    public void resumeProject(Project project)
     {
-        Project project = getProject(projectId);
+        project = getProject(project.getId());
         if (project != null)
         {
             project.resume();

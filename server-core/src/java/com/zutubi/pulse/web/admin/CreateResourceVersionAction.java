@@ -1,11 +1,12 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.web;
+package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
 import com.zutubi.pulse.model.persistence.ResourceDao;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
  * Used to add a new version to a resource.

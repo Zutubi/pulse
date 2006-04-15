@@ -105,4 +105,23 @@ public class Resource extends Entity implements Namespace
 
         return count;
     }
+
+    public int getEmptyVersionCount()
+    {
+        int count = 0;
+        if(properties.isEmpty())
+        {
+            count++;
+        }
+
+        for(ResourceVersion v: versions.values())
+        {
+            if(v.getProperties().isEmpty())
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
 }

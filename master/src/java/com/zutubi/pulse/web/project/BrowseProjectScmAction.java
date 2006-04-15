@@ -5,6 +5,7 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.filesystem.remote.RemoteScmFileSystem;
 import com.zutubi.pulse.model.Project;
+import org.acegisecurity.acl.AclManager;
 
 /**
  */
@@ -47,6 +48,8 @@ public class BrowseProjectScmAction extends AbstractBrowseDirAction
             addActionError("Unknown project [" + id + "]");
             return ERROR;
         }
+
+        getProjectManager().checkWrite(project);
 
         try
         {

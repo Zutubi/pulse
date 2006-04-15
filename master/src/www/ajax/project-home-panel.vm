@@ -8,6 +8,7 @@
                     </th>
                     <td #if($project.isPaused()) class="note" #else class="content" #end>
                         $project.state.toString().toLowerCase()&nbsp;
+#acl("domainObject=project" "hasPermission=4,1")
             #if($project.isPaused())
                         <a class="unadorned" href="projectState.action?id=$project.id&amp;pause=false">
                             <img style="vertical-align: top" src="/images/control_play_blue.gif"/>
@@ -19,6 +20,7 @@
                             #wwtext("name=pause")
                         </a>
             #end
+#end
                     </td>
                 </tr>
                 <tr>
@@ -47,6 +49,7 @@
             #if($project.url && $project.url.length() > 0)
                 #dynamicLinkRow("project.url" $project.url $project.url)
             #end
+#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
                 <tr>
                     <th class="content-row">#wwtext("name=actions")</th>
                     <td class="content">
@@ -57,6 +60,7 @@
             #else
                         #wwtext("name=project.actions.building")
             #end
+#end
                     </td>
                 </tr>
             </table>

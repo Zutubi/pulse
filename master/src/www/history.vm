@@ -54,7 +54,9 @@
             #testsCell($project $buildResult)
             #buildFileCell($project $buildResult)
             #artifactsCell($project $buildResult)
+#acl("domainObject=project" "hasPermission=4,1")
             #workingCopyCell($project $buildResult)
+#end
         </tr>
     #end
     </table>

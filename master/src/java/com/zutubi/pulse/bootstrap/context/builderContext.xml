@@ -4,6 +4,17 @@
 
     <bean id="velocityEngine" class="com.zutubi.pulse.bootstrap.velocity.VelocityEngineFactoryBean"/>
 
+    <bean id="transactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
     <bean id="buildManagerTarget" class="com.zutubi.pulse.model.DefaultBuildManager" autowire="byName"
           init-method="init"/>
 
@@ -24,17 +35,15 @@
 
     <bean id="projectManagerTarget" class="com.zutubi.pulse.model.DefaultProjectManager" autowire="byName"
           init-method="initialise"/>
-    <bean id="projectManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+    <bean id="projectManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
             <ref bean="projectManagerTarget"/>
         </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
+        <property name="interceptorNames">
+            <list>
+                <value>transactionInterceptor</value>
+                <value>securityInterceptor</value>
+            </list>
         </property>
     </bean>
 

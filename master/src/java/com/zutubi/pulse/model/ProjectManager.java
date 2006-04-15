@@ -3,6 +3,8 @@
  ********************************************************************************/
 package com.zutubi.pulse.model;
 
+import org.acegisecurity.annotation.Secured;
+
 import java.util.List;
 
 /**
@@ -30,23 +32,32 @@ public interface ProjectManager extends EntityManager<Project>
     /**
      * Deletes a build specification *and* all triggers that refer to it.
      *
-     * @param projectId the identifier of the project to delete the
-     *                  specification from
+     * @param project   the project to delete the specification from
      * @param specId    the identifier of the specification to delete
      * @throws com.zutubi.pulse.core.PulseRuntimeException
      *          if there is no
      *          specification with the given identifier, or an error occurs
      *          while deleting it
      */
-    void deleteBuildSpecification(long projectId, long specId);
+    @Secured({"ACL_PROJECT_WRITE"})
+    void deleteBuildSpecification(Project project, long specId);
 
     void buildCommenced(long projectId);
 
     void buildCompleted(long projectId);
 
-    Project pauseProject(long projectId);
+    @Secured({"ACL_PROJECT_WRITE"})
+    Project pauseProject(Project project);
 
-    void resumeProject(long projectId);
+    @Secured({"ACL_PROJECT_WRITE"})
+    void resumeProject(Project project);
 
-    void delete(long projectId);
+    @Secured({"ROLE_ADMINISTRATOR", "ACL_PROJECT_WRITE"})
+    void save(Project project);
+
+    @Secured({"ROLE_ADMINISTRATOR"})
+    void delete(Project project);
+
+    @Secured({"ACL_PROJECT_WRITE"})
+    void checkWrite(Project project);
 }
