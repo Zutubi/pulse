@@ -9,6 +9,8 @@
 
     #parse("/template/includes/actionerrors.vm")
 
+    <table class="columns">
+        <tr><td class="columns">
 #wwcform("action=addTrigger.action" "id=trigger.cron.create" "heading=%{getText('trigger.cron.step')}" "method=post")
     #wwhidden("name=state")
     #wwhidden("name=submit")
@@ -17,5 +19,34 @@
     #inlineHelp("trigger.cron.string.help")
     #previousFinishCancel(2)
 #end
+
+        </td><td width="400px" class="columns">
+
+    <table class="fill-content">
+        #headingRow("trigger.cron.examples" 2)
+        <tr>
+            #contentHeading("trigger.example.when" 1)
+            #contentHeading("trigger.cron.string" 1)
+        </tr>
+        <tr>
+            #contentCell("trigger.fifteen.past.hour")
+            #contentCell("0 15 * * * ?")
+        </tr>
+        <tr>
+            #contentCell("trigger.half.hour")
+            #contentCell("0 0/30 * * * ?")
+        </tr>
+        <tr>
+            #contentCell("trigger.noon")
+            #contentCell("0 0 12 * * ?")
+        </tr>
+        <tr>
+            #contentCell("trigger.ten.fifteen.weekdays")
+            #contentCell("0 15 10 ? * MON-FRI")
+        </tr>
+    </table>
+
+        </td></tr>
+    </table>
 </body>
 </html>
