@@ -68,11 +68,13 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         recipeProcessor.build(1, new SimpleRecipePaths(baseDir, outputDir), new SimpleBootstrapper(), getPulseFile("basic"), "default");
         assertRecipeCommenced(1, "default");
+        assertCommandCommenced(1, "bootstrap");
+        assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "greeting");
         assertCommandCompleted(1, ResultState.SUCCESS);
         assertRecipeCompleted(1, ResultState.SUCCESS);
         assertNoMoreEvents();
-        assertOutputFile(0, "greeting", "hello world\n");
+        assertOutputFile(1, "greeting", "hello world\n");
     }
 
     public void testExceptionDuringBootstrap() throws Exception
@@ -80,7 +82,11 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         ErrorBootstrapper bootstrapper = new ErrorBootstrapper(new BuildException("test exception"));
         recipeProcessor.build(1, new SimpleRecipePaths(baseDir, outputDir), bootstrapper, getPulseFile("basic"), "default");
         assertRecipeCommenced(1, "default");
-        assertRecipeError(1, "test exception");
+        assertCommandCommenced(1, "bootstrap");
+        assertCommandError(1, "test exception");
+        // Counter intuitive perhaps: the state is maintained by
+        // RecipeControllers so it is not used from this event
+        assertRecipeCompleted(1, ResultState.SUCCESS);
         assertNoMoreEvents();
     }
 
@@ -88,6 +94,8 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         recipeProcessor.build(1, new SimpleRecipePaths(baseDir, outputDir), new SimpleBootstrapper(), getPulseFile("nodefault"), null);
         assertRecipeCommenced(1, null);
+        assertCommandCommenced(1, "bootstrap");
+        assertCommandCompleted(1, ResultState.SUCCESS);
         assertRecipeError(1, "Please specify a default recipe for your project.");
         assertNoMoreEvents();
     }
@@ -96,6 +104,8 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         recipeProcessor.build(1, new SimpleRecipePaths(baseDir, outputDir), new SimpleBootstrapper(), getPulseFile("basic"), "failure");
         assertRecipeCommenced(1, "failure");
+        assertCommandCommenced(1, "bootstrap");
+        assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "born to fail");
         assertCommandFailure(1, "failure command");
         // Counter intuitive perhaps: the state is maintained by
@@ -108,6 +118,8 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         recipeProcessor.build(1, new SimpleRecipePaths(baseDir, outputDir), new SimpleBootstrapper(), getPulseFile("basic"), "exception");
         assertRecipeCommenced(1, "exception");
+        assertCommandCommenced(1, "bootstrap");
+        assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "predictable");
         assertCommandError(1, "exception command");
         // Counter intuitive perhaps: the state is maintained by
@@ -120,6 +132,8 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         recipeProcessor.build(1, new SimpleRecipePaths(baseDir, outputDir), new SimpleBootstrapper(), getPulseFile("basic"), "unexpected exception");
         assertRecipeCommenced(1, "unexpected exception");
+        assertCommandCommenced(1, "bootstrap");
+        assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "oops");
         assertCommandError(1, "Unexpected error: unexpected exception command");
         // Counter intuitive perhaps: the state is maintained by
@@ -135,6 +149,10 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         Thread thread = new Thread(runner);
         thread.start();
         assertRecipeCommenced(1, "default");
+        semaphore.release();
+        assertCommandCommenced(1, "bootstrap");
+        semaphore.release();
+        assertCommandCompleted(1, ResultState.SUCCESS);
         recipeProcessor.terminateRecipe(1);
         semaphore.release();
         // Counter intuitive perhaps: the state is maintained by
@@ -152,6 +170,10 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         Thread thread = new Thread(runner);
         thread.start();
         assertRecipeCommenced(1, "default");
+        semaphore.release();
+        assertCommandCommenced(1, "bootstrap");
+        semaphore.release();
+        assertCommandCompleted(1, ResultState.SUCCESS);
         semaphore.release();
         // Try and make the race fair...
         Thread.sleep(500);
@@ -188,6 +210,10 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         Thread thread = new Thread(runner);
         thread.start();
         assertRecipeCommenced(1, "default");
+        semaphore.release();
+        assertCommandCommenced(1, "bootstrap");
+        semaphore.release();
+        assertCommandCompleted(1, ResultState.SUCCESS);
         semaphore.release();
         assertCommandCommenced(1, "greeting");
         recipeProcessor.terminateRecipe(1);
