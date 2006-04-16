@@ -12,8 +12,7 @@
         #dynamicRow("changelist.revision" $changelist.revision)
         #dynamicRow("changelist.who" $changelist.user)
         #dynamicRow("changelist.when" $changelist.prettyDate)
-#set($comment = $!webwork.htmlEncode($changelist.comment))
-        #dynamicRow("changelist.comment" $comment)
+        #dynamicRow("changelist.comment" $changelist.comment)
     </table>
     <table class="content">
         #headingRow("changelist.files" 3)
