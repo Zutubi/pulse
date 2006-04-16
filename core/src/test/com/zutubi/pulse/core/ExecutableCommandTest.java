@@ -42,7 +42,7 @@ public class ExecutableCommandTest extends TestCase
         command.setExe("echo");
         command.setArgs("hello world");
         CommandResult result = new CommandResult("success");
-        command.execute(baseDirectory, outputDirectory, result);
+        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
         assertEquals(result.getState(), ResultState.SUCCESS);
     }
 
@@ -52,7 +52,7 @@ public class ExecutableCommandTest extends TestCase
         command.setExe("dir");
         command.setArgs("w");
         CommandResult result = new CommandResult("failure");
-        command.execute(baseDirectory, outputDirectory, result);
+        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
         assertEquals(result.getState(), ResultState.FAILURE);
     }
 
@@ -61,7 +61,7 @@ public class ExecutableCommandTest extends TestCase
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("netstat");
         CommandResult result = new CommandResult("no arg");
-        command.execute(baseDirectory, outputDirectory, result);
+        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
         assertEquals(result.getState(), ResultState.SUCCESS);
     }
 
@@ -72,7 +72,7 @@ public class ExecutableCommandTest extends TestCase
         command.setArgs("command");
         try
         {
-            command.execute(baseDirectory, outputDirectory, new CommandResult("exception"));
+            command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, new CommandResult("exception"));
             assertTrue(false);
         }
         catch (BuildException e)
@@ -96,7 +96,7 @@ public class ExecutableCommandTest extends TestCase
         processArtifact.setProcessor(processor);
 
         CommandResult cmdResult = new CommandResult("processed");
-        command.execute(baseDirectory, outputDirectory, cmdResult);
+        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, cmdResult);
         assertEquals(ResultState.FAILURE, cmdResult.getState());
 
         StoredArtifact artifact = cmdResult.getArtifact(ExecutableCommand.OUTPUT_NAME);

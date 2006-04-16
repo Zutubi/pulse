@@ -44,7 +44,7 @@ public class MavenCommand extends ExecutableCommand implements Command, ScopeAwa
         }
     }
 
-    public void execute(File baseDir, File outputDir, CommandResult cmdResult)
+    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult cmdResult)
     {
         checkExe();
 
@@ -54,7 +54,7 @@ public class MavenCommand extends ExecutableCommand implements Command, ScopeAwa
             cmdResult.getProperties().put("targets", targets);
         }
 
-        super.execute(baseDir, outputDir, cmdResult);
+        super.execute(recipeId, paths, outputDir, cmdResult);
     }
 
     public String getTargets()

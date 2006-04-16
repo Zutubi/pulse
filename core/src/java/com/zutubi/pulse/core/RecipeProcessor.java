@@ -86,27 +86,36 @@ public class RecipeProcessor
 
         try
         {
-            bootstrapper.bootstrap(recipeId, paths);
+            // Wrap bootstrapper in a command and run it.
+            BootstrapCommand bootstrapCommand = new BootstrapCommand(bootstrapper);
+            CommandResult bootstrapResult = new CommandResult(bootstrapCommand.getName());
+            File commandOutput = new File(paths.getOutputDir(), getCommandDirName(0, bootstrapResult));
 
-            PulseFile pulseFile = loadPulseFile(paths.getBaseDir(), pulseFileSource, recipeName);
-            Recipe recipe;
+            executeCommand(recipeId, bootstrapResult, paths, commandOutput, bootstrapCommand);
 
-            if (recipeName == null)
+            if (bootstrapResult.succeeded())
             {
-                recipeName = pulseFile.getDefaultRecipe();
+                // Now we can load the recipe from the pulse file
+                PulseFile pulseFile = loadPulseFile(paths.getBaseDir(), pulseFileSource, recipeName);
+                Recipe recipe;
+
                 if (recipeName == null)
                 {
-                    throw new BuildException("Please specify a default recipe for your project.");
+                    recipeName = pulseFile.getDefaultRecipe();
+                    if (recipeName == null)
+                    {
+                        throw new BuildException("Please specify a default recipe for your project.");
+                    }
                 }
-            }
 
-            recipe = pulseFile.getRecipe(recipeName);
-            if (recipe == null)
-            {
-                throw new BuildException("Undefined recipe '" + recipeName + "'");
-            }
+                recipe = pulseFile.getRecipe(recipeName);
+                if (recipe == null)
+                {
+                    throw new BuildException("Undefined recipe '" + recipeName + "'");
+                }
 
-            build(recipeId, recipe, paths.getBaseDir(), paths.getOutputDir());
+                build(recipeId, recipe, paths);
+            }
         }
         catch (BuildException e)
         {
@@ -132,15 +141,15 @@ public class RecipeProcessor
         }
     }
 
-    public void build(long recipeId, Recipe recipe, File baseDir, File outputDir) throws BuildException
+    public void build(long recipeId, Recipe recipe, RecipePaths paths) throws BuildException
     {
         // TODO: support continuing build when errors occur. Take care: exceptions.
-        int i = 0;
+        int i = 1;
         for (Command command : recipe.getCommands())
         {
             CommandResult result = new CommandResult(command.getName());
 
-            File commandOutput = new File(outputDir, getCommandDirName(i, result));
+            File commandOutput = new File(paths.getOutputDir(), getCommandDirName(i, result));
 
             runningLock.lock();
             if (terminating)
@@ -152,7 +161,7 @@ public class RecipeProcessor
             runningCommand = command;
             runningLock.unlock();
 
-            executeCommand(recipeId, result, baseDir, commandOutput, command);
+            executeCommand(recipeId, result, paths, commandOutput, command);
 
             switch (result.getState())
             {
@@ -164,19 +173,19 @@ public class RecipeProcessor
         }
     }
 
-    private void executeCommand(long recipeId, CommandResult result, File baseDir, File commandOutput, Command command)
+    private void executeCommand(long recipeId, CommandResult result, RecipePaths paths, File commandOutput, Command command)
     {
         result.commence(commandOutput);
         eventManager.publish(new CommandCommencedEvent(this, recipeId, result.getCommandName(), result.getStamps().getStartTime()));
 
         try
         {
-            if (!commandOutput.mkdir())
+            if (!commandOutput.mkdirs())
             {
                 throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
             }
 
-            command.execute(baseDir, commandOutput, result);
+            command.execute(recipeId, paths, commandOutput, result);
         }
         catch (BuildException e)
         {

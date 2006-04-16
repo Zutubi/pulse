@@ -22,7 +22,7 @@ public class FailureCommand extends CommandSupport
         super(name);
     }
 
-    public void execute(File baseDir, File outputDir, CommandResult result)
+    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult result)
     {
         result.failure("failure command");
     }

@@ -38,7 +38,7 @@ public class ExecutableCommand implements Command
     private Process child;
     private volatile boolean terminated = false;
 
-    public void execute(File baseDir, File outputDir, CommandResult cmdResult)
+    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult cmdResult)
     {
         List<String> command = new LinkedList<String>();
         command.add(exe);
@@ -54,7 +54,7 @@ public class ExecutableCommand implements Command
         ProcessBuilder builder = new ProcessBuilder(command);
         if (workingDir == null)
         {
-            builder.directory(baseDir);
+            builder.directory(paths.getBaseDir());
         }
         else
         {

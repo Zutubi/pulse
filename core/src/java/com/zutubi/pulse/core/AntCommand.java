@@ -43,7 +43,7 @@ public class AntCommand extends ExecutableCommand implements Command, ScopeAware
         }
     }
 
-    public void execute(File baseDir, File outputDir, CommandResult cmdResult)
+    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult cmdResult)
     {
         checkExe();
 
@@ -59,7 +59,7 @@ public class AntCommand extends ExecutableCommand implements Command, ScopeAware
             cmdResult.getProperties().put("targets", targets);
         }
 
-        super.execute(baseDir, outputDir, cmdResult);
+        super.execute(recipeId, paths, outputDir, cmdResult);
 
         AntPostProcessor pp = new AntPostProcessor("ant.pp");
         pp.process(outputDir, cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);

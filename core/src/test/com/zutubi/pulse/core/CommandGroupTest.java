@@ -238,7 +238,7 @@ public class CommandGroupTest extends PulseTestCase
     private CommandResult testSuccessWithOutput(CommandGroup group, String output) throws IOException
     {
         CommandResult result = new CommandResult("test");
-        group.execute(baseDirectory, outputDirectory, result);
+        group.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
         assertEquals(ResultState.SUCCESS, result.getState());
         StoredArtifact artifact = result.getArtifact(ExecutableCommand.OUTPUT_NAME);
         File outputFile = new File(outputDirectory, artifact.getFile().getPath());
@@ -258,7 +258,7 @@ public class CommandGroupTest extends PulseTestCase
         try
         {
             result = new CommandResult("test");
-            group.execute(baseDirectory, outputDirectory, result);
+            group.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
         }
         catch (BuildException e)
         {

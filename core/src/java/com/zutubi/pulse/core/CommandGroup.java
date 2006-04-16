@@ -69,12 +69,12 @@ public class CommandGroup implements Command, Validateable
         return customArtifact;
     }
 
-    public void execute(File baseDir, File outputDir, CommandResult result)
+    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult result)
     {
-        command.execute(baseDir, outputDir, result);
+        command.execute(recipeId, paths, outputDir, result);
         for(Artifact artifact: artifacts)
         {
-            artifact.capture(result, baseDir, outputDir);
+            artifact.capture(result, paths.getBaseDir(), outputDir);
         }
     }
 

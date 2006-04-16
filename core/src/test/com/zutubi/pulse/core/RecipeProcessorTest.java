@@ -66,7 +66,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testBasicRecipe() throws Exception
     {
-        recipeProcessor.build(1, new SimpleRecipePaths(), new SimpleBootstrapper(), getPulseFile("basic"), "default");
+        recipeProcessor.build(1, new SimpleRecipePaths(baseDir, outputDir), new SimpleBootstrapper(), getPulseFile("basic"), "default");
         assertRecipeCommenced(1, "default");
         assertCommandCommenced(1, "greeting");
         assertCommandCompleted(1, ResultState.SUCCESS);
@@ -78,7 +78,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     public void testExceptionDuringBootstrap() throws Exception
     {
         ErrorBootstrapper bootstrapper = new ErrorBootstrapper(new BuildException("test exception"));
-        recipeProcessor.build(1, new SimpleRecipePaths(), bootstrapper, getPulseFile("basic"), "default");
+        recipeProcessor.build(1, new SimpleRecipePaths(baseDir, outputDir), bootstrapper, getPulseFile("basic"), "default");
         assertRecipeCommenced(1, "default");
         assertRecipeError(1, "test exception");
         assertNoMoreEvents();
@@ -86,7 +86,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testNoDefaultRecipe() throws Exception
     {
-        recipeProcessor.build(1, new SimpleRecipePaths(), new SimpleBootstrapper(), getPulseFile("nodefault"), null);
+        recipeProcessor.build(1, new SimpleRecipePaths(baseDir, outputDir), new SimpleBootstrapper(), getPulseFile("nodefault"), null);
         assertRecipeCommenced(1, null);
         assertRecipeError(1, "Please specify a default recipe for your project.");
         assertNoMoreEvents();
@@ -94,7 +94,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testCommandFailure() throws Exception
     {
-        recipeProcessor.build(1, new SimpleRecipePaths(), new SimpleBootstrapper(), getPulseFile("basic"), "failure");
+        recipeProcessor.build(1, new SimpleRecipePaths(baseDir, outputDir), new SimpleBootstrapper(), getPulseFile("basic"), "failure");
         assertRecipeCommenced(1, "failure");
         assertCommandCommenced(1, "born to fail");
         assertCommandFailure(1, "failure command");
@@ -106,7 +106,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testCommandException() throws Exception
     {
-        recipeProcessor.build(1, new SimpleRecipePaths(), new SimpleBootstrapper(), getPulseFile("basic"), "exception");
+        recipeProcessor.build(1, new SimpleRecipePaths(baseDir, outputDir), new SimpleBootstrapper(), getPulseFile("basic"), "exception");
         assertRecipeCommenced(1, "exception");
         assertCommandCommenced(1, "predictable");
         assertCommandError(1, "exception command");
@@ -118,7 +118,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testCommandUnexpectedException() throws Exception
     {
-        recipeProcessor.build(1, new SimpleRecipePaths(), new SimpleBootstrapper(), getPulseFile("basic"), "unexpected exception");
+        recipeProcessor.build(1, new SimpleRecipePaths(baseDir, outputDir), new SimpleBootstrapper(), getPulseFile("basic"), "unexpected exception");
         assertRecipeCommenced(1, "unexpected exception");
         assertCommandCommenced(1, "oops");
         assertCommandError(1, "Unexpected error: unexpected exception command");
@@ -131,7 +131,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     public void testTerminate() throws Exception
     {
         waitMode = true;
-        AsyncRunner runner = new AsyncRunner(recipeProcessor, 1, new SimpleRecipePaths(), new SimpleBootstrapper(), getPulseFile("basic"), "default");
+        AsyncRunner runner = new AsyncRunner(recipeProcessor, 1, new SimpleRecipePaths(baseDir, outputDir), new SimpleBootstrapper(), getPulseFile("basic"), "default");
         Thread thread = new Thread(runner);
         thread.start();
         assertRecipeCommenced(1, "default");
@@ -148,7 +148,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     public void testTerminateRaceWithCommand() throws Exception
     {
         waitMode = true;
-        AsyncRunner runner = new AsyncRunner(recipeProcessor, 1, new SimpleRecipePaths(), new SimpleBootstrapper(), getPulseFile("basic"), "default");
+        AsyncRunner runner = new AsyncRunner(recipeProcessor, 1, new SimpleRecipePaths(baseDir, outputDir), new SimpleBootstrapper(), getPulseFile("basic"), "default");
         Thread thread = new Thread(runner);
         thread.start();
         assertRecipeCommenced(1, "default");
@@ -184,7 +184,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     public void testTerminateDuringCommand() throws Exception
     {
         waitMode = true;
-        AsyncRunner runner = new AsyncRunner(recipeProcessor, 1, new SimpleRecipePaths(), new SimpleBootstrapper(), getPulseFile("basic"), "default");
+        AsyncRunner runner = new AsyncRunner(recipeProcessor, 1, new SimpleRecipePaths(baseDir, outputDir), new SimpleBootstrapper(), getPulseFile("basic"), "default");
         Thread thread = new Thread(runner);
         thread.start();
         assertRecipeCommenced(1, "default");
@@ -339,19 +339,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     public Class[] getHandledEvents()
     {
         return new Class[]{Event.class};
-    }
-
-    public class SimpleRecipePaths implements RecipePaths
-    {
-        public File getBaseDir()
-        {
-            return baseDir;
-        }
-
-        public File getOutputDir()
-        {
-            return outputDir;
-        }
     }
 
     public class SimpleBootstrapper extends BootstrapperSupport
