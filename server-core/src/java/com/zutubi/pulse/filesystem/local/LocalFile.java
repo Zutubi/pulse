@@ -65,10 +65,15 @@ public class LocalFile implements File, Comparable
     public String getPath()
     {
         String path = file.getPath();
-        String basePath = fileSystem.getBase().getAbsolutePath() + fileSystem.getSeparator();
+        String basePath = fileSystem.getBase().getAbsolutePath();
         if (path.startsWith(basePath))
         {
             path = path.substring(basePath.length());
+        }
+
+        if(path.startsWith(fileSystem.getSeparator()))
+        {
+            path = path.substring(fileSystem.getSeparator().length());
         }
 
         return path;

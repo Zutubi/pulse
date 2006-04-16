@@ -7,6 +7,7 @@ import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.filesystem.local.LocalFileSystem;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
 
 /**
  */
@@ -42,6 +43,16 @@ public class BrowseProjectDirAction extends AbstractBrowseDirAction
     public BuildResult getBuildResult()
     {
         return buildResult;
+    }
+
+    public Project getProject()
+    {
+        if(buildResult != null)
+        {
+            return buildResult.getProject();
+        }
+
+        return null;
     }
 
     public boolean getFoundBase()

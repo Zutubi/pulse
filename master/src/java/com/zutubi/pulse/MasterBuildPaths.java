@@ -57,6 +57,6 @@ public class MasterBuildPaths
 
     public File getBaseDir(Project project, BuildResult result, long recipeId)
     {
-        return new File(getRecipeDir(project, result, recipeId), "work");
+        return new File(getRecipeDir(project, result, recipeId), "base");
     }
 }

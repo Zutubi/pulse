@@ -72,7 +72,8 @@ public abstract class AbstractBrowseDirAction extends ProjectActionSupport
 
         if (TextUtils.stringSet(path))
         {
-            entries.add(new DirectoryEntry(dir.getParentFile(), ".."));
+            File parentFile = dir.getParentFile();
+            entries.add(new DirectoryEntry(parentFile, ".."));
         }
 
         File[] files = fs.list(dir);
