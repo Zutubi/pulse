@@ -106,7 +106,7 @@
                     #contentHeading("build.spec" 1)
                     #contentHeading("build.status" 2)
                     #contentHeading("build.tests" 1)
-                    #contentHeading("last.built" 1)
+                    #contentHeading("build.when" 1)
                     #contentHeading("build.elapsed" 1)
                     #contentHeading("actions" 2)
                 </tr>
@@ -120,7 +120,7 @@
                     #classCell($buildResult.buildSpecification)
                     #statusCell($buildResult)
                     #testResultsCell($buildResult $buildResult)
-                    #classCell($buildResult.stamps.prettyStartTime)
+                    #dateClassCell($buildResult)
                     #classCell($buildResult.stamps.prettyElapsed)
                     #viewCell($project $buildResult)
                     #changesCell($project $buildResult)
@@ -146,7 +146,7 @@
                 <tr>
                     #rightCell($changelist.revision)
                     #dynamicCell($changelist.user)
-                    #dynamicCell($changelist.prettyDate)
+                    #dateCell($changelist)
                     #dynamicCell($action.trimmedString($changelist.comment, 60))
                     #linkCell("view" "viewChangelist.action?id=$changelist.id")
                 </tr>

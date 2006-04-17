@@ -13,7 +13,10 @@
         #headingRow("changelist.details" 2)
         #dynamicRow("changelist.revision" $changelist.revision)
         #dynamicRow("changelist.who" $changelist.user)
-        #dynamicRow("changelist.when" $changelist.prettyDate)
+        <tr>
+            #contentRowHeading("changelist.when")
+            #dateCell($changelist)
+        </tr>
         #dynamicRow("changelist.comment" $changelist.comment)
     </table>
 

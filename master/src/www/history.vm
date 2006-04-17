@@ -46,7 +46,7 @@
             #statusCell($buildResult)
             #testResultsCell($buildResult $buildResult)
             #classCell($buildResult.buildSpecification)
-            #classCell($buildResult.stamps.prettyStartTime)
+            #dateClassCell($buildResult)
             #classCell($buildResult.stamps.prettyElapsed)
             #viewCell($project $buildResult)
             #logCell($project $buildResult)

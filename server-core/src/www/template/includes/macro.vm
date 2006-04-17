@@ -566,6 +566,36 @@
 #end
 
 ##
+## Shared by date cell macros
+##
+#macro(dateCellContent $entity $date $time)
+    <span id="${entity.id}_time">$time</span>
+    <span id="${entity.id}_date" style="display: none">$date</span>
+    <a href="#" class="unadorned" title="$date" onclick="toggleDisplay('${entity.id}_time'); toggleDisplay('${entity.id}_date'); return false;">
+        <img src="images/calendar.gif"/>
+    </a>
+#end
+
+##
+## Outputs a timestamp cell with class based on $cssClass
+##
+#macro(dateClassCell $result)
+    <td class="$cssClass">
+        #dateCellContent($result $result.stamps.prettyStartDate $result.stamps.prettyStartTime)
+    </td>
+#end
+
+##
+## Outputs a plain date cell with toggling.  $entity must have .id (unique),
+## .prettyDate and .prettyTime.
+##
+#macro(dateCell $entity)
+    <td class="content">
+        #dateCellContent($entity $entity.prettyDate $entity.prettyTime)
+    </td>
+#end
+
+##
 ## Outputs a content row for the tail of a content table
 ##
 #macro(contentRow $key $span)
@@ -912,7 +942,7 @@
             #dynamicCell($recipe.recipeNameSafe)
             #statusCell($recipe)
             #testResultsCell($build $recipe)
-            #classCell("$recipe.stamps.prettyStartDate ($recipe.stamps.prettyStartTime)")
+            #dateClassCell($recipe)
             #classCell($recipe.stamps.prettyElapsed)
 ##            #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$build.project.id")
         </tr>
@@ -931,7 +961,7 @@
             #dynamicLinkCell($command.commandName "viewCommandLog.action?id=$build.id#command-$velocityCount")
             #statusCell($command)
             #testResultsCell($build $command)
-            #classCell("$command.stamps.prettyStartDate ($command.stamps.prettyStartTime)")
+            #dateClassCell($command)
             #classCell($command.stamps.prettyElapsed)
         </tr>
     #end
@@ -1329,7 +1359,7 @@
                     #classCell($buildResult.buildSpecification)
                     #statusCell($buildResult)
                     #testResultsCell($buildResult $buildResult)
-                    #classCell("$buildResult.stamps.prettyStartDate ($buildResult.stamps.prettyStartTime)")
+                    #dateClassCell($buildResult)
                     #classCell($buildResult.stamps.prettyElapsed)
     #if($showActions)
                     #viewCell($project $buildResult)
@@ -1432,7 +1462,7 @@
             #classCell($lastResult.buildSpecification)
             #statusCell($lastResult)
             #testResultsCell($lastResult $lastResult)
-            #classCell($lastResult.stamps.prettyStartTime)
+            #dateClassCell($lastResult)
             #classCell($lastResult.stamps.prettyElapsed)
             #viewCell($project $lastResult)
             #changesCell($project $lastResult)

@@ -13,7 +13,7 @@
         #set($index = $velocityCount - 1)
         <tr>
             #rightCell($changelist.revision)
-            #dynamicCell($changelist.prettyDate)
+            #dateCell($changelist)
             #dynamicCell($action.trimmedString($changelist.comment, 60))
             #linkCell("view" "viewChangelist.action?id=$changelist.id")
         </tr>

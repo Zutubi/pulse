@@ -206,7 +206,7 @@ a {
     border-bottom: dotted 1px #336;
 }
 
-a.unadorned {
+a.unadorned, a.unadorned:hover {
     border-bottom: none;
 }
 

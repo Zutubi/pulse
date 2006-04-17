@@ -77,3 +77,19 @@ function openBrowseWindow(selectDir, elementId, extraArgs)
     browseWindow.opener = self;
     browseWindow.focus();
 }
+
+// Toggles the display attribute of an element between '' and 'none' to
+// show/hide it.
+function toggleDisplay(id)
+{
+    var element = getElement(id);
+
+    if(!element.style.display)
+    {
+        element.style.display = 'none';
+    }
+    else
+    {
+        element.style.display = '';
+    }
+}

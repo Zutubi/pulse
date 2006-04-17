@@ -31,7 +31,7 @@
         <tr>
             #rightCell($change.revision)
             #dynamicCell($change.user)
-            #dynamicCell($change.prettyDate)
+            #dateCell($change)
             #dynamicCell($action.trimmedString($change.comment, 60))
             #linkCell("view" "viewChangelist.action?id=$change.id&buildId=$result.id")
         </tr>

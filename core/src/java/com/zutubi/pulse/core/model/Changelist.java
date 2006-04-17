@@ -53,9 +53,14 @@ public class Changelist extends Entity
         return getRevision().getDate();
     }
 
-    public String getPrettyDate()
+    public String getPrettyTime()
     {
         return TimeStamps.getPrettyTime(getRevision().getDate().getTime());
+    }
+
+    public String getPrettyDate()
+    {
+        return TimeStamps.getPrettyDate(getRevision().getDate().getTime());
     }
 
     public String getUser()
