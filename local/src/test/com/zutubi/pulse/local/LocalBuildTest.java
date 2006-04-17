@@ -16,7 +16,7 @@ import java.net.URL;
 public class LocalBuildTest extends PulseTestCase
 {
     File tmpDir;
-    boolean generateMode = false;
+    boolean generateMode = true;
     LocalBuild builder;
 
     @Override
@@ -150,6 +150,7 @@ public class LocalBuildTest extends PulseTestCase
 
         if (generateMode)
         {
+            removeDirectory(expectedDir);
             tmpDir.renameTo(expectedDir);
         }
         else
