@@ -96,6 +96,69 @@ public class FileLoaderTest extends FileLoaderTestBase
         assertEquals("b", recipe.getDependencies().get(0).getVersion());
     }
 
+    public void testMacro() throws Exception
+    {
+        PulseFile pf = new PulseFile();
+        loader.load(getInput("testMacro"), pf);
+
+        Recipe recipe = pf.getRecipe("r1");
+        assertNotNull(recipe);
+        Command command = recipe.getCommand("m1-e1");
+        assertNotNull(command);
+        command = recipe.getCommand("m1-e2");
+        assertNotNull(command);
+    }
+
+    public void testMacroEmpty() throws Exception
+    {
+        PulseFile pf = new PulseFile();
+        loader.load(getInput("testMacroEmpty"), pf);
+
+        Recipe recipe = pf.getRecipe("r1");
+        assertNotNull(recipe);
+        assertEquals(0, recipe.getCommands().size());
+    }
+
+    public void testMacroExpandError() throws Exception
+    {
+        errorHelper("testMacroExpandError", "Processing element 'recipe': starting at line 8 column 5: Processing element 'macro-ref': starting at line 9 column 9: While expanding macro defined at line 4 column 5: Processing element 'no-such-type': starting at line 5 column 9: Undefined type 'no-such-type'");
+    }
+
+    public void testMacroNoName() throws Exception
+    {
+        errorHelper("testMacroNoName", "Required attribute 'name' not found");
+    }
+
+    public void testMacroUnknownAttribute() throws Exception
+    {
+        errorHelper("testMacroUnknownAttribute", "Unrecognised attribute 'unkat'");
+    }
+
+    public void testMacroRefNoMacro() throws Exception
+    {
+        errorHelper("testMacroRefNoMacro", "Required attribute 'macro' not found");
+    }
+
+    public void testMacroRefNotMacro() throws Exception
+    {
+        errorHelper("testMacroRefNotMacro", "Reference '${not-macro}' does not resolve to a macro");
+    }
+
+    public void testMacroRefNotFound() throws Exception
+    {
+        errorHelper("testMacroRefNotFound", "Unknown variable reference 'not-found'");
+    }
+
+    public void testMacroRefUnknownAttribute() throws Exception
+    {
+        errorHelper("testMacroRefUnknownAttribute", "Unrecognised attribute 'whatthe'");
+    }
+
+    public void testMacroInfiniteRecursion() throws Exception
+    {
+        errorHelper("testMacroInfiniteRecursion", "Maximum recursion depth exceeded");
+    }
+
     private List<ExecutableCommand.Arg> executableArgsHelper(int commandIndex) throws Exception
     {
         PulseFile bf = new PulseFile();

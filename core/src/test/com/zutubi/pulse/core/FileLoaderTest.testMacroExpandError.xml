@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<project>
+
+    <macro name="m1">
+        <no-such-type/>
+    </macro>
+
+    <recipe name="r1">
+        <macro-ref macro="${m1}"/>
+    </recipe>
+
+</project>

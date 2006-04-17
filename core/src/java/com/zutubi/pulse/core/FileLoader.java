@@ -23,6 +23,8 @@ import java.util.Map;
  */
 public class FileLoader
 {
+    private static final int MAX_RECURSION_DEPTH = 128;
+
     private final Map<String, Class> typeDefinitions = new HashMap<String, Class>();
     private TypeLoadPredicate predicate = null;
     private ObjectFactory factory;
@@ -107,7 +109,7 @@ public class FileLoader
                 {
                     continue;
                 }
-                loadType((Element) node, root, true, globalScope);
+                loadType((Element) node, root, true, globalScope, 1);
             }
         }
         finally
@@ -116,7 +118,7 @@ public class FileLoader
         }
     }
 
-    private void loadType(Element e, Object parent, boolean resolveReferences, Scope scope) throws PulseException
+    private void loadType(Element e, Object parent, boolean resolveReferences, Scope scope, int depth) throws PulseException
     {
         IntrospectionHelper parentHelper = IntrospectionHelper.getHelper(parent.getClass(), typeDefinitions);
         String name = e.getLocalName();
@@ -125,6 +127,16 @@ public class FileLoader
 
         try
         {
+            if(depth > MAX_RECURSION_DEPTH)
+            {
+                throw new FileLoadException("Maximum recursion depth exceeded");
+            }
+
+            if(handleInternalElement(e, parent, resolveReferences, scope, parentHelper, depth))
+            {
+                return;
+            }
+
             // if create factory method, use it
             String propertyName = convertLocalNameToPropertyName(name);
             if (parentHelper.hasCreate(propertyName))
@@ -182,25 +194,7 @@ public class FileLoader
             if(loadType)
             {
                 // initialise sub-elements.
-                for (int index = 0; index < e.getChildCount(); index++)
-                {
-                    Node node = e.getChild(index);
-
-                    if (node instanceof Element)
-                    {
-                        Element element = (Element) node;
-                        // process type.
-                        loadType(element, type, resolveReferences, scope);
-
-                    }
-                    else if (node instanceof Text)
-                    {
-                        if (typeHelper.hasAddText())
-                        {
-                            typeHelper.addText(type, node.getValue());
-                        }
-                    }
-                }
+                loadSubElements(e, type, resolveReferences, scope, typeHelper, depth);
             }
 
             // add to container.
@@ -239,18 +233,109 @@ public class FileLoader
 
             throw new ParseException(createParseErrorMessage(name, e, t));
         }
-        catch (ValidationException ex)
+        catch (Exception ex)
         {
             throw new ParseException(createParseErrorMessage(name, e, ex));
         }
-        catch (FileLoadException ex)
+    }
+
+    private void loadSubElements(Element e, Object type, boolean resolveReferences, Scope scope, IntrospectionHelper typeHelper, int depth)
+            throws Exception
+    {
+        for (int index = 0; index < e.getChildCount(); index++)
         {
-            throw new ParseException(createParseErrorMessage(name, e, ex));
+            Node node = e.getChild(index);
+
+            if (node instanceof Element)
+            {
+                Element element = (Element) node;
+                // process type.
+                loadType(element, type, resolveReferences, scope, depth + 1);
+            }
+            else if (node instanceof Text)
+            {
+                if (typeHelper.hasAddText())
+                {
+                    typeHelper.addText(type, node.getValue());
+                }
+            }
         }
-        catch (IllegalAccessException ex)
+    }
+
+    private boolean handleInternalElement(Element element, Object type, boolean resolveReferences, Scope scope, IntrospectionHelper typeHelper, int depth) throws Exception
+    {
+        String localName = element.getLocalName();
+        if(localName.equals("macro"))
         {
-            throw new ParseException(createParseErrorMessage(name, e, ex));
+            // Macro definition, get name and store child elements
+            boolean found = false;
+
+            for(int i = 0; i < element.getAttributeCount(); i++)
+            {
+                Attribute attribute = element.getAttribute(i);
+                if(attribute.getLocalName().equals("name"))
+                {
+                    scope.setReference(new Macro(attribute.getValue(), element));
+                    found = true;
+                }
+                else
+                {
+                    throw new FileLoadException("Unrecognised attribute '" + attribute.getLocalName() + "'");
+                }
+            }
+
+            if(!found)
+            {
+                throw new FileLoadException("Required attribute 'name' not found");
+            }
+
+            return true;
         }
+        else if(localName.equals("macro-ref"))
+        {
+            // Macro referece.  Lookup macro, and load all it's children now.
+            boolean found = false;
+
+            for(int i = 0; i < element.getAttributeCount(); i++)
+            {
+                Attribute attribute = element.getAttribute(i);
+                if(attribute.getLocalName().equals("macro"))
+                {
+                    String macroName = attribute.getValue();
+                    
+                    Object o = VariableHelper.replaceVariable(macroName, scope);
+                    if(!LocationAwareElement.class.isAssignableFrom(o.getClass()))
+                    {
+                        throw new FileLoadException("Reference '" + macroName + "' does not resolve to a macro");
+                    }
+
+                    LocationAwareElement lae = (LocationAwareElement) o;
+
+                    try
+                    {
+                        loadSubElements(lae, type, resolveReferences, scope, typeHelper, depth);
+                    }
+                    catch(Exception e)
+                    {
+                        throw new FileLoadException("While expanding macro defined at line " + lae.getLineNumber() + " column " + lae.getColumnNumber() + ": " + e.getMessage(), e);
+                    }
+                    found = true;
+                }
+                else
+                {
+                    throw new FileLoadException("Unrecognised attribute '" + attribute.getLocalName() + "'");
+                }
+            }
+
+            if(!found)
+            {
+                throw new FileLoadException("Required attribute 'macro' not found");
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     private String createParseErrorMessage(String name, Element element, Throwable t)
