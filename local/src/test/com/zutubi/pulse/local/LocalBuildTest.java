@@ -16,7 +16,7 @@ import java.net.URL;
 public class LocalBuildTest extends PulseTestCase
 {
     File tmpDir;
-    boolean generateMode = true;
+    boolean generateMode = false;
     LocalBuild builder;
 
     @Override
