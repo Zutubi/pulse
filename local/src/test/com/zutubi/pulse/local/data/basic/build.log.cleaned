@@ -1,0 +1,62 @@
+[my-default]
+  commenced:
+  [bootstrap]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+
+  [noice]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+    artifacts:
+      * command output
+        * out/00000001-noice/command output/output.txt
+
+  [oops]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+    artifacts:
+      * command output
+        * out/00000002-oops/command output/output.txt
+          warning features:
+            * warning: everythings ok
+
+  [whoa]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+    artifacts:
+      * command output
+        * out/00000003-whoa/command output/output.txt
+          warning features:
+            * warning: everythings still fine
+
+  [hey]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+    artifacts:
+      * command output
+        * out/00000004-hey/command output/output.txt
+          info features:
+            * info: informative
+
+  [bzzzt]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+    artifacts:
+      * command output
+        * out/00000005-bzzzt/command output/output.txt
+
+  completed:
+  elapsed  :
+  result   : success

@@ -1,0 +1,21 @@
+[my-default]
+  commenced:
+  [bootstrap]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+
+  [noice]
+    commenced:
+    completed:
+    elapsed  :
+    result   : error
+    errors   :
+      Unable to create process: No such executable 'nosuchexe'
+
+  completed:
+  elapsed  :
+  result   : error
+  errors   :
+    Error executing command 'noice'
