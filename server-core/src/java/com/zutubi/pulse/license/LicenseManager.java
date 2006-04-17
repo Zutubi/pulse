@@ -8,5 +8,4 @@ package com.zutubi.pulse.license;
  */
 public interface LicenseManager
 {
-    boolean hasValidLicense();
 }
