@@ -241,6 +241,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         while (results.size() > 0);
     }
 
+    public Changelist getChangelistByRevision(Revision revision)
+    {
+        return changelistDao.findByRevision(revision);
+    }
+
     public BuildResult getPreviousBuildResult(BuildResult result)
     {
         return buildResultDao.findPreviousBuildResult(result);

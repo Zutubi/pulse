@@ -33,7 +33,7 @@
             #dynamicCell($change.user)
             #dynamicCell($change.prettyDate)
             #dynamicCell($action.trimmedString($change.comment, 60))
-            #linkCell("view" "viewChangelist.action?id=$change.id")
+            #linkCell("view" "viewChangelist.action?id=$change.id&buildId=$result.id")
         </tr>
         #if($change.changes.size() > 0)
         <tr>

@@ -289,12 +289,7 @@ public class BuildController implements EventListener
                     Revision previousRevision = previousScmDetails.getRevision();
                     if (previousRevision != null)
                     {
-                        scmChanges = server.getChanges(previousRevision, revision, "");
-                        for (Changelist change : scmChanges)
-                        {
-                            change.setProjectId(buildResult.getProject().getId());
-                            change.setResultId(buildResult.getId());
-                        }
+                        scmChanges = getChangeSince(server, previousRevision, revision, scmChanges);
                     }
                 }
             }
@@ -306,6 +301,25 @@ public class BuildController implements EventListener
 
         BuildScmDetails scmDetails = new BuildScmDetails(revision, scmChanges);
         buildResult.setScmDetails(scmDetails);
+    }
+
+    private List<Changelist> getChangeSince(SCMServer server, Revision previousRevision, Revision revision, List<Changelist> scmChanges)
+            throws SCMException
+    {
+        scmChanges = server.getChanges(previousRevision, revision, "");
+        for (Changelist change : scmChanges)
+        {
+            // Have we already got this revision?
+            Changelist alreadySaved = buildManager.getChangelistByRevision(change.getRevision());
+            if(alreadySaved != null)
+            {
+                change = alreadySaved;
+            }
+
+            change.addProjectId(buildResult.getProject().getId());
+            change.addResultId(buildResult.getId());
+        }
+        return scmChanges;
     }
 
     private void scheduleTimeout()

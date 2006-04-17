@@ -4,6 +4,7 @@
 package com.zutubi.pulse.model.persistence;
 
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 
@@ -31,4 +32,6 @@ public interface ChangelistDao extends EntityDao<Changelist>
      * @return a list of latest changes against the project
      */
     List<Changelist> findLatestByProject(Project project, int max);
+
+    Changelist findByRevision(Revision revision);
 }

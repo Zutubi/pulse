@@ -155,4 +155,9 @@ public class MockBuildManager implements BuildManager
     {
         throw new RuntimeException("Method not implemented.");
     }
+
+    public Changelist getChangelistByRevision(Revision revision)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
 }

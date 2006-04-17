@@ -4,6 +4,7 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
@@ -52,13 +53,29 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from Changelist model where model.projectId = :projectId order by id desc");
+                Query queryObject = session.createQuery("from Changelist model where :projectId in elements(model.projectIds) order by id desc");
                 queryObject.setParameter("projectId", project.getId());
                 queryObject.setMaxResults(max);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
 
                 return queryObject.list();
+            }
+        });
+    }
+
+    public Changelist findByRevision(final Revision revision)
+    {
+        return (Changelist) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from Changelist model where model.revision.revisionString = :revisionString order by id desc");
+                queryObject.setParameter("revisionString", revision.getRevisionString());
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.uniqueResult();
             }
         });
     }

@@ -23,8 +23,6 @@ public class DashboardAction extends ActionSupport
     private List<Project> projects;
     private List<BuildResult> latestBuilds;
     private List<Changelist> changelists;
-    private List<Project> changeProjects;
-    private List<BuildResult> changeBuilds;
 
     private ProjectManager projectManager;
     private BuildManager buildManager;
@@ -48,16 +46,6 @@ public class DashboardAction extends ActionSupport
     public List<Changelist> getChangelists()
     {
         return changelists;
-    }
-
-    public List<Project> getChangeProjects()
-    {
-        return changeProjects;
-    }
-
-    public List<BuildResult> getChangeBuilds()
-    {
-        return changeBuilds;
     }
 
     public String execute() throws Exception
@@ -92,15 +80,6 @@ public class DashboardAction extends ActionSupport
 
         changelists = buildManager.getLatestChangesForUser(user, 10);
         Collections.sort(changelists, new ChangelistComparator());
-        changeProjects = new LinkedList<Project>();
-        changeBuilds = new LinkedList<BuildResult>();
-
-        for (Changelist list : changelists)
-        {
-            BuildResult build = buildManager.getBuildResult(list.getResultId());
-            changeProjects.add(build.getProject());
-            changeBuilds.add(build);
-        }
 
         return SUCCESS;
     }
@@ -120,29 +99,11 @@ public class DashboardAction extends ActionSupport
         this.userManager = userManager;
     }
 
-    /**
-     * Compare changelists based on two things:
-     * - sort primarily by build id
-     * - sort secondarily by revision
-     * Note we sort in descending order.
-     */
     private class ChangelistComparator implements Comparator<Changelist>
     {
         public int compare(Changelist c1, Changelist c2)
         {
-            long id1 = c1.getResultId();
-            long id2 = c2.getResultId();
-
-            if (id1 < id2)
-            {
-                return 1;
-            }
-            else if (id1 > id2)
-            {
-                return -1;
-            }
-
-            // Need to go to the revision.
+            // Compare the revision.
             return -c1.getRevision().compareTo(c2.getRevision());
         }
     }

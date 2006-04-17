@@ -3,11 +3,9 @@
  ********************************************************************************/
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.CvsRevision;
-import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 
 import java.util.Calendar;
@@ -57,6 +55,25 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         assertPropertyEquals(change, otherChange);
     }
 
+    public void testLatestForProject()
+    {
+        changelistDao.save(createChangelist(1, 1, "login1"));
+        changelistDao.save(createChangelist(1, 2, "login2"));
+        changelistDao.save(createChangelist(2, 3, "login1"));
+        changelistDao.save(createChangelist(1, 4, "login1"));
+        changelistDao.save(createChangelist(2, 5, "login2"));
+
+        commitAndRefreshTransaction();
+        Project p = new Project();
+        p.setId(1);
+
+        List<Changelist> changes = changelistDao.findLatestByProject(p, 10);
+        assertEquals(3, changes.size());
+        assertEquals("4", changes.get(0).getRevision().getRevisionString());
+        assertEquals("2", changes.get(1).getRevision().getRevisionString());
+        assertEquals("1", changes.get(2).getRevision().getRevisionString());
+    }
+
     public void testLatestByUser()
     {
         changelistDao.save(createChangelist(1, "login1"));
@@ -97,10 +114,47 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         assertEquals("1", changes.get(3).getRevision().getRevisionString());
     }
 
-    private Changelist createChangelist(long number, String login)
+    public void testLookupByRevision()
+    {
+        changelistDao.save(createChangelist(12, "jason"));
+
+        commitAndRefreshTransaction();
+
+        Changelist changelist = changelistDao.findByRevision(new NumericalRevision(12));
+        assertNotNull(changelist);
+        assertEquals("jason", changelist.getRevision().getAuthor());
+    }
+
+    public void testLookupByCvsRevision()
+    {
+        Revision r = new CvsRevision("joe", "MAIN", "i made this", new Date(1234));
+        Changelist list = new Changelist(r);
+
+        changelistDao.save(list);
+
+        commitAndRefreshTransaction();
+
+        Changelist otherList = changelistDao.findByRevision(r);
+        assertNotNull(otherList);
+        assertPropertyEquals(list, otherList);
+    }
+
+    private Changelist createChangelist(long project, long number, String login)
     {
         NumericalRevision revision = new NumericalRevision(number);
         revision.setAuthor(login);
-        return new Changelist(revision);
+        Changelist changelist = new Changelist(revision);
+
+        if(project != 0)
+        {
+            changelist.addProjectId(project);
+        }
+
+        return changelist;
+    }
+
+    private Changelist createChangelist(long number, String login)
+    {
+        return createChangelist(0, number, login);
     }
 }

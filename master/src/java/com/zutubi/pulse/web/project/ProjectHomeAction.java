@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ChangelistUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class ProjectHomeAction extends ProjectActionSupport
     private int failedBuilds;
     private BuildResult currentBuild;
     private List<Changelist> latestChanges;
-    private LinkedList<BuildResult> changeBuilds;
+    private List<BuildResult> recentBuilds;
 
     public long getId()
     {
@@ -107,9 +108,9 @@ public class ProjectHomeAction extends ProjectActionSupport
         return latestChanges;
     }
 
-    public LinkedList<BuildResult> getChangeBuilds()
+    public List<BuildResult> getRecentBuilds()
     {
-        return changeBuilds;
+        return recentBuilds;
     }
 
     public String execute()
@@ -123,12 +124,10 @@ public class ProjectHomeAction extends ProjectActionSupport
             failedBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE}, null);
             currentBuild = buildManager.getLatestBuildResult(project);
             latestChanges = getBuildManager().getLatestChangesForProject(project, 10);
-            changeBuilds = new LinkedList<BuildResult>();
-
-            for (Changelist list : latestChanges)
+            recentBuilds = buildManager.getLatestBuildResultsForProject(project, 11);
+            if(!recentBuilds.isEmpty())
             {
-                BuildResult build = getBuildManager().getBuildResult(list.getResultId());
-                changeBuilds.add(build);
+                recentBuilds.remove(0);
             }
         }
         else
@@ -139,4 +138,5 @@ public class ProjectHomeAction extends ProjectActionSupport
 
         return SUCCESS;
     }
+
 }

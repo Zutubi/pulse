@@ -18,13 +18,14 @@ public class Changelist extends Entity
 {
     private Revision revision;
     private List<Change> changes;
-    private long projectId;
+    // Used to facilitate recent changes for project lookup
+    private List<Long> projectIds = new LinkedList<Long>();
     /**
-     * Id of the build result this is part of: the BuildResult class is up
-     * in master so we can't map it directly.  In any case, this forces lazy
-     * loading of the result which is a Good Thing.
+     * Id of the build results affected by this change: the BuildResult class
+     * is up in master so we can't map them directly.  In any case, this
+     * forces lazy loading of the results which is a Good Thing.
      */
-    private long resultId;
+    private List<Long> resultIds = new LinkedList<Long>();
 
     protected Changelist()
     {
@@ -82,23 +83,36 @@ public class Changelist extends Entity
         this.revision = revision;
     }
 
-    public long getProjectId()
+    public List<Long> getProjectIds()
     {
-        return projectId;
+        return projectIds;
     }
 
-    public void setProjectId(long projectId)
+    public void setProjectIds(List<Long> projectIds)
     {
-        this.projectId = projectId;
+        this.projectIds = projectIds;
     }
 
-    public long getResultId()
+    public List<Long> getResultIds()
     {
-        return resultId;
+        return resultIds;
     }
 
-    public void setResultId(long resultId)
+    public void setResultIds(List<Long> resultIds)
     {
-        this.resultId = resultId;
+        this.resultIds = resultIds;
+    }
+
+    public void addProjectId(long id)
+    {
+        if(!projectIds.contains(id))
+        {
+            projectIds.add(id);
+        }
+    }
+
+    public void addResultId(long id)
+    {
+        resultIds.add(id);
     }
 }

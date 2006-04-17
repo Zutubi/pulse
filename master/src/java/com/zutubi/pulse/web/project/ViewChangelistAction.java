@@ -5,20 +5,27 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.ChangelistUtils;
+import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.web.ActionSupport;
+
+import java.util.List;
 
 /**
  */
 public class ViewChangelistAction extends ActionSupport
 {
     private long id;
-    private long buildId;
     private Changelist changelist;
     private ChangelistDao changelistDao;
-    private BuildResultDao buildResultDao;
+    private BuildManager buildManager;
+    private long buildId;
+    /** This is the build result we have drilled down from, if any. */
     private BuildResult buildResult;
+    /** All builds affected by this change. */
+    private List<BuildResult> buildResults;
 
     public long getId()
     {
@@ -33,6 +40,11 @@ public class ViewChangelistAction extends ActionSupport
     public long getBuildId()
     {
         return buildId;
+    }
+
+    public void setBuildId(long buildId)
+    {
+        this.buildId = buildId;
     }
 
     public BuildResult getBuildResult()
@@ -61,8 +73,14 @@ public class ViewChangelistAction extends ActionSupport
 
     public String execute()
     {
-        buildId = changelist.getResultId();
-        buildResult = buildResultDao.findById(buildId);
+        if(buildId != 0)
+        {
+            // It is valid to have no build ID set: we may not be viewing
+            // the change as part of a build.
+            buildResult = buildManager.getBuildResult(buildId);
+        }
+
+        buildResults = ChangelistUtils.getBuilds(buildManager, changelist);
         // TODO dodgy walking of tree: hibernate eager/lazy loading!
         changelist.getRevision();
         changelist.getChanges();
@@ -74,8 +92,13 @@ public class ViewChangelistAction extends ActionSupport
         this.changelistDao = changelistDao;
     }
 
-    public void setBuildResultDao(BuildResultDao buildResultDao)
+    public void setBuildManager(BuildManager buildManager)
     {
-        this.buildResultDao = buildResultDao;
+        this.buildManager = buildManager;
+    }
+
+    public List<BuildResult> getBuildResults()
+    {
+        return buildResults;
     }
 }

@@ -91,4 +91,6 @@ public interface BuildManager
     List<Changelist> getLatestChangesForProject(Project project, int max);
 
     void deleteAllBuilds(Project project);
+
+    Changelist getChangelistByRevision(Revision revision);
 }

@@ -179,7 +179,7 @@ pre.feature {
             [@dynamicCell cc=change.user/]
             [@dynamicCell cc=change.prettyDate/]
             [@dynamicCell cc=renderer.trimmedString(change.comment, 60)/]
-            [@linkCell cc="view" url="http://${hostname}/viewChangelist.action?id=${change.id?c}"/]
+            [@linkCell cc="view" url="http://${hostname}/viewChangelist.action?id=${change.id?c}&amp;buildId=${result.id?c}"/]
         </tr>
         [/#list]
     [#else]

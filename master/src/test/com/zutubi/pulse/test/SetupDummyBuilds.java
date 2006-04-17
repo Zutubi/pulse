@@ -231,8 +231,8 @@ public class SetupDummyBuilds implements Runnable
         list.addChange(new Change("/home/jsankey/some/branched/file2", "1", Change.Action.BRANCH));
         list.addChange(new Change("/home/jsankey/some/branched/file3", "1", Change.Action.BRANCH));
         list.addChange(new Change("/home/jsankey/some/branched/file4", "1", Change.Action.BRANCH));
-        list.setProjectId(result.getProject().getId());
-        list.setResultId(result.getId());
+        list.addProjectId(result.getProject().getId());
+        list.addResultId(result.getId());
         changelists.add(list);
 
         userRevision = new NumericalRevision(9101);
@@ -241,8 +241,8 @@ public class SetupDummyBuilds implements Runnable
         userRevision.setDate(new Date(System.currentTimeMillis() - 10000));
         list = new Changelist(userRevision);
         list.addChange(new Change("/home/jsankey/some/branched/file/with/a/very/long/filename/to/test/the/display/handling/of/such/things", "1", Change.Action.BRANCH));
-        list.setProjectId(result.getProject().getId());
-        list.setResultId(result.getId());
+        list.addProjectId(result.getProject().getId());
+        list.addResultId(result.getId());
         changelists.add(list);
 
         userRevision = new NumericalRevision(9103);
@@ -251,8 +251,8 @@ public class SetupDummyBuilds implements Runnable
         userRevision.setDate(new Date(System.currentTimeMillis() - 9000));
         list = new Changelist(userRevision);
         list.addChange(new Change("/home/jsankey/some/file", "120", Change.Action.BRANCH));
-        list.setProjectId(result.getProject().getId());
-        list.setResultId(result.getId());
+        list.addProjectId(result.getProject().getId());
+        list.addResultId(result.getId());
         changelists.add(list);
 
         BuildScmDetails scmDetails = new BuildScmDetails(new NumericalRevision(16672), changelists);
@@ -618,7 +618,7 @@ public class SetupDummyBuilds implements Runnable
         try
         {
             File root = PulseTestCase.getPulseRoot();
-            File dummy = new File(root, FileSystemUtils.composeFilename("master", "src", "test", "com", "pulse", "test", "dummyArtifactFile.txt"));
+            File dummy = new File(root, FileSystemUtils.composeFilename("master", "src", "test", "com", "zutubi", "pulse", "test", "dummyArtifactFile.txt"));
             File artifactFile = new File(dir, filename);
             IOUtils.copyFile(dummy, artifactFile);
             findFeatures(file, artifactFile);

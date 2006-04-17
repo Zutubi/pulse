@@ -1,5 +1,7 @@
 #authorisationTags($principle)
-#buildTags($buildResult.project $buildResult)
+#if($buildResult)
+    #buildTags($buildResult.project $buildResult)
+#end
 <html>
 <head>
     <title>#wwtext("name=changelist") $changelist.revision</title>
@@ -14,6 +16,28 @@
         #dynamicRow("changelist.when" $changelist.prettyDate)
         #dynamicRow("changelist.comment" $changelist.comment)
     </table>
+
+    <table class="content">
+       #headingRow("changelist.builds" 5)
+       <tr>
+           #contentHeading("project" 1)
+           #contentHeading("build.id" 1)
+           #contentHeading("build.spec" 1)
+           #contentHeading("status" 2)
+        </tr>
+#foreach($result in $buildResults)
+        <tr>
+            <td class="content"><a href="currentBuild.action?id=$result.project.id">$!webwork.htmlEncode($result.project.name)</a></td>
+
+            #set($result = $latestBuilds.get($index))
+            #set($cssClass = $result.state.string)
+
+            <td class="content-right"><a href="viewBuild.action?id=$result.id">$result.number</a></td>
+            #classCell($result.buildSpecification)
+            #statusCell($result)
+        </tr>
+#end
+
     <table class="content">
         #headingRow("changelist.files" 3)
         <tr>

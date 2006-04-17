@@ -1,6 +1,5 @@
-    <table class="columns" width="95%">
-        <tr><td class="columns">
-            <table class="fill-content" width="45%">
+        <div style="float: right; width: 310px">
+            <table class="fill-content">
                 #headingRow("project.status" 2)
                 <tr>
                     <th class="content-row">
@@ -37,17 +36,33 @@
                     </th>
                     <td class="content">
                         <img class="centre" title="$successfulBuilds (${percentSuccessful}%) successful" src="/images/box-success.gif" height="10" width="$percentSuccessful"/><img class="centre" title="$failedBuilds (${percentFailed}%) failed" src="/images/box-failure.gif" height="10" width="$percentFailed"/><img class="centre" title="$errorBuilds (${percentError}%) errors" src="/images/box-error.gif" height="10" width="$percentError"/>
-                        $totalBuilds builds (s: $successfulBuilds, f: $failedBuilds, e: $errorBuilds)
+                        <br/>$totalBuilds builds (s: $successfulBuilds, f: $failedBuilds, e: $errorBuilds)
                     </td>
                 </tr>
             </table>
+
+            <table id="project.buildspecs" class="fill-content">
+                #headingRow("project.buildspecs" 2)
+                <tr>
+                    #contentHeading("buildspec.name" 1)
+                    #contentHeading("actions" 1)
+                </tr>
+    #foreach($buildSpec in $project.buildSpecifications)
+                <tr>
+                    #dynamicCell($buildSpec.name)
+                    #actionCell("buildspec.trigger" "triggerBuild.action?id=$buildSpec.id&amp;projectId=$project.id" "lightning.gif")
+                </tr>
+    #end
+            </table>
+
             <table class="fill-content">
                 #headingRow("project.basics" 2)
+                #dynamicRow("project.name" $project.name)
             #if($project.description && $project.description.length() > 0)
                 #dynamicRow("project.description" $project.description)
             #end
             #if($project.url && $project.url.length() > 0)
-                #dynamicLinkRow("project.url" $project.url $project.url)
+                #dynamicLinkRow("project.url" "homepage" $project.url)
             #end
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
                 <tr>
@@ -64,66 +79,83 @@
                     </td>
                 </tr>
             </table>
-        </td>
-        <td class="columns"  width="45%">
-            <table id="project.buildspecs" class="fill-content">
-                #headingRow("project.buildspecs" 2)
+
+        </div>
+
+<!-- ********** Left column ********** -->
+
+        <div style="margin-right: 350px;">
+
+            <h2 class="section">#wwtext("name=current.build")</h2>
+
+        #if($currentBuild)
+            #showBuild($currentBuild true)
+        #else
+            <p>
+                #wwtext("name=never.built")
+            </p>
+        #end
+
+        #if($recentBuilds.size() > 0)
+            <h2 class="section">#wwtext("name=recent.builds")</h2>
+
+            <table class="content">
+                #headingRow("recent.builds" 9)
                 <tr>
-                    #contentHeading("buildspec.name" 1)
+                    #contentHeading("build.id" 1)
+                    #contentHeading("build.spec" 1)
+                    #contentHeading("build.status" 2)
+                    #contentHeading("build.tests" 1)
+                    #contentHeading("last.built" 1)
+                    #contentHeading("build.elapsed" 1)
+                    #contentHeading("actions" 2)
+                </tr>
+
+            #foreach($buildResult in $recentBuilds)
+                <tr>
+                    #set($buildResult = $latestBuilds.get($index))
+                    #set($cssClass = $buildResult.state.string)
+
+                    <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
+                    #classCell($buildResult.buildSpecification)
+                    #statusCell($buildResult)
+                    #testResultsCell($buildResult $buildResult)
+                    #classCell($buildResult.stamps.prettyStartTime)
+                    #classCell($buildResult.stamps.prettyElapsed)
+                    #viewCell($project $buildResult)
+                    #changesCell($project $buildResult)
+                </tr>
+            #end
+            </table>
+        #end
+
+            <h2 class="section">#wwtext("name=latest.changes")</h2>
+
+            <table class="content">
+                #headingRow("latest.changes" 5)
+                <tr>
+                    #contentHeading("change.revision" 1)
+                    #contentHeading("change.who" 1)
+                    #contentHeading("change.when" 1)
+                    #contentHeading("change.comment" 1)
                     #contentHeading("actions" 1)
                 </tr>
-    #foreach($buildSpec in $project.buildSpecifications)
+        #if($latestChanges.size() > 0)
+            #foreach($changelist in $latestChanges)
+                #set($index = $velocityCount - 1)
                 <tr>
-                    #dynamicCell($buildSpec.name)
-                    #actionCell("buildspec.trigger" "triggerBuild.action?id=$buildSpec.id&amp;projectId=$project.id" "lightning.gif")
+                    #rightCell($changelist.revision)
+                    #dynamicCell($changelist.user)
+                    #dynamicCell($changelist.prettyDate)
+                    #dynamicCell($action.trimmedString($changelist.comment, 60))
+                    #linkCell("view" "viewChangelist.action?id=$changelist.id")
                 </tr>
-    #end
+            #end
+        #else
+                <tr>
+                    <td class="content" colspan="8">#wwtext("name=no.changes")</td>
+                <tr>
+        #end
             </table>
+        </div>
 
-        </td></tr>
-    </table>
-
-    <h2 class="section">#wwtext("name=current.build")</h2>
-
-#if($currentBuild)
-    #showBuild($currentBuild true)
-#else
-    <p>
-        #wwtext("name=never.built")
-    </p>
-#end
-
-    <h2 class="section">#wwtext("name=latest.changes")</h2>
-
-    <table class="content">
-        #headingRow("latest.changes" 8)
-        <tr>
-            #contentHeading("build.id" 1)
-            #contentHeading("build.status" 2)
-            #contentHeading("change.revision" 1)
-            #contentHeading("change.who" 1)
-            #contentHeading("change.when" 1)
-            #contentHeading("change.comment" 1)
-            #contentHeading("actions" 1)
-        </tr>
-#if($latestChanges.size() > 0)
-    #foreach($changelist in $latestChanges)
-        #set($index = $velocityCount - 1)
-        #set($build = $changeBuilds.get($index))
-        #set($cssClass = $build.state.string)
-        <tr>
-            <td class="${cssClass}-right"><a href="viewBuild.action?id=$build.id">$build.number</td>
-            #statusCell($build)
-            #rightCell($changelist.revision)
-            #dynamicCell($changelist.user)
-            #dynamicCell($changelist.prettyDate)
-            #dynamicCell($action.trimmedString($changelist.comment, 60))
-            #linkCell("view" "viewChangelist.action?id=$changelist.id")
-        </tr>
-    #end
-#else
-        <tr>
-            <td class="content" colspan="8">#wwtext("name=no.changes")</td>
-        <tr>
-#end
-    </table>

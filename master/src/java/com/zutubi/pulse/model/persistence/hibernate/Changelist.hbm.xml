@@ -18,9 +18,15 @@
             <one-to-many class="com.zutubi.pulse.core.model.Change"/>
         </list>
 
-        <property name="projectId" type="long"/>
+        <bag name="projectIds" table="CHANGELIST_PROJECTS" lazy="false">
+            <key column="CHANGELIST_ID"/>
+            <element type="long" column="PROJECT_ID" not-null="true"/>
+        </bag>
 
-        <property name="resultId" type="long"/>
+        <bag name="resultIds" table="CHANGELIST_RESULTS" lazy="false">
+            <key column="CHANGELIST_ID"/>
+            <element type="long" column="RESULT_ID" not-null="true"/>
+        </bag>
     </class>
 
     <class name="com.zutubi.pulse.core.model.Change" table="CHANGE" lazy="false">
