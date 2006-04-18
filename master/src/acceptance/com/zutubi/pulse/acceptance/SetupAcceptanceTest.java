@@ -103,10 +103,14 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
 
         licenseForm.assertFormPresent();
 
+        // check that license is required.
+        licenseForm.nextFormElements("");
+        licenseForm.assertFormPresent();
+        licenseForm.assertFormElements("");
+        assertTextPresent("required");
+
         // check that license validation works.
         licenseForm.nextFormElements(INVALID_LICENSE_KEY);
-
-        // assert that we are still on the license page, with all of the correct details.
         licenseForm.assertFormPresent();
         licenseForm.assertFormElements(INVALID_LICENSE_KEY);
         assertTextPresent("invalid");

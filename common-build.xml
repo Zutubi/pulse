@@ -119,9 +119,13 @@
         <copy todir="${process.src.dir}" overwrite="true">
             <fileset dir="${src.dir}">
                 <include name="**/*.java"/>
+                <!-- contains license encoding details. -->
+                <exclude name="**/license/LicenseEncoder.java"/>
             </fileset>
             <fileset dir="${test.dir}">
                 <include name="**/*.java"/>
+                <!-- contains license details. -->
+                <exclude name="**/SetupAcceptanceTest.java"/>
             </fileset>
         </copy>
 

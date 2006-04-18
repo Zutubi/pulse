@@ -59,4 +59,10 @@ public class LicenseEncodeDecodeTest extends PulseTestCase
         License l = new License("dummy license", now.getTime());
         assertEquals(l, decoder.decode(encoder.encode(l)));
     }
+
+    public void testDecodeInvalidLength() throws LicenseException
+    {
+        LicenseDecoder decoder = new LicenseDecoder();
+        assertNull(decoder.decode("SADFA".getBytes()));
+    }
 }

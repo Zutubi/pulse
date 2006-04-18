@@ -36,8 +36,25 @@ public class LicenseDecoder
         // extract the data and the digital signature.
         byte[] data = Base64.decodeBase64(raw);
 
+        if (data.length < 4)
+        {
+            // there is not enough room for the length field at the start of the data. data is invalid.
+            return null;
+        }
+
         // read the first 4 bytes, which make up the length of the license data portion of the license.
         int length = ((0xff & data[0]) << 24) + ((0xff & data[1]) << 16) + ((0xff & data[2]) << 8) + (0xff & data[3]);
+        if (length < 0)
+        {
+            // invalid length.
+            return null;
+        }
+        
+        if (data.length < 4 + length)
+        {
+            // the reported data length more then the available data. data is invalid.
+            return null;
+        }
 
         byte[] licenseStr = new byte[length];
         System.arraycopy(data, 4, licenseStr, 0, licenseStr.length);
