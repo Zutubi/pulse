@@ -17,7 +17,10 @@
             #contentRowHeading("changelist.when")
             #dateCell($changelist)
         </tr>
-        #dynamicRow("changelist.comment" $changelist.comment)
+        <tr>
+            #contentRowHeading("changelist.comment")
+            #wrapCell($changelist.comment)
+        </tr>
     </table>
 
     <table class="content">

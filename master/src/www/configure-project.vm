@@ -17,7 +17,10 @@
                 <table id="project.basics" class="fill-content">
                     #aclEditHeadingRow("project.basics" 2 "editProject!input.action?id=$project.id" "project.basics.edit" "project")
                     #dynamicRow("project.name" $project.name)
-                    #dynamicRow("project.description" $project.description)
+                    <tr>
+                        #contentRowHeading("project.description")
+                        #wrapCell($project.description)
+                    </tr>
                     #dynamicLinkRow("project.url" $project.url $project.url)
                 </table>
 

@@ -409,6 +409,15 @@
     <th class="content-row">$!webwork.htmlEncode($content)</th>
 #end
 
+
+##
+## Outputs a cell for a content table with the given dynamic content, which
+## should be escaped and is allowed to wrap.
+##
+#macro(wrapCell $content)
+    <td class="content-wrap">$!webwork.htmlEncode($content)</td>
+#end
+
 ##
 ## Outputs a cell for a content table with the given dynamic content, which
 ## should be escaped, with a row span.
@@ -993,10 +1002,10 @@
         <ul>
         #foreach($feature in $fileArtifact.getFeatures($level))
             <li class="$level.toString().toLowerCase()">
-                <pre class="feature">$!webwork.htmlEncode($feature.summary)</pre>
+                $action.plainToHtml($feature.summary)
             #if($feature.isPlain())
                 <a class="unadorned" href="viewArtifact.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id#$feature.firstLine">
-                    <span class="small">#wwtext("name=jump.to")</span> <img src="/images/go_small.gif"/>
+                    <br/><span class="small">#wwtext("name=jump.to")</span> <img src="/images/go_small.gif"/>
                 </a>
             #end
             </li>
@@ -1021,7 +1030,7 @@
     </li>
         #else
     <li class="error"><b>$test.status.toString().toLowerCase()</b> :: #wwtext("name=test.case") $!webwork.htmlEncode($test.name)
-        <pre class="feature">$!webwork.htmlEncode($test.message)</pre>
+        $action.plainToHtml($test.message)
     </li>
          #end
     #end
@@ -1370,10 +1379,10 @@
         </td></tr>
     #if($buildResult.hasMessages($errorLevel) || $buildResult.hasMessages($warningLevel))
         <tr><td>
-            <table class="fill-content">
+            <table class="content">
                 #headingRow("build.features" 1)
                <tr>
-                   <td class="content">
+                   <td class="content-wrap">
                        #buildMessageSummary($buildResult $errorLevel)
                        #buildMessageSummary($buildResult $warningLevel)
                    </td>
@@ -1383,7 +1392,7 @@
     #end
     #if($buildResult.hasBrokenTests())
         <tr><td>
-            <table class="fill-content">
+            <table class="content">
                 #headingRow("test.failures" 5)
                 <tr>
                     #contentHeading("test.name" 1)
@@ -1595,8 +1604,8 @@
             #staticCell($action.getText("test.suite.details", ["$test.total", "$test.errors", "$test.failures"]))
         #else
             #if($test.message)
-            <td class="content-large">
-                <pre>$action.wrapString($!webwork.htmlEncode($test.message), 80)</pre>
+            <td class="content-wrap">
+                $action.plainToHtml($test.message)
             </td>
             #else
                 #contentCell("empty.cell")

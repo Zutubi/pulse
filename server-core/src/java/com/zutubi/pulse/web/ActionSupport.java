@@ -10,6 +10,8 @@ import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;
 import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
+import com.opensymphony.webwork.views.util.TextUtil;
+import com.opensymphony.util.TextUtils;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -106,5 +108,10 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     public String wrapString(String s, int lineLength)
     {
         return StringUtils.wrapString(s, lineLength, null);
+    }
+
+    public String plainToHtml(String s)
+    {
+        return TextUtils.plainTextToHtml(s);
     }
 }

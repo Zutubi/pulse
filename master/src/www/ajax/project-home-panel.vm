@@ -59,7 +59,10 @@
                 #headingRow("project.basics" 2)
                 #dynamicRow("project.name" $project.name)
             #if($project.description && $project.description.length() > 0)
-                #dynamicRow("project.description" $project.description)
+                <tr>
+                    #contentRowHeading("project.description")
+                    #wrapCell($project.description)
+                </tr>
             #end
             #if($project.url && $project.url.length() > 0)
                 #dynamicLinkRow("project.url" "homepage" $project.url)
@@ -84,7 +87,7 @@
 
 <!-- ********** Left column ********** -->
 
-        <div style="margin-right: 350px;">
+        <div style="margin-right: 330px;">
 
             <h2 class="section">#wwtext("name=current.build")</h2>
 

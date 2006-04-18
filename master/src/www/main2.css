@@ -272,7 +272,7 @@ table.fill-content {
     width: 98%;
 }
 
-h3.heading, div.box, th.heading, th.note, th.content, th.content-row, td.content, td.content-centre, td.content-right, td.content-large, td.image, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
+h3.heading, div.box, th.heading, th.note, th.content, th.content-row, td.content, td.content-wrap, td.content-centre, td.content-right, td.content-large, td.image, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
     border: 1px solid #bbb;
     padding: 4px;
 }
@@ -281,7 +281,7 @@ th {
     white-space: nowrap;
 }
 
-th.heading, th.note, th.content, th.content-row, td.content, td.content-large, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add {
+th.heading, th.note, th.content, th.content-row, td.content, td.content-wrap, td.content-large, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add {
     text-align: left;
     vertical-align: top;
 }
@@ -305,7 +305,6 @@ a img {
 }
 
 th.content-row {
-    width: 1px;
     white-space: nowrap;
 }
 
@@ -317,6 +316,14 @@ h3.heading, th.heading {
 .note {
     background: #ffffc0;
     white-space: nowrap;
+}
+
+td.content {
+    white-space: nowrap;
+}
+
+td.content-wrap {
+    white-space: normal;
 }
 
 td.success, td.success-right {
@@ -380,12 +387,13 @@ div.box {
 
 ul {
     list-style: none;
-    padding-left: 10px;
+    padding-left: 20px;
+    margin-left: 0px;
 }
 
 ul.error, ul.warning, ul.info {
-    padding: 5px;
-    margin-left: 20px;
+    /*padding: 5px;*/
+    /*margin-left: 20px;*/
     margin-top: 10px;
     margin-bottom: 10px;
     border: solid 1px;
@@ -410,11 +418,8 @@ li.error, li.warning, li.info, li.artifact, li.file-artifact, li.dir-artifact, l
     font-weight: normal;
     list-style: none;
     padding-left: 20px;
-    margin-top: 4px;
-    margin-bottom: 4px;
-}
-
-li.error, li.warning, li.info {
+    margin-top: 7px;
+    /*margin-bottom: 6px;*/
 }
 
 pre.feature {
@@ -475,29 +480,34 @@ a.dec {
     border: none;
 }
 
-td.num-none, td.num-error, td.num-warning, td.num-info, td.dec-none, td.dec-error, td.dec-warning, td.dec-info {
+#decorated td, #decorated th {
     font-family: monospace;
     white-space: nowrap;
     padding-left: 5px;
     padding-right: 5px;
 }
 
-td.num-none, td.num-error, td.num-warning, td.num-info {
+#decorated th {
+    font-weight: normal;
     text-align: right;
     vertical-align: top;
     border-right: solid 1px #bbb;
 }
 
-td.dec-error, td.num-error {
+#decorated .e {
     background-color: #ffdddd;
 }
 
-td.dec-warning, td.num-warning {
+#decorated .w {
     background-color: #fcfcce;
 }
 
-td.dec-info, td.num-info {
+#decorated .i {
     background-color: #eeeeff;
+}
+
+#decorated a, #decorated a:hover {
+    border-bottom: none;
 }
 
 td.okaybar {

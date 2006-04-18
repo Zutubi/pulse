@@ -6,6 +6,7 @@
         <pattern>/ajax/*</pattern>
         <pattern>/popups/*</pattern>
         <pattern>/view/*</pattern>
+        <pattern>/viewArtifact.action*</pattern>
     </excludes>
 
     <decorator name="main" page="main.vm">

@@ -16,10 +16,7 @@ import com.zutubi.pulse.model.persistence.SlaveDao;
 import com.zutubi.pulse.model.persistence.UserDao;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -562,6 +559,7 @@ public class SetupDummyBuilds implements Runnable
         result.addArtifact(createInfoArtifact("command output", "output.txt"));
         result.addArtifact(createWarningArtifact("warnings here", "this/file/is/nested/several/dirs/down"));
         result.addArtifact(createErrorArtifact(outputDir, "errors be here", "errors.txt"));
+        result.addArtifact(createLargeArtifact(outputDir, "large errors", "large.txt"));
         result.addArtifact(createSimpleArtifact("junit report", "tests/junit.html"));
         result.addArtifact(createMultifileArtifact(outputDir, "multi ball"));
         result.complete();
@@ -621,6 +619,37 @@ public class SetupDummyBuilds implements Runnable
             File dummy = new File(root, FileSystemUtils.composeFilename("master", "src", "test", "com", "zutubi", "pulse", "test", "dummyArtifactFile.txt"));
             File artifactFile = new File(dir, filename);
             IOUtils.copyFile(dummy, artifactFile);
+            findFeatures(file, artifactFile);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        return artifact;
+    }
+
+    private StoredArtifact createLargeArtifact(File outputDir, String name, String filename)
+    {
+        StoredArtifact artifact = createSimpleArtifact(name, filename);
+        StoredFileArtifact file = artifact.getFile();
+        File dir = new File(outputDir, name);
+        dir.mkdirs();
+
+        try
+        {
+            File root = PulseTestCase.getPulseRoot();
+            File artifactFile = new File(dir, filename);
+            FileWriter writer = new FileWriter(artifactFile);
+            for(int i = 0; i < 30000; i++)
+            {
+                if(Math.random() < 0.002)
+                {
+                    writer.write("Error: ");
+                }
+                writer.write("this is a test artficact with lines that are of a reasonable length and a large number, thus allowing us to test waht happens when we decorate it\n");
+            }
+            writer.close();
             findFeatures(file, artifactFile);
         }
         catch (IOException e)
