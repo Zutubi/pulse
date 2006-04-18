@@ -61,7 +61,15 @@ public class DashboardAction extends ActionSupport
             return ERROR;
         }
 
-        projects = projectManager.getAllProjects();
+        if(user.getShowAllProjects())
+        {
+            projects = projectManager.getAllProjects();
+        }
+        else
+        {
+            projects = userManager.getDashboardProjects(user);
+        }
+        
         Collections.sort(projects, new ProjectNameComparator());
         latestBuilds = new LinkedList<BuildResult>();
 

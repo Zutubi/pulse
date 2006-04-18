@@ -43,4 +43,13 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
     int getUserCount();
 
     void save(ContactPoint contact);
+
+    /**
+     * Returns a list of projects configured by the user to show on their
+     * dashboard.
+     *
+     * @param user user to get the projects for
+     * @return the user's projects
+     */
+    List<Project> getDashboardProjects(User user);
 }

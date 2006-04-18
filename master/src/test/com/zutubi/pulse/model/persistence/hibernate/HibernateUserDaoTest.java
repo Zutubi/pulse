@@ -5,9 +5,12 @@ package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.model.EmailContactPoint;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.model.persistence.ProjectDao;
 
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  * @noinspection FieldCanBeLocal
@@ -15,11 +18,13 @@ import java.util.List;
 public class HibernateUserDaoTest extends MasterPersistenceTestCase
 {
     private UserDao userDao;
+    private ProjectDao projectDao;
 
     public void setUp() throws Exception
     {
         super.setUp();
         userDao = (UserDao) context.getBean("userDao");
+        projectDao = (ProjectDao) context.getBean("projectDao");
     }
 
     public void tearDown() throws Exception
@@ -88,6 +93,30 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         assertTrue(user.hasAlias("rhonda"));
     }
 
+    public void testProjects()
+    {
+        List<Project> projects = new LinkedList<Project>();
+        Project p1 = new Project("1", "project 1");
+        Project p2 = new Project("2", "project 2");
+        projectDao.save(p1);
+        projectDao.save(p2);
+        projects.add(p1);
+        projects.add(p2);
+
+        User user = new User();
+        user.setShowAllProjects(true);
+        user.setProjects(projects);
+        userDao.save(user);
+        commitAndRefreshTransaction();
+
+        user = userDao.findById(user.getId());
+        assertTrue(user.getShowAllProjects());
+
+        List<Project> otherProjects = userDao.getProjects(user);
+        assertEquals(2, otherProjects.size());
+        assertEquals("1", otherProjects.get(0).getName());
+        assertEquals("2", otherProjects.get(1).getName());
+    }
 /*
     public void testGrantedAuthorities()
     {

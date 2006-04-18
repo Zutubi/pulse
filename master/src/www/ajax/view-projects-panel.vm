@@ -1,1 +1,1 @@
-#recentBuilds($projects true)
+#recentBuilds($projects true false false false)

@@ -40,6 +40,11 @@ public class DefaultUserManager implements UserManager
         contactDao.save(contact);
     }
 
+    public List<Project> getDashboardProjects(User user)
+    {
+        return userDao.getProjects(user);
+    }
+
     public User getUser(String login)
     {
         return userDao.findByLogin(login);

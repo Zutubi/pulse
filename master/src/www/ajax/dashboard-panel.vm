@@ -1,4 +1,4 @@
-    #recentBuilds($projects false)
+    #recentBuilds($projects false "configure.dashboard.projects" "/user/configureDashboardProjects!input.action" "pencil.gif")
 
     <table class="content">
         #headingRow("my.changes" 4)

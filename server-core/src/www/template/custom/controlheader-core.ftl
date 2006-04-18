@@ -26,6 +26,8 @@
         class="error-${labelClass}"<#t/>
 <#else>
         class="${labelClass}"<#t/>
+</#if> <#if parameters.labelposition?default("") == 'top'>
+        style="text-align: left"<#t/>
 </#if>
     ><#t/>
 <#if parameters.label?exists>
@@ -46,3 +48,7 @@
     </label>:<#t/>
 </#if>
     </th><#lt/>
+<#if parameters.labelposition?default("") == 'top'>
+</tr>
+<tr>
+</#if>

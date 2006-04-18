@@ -52,6 +52,14 @@ public class User extends Entity implements UserDetails
      * user disables refreshing.
      */
     private int refreshInterval = 60;
+    /**
+     * If true, show all projects on the user's dashboard.
+     */
+    private boolean showAllProjects = true;
+    /**
+     * List of projects the user wants to display on their dashboard.
+     */
+    private List<Project> projects = new LinkedList<Project>();
 
     private List<GrantedAuthority> authorities;
 
@@ -329,4 +337,33 @@ public class User extends Entity implements UserDetails
         return aliases.contains(alias);
     }
 
+    public boolean getShowAllProjects()
+    {
+        return showAllProjects;
+    }
+
+    public void setShowAllProjects(boolean showAllProjects)
+    {
+        this.showAllProjects = showAllProjects;
+    }
+
+    public List<Project> getProjects()
+    {
+        return projects;
+    }
+
+    public void setProjects(List<Project> projects)
+    {
+        this.projects = projects;
+    }
+
+    public void addProject(Project p)
+    {
+        projects.add(p);
+    }
+
+    public void clearProjects()
+    {
+        projects = new LinkedList<Project>();
+    }
 }

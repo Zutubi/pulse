@@ -1434,9 +1434,9 @@
 ##
 ## Shows a list of recent builds for the given list of projects
 ##
-#macro(recentBuilds $projects $showAdd)
+#macro(recentBuilds $projects $showAdd $actionKey $url $image)
     <table class="content">
-        #headingRow("latest.builds" 10)
+        #actionHeadingRow("latest.builds" 10 $actionKey $url $image "recent.builds")
         <tr>
             #contentHeading("project.name" 1)
             #contentHeading("build.id" 1)

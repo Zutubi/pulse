@@ -35,6 +35,13 @@
             <key column="USER_ID"/>
             <element type="string" column="ALIAS" not-null="true"/>
         </bag>
+
+        <property name="showAllProjects" type="boolean"/>
+
+        <bag name="projects" lazy="true">
+            <key column="USER_ID"/>
+            <one-to-many class="com.zutubi.pulse.model.Project"/>
+        </bag>
     </class>
 
     <class name="com.zutubi.pulse.model.GrantedAuthority" table="AUTHORITIES" lazy="false">

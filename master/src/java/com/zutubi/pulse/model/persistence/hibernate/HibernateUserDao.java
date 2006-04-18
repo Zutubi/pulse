@@ -4,6 +4,7 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.UserDao;
 import org.hibernate.*;
 import org.hibernate.criterion.Projections;
@@ -77,5 +78,22 @@ public class HibernateUserDao extends HibernateEntityDao<User> implements UserDa
                 return criteria.uniqueResult();
             }
         });
+    }
+
+    public List<Project> getProjects(final User user)
+    {
+        User u = (User) getHibernateTemplate().execute(new HibernateCallback(){
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from User user left join fetch user.projects where user.id = :id");
+                queryObject.setParameter("id", user.getId());
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.uniqueResult();
+            }
+        });
+
+        return u.getProjects();
     }
 }

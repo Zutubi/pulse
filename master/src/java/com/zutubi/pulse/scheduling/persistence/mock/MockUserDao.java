@@ -4,6 +4,7 @@
 package com.zutubi.pulse.scheduling.persistence.mock;
 
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.UserDao;
 
 import java.util.List;
@@ -32,5 +33,10 @@ public class MockUserDao extends MockEntityDao<User> implements UserDao
     public int getUserCount()
     {
         return findAll().size();
+    }
+
+    public List<Project> getProjects(User user)
+    {
+        throw new RuntimeException("Method not implemented.");
     }
 }
