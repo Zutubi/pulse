@@ -569,11 +569,11 @@
 ## Shared by date cell macros
 ##
 #macro(dateCellContent $entity $date $time)
-    <span id="${entity.id}_time">$time</span>
-    <span id="${entity.id}_date" style="display: none">$date</span>
     <a href="#" class="unadorned" title="$date" onclick="toggleDisplay('${entity.id}_time'); toggleDisplay('${entity.id}_date'); return false;">
         <img src="images/calendar.gif"/>
     </a>
+    <span id="${entity.id}_time">$time</span>
+    <span id="${entity.id}_date" style="display: none">$date</span>
 #end
 
 ##

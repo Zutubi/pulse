@@ -76,7 +76,7 @@ public class FileLoaderTest extends FileLoaderTestBase
         Property property = new Property("base.dir", "/whatever");
         properties.add(property);
 
-        loader.load(getInput("testSampleProject"), bf, properties);
+        loader.load(getInput("testSampleProject"), bf, properties, null);
     }
 
     public void testDependency() throws Exception
@@ -262,8 +262,7 @@ public class FileLoaderTest extends FileLoaderTestBase
     public void testSpecificRecipe() throws PulseException
     {
         PulseFile bf = new PulseFile();
-        loader.setPredicate(new RecipeLoadPredicate(bf, "default"));
-        loader.load(getInput("testSpecificRecipe"), bf);
+        loader.load(getInput("testSpecificRecipe"), bf, null, new RecipeLoadPredicate(bf, "default"));
         assertEquals(2, bf.getRecipes().size());
         assertNotNull(bf.getRecipe("default"));
         assertNotNull(bf.getRecipe("default").getCommand("build"));
@@ -273,8 +272,7 @@ public class FileLoaderTest extends FileLoaderTestBase
     public void testSpecificRecipeDefault() throws PulseException
     {
         PulseFile bf = new PulseFile();
-        loader.setPredicate(new RecipeLoadPredicate(bf, null));
-        loader.load(getInput("testSpecificRecipe"), bf);
+        loader.load(getInput("testSpecificRecipe"), bf, null, new RecipeLoadPredicate(bf, null));
         assertEquals(2, bf.getRecipes().size());
         assertNotNull(bf.getRecipe("default"));
         assertNotNull(bf.getRecipe("default").getCommand("build"));
@@ -286,8 +284,7 @@ public class FileLoaderTest extends FileLoaderTestBase
         try
         {
             PulseFile bf = new PulseFile();
-            loader.setPredicate(new RecipeLoadPredicate(bf, "don't load!"));
-            loader.load(getInput("testSpecificRecipe"), bf);
+            loader.load(getInput("testSpecificRecipe"), bf, null, new RecipeLoadPredicate(bf, "don't load!"));
             fail();
         }
         catch (PulseException e)

@@ -14,7 +14,11 @@
     #wwhidden("name=projectId")
 
     #wwtextfield("name=spec.name" "label=%{getText('spec.name')}" "required=true"  "tabindex=1")
+#if($recipes.size() > 1)
+    #wwcombobox("name=recipe" "list=recipes" "label=%{getText('recipe')}" "tabindex=2")
+#else
     #wwtextfield("name=recipe" "label=%{getText('recipe')}" "tabindex=2")
+#end
     #inlineHelp("spec.recipe.help")
     #wwcheckbox("name=timeoutEnabled" "label=%{getText('enable.timeout')}" "fieldValue=true" "onclick=setEnableState('spec.edit_timeout', 'spec.edit_timeoutEnabled')" "tabindex=3")
     #set($minutes = $action.getText('spec.timeout.minutes'))

@@ -4,33 +4,23 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
+
+import java.util.List;
+import java.util.LinkedList;
+import java.io.ByteArrayInputStream;
 
 /**
  */
-public class CreateBuildSpecificationAction extends ProjectActionSupport
+public class CreateBuildSpecificationAction extends BuildSpecificationActionSupport
 {
-    private long projectId;
-    private Project project;
     private BuildSpecification spec = new BuildSpecification();
     private String recipe;
     private int timeout = 60;
     private boolean timeoutEnabled = false;
-
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
-    }
-
-    public Project getProject()
-    {
-        return project;
-    }
 
     public BuildSpecification getSpec()
     {
@@ -75,6 +65,8 @@ public class CreateBuildSpecificationAction extends ProjectActionSupport
     public String doInput()
     {
         project = getProjectManager().getProject(projectId);
+        populateRecipes();
+
         return INPUT;
     }
 
@@ -123,5 +115,10 @@ public class CreateBuildSpecificationAction extends ProjectActionSupport
         project.addBuildSpecification(spec);
         getProjectManager().save(project);
         return SUCCESS;
+    }
+
+    public void setResourceRepository(ResourceRepository resourceRepository)
+    {
+        this.resourceRepository = resourceRepository;
     }
 }

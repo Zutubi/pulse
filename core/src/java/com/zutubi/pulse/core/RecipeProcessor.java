@@ -44,23 +44,7 @@ public class RecipeProcessor
     {
         if (fileLoader == null)
         {
-            fileLoader = new FileLoader();
-            fileLoader.register("property", Property.class);
-            fileLoader.register("recipe", Recipe.class);
-            fileLoader.register("def", ComponentDefinition.class);
-            fileLoader.register("post-processor", PostProcessorGroup.class);
-            fileLoader.register("command", CommandGroup.class);
-            fileLoader.register("ant.pp", AntPostProcessor.class);
-            fileLoader.register("junit.pp", JUnitReportPostProcessor.class);
-            fileLoader.register("make.pp", MakePostProcessor.class);
-            fileLoader.register("regex.pp", RegexPostProcessor.class);
-            fileLoader.register("ant", AntCommand.class);
-            fileLoader.register("maven", MavenCommand.class);
-            fileLoader.register("executable", ExecutableCommand.class);
-            fileLoader.register("make", MakeCommand.class);
-            fileLoader.register("resource", ResourceReference.class);
-            fileLoader.setObjectFactory(new ObjectFactory());
-            fileLoader.setResourceRepository(resourceRepository);
+            fileLoader = new PulseFileLoader(new ObjectFactory(), resourceRepository);
         }
     }
 
@@ -220,8 +204,7 @@ public class RecipeProcessor
 
             stream = new ByteArrayInputStream(pulseFileSource.getBytes());
             PulseFile result = new PulseFile();
-            fileLoader.setPredicate(new RecipeLoadPredicate(result, recipeName));
-            fileLoader.load(stream, result, properties);
+            fileLoader.load(stream, result, properties, new RecipeLoadPredicate(result, recipeName));
             return result;
         }
         catch (Exception e)

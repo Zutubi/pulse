@@ -14,10 +14,9 @@ import java.util.List;
 
 /**
  */
-public class EditBuildSpecificationAction extends ProjectActionSupport implements Preparable
+public class EditBuildSpecificationAction extends BuildSpecificationActionSupport implements Preparable
 {
     private long id;
-    private long projectId;
     private Project project;
     private BuildSpecification spec;
     private BuildSpecificationDao buildSpecificationDao;
@@ -34,26 +33,6 @@ public class EditBuildSpecificationAction extends ProjectActionSupport implement
     public long getId()
     {
         return this.id;
-    }
-
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
-    }
-
-    public Project getProject()
-    {
-        if (project == null)
-        {
-            project = getProjectManager().getProject(projectId);
-        }
-
-        return project;
     }
 
     public String getRecipe()
@@ -152,7 +131,8 @@ public class EditBuildSpecificationAction extends ProjectActionSupport implement
         }
 
         recipe = spec.getRoot().getChildren().get(0).getStage().getRecipe();
-
+        populateRecipes();
+        
         timeoutEnabled = spec.getTimeout() != BuildSpecification.TIMEOUT_NEVER;
         if (timeoutEnabled)
         {
