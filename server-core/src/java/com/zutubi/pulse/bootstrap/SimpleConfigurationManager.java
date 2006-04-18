@@ -42,7 +42,7 @@ public class SimpleConfigurationManager implements ConfigurationManager
 
     public UserPaths getUserPaths()
     {
-        File pulseHome = getPulseHome();
+        File pulseHome = getHomeDirectory();
         if (pulseHome != null)
         {
             return new Home(pulseHome);
@@ -50,9 +50,19 @@ public class SimpleConfigurationManager implements ConfigurationManager
         return null;
     }
 
-    public File getPulseHome()
+    public File getHomeDirectory()
     {
         return getHomeConfig().getHomeDirectory();
+    }
+
+    public File getInstallDirectory()
+    {
+        if (System.getProperties().containsKey(PULSE_INSTALL))
+        {
+            return new File(System.getProperty(PULSE_INSTALL));
+        }
+        // this is expected in a dev environment.
+        return null;
     }
 
     public Home getHome()
@@ -118,7 +128,7 @@ public class SimpleConfigurationManager implements ConfigurationManager
                 throw new StartupException("Property '" + PULSE_INSTALL + "' does not refer to a " +
                         "directory ('" + pulseInstall + ")");
             }
-            // initialise applicationPaths based on pulse.home.
+            // initialise applicationPaths based on pulse.install.
             systemPaths = new DefaultSystemPaths(pulseRoot);
         }
         return systemPaths;

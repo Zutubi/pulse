@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
+import java.io.File;
 
 /**
  *
@@ -34,6 +35,7 @@ public class SystemInfoAction extends ActionSupport
 
     private DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
     private DateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss z");
+    private Home home;
 
     public void setStartupManager(StartupManager startupManager)
     {
@@ -62,7 +64,7 @@ public class SystemInfoAction extends ActionSupport
 
         props.put("os.name", systemProperties.getProperty("os.name") + " " + systemProperties.getProperty("os.version"));
 
-        Home home = configurationManager.getHome();
+        home = configurationManager.getHome();
         license = home.getLicense();
         version = home.getVersion();
 
@@ -111,6 +113,20 @@ public class SystemInfoAction extends ActionSupport
     public Version getVersion()
     {
         return version;
+    }
+
+    /**
+     * Get the configured home directory.
+     *
+     */
+    public File getHomeDir()
+    {
+        return configurationManager.getHomeDirectory();
+    }
+
+    public File getInstallDir()
+    {
+        return configurationManager.getInstallDirectory();
     }
 
     /**

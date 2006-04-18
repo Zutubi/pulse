@@ -63,6 +63,11 @@
                     #dynamicRow("version.versionNumber.field" $version.versionNumber)
                     #dynamicRow("version.buildNumber.field" $version.buildNumber)
                 </table>
+                <table class="fill-content" id="pulse.info">
+                    #headingRow("pulse.info" 2)
+                    #dynamicRow("pulse.installDir.field" $installDir)
+                    #dynamicRow("pulse.homeDir.field" $homeDir)
+                </table>
                 <table class="fill-content" id="license.info">
                     #headingRow("license.info" 2)
                     #dynamicRow("license.holder.field" $license.holder)

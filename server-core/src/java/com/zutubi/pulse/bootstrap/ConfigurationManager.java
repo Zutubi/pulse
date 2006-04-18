@@ -23,7 +23,7 @@ public interface ConfigurationManager
 
     void setPulseHome(File pulseHome);
 
-    File getPulseHome();
+    File getHomeDirectory();
 
     Home getHome();
 
@@ -33,4 +33,6 @@ public interface ConfigurationManager
      * @return true if further configuration is required.
      */
     boolean requiresSetup();
+
+    File getInstallDirectory();
 }
