@@ -3,13 +3,18 @@
  ********************************************************************************/
 package com.zutubi.pulse.web.console;
 
+import com.zutubi.pulse.Version;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.Home;
 import com.zutubi.pulse.bootstrap.StartupManager;
+import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
@@ -20,18 +25,24 @@ import java.util.Properties;
  */
 public class SystemInfoAction extends ActionSupport
 {
-    private Runtime runtime = Runtime.getRuntime();
-
     private Properties props;
+    private License license;
+    private Version version;
 
     private StartupManager startupManager;
+    private ConfigurationManager configurationManager;
 
     private DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
-    private DateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
+    private DateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss z");
 
     public void setStartupManager(StartupManager startupManager)
     {
         this.startupManager = startupManager;
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 
     /**
@@ -45,20 +56,61 @@ public class SystemInfoAction extends ActionSupport
         props.putAll(systemProperties);
         props.put("system.date", dateFormatter.format(new Date()));
         props.put("system.time", timeFormatter.format(new Date()));
+
         // record the time when the system startup
         props.put("system.uptime", formatUptime(startupManager.getUptime()));
 
         props.put("os.name", systemProperties.getProperty("os.name") + " " + systemProperties.getProperty("os.version"));
 
+        Home home = configurationManager.getHome();
+        license = home.getLicense();
+        version = home.getVersion();
+
         return SUCCESS;
     }
 
     /**
+     * Retrieve a set of runtime properties.
      *
      */
     public Map getProperties()
     {
         return props;
+    }
+
+    /**
+     * Retrieve the currently installed license.
+     *
+     * @return license
+     */
+    public License getLicense()
+    {
+        return license;
+    }
+
+    public String getExpiryDate()
+    {
+        if (license.expires())
+        {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(license.getExpiryDate());
+            cal.set(Calendar.HOUR, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            return dateFormatter.format(cal.getTime());
+        }
+        return "Never";
+    }
+
+    /**
+     * Retrieve the current home version.
+     *
+     * @return version
+     */
+    public Version getVersion()
+    {
+        return version;
     }
 
     /**
@@ -69,7 +121,7 @@ public class SystemInfoAction extends ActionSupport
      */
     public long getTotalMemory()
     {
-        return runtime.totalMemory() / Constants.MEGABYTE;
+        return Runtime.getRuntime().totalMemory() / Constants.MEGABYTE;
     }
 
     /**
@@ -79,7 +131,7 @@ public class SystemInfoAction extends ActionSupport
      */
     public long getFreeMemory()
     {
-        return runtime.freeMemory() / Constants.MEGABYTE;
+        return Runtime.getRuntime().freeMemory() / Constants.MEGABYTE;
     }
 
     /**

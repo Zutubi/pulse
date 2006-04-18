@@ -12,7 +12,11 @@
 #set ($propertiesMap = $action.getProperties())
 #set ($properties = ["system.date", "system.time", "system.uptime", "java.version", "java.vendor", "java.vm.name", "java.runtime.name", "user.name", "user.timezone", "os.name"])
 
-    <table class="content">
+    <table class="columns" width="90%">
+        <tr>
+            <td class="columns" width="40%">
+
+    <table class="fill-content">
         #headingRow("system.info" 2)
 #foreach ($key in $properties)
         #dynamicRow($action.getText($key) $propertiesMap.get($key))
@@ -51,6 +55,21 @@
             </table>
         </td>
     </tr>
+    </table>
+            </td>
+            <td class="columns" width="40%">
+                <table class="fill-content" id="version.info">
+                    #headingRow("version.info" 2)
+                    #dynamicRow("version.versionNumber.field" $version.versionNumber)
+                    #dynamicRow("version.buildNumber.field" $version.buildNumber)
+                </table>
+                <table class="fill-content" id="license.info">
+                    #headingRow("license.info" 2)
+                    #dynamicRow("license.holder.field" $license.holder)
+                    #dynamicRow("license.expiry.field" $expiryDate)
+                </table>
+            </td>
+        </tr>
     </table>
 
 </html>

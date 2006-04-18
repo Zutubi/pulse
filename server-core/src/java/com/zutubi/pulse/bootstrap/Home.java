@@ -4,6 +4,9 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseDecoder;
+import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -39,6 +42,7 @@ public class Home implements UserPaths
 
     private Properties config = null;
     private String licenseKey;
+    private License license;
 
     protected Home(File homeDir)
     {
@@ -131,6 +135,29 @@ public class Home implements UserPaths
             licenseKey = getConfig().getProperty("license.key");
         }
         return licenseKey;
+    }
+
+    public License getLicense()
+    {
+        if (license == null)
+        {
+            try
+            {
+                LicenseDecoder decoder = new LicenseDecoder();
+                license = decoder.decode(getLicenseKey().getBytes());
+            }
+            catch (LicenseException e)
+            {
+                LOG.severe("Failed to decode the license.", e);
+                return null;
+            }
+            catch (IOException e)
+            {
+                LOG.severe("Failed to retrieve the license key.", e);
+                return null;
+            }
+        }
+        return license;
     }
 
     /**
