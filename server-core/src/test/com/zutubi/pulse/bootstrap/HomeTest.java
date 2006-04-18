@@ -65,7 +65,7 @@ public class HomeTest extends PulseTestCase
         home.init();
 
         Version v = Version.getVersion();
-        Version homeVersion = home.getHomeVersion();
+        Version homeVersion = home.getVersion();
         assertEquals(v.getBuildNumber(), homeVersion.getBuildNumber());
         assertEquals(v.getVersionNumber(), homeVersion.getVersionNumber());
     }

@@ -10,7 +10,7 @@ import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
 
 /**
  * A setup test that covers the systems setup procedure.
- *
+ * <p/>
  * This setup test is a little awkward since we can only run it once. Once done, the
  * server is setup and will not take kindly to us trying to set it up again. So, rather than
  * having multiple test methods, there is one testSetupProcess method that is breaks up the setup
@@ -18,6 +18,22 @@ import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
  */
 public class SetupAcceptanceTest extends BaseAcceptanceTest
 {
+    private static final String VALID_LICENSE_KEY =
+            "AAAAaXNvbWUgY29tcGFueSBhbmQgc29tZSBvdGhlciBkYXRhIHRoYXQgd2ls\n" +
+                    "bCBjb21lIGZyb20gb3RoZXIgZmllbGRzIGluIHRoZSBmdXR1cmUuCjIwMDYt\n" +
+                    "MDQtMTggMTA6Mjc6MTUgRVNUCk+U6cAyFORQLoB7r+IDKasLJjamRU7YMYjm\n" +
+                    "sIT2VU3Mz5ZY67+fAc5o35/TjNnrWEqkhdja36DdMx5+0ADEAMh/UvE8E2hk\n" +
+                    "icA0MLr3lR3etbPQKn3PYFLhSM6C3CSXU5V9a9uclezgQIkxP+/eoJdOYeAy\n" +
+                    "Qn/Zs7NGNWH+TB79";
+
+    private static final String INVALID_LICENSE_KEY =
+            "AAAAaXNvbWUgY29tcGFueSBhbmQgc29tZSBvdGhlciBkYXRhIHRoYXQgd2ls\n" +
+                    "bCBjb21lIGZyb20gb3RoZXIgZmllbGRzIgluIHRoZSBmdXR1cmUuCjIwMDYt\n" +
+                    "MDQtMTggMTA6Mjc6MTUgRVNUCk+U6cAyaORQLoB7r+IDKasLJjamRU7YMYjm\n" +
+                    "sIT2VU3Mz5ZY67+fAc5o35/TjNnrWEqkhdha36DdMx5+0ADEAMh/UvE8E2hk\n" +
+                    "icA0MLr3lR3etbPQKn3PYFLhSM6C3CSXU5V9a9uclezgQIkxP+/eoJdOYeAy\n" +
+                    "Qn/Zs7NGNWH+TB79";
+
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -88,15 +104,16 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         licenseForm.assertFormPresent();
 
         // check that license validation works.
-        licenseForm.nextFormElements("this is an invalid license string...");
+        licenseForm.nextFormElements(INVALID_LICENSE_KEY);
 
         // assert that we are still on the license page, with all of the correct details.
         licenseForm.assertFormPresent();
-        licenseForm.assertFormElements("this is an invalid license string...");
+        licenseForm.assertFormElements(INVALID_LICENSE_KEY);
         assertTextPresent("invalid");
 
         // enter a valid license.
-        licenseForm.nextFormElements("this is a valid license string...");
+        licenseForm.nextFormElements(VALID_LICENSE_KEY);
+        licenseForm.assertFormNotPresent();
     }
 
     private void checkCreateAdmin()

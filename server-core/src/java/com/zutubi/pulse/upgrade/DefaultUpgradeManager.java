@@ -141,7 +141,7 @@ public class DefaultUpgradeManager implements UpgradeManager
     {
         checkHome(home);
 
-        Version from = home.getHomeVersion();
+        Version from = home.getVersion();
         Version to = Version.getVersion();
 
         return isUpgradeRequired(from, to);
@@ -161,7 +161,7 @@ public class DefaultUpgradeManager implements UpgradeManager
         // ensure that
         // a) upgrade is not in progress.
 
-        Version from = home.getHomeVersion();
+        Version from = home.getVersion();
         Version to = Version.getVersion();
 
         List<UpgradeTask> tasks = determineRequiredUpgradeTasks(from, to);

@@ -15,17 +15,24 @@ import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
 import com.zutubi.pulse.web.wizard.WizardCompleteState;
+import com.zutubi.pulse.license.LicenseDecoder;
+import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.io.IOException;
 
 /**
  * <class-comment/>
  */
 public class SetupWizard extends BaseWizard
 {
+    private static final Logger LOG = Logger.getLogger(SetupWizard.class);
+
     private LicenseState licenseState;
     private CreateAdminState createAdminState;
     private ServerSettingsState serverSettingsState;
@@ -52,13 +59,25 @@ public class SetupWizard extends BaseWizard
         super.process();
 
         // record the license details.
-
+        String licenseKey = licenseState.getLicense();
+        licenseKey = licenseKey.replaceAll("\n", "");
+        try
+        {
+            configurationManager.getHome().updateLicenseKey(licenseKey);
+        }
+        catch (IOException e)
+        {
+            addActionError(e.getMessage());
+            LOG.severe(e.getMessage(), e);
+            return;
+        }
 
         // create the admin user.
         User admin = createAdminState.getAdmin();
         admin.setEnabled(true);
         admin.add(GrantedAuthority.USER);
         admin.add(GrantedAuthority.ADMINISTRATOR);
+
         // Send the admin to a welcome page by default
         admin.setDefaultAction(DefaultAction.WELCOME_ACTION);
         userManager.save(admin);
@@ -81,7 +100,8 @@ public class SetupWizard extends BaseWizard
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            addActionError(e.getMessage());
+            LOG.severe(e.getMessage(), e);
         }
     }
 
@@ -141,9 +161,20 @@ public class SetupWizard extends BaseWizard
 
         public void validate()
         {
-            if (license.contains("invalid"))
+            // take the license string, strip out any '\n' chars and check it.
+            String licenseKey = license.replaceAll("\n", "");
+            LicenseDecoder decoder = new LicenseDecoder();
+            try
             {
-                addFieldError("license", getTextProvider().getText("license.invalid"));
+                License l = decoder.decode(licenseKey.getBytes());
+                if (l == null)
+                {
+                    addFieldError("license", getTextProvider().getText("license.invalid"));
+                }
+            }
+            catch (LicenseException e)
+            {
+                addFieldError("license", getTextProvider().getText("license.decode.error"));
             }
         }
     }
@@ -292,7 +323,7 @@ public class SetupWizard extends BaseWizard
         }
 
         public void validate()
-        {            
+        {
             if (TextUtils.stringSet(smtpHost) && !TextUtils.stringSet(fromAddress))
             {
                 addFieldError("fromAddress", "from address is required when smtp host is provided");

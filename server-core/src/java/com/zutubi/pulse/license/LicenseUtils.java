@@ -1,11 +1,13 @@
 package com.zutubi.pulse.license;
 
+import java.util.Calendar;
+
 /**
  * <class-comment/>
  */
 public class LicenseUtils
 {
-    private static final int WIDTH = 80;
+    private static final int WIDTH = 60;
 
     public static String print(byte[] b)
     {
@@ -31,5 +33,17 @@ public class LicenseUtils
             buffer.append("\n");
         }
         return buffer.toString();
+    }
+
+    public static void printEncodedLicense(License l) throws LicenseException
+    {
+        LicenseEncoder encoder = new LicenseEncoder();
+        System.out.println(print(encoder.encode(l)));
+    }
+
+    public static void main(String argv[]) throws LicenseException
+    {
+        License l = new License("some company and some other data that will come from other fields in the future.", Calendar.getInstance().getTime());
+        printEncodedLicense(l);
     }
 }

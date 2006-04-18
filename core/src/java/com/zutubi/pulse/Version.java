@@ -90,6 +90,11 @@ public class Version implements Comparable
     public static Version load(InputStream in) throws IOException
     {
         Properties properties = IOUtils.read(in);
+        return read(properties);
+    }
+
+    public static Version read(Properties properties)
+    {
         return new Version(properties.getProperty(VERSION_NUMBER),
                 properties.getProperty(BUILD_DATE),
                 properties.getProperty(BUILD_NUMBER)
@@ -106,10 +111,19 @@ public class Version implements Comparable
     public void write(OutputStream out) throws IOException
     {
         Properties props = new Properties();
+        write(props);
+        props.store(out, null);
+    }
+
+    /**
+     * Write this version object to the specified properties object.
+     * @param props
+     */
+    public void write(Properties props)
+    {
         props.setProperty(VERSION_NUMBER, getVersionNumber());
         props.setProperty(BUILD_DATE, getBuildDate());
         props.setProperty(BUILD_NUMBER, getBuildNumber());
-        props.store(out, null);
     }
 
     /**

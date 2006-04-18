@@ -46,7 +46,7 @@ public class UpgradePreviewAction extends UpgradeActionSupport
     public String execute()
     {
         targetHome = configurationManager.getHome();
-        targetVersion = targetHome.getHomeVersion();
+        targetVersion = targetHome.getVersion();
 
         upgradeManager.prepareUpgrade(targetHome);
 
