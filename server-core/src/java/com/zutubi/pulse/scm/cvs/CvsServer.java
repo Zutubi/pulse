@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.Map;
 
 /**
  * The Cvs Server provides all interactions with a cvs repository.
@@ -50,6 +51,14 @@ public class CvsServer extends CachingSCMServer
     public CvsServer(Cvs cvs)
     {
         this(cvs.getRoot(), cvs.getModule(), cvs.getPassword(), cvs.getBranch());
+    }
+
+    public Map<String, String> getServerInfo() throws SCMException
+    {
+        Map<String, String> info = new TreeMap<String, String>();
+        info.put("location", getLocation());
+        info.put("version", cvs.getServerVersion());
+        return info;
     }
 
     public String getLocation()

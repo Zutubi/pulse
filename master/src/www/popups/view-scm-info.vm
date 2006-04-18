@@ -1,0 +1,18 @@
+<html>
+<head>
+    <title>#wwtext("name=scm.info")</title>
+    <link href="/main2.css" rel="stylesheet" type="text/css" media="screen"/>
+</head>
+<body>
+    <div class="content" style="margin-top: 20px">
+        #parse("template/includes/actionerrors.vm")
+
+        <table class="content">
+            #headingRow("scm.info" 2)
+#foreach($property in $info.entrySet())
+            #propertyRow($property)
+#end
+        </table>
+    </div>
+</body>
+</html>

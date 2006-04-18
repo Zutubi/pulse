@@ -10,6 +10,7 @@ import com.zutubi.pulse.filesystem.remote.RemoteFile;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An interface for interaction with SCM servers.
@@ -18,6 +19,13 @@ import java.util.List;
  */
 public interface SCMServer
 {
+    /**
+     * Returns information about the server, as name-value pairs.
+     *
+     * @return a set of name-value pairs giving information about the server
+     */
+    Map<String, String> getServerInfo() throws SCMException;
+
     /**
      * Returns a summarised form of the location of the source this SCM has
      * been configured to check out.  For example, an subversion URL.

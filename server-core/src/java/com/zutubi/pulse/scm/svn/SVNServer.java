@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * A connection to a subversion server.
@@ -200,6 +201,15 @@ public class SVNServer implements SCMServer
     //=======================================================================
     // SCMServer interface
     //=======================================================================
+
+    public Map<String, String> getServerInfo() throws SCMException
+    {
+        // Unfortunately we can't find out much about the server, we just
+        // know where it is
+        Map<String, String> info = new TreeMap<String, String>();
+        info.put("location", location.toString());
+        return info;
+    }
 
     public String getLocation()
     {

@@ -18,7 +18,7 @@ body {
     padding: 0;
     margin: 0;
     border-bottom: 1px solid #99a;
-    font-size: 14;
+    font-size: 14px;
 }
 
 #header table {
@@ -60,7 +60,7 @@ body {
     border-top: 1px solid #ccd;
     border-bottom: 2px solid #99a;
     background: #aac /*url(../img/nav-bg-blue.gif) repeat-x top left*/;
-    font-size: 14;
+    font-size: 14px;
 }
 
 #nav li {
@@ -93,7 +93,7 @@ body {
     padding: 0 1%;
     list-style: none;
     border-bottom: 1px solid #bbb;
-    font-size: 14;
+    font-size: 14px;
 }
 
 #innernav li {
@@ -131,7 +131,7 @@ body {
     border-style: solid;
     color: #c0c0c0;
     font-size: 80%;
-    padding: 1;
+    padding: 1px;
     text-align: center;
     bottom: 0;
     width: 100%;
@@ -305,7 +305,7 @@ a img {
 }
 
 th.content-row {
-    width: 1;
+    width: 1px;
     white-space: nowrap;
 }
 

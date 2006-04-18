@@ -48,7 +48,10 @@
 #acl("domainObject=project" "hasPermission=4,1")
                     <tr>
                         #contentRowHeading("actions")
-                        #linkCell("scm.browse" "browseProjectScm.action?id=$project.id")
+                        <td class="content">
+                            <a href="#" onclick="window.open('/popups/viewScmInfo.action?id=$project.id', 'scm info', 'status=yes,resizable=yes,top=100,left=100,width=600,height=400,scrollbars=yes'); return false;">#wwtext("name=scm.info")</a>
+                            | <a href="browseProjectScm.action?id=$project.id">#wwtext("name=scm.browse")</a>
+                        </td>
                     </tr>
 #end
                 </table>

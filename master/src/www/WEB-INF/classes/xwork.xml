@@ -867,10 +867,16 @@
     <package name="popups" namespace="/popups" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
+        <action name="viewScmInfo" class="com.zutubi.pulse.web.project.ViewScmInfoAction">
+            <result name="success" type="velocity">view-scm-info.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
         <action name="browseScm" class="com.zutubi.pulse.web.project.BrowseScmAction">
             <result name="dir" type="velocity">browse-scm-dir.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
+
     </package>
 
 </xwork>

@@ -17,10 +17,7 @@ import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +37,7 @@ public class P4Server extends CachingSCMServer
     private static final String COMMAND_DIRS = "dirs";
     private static final String COMMAND_DESCRIBE = "describe";
     private static final String COMMAND_FILES = "files";
+    private static final String COMMAND_INFO = "info";
     private static final String COMMAND_SYNC = "sync";
     private static final String COMMAND_WHERE = "where";
     private static final String FLAG_CLIENT = "-c";
@@ -792,6 +790,24 @@ public class P4Server extends CachingSCMServer
         }
 
         setEnv(ENV_CLIENT, client);
+    }
+
+    public Map<String, String> getServerInfo() throws SCMException
+    {
+        Map<String, String> info = new TreeMap<String, String>();
+        P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_INFO);
+        String [] lines = lineSplitterPattern.split(result.stdout);
+
+        for(String line: lines)
+        {
+            int index = line.indexOf(':');
+            if(index > 0 && index < line.length() - 1)
+            {
+                info.put(line.substring(0, index).trim(), line.substring(index + 1).trim());
+            }
+        }
+
+        return info;
     }
 
     public String getLocation()
