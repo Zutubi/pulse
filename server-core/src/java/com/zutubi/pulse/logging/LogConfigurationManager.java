@@ -6,6 +6,8 @@ package com.zutubi.pulse.logging;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import com.opensymphony.webwork.dispatcher.VelocityResult;
+import com.opensymphony.webwork.dispatcher.DispatcherUtils;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -13,6 +15,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Enumeration;
 import java.util.logging.LogManager;
+import java.util.logging.Filter;
+import java.util.logging.LogRecord;
 
 /**
  * The Log Configuration Manager handles the systems logging configuration.
@@ -26,6 +30,11 @@ public class LogConfigurationManager
     public void init()
     {
         updateConfiguration(configurationManager.getAppConfig().getLogConfig());
+
+        Logger l = Logger.getLogger(VelocityResult.class.getName());
+        l.setFilter(new BlockingFilter());
+        l = Logger.getLogger(DispatcherUtils.class.getName());
+        l.setFilter(new BlockingFilter());
     }
 
     public List<String> getAvailableConfigurations()
@@ -105,5 +114,13 @@ public class LogConfigurationManager
         this.configurationManager = configurationManager;
         File configDirectory = this.configurationManager.getSystemPaths().getConfigRoot();
         logConfigDir = new File(configDirectory, "logging");
+    }
+
+    private static class BlockingFilter implements Filter
+    {
+        public boolean isLoggable(LogRecord record)
+        {
+            return false;
+        }
     }
 }

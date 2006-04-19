@@ -9,9 +9,9 @@
 
     #projectTabs("configuration")
 
-    <table class="columns" width="90%">
+    <table class="columns" width="98%">
         <tr>
-            <td class="columns" width="40%">
+            <td class="columns" width="50%">
 
             <!-- Project basics -->
                 <table id="project.basics" class="fill-content">
@@ -90,7 +90,7 @@
 
             <!-- ********** Right hand column ********** -->
 
-            <td class="columns" width="40%">
+            <td class="columns" width="50%">
 
             <!-- Build specifications -->
 

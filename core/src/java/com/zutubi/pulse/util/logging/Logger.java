@@ -4,6 +4,7 @@
 package com.zutubi.pulse.util.logging;
 
 import java.util.logging.Level;
+import java.util.logging.Filter;
 
 /**
  * Simple wrapper around the java.util.logging.Logger to provide some utility methods.
@@ -257,4 +258,8 @@ public class Logger
         // OK as we are only committed to making a "best effort" here.
     }
 
+    public void setFilter(Filter filter)
+    {
+        delegate.setFilter(filter);
+    }
 }
