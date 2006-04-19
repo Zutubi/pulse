@@ -7,9 +7,9 @@
 <body>
     <h1>:: #wwtext("name=add.project") ::</h1>
 
-    #parse("template/includes/pulse-file-reference.vm")
 
-    <div style="margin-right: 350px;">
+<table class="columns">
+    <tr><td class="columns" width="100%">
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -21,7 +21,11 @@
     #previousFinishCancel(2)
  #end
 
-     </div>
+    </td><td class="columns">
 
+        #parse("template/includes/pulse-file-reference.vm")
+
+    </td></tr>
+</table>
 </body>
 </html>

@@ -1,5 +1,5 @@
-<div style="float: right; width=340px;" id="reference">
-    <table class="content">
+<div id="reference">
+    <table class="fill-content">
         #headingRow("pulse.file.reference" 1)
         <td class="content">
             <ul>

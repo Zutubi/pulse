@@ -157,6 +157,7 @@
             <interceptor-stack name="ajaxStack">
                 <interceptor-ref name="completeStack"/>
                 <interceptor-ref name="ajax"/>
+                <interceptor-ref name="errorHanding"/>
             </interceptor-stack>
         </interceptors>
 

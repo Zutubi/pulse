@@ -7,9 +7,8 @@
 <body>
     <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
 
-    #parse("template/includes/pulse-file-reference.vm")
-    
-    <div style="margin-right: 350px;">
+<table class="columns">
+    <tr><td class="columns" width="100%">
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -17,10 +16,15 @@
     #wwhidden("name=id")
     #wwhidden("name=projectId")
 
-    #wwtextarea("name=details.pulseFile" "labelposition=top" "cssStyle=width: 98%" "label=%{getText('pulse.file')}" "required=true" "rows=30" "cols=" "tabindex=1")
+    #wwtextarea("name=details.pulseFile" "labelposition=top" "cssStyle=width: 98%" "label=%{getText('pulse.file')}" "required=true" "rows=30" "cols=80" "tabindex=1")
     #saveCancel(2)
  #end
 
-     </div>
+    </td><td class="columns">
+        
+        #parse("template/includes/pulse-file-reference.vm")
+
+    </td></tr>
+</table>
 </body>
 </html>

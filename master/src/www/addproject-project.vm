@@ -7,8 +7,27 @@
 <body>
     <h1>:: #wwtext("name=add.project") ::</h1>
 
-    <div style="float: right; width: 340px">
-        <table class="content">
+    <table class="columns">
+        <tr><td class="columns">
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=addProject.action" "id=project.basics" "width=100%" "heading=%{getText('project.basics')}" "method=post")
+    #wwhidden("name=state")
+    #wwhidden("name=submit")
+
+    #wwtextfield("name=name" "label=%{getText('project.name')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=description" "label=%{getText('project.description')}" "size=50" "tabindex=2" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=url" "label=%{getText('project.url')}" "size=50" "tabindex=4" "onkeypress=return submitenter(this,event)")
+    #wwselect("name=scm" "label=%{getText('scm')}" "list=scms" "required=true" "tabindex=5" "onkeypress=return submitenter(this,event)")
+    #wwselect("name=type" "label=%{getText('project.type')}" "list=types" "required=true" "tabindex=6" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("project.type.help")
+    #nextCancel(7)
+#end
+
+    </td><td class="columns">
+
+        <table class="fill-content">
             #headingRow("project.types" 2)
             <tr>
                 #contentRowHeading("project.type.ant")
@@ -31,26 +50,8 @@
                 #staticWrapCell("project.type.versioned.description")
             </tr>
         </table>
-    </div>
 
-    <div style="margin-right: 350px">
-
-    #parse("/template/includes/actionerrors.vm")
-
-#wwcform("action=addProject.action" "id=project.basics" "width=100%" "heading=%{getText('project.basics')}" "method=post")
-    #wwhidden("name=state")
-    #wwhidden("name=submit")
-
-    #wwtextfield("name=name" "label=%{getText('project.name')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
-    #wwtextfield("name=description" "label=%{getText('project.description')}" "size=40" "tabindex=2" "onkeypress=return submitenter(this,event)")
-    #wwtextfield("name=url" "label=%{getText('project.url')}" "size=40" "tabindex=4" "onkeypress=return submitenter(this,event)")
-    #wwselect("name=scm" "label=%{getText('scm')}" "list=scms" "required=true" "tabindex=5" "onkeypress=return submitenter(this,event)")
-    #wwselect("name=type" "label=%{getText('project.type')}" "list=types" "required=true" "tabindex=6" "onkeypress=return submitenter(this,event)")
-    #inlineHelp("project.type.help")
-    #nextCancel(7)
-#end
-
-    </div>
-
+    </td></tr>
+</table>
 </body>
 </html>
