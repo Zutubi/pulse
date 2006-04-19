@@ -1,4 +1,88 @@
-        <div style="float: right; width: 310px">
+<table>
+    <tr>
+
+<!-- ********** Left column ********** -->
+
+        <td class="columns" width="100%">
+
+            <h2 class="section">#wwtext("name=current.build")</h2>
+
+        #if($currentBuild)
+            #showBuild($currentBuild true)
+        #else
+            <p>
+                #wwtext("name=never.built")
+            </p>
+        #end
+
+        #if($recentBuilds.size() > 0)
+            <h2 class="section">#wwtext("name=recent.builds")</h2>
+
+            <table class="content">
+                #headingRow("recent.builds" 9)
+                <tr>
+                    #contentHeading("build.id" 1)
+                    #contentHeading("build.spec" 1)
+                    #contentHeading("build.status" 2)
+                    #contentHeading("build.tests" 1)
+                    #contentHeading("build.when" 1)
+                    #contentHeading("build.elapsed" 1)
+                    #contentHeading("actions" 2)
+                </tr>
+
+            #foreach($buildResult in $recentBuilds)
+                <tr>
+                    #set($buildResult = $latestBuilds.get($index))
+                    #set($cssClass = $buildResult.state.string)
+
+                    <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
+                    #classCell($buildResult.buildSpecification)
+                    #statusCell($buildResult)
+                    #testResultsCell($buildResult $buildResult)
+                    #dateClassCell($buildResult)
+                    #classCell($buildResult.stamps.prettyElapsed)
+                    #viewCell($project $buildResult)
+                    #changesCell($project $buildResult)
+                </tr>
+            #end
+            </table>
+        #end
+
+            <h2 class="section">#wwtext("name=latest.changes")</h2>
+
+            <table class="content">
+                #headingRow("latest.changes" 5)
+                <tr>
+                    #contentHeading("change.revision" 1)
+                    #contentHeading("change.who" 1)
+                    #contentHeading("change.when" 1)
+                    #contentHeading("change.comment" 1)
+                    #contentHeading("actions" 1)
+                </tr>
+        #if($latestChanges.size() > 0)
+            #foreach($changelist in $latestChanges)
+                #set($index = $velocityCount - 1)
+                <tr>
+                    #rightCell($changelist.revision)
+                    #dynamicCell($changelist.user)
+                    #dateCell($changelist)
+                    #dynamicCell($action.trimmedString($changelist.comment, 60))
+                    #linkCell("view" "viewChangelist.action?id=$changelist.id")
+                </tr>
+            #end
+        #else
+                <tr>
+                    <td class="content" colspan="8">#wwtext("name=no.changes")</td>
+                <tr>
+        #end
+            </table>
+
+        </td>
+
+<!-- ********** Right column ********** -->
+
+        <td class="columns" width="400px" style="padding-left: 20px;">
+
             <table class="fill-content">
                 #headingRow("project.status" 2)
                 <tr>
@@ -83,82 +167,6 @@
                 </tr>
             </table>
 
-        </div>
-
-<!-- ********** Left column ********** -->
-
-        <div style="margin-right: 330px;">
-
-            <h2 class="section">#wwtext("name=current.build")</h2>
-
-        #if($currentBuild)
-            #showBuild($currentBuild true)
-        #else
-            <p>
-                #wwtext("name=never.built")
-            </p>
-        #end
-
-        #if($recentBuilds.size() > 0)
-            <h2 class="section">#wwtext("name=recent.builds")</h2>
-
-            <table class="content">
-                #headingRow("recent.builds" 9)
-                <tr>
-                    #contentHeading("build.id" 1)
-                    #contentHeading("build.spec" 1)
-                    #contentHeading("build.status" 2)
-                    #contentHeading("build.tests" 1)
-                    #contentHeading("build.when" 1)
-                    #contentHeading("build.elapsed" 1)
-                    #contentHeading("actions" 2)
-                </tr>
-
-            #foreach($buildResult in $recentBuilds)
-                <tr>
-                    #set($buildResult = $latestBuilds.get($index))
-                    #set($cssClass = $buildResult.state.string)
-
-                    <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
-                    #classCell($buildResult.buildSpecification)
-                    #statusCell($buildResult)
-                    #testResultsCell($buildResult $buildResult)
-                    #dateClassCell($buildResult)
-                    #classCell($buildResult.stamps.prettyElapsed)
-                    #viewCell($project $buildResult)
-                    #changesCell($project $buildResult)
-                </tr>
-            #end
-            </table>
-        #end
-
-            <h2 class="section">#wwtext("name=latest.changes")</h2>
-
-            <table class="content">
-                #headingRow("latest.changes" 5)
-                <tr>
-                    #contentHeading("change.revision" 1)
-                    #contentHeading("change.who" 1)
-                    #contentHeading("change.when" 1)
-                    #contentHeading("change.comment" 1)
-                    #contentHeading("actions" 1)
-                </tr>
-        #if($latestChanges.size() > 0)
-            #foreach($changelist in $latestChanges)
-                #set($index = $velocityCount - 1)
-                <tr>
-                    #rightCell($changelist.revision)
-                    #dynamicCell($changelist.user)
-                    #dateCell($changelist)
-                    #dynamicCell($action.trimmedString($changelist.comment, 60))
-                    #linkCell("view" "viewChangelist.action?id=$changelist.id")
-                </tr>
-            #end
-        #else
-                <tr>
-                    <td class="content" colspan="8">#wwtext("name=no.changes")</td>
-                <tr>
-        #end
-            </table>
-        </div>
-
+        </td>
+    </tr>
+</table>
