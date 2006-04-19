@@ -77,6 +77,7 @@ public class LicenseDecoder
         try
         {
             LineNumberReader reader = new LineNumberReader(new StringReader(data));
+            String name = reader.readLine();
             String holder = reader.readLine();
             String expiryString = reader.readLine();
             Date expiryDate = null;
@@ -84,7 +85,7 @@ public class LicenseDecoder
             {
                 expiryDate = DATE_FORMAT.parse(expiryString);
             }
-            return new License(holder, expiryDate);
+            return new License(name, holder, expiryDate);
         }
         catch (IOException e)
         {

@@ -7,6 +7,7 @@ import com.zutubi.pulse.acceptance.forms.setup.CreateAdminForm;
 import com.zutubi.pulse.acceptance.forms.setup.ServerSettingsForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseHomeForm;
 import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
+import com.zutubi.pulse.test.LicenseHelper;
 
 /**
  * A setup test that covers the systems setup procedure.
@@ -18,25 +19,21 @@ import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
  */
 public class SetupAcceptanceTest extends BaseAcceptanceTest
 {
-    public static final String VALID_LICENSE_KEY =
-            "AAAAaXNvbWUgY29tcGFueSBhbmQgc29tZSBvdGhlciBkYXRhIHRoYXQgd2ls\n" +
-                    "bCBjb21lIGZyb20gb3RoZXIgZmllbGRzIGluIHRoZSBmdXR1cmUuCjIwMDYt\n" +
-                    "MDQtMTggMTA6Mjc6MTUgRVNUCk+U6cAyFORQLoB7r+IDKasLJjamRU7YMYjm\n" +
-                    "sIT2VU3Mz5ZY67+fAc5o35/TjNnrWEqkhdja36DdMx5+0ADEAMh/UvE8E2hk\n" +
-                    "icA0MLr3lR3etbPQKn3PYFLhSM6C3CSXU5V9a9uclezgQIkxP+/eoJdOYeAy\n" +
-                    "Qn/Zs7NGNWH+TB79";
+    public String licenseKey;
 
     public static final String INVALID_LICENSE_KEY =
-            "AAAAaXNvbWUgY29tcGFueSBhbmQgc29tZSBvdGhlciBkYXRhIHRoYXQgd2ls\n" +
-                    "bCBjb21lIGZyb20gb3RoZXIgZmllbGRzIgluIHRoZSBmdXR1cmUuCjIwMDYt\n" +
-                    "MDQtMTggMTA6Mjc6MTUgRVNUCk+U6cAyaORQLoB7r+IDKasLJjamRU7YMYjm\n" +
-                    "sIT2VU3Mz5ZY67+fAc5o35/TjNnrWEqkhdha36DdMx5+0ADEAMh/UvE8E2hk\n" +
-                    "icA0MLr3lR3etbPQKn3PYFLhSM6C3CSXU5V9a9uclezgQIkxP+/eoJdOYeAy\n" +
-                    "Qn/Zs7NGNWH+TB79";
+            "AAAAaXNvbUgY29tcGFueSBhbmQgc29tZSBvdGhlciBkYXRhIHRoYXQgd2ls\n" +
+                    "bBjb21lIGZyb20gb3RoZXIgZmllbGRzIgluIHRoZSBmdXR1cmUuCjIwMDYt\n" +
+                    "MQtMTggMTA6Mjc6MTUgRVNUCk+U6cAyaORQLoB7r+IDKasLJjamRU7YMYjm\n" +
+                    "sT2VU3Mz5ZY67+fAc5o35/TjNnrWEqkhdha36DdMx5+0ADEAMh/UvE8E2hk\n" +
+                    "iA0MLr3lR3etbPQKn3PYFLhSM6C3CSXU5V9a9uclezgQIkxP+/eoJdOYeAy\n" +
+                    "Q/Zs7NGNWH+TB79";
 
     protected void setUp() throws Exception
     {
         super.setUp();
+
+        licenseKey = LicenseHelper.newLicenseKey("dummy", "S. O. MeBody", null);
     }
 
     protected void tearDown() throws Exception
@@ -116,7 +113,7 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         assertTextPresent("invalid");
 
         // enter a valid license.
-        licenseForm.nextFormElements(VALID_LICENSE_KEY);
+        licenseForm.nextFormElements(licenseKey);
         licenseForm.assertFormNotPresent();
     }
 

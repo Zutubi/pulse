@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 /**
  * <class-comment/>
  */
-public class LicenseEncoder
+public class LicenseEncoder implements LicenseKeyFactory
 {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
@@ -64,6 +64,7 @@ public class LicenseEncoder
     private String toString(License license)
     {
         StringBuffer buffer = new StringBuffer();
+        buffer.append(license.getName()).append("\n");
         buffer.append(license.getHolder()).append("\n");
         if (license.expires())
         {

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.license;
 
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.RandomUtils;
 
 import java.util.Calendar;
 
@@ -39,14 +40,13 @@ public class LicenseEncodeDecodeTest extends PulseTestCase
 
     public void testSimpleLicenseEncoding() throws Exception
     {
-        License l = new License("dummy", null);
+        License l = new License("dummy", "S. O MeBody", null);
         assertEquals(l, decoder.decode(encoder.encode(l)));
     }
 
     public void testLongLicenseEncoding() throws LicenseException
     {
-        License l = new License("this is a dummy holder that is more then 128 chars in length to ensure that " +
-                "setting of the data length at the end of the data encoding is handled correctly.", null);
+        License l = new License("dummy", RandomUtils.randomString(128), null);
         assertEquals(l, decoder.decode(encoder.encode(l)));
     }
 
@@ -56,7 +56,7 @@ public class LicenseEncodeDecodeTest extends PulseTestCase
         Calendar now = Calendar.getInstance();
         now.set(Calendar.MILLISECOND, 0);
 
-        License l = new License("dummy license", now.getTime());
+        License l = new License("dummy", "S. O. MeBody", now.getTime());
         assertEquals(l, decoder.decode(encoder.encode(l)));
     }
 

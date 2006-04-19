@@ -41,7 +41,7 @@ public class LicenseUtils
 
     public static void main(String argv[]) throws LicenseException
     {
-        License l = new License("dummy license b", null);
+        License l = new License("dummy", "S. O. MeBody", null);
         printEncodedLicense(l);
     }
 }

@@ -14,11 +14,13 @@ import java.util.Calendar;
  */
 public class License
 {
+    private String name;
     private String holder;
     private Date expiryDate;
 
-    License(String holder, Date expiry)
+    public License(String name, String holder, Date expiry)
     {
+        this.name = name;
         this.holder = holder;
         this.expiryDate = expiry;
     }
@@ -43,6 +45,16 @@ public class License
         return expiryDate;
     }
 
+    /**
+     * Get the name of this license. For example, evaluation.
+     *
+     * @return the name string
+     */
+    public String getName()
+    {
+        return name;
+    }
+
     public boolean equals(Object o)
     {
         if (!(o instanceof License))
@@ -52,7 +64,8 @@ public class License
         License other = (License) o;
 
         return ObjectUtils.equals(holder, other.holder) &&
-                ObjectUtils.equals(expiryDate, other.expiryDate);
+                ObjectUtils.equals(expiryDate, other.expiryDate) &&
+                ObjectUtils.equals(name, other.name);
     }
 
 

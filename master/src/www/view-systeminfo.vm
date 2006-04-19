@@ -70,6 +70,7 @@
                 </table>
                 <table class="fill-content" id="license.info">
                     #restrictedHeadingRow("license.info" 2 "ROLE_ADMINISTRATOR" "edit" "/admin/editLicense!input.action" "pencil.gif" "license.edit")
+                    #dynamicRow("license.name.field" $license.name)
                     #dynamicRow("license.holder.field" $license.holder)
                     #dynamicRow("license.expiry.field" $expiryDate)
                 </table>
