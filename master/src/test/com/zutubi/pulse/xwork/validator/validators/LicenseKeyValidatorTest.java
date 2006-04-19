@@ -1,7 +1,6 @@
 package com.zutubi.pulse.xwork.validator.validators;
 
 import com.opensymphony.xwork.validator.FieldValidator;
-import com.zutubi.pulse.acceptance.SetupAcceptanceTest;
 import com.zutubi.pulse.test.LicenseHelper;
 
 import java.util.Arrays;
@@ -49,7 +48,8 @@ public class LicenseKeyValidatorTest extends FieldValidatorTestBase
 
     public void testInvalidLicenseString() throws Exception
     {
-        validator.validate(new FieldProvider(SetupAcceptanceTest.INVALID_LICENSE_KEY));
+        String key = LicenseHelper.newLicenseKey("dummy", "dummy", null);
+        validator.validate(new FieldProvider(key.substring(2)));
         assertTrue(validationAware.hasErrors());
         assertEquals(Arrays.asList("license.key.invalid"), validationAware.getFieldErrors().get("field"));
     }

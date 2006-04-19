@@ -54,11 +54,8 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
     public void testLicenseDetails()
     {
         assertTablePresent("license.info");
-
-        // need some more validation here... need to ensure that it
-        // handles that the installed license could be one of multiple
-        // licenses used in testing.
-
+        // this is a little difficult since we dont know exactly what the
+        // details of the installed license are...
     }
 
     public void testUpdateLicense()
@@ -119,7 +116,12 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
         // set a new license string.
         form.saveFormElements(expiredLicenseKey);
         form.assertFormPresent();
-        
+
         assertTextPresent("expired");
+    }
+
+    public void testEditLicenseLinkOnlyAvailableToAdmin()
+    {
+
     }
 }

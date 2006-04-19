@@ -108,6 +108,7 @@
         <javac srcdir="${accept.dir}" destdir="${accept.classes.dir}" debug="true">
             <classpath refid="lib.path"/>
             <classpath location="${classes.dir}"/>
+            <classpath location="${test.classes.dir}"/>
         </javac>
 
         <copy todir="${accept.classes.dir}" overwrite="true">
