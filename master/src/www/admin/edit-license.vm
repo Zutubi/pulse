@@ -1,0 +1,19 @@
+#authorisationTags($principle)
+<content tag="selectedTab">server</content>
+<html>
+<head>
+    <title>#wwtext("name=license.edit")</title>
+</head>
+
+<body>
+    <h1>:: #wwtext("name=license.edit") ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editLicense!save.action" "heading=%{getText('license.edit')}" "method=post" "id=license.edit")
+    #wwtextarea("name=license" "labelCssClass=textarea" "label=%{getText('license.key.field')}" "required=true" "rows=10" "cols=65" "tabindex=1")
+    #saveCancel("2")
+#end
+
+</body>
+</html>

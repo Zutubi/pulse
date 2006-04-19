@@ -13,4 +13,5 @@
     <validator name="cronexpression" class="com.zutubi.pulse.xwork.validator.validators.CronExpressionValidator"/>
     <validator name="integral" class="com.zutubi.pulse.xwork.validator.validators.IntegralValidator"/>
     <validator name="name" class="com.zutubi.pulse.xwork.validator.validators.NameValidator"/>
+    <validator name="licensekey" class="com.zutubi.pulse.xwork.validator.validators.LicenseKeyValidator"/>
 </validators>

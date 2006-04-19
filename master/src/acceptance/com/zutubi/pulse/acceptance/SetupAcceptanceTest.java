@@ -18,7 +18,7 @@ import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
  */
 public class SetupAcceptanceTest extends BaseAcceptanceTest
 {
-    private static final String VALID_LICENSE_KEY =
+    public static final String VALID_LICENSE_KEY =
             "AAAAaXNvbWUgY29tcGFueSBhbmQgc29tZSBvdGhlciBkYXRhIHRoYXQgd2ls\n" +
                     "bCBjb21lIGZyb20gb3RoZXIgZmllbGRzIGluIHRoZSBmdXR1cmUuCjIwMDYt\n" +
                     "MDQtMTggMTA6Mjc6MTUgRVNUCk+U6cAyFORQLoB7r+IDKasLJjamRU7YMYjm\n" +
@@ -26,7 +26,7 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
                     "icA0MLr3lR3etbPQKn3PYFLhSM6C3CSXU5V9a9uclezgQIkxP+/eoJdOYeAy\n" +
                     "Qn/Zs7NGNWH+TB79";
 
-    private static final String INVALID_LICENSE_KEY =
+    public static final String INVALID_LICENSE_KEY =
             "AAAAaXNvbWUgY29tcGFueSBhbmQgc29tZSBvdGhlciBkYXRhIHRoYXQgd2ls\n" +
                     "bCBjb21lIGZyb20gb3RoZXIgZmllbGRzIgluIHRoZSBmdXR1cmUuCjIwMDYt\n" +
                     "MDQtMTggMTA6Mjc6MTUgRVNUCk+U6cAyaORQLoB7r+IDKasLJjamRU7YMYjm\n" +

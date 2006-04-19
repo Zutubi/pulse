@@ -735,18 +735,6 @@
             <result name="success" type="redirect">viewUsers.action</result>
         </action>
 
-        <!--
-                <action name="findUsers!default" class="com.opensymphony.xwork.ActionSupport">
-                    <interceptor-ref name="defaultStack"/>
-                    <result name="success" type="velocity">find-user.vm</result>
-                </action>
-
-                <action name="findUsers" class="com.zutubiuser.FindUsersAction">
-                    <result name="input" type="velocity">find-user.vm</result>
-                    <result name="success" type="velocity">find-user.vm</result>
-                </action>
-        -->
-
         <action name="smtp" class="com.zutubi.pulse.web.admin.SmtpConfigurationAction">
             <interceptor-ref name="defaultStack"/>
             <result name="error" type="velocity">configure-smtpconfig.vm</result>
@@ -839,6 +827,13 @@
         <action name="deleteProperty" class="com.zutubi.pulse.web.admin.DeletePropertyAction">
             <result name="error" type="velocity">/generic-error.vm</result>
             <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+        </action>
+
+        <action name="editLicense" class="com.zutubi.pulse.web.admin.ManageLicenseAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="input" type="velocity">edit-license.vm</result>
+            <result name="success" type="redirect">/viewSystemInfo.action</result>
+            <result name="cancel" type="redirect">/viewSystemInfo.action</result>
         </action>
 
     </package>

@@ -142,4 +142,9 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
     {
         return "edit_" + name;
     }
+
+    public boolean textInResponse(String text)
+    {
+        return tester.getDialog().isTextInResponse(text);
+    }
 }

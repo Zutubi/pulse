@@ -69,7 +69,7 @@
                     #dynamicRow("pulse.homeDir.field" $homeDir)
                 </table>
                 <table class="fill-content" id="license.info">
-                    #headingRow("license.info" 2)
+                    #restrictedHeadingRow("license.info" 2 "ROLE_ADMINISTRATOR" "edit" "/admin/editLicense!input.action" "pencil.gif" "license.edit")
                     #dynamicRow("license.holder.field" $license.holder)
                     #dynamicRow("license.expiry.field" $expiryDate)
                 </table>
