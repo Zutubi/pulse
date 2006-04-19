@@ -60,9 +60,9 @@ public class RssAcceptanceTest extends BaseAcceptanceTest
         clickLinkWithText("add new project");
 
         String projectName = "project " + RandomUtils.randomString(5);
-        submitProjectBasicsForm(projectName, "test project description", "http://test.project.com", "cvs", "custom");
+        submitProjectBasicsForm(projectName, "test project description", "http://test.project.com", "cvs", "versioned");
         submitCvsSetupForm(":pserver:tester@test.project.com:/cvsroot", "module", "", "");
-        submitCustomSetupForm("pulse.xml");
+        submitVersionedSetupForm("pulse.xml");
         assertTablePresent("project.basics");
         return projectName;
     }

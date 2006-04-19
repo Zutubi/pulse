@@ -63,6 +63,15 @@ public abstract class AbstractEditDetailsAction extends ProjectActionSupport imp
         return PREPARE_PARAMS;
     }
 
+    public void validate()
+    {
+        project = getProjectManager().getProject(projectId);
+        if(project == null)
+        {
+            addActionError("Unknown project [" + projectId + "]");
+        }
+    }
+
     public String doInput() throws Exception
     {
         prepare();

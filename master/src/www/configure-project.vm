@@ -33,10 +33,10 @@
                     #propertyRow($property)
 #end
 #acl("domainObject=project" "hasPermission=4,1")
-    #if(!$project.pulseFileDetails.type.equals("custom"))
+    #if(!$project.pulseFileDetails.type.equals("versioned"))
                     <tr>
                         #contentRowHeading("actions")
-                        #linkCell("convert.to.custom" "convertToCustomProject!input.action?id=$project.id")
+                        #linkCell("convert.to.versioned" "convertToVersionedProject!input.action?id=$project.id")
                     </tr>
     #end
 #end

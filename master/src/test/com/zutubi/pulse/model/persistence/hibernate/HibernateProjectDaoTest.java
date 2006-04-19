@@ -80,14 +80,14 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         assertEquals(rule, otherRule);
     }
 
-    public void testLoadSaveCustomPulseFileSource()
+    public void testLoadSaveVersionedPulseFileSource()
     {
-        CustomPulseFileDetails details = new CustomPulseFileDetails("hello");
+        VersionedPulseFileDetails details = new VersionedPulseFileDetails("hello");
 
         projectDao.save(details);
         commitAndRefreshTransaction();
 
-        CustomPulseFileDetails otherDetails = projectDao.findCustomPulseFileSource(details.getId());
+        VersionedPulseFileDetails otherDetails = projectDao.findVersionedPulseFileDetails(details.getId());
         assertPropertyEquals(details, otherDetails);
     }
 

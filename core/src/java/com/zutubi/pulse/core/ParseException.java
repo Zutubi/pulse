@@ -9,6 +9,9 @@ package com.zutubi.pulse.core;
  */
 public class ParseException extends PulseException
 {
+    private int line;
+    private int column;
+
     /**
      * @param errorMessage
      */
@@ -42,4 +45,20 @@ public class ParseException extends PulseException
         super(errorMessage, cause);
     }
 
+    public ParseException(int line, int column, String message)
+    {
+        super(message);
+        this.line = line;
+        this.column = column;
+    }
+
+    public int getLine()
+    {
+        return line;
+    }
+
+    public int getColumn()
+    {
+        return column;
+    }
 }

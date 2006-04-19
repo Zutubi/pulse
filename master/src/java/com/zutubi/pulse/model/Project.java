@@ -59,7 +59,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
 
     public Project(String name, String description)
     {
-        this(name, description, new CustomPulseFileDetails("pulse.xml"));
+        this(name, description, new VersionedPulseFileDetails("pulse.xml"));
     }
 
     public Project(String name, String description, PulseFileDetails pulseFileDetails)

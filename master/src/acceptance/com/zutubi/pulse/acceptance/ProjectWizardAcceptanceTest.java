@@ -31,7 +31,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         login("admin", "admin");
     }
 
-    public void testCreateCustomProject()
+    public void testCreateVersionedProject()
     {
         // navigate to project panel.
         beginAt("/");
@@ -43,12 +43,12 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
 
         String projectName = "test project " + RandomUtils.randomString(3);
 
-        submitProjectBasicsForm(projectName, "this is a test project created by the automated project wizard acceptance test.", "http://wizard/url", "cvs", "custom");
+        submitProjectBasicsForm(projectName, "this is a test project created by the automated project wizard acceptance test.", "http://wizard/url", "cvs", "versioned");
 
         submitCvsSetupForm("/local", "module", "", "");
 
-        assertFormElementNotEmpty(CUSTOM_SETUP_FILE);
-        submitCustomSetupForm("pulse.xml");
+        assertFormElementNotEmpty(VERSIONED_SETUP_FILE);
+        submitVersionedSetupForm("pulse.xml");
 
         // assert that all of the expected tables have the expected data.
         assertTablePresent("project.basics");
@@ -60,7 +60,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
 
         assertTablePresent("project.specifics");
         assertTableRowsEqual("project.specifics", 1, new String[][]{
-                new String[]{"type", "custom"},
+                new String[]{"type", "versioned"},
                 new String[]{"pulse file", "pulse.xml"}
         });
 
@@ -104,15 +104,15 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         clickLink("project.add");
 
         String projectName = "project " + RandomUtils.randomString(5);
-        submitProjectBasicsForm(projectName, "", "", "cvs", "custom");
+        submitProjectBasicsForm(projectName, "", "", "cvs", "versioned");
         submitCvsSetupForm("/local", "module", "", "");
-        submitCustomSetupForm("pulse.xml");
+        submitVersionedSetupForm("pulse.xml");
         assertTablePresent("project.basics");
 
         clickLinkWithText("projects");
         clickLink("project.add");
 
-        submitProjectBasicsForm(projectName, "", "", "cvs", "custom");
+        submitProjectBasicsForm(projectName, "", "", "cvs", "versioned");
         assertFormPresent(FO_PROJECT_BASICS);
     }
 }

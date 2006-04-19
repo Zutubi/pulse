@@ -58,7 +58,11 @@
         <discriminator column="SOURCE_TYPE" type="string" length="63"/>
 
         <subclass name="com.zutubi.pulse.model.CustomPulseFileDetails" discriminator-value="CUSTOM" lazy="false">
-            <property name="pulseFileName" column="BOB_FILE_NAME" type="string" length="255"/>
+            <property name="pulseFile" column="PULSE_FILE" type="string"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.VersionedPulseFileDetails" discriminator-value="VERSIONED" lazy="false">
+            <property name="pulseFileName" column="PULSE_FILE_NAME" type="string" length="255"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.AntPulseFileDetails" discriminator-value="ANT" lazy="false">

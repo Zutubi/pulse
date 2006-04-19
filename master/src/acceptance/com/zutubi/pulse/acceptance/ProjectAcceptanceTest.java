@@ -41,9 +41,9 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         clickLinkWithText("add new project");
 
         projectName = "project " + RandomUtils.randomString(5);
-        submitProjectBasicsForm(projectName, DESCRIPTION, URL, "cvs", "custom");
+        submitProjectBasicsForm(projectName, DESCRIPTION, URL, "cvs", "versioned");
         submitCvsSetupForm("/local", "module", "", "");
-        submitCustomSetupForm("pulse.xml");
+        submitVersionedSetupForm("pulse.xml");
         assertTablePresent("project.basics");
     }
 
@@ -113,9 +113,9 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         clickLinkWithText("add new project");
 
         String newProject = "project " + RandomUtils.randomString(5);
-        submitProjectBasicsForm(newProject, "test description", "http://test/url", "cvs", "custom");
+        submitProjectBasicsForm(newProject, "test description", "http://test/url", "cvs", "versioned");
         submitCvsSetupForm("/local", "module", "", "");
-        submitCustomSetupForm("pulse.xml");
+        submitVersionedSetupForm("pulse.xml");
 
         clickLink("project.basics.edit");
         form.saveFormElements(projectName, null, null);
@@ -127,12 +127,12 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertTextPresent("select a different project");
     }
 
-    public void testEditCustomSpecifics()
+    public void testEditVersionedSpecifics()
     {
-        CustomProjectEditForm form = new CustomProjectEditForm(tester);
+        VersionedProjectEditForm form = new VersionedProjectEditForm(tester);
 
         // verify what we have to start with.
-        assertProjectSpecificsTable("custom", "pulse.xml");
+        assertProjectSpecificsTable("versioned", "pulse.xml");
 
         assertLinkPresent("project.specifics.edit");
         clickLink("project.specifics.edit");
@@ -140,17 +140,17 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         // assert that the form is pre populated with the expected data.
         form.assertFormElements("pulse.xml");
 
-        form.saveFormElements("custom.xml");
+        form.saveFormElements("versioned.xml");
 
         // assert that the data has been updated.
-        assertProjectSpecificsTable("custom", "custom.xml");
+        assertProjectSpecificsTable("versioned", "versioned.xml");
     }
 
-    public void testEditCustomSpecificsValidation()
+    public void testEditVersionedSpecificsValidation()
     {
-        CustomProjectEditForm form = new CustomProjectEditForm(tester);
+        VersionedProjectEditForm form = new VersionedProjectEditForm(tester);
 
-        assertProjectSpecificsTable("custom", "pulse.xml");
+        assertProjectSpecificsTable("versioned", "pulse.xml");
 
         assertLinkPresent("project.specifics.edit");
         clickLink("project.specifics.edit");
@@ -163,21 +163,21 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         form.assertFormElements("");
     }
 
-    public void testEditCustomSpecificsCancel()
+    public void testEditVersionedSpecificsCancel()
     {
-        CustomProjectEditForm form = new CustomProjectEditForm(tester);
+        VersionedProjectEditForm form = new VersionedProjectEditForm(tester);
 
-        // test the editing of custom specifics.
-        assertProjectSpecificsTable("custom", "pulse.xml");
+        // test the editing of versioned specifics.
+        assertProjectSpecificsTable("versioned", "pulse.xml");
 
         assertLinkPresent("project.specifics.edit");
         clickLink("project.specifics.edit");
 
         form.assertFormElements("pulse.xml");
 
-        form.cancelFormElements("custom.xml");
+        form.cancelFormElements("versioned.xml");
 
-        assertProjectSpecificsTable("custom", "pulse.xml");
+        assertProjectSpecificsTable("versioned", "pulse.xml");
     }
 
     public void testEditScm()

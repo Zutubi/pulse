@@ -225,11 +225,11 @@ public class FileLoader
                 t = ex;
             }
 
-            throw new ParseException(createParseErrorMessage(name, e, t));
+            throw createParseException(name, e, t);
         }
         catch (Exception ex)
         {
-            throw new ParseException(createParseErrorMessage(name, e, ex));
+            throw createParseException(name, e, ex);
         }
     }
 
@@ -332,8 +332,11 @@ public class FileLoader
         return false;
     }
 
-    private String createParseErrorMessage(String name, Element element, Throwable t)
+    private ParseException createParseException(String name, Element element, Throwable t)
     {
+        int line = -1;
+        int column = -1;
+
         StringBuilder message = new StringBuilder(256);
 
         message.append("Processing element '");
@@ -344,14 +347,16 @@ public class FileLoader
         {
             LocationAwareElement location = (LocationAwareElement) element;
             message.append("starting at line ");
-            message.append(location.getLineNumber());
+            line = location.getLineNumber();
+            message.append(line);
             message.append(" column ");
-            message.append(location.getColumnNumber());
+            column = location.getColumnNumber();
+            message.append(column);
             message.append(": ");
         }
 
         message.append(t.getMessage());
-        return message.toString();
+        return new ParseException(line, column, message.toString());
     }
 
     private Object create(String name) throws FileLoadException

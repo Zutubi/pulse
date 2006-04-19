@@ -3,10 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.model.AntPulseFileDetails;
-import com.zutubi.pulse.model.CustomPulseFileDetails;
-import com.zutubi.pulse.model.MakePulseFileDetails;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -35,14 +32,14 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
         return findByNamedQuery("findByLikeName", "name", name);
     }
 
-    public void save(CustomPulseFileDetails details)
+    public void save(VersionedPulseFileDetails details)
     {
         getHibernateTemplate().saveOrUpdate(details);
     }
 
-    public CustomPulseFileDetails findCustomPulseFileSource(long id)
+    public VersionedPulseFileDetails findVersionedPulseFileDetails(long id)
     {
-        return (CustomPulseFileDetails) getHibernateTemplate().load(CustomPulseFileDetails.class, id);
+        return (VersionedPulseFileDetails) getHibernateTemplate().load(VersionedPulseFileDetails.class, id);
     }
 
     public void save(AntPulseFileDetails source)

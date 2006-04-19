@@ -113,4 +113,34 @@ public class StringUtilsTest extends PulseTestCase
 
         }
     }
+
+    public void testGetLineLinefeed()
+    {
+        assertEquals("string", StringUtils.getLine("some\nstring\nhere", 2));
+    }
+
+    public void testGetLineCarriageReturn()
+    {
+        assertEquals("string", StringUtils.getLine("some\rstring\rhere", 2));
+    }
+
+    public void testGetLineCarriageReturnLinefeed()
+    {
+        assertEquals("string", StringUtils.getLine("some\r\nstring\r\nhere", 2));
+    }
+
+    public void testGetLineMixed()
+    {
+        assertEquals("w00t", StringUtils.getLine("using\r\ndifferent\nsplitters\rw00t\r\nto\nconfuse\r\nthings\n", 4));
+    }
+
+    public void testGetLineEmpty()
+    {
+        assertEquals("", StringUtils.getLine("third\nline\n\nis empty", 3));
+    }
+
+    public void testGetLinePastEnd()
+    {
+        assertNull(StringUtils.getLine("some\nlines\nhere", 4));
+    }
 }

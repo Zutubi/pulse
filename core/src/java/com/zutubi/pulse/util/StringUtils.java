@@ -145,4 +145,25 @@ public class StringUtils
 
         return result.toString();
     }
+
+    /**
+     * Returns the line'th line in the given string, where lines are
+     * separated by any one of \r, \n or \r\n.
+     *
+     * @param s      the string to extract the line from
+     * @param line   the one-based number of the line to extract
+     * @return the given line, or null if there are not that many lines
+     */
+    public static String getLine(String s, int line)
+    {
+        String [] lines = s.split("\r\n|\n|\r");
+        if(lines.length >= line)
+        {
+            return lines[line - 1];
+        }
+        else
+        {
+            return null;
+        }
+    }
 }

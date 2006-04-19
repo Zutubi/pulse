@@ -392,7 +392,7 @@ ul {
 }
 
 ul.error, ul.warning, ul.info {
-    /*padding: 5px;*/
+    padding-bottom: 5px;
     /*margin-left: 20px;*/
     margin-top: 10px;
     margin-bottom: 10px;
@@ -412,6 +412,15 @@ ul.warning {
 ul.info {
     border-color: #b0b0f0;
     background-color: #eeeeff;
+}
+
+#reference ul {
+    list-style: disc;
+}
+
+#reference li {
+    margin-top: 3px;
+    margin-bottom: 3px;
 }
 
 li.error, li.warning, li.info, li.artifact, li.file-artifact, li.dir-artifact, li.report-artifact, li.task, li.explore {

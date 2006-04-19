@@ -1,0 +1,96 @@
+<div style="float: right; width=340px;" id="reference">
+    <table class="content">
+        #headingRow("pulse.file.reference" 1)
+        <td class="content">
+            <ul>
+                <li>
+                    <a href="$helpUrl/pulse+Files" title="pulse Files">pulse Files</a>
+                    <ul>
+                        <li>
+                            <a href="$helpUrl/ant.pp" title="ant.pp">ant.pp</a>
+                        </li>
+                        <li>
+                            <a href="$helpUrl/junit.pp" title="junit.pp">junit.pp</a>
+                        </li>
+                        <li>
+                            <a href="$helpUrl/macro" title="macro">macro</a>
+
+                        </li>
+                        <li>
+                            <a href="$helpUrl/macro-ref" title="macro-ref">macro-ref</a>
+                        </li>
+                        <li>
+                            <a href="$helpUrl/make.pp" title="make.pp">make.pp</a>
+                        </li>
+                        <li>
+                            <a href="$helpUrl/post-processor" title="post-processor">post-processor</a>
+                        </li>
+                        <li>
+                            <a href="$helpUrl/property" title="property">property</a>
+                        </li>
+                        <li>
+                            <a href="$helpUrl/recipe" title="recipe">recipe</a>
+                            <ul>
+                                <li>
+                                    <a href="$helpUrl/ant" title="ant">ant</a></li><li><a href="$helpUrl/command"
+                                                                                                title="command">command</a>
+                                <ul>
+                                    <li>
+                                        <a href="$helpUrl/artifact" title="artifact">artifact</a>
+                                        <ul>
+                                            <li>
+                                                <a href="$helpUrl/process" title="process">process</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="$helpUrl/dir-artifact" title="dir-artifact">dir-artifact</a>
+                                        <ul>
+                                            <li>
+                                                <a href="$helpUrl/exclude+%28dir-artifact%29" title="exclude (dir-artifact)">exclude
+                                                    (dir-artifact)</a>
+                                            </li>
+                                            <li>
+                                                <a href="$helpUrl/include" title="include">include</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                                <li>
+                                    <a href="$helpUrl/executable" title="executable">executable</a>
+                                    <ul>
+                                        <li>
+                                            <a href="$helpUrl/arg" title="arg">arg</a>
+                                        </li>
+                                        <li>
+                                            <a href="$helpUrl/environment" title="environment">environment</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="$helpUrl/make" title="make">make</a>
+                                </li>
+                                <li>
+                                    <a href="$helpUrl/resource" title="resource">resource</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><a href="$helpUrl/regex.pp" title="regex.pp">regex.pp</a>
+                            <ul>
+                                <li>
+                                    <a href="$helpUrl/pattern" title="pattern">pattern</a>
+                                    <ul>
+                                        <li>
+                                            <a href="$helpUrl/exclude" title="exclude">exclude</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </td>
+    </table>
+</div>

@@ -3,28 +3,25 @@
 <html>
 <head>
     <title>#wwtext("name=add.project")</title>
-    <script type="text/javascript" src="/prototype.js"></script>
-    <script type="text/javascript">
-    <!--
-    	function openFileWindow()
-    	{
-    	    openBrowseWindow(false, "custom.setup_details_pulseFileName", "");
-    	}
-    -->
-    </script>
 </head>
 <body>
     <h1>:: #wwtext("name=add.project") ::</h1>
 
+    #parse("template/includes/pulse-file-reference.vm")
+
+    <div style="margin-right: 350px;">
+
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=addProject.action" "id=custom.setup" "heading=%{getText('custom.setup')}" "method=post")
+#wwcform("action=addProject.action" "id=custom.setup" "width=100%" "heading=%{getText('custom.setup')}" "method=post")
     #wwhidden("name=state")
     #wwhidden("name=submit")
 
-    #wwtextfield("name=details.pulseFileName" "label=%{getText('pulse.filename')}" "after= <a href='#' onclick='openFileWindow(); return false;'>browse</a>" "required=true" "size=40" "tabindex=1" "onkeypress=return submitenter(this,event)")
-    #inlineHelp("pulse.filename.help")
+    #wwtextarea("name=details.pulseFile" "labelposition=top" "cssStyle=width: 95%" "label=%{getText('pulse.file')}" "required=true" "rows=30" "cols=" "tabindex=1")
     #previousFinishCancel(2)
  #end
+
+     </div>
+
 </body>
 </html>

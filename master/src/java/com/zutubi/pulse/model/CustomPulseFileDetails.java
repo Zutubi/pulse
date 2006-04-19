@@ -13,16 +13,16 @@ import java.util.Properties;
  */
 public class CustomPulseFileDetails extends PulseFileDetails
 {
-    private String pulseFileName;
+    private String pulseFile;
 
     public CustomPulseFileDetails()
     {
 
     }
 
-    public CustomPulseFileDetails(String pulseFileName)
+    public CustomPulseFileDetails(String pulseFile)
     {
-        this.pulseFileName = pulseFileName;
+        this.pulseFile = pulseFile;
     }
 
     public String getType()
@@ -32,34 +32,21 @@ public class CustomPulseFileDetails extends PulseFileDetails
 
     public Properties getProperties()
     {
-        // TODO i18n
-        Properties result = new Properties();
-        result.put("pulse file", pulseFileName);
-        return result;
+        return new Properties();
     }
 
     public String getPulseFile(long id, Project project, Revision revision)
     {
-        Scm scm = project.getScm();
-
-        try
-        {
-            return scm.createServer().checkout(id, revision, pulseFileName);
-        }
-        catch (SCMException e)
-        {
-            throw new BuildException("Unable to retrieve pulse file from SCM: " + e.getMessage());
-        }
+        return getPulseFile();
     }
 
-    public String getPulseFileName()
+    public String getPulseFile()
     {
-        return pulseFileName;
+        return pulseFile;
     }
 
-    public void setPulseFileName(String pulseFileName)
+    public void setPulseFile(String pulseFile)
     {
-        this.pulseFileName = pulseFileName;
+        this.pulseFile = pulseFile;
     }
-
 }

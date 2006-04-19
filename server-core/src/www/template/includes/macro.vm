@@ -419,6 +419,14 @@
 #end
 
 ##
+## Outputs a cell for a content table with the given static content, which
+## is be allowed to wrap.
+##
+#macro(staticWrapCell $key)
+    <td class="content-wrap">#wwtext("name=$key")</td>
+#end
+
+##
 ## Outputs a cell for a content table with the given dynamic content, which
 ## should be escaped, with a row span.
 ##

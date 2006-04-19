@@ -3,10 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.model.persistence;
 
-import com.zutubi.pulse.model.AntPulseFileDetails;
-import com.zutubi.pulse.model.CustomPulseFileDetails;
-import com.zutubi.pulse.model.MakePulseFileDetails;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.*;
 
 import java.util.List;
 
@@ -20,9 +17,9 @@ public interface ProjectDao extends EntityDao<Project>
 
     List<Project> findByLikeName(String name);
 
-    void save(CustomPulseFileDetails details);
+    void save(VersionedPulseFileDetails details);
 
-    CustomPulseFileDetails findCustomPulseFileSource(long id);
+    VersionedPulseFileDetails findVersionedPulseFileDetails(long id);
 
     void save(AntPulseFileDetails source);
 

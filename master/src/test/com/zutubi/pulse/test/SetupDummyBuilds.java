@@ -176,7 +176,7 @@ public class SetupDummyBuilds implements Runnable
     private Project setupProject(String name)
     {
         Project project = new Project(name, "A test project with a decently long description to test wrapping etc.");
-        project.setPulseFileDetails(new CustomPulseFileDetails("pulse.xml"));
+        project.setPulseFileDetails(new VersionedPulseFileDetails("pulse.xml"));
 
         P4 scm = new P4();
         scm.setPort(":1666");

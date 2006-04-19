@@ -12,15 +12,18 @@ import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
 import com.zutubi.pulse.web.wizard.WizardCompleteState;
+import com.zutubi.pulse.core.*;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.io.ByteArrayInputStream;
 
 /**
  */
@@ -34,6 +37,7 @@ public class AddProjectWizard extends BaseWizard
     private P4Details p4Details;
 
     private CustomDetails customDetails;
+    private VersionedDetails versionedDetails;
     private AntDetails antDetails;
     private MakeDetails makeDetails;
     private MavenDetails mavenDetails;
@@ -61,6 +65,7 @@ public class AddProjectWizard extends BaseWizard
         makeDetails = new MakeDetails(this, "make");
         mavenDetails = new MavenDetails(this, "maven");
         customDetails = new CustomDetails(this, "custom");
+        versionedDetails = new VersionedDetails(this, "versioned");
 
         // finished.
         completeState = new WizardCompleteState(this, "success");
@@ -73,6 +78,7 @@ public class AddProjectWizard extends BaseWizard
         addState(makeDetails);
         addState(mavenDetails);
         addState(customDetails);
+        addState(versionedDetails);
         addFinalState(completeState.getStateName(), completeState);
     }
 
@@ -106,6 +112,10 @@ public class AddProjectWizard extends BaseWizard
         else if ("maven".equals(projectType))
         {
             details = mavenDetails.getDetails();
+        }
+        else if ("versioned".equals(projectType))
+        {
+            details = versionedDetails.getDetails();
         }
         project.setPulseFileDetails(details);
 
@@ -221,6 +231,7 @@ public class AddProjectWizard extends BaseWizard
                 types.put("custom", "custom project");
                 types.put("make", "make project");
                 types.put("maven", "maven project");
+                types.put("versioned", "versioned project");
             }
             return types;
         }
@@ -559,11 +570,69 @@ public class AddProjectWizard extends BaseWizard
         }
     }
 
-    private class CustomDetails extends BaseWizardState
+    private class CustomDetails extends BaseWizardState implements Validateable
     {
-        private PulseFileDetails details = new CustomPulseFileDetails("pulse.xml");
+        private CustomPulseFileDetails details = new CustomPulseFileDetails("<?xml version=\"1.0\"?>\n<project>\n</project>\n");
+        private ResourceRepository resourceRepository;
 
         public CustomDetails(Wizard wizard, String name)
+        {
+            super(wizard, name);
+        }
+
+        public String getNextStateName()
+        {
+            return ((AddProjectWizard) getWizard()).completeState.getStateName();
+        }
+
+        public PulseFileDetails getDetails()
+        {
+            return details;
+        }
+
+
+        public void validate()
+        {
+            if(!TextUtils.stringSet(details.getPulseFile()))
+            {
+                addFieldError("details.pulseFile", "pulse file is required");
+                return;
+            }
+
+            try
+            {
+                PulseFileLoader loader = new PulseFileLoader(new ObjectFactory(), resourceRepository);
+                loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile());
+            }
+            catch(ParseException pe)
+            {
+                addActionError(pe.getMessage());
+                if(pe.getLine() > 0)
+                {
+                    String line = StringUtils.getLine(details.getPulseFile(), pe.getLine());
+                    if(line != null)
+                    {
+                        addActionError("First line of offending element: " + line);
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                addActionError(e.getMessage());
+            }
+        }
+
+        public void setResourceRepository(ResourceRepository resourceRepository)
+        {
+            this.resourceRepository = resourceRepository;
+        }
+    }
+
+    private class VersionedDetails extends BaseWizardState
+    {
+        private PulseFileDetails details = new VersionedPulseFileDetails("pulse.xml");
+
+        public VersionedDetails(Wizard wizard, String name)
         {
             super(wizard, name);
         }

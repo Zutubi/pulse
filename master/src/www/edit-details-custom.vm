@@ -3,29 +3,24 @@
 <html>
 <head>
     <title>#wwtext("name=edit.custom")</title>
-    <script type="text/javascript" src="/prototype.js"></script>
-    <script type="text/javascript">
-    <!--
-    	function openFileWindow()
-    	{
-    	    openBrowseWindow(false, "custom.edit_details_pulseFileName", "&id=$project.id");
-    	}
-    -->
-    </script>
 </head>
 <body>
     <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
 
+    #parse("template/includes/pulse-file-reference.vm")
+    
+    <div style="margin-right: 350px;">
+
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=editCustomDetails.action" "id=custom.edit" "heading=%{getText('edit.custom')}" "method=post")
+#wwcform("action=editCustomDetails.action" "id=custom.edit" "width=100%;" "heading=%{getText('edit.custom')}" "method=post")
     #wwhidden("name=id")
     #wwhidden("name=projectId")
 
-    #wwtextfield("name=details.pulseFileName" "label=%{getText('pulse.filename')}" "after= <a href='#' onclick='openFileWindow(); return false;'>browse</a>" "required=true" "size=40" "tabindex=1")
-    #inlineHelp("pulse.filename.help")
-    
+    #wwtextarea("name=details.pulseFile" "labelposition=top" "cssStyle=width: 98%" "label=%{getText('pulse.file')}" "required=true" "rows=30" "cols=" "tabindex=1")
     #saveCancel(2)
  #end
+
+     </div>
 </body>
 </html>
