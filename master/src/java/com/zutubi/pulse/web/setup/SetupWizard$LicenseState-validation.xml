@@ -2,8 +2,8 @@
         "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
 <validators>
     <field name="license">
-        <field-validator type="requiredstring">
-            <message key="license.required">required field.</message>
+        <field-validator type="licensekey">
+            <message key="license.key.invalid">invalid key.</message>
         </field-validator>
     </field>
 </validators>

@@ -20,6 +20,7 @@ import com.zutubi.pulse.test.LicenseHelper;
 public class SetupAcceptanceTest extends BaseAcceptanceTest
 {
     public String licenseKey;
+    public String expiredLicenseKey;
 
     public static final String INVALID_LICENSE_KEY =
             "AAAAaXNvbUgY29tcGFueSBhbmQgc29tZSBvdGhlciBkYXRhIHRoYXQgd2ls\n" +
@@ -33,7 +34,8 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
     {
         super.setUp();
 
-        licenseKey = LicenseHelper.newLicenseKey("dummy", "S. O. MeBody", null);
+        licenseKey = LicenseHelper.newLicenseKey("dummy", "S. O. MeBody");
+        expiredLicenseKey = LicenseHelper.newExpiredLicenseKey("dummy", "S. O. MeBody");
     }
 
     protected void tearDown() throws Exception
@@ -111,6 +113,12 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         licenseForm.assertFormPresent();
         licenseForm.assertFormElements(INVALID_LICENSE_KEY);
         assertTextPresent("invalid");
+
+        // check that an expired license is not accepted.
+        licenseForm.nextFormElements(expiredLicenseKey);
+        licenseForm.assertFormPresent();
+        licenseForm.assertFormElements(expiredLicenseKey);
+        assertTextPresent("expired");
 
         // enter a valid license.
         licenseForm.nextFormElements(licenseKey);

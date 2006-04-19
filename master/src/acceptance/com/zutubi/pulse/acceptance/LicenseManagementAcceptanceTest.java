@@ -20,6 +20,7 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
 
     private String newLicenseKey;
     private String newLicenseHolder;
+    private String expiredLicenseKey;
 
     public LicenseManagementAcceptanceTest()
     {
@@ -40,6 +41,7 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
 
         newLicenseHolder = RandomUtils.randomString(10);
         newLicenseKey = LicenseHelper.newLicenseKey("dummy", newLicenseHolder, null);
+        expiredLicenseKey = LicenseHelper.newExpiredLicenseKey("dummy", "S. O. MeBody");
     }
 
     protected void tearDown() throws Exception
@@ -105,5 +107,19 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
 
         assertTablePresent("license.info");
         assertTextNotPresent(newLicenseHolder);
+    }
+
+    public void testExpiredLicense()
+    {
+        clickLink("license.edit");
+
+        LicenseEditForm form = new LicenseEditForm(tester);
+        form.assertFormPresent();
+
+        // set a new license string.
+        form.saveFormElements(expiredLicenseKey);
+        form.assertFormPresent();
+        
+        assertTextPresent("expired");
     }
 }

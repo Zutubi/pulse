@@ -3,6 +3,9 @@ package com.zutubi.pulse.web.admin;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.Home;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseDecoder;
+import com.zutubi.pulse.license.LicenseException;
 
 import java.io.IOException;
 
@@ -37,6 +40,23 @@ public class ManageLicenseAction extends ActionSupport
         this.license = license;
     }
 
+    public void validate()
+    {
+        try
+        {
+            String licenseKey = license.replaceAll("\n", "");
+            License l = new LicenseDecoder().decode(licenseKey.getBytes());
+            if (l.hasExpired())
+            {
+                addFieldError("license", getText("license.key.expired"));
+            }
+        }
+        catch (LicenseException e)
+        {
+            addActionError(getText("license.key.valdiation.error", e.getMessage()));
+        }
+    }
+
     public String doSave()
     {
         return execute();
@@ -53,7 +73,7 @@ public class ManageLicenseAction extends ActionSupport
         }
         catch (IOException e)
         {
-            addActionError(getText("license.key.update.failed", e.getMessage()));
+            addActionError(getText("license.key.update.error", e.getMessage()));
             return ERROR;
         }
         return SUCCESS;

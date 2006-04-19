@@ -169,7 +169,13 @@ public class SetupWizard extends BaseWizard
                 License l = decoder.decode(licenseKey.getBytes());
                 if (l == null)
                 {
-                    addFieldError("license", getTextProvider().getText("license.invalid"));
+                    addFieldError("license", getTextProvider().getText("license.key.invalid"));
+                    return;
+                }
+                if (l.hasExpired())
+                {
+                    addFieldError("license", getTextProvider().getText("license.key.expired"));
+
                 }
             }
             catch (LicenseException e)
