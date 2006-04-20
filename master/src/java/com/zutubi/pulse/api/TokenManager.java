@@ -13,6 +13,9 @@ import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.acegisecurity.context.SecurityContextHolder;
+import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+import org.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
 
 import java.io.File;
 import java.io.IOException;
@@ -131,6 +134,17 @@ public class TokenManager
         }
 
         throw new AuthenticationException("Access denied");
+    }
+
+    public void loginUser(String token) throws AuthenticationException
+    {
+        User user = verifyToken(token);
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities()));
+    }
+
+    public void logoutUser()
+    {
+        SecurityContextHolder.getContext().setAuthentication(null);
     }
 
     private synchronized User verifyToken(String token) throws AuthenticationException
@@ -258,4 +272,5 @@ public class TokenManager
             throw new AuthenticationException("Token based login disabled.");
         }
     }
+
 }

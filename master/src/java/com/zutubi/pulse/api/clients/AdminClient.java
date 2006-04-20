@@ -4,12 +4,13 @@
 package com.zutubi.pulse.api.clients;
 
 import org.apache.commons.cli.*;
-import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
-import org.apache.xmlrpc.client.XmlRpcClient;
+import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcException;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Vector;
+import java.util.Arrays;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.io.IOException;
@@ -144,20 +145,20 @@ public class AdminClient
             SystemBootstrapManager.loadBootstrapContext();
             ConfigurationManager configurationManager = (ConfigurationManager) ComponentContext.getBean("configurationManager");
 
-            XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+            URL url;
             try
             {
                 int webPort = configurationManager.getAppConfig().getServerPort();
-                config.setServerURL(new URL("http", "127.0.0.1", webPort, "/xmlrpc"));
+                url = new URL("http", "127.0.0.1", webPort, "/xmlrpc");
             }
             catch (MalformedURLException e)
             {
                 // Programmer error
                 e.printStackTrace();
+                return 1;
             }
 
-            xmlRpcClient = new XmlRpcClient();
-            xmlRpcClient.setConfig(config);
+            xmlRpcClient = new XmlRpcClient(url);
 
             try
             {
@@ -166,7 +167,7 @@ public class AdminClient
             }
             catch (IOException e)
             {
-                System.err.println("Error opening admin token file: " + e.getMessage());
+                System.err.println("I/O Error: " + e.getMessage());
                 return 1;
             }
             catch (XmlRpcException e)
@@ -181,7 +182,7 @@ public class AdminClient
          * in this method. When this method is invoked, both the XmlRpcClient and the
          * AdminToken will be available.
          */
-        public abstract int doExecute() throws XmlRpcException;
+        public abstract int doExecute() throws XmlRpcException, IOException;
 
     }
 
@@ -219,9 +220,10 @@ public class AdminClient
             password = commandLine.getOptionValue('p');
         }
 
-        public int doExecute() throws XmlRpcException
+        public int doExecute() throws XmlRpcException, IOException
         {
-            xmlRpcClient.execute("RemoteApi.setPassword", new Object[]{adminToken, user, password});
+            xmlRpcClient.execute("RemoteApi.setPassword", new Vector<Object>(Arrays.asList(
+                    new Object[]{adminToken, user, password})));
             return 0;
         }
     }
@@ -245,9 +247,9 @@ public class AdminClient
             force = (commandLine.hasOption("force"));
         }
 
-        public int doExecute() throws XmlRpcException
+        public int doExecute() throws XmlRpcException, IOException
         {
-            xmlRpcClient.execute("RemoteApi.shutdown", new Object[]{adminToken, force});
+            xmlRpcClient.execute("RemoteApi.shutdown", new Vector<Object>(Arrays.asList(new Object[]{adminToken, force})));
             return 0;
         }
     }

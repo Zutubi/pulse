@@ -6,8 +6,11 @@ package com.zutubi.pulse.acceptance;
 import junit.framework.TestCase;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
+import org.apache.xmlrpc.XmlRpcClient;
 
 import java.net.URL;
+import java.util.Vector;
+import java.util.Arrays;
 
 /**
  * <class-comment/>
@@ -38,11 +41,7 @@ public class BaseXmlRpcAcceptanceTest extends TestCase
         }
 
         // test configuration.
-        XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-            config.setServerURL(new URL("http", "localhost", port, "/xmlrpc"));
-
-        xmlRpcClient = new XmlRpcClient();
-        xmlRpcClient.setConfig(config);
+        xmlRpcClient = new XmlRpcClient(new URL("http", "localhost", port, "/xmlrpc"));
     }
 
     protected void tearDown() throws Exception
@@ -50,5 +49,10 @@ public class BaseXmlRpcAcceptanceTest extends TestCase
         xmlRpcClient = null;
 
         super.tearDown();
+    }
+
+    protected Vector<Object> getVector(Object... o)
+    {
+        return new Vector<Object>(Arrays.asList(o));
     }
 }

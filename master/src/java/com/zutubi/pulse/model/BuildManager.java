@@ -31,6 +31,8 @@ public interface BuildManager
 
     StoredFileArtifact getFileArtifact(long id);
 
+    List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);    
+
     List<BuildResult> getLatestBuildResultsForProject(Project project, int max);
 
     public int getBuildCount(Project project, ResultState[] states, String spec);

@@ -12,7 +12,7 @@
 #wwcform("action=addProjectAdmins.action" "heading=%{getText('project.admin.add')}" "method=post")
     #wwhidden("name=projectId")
 
-    #wwselect("name=admins" "label=%{getText('project.new.admins')}" "list=users" "multiple=true" "size=10" "tabindex=1")
+    #wwselect("name=admins" "label=%{getText('project.new.admins')}" "labelposition=top" "list=users" "multiple=true" "size=10" "tabindex=1")
 
     #saveCancel(2)
 #end

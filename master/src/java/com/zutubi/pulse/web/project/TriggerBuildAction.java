@@ -50,6 +50,8 @@ public class TriggerBuildAction extends ProjectActionSupport
             return ERROR;
         }
 
+        getProjectManager().checkWrite(project);
+
         List<BuildSpecification> specs = project.getBuildSpecifications();
         BuildSpecification spec = null;
 

@@ -183,6 +183,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return fileArtifactDao.findById(id);
     }
 
+    public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)
+    {
+        return buildResultDao.queryBuilds(projects, states, specs, earliestStartTime, latestStartTime, hasWorkDir, first, max, mostRecentFirst);
+    }
+
     public long getNextBuildNumber(Project project)
     {
         long number = 1;
