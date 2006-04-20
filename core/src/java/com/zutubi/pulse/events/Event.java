@@ -6,21 +6,21 @@ package com.zutubi.pulse.events;
 /**
  * <class-comment/>
  */
-public class Event
+public class Event<T>
 {
-    Object source;
+    T source;
 
-    public Event(Object source)
+    public Event(T source)
     {
         this.source = source;
     }
 
-    public Object getSource()
+    public T getSource()
     {
         return source;
     }
 
-    public void setSource(Object o)
+    public void setSource(T o)
     {
         source = o;
     }

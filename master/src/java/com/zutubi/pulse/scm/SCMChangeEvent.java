@@ -10,7 +10,7 @@ import com.zutubi.pulse.model.Scm;
 /**
  * This event indicates that a change has been detected in an SCM.
  */
-public class SCMChangeEvent extends Event
+public class SCMChangeEvent extends Event<Scm>
 {
     private Revision newRevision;
     private Revision previousRevision;
@@ -24,7 +24,7 @@ public class SCMChangeEvent extends Event
 
     public Scm getScm()
     {
-        return (Scm) getSource();
+        return getSource();
     }
     
     public Revision getNewRevision()

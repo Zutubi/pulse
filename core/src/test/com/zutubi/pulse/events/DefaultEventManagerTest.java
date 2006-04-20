@@ -8,8 +8,6 @@ import junit.framework.TestCase;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.zutubi.pulse.events.DefaultEventManager;
-
 /**
  * <class-comment/>
  */
@@ -230,7 +228,7 @@ public class DefaultEventManagerTest extends TestCase
         }
     }
 
-    private class TestEvent extends Event implements TestInterface
+    private class TestEvent extends Event<Object> implements TestInterface
     {
         public TestEvent(Object source)
         {

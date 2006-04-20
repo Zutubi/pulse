@@ -138,5 +138,12 @@
     </bean>
 
     <bean id="jabberManager" class="com.zutubi.pulse.jabber.JabberManager" autowire="byName" init-method="init"/>
-    
+
+    <!--
+    This monitor is defined here so that it can be initialised on system startup. It would be better
+    if we had a way to just define a list of tasks that need to be scheduled on startup. Since we dont have
+    one, this will have to do.
+    -->
+    <bean id="licenseMonitor" class="com.zutubi.pulse.license.LicenseMonitor" autowire="byName" init-method="init"/>
+
 </beans>

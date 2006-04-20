@@ -9,7 +9,7 @@ import com.zutubi.pulse.events.Event;
  * Parent for all system events.  These are events that indicate a change in
  * the server state.
  */
-public abstract class SystemEvent extends Event
+public abstract class SystemEvent extends Event<Object>
 {
     public SystemEvent(Object source)
     {

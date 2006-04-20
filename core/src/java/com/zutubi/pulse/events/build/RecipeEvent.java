@@ -7,7 +7,7 @@ import com.zutubi.pulse.events.Event;
 
 /**
  */
-public class RecipeEvent extends Event
+public class RecipeEvent extends Event<Object>
 {
     private long recipeId;
 

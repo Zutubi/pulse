@@ -19,6 +19,10 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.scheduling.quartz.TimeoutBuildJob;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.license.LicenseExpiredEvent;
+import com.zutubi.pulse.license.LicenseUpdateEvent;
+import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseEvent;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -57,6 +61,12 @@ public class FatController implements EventListener, Stoppable
     private Scheduler quartzScheduler;
     private ProjectManager projectManager;
 
+    /**
+     * When the fat controller is enabled, it will handle incoming build requests.
+     * If not, it will ignore them.
+     */
+    private boolean enabled = false;
+
     public FatController()
     {
     }
@@ -70,13 +80,65 @@ public class FatController implements EventListener, Stoppable
         detail.getJobDataMap().put(PARAM_EVENT_MANAGER, eventManager);
         detail.setDurability(true); // will stay around after the trigger has gone.
         quartzScheduler.addJob(detail, true);
+
+        // check license: enable the fat controller iff the license is valid.
+        License license = configManager.getHome().getLicense();
+        if (license.hasExpired())
+        {
+            disable();
+        }
+        else
+        {
+            enable();
+        }
+    }
+
+    /**
+     * If enabled, this fat controller is accepting build requests.
+     *
+     * @see #isDisabled()
+     */
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+    /**
+     * If disabled, this fat controller is ignoring build requests.
+     *
+     * @see #isEnabled()
+     */
+    public boolean isDisabled()
+    {
+        return !isEnabled();
+    }
+
+    /**
+     * Sets the enabled state of this instance to true.
+     *
+     * @see #isEnabled()
+     * @see #isDisabled()
+     */
+    private void enable()
+    {
+        enabled = true;
+    }
+
+    /**
+     * Sets the enabled state of this instance to false.
+     *
+     * @see #isEnabled()
+     * @see #isDisabled()
+     */
+    private void disable()
+    {
+        enabled = false;
     }
 
     public void stop(boolean force)
     {
         // Make sure all controllers are done
         lock.lock();
-
         try
         {
             // Flag that no new builds should be initiated
@@ -129,10 +191,40 @@ public class FatController implements EventListener, Stoppable
         {
             handleBuildTimeout((BuildTimeoutEvent) event);
         }
+        else if (event instanceof LicenseEvent)
+        {
+            handleLicenseEvent((LicenseEvent)event);
+        }
     }
+
+    private void handleLicenseEvent(LicenseEvent event)
+    {
+        if (event instanceof LicenseExpiredEvent)
+        {
+            disable();
+        }
+        else if (event instanceof LicenseUpdateEvent)
+        {
+            if (event.getLicense().hasExpired())
+            {
+                disable();
+            }
+            else
+            {
+                enable();
+            }
+        }
+    }
+
 
     private void handleBuildRequest(BuildRequestEvent event)
     {
+        // we are disabled, so we ignore incoming build requests.
+        if (isDisabled())
+        {
+            return;
+        }
+
         if (event.getProject().isPaused())
         {
             // Ignore build requests while project is paused
@@ -184,9 +276,9 @@ public class FatController implements EventListener, Stoppable
 
     public void terminateBuild(long id, boolean timeout)
     {
+        lock.lock();
         try
         {
-            lock.lock();
             for (BuildController controller : runningBuilds)
             {
                 if (controller.getBuildId() == id)
@@ -238,7 +330,12 @@ public class FatController implements EventListener, Stoppable
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildRequestEvent.class, BuildCompletedEvent.class, BuildTimeoutEvent.class};
+        return new Class[]{BuildRequestEvent.class,
+                BuildCompletedEvent.class,
+                BuildTimeoutEvent.class,
+                LicenseExpiredEvent.class,
+                LicenseUpdateEvent.class
+        };
     }
 
     public Map<Project, List<BuildRequestEvent>> snapshotProjectQueue()
@@ -254,31 +351,61 @@ public class FatController implements EventListener, Stoppable
         }
     }
 
+    /**
+     * Required resource.
+     *
+     * @param buildManager
+     */
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param recipeQueue
+     */
     public void setRecipeQueue(RecipeQueue recipeQueue)
     {
         this.recipeQueue = recipeQueue;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param eventManager
+     */
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param quartzScheduler
+     */
     public void setQuartzScheduler(Scheduler quartzScheduler)
     {
         this.quartzScheduler = quartzScheduler;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param configManager
+     */
     public void setConfigurationManager(ConfigurationManager configManager)
     {
         this.configManager = configManager;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param projectManager
+     */
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;

@@ -2,10 +2,12 @@ package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.Home;
-import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseDecoder;
 import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.license.LicenseUpdateEvent;
+import com.zutubi.pulse.web.ActionSupport;
 
 import java.io.IOException;
 
@@ -18,6 +20,8 @@ import java.io.IOException;
 public class ManageLicenseAction extends ActionSupport
 {
     private ConfigurationManager configurationManager;
+
+    private EventManager eventManager;
 
     /**
      * The license key
@@ -76,6 +80,10 @@ public class ManageLicenseAction extends ActionSupport
             addActionError(getText("license.key.update.error", e.getMessage()));
             return ERROR;
         }
+
+        // todo: move this into the business logic layer.. will need to move the updating license
+        // todo: into a system license store / manager object..
+        eventManager.publish(new LicenseUpdateEvent(home.getLicense()));
         return SUCCESS;
     }
 
@@ -87,5 +95,15 @@ public class ManageLicenseAction extends ActionSupport
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param eventManager
+     */
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }

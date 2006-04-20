@@ -7,7 +7,7 @@ import com.zutubi.pulse.events.Event;
 
 /**
  */
-public class BuildTimeoutEvent extends Event
+public class BuildTimeoutEvent extends Event<Object>
 {
     long buildId;
 
