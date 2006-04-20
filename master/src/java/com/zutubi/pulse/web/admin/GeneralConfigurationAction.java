@@ -16,6 +16,7 @@ public class GeneralConfigurationAction extends ActionSupport
 
     private String hostName;
     private String helpUrl;
+    private boolean rssEnabled;
 
     public String doReset()
     {
@@ -66,11 +67,22 @@ public class GeneralConfigurationAction extends ActionSupport
         this.helpUrl = helpUrl;
     }
 
+    public boolean isRssEnabled()
+    {
+        return rssEnabled;
+    }
+
+    public void setRssEnabled(boolean rssEnabled)
+    {
+        this.rssEnabled = rssEnabled;
+    }
+
     private void resetConfig()
     {
         ApplicationConfiguration config = configurationManager.getAppConfig();
         config.setHostName(null);
         config.setHelpUrl(null);
+        config.setRssEnabled(null);
     }
 
     private void saveConfig()
@@ -78,6 +90,7 @@ public class GeneralConfigurationAction extends ActionSupport
         ApplicationConfiguration config = configurationManager.getAppConfig();
         config.setHostName(hostName);
         config.setHelpUrl(helpUrl);
+        config.setRssEnabled(rssEnabled);
     }
 
     private void loadConfig()
@@ -85,8 +98,14 @@ public class GeneralConfigurationAction extends ActionSupport
         ApplicationConfiguration config = configurationManager.getAppConfig();
         hostName = config.getHostName();
         helpUrl = config.getHelpUrl();
+        rssEnabled = config.getRssEnabled();
     }
 
+    /**
+     * Required resource.
+     *
+     * @param configurationManager
+     */
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;

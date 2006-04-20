@@ -28,7 +28,7 @@
             <td>
 
     <table width="100%" class="content">
-        #searchHeadingRow("recent.builds" 14 "searchBuilds.action?projectId=$project.id" "search.builds" "rss.action?projectId=$project.id" "rss.builds" )
+        #searchHeadingRow("recent.builds" 14 "searchBuilds.action?projectId=$project.id" "search.builds" "$rssEnabled" "rss.action?projectId=$project.id" "rss.builds" )
         <tr>
             #contentHeading("build.id" 1)
             #contentHeading("build.status" 2)

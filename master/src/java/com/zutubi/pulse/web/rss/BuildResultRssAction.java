@@ -88,6 +88,13 @@ public class BuildResultRssAction extends ProjectActionSupport
 
     public String execute()
     {
+        // check that rss is enabled.
+        if (!configurationManager.getAppConfig().getRssEnabled())
+        {
+            addActionError("rss feed is disabled");
+            return "disabled";
+        }
+
         Project project = getProject();
         if (project == null)
         {

@@ -95,4 +95,25 @@ public class ConfigSupport implements Config
         }
         return null;
     }
+
+    public Boolean getBooleanProperty(String key, Boolean defaultValue)
+    {
+        if (hasProperty(key))
+        {
+            return Boolean.valueOf(getProperty(key));
+        }
+        return defaultValue;
+    }
+
+    public void setBooleanProperty(String key, Boolean val)
+    {
+        if (val != null)
+        {
+            setProperty(key, val.toString());
+        }
+        else
+        {
+            removeProperty(key);
+        }
+    }
 }

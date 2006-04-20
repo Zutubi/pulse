@@ -45,6 +45,10 @@ public interface ApplicationConfiguration
 
     public static final String LOGGING_CONFIG = "log.config";
 
+    //---( rss configuration )---
+    
+    public static final String RSS_ENABLED = "rss.enabled";
+
     /**
      * The port on which the http server will listen for connections.
      */
@@ -102,5 +106,9 @@ public interface ApplicationConfiguration
     String getLogConfig();
 
     void setLogConfig(String config);
+
+    Boolean getRssEnabled();
+
+    void setRssEnabled(Boolean rssEnabled);
 
 }

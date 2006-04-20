@@ -350,14 +350,11 @@
 ##
 ## Outputs a heading cell for a search table.
 ##
-#macro(searchHeadingRow $key $span $searchUrl $searchId $rssUrl $rssId)
+#macro(searchHeadingRow $key $span $searchUrl $searchId $rssEnabled $rssUrl $rssId)
     <tr>
         <th class="heading" colspan="$span">
             <span class="action">
-##            #if($searchUrl)
-##                <a #if($searchId != "")id="$searchId"#end href="$searchUrl"><img alt="$action.getText('search')" src="/images/zoom.gif"/>#wwtext("name=search")</a>
-##            #end
-            #if($rssUrl)
+            #if($rssEnabled == "true")
                 <a class="unadorned" #if($rssId != "")id="$rssId"#end href="$rssUrl"><img alt="$action.getText('rss')" src="/images/rss.gif"/></a>
             #end
             </span>
@@ -467,6 +464,17 @@
     <tr>
         <th class="content-row" #if($span > 1) colspan="$span" #end>#wwtext("name=$key")</th>
         #dynamicCell($value)
+    </tr>
+#end
+
+##
+## Outputs an enabled:disabled row based on the boolean value of the property.
+## ie: true is translated to enabled, false to disabled.
+##
+#macro(enabledDisabledRow $key $value)
+    <tr>
+        <th class="content-row" #if($span > 1) colspan="$span" #end>#wwtext("name=$key")</th>
+        <td>#if($value)#wwtext("name=enabled")#else #wwtext("name=disabled")#end</td>
     </tr>
 #end
 

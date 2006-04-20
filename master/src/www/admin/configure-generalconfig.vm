@@ -15,8 +15,10 @@
     #wwtextfield("name=hostName" "label=%{getText('general.host')}" "required=true" "size=60" "tabindex=3")
     #inlineHelp("general.host.help")
     #wwtextfield("name=helpUrl" "label=%{getText('general.help.url')}" "required=true" "size=60" "tabindex=4")
+    #wwcheckbox("name=rssEnabled" "label=%{getText('general.rss.enabled')}" "tabindex=5")
+    #inlineHelp("general.rss.enabled.help")
 
-    #saveCancel("5")
+    #saveCancel("6")
 #end
 
 </body>

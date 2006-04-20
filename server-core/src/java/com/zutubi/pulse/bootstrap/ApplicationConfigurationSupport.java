@@ -93,6 +93,16 @@ public class ApplicationConfigurationSupport implements ApplicationConfiguration
         config.setProperty(LOGGING_CONFIG, logConfig);
     }
 
+    public Boolean getRssEnabled()
+    {
+        return config.getBooleanProperty(RSS_ENABLED, Boolean.FALSE);
+    }
+
+    public void setRssEnabled(Boolean rssEnabled)
+    {
+        config.setBooleanProperty(RSS_ENABLED, rssEnabled);
+    }
+
     public String getSmtpPrefix()
     {
         return config.getProperty(SMTP_PREFIX);

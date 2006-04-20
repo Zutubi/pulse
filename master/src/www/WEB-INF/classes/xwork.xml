@@ -538,7 +538,9 @@
             <result name="success" type="redirect">/serverStatus.action</result>
         </action>
 
-        <action name="rss" class="com.zutubi.pulse.web.rss.BuildResultRssAction"/>
+        <action name="rss" class="com.zutubi.pulse.web.rss.BuildResultRssAction">
+            <result name="disabled" type="velocity">generic-error.vm</result>
+        </action>
 
     </package>
 
