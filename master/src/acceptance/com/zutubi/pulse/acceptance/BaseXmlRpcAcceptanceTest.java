@@ -4,8 +4,6 @@
 package com.zutubi.pulse.acceptance;
 
 import junit.framework.TestCase;
-import org.apache.xmlrpc.client.XmlRpcClient;
-import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.XmlRpcClient;
 
 import java.net.URL;
