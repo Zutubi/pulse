@@ -73,7 +73,7 @@ public class License
      *
      * @return true if the license has expired, false otherwise.
      */
-    public boolean hasExpired()
+    public boolean isExpired()
     {
         if (expires())
         {

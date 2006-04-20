@@ -4,6 +4,7 @@
 package com.zutubi.pulse.velocity;
 
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
@@ -48,6 +49,9 @@ public class CustomVelocityManager extends VelocityManager
         context.put("version_number", v.getVersionNumber());
         context.put("build_date", v.getBuildDate());
         context.put("build_number", v.getBuildNumber());
+
+        License license = configManager.getHome().getLicense();
+        context.put("license", license);
 
         return context;
     }

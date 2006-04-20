@@ -85,7 +85,10 @@
       <div class="clear"></div>
 
       <div class="content">
-        $body
+          $body
+          #if($license.expired)
+            <div id="statusmessage">#wwtext("name=license.expiry.notice")</div>
+          #end
       </div>
       <div id="footer">
         <strong>:: pulse ($version_number #$build_number) ::</strong>

@@ -83,7 +83,7 @@ public class FatController implements EventListener, Stoppable
 
         // check license: enable the fat controller iff the license is valid.
         License license = configManager.getHome().getLicense();
-        if (license.hasExpired())
+        if (license.isExpired())
         {
             disable();
         }
@@ -205,7 +205,7 @@ public class FatController implements EventListener, Stoppable
         }
         else if (event instanceof LicenseUpdateEvent)
         {
-            if (event.getLicense().hasExpired())
+            if (event.getLicense().isExpired())
             {
                 disable();
             }

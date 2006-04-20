@@ -542,3 +542,12 @@ td.clearbar {
     border: 1px solid #9c9c9c;
     padding: 0px;
 }
+
+#statusmessage {
+    margin:1em;
+    padding:0.5em;
+    border: 1px solid;
+    border-color: #c00000;
+    background-color: #ffdddd;
+    text-align:center;
+}

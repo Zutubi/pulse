@@ -172,7 +172,7 @@ public class SetupWizard extends BaseWizard
                     addFieldError("license", getTextProvider().getText("license.key.invalid"));
                     return;
                 }
-                if (l.hasExpired())
+                if (l.isExpired())
                 {
                     addFieldError("license", getTextProvider().getText("license.key.expired"));
 

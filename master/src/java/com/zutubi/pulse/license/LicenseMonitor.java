@@ -73,7 +73,7 @@ public class LicenseMonitor implements Task
     public void execute(TaskExecutionContext context)
     {
         License license = configurationManager.getHome().getLicense();
-        if (license.hasExpired())
+        if (license.isExpired())
         {
             eventManager.publish(new LicenseExpiredEvent(license));
         }

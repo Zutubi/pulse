@@ -50,7 +50,7 @@ public class ManageLicenseAction extends ActionSupport
         {
             String licenseKey = license.replaceAll("\n", "");
             License l = new LicenseDecoder().decode(licenseKey.getBytes());
-            if (l.hasExpired())
+            if (l.isExpired())
             {
                 addFieldError("license", getText("license.key.expired"));
             }
