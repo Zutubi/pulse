@@ -9,6 +9,7 @@ import com.zutubi.pulse.license.LicenseDecoder;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import com.opensymphony.util.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -143,8 +144,12 @@ public class Home implements UserPaths
         {
             try
             {
-                LicenseDecoder decoder = new LicenseDecoder();
-                license = decoder.decode(getLicenseKey().getBytes());
+                String licenseKey = getLicenseKey();
+                if (TextUtils.stringSet(licenseKey))
+                {
+                    LicenseDecoder decoder = new LicenseDecoder();
+                    license = decoder.decode(licenseKey.getBytes());
+                }
             }
             catch (LicenseException e)
             {

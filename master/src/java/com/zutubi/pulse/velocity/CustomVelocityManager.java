@@ -3,16 +3,16 @@
  ********************************************************************************/
 package com.zutubi.pulse.velocity;
 
+import com.opensymphony.webwork.views.velocity.VelocityManager;
+import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.Home;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.security.AcegiUtils;
-import com.opensymphony.webwork.views.velocity.VelocityManager;
-import com.opensymphony.xwork.util.OgnlValueStack;
 import org.apache.velocity.context.Context;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,8 +50,9 @@ public class CustomVelocityManager extends VelocityManager
         context.put("build_date", v.getBuildDate());
         context.put("build_number", v.getBuildNumber());
 
-        License license = configManager.getHome().getLicense();
-        context.put("license", license);
+        Home home = configManager.getHome();
+        if (home != null)
+            context.put("license", home.getLicense());
 
         return context;
     }
