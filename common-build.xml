@@ -42,6 +42,10 @@
             <include name="**/*.txt"/>
         </patternset>
 
+        <patternset id="release.excludes">
+            <exclude name="**/LicenseEncoder*"/>
+        </patternset>
+
     </target>
 
     <!-- clean dependencies -->
@@ -120,8 +124,6 @@
         <copy todir="${process.src.dir}" overwrite="true">
             <fileset dir="${src.dir}">
                 <include name="**/*.java"/>
-                <!-- contains license encoding details. -->
-                <exclude name="**/license/LicenseEncoder.java"/>
             </fileset>
             <fileset dir="${test.dir}">
                 <include name="**/*.java"/>
@@ -175,9 +177,18 @@
 
     <!-- package artifacts -->
     <target name="package" depends="init">
-        <jar file="${module.root.dir}/build/${module}.jar" basedir="${classes.dir}"/>
-        <jar file="${module.root.dir}/build/${module}-test.jar" basedir="${test.classes.dir}"/>
-        <jar file="${module.root.dir}/build/${module}-src.jar" basedir="${process.src.dir}"/>
+        <jar file="${module.root.dir}/build/${module}.jar" basedir="${classes.dir}">
+            <!-- contains license encoding details. -->
+            <patternset refid="release.excludes"/>
+        </jar>
+        <jar file="${module.root.dir}/build/${module}-test.jar" basedir="${test.classes.dir}">
+            <!-- contains license encoding details. -->
+            <patternset refid="release.excludes"/>
+        </jar>
+        <jar file="${module.root.dir}/build/${module}-src.jar" basedir="${process.src.dir}">
+            <!-- contains license encoding details. -->
+            <patternset refid="release.excludes"/>
+        </jar>
     </target>
 
     <target name="publish" depends="init">
