@@ -3,6 +3,8 @@
  ********************************************************************************/
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.forms.GeneralConfigurationForm;
+
 /**
  * <class-comment/>
  */
@@ -46,9 +48,13 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
         assertTextNotPresent("saved.help.url");
 
         clickLinkWithText("edit");
-        setFormElement("hostName", "saved.host.net");
-        setFormElement("helpUrl", "saved.help.url");
-        submit("save");
+
+        GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
+
+        form.assertFormPresent();
+        form.saveFormElements("saved.host.net", "saved.help.url", "true");
+
+        form.assertFormNotPresent();
 
         assertTextPresent("saved.host.net");
         assertTextPresent("saved.help.url");
@@ -61,10 +67,15 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
         assertTextNotPresent("cancelled.host.com");
 
         clickLinkWithText("edit");
-        setFormElement("hostName", "cancelled.host.com");
-        submit("cancel");
+
+        GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
+        form.assertFormPresent();
+
+        form.cancelFormElements("cancelled.host.net", "cancelled.help.url", "true");
+        form.assertFormNotPresent();
 
         assertTextNotPresent("cancelled.host.com");
+        assertTextNotPresent("cancelled.help.url");
     }
 
 

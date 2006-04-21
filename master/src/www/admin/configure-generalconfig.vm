@@ -10,7 +10,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=editGeneral!save.action" "heading=%{getText('general.config')}" "method=post")
+#wwcform("action=editGeneral!save.action" "heading=%{getText('general.config')}" "method=post" "id=general.config")
 
     #wwtextfield("name=hostName" "label=%{getText('general.host')}" "required=true" "size=60" "tabindex=3")
     #inlineHelp("general.host.help")
