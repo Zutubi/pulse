@@ -87,6 +87,7 @@ public class RemoteApi
             buildDetails.put("id", (int)build.getNumber());
             buildDetails.put("specification", build.getBuildSpecification());
             buildDetails.put("status", build.getState().getPrettyString());
+            buildDetails.put("completed", build.completed());
             buildDetails.put("succeeded", build.succeeded());
             buildDetails.put("commenced", new Date(build.getStamps().getStartTime()));
             buildDetails.put("completed", new Date(build.getStamps().getEndTime()));
