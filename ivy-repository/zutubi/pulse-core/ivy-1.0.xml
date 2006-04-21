@@ -2,9 +2,9 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi.pulse" module="core" revision="0.4" status="integration" publication="20060404165844">
-        <ivyauthor name="zutubi.pulse" url="http://www.zutubi.pulse.com/"/>
-        <description homepage="http://www.zutubi.pulse.com/">
+    <info organisation="zutubi" module="pulse-core" revision="1.0" status="release" publication="20060421141929">
+        <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
+        <description homepage="http://www.zutubi.com/">
             description....
         </description>
     </info>
