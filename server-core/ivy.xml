@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="pulse-server-core" status="integration">
+    <info organisation="zutubi" module="pulse-server-core" revision="1.0" status="release">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
             description....
@@ -22,9 +22,9 @@
 
     <dependencies>
 
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="external->external"/>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="release->release"/>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="test->test"/>
+        <dependency org="zutubi" name="pulse-core" rev="1.0" conf="external->external"/>
+        <dependency org="zutubi" name="pulse-core" rev="1.0" conf="release->release"/>
+        <dependency org="zutubi" name="pulse-core" rev="1.0" conf="test->test"/>
 
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external->default"/>
         <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external->default"/>
