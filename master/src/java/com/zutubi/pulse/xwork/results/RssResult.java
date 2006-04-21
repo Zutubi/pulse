@@ -34,7 +34,7 @@ public class RssResult extends WebWorkResultSupport
 
         // rss content type.
         response.setContentType("application/rss+xml; charset=UTF-8");
-        response.setHeader("Content-disposition", "filename=rss.xml");
+        response.setHeader("Content-Disposition", "filename=rss.xml");
 
         // render the feed in the requested format.
         WireFeed outFeed = feed.createWireFeed(format);
