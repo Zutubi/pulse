@@ -36,17 +36,17 @@ public class DefaultSetupManager implements SetupManager
      */
     public void prepareSetup()
     {
-        Home home = configurationManager.getHome();
-        if (home == null || home.getHome() == null)
+        Data data = configurationManager.getData();
+        if (data == null || data.getData() == null)
             throw new IllegalStateException("");
 
         try
         {
-            home.init();
+            data.init();
         }
         catch (IOException e)
         {
-            throw new StartupException("Failed to initialise home directory.");
+            throw new StartupException("Failed to initialise data directory.");
         }
 
         // load database context.
@@ -78,17 +78,17 @@ public class DefaultSetupManager implements SetupManager
      */
     public boolean systemRequiresSetup()
     {
-        return !configurationManager.getHome().isInitialised();
+        return !configurationManager.getData().isInitialised();
     }
 
     /**
      * Check if upgrading is required.
      *
-     * @return true if the system home requires an upgrade, false otherwise.
+     * @return true if the system data requires an upgrade, false otherwise.
      */
     public boolean systemRequiresUpgrade()
     {
-        return upgradeManager.isUpgradeRequired(configurationManager.getHome());
+        return upgradeManager.isUpgradeRequired(configurationManager.getData());
     }
 
     /**

@@ -5,7 +5,7 @@ package com.zutubi.pulse.web.upgrade;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.Home;
+import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class UpgradePreviewAction extends UpgradeActionSupport
 
     private Version targetVersion;
 
-    private Home targetHome;
+    private Data targetData;
 
     private ConfigurationManager configurationManager;
 
@@ -45,10 +45,10 @@ public class UpgradePreviewAction extends UpgradeActionSupport
 
     public String execute()
     {
-        targetHome = configurationManager.getHome();
-        targetVersion = targetHome.getVersion();
+        targetData = configurationManager.getData();
+        targetVersion = targetData.getVersion();
 
-        upgradeManager.prepareUpgrade(targetHome);
+        upgradeManager.prepareUpgrade(targetData);
 
         upgradePreview = upgradeManager.previewUpgrade();
         return SUCCESS;

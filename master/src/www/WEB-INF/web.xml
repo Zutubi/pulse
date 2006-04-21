@@ -85,11 +85,11 @@
         <servlet-name>hessian</servlet-name>
         <servlet-class>com.zutubiian.CustomHessianServlet</servlet-class>
         <init-param>
-            <param-name>home-class</param-name>
+            <param-name>data-class</param-name>
             <param-value>com.zutubierServiceImpl</param-value>
         </init-param>
         <init-param>
-            <param-name>home-api</param-name>
+            <param-name>data-api</param-name>
             <param-value>com.zutubiices.MasterService</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>

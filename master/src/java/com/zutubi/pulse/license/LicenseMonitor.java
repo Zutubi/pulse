@@ -22,7 +22,7 @@ public class LicenseMonitor implements Task
     private static final Logger LOG = Logger.getLogger(LicenseMonitor.class);
 
     /**
-     * Used to lookup the home -> license.
+     * Used to lookup the data -> license.
      */
     private ConfigurationManager configurationManager;
 
@@ -72,7 +72,7 @@ public class LicenseMonitor implements Task
      */
     public void execute(TaskExecutionContext context)
     {
-        License license = configurationManager.getHome().getLicense();
+        License license = configurationManager.getData().getLicense();
         if (license.isExpired())
         {
             eventManager.publish(new LicenseExpiredEvent(license));

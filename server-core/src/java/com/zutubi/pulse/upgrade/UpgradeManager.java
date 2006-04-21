@@ -3,7 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.upgrade;
 
-import com.zutubi.pulse.bootstrap.Home;
+import com.zutubi.pulse.bootstrap.Data;
 
 import java.util.List;
 
@@ -16,9 +16,9 @@ public interface UpgradeManager
      * Returns true if the execution of upgrade tasks is required, false otherwise.
      *
      */
-    boolean isUpgradeRequired(Home home);
+    boolean isUpgradeRequired(Data data);
 
-    void prepareUpgrade(Home home);
+    void prepareUpgrade(Data data);
 
     List<UpgradeTask> previewUpgrade();
 

@@ -16,12 +16,12 @@ import java.io.File;
  */
 public class SimpleConfigurationManager implements ConfigurationManager
 {
-    public static final String PULSE_INSTALL = "pulse.install";
+    public static final String PULSE_HOME = "pulse.home";
 
     private static final Logger LOG = Logger.getLogger(SimpleConfigurationManager.class);
 
     private SystemPaths systemPaths = null;
-    private HomeConfiguration homeConfig;
+    private DataConfiguration dataConfig;
 
     public ApplicationConfiguration getAppConfig()
     {
@@ -42,44 +42,44 @@ public class SimpleConfigurationManager implements ConfigurationManager
 
     public UserPaths getUserPaths()
     {
-        File pulseHome = getHomeDirectory();
+        File pulseHome = getDataDirectory();
         if (pulseHome != null)
         {
-            return new Home(pulseHome);
+            return new Data(pulseHome);
         }
         return null;
     }
 
-    public File getHomeDirectory()
+    public File getDataDirectory()
     {
-        return getHomeConfig().getHomeDirectory();
+        return getDataConfig().getDataDirectory();
     }
 
-    public File getInstallDirectory()
+    public File getHomeDirectory()
     {
-        if (System.getProperties().containsKey(PULSE_INSTALL))
+        if (System.getProperties().containsKey(PULSE_HOME))
         {
-            return new File(System.getProperty(PULSE_INSTALL));
+            return new File(System.getProperty(PULSE_HOME));
         }
         // this is expected in a dev environment.
         return null;
     }
 
-    public Home getHome()
+    public Data getData()
     {
-        return getHomeConfig().getHome();
+        return getDataConfig().getData();
     }
 
     public boolean requiresSetup()
     {
-        // At the moment, this is nice and simple. Do we have a home configured?
+        // At the moment, this is nice and simple. Do we have a data configured?
         // and if so, is it valid.
-        Home home = getHome();
-        if (home == null)
+        Data data = getData();
+        if (data == null)
         {
             return true;
         }
-        if (!home.isInitialised())
+        if (!data.isInitialised())
         {
             return true;
         }
@@ -94,41 +94,41 @@ public class SimpleConfigurationManager implements ConfigurationManager
         // c) .. whatever else comes up...
     }
 
-    private HomeConfiguration getHomeConfig()
+    private DataConfiguration getDataConfig()
     {
-        if (homeConfig == null)
+        if (dataConfig == null)
         {
-            homeConfig = new HomeConfiguration();
-            homeConfig.setConfigurationManager(this);
+            dataConfig = new DataConfiguration();
+            dataConfig.setConfigurationManager(this);
         }
-        return homeConfig;
+        return dataConfig;
     }
 
-    public void setPulseHome(File f)
+    public void setPulseData(File f)
     {
-        HomeConfiguration homeConfig = getHomeConfig();
-        homeConfig.setHomeDirectory(f);
+        DataConfiguration dataConfig = getDataConfig();
+        dataConfig.setDataDirectory(f);
     }
 
     public SystemPaths getSystemPaths()
     {
         if (systemPaths == null)
         {
-            String pulseInstall = System.getProperty(PULSE_INSTALL);
-            if (pulseInstall == null || pulseInstall.length() == 0)
+            String pulseHome = System.getProperty(PULSE_HOME);
+            if (pulseHome == null || pulseHome.length() == 0)
             {
-                // fatal error, PULSE_INSTALL property needs to exist.
-                throw new StartupException("Required property '" + PULSE_INSTALL + "' is not set");
+                // fatal error, PULSE_HOME property needs to exist.
+                throw new StartupException("Required property '" + PULSE_HOME + "' is not set");
             }
 
-            File pulseRoot = new File(pulseInstall);
+            File pulseRoot = new File(pulseHome);
             if (!pulseRoot.exists() || !pulseRoot.isDirectory())
             {
-                // fatal error, PULSE_INSTALL property needs to reference pulse's home directory
-                throw new StartupException("Property '" + PULSE_INSTALL + "' does not refer to a " +
-                        "directory ('" + pulseInstall + ")");
+                // fatal error, PULSE_HOME property needs to reference pulse's home directory
+                throw new StartupException("Property '" + PULSE_HOME + "' does not refer to a " +
+                        "directory ('" + pulseHome + ")");
             }
-            // initialise applicationPaths based on pulse.install.
+            // initialise applicationPaths based on pulse.home.
             systemPaths = new DefaultSystemPaths(pulseRoot);
         }
         return systemPaths;

@@ -1,0 +1,20 @@
+<html>
+<head>
+    <title>#wwtext("name=data.setup")</title>
+</head>
+
+<body>
+    <h1>:: #wwtext("name=data.setup") ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=setup.action" "heading=%{getText('data.setup')}" "name=setup.data" "method=post")
+
+    #wwtextfield("name=data" "label=%{getText('data.field')}" "required=true" "size=60" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("data.help")
+
+    #next(2)
+#end
+
+</body>
+</html>

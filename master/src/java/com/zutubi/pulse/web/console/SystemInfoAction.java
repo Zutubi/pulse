@@ -5,7 +5,7 @@ package com.zutubi.pulse.web.console;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.Home;
+import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.util.Constants;
@@ -35,7 +35,7 @@ public class SystemInfoAction extends ActionSupport
 
     private DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
     private DateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss z");
-    private Home home;
+    private Data data;
 
     public void setStartupManager(StartupManager startupManager)
     {
@@ -64,9 +64,9 @@ public class SystemInfoAction extends ActionSupport
 
         props.put("os.name", systemProperties.getProperty("os.name") + " " + systemProperties.getProperty("os.version"));
 
-        home = configurationManager.getHome();
-        license = home.getLicense();
-        version = home.getVersion();
+        data = configurationManager.getData();
+        license = data.getLicense();
+        version = data.getVersion();
 
         return SUCCESS;
     }
@@ -106,7 +106,7 @@ public class SystemInfoAction extends ActionSupport
     }
 
     /**
-     * Retrieve the current home version.
+     * Retrieve the current data version.
      *
      * @return version
      */
@@ -116,17 +116,17 @@ public class SystemInfoAction extends ActionSupport
     }
 
     /**
-     * Get the configured home directory.
+     * Get the configured data directory.
      *
      */
+    public File getDataDir()
+    {
+        return configurationManager.getDataDirectory();
+    }
+
     public File getHomeDir()
     {
         return configurationManager.getHomeDirectory();
-    }
-
-    public File getInstallDir()
-    {
-        return configurationManager.getInstallDirectory();
     }
 
     /**

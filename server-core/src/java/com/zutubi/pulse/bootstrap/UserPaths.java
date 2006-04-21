@@ -11,12 +11,12 @@ import java.io.File;
 public interface UserPaths
 {
     /**
-     * The pulse home direcory is the place where all of the users data is
+     * The pulse data direcory is the place where all of the users data is
      * stored.
      *
-     * @return the home directory for all pulse data
+     * @return the data directory for all pulse data
      */
-    File getHome();
+    File getData();
 
     /**
      * The user configuration directory.  Configuration files in this

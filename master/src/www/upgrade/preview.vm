@@ -5,7 +5,7 @@
 <h1>Upgrade Preview</h1>
 
 <p>
-    The home directory you have selected contains an existing installation.
+    The data directory you have selected contains an existing installation.
     <table class="columns" width="40%">
         <tr>
             <td class="columns" width="90%">

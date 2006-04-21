@@ -9,20 +9,20 @@ import net.sourceforge.jwebunit.WebTester;
 /**
  * <class-comment/>
  */
-public class SetPulseHomeForm extends BaseForm
+public class SetPulseDataForm extends BaseForm
 {
-    public SetPulseHomeForm(WebTester tester)
+    public SetPulseDataForm(WebTester tester)
     {
         super(tester);
     }
 
     public String getFormName()
     {
-        return "setup.home";
+        return "setup.data";
     }
 
     public String[] getFieldNames()
     {
-        return new String[]{"home"};
+        return new String[]{"data"};
     }
 }

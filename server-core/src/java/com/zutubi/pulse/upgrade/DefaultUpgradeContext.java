@@ -4,13 +4,13 @@
 package com.zutubi.pulse.upgrade;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.bootstrap.Home;
+import com.zutubi.pulse.bootstrap.Data;
 
 import java.util.List;
 
 /**
  * The upgrade context object contains information relating to the upgrade that is
- * being executed. In particular, this includes the versions, tasks and home directory.
+ * being executed. In particular, this includes the versions, tasks and data directory.
  *
  * @author Daniel Ostermeier
  */
@@ -32,9 +32,9 @@ public class DefaultUpgradeContext implements UpgradeContext
     private List<UpgradeTask> tasks = null;
 
     /**
-     * The home directory that is being upgraded.
+     * The data directory that is being upgraded.
      */
-    private Home home;
+    private Data data;
 
     public DefaultUpgradeContext(Version from, Version to)
     {
@@ -44,7 +44,7 @@ public class DefaultUpgradeContext implements UpgradeContext
 
     /**
      * Get the version we are upgrading from. This is typically the version of the
-     * target home directory.
+     * target data directory.
      *
      * @return version
      */
@@ -103,17 +103,17 @@ public class DefaultUpgradeContext implements UpgradeContext
     }
 
     /**
-     * Get the home directory that is being upgraded.
+     * Get the data directory that is being upgraded.
      *
-     * @return home directory.
+     * @return data directory.
      */
-    public Home getHome()
+    public Data getData()
     {
-        return home;
+        return data;
     }
 
-    public void setHome(Home home)
+    public void setData(Data data)
     {
-        this.home = home;
+        this.data = data;
     }
 }

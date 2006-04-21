@@ -29,7 +29,7 @@ public class ServerRecipePaths implements RecipePaths
 
     private File getRecipesRoot()
     {
-        return new File(configurationManager.getUserPaths().getHome(), "recipes");
+        return new File(configurationManager.getUserPaths().getData(), "recipes");
     }
 
     public File getRecipeRoot()

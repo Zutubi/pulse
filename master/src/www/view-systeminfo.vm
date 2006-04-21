@@ -65,8 +65,8 @@
                 </table>
                 <table class="fill-content" id="pulse.info">
                     #headingRow("pulse.info" 2)
-                    #dynamicRow("pulse.installDir.field" $installDir)
                     #dynamicRow("pulse.homeDir.field" $homeDir)
+                    #dynamicRow("pulse.dataDir.field" $dataDir)
                 </table>
                 <table class="fill-content" id="license.info">
                     #restrictedHeadingRow("license.info" 2 "ROLE_ADMINISTRATOR" "edit" "/admin/editLicense!input.action" "pencil.gif" "license.edit")

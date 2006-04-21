@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.Home;
+import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseDecoder;
@@ -74,11 +74,11 @@ public class ManageLicenseAction extends ActionSupport
     public String execute()
     {
         // update the license string.
-        Home home = configurationManager.getHome();
+        Data data = configurationManager.getData();
 
         try
         {
-            home.updateLicenseKey(license);
+            data.updateLicenseKey(license);
         }
         catch (IOException e)
         {
@@ -88,7 +88,7 @@ public class ManageLicenseAction extends ActionSupport
 
         // todo: move this into the business logic layer.. will need to move the updating license
         // todo: into a system license store / manager object..
-        eventManager.publish(new LicenseUpdateEvent(home.getLicense()));
+        eventManager.publish(new LicenseUpdateEvent(data.getLicense()));
         return SUCCESS;
     }
 

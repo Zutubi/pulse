@@ -4,7 +4,7 @@
 package com.zutubi.pulse.upgrade;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.bootstrap.Home;
+import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class DefaultUpgradeManager implements UpgradeManager
 
     private UpgradeProgressMonitor monitor;
 
-    private Home upgradeTarget;
+    private Data upgradeTarget;
 
     /**
      * Register an upgrade task with this upgrade manager.
@@ -130,38 +130,38 @@ public class DefaultUpgradeManager implements UpgradeManager
     }
 
     /**
-     * Check if the specified home directory requires an upgrade to be used with the
+     * Check if the specified data directory requires an upgrade to be used with the
      * current installation.
      *
-     * @param home
+     * @param data
      *
      * @return true if an upgrade is required, false otherwise.
      */
-    public boolean isUpgradeRequired(Home home)
+    public boolean isUpgradeRequired(Data data)
     {
-        checkHome(home);
+        checkData(data);
 
-        Version from = home.getVersion();
+        Version from = data.getVersion();
         Version to = Version.getVersion();
 
         return isUpgradeRequired(from, to);
     }
 
     /**
-     * Prepare to upgrade the specified home directory. Prepare must be called before
+     * Prepare to upgrade the specified data directory. Prepare must be called before
      * the upgrade can be executed and before any specific details about the upgrade
      * are available.
      *
-     * @param home
+     * @param data
      */
-    public void prepareUpgrade(Home home)
+    public void prepareUpgrade(Data data)
     {
-        checkHome(home);
+        checkData(data);
 
         // ensure that
         // a) upgrade is not in progress.
 
-        Version from = home.getVersion();
+        Version from = data.getVersion();
         Version to = Version.getVersion();
 
         List<UpgradeTask> tasks = determineRequiredUpgradeTasks(from, to);
@@ -173,7 +173,7 @@ public class DefaultUpgradeManager implements UpgradeManager
 
         monitor = new UpgradeProgressMonitor();
 
-        upgradeTarget = home;
+        upgradeTarget = data;
     }
 
     /**
@@ -232,7 +232,7 @@ public class DefaultUpgradeManager implements UpgradeManager
 
         monitor.setPercentageComplete(99);
 
-        // commit the upgrade by updating the home version details.
+        // commit the upgrade by updating the data version details.
         try
         {
             upgradeTarget.updateVersion(context.getTo());
@@ -253,16 +253,16 @@ public class DefaultUpgradeManager implements UpgradeManager
     }
 
     /**
-     * Check that the specified home instance if a valid instance to be working
+     * Check that the specified data instance if a valid instance to be working
      * with.
      *
-     * @param home
+     * @param data
      *
-     * @throws IllegalArgumentException if the home instance is not valid.
+     * @throws IllegalArgumentException if the data instance is not valid.
      */
-    private void checkHome(Home home)
+    private void checkData(Data data)
     {
-        if (!home.isInitialised())
+        if (!data.isInitialised())
         {
             throw new IllegalArgumentException();
         }

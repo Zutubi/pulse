@@ -16,25 +16,25 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * The home object provides an interface to the configured home directory,
+ * The data object provides an interface to the configured data directory,
  * its layout and its data.
  * <p/>
- * The home directory is layed out as follows:
+ * The data directory is layed out as follows:
  * <p/>
- * home/
+ * data/
  * config/: user configuration files
  * database/: the embedded HSQL database
  * projects/: build artifacts
  * <p/>
  * pulse.config.properties: core configuration properties, contain version and license details amongst other things
  */
-public class Home implements UserPaths
+public class Data implements UserPaths
 {
-    private static final Logger LOG = Logger.getLogger(Home.class);
+    private static final Logger LOG = Logger.getLogger(Data.class);
 
-    private final File pulseHome;
+    private final File pulseData;
 
-    private Version homeVersion;
+    private Version dataVersion;
     private File userConfigRoot;
     private File projectRoot;
     private File databaseRoot;
@@ -45,20 +45,20 @@ public class Home implements UserPaths
     private String licenseKey;
     private License license;
 
-    protected Home(File homeDir)
+    protected Data(File dataDir)
     {
-        this.pulseHome = homeDir;
+        this.pulseData = dataDir;
     }
 
     /**
-     * The home directory MUST be initialised before the application can start.
+     * The data directory MUST be initialised before the application can start.
      *
-     * @return true if the home is initialised
+     * @return true if the data is initialised
      * @see #init()
      */
     public boolean isInitialised()
     {
-        if (!pulseHome.exists())
+        if (!pulseData.exists())
         {
             return false;
         }
@@ -67,7 +67,7 @@ public class Home implements UserPaths
     }
 
     /**
-     * Initialise the home directory. This will ensure that the necessary directories
+     * Initialise the data directory. This will ensure that the necessary directories
      * and configuration files are setup.
      *
      * @throws IOException
@@ -76,13 +76,13 @@ public class Home implements UserPaths
     {
         if (isInitialised())
         {
-            throw new StartupException("Can not initialise a home directory that is already initialised.");
+            throw new StartupException("Can not initialise a data directory that is already initialised.");
         }
 
-        // create the home directory.
-        if (!pulseHome.exists() && !pulseHome.mkdirs())
+        // create the data directory.
+        if (!pulseData.exists() && !pulseData.mkdirs())
         {
-            throw new StartupException("Failed to create the configured home directory: " + pulseHome + ".");
+            throw new StartupException("Failed to create the configured data directory: " + pulseData + ".");
         }
 
         // write the version file.
@@ -91,7 +91,7 @@ public class Home implements UserPaths
     }
 
     /**
-     * Update the version recorded in the home directory.
+     * Update the version recorded in the data directory.
      *
      * @param version
      * @throws IOException
@@ -103,24 +103,24 @@ public class Home implements UserPaths
     }
 
     /**
-     * Retrieve the version recorded in the home directory.
+     * Retrieve the version recorded in the data directory.
      *
      * @return Version
      */
     public Version getVersion()
     {
-        if (homeVersion == null)
+        if (dataVersion == null)
         {
             try
             {
-                homeVersion = Version.read(getConfig());
+                dataVersion = Version.read(getConfig());
             }
             catch (IOException e)
             {
                 LOG.severe("Failed to load the config. Cause: " + e.getMessage(), e);
             }
         }
-        return homeVersion;
+        return dataVersion;
     }
 
     public void updateLicenseKey(String key) throws IOException
@@ -166,13 +166,13 @@ public class Home implements UserPaths
     }
 
     /**
-     * Retrieve the home directory.
+     * Retrieve the data directory.
      *
-     * @return the configured home root directory.
+     * @return the configured data root directory.
      */
-    public File getHome()
+    public File getData()
     {
-        return pulseHome;
+        return pulseData;
     }
 
     /**
@@ -182,7 +182,7 @@ public class Home implements UserPaths
     {
         if (userConfigRoot == null)
         {
-            userConfigRoot = new File(pulseHome, "config");
+            userConfigRoot = new File(pulseData, "config");
         }
         return userConfigRoot;
     }
@@ -194,7 +194,7 @@ public class Home implements UserPaths
     {
         if (databaseRoot == null)
         {
-            databaseRoot = new File(pulseHome, "database");
+            databaseRoot = new File(pulseData, "database");
         }
         return databaseRoot;
     }
@@ -206,7 +206,7 @@ public class Home implements UserPaths
     {
         if (projectRoot == null)
         {
-            projectRoot = new File(pulseHome, "projects");
+            projectRoot = new File(pulseData, "projects");
         }
         return projectRoot;
     }
@@ -229,6 +229,6 @@ public class Home implements UserPaths
 
     private File getConfigFile()
     {
-        return new File(pulseHome, CONFIG_FILE_NAME);
+        return new File(pulseData, CONFIG_FILE_NAME);
     }
 }

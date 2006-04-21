@@ -5,7 +5,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.setup.CreateAdminForm;
 import com.zutubi.pulse.acceptance.forms.setup.ServerSettingsForm;
-import com.zutubi.pulse.acceptance.forms.setup.SetPulseHomeForm;
+import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
 import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
 import com.zutubi.pulse.test.LicenseHelper;
 
@@ -49,7 +49,7 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         beginAt("/");
 
         // step one. setting the pulse home variable.
-        checkSetPulseHome();
+        checkSetPulseData();
 
         // step two. setting the license details.
         checkLicenseDetails();
@@ -155,26 +155,26 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         createAdminForm.nextFormElements("admin", "A. D. Ministrator", "admin", "admin");
     }
 
-    private void checkSetPulseHome()
+    private void checkSetPulseData()
     {
-        SetPulseHomeForm homeForm = new SetPulseHomeForm(tester);
+        SetPulseDataForm dataForm = new SetPulseDataForm(tester);
 
-        homeForm.assertFormPresent();
+        dataForm.assertFormPresent();
 
-        // ensure that we have a default value for the pulseHome property.
-        assertFormElementNotEmpty("home");
+        // ensure that we have a default value for the pulseData property.
+        assertFormElementNotEmpty("data");
         // record the default value for later use.
-        String defaultHome = getFormValue("home");
+        String defaultData = getFormValue("data");
 
-        // check the validation - an empty pulse home.
-        homeForm.nextFormElements("");
+        // check the validation - an empty pulse data.
+        dataForm.nextFormElements("");
         // assert that we are still on the same page.
-        homeForm.assertFormElements("");
+        dataForm.assertFormElements("");
 
-        // check validation - an invalid pulse home value.
+        // check validation - an invalid pulse data value.
 
-        // enter valid pulse home that does not exist.
-        homeForm.nextFormElements(defaultHome);
+        // enter valid pulse data that does not exist.
+        dataForm.nextFormElements(defaultData);
 
         // it should prompt for confirmation to create the directory....
     }

@@ -6,7 +6,7 @@
          its value in the running VM.
 
          The following properties are translated:
-         user.home - User's home directory
+         user.data - User's data directory
          user.dir - User's current working directory
          java.io.tmpdir - Default temp file path -->
     <diskStore path="java.io.tmpdir"/>

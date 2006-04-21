@@ -63,7 +63,7 @@ public class SetupWizard extends BaseWizard
         licenseKey = licenseKey.replaceAll("\n", "");
         try
         {
-            configurationManager.getHome().updateLicenseKey(licenseKey);
+            configurationManager.getData().updateLicenseKey(licenseKey);
         }
         catch (IOException e)
         {

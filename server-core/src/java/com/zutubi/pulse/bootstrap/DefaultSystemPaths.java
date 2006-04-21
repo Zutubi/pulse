@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class DefaultSystemPaths implements SystemPaths
 {
-    private final File pulseInstall;
+    private final File pulseHome;
 
     private File systemRoot;
     private File contentRoot;
@@ -24,14 +24,14 @@ public class DefaultSystemPaths implements SystemPaths
 
     public DefaultSystemPaths(File pulseHome)
     {
-        this.pulseInstall = pulseHome;
+        this.pulseHome = pulseHome;
     }
 
     public File getSystemRoot()
     {
         if (systemRoot == null)
         {
-            systemRoot = new File(pulseInstall, "system");
+            systemRoot = new File(pulseHome, "system");
         }
         return systemRoot;
     }

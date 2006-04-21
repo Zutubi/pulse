@@ -4,7 +4,7 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.bootstrap.Home;
+import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 
@@ -43,7 +43,7 @@ public class MockUpgradeContext implements UpgradeContext
         return null;
     }
 
-    public Home getHome()
+    public Data getData()
     {
         return null;
     }

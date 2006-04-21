@@ -35,11 +35,11 @@
         <servlet-name>hessian</servlet-name>
         <servlet-class>com.zutubi.pulse.hessian.CustomHessianServlet</servlet-class>
         <init-param>
-            <param-name>home-class</param-name>
+            <param-name>data-class</param-name>
             <param-value>com.zutubi.pulse.slave.SlaveServiceImpl</param-value>
         </init-param>
         <init-param>
-            <param-name>home-api</param-name>
+            <param-name>data-api</param-name>
             <param-value>com.zutubi.pulse.services.SlaveService</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>

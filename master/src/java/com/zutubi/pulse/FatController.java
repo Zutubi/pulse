@@ -82,7 +82,7 @@ public class FatController implements EventListener, Stoppable
         quartzScheduler.addJob(detail, true);
 
         // check license: enable the fat controller iff the license is valid.
-        License license = configManager.getHome().getLicense();
+        License license = configManager.getData().getLicense();
         if (license.isExpired())
         {
             disable();

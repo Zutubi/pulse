@@ -40,7 +40,7 @@
     <div class="box">
        <ul>
            <li class="explore">
-               <a href="dashboard.action">go to your home page</a> :: at the dashboard view (dashboard &gt; home)
+               <a href="dashboard.action">go to your data page</a> :: at the dashboard view (dashboard &gt; data)
            </li>
            <li class="explore">
                <a href="viewProjects.action">view all projects</a> :: at the projects view (projects)

@@ -6,7 +6,7 @@ package com.zutubi.pulse.bootstrap;
 /**
  * <class-comment/>
  */
-public interface HomeResolver
+public interface DataResolver
 {
-    Home getHome();
+    Data getData();
 }

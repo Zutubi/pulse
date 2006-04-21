@@ -46,13 +46,13 @@ public class FileHandler extends java.util.logging.FileHandler
         }
 
         // only handle substitution if pulse.home is set.
-        if (!System.getProperties().contains("pulse.install"))
+        if (!System.getProperties().contains("pulse.home"))
         {
             return pattern;
         }
 
         // WARNING: The following implementation does not support the escaping of the '%' character.
-        String pulseHome = System.getProperty("pulse.install");
+        String pulseHome = System.getProperty("pulse.home");
 
         int index = pattern.indexOf("%b");
         while (index != -1)

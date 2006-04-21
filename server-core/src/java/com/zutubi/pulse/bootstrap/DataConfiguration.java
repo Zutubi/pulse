@@ -13,9 +13,9 @@ import java.io.File;
 /**
  * <class-comment/>
  */
-public class HomeConfiguration implements HomeResolver
+public class DataConfiguration implements DataResolver
 {
-    private static final Logger LOG = Logger.getLogger(HomeConfiguration.class);
+    private static final Logger LOG = Logger.getLogger(DataConfiguration.class);
 
     private static final String FILENAME = "pulse-init.properties";
 
@@ -25,37 +25,37 @@ public class HomeConfiguration implements HomeResolver
     private SystemPaths paths = null;
 
     /**
-     * The home property.
+     * The data property.
      */
-    private static final String HOME_PROPERTY_NAME = "pulse.home";
+    private static final String DATA_PROPERTY_NAME = "pulse.data";
 
-    public Home getHome()
+    public Data getData()
     {
-        File dir = getHomeDirectory();
+        File dir = getDataDirectory();
         if (dir != null)
         {
-            return new Home(dir);
+            return new Data(dir);
         }
         return null;
     }
 
-    public void setHomeDirectory(File f)
+    public void setDataDirectory(File f)
     {
         Config init = getInitProps();
-        init.setProperty(HOME_PROPERTY_NAME, f.getAbsolutePath());
+        init.setProperty(DATA_PROPERTY_NAME, f.getAbsolutePath());
     }
 
-    public File getHomeDirectory()
+    public File getDataDirectory()
     {
         Config sys = getSystemProps();
-        if (sys.hasProperty(HOME_PROPERTY_NAME))
+        if (sys.hasProperty(DATA_PROPERTY_NAME))
         {
-            return new File(sys.getProperty(HOME_PROPERTY_NAME));
+            return new File(sys.getProperty(DATA_PROPERTY_NAME));
         }
         Config init = getInitProps();
-        if (init.hasProperty(HOME_PROPERTY_NAME))
+        if (init.hasProperty(DATA_PROPERTY_NAME))
         {
-            return new File(init.getProperty(HOME_PROPERTY_NAME));
+            return new File(init.getProperty(DATA_PROPERTY_NAME));
         }
         return null;
     }

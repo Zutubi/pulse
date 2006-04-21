@@ -21,11 +21,11 @@ public interface ConfigurationManager
 
     SystemPaths getSystemPaths();
 
-    void setPulseHome(File pulseHome);
+    void setPulseData(File pulseHome);
 
-    File getHomeDirectory();
+    File getDataDirectory();
 
-    Home getHome();
+    Data getData();
 
     /**
      * Returns true if the system is not completely configured.
@@ -34,5 +34,5 @@ public interface ConfigurationManager
      */
     boolean requiresSetup();
 
-    File getInstallDirectory();
+    File getHomeDirectory();
 }

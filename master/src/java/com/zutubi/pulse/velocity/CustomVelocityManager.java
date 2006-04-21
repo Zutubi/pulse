@@ -9,7 +9,7 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.Home;
+import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.security.AcegiUtils;
@@ -50,9 +50,9 @@ public class CustomVelocityManager extends VelocityManager
         context.put("build_date", v.getBuildDate());
         context.put("build_number", v.getBuildNumber());
 
-        Home home = configManager.getHome();
-        if (home != null)
-            context.put("license", home.getLicense());
+        Data data = configManager.getData();
+        if (data != null)
+            context.put("license", data.getLicense());
 
         return context;
     }

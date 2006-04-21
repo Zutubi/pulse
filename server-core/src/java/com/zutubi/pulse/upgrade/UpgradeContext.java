@@ -4,7 +4,7 @@
 package com.zutubi.pulse.upgrade;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.bootstrap.Home;
+import com.zutubi.pulse.bootstrap.Data;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public interface UpgradeContext
 
     List<UpgradeTask> getTasks();
 
-    Home getHome();
+    Data getData();
 
     Version getFrom();
 

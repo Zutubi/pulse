@@ -13,58 +13,58 @@ import java.io.File;
 /**
  * <class-comment/>
  */
-public class ConfigurePulseHomeAction extends ActionSupport
+public class ConfigurePulseDataAction extends ActionSupport
 {
     private ConfigurationManager configurationManager;
 
     private SetupManager setupManager;
 
-    private String home;
+    private String data;
 
-    public String getHome()
+    public String getData()
     {
-        return home;
+        return data;
     }
 
-    public void setHome(String home)
+    public void setData(String data)
     {
-        this.home = home;
+        this.data = data;
     }
 
     public void validate()
     {
-        // attempt to create the home directory. If this fails, we need to ask the
+        // attempt to create the data directory. If this fails, we need to ask the
         // user for another directory.
-        File home = new File(this.home);
-        if (!home.exists() && !home.mkdirs())
+        File data = new File(this.data);
+        if (!data.exists() && !data.mkdirs())
         {
-            addFieldError("home", getText(""));
+            addFieldError("data", getText(""));
         }
     }
 
     public String doInput() throws Exception
     {
         // set the default.
-        String install = System.getProperty(SimpleConfigurationManager.PULSE_INSTALL);
-        if (install == null)
+        String data = System.getProperty(SimpleConfigurationManager.PULSE_HOME);
+        if (data == null)
         {
-            this.home = "home";
+            this.data = "data";
         }
         else
         {
-            this.home = install + File.separatorChar + "home";
+            this.data = data + File.separatorChar + "data";
         }
 
         // make the path the shortest possible.
-        this.home = new File(this.home).getCanonicalPath();
+        this.data = new File(this.data).getCanonicalPath();
 
         return INPUT;
     }
 
     public String execute()
     {
-        File home = new File(this.home);
-        configurationManager.setPulseHome(home);
+        File home = new File(this.data);
+        configurationManager.setPulseData(home);
 
         // next we need to know if we need to upgrade or setup.
         if (setupManager.systemRequiresSetup())
