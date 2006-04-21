@@ -51,7 +51,7 @@ public class DefaultTriggerHandlerPersistenceTest extends PersistenceTestCase
     public void testTriggerStatePersistedWhenTaskThrowsException()
     {
         // configure the trigger.
-        NoopTrigger trigger = new NoopTrigger("test");
+        NoopTrigger trigger = new NoopTrigger("testTriggerStatePersistedWhenTaskThrowsException");
         trigger.setTaskClass(GenerateExceptionTask.class);
         triggerDao.save(trigger);
 
@@ -70,6 +70,24 @@ public class DefaultTriggerHandlerPersistenceTest extends PersistenceTestCase
         }
 
         // assert that its state change was persisted.
+        persistentTrigger = triggerDao.findById(trigger.getId());
+        assertEquals(1, persistentTrigger.getTriggerCount());
+    }
+
+    public void testTriggerStatePersistenceAcrossTransactions() throws SchedulingException
+    {
+        NoopTrigger trigger = new NoopTrigger("testTriggerStatePersistenceAcrossTransactions");
+        trigger.setTaskClass(NoopTask.class);
+        triggerDao.save(trigger);
+
+        // assert its initial state.
+        Trigger persistentTrigger = triggerDao.findById(trigger.getId());
+        assertEquals(0, persistentTrigger.getTriggerCount());
+
+        commitAndRefreshTransaction();
+        handler.fire(trigger);
+        commitAndRefreshTransaction();
+
         persistentTrigger = triggerDao.findById(trigger.getId());
         assertEquals(1, persistentTrigger.getTriggerCount());
     }

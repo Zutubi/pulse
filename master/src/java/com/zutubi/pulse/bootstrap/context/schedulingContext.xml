@@ -101,6 +101,9 @@ This context requires:
         <property name="objectFactory">
             <ref bean="objectFactory"/>
         </property>
+        <property name="triggerDao">
+            <ref bean="triggerDao"/>
+        </property>
     </bean>
 
 </beans>

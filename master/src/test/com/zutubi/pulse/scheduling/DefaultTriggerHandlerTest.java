@@ -35,6 +35,7 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
         handler = new DefaultTriggerHandler();
         handler.setObjectFactory(new ObjectFactory());
         triggerDao = new MockTriggerDao();
+        handler.setTriggerDao(triggerDao);
 
         executor = Executors.newFixedThreadPool(5);
     }
