@@ -13,7 +13,7 @@
 
     <recipe name="default">
         <property name="targets" value="build.all"/>
-        <macro-ref name="ant-build"/>
+        <macro-ref macro="ant-build"/>
     </recipe>
 
     <recipe name="acceptance">
