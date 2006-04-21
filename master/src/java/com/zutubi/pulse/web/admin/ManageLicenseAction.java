@@ -46,6 +46,11 @@ public class ManageLicenseAction extends ActionSupport
 
     public void validate()
     {
+        if (hasErrors())
+        {
+            return;
+        }
+
         try
         {
             String licenseKey = license.replaceAll("\n", "");
