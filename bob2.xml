@@ -13,11 +13,11 @@
 
     <recipe name="default">
         <property name="targets" value="build.all"/>
-        <macro-ref macro="ant-build"/>
+        <macro-ref macro="${ant-build}"/>
     </recipe>
 
     <recipe name="acceptance">
         <property name="targets" value="accept.master"/>
-        <macro-ref name="ant-build"/>
+        <macro-ref name="${ant-build}"/>
     </recipe>
 </project>
