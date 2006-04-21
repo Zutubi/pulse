@@ -1,17 +1,18 @@
 package com.zutubi.pulse.license;
 
+import com.opensymphony.util.TextUtils;
 import org.apache.commons.codec.binary.Base64;
 
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.StringReader;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
-import java.io.LineNumberReader;
-import java.io.StringReader;
-import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -49,7 +50,7 @@ public class LicenseDecoder
             // invalid length.
             return null;
         }
-        
+
         if (data.length < 4 + length)
         {
             // the reported data length more then the available data. data is invalid.
@@ -80,6 +81,15 @@ public class LicenseDecoder
             String name = reader.readLine();
             String holder = reader.readLine();
             String expiryString = reader.readLine();
+
+            // verify that all of the expected fields where available.
+            if (!TextUtils.stringSet(name) ||
+                    !TextUtils.stringSet(holder) ||
+                    !TextUtils.stringSet(expiryString))
+            {
+                return null;
+            }
+
             Date expiryDate = null;
             if (!expiryString.equals("Never"))
             {
