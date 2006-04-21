@@ -162,6 +162,7 @@
             <sysproperty key="pulse.port" value="8889"/>
             <classpath>
                 <pathelement location="${build.dir}/classes"/>
+                <pathelement location="${build.dir}/test.classes"/>
                 <pathelement location="${build.dir}/accept.classes"/>
                 <fileset dir="${build.dir}/lib">
                     <include name="**/*.jar"/>
