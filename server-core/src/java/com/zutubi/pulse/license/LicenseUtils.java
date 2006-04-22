@@ -1,5 +1,7 @@
 package com.zutubi.pulse.license;
 
+import java.util.Calendar;
+
 /**
  * <class-comment/>
  */
@@ -41,7 +43,9 @@ public class LicenseUtils
 
     public static void main(String argv[]) throws LicenseException
     {
-        License l = new License("dummy", "S. O. MeBody", null);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_YEAR, 45);
+        License l = new License("beta", "Aslak Hellesoy", cal.getTime());
         printEncodedLicense(l);
     }
 }
