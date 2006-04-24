@@ -3,6 +3,9 @@
  ********************************************************************************/
 package com.zutubi.pulse.web.project;
 
+import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.Validateable;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildSpecificationNodeDao;
 import com.zutubi.pulse.scheduling.EventTrigger;
@@ -11,19 +14,18 @@ import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.scm.SCMChangeEvent;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
 import com.zutubi.pulse.web.wizard.WizardCompleteState;
-import com.zutubi.pulse.core.*;
-import com.opensymphony.util.TextUtils;
-import com.opensymphony.xwork.Validateable;
+import org.acegisecurity.AccessDeniedException;
 
+import java.io.ByteArrayInputStream;
 import java.util.Map;
 import java.util.TreeMap;
-import java.io.ByteArrayInputStream;
 
 /**
  */
@@ -80,6 +82,15 @@ public class AddProjectWizard extends BaseWizard
         addState(customDetails);
         addState(versionedDetails);
         addFinalState(completeState.getStateName(), completeState);
+    }
+
+    public void initialise()
+    {
+        super.initialise();
+        if(!AcegiUtils.userHasRole(GrantedAuthority.ADMINISTRATOR))
+        {
+            throw new AccessDeniedException("Access denied");
+        }
     }
 
     public void process()

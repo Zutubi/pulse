@@ -19,19 +19,22 @@
     <h3 class="heading">configure</h3>
     <div class="box">
         <ul>
+            #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
             <li class="task">
                 <a href="addProject!input.action">add new projects</a> :: using the add project wizard (projects &gt; add new project)
             </li>
-            #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
             <li class="task">
                 <a href="admin/userSettings.action">add new users</a> :: at the users view (administration &gt; users tab )
             </li>
-            #end
             <li class="task">
                 <a href="admin/serverSettings.action">configure server settings</a> :: at the server settings view (administration &gt; settings tab)
             </li>
             <li class="task">
                 <a href="viewResources.action">add new resources</a> :: at the server resources view (server &gt; resources tab)
+            </li>
+            #end
+            <li class="task">
+                <a href="preferences.action">configure your preferences</a> :: at the preferences view (dashboard &gt; preferences)
             </li>
         </ul>
     </div>
@@ -40,16 +43,14 @@
     <div class="box">
        <ul>
            <li class="explore">
-               <a href="dashboard.action">go to your data page</a> :: at the dashboard view (dashboard &gt; data)
+               <a href="dashboard.action">go to your home page</a> :: at the dashboard view (dashboard &gt; home)
            </li>
            <li class="explore">
                <a href="viewProjects.action">view all projects</a> :: at the projects view (projects)
            </li>
-           #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
            <li class="explore">
                <a href="viewRecipeQueue.action">view server activity</a> :: at the server status view (server &gt; status )
            </li>
-           #end
        </ul>
     </div>
 

@@ -4,6 +4,7 @@
 package com.zutubi.pulse.security;
 
 import org.acegisecurity.Authentication;
+import org.acegisecurity.GrantedAuthority;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.userdetails.UserDetails;
@@ -44,5 +45,34 @@ public class AcegiUtils
             }
         }
         return null;
+    }
+
+    /**
+     * Tests if the logged in user has been granted the given role.
+     *
+     * @param role the role to test for
+     * @return true iff there is a logged in user who has been granted the
+     * given role
+     */
+    public static boolean userHasRole(String role)
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication != null)
+        {
+            Object principle = authentication.getPrincipal();
+            if(principle instanceof UserDetails)
+            {
+                UserDetails details = (UserDetails)principle;
+                for(GrantedAuthority authority: details.getAuthorities())
+                {
+                    if(authority.getAuthority().equals(role))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }
