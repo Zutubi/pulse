@@ -10,9 +10,6 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.TreeNode;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
@@ -22,6 +19,9 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.quartz.TimeoutBuildJob;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.TreeNode;
 import com.zutubi.pulse.util.logging.Logger;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -306,11 +306,17 @@ public class BuildController implements EventListener
     private List<Changelist> getChangeSince(SCMServer server, Revision previousRevision, Revision revision, List<Changelist> scmChanges)
             throws SCMException
     {
+        List<Changelist> result = new LinkedList<Changelist>();
         scmChanges = server.getChanges(previousRevision, revision, "");
+
+        // Get the uid after the changes as Svn requires a connection to be
+        // made first
+        String uid = server.getUid();
+
         for (Changelist change : scmChanges)
         {
             // Have we already got this revision?
-            Changelist alreadySaved = buildManager.getChangelistByRevision(change.getRevision());
+            Changelist alreadySaved = buildManager.getChangelistByRevision(uid, change.getRevision());
             if(alreadySaved != null)
             {
                 change = alreadySaved;
@@ -318,8 +324,10 @@ public class BuildController implements EventListener
 
             change.addProjectId(buildResult.getProject().getId());
             change.addResultId(buildResult.getId());
+            result.add(change);
         }
-        return scmChanges;
+
+        return result;
     }
 
     private void scheduleTimeout()

@@ -7,12 +7,12 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.CachingSCMServer;
-import com.zutubi.pulse.scm.SCMFileCache;
-import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
+import com.zutubi.pulse.scm.CachingSCMServer;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMFileCache;
+import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
 import java.text.ParseException;
@@ -684,7 +684,7 @@ public class P4Server extends CachingSCMServer
         revision.setComment(comment);
         // branch??
 
-        Changelist changelist = new Changelist(revision);
+        Changelist changelist = new Changelist(getUid(), revision);
 
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {
@@ -808,6 +808,11 @@ public class P4Server extends CachingSCMServer
         }
 
         return info;
+    }
+
+    public String getUid()
+    {
+        return port;
     }
 
     public String getLocation()

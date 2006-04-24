@@ -4,12 +4,12 @@
 package com.zutubi.pulse.renderer;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.BuildScmDetails;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.IOUtils;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 
@@ -174,9 +174,9 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         buildRevision.setRevisionString("656");
 
         List<Changelist> changes = new LinkedList<Changelist>();
-        Changelist list = new Changelist(new Revision("test author", "short comment", 324252, "655"));
+        Changelist list = new Changelist("scm", new Revision("test author", "short comment", 324252, "655"));
         changes.add(list);
-        list = new Changelist(new Revision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output dadada da dadad ad ad adadad ad ad ada d adada dad ad ad d ad ada da d", 310000, "656"));
+        list = new Changelist("scm", new Revision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output dadada da dadad ad ad adadad ad ad ada d adada dad ad ad d ad ada da d", 310000, "656"));
         changes.add(list);
 
         BuildScmDetails details = new BuildScmDetails(buildRevision, changes);

@@ -9,7 +9,7 @@ import com.zutubi.pulse.core.model.Revision;
  */
 public interface SCMCachePopulator
 {
-    String getUID();
+    String getUniqueLocation();
 
     boolean requiresRefresh(Revision revision) throws SCMException;
 

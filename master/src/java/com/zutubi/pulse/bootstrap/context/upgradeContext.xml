@@ -5,6 +5,20 @@
 -->
 <beans>
 
-    <bean id="upgradeManager" class="com.zutubi.pulse.upgrade.DefaultUpgradeManager" autowire="byName"/>
+    <bean id="upgradeManager" class="com.zutubi.pulse.upgrade.DefaultUpgradeManager" autowire="byName">
+        <property name="tasks">
+            <list>
+                <bean id="scmUidTask" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+                    <property name="buildNumber" value="1001"/>
+                    <property name="mappings">
+                        <list>
+                            <value>com/zutubi/pulse/upgrade/schema/build-1010/Changelist.hbm.xml</value>
+                            <value>com/zutubi/pulse/upgrade/schema/build-1010/Revision.hbm.xml</value>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
 
 </beans>

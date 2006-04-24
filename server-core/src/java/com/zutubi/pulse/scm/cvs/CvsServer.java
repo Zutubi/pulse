@@ -9,15 +9,15 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.model.Cvs;
 import com.zutubi.pulse.scm.CachingSCMServer;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMFileCache;
 import com.zutubi.pulse.scm.cvs.client.CvsClient;
+import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
@@ -25,8 +25,8 @@ import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * The Cvs Server provides all interactions with a cvs repository.
@@ -59,6 +59,11 @@ public class CvsServer extends CachingSCMServer
         info.put("location", getLocation());
         info.put("version", cvs.getServerVersion());
         return info;
+    }
+
+    public String getUid()
+    {
+        return getRoot();
     }
 
     public String getLocation()
@@ -213,7 +218,7 @@ public class CvsServer extends CachingSCMServer
         // differences across multiple branches/revisions. For practical reasons, we do not need to...
 
 
-        return cvs.getChangesBetween((CvsRevision)from, (CvsRevision)to);
+        return cvs.getChangesBetween(getUid(), (CvsRevision)from, (CvsRevision)to);
     }
 
     /**
@@ -231,12 +236,12 @@ public class CvsServer extends CachingSCMServer
             throw new IllegalArgumentException("since revision date can not be null.");
         }
 
-        return cvs.getLatestChange((CvsRevision)since) != null;
+        return cvs.getLatestChange(getUid(), (CvsRevision)since) != null;
     }
 
     public CvsRevision getLatestRevision() throws SCMException
     {
-        return cvs.getLatestChange();
+        return cvs.getLatestChange(getUid());
     }
 
     /**

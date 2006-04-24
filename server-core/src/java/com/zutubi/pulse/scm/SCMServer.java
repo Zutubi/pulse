@@ -27,6 +27,15 @@ public interface SCMServer
     Map<String, String> getServerInfo() throws SCMException;
 
     /**
+     * Returns a string that uniquely identifies the server itself.  This may
+     * include the server address and repository root, for example.  All
+     * SCMServer objects talking to the same SCM should return the same id.
+     *
+     * @return a unique id for the SCM server
+     */
+    String getUid() throws SCMException;
+
+    /**
      * Returns a summarised form of the location of the source this SCM has
      * been configured to check out.  For example, an subversion URL.
      *

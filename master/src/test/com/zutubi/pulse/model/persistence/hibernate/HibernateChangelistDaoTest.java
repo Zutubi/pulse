@@ -4,8 +4,8 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 
 import java.util.Calendar;
@@ -37,7 +37,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
     {
         Date date = Calendar.getInstance().getTime();
         CvsRevision revision = new CvsRevision("pulse", "MAIN", "test changelist", date);
-        Changelist list = new Changelist(revision);
+        Changelist list = new Changelist("scm", revision);
         Change change = new Change("some/random/file", "23", Change.Action.EDIT);
 
         list.addChange(change);
@@ -120,7 +120,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        Changelist changelist = changelistDao.findByRevision(new NumericalRevision(12));
+        Changelist changelist = changelistDao.findByRevision("scm", new NumericalRevision(12));
         assertNotNull(changelist);
         assertEquals("jason", changelist.getRevision().getAuthor());
     }
@@ -128,13 +128,13 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
     public void testLookupByCvsRevision()
     {
         Revision r = new CvsRevision("joe", "MAIN", "i made this", new Date(1234));
-        Changelist list = new Changelist(r);
+        Changelist list = new Changelist("scm", r);
 
         changelistDao.save(list);
 
         commitAndRefreshTransaction();
 
-        Changelist otherList = changelistDao.findByRevision(r);
+        Changelist otherList = changelistDao.findByRevision("scm", r);
         assertNotNull(otherList);
         assertPropertyEquals(list, otherList);
     }
@@ -143,7 +143,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
     {
         NumericalRevision revision = new NumericalRevision(number);
         revision.setAuthor(login);
-        Changelist changelist = new Changelist(revision);
+        Changelist changelist = new Changelist("scm", revision);
 
         if(project != 0)
         {

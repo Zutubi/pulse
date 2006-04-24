@@ -3,9 +3,9 @@
  ********************************************************************************/
 package com.zutubi.pulse.scm;
 
-import com.zutubi.pulse.filesystem.remote.RemoteFile;
-import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
+import com.zutubi.pulse.filesystem.remote.RemoteFile;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
  */
 public abstract class CachingSCMServer implements SCMServer, SCMCachePopulator
 {
-    public String getUID()
+    public String getUniqueLocation()
     {
         return getLocation();
     }

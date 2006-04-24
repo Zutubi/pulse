@@ -161,7 +161,7 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public Changelist getChangelistByRevision(Revision revision)
+    public Changelist getChangelistByRevision(String serverUid, Revision revision)
     {
         throw new RuntimeException("Method not implemented.");
     }

@@ -211,6 +211,18 @@ public class SVNServer implements SCMServer
         return info;
     }
 
+    public String getUid() throws SCMException
+    {
+        String id = repository.getRepositoryUUID();
+        if(id == null)
+        {
+            // We have to connect to the server to get the id.
+            testConnection();
+            id = repository.getRepositoryUUID();
+        }
+        return id;
+    }
+
     public String getLocation()
     {
         return location.toString();
@@ -327,7 +339,7 @@ public class SVNServer implements SCMServer
                     revision.setDate(entry.getDate());
                     // branch??
 
-                    Changelist list = new Changelist(revision);
+                    Changelist list = new Changelist(getUid(), revision);
                     Map files = entry.getChangedPaths();
 
                     for (Object value : files.values())

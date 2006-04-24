@@ -7,13 +7,13 @@ import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.SlaveDao;
 import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
@@ -220,7 +220,7 @@ public class SetupDummyBuilds implements Runnable
         userRevision.setAuthor("jason");
         userRevision.setComment("a short comment");
         userRevision.setDate(new Date(System.currentTimeMillis() - 100000));
-        Changelist list = new Changelist(userRevision);
+        Changelist list = new Changelist("scm", userRevision);
         list.addChange(new Change("/home/jsankey/some/normal/file", "11", Change.Action.EDIT));
         list.addChange(new Change("/home/jsankey/some/other/file", "10", Change.Action.EDIT));
         list.addChange(new Change("/home/jsankey/a/silly/file/with/a/very/very/long/name/to/really/make/life/difficult/for/the/poor/little/UI/lets/see/if/it/gets/wrapped/shall/we", "1", Change.Action.BRANCH));
@@ -236,7 +236,7 @@ public class SetupDummyBuilds implements Runnable
         userRevision.setAuthor("jsankey");
         userRevision.setComment("a very long comment including\nnewlines like that one you just saw dude, not really very friendly at all");
         userRevision.setDate(new Date(System.currentTimeMillis() - 10000));
-        list = new Changelist(userRevision);
+        list = new Changelist("scm", userRevision);
         list.addChange(new Change("/home/jsankey/some/branched/file/with/a/very/long/filename/to/test/the/display/handling/of/such/things", "1", Change.Action.BRANCH));
         list.addProjectId(result.getProject().getId());
         list.addResultId(result.getId());
@@ -246,7 +246,7 @@ public class SetupDummyBuilds implements Runnable
         userRevision.setAuthor("jsankey");
         userRevision.setComment("short and sweet");
         userRevision.setDate(new Date(System.currentTimeMillis() - 9000));
-        list = new Changelist(userRevision);
+        list = new Changelist("scm", userRevision);
         list.addChange(new Change("/home/jsankey/some/file", "120", Change.Action.BRANCH));
         list.addProjectId(result.getProject().getId());
         list.addResultId(result.getId());

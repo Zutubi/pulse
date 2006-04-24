@@ -94,5 +94,5 @@ public interface BuildManager
 
     void deleteAllBuilds(Project project);
 
-    Changelist getChangelistByRevision(Revision revision);
+    Changelist getChangelistByRevision(String serverUid, Revision revision);
 }

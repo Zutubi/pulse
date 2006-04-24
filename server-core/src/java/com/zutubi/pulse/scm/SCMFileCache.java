@@ -5,7 +5,6 @@ package com.zutubi.pulse.scm;
 
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
-import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.cvs.CvsServer;
 
 import java.util.Map;
@@ -46,7 +45,7 @@ public class SCMFileCache
         lock.lock();
         try
         {
-            String uid = populator.getUID();
+            String uid = populator.getUniqueLocation();
             if (cache.containsKey(uid))
             {
                 item = cache.get(uid);

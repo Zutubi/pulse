@@ -16,6 +16,8 @@ import java.util.List;
  */
 public class Changelist extends Entity
 {
+    /* Unique ID for the server this revision is stored on. */
+    private String serverUid;
     private Revision revision;
     private List<Change> changes;
     // Used to facilitate recent changes for project lookup
@@ -32,8 +34,9 @@ public class Changelist extends Entity
 
     }
 
-    public Changelist(Revision revision)
+    public Changelist(String serverUid, Revision revision)
     {
+        this.serverUid = serverUid;
         this.revision = revision;
         this.changes = new LinkedList<Change>();
     }
@@ -41,6 +44,16 @@ public class Changelist extends Entity
     public void addChange(Change change)
     {
         changes.add(change);
+    }
+
+    public String getServerUid()
+    {
+        return serverUid;
+    }
+
+    private void setServerUid(String serverUid)
+    {
+        this.serverUid = serverUid;
     }
 
     public Revision getRevision()

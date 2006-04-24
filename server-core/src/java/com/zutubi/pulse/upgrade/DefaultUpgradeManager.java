@@ -4,9 +4,11 @@
 package com.zutubi.pulse.upgrade;
 
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.util.logging.Logger;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -158,6 +160,10 @@ public class DefaultUpgradeManager implements UpgradeManager
     {
         checkData(data);
 
+        // load the datasource as some tasks require it
+        ComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/bootstrap/context/databaseContext.xml");
+        DataSource dataSource = (DataSource) ComponentContext.getBean("dataSource");
+
         // ensure that
         // a) upgrade is not in progress.
 
@@ -165,6 +171,13 @@ public class DefaultUpgradeManager implements UpgradeManager
         Version to = Version.getVersion();
 
         List<UpgradeTask> tasks = determineRequiredUpgradeTasks(from, to);
+        for(UpgradeTask task: tasks)
+        {
+            if(DataSourceAware.class.isAssignableFrom(task.getClass()))
+            {
+                ((DataSourceAware)task).setDataSource(dataSource);
+            }
+        }
 
         // copy the tasks...
 

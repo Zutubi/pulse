@@ -32,10 +32,12 @@ public class LogAnalyser
 
     // group by (author,branch,comment)
 
+    private String uid;
     private CVSRoot root;
 
-    public LogAnalyser(CVSRoot root)
+    public LogAnalyser(String uid, CVSRoot root)
     {
+        this.uid = uid;
         this.root = root;
     }
 
@@ -185,7 +187,7 @@ public class LogAnalyser
             // is common to all the changes.
             Revision lastChange = localChanges.get(localChanges.size() - 1);
             CvsRevision rev = new CvsRevision(lastChange.getAuthor(), lastChange.getTag(), lastChange.getMessage(), lastChange.getDate());
-            Changelist changelist = new Changelist(rev);
+            Changelist changelist = new Changelist(uid, rev);
             for (Revision change : localChanges)
             {
                 changelist.addChange(new Change(change.getFilename(), change.getRevision(), change.getAction()));

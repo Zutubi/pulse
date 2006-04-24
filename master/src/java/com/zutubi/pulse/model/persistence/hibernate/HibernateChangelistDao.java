@@ -64,13 +64,14 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         });
     }
 
-    public Changelist findByRevision(final Revision revision)
+    public Changelist findByRevision(final String serverUid, final Revision revision)
     {
         return (Changelist) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from Changelist model where model.revision.revisionString = :revisionString order by id desc");
+                Query queryObject = session.createQuery("from Changelist model where model.serverUid = :serverUid and model.revision.revisionString = :revisionString");
+                queryObject.setParameter("serverUid", serverUid);
                 queryObject.setParameter("revisionString", revision.getRevisionString());
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());

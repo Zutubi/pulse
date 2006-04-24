@@ -5,11 +5,11 @@ package com.zutubi.pulse.renderer;
 
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.BuildScmDetails;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.IOUtils;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.File;
@@ -59,9 +59,9 @@ public class VelocityBuildResultRendererTest extends PulseTestCase
         buildRevision.setRevisionString("656");
 
         List<Changelist> changes = new LinkedList<Changelist>();
-        Changelist list = new Changelist(new Revision("test author", "short comment", System.currentTimeMillis() - 324252, "655"));
+        Changelist list = new Changelist("scm", new Revision("test author", "short comment", System.currentTimeMillis() - 324252, "655"));
         changes.add(list);
-        list = new Changelist(new Revision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output", System.currentTimeMillis() - 310000, "656"));
+        list = new Changelist("scm", new Revision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output", System.currentTimeMillis() - 310000, "656"));
         changes.add(list);
 
         BuildScmDetails details = new BuildScmDetails(buildRevision, changes);

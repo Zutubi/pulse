@@ -7,8 +7,6 @@ import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.DatabaseBootstrap;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
@@ -21,6 +19,8 @@ import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.SimpleTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.tasks.CleanupBuilds;
+import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
@@ -246,9 +246,9 @@ public class DefaultBuildManager implements BuildManager, EventListener
         while (results.size() > 0);
     }
 
-    public Changelist getChangelistByRevision(Revision revision)
+    public Changelist getChangelistByRevision(String serverUid, Revision revision)
     {
-        return changelistDao.findByRevision(revision);
+        return changelistDao.findByRevision(serverUid, revision);
     }
 
     public BuildResult getPreviousBuildResult(BuildResult result)

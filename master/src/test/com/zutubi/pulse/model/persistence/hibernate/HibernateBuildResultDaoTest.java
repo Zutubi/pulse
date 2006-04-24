@@ -88,7 +88,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         revision.setAuthor("user");
         revision.setComment("i like fruit");
 
-        Changelist changes = new Changelist(revision);
+        Changelist changes = new Changelist("scm", revision);
         changes.addChange(new Change("/filename.1", "1.0", Change.Action.ADD));
         changes.addChange(new Change("/filename.2", "2.0", Change.Action.DELETE));
         changes.addChange(new Change("/filename.3", "3.0", Change.Action.EDIT));

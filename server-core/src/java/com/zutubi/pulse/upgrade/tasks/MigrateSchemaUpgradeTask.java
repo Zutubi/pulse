@@ -3,6 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.upgrade.tasks;
 
+import com.zutubi.pulse.upgrade.DataSourceAware;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.upgrade.UpgradeTask;
@@ -19,7 +20,7 @@ import java.util.Properties;
 /**
  * <class-comment/>
  */
-public class MigrateSchemaUpgradeTask implements UpgradeTask
+public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
 {
     private List<String> mappings = new LinkedList<String>();
 

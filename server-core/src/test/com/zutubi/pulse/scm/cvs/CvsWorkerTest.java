@@ -3,15 +3,15 @@
  ********************************************************************************/
 package com.zutubi.pulse.scm.cvs;
 
-import com.zutubi.pulse.core.model.CvsRevision;
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.test.PulseTestCase;
 import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
@@ -99,7 +99,7 @@ public class CvsWorkerTest extends PulseTestCase
         cvs.setModule(module);
 
         Date before = new Date();
-        CvsRevision revision = cvs.getLatestChange();
+        CvsRevision revision = cvs.getLatestChange("test");
         Date after = new Date();
 
         assertNotNull(revision);
@@ -119,22 +119,22 @@ public class CvsWorkerTest extends PulseTestCase
 
         // try a time a couple of days before the change.
         CvsRevision since = new CvsRevision("", "", "", LOCAL_DATE.parse("2006-03-01 02:00:00"));
-        CvsRevision revision = cvs.getLatestChange(since);
+        CvsRevision revision = cvs.getLatestChange("test", since);
         assertEquals("2006-03-10 04:00:00 GMT", SERVER_DATE.format(revision.getDate()));
 
         // try a time a couple of days after the change.
         since = new CvsRevision("", "", "", LOCAL_DATE.parse("2006-03-12 02:00:00"));
-        revision = cvs.getLatestChange(since);
+        revision = cvs.getLatestChange("test", since);
         assertNull(revision);
 
         // try a time 1 second before the change was made
         since = new CvsRevision("", "", "", SERVER_DATE.parse("2006-03-10 03:59:59 GMT"));
-        revision = cvs.getLatestChange(since);
+        revision = cvs.getLatestChange("test", since);
         assertEquals("2006-03-10 04:00:00 GMT", SERVER_DATE.format(revision.getDate()));
 
         // the revision represents the latest change, so if we ask for a change since then,
         // we should get null back.
-        assertNull(cvs.getLatestChange(revision));
+        assertNull(cvs.getLatestChange("test", revision));
     }
 
     public void testCheckoutHead() throws SCMException
@@ -248,7 +248,7 @@ public class CvsWorkerTest extends PulseTestCase
         CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-03-10 00:59:00 GMT"));
         CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-03-10 01:00:00 GMT"));
 
-        List<Changelist> changes = cvs.getChangesBetween(fromRevision, toRevision);
+        List<Changelist> changes = cvs.getChangesBetween("test", fromRevision, toRevision);
 
         assertEquals(2, changes.size());
         assertValidChangeSets(changes);
@@ -284,7 +284,7 @@ public class CvsWorkerTest extends PulseTestCase
         CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-02-10 00:59:00 GMT"));
         CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-04-10 01:00:00 GMT"));
 
-        List<Changelist> changes = cvs.getChangesBetween(fromRevision, toRevision);
+        List<Changelist> changes = cvs.getChangesBetween("test", fromRevision, toRevision);
 
         assertEquals(4, changes.size());
         assertValidChangeSets(changes);
@@ -339,7 +339,7 @@ public class CvsWorkerTest extends PulseTestCase
         String module = "unit-test/CvsWorkerTest/testChangesByDifferentAuthors";
         cvs.setModule(module);
 
-        List<Changelist> changes = cvs.getChangesBetween(fromRevision, toRevision);
+        List<Changelist> changes = cvs.getChangesBetween("test", fromRevision, toRevision);
 
         assertEquals(2, changes.size());
         assertValidChangeSets(changes);
@@ -362,7 +362,7 @@ public class CvsWorkerTest extends PulseTestCase
         String module = "unit-test/CvsWorkerTest/testChangesByOverlappingCommits";
         cvs.setModule(module);
 
-        List<Changelist> changes = cvs.getChangesBetween(fromRevision, toRevision);
+        List<Changelist> changes = cvs.getChangesBetween("test", fromRevision, toRevision);
 
         assertEquals(3, changes.size());
         assertValidChangeSets(changes);
@@ -393,7 +393,7 @@ public class CvsWorkerTest extends PulseTestCase
         String module = "unit-test/CvsWorkerTest/testChangesWithRemoval";
         cvs.setModule(module);
 
-        List<Changelist> changes = cvs.getChangesBetween(fromRevision, toRevision);
+        List<Changelist> changes = cvs.getChangesBetween("test", fromRevision, toRevision);
 
         assertEquals(4, changes.size());
         assertValidChangeSets(changes);
@@ -424,7 +424,7 @@ public class CvsWorkerTest extends PulseTestCase
         String module = "unit-test/CvsWorkerTest/testChangesWithAdd";
         cvs.setModule(module);
 
-        List<Changelist> changes = cvs.getChangesBetween(fromRevision, toRevision);
+        List<Changelist> changes = cvs.getChangesBetween("test", fromRevision, toRevision);
 
         assertEquals(1, changes.size());
         assertValidChangeSets(changes);
@@ -442,7 +442,7 @@ public class CvsWorkerTest extends PulseTestCase
         String module = "unit-test/CvsWorkerTest/testChangesWithModify";
         cvs.setModule(module);
 
-        List<Changelist> changes = cvs.getChangesBetween(fromRevision, toRevision);
+        List<Changelist> changes = cvs.getChangesBetween("test", fromRevision, toRevision);
 
         assertEquals(3, changes.size());
         assertValidChangeSets(changes);
@@ -469,7 +469,7 @@ public class CvsWorkerTest extends PulseTestCase
         cvs.setModule(module);
         cvs.setBranch("BRANCH");
 
-        List<Changelist> changes = cvs.getChangesBetween(fromRevision, toRevision);
+        List<Changelist> changes = cvs.getChangesBetween("test", fromRevision, toRevision);
 
         assertEquals(2, changes.size());
         assertValidChangeSets(changes);
@@ -491,8 +491,8 @@ public class CvsWorkerTest extends PulseTestCase
         cvs.setModule(module);
         cvs.setBranch("BRANCH");
 
-        assertNotNull(cvs.getLatestChange(new CvsRevision("", "", "", DATE_FORMAT.parse("2006-03-10"))));
-        assertNull(cvs.getLatestChange(new CvsRevision("", "", "", DATE_FORMAT.parse("2006-03-11"))));
+        assertNotNull(cvs.getLatestChange("test", new CvsRevision("", "", "", DATE_FORMAT.parse("2006-03-10"))));
+        assertNull(cvs.getLatestChange("test", new CvsRevision("", "", "", DATE_FORMAT.parse("2006-03-11"))));
     }
 
     public void testHasFileChangedSince() throws SCMException, ParseException
@@ -500,16 +500,16 @@ public class CvsWorkerTest extends PulseTestCase
         String module = "unit-test/CvsWorkerTest/testHasFileChangedSince";
         cvs.setModule(module + "/file1.txt");
 
-        assertNotNull(cvs.getLatestChange(new CvsRevision("", "", "", DATE_FORMAT.parse("2006-03-10"))));
-        assertNull(cvs.getLatestChange(new CvsRevision("", "", "", DATE_FORMAT.parse("2006-03-11"))));
+        assertNotNull(cvs.getLatestChange("test", new CvsRevision("", "", "", DATE_FORMAT.parse("2006-03-10"))));
+        assertNull(cvs.getLatestChange("test", new CvsRevision("", "", "", DATE_FORMAT.parse("2006-03-11"))));
     }
 
     public void testHasModuleChangedSince() throws SCMException, ParseException
     {
         cvs.setModule("module2");
 
-        assertNotNull(cvs.getLatestChange(new CvsRevision("", "", "", SERVER_DATE.parse("2006-03-10 14:00:00 GMT"))));
-        assertNull(cvs.getLatestChange(new CvsRevision("", "", "", SERVER_DATE.parse("2006-03-10 16:00:00 GMT"))));
+        assertNotNull(cvs.getLatestChange("test", new CvsRevision("", "", "", SERVER_DATE.parse("2006-03-10 14:00:00 GMT"))));
+        assertNull(cvs.getLatestChange("test", new CvsRevision("", "", "", SERVER_DATE.parse("2006-03-10 16:00:00 GMT"))));
     }
 
     public void testFileLastChangedDate() throws SCMException, ParseException
@@ -517,8 +517,8 @@ public class CvsWorkerTest extends PulseTestCase
         String module = "unit-test/CvsWorkerTest/testFileLastChangedDate";
         cvs.setModule(module + "/file1.txt");
 
-        assertNull(cvs.getLatestChange(new CvsRevision("", "", "", DATE_FORMAT.parse("2006-03-12"))));
-        CvsRevision rev = cvs.getLatestChange(new CvsRevision("", "", "", DATE_FORMAT.parse("2006-03-11")));
+        assertNull(cvs.getLatestChange("test", new CvsRevision("", "", "", DATE_FORMAT.parse("2006-03-12"))));
+        CvsRevision rev = cvs.getLatestChange("test", new CvsRevision("", "", "", DATE_FORMAT.parse("2006-03-11")));
         assertEquals("2006-03-11 02:00:00 GMT", SERVER_DATE.format(rev.getDate()));
     }
 

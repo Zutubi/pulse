@@ -2,6 +2,6 @@
 <#include "/${parameters.templateDir}/simple/form.ftl" />
 <table class="form"
 <#if parameters.width?exists>
-       width="${parameters.width}"<#tr/>
+       width="${parameters.width}"<#rt/>
        </#if>
 >

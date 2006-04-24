@@ -4,21 +4,21 @@
 package com.zutubi.pulse.scm.cvs;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.cvs.client.CvsClient;
 import com.zutubi.pulse.scm.cvs.client.LogCommandListener;
 import com.zutubi.pulse.scm.cvs.client.LogDirectoryBuilder;
 import com.zutubi.pulse.scm.cvs.client.VersionCommand;
-import com.zutubi.pulse.scm.cvs.client.CvsClient;
 import com.zutubi.pulse.util.logging.Logger;
+import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
-import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.io.File;
 
 /**
  * <class-comment/>
@@ -114,7 +114,7 @@ public class CvsWorker
     /**
      * @throws SCMException
      */
-    public CvsRevision getLatestChange() throws SCMException
+    public CvsRevision getLatestChange(String uid) throws SCMException
     {
         LOG.entering();
 
@@ -128,7 +128,7 @@ public class CvsWorker
             cal.add(Calendar.HOUR, -1 * hour);
 
             CvsRevision since = new CvsRevision("", branch, "", cal.getTime());
-            CvsRevision latest = getLatestChange(since);
+            CvsRevision latest = getLatestChange(uid, since);
             if (latest != null)
             {
                 return latest;
@@ -151,11 +151,11 @@ public class CvsWorker
      * @param since
      * @throws SCMException
      */
-    public CvsRevision getLatestChange(CvsRevision since) throws SCMException
+    public CvsRevision getLatestChange(String uid, CvsRevision since) throws SCMException
     {
         LOG.entering();
         CvsClient client = getClient();
-        LogAnalyser analyser = getAnalyser();
+        LogAnalyser analyser = getAnalyser(uid);
 
         RlogCommand log = newRlogCommand();
 
@@ -175,7 +175,7 @@ public class CvsWorker
         return result;
     }
 
-    public List<Changelist> getChangesBetween(CvsRevision from, CvsRevision to) throws SCMException
+    public List<Changelist> getChangesBetween(String uid, CvsRevision from, CvsRevision to) throws SCMException
     {
         LOG.entering();
 
@@ -204,7 +204,7 @@ public class CvsWorker
         List<LogInformation> response = new LinkedList<LogInformation>();
         getClient().executeCommand(rlog, new LogCommandListener(response));
 
-        List<Changelist> changelists = getAnalyser().extract(response);
+        List<Changelist> changelists = getAnalyser(uid).extract(response);
         LOG.exiting(changelists.size());
         return changelists;
     }
@@ -284,11 +284,11 @@ public class CvsWorker
     /**
      *
      */
-    private LogAnalyser getAnalyser()
+    private LogAnalyser getAnalyser(String uid)
     {
         if (analyser == null)
         {
-            analyser = new LogAnalyser(getClient().getRoot());
+            analyser = new LogAnalyser(uid, getClient().getRoot());
         }
         return analyser;
     }
