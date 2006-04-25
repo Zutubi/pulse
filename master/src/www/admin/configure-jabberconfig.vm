@@ -16,8 +16,10 @@
     #wwtextfield("name=jabber.port" "label=%{getText('jabber.port')}" "required=true" "size=6" "tabindex=2")
     #wwtextfield("name=jabber.username" "label=%{getText('jabber.username')}" "required=true" "tabindex=3")
     #wwpassword("name=jabber.password" "label=%{getText('jabber.password')}" "showPassword=true" "tabindex=4")
+    #wwcheckbox("name=jabber.forceSSL" "label=%{getText('jabber.force.ssl')}" "tabindex=5")
+    #inlineHelp("jabber.force.ssl.help")
 
-    #saveCancel(5)
+    #saveCancel(6)
 #end
 
 </body>

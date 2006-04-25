@@ -10,7 +10,8 @@ import com.zutubi.pulse.jabber.JabberManager;
 import org.hibernate.event.EventSource;
 
 /**
- * <class-comment/>
+ * Action to configure connection to a Jabber server for instant message
+ * notifications.
  */
 public class JabberConfigurationAction extends ActionSupport
 {
@@ -60,6 +61,7 @@ public class JabberConfigurationAction extends ActionSupport
         config.setJabberPort(JabberManager.DEFAULT_PORT);
         config.setJabberUsername(null);
         config.setJabberPassword(null);
+        config.setJabberForceSSL(Boolean.FALSE);
         jabberManager.refresh();
     }
 
@@ -70,6 +72,7 @@ public class JabberConfigurationAction extends ActionSupport
         config.setJabberPort(jabber.getPort());
         config.setJabberUsername(jabber.getUsername());
         config.setJabberPassword(jabber.getPassword());
+        config.setJabberForceSSL(jabber.getForceSSL());
         jabberManager.refresh();
     }
 
@@ -79,6 +82,7 @@ public class JabberConfigurationAction extends ActionSupport
         jabber.setHost(config.getJabberHost());
         jabber.setUsername(config.getJabberUsername());
         jabber.setPassword(config.getJabberPassword());
+        jabber.setForceSSL(config.getJabberForceSSL());
     }
 
     /**
@@ -105,6 +109,7 @@ public class JabberConfigurationAction extends ActionSupport
         private int port = JabberManager.DEFAULT_PORT;
         private String username;
         private String password;
+        private Boolean forceSSL;
 
         public String getHost()
         {
@@ -144,6 +149,16 @@ public class JabberConfigurationAction extends ActionSupport
         public void setUsername(String username)
         {
             this.username = username;
+        }
+
+        public Boolean getForceSSL()
+        {
+            return forceSSL;
+        }
+
+        public void setForceSSL(Boolean forceSSL)
+        {
+            this.forceSSL = forceSSL;
         }
     }
 }

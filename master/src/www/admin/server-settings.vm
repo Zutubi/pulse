@@ -38,6 +38,7 @@
                     #dynamicRow("jabber.port" $config.jabberPort)
                     #dynamicRow("jabber.username" $config.jabberUsername)
                     <!-- Probably best we don't show the password -->
+                    #dynamicRow("jabber.force.ssl" $config.jabberForceSSL.toString().toLowerCase())
                 </table>
             </td>
         </tr>

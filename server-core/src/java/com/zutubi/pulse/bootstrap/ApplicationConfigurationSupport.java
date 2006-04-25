@@ -93,6 +93,16 @@ public class ApplicationConfigurationSupport implements ApplicationConfiguration
         config.setProperty(LOGGING_CONFIG, logConfig);
     }
 
+    public Boolean getJabberForceSSL()
+    {
+        return config.getBooleanProperty(JABBER_FORCE_SSL, Boolean.FALSE);
+    }
+
+    public void setJabberForceSSL(Boolean forceSSL)
+    {
+        config.setBooleanProperty(JABBER_FORCE_SSL, forceSSL);
+    }
+
     public Boolean getRssEnabled()
     {
         return config.getBooleanProperty(RSS_ENABLED, Boolean.FALSE);

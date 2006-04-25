@@ -62,7 +62,15 @@ public class JabberManager implements Stoppable, PacketListener
     private void openConnection(ApplicationConfiguration appConfig)
             throws XMPPException
     {
-        connection = new XMPPConnection(appConfig.getJabberHost(), appConfig.getJabberPort());
+        if(appConfig.getJabberForceSSL())
+        {
+            connection = new SSLXMPPConnection(appConfig.getJabberHost(), appConfig.getJabberPort());
+        }
+        else
+        {
+            connection = new XMPPConnection(appConfig.getJabberHost(), appConfig.getJabberPort());
+        }
+        
         connection.login(appConfig.getJabberUsername(), appConfig.getJabberPassword());
         connection.addPacketListener(this, new MessageTypeFilter(Message.Type.ERROR));
     }

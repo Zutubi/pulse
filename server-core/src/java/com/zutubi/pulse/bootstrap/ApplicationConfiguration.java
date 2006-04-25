@@ -41,6 +41,8 @@ public interface ApplicationConfiguration
 
     public static final String JABBER_PASSWORD = "jabber.password";
 
+    public static final String JABBER_FORCE_SSL = "jabber.force.ssl";
+
     //---( logging configuration )---
 
     public static final String LOGGING_CONFIG = "log.config";
@@ -106,6 +108,10 @@ public interface ApplicationConfiguration
     String getLogConfig();
 
     void setLogConfig(String config);
+
+    Boolean getJabberForceSSL();
+
+    void setJabberForceSSL(Boolean forceSSL);
 
     Boolean getRssEnabled();
 
