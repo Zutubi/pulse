@@ -111,8 +111,8 @@ public class DashboardAction extends ActionSupport
     {
         public int compare(Changelist c1, Changelist c2)
         {
-            // Compare the revision.
-            return -c1.getRevision().compareTo(c2.getRevision());
+            // Compare the date.
+            return -c1.getDate().compareTo(c2.getDate());
         }
     }
 }
