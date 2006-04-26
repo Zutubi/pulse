@@ -9,6 +9,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * <class-comment/>
@@ -104,10 +105,20 @@ public class LicenseEncoder implements LicenseKeyFactory
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, 30);
 
-        License license = new License("beta", argv[0], cal.getTime());
+        // todo: some form of validation would be nice.
+        // todo: support multiple license types
+
+        String type = argv[0];
+        String name = argv[1];
+        Date expiry = cal.getTime();
+
+        License license = new License(type, name, expiry);
 
         LicenseEncoder encoder = new LicenseEncoder();
         byte[] licenseKey = encoder.encode(license);
-        System.out.println(new String(licenseKey));
+
+        // print the license key to standard out - do not include a new line
+        // since it will look like part of the license key to an external process.
+        System.out.print(new String(licenseKey));
     }
 }
