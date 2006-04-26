@@ -20,7 +20,7 @@
         </property>
         <property name="startupRunnables">
             <list>
-                <value>com.zutubi.pulse.test.SetupDummyBuilds</value>
+                <value>com.zutubi.pulse.test.SetupFeatureTour</value>
                 <value>com.zutubi.pulse.ResourceDiscoverer</value>
             </list>
         </property>

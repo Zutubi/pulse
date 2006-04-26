@@ -530,4 +530,25 @@ public class FileSystemUtils
 
         return path;
     }
+
+    // WARNING: will not handle recursive symlinks
+    public static void copyRecursively(File from, File to) throws IOException
+    {
+        if(from.isDirectory())
+        {
+            if(!to.mkdirs())
+            {
+                throw new IOException("Unable to create destination directory '" + to.getAbsolutePath() + "'");
+            }
+
+            for(String file: from.list())
+            {
+                copyRecursively(new File(from, file), new File(to, file));
+            }
+        }
+        else
+        {
+            IOUtils.copyFile(from, to);
+        }
+    }
 }

@@ -4,17 +4,15 @@
 </head>
 
 <body>
-
-<h1>login</h1>
+    <img style="margin-top: 30px; margin-bottom: 20px;" alt="pulse logo" src="/images/pulse-pagan-smallmedium.jpg"/>
 
     #foreach($error in $action.actionErrors)
         <h2 style="color:red">$error</h2>
     #end
 
-    #wwcform("action=/j_acegi_security_check" "name=j_acegi_security_check" "heading=%{getText('login')}" "method=post")
-
-        #wwtextfield("name=j_username" "label=%{getText('login.username')}" "required=true" "size=30" "tabindex=1")
-        #wwpassword("name=j_password" "label=%{getText('login.password')}" "required=true" "size=30" "tabindex=2")
+    #wwcform("action=/j_acegi_security_check" "name=j_acegi_security_check" "heading=%{getText('login')}" "cssStyle=margin-bottom: 30px;" "method=post")
+        #wwtextfield("name=j_username" "label=%{getText('login.username')}" "required=true" "size=30" "cssStyle=width: 15em" "tabindex=1")
+        #wwpassword("name=j_password" "label=%{getText('login.password')}" "required=true" "size=30" "cssStyle=width: 15em" "tabindex=2")
         #wwcheckbox("name=_acegi_security_remember_me" "label=%{getText('login.rememberme')}" "tabindex=3")
 
         #openSubmit()
