@@ -1,7 +1,5 @@
 package com.zutubi.pulse.license;
 
-import java.util.Calendar;
-
 /**
  * <class-comment/>
  */
@@ -33,19 +31,5 @@ public class LicenseUtils
             buffer.append("\n");
         }
         return buffer.toString();
-    }
-
-    public static void printEncodedLicense(License l) throws LicenseException
-    {
-        LicenseEncoder encoder = new LicenseEncoder();
-        System.out.println(print(encoder.encode(l)));
-    }
-
-    public static void main(String argv[]) throws LicenseException
-    {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, 45);
-        License l = new License("beta", "Aslak Hellesoy", cal.getTime());
-        printEncodedLicense(l);
     }
 }

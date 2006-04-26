@@ -15,7 +15,7 @@
     </target>
 
     <target name="clean.dev">
-        <delete dir="home"/>
+        <delete dir="data"/>
         <delete dir="master/system"/>
         <delete file="master/etc/admin.token"/>
         <delete file="master/etc/pulse-init.properties"/>

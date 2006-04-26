@@ -8,6 +8,7 @@ import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  * <class-comment/>
@@ -94,5 +95,19 @@ public class LicenseEncoder implements LicenseKeyFactory
         rsa.update(data);
 
         return rsa.sign();
+    }
+
+    public static void main(String argv[]) throws LicenseException
+    {
+        // initially, we just create a 30 evaluation license for the named user.
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_YEAR, 30);
+
+        License license = new License("beta", argv[0], cal.getTime());
+
+        LicenseEncoder encoder = new LicenseEncoder();
+        byte[] licenseKey = encoder.encode(license);
+        System.out.println(new String(licenseKey));
     }
 }
