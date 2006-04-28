@@ -421,6 +421,11 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         assertLinkPresent("edit_newHome");
         assertLinkNotPresent("edit_home");
 
+        clickLink("edit_newHome");
+        form.assertFormPresent();
+        form.assertFormElements("newHome", "anotherUser@example.com", "plain");
+        form.cancelFormElements("cancelled", "nouser@example.com", "html");
+
         // assert that the contact appears as expected.
         assertTablePresent("contacts");
         assertTableRowsEqual("contacts", 1, new String[][]{
