@@ -37,7 +37,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
 
         clickLinkWithText("reset");
         assertTextPresent("localhost:" + port);
-        assertTextPresent("http://confluence.zutubi.com/display/CIB");
+        assertTextPresent("http://confluence.zutubi.com/display/Pulse");
     }
 
     public void testEdit() throws Exception
