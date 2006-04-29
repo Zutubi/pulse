@@ -238,6 +238,7 @@ The beans defined within the security subsystem need not be accessed by other co
                 /logout.action=ROLE_ANONYMOUS,ROLE_USER
                 /=ROLE_USER
                 /default.action=ROLE_USER
+                /rss.action*=ROLE_ANONYMOUS,ROLE_USER
                 /view/**/*=ROLE_USER
                 /admin/**/*=ROLE_ADMINISTRATOR
                 /**/*.action*=ROLE_USER
