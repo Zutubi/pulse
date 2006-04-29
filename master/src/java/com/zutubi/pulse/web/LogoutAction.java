@@ -16,6 +16,7 @@ import javax.servlet.http.HttpSession;
  */
 public class LogoutAction extends ActionSupport
 {
+    private static final String ROOT_CONTEXT = "/";
 
     public String execute()
     {
@@ -25,6 +26,11 @@ public class LogoutAction extends ActionSupport
 
         Cookie terminate = new Cookie(TokenBasedRememberMeServices.ACEGI_SECURITY_HASHED_REMEMBER_ME_COOKIE_KEY, null);
         terminate.setMaxAge(0);
+        terminate.setPath(ROOT_CONTEXT);
+        if (System.getProperties().contains("logout.path.null"))
+        {
+            terminate.setPath(null);
+        }
 
         HttpServletResponse response = ServletActionContext.getResponse();
         response.addCookie(terminate);
