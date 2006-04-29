@@ -44,7 +44,7 @@ set LOCALCLASSPATH=%LOCALCLASSPATH%;"%PULSE_HOME%\lib"
 for %%i in ("%PULSE_HOME%\lib\*.jar") do call "%PULSE_HOME%\bin\lcp.bat" %%i
 for %%i in ("%PULSE_HOME%\lib\*.xml") do call "%PULSE_HOME%\bin\lcp.bat" %%i
 
-%_EXECCMD% %PULSE_OPTS% -classpath "%LOCALCLASSPATH%" -Dpulse.home="%PULSE_HOME%" -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig -Djava.awt.headless=true %*
+%_EXECCMD% %PULSE_OPTS% -classpath "%LOCALCLASSPATH%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true %*
 
 rem if "%1" == "start" goto end
 rem if errorlevel 1 pause

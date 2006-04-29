@@ -4,9 +4,9 @@
 package com.zutubi.pulse.local;
 
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.util.IOUtils;
 import org.apache.commons.cli.*;
 
 import java.io.*;
@@ -27,18 +27,9 @@ public class LocalBuild
 
         Options options = new Options();
 
-        // TODO: rename pulse file as appropriate
-        options.addOption(OptionBuilder.withLongOpt("pulse-file")
-                .withArgName("file")
-                .hasArg()
-                .withDescription("use specified pulse file [default: pulse.xml]")
-                .create('b'));
-
-        options.addOption(OptionBuilder.withLongOpt("resources-file")
-                .withArgName("file")
-                .hasArg()
-                .withDescription("use resources file [default: <none>]")
-                .create('r'));
+        options.addOption(OptionBuilder.withLongOpt("help")
+                .withDescription("display usage")
+                .create('h'));
 
         options.addOption(OptionBuilder.withLongOpt("output-dir")
                 .withArgName("dir")
@@ -46,11 +37,31 @@ public class LocalBuild
                 .withDescription("write output to specified directory [default: pulse.out]")
                 .create('o'));
 
+        options.addOption(OptionBuilder.withLongOpt("pulse-file")
+                .withArgName("file")
+                .hasArg()
+                .withDescription("use specified pulse file [default: pulse.xml]")
+                .create('p'));
+
+        options.addOption(OptionBuilder.withLongOpt("resources-file")
+                .withArgName("file")
+                .hasArg()
+                .withDescription("use resources file [default: <none>]")
+                .create('r'));
+
+
         CommandLineParser parser = new PosixParser();
 
         try
         {
             CommandLine commandLine = parser.parse(options, argv, true);
+            if(commandLine.hasOption('h'))
+            {
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp("pulse-local", options);
+                System.exit(0);
+            }
+
             if (commandLine.hasOption('b'))
             {
                 pulseFile = commandLine.getOptionValue('b');
