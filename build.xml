@@ -101,6 +101,10 @@
             <fileset dir="master/src/bin" includes="**/*"/>
         </copy>
 
+        <copy todir="${package.root}/licenses">
+            <fileset dir="ivy-repository" includes="**/*.txt"/>
+        </copy>
+
         <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
         <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh" verbose="true"/>
 
