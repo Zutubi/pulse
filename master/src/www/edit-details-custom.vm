@@ -5,7 +5,7 @@
     <title>#wwtext("name=edit.custom")</title>
 </head>
 <body>
-    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+    <h1>#projectName($project)</h1>
 
 <table class="columns">
     <tr><td class="columns" width="100%">

@@ -164,6 +164,17 @@ h1, h2 {
     color: #bbb;
 }
 
+/* links in headers should be the same colour as headers. */
+h1 a:link, h1 a:visited, h1 a:hover, h2 a:link, h2 a:visited, h2 a:hover {
+    color: #bbb;
+    border-bottom: dotted 1px #bbb;
+}
+
+h1 a:hover, h2 a:hover {
+    border-bottom: solid 2px #bbb;
+}
+
+
 h1 {
     margin-top: 6px;
     font-size: 150%;

@@ -5,7 +5,7 @@
     <title>#wwtext("name=add.cleanup.rule")</title>
 </head>
 <body>
-    <h1>:: $!webwork.htmlEncode($project.name) ::</h1>
+    <h1>#projectName($project)</h1>
 
     #parse("/template/includes/actionerrors.vm")
 

@@ -27,6 +27,13 @@
 #end
 
 ##
+## Outputs a project heading
+##        
+#macro(projectName $project)
+    :: <a href="/currentBuild.action?id=${project.id}">$!webwork.htmlEncode($project.name)</a> ::
+#end
+
+##
 ## Outputs a tab header bar, with the javascript necessary to control the
 ## tab selection.
 ##
