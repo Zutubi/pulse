@@ -15,7 +15,7 @@ public class ViewUserAction extends UserActionSupport
     {
         if (getUser() == null)
         {
-            addUnknownUserFieldError();
+            addActionError("Unknown user [" + getUserId() + "]");
         }
     }
 }

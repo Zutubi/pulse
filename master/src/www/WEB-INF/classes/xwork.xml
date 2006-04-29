@@ -698,7 +698,7 @@
         </action>
 
         <action name="viewUser" class="com.zutubi.pulse.web.admin.user.ViewUserAction">
-            <result name="input" type="velocity">undefined.vm</result>
+            <result name="input" type="velocity">/generic-error.vm</result>
             <result name="success" type="velocity">view-user.vm</result>
         </action>
 
