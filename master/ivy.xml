@@ -38,7 +38,7 @@
 
         <!-- external notifications... -->
         <dependency org="jive" name="smack" rev="2.2.0" conf="external->default"/>
-        <dependency org="ymsg" name="ymsg" rev="0.61" conf="external->default"/>
+        <!--<dependency org="ymsg" name="ymsg" rev="0.61" conf="external->default"/>-->
 
         <dependency org="apache" name="xmlrpc" rev="2.0.1" conf="external->default"/>
 

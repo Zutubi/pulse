@@ -5,10 +5,9 @@ import org.apache.commons.codec.binary.Base64;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.security.*;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -81,7 +80,6 @@ public class LicenseEncoder implements LicenseKeyFactory
 
     /**
      * Generate a signature.
-     *
      */
     private byte[] signData(byte[] data) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException
     {
@@ -98,27 +96,32 @@ public class LicenseEncoder implements LicenseKeyFactory
         return rsa.sign();
     }
 
-    public static void main(String argv[]) throws LicenseException
+    public static void main(String argv[])
     {
-        // initially, we just create a 30 evaluation license for the named user.
-
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, 30);
-
         // todo: some form of validation would be nice.
         // todo: support multiple license types
+        try
+        {
+            SimpleDateFormat expiryFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        String type = argv[0];
-        String name = argv[1];
-        Date expiry = cal.getTime();
+            String type = argv[0];
+            String name = argv[1];
+            Date expiry = expiryFormat.parse(argv[2]);
 
-        License license = new License(type, name, expiry);
+            License license = new License(type, name, expiry);
 
-        LicenseEncoder encoder = new LicenseEncoder();
-        byte[] licenseKey = encoder.encode(license);
+            LicenseEncoder encoder = new LicenseEncoder();
+            byte[] licenseKey = encoder.encode(license);
 
-        // print the license key to standard out - do not include a new line
-        // since it will look like part of the license key to an external process.
-        System.out.print(new String(licenseKey));
+            // print the license key to standard out - do not include a new line
+            // since it will look like part of the license key to an external process.
+            System.out.print(new String(licenseKey));
+            System.exit(0);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }

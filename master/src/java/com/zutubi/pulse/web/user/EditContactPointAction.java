@@ -5,7 +5,6 @@ package com.zutubi.pulse.web.user;
 
 import com.zutubi.pulse.model.ContactPoint;
 import com.zutubi.pulse.model.EmailContactPoint;
-import com.zutubi.pulse.model.YahooContactPoint;
 import com.zutubi.pulse.model.JabberContactPoint;
 
 /**
@@ -33,11 +32,7 @@ public class EditContactPointAction extends UserActionSupport
         {
             return INPUT;
         }
-        if (contact instanceof YahooContactPoint)
-        {
-            return "yahoo";
-        }
-        else if (contact instanceof EmailContactPoint)
+        if (contact instanceof EmailContactPoint)
         {
             return "email";
         }
