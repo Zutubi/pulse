@@ -680,6 +680,45 @@
     </td>
 #end
 
+#macro(aggregateResultCell $changelist)
+
+    #set ($selectedResult = "n")
+    #foreach($id in $changelist.resultIds)
+        #set($result = $action.getResult($id))
+        #if ($selectedResult == "n")
+            #set($selectedResult = $result)
+        #end
+        #if (!$result.succeeded())
+            #set($selectedResult = $result)
+        #end
+    #end
+
+    <td class="$result.state.string">
+        #if($result.succeeded())
+            <img alt="success" src="/images/accept.gif"/>
+        #elseif($result.inProgress())
+            <img alt="in progress" src="/images/inprogress.gif"/>
+        #elseif($result.terminating())
+            <img alt="terminating" src="/images/stop.gif"/>
+        #elseif($result.pending())
+            <img alt="pending" src="/images/hourglass.gif"/>
+        #elseif($result.errored() || $result.failed())
+            <img alt="failure" src="/images/exclamation.gif"/>
+        #else
+            &nbsp;
+        #end
+        $selectedResult.state.prettyString
+        <a href="" onclick="toggleDisplay('$changelist.id'); return false">T</a>
+        <ul style="display:none;" id="$changelist.id">
+        #foreach($id in $changelist.resultIds)
+            #set($result = $action.getResult($id))
+            <li>project <a href="currentBuild.action?id=$result.project.id">$!webwork.htmlEncode($result.project.name)</a> build <a href="viewBuild.action?id=$result.id">$!webwork.htmlEncode($result.id)</a></li>
+        #end
+        </ul>
+    </td>
+
+#end
+
 ##
 ## Outputs a result test summary cell
 ##

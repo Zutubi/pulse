@@ -1,11 +1,12 @@
     #recentBuilds($projects false "configure.dashboard.projects" "/user/configureDashboardProjects!input.action" "pencil.gif")
 
     <table class="content">
-        #headingRow("my.changes" 4)
+        #headingRow("my.changes" 5)
         <tr>
             #contentHeading("change.revision" 1)
             #contentHeading("change.when" 1)
             #contentHeading("change.comment" 1)
+            #contentHeading("build result" 1)
             #contentHeading("actions" 1)
         </tr>
 #if($changelists.size() > 0)
@@ -15,6 +16,7 @@
             #rightCell($changelist.revision)
             #dateCell($changelist)
             #dynamicCell($action.trimmedString($changelist.comment, 60))
+            #aggregateResultCell($changelist)
             #linkCell("view" "viewChangelist.action?id=$changelist.id")
         </tr>
     #end

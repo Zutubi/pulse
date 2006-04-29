@@ -92,6 +92,32 @@ public class DashboardAction extends ActionSupport
         return SUCCESS;
     }
 
+    /**
+     * Allow the template access to a specific project instance.
+     *
+     * @param id uniquely identifies a project.
+     *
+     * @return the project associated with the id, or null if it does
+     * not exist.
+     */
+    public Project getProject(long id)
+    {
+        return projectManager.getProject(id);
+    }
+
+    /**
+     * Allow the template access to a specific build result instance.
+     *
+     * @param id uniquely identifies a project.
+     *
+     * @return the build result associated with the id, or null if it does
+     * not exist.
+     */
+    public BuildResult getResult(long id)
+    {
+        return buildManager.getBuildResult(id);
+    }
+
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
