@@ -11,7 +11,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=editJabber!save.action" "heading=%{getText('jabber.config')}" "id=jabber.config" "method=post")
+#wwcform("action=saveJabber!save.action" "heading=%{getText('jabber.config')}" "id=jabber.config" "method=post")
 
     #wwtextfield("name=jabber.host" "label=%{getText('jabber.host')}" "required=true" "size=60" "tabindex=1")
     #wwtextfield("name=jabber.port" "label=%{getText('jabber.port')}" "required=true" "size=6" "tabindex=2")

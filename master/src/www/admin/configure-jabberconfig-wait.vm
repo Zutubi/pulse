@@ -1,0 +1,16 @@
+#authorisationTags($principle)
+<content tag="selectedTab">administration</content>
+<html>
+<head>
+    <meta http-equiv="refresh" content='5;#wwurl("includeParams=all")'/>
+    <title>#wwtext("name=jabber.config")</title>
+</head>
+
+<body>
+    <h1>:: #wwtext("name=please.wait") ::</h1>
+
+    <p>
+        <img alt="waiting..." src="/images/inprogress.gif"/> #wwtext("name=jabber.applying")
+    </p>
+</body>
+</html>

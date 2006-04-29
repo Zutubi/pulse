@@ -3,11 +3,10 @@
  ********************************************************************************/
 package com.zutubi.pulse.web.admin;
 
-import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.jabber.JabberManager;
-import org.hibernate.event.EventSource;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
  * Action to configure connection to a Jabber server for instant message
@@ -35,7 +34,7 @@ public class JabberConfigurationAction extends ActionSupport
     public String doSave()
     {
         saveConfig();
-
+        
         return SUCCESS;
     }
 
@@ -73,6 +72,7 @@ public class JabberConfigurationAction extends ActionSupport
         config.setJabberUsername(jabber.getUsername());
         config.setJabberPassword(jabber.getPassword());
         config.setJabberForceSSL(jabber.getForceSSL());
+
         jabberManager.refresh();
     }
 

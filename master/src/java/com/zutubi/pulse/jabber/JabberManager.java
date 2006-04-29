@@ -3,16 +3,16 @@
  ********************************************************************************/
 package com.zutubi.pulse.jabber;
 
-import org.jivesoftware.smack.*;
-import org.jivesoftware.smack.filter.MessageTypeFilter;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.XMPPError;
-import org.jivesoftware.smack.packet.Message;
+import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
-import com.opensymphony.util.TextUtils;
+import org.jivesoftware.smack.*;
+import org.jivesoftware.smack.filter.MessageTypeFilter;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.XMPPError;
 
 /**
  */
@@ -25,8 +25,15 @@ public class JabberManager implements Stoppable, PacketListener
     private XMPPConnection connection = null;
     private ConfigurationManager configurationManager;
 
+    /**
+     * Holds the status from when we last tried to connect.  Will be null
+     * if everything was ok.
+     */
+    private String statusMessage = null;
+
     public void init()
     {
+        statusMessage = null;
         ApplicationConfiguration appConfig = configurationManager.getAppConfig();
         if (TextUtils.stringSet(appConfig.getJabberHost()))
         {
@@ -48,7 +55,8 @@ public class JabberManager implements Stoppable, PacketListener
                 catch(Exception nesty)
                 {
                     stop(true);
-                    LOG.error("Could not initialise Jabber: " + e.getMessage(), nesty);
+                    statusMessage = "Could not initialise Jabber: " + nesty.getMessage();
+                    LOG.error(statusMessage, nesty);
                 }
             }
         }
@@ -123,6 +131,11 @@ public class JabberManager implements Stoppable, PacketListener
     {
         stop(true);
         init();
+    }
+
+    public String getStatusMessage()
+    {
+        return statusMessage;
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)

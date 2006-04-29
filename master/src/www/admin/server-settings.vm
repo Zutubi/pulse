@@ -10,6 +10,8 @@
 
     #adminTabs("settings")
 
+    #parse("/template/includes/actionerrors.vm")
+
     <table class="columns" width="90%">
         <tr>
             <td class="columns" width="40%">
@@ -35,6 +37,11 @@
                 </table>
                 <table id="jabber.config" class="fill-content">
                     #adminHeadingRow("jabber.config" "/admin/editJabber!input.action" "jabber.edit" "/admin/jabber!reset.action" "jabber.reset")
+#if($jabberStatus)
+                    <tr>
+                        <th class="note" colspan="2">$!webwork.htmlEncode($jabberStatus)</th>
+                    </tr>
+#end
                     #dynamicRow("jabber.host" $config.jabberHost)
                     #dynamicRow("jabber.port" $config.jabberPort)
                     #dynamicRow("jabber.username" $config.jabberUsername)
