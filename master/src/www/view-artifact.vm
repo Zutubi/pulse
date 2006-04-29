@@ -1,5 +1,11 @@
-###authorisationTags($principle)
-###buildTags($buildResult.project $buildResult)
+#macro(breadcrumbs)
+    <div class="content" style="margin-top: 10px; margin-bottom: 10px">
+        :: <a href="/default.action">pulse</a> ::
+        <a href="currentBuild.action?id=$buildResult.project.id">$!webwork.htmlEncode($buildResult.project.name)</a> ::
+        <a href="viewBuild.action?id=$buildResult.id">#wwtext("name=build") $buildResult.number</a> ::
+        <a href="viewBuildArtifacts.action?id=$buildResult.id">all artifacts</a>
+    </div>
+#end
 <html>
 <head>
     <meta http-equiv="Pragma" content="no-cache"/>
@@ -9,6 +15,7 @@
     <title>#wwtext("name=artifact") $!webwork.htmlEncode($artifact.path)</title>
 </head>
 <body>
+#breadcrumbs()
 <div class="content" style="margin-top: 10px;">
 #if($artifact.hasFeatures())
     <table class="decorated">
@@ -28,5 +35,6 @@
     #foreach($line in $readerIterator)#if($action.notNull($action.getLineLevel($velocityCount)))#set($lineClass = $action.getLineLevel($velocityCount).toString().toLowerCase().charAt(0))#else#set($lineClass = false)#end<tr><th#if($lineClass) class="$lineClass"#end>#if($lineClass)<a name="$velocityCount">#end$velocityCount#if($lineClass)</a>#end</th><td#if($lineClass) class="$lineClass"#end>$line</td></tr>#end
     </table>
 </div>
+#breadcrumbs()
 </body>
 </html>
