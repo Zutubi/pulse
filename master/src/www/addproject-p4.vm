@@ -1,3 +1,4 @@
+#helpTag("Perforce")
 #authorisationTags($principle)
 <content tag="selectedTab">projects</content>
 <html>

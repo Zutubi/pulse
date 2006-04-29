@@ -1,3 +1,4 @@
+#helpTag("Changelist+View")
 #authorisationTags($principle)
 #if($buildResult)
     #buildTags($buildResult.project $buildResult)

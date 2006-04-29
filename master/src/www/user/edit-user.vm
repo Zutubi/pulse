@@ -1,3 +1,4 @@
+#helpTag("User+Basics")
 #authorisationTags($principle)
 <content tag="selectedTab">dashboard</content>
 <html>

@@ -1,3 +1,4 @@
+#helpTag("License+Management")
 #authorisationTags($principle)
 <content tag="selectedTab">server</content>
 <html>

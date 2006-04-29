@@ -9,6 +9,13 @@
 #end
 
 ##
+## Outputs a sitemesh tag for context-sensitive help
+##
+#macro(helpTag $path)
+    <content tag="helpPage">$path</content>
+#end
+
+##
 ## Outputs sitemesh content tags for the project links on the header bar
 ##
 #macro(projectTags $project)

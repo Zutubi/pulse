@@ -1,3 +1,4 @@
+#helpTag("CVS")
 #authorisationTags($principle)
 <content tag="selectedTab">projects</content>
 <html>

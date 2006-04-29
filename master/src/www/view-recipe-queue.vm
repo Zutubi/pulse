@@ -1,3 +1,4 @@
+#helpTag("Server+Status+Tab")
 #authorisationTags($principle)
 <content tag="selectedTab">server</content>
 <html>

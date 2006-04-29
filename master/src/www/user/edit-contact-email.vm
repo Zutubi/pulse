@@ -1,3 +1,4 @@
+#helpTag("Email+Contact+Points")
 #authorisationTags($principle)
 <content tag="selectedTab">dashboard</content>
 <html>

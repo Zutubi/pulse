@@ -1,3 +1,4 @@
+#helpTag("Build+Artifacts+Tab")
 #authorisationTags($principle)
 #buildTags($project $result)
 <html>

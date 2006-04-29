@@ -1,3 +1,4 @@
+#helpTag("Project+Triggers")
 #authorisationTags($principle)
 #projectTags($wizard.project)
 <html>

@@ -1,3 +1,4 @@
+#helpTag("Project+SCM+Triggers")
 #authorisationTags($principle)
 #projectTags($project)
 <html>

@@ -1,3 +1,4 @@
+#helpTag("Build+Pulse+File+Tab")
 #authorisationTags($principle)
 #buildTags($project $result)
 <html>

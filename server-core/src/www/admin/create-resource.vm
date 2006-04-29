@@ -1,3 +1,4 @@
+#helpTag("Resource+Repository")
 #authorisationTags($principle)
 <html>
 <head>

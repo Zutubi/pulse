@@ -1,3 +1,4 @@
+#helpTag("Build+Changes+Tab")
 #authorisationTags($principle)
 #buildTags($project $result)
 <html>

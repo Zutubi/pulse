@@ -1,3 +1,4 @@
+#helpTag("Project+Cron+Triggers")
 #authorisationTags($principle)
 #projectTags($wizard.project)
 <html>

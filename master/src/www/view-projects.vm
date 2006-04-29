@@ -1,3 +1,4 @@
+#helpTag("Projects+View")
 #authorisationTags($principle)
 <content tag="selectedTab">projects</content>
 <content tag="helpPage">Projects+View</content>

@@ -1,3 +1,4 @@
+#helpTag("Custom+Projects")
 #authorisationTags($principle)
 #projectTags($project)
 <html>

@@ -1,3 +1,4 @@
+#helpTag("Resource+View")
 #authorisationTags($principle)
 #macro(showProperties $properties $version)
     #if($version)

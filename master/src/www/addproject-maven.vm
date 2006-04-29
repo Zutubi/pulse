@@ -1,3 +1,4 @@
+#helpTag("Maven+Projects")
 #authorisationTags($principle)
 <content tag="selectedTab">projects</content>
 <html>

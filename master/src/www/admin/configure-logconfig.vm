@@ -1,3 +1,4 @@
+#helpTag("Logging+Configuration")
 #authorisationTags($principle)
 <content tag="selectedTab">administration</content>
 <html>

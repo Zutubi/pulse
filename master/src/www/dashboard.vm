@@ -1,3 +1,4 @@
+#helpTag("Dashboard+Section")
 #authorisationTags($principle)
 <content tag="selectedTab">dashboard</content>
 <content tag="helpPage">Dashboard</content>
