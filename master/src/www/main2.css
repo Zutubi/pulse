@@ -138,6 +138,10 @@ body {
     position: relative;
 }
 
+#footer a {
+    color: #c0c0c0;
+    border-color: #c0c0c0;
+}
     /*------------------------------
     Globals
     */
