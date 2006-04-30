@@ -22,7 +22,8 @@ public class ResourceReferenceTest extends PulseTestCase
 
     public void testResourceReference() throws Exception
     {
-        Scope scope = new Scope();
+        Scope parent = new Scope();
+        Scope scope = new Scope(parent);
         FileResourceRepository repo = ResourceFileLoader.load(getInput("testResourceReference"));
         ResourceReference ref = new ResourceReference();
         ref.setResourceRepository(repo);
@@ -32,13 +33,13 @@ public class ResourceReferenceTest extends PulseTestCase
         ref.setVersion("aVersion");
         ref.initBeforeChildren();
 
-        assertTrue(scope.containsReference("b"));
-        assertTrue(scope.containsReference("d"));
-        assertEquals("c", scope.getReference("b").getValue());
-        assertEquals("e", scope.getReference("d").getValue());
+        assertTrue(parent.containsReference("b"));
+        assertTrue(parent.containsReference("d"));
+        assertEquals("c", parent.getReference("b").getValue());
+        assertEquals("e", parent.getReference("d").getValue());
 
-        assertFalse(scope.containsReference("1"));
-        assertFalse(scope.containsReference("3"));
+        assertFalse(parent.containsReference("1"));
+        assertFalse(parent.containsReference("3"));
     }
 }
 

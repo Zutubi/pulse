@@ -71,7 +71,7 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
                 return;
             }
 
-            scope.add(resourceVersion.getProperties());
+            scope.getParent().add(resourceVersion.getProperties());
         }
     }
 
