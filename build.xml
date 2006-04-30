@@ -238,8 +238,8 @@
         <retrieve.dependencies module="slave" dest="lib"/>
     </target>
 
-    <!-- 
-     Retrieve the dependencies for the specified module, and place them into the 
+    <!--
+     Retrieve the dependencies for the specified module, and place them into the
      destination directory.
     -->
     <macrodef name="retrieve.dependencies">
@@ -260,7 +260,7 @@
     <macrodef name="foreach">
         <attribute name="target"/>
         <sequential>
-            <!--<ant inheritAll="false" dir="boot" antfile="build.xml" target="@{target}"/>-->
+            <ant inheritAll="false" dir="boot" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="core" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="local" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="server-core" antfile="build.xml" target="@{target}"/>
