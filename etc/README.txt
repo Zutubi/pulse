@@ -16,7 +16,7 @@ Contents
     README.txt 		This file
     bin/            Startup and admin scripts for launching Pulse.
     lib/            Library files
-    license/        License files for Pulse and bundled software.
+    licenses/       License files for Pulse and bundled software.
 
     system/         
         config/     Default configuration files.
