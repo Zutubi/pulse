@@ -150,10 +150,6 @@ public class PulseCtl
         appendToClasspath(files, ".xml", classpath);
 
         URL[] urls = classpath.toArray(new URL[0]);
-        for (URL url : urls)
-        {
-            System.err.println("Adding: " + url);
-        }
         return new URLClassLoader(urls, parent);
     }
 
