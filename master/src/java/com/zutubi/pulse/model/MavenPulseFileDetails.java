@@ -31,11 +31,7 @@ public class MavenPulseFileDetails extends TemplatePulseFileDetails
     {
         if (TextUtils.stringSet(targets))
         {
-            String[] arg = targets.split(" ");
-            if (arg.length > 0)
-            {
-                context.put("targets", arg);
-            }
+            context.put("targets", targets);
         }
         if (TextUtils.stringSet(workingDir))
         {
