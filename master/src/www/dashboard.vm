@@ -20,9 +20,9 @@
             var position = getPosition(cell);
             window.style.visibility = 'hidden';
             window.style.display = '';
-            window.style.left = position[0] + cell.offsetWidth - window.offsetWidth - 10 + "px";
+            window.style.left = position[0] + cell.offsetWidth - window.offsetWidth - 20 + "px";
             window.style.visibility = 'visible';
-            window.style.top = position[1] + 10 + "px";
+            window.style.top = position[1] + 20 + "px";
         }
     </script>
 </head>
