@@ -3,15 +3,13 @@
  ********************************************************************************/
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.core.Namespace;
-
 import java.util.Map;
 import java.util.TreeMap;
 
 /**
  * <class-comment/>
  */
-public class Resource extends Entity implements Namespace
+public class Resource extends Entity
 {
     private String name;
 

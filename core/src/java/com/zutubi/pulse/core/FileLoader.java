@@ -3,9 +3,8 @@
  ********************************************************************************/
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.core.validation.CommandValidationManager;
-import com.opensymphony.xwork.validator.ValidationException;
+import com.zutubi.pulse.util.IOUtils;
 import nu.xom.*;
 
 import java.io.File;
@@ -164,10 +163,7 @@ public class FileLoader
                 }
             }
 
-            if (Namespace.class.isAssignableFrom(type.getClass()))
-            {
-                scope = new Scope(scope);
-            }
+            scope = new Scope(scope);
 
             if (ScopeAware.class.isAssignableFrom(type.getClass()))
             {

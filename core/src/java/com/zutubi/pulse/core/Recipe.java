@@ -3,15 +3,15 @@
  ********************************************************************************/
 package com.zutubi.pulse.core;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
  *
  */
-public class Recipe implements Reference, Namespace
+public class Recipe implements Reference
 {
     private String name;
 

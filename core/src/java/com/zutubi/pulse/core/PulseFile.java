@@ -10,7 +10,7 @@ import java.util.List;
 /**
  *
  */
-public class PulseFile implements Namespace, ScopeAware
+public class PulseFile implements ScopeAware
 {
     private String defaultRecipe;
     private String name;

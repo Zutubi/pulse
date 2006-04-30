@@ -4,7 +4,6 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.Namespace;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -12,7 +11,7 @@ import java.util.TreeMap;
 /**
  * <class-comment/>
  */
-public class ResourceVersion extends Entity implements Namespace
+public class ResourceVersion extends Entity
 {
     private String value;
     private Map<String, Property> properties = new TreeMap<String, Property>();

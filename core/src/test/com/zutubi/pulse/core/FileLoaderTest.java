@@ -96,6 +96,19 @@ public class FileLoaderTest extends FileLoaderTestBase
         assertEquals("b", recipe.getDependencies().get(0).getVersion());
     }
 
+    public void testScoping() throws Exception
+    {
+        PulseFile pf = new PulseFile();
+        loader.load(getInput("testScoping"), pf);
+
+        Recipe recipe = pf.getRecipe("global");
+        assertNotNull(recipe);
+        Command command = recipe.getCommand("in recipe");
+        assertNotNull(command);
+        ExecutableCommand exe = (ExecutableCommand) ((CommandGroup)command).getCommand();
+        assertEquals("in command", exe.getExe());
+    }
+
     public void testMacro() throws Exception
     {
         PulseFile pf = new PulseFile();
