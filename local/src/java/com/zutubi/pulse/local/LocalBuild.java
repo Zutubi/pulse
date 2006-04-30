@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.ResourceDiscoverer;
 import org.apache.commons.cli.*;
 
 import java.io.*;
@@ -93,11 +94,11 @@ public class LocalBuild
         }
     }
 
-    private FileResourceRepository createRepository(String resourcesFile) throws PulseException
+    private ResourceRepository createRepository(String resourcesFile) throws PulseException
     {
         if (resourcesFile == null)
         {
-            return null;
+            return new FileResourceRepository();
         }
 
         FileInputStream stream = null;
@@ -135,7 +136,10 @@ public class LocalBuild
     {
         printPrologue(pulseFileName, resourcesFile, outputDir);
 
-        FileResourceRepository repository = createRepository(resourcesFile);
+        ResourceRepository repository = createRepository(resourcesFile);
+        ResourceDiscoverer discoverer = new ResourceDiscoverer(repository);
+        discoverer.run();
+        
         RecipePaths paths = new LocalRecipePaths(baseDir, outputDir);
 
         if (!paths.getBaseDir().isDirectory())

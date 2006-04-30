@@ -16,6 +16,15 @@ public class ResourceDiscoverer implements Runnable
 {
     private ResourceRepository resourceRepository;
 
+    public ResourceDiscoverer()
+    {
+    }
+
+    public ResourceDiscoverer(ResourceRepository resourceRepository)
+    {
+        this.resourceRepository = resourceRepository;
+    }
+
     public void run()
     {
         discoverAnt();
