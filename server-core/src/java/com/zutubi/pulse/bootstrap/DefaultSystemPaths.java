@@ -58,7 +58,7 @@ public class DefaultSystemPaths implements SystemPaths
     {
         if (logRoot == null)
         {
-            logRoot = new File(getSystemRoot(), "log");
+            logRoot = new File(getSystemRoot(), "logs");
         }
         return logRoot;
     }

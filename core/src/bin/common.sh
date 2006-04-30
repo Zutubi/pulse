@@ -28,7 +28,7 @@ if $cygwin; then
 fi
 
 # Construct the runtime classpath.
-for i in "$PULSE_HOME"/lib/pulse-boot*.jar; do
+for i in "$PULSE_HOME"/lib/boot-*.jar; do
   LOCALCLASSPATH="$LOCALCLASSPATH":"$i"
 done
 

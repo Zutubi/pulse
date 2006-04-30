@@ -123,7 +123,7 @@
             <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl"/>
         </copy>
         <!-- place holder for the log directory -->
-        <copy todir="${package.root}/system/log">
+        <copy todir="${package.root}/system/logs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
         <copy todir="${package.root}/system/www">

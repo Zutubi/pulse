@@ -39,7 +39,7 @@ set _EXECCMD=start "Pulse" "%_JAVACMD%"
 :doExec
 
 rem setup the classpath.
-for %%i in ("%PULSE_HOME%\lib\pulse-boot*.jar") do call "%PULSE_HOME%\bin\lcp.bat" %%i
+for %%i in ("%PULSE_HOME%\lib\boot-*.jar") do call "%PULSE_HOME%\bin\lcp.bat" %%i
 
 %_EXECCMD% %PULSE_OPTS% -classpath "%LOCALCLASSPATH%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true %*
 
