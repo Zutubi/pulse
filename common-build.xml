@@ -2,7 +2,13 @@
 <project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="common core" basedir=".">
 
     <!-- initialise configuration -->
-    <target name="init" depends="module-init">
+    <target name="init" depends="module-pre-init, common-init, module-post-init"/>
+
+    <target name="module-pre-init"/>
+
+    <target name="module-post-init"/>
+
+    <target name="common-init">
 
         <property name="module.root.dir" value="${project.root.dir}/${module}"/>
 
@@ -54,7 +60,13 @@
     </target>
 
     <!-- prepare for new build -->
-    <target name="prepare" depends="init">
+    <target name="prepare" depends="init, module-pre-prepare, common-prepare, module-post-prepare"/>
+
+    <target name="module-pre-prepare"/>
+
+    <target name="module-post-prepare"/>
+
+    <target name="common-prepare" depends="init">
 
         <!-- create necessary directories -->
         <mkdir dir="${build.dir}"/>
@@ -139,8 +151,6 @@
 
     </target>
 
-    <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
-
     <target name="test" depends="init, module-pre-test, common-test, module-post-test"/>
 
     <target name="module-pre-test"/>
@@ -176,7 +186,13 @@
     </target>
 
     <!-- package artifacts -->
-    <target name="package" depends="init">
+    <target name="package" depends="init, module-pre-package, common-package, module-post-package"/>
+
+    <target name="module-pre-package"/>
+
+    <target name="module-post-package"/>
+
+    <target name="common-package" depends="init">
         <jar file="${module.root.dir}/build/${module}.jar" basedir="${classes.dir}">
             <!-- contains license encoding details. -->
             <patternset refid="release.excludes"/>
@@ -209,5 +225,9 @@
             <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
         </sequential>
     </macrodef>
+
+    <!-- the command that rules them all. -->
+    <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
+
 
 </project>

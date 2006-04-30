@@ -13,7 +13,7 @@ goto end
 
 :havePulse
 
-call "%PULSE_HOME%"\bin\common.bat com.zutubi.pulse.api.clients.AdminClient %*
+call "%PULSE_HOME%"\bin\common.bat com.zutubi.pulse.command.PulseCtl %*
 
 :end
 rem all done

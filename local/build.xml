@@ -3,7 +3,7 @@
 
     <import file="../common-build.xml" />
 
-    <target name="module-init">
+    <target name="module-pre-init">
         <property name="module" value="local"/>
         <dirname property="project.root.dir" file="../build.xml"/>
     </target>

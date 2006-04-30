@@ -21,7 +21,11 @@
         <delete file="master/etc/pulse-init.properties"/>
     </target>
 
-    <target name="build.core">
+    <target name="build.boot">
+        <ant inheritAll="false" dir="boot" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.core" depends="build.boot">
         <ant inheritAll="false" dir="core" antfile="build.xml" target="build.module"/>
     </target>
 
@@ -248,6 +252,7 @@
     <macrodef name="foreach">
         <attribute name="target"/>
         <sequential>
+            <!--<ant inheritAll="false" dir="boot" antfile="build.xml" target="@{target}"/>-->
             <ant inheritAll="false" dir="core" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="local" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="server-core" antfile="build.xml" target="@{target}"/>
