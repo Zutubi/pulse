@@ -35,7 +35,7 @@ public class MavenPulseFileDetails extends TemplatePulseFileDetails
         }
         if (TextUtils.stringSet(workingDir))
         {
-            context.put("workDir", workingDir.trim());
+            context.put("workingDir", workingDir.trim());
         }
 
         if (TextUtils.stringSet(arguments))
