@@ -693,7 +693,7 @@
         #end
     #end
 
-    <td class="$result.state.string">
+    <td id="${changelist.id}_cell" class="$result.state.string">
         #if($result.succeeded())
             <img alt="success" src="/images/accept.gif"/>
         #elseif($result.inProgress())
@@ -708,13 +708,35 @@
             &nbsp;
         #end
         $selectedResult.state.prettyString
-        <a href="" onclick="toggleDisplay('$changelist.id'); return false">T</a>
-        <ul style="display:none;" id="$changelist.id">
+        <a href="#" onclick="showBuildsFloat('$changelist.id', '${changelist.id}_cell'); return false">+</a>
+        <div id="$changelist.id" style="display: none">
+        <table class="content" style="margin: 0">
+            <tr>
+                <th class="heading" colspan="5">
+                    <span class="action">
+                        <a href="#" onclick="toggleDisplay('buildsWindow'); return false;"><img alt="$action.getText('close')" src="/images/delete.gif"/>#wwtext("name=close")</a>
+                    </span>
+                    #wwtext("name=build.results")
+                </th>
+            </tr>
+            <tr>
+                #contentHeading("project" 1)
+                #contentHeading("build id" 1)
+                #contentHeading("build.spec" 1)
+                #contentHeading("status" 2)
+            </tr>
         #foreach($id in $changelist.resultIds)
+            <tr>
             #set($result = $action.getResult($id))
-            <li>project <a href="currentBuild.action?id=$result.project.id">$!webwork.htmlEncode($result.project.name)</a> build <a href="viewBuild.action?id=$result.id">$!webwork.htmlEncode($result.id)</a></li>
-        #end
-        </ul>
+                <td class="content"><a href="currentBuild.action?id=$result.project.id">$!webwork.htmlEncode($result.project.name)</a></td>
+                #set($cssClass = $result.state.string)
+                <td class="content-right"><a href="viewBuild.action?id=$result.id">$result.number</a></td>
+                #classCell($result.buildSpecification)
+                #statusCell($result)
+            #end
+            </tr>
+        </table>
+        </div>
     </td>
 
 #end

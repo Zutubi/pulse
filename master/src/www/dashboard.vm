@@ -8,6 +8,20 @@
     <script type="text/javascript" src="/prototype.js"></script>
     <script type="text/javascript">
         #updater("/ajax/dashboardPanel.action" "panel" $principle)
+
+        function showBuildsFloat(id, cellId)
+        {
+            var element = getElement(id);
+            var cell = getElement(cellId);
+            var window = getElement('buildsWindow');
+            var windowContent = getElement('buildsWindowContent');
+
+            windowContent.innerHTML = element.innerHTML;
+            var position = getPosition(cell);
+            window.style.left = position[0] + 10 + "px";
+            window.style.top = position[1] + 10 + "px";
+            window.style.display = '';
+        }
     </script>
 </head>
 <body>
@@ -17,6 +31,11 @@
 
     <div id="panel">
         #parse("ajax/dashboard-panel.vm")
+    </div>
+
+    <div id="buildsWindow" class="floating" style="display: none;">
+        <div id="buildsWindowContent">
+        </div>
     </div>
 </body>
 </html>

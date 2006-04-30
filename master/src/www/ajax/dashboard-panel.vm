@@ -6,7 +6,7 @@
             #contentHeading("change.revision" 1)
             #contentHeading("change.when" 1)
             #contentHeading("change.comment" 1)
-            #contentHeading("build result" 1)
+            #contentHeading("build.results" 1)
             #contentHeading("actions" 1)
         </tr>
 #if($changelists.size() > 0)

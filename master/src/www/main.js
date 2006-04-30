@@ -20,6 +20,21 @@ function getElement(id)
     return element;
 }
 
+function getPosition(element)
+{
+    var x = 0;
+    var y = 0;
+
+    while(element != null)
+    {
+        x += element.offsetLeft;
+        y += element.offsetTop;
+        element = element.offsetParent;
+    }
+
+    return [x, y];
+}
+
 function setEnableState(id, checkboxId)
 {
     var element = getElement(id);
