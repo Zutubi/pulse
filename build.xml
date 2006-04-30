@@ -162,6 +162,15 @@
         <exec executable="./acceptance-test-prep.sh">
             <arg line="build/pulse-${pulse.version}.tgz"/>
         </exec>
+
+        <javac srcdir="server-core/src/java" destdir="${build.dir}/classes" includes="**/LicenseEncoder*" debug="true">
+            <classpath>
+                <fileset dir="${build.dir}/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+
         <junit printsummary="yes" fork="on" failureProperty="test.failed" errorProperty="test.failed">
             <sysproperty key="pulse.port" value="8889"/>
             <classpath>
@@ -190,7 +199,8 @@
         <exec executable="./acceptance-test-post.sh">
             <arg line="${pulse.version}"/>
         </exec>
-        <fail message="One or more acceptance tests failed.  See the reports (${report.dir}) for details." if="test.failed"/>
+        <fail message="One or more acceptance tests failed.  See the reports (${report.dir}) for details."
+              if="test.failed"/>
     </target>
 
     <target name="init">
@@ -206,8 +216,8 @@
         <!-- refreshing the lib directory -->
         <delete dir="lib"/>
 
-	    <!-- use the default ivy configuration properties. -->
-    	<property file="ivy.properties"/>
+        <!-- use the default ivy configuration properties. -->
+        <property file="ivy.properties"/>
         <ivy:configure/>
         <retrieve.dependencies module="core" dest="lib"/>
         <retrieve.dependencies module="server-core" dest="lib"/>
@@ -225,7 +235,7 @@
         <attribute name="conf" default="external"/>
         <attribute name="dest" default="lib"/>
         <sequential>
-    	    <!-- resolve the modules ivy file. -->
+            <!-- resolve the modules ivy file. -->
             <ivy:resolve file="@{module}/ivy.xml" conf="@{conf}"/>
             <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
             <ivy:retrieve pattern="@{dest}/[artifact]-[revision].[ext]" validate="true" conf="@{conf}"/>

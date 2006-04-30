@@ -47,6 +47,11 @@ public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTest
         form.assertFormPresent();
 
         form.saveFormElements("testhost", "10", "testuser", "testpassword");
+
+        // The jabber config throws up a wait page, run around it :)
+        beginAt("/");
+        clickLinkWithText("administration");
+
         assertJabberTable("testhost", "10", "testuser");
     }
 
@@ -88,6 +93,9 @@ public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTest
     private void assertJabberTable(String host, String port, String username)
     {
         assertTablePresent("jabber.config");
-        assertTableRowsEqual("jabber.config", 1, new String[][] {{"jabber server", host}, {"port", port}, {"username",username}});
+        // Can't assert directly on the table as it may or may not have a note row
+        assertTextPresent(host);
+        assertTextPresent(port);
+        assertTextPresent(username);
     }
 }
