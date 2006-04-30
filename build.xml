@@ -131,6 +131,14 @@
             <fileset dir="master/src/www" includes="**/*"/>
         </copy>
 
+        <!-- copy the readme file. -->
+        <copy todir="${package.root}">
+            <fileset dir="etc" includes="README.txt"/>
+        </copy>
+        <replace dir="${package.root}" token="@VERSION@" value="${pulse.version}">
+            <include name="README.txt"/>
+        </replace>
+
         <!-- /config is for user configuration properties -->
         <copy todir="${package.root}/system/config">
             <fileset dir="master/etc" includes="pulse-defaults.properties,logging.properties"/>
