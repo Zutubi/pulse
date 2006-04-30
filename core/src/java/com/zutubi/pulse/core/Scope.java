@@ -3,9 +3,9 @@
  ********************************************************************************/
 package com.zutubi.pulse.core;
 
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -24,6 +24,11 @@ public class Scope
     public Scope(Scope parent)
     {
         this.parent = parent;
+    }
+
+    public Scope getParent()
+    {
+        return parent;
     }
 
     public boolean containsReference(String name)

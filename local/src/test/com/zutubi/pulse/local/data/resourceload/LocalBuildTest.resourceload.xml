@@ -3,7 +3,7 @@
 
     <recipe name="my-default">
         <resource name="my-resource"/>
-        <executable name="noice" exe="echo" args="${resource-var}"/>
+        <print name="noice" message="${resource-var}"/>
     </recipe>
 
 </project>

@@ -2,8 +2,8 @@
 <project defaultRecipe="my-default">
 
     <recipe name="cool">
-        <executable name="howdy" exe="echo" args="hello world!"/>
-        <executable name="chowdy" exe="echo" args="bye now"/>
+        <print name="howdy" message="hello world!"/>
+        <print name="chowdy" message="bye now"/>
     </recipe>
 
     <post-processor name="my-pp">
@@ -15,23 +15,23 @@
     </post-processor>
 
     <recipe name="my-default">
-        <executable name="noice" exe="echo" args="brief intro..."/>
+        <print name="noice" message="brief intro..."/>
         <command name="oops">
-            <executable exe="echo" args="warning: everythings ok">
+            <print message="warning: everythings ok">
                 <process processor="${my-pp}"/>
-            </executable>
+            </print>
         </command>
         <command name="whoa">
-            <executable exe="echo" args="warning: everythings still fine">
+            <print message="warning: everythings still fine">
                 <process processor="${my-pp}"/>
-            </executable>
+            </print>
         </command>
         <command name="hey">
-            <executable exe="echo" args="info: informative">
+            <print message="info: informative">
                 <process processor="${my-pp}"/>
-            </executable>
+            </print>
         </command>
-        <executable name="bzzzt" exe="echo" args="donskis"/>
+        <print name="bzzzt" message="donskis"/>
     </recipe>
 
 </project>

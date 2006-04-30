@@ -22,6 +22,7 @@ public class PulseFileLoader extends FileLoader
         register("ant", AntCommand.class);
         register("maven", MavenCommand.class);
         register("executable", ExecutableCommand.class);
+        register("print", PrintCommand.class);
         register("make", MakeCommand.class);
         register("resource", ResourceReference.class);
     }

@@ -4,9 +4,6 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -135,14 +132,7 @@ public class ExecutableCommand implements Command
                 cmdResult.getProperties().put("working directory", builder.directory().getAbsolutePath());
             }
 
-            String path = FileSystemUtils.composeFilename(outputFileDir.getName(), outputFile.getName());
-            StoredFileArtifact fileArtifact = new StoredFileArtifact(path, "text/plain");
-            StoredArtifact artifact = new StoredArtifact("command output", fileArtifact);
-            for (ProcessArtifact p : processes)
-            {
-                p.getProcessor().process(outputDir, fileArtifact, cmdResult);
-            }
-            cmdResult.addArtifact(artifact);
+            ProcessSupport.postProcess(processes, outputFileDir, outputFile, outputDir, cmdResult);
         }
         catch (IOException e)
         {
