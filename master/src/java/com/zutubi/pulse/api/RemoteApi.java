@@ -4,6 +4,7 @@
 package com.zutubi.pulse.api;
 
 import com.zutubi.pulse.ShutdownManager;
+import com.zutubi.pulse.Version;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.core.model.ResultState;
@@ -36,6 +37,12 @@ public class RemoteApi
     {
         // can remove this call when we sort out autowiring from the XmlRpcServlet.
         ComponentContext.autowire(this);
+    }
+
+    public int getVersion()
+    {
+        Version v = Version.getVersion();
+        return v.getIntBuildNumber();
     }
 
     public String login(String username, String password) throws AuthenticationException
