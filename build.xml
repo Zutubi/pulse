@@ -116,9 +116,11 @@
         <retrieve.dependencies module="." conf="master" dest="${package.root}/lib"/>
 
         <!-- place holder for package documentation -->
+<!--
         <copy todir="${package.root}/docs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
+-->
         <copy todir="${package.root}/system/templates">
             <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl"/>
         </copy>
