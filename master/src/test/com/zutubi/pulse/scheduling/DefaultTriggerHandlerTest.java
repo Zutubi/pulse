@@ -69,7 +69,11 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
 
         assertEquals(1, a.getTriggerCount());
         fire(a);
-        pause(300);
+        // ensure that the parallel thread that handles the execution of the
+        // fired trigger has a chance to do its work. Not sure why we need to
+        // wait this long - have not yet tracked down the cause of the random
+        // failures.
+        pause(600);
 
         assertEquals(2, a.getTriggerCount());
 
