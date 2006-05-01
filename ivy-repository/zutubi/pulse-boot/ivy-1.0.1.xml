@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="zutubi" module="pulse-boot" revision="1.0.1" status="integration" publication="20060501144509">
+        <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
+        <description homepage="http://www.zutubi.com/">
+            description....
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="release"/>
+        <conf name="test"/>
+        <conf name="external"/>
+    </configurations>
+
+    <publications>
+        <artifact name="boot" type="jar" conf="release"/>
+    </publications>
+
+</ivy-module>

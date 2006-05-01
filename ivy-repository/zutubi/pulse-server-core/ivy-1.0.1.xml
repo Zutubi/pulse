@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="zutubi" module="pulse-server-core" revision="1.0.1" status="integration" publication="20060501144641">
+        <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
+        <description homepage="http://www.zutubi.com/">
+            description....
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="external" description="external dependencies"/>
+        <conf name="release"/>
+        <conf name="test"/>
+    </configurations>
+
+    <publications>
+        <artifact name="server-core" type="jar" conf="release"/>
+        <artifact name="server-core-test" type="jar" conf="test"/>
+    </publications>
+
+    <dependencies>
+
+        <dependency org="zutubi" name="pulse-core" rev="1.0.1" conf="external->external"/>
+        <dependency org="zutubi" name="pulse-core" rev="1.0.1" conf="release->release"/>
+        <dependency org="zutubi" name="pulse-core" rev="1.0.1" conf="test->test"/>
+
+        <dependency org="apache" name="commons-collections" rev="3.1" conf="external->default"/>
+        <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external->default"/>
+        <dependency org="apache" name="commons-fileupload" rev="1.0" conf="external->default"/>
+        <dependency org="apache" name="jasper" rev="5.5.9" conf="external->default"/>
+        <dependency org="apache" name="commons-pool" rev="1.2" conf="external->default"/>
+
+        
+        <dependency org="jwebunit" name="jwebunit" rev="1.2" conf="test->default"/>
+        
+        <dependency org="jetty" name="org.mortbay.jetty" rev="5.1.6" conf="external->default"/>
+        <dependency org="springframework" name="spring" rev="1.2.6" conf="external->spring-aop,spring-jdbc,spring-beans,spring-context,spring-core,spring-orm,spring-hibernate3,spring-support"/>
+
+        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.0-RC1" conf="external->default"/>
+
+        <dependency org="opensymphony" name="sitemesh" rev="2.2.1" conf="external->default"/>
+        <dependency org="opensymphony" name="webwork" rev="2.2.1" conf="external->default"/>
+        
+        <dependency org="portlet-api" name="portlet-api" rev="1.0" conf="external->default"/>
+
+        
+        <dependency org="hibernate" name="hibernate" rev="3.1.1" conf="external->default"/>
+        <dependency org="hsqldb" name="hsqldb" rev="1.8.0.1" conf="external->default"/>
+        <dependency org="ehcache" name="ehcache" rev="1.1" conf="external->default"/>
+
+        <dependency org="sun" name="servlet" rev="2.4" conf="external->default"/>
+        <dependency org="sun" name="transaction" rev="1.0.1b" conf="external->default"/>
+
+        <dependency org="caucho" name="hessian" rev="3.0.13" conf="external->default"/>
+
+        
+        <dependency org="javasvn" name="javasvn" rev="0.8.8.1" conf="external->default"/>
+        <dependency org="netbeans" name="javacvs" rev="11nov2005" conf="external->default"/>
+        <dependency org="jssh" name="jssh" rev="0.2.7" conf="external->default"/>
+
+    </dependencies>
+
+
+</ivy-module>

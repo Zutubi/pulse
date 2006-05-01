@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="zutubi" module="pulse-core" revision="1.0.1" status="integration" publication="20060501144535">
+        <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
+        <description homepage="http://www.zutubi.com/">
+            description....
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="external" description="external dependencies"/>
+        <conf name="release"/>
+        <conf name="test"/>
+    </configurations>
+
+    <publications>
+        <artifact name="core" type="jar" conf="release"/>
+        <artifact name="core-test" type="jar" conf="test"/>
+    </publications>
+
+    <dependencies>
+
+        <dependency org="zutubi" name="pulse-boot" rev="1.0.1" conf="release->release"/>
+
+        <dependency org="apache" name="ant" rev="1.6.5" conf="external->default"/>
+
+        <dependency org="apache" name="velocity" rev="1.3.1" conf="external->default"/>
+
+        <dependency org="junit" name="junit" rev="3.8.1" conf="test->default"/>
+
+        
+        <dependency org="opensymphony" name="xwork" rev="1.1.1" conf="external->default"/>
+        <dependency org="opensymphony" name="oscore" rev="2.2.4" conf="external->default"/>
+
+        
+        <dependency org="xom" name="xom" rev="20051027" conf="external->default"/>
+
+    </dependencies>
+
+</ivy-module>
