@@ -15,6 +15,7 @@ import com.sun.syndication.feed.synd.*;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Date;
 
 /**
  * <class-comment/>
@@ -124,6 +125,7 @@ public class BuildResultRssAction extends ProjectActionSupport
             description.setValue(renderResult(result));
 
             entry.setDescription(description);
+            entry.setPublishedDate(new Date(result.getStamps().getEndTime()));
             entries.add(entry);
         }
 
