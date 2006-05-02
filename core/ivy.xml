@@ -11,6 +11,7 @@
 
     <configurations>
         <conf name="external" description="external dependencies"/>
+        <conf name="external-test" description="external testing dependencies"/>
         <conf name="release"/>
         <conf name="test"/>
     </configurations>
@@ -28,7 +29,7 @@
 
         <dependency org="apache" name="velocity" rev="1.3.1" conf="external->default"/>
 
-        <dependency org="junit" name="junit" rev="3.8.1" conf="test->default"/>
+        <dependency org="junit" name="junit" rev="3.8.1" conf="external-test->default"/>
 
         <!-- used for validation support -->
         <dependency org="opensymphony" name="xwork" rev="1.1.1" conf="external->default"/>

@@ -177,6 +177,7 @@ public class RecipeProcessor
         }
         catch (Exception e)
         {
+            LOG.severe(e);
             result.error(new BuildException("Unexpected error: " + e.getMessage(), e));
         }
         finally

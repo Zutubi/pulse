@@ -205,6 +205,7 @@ public class SetupFeatureTour implements Runnable
 
     private void addBuildResult()
     {
+        BuildResult previous = build;
         build = new BuildResult(project, "default", ++buildNumber);
         buildResultDao.save(build);
 
@@ -228,14 +229,14 @@ public class SetupFeatureTour implements Runnable
         RecipeResultNode node = new RecipeResultNode(recipe);
         build.getRoot().addChild(node);
 
-        addChanges();
+        addChanges(previous);
 
         commandIndex = 0;
         addCommandResult("bootstrap");
         completeCommandResult();
     }
 
-    private void addChanges()
+    private void addChanges(BuildResult previous)
     {
         List<Changelist> changes = new LinkedList<Changelist>();
 
@@ -243,7 +244,7 @@ public class SetupFeatureTour implements Runnable
         {
             String author = Math.random() > 0.3 ? "jsankey" : "dostermeier"; // ;)
 
-            changes.add(createChange(revisions[changeIndex], author, comments[changeIndex], (1000 - revisions[changeIndex]) * 600000, generateChangeFiles()));
+            changes.add(createChange(previous, revisions[changeIndex], author, comments[changeIndex], (1000 - revisions[changeIndex]) * 600000, generateChangeFiles()));
             changeIndex++;
             if (changeIndex >= comments.length)
             {
@@ -386,7 +387,7 @@ public class SetupFeatureTour implements Runnable
         return fileArtifact;
     }
 
-    private Changelist createChange(long revision, String author, String comment, long ago, String... files)
+    private Changelist createChange(BuildResult previous, long revision, String author, String comment, long ago, String... files)
     {
         NumericalRevision rev = new NumericalRevision(revision);
         rev.setAuthor(author);
@@ -396,6 +397,12 @@ public class SetupFeatureTour implements Runnable
         Changelist list = new Changelist(":1666", rev);
         list.addProjectId(project.getId());
         list.addResultId(build.getId());
+        if(previous != null)
+        {
+            list.addProjectId(previous.getProject().getId());
+            list.addResultId(previous.getId());
+        }
+
         for (String file : files)
         {
             list.addChange(new Change(file, "3", Change.Action.EDIT));
