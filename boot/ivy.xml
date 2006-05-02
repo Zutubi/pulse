@@ -13,6 +13,7 @@
         <conf name="release"/>
         <conf name="test"/>
         <conf name="external"/>
+        <conf name="external-test"/>
     </configurations>
 
     <publications>

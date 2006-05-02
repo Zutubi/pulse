@@ -13,6 +13,7 @@
         <conf name="external" description="external dependencies"/>
         <conf name="release"/>
         <conf name="test"/>
+        <conf name="external-test"/>
     </configurations>
 
     <publications>
@@ -24,6 +25,7 @@
         <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="release->release"/>
         <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="external->external"/>
         <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="test->test"/>
+        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="external-test->external-test"/>
 
         <!-- command line interface. -->
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external->default"/>

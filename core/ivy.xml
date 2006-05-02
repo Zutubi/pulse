@@ -24,6 +24,7 @@
     <dependencies>
 
         <dependency org="zutubi" name="pulse-boot" rev="latest.integration" conf="release->release"/>
+        <dependency org="zutubi" name="pulse-boot" rev="latest.integration" conf="test-external->test-external"/>
 
         <dependency org="apache" name="ant" rev="1.6.5" conf="external->default"/>
 

@@ -85,6 +85,7 @@
         <resolve conf="external"/>
         <resolve conf="release"/>
         <resolve conf="test"/>
+        <resolve conf="external-test"/>
 
     </target>
 
