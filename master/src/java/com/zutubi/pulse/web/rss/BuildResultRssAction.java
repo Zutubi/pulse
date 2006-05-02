@@ -136,8 +136,10 @@ public class BuildResultRssAction extends ProjectActionSupport
             titleBuffer.append(result.succeeded() ? "succeeded" : "failed");
             entry.setTitle(titleBuffer.toString());
 
+            // NOTES:
+            // calling setLink is effectively setting guid without a isPermaLink reference.
+            // calling setUri() is equivalent to guid isPermaLink=false - refer to ConverterForRSS094.java
             String permalink = "http://" + configurationManager.getAppConfig().getHostName() +"/viewBuild.action?id=" + result.getId();
-            entry.setUri(permalink);
             entry.setLink(permalink);
             entry.setPublishedDate(new Date(result.getStamps().getEndTime()));
             entries.add(entry);
