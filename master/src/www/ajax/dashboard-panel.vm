@@ -22,7 +22,7 @@
     #end
 #else
         <tr>
-            <td class="content" colspan="4">#wwtext("name=no.changes")</td>
+            <td class="content" colspan="5">#wwtext("name=no.changes")</td>
         </tr>
 #end
     </table>
