@@ -3,22 +3,21 @@
  ********************************************************************************/
 package com.zutubi.pulse.xwork.results;
 
+import com.opensymphony.util.TextUtils;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.WebWorkResultSupport;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
-import com.opensymphony.util.TextUtils;
 import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.WireFeedOutput;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Calendar;
 
 /**
  * Render an RSS feed.
@@ -31,20 +30,21 @@ public class RssResult extends WebWorkResultSupport
 
     protected void doExecute(String format, ActionInvocation actionInvocation) throws Exception
     {
+        // No need to create a session for RSS
+        ServletActionContext.getRequest().getSession(false);
+        HttpServletResponse response = ServletActionContext.getResponse();
+        HttpServletRequest request = ServletActionContext.getRequest();
+
         OgnlValueStack stack = actionInvocation.getStack();
 
         SyndFeed feed = (SyndFeed) stack.findValue("feed");
         if (feed == null)
         {
-            // we have a problem - the action did not generate a synd feed for
-            // us to render
-            throw new ServletException("Unable to find feed for this action");
+            // this means that the feed requested does not exist. Thats not to say it
+            // never existed, just that it no longer exists. So, we deal with it appropriately
+            response.sendError(HttpServletResponse.SC_GONE);
+            return;
         }
-
-        // No need to create a session for RSS
-        ServletActionContext.getRequest().getSession(false);
-        HttpServletResponse response = ServletActionContext.getResponse();
-        HttpServletRequest request = ServletActionContext.getRequest();
 
         // rss content type.
         response.setContentType("application/rss+xml; charset=UTF-8");
@@ -73,6 +73,7 @@ public class RssResult extends WebWorkResultSupport
         // always set
         response.setDateHeader("Last-Modified", feedLastModified.getTime());
 
+        // ETag should be based on the pre-concatenated lastmodified date.
         String etag = Long.toString(feedLastModified.getTime());
         response.setHeader("ETag", etag);
 
