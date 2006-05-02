@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="pulse-root" status="integration">
+    <info organisation="zutubi" module="pulse-slave" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
             description....
@@ -10,23 +10,19 @@
     </info>
 
     <configurations>
-        <conf name="external" description="external dependencies"/>
-        <conf name="release"/>
-        <conf name="test"/>
-        <conf name="external-test"/>
+        <conf name="release" description="Defines those packages that are included in the final release."/>
+        <conf name="external" description="All of those packages not written by Zutubi."/>
+        <conf name="build" description="All of the packages required during the build."/>
     </configurations>
 
     <publications>
-
+        <!-- to be completed when we start working with slaves again. -->
     </publications>
 
     <dependencies>
-
         <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="release->release"/>
         <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="external->external"/>
-        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="test->test"/>
-        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="test-external->test-external"/>
-
+        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="build->build"/>
     </dependencies>
 
 

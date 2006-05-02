@@ -82,10 +82,7 @@
         <mkdir dir="${process.src.dir}"/>
 
         <!-- resolve dependencies -->
-        <resolve conf="external"/>
-        <resolve conf="release"/>
-        <resolve conf="test"/>
-        <resolve conf="external-test"/>
+        <resolve conf="build"/>
 
     </target>
 

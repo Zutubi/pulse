@@ -233,13 +233,13 @@
         <!-- use the default ivy configuration properties. -->
         <property file="ivy.properties"/>
         <ivy:configure/>
-        <retrieve.dependencies module="core" dest="lib" conf="external-test"/>
-        <retrieve.dependencies module="core" dest="lib"/>
-        <retrieve.dependencies module="server-core" dest="lib" conf="external-test"/>
-        <retrieve.dependencies module="server-core" dest="lib"/>
-        <retrieve.dependencies module="local" dest="lib"/>
-        <retrieve.dependencies module="master" dest="lib"/>
-        <retrieve.dependencies module="slave" dest="lib"/>
+        <!-- retrieve all of the modules external dependencies -->
+        <retrieve.dependencies module="boot" dest="lib" conf="external"/>
+        <retrieve.dependencies module="core" dest="lib" conf="external"/>
+        <retrieve.dependencies module="server-core" dest="lib" conf="external"/>
+        <retrieve.dependencies module="local" dest="lib" conf="external"/>
+        <retrieve.dependencies module="master" dest="lib" conf="external"/>
+        <retrieve.dependencies module="slave" dest="lib" conf="external"/>
     </target>
 
     <!--

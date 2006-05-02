@@ -16,9 +16,9 @@
     </configurations>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-local" rev="latest.integration" conf="local->release,external"/>
-        <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="master->release,external"/>
-        <dependency org="zutubi" name="pulse-slave" rev="latest.integration" conf="slave->release,external"/>
+        <dependency org="zutubi" name="pulse-local" rev="latest.integration" conf="local->release"/>
+        <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="master->release"/>
+        <dependency org="zutubi" name="pulse-slave" rev="latest.integration" conf="slave->release"/>
     </dependencies>
 
 </ivy-module>

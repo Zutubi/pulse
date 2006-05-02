@@ -10,25 +10,23 @@
     </info>
 
     <configurations>
-        <conf name="external" description="external dependencies"/>
-        <conf name="release"/>
-        <conf name="test"/>
-        <conf name="external-test"/>
+        <conf name="release" description="Defines those packages that are included in the final release."/>
+        <conf name="external" description="All of those packages not written by Zutubi."/>
+        <conf name="build" description="All of the packages required during the build."/>
     </configurations>
 
     <publications>
-        <artifact name="local" type="jar" conf="release"/>
+        <artifact name="local" type="jar" conf="release,build"/>
     </publications>
 
     <dependencies>
 
         <!-- command line parsing -->
-        <dependency org="apache" name="commons-cli" rev="1.0" conf="external->default"/>
+        <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
 
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="test->test"/>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build->build"/>
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="release->release"/>
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="external->external"/>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="test-external->test-external"/>
 
     </dependencies>
 
