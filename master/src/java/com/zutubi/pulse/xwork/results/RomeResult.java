@@ -23,17 +23,39 @@ import java.util.Calendar;
  * Render an Rome synd feed instance.
  *
  *
- *
  * @author Daniel Ostermeier
  */
 public class RomeResult extends WebWorkResultSupport
 {
+    /**
+     * Default feed last modified date.
+     */
     private static final Date DAY_0 = new Date(0);
 
     /**
      * The name used to retrieve the feed instance from the OGNL stack.
      */
     private String feedName = "feed";
+
+    /**
+     * Last modified header.
+     */
+    private static final String LAST_MODIFIED = "Last-Modified";
+
+    /**
+     * If none match header.
+     */
+    private static final String IF_NONE_MATCH = "If-None-Match";
+
+    /**
+     * If modified since header.
+     */
+    private static final String IF_MODIFIED_SINCE = "If-Modified-Since";
+
+    /**
+     * ETag header.
+     */
+    private static final String ETAG = "ETag";
 
     /**
      * Specify the name of the feed as it appears in the OGNL stack. This value defaults to "feed"
@@ -88,18 +110,18 @@ public class RomeResult extends WebWorkResultSupport
         feedLastModified = cal.getTime();
 
         // always set
-        response.setDateHeader("Last-Modified", feedLastModified.getTime());
+        response.setDateHeader(LAST_MODIFIED, feedLastModified.getTime());
 
         // ETag should be based on the pre-concatenated lastmodified date.
         String etag = Long.toString(feedLastModified.getTime());
-        response.setHeader("ETag", etag);
+        response.setHeader(ETAG, etag);
 
         // check the headers to determine whether or not a response is required.
-        if (TextUtils.stringSet(request.getHeader("If-None-Match")) ||
-                TextUtils.stringSet(request.getHeader("If-Modified-Since")))
+        if (TextUtils.stringSet(request.getHeader(IF_NONE_MATCH)) ||
+                TextUtils.stringSet(request.getHeader(IF_MODIFIED_SINCE)))
         {
-            if (etag.equals(request.getHeader("If-None-Match")) &&
-                    feedLastModified.getTime() == request.getDateHeader("If-Modified-Since"))
+            if (etag.equals(request.getHeader(IF_NONE_MATCH)) &&
+                    feedLastModified.getTime() == request.getDateHeader(IF_MODIFIED_SINCE))
             {
                 // if response is not required, send 304 Not modified.
                 response.sendError(HttpServletResponse.SC_NOT_MODIFIED);

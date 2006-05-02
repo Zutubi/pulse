@@ -112,19 +112,33 @@ public class BuildResultRssAction extends ProjectActionSupport
         feed = new SyndFeedImpl();
 
         // set Title, Description and Link
-        feed.setTitle("build results for " + project.getName());
-        feed.setDescription("this feed contains the latest build results for the " + project.getName() + " project.");
+        feed.setTitle("Pulse build results for " + project.getName());
+        feed.setDescription("This feed contains the latest pulse build results for the " + project.getName() + " project.");
         feed.setLink("http://" + configurationManager.getAppConfig().getHostName() +"/currentBuild.action?id=" + project.getId());
 
         List<SyndEntry> entries = new LinkedList<SyndEntry>();
         for (BuildResult result : page.getResults())
         {
             SyndEntry entry = new SyndEntryImpl();
+
+            // with rss 2.0, the content is added in the description field.
             SyndContent description = new SyndContentImpl();
+
+            // type should be based on user selected type.
             description.setType("text/html");
             description.setValue(renderResult(result));
-
             entry.setDescription(description);
+
+            StringBuffer titleBuffer = new StringBuffer();
+            titleBuffer.append("Build ");
+            titleBuffer.append(result.getNumber());
+            titleBuffer.append(" ");
+            titleBuffer.append(result.succeeded() ? "succeeded" : "failed");
+            entry.setTitle(titleBuffer.toString());
+
+            String permalink = "http://" + configurationManager.getAppConfig().getHostName() +"/viewBuild.action?id=" + result.getId();
+            entry.setUri(permalink);
+            entry.setLink(permalink);
             entry.setPublishedDate(new Date(result.getStamps().getEndTime()));
             entries.add(entry);
         }
