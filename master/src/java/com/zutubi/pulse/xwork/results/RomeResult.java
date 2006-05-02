@@ -3,11 +3,11 @@
  ********************************************************************************/
 package com.zutubi.pulse.xwork.results;
 
-import com.opensymphony.util.TextUtils;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.WebWorkResultSupport;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
+import com.opensymphony.util.TextUtils;
 import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -15,18 +15,35 @@ import com.sun.syndication.io.WireFeedOutput;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Calendar;
 
 /**
- * Render an RSS feed.
+ * Render an Rome synd feed instance.
+ *
+ *
  *
  * @author Daniel Ostermeier
  */
-public class RssResult extends WebWorkResultSupport
+public class RomeResult extends WebWorkResultSupport
 {
     private static final Date DAY_0 = new Date(0);
+
+    /**
+     * The name used to retrieve the feed instance from the OGNL stack.
+     */
+    private String feedName = "feed";
+
+    /**
+     * Specify the name of the feed as it appears in the OGNL stack. This value defaults to "feed"
+     *
+     * @param feedName
+     */
+    public void setFeedName(String feedName)
+    {
+        this.feedName = feedName;
+    }
 
     protected void doExecute(String format, ActionInvocation actionInvocation) throws Exception
     {
@@ -37,7 +54,7 @@ public class RssResult extends WebWorkResultSupport
 
         OgnlValueStack stack = actionInvocation.getStack();
 
-        SyndFeed feed = (SyndFeed) stack.findValue("feed");
+        SyndFeed feed = (SyndFeed) stack.findValue(feedName);
         if (feed == null)
         {
             // this means that the feed requested does not exist. Thats not to say it
