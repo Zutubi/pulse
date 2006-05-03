@@ -10,8 +10,11 @@ import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.ProjectNameComparator;
 
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  */
@@ -81,6 +84,21 @@ public class ViewChangelistAction extends ActionSupport
         }
 
         buildResults = ChangelistUtils.getBuilds(buildManager, changelist);
+        Collections.sort(buildResults, new Comparator<BuildResult>()
+        {
+            public int compare(BuildResult b1, BuildResult b2)
+            {
+                ProjectNameComparator comparator = new ProjectNameComparator();
+                int result = comparator.compare(b1.getProject(), b2.getProject());
+                if(result == 0)
+                {
+                    result = (int)(b1.getNumber() - b2.getNumber());
+                }
+
+                return result;
+            }
+        });
+        
         // TODO dodgy walking of tree: hibernate eager/lazy loading!
         changelist.getRevision();
         changelist.getChanges();

@@ -133,4 +133,22 @@ public class Changelist extends Entity
     {
         resultIds.add(id);
     }
+
+    public void removeResultId(long id, long projectId)
+    {
+        int i;
+
+        for(i = 0; i < resultIds.size(); i++)
+        {
+            if(resultIds.get(i) == id)
+            {
+                break;
+            }
+        }
+
+        if(i < resultIds.size())
+        {
+            resultIds.remove(i);
+        }
+    }
 }

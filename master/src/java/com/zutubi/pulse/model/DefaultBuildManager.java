@@ -9,6 +9,7 @@ import com.zutubi.pulse.bootstrap.DatabaseBootstrap;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.model.persistence.ArtifactDao;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
@@ -43,6 +44,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
     private ProjectManager projectManager;
     private Scheduler scheduler;
     private ConfigurationManager configurationManager;
+    private EventManager eventManager;
 
     private static final String CLEANUP_NAME = "cleanup";
     private static final String CLEANUP_GROUP = "services";
@@ -50,6 +52,8 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public void init()
     {
+        eventManager.register(this);
+
         // register a schedule for cleaning up old build results.
         // check if the trigger exists. if not, create and schedule.
         Trigger trigger = scheduler.getTrigger(CLEANUP_NAME, CLEANUP_GROUP);
@@ -288,6 +292,13 @@ public class DefaultBuildManager implements BuildManager, EventListener
             return;
         }
 
+        // Remove records of this build from changelists
+        for(Changelist change: build.getScmDetails().getChangelists())
+        {
+            change.removeResultId(build.getId());
+            changelistDao.save(change);
+        }
+
         buildResultDao.delete(build);
     }
 
@@ -352,5 +363,10 @@ public class DefaultBuildManager implements BuildManager, EventListener
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }
