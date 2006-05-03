@@ -34,7 +34,7 @@ public class JabberConfigurationAction extends ActionSupport
     public String doSave()
     {
         saveConfig();
-        
+
         return SUCCESS;
     }
 
@@ -80,6 +80,7 @@ public class JabberConfigurationAction extends ActionSupport
     {
         ApplicationConfiguration config = configurationManager.getAppConfig();
         jabber.setHost(config.getJabberHost());
+        jabber.setPort(config.getJabberPort());
         jabber.setUsername(config.getJabberUsername());
         jabber.setPassword(config.getJabberPassword());
         jabber.setForceSSL(config.getJabberForceSSL());

@@ -46,13 +46,16 @@ public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTest
         assertAndClick("jabber.edit");
         form.assertFormPresent();
 
-        form.saveFormElements("testhost", "10", "testuser", "testpassword");
+        form.saveFormElements("testhost", "10101", "testuser", "testpassword");
 
         // The jabber config throws up a wait page, run around it :)
         beginAt("/");
         clickLinkWithText("administration");
 
-        assertJabberTable("testhost", "10", "testuser");
+        assertJabberTable("testhost", "10101", "testuser");
+
+        assertAndClick("jabber.edit");
+        form.assertFormElements("testhost", "10101", "testuser", "testpassword");
     }
 
     public void testReset() throws Exception
