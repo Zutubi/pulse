@@ -134,7 +134,7 @@ public class Changelist extends Entity
         resultIds.add(id);
     }
 
-    public void removeResultId(long id, long projectId)
+    public void removeResultId(long id)
     {
         int i;
 
