@@ -33,6 +33,7 @@ public class ViewFileServlet extends HttpServlet
         }
 
         String path = httpServletRequest.getPathInfo();
+        path = path.replace('+', ' ');
         String [] parts = path.split("/", 4);
 
         if (parts.length != 4)

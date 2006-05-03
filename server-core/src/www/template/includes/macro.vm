@@ -1319,7 +1319,7 @@
     <li class="file-artifact">
     #set($trimmedPath = $artifact.trimmedPath($fileArtifact))
     #if($showArtifactLink)
-        <a href="/view/$result.id/$artifact.id/$fileArtifact.path">$trimmedPath</a>
+        <a href="/view/$result.id/$artifact.id/$!webwork.urlEncode($fileArtifact.path)">$trimmedPath</a>
         #if($fileArtifact.canDecorate())
             [<a href="viewArtifact.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$result.id">decorated</a>]
         #end
@@ -1349,7 +1349,7 @@
     #end
     <li class="$artClass">
     #if($hasIndex)
-        <a href="/view/$result.id/$artifact.id/$artifact.name/">
+        <a href="/view/$result.id/$artifact.id/$!webwork.urlEncode($artifact.name)/">
     #end
             $!webwork.htmlEncode($artifact.name)
     #if($hasIndex)
