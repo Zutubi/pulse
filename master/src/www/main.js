@@ -108,3 +108,75 @@ function toggleDisplay(id)
         element.style.display = '';
     }
 }
+
+// Toggles the display of a nested list and switched the correcsponding image
+function toggleList(id)
+{
+    var element = getElement(id);
+    var image = getElement(id + '_image');
+
+    if(!element.style.display)
+    {
+        element.style.display = 'none';
+        image.src = '/images/resultset_next.gif';
+    }
+    else
+    {
+        element.style.display = '';
+        image.src = '/images/resultset_down.gif';
+    }
+}
+
+// Changes display style for all lists under the given node
+function styleAllLists(id, style, imageSource)
+{
+    var node = getElement(id);
+    var childLists = node.getElementsByTagName("ul");
+
+    for(var i = 0; i < childLists.length; i++)
+    {
+        if(childLists[i].id != '')
+        {
+            childLists[i].style.display = style;
+            var image = getElement(childLists[i].id + '_image');
+            if(image)
+            {
+                image.src = imageSource;
+            }
+        }
+    }
+}
+
+// Expands all lists under the given node
+function expandAllLists(id)
+{
+    styleAllLists(id, '', '/images/resultset_down.gif');
+}
+
+// Collapses all lists under the given node
+function collapseAllLists(id)
+{
+    styleAllLists(id, 'none', '/images/resultset_next.gif');
+}
+
+// Hides all children of the element with the given id
+function hideChildren(id)
+{
+    var element = getElement(id);
+
+    for(var i = 0; i < element.childNodes.length; i++)
+    {
+        var child = element.childNodes[i];
+        if(child.nodeType == 1)
+        {
+            if(child.style.display == '')
+            {
+                child.style.display = 'none';
+            }
+            else
+            {
+                child.style.display = '';
+            }
+        }
+    }
+}

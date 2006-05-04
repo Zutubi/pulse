@@ -11,6 +11,9 @@
     #buildTabs($result "artifacts")
 
     <h3>#wwtext("name=artifacts.all")</h3>
-
+    <div class="small">
+        <a href="#" onclick="expandAllLists('${result.id}_artifacts'); return false">#wwtext("name=expand.all")</a> |
+        <a href="#" onclick="collapseAllLists('${result.id}_artifacts'); return false">#wwtext("name=collapse.all")</a>
+    </div>
     #buildArtifacts($result)
 </html>

@@ -56,6 +56,7 @@ public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTest
 
         assertAndClick("jabber.edit");
         form.assertFormElements("testhost", "10101", "testuser", "testpassword");
+        form.cancelFormElements("testhost", "10101", "testuser", "testpassword");
     }
 
     public void testReset() throws Exception

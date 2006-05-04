@@ -36,6 +36,7 @@ public interface ApplicationConfiguration
     public static final String JABBER_HOST = "jabber.host";
 
     public static final String JABBER_PORT = "jabber.port";
+    public static final int JABBER_PORT_DEFAULT = 5222;
 
     public static final String JABBER_USERNAME = "jabber.username";
 

@@ -1367,7 +1367,7 @@
 ## Shows a list of artifacts for a command
 ##
 #macro(commandArtifacts $build $result $showFeatures $showArtifactLink)
-    <ul class="artifact">
+    <ul class="artifact" id="${commandResult.id}_artifacts">
     #foreach($artifact in $result.artifacts)
         #commandMultiArtifact($artifact $build $result $showFeatures $showArtifactLink)
     #end
@@ -1384,7 +1384,7 @@
         #end
         #foreach($commandResult in $result.commandResults)
             #if($commandResult.hasArtifacts())
-        <li class="artifact">#wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)
+        <li class="artifact"><img alt="toggle" id="${commandResult.id}_artifacts_image" src="/images/resultset_down.gif" onclick="toggleList('${commandResult.id}_artifacts');"/> #wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)
             #commandArtifacts($build $commandResult false $result.completed())
         </li>
             #end
@@ -1404,8 +1404,8 @@
 ##
 #macro(recipeNodeArtifacts $build $node)
     #if($node.hasArtifacts())
-        <li class="artifact">#wwtext("name=recipe") :: $!webwork.htmlEncode($node.result.recipeNameSafe)
-            <ul class="artifact">
+        <li class="artifact"><img alt="toggle" id="${node.result.id}_artifacts_image" src="/images/resultset_down.gif" onclick="toggleList('${node.result.id}_artifacts');"/> #wwtext("name=recipe") :: $!webwork.htmlEncode($node.result.recipeNameSafe)
+            <ul class="artifact" id="${node.result.id}_artifacts">
             #recipeArtifacts($build $node.result false)
             #foreach($child in $node.children)
                 #recipeNodeArtifacts($build $child)
@@ -1421,7 +1421,7 @@
 ##
 #macro(buildArtifacts $result)
     #if($result.hasArtifacts())
-    <ul class="artifact">
+    <ul class="artifact" id="${result.id}_artifacts">
         #foreach($node in $result.root.children)
             #recipeNodeArtifacts($result $node)
         #end

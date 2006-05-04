@@ -49,6 +49,18 @@ public class ConfigSupport implements Config
         return Integer.parseInt(getProperty(key));
     }
 
+    public int getInt(String key, int defaultValue)
+    {
+        if(hasProperty(key))
+        {
+            return getInt(key);
+        }
+        else
+        {
+            return defaultValue;
+        }
+    }
+
     public void setInt(String key, int value)
     {
         setProperty(key, Integer.toString(value));
@@ -116,4 +128,5 @@ public class ConfigSupport implements Config
             removeProperty(key);
         }
     }
+
 }

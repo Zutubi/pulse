@@ -450,9 +450,11 @@ ul.info {
 li.error, li.warning, li.info, li.artifact, li.file-artifact, li.dir-artifact, li.report-artifact, li.task, li.explore {
     font-weight: normal;
     list-style: none;
-    padding-left: 20px;
     margin-top: 7px;
-    /*margin-bottom: 6px;*/
+}
+
+li.error, li.warning, li.info, li.file-artifact, li.dir-artifact, li.report-artifact, li.task, li.explore {
+    padding-left: 20px;
 }
 
 pre.feature {
@@ -471,10 +473,6 @@ li.warning {
 
 li.info {
     background: url( images/information.gif ) no-repeat 0 0;
-}
-
-li.artifact {
-    background: url( images/resultset_next.gif ) no-repeat 0 0;
 }
 
 li.task {

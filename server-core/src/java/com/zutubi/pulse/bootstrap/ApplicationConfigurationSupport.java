@@ -145,7 +145,7 @@ public class ApplicationConfigurationSupport implements ApplicationConfiguration
 
     public int getJabberPort()
     {
-        return config.getInt(JABBER_PORT);
+        return config.getInt(JABBER_PORT, JABBER_PORT_DEFAULT);
     }
 
     public void setJabberPort(int port)
