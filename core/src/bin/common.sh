@@ -66,7 +66,7 @@ if [ -z "$PULSE_PID" ]
 then
     exec "$JAVACMD" -classpath "$LOCALCLASSPATH" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@
 else
-    "$JAVACMD" -classpath "$LOCALCLASSPATH" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@ >> "$PULSE_HOME"/pulse.out 2>&1 &
+    "$JAVACMD" $JAVA_OPTS $PULSE_OPTS -classpath "$LOCALCLASSPATH" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@ >> "$PULSE_HOME"/pulse.out 2>&1 &
     echo $! > $PULSE_PID
     exit 0
 fi
