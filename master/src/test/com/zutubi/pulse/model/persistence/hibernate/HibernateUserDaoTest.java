@@ -117,6 +117,25 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         assertEquals("1", otherProjects.get(0).getName());
         assertEquals("2", otherProjects.get(1).getName());
     }
+
+    public void testPropertyPersistence()
+    {
+        User user = new User();
+        userDao.save(user);
+        commitAndRefreshTransaction();
+        user = userDao.findById(user.getId());
+
+        assertFalse(user.hasProperty("a"));
+        assertNull(user.getProperty("a"));
+        user.setProperty("a", "b");
+        assertTrue(user.hasProperty("a"));
+        assertEquals("b", user.getProperty("a"));
+        commitAndRefreshTransaction();
+
+        user = userDao.findById(user.getId());
+        assertTrue(user.hasProperty("a"));
+        assertEquals("b", user.getProperty("a"));
+    }
 /*
     public void testGrantedAuthorities()
     {

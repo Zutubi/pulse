@@ -197,7 +197,7 @@ public class JDBCUtils
             }
             catch (SQLException e)
             {
-                LOG.debug(e);
+                LOG.warning(e);
             }
         }
     }
@@ -212,7 +212,7 @@ public class JDBCUtils
             }
             catch (SQLException e)
             {
-                LOG.debug(e);
+                LOG.warning(e);
             }
         }
     }
@@ -227,7 +227,7 @@ public class JDBCUtils
             }
             catch (SQLException e)
             {
-                LOG.debug(e);
+                LOG.warning(e);
             }
         }
     }
@@ -242,8 +242,96 @@ public class JDBCUtils
             }
             catch (SQLException e)
             {
-                LOG.debug(e);
+                LOG.warning(e);
             }
         }
+    }
+
+    public static void setString(PreparedStatement ps, int col, String str) throws SQLException
+    {
+        if (str == null)
+        {
+            ps.setNull(col, Types.VARCHAR);
+        }
+        else
+        {
+            ps.setString(col, str);
+        }
+    }
+
+    public static String getString(ResultSet rs, String col) throws SQLException
+    {
+        Object result = rs.getString(col);
+        if (rs.wasNull())
+        {
+            return null;
+        }
+        return (String)result;
+    }
+
+    public static void setInt(PreparedStatement ps, int col, Integer i) throws SQLException
+    {
+        if (i == null)
+        {
+            ps.setNull(col, Types.INTEGER);
+        }
+        else
+        {
+            ps.setInt(col, i);
+        }
+    }
+
+    public static Integer getInt(ResultSet rs, String col) throws SQLException
+    {
+        Object result = rs.getInt(col);
+        if (rs.wasNull())
+        {
+            return null;
+        }
+        return (Integer)result;
+    }
+
+    public static void setLong(PreparedStatement ps, int col, Long l) throws SQLException
+    {
+        if (l == null)
+        {
+            ps.setNull(col, Types.BIGINT);
+        }
+        else
+        {
+            ps.setLong(col, l);
+        }
+    }
+
+    public static Long getLong(ResultSet rs, String col) throws SQLException
+    {
+        Object result = rs.getLong(col);
+        if (rs.wasNull())
+        {
+            return null;
+        }
+        return (Long)result;
+    }
+
+    public static void setBool(PreparedStatement ps, int col, Boolean b) throws SQLException
+    {
+        if (b == null)
+        {
+            ps.setNull(col, Types.BOOLEAN);
+        }
+        else
+        {
+            ps.setBoolean(col, b);
+        }
+    }
+
+    public static Boolean getBool(ResultSet rs, String col) throws SQLException
+    {
+        Object result = rs.getBoolean(col);
+        if (rs.wasNull())
+        {
+            return null;
+        }
+        return (Boolean)result;
     }
 }

@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <class name="com.zutubi.pulse.model.Project" table="PROJECT" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="name" column="NAME" type="string" length="255"/>
+
+        <property name="description" column="DESCRIPTION" type="string" length="4096"/>
+
+        <property name="url" column="URL" type="string" length="512"/>
+
+        <property name="stateName" column="STATE" type="string" length="31"/>
+
+        <many-to-one name="pulseFileDetails" class="com.zutubi.pulse.model.PulseFileDetails" column="BOB_FILE_DETAILS"
+                     lazy="false" cascade="all"/>
+
+        <bag name="buildSpecifications" cascade="all-delete-orphan" lazy="false">
+            <key column="PROJECT_ID"/>
+            <one-to-many class="com.zutubi.pulse.model.BuildSpecification"/>
+        </bag>
+
+        <bag name="cleanupRules" cascade="all-delete-orphan" lazy="false">
+            <key column="PROJECT_ID"/>
+            <one-to-many class="com.zutubi.pulse.model.CleanupRule"/>
+        </bag>
+
+        <many-to-one name="scm" class="com.zutubi.pulse.model.Scm" column="SCM" cascade="all" lazy="false"/>
+
+        <bag name="aclEntries" inverse="true" cascade="all-delete-orphan" lazy="false">
+            <key column="PROJECT_ID"/>
+            <one-to-many class="com.zutubi.pulse.model.ProjectAclEntry"/>
+        </bag>
+    </class>
+
+    <class name="com.zutubi.pulse.model.ProjectAclEntry" table="PROJECT_ACL_ENTRY" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="recipient" type="string"/>
+
+        <property name="mask" type="int"/>
+
+        <many-to-one name="aclObjectIdentity" column="PROJECT_ID" class="com.zutubi.pulse.model.Project" not-null="true"/>
+    </class>
+
+    <class name="com.zutubi.pulse.model.PulseFileDetails" table="BOB_FILE_DETAILS" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="SOURCE_TYPE" type="string" length="63"/>
+
+        <subclass name="com.zutubi.pulse.model.CustomPulseFileDetails" discriminator-value="CUSTOM" lazy="false">
+            <property name="pulseFile" column="PULSE_FILE" type="string"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.VersionedPulseFileDetails" discriminator-value="VERSIONED" lazy="false">
+            <property name="pulseFileName" column="PULSE_FILE_NAME" type="string" length="255"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.AntPulseFileDetails" discriminator-value="ANT" lazy="false">
+            <property name="buildFile" column="BUILD_FILE" type="string" length="255"/>
+
+            <property name="targets" column="TARGETS" type="string" length="255"/>
+
+            <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
+
+            <property name="workingDir" column="WORKING_DIR" type="string" length="255"/>
+
+            <map name="environment" lazy="false" table="ANT_SOURCE_ENVIRONMENT" cascade="all">
+                <key column="SOURCE_ID"/>
+                <index column="NAME" type="string"/>
+                <element type="string" column="VALUE"/>
+            </map>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.MakePulseFileDetails" discriminator-value="MAKE" lazy="false">
+            <property name="makefile" column="MAKEFILE" type="string" length="255"/>
+
+            <property name="targets" column="TARGETS" type="string" length="255"/>
+
+            <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
+
+            <property name="workingDir" column="WORKING_DIR" type="string" length="255"/>
+
+            <map name="environment" lazy="false" table="MAKE_SOURCE_ENVIRONMENT" cascade="all">
+                <key column="SOURCE_ID"/>
+                <index column="NAME" type="string"/>
+                <element type="string" column="VALUE"/>
+            </map>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.MavenPulseFileDetails" discriminator-value="MAVEN" lazy="false">
+            <property name="workingDir" column="BASE_DIR" type="string" length="255"/>
+            <property name="targets" column="TARGETS" type="string" length="255"/>
+            <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
+        </subclass>
+
+    </class>
+
+    <class name="com.zutubi.pulse.model.CleanupRule" table="CLEANUP_RULE" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="workDirOnly" type="boolean"/>
+
+        <property name="stateNames" type="string"/>
+
+        <property name="limit" type="int"/>
+
+        <property name="unitName" type="string"/>
+    </class>
+
+    <query name="findByLikeName"><![CDATA[
+        from Project project
+        where project.name like :name
+    ]]></query>
+
+    <query name="findByName"><![CDATA[
+        from Project project
+        where project.name = :name
+    ]]></query>
+
+</hibernate-mapping>

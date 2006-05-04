@@ -9,6 +9,8 @@ import org.acegisecurity.userdetails.UserDetails;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * 
@@ -62,6 +64,8 @@ public class User extends Entity implements UserDetails
     private List<Project> projects = new LinkedList<Project>();
 
     private List<GrantedAuthority> authorities;
+
+    private Map<String, String> properties;
 
     /**
      * A list of login aliases for the user: logins in other tools that pulse
@@ -365,5 +369,34 @@ public class User extends Entity implements UserDetails
     public void clearProjects()
     {
         projects = new LinkedList<Project>();
+    }
+
+    public void setProperties(Map<String, String> props)
+    {
+        this.properties = props;
+    }
+
+    public Map<String, String> getProperties()
+    {
+        if (properties == null)
+        {
+            properties = new HashMap<String, String>();
+        }
+        return properties;
+    }
+
+    public void setProperty(String key, String value)
+    {
+        getProperties().put(key, value);
+    }
+
+    public String getProperty(String key)
+    {
+        return getProperties().get(key);
+    }
+
+    public boolean hasProperty(String key)
+    {
+        return getProperties().containsKey(key);
     }
 }
