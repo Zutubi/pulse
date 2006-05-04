@@ -90,6 +90,22 @@ public class AntPostProcessorTest extends PulseTestCase
                 feature.getSummary());
     }
 
+    public void testJavacWarning() throws Exception
+    {
+        createAndProcessArtifact("javacWarning");
+        assertEquals(1, artifact.getFeatures().size());
+        assertEquals(1, artifact.getFeatures(Feature.Level.WARNING).size());
+        List<Feature> features = artifact.getFeatures(Feature.Level.WARNING);
+        Feature feature = features.get(0);
+        assertEquals("compile:\n" +
+                "[mkdir] Created dir: /usr/pulse/data/recipes/851971/base/webwork/build/java\n" +
+                "[javac] Compiling 476 source files to /usr/pulse/data/recipes/851971/base/webwork/build/java\n" +
+                "[javac] /usr/pulse/data/recipes/851971/base/webwork/src/java/com/opensymphony/webwork/config/DelegatingConfiguration.java:17: warning: unmappable character for encoding UTF8\n" +
+                "[javac] * @author Rickard �berg\n" +
+                "[javac] ^",
+                feature.getSummary());
+    }
+    
     private CommandResult createAndProcessArtifact(String name) throws Exception
     {
         createArtifact(name);

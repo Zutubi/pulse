@@ -42,9 +42,15 @@ public class AntPostProcessor extends RegexPostProcessor
         // javac task compiler messages
         pattern = createPattern();
         pattern.setPattern(Pattern.compile("\\[javac\\] .*:[0-9]+:"));
-        //pattern.setPattern(Pattern.compile("javac.*:[0-9]+:"));
+        RegexPattern.Exclusion exclude = pattern.createExclude();
+        Pattern warningPattern = Pattern.compile("\\[javac\\] .*:[0-9]+: warning");
+        exclude.setPattern(warningPattern);
         pattern.setCategory(Feature.Level.ERROR);
 
+        pattern = createPattern();
+        pattern.setPattern(warningPattern);
+        pattern.setCategory(Feature.Level.WARNING);
+        
         // Unfortunately the ant.bat file on windows does not exit with
         // a non-zero code on failure.  Thus, we need to rely on the output
         // to see if ant is reporting failure.

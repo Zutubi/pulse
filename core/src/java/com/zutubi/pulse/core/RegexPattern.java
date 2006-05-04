@@ -136,7 +136,7 @@ public class RegexPattern
         exclusions.add(new Exclusion(pattern));
     }
 
-    class Exclusion
+    public class Exclusion
     {
         private String expression;
         private Pattern pattern;
@@ -157,6 +157,11 @@ public class RegexPattern
             return expression;
         }
 
+        public void setPattern(Pattern pattern)
+        {
+            this.pattern = pattern;
+        }
+        
         public void setExpression(String expression) throws FileLoadException
         {
             try
