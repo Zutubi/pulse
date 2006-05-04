@@ -2,6 +2,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: Verdana, sans-serif;
+    font-size: 12px;
 }
 
 #wrap {
@@ -181,27 +182,27 @@ h1 a:hover, h2 a:hover {
 
 h1 {
     margin-top: 6px;
-    font-size: 150%;
+    font-size: 180%;
 }
 
 h2 {
-    font-size: 120%;
+    font-size: 140%;
 }
 
 h2.section {
     margin-top: 0.8em;
     color: #606078;
-    font-size: 130%;
+    font-size: 150%;
     border-bottom: solid 2px #a0a0c0;
 }
 
 h3 {
     margin-top: 0px;
-    font-size: 100%;
+    font-size: 120%;
 }
 
 h4 {
-    font-size: 90%;
+    font-size: 100%;
     margin: 6px;
 }
 
@@ -277,10 +278,6 @@ td.columns {
 table.content, table.fill-content, table.decorated {
     border: 1px solid #bbb;
     margin-bottom: 16px;
-}
-
-table.content, table.fill-content {
-    font-size: 80%;
 }
 
 table.fill-content {
@@ -450,7 +447,9 @@ ul.info {
 li.error, li.warning, li.info, li.artifact, li.file-artifact, li.dir-artifact, li.report-artifact, li.task, li.explore {
     font-weight: normal;
     list-style: none;
-    margin-top: 7px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    line-height: 20px;
 }
 
 li.error, li.warning, li.info, li.file-artifact, li.dir-artifact, li.report-artifact, li.task, li.explore {
