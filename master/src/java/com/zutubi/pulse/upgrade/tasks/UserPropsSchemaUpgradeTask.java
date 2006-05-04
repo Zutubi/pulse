@@ -17,16 +17,6 @@ public class UserPropsSchemaUpgradeTask extends MigrateSchemaUpgradeTask
     {
         List<String> mappings = new LinkedList<String>();
         mappings.add("com/zutubi/pulse/upgrade/schema/build-1020/User.hbm.xml");
-        mappings.add("com/zutubi/pulse/upgrade/schema/build-1020/Project.hbm.xml");
-        mappings.add("com/zutubi/pulse/upgrade/schema/build-1020/BuildSpecification.hbm.xml");
-        mappings.add("com/zutubi/pulse/upgrade/schema/build-1020/Slave.hbm.xml");
-        mappings.add("com/zutubi/pulse/upgrade/schema/build-1020/BuildResult.hbm.xml");
-        mappings.add("com/zutubi/pulse/upgrade/schema/build-1020/ChangeList.hbm.xml");
-        mappings.add("com/zutubi/pulse/upgrade/schema/build-1020/CommandResult.hbm.xml");
-        mappings.add("com/zutubi/pulse/upgrade/schema/build-1020/Feature.hbm.xml");
-        mappings.add("com/zutubi/pulse/upgrade/schema/build-1020/Revision.hbm.xml");
-        mappings.add("com/zutubi/pulse/upgrade/schema/build-1020/Scm.hbm.xml");
-        mappings.add("com/zutubi/pulse/upgrade/schema/build-1020/StoredArtifact.hbm.xml");
         setMappings(mappings);
     }
 }
