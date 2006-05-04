@@ -11,7 +11,7 @@
     #serverTabs("server-info")
 
 #set ($propertiesMap = $action.getProperties())
-#set ($properties = ["system.date", "system.time", "system.uptime", "java.version", "java.vendor", "java.vm.name", "java.runtime.name", "user.name", "user.timezone", "os.name"])
+#set ($properties = ["system.date", "system.time", "system.uptime", "java.version", "java.vendor", "java.vm.name", "java.runtime.name", "user.name", "user.timezone", "os.name", "memory.total", "memory.used", "memory.free"])
 
     <table class="columns" width="90%">
         <tr>
@@ -51,7 +51,7 @@
                             </td>
                         </table>
                     </td>
-                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free", ["$percentageFree"]) #authorize("ifAllGranted=ROLE_ADMINISTRATOR") (<a href="garbageCollect.action">gc</a>) #end </td>
+                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free.percent", ["$percentageFree"]) #authorize("ifAllGranted=ROLE_ADMINISTRATOR") (<a href="garbageCollect.action">gc</a>) #end </td>
                 </tr>
             </table>
         </td>

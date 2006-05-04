@@ -64,6 +64,10 @@ public class SystemInfoAction extends ActionSupport
 
         props.put("os.name", systemProperties.getProperty("os.name") + " " + systemProperties.getProperty("os.version"));
 
+        props.put("memory.used", getUsedMemory());
+        props.put("memory.free", getFreeMemory());
+        props.put("memory.total", getTotalMemory());
+
         data = configurationManager.getData();
         license = data.getLicense();
         version = data.getVersion();
