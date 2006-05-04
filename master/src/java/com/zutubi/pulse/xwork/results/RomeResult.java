@@ -69,8 +69,6 @@ public class RomeResult extends WebWorkResultSupport
 
     protected void doExecute(String format, ActionInvocation actionInvocation) throws Exception
     {
-        // No need to create a session for RSS
-        ServletActionContext.getRequest().getSession(false);
         HttpServletResponse response = ServletActionContext.getResponse();
         HttpServletRequest request = ServletActionContext.getRequest();
 
@@ -89,44 +87,43 @@ public class RomeResult extends WebWorkResultSupport
         response.setContentType("application/rss+xml; charset=UTF-8");
         response.setHeader("Content-Disposition", "filename=rss.xml");
 
-        Date feedLastModified = DAY_0;
+        Date lastModified = new Date(request.getDateHeader(IF_MODIFIED_SINCE));
         List entries = feed.getEntries();
         if (entries.size() > 0)
         {
             // get the latest feed entry - assuming the latest is at the top.
             SyndEntry entry = (SyndEntry) entries.get(0);
-            feedLastModified = entry.getPublishedDate();
+            lastModified = entry.getPublishedDate();
             Date updatedDate = entry.getUpdatedDate();
-            if (updatedDate != null && feedLastModified.compareTo(updatedDate) < 0)
+            if (updatedDate != null && lastModified.compareTo(updatedDate) < 0)
             {
-                feedLastModified = updatedDate;
+                lastModified = updatedDate;
             }
         }
 
+        // ETag should be based on the pre-concatenated lastmodified date.
+        String etag = Long.toString(lastModified.getTime());
+        response.setHeader(ETAG, etag);
+
         // drop things below the second, that level of detail is not included in the http headers.
         Calendar cal = Calendar.getInstance();
-        cal.setTime(feedLastModified);
+        cal.setTime(lastModified);
         cal.set(Calendar.MILLISECOND, 0);
-        feedLastModified = cal.getTime();
+        lastModified = cal.getTime();
 
         // always set
-        response.setDateHeader(LAST_MODIFIED, feedLastModified.getTime());
-
-        // ETag should be based on the pre-concatenated lastmodified date.
-        String etag = Long.toString(feedLastModified.getTime());
-        response.setHeader(ETAG, etag);
+        response.setDateHeader(LAST_MODIFIED, lastModified.getTime());
 
         // check the headers to determine whether or not a response is required.
         if (TextUtils.stringSet(request.getHeader(IF_NONE_MATCH)) ||
                 TextUtils.stringSet(request.getHeader(IF_MODIFIED_SINCE)))
         {
             if (etag.equals(request.getHeader(IF_NONE_MATCH)) &&
-                    feedLastModified.getTime() == request.getDateHeader(IF_MODIFIED_SINCE))
+                    lastModified.getTime() == request.getDateHeader(IF_MODIFIED_SINCE))
             {
                 // if response is not required, send 304 Not modified.
                 response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
                 return;
-
             }
         }
 
