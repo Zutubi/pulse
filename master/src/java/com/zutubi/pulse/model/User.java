@@ -41,23 +41,10 @@ public class User extends Entity implements UserDetails
      */
     private String password;
     /**
-     * The action to take the user to when they log in.  Usually their
-     * dashboard, but can be a welcome page when they first sign up.
-     */
-    private String defaultAction = DefaultAction.DASHBOARD_ACTION;
-    /**
      * Contact points configured by the user for notifications.
      */
     private List<ContactPoint> contactPoints;
-    /**
-     * Number of seconds between refreshes of "live" content, or 0 if the
-     * user disables refreshing.
-     */
-    private int refreshInterval = 60;
-    /**
-     * If true, show all projects on the user's dashboard.
-     */
-    private boolean showAllProjects = true;
+
     /**
      * List of projects the user wants to display on their dashboard.
      */
@@ -135,16 +122,6 @@ public class User extends Entity implements UserDetails
     public void setPassword(String password)
     {
         this.password = password;
-    }
-
-    public String getDefaultAction()
-    {
-        return defaultAction;
-    }
-
-    public void setDefaultAction(String defaultAction)
-    {
-        this.defaultAction = defaultAction;
     }
 
     public void add(ContactPoint point)
@@ -298,16 +275,6 @@ public class User extends Entity implements UserDetails
         return true;
     }
 
-    public int getRefreshInterval()
-    {
-        return refreshInterval;
-    }
-
-    public void setRefreshInterval(int refreshInterval)
-    {
-        this.refreshInterval = refreshInterval;
-    }
-
     public List<String> getAliases()
     {
         return aliases;
@@ -339,16 +306,6 @@ public class User extends Entity implements UserDetails
     public boolean hasAlias(String alias)
     {
         return aliases.contains(alias);
-    }
-
-    public boolean getShowAllProjects()
-    {
-        return showAllProjects;
-    }
-
-    public void setShowAllProjects(boolean showAllProjects)
-    {
-        this.showAllProjects = showAllProjects;
     }
 
     public List<Project> getProjects()
@@ -399,4 +356,59 @@ public class User extends Entity implements UserDetails
     {
         return getProperties().containsKey(key);
     }
+
+    // ---( for backward compatibility and ease of migration. )---
+    /**
+     * The action to take the user to when they log in.  Usually their
+     * dashboard, but can be a welcome page when they first sign up.
+     */
+    public String getDefaultAction()
+    {
+        if (hasProperty("user.defaultAction"))
+        {
+            return getProperty("user.defaultAction");
+        }
+        return DefaultAction.DASHBOARD_ACTION;
+    }
+
+    public void setDefaultAction(String defaultAction)
+    {
+        setProperty("user.defaultAction", defaultAction);
+    }
+
+    /**
+     * If true, show all projects on the user's dashboard.
+     */
+    public boolean getShowAllProjects()
+    {
+        if (hasProperty("user.showAllProjects"))
+        {
+            return Boolean.valueOf(getProperty("user.showAllProjects"));
+        }
+        return true;
+    }
+
+    public void setShowAllProjects(boolean showAllProjects)
+    {
+        setProperty("user.showAllProjects", Boolean.toString(showAllProjects));
+    }
+
+    /**
+     * Number of seconds between refreshes of "live" content, or 0 if the
+     * user disables refreshing.
+     */
+    public int getRefreshInterval()
+    {
+        if (hasProperty("user.refreshInterval"))
+        {
+            return Integer.valueOf(getProperty("user.refreshInterval"));
+        }
+        return 60;
+    }
+
+    public void setRefreshInterval(int refreshInterval)
+    {
+        setProperty("user.refreshInterval", Integer.toString(refreshInterval));
+    }
+
 }

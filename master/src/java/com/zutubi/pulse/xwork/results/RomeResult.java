@@ -28,11 +28,6 @@ import java.util.Calendar;
 public class RomeResult extends WebWorkResultSupport
 {
     /**
-     * Default feed last modified date.
-     */
-    private static final Date DAY_0 = new Date(0);
-
-    /**
      * The name used to retrieve the feed instance from the OGNL stack.
      */
     private String feedName = "feed";
