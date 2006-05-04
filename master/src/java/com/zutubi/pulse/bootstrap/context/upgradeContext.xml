@@ -19,8 +19,8 @@
         <property name="buildNumber" value="1001"/>
         <property name="mappings">
             <list>
-                <value>com/zutubi/pulse/upgrade/schema/build-1010/Changelist.hbm.xml</value>
-                <value>com/zutubi/pulse/upgrade/schema/build-1010/Revision.hbm.xml</value>
+                <value>com/zutubi/pulse/upgrade/schema/build_1001/Changelist.hbm.xml</value>
+                <value>com/zutubi/pulse/upgrade/schema/build_1001/Revision.hbm.xml</value>
             </list>
         </property>
     </bean>

@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * <class-comment/>
  */
-public class BaseUpgradeTaskTestCase extends PulseTestCase
+public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
 {
     public BaseUpgradeTaskTestCase()
     {
@@ -40,7 +40,7 @@ public class BaseUpgradeTaskTestCase extends PulseTestCase
         props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyUpgradeTaskConnectionProvider");
 
         // a) retrieve hibernate mappings for schema generation.
-        String path = "master/src/test/com/zutubi/pulse/upgrade/tasks/schema/build-" + build;
+        String path = "master/src/test/com/zutubi/pulse/upgrade/schema/build_" + build;
         File mappingDir = new File(getPulseRoot(), path);
         for (File f : mappingDir.listFiles(new XMLFilenameFilter()))
         {
