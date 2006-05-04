@@ -75,15 +75,15 @@
                 #pagingRow("history.action?id=$project.id&amp;stateFilter=$stateFilter&amp;spec=$spec&amp;" $pagingSupport)
                 <tr><th colspan="5">$action.getText("history.count", ["$pagingSupport.totalItems"])</td></tr>
             </table>
-
-            </td>
-        </tr>
 #else
         <tr>
             <td class="content" colspan="14">
                 #wwtext("name=no.history")
             </td>
         </tr>
+    </table>
 #end
+            </td>
+        </tr>
     </table>
 </html>
