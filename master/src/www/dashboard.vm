@@ -9,20 +9,29 @@
     <script type="text/javascript">
         #updater("/ajax/dashboardPanel.action" "panel" $principle)
 
-        function showBuildsFloat(id, cellId)
+        function showHideBuildsFloat(id)
         {
-            var element = getElement(id);
-            var cell = getElement(cellId);
             var window = getElement('buildsWindow');
-            var windowContent = getElement('buildsWindowContent');
+            var link = getElement(id + "_link");
 
-            windowContent.innerHTML = element.innerHTML;
-            var position = getPosition(cell);
-            window.style.visibility = 'hidden';
-            window.style.display = '';
-            window.style.left = position[0] + cell.offsetWidth - window.offsetWidth - 20 + "px";
-            window.style.visibility = 'visible';
-            window.style.top = position[1] + 20 + "px";
+            if(window.style.display == 'none')
+            {
+                var element = getElement(id);
+                var cell = getElement(id + "_cell");
+                var windowContent = getElement('buildsWindowContent');
+
+                windowContent.innerHTML = element.innerHTML;
+                var position = getPosition(cell);
+                window.style.visibility = 'hidden';
+                window.style.display = '';
+                window.style.left = position[0] + cell.offsetWidth - window.offsetWidth - 20 + "px";
+                window.style.visibility = 'visible';
+                window.style.top = position[1] + 20 + "px";
+            }
+            else
+            {
+                window.style.display = 'none';
+            }
         }
     </script>
 </head>

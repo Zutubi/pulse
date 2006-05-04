@@ -681,7 +681,6 @@
 #end
 
 #macro(aggregateResultCell $changelist)
-
     #set ($selectedResult = "n")
     #foreach($id in $changelist.resultIds)
         #set($result = $action.getResult($id))
@@ -693,28 +692,28 @@
         #end
     #end
 
-    <td id="${changelist.id}_cell" class="$result.state.string">
-        #if($result.succeeded())
+    <td id="${changelist.id}_cell" class="$selectedResult.state.string">
+        #if($selectedResult.succeeded())
             <img alt="success" src="/images/accept.gif"/>
-        #elseif($result.inProgress())
+        #elseif($selectedResult.inProgress())
             <img alt="in progress" src="/images/inprogress.gif"/>
-        #elseif($result.terminating())
+        #elseif($selectedResult.terminating())
             <img alt="terminating" src="/images/stop.gif"/>
-        #elseif($result.pending())
+        #elseif($selectedResult.pending())
             <img alt="pending" src="/images/hourglass.gif"/>
-        #elseif($result.errored() || $result.failed())
+        #elseif($selectedResult.errored() || $selectedResult.failed())
             <img alt="failure" src="/images/exclamation.gif"/>
         #else
             &nbsp;
         #end
         $selectedResult.state.prettyString
-        <a href="#" onclick="showBuildsFloat('$changelist.id', '${changelist.id}_cell'); return false">+</a>
+        <a href="#" id="${changelist.id}_link" onclick="showHideBuildsFloat('$changelist.id'); return false">+</a>
         <div id="$changelist.id" style="display: none">
         <table class="content" style="margin: 0">
             <tr>
                 <th class="heading" colspan="5">
                     <span class="action">
-                        <a href="#" onclick="toggleDisplay('buildsWindow'); return false;"><img alt="$action.getText('close')" src="/images/delete.gif"/>#wwtext("name=close")</a>
+                        <a href="#" onclick="showHideBuildsFloat('$changelist.id'); return false;"><img alt="$action.getText('close')" src="/images/delete.gif"/>#wwtext("name=close")</a>
                     </span>
                     #wwtext("name=build.results")
                 </th>
