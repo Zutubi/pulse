@@ -4,12 +4,11 @@
 /**
  * <class-comment/>
  */
-package com.zutubi.pulse.scheduling.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.model.persistence.hibernate.MasterPersistenceTestCase;
 import com.zutubi.pulse.scheduling.NoopTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.scheduling.persistence.TriggerDao;
+import com.zutubi.pulse.model.persistence.TriggerDao;
 
 import java.util.List;
 
@@ -40,7 +39,7 @@ public class HibernateTriggerDaoTestCase extends MasterPersistenceTestCase
     protected String[] getConfigLocations()
     {
         return new String[]{"com/zutubi/pulse/bootstrap/testBootstrapContext.xml",
-                "com/zutubi/pulse/scheduling/persistence/hibernate/HibernateTriggerDaoContext.xml"
+                "com/zutubi/pulse/model/persistence/hibernate/HibernateTriggerDaoContext.xml"
         };
     }
 
@@ -48,7 +47,7 @@ public class HibernateTriggerDaoTestCase extends MasterPersistenceTestCase
     {
         Trigger trigger = new NoopTrigger("triggerName", "triggerGroup");
         trigger.getDataMap().put("key", "value");
-        trigger.getDataMap().put("class", HibernateTriggerDao.class);
+        trigger.getDataMap().put("class", com.zutubi.pulse.model.persistence.hibernate.HibernateTriggerDao.class);
         trigger.fire();
 
         dao.save(trigger);

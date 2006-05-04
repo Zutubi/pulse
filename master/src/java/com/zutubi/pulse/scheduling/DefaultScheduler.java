@@ -7,7 +7,7 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
-import com.zutubi.pulse.scheduling.persistence.TriggerDao;
+import com.zutubi.pulse.model.persistence.TriggerDao;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;

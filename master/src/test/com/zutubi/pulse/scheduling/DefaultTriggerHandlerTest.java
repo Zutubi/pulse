@@ -4,7 +4,7 @@
 package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.core.ObjectFactory;
-import com.zutubi.pulse.scheduling.persistence.mock.MockTriggerDao;
+import com.zutubi.pulse.model.persistence.mock.MockTriggerDao;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.concurrent.ExecutorService;

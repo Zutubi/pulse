@@ -9,7 +9,7 @@ import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.scheduling.persistence.TriggerDao;
+import com.zutubi.pulse.model.persistence.TriggerDao;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 
 import java.util.List;

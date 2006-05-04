@@ -5,7 +5,7 @@ package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.model.persistence.hibernate.PersistenceTestCase;
-import com.zutubi.pulse.scheduling.persistence.TriggerDao;
+import com.zutubi.pulse.model.persistence.TriggerDao;
 
 /**
  * <class-comment/>

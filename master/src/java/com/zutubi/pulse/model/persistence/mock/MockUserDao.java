@@ -1,7 +1,7 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.scheduling.persistence.mock;
+package com.zutubi.pulse.model.persistence.mock;
 
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.Project;

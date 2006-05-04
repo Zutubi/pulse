@@ -24,7 +24,7 @@ This context exports:
                 <value>com/zutubi/pulse/model/persistence/hibernate/Scm.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Slave.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
-                <value>com/zutubi/pulse/scheduling/persistence/hibernate/Trigger.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Trigger.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/User.hbm.xml</value>
             </list>
         </property>

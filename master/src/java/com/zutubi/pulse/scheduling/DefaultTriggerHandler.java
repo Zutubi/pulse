@@ -5,7 +5,7 @@ package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.scheduling.persistence.TriggerDao;
+import com.zutubi.pulse.model.persistence.TriggerDao;
 
 import java.util.HashSet;
 import java.util.Set;

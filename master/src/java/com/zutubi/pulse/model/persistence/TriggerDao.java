@@ -1,9 +1,8 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.scheduling.persistence;
+package com.zutubi.pulse.model.persistence;
 
-import com.zutubi.pulse.model.persistence.EntityDao;
 import com.zutubi.pulse.scheduling.Trigger;
 
 import java.util.List;

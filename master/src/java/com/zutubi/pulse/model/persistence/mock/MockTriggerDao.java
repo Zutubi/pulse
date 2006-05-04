@@ -1,11 +1,11 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.scheduling.persistence.mock;
+package com.zutubi.pulse.model.persistence.mock;
 
 
 import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.scheduling.persistence.TriggerDao;
+import com.zutubi.pulse.model.persistence.TriggerDao;
 
 import java.util.List;
 

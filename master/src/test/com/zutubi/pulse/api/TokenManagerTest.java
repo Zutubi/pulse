@@ -7,7 +7,7 @@ import com.zutubi.pulse.model.DefaultUserManager;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.UserDao;
-import com.zutubi.pulse.scheduling.persistence.mock.MockUserDao;
+import com.zutubi.pulse.model.persistence.mock.MockUserDao;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.Constants;
 

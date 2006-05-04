@@ -4,8 +4,8 @@
 package com.zutubi.pulse.scheduling;
 
 import junit.framework.*;
-import com.zutubi.pulse.scheduling.persistence.mock.MockTriggerDao;
-import com.zutubi.pulse.scheduling.persistence.TriggerDao;
+import com.zutubi.pulse.model.persistence.mock.MockTriggerDao;
+import com.zutubi.pulse.model.persistence.TriggerDao;
 
 /**
  * <class-comment/>

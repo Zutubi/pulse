@@ -365,7 +365,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="triggerDaoTarget" class="com.zutubi.pulse.scheduling.persistence.hibernate.HibernateTriggerDao">
+    <bean id="triggerDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateTriggerDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>

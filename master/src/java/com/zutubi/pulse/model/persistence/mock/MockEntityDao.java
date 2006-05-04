@@ -1,7 +1,7 @@
 /********************************************************************************
   @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.scheduling.persistence.mock;
+package com.zutubi.pulse.model.persistence.mock;
 
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.model.persistence.EntityDao;

@@ -1,11 +1,11 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.scheduling.persistence.hibernate;
+package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.model.persistence.hibernate.HibernateEntityDao;
+import com.zutubi.pulse.model.persistence.TriggerDao;
 import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.scheduling.persistence.TriggerDao;
 
 import java.util.List;
 
