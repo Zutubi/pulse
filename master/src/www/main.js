@@ -95,10 +95,8 @@ function openBrowseWindow(selectDir, elementId, extraArgs)
 
 // Toggles the display attribute of an element between '' and 'none' to
 // show/hide it.
-function toggleDisplay(id)
+function toggleElementDisplay(element)
 {
-    var element = getElement(id);
-
     if(!element.style.display)
     {
         element.style.display = 'none';
@@ -107,6 +105,11 @@ function toggleDisplay(id)
     {
         element.style.display = '';
     }
+}
+
+function toggleDisplay(id)
+{
+    toggleElement(getElement(id));
 }
 
 // Toggles the display of a nested list and switched the correcsponding image
@@ -177,6 +180,24 @@ function hideChildren(id)
             {
                 child.style.display = '';
             }
+        }
+    }
+}
+
+// Toggle display for all rows under the given table with a first cell of the given class
+function toggleRowsWithClass(tableId, className)
+{
+    var table = getElement(tableId);
+    var rows = table.getElementsByTagName("tr");
+
+    for(var i = 0; i < rows.length; i++)
+    {
+        var row = rows[i];
+        var cells = row.getElementsByTagName("td");
+
+        if(cells.length > 0 && cells[0].className == className)
+        {
+            toggleElementDisplay(row);
         }
     }
 }

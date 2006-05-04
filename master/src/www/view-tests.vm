@@ -12,8 +12,13 @@
 
     #if($result.hasTests())
         #set($recipe = $result.root.children.get(0).result)
-    <table class="fill-content">
-        #headingRow("test.results" 5)
+    <table class="fill-content" id="test-results">
+        <tr>
+            <th class="heading" colspan="5">
+                <span class="action"><a href="#" onclick="toggleRowsWithClass('test-results', 'success'); return false;">#wwtext("name=tests.toggle.successful")</a></span>
+                #wwtext("name=test.results")
+            </th>
+        </tr>
         <tr>
             #contentHeading("test.name" 1)
             #contentHeading("test.status" 2)
