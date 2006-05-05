@@ -12,6 +12,7 @@
 
     #wwcform("action=contactWizard.action" "id=contact.create" "heading=%{getText('contact.create')}" "method=post")
         #wwhidden("name=state")
+        #wwhidden("name=submit")
         #wwselect("name=contact" "label=%{getText('contact')}" "list=contacts" "required=true" "tabindex=1"  "onkeypress=return submitenter(this,event)")
         #nextCancel(2)
     #end

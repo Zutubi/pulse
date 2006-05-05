@@ -22,12 +22,12 @@ public class UserSettingsForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"defaultAction", "refreshEnabled", "refreshInterval"};
+        return new String[]{"defaultAction", "refreshEnabled", "refreshInterval", "rssFormat"};
     }
 
     public int[] getFieldTypes()
     {
-        return new int[]{SELECT, CHECKBOX, TEXTFIELD};
+        return new int[]{SELECT, CHECKBOX, TEXTFIELD, RADIOBOX};
     }
 
     public String[] getSelectOptions(String name)

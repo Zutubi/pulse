@@ -24,13 +24,10 @@ public class LogoutAction extends ActionSupport
         HttpSession session = request.getSession();
         session.invalidate();
 
+        // set a new acegi remember me cookie that expires immediately.
         Cookie terminate = new Cookie(TokenBasedRememberMeServices.ACEGI_SECURITY_HASHED_REMEMBER_ME_COOKIE_KEY, null);
         terminate.setMaxAge(0);
         terminate.setPath(ROOT_CONTEXT);
-        if (System.getProperties().contains("logout.path.null"))
-        {
-            terminate.setPath(null);
-        }
 
         HttpServletResponse response = ServletActionContext.getResponse();
         response.addCookie(terminate);

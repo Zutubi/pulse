@@ -11,14 +11,24 @@ import net.sourceforge.jwebunit.WebTester;
 public class EmailContactForm extends BaseForm
 {
 
-    public EmailContactForm(WebTester tester)
+    private boolean create;
+
+    public EmailContactForm(WebTester tester, boolean create)
     {
         super(tester);
+        this.create = create;
     }
 
     public String getFormName()
     {
-        return "email.edit";
+        if (create)
+        {
+            return "email.create";
+        }
+        else
+        {
+            return "email.edit";
+        }
     }
 
     public String[] getFieldNames()
@@ -26,6 +36,18 @@ public class EmailContactForm extends BaseForm
         return new String[]{"contact.name", "contact.email", "contact.type"};
     }
 
+    public void saveFormElements(String... args)
+    {
+        if(create)
+        {
+            super.nextFormElements(args);
+        }
+        else
+        {
+            super.saveFormElements(args);
+        }
+    }
+    
     public int[] getFieldTypes()
     {
         return new int[]{TEXTFIELD, TEXTFIELD, RADIOBOX};

@@ -10,6 +10,7 @@
 
 #wwcform("action=setupWizard.action" "heading=%{getText('license.setup')}" "name=setup.license" "method=post")
     #wwhidden("name=state")
+    #wwhidden("name=submit")
 
     #wwtextarea("name=license" "labelCssClass=textarea" "label=%{getText('license.key.field')}" "required=true" "rows=10" "cols=65" "tabindex=1")
     #inlineHelp("license.help")
