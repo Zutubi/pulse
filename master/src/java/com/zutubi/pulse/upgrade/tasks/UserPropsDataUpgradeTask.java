@@ -23,6 +23,8 @@ public class UserPropsDataUpgradeTask implements UpgradeTask
 {
     private DataSource dataSource;
 
+    private int buildNumber;
+
     private List<String> errors = new LinkedList<String>();
 
     public String getName()
@@ -38,7 +40,12 @@ public class UserPropsDataUpgradeTask implements UpgradeTask
 
     public int getBuildNumber()
     {
-        return 1011;
+        return buildNumber;
+    }
+
+    public void setBuildNumber(int no)
+    {
+        this.buildNumber = no;
     }
 
     public void execute(UpgradeContext context) throws UpgradeException
