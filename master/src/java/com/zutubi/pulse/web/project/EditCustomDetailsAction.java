@@ -5,6 +5,7 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.PulseFileDetails;
 import com.zutubi.pulse.model.CustomPulseFileDetails;
+import com.zutubi.pulse.model.CustomProjectValidationPredicate;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.util.IOUtils;
@@ -12,6 +13,7 @@ import com.zutubi.pulse.util.StringUtils;
 import com.opensymphony.util.TextUtils;
 
 import java.io.ByteArrayInputStream;
+import java.util.LinkedList;
 
 /**
  *
@@ -49,7 +51,7 @@ public class EditCustomDetailsAction extends AbstractEditDetailsAction implement
         try
         {
             PulseFileLoader loader = new PulseFileLoader(new ObjectFactory(), resourceRepository);
-            loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile());
+            loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile(), new LinkedList<Reference>(), new CustomProjectValidationPredicate());
         }
         catch(ParseException pe)
         {

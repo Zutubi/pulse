@@ -288,7 +288,6 @@ public class BaseWizard implements Wizard
 
     public void addActionError(String anErrorMessage)
     {
-        LOG.severe("addActionError: " + anErrorMessage);
         validationAware.addActionError(anErrorMessage);
     }
 

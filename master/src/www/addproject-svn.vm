@@ -12,7 +12,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=addProject.action" "heading=%{getText('svn.setup')}" "method=post")
+#wwcform("action=addProject.action" "id=svn.setup" "heading=%{getText('svn.setup')}" "method=post")
     #wwhidden("name=state")
     #wwhidden("name=submit")
 

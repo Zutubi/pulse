@@ -26,6 +26,7 @@ import org.acegisecurity.AccessDeniedException;
 import java.io.ByteArrayInputStream;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.LinkedList;
 
 /**
  */
@@ -613,7 +614,7 @@ public class AddProjectWizard extends BaseWizard
             try
             {
                 PulseFileLoader loader = new PulseFileLoader(new ObjectFactory(), resourceRepository);
-                loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile());
+                loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile(), new LinkedList<Reference>(), new CustomProjectValidationPredicate());
             }
             catch(ParseException pe)
             {
