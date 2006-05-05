@@ -55,7 +55,14 @@ public class ExecutableCommand implements Command
         }
         else
         {
-            builder.directory(workingDir);
+            if(workingDir.isAbsolute())
+            {
+                builder.directory(workingDir);
+            }
+            else
+            {
+                builder.directory(new File(paths.getBaseDir(), workingDir.getPath()));
+            }
         }
 
         for (Environment setting : env)

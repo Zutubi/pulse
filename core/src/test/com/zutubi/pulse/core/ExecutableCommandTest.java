@@ -8,9 +8,11 @@ import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.SystemUtils;
 import junit.framework.TestCase;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -105,5 +107,34 @@ public class ExecutableCommandTest extends TestCase
         Feature feature = features.get(0);
         assertEquals(Feature.Level.ERROR, feature.getLevel());
         assertEquals("error: badness", feature.getSummary());
+    }
+
+    public void testWorkingDir() throws IOException
+    {
+        File dir = new File(baseDirectory, "nested");
+        File file;
+
+        assertTrue(dir.mkdir());
+
+        if(SystemUtils.isWindows())
+        {
+            file = new File(dir, "list.bat");
+            FileSystemUtils.createFile(file, "dir");
+        }
+        else
+        {
+            file = new File(dir, "./list.sh");
+            FileSystemUtils.createFile(file, "#! /bin/sh\nls");
+            FileSystemUtils.setPermissions(file, 777);
+        }
+
+
+        ExecutableCommand command = new ExecutableCommand();
+        command.setWorkingDir(new File("nested"));
+        command.setExe(file.getPath());
+
+        CommandResult result = new CommandResult("work");
+        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
+        assertTrue(result.succeeded());
     }
 }
