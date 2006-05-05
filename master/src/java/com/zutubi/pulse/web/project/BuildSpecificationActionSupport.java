@@ -65,7 +65,7 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
         catch(Exception e)
         {
             // Ignore...we just don't show recipes
-            LOG.warning("Unable to load pulse file for project '" + project.getName() + "': " + e.getMessage(), e);
+            LOG.warning("Unable to load pulse file for project '" + project.getName() + "': " + e.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 }
