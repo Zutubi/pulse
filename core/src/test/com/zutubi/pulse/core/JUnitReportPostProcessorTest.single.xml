@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="1" failures="1" name="com.zutubi.pulse.core.JUnitReportPostProcessorTest" tests="3" time="0.391">
+  <properties>
+    <property name="ivy.dep.file" value="ivy.xml"></property>
+  </properties>
+  <testcase classname="com.zutubi.pulse.core.JUnitReportPostProcessorTest" name="testSimple" time="0.291"></testcase>
+  <testcase classname="com.zutubi.pulse.core.JUnitReportPostProcessorTest" name="testFailure" time="0.01">
+    <failure type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError
+	at com.zutubi.pulse.core.JUnitReportPostProcessorTest.testFailure(JUnitReportPostProcessorTest.java:63)
+</failure>
+  </testcase>
+  <testcase classname="com.zutubi.pulse.core.JUnitReportPostProcessorTest" name="testError" time="0.0">
+    <error message="whoops!" type="java.lang.RuntimeException">java.lang.RuntimeException: whoops!
+	at com.zutubi.pulse.core.JUnitReportPostProcessorTest.testError(JUnitReportPostProcessorTest.java:68)
+</error>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

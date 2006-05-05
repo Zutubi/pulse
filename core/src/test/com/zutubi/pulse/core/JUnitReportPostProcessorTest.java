@@ -4,8 +4,8 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.List;
@@ -30,11 +30,7 @@ public class JUnitReportPostProcessorTest extends PulseTestCase
 
     public void testSimple()
     {
-        File root = getPulseRoot();
-        File outputDir = new File(root, FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "core"));
-
-        StoredFileArtifact artifact = new StoredFileArtifact(getClass().getSimpleName() + ".simple.xml");
-        pp.process(outputDir, artifact, new CommandResult("test"));
+        StoredFileArtifact artifact = runProcessor("simple");
 
         List<TestResult> tests = artifact.getTests();
         assertEquals(3, tests.size());
@@ -56,6 +52,41 @@ public class JUnitReportPostProcessorTest extends PulseTestCase
         checkCase((TestCaseResult) children.get(2), "testThrowException", TestCaseResult.Status.ERROR, 10,
                 "java.lang.RuntimeException: random message\n" +
                 "\tat com.zutubi.pulse.junit.SimpleTest.testThrowException(Unknown Source)");
+    }
+
+    public void testSingle()
+    {
+        StoredFileArtifact artifact = runProcessor("single");
+
+        List<TestResult> tests = artifact.getTests();
+        assertEquals(1, tests.size());
+
+        TestResult result = artifact.getTests().get(0);
+        assertTrue(result instanceof TestSuiteResult);
+        TestSuiteResult suite = (TestSuiteResult) result;
+        assertEquals("com.zutubi.pulse.core.JUnitReportPostProcessorTest", suite.getName());
+        assertEquals(391, suite.getDuration());
+
+        List<TestResult> children = suite.getChildren();
+        assertEquals(3, children.size());
+        checkCase((TestCaseResult) children.get(0), "testSimple", TestCaseResult.Status.PASS, 291, null);
+        checkCase((TestCaseResult) children.get(1), "testFailure", TestCaseResult.Status.FAILURE, 10,
+                "junit.framework.AssertionFailedError\n" +
+                        "\tat com.zutubi.pulse.core.JUnitReportPostProcessorTest.testFailure(JUnitReportPostProcessorTest.java:63)");
+        checkCase((TestCaseResult) children.get(2), "testError", TestCaseResult.Status.ERROR, 0,
+                "java.lang.RuntimeException: whoops!\n" +
+                        "\tat com.zutubi.pulse.core.JUnitReportPostProcessorTest.testError(JUnitReportPostProcessorTest.java:68)");
+    }
+
+    private StoredFileArtifact runProcessor(String name)
+    {
+        File root = getPulseRoot();
+
+        File outputDir = new File(root, FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "core"));
+
+        StoredFileArtifact artifact = new StoredFileArtifact(getClass().getSimpleName() + "." + name + ".xml");
+        pp.process(outputDir, artifact, new CommandResult("test"));
+        return artifact;
     }
 
     private void checkCase(TestCaseResult caseResult, String name, TestCaseResult.Status status, long duration, String message)

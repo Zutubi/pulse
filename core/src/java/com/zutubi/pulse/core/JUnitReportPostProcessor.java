@@ -56,10 +56,19 @@ public class JUnitReportPostProcessor implements PostProcessor
     private void processDocument(Document doc, StoredFileArtifact artifact)
     {
         Element root = doc.getRootElement();
-        Elements suiteElements = root.getChildElements(ELEMENT_SUITE);
-        for(int i = 0; i < suiteElements.size(); i++)
+        if(root.getLocalName().equals(ELEMENT_SUITE))
         {
-            processSuite(suiteElements.get(i), artifact);
+            // A single suite
+            processSuite(root, artifact);
+        }
+        else
+        {
+            // Looks like a full report, search for suites
+            Elements suiteElements = root.getChildElements(ELEMENT_SUITE);
+            for(int i = 0; i < suiteElements.size(); i++)
+            {
+                processSuite(suiteElements.get(i), artifact);
+            }
         }
     }
 
