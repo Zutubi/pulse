@@ -6,6 +6,7 @@ package com.zutubi.pulse.upgrade.tasks;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
+import com.zutubi.pulse.upgrade.DataSourceAware;
 import com.zutubi.pulse.util.JDBCUtils;
 
 import javax.sql.DataSource;
@@ -19,7 +20,7 @@ import java.sql.ResultSet;
 /**
  * <class-comment/>
  */
-public class UserPropsDataUpgradeTask implements UpgradeTask
+public class UserPropsDataUpgradeTask implements UpgradeTask, DataSourceAware
 {
     private DataSource dataSource;
 
