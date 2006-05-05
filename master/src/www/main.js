@@ -109,7 +109,7 @@ function toggleElementDisplay(element)
 
 function toggleDisplay(id)
 {
-    toggleElement(getElement(id));
+    toggleElementDisplay(getElement(id));
 }
 
 // Toggles the display of a nested list and switched the correcsponding image

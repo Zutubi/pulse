@@ -5,6 +5,7 @@ package com.zutubi.pulse.util;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * A time stamp pair to mark the start and end times for something.
@@ -110,19 +111,19 @@ public class TimeStamps
         return getPrettyTime(endTime);
     }
 
-    public String getPrettyQueueDate()
+    public String getPrettyQueueDate(Locale locale)
     {
-        return getPrettyDate(queueTime);
+        return getPrettyDate(queueTime, locale);
     }
 
-    public String getPrettyStartDate()
+    public String getPrettyStartDate(Locale locale)
     {
-        return getPrettyDate(startTime);
+        return getPrettyDate(startTime, locale);
     }
 
-    public String getPrettyEndDate()
+    public String getPrettyEndDate(Locale locale)
     {
-        return getPrettyDate(endTime);
+        return getPrettyDate(endTime, locale);
     }
 
     public static String getPrettyElapsed(long elapsed)
@@ -276,7 +277,7 @@ public class TimeStamps
         }
     }
 
-    public static String getPrettyDate(long time)
+    public static String getPrettyDate(long time, Locale locale)
     {
         if (time == UNINITIALISED_TIME)
         {
@@ -284,7 +285,7 @@ public class TimeStamps
         }
         else
         {
-            return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date(time));
+            return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG, locale).format(new Date(time));
         }
     }
 

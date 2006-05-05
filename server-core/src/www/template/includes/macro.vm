@@ -620,7 +620,7 @@
 ##
 #macro(dateClassCell $result)
     <td class="$cssClass">
-        #dateCellContent($result $result.stamps.prettyStartDate $result.stamps.prettyStartTime)
+        #dateCellContent($result $result.stamps.getPrettyStartDate($locale) $result.stamps.prettyStartTime)
     </td>
 #end
 
@@ -630,7 +630,7 @@
 ##
 #macro(dateCell $entity)
     <td class="content">
-        #dateCellContent($entity $entity.prettyDate $entity.prettyTime)
+        #dateCellContent($entity $entity.getPrettyDate($locale) $entity.prettyTime)
     </td>
 #end
 

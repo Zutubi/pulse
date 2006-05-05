@@ -8,6 +8,7 @@ import com.zutubi.pulse.util.TimeStamps;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A trivial implementation of the Changelist interface.
@@ -71,9 +72,9 @@ public class Changelist extends Entity
         return TimeStamps.getPrettyTime(getRevision().getDate().getTime());
     }
 
-    public String getPrettyDate()
+    public String getPrettyDate(Locale locale)
     {
-        return TimeStamps.getPrettyDate(getRevision().getDate().getTime());
+        return TimeStamps.getPrettyDate(getRevision().getDate().getTime(), locale);
     }
 
     public String getUser()

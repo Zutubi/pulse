@@ -9,12 +9,16 @@ import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;
 import com.opensymphony.xwork.TextProvider;
+import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.opensymphony.webwork.views.util.TextUtil;
+import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.util.TextUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Locale;
 
 /**
  * 
@@ -95,14 +99,19 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         return object != null;
     }
 
+    public Locale getLocale()
+    {
+        return ActionContext.getContext().getLocale();
+    }
+
     public String getPrettyTime(long time)
     {
         return TimeStamps.getPrettyTime(time);
     }
-    
+
     public String getPrettyDate(long time)
     {
-        return TimeStamps.getPrettyDate(time);
+        return TimeStamps.getPrettyDate(time, getLocale());
     }
 
     public String wrapString(String s, int lineLength)
