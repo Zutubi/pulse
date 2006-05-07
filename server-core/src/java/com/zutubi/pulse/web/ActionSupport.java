@@ -123,4 +123,9 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     {
         return TextUtils.plainTextToHtml(s);
     }
+
+    public String escapeSpaces(String s)
+    {
+        return s.replace(' ', '+');
+    }
 }
