@@ -14,7 +14,7 @@ import java.io.File;
 public class Maven2Command extends ExecutableCommand implements Command, ScopeAware
 {
     private Scope scope;
-    private String targets = "test";
+    private String goals;
 
     private void checkExe()
     {
@@ -48,10 +48,10 @@ public class Maven2Command extends ExecutableCommand implements Command, ScopeAw
     {
         checkExe();
 
-        if (targets != null)
+        if (goals != null)
         {
-            addArguments(targets.trim().split(" +"));
-            cmdResult.getProperties().put("targets", targets);
+            addArguments(goals.trim().split(" +"));
+            cmdResult.getProperties().put("goals", goals);
         }
 
         super.execute(recipeId, paths, outputDir, cmdResult);
@@ -60,14 +60,14 @@ public class Maven2Command extends ExecutableCommand implements Command, ScopeAw
         pp.process(outputDir, cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);
     }
 
-    public String getTargets()
+    public String getGoals()
     {
-        return targets;
+        return goals;
     }
 
-    public void setTargets(String targets)
+    public void setGoals(String goals)
     {
-        this.targets = targets;
+        this.goals = goals;
     }
 
     public void setScope(Scope scope)

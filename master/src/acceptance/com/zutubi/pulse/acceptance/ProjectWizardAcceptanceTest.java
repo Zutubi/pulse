@@ -6,6 +6,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.acceptance.forms.SubversionForm;
 import com.zutubi.pulse.acceptance.forms.CustomDetailsForm;
+import com.zutubi.pulse.acceptance.forms.Maven2DetailsForm;
 
 import java.util.Properties;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
     {
         super.setUp();
 
-        login("admin", "admin");
+        login("j", "j");
     }
 
     public void testCreateVersionedProject()
@@ -95,10 +96,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
 
         submitProjectBasicsForm(projectName, description, url, scm, type);
 
-        SubversionForm.Create svnForm = new SubversionForm.Create(tester);
-        svnForm.assertFormPresent();
-        String location = "http://url";
-        svnForm.nextFormElements("username", "password", location, null, null);
+        String location = submitSubversion();
 
         CustomDetailsForm detailsForm = new CustomDetailsForm(tester);
         detailsForm.assertFormPresent();
@@ -113,6 +111,59 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         assertScm("subversion", location);
 
         assertDefaultSetup(projectName);
+
+        // ensure that it appears in your list of projects.
+        clickLinkWithText("projects");
+        assertLinkPresentWithText(projectName);
+    }
+
+    public void testCreateMaven2Project()
+    {
+        // navigate to project panel.
+        beginAt("/");
+        clickLinkWithText("projects");
+        assertLinkPresentWithText("add new project");
+
+        clickLinkWithText("add new project");
+        assertFormPresent(FO_PROJECT_BASICS);
+
+        String projectName = "maven2 project " + RandomUtils.randomString(3);
+        String description = "this is a maven2 project created by the automated project wizard acceptance test.";
+        String url = "http://maven2/url";
+        String scm = "svn";
+        String type = "maven2";
+
+        submitProjectBasicsForm(projectName, description, url, scm, type);
+
+        String location = submitSubversion();
+
+        Maven2DetailsForm detailsForm = new Maven2DetailsForm(tester, true);
+        detailsForm.assertFormPresent();
+        detailsForm.nextFormElements("work", "compile test", "-arg");
+
+        // assert that all of the expected tables have the expected data.
+        assertBasics(projectName, description, url);
+
+        Properties properties = new Properties();
+        properties.put("working directory", "work");
+        properties.put("goals", "compile test");
+        properties.put("arguments", "-arg");
+        assertSpecifics(type, properties);
+
+        assertScm("subversion", location);
+
+        assertDefaultSetup(projectName);
+
+        // edit it
+        clickLink("project.specifics.edit");
+        detailsForm = new Maven2DetailsForm(tester,  false);
+        detailsForm.assertFormPresent();
+        detailsForm.assertFormElements("work", "compile test", "-arg");
+        detailsForm.saveFormElements("newwork", "", "");
+
+        properties.clear();
+        properties.put("working directory", "newwork");
+        assertSpecifics(type, properties);
 
         // ensure that it appears in your list of projects.
         clickLinkWithText("projects");
@@ -137,6 +188,15 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         assertFormPresent(FO_PROJECT_BASICS);
     }
 
+    private String submitSubversion()
+    {
+        SubversionForm.Create svnForm = new SubversionForm.Create(tester);
+        svnForm.assertFormPresent();
+        String location = "http://url";
+        svnForm.nextFormElements("username", "password", location, null, null);
+        return location;
+    }
+
     private void assertBasics(String projectName, String description, String url)
     {
         assertTablePresent("project.basics");
@@ -156,7 +216,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
             rowCount++;
         }
 
-        String [][] rows = new String[2][rowCount];
+        String [][] rows = new String[rowCount][2];
 
         rows[0] = new String[]{"type", type};
 

@@ -47,6 +47,10 @@
                 #staticWrapCell("project.type.maven.description")
             </tr>
             <tr>
+                #contentRowHeading("project.type.maven2")
+                #staticWrapCell("project.type.maven2.description")
+            </tr>
+            <tr>
                 #contentRowHeading("project.type.versioned")
                 #staticWrapCell("project.type.versioned.description")
             </tr>

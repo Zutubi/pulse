@@ -1,0 +1,27 @@
+#helpTag("Maven+2+Projects")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=edit.maven2")</title>
+</head>
+<body>
+    <h1>#projectName($project)</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editMaven2Details.action" "id=maven2.edit" "heading=%{getText('edit.maven2')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=projectId")
+
+    #wwtextfield("name=details.workingDir" "label=%{getText('maven2.working.dir')}" "size=40" "tabindex=1")
+    #inlineHelp("maven2.working.dir.help")
+    #wwtextfield("name=details.goals" "label=%{getText('maven2.goals')}" "size=40" "tabindex=2")
+    #inlineHelp("maven2.goals.help")
+    #wwtextfield("name=details.arguments" "label=%{getText('maven2.args')}" "size=40" "tabindex=3")
+    #inlineHelp("maven2.args.help")
+
+    #saveCancel(4)
+ #end
+</body>
+</html>

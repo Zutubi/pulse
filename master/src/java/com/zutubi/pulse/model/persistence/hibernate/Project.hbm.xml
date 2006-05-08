@@ -103,6 +103,12 @@
             <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
         </subclass>
 
+        <subclass name="com.zutubi.pulse.model.Maven2PulseFileDetails" discriminator-value="MAVEN2" lazy="false">
+            <property name="workingDir" column="BASE_DIR" type="string" length="255"/>
+            <!-- Use a targets column so that it overlaps with other subtypes -->
+            <property name="goals" column="TARGETS" type="string" length="255"/>
+            <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
+        </subclass>
     </class>
 
     <class name="com.zutubi.pulse.model.CleanupRule" table="CLEANUP_RULE" lazy="false">

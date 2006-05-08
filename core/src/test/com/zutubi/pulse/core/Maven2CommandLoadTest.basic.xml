@@ -2,6 +2,6 @@
 <project>
     <recipe name="default">
         <maven2 name="empty"/>
-        <maven2 name="targets" targets="compile test"/>
+        <maven2 name="goals" goals="compile test"/>
     </recipe>
 </project>

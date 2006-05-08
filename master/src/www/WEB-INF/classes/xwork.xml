@@ -267,6 +267,7 @@
             <result name="ant" type="chain">editAntDetails!input</result>
             <result name="make" type="chain">editMakeDetails!input</result>
             <result name="maven" type="chain">editMavenDetails!input</result>
+            <result name="maven2" type="chain">editMaven2Details!input</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
@@ -340,6 +341,22 @@
                 /configureProject.action?id=${projectId}&amp;tab=configuration</result>
         </action>
 
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editMaven2Details!input" class="com.zutubi.pulse.web.project.EditMaven2DetailsAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-maven2.vm</result>
+        </action>
+
+        <action name="editMaven2Details" class="com.zutubi.pulse.web.project.EditMaven2DetailsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-maven2.vm</result>
+            <result name="cancel" type="redirect">
+                /configureProject.action?id=${projectId}&amp;tab=configuration</result>
+            <result name="success" type="redirect">
+                /configureProject.action?id=${projectId}&amp;tab=configuration</result>
+        </action>
+
         <action name="editTrigger" class="com.zutubi.pulse.web.project.EditTriggerAction">
             <result name="cron" type="chain">editCronTrigger!input</result>
             <result name="event" type="chain">editEventTrigger!input</result>
@@ -383,6 +400,7 @@
             <result name="custom" type="velocity">addproject-custom.vm</result>
             <result name="versioned" type="velocity">addproject-versioned.vm</result>
             <result name="maven" type="velocity">addproject-maven.vm</result>
+            <result name="maven2" type="velocity">addproject-maven2.vm</result>
             <result name="ant" type="velocity">addproject-ant.vm</result>
             <result name="make" type="velocity">addproject-make.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>

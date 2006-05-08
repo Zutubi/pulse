@@ -44,6 +44,7 @@ public class AddProjectWizard extends BaseWizard
     private AntDetails antDetails;
     private MakeDetails makeDetails;
     private MavenDetails mavenDetails;
+    private Maven2Details maven2Details;
 
     private WizardCompleteState completeState;
 
@@ -67,6 +68,7 @@ public class AddProjectWizard extends BaseWizard
         antDetails = new AntDetails(this, "ant");
         makeDetails = new MakeDetails(this, "make");
         mavenDetails = new MavenDetails(this, "maven");
+        maven2Details = new Maven2Details(this, "maven2");
         customDetails = new CustomDetails(this, "custom");
         versionedDetails = new VersionedDetails(this, "versioned");
 
@@ -80,6 +82,7 @@ public class AddProjectWizard extends BaseWizard
         addState(antDetails);
         addState(makeDetails);
         addState(mavenDetails);
+        addState(maven2Details);
         addState(customDetails);
         addState(versionedDetails);
         addFinalState(completeState.getStateName(), completeState);
@@ -124,6 +127,10 @@ public class AddProjectWizard extends BaseWizard
         else if ("maven".equals(projectType))
         {
             details = mavenDetails.getDetails();
+        }
+        else if ("maven2".equals(projectType))
+        {
+            details = maven2Details.getDetails();
         }
         else if ("versioned".equals(projectType))
         {
@@ -243,6 +250,7 @@ public class AddProjectWizard extends BaseWizard
                 types.put("custom", "custom project");
                 types.put("make", "make project");
                 types.put("maven", "maven project");
+                types.put("maven2", "maven 2 project");
                 types.put("versioned", "versioned project");
             }
             return types;
@@ -573,6 +581,39 @@ public class AddProjectWizard extends BaseWizard
             if (!TextUtils.stringSet(details.getTargets()))
             {
                 details.setTargets(null);
+            }
+
+            if (!TextUtils.stringSet(details.getWorkingDir()))
+            {
+                details.setWorkingDir(null);
+            }
+        }
+    }
+
+    private class Maven2Details extends BaseWizardState
+    {
+        private Maven2PulseFileDetails details = new Maven2PulseFileDetails();
+
+        public Maven2Details(Wizard wizard, String name)
+        {
+            super(wizard, name);
+        }
+
+        public String getNextStateName()
+        {
+            return ((AddProjectWizard) getWizard()).completeState.getStateName();
+        }
+
+        public PulseFileDetails getDetails()
+        {
+            return details;
+        }
+
+        public void execute()
+        {
+            if (!TextUtils.stringSet(details.getGoals()))
+            {
+                details.setGoals(null);
             }
 
             if (!TextUtils.stringSet(details.getWorkingDir()))

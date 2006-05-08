@@ -57,9 +57,9 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
                 "[INFO] ----------------------------------------------------------------------------");
     }
 
-    public void testNoTarget() throws Exception
+    public void testNoGoal() throws Exception
     {
-        createAndProcessArtifact("notarget", pp);
+        createAndProcessArtifact("nogoal", pp);
         assertErrors("[INFO] ----------------------------------------------------------------------------\n" +
                 "[ERROR] BUILD FAILURE\n" +
                 "[INFO] ----------------------------------------------------------------------------\n" +

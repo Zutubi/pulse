@@ -37,49 +37,48 @@ public class Maven2CommandTest extends PulseTestCase
     public void testBasic() throws Exception
     {
         Maven2Command command = new Maven2Command();
-        command.setTargets("compile");
+        command.setGoals("compile");
         successRun("basic", "basic", command);
     }
 
     public void testNoTarget() throws Exception
     {
         Maven2Command command = new Maven2Command();
-        command.setTargets("");
-        failedRun("basic", "notarget", command);
+        failedRun("basic", "nogoal", command);
     }
 
-    public void testMultiTarget() throws Exception
+    public void testMultiGoal() throws Exception
     {
         Maven2Command command = new Maven2Command();
-        command.setTargets("compile test");
-        successRun("basic", "multitarget", command);
+        command.setGoals("compile test");
+        successRun("basic", "multigoal", command);
     }
 
     public void testNoPOM() throws Exception
     {
         Maven2Command command = new Maven2Command();
-        command.setTargets("compile");
+        command.setGoals("compile");
         failedRun("nopom", "nopom", command);
     }
 
     public void testCompilerError() throws Exception
     {
         Maven2Command command = new Maven2Command();
-        command.setTargets("compile");
+        command.setGoals("compile");
         failedRun("compilererror", "compilererror", command);
     }
 
     public void testTestFailure() throws Exception
     {
         Maven2Command command = new Maven2Command();
-        command.setTargets("test");
+        command.setGoals("test");
         failedRun("testfailure", "testfailure", command);
     }
 
     public void testAppliesProcessor() throws Exception
     {
         Maven2Command command = new Maven2Command();
-        command.setTargets("test");
+        command.setGoals("test");
         CommandResult result = failedRun("testfailure", "testfailure", command);
         List<Feature> features = result.getArtifact("command output").getFeatures(Feature.Level.ERROR);
         assertEquals(2, features.size());

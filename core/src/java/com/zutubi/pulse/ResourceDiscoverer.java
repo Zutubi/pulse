@@ -29,6 +29,7 @@ public class ResourceDiscoverer implements Runnable
     {
         discoverAnt();
         discoverMake();
+        discoverMaven2();
         discoverJava();
     }
 
@@ -78,6 +79,20 @@ public class ResourceDiscoverer implements Runnable
                 Resource makeResource = new Resource("make");
                 makeResource.addProperty(new Property("make.bin", makeBin.getAbsolutePath()));
                 resourceRepository.addResource(makeResource);
+            }
+        }
+    }
+
+    private void discoverMaven2()
+    {
+        if (!resourceRepository.hasResource("maven2"))
+        {
+            File mvn = SystemUtils.findInPath("mvn");
+            if (mvn != null)
+            {
+                Resource mvnResource = new Resource("maven2");
+                mvnResource.addProperty(new Property("maven2.bin", mvn.getAbsolutePath()));
+                resourceRepository.addResource(mvnResource);
             }
         }
     }
