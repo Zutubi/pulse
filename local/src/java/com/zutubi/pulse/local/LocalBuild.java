@@ -200,7 +200,7 @@ public class LocalBuild
 
     private void printPrologue(String pulseFile, String resourcesFile, String outputDir)
     {
-        System.out.println("pulsefile       : '" + pulseFile + "'");
+        System.out.println("pulse file      : '" + pulseFile + "'");
         System.out.println("output directory: '" + outputDir + "'");
 
         if (resourcesFile != null)

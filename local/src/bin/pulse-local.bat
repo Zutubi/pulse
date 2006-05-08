@@ -13,7 +13,7 @@ goto end
 
 :havePulse
 
-call "%PULSE_HOME%"\bin\common.bat com.zutubi.pulse.local.LocalBuild %*
+call "%PULSE_HOME%"\bin\common.bat com.zutubi.pulse.command.PulseCtl local %*
 
 :end
 rem all done

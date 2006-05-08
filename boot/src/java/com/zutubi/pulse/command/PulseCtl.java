@@ -22,6 +22,7 @@ public class PulseCtl
 
     static
     {
+        COMMANDS.put("local", "com.zutubi.pulse.local.LocalBuildCommand");
         COMMANDS.put("start", "com.zutubi.pulse.command.StartCommand");
         COMMANDS.put("shutdown", "com.zutubi.pulse.command.ShutdownCommand");
         COMMANDS.put("setpassword", "com.zutubi.pulse.command.SetPasswordCommand");
