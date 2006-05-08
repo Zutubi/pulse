@@ -13,14 +13,19 @@
                             <a href="$helpUrl/junit.pp" title="junit.pp">junit.pp</a>
                         </li>
                         <li>
+                            <a href="$helpUrl/junit.summary.pp" title="junit.summary.pp">junit.summary.pp</a>
+                        </li>
+                        <li>
                             <a href="$helpUrl/macro" title="macro">macro</a>
-
                         </li>
                         <li>
                             <a href="$helpUrl/macro-ref" title="macro-ref">macro-ref</a>
                         </li>
                         <li>
                             <a href="$helpUrl/make.pp" title="make.pp">make.pp</a>
+                        </li>
+                        <li>
+                            <a href="$helpUrl/maven2.pp" title="maven2.pp">maven2.pp</a>
                         </li>
                         <li>
                             <a href="$helpUrl/post-processor" title="post-processor">post-processor</a>
@@ -70,6 +75,12 @@
                                 </li>
                                 <li>
                                     <a href="$helpUrl/make" title="make">make</a>
+                                </li>
+                                <li>
+                                    <a href="$helpUrl/maven" title="make">maven</a>
+                                </li>
+                                <li>
+                                    <a href="$helpUrl/maven2" title="maven2">maven2</a>
                                 </li>
                                 <li>
                                     <a href="$helpUrl/resource" title="resource">resource</a>
