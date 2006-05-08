@@ -44,11 +44,17 @@ public class LocalBuild
                 .withDescription("use specified pulse file [default: pulse.xml]")
                 .create('p'));
 
+        options.addOption(OptionBuilder.withLongOpt("recipe")
+                .withArgName("recipe")
+                .hasArg()
+                .withDescription("execute recipe [default: the default recipe]")
+                .create('r'));
+
         options.addOption(OptionBuilder.withLongOpt("resources-file")
                 .withArgName("file")
                 .hasArg()
                 .withDescription("use resources file [default: <none>]")
-                .create('r'));
+                .create('e'));
 
 
         CommandLineParser parser = new PosixParser();
@@ -70,7 +76,12 @@ public class LocalBuild
 
             if (commandLine.hasOption('r'))
             {
-                resourcesFile = commandLine.getOptionValue('r');
+                recipe = commandLine.getOptionValue('r');
+            }
+
+            if (commandLine.hasOption('e'))
+            {
+                resourcesFile = commandLine.getOptionValue('e');
             }
 
             if (commandLine.hasOption('o'))
