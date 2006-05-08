@@ -61,6 +61,15 @@ public class MavenCommandTest extends CommandTestBase
         successRun(command, "BUILD SUCCESSFUL", "build target", "test target", "_Apache_", "v. 1.0.2");
     }
 
+    public void testMissingTarget() throws IOException
+    {
+        copyBuildFile("basic");
+        MavenCommand command = new MavenCommand();
+        command.setTargets("missingTarget");
+        command.setWorkingDir(baseDir);
+        failedRun(command, "BUILD FAILED");
+    }
+
     public void testExtraArgument() throws IOException
     {
         copyBuildFile("basic");

@@ -4,6 +4,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.util.SystemUtils;
 
 import java.util.regex.Pattern;
 
@@ -30,7 +31,12 @@ public class Maven2PostProcessor extends PostProcessorGroup
         pattern.setPattern(Pattern.compile("^\\[WARNING\\]"));
         pattern.setCategory(Feature.Level.WARNING);
 
-        maven.setFailOnError(false);
+        if (!SystemUtils.isWindows())
+        {
+            // By default, prefer the exit code!
+            maven.setFailOnError(false);
+        }
+
         maven.setLeadingContext(1);
         maven.setTrailingContext(6);
         add(maven);
