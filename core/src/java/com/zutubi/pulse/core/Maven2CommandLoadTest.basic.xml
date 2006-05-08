@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project>
+    <recipe name="default">
+        <maven2 name="empty"/>
+        <maven2 name="targets" targets="compile test"/>
+    </recipe>
+</project>

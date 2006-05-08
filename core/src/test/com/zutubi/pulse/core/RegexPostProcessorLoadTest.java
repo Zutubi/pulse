@@ -9,21 +9,9 @@ import com.zutubi.pulse.core.model.Feature;
  */
 public class RegexPostProcessorLoadTest extends FileLoaderTestBase
 {
-    private RegexPostProcessor helper(String ppName) throws PulseException
-    {
-        PulseFile bf = new PulseFile();
-        loader.load(getInput("basic"), bf);
-
-        Scope globalScope = bf.getGlobalScope();
-        assertTrue(globalScope.containsReference(ppName));
-        assertTrue(globalScope.getReference(ppName) instanceof RegexPostProcessor);
-
-        return (RegexPostProcessor) globalScope.getReference(ppName);
-    }
-
     public void testEmpty() throws PulseException
     {
-        RegexPostProcessor pp = helper("empty");
+        RegexPostProcessor pp = referenceHelper("empty");
         assertTrue(pp.getFailOnError());
         assertFalse(pp.getFailOnWarning());
         assertEquals(0, pp.getPatterns().size());
@@ -31,7 +19,7 @@ public class RegexPostProcessorLoadTest extends FileLoaderTestBase
 
     public void testFailOnWarning() throws PulseException
     {
-        RegexPostProcessor pp = helper("failOnWarning");
+        RegexPostProcessor pp = referenceHelper("failOnWarning");
         assertTrue(pp.getFailOnError());
         assertTrue(pp.getFailOnWarning());
         assertEquals(0, pp.getPatterns().size());
@@ -39,7 +27,7 @@ public class RegexPostProcessorLoadTest extends FileLoaderTestBase
 
     public void testNoFailOnError() throws PulseException
     {
-        RegexPostProcessor pp = helper("noFailOnError");
+        RegexPostProcessor pp = referenceHelper("noFailOnError");
         assertFalse(pp.getFailOnError());
         assertFalse(pp.getFailOnWarning());
         assertEquals(0, pp.getPatterns().size());
@@ -47,7 +35,7 @@ public class RegexPostProcessorLoadTest extends FileLoaderTestBase
 
     private void levelPattern(String name, Feature.Level level) throws PulseException
     {
-        RegexPostProcessor pp = helper(name);
+        RegexPostProcessor pp = referenceHelper(name);
         assertEquals(1, pp.getPatterns().size());
         RegexPattern pattern = pp.getPatterns().get(0);
         assertEquals(level, pattern.getCategory());
@@ -71,7 +59,7 @@ public class RegexPostProcessorLoadTest extends FileLoaderTestBase
 
     public void testContext() throws PulseException
     {
-        RegexPostProcessor pp = helper("context");
+        RegexPostProcessor pp = referenceHelper("context");
         assertEquals(1, pp.getLeadingContext());
         assertEquals(2, pp.getTrailingContext());
     }

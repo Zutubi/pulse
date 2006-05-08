@@ -48,4 +48,14 @@ public class PostProcessorGroup implements PostProcessor
     {
         this.name = name;
     }
+
+    public int size()
+    {
+        return processors.size();
+    }
+
+    public PostProcessor get(int index)
+    {
+        return processors.get(index);
+    }
 }

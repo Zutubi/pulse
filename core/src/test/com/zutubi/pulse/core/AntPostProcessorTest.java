@@ -18,10 +18,9 @@ import java.util.List;
 /**
  * Tests for RegexPostProcessor.
  */
-public class AntPostProcessorTest extends PulseTestCase
+public class AntPostProcessorTest extends PostProcessorTestBase
 {
     private AntPostProcessor pp;
-    private StoredFileArtifact artifact;
     private File tempDir;
 
 
@@ -40,40 +39,32 @@ public class AntPostProcessorTest extends PulseTestCase
 
     public void testSuccess() throws Exception
     {
-        CommandResult result = createAndProcessArtifact("success");
+        CommandResult result = createAndProcessArtifact("success", pp);
         assertTrue(result.succeeded());
         assertEquals(0, artifact.getFeatures().size());
     }
 
     public void testNoBuildFile() throws Exception
     {
-        createAndProcessArtifact("nobuild");
-        assertEquals(1, artifact.getFeatures(Feature.Level.ERROR).size());
-        Feature feature = artifact.getFeatures(Feature.Level.ERROR).get(0);
-        assertEquals("Buildfile: nobuild.xml does not exist!\nBuild failed", feature.getSummary());
+        createAndProcessArtifact("nobuild", pp);
+        assertErrors("Buildfile: nobuild.xml does not exist!\nBuild failed");
     }
 
     public void testSyntaxError() throws Exception
     {
-        createAndProcessArtifact("syntaxError");
-        assertEquals(1, artifact.getFeatures(Feature.Level.ERROR).size());
-        Feature feature = artifact.getFeatures(Feature.Level.ERROR).get(0);
-        assertEquals("Buildfile: build.xml\n" +
+        createAndProcessArtifact("syntaxError", pp);
+        assertErrors("Buildfile: build.xml\n" +
                 "\n" +
                 "BUILD FAILED\n" +
                 "/home/jsankey/svn/oro/trunk/build.xml:-1: Element type \"attribute\" must be followed by either attribute specifications, \">\" or \"/>\".\n" +
                 "\n" +
-                "Total time: 0 seconds",
-                feature.getSummary());
+                "Total time: 0 seconds");
     }
 
     public void testJavacError() throws Exception
     {
-        createAndProcessArtifact("javacError");
-        assertEquals(1, artifact.getFeatures(Feature.Level.ERROR).size());
-        List<Feature> features = artifact.getFeatures(Feature.Level.ERROR);
-        Feature feature = features.get(0);
-        assertEquals("\n" +
+        createAndProcessArtifact("javacError", pp);
+        assertErrors("\n" +
                 "prepare:\n" +
                 "\n" +
                 "compile:\n" +
@@ -86,42 +77,17 @@ public class AntPostProcessorTest extends PulseTestCase
                 "BUILD FAILED\n" +
                 "/home/jsankey/svn/oro/trunk/build.xml:127: Compile failed; see the compiler error output for details.\n" +
                 "\n" +
-                "Total time: 1 second",
-                feature.getSummary());
+                "Total time: 1 second");
     }
 
     public void testJavacWarning() throws Exception
     {
-        createAndProcessArtifact("javacWarning");
-        assertEquals(1, artifact.getFeatures().size());
-        assertEquals(1, artifact.getFeatures(Feature.Level.WARNING).size());
-        List<Feature> features = artifact.getFeatures(Feature.Level.WARNING);
-        Feature feature = features.get(0);
-        assertEquals("compile:\n" +
+        createAndProcessArtifact("javacWarning", pp);
+        assertWarnings("compile:\n" +
                 "[mkdir] Created dir: /usr/pulse/data/recipes/851971/base/webwork/build/java\n" +
                 "[javac] Compiling 476 source files to /usr/pulse/data/recipes/851971/base/webwork/build/java\n" +
                 "[javac] /usr/pulse/data/recipes/851971/base/webwork/src/java/com/opensymphony/webwork/config/DelegatingConfiguration.java:17: warning: unmappable character for encoding UTF8\n" +
                 "[javac] * @author Rickard �berg\n" +
-                "[javac] ^",
-                feature.getSummary());
-    }
-    
-    private CommandResult createAndProcessArtifact(String name) throws Exception
-    {
-        createArtifact(name);
-        CommandResult commandResult = new CommandResult("test");
-        commandResult.commence(tempDir);
-        pp.process(tempDir, artifact, commandResult);
-        commandResult.complete();
-        return commandResult;
-    }
-
-    public void createArtifact(String name) throws Exception
-    {
-        URL url = getInputURL(name, ".txt");
-        File fromFile = new File(url.toURI());
-        File toFile = new File(tempDir, fromFile.getName());
-        IOUtils.copyFile(fromFile, toFile);
-        artifact = new StoredFileArtifact(toFile.getName());
+                "[javac] ^");
     }
 }
