@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="zutubi" module="pulse-boot" revision="1.0.2" status="integration" publication="20060509011136">
+        <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
+        <description homepage="http://www.zutubi.com/">
+            description....
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="release" description="Defines those packages that are included in the final release."/>
+        <conf name="external" description="All of those packages not written by Zutubi."/>
+        <conf name="build" description="All of the packages required during the build."/>
+    </configurations>
+
+    <publications>
+        <artifact name="boot" type="jar" conf="release, build"/>
+    </publications>
+
+</ivy-module>
