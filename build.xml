@@ -61,7 +61,9 @@
 
     <target name="package.local" depends="init, build.local">
 
-        <property name="package.root" value="build/package"/>
+        <property name="package.name" value="pulse-local-${pulse.version}"/>
+        <property name="package.root" value="build/package/${package.name}"/>
+
         <delete dir="${package.root}"/>
         <mkdir dir="${package.root}"/>
 
@@ -75,19 +77,28 @@
 
         <retrieve.dependencies module="." conf="local" dest="${package.root}/lib"/>
 
+        <copy todir="${package.root}/lib">
+            <fileset dir="local/etc" includes="*.xml"/>
+        </copy>
+
         <!-- place holder for package documentation -->
-        <copy todir="${package.root}/docs">
-            <fileset dir="etc" includes="delete-me.txt"/>
-        </copy>
-        <!-- place holder for the log directory -->
-        <copy todir="${package.root}/system/log">
-            <fileset dir="etc" includes="delete-me.txt"/>
-        </copy>
+        <!--<copy todir="${package.root}/docs">-->
+            <!--<fileset dir="etc" includes="delete-me.txt"/>-->
+        <!--</copy>-->
 
-        <zip destfile="build/pulse-local-${pulse.version}.zip">
-            <zipfileset dir="build/package" includes="**/*" prefix="pulse-local-${pulse.version}"/>
-        </zip>
+        <exec executable="zip" dir="${package.root}/..">
+            <arg line="-r ../${package.name}.zip ${package.name}"/>
+        </exec>
 
+        <tar destfile="build/${package.name}.tgz" compression="gzip">
+            <tarfileset dir="${package.root}/.." mode="755" username="root" group="root">
+                <include name="${package.name}/bin/*"/>
+            </tarfileset>
+            <tarfileset dir="${package.root}/.." username="root" group="root">
+                <include name="${package.name}/**/*"/>
+                <exclude name="${package.name}/bin/*"/>
+            </tarfileset>
+        </tar>
     </target>
 
     <target name="package.master" depends="init, clean, build.local, build.master">
