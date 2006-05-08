@@ -3,14 +3,13 @@
  ********************************************************************************/
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.Feature;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -20,6 +19,7 @@ public class Maven2CommandTest extends PulseTestCase
 {
     File baseDir;
     File outputDir;
+
     private boolean generateMode = false;
 
     public void setUp() throws IOException
@@ -38,48 +38,49 @@ public class Maven2CommandTest extends PulseTestCase
     {
         Maven2Command command = new Maven2Command();
         command.setGoals("compile");
-        successRun("basic", "basic", command);
+        successRun("basic", command, "[compiler:compile]", "BUILD SUCCESSFUL");
     }
 
     public void testNoTarget() throws Exception
     {
         Maven2Command command = new Maven2Command();
-        failedRun("basic", "nogoal", command);
+        failedRun("basic", command, "BUILD FAILURE", "You must specify at least one goal");
     }
 
     public void testMultiGoal() throws Exception
     {
         Maven2Command command = new Maven2Command();
         command.setGoals("compile test");
-        successRun("basic", "multigoal", command);
+        successRun("basic", command, "BUILD SUCCESSFUL", "[surefire] Running com.zutubi.maven2.test.AppTest",
+                "task-segment: [compile, test]", "[compiler:compile]", "[compiler:testCompile]");
     }
 
     public void testNoPOM() throws Exception
     {
         Maven2Command command = new Maven2Command();
         command.setGoals("compile");
-        failedRun("nopom", "nopom", command);
+        failedRun("nopom", command, "BUILD ERROR", "Cannot execute mojo: resources", "It requires a project with an existing pom.xml");
     }
 
     public void testCompilerError() throws Exception
     {
         Maven2Command command = new Maven2Command();
         command.setGoals("compile");
-        failedRun("compilererror", "compilererror", command);
+        failedRun("compilererror", command, "Compilation failure", "BUILD FAILURE", "task-segment: [compile]");
     }
 
     public void testTestFailure() throws Exception
     {
         Maven2Command command = new Maven2Command();
         command.setGoals("test");
-        failedRun("testfailure", "testfailure", command);
+        failedRun("testfailure", command, "task-segment: [test]", "There are test failures.");
     }
 
     public void testAppliesProcessor() throws Exception
     {
         Maven2Command command = new Maven2Command();
         command.setGoals("test");
-        CommandResult result = failedRun("testfailure", "testfailure", command);
+        CommandResult result = failedRun("testfailure", command);
         List<Feature> features = result.getArtifact("command output").getFeatures(Feature.Level.ERROR);
         assertEquals(2, features.size());
         assertEquals("[surefire] Running com.zutubi.maven2.test.AppTest\n" +
@@ -87,21 +88,23 @@ public class Maven2CommandTest extends PulseTestCase
                 features.get(0).getSummary().replaceAll("elapsed: .* sec", "elapsed: x sec"));
     }
 
-    private CommandResult successRun(String inName, String outName, Maven2Command command) throws Exception
+    private CommandResult successRun(String inName, Maven2Command command, String ...contents) throws Exception
     {
-        CommandResult result = runMaven(inName, outName, command);
+        CommandResult result = runMaven(inName, command);
         assertTrue(result.succeeded());
+        checkOutput(result, contents);
         return result;
     }
 
-    private CommandResult failedRun(String inName, String outName, Maven2Command command) throws Exception
+    private CommandResult failedRun(String inName, Maven2Command command, String ...contents) throws Exception
     {
-        CommandResult result = runMaven(inName, outName, command);
+        CommandResult result = runMaven(inName, command);
         assertTrue(result.failed());
+        checkOutput(result, contents);
         return result;
     }
 
-    private CommandResult runMaven(String inName, String outName, Maven2Command command) throws Exception
+    private CommandResult runMaven(String inName, Maven2Command command) throws Exception
     {
         File sourceDir = getSource(inName);
         FileSystemUtils.removeDirectory(baseDir);
@@ -113,7 +116,6 @@ public class Maven2CommandTest extends PulseTestCase
         CommandResult result = new CommandResult("maven2-test");
         command.execute(0, new SimpleRecipePaths(baseDir, null), outputDir, result);
 
-        compareOutput(outName);
         return result;
     }
 
@@ -141,18 +143,24 @@ public class Maven2CommandTest extends PulseTestCase
         return new File(getPulseRoot(), FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "core", getClass().getSimpleName() + "." + name));
     }
 
-    private void compareOutput(String name) throws Exception
+    protected void checkOutput(CommandResult commandResult, String ...contents) throws IOException
     {
-        File actualOutput = cleanOutput();
-        File expectedOutput = new File(getSource(name).getAbsolutePath() + ".txt");
-
-        if(generateMode)
+        FileInputStream is = null;
+        try
         {
-            IOUtils.copyFile(actualOutput, expectedOutput);
+            is = new FileInputStream(cleanOutput());
+            String output = IOUtils.inputStreamToString(is);
+            for (String content : contents)
+            {
+                if (!output.contains(content))
+                {
+                    fail("Output '" + output + "' does not contain '" + content + "'");
+                }
+            }
         }
-        else
+        finally
         {
-            assertFilesEqual(expectedOutput, actualOutput);
+            IOUtils.close(is);
         }
     }
 
