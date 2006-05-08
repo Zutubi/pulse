@@ -124,7 +124,7 @@ public class RomeResult extends WebWorkResultSupport
 
         // render the feed in the requested format.
         WireFeed outFeed = feed.createWireFeed(format);
-        outFeed.setEncoding("UTF-8");
+        outFeed.setEncoding(response.getCharacterEncoding());
         new WireFeedOutput().output(outFeed, response.getWriter());
         response.flushBuffer();
     }
