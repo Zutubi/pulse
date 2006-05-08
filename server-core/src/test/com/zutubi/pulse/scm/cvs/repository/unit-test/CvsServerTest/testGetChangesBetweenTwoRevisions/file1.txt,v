@@ -1,0 +1,39 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2006.05.08.11.16.16;	author daniel;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2006.05.08.11.12.24;	author daniel;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@update
+@
+text
+@BLAH
+@
+
+
+1.1
+log
+@initial commit
+@
+text
+@d1 1
+@
+

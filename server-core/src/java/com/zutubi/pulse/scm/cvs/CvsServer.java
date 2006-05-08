@@ -217,8 +217,20 @@ public class CvsServer extends CachingSCMServer
         // assert that the branch for both revisions is the same. We do not support retrieving
         // differences across multiple branches/revisions. For practical reasons, we do not need to...
 
+        List<Changelist> changes = cvs.getChangesBetween(getUid(), (CvsRevision)from, (CvsRevision)to);
 
-        return cvs.getChangesBetween(getUid(), (CvsRevision)from, (CvsRevision)to);
+        // ensure that the lower bound of the changes is excluded.
+        if (changes.size() == 0)
+        {
+            return changes;
+        }
+
+        Changelist firstChange = changes.get(0);
+        if (firstChange.getRevision().compareTo(from) == 0)
+        {
+            return changes.subList(1, changes.size());
+        }
+        return changes;
     }
 
     /**
