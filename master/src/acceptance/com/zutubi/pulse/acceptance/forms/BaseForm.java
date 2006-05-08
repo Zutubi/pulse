@@ -4,6 +4,7 @@
 package com.zutubi.pulse.acceptance.forms;
 
 import net.sourceforge.jwebunit.WebTester;
+import junit.framework.Assert;
 
 /**
  * <class-comment/>
@@ -129,6 +130,8 @@ public abstract class BaseForm
         tester.setWorkingForm(getFormName());
 
         int[] types = getFieldTypes();
+        Assert.assertEquals(values.length, types.length);
+
         for (int i = 0; i < types.length; i++)
         {
             switch (types[i])

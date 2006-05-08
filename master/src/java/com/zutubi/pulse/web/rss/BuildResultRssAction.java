@@ -11,6 +11,8 @@ import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
 import com.opensymphony.util.TextUtils;
 import com.sun.syndication.feed.synd.*;
+import com.sun.syndication.feed.module.content.ContentModule;
+import com.sun.syndication.feed.module.content.ContentModuleImpl;
 
 import java.io.StringWriter;
 import java.util.LinkedList;
@@ -124,17 +126,22 @@ public class BuildResultRssAction extends ProjectActionSupport
             // with rss 2.0, the content is added in the description field.
             SyndContent description = new SyndContentImpl();
 
-            // type should be based on user selected type.
-            description.setType("text/html");
-            description.setValue(renderResult(result));
-            entry.setDescription(description);
-
             StringBuffer titleBuffer = new StringBuffer();
             titleBuffer.append("Build ");
             titleBuffer.append(result.getNumber());
             titleBuffer.append(" ");
             titleBuffer.append(result.succeeded() ? "succeeded" : "failed");
+
+            // type should be based on user selected type.
+            description.setType("text/plain");
+            description.setValue(titleBuffer.toString());
+            entry.setDescription(description);
+
             entry.setTitle(titleBuffer.toString());
+
+            ContentModule content = new ContentModuleImpl();
+            content.setEncodeds(asList(renderResult(result)));
+            entry.setModules(asList(content));
 
             // NOTES:
             // calling setLink is effectively setting guid without a isPermaLink reference.
@@ -144,12 +151,21 @@ public class BuildResultRssAction extends ProjectActionSupport
             entry.setPublishedDate(new Date(result.getStamps().getEndTime()));
             entries.add(entry);
         }
-
         feed.setEntries(entries);
 
         // return the requested feed type. at the moment,
         // we only support RSS.
         return "rss";
+    }
+
+    private <X> List<X> asList(X... objs)
+    {
+        List<X> l = new LinkedList<X>();
+        for (X x : objs)
+        {
+            l.add(x);
+        }
+        return l;
     }
 
     private String renderResult(BuildResult result)

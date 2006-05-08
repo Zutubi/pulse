@@ -18,7 +18,6 @@ public class EditUserSettingsAction extends UserActionSupport
     private String defaultAction;
     private boolean refreshEnabled = false;
     private int refreshInterval;
-    private String rssFormat;
 
     public List<String> getDefaultActions()
     {
@@ -62,16 +61,6 @@ public class EditUserSettingsAction extends UserActionSupport
         this.refreshInterval = refreshInterval;
     }
 
-    public String getRssFormat()
-    {
-        return rssFormat;
-    }
-
-    public void setRssFormat(String rssFormat)
-    {
-        this.rssFormat = rssFormat;
-    }
-
     public String doInput() throws Exception
     {
         // load user details.
@@ -83,7 +72,6 @@ public class EditUserSettingsAction extends UserActionSupport
         }
 
         defaultAction = getUser().getDefaultAction();
-        rssFormat = getUser().getRssFormat();
 
         return super.doInput();
     }
@@ -115,7 +103,6 @@ public class EditUserSettingsAction extends UserActionSupport
         }
 
         persistentUser.setDefaultAction(defaultAction);
-        persistentUser.setRssFormat(rssFormat);
         getUserManager().save(persistentUser);
         return SUCCESS;
     }

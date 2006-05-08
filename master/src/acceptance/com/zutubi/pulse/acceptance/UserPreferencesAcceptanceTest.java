@@ -61,7 +61,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
 
         assertAliasesTable();
 
-        assertSettingsTable("welcome", "every 60 seconds", "plain");
+        assertSettingsTable("welcome", "every 60 seconds");
 
         assertTablePresent("contacts");
         assertTableRowsEqual("contacts", 1, new String[][]{
@@ -292,14 +292,14 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
 
         UserSettingsForm form = new UserSettingsForm(tester);
         form.assertFormPresent();
-        form.assertFormElements("welcome", "true", "60", "plain");
-        form.saveFormElements("dashboard", "false", "60", "html");
+        form.assertFormElements("welcome", "true", "60");
+        form.saveFormElements("dashboard", "false", "60");
 
-        assertSettingsTable("dashboard", "never", "html");
+        assertSettingsTable("dashboard", "never");
 
         assertAndClick("user.settings");
         form.assertFormPresent();
-        form.assertFormElements("dashboard", "false", "60", "html");
+        form.assertFormElements("dashboard", "false", "60");
     }
 
     public void testEditSettingsCancel()
@@ -308,10 +308,10 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
 
         UserSettingsForm form = new UserSettingsForm(tester);
         form.assertFormPresent();
-        form.assertFormElements("welcome", "true", "60", "html");
+        form.assertFormElements("welcome", "true", "60");
         form.cancelFormElements("dashboard", "false", null);
 
-        assertSettingsTable("welcome", "every 60 seconds", "plain");
+        assertSettingsTable("welcome", "every 60 seconds");
     }
 
     public void testEditSettingsValidation()
@@ -342,13 +342,12 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         assertTableEquals("aliases", expectedTable);
     }
 
-    private void assertSettingsTable(String defaultAction, String refreshInterval, String rssFormat)
+    private void assertSettingsTable(String defaultAction, String refreshInterval)
     {
         assertTablePresent("settings");
         assertTableRowsEqual("settings", 1, new String[][]{
                 new String[]{"default page", defaultAction},
-                new String[]{"refresh live content", refreshInterval},
-                new String[]{"rss feed format", rssFormat}
+                new String[]{"refresh live content", refreshInterval}
         });
     }
 

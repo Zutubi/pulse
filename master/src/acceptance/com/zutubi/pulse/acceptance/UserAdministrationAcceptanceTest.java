@@ -214,7 +214,7 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         clickLink("edit_" + login);
 
         EditPasswordForm form = new EditPasswordForm(tester);
-        form.assertFormElements("", "", "");
+        form.assertFormElements("", "");
 
         // check that each field is required.
         form.saveFormElements("a", "");

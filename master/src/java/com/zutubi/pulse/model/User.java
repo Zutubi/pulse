@@ -410,18 +410,4 @@ public class User extends Entity implements UserDetails
     {
         setProperty("user.refreshInterval", Integer.toString(refreshInterval));
     }
-
-    public String getRssFormat()
-    {
-        if (hasProperty("user.rssFormat"))
-        {
-            return getProperty("user.rssFormat");
-        }
-        return "plain";
-    }
-
-    public void setRssFormat(String str)
-    {
-        setProperty("user.rssFormat", str);
-    }
 }

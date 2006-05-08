@@ -47,7 +47,6 @@ table.content {
     border-collapse: collapse;
     border: 1px solid #bbb;
     margin-bottom: 16px;
-    width: 100%;
 }
 
 th.heading, th.content, td.content, td.content-right, td.failure, td.error, td.test-failure, td.success {
@@ -130,7 +129,7 @@ pre.feature {
     </h1>
 <table>
 <tr><td>
-    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px; width: 100%;">
+    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
         <tr>
             <th class="heading" colspan="11" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
                 summary
@@ -161,7 +160,7 @@ pre.feature {
 [#if result.scmDetails?exists]
     [#assign changes = result.scmDetails.changelists]
 <tr><td>
-    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px; width: 100%;">
+    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
         <th class="heading" colspan="5" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
             changes
         </th>
@@ -195,7 +194,7 @@ pre.feature {
 
 [#if result.hasMessages(errorLevel) || result.hasMessages(warningLevel)]
 <tr><td>
-    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px; width: 100%;">
+    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
         <tr>
         <th class="heading" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
             features
@@ -214,7 +213,7 @@ pre.feature {
 [#assign testSummary = result.testSummary]
 [#if !testSummary.allPassed()]
 <tr><td>
-    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px; width: 100%;">
+    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
         <th class="heading" colspan="3" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
             broken tests (total: ${testSummary.total}, errors: ${testSummary.errors}, failures: ${testSummary.failures})
         </th>
