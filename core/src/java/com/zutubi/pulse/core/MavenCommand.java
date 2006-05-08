@@ -55,6 +55,9 @@ public class MavenCommand extends ExecutableCommand implements Command, ScopeAwa
         }
 
         super.execute(recipeId, paths, outputDir, cmdResult);
+
+        MavenPostProcessor pp = new MavenPostProcessor("maven.pp");
+        pp.process(outputDir, cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);
     }
 
     public String getTargets()

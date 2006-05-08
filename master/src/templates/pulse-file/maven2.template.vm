@@ -18,7 +18,11 @@
                 args="$arguments"
 #end
             />
+        #if($workingDir)
+            <dir-artifact name="test reports" base="${base.dir}/$workingDir/target/surefire-reports" fail-if-not-present="false">
+        #else
             <dir-artifact name="test reports" base="${base.dir}/target/surefire-reports" fail-if-not-present="false">
+        #end
                 <include pattern="**/TEST-*.xml"/>
                 <process processor="${junit.pp}"/>
             </dir-artifact>
