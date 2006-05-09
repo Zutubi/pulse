@@ -184,10 +184,6 @@
         <mkdir dir="${report.dir}/xml"/>
         <mkdir dir="${report.dir}/html"/>
 
-        <exec executable="./acceptance-test-prep.sh">
-            <arg line="build/pulse-${pulse.version}.tgz"/>
-        </exec>
-
         <javac srcdir="server-core/src/java" destdir="${build.dir}/classes" includes="**/LicenseEncoder*" debug="true">
             <classpath>
                 <fileset dir="${build.dir}/lib">
@@ -195,6 +191,18 @@
                 </fileset>
             </classpath>
         </javac>
+
+        <condition property="extension" value="tgz" else="zip">
+            <os family="unix"/>
+        </condition>
+
+        <exec executable="bash" spawn="true">
+            <arg line="acceptance-test-prep.sh build/pulse-${pulse.version}.${extension}"/>
+        </exec>
+
+        <exec executable="bash">
+            <arg line="acceptance-test-wait.sh"/>
+        </exec>
 
         <junit printsummary="yes" fork="on" failureProperty="test.failed" errorProperty="test.failed">
             <sysproperty key="pulse.port" value="8889"/>
@@ -212,7 +220,6 @@
                     <include name="**/AcceptanceTestSuite.java"/>
                 </fileset>
             </batchtest>
-            <!--<test name="com.zutubi.pulse.acceptance.AcceptanceTestSuite"/>-->
         </junit>
         <junitreport todir="${report.dir}">
             <fileset dir=".">
@@ -221,8 +228,8 @@
             </fileset>
             <report format="frames" todir="${report.dir}/html"/>
         </junitreport>
-        <exec executable="./acceptance-test-post.sh">
-            <arg line="${pulse.version}"/>
+        <exec executable="bash">
+            <arg line="acceptance-test-post.sh ${pulse.version}"/>
         </exec>
         <fail message="One or more acceptance tests failed.  See the reports (${report.dir}) for details."
               if="test.failed"/>

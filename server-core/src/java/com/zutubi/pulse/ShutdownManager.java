@@ -26,6 +26,7 @@ public class ShutdownManager
         {
             stoppable.stop(force);
         }
+        System.exit(0);
     }
 
     public void setStoppables(List<Stoppable> stoppables)

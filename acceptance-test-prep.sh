@@ -45,16 +45,7 @@ mv $properties.$$ $properties
 
 # Fire it up!
 export PULSE_HOME="$(pwd)"
-daemon $(pwd)/bin/startup.sh
-
-# Wait for it to come online
-while ! netstat -l | grep 8889 > /dev/null
-do
-    sleep 2
-done
-
-# Take a breath...
-sleep 5
+$(pwd)/bin/startup.sh > /cygdrive/c/pulse.log
 
 trap ERR
 
