@@ -5,7 +5,9 @@
     <info organisation="zutubi" module="pulse-local" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
-            description....
+            The pulse local module contains the local build functionality. The local
+            build allows the core pulse engine to be executed against a local pulse
+            file via a command line interface.
         </description>
     </info>
 
@@ -21,12 +23,11 @@
 
     <dependencies>
 
-        <!-- command line parsing -->
-        <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
-
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build->build"/>
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="release->release"/>
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="external->external"/>
+
+        <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
 
     </dependencies>
 

@@ -5,7 +5,9 @@
     <info organisation="zutubi" module="pulse-boot" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
-            description....
+            The pulse boot module is responsible for handling the Pulse bootstrap process. This
+            consists of handling the command line interaction and initialising the Pulse
+            class loaders.
         </description>
     </info>
 
@@ -18,5 +20,10 @@
     <publications>
         <artifact name="boot" type="jar" conf="release, build"/>
     </publications>
+
+    <dependencies>
+        <!-- The boot module is responsible for setting up the classpath, and therefore should
+        not have any dependencies -->
+    </dependencies>
 
 </ivy-module>

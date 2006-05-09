@@ -5,7 +5,9 @@
     <info organisation="zutubi" module="pulse-master" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
-            description....
+            The pulse master module is what is commonly thought of as Pulse. It includes
+            the web application for the primary pulse server and everything specific to
+            it.
         </description>
     </info>
 
@@ -25,26 +27,20 @@
         <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="external->external"/>
         <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="build->build"/>
 
-        <!-- command line interface. -->
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
-
-        <!-- temporal scheduling -->
-        <dependency org="opensymphony" name="quartz" rev="20060404" conf="external,build,release->default"/>
-
-        <!-- not using this at the moment. -->
-        <dependency org="displaytag" name="displaytag" rev="1.0" conf="external,build,release->default"/>
-
-        <dependency org="sun" name="javamail" rev="1.3.2" conf="external,build,release->default"/>
-
-        <!-- external notifications... -->
-        <dependency org="jive" name="smack" rev="2.2.0" conf="external,build,release->default"/>
-
         <dependency org="apache" name="xmlrpc" rev="2.0.1" conf="external,build,release->default"/>
 
-        <dependency org="sun" name="rome" rev="0.8" conf="external,build,release->default"/>
-        <dependency org="sun" name="rome-content" rev="0.4.1-20060508" conf="external,build,release->default"/>
+        <dependency org="displaytag" name="displaytag" rev="1.0" conf="external,build,release->default"/>
+
+        <dependency org="jive" name="smack" rev="2.2.0" conf="external,build,release->default"/>
+
+        <dependency org="opensymphony" name="quartz" rev="20060404" conf="external,build,release->default"/>
 
         <dependency org="rife" name="jhighlight" rev="1.0" conf="external,build,release->default"/>
+
+        <dependency org="sun" name="javamail" rev="1.3.2" conf="external,build,release->default"/>
+        <dependency org="sun" name="rome" rev="0.8" conf="external,build,release->default"/>
+        <dependency org="sun" name="rome-content" rev="0.4.1-20060508" conf="external,build,release->default"/>
 
     </dependencies>
 

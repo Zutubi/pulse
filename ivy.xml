@@ -5,20 +5,20 @@
     <info organisation="zutubi" module="pulse-root" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
-            description....
+            The pulse root module is a utility module used to define ivy targets
+            for the packaging process. The available release configurations are:
+            local and master.
         </description>
     </info>
 
     <configurations>
         <conf name="local" description="Local package"/>
         <conf name="master" description="Master package"/>
-        <conf name="slave" description="Slave package"/>
     </configurations>
 
     <dependencies>
         <dependency org="zutubi" name="pulse-local" rev="latest.integration" conf="local->release"/>
         <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="master->release"/>
-        <dependency org="zutubi" name="pulse-slave" rev="latest.integration" conf="slave->release"/>
     </dependencies>
 
 </ivy-module>
