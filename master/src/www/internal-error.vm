@@ -3,7 +3,8 @@
     <link href="$base/main2.css" rel="stylesheet" type="text/css" media="screen"/>
     <title>#wwtext("name=internal.error")</title>
 </head>
-<body style="margin: 10px">
+<body>
+    <div id="pagecontent">
     <h1 style="color: #c04040">:: #wwtext("name=internal.error") ::</h1>
 
     <p class="error">
@@ -15,5 +16,6 @@
 #foreach($record in $records)
     #serverMessage($record)
 #end
+    </div>
 </body>
 </html>

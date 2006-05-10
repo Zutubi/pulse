@@ -6,8 +6,6 @@
     <title>#wwtext("name=server")</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=server") ::</h1>
-
     #serverTabs("server-messages")
 
     <table class="fill-content">
@@ -25,4 +23,6 @@
         <tr><th colspan="5">$action.getText("messages.count", ["$pagingSupport.totalItems"])</td></tr>
     </table>
 #end
+
+    #tabEnd()
 </html>

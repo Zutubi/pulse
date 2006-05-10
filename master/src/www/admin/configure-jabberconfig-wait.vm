@@ -5,12 +5,13 @@
     <meta http-equiv="refresh" content='5;#wwurl("includeParams=all")'/>
     <title>#wwtext("name=jabber.config")</title>
 </head>
-
 <body>
-    <h1>:: #wwtext("name=please.wait") ::</h1>
+    #adminTabs("settings")
 
     <p>
         <img alt="waiting..." src="/images/inprogress.gif"/> #wwtext("name=jabber.applying")
     </p>
+
+    #tabEnd()
 </body>
 </html>

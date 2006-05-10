@@ -6,8 +6,6 @@
     <title>#wwtext("name=build") $result.number</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=build") $result.number ::</h1>
-
     #buildTabs($result "tests")
 
     #if($result.hasTests())
@@ -32,4 +30,6 @@
         #wwtext("name=build.no.tests")
     </p>
     #end
+
+    #tabEnd()
 </html>

@@ -6,8 +6,6 @@
     <title>#wwtext("name=build") $result.number</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=build") $result.number ::</h1>
-
     #buildTabs($result "changes")
 
     <table class="content">
@@ -66,4 +64,6 @@
         </tr>
 #end
     </table>
+
+    #tabEnd()
 </html>

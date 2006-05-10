@@ -10,12 +10,12 @@
     </script>
 </head>
 <body>
-    <h1>:: #wwtext("name=server") ::</h1>
-
     #serverTabs("status")
 
     <div id="panel">
         #parse("ajax/view-recipe-queue-panel.vm")
     </div>
+
+    #tabEnd()
 </body>
 </html>

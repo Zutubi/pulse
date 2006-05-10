@@ -9,7 +9,7 @@
     </head>
     <body>    
 
-        <h1 class="build-log">:: $user.name ::</h1>
+     #adminTabs("users")
 
         <table class="columns" width="50%">
             <tr>
@@ -55,6 +55,6 @@
             </tr>
 
         </table>
-
+    #tabEnd()
     </body>
 </html>

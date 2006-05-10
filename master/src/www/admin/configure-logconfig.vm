@@ -5,9 +5,8 @@
 <head>
     <title>#wwtext("name=logging.config")</title>
 </head>
-
 <body>
-    <h1>:: #wwtext("name=logging.config") ::</h1>
+    #adminTabs("settings")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -18,5 +17,6 @@
     #saveCancel("5")
 #end
 
+    #tabEnd()
 </body>
 </html>

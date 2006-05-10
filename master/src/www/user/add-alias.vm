@@ -7,7 +7,7 @@
 </head>
 <body>
 
-    <h1>:: #wwtext("name=alias.create") ::</h1>
+    #dashboardTabs("preferences")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -17,5 +17,7 @@
         #wwtextfield("name=alias" "label=%{getText('alias')}" "required=true" "tabindex=1")
         #saveCancel(2)
     #end
+
+    #tabEnd()
 </body>
 </html>

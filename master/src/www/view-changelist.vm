@@ -8,6 +8,8 @@
     <title>#wwtext("name=changelist") $changelist.revision</title>
 </head>
 <body>
+    <div id="pagecontent">
+    
     <h1>:: #wwtext("name=changelist") $changelist.revision ::</h1>
 
     <table class="content">
@@ -60,4 +62,6 @@
         </tr>
 #end
     </table>
+
+    </div>
 </html>

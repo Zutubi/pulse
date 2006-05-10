@@ -5,9 +5,8 @@
 <head>
     <title>#wwtext("name=smtp.config")</title>
 </head>
-
 <body>
-    <h1>:: #wwtext("name=smtp.config") ::</h1>
+    #adminTabs("settings")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -25,5 +24,6 @@
     #closeSubmit()
 #end
 
+    #tabEnd()
 </body>
 </html>

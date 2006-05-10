@@ -6,12 +6,10 @@
     <title>$!webwork.htmlEncode($project.name)</title>
     <!-- how can we ensure that this link is included by sitemesh?.. -->
     #if ($rssEnabled)
-        <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.action?projectId=$project.id">
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.action?projectId=$project.id"/>
     #end
 </head>
 <body>
-    <h1>#projectName($project)</h1>
-
     #projectTabs("history")
 
     <table>
@@ -73,7 +71,7 @@
 
             <table width="100%" class="content">
                 #pagingRow("history.action?id=$project.id&amp;stateFilter=$stateFilter&amp;spec=$spec&amp;" $pagingSupport)
-                <tr><th colspan="5">$action.getText("history.count", ["$pagingSupport.totalItems"])</td></tr>
+                <tr><th colspan="5">$action.getText("history.count", ["$pagingSupport.totalItems"])</th></tr>
             </table>
 #else
         <tr>
@@ -86,4 +84,6 @@
             </td>
         </tr>
     </table>
+
+    #tabEnd()   
 </html>

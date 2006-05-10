@@ -36,8 +36,6 @@
     </script>
 </head>
 <body>
-    <h1>:: #wwtext("name=dashboard") ::</h1>
-
     #dashboardTabs("homepage")
 
     <div id="panel">
@@ -48,5 +46,7 @@
         <div id="buildsWindowContent">
         </div>
     </div>
+
+    #tabEnd()
 </body>
 </html>

@@ -4,6 +4,8 @@
     <title>welcome</title>
 </head>
 <body>
+    <div id="pagecontent">
+
     <h1>:: #wwtext("name=welcome") :: </h1>
     <p>
         Welcome to your new pulse server!  To help you get started, some common setup tasks are listed below.
@@ -57,5 +59,7 @@
     <p>
         <a href="dismissWelcome.action"><img alt="$!webwork.getText('delete')" src="images/delete.gif">dismiss this page</a>
     </p>
+
+    </div>
 </body>
 </html>

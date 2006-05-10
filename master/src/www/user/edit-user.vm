@@ -7,7 +7,7 @@
 </head>
 <content tag="action">user.edit</content>
 <body>
-<h1>:: #wwtext("name=user.edit") ::</h1>
+    #dashboardTabs("preferences")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -39,6 +39,6 @@
     </tr>
 </table>
 
-
+    #tabEnd()
 </body>
 </html>

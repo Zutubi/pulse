@@ -132,6 +132,7 @@
 ## Opens a list of tabs
 ##
 #macro(openTabs)
+<div id="tabbar">
     <ul id="innernav">
 #end
 
@@ -140,7 +141,16 @@
 ##
 #macro(closeTabs)
     </ul>
-    <span class="hidden">ie workaround</span>
+    <div class="clear"></div>
+</div>
+<div id="pagecontent">
+#end
+
+##
+## Marks the end of the tab content
+##
+#macro(tabEnd)
+</div>
 #end
 
 ##
@@ -148,11 +158,11 @@
 ##
 #macro(tabItem $name $url $selected)
     <li>
-        <a
+        <a href="$url"
     #if($selected == $name)
             class="active"
     #else
-            href="$url" class="inactive"
+            class="inactive"
     #end
           >
             #wwtext("name=${name}.tab")
@@ -609,7 +619,7 @@
 ##
 #macro(dateCellContent $entity $date $time)
     <a href="#" class="unadorned" title="$date" onclick="toggleDisplay('${entity.id}_time'); toggleDisplay('${entity.id}_date'); return false;">
-        <img src="images/calendar.gif"/>
+        <img alt="toggle format" src="images/calendar.gif"/>
     </a>
     <span id="${entity.id}_time">$time</span>
     <span id="${entity.id}_date" style="display: none">$date</span>
@@ -1304,8 +1314,9 @@
     #foreach($level in $featureLevels)
         #if($fileArtifact.hasMessages($level))
     <ul class="$level.toString().toLowerCase()">
-        <li class="header">$level.toString().toLowerCase() #wwtext("name=features")</li>
+        <li class="header">$level.toString().toLowerCase() #wwtext("name=features")
         #fileArtifactMessageSummary($build $result $fileArtifact $level false)
+        </li>
     </ul>
         #end
     #end
@@ -1329,8 +1340,10 @@
         #fileArtifactFeatures($build $result $fileArtifact)
         #if($fileArtifact.hasBrokenTests())
             <ul class="error">
-                <li class="header">#wwtext("name=tests.broken")</li>
+                <li class="header">#wwtext("name=tests.broken")
                 #fileArtifactTestSummary($build $result $fileArtifact false)
+                </li>
+            </ul>
         #end
     #end
     </li>

@@ -3,14 +3,14 @@
 <content tag="selectedTab">dashboard</content>
 <html>
 <head>
-    <title>#wwtext("name=jabber.edit")</title>
+    <title>#wwtext("name=jabber.contact.edit")</title>
 </head>
 <body>
-<h1>:: #wwtext("name=jabber.edit") ::</h1>
+    #dashboardTabs("preferences")
 
     #parse("/template/includes/actionerrors.vm")
 
-    #wwcform("action=editJabberContactPoint.action" "heading=%{getText('jabber.edit')}" "id=jabber.edit" "method=post")
+    #wwcform("action=editJabberContactPoint.action" "heading=%{getText('jabber.contact.edit')}" "id=jabber.edit" "method=post")
         #wwhidden("name=id")
         #wwhidden("name=userId")
         #wwtextfield("name=contact.name" "label=%{getText('contact.name')}" "required=true" "tabindex=1")
@@ -18,5 +18,6 @@
         #saveCancel(3)
     #end
 
+    #tabEnd()
 </body>
 </html>

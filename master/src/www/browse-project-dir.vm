@@ -5,8 +5,6 @@
     <title>$!webwork.htmlEncode($path)</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=browse.dir") ::</h1>
-
     #buildTabs($buildResult "working-dir")
 
 #if($buildResult.completed())
@@ -22,4 +20,6 @@
         #wwtext("name=working.dir.pending")
     </p>
 #end
+
+    #tabEnd()
 </html>

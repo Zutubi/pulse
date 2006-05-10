@@ -8,6 +8,7 @@
     #svnTestScript("addProject")
 </head>
 <body>
+    <div id="pagecontent">
     <h1>:: #wwtext("name=add.project") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
@@ -28,5 +29,7 @@
 
     #previousNextCancel(6)
 #end
+
+    </div>
 </body>
 </html>

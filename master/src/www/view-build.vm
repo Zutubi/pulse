@@ -10,11 +10,11 @@
     </script>
 </head>
 <body>
-    <h1>:: #wwtext("name=build") $result.number ::</h1>
-
     #buildTabs($result "summary")
 
     <div id="panel">
         #parse("ajax/view-build-panel.vm")
     </div>
+
+    #tabEnd()
 </html>

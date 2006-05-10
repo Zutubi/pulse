@@ -8,6 +8,7 @@
     #p4TestScript("addProject")
 </head>
 <body>
+    <div id="pagecontent">
     <h1>:: #wwtext("name=add.project") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
@@ -27,5 +28,7 @@
 
     #previousNextCancel(5)
  #end
+
+     </div>
 </body>
 </html>

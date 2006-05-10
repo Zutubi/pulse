@@ -6,7 +6,7 @@
     <title>#wwtext("name=email.edit")</title>
 </head>
 <body>
-<h1>:: #wwtext("name=email.edit") ::</h1>
+    #dashboardTabs("preferences")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -19,5 +19,6 @@
         #saveCancel(4)
     #end
 
+    #tabEnd()
 </body>
 </html>

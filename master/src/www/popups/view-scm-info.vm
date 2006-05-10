@@ -4,7 +4,7 @@
     <link href="/main2.css" rel="stylesheet" type="text/css" media="screen"/>
 </head>
 <body>
-    <div class="content" style="margin-top: 20px">
+    <div class="pagecontent" style="margin-top: 20px">
         #parse("template/includes/actionerrors.vm")
 
         <table class="content">

@@ -1,8 +1,14 @@
+html {
+    height: 100%;
+}
+
 body {
     margin: 0;
     padding: 0;
     font-family: Verdana, sans-serif;
     font-size: 12px;
+    background: #fff;
+    height: 100%;
 }
 
 #wrap {
@@ -16,22 +22,20 @@ body {
     */
 
 #header {
-    padding: 0;
+    padding-bottom: 4px;
+    background: #3e4e6a url(images/header.gif) top left repeat-x;
     margin: 0;
-    border-bottom: 1px solid #99a;
     font-size: 14px;
 }
 
 #header table {
     width: 100%;
     margin: 0;
-    background: #a0a0c0;
     border-spacing: 0px;
 }
 
 #header td {
     color: #fff;
-    background: #a0a0c0;
     padding: 2px;
 }
 
@@ -40,7 +44,8 @@ body {
 }
 
 #header td.user {
-    font-size: 80%;
+    font-size: 12px;
+    vertical-align:bottom;
 }
 
 #header a {
@@ -56,11 +61,9 @@ body {
     float: left;
     width: 100%;
     margin: 0;
-    padding: 0;
+    padding: 0px;
     list-style: none;
-    border-top: 1px solid #ccd;
-    border-bottom: 2px solid #99a;
-    background: #aac /*url(../img/nav-bg-blue.gif) repeat-x top left*/;
+    background: #667e9f;
     font-size: 14px;
 }
 
@@ -73,52 +76,64 @@ body {
 
 #nav a {
     float: left;
-    padding: 4px 7px;
+    padding: 6px 8px;
     text-decoration: none;
     border-bottom: none;
     color: #fff;
 }
 
 #nav a:hover, #nav a.active {
-    background: #88b;
+    background: #88a0b8;
 }
 
 #nav a.active {
     font-weight: bold;
 }
 
+#tabbar {
+    width: 100%;
+    background: #88a0b8;
+}
+
 #innernav {
-    float: left;
-    width: 98%;
-    margin: 0;
-    padding: 0 1%;
+    margin: 0px;
+    padding: 10px 5px 0px 10px;
     list-style: none;
-    border-bottom: 1px solid #bbb;
     font-size: 14px;
 }
 
 #innernav li {
     float: left;
-    margin: 0;
+    display: block;
+    margin: 0px 5px 0px 0px;
     padding: 0 1px 0 0;
     list-style: none;
 }
 
 #innernav a {
     float: left;
-    padding: 5px 7px;
+    display: block;
+    padding: 3px 10px 6px 10px;
     text-decoration: none;
+    border-top: 3px solid #667e9f;
     border-bottom: none;
-    color: #bbb;
+    color: #fff;
+    background: #3e4e6a;
 }
 
 #innernav a:hover, #innernav a.active {
-    color: #fff;
-    background: #bbb;
+    border-top: 3px solid #f07e0a;
+    color: #3e4e6a;
+    background: #fff;
 }
 
 #innernav a.active {
     font-weight: bold;
+}
+
+#pagecontent {
+    clear: both;
+    margin: 16px;
 }
 
     /*------------------------------
@@ -127,16 +142,12 @@ body {
 
 #footer {
     clear: both;
-    border-color: #c0c0c0;
-    border-width: 1px 0px 0px 0px;
-    border-style: solid;
+    border-top: solid 1px #c0c0c0;
     color: #c0c0c0;
-    font-size: 80%;
+    font-size: 10px;
     padding: 1px;
     text-align: center;
-    bottom: 0;
     width: 100%;
-    position: relative;
 }
 
 #footer a {
@@ -152,7 +163,7 @@ div {
     padding: 0;
 }
 
-div.clear {
+.clear {
     clear: both;
 }
 
@@ -182,18 +193,22 @@ h1 a:hover, h2 a:hover {
 
 h1 {
     margin-top: 6px;
-    font-size: 180%;
+    font-size: 24px;
 }
 
 h2 {
-    font-size: 140%;
+    font-size: 20px;
 }
 
 h2.section {
     margin-top: 0.8em;
-    color: #606078;
-    font-size: 150%;
-    border-bottom: solid 2px #a0a0c0;
+    color: #3e4e6a;
+    font-size: 20px;
+    border-bottom: solid 2px #667e9f;
+}
+
+h2.top {
+    margin-top: 0px;
 }
 
 h3 {
@@ -262,8 +277,10 @@ img.centre {
 }
 
 div.content {
-    padding-left: 10px;
-    padding-right: 10px;
+    clear: both;
+    background: #fff;
+    position: relative;
+    min-height: 88%;
 }
 
 table.columns {
@@ -276,6 +293,7 @@ td.columns {
 }
 
 table.content, table.fill-content, table.decorated {
+    font-size: 12px;
     border: 1px solid #bbb;
     margin-bottom: 16px;
 }
@@ -321,7 +339,7 @@ th.content-row {
 }
 
 h3.heading, th.heading {
-    background: #e9e9f5;
+    background: #e8e8f3;
     white-space: nowrap;
 }
 
@@ -408,15 +426,16 @@ div.floating {
 
 ul {
     list-style: none;
+    padding: 0px;
     padding-left: 20px;
-    margin-left: 0px;
+    margin: 4px 0px;
 }
 
 ul.error, ul.warning, ul.info {
-    padding-bottom: 5px;
-    /*margin-left: 20px;*/
-    margin-top: 10px;
-    margin-bottom: 10px;
+    padding: 5px;
+    margin-top: 5px;
+    margin-left: 20px;
+    margin-bottom: 5px;
     border: solid 1px;
 }
 
@@ -456,10 +475,9 @@ li.error, li.warning, li.info, li.file-artifact, li.dir-artifact, li.report-arti
     padding-left: 20px;
 }
 
-pre.feature {
-    font-family: Verdana sans-serif;
-    margin-top: 8px;
-    margin-bottom: 0px;
+li.error, li.warning, li.info, li.artifact {
+    margin-top: 6px;
+    margin-bottom: 6px;
 }
 
 li.error {
@@ -496,8 +514,6 @@ li.report-artifact {
 
 li.header {
     font-weight: bold;
-    margin-top: 4px;
-    margin-bottom: 4px;
 }
 
     /*------------------------------

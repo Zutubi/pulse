@@ -6,16 +6,14 @@
     <title>#wwtext("name=build") $result.number</title>
 </head>
 <body>
-    <a name="top" class="unadorned">
-        <h1>:: #wwtext("name=build") $result.number ::</h1>
-    </a>
-
     #buildTabs($result "command-log")
 
 #set($recipeResult = $result.root.children.get(0).result)
 #if($recipeResult.commandResults.size() > 0)
     <p>
+    <a name="top" class="unadorned">
         <b>#wwtext("name=jump.to")</b>
+    </a>
     #foreach($commandResult in $recipeResult.commandResults)
         :: <a href="#command-$velocityCount">$!webwork.htmlEncode($commandResult.commandName)</a>
     #end
@@ -89,4 +87,6 @@
         #wwtext("name=commands.none")
     </p>
 #end
+
+    #tabEnd()
 </html>

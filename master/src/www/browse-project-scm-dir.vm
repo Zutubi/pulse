@@ -5,7 +5,9 @@
     <title>$!webwork.htmlEncode($path)</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=scm.browse") ::</h1>
+    #projectTabs("configuration")
 
     #showDirectoryListing("$!webwork.htmlEncode($location)" "browseProjectScm.action?id=$project.id&amp;" false false)
+
+    #tabEnd()
 </html>

@@ -6,7 +6,7 @@
     <title>#wwtext("name=jabber.create")</title>
 </head>
 <body>
-<h1>:: #wwtext("name=jabber.create") ::</h1>
+    #dashboardTabs("preferences")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -18,6 +18,6 @@
         #previousFinishCancel(3)
     #end
 
-
+    #tabEnd()
 </body>
 </html>

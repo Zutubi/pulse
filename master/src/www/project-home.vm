@@ -10,8 +10,6 @@
     </script>
 </head>
 <body>
-    <h1>#projectName($project)</h1>
-
     #projectTabs("home")
 
     #parse("/template/includes/actionerrors.vm")
@@ -19,4 +17,7 @@
     <div id="panel">
         #parse("ajax/project-home-panel.vm")
     </div>
+
+    #tabEnd()
+</body>
 </html>

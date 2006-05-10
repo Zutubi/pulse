@@ -7,8 +7,6 @@
     <title>#wwtext("name=dashboard")</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=dashboard") ::</h1>
-
     #dashboardTabs("preferences")
 
     #parse("/template/includes/actionerrors.vm")
@@ -95,8 +93,8 @@
                 </table>
             </td>
         </tr>
-
     </table>
 
+    #tabEnd()
 </body>
 </html>

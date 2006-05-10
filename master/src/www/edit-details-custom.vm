@@ -6,7 +6,7 @@
     <title>#wwtext("name=edit.custom")</title>
 </head>
 <body>
-    <h1>#projectName($project)</h1>
+    #projectTabs("configuration")
 
 <table class="columns">
     <tr><td class="columns" width="100%">
@@ -27,5 +27,7 @@
 
     </td></tr>
 </table>
+
+    #tabEnd()
 </body>
 </html>

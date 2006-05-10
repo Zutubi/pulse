@@ -6,8 +6,6 @@
     <title>$!webwork.htmlEncode($project.name)</title>
 </head>
 <body>
-    <h1>#projectName($project)</h1>
-
     #projectTabs("configuration")
 
     <table class="columns" width="98%">
@@ -199,4 +197,7 @@
             </td>
         </tr>
     </table>
+
+    #tabEnd()
+</body>
 </html>

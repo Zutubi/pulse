@@ -7,12 +7,12 @@
     <link href="/highlight.css" rel="stylesheet" type="text/css" media="screen"/>
 </head>
 <body>
-    <h1>:: #wwtext("name=build") $result.number ::</h1>
-
     #buildTabs($result "build-file")
 
-    <h3 class="heading">#wwtext("name=pulse.file") &nbsp;<a href="downloadBuildFile.action?id=$result.id"><img src="/images/arrow_down.gif"/>#wwtext("name=download")</a></h3>
+    <h3 class="heading">#wwtext("name=pulse.file") &nbsp;<a href="downloadBuildFile.action?id=$result.id"><img alt="down" src="/images/arrow_down.gif"/>#wwtext("name=download")</a></h3>
     <div class="box">
         $highlightedFile
     </div>
+
+    #tabEnd()
 </html>

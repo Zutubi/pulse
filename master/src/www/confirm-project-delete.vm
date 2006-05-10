@@ -5,7 +5,7 @@
     <title>$!webwork.htmlEncode($project.name)</title>
 </head>
 <body>
-    <h1>#projectName($project)</h1>
+    <div id="pagecontent">
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -26,5 +26,7 @@
         #wwsubmit("name=ok" "value=%{getText('ok.name')}" "tabindex=2")
     #closeSubmit()
 #end
+    </div>
+
     </div>
 </html>

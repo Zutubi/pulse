@@ -11,9 +11,13 @@
     </script>
 </head>
 <body>
+    <div id="pagecontent">
+
     <h1>:: #wwtext("name=projects") ::</h1>
     <div id="panel">
         #parse("ajax/view-projects-panel.vm")
+    </div>
+
     </div>
 </body>
 </html>

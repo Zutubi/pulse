@@ -5,9 +5,8 @@
 <head>
     <title>#wwtext("name=general.config")</title>
 </head>
-
 <body>
-    <h1>:: #wwtext("name=general.config") ::</h1>
+    #adminTabs("settings")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -22,5 +21,6 @@
     #saveCancel("6")
 #end
 
+    #tabEnd()
 </body>
 </html>

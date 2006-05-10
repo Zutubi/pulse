@@ -6,7 +6,7 @@
     <title>#wwtext("name=add.trigger")</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=add.trigger") ::</h1>
+    #projectTabs("configuration")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -49,5 +49,7 @@
 
         </td></tr>
     </table>
+
+    #tabEnd()
 </body>
 </html>

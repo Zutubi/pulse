@@ -6,8 +6,6 @@
     <title>#wwtext("name=server")</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=server") ::</h1>
-
     #serverTabs("server-info")
 
 #set ($propertiesMap = $action.getProperties())
@@ -79,4 +77,5 @@
         </tr>
     </table>
 
+    #tabEnd()
 </html>

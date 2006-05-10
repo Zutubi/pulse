@@ -8,7 +8,7 @@
     #cvsTestScript("cvs.edit")
 </head>
 <body>
-    <h1>#projectName($project)</h1>
+    #projectTabs("configuration")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -33,5 +33,7 @@
 
     #saveCancel(8)
  #end
+
+    #tabEnd()
 </body>
 </html>

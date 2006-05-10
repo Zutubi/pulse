@@ -6,8 +6,6 @@
     <title>#wwtext("name=build") $result.number</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=build") $result.number ::</h1>
-
     #buildTabs($result "artifacts")
 
     <h3>#wwtext("name=artifacts.all")</h3>
@@ -16,4 +14,6 @@
         <a href="#" onclick="collapseAllLists('${result.id}_artifacts'); return false">#wwtext("name=collapse.all")</a>
     </div>
     #buildArtifacts($result)
+
+    #tabEnd()
 </html>

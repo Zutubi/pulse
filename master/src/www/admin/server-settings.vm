@@ -6,8 +6,6 @@
     <title>#wwtext("name=administration")</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=administration") ::</h1>
-
     #adminTabs("settings")
 
     #parse("/template/includes/actionerrors.vm")
@@ -51,6 +49,6 @@
             </td>
         </tr>
     </table>
-
+    #tabEnd()
 </body>
 </html>

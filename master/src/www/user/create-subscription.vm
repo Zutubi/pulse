@@ -7,8 +7,7 @@
 </head>
 <content tag="action">subscription.create</content>
 <body>
-
-    <h1>:: #wwtext("name=subscription.create") ::</h1>
+    #dashboardTabs("preferences")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -21,5 +20,6 @@
         #createCancel(4)
     #end
 
+    #tabEnd()
 </body>
 </html>

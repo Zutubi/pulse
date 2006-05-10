@@ -6,7 +6,7 @@
     <title>#wwtext("name=user.settings.edit")</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=user.settings.edit") ::</h1>
+    #dashboardTabs("preferences")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -22,5 +22,7 @@
     <script type="text/javascript">
         setEnableState('user.settings.edit_refreshInterval', 'user.settings.edit_refreshEnabled');
     </script>
+
+    #tabEnd()
 </body>
 </html>

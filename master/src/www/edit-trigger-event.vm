@@ -6,7 +6,7 @@
     <title>#wwtext("name=edit.trigger")</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=edit.trigger") ::</h1>
+    #projectTabs("configuration")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -19,5 +19,7 @@
 
     #saveCancel(3)
 #end
+
+    #tabEnd()
 </body>
 </html>

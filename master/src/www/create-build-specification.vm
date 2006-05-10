@@ -6,7 +6,7 @@
     <title>#wwtext("name=add.spec")</title>
 </head>
 <body>
-    <h1>#projectName($project)</h1>
+    #projectTabs("configuration")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -30,5 +30,7 @@
 
     #saveCancel(5)
 #end
+
+    #tabEnd()
 </body>
 </html>

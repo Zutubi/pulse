@@ -6,7 +6,7 @@
     <title>#wwtext("name=edit.maven2")</title>
 </head>
 <body>
-    <h1>#projectName($project)</h1>
+    #projectTabs("configuration")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -23,5 +23,7 @@
 
     #saveCancel(4)
  #end
+
+     #tabEnd()
 </body>
 </html>

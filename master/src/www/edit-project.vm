@@ -6,7 +6,7 @@
     <title>#wwtext("name=edit.project")</title>
 </head>
 <body>
-    <h1>#projectName($project)</h1>
+    #projectTabs("configuration")
 
     #parse("/template/includes/actionerrors.vm")
     
@@ -18,5 +18,7 @@
 
     #saveCancel(4)
 #end
+
+    #tabEnd()
 </body>
 </html>
