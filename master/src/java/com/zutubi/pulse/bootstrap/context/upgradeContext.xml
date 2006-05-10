@@ -15,6 +15,7 @@
                 <ref local="scmUidTask"/>
                 <ref local="userPropsSchemaUpgrade"/>
                 <ref local="userPropsDataUpgrade"/>
+                <ref local="encryptPasswordUpgrade"/>
             </list>
         </property>
     </bean>
@@ -36,6 +37,11 @@
 
     <bean id="userPropsDataUpgrade" class="com.zutubi.pulse.upgrade.tasks.UserPropsDataUpgradeTask" autowire="byName">
         <property name="buildNumber" value="1011"/>
+    </bean>
+
+    <!-- Encrypt the users passwords in the user table. -->
+    <bean id="encryptPasswordUpgrade" class="com.zutubi.pulse.upgrade.tasks.EncryptPasswordUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="1021"/>
     </bean>
 
 </beans>
