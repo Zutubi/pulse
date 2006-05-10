@@ -21,7 +21,7 @@
                 var windowContent = getElement('buildsWindowContent');
 
                 windowContent.innerHTML = element.innerHTML;
-                var position = getPosition(cell);
+                var position = Position.positionedOffset(cell);
                 window.style.visibility = 'hidden';
                 window.style.display = '';
                 window.style.left = position[0] + cell.offsetWidth - window.offsetWidth - 20 + "px";

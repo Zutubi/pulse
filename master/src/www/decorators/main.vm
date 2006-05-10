@@ -83,7 +83,6 @@
         #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
         <li><a #if($selectedTab && $selectedTab == "administration") class="active" #end href="/admin/serverSettings.action">administration</a></li>
       #end
-      <div class="clear"></div>
       </ul>
       <div class="clear"></div>
 
