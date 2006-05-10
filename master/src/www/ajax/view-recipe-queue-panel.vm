@@ -36,9 +36,7 @@
             #contentHeading("build.id" 1)
             #contentHeading("build.spec" 1)
             #contentHeading("queue.when" 1)
-#acl("domainObject=project" "hasPermission=4,1")
             #contentHeading("actions" 1)
-#end
         </tr>
 #if($action.hasActiveBuilds())
     #foreach($project in $projectQueue.keySet())
