@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <class name="com.zutubi.pulse.model.BuildSpecification" table="BUILD_SPECIFICATION" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="name" column="NAME" type="string" length="255"/>
+
+        <property name="timeout" column="TIMEOUT" type="int"/>
+
+        <many-to-one name="root" class="com.zutubi.pulse.model.BuildSpecificationNode"
+                     column="ROOT_ID" cascade="all" lazy="false"/>
+
+    </class>
+
+    <class name="com.zutubi.pulse.model.BuildSpecificationNode" table="BUILD_SPECIFICATION_NODE" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <component name="stage" class="com.zutubi.pulse.model.BuildStage">
+            <many-to-one name="hostRequirements" class="com.zutubi.pulse.model.AbstractBuildHostRequirements"
+                         column="BUILD_HOST_REQUIREMENTS_ID"
+                         cascade="all" unique="true"/>
+
+            <property name="recipe" type="string" length="255"/>
+        </component>
+
+        <list name="children" cascade="all-delete-orphan" lazy="false">
+            <key column="PARENT_ID"/>
+            <index column="ORDINAL"/>
+            <one-to-many class="com.zutubi.pulse.model.BuildSpecificationNode"/>
+        </list>
+
+    </class>
+
+    <class name="com.zutubi.pulse.model.AbstractBuildHostRequirements" table="BUILD_HOST_REQUIREMENTS" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="REQUIREMENTS_TYPE" type="string" length="63"/>
+
+        <subclass name="com.zutubi.pulse.model.MasterBuildHostRequirements" discriminator-value="MASTER">
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.SlaveBuildHostRequirements" discriminator-value="SLAVE">
+            <many-to-one name="slave" class="com.zutubi.pulse.model.Slave"/>
+        </subclass>
+    </class>
+
+    <query name="findBuildSpecificationByName"><![CDATA[
+        from BuildSpecification spec
+        where spec.name = :name
+    ]]></query>
+
+</hibernate-mapping>
