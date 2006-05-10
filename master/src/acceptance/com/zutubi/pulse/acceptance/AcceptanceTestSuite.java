@@ -28,6 +28,7 @@ public class AcceptanceTestSuite
         suite.addTestSuite(JabberConfigurationAcceptanceTest.class);
         suite.addTestSuite(UserAdministrationAcceptanceTest.class);
         suite.addTestSuite(UserPreferencesAcceptanceTest.class);
+        suite.addTestSuite(UserSecurityAcceptanceTest.class);
         suite.addTestSuite(WebAppAcceptanceTest.class);
         return suite;
     }
