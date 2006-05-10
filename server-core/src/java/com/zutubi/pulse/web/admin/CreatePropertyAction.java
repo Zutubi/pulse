@@ -35,6 +35,11 @@ public class CreatePropertyAction extends ActionSupport
         this.resourceId = resourceId;
     }
 
+    public Resource getResource()
+    {
+        return resource;
+    }
+
     public Long getVersionId()
     {
         return versionId;
@@ -71,6 +76,7 @@ public class CreatePropertyAction extends ActionSupport
     public String doInput()
     {
         // setup any default data.
+        resource = resourceDao.findById(resourceId);
         return INPUT;
     }
 

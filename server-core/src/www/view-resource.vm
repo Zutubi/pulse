@@ -1,5 +1,6 @@
 #helpTag("Resource+View")
 #authorisationTags($principle)
+#resourceTags($resource)
 #macro(showProperties $properties $version)
     #if($version)
         #set($versionLink = "&amp;versionId=$version.id")
@@ -27,10 +28,11 @@
     <title>#wwtext("name=resource") $!webwork.htmlEncode($resource.name)</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=resource") $!webwork.htmlEncode($resource.name) ::</h1>
+    #serverTabs("resources")
+
+    <h2 class="section">$!webwork.htmlEncode($resource.name)</h2>
 
     <table class="content">
-        <tr><td class="content"><a href="/viewResources.action">#wwtext("name=resources.return")</td></tr>
         #addRow("version.add" 1 "/admin/createResourceVersion!input.action?resourceId=$resource.id" "version.add")
     </table>
 
@@ -50,5 +52,7 @@
     #showProperties($version.properties $version)
     </table>
 #end
-    </body>
+
+    #tabEnd()
+</body>
 </html>

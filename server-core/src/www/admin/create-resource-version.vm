@@ -1,11 +1,12 @@
 #helpTag("Resource+Repository")
 #authorisationTags($principle)
+#resourceTags($resource)
 <html>
 <head>
     <title>#wwtext("name=version.add")</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=version.add") ::</h1>
+    #serverTabs("resources")
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -15,5 +16,7 @@
 
     #saveCancel(2)
 #end
+
+   #tabEnd()
 </body>
 </html>

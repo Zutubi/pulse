@@ -45,6 +45,7 @@ public class CreateResourceVersionAction extends ActionSupport
 
     public String doInput()
     {
+        resource = resourceDao.findById(resourceId);
         return INPUT;
     }
 

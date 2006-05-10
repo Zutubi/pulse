@@ -34,6 +34,14 @@
 #end
 
 ##
+## Outputs sitemesh content tags for the resource links on the header bar
+##
+#macro(resourceTags $resource)
+    <content tag="resourceId">$resource.id</content>
+    <content tag="resourceName">$!webwork.htmlEncode($resource.name)</content>
+#end
+
+##
 ## Outputs a project heading
 ##        
 #macro(projectName $project)
