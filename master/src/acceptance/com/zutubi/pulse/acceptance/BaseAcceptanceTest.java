@@ -63,7 +63,7 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
     {
         beginAt("/login.action");
         LoginForm loginForm = new LoginForm(tester);
-        loginForm.loginFormElements(user, password);
+        loginForm.loginFormElements(user, password, "false");
     }
 
     /**

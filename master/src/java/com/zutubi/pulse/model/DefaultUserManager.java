@@ -7,6 +7,7 @@ import com.zutubi.pulse.model.persistence.ContactPointDao;
 import com.zutubi.pulse.model.persistence.UserDao;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
+import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.springframework.dao.DataAccessException;
 
 import java.util.List;
@@ -18,7 +19,9 @@ import java.util.List;
 public class DefaultUserManager implements UserManager
 {
     private UserDao userDao;
-    private ContactPointDao contactDao;
+    private ContactPointDao contactPointDao;
+
+    private PasswordEncoder passwordEncoder;
 
     public void setUserDao(UserDao userDao)
     {
@@ -27,7 +30,7 @@ public class DefaultUserManager implements UserManager
 
     public void setContactPointDao(ContactPointDao contactDao)
     {
-        this.contactDao = contactDao;
+        this.contactPointDao = contactDao;
     }
 
     public void save(User user)
@@ -37,7 +40,7 @@ public class DefaultUserManager implements UserManager
 
     public void save(ContactPoint contact)
     {
-        contactDao.save(contact);
+        contactPointDao.save(contact);
     }
 
     public List<Project> getDashboardProjects(User user)
@@ -67,7 +70,7 @@ public class DefaultUserManager implements UserManager
 
     public ContactPoint getContactPoint(long id)
     {
-        return contactDao.findById(id);
+        return contactPointDao.findById(id);
     }
 
     public void delete(User user)
@@ -77,7 +80,7 @@ public class DefaultUserManager implements UserManager
 
     public void delete(ContactPoint contact)
     {
-        contactDao.delete(contact);
+        contactPointDao.delete(contact);
     }
 
     public int getUserCount()
@@ -94,5 +97,27 @@ public class DefaultUserManager implements UserManager
         }
 
         return details;
+    }
+
+    /**
+     * Update the password for this user.
+     *
+     * @param user
+     * @param rawPassword
+     */
+    public void setPassword(User user, String rawPassword)
+    {
+        String encodedPassword = passwordEncoder.encodePassword(rawPassword, user.getId());
+        user.setPassword(encodedPassword);
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param passwordEncoder
+     */
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder)
+    {
+        this.passwordEncoder = passwordEncoder;
     }
 }

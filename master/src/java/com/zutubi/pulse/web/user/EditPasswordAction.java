@@ -4,6 +4,7 @@
 package com.zutubi.pulse.web.user;
 
 import com.zutubi.pulse.model.User;
+import org.acegisecurity.providers.encoding.PasswordEncoder;
 
 /**
  * Allow a user to edit there password.
@@ -14,6 +15,8 @@ public class EditPasswordAction extends UserActionSupport
     private String current;
     private String password;
     private String confirm;
+
+    private PasswordEncoder passwordEncoder;
 
     public String getCurrent()
     {
@@ -55,7 +58,7 @@ public class EditPasswordAction extends UserActionSupport
             return;
         }
 
-        if (!user.getPassword().equals(current))
+        if (!passwordEncoder.isPasswordValid(user.getPassword(), current, user.getId()))
         {
             addFieldError("password", getText("password.current.mismatch"));
         }
@@ -75,8 +78,18 @@ public class EditPasswordAction extends UserActionSupport
     public String execute() throws Exception
     {
         User user = getUser();
-        user.setPassword(password);
+        getUserManager().setPassword(user, password);
         getUserManager().save(user);
         return SUCCESS;
+    }
+
+    /**
+     * Required resource.
+     * 
+     * @param passwordEncoder
+     */
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder)
+    {
+        this.passwordEncoder = passwordEncoder;
     }
 }

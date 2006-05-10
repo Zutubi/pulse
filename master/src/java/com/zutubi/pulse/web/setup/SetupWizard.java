@@ -82,6 +82,11 @@ public class SetupWizard extends BaseWizard
         admin.setDefaultAction(DefaultAction.WELCOME_ACTION);
         userManager.save(admin);
 
+        // make sure that we encode the password after we have a persistent user,
+        // since the users id is required. This is a little awkward...
+        userManager.setPassword(admin, admin.getPassword());
+        userManager.save(admin);
+
         // apply the settings
         ApplicationConfiguration config = configurationManager.getAppConfig();
         config.setHostName(serverSettingsState.getHostname());

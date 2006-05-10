@@ -4,18 +4,18 @@
 package com.zutubi.pulse.api;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.util.logging.Logger;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
+import org.acegisecurity.providers.encoding.PasswordEncoder;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +40,7 @@ public class TokenManager
     private String adminToken;
     private Set<String> validTokens = new TreeSet<String>();
     private UserManager userManager;
+    private PasswordEncoder passwordEncoder;
     private ConfigurationManager configurationManager;
 
 
@@ -70,7 +71,7 @@ public class TokenManager
             throw new AuthenticationException("Invalid username");
         }
 
-        if (!password.equals(user.getPassword()))
+        if (!passwordEncoder.isPasswordValid(user.getPassword(), password,  user.getId()))
         {
             throw new AuthenticationException("Invalid password");
         }
@@ -254,6 +255,16 @@ public class TokenManager
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param passwordEncoder
+     */
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder)
+    {
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**

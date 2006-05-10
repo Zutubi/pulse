@@ -30,6 +30,7 @@ public class SetupFeatureTour implements Runnable
     private ProjectDao projectDao;
     private BuildResultDao buildResultDao;
     private UserDao userDao;
+    private UserManager userManager;
     private ConfigurationManager configManager;
 
     private Project project;
@@ -151,7 +152,7 @@ public class SetupFeatureTour implements Runnable
     private void setupUsers(Project project)
     {
         User user = new User("jsankey", "Jason Sankey");
-        user.setPassword("password");
+        userManager.setPassword(user, "password");
         user.setEnabled(true);
         user.add(GrantedAuthority.USER);
         user.add(GrantedAuthority.ADMINISTRATOR);
@@ -429,5 +430,10 @@ public class SetupFeatureTour implements Runnable
     public void setConfigurationManager(ConfigurationManager configManager)
     {
         this.configManager = configManager;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 }

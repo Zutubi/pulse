@@ -52,4 +52,6 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
      * @return the user's projects
      */
     List<Project> getDashboardProjects(User user);
+
+    void setPassword(User user, String rawPassword);
 }

@@ -3,23 +3,19 @@
  ********************************************************************************/
 package com.zutubi.pulse.api;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.events.build.BuildRequestEvent;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.build.BuildRequestEvent;
+import com.zutubi.pulse.model.*;
 
-import java.util.*;
-import java.util.logging.Handler;
-
-import org.acegisecurity.AuthenticationManager;
-import org.acegisecurity.adapters.PrincipalAcegiUserToken;
-import org.acegisecurity.context.SecurityContextHolder;
-import org.acegisecurity.runas.RunAsUserToken;
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -220,10 +216,9 @@ public class RemoteApi
         User user = userManager.getUser(login);
         if (user == null)
         {
-            throw new IllegalArgumentException("unknown username '"+login +"'");
+            throw new IllegalArgumentException("Unknown username '"+login +"'");
         }
-
-        user.setPassword(password);
+        userManager.setPassword(user, password);
         userManager.save(user);
         return true;
     }

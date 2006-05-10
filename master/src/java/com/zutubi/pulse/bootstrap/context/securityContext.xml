@@ -35,11 +35,18 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="userDetailsService">
             <ref bean="userManager"/>
         </property>
-        <!-- no password encoding at the moment.
-                <property name="passwordEncoder">
-                    <ref local="passwordEncoder"/>
-                </property>
-        -->
+        <property name="saltSource">
+            <ref local="reflectionSaltSource"/>
+        </property>
+        <property name="passwordEncoder">
+            <ref bean="passwordEncoder"/>
+        </property>
+    </bean>
+
+    <bean id="reflectionSaltSource" class="org.acegisecurity.providers.dao.salt.ReflectionSaltSource">
+        <property name="userPropertyToUse">
+            <value>getId</value>
+        </property>
     </bean>
 
     <!--

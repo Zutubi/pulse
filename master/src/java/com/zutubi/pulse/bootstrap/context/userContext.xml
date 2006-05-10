@@ -23,8 +23,7 @@ This context exports:
         </bean>
     -->
 
-    <bean id="passwordEncoder" class="org.acegisecurity.providers.encoding.PlaintextPasswordEncoder"/>
-
+    <bean id="passwordEncoder" class="org.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
 
     <bean id="userManagerTarget" class="com.zutubi.pulse.model.DefaultUserManager" autowire="byName"/>
     <bean id="userManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

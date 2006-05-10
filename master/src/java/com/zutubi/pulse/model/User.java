@@ -119,9 +119,17 @@ public class User extends Entity implements UserDetails
         return password;
     }
 
-    public void setPassword(String password)
+    /**
+     * NOTE: Do not use this  method to update the users password. Please use the
+     * userManager instead.
+     *
+     * @param encodedPassword
+     *
+     * @see com.zutubi.pulse.model.UserManager#setPassword(User, String)
+     */
+    public void setPassword(String encodedPassword)
     {
-        this.password = password;
+        this.password = encodedPassword;
     }
 
     public void add(ContactPoint point)

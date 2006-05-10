@@ -202,6 +202,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         EditPasswordForm form = new EditPasswordForm(tester);
         form.assertFormElements("", "", "");
         form.saveFormElements(login, "newPassword", "newPassword");
+        form.assertFormNotPresent();
 
         // assert that we are back on the preferences page.
         assertTablePresent("user");

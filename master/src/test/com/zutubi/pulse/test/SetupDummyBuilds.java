@@ -33,6 +33,7 @@ public class SetupDummyBuilds implements Runnable
     private BuildResultDao buildResultDao;
     private UserDao userDao;
     private ConfigurationManager configManager;
+    private UserManager userManager;
     private Slave slave;
     private static final int BUILDS_IN_LONG_HISTORY_PROJECT = 100;
 
@@ -160,7 +161,7 @@ public class SetupDummyBuilds implements Runnable
     private void setupUsers(Project project)
     {
         User user = new User("jsankey", "Jason Sankey");
-        user.setPassword("password");
+        userManager.setPassword(user, "password");
         user.setEnabled(true);
         user.add(GrantedAuthority.USER);
         user.add(GrantedAuthority.ADMINISTRATOR);
@@ -795,5 +796,10 @@ public class SetupDummyBuilds implements Runnable
     public void setConfigurationManager(ConfigurationManager configManager)
     {
         this.configManager = configManager;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 }

@@ -5,6 +5,7 @@ package com.zutubi.pulse.web.admin.user;
 
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.GrantedAuthority;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.web.user.UserActionSupport;
 import com.zutubi.pulse.web.DefaultAction;
 
@@ -76,7 +77,13 @@ public class CreateUserAction extends UserActionSupport
         }
         newUser.setEnabled(true);
         newUser.setDefaultAction(DefaultAction.WELCOME_ACTION);
-        getUserManager().save(newUser);
+        UserManager userManager = getUserManager();
+        userManager.save(newUser);
+        // can only update the password on a persistent user since the password salt relies
+        // upon the users id.
+        userManager.setPassword(newUser, newUser.getPassword());
+        userManager.save(newUser);
+        
         doReset();
         return SUCCESS;
     }

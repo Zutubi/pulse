@@ -3,9 +3,9 @@
  ********************************************************************************/
 package com.zutubi.pulse.web.admin.user;
 
+import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.web.user.UserActionSupport;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.util.RandomUtils;
 
 /**
  * <class-comment/>
@@ -66,12 +66,11 @@ public class EditPasswordAction extends UserActionSupport
      */
     public String doReset()
     {
+        //TODO: There needs to be a way to send out some form of notification of this password.
+        String rawPassword = RandomUtils.randomString(8);
         User user = getUser();
-
-        // generate random password.
-        user.setPassword(RandomUtils.randomString(8));
+        getUserManager().setPassword(user, rawPassword);
         getUserManager().save(user);
-
         return SUCCESS;
     }
 
@@ -82,9 +81,8 @@ public class EditPasswordAction extends UserActionSupport
     public String execute()
     {
         User user = getUser();
-        user.setPassword(password);
+        getUserManager().setPassword(user, password);
         getUserManager().save(user);
-
         return SUCCESS;
     }
 }
