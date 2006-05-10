@@ -17,9 +17,7 @@
 #if($arguments)
                 args="$arguments"
 #end
-            >
-                <process processor="${maven.pp}"/>
-            </maven>
+            />
         #if($workingDir)
             <dir-artifact name="test reports" base="${base.dir}/$workingDir/target/test-reports" fail-if-not-present="false">
         #else
