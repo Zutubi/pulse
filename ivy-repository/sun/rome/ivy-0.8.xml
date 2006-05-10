@@ -14,7 +14,6 @@
 
     <publications>
         <artifact name="rome" type="jar"/>
-        <artifact name="content-0.4.1" type="jar"/>
     </publications>
 
     <dependencies>

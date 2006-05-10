@@ -55,9 +55,9 @@
               </td>
               <td align="right">
 #if($principle)
-                  $principle.name [ <a href="/logout.action">logout</a> ]
+                  $principle.name [ <a id="logout" href="/logout.action">logout</a> ]
 #else
-                  <a href="/login.action">login</a>
+                  <a id="login" href="/login.action">login</a>
 #end
                   &nbsp;
 #if($helpPage)

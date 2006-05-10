@@ -4,10 +4,8 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.CvsForm;
-import com.zutubi.pulse.util.FileSystemUtils;
-
-import java.io.File;
-import java.io.IOException;
+import com.zutubi.pulse.acceptance.forms.LoginForm;
+import com.meterware.httpunit.WebClient;
 
 /**
  * <class-comment/>
@@ -47,7 +45,6 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
     {
         super.setUp();
 
-
         port = System.getProperty("pulse.port");
         if(port == null)
         {
@@ -62,22 +59,41 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
         super.tearDown();
     }
 
-
-    protected void removeDirectory(File dir) throws IOException
-    {
-        if (!FileSystemUtils.removeDirectory(dir))
-        {
-            throw new IOException("Failed to remove " + dir);
-        }
-    }
-
     protected void login(String user, String password)
     {
         beginAt("/login.action");
-        setWorkingForm("j_acegi_security_check");
-        setFormElement("j_username", user);
-        setFormElement("j_password", password);
-        submit("login");
+        LoginForm loginForm = new LoginForm(tester);
+        loginForm.loginFormElements(user, password);
+    }
+
+    /**
+     * Assert that the cookie has been set as part of the conversation with the
+     * server.
+     *
+     * @param cookieName
+     */
+    protected void assertCookieSet(String cookieName)
+    {
+        WebClient client = tester.getDialog().getWebClient();
+        assertNotNull(client.getCookieValue(cookieName));
+    }
+
+    protected void assertCookieValue(String cookieName, String expectedValue)
+    {
+        WebClient client = tester.getDialog().getWebClient();
+        assertEquals(expectedValue, client.getCookieValue(cookieName));
+    }
+
+    /**
+     * Assert that the cookie has not been set as part of the conversation with
+     * the server.
+     *
+     * @param cookieName
+     */
+    protected void assertCookieNotSet(String cookieName)
+    {
+        WebClient client = tester.getDialog().getWebClient();
+        assertNull(client.getCookieValue(cookieName));
     }
 
     protected void submitCreateUserForm(String login, String name, String password, String confirm, boolean admin)

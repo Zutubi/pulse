@@ -21,9 +21,4 @@
         <artifact name="boot" type="jar" conf="release, build"/>
     </publications>
 
-    <dependencies>
-        <!-- The boot module is responsible for setting up the classpath, and therefore should
-        not have any dependencies -->
-    </dependencies>
-
 </ivy-module>

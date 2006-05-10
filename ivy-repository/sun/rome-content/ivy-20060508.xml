@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-    <info organisation="sun" module="rome-content" revision="0.4.1-20060508" status="release">
+    <info organisation="sun" module="rome-content" revision="20060508" status="release">
 
         <license name="LGPL" url="...."/>
 
         <description homepage="https://rome.dev.java.net/">
-            The content module for the Rome project. This version of the module has
-            been modified to remove an annoying System.out.println
+            The content module for the Rome project. This version is based on the 0.4.1 
+            version of the module. The changes are: 
+            * removed an annoying System.out.println
         </description>
     </info>
 
