@@ -107,7 +107,7 @@ public class DefaultUserManager implements UserManager
      */
     public void setPassword(User user, String rawPassword)
     {
-        String encodedPassword = passwordEncoder.encodePassword(rawPassword, user.getId());
+        String encodedPassword = passwordEncoder.encodePassword(rawPassword, null);
         user.setPassword(encodedPassword);
     }
 

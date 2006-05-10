@@ -10,6 +10,7 @@ import com.zutubi.pulse.model.persistence.UserDao;
 import com.zutubi.pulse.model.persistence.mock.MockUserDao;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.Constants;
+import org.acegisecurity.providers.encoding.PlaintextPasswordEncoder;
 
 /**
  */
@@ -28,8 +29,10 @@ public class TokenManagerTest extends PulseTestCase
 
         userManager = new DefaultUserManager();
         userManager.setUserDao(userDao);
+
         tokenManager = new TokenManager();
         tokenManager.setUserManager(userManager);
+        tokenManager.setPasswordEncoder(new PlaintextPasswordEncoder());
     }
 
     public void testLoginUnknownUser() throws Exception

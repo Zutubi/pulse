@@ -58,7 +58,7 @@ public class EditPasswordAction extends UserActionSupport
             return;
         }
 
-        if (!passwordEncoder.isPasswordValid(user.getPassword(), current, user.getId()))
+        if (!passwordEncoder.isPasswordValid(user.getPassword(), current, null))
         {
             addFieldError("password", getText("password.current.mismatch"));
         }
@@ -85,7 +85,7 @@ public class EditPasswordAction extends UserActionSupport
 
     /**
      * Required resource.
-     * 
+     *
      * @param passwordEncoder
      */
     public void setPasswordEncoder(PasswordEncoder passwordEncoder)

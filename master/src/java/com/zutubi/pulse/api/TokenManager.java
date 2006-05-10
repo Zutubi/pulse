@@ -71,7 +71,7 @@ public class TokenManager
             throw new AuthenticationException("Invalid username");
         }
 
-        if (!passwordEncoder.isPasswordValid(user.getPassword(), password,  user.getId()))
+        if (!passwordEncoder.isPasswordValid(user.getPassword(), password,  null))
         {
             throw new AuthenticationException("Invalid password");
         }

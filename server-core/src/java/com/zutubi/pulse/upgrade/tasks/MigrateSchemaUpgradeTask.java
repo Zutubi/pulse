@@ -47,7 +47,7 @@ public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
 
     public String getName()
     {
-        return "schema upgrade";
+        return "Schema upgrade";
     }
 
     public List<String> getErrors()
