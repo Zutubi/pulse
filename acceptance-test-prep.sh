@@ -45,7 +45,7 @@ mv $properties.$$ $properties
 
 # Fire it up!
 export PULSE_HOME="$(pwd)"
-$(pwd)/bin/startup.sh > /cygdrive/c/pulse.log
+$(pwd)/bin/startup.sh
 
 trap ERR
 
