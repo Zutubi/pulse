@@ -16,6 +16,7 @@ import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
@@ -24,6 +25,7 @@ import com.zutubi.pulse.web.wizard.WizardCompleteState;
 import org.acegisecurity.AccessDeniedException;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.LinkedList;
@@ -587,6 +589,11 @@ public class AddProjectWizard extends BaseWizard
             {
                 details.setWorkingDir(null);
             }
+
+            DirectoryCapture testCapture = new DirectoryCapture("test reports");
+            testCapture.setIncludes("**/target/test-reports/TEST-*.xml");
+            testCapture.addProcessor("junit");
+            details.addCapture(testCapture);
         }
     }
 
@@ -620,6 +627,11 @@ public class AddProjectWizard extends BaseWizard
             {
                 details.setWorkingDir(null);
             }
+
+            DirectoryCapture testCapture = new DirectoryCapture("test reports");
+            testCapture.setIncludes("**/target/surefire-reports/TEST-*.xml");
+            testCapture.addProcessor("junit");
+            details.addCapture(testCapture);
         }
     }
 

@@ -23,24 +23,6 @@
                     #dynamicLinkRow("project.url" $project.url $project.url)
                 </table>
 
-            <!-- Type-specific details -->
-
-                <table id="project.specifics" class="fill-content">
-                    #aclEditHeadingRow("project.specifics" 2 "editPulseFileDetails!input.action?id=$project.pulseFileDetails.id&amp;projectId=$project.id" "project.specifics.edit" "project")
-                    #dynamicRow("project.type" $project.pulseFileDetails.type)
-#foreach($property in $project.pulseFileDetails.properties.entrySet())
-                    #propertyRow($property)
-#end
-#acl("domainObject=project" "hasPermission=4,1")
-    #if(!$project.pulseFileDetails.type.equals("versioned"))
-                    <tr>
-                        #contentRowHeading("actions")
-                        #linkCell("convert.to.versioned" "convertToVersionedProject!input.action?id=$project.id")
-                    </tr>
-    #end
-#end
-                </table>
-
             <!-- SCM configuration -->
 
                 <table id="project.scm" class="fill-content">
@@ -65,33 +47,59 @@
                     <!--#dynamicRow("actions" "force checkout")-->
                 </table>
 
-            <!-- Project administrators -->
+            <!-- Type-specific details -->
 
-                <table id="project.admins" class="fill-content">
-                    #headingRow("project.admins" 2)
-                    <tr>
-                        #contentHeading("project.admin" 1)
-#acl("domainObject=project" "hasPermission=4,1")
-                        #contentHeading("actions" 1)
+                <table id="project.specifics" class="fill-content">
+                    #aclEditHeadingRow("project.specifics" 2 "editPulseFileDetails!input.action?id=$project.pulseFileDetails.id&amp;projectId=$project.id" "project.specifics.edit" "project")
+                    #dynamicRow("project.type" $project.pulseFileDetails.type)
+#foreach($property in $project.pulseFileDetails.properties.entrySet())
+                    #propertyRow($property)
 #end
-                    </tr>
-#if($projectAdmins.size() > 0)
-    #foreach($admin in $projectAdmins)
-        #set($confirmMessage = $action.getText("project.admin.confirm.delete", [$admin.name]))
+#acl("domainObject=project" "hasPermission=4,1")
+    #if(!$project.pulseFileDetails.type.equals("versioned"))
                     <tr>
-                        #dynamicCell($admin.name)
-        #acl("domainObject=project" "hasPermission=4,1")
-                        #removeCell($confirmMessage "deleteProjectAdmin.action?projectId=$project.id&amp;login=$admin.login" "delete_admin_$admin")
-        #end
+                        #contentRowHeading("actions")
+                        #linkCell("convert.to.versioned" "convertToVersionedProject!input.action?id=$project.id")
                     </tr>
     #end
-#else
-                    #contentRow("project.admins.none" 2)
-#end
-#acl("domainObject=project" "hasPermission=4,1")
-                    #addRow("project.admin.add" 2 "addProjectAdmins!input.action?projectId=$project.id" "project.admin.add")
 #end
                 </table>
+
+            <!-- Artifacts (built in projects only) -->
+#if($project.pulseFileDetails.builtIn)
+                <table id="project.artifacts" class="fill-content">
+                    #headingRow("project.artifacts" 4)
+                    <tr>
+                        #contentHeading("artifact.name" 1)
+                        #contentHeading("artifact.type" 1)
+    #acl("domainObject=project" "hasPermission=4,1")
+                        #contentHeading("actions" 2)
+    #end
+                    </tr>
+                    <tr>
+                        #contentCell("artifact.output")
+                        #contentCell("artifact.type.output")
+    #acl("domainObject=project" "hasPermission=4,1")
+                        #editCell("editOutputProcessors!input.action?projectId=$project.id" "edit_command_output")
+                        #contentCell("empty.cell")
+    #end
+                    </tr>
+    #foreach($capture in $project.pulseFileDetails.captures)
+        #set($confirmMessage = $action.getText("artifact.confirm.delete", [$capture.name]))
+                    <tr>
+                        #dynamicCell($capture.name)
+                        #dynamicCell($capture.type)
+        #acl("domainObject=project" "hasPermission=4,1")
+                        #editCell("editArtifact!input.action?projectId=$project.id&amp;id=$capture.id" "edit_$!webwork.htmlEncode($capture.name)")
+                        #deleteCell($confirmMessage "deleteArtifact.action?projectId=$project.id&amp;id=$capture.id" "delete_$!webwork.htmlEncode($capture.name)")
+        #end
+                     </tr>
+    #end
+    #acl("domainObject=project" "hasPermission=4,1")
+                    #addRow("artifact.add" 5 "addArtifact.action?projectId=$project.id" "project.artifact.add")
+    #end
+                </table>
+#end
             </td>
 
             <!-- ********** Right hand column ********** -->
@@ -201,6 +209,35 @@
                     #addRow("cleanup.rule.add" 5 "addCleanupRule!input.action?projectId=$project.id" "project.cleanup.add")
 #end
                 </table>
+
+            <!-- Project administrators -->
+
+                <table id="project.admins" class="fill-content">
+                    #headingRow("project.admins" 2)
+                    <tr>
+                        #contentHeading("project.admin" 1)
+#acl("domainObject=project" "hasPermission=4,1")
+                        #contentHeading("actions" 1)
+#end
+                    </tr>
+#if($projectAdmins.size() > 0)
+    #foreach($admin in $projectAdmins)
+        #set($confirmMessage = $action.getText("project.admin.confirm.delete", [$admin.name]))
+                    <tr>
+                        #dynamicCell($admin.name)
+        #acl("domainObject=project" "hasPermission=4,1")
+                        #removeCell($confirmMessage "deleteProjectAdmin.action?projectId=$project.id&amp;login=$admin.login" "delete_admin_$admin")
+        #end
+                    </tr>
+    #end
+#else
+                    #contentRow("project.admins.none" 2)
+#end
+#acl("domainObject=project" "hasPermission=4,1")
+                    #addRow("project.admin.add" 2 "addProjectAdmins!input.action?projectId=$project.id" "project.admin.add")
+#end
+                </table>
+
             </td>
         </tr>
     </table>

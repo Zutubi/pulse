@@ -30,37 +30,37 @@ public class MakePulseFileDetailsTest extends TemplatePulseFileDetailsTestBase
         return details;
     }
 
-    public void testBasic() throws IOException
+    public void testBasic() throws Exception
     {
         createAndVerify("basic");
     }
 
-    public void testExplicitBuildFile() throws IOException
+    public void testExplicitBuildFile() throws Exception
     {
         details.setMakefile("test.makefile");
         createAndVerify("explicitMakefile");
     }
 
-    public void testEnvironment() throws IOException
+    public void testEnvironment() throws Exception
     {
         details.addEnvironmentalVariable("var", "value");
         details.addEnvironmentalVariable("var2", "value2");
         createAndVerify("environment");
     }
 
-    public void testExplicitTargets() throws IOException
+    public void testExplicitTargets() throws Exception
     {
         details.setTargets("build test");
         createAndVerify("explicitTargets");
     }
 
-    public void testExplicitWorkingDir() throws IOException
+    public void testExplicitWorkingDir() throws Exception
     {
         details.setWorkingDir("mywork");
         createAndVerify("explicitWorkingDir");
     }
 
-    public void testExplicitArgs() throws IOException
+    public void testExplicitArgs() throws Exception
     {
         details.setArguments("arg1 arg2");
         createAndVerify("explicitArgs");

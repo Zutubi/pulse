@@ -67,49 +67,80 @@
             <property name="pulseFileName" column="PULSE_FILE_NAME" type="string" length="255"/>
         </subclass>
 
-        <subclass name="com.zutubi.pulse.model.AntPulseFileDetails" discriminator-value="ANT" lazy="false">
-            <property name="buildFile" column="BUILD_FILE" type="string" length="255"/>
+        <subclass name="com.zutubi.pulse.model.TemplatePulseFileDetails" lazy="false">
+            <bag name="captures" cascade="all-delete-orphan" lazy="false">
+                <key column="DETAILS_ID"/>
+                <one-to-many class="com.zutubi.pulse.model.Capture"/>
+            </bag>
 
-            <property name="targets" column="TARGETS" type="string" length="255"/>
+            <bag name="outputProcessors" table="OUTPUT_PROCESSORS" lazy="false">
+                <key column="DETAILS_ID"/>
+                <element type="string" column="PROCESSOR" not-null="true"/>
+            </bag>
 
-            <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
+            <subclass name="com.zutubi.pulse.model.AntPulseFileDetails" discriminator-value="ANT" lazy="false">
+                <property name="buildFile" column="BUILD_FILE" type="string" length="255"/>
+                <property name="targets" column="TARGETS" type="string" length="255"/>
+                <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
+                <property name="workingDir" column="WORKING_DIR" type="string" length="255"/>
+                <map name="environment" lazy="false" table="ANT_SOURCE_ENVIRONMENT" cascade="all">
+                    <key column="SOURCE_ID"/>
+                    <index column="NAME" type="string"/>
+                    <element type="string" column="VALUE"/>
+                </map>
+            </subclass>
 
-            <property name="workingDir" column="WORKING_DIR" type="string" length="255"/>
+            <subclass name="com.zutubi.pulse.model.MakePulseFileDetails" discriminator-value="MAKE" lazy="false">
+                <property name="makefile" column="MAKEFILE" type="string" length="255"/>
+                <property name="targets" column="TARGETS" type="string" length="255"/>
+                <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
+                <property name="workingDir" column="WORKING_DIR" type="string" length="255"/>
+                <map name="environment" lazy="false" table="MAKE_SOURCE_ENVIRONMENT" cascade="all">
+                    <key column="SOURCE_ID"/>
+                    <index column="NAME" type="string"/>
+                    <element type="string" column="VALUE"/>
+                </map>
+            </subclass>
 
-            <map name="environment" lazy="false" table="ANT_SOURCE_ENVIRONMENT" cascade="all">
-                <key column="SOURCE_ID"/>
-                <index column="NAME" type="string"/>
-                <element type="string" column="VALUE"/>
-            </map>
+            <subclass name="com.zutubi.pulse.model.MavenPulseFileDetails" discriminator-value="MAVEN" lazy="false">
+                <property name="workingDir" column="BASE_DIR" type="string" length="255"/>
+                <property name="targets" column="TARGETS" type="string" length="255"/>
+                <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
+            </subclass>
+
+            <subclass name="com.zutubi.pulse.model.Maven2PulseFileDetails" discriminator-value="MAVEN2" lazy="false">
+                <property name="workingDir" column="BASE_DIR" type="string" length="255"/>
+                <!-- Use a targets column so that it overlaps with other subtypes -->
+                <property name="goals" column="TARGETS" type="string" length="255"/>
+                <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
+            </subclass>
+        </subclass>
+    </class>
+
+    <class name="com.zutubi.pulse.model.Capture" table="CAPTURE">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="TYPE" type="string" length="31"/>
+
+        <property name="name" type="string"/>
+
+        <bag name="processors" table="CAPTURE_PROCESSORS" lazy="false">
+            <key column="CAPTURE_ID"/>
+            <element type="string" column="PROCESSOR" not-null="true"/>
+        </bag>
+
+        <subclass name="com.zutubi.pulse.model.DirectoryCapture" discriminator-value="DIRECTORY" lazy="false">
+            <property name="base" type="string"/>
+            <property name="includes" type="string"/>
+            <property name="excludes" type="string"/>
+            <property name="mimeType" type="string"/>
         </subclass>
 
-        <subclass name="com.zutubi.pulse.model.MakePulseFileDetails" discriminator-value="MAKE" lazy="false">
-            <property name="makefile" column="MAKEFILE" type="string" length="255"/>
-
-            <property name="targets" column="TARGETS" type="string" length="255"/>
-
-            <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
-
-            <property name="workingDir" column="WORKING_DIR" type="string" length="255"/>
-
-            <map name="environment" lazy="false" table="MAKE_SOURCE_ENVIRONMENT" cascade="all">
-                <key column="SOURCE_ID"/>
-                <index column="NAME" type="string"/>
-                <element type="string" column="VALUE"/>
-            </map>
-        </subclass>
-
-        <subclass name="com.zutubi.pulse.model.MavenPulseFileDetails" discriminator-value="MAVEN" lazy="false">
-            <property name="workingDir" column="BASE_DIR" type="string" length="255"/>
-            <property name="targets" column="TARGETS" type="string" length="255"/>
-            <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
-        </subclass>
-
-        <subclass name="com.zutubi.pulse.model.Maven2PulseFileDetails" discriminator-value="MAVEN2" lazy="false">
-            <property name="workingDir" column="BASE_DIR" type="string" length="255"/>
-            <!-- Use a targets column so that it overlaps with other subtypes -->
-            <property name="goals" column="TARGETS" type="string" length="255"/>
-            <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
+        <subclass name="com.zutubi.pulse.model.FileCapture" discriminator-value="FILE" lazy="false">
+            <property name="file" type="string"/>
+            <property name="mimeType" type="string"/>
         </subclass>
     </class>
 

@@ -30,10 +30,6 @@ public class MavenPostProcessor extends PostProcessorGroup
         pattern.setPattern(Pattern.compile("Basedir.*does not exist"));
         pattern.setCategory(Feature.Level.ERROR);
 
-        pattern = maven.createPattern();
-        pattern.setPattern(Pattern.compile(".*Exception.*"));
-        pattern.setCategory(Feature.Level.WARNING);
-
         if (!SystemUtils.isWindows())
         {
             maven.setFailOnError(false);

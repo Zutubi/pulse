@@ -42,6 +42,9 @@ public interface ProjectManager extends EntityManager<Project>
     @Secured({"ACL_PROJECT_WRITE"})
     void deleteBuildSpecification(Project project, long specId);
 
+    @Secured({"ACL_PROJECT_WRITE"})
+    void deleteArtifact(Project project, long id);
+
     void buildCommenced(long projectId);
 
     void buildCompleted(long projectId);

@@ -27,6 +27,11 @@ public class VersionedPulseFileDetails extends PulseFileDetails
         this.pulseFileName = pulseFileName;
     }
 
+    public boolean isBuiltIn()
+    {
+        return false;
+    }
+
     public String getType()
     {
         return "versioned";

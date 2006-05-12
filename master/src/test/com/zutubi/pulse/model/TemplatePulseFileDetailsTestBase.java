@@ -6,11 +6,14 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.model.Property;
 import org.apache.velocity.app.VelocityEngine;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  */
@@ -18,6 +21,7 @@ public abstract class TemplatePulseFileDetailsTestBase extends PulseTestCase
 {
     protected File tmpDir;
     protected VelocityEngine engine;
+    protected boolean generateMode = false;
 
     protected void setUp() throws Exception
     {
@@ -37,14 +41,47 @@ public abstract class TemplatePulseFileDetailsTestBase extends PulseTestCase
         super.tearDown();
     }
 
-    protected void createAndVerify(String expectedName) throws IOException
+    protected void createAndVerify(String expectedName) throws Exception
     {
-        InputStream expectedStream = getInput(expectedName);
-
         String got = getDetails().getPulseFile(0, null, null);
-        String expected = IOUtils.inputStreamToString(expectedStream);
+        File file = new File(getPulseRoot(), FileSystemUtils.composeFilename("master", "src", "test", "com", "zutubi", "pulse", "model", getClass().getSimpleName() + "." + expectedName + ".xml"));
 
-        assertEquals(expected, got);
+        if(generateMode)
+        {
+            FileSystemUtils.createFile(file, got);
+        }
+        else
+        {
+            InputStream expectedStream = null;
+
+            try
+            {
+                expectedStream = new FileInputStream(file);
+                String expected = IOUtils.inputStreamToString(expectedStream);
+                assertEquals(expected, got);
+                expectedStream.close();
+            }
+            finally
+            {
+                IOUtils.close(expectedStream);
+            }
+        }
+
+        // Ensure syntactic correctness
+        PulseFileLoader loader = new PulseFileLoader(new ObjectFactory(), new FileResourceRepository());
+        List<Reference> references = new LinkedList<Reference>();
+        references.add(new Property("base.dir", "testbase"));
+        FileInputStream input = null;
+
+        try
+        {
+            input = new FileInputStream(file);
+            loader.load(input, new PulseFile(), references, null);
+        }
+        finally
+        {
+            IOUtils.close(input);
+        }
     }
 
     public abstract TemplatePulseFileDetails getDetails();

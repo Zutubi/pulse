@@ -3,6 +3,8 @@
  ********************************************************************************/
 package com.zutubi.pulse.model;
 
+import org.acegisecurity.annotation.Secured;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,12 @@ public class MockProjectManager implements ProjectManager
     }
 
     public void deleteBuildSpecification(Project project, long specId)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    @Secured({"ACL_PROJECT_WRITE"})
+    public void deleteArtifact(Project project, long id)
     {
         throw new RuntimeException("Method not implemented.");
     }

@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <project defaultRecipe="make build">
+
+    #parse("pulse-file/prologue.vm")
+
     <recipe name="make build">
         <command name="build">
             <make
@@ -19,7 +22,11 @@
 #foreach($key in $environment.keySet())
                 <environment name="$key" value="$environment.get($key)"/>
 #end
+                #parse("pulse-file/output.processors.vm")
             </make>
+
+            #parse("pulse-file/artifacts.vm")
+
         </command>
     </recipe>
 </project>

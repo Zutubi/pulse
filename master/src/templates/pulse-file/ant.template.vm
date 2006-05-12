@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <project defaultRecipe="ant build">
+
+    #parse("pulse-file/prologue.vm")
+
     <recipe name="ant build">
         <command name="build">
             <!-- pull in the ant resource if configured. -->
@@ -21,7 +24,11 @@
 #foreach($key in $environment.keySet())
                 <environment name="$key" value="$environment.get($key)"/>
 #end
+                #parse("pulse-file/output.processors.vm")
             </ant>
+
+            #parse("pulse-file/artifacts.vm")
+
         </command>
     </recipe>
 </project>

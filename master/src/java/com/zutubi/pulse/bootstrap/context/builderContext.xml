@@ -146,4 +146,6 @@
     -->
     <bean id="licenseMonitor" class="com.zutubi.pulse.license.LicenseMonitor" autowire="byName" init-method="init"/>
 
+    <bean id="postProcessorManager" class="com.zutubi.pulse.PostProcessorManager" autowire="byName"/>
+
 </beans>

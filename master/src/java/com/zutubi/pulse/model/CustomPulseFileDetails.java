@@ -25,6 +25,11 @@ public class CustomPulseFileDetails extends PulseFileDetails
         this.pulseFile = pulseFile;
     }
 
+    public boolean isBuiltIn()
+    {
+        return false;
+    }
+
     public String getType()
     {
         return "custom";

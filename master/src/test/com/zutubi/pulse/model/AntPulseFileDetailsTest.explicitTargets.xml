@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <project defaultRecipe="ant build">
+
+    
     <recipe name="ant build">
         <command name="build">
             <!-- pull in the ant resource if configured. -->
@@ -7,7 +9,9 @@
             <ant
                     targets="build test"
                     >
-            </ant>
+                            </ant>
+
+            
         </command>
     </recipe>
 </project>

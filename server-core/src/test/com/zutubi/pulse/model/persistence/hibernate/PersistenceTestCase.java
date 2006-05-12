@@ -120,7 +120,7 @@ public abstract class PersistenceTestCase extends PulseTestCase
             for (PropertyDescriptor property : beanInfo.getPropertyDescriptors())
             {
                 Method getter = property.getReadMethod();
-                if (getter.getDeclaringClass() != Object.class)
+                if (getter != null && getter.getDeclaringClass() != Object.class)
                 {
                     assertObjectEquals(getter.getName(), getter.invoke(a), getter.invoke(b));
                 }

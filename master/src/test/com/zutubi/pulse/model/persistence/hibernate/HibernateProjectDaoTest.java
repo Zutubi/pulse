@@ -133,6 +133,36 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         }
     }
 
+    public void testLoadSaveFileCapture()
+    {
+        AntPulseFileDetails details = new AntPulseFileDetails();
+        FileCapture capture = new FileCapture("name", "file", "type");
+        capture.addProcessor("processor");
+        details.addCapture(capture);
+
+        projectDao.save(details);
+        commitAndRefreshTransaction();
+
+        AntPulseFileDetails otherDetails = projectDao.findAntPulseFileSource(details.getId());
+        assertPropertyEquals(capture, otherDetails.getCaptures().get(0));
+    }
+
+    public void testLoadSaveDirectoryCapture()
+    {
+        AntPulseFileDetails details = new AntPulseFileDetails();
+        DirectoryCapture capture = new DirectoryCapture("name", "file", "type");
+        capture.setIncludes("include pattern");
+        capture.setIncludes("exclude pattern");
+        capture.addProcessor("processor");
+        details.addCapture(capture);
+
+        projectDao.save(details);
+        commitAndRefreshTransaction();
+
+        AntPulseFileDetails otherDetails = projectDao.findAntPulseFileSource(details.getId());
+        assertPropertyEquals(capture, otherDetails.getCaptures().get(0));
+    }
+
     public void testFindByLikeName()
     {
         Project projectA = new Project("nameA", "description");

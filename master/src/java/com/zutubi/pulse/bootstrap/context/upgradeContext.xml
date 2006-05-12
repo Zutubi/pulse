@@ -16,6 +16,8 @@
                 <ref local="userPropsSchemaUpgrade"/>
                 <ref local="userPropsDataUpgrade"/>
                 <ref local="encryptPasswordUpgrade"/>
+                <ref local="artifactsSchemaUpgrade"/>
+                <ref local="mavenCapturesUpgrade"/>
             </list>
         </property>
     </bean>
@@ -42,6 +44,19 @@
     <!-- Encrypt the users passwords in the user table. -->
     <bean id="encryptPasswordUpgrade" class="com.zutubi.pulse.upgrade.tasks.EncodePasswordUpgradeTask" autowire="byName">
         <property name="buildNumber" value="1021"/>
+    </bean>
+
+    <bean id="artifactsSchemaUpgrade" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="1021"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_1021/Project.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="mavenCapturesUpgrade" class="com.zutubi.pulse.upgrade.tasks.MavenCapturesUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="1022"/>
     </bean>
 
 </beans>

@@ -12,6 +12,8 @@ import java.util.Properties;
  */
 public abstract class PulseFileDetails extends Entity
 {
+    public abstract boolean isBuiltIn();
+
     public abstract String getType();
 
     public abstract Properties getProperties();

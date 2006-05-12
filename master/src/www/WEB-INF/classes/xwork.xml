@@ -408,6 +408,64 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="editOutputProcessors" class="com.zutubi.pulse.web.project.EditOutputProcessorsAction">
+            <result name="input" type="velocity">edit-output-processors.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="addArtifact" class="com.zutubi.pulse.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.zutubi.pulse.web.project.AddArtifactWizard</param>
+            <result name="select" type="velocity">addartifact-artifact.vm</result>
+            <result name="dir" type="velocity">addartifact-directory.vm</result>
+            <result name="file" type="velocity">addartifact-file.vm</result>
+            <result name="processors" type="velocity">addartifact-processors.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
+        </action>
+
+        <action name="deleteArtifact" class="com.zutubi.pulse.web.project.DeleteArtifactAction">
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="input" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="editArtifact" class="com.zutubi.pulse.web.project.EditArtifactAction">
+            <result name="directory" type="chain">editDirectoryArtifact!input</result>
+            <result name="file" type="chain">editFileArtifact!input</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editDirectoryArtifact!input" class="com.zutubi.pulse.web.project.EditDirectoryArtifactAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-artifact-directory.vm</result>
+        </action>
+
+        <action name="editDirectoryArtifact" class="com.zutubi.pulse.web.project.EditDirectoryArtifactAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-artifact-directory.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editFileArtifact!input" class="com.zutubi.pulse.web.project.EditFileArtifactAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-artifact-file.vm</result>
+        </action>
+
+        <action name="editFileArtifact" class="com.zutubi.pulse.web.project.EditFileArtifactAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-artifact-file.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
         <action name="addTrigger" class="com.zutubi.pulse.web.wizard.WizardAction">
             <interceptor-ref name="wizardStack"/>
             <param name="wizardClass">com.zutubi.pulse.web.project.AddTriggerWizard</param>

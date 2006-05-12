@@ -2,6 +2,13 @@
 <#if parameters.list?exists>
     <@ww.iterator value="parameters.list">
         <#assign itemCount = itemCount + 1/>
+        <#if parameters.multirow?exists && itemCount &gt; 1>
+            </td></tr><tr>
+            <#if parameters.labelposition?default("") != 'top'>
+                <th class="label">&nbsp;</th>
+            </#if>
+            <td class="field">
+        </#if>
         <#if parameters.listKey?exists>
             <#assign itemKey = stack.findValue(parameters.listKey)/>
         <#else>

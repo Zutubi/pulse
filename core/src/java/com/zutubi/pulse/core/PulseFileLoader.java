@@ -19,6 +19,7 @@ public class PulseFileLoader extends FileLoader
         register("junit.pp", JUnitReportPostProcessor.class);
         register("junit.summary.pp", JUnitSummaryPostProcessor.class);
         register("make.pp", MakePostProcessor.class);
+        register("maven.pp", MavenPostProcessor.class);
         register("maven2.pp", Maven2PostProcessor.class);
         register("regex.pp", RegexPostProcessor.class);
         register("ant", AntCommand.class);

@@ -65,8 +65,6 @@ public abstract class AbstractEditDetailsAction extends ProjectActionSupport imp
     {
         prepare();
 
-        project = getProjectManager().getProject(projectId);
-
         if (getDetails() == null)
         {
             addActionError("Unknown project details '" + getId() + "'");

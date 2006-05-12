@@ -1,11 +1,15 @@
 <?xml version="1.0"?>
 <project defaultRecipe="make build">
+
+    
     <recipe name="make build">
         <command name="build">
             <make
                     working-dir="${base.dir}/mywork"
                     >
-            </make>
+                            </make>
+
+            
         </command>
     </recipe>
 </project>

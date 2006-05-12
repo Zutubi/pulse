@@ -1,11 +1,15 @@
 <?xml version="1.0"?>
 <project defaultRecipe="make build">
+
+    
     <recipe name="make build">
         <command name="build">
             <make
                     targets="build test"
                     >
-            </make>
+                            </make>
+
+            
         </command>
     </recipe>
 </project>

@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <project defaultRecipe="default">
 
+    #parse("pulse-file/prologue.vm")
+
     <junit.pp name="junit.pp"/>
 
     <recipe name="default">
@@ -17,15 +19,12 @@
 #if($arguments)
                 args="$arguments"
 #end
-            />
-        #if($workingDir)
-            <dir-artifact name="test reports" base="${base.dir}/$workingDir/target/surefire-reports" fail-if-not-present="false">
-        #else
-            <dir-artifact name="test reports" base="${base.dir}/target/surefire-reports" fail-if-not-present="false">
-        #end
-                <include pattern="**/TEST-*.xml"/>
-                <process processor="${junit.pp}"/>
-            </dir-artifact>
+            >
+                #parse("pulse-file/output.processors.vm")
+            </maven2>
+
+            #parse("pulse-file/artifacts.vm")
+
         </command>
     </recipe>
 </project>
