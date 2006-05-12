@@ -110,6 +110,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         try
         {
             newDispatches.add(dispatchRequest);
+            dispatchRequest.queued();
             lockCondition.signal();
         }
         finally

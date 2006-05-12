@@ -70,7 +70,7 @@ public class RecipeDispatchRequest
     {
         if(lazyPulseFile.getPulseFile() == null)
         {
-            ScmBootstrapper scmBootstrapper = (ScmBootstrapper) request.getBootstrapper();
+            ProjectRepoBootstrapper scmBootstrapper = (ProjectRepoBootstrapper) request.getBootstrapper();
             scmBootstrapper.prepare();
             Revision revision = scmBootstrapper.getRevision();
 

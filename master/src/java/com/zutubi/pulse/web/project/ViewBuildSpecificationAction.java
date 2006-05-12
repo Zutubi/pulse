@@ -4,7 +4,6 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.BuildSpecification;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 
 /**
@@ -13,7 +12,6 @@ public class ViewBuildSpecificationAction extends ProjectActionSupport
 {
     private BuildSpecification specification;
     private long id;
-    private long projectId;
     private BuildSpecificationDao buildSpecificationDao;
 
     public BuildSpecification getSpecification()
@@ -35,22 +33,6 @@ public class ViewBuildSpecificationAction extends ProjectActionSupport
     {
         this.id = id;
     }
-
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
-    }
-
-    public Project getProject()
-    {
-        return getProjectManager().getProject(projectId);
-    }
-
 
     public void setBuildSpecificationDao(BuildSpecificationDao buildSpecificationDao)
     {

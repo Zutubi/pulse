@@ -13,7 +13,6 @@ import java.util.List;
 public class TriggerBuildAction extends ProjectActionSupport
 {
     private long id;
-    private long projectId;
     private EventManager eventManager;
 
     public long getId()
@@ -24,16 +23,6 @@ public class TriggerBuildAction extends ProjectActionSupport
     public void setId(long id)
     {
         this.id = id;
-    }
-
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
     }
 
     public void validate()

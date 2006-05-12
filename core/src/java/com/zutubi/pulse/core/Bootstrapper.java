@@ -4,6 +4,7 @@
 package com.zutubi.pulse.core;
 
 /**
+ * 
  */
 public interface Bootstrapper
 {
@@ -14,7 +15,8 @@ public interface Bootstrapper
     void prepare() throws PulseException;
 
     /**
+     *
      */
-    void bootstrap(long recipeId, RecipePaths paths) throws BuildException;
+    void bootstrap(RecipePaths paths) throws BuildException;
 
 }

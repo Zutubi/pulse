@@ -6,7 +6,6 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
 
 /**
@@ -16,7 +15,6 @@ import com.zutubi.pulse.model.RecipeResultNode;
 public class ViewRecipeAction extends ProjectActionSupport
 {
     private long id;
-    private long projectId;
     private RecipeResultNode node;
 
     public long getId()
@@ -27,16 +25,6 @@ public class ViewRecipeAction extends ProjectActionSupport
     public void setId(long id)
     {
         this.id = id;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
-    }
-
-    public Project getProject()
-    {
-        return getProjectManager().getProject(projectId);
     }
 
     public RecipeResultNode getNode()

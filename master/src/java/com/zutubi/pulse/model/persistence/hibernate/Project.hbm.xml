@@ -16,6 +16,8 @@
 
         <property name="stateName" column="STATE" type="string" length="31"/>
 
+        <property name="checkoutSchemeName" column="CHECKOUT_SCHEME" type="string" length="50"/>
+
         <many-to-one name="pulseFileDetails" class="com.zutubi.pulse.model.PulseFileDetails" column="BOB_FILE_DETAILS"
                      lazy="false" cascade="all"/>
 

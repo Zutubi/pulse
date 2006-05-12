@@ -31,7 +31,7 @@ public class CopyBootstrapper extends BootstrapperSupport
         this.previousRecipeId = previousRecipeId;
     }
 
-    public void bootstrap(long recipeId, RecipePaths paths) throws BuildException
+    public void bootstrap(RecipePaths paths) throws BuildException
     {
         try
         {

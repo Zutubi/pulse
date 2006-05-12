@@ -1,0 +1,24 @@
+#helpTag("Project+Checkout+Scheme")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=edit.checkout.scheme")</title>
+</head>
+<body>
+    #projectTabs("configuration")
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editCheckoutScheme.action" "heading=%{getText('edit.checkout.scheme')}" "id=edit.checkout.scheme" "method=post")
+    #wwhidden("name=projectId")
+
+    #wwselect("name=checkoutScheme" "label=%{getText('project.checkout.scheme')}" "list=checkoutSchemes" "tabindex=1")
+    #inlineHelp("project.checkout.scheme.help")
+
+    #saveCancel(2)
+#end
+
+    #tabEnd()
+</body>
+</html>

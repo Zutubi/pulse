@@ -19,22 +19,11 @@ public class CleanupRuleActionSupport extends ProjectActionSupport
     public static final String UNITS_BUILDS = "builds";
     public static final String UNITS_DAYS = "days";
 
-    protected long projectId;
     protected Project project;
     protected boolean workDirOnly = true;
     protected List<String> stateNames;
     protected String buildUnits = UNITS_BUILDS;
     protected int limit = 10;
-
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
-    }
 
     public Project getProject()
     {

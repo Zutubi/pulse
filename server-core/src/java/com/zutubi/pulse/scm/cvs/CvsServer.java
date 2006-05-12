@@ -143,20 +143,52 @@ public class CvsServer extends CachingSCMServer
         return FileSystemUtils.createTempDirectory("cvs", "checkout", tmpSpace);
     }
 
+    /**
+     * Update the working directory to the specified revision.  It is required that the working
+     * directory has a local checkout that can be updated.
+     *
+     * @param workingDirectory
+     * @param rev
+     */
+    public void update(File workingDirectory, Revision rev) throws SCMException
+    {
+        assertRevisionArgValid(rev);
+        cvs.update(workingDirectory, (CvsRevision) rev);
+    }
+
+    public boolean supportsUpdate()
+    {
+        return true;
+    }
+
     public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
     {
-        if (revision == null)
-        {
-            throw new IllegalArgumentException("Revision is a required argument.");
-        }
-        if (!(revision instanceof CvsRevision))
-        {
-            throw new IllegalArgumentException("Unsupported revision type: " + revision.getClass() + ".");
-        }
+        assertRevisionArgValid(revision);
 
         cvs.checkout(toDirectory, (CvsRevision)revision);
 
         return revision;
+    }
+
+    /**
+     * Throw an IllegalArgumentException if either of the following are true:
+     * <ul>
+     * <li>The revision is null</li>
+     * <li>The revision is not of type CvsRevision</li>
+     * </ul>
+     *
+     * @param r
+     */
+    private void assertRevisionArgValid(Revision r)
+    {
+        if (r == null)
+        {
+            throw new IllegalArgumentException("Revision is a required argument.");
+        }
+        if (!(r instanceof CvsRevision))
+        {
+            throw new IllegalArgumentException("Unsupported revision type: " + r.getClass() + ".");
+        }
     }
 
     public String checkout(long id, Revision revision, String file) throws SCMException

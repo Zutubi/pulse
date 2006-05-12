@@ -10,6 +10,7 @@ import java.util.Arrays;
  * An adaptation between the command and Bootstrap interfaces that allows
  * any bootstrapper to be run like a command.  This further allows the result
  * of bootstrapping to be stored as part of the recipe result.
+ *
  */
 public class BootstrapCommand implements Command
 {
@@ -24,7 +25,7 @@ public class BootstrapCommand implements Command
 
     public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult result)
     {
-        bootstrapper.bootstrap(recipeId, paths);
+        bootstrapper.bootstrap(paths);
     }
 
     public List<String> getArtifactNames()

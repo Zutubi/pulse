@@ -3,25 +3,24 @@
  ********************************************************************************/
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Scm;
-import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 
 import java.io.File;
 
 /**
- * A bootstrapper that populates the working directory by checking out from one
- * or more SCMs.
+ * A bootstrapper that populates the working directory by checking out from one SCM.
+ * 
  */
-public class ScmBootstrapper implements Bootstrapper
+public abstract class ScmBootstrapper implements Bootstrapper
 {
-    public Scm scm;
-    public Revision revision;
+    protected Scm scm;
+
+    protected Revision revision;
 
     public ScmBootstrapper(Scm scm)
     {
@@ -38,37 +37,26 @@ public class ScmBootstrapper implements Bootstrapper
         }
     }
 
-    public void bootstrap(long recipeId, RecipePaths paths)
+    public void bootstrap(RecipePaths paths)
     {
-        File checkoutDir;
+        File workDir;
 
         if (scm.getPath() != null)
         {
-            checkoutDir = new File(paths.getBaseDir(), scm.getPath());
+            workDir = new File(paths.getBaseDir(), scm.getPath());
         }
         else
         {
-            checkoutDir = paths.getBaseDir();
+            workDir = paths.getBaseDir();
         }
-
-        try
-        {
-            scm.createServer().checkout(recipeId, checkoutDir, revision, null);
-        }
-        catch (SCMException e)
-        {
-            throw new BuildException("Error checking out from SCM: " + e.getMessage(), e);
-        }
+        bootstrap(workDir);
     }
 
-    public Revision getRevision()
+    protected Revision getRevision()
     {
         return revision;
     }
 
-    public void setRevision(Revision revision)
-    {
-        this.revision = revision;
-    }
+    abstract void bootstrap(File workDir);
 
 }

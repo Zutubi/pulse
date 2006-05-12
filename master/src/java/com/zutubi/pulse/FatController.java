@@ -9,10 +9,7 @@ import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.events.build.BuildRequestEvent;
-import com.zutubi.pulse.events.build.BuildTerminationRequestEvent;
-import com.zutubi.pulse.events.build.BuildTimeoutEvent;
+import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
@@ -177,6 +174,11 @@ public class FatController implements EventListener, Stoppable
         asyncListener.stop(force);
     }
 
+    /**
+     * Handle the incoming event.
+     *
+     * @param event
+     */
     public void handleEvent(Event event)
     {
         if (event instanceof BuildRequestEvent)
@@ -245,6 +247,8 @@ public class FatController implements EventListener, Stoppable
         BuildSpecification buildSpec = project.getBuildSpecification(specName);
         if (buildSpec == null)
         {
+            // the build spec was deleted / renamed between the project build request being created and
+            // the request triggering a start build.
             LOG.warning("Request to build unknown specification '" + specName + "' for project '" + project.getName() + "'");
             projectQueue.buildCompleted(project);
             return;
@@ -338,6 +342,12 @@ public class FatController implements EventListener, Stoppable
         };
     }
 
+    /**
+     * Retrieve a snapshot of the current project queue.
+     *
+     * @return a mapping of projects to queued build request events. These events will be
+     * the order that these events will be handled.
+     */
     public Map<Project, List<BuildRequestEvent>> snapshotProjectQueue()
     {
         lock.lock();

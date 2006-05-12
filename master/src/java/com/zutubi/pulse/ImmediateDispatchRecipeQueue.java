@@ -82,6 +82,7 @@ public class ImmediateDispatchRecipeQueue implements RecipeQueue, EventListener
 
     public void enqueue(RecipeDispatchRequest request)
     {
+        request.queued();
         // This assumes we can dispatch now, which is unlikely to be a
         // practical dispatch algorithm!
         for (BuildService service : buildServices)

@@ -21,7 +21,6 @@ import java.util.List;
 public abstract class AbstractEditTriggerAction extends ProjectActionSupport implements Preparable
 {
     private long id;
-    private long projectId;
     private Project project;
     private String specification;
     private List<String> specifications;
@@ -35,16 +34,6 @@ public abstract class AbstractEditTriggerAction extends ProjectActionSupport imp
     public void setId(long id)
     {
         this.id = id;
-    }
-
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
     }
 
     public Project getProject()

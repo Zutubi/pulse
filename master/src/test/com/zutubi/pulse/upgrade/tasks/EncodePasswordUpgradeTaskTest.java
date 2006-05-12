@@ -14,15 +14,15 @@ import java.sql.*;
 /**
  * <class-comment/>
  */
-public class EncryptPasswordUpgradeTaskTest extends BaseUpgradeTaskTestCase
+public class EncodePasswordUpgradeTaskTest extends BaseUpgradeTaskTestCase
 {
     private BasicDataSource dataSource;
 
-    public EncryptPasswordUpgradeTaskTest()
+    public EncodePasswordUpgradeTaskTest()
     {
     }
 
-    public EncryptPasswordUpgradeTaskTest(String name)
+    public EncodePasswordUpgradeTaskTest(String name)
     {
         super(name);
     }
@@ -55,20 +55,23 @@ public class EncryptPasswordUpgradeTaskTest extends BaseUpgradeTaskTestCase
 
             // insert data into table.
             insertTestData(con, 1L, "password");
+            insertTestData(con, 2L, "~!@#$%^&*()_+");
+            insertTestData(con, 3L, "`1234567890-=");
+            insertTestData(con, 4L, "      ");
 
             // upgrade
-            EncryptPasswordUpgradeTask upgradeTask = new EncryptPasswordUpgradeTask();
+            EncodePasswordUpgradeTask upgradeTask = new EncodePasswordUpgradeTask();
             upgradeTask.setDataSource(dataSource);
             upgradeTask.execute(new MockUpgradeContext());
 
             assertEquals(0, upgradeTask.getErrors().size());
 
-            // extract data
-            String password = selectPassword(con, 1L);
-
             // verify that it is as expected.
             Md5PasswordEncoder encoder = new Md5PasswordEncoder();
-            assertTrue(encoder.isPasswordValid(password, "password", null));
+            assertTrue(encoder.isPasswordValid(selectPassword(con, 1L), "password", null));
+            assertTrue(encoder.isPasswordValid(selectPassword(con, 2L), "~!@#$%^&*()_+", null));
+            assertTrue(encoder.isPasswordValid(selectPassword(con, 3L), "`1234567890-=", null));
+            assertTrue(encoder.isPasswordValid(selectPassword(con, 4L), "      ", null));
         }
         finally
         {

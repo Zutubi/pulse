@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
@@ -67,7 +68,7 @@ public class RecipeControllerTest extends PulseTestCase
     public void testDispatchRequest()
     {
         // Initialising should cause a dispatch request, and should initialise the bootstrapper
-        ScmBootstrapper bootstrapper = new ScmBootstrapper(new Svn());
+        Bootstrapper bootstrapper = new CheckoutBootstrapper(new Svn());
         recipeController.initialise(bootstrapper);
         assertTrue(recipeQueue.hasDispatched(rootResult.getId()));
         RecipeDispatchRequest dispatched = recipeQueue.getRequest(rootResult.getId());

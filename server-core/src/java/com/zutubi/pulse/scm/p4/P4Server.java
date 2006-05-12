@@ -947,6 +947,21 @@ public class P4Server extends CachingSCMServer
         }
     }
 
+    public void update(File workDir, Revision rev) throws SCMException
+    {
+        throw new RuntimeException("nyi");
+    }
+
+    /**
+     * Indicate that update is currently not supported.
+     *
+     * @return false.
+     */
+    public boolean supportsUpdate()
+    {
+        return false;
+    }
+
     public static void main(String argv[])
     {
         P4Server server = new P4Server("localhost:1666", "jsankey", "", "pulse-demo");

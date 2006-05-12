@@ -73,6 +73,10 @@ public class BuildController implements EventListener
     {
         createBuildTree();
 
+        // Fail early if things are not as expected.
+        if (!buildResult.isPersistent())
+            throw new RuntimeException("Build result must be a persistent instance.");
+
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File buildDir = paths.getBuildDir(project, buildResult);
         buildResult.queue(buildDir);
@@ -123,6 +127,9 @@ public class BuildController implements EventListener
 
     public void handleEvent(Event evt)
     {
+        // Add an event filter here... we are only interested in events that belong to the project
+        // that we are dealing with. Q: How do we identify our events..
+
         try
         {
             if (evt instanceof BuildCommencedEvent)
@@ -168,7 +175,11 @@ public class BuildController implements EventListener
             throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
         }
 
-        ScmBootstrapper initialBootstrapper = new ScmBootstrapper(project.getScm());
+        // check project configuration to determine which bootstrap configuration should be used.
+        boolean checkoutOnly = project.getCheckoutScheme() == Project.CheckoutScheme.CHECKOUT_ONLY;
+
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        ProjectRepoBootstrapper initialBootstrapper = new ProjectRepoBootstrapper(paths.getRepoDir(project), project.getScm(), checkoutOnly);
         PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
         ComponentContext.autowire(pulseFileDetails);
         tree.prepare(buildResult);
@@ -251,6 +262,8 @@ public class BuildController implements EventListener
     {
         RecipeRequest request = controller.getDispatchRequest().getRequest();
 
+        // can retreive the revision from the dispatch request here
+
         try
         {
             FileSystemUtils.createFile(new File(buildResult.getOutputDir(), BuildResult.PULSE_FILE), request.getPulseFileSource());
@@ -260,7 +273,7 @@ public class BuildController implements EventListener
             LOG.warning("Unable to save pulse file for build: " + e.getMessage(), e);
         }
 
-        getChanges((ScmBootstrapper) request.getBootstrapper());
+        getChanges((ProjectRepoBootstrapper) request.getBootstrapper());
         buildResult.commence(controller.getResult().getStamps().getStartTime());
         if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
         {
@@ -269,7 +282,7 @@ public class BuildController implements EventListener
         buildManager.save(buildResult);
     }
 
-    private void getChanges(ScmBootstrapper bootstrapper)
+    private void getChanges(ProjectRepoBootstrapper bootstrapper)
     {
         Scm scm = project.getScm();
         Revision revision = bootstrapper.getRevision();

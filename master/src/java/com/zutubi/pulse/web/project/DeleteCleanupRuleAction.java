@@ -9,18 +9,7 @@ import com.zutubi.pulse.model.Project;
  */
 public class DeleteCleanupRuleAction extends ProjectActionSupport
 {
-    private long projectId;
     private long id;
-
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
-    }
 
     public long getId()
     {

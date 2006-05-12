@@ -9,18 +9,7 @@ import com.zutubi.pulse.model.Project;
  */
 public class DeleteProjectAdminAction extends ProjectActionSupport
 {
-    private long projectId;
     private String login;
-
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
-    }
 
     public String getLogin()
     {

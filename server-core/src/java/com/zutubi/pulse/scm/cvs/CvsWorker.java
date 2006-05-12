@@ -15,6 +15,7 @@ import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
+import org.netbeans.lib.cvsclient.command.update.UpdateCommand;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -117,6 +118,12 @@ public class CvsWorker
     public CvsRevision getLatestChange(String uid) throws SCMException
     {
         LOG.entering();
+
+        // The latest change in a cvs repository is located by taking time x, and checking if
+        // there have been any changes since that time. We jump through hoops (as mentioned below)
+        // to handle possible time differences between the local and remote server machines. If
+        // times were in sync, then the latest revision would be now. However, since times are not
+        // in sync, we go back a few hours and have a look. 
 
         // We jump through hoops to handle the possible time difference between the hosts.
 
@@ -251,6 +258,24 @@ public class CvsWorker
         return revision;
     }
 
+    /**
+     * The update command updates the configured module in the specified working directory.
+     * An update requires that a checkout is executed to the same working directory.
+     *
+     * @param workdir
+     * @param byDate
+     * @throws SCMException
+     */
+    public void update(File workdir, CvsRevision byDate) throws SCMException
+    {
+        LOG.entering();
+        UpdateCommand update = newUpdateCommand(byDate);
+        CvsClient client = getClient();
+        client.setLocalPath(new File(workdir, module));
+        client.executeCommand(update);
+        LOG.exiting();
+    }
+
     public List<String> getListing() throws SCMException
     {
         LOG.entering();
@@ -359,6 +384,24 @@ public class CvsWorker
         }
 
         return checkout;
+    }
+
+    private UpdateCommand newUpdateCommand(CvsRevision revision)
+    {
+        UpdateCommand update = new UpdateCommand();
+        update.setPruneDirectories(true);
+        update.setBuildDirectories(true);
+        update.setResetStickyOnes(true);
+
+        if (TextUtils.stringSet(branch))
+        {
+            update.setUpdateByRevision(branch);
+        }
+        if (revision.getDate() != null)
+        {
+            update.setUpdateByDate(SERVER_DATE.format(revision.getDate()));
+        }
+        return update;
     }
 
     private VersionCommand newVersionCommand()

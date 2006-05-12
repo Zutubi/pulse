@@ -18,7 +18,6 @@ import java.util.List;
 public abstract class AbstractEditDetailsAction extends ProjectActionSupport implements Preparable
 {
     private long id;
-    private long projectId;
     private Project project;
     private PulseFileDetailsDao pulseFileDetailsDao;
     private static final List<String> PREPARE_PARAMS = Arrays.asList("id", "projectId");
@@ -31,16 +30,6 @@ public abstract class AbstractEditDetailsAction extends ProjectActionSupport imp
     public void setId(long id)
     {
         this.id = id;
-    }
-
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
     }
 
     public Project getProject()

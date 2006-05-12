@@ -125,4 +125,22 @@ public interface SCMServer
      *         path
      */
     List<RemoteFile> getListing(String path) throws SCMException;
+
+    /**
+     * Update the working directory to the specified revision.
+     *
+     * @param workDir contains a local copy (checkout) of the module.
+     * @param rev to to which the local copy will be updated.
+     *
+     * @throws SCMException
+     */
+    void update(File workDir, Revision rev) throws SCMException;
+
+    /**
+     * Allows the scm server to indicate whether or not it supports the update
+     * operation.
+     *
+     * @return true if update is supported, false otherwise.
+     */
+    boolean supportsUpdate();
 }

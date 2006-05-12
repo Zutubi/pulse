@@ -17,7 +17,6 @@ public class DeleteTriggerAction extends ProjectActionSupport
 
     private long id;
     private Trigger trigger;
-    private long projectId;
 
     public long getId()
     {
@@ -32,11 +31,6 @@ public class DeleteTriggerAction extends ProjectActionSupport
     public Trigger getTrigger()
     {
         return trigger;
-    }
-
-    public long getProjectId()
-    {
-        return projectId;
     }
 
     public void validate()

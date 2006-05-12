@@ -180,6 +180,21 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertProjectSpecificsTable("versioned", "pulse.xml");
     }
 
+    public void testEditCheckoutScheme()
+    {
+        // the default should be CHECOUT_ONLY.
+        assertTextPresent("CHECKOUT_ONLY");
+
+        clickLink("project.checkout.edit");
+
+        EditCheckoutSchemeForm form = new EditCheckoutSchemeForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements("CHECKOUT_AND_UPDATE");
+        form.assertFormNotPresent();
+
+        assertTextPresent("CHECKOUT_AND_UPDATE");
+    }
+
     public void testEditScm()
     {
         CvsForm.Edit form = new CvsForm.Edit(tester);
@@ -198,7 +213,6 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         // check the form again to ensure that the path has been saved.
         clickLink("project.scm.edit");
         form.assertFormElements("/loc", "mod", "", "", "1", "1");
-
     }
 
     public void testEditScmPasswordValue()
@@ -315,7 +329,10 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
         assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
 
-        clickLinkWithText("edit", 5);
+        // using the index of the link is brittle, but since the links id
+        // contains a reference to the id of the object (which we do not know)
+        // there are not many options available.
+        clickLinkWithText("edit", 6);
 
         form.assertFormElements(null, null, "10", "builds");
         assertOptionsEqual(CleanupRuleForm.WORK_DIR_ONLY, new String[]{ "whole build results", "working directories only" });
@@ -331,7 +348,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         assertProjectCleanupTable(new String[][] { getCleanupRow(false, "error, success", "2 days") });
 
         // Check form is correctly populated again
-        clickLinkWithText("edit", 5);
+        clickLinkWithText("edit", 6);
 
         form.assertFormElements(null, null, "2", "days");
         assertSelectionValues(CleanupRuleForm.WORK_DIR_ONLY, new String[]{ "false" });
@@ -344,7 +361,10 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
         assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
 
-        clickLinkWithText("edit", 5);
+        // using the index of the link is brittle, but since the links id
+        // contains a reference to the id of the object (which we do not know)
+        // there are not many options available.
+        clickLinkWithText("edit", 6);
 
         form.assertFormElements(null, null, "10", "builds");
         tester.selectOption(CleanupRuleForm.WORK_DIR_ONLY, "whole build results");
@@ -360,7 +380,10 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
         assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
 
-        clickLinkWithText("edit", 5);
+        // using the index of the link is brittle, but since the links id
+        // contains a reference to the id of the object (which we do not know)
+        // there are not many options available.
+        clickLinkWithText("edit", 6);
 
         form.saveFormElements(null, null, "0", "days");
         form.assertFormPresent();

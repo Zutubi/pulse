@@ -18,18 +18,7 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
 
     protected List<String> recipes = new LinkedList<String>();
     protected ResourceRepository resourceRepository;
-    protected long projectId;
     protected Project project;
-
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
-    }
 
     public Project getProject()
     {

@@ -369,7 +369,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public class SimpleBootstrapper extends BootstrapperSupport
     {
-        public void bootstrap(long recipeId, RecipePaths paths) throws BuildException
+        public void bootstrap(RecipePaths paths) throws BuildException
         {
             // Do nothing.
         }
@@ -384,7 +384,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
             this.exception = exception;
         }
 
-        public void bootstrap(long recipeId, RecipePaths paths) throws BuildException
+        public void bootstrap(RecipePaths paths) throws BuildException
         {
             throw exception;
         }

@@ -20,6 +20,18 @@ public abstract class Scm extends Entity
 
     public abstract SCMServer createServer() throws SCMException;
 
+    public boolean supportsUpdate()
+    {
+        try
+        {
+            return createServer().supportsUpdate();
+        }
+        catch (SCMException e)
+        {
+            return false;
+        }
+    }
+
     protected Properties getProperties()
     {
         if (properties == null)

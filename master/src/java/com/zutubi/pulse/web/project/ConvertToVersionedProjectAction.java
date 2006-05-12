@@ -3,7 +3,6 @@
  ********************************************************************************/
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.CustomPulseFileDetails;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.VersionedPulseFileDetails;
 

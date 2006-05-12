@@ -525,6 +525,13 @@
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
+        <action name="editCheckoutScheme" class="com.zutubi.pulse.web.project.EditProjectCheckoutSchemeAction">
+            <result name="input" type="velocity">edit-checkout-scheme.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
         <action name="addProjectAdmins" class="com.zutubi.pulse.web.project.AddProjectAdminsAction">
             <result name="input" type="velocity">add-project-admins.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>

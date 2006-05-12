@@ -31,16 +31,6 @@ public abstract class AbstractEditScmAction extends ProjectActionSupport impleme
         this.id = id;
     }
 
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
-    }
-
     public Project getProject()
     {
         return project;

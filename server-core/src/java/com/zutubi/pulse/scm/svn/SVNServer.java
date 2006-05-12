@@ -11,18 +11,17 @@ import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import org.tmatesoft.svn.core.*;
-import org.tmatesoft.svn.core.wc.SVNWCUtil;
-import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
-import org.tmatesoft.svn.core.auth.SVNSSHAuthentication;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationProvider;
 import org.tmatesoft.svn.core.auth.SVNAuthentication;
+import org.tmatesoft.svn.core.auth.SVNSSHAuthentication;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
-import org.tmatesoft.svn.core.internal.util.DefaultSVNDebugLogger;
-import org.tmatesoft.svn.core.io.*;
-import org.tmatesoft.svn.util.SVNDebugLog;
+import org.tmatesoft.svn.core.io.SVNRepository;
+import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
+import org.tmatesoft.svn.core.wc.SVNRevision;
+import org.tmatesoft.svn.core.wc.SVNUpdateClient;
+import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,8 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 
 /**
  * A connection to a subversion server.
@@ -442,6 +439,21 @@ public class SVNServer implements SCMServer
         }
 
         return result;
+    }
+
+    public void update(File workDir, Revision rev) throws SCMException
+    {
+        throw new RuntimeException("nyi");
+    }
+
+    /**
+     * Indicate that update is currently not supported.
+     *
+     * @return false.
+     */
+    public boolean supportsUpdate()
+    {
+        return false;
     }
 
     //=======================================================================

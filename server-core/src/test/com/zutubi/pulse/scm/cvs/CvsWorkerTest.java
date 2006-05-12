@@ -9,9 +9,9 @@ import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.Constants;
 import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
@@ -104,9 +104,11 @@ public class CvsWorkerTest extends PulseTestCase
 
         assertNotNull(revision);
 
-        // ensure that the date is somewhere in the vacinity of 31 hours old.
+        // ensure that the date is somewhere in the vacinity of 31 hours old (unless a change
+        // has been made to the repository). So, just check that the revision date is no more
+        // than 31 hours old.
         assertTrue(before.getTime() - 31 * Constants.HOUR <= revision.getDate().getTime());
-        assertTrue(revision.getDate().getTime() <= after.getTime() - 31 * Constants.HOUR);
+//        assertTrue(revision.getDate().getTime() <= after.getTime() - 31 * Constants.HOUR);
     }
 
     public void testGetLatestRevisionSince() throws SCMException, ParseException
@@ -528,6 +530,46 @@ public class CvsWorkerTest extends PulseTestCase
 
         List<String> dirListing = cvs.getListing();
         assertTrue(dirListing.size() > 100);
+    }
+
+    public void testUpdateToHead() throws ParseException, SCMException
+    {
+        String module = "unit-test/CvsWorkerTest/testUpdateOnHead";
+        cvs.setModule(module);
+
+        // checkout is required first.    2006.05.10.13.33.54
+        CvsRevision byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-05-10 13:33:00 GMT"));
+        cvs.checkout(workdir, byDate);
+
+        // verify that file x is not there.
+        File x = new File(workdir, module + "/file1.txt");
+        assertFalse(x.exists());
+
+        // cvs update to a specific date.
+        cvs.update(workdir, CvsRevision.HEAD);
+
+        // verify that file x is now there.
+        assertTrue(x.exists());
+    }
+
+    public void testUpdateToDate() throws SCMException, ParseException
+    {
+        String module = "unit-test/CvsWorkerTest/testUpdateOnHead";
+        cvs.setModule(module);
+
+        // checkout is required first.    2006.05.10.13.33.54
+        CvsRevision byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-05-10 13:33:00 GMT"));
+        cvs.checkout(workdir, byDate);
+
+        // verify that file x is not there.
+        File x = new File(workdir, module + "/file1.txt");
+        assertFalse(x.exists());
+
+        // cvs update to a specific date.
+        cvs.update(workdir, new CvsRevision(null, null, null, SERVER_DATE.parse("2006-05-10 13:34:00 GMT")));
+
+        // verify that file x is now there.
+        assertTrue(x.exists());
     }
 
     private void assertContents(String expected, File file) throws IOException

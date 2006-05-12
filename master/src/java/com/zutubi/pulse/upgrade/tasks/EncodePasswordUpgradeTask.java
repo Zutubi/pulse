@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * <class-comment/>
  */
-public class EncryptPasswordUpgradeTask implements UpgradeTask, DataSourceAware
+public class EncodePasswordUpgradeTask implements UpgradeTask, DataSourceAware
 {
     private DataSource dataSource;
 

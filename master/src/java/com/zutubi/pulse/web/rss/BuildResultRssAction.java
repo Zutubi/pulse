@@ -9,7 +9,6 @@ import com.zutubi.pulse.model.HistoryPage;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
-import com.opensymphony.util.TextUtils;
 import com.sun.syndication.feed.synd.*;
 import com.sun.syndication.feed.module.content.ContentModule;
 import com.sun.syndication.feed.module.content.ContentModuleImpl;
@@ -24,69 +23,14 @@ import java.util.Date;
  */
 public class BuildResultRssAction extends ProjectActionSupport
 {
-    private static final int NOT_SPECIFIED = -1;
-
-    private String projectName;
-
-    private long projectId = NOT_SPECIFIED;
-
     private BuildResultRenderer buildResultRenderer;
     private ConfigurationManager configurationManager;
 
     private SyndFeed feed;
 
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
-    }
-
-    public String getProjectName()
-    {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName)
-    {
-        this.projectName = projectName;
-    }
-
     public SyndFeed getFeed()
     {
         return feed;
-    }
-
-    public Project getProject()
-    {
-        if (projectId != NOT_SPECIFIED)
-        {
-            return getProjectManager().getProject(projectId);
-        }
-        else if (TextUtils.stringSet(projectName))
-        {
-            return getProjectManager().getProject(projectName);
-        }
-        return null;
-    }
-
-    public void addUnknownProjectError()
-    {
-        if (projectId != NOT_SPECIFIED)
-        {
-            addActionError("Unknown project [" + projectId + "]");
-        }
-        else if (TextUtils.stringSet(projectName))
-        {
-            addActionError("Unknown project [" + projectName + "]");
-        }
-        else
-        {
-            addActionError("Require either a project name or id.");
-        }
     }
 
     public String execute()
@@ -101,7 +45,7 @@ public class BuildResultRssAction extends ProjectActionSupport
         Project project = getProject();
         if (project == null)
         {
-            addUnknownProjectError();
+            addUnknownProjectActionError();
             return ERROR;
         }
 

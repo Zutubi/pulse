@@ -10,6 +10,17 @@ import com.zutubi.pulse.model.Project;
 import java.io.File;
 
 /**
+ * The Master Build Paths directory structure is as follows:
+ *
+ *  PROJECTS_ROOT/ -
+ *      \-- (project-id)
+ *          \--  repo
+ *          \--  builds/
+ *              \-- (build number)
+ *                  \-- (recipe number)
+ *                      \-- base
+ *                      \-- output
+ *
  */
 public class MasterBuildPaths
 {
@@ -28,6 +39,11 @@ public class MasterBuildPaths
     public File getProjectDir(Project project)
     {
         return new File(rootBuildDir, getProjectDirName(project));
+    }
+
+    public File getRepoDir(Project project)
+    {
+        return new File(getProjectDir(project), "repo");
     }
 
     public File getBuildsDir(Project project)

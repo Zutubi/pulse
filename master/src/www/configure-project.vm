@@ -58,6 +58,13 @@
 #end
                 </table>
 
+            <!-- checkout scheme -->
+                <table id="project.checkout" class="fill-content">
+                    #aclEditHeadingRow("project.checkout" 2 "editCheckoutScheme!input.action?projectId=$project.id" "project.checkout.edit" "project")
+                    #dynamicRow("project.checkout.scheme" "$project.checkoutScheme")
+                    <!--#dynamicRow("actions" "force checkout")-->
+                </table>
+
             <!-- Project administrators -->
 
                 <table id="project.admins" class="fill-content">

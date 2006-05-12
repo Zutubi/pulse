@@ -11,6 +11,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * The Asynchronous delegating listener, as the name suggests, is an event listener that
+ * delegates the handling of the event to another event listener (the delegate) that is
+ * executed on a separate thread.
+ *
+ * The use of this delegating listener ensures that events do not block the event dispatch
+ * thread and are delegated in the same order as they are received.
+ *
  */
 public class AsynchronousDelegatingListener implements EventListener, Stoppable
 {
@@ -27,6 +34,10 @@ public class AsynchronousDelegatingListener implements EventListener, Stoppable
 
     public void handleEvent(final Event event)
     {
+        // deletate the handling of the event to the delegate being executed on
+        // a separate thread. The executor will queue the event handling until the
+        // thread is available. See Executors.newSingleThreadExecutor for full
+        // sematic definition.
         executor.execute(new Runnable()
         {
             public void run()

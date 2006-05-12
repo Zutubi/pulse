@@ -12,7 +12,6 @@ import com.zutubi.pulse.scheduling.Trigger;
 public class EditTriggerAction extends ProjectActionSupport
 {
     private long id;
-    private long projectId;
     private Project project;
     private Trigger trigger;
 
@@ -24,16 +23,6 @@ public class EditTriggerAction extends ProjectActionSupport
     public void setId(long id)
     {
         this.id = id;
-    }
-
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
     }
 
     public Project getProject()

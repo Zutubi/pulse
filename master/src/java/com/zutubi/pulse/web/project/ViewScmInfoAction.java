@@ -3,11 +3,8 @@
  ********************************************************************************/
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.filesystem.remote.RemoteScmFileSystem;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.Scm;
-import com.opensymphony.util.TextUtils;
-import com.opensymphony.xwork.ActionContext;
 
 import java.util.Map;
 

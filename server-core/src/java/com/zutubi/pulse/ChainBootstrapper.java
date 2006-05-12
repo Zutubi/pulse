@@ -31,11 +31,11 @@ public class ChainBootstrapper implements Bootstrapper
         }
     }
 
-    public void bootstrap(long recipeId, RecipePaths paths) throws BuildException
+    public void bootstrap(RecipePaths paths) throws BuildException
     {
         for (Bootstrapper bootstrapper : bootstrappers)
         {
-            bootstrapper.bootstrap(recipeId, paths);
+            bootstrapper.bootstrap(paths);
         }
     }
 
