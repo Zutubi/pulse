@@ -29,7 +29,7 @@ public class PreferencesAction extends UserActionSupport
         String login = AcegiUtils.getLoggedInUser();
         if (login == null)
         {
-            return ERROR;
+            return "guest";
         }
 
         setUserLogin(login);

@@ -18,6 +18,7 @@
                     #dynamicRow("general.host" $config.hostName)
                     #dynamicRow("general.help.url" $config.helpUrl)
                     #enabledDisabledRow("general.rss.enabled" $config.rssEnabled)
+                    #enabledDisabledRow("general.anonymous" $config.anonymousAccessEnabled)
                 </table>
                 <table id="logging.config" class="fill-content">
                     #adminHeadingRow("logging.config" "/admin/editLogConfig!input.action" "logging.edit" "/admin/logConfig!reset.action" "logging.reset")

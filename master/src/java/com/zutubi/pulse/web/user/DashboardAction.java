@@ -53,7 +53,7 @@ public class DashboardAction extends ActionSupport
         String login = AcegiUtils.getLoggedInUser();
         if (login == null)
         {
-            return ERROR;
+            return "guest";
         }
         user = userManager.getUser(login);
         if (user == null)

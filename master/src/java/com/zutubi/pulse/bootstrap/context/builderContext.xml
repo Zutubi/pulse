@@ -17,18 +17,15 @@
 
     <bean id="buildManagerTarget" class="com.zutubi.pulse.model.DefaultBuildManager" autowire="byName"
           init-method="init"/>
-
-    <bean id="buildManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+    <bean id="buildManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
             <ref bean="buildManagerTarget"/>
         </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
+        <property name="interceptorNames">
+            <list>
+                <value>transactionInterceptor</value>
+                <value>securityInterceptor</value>
+            </list>
         </property>
     </bean>
 
@@ -148,4 +145,5 @@
 
     <bean id="postProcessorManager" class="com.zutubi.pulse.PostProcessorManager" autowire="byName"/>
 
+    <bean id="guestAccessManager" class="com.zutubi.pulse.GuestAccessManager" autowire="byName" init-method="init"/>
 </beans>

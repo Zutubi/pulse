@@ -506,7 +506,7 @@
 #macro(enabledDisabledRow $key $value)
     <tr>
         <th class="content-row" #if($span > 1) colspan="$span" #end>#wwtext("name=$key")</th>
-        <td>#if($value)#wwtext("name=enabled")#else #wwtext("name=disabled")#end</td>
+        <td class="content">#if($value)#wwtext("name=enabled")#else #wwtext("name=disabled")#end</td>
     </tr>
 #end
 

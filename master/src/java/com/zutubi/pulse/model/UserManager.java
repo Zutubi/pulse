@@ -13,6 +13,8 @@ import java.util.List;
  */
 public interface UserManager extends EntityManager<User>, UserDetailsService
 {
+    String ANONYMOUS_LOGIN = "anonymous";
+
     /**
      * Retrieve an instance of the user identified by the login name
      * @param login

@@ -10,6 +10,7 @@
             <!--<result name="setupAdmin" type="redirect">/setup/setupWizard.action</result>-->
             <result name="dashboard" type="redirect">/dashboard.action</result>
             <result name="welcome" type="velocity">/welcome.vm</result>
+            <result name="projects" type="redirect">/viewProjects.action</result>
         </action>
 
         <action name="login" class="com.zutubi.pulse.web.LoginAction">
@@ -29,17 +30,20 @@
         <action name="dashboard" class="com.zutubi.pulse.web.user.DashboardAction">
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="velocity">dashboard.vm</result>
-            <result name="error" type="redirect">/</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
 
         <action name="preferences" class="com.zutubi.pulse.web.user.PreferencesAction">
             <result name="input" type="velocity">/preferences.vm</result>
             <result name="success" type="velocity">/preferences.vm</result>
-            <result name="error" type="redirect">/</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
 
         <action name="preferences!input" class="com.zutubi.pulse.web.user.PreferencesAction" method="doInput">
             <result name="input" type="velocity">/preferences.vm</result>
+            <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
 
         <action name="viewRecipeQueue" class="com.zutubi.pulse.web.server.ViewRecipeQueueAction">

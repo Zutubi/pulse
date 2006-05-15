@@ -3,6 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.web;
 
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.security.AcegiUtils;
 
@@ -39,9 +40,17 @@ public class DefaultAction extends ActionSupport
         {
             return SETUP_ADMIN;
         }
-        // We always expect a user to be logged in at this point. 
+
         String login = AcegiUtils.getLoggedInUser();
-        return userManager.getUser(login).getDefaultAction();
+        if(login == null)
+        {
+            return "projects";
+        }
+        else
+        {
+            User user = userManager.getUser(login);
+            return user.getDefaultAction();
+        }
     }
 
     /**

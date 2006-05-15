@@ -113,6 +113,16 @@ public class ApplicationConfigurationSupport implements ApplicationConfiguration
         config.setBooleanProperty(RSS_ENABLED, rssEnabled);
     }
 
+    public Boolean getAnonymousAccessEnabled()
+    {
+        return config.getBooleanProperty(ANONYMOUS_ACCESS_ENABLED, Boolean.FALSE);
+    }
+
+    public void setAnonymousAccessEnabled(Boolean anonEnabled)
+    {
+        config.setBooleanProperty(ANONYMOUS_ACCESS_ENABLED, anonEnabled);
+    }
+
     public String getSmtpPrefix()
     {
         return config.getProperty(SMTP_PREFIX);

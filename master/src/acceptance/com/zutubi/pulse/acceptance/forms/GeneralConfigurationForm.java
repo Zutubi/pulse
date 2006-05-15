@@ -22,11 +22,11 @@ public class GeneralConfigurationForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"hostName", "helpUrl", "rssEnabled"};
+        return new String[]{"hostName", "helpUrl", "rssEnabled", "anonEnabled"};
     }
 
     public int[] getFieldTypes()
     {
-        return new int[]{TEXTFIELD, TEXTFIELD, CHECKBOX};
+        return new int[]{TEXTFIELD, TEXTFIELD, CHECKBOX, CHECKBOX};
     }
 }

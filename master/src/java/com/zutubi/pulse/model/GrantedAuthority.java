@@ -10,6 +10,8 @@ import com.zutubi.pulse.core.model.Entity;
  */
 public class GrantedAuthority extends Entity implements org.acegisecurity.GrantedAuthority
 {
+    public static final String ANONYMOUS = "ROLE_ANONYMOUS";
+    public static final String GUEST = "ROLE_GUEST";
     public static final String USER = "ROLE_USER";
     public static final String ADMINISTRATOR = "ROLE_ADMINISTRATOR";
 

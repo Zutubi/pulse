@@ -7,12 +7,14 @@ import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.model.TestResultSummary;
+import org.acegisecurity.acl.basic.AclObjectIdentity;
+import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
 import java.util.List;
 
 /**
  */
-public class BuildResult extends Result
+public class BuildResult extends Result implements AclObjectIdentityAware
 {
     public static final String PULSE_FILE = "pulse.xml";
 
@@ -160,5 +162,10 @@ public class BuildResult extends Result
     public void accumulateTestSummary(TestResultSummary summary)
     {
         root.accumulateTestSummary(summary);
+    }
+
+    public AclObjectIdentity getAclObjectIdentity()
+    {
+        return project;
     }
 }

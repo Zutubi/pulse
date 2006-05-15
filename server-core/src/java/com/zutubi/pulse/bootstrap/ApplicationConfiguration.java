@@ -52,6 +52,10 @@ public interface ApplicationConfiguration
     
     public static final String RSS_ENABLED = "rss.enabled";
 
+    //---( anonymous access )---
+
+    public static final String ANONYMOUS_ACCESS_ENABLED = "anon.enabled";
+
     /**
      * The port on which the http server will listen for connections.
      */
@@ -117,5 +121,9 @@ public interface ApplicationConfiguration
     Boolean getRssEnabled();
 
     void setRssEnabled(Boolean rssEnabled);
+
+    Boolean getAnonymousAccessEnabled();
+
+    void setAnonymousAccessEnabled(Boolean anonEnabled);
 
 }

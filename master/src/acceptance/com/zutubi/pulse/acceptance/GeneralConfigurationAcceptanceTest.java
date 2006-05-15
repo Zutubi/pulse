@@ -52,12 +52,17 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
 
         form.assertFormPresent();
-        form.saveFormElements("saved.host.net", "saved.help.url", "true");
+        form.saveFormElements("saved.host.net", "saved.help.url", "true", "true");
 
         form.assertFormNotPresent();
 
         assertTextPresent("saved.host.net");
         assertTextPresent("saved.help.url");
+
+        clickLinkWithText("edit");
+        form.assertFormPresent();
+        form.assertFormElements("saved.host.net", "saved.help.url", "true", "true");
+        form.saveFormElements("saved.host.net", "saved.help.url", "true", "false");
     }
 
     public void testCancel() throws Exception
@@ -71,7 +76,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
         form.assertFormPresent();
 
-        form.cancelFormElements("cancelled.host.net", "cancelled.help.url", "true");
+        form.cancelFormElements("cancelled.host.net", "cancelled.help.url", "true", "true");
         form.assertFormNotPresent();
 
         assertTextNotPresent("cancelled.host.com");

@@ -3,6 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.web.admin;
 
+import com.zutubi.pulse.GuestAccessManager;
 import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.web.ActionSupport;
@@ -13,10 +14,12 @@ import com.zutubi.pulse.web.ActionSupport;
 public class GeneralConfigurationAction extends ActionSupport
 {
     private ConfigurationManager configurationManager;
+    private GuestAccessManager guestAccessManager;
 
     private String hostName;
     private String helpUrl;
     private boolean rssEnabled;
+    private boolean anonEnabled;
 
     public String doReset()
     {
@@ -77,12 +80,24 @@ public class GeneralConfigurationAction extends ActionSupport
         this.rssEnabled = rssEnabled;
     }
 
+    public boolean isAnonEnabled()
+    {
+        return anonEnabled;
+    }
+
+    public void setAnonEnabled(boolean anonEnabled)
+    {
+        this.anonEnabled = anonEnabled;
+    }
+
     private void resetConfig()
     {
         ApplicationConfiguration config = configurationManager.getAppConfig();
         config.setHostName(null);
         config.setHelpUrl(null);
         config.setRssEnabled(null);
+        config.setAnonymousAccessEnabled(null);
+        guestAccessManager.init();
     }
 
     private void saveConfig()
@@ -91,6 +106,8 @@ public class GeneralConfigurationAction extends ActionSupport
         config.setHostName(hostName);
         config.setHelpUrl(helpUrl);
         config.setRssEnabled(rssEnabled);
+        config.setAnonymousAccessEnabled(anonEnabled);
+        guestAccessManager.init();
     }
 
     private void loadConfig()
@@ -99,6 +116,7 @@ public class GeneralConfigurationAction extends ActionSupport
         hostName = config.getHostName();
         helpUrl = config.getHelpUrl();
         rssEnabled = config.getRssEnabled();
+        anonEnabled = config.getAnonymousAccessEnabled();
     }
 
     /**
@@ -109,5 +127,10 @@ public class GeneralConfigurationAction extends ActionSupport
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setGuestAccessManager(GuestAccessManager guestAccessManager)
+    {
+        this.guestAccessManager = guestAccessManager;
     }
 }

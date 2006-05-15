@@ -5,6 +5,7 @@
     <link href="/main2.css" rel="stylesheet" type="text/css" media="screen"/>
 </head>
 <body>
+    <div id="pagecontent">
     <h1>:: #wwtext("name=error") ::</h1>
 
 #parse("/template/includes/actionerrors.vm")
@@ -12,6 +13,6 @@
     <p>
         #wwtext("name=error.advice")
     </p>
-
+    </div>
 </body>
 </html>
