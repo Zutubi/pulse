@@ -145,7 +145,8 @@ body {
     border-top: solid 1px #c0c0c0;
     color: #c0c0c0;
     font-size: 10px;
-    padding: 1px;
+    padding-top: 4px;
+    padding-bottom: 4px;
     text-align: center;
     width: 100%;
 }
