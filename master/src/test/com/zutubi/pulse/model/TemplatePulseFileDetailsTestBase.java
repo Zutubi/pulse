@@ -85,4 +85,15 @@ public abstract class TemplatePulseFileDetailsTestBase extends PulseTestCase
     }
 
     public abstract TemplatePulseFileDetails getDetails();
+
+    protected void addCaptures(TemplatePulseFileDetails details)
+    {
+        FileCapture capture = new FileCapture("artifact 1", "filename");
+        capture.addProcessor("junit");
+        details.addCapture(capture);
+
+        capture = new FileCapture("artifact 2", "filename");
+        capture.addProcessor("junit");
+        details.addCapture(capture);
+    }
 }
