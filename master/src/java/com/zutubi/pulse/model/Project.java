@@ -4,6 +4,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.opensymphony.util.TextUtils;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
@@ -333,7 +334,15 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
      */
     private void setCheckoutSchemeName(String str)
     {
-        checkoutScheme = CheckoutScheme.valueOf(str);
+        // need to handle nulls in the database.
+        if (TextUtils.stringSet(str))
+        {
+            checkoutScheme = CheckoutScheme.valueOf(str);
+        }
+        else
+        {
+            checkoutScheme = CheckoutScheme.CHECKOUT_ONLY;
+        }
     }
 
     public AclObjectIdentity getAclObjectIdentity()
