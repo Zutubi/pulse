@@ -14,7 +14,7 @@
     #wwhidden("name=projectId")
     #wwhidden("name=id")
 
-    #wwtextfield("name=capture.name" "label=%{getText('artifact.name')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=name" "label=%{getText('artifact.name')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
     #wwtextfield("name=capture.base" "label=%{getText('artifact.directory.base')}" "tabindex=2" "size=60" "onkeypress=return submitenter(this,event)")
     #inlineHelp("artifact.directory.base.help")
     #wwtextfield("name=capture.includes" "label=%{getText('artifact.directory.inclusions')}" "size=60" "tabindex=3" "onkeypress=return submitenter(this,event)")

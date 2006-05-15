@@ -26,7 +26,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=addProject.action" "heading=%{getText('ant.setup')}" "method=post")
+#wwcform("action=addProject.action" "id=ant.setup" "heading=%{getText('ant.setup')}" "method=post")
     #wwhidden("name=state")
     #wwhidden("name=submit")
 

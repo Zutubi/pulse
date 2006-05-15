@@ -16,6 +16,7 @@ public abstract class BaseForm
     protected static final int CHECKBOX = 4;
     protected static final int RADIOBOX = 5;
     protected static final int SELECT = 6;
+    protected static final int MULTI_CHECKBOX = 7;
 
     public BaseForm(WebTester tester)
     {
@@ -120,6 +121,20 @@ public abstract class BaseForm
                         setRadioboxSelected(getFieldNames()[i], values[i]);
                     }
                     break;
+                case MULTI_CHECKBOX:
+                    if(values[i] != null)
+                    {
+                        String[] set;
+                        if(values[i].length() > 0)
+                        {
+                            set = values[i].split(",");
+                        }
+                        else
+                        {
+                            set = new String[0];
+                        }
+                        setMultiCheckboxValues(getFieldNames()[i], set);
+                    }
                 default:
                     break;
             }
@@ -153,10 +168,42 @@ public abstract class BaseForm
                     {
                         tester.assertFormElementEquals(getFieldNames()[i], values[i]);
                     }
+                    break;
+                case MULTI_CHECKBOX:
+                    if(values[i] != null)
+                    {
+                        String[] expected;
+
+                        if(values[i].length() > 0)
+                        {
+                            expected = values[i].split(",");
+                        }
+                        else
+                        {
+                            expected = new String[0];
+                        }
+
+                        assertMultiCheckboxValues(getFieldNames()[i], expected);
+                    }
                 default:
                     break;
             }
         }
+    }
+
+    public void assertMultiCheckboxValues(String name, String ...values)
+    {
+        String[] gotValues = tester.getDialog().getForm().getParameterValues(name);
+        Assert.assertEquals(values.length, gotValues.length);
+        for(int i = 0; i < values.length; i++)
+        {
+            Assert.assertEquals(values[i], gotValues[i]);
+        }
+    }
+
+    public void setMultiCheckboxValues(String name, String[] values)
+    {
+        tester.getDialog().getForm().setParameter(name, values);
     }
 
     public void setRadioboxSelected(String fieldName, String selectedOption)
@@ -192,4 +239,5 @@ public abstract class BaseForm
             tester.assertFormElementEquals(name, null);
         }
     }
+
 }

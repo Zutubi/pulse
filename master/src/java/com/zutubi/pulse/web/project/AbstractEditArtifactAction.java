@@ -27,6 +27,8 @@ public abstract class AbstractEditArtifactAction extends ProjectActionSupport im
     private long id;
     private long projectId;
     private Project project;
+    // Name treated specially as we need to prevent duplicates
+    private String name;
     private Capture capture;
     private List<String> processors;
     private Map<String, String> processorList;
@@ -55,6 +57,16 @@ public abstract class AbstractEditArtifactAction extends ProjectActionSupport im
     public Project getProject()
     {
         return project;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     public Capture getCapture()
@@ -92,7 +104,7 @@ public abstract class AbstractEditArtifactAction extends ProjectActionSupport im
         return PREPARE_PARAMS;
     }
 
-    public void validate()
+    private void validateProject()
     {
         if(project != null)
         {
@@ -112,9 +124,25 @@ public abstract class AbstractEditArtifactAction extends ProjectActionSupport im
         }
     }
 
+    public void validate()
+    {
+        validateProject();
+        if(hasErrors())
+        {
+            return;
+        }
+
+        TemplatePulseFileDetails details = (TemplatePulseFileDetails) project.getPulseFileDetails();
+        Capture sameName = details.getCapture(name);
+        if(sameName != null && sameName.getId() != capture.getId())
+        {
+            addFieldError("name", "the name " + name + " is already being used");
+        }
+    }
+
     public void prepare() throws Exception
     {
-        validate();
+        validateProject();
         if(hasErrors())
         {
             return;
@@ -132,6 +160,8 @@ public abstract class AbstractEditArtifactAction extends ProjectActionSupport im
             addActionError("Invalid operation for artifact");
         }
 
+        name = capture.getName();
+
         processors = capture.getProcessors();
     }
 
@@ -148,6 +178,8 @@ public abstract class AbstractEditArtifactAction extends ProjectActionSupport im
 
     public String execute()
     {
+        capture.setName(name);
+
         List<String> procs = capture.getProcessors();
         procs.clear();
         if(processors != null)

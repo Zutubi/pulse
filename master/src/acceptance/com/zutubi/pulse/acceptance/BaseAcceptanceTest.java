@@ -27,6 +27,7 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
     protected static final String PROJECT_BASICS_URL = "url";
     protected static final String PROJECT_BASICS_SCM = "scm";
     protected static final String PROJECT_BASICS_TYPE = "type";
+    protected static final String FO_ANT_SETUP = "ant.setup";
     protected static final String FO_VERSIONED_SETUP = "versioned.setup";
     protected static final String VERSIONED_SETUP_FILE = "details.pulseFileName";
 
@@ -119,6 +120,13 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
         gotoPage("/");
         clickLinkWithText("administration");
         clickLinkWithText("users");
+    }
+
+    protected void submitAntSetupForm()
+    {
+        assertFormPresent(FO_ANT_SETUP);
+        setWorkingForm(FO_ANT_SETUP);
+        submit("next");
     }
 
     protected void submitVersionedSetupForm(String file)

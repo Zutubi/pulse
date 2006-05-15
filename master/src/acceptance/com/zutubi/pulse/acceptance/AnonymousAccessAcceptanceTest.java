@@ -9,7 +9,7 @@ public class AnonymousAccessAcceptanceTest extends BaseAcceptanceTest
 {
     public void testDisabledByDefault()
     {
-        gotoPage("/");
+        beginAt("/");
         LoginForm form = new LoginForm(tester);
         form.assertFormPresent();
     }

@@ -9,11 +9,8 @@ import com.zutubi.pulse.util.RandomUtils;
 /**
  * <class-comment/>
  */
-public class ProjectAcceptanceTest extends BaseAcceptanceTest
+public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 {
-    private String projectName;
-    private static final String DESCRIPTION = "test description";
-    private static final String URL = "http://test/url";
     private static final String CRON_TRIGGER_NAME = "cron-trigger-name";
     private static final String CRON_STRING = "0 0 0 * * ?";
     private static final String SPEC_NAME = "spec-name";
@@ -21,36 +18,12 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
 
     public ProjectAcceptanceTest()
     {
+        super(Type.VERSIONED);
     }
 
     public ProjectAcceptanceTest(String name)
     {
-        super(name);
-    }
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-
-        // create project that will be used during this set of tests.
-        login("admin", "admin");
-
-        // navigate to the create project wizard.
-        // fill in the form details.
-        clickLinkWithText("projects");
-        clickLinkWithText("add new project");
-
-        projectName = "project " + RandomUtils.randomString(5);
-        submitProjectBasicsForm(projectName, DESCRIPTION, URL, "cvs", "versioned");
-        submitCvsSetupForm("/local", "module", "", "");
-        submitVersionedSetupForm("pulse.xml");
-        assertTablePresent("project.basics");
-    }
-
-    protected void tearDown() throws Exception
-    {
-
-        super.tearDown();
+        super(name, Type.VERSIONED);
     }
 
     public void testEditProjectBasics()
@@ -183,7 +156,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
     public void testEditCheckoutScheme()
     {
         // the default should be CHECOUT_ONLY.
-        assertTextPresent("CHECKOUT_ONLY");
+        assertTextPresent("checkout only");
 
         clickLink("project.checkout.edit");
 
@@ -192,7 +165,7 @@ public class ProjectAcceptanceTest extends BaseAcceptanceTest
         form.saveFormElements("CHECKOUT_AND_UPDATE");
         form.assertFormNotPresent();
 
-        assertTextPresent("CHECKOUT_AND_UPDATE");
+        assertTextPresent("checkout and update");
     }
 
     public void testEditScm()
