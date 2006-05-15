@@ -126,6 +126,6 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public String escapeSpaces(String s)
     {
-        return s.replace(' ', '+');
+        return s.replace(" ", "%20");
     }
 }
