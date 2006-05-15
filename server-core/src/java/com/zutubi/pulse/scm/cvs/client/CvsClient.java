@@ -226,7 +226,12 @@ public class CvsClient
             long time = System.currentTimeMillis();
             try
             {
-                return client.executeCommand(command, globalOptions);
+                if (!client.executeCommand(command, globalOptions))
+                {
+                    LOG.error("Cvs command: " + command.getCVSCommand() + " has failed.");
+                    return false;
+                }
+                return true;
             }
             finally
             {
