@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Prints status information to standard out while doing a local build.
@@ -23,6 +24,7 @@ public class BuildStatusPrinter implements EventListener
     private Indenter indenter;
     private String baseDir;
     private RecipeResult result;
+    private Locale locale;
 
     public BuildStatusPrinter(File base, OutputStream logStream)
     {
@@ -30,6 +32,7 @@ public class BuildStatusPrinter implements EventListener
         indenter = new Indenter(new PrintStream(fork), "  ");
         baseDir = base.getAbsolutePath() + File.separatorChar;
         result = new RecipeResult();
+        locale = Locale.getDefault();        
     }
 
 
@@ -72,14 +75,14 @@ public class BuildStatusPrinter implements EventListener
 
         indenter.println("[" + recipeName + "]");
         indenter.indent();
-        indenter.println("commenced: " + TimeStamps.getPrettyTime(event.getStartTime()));
+        indenter.println("commenced: " + TimeStamps.getPrettyDate(event.getStartTime(), locale));
     }
 
     private void handleCommandCommenced(CommandCommencedEvent event)
     {
         indenter.println("[" + event.getName() + "]");
         indenter.indent();
-        indenter.println("commenced: " + TimeStamps.getPrettyTime(event.getStartTime()));
+        indenter.println("commenced: " + TimeStamps.getPrettyDate(event.getStartTime(), locale));
     }
 
     private void handleCommandCompleted(CommandCompletedEvent event)
@@ -87,7 +90,7 @@ public class BuildStatusPrinter implements EventListener
         CommandResult commandResult = event.getResult();
         result.add(commandResult);
 
-        indenter.println("completed: " + commandResult.getStamps().getPrettyEndTime());
+        indenter.println("completed: " + commandResult.getStamps().getPrettyEndDate(locale));
         indenter.println("elapsed  : " + commandResult.getStamps().getPrettyElapsed());
         indenter.println("result   : " + commandResult.getState().getPrettyString());
 
@@ -206,7 +209,7 @@ public class BuildStatusPrinter implements EventListener
     {
         result.complete();
 
-        indenter.println("completed: " + result.getStamps().getPrettyEndTime());
+        indenter.println("completed: " + result.getStamps().getPrettyEndDate(locale));
         indenter.println("elapsed  : " + result.getStamps().getPrettyElapsed());
         indenter.println("result   : " + result.getState().getPrettyString());
 
