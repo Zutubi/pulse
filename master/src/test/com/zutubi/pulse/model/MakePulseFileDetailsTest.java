@@ -16,6 +16,7 @@ public class MakePulseFileDetailsTest extends TemplatePulseFileDetailsTestBase
     protected void setUp() throws Exception
     {
         details = new MakePulseFileDetails();
+        generateMode = true;
         super.setUp();
     }
 
@@ -64,5 +65,17 @@ public class MakePulseFileDetailsTest extends TemplatePulseFileDetailsTestBase
     {
         details.setArguments("arg1 arg2");
         createAndVerify("explicitArgs");
+    }
+
+    public void testProcessOutput() throws Exception
+    {
+        details.getOutputProcessors().add("junit");
+        createAndVerify("processOutput");
+    }
+
+    public void testCaptureArtifacts() throws Exception
+    {
+        addCaptures(details);
+        createAndVerify("captureArtifacts");
     }
 }
