@@ -7,6 +7,7 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.InitialBootstrapper;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
@@ -176,10 +177,17 @@ public class BuildController implements EventListener
         }
 
         // check project configuration to determine which bootstrap configuration should be used.
+        InitialBootstrapper initialBootstrapper;
         boolean checkoutOnly = project.getCheckoutScheme() == Project.CheckoutScheme.CHECKOUT_ONLY;
-
-        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        ProjectRepoBootstrapper initialBootstrapper = new ProjectRepoBootstrapper(paths.getRepoDir(project), project.getScm(), checkoutOnly);
+        if (checkoutOnly)
+        {
+            initialBootstrapper = new CheckoutBootstrapper(project.getScm());
+        }
+        else
+        {
+            MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+            initialBootstrapper = new ProjectRepoBootstrapper(paths.getRepoDir(project), project.getScm());
+        }
         PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
         ComponentContext.autowire(pulseFileDetails);
         tree.prepare(buildResult);
@@ -273,7 +281,7 @@ public class BuildController implements EventListener
             LOG.warning("Unable to save pulse file for build: " + e.getMessage(), e);
         }
 
-        getChanges((ProjectRepoBootstrapper) request.getBootstrapper());
+        getChanges((InitialBootstrapper) request.getBootstrapper());
         buildResult.commence(controller.getResult().getStamps().getStartTime());
         if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
         {
@@ -282,7 +290,7 @@ public class BuildController implements EventListener
         buildManager.save(buildResult);
     }
 
-    private void getChanges(ProjectRepoBootstrapper bootstrapper)
+    private void getChanges(InitialBootstrapper bootstrapper)
     {
         Scm scm = project.getScm();
         Revision revision = bootstrapper.getRevision();

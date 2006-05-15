@@ -4,6 +4,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.InitialBootstrapper;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.util.IOUtils;
@@ -70,7 +71,7 @@ public class RecipeDispatchRequest
     {
         if(lazyPulseFile.getPulseFile() == null)
         {
-            ProjectRepoBootstrapper scmBootstrapper = (ProjectRepoBootstrapper) request.getBootstrapper();
+            InitialBootstrapper scmBootstrapper = (InitialBootstrapper) request.getBootstrapper();
             scmBootstrapper.prepare();
             Revision revision = scmBootstrapper.getRevision();
 

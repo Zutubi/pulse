@@ -43,7 +43,7 @@
             <!-- checkout scheme -->
                 <table id="project.checkout" class="fill-content">
                     #aclEditHeadingRow("project.checkout" 2 "editCheckoutScheme!input.action?projectId=$project.id" "project.checkout.edit" "project")
-                    #dynamicRow("project.checkout.scheme" "$project.checkoutScheme")
+                    #dynamicRow("project.checkout.scheme" "$action.checkoutSchemeName")
                     <!--#dynamicRow("actions" "force checkout")-->
                 </table>
 

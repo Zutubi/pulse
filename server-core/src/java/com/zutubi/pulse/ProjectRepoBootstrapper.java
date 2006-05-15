@@ -3,10 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.PulseException;
-import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -19,7 +16,7 @@ import java.io.IOException;
  * directory and then runs an update when necessary, copying the results into the build directory.
  *
  */
-public class ProjectRepoBootstrapper implements Bootstrapper
+public class ProjectRepoBootstrapper implements InitialBootstrapper
 {
     /**
      * The local scm working directory.
@@ -28,13 +25,11 @@ public class ProjectRepoBootstrapper implements Bootstrapper
 
     private final Scm scm;
     private ScmBootstrapper bootstrapper;
-    private boolean checkoutOnly;
 
-    public ProjectRepoBootstrapper(File localDir, Scm scm, boolean checkoutOnly)
+    public ProjectRepoBootstrapper(File localDir, Scm scm)
     {
         this.localDir = localDir;
         this.scm = scm;
-        this.checkoutOnly = checkoutOnly;
     }
 
     public void prepare() throws PulseException
@@ -59,13 +54,6 @@ public class ProjectRepoBootstrapper implements Bootstrapper
 
     public void bootstrap(RecipePaths paths) throws BuildException
     {
-        if (checkoutOnly)
-        {
-            // bootstrap the recipe paths directly.
-            bootstrapper.bootstrap(paths);
-            return;
-        }
-
         // run the scm bootstrapper on the local directory,
         bootstrapper.bootstrap(new RecipePaths()
         {
@@ -98,10 +86,6 @@ public class ProjectRepoBootstrapper implements Bootstrapper
 
     private ScmBootstrapper selectBootstrapper()
     {
-        if (checkoutOnly)
-        {
-            return new CheckoutBootstrapper(scm);
-        }
         // else we can update.
         if (localDir.list().length == 0)
         {

@@ -4,6 +4,7 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.Project.CheckoutScheme;
 import com.zutubi.pulse.model.ProjectAclEntry;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.model.User;
@@ -39,6 +40,19 @@ public class ConfigureProjectAction extends ProjectActionSupport
     public List<Trigger> getTriggers()
     {
         return triggers;
+    }
+
+    public String getCheckoutSchemeName()
+    {
+        CheckoutScheme scheme = project.getCheckoutScheme();
+        if (scheme == CheckoutScheme.CHECKOUT_AND_UPDATE)
+        {
+            return getText("project.checkoutAndUpdate");
+        }
+        else
+        {
+            return getText("project.checkoutOnly");
+        }
     }
 
     public List<User> getProjectAdmins()
