@@ -312,6 +312,10 @@ h3.heading, div.box, th.heading, th.note, th.content, th.content-row, td.content
     padding: 4px;
 }
 
+tr.suite-hover {
+    background: #ffd;
+}
+
 th {
     white-space: nowrap;
 }
@@ -363,7 +367,6 @@ td.content-wrap {
 
 td.success, td.success-right {
     color: #383;
-    background: #ffffff;
 }
 
 td.failure, td.error, td.failure-right, td.error-right {
@@ -397,8 +400,22 @@ td.image {
     text-align: center;
 }
 
+td.expand {
+    padding-left: 20px;
+    background: url(images/bullet_toggle_plus.gif) no-repeat 0 center;
+}
+
+td.collapse {
+    padding-left: 20px;
+    background: url(images/bullet_toggle_minus.gif) no-repeat 0 center;
+}
+
 span.action {
     float: right;
+}
+
+span.action a {
+    margin-left: 5px;
 }
 
     /*------------------------------

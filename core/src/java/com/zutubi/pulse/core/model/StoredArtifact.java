@@ -225,4 +225,12 @@ public class StoredArtifact extends Entity
             file.accumulateTestSummary(summary);
         }
     }
+
+    public void addAllTestResults(List<TestResult> tests)
+    {
+        for(StoredFileArtifact file: children)
+        {
+            file.addAllTestResults(tests);
+        }
+    }
 }

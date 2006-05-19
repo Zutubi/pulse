@@ -179,4 +179,27 @@ public class StoredFileArtifact extends Entity
         }
     }
 
+    public void addAllTestResults(List<TestResult> allTests)
+    {
+        for(TestResult result: tests)
+        {
+            if(!testExists(result.getName(), allTests))
+            {
+                allTests.add(result);
+            }
+        }
+    }
+
+    private boolean testExists(String name, List<TestResult> tests)
+    {
+        for(TestResult t: tests)
+        {
+            if(t.getName().equals(name))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

@@ -3,9 +3,13 @@
  ********************************************************************************/
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.util.Sort;
+
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * 
@@ -187,5 +191,26 @@ public class RecipeResult extends Result
         {
             c.accumulateTestSummary(summary);
         }
+    }
+
+    public List<TestResult> getAllTestResults()
+    {
+        List<TestResult> tests = new LinkedList<TestResult>();
+        for(CommandResult command: results)
+        {
+            command.addAllTestResults(tests);
+        }
+
+        final Comparator<String> packageComp = new Sort.PackageComparator();
+
+        Collections.sort(tests, new Comparator<TestResult>()
+        {
+            public int compare(TestResult t1, TestResult t2)
+            {
+                return packageComp.compare(t1.getName(), t2.getName());
+            }
+        });
+
+        return tests;
     }
 }

@@ -6,6 +6,7 @@ package com.zutubi.pulse.core.model;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Collection;
 
 /**
  * 
@@ -108,6 +109,14 @@ public class CommandResult extends Result
         for (StoredArtifact a : artifacts)
         {
             a.accumulateTestSummary(summary);
+        }
+    }
+
+    public void addAllTestResults(List<TestResult> tests)
+    {
+        for(StoredArtifact a: artifacts)
+        {
+            a.addAllTestResults(tests);            
         }
     }
 }

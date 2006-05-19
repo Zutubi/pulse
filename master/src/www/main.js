@@ -191,7 +191,7 @@ function hideChildren(id)
 }
 
 // Toggle display for all rows under the given table with a first cell of the given class
-function toggleRowsWithClass(tableId, className)
+function toggleRowsWithClass(tableId, className, visible)
 {
     var table = getElement(tableId);
     var rows = table.getElementsByTagName("tr");
@@ -201,9 +201,93 @@ function toggleRowsWithClass(tableId, className)
         var row = rows[i];
         var cells = row.getElementsByTagName("td");
 
-        if(cells.length > 0 && cells[0].className == className)
+        if(!row.collapsed && cells.length > 0 && cells[0].className.indexOf(className) == 0)
         {
-            toggleElementDisplay(row);
+            row.style.display = visible ? '' : 'none';
         }
     }
+}
+
+function toggleTests(id)
+{
+    var row = getElement(id);
+    if(row)
+    {
+        expandCollapseSuite(row, row.childrenCollapsed);
+    }
+}
+
+function expandCollapseSuite(row, expand)
+{
+    var cells = row.getElementsByTagName('td');
+
+    if(cells.length > 0)
+    {
+        var firstCell = cells[0];
+
+        row.childrenCollapsed = !expand;        
+        if(expand)
+        {
+            firstCell.className = firstCell.className.replace('expand', 'collapse');
+        }
+        else
+        {
+            firstCell.className = firstCell.className.replace('collapse', 'expand');
+        }
+
+        var sibling = row.nextSibling;
+        while(sibling)
+        {
+            if(sibling.id)
+            {
+                if(sibling.id.indexOf(row.id) == 0)
+                {
+                    cells = sibling.getElementsByTagName('td');
+
+                    if(cells.length > 0)
+                    {
+                        sibling.collapsed = !expand;
+
+                        if(successfulShowing || (cells[0].className.indexOf('success') < 0))
+                        {
+                            if(expand)
+                            {
+                                sibling.style.display = '';
+                            }
+                            else
+                            {
+                                sibling.style.display = 'none';
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            sibling = sibling.nextSibling;
+        }
+    }
+}
+
+function toggleAllTests(tableId, expand)
+{
+    var table = getElement(tableId);
+    var rows = table.getElementsByTagName('tr');
+
+    for(var i = 0; i < rows.length; i++)
+    {
+        if(rows[i].id && rows[i].className && rows[i].className.indexOf('suite') == 0)
+        {
+            expandCollapseSuite(rows[i], expand);
+        }
+    }
+}
+
+function setText(id, text)
+{
+    var element = getElement(id);
+    element.innerHTML = text;
 }

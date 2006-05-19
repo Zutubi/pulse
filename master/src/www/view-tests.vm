@@ -4,6 +4,44 @@
 <html>
 <head>
     <title>#wwtext("name=build") $result.number</title>
+    <script type="text/javascript">
+        var successfulShowing = true;
+        var allShowing = true;
+
+        function toggleSuccessful()
+        {
+            if(successfulShowing)
+            {
+                text = "#wwtext("name=tests.show.successful")";
+                successfulShowing = false;
+            }
+            else
+            {
+                text = "#wwtext("name=tests.hide.successful")";
+                successfulShowing = true;
+            }
+
+            toggleRowsWithClass('test-results', 'success', successfulShowing);
+            setText("success_toggle", text);
+        }
+
+        function toggleAll()
+        {
+            if(allShowing)
+            {
+                text ="#wwtext("name=tests.expand.all")";
+                allShowing = false;
+            }
+            else
+            {
+                text ="#wwtext("name=tests.collapse.all")";
+                allShowing = true;
+            }
+
+            toggleAllTests("test-results", allShowing);
+            setText("all_toggle", text);
+        }
+    </script>
 </head>
 <body>
     #buildTabs($result "tests")
@@ -13,7 +51,14 @@
     <table class="fill-content" id="test-results">
         <tr>
             <th class="heading" colspan="5">
-                <span class="action"><a href="#" onclick="toggleRowsWithClass('test-results', 'success'); return false;">#wwtext("name=tests.toggle.successful")</a></span>
+                <span class="action">
+                    <a href="#" id="success_toggle" onclick="toggleSuccessful(); return false;">
+                        #wwtext("name=tests.hide.successful")
+                    </a>
+                    <a href="#" id="all_toggle" onclick="toggleAll(); return false;">
+                        #wwtext("name=tests.collapse.all")
+                    </a>
+                </span>
                 #wwtext("name=test.results")
             </th>
         </tr>

@@ -1699,15 +1699,26 @@
 ##
 ## Shows a single test with any nested tests (if it is a suite).
 ##
-#macro(showTest $test $indent $showPassed)
+#macro(showTest $test $indent $showPassed $parent)
     #if($showPassed || $test.hasBrokenTests())
         #if($test.hasBrokenTests())
             #set($cssClass = "test-failure")
         #else
             #set($cssClass = "success")
         #end
-        <tr>
-            <td class="$cssClass">
+        #set($rowId = "test${parent}_${test.id}")
+        <tr id="$rowId"
+        #if($test.isSuite())
+            class="suite" onmouseover="getElement('$rowId').className = 'suite-hover';" onmouseout="getElement('$rowId').className = 'suite';" onclick="toggleTests('$rowId');"
+        #end
+        >
+            <td
+        #if($test.isSuite())
+                class="$cssClass collapse"
+        #else
+                class="$cssClass"
+        #end
+            >
                  ${indent}$!webwork.htmlEncode($test.name)
              </td>
             #testStatusCell($test)
@@ -1729,7 +1740,7 @@
 
         #if($test.isSuite())
             #foreach($child in $test.children)
-                #showTest($child "$indent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" $showPassed)
+                #showTest($child "$indent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" $showPassed "${parent}_${test.id}")
             #end
         #end
     #end
@@ -1739,16 +1750,8 @@
 ## Shows the test summary view for all tests in the given recipe.
 ##
 #macro(showRecipeTests $recipe $showPassed)
-    #foreach($command in $recipe.commandResults)
-        #if($command.hasTests())
-            #foreach($artifact in $command.artifacts)
-                #foreach($fileArtifact in $artifact.children)
-                    #foreach($test in $fileArtifact.tests)
-                        #showTest($test "" $showPassed)
-                    #end
-                #end
-            #end
-        #end
+    #foreach($test in $recipe.allTestResults)
+        #showTest($test "" $showPassed "")
     #end
 #end
 
