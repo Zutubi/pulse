@@ -10,17 +10,18 @@
     <tr>
         #contentHeading("property.name" 1)
         #contentHeading("property.value" 1)
-        #contentHeading("actions" 1)
+        #contentHeading("actions" 2)
     </tr>
     #foreach($property in $properties)
         #set($confirmMessage = $action.getText("property.confirm.delete", [$property.name]))
     <tr>
         #dynamicCell($property.name)
         #dynamicCell($property.value)
+        #editCell("/admin/editProperty!input.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)" "edit_$!webwork.htmlEncode($property.name)")
         #deleteCell($confirmMessage "/admin/deleteProperty.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)" "delete_$!webwork.htmlEncode($property.name)")
     <tr>
     #end
-    #addRow("property.add" 3 "/admin/createProperty!input.action?resourceId=$resource.id$versionLink" "property.add")
+    #addRow("property.add" 4 "/admin/createProperty!input.action?resourceId=$resource.id$versionLink" "property.add")
 #end
 
 <html>
@@ -38,17 +39,17 @@
 
     <h2 class="section">#wwtext("name=defaults")</h2>
     <table class="content">
-        #headingRow("properties" 3)
+        #headingRow("properties" 4)
 #showProperties($resource.properties null)
     </table>
 
 #foreach($version in $resource.versions.values())
     #set($confirmMessage = $action.getText("version.confirm.delete", [$version.value]))
     <h2 class="section">
-        #wwtext("name=version") $!webwork.htmlEncode($version.value) [<a href="#" class="unadorned" onclick="confirmUrl('$confirmMessage', '/admin/deleteResourceVersion.action?id=$version.id&amp;resourceId=$resource.id')"><img alt="$action.getText('delete')" src="images/delete.gif"/></a>]
+        #wwtext("name=version") $!webwork.htmlEncode($version.value) [<a href="#" class="unadorned" onclick="confirmUrl('$confirmMessage', '/admin/deleteResourceVersion.action?id=$version.id&amp;resourceId=$resource.id')"><img alt="$action.getText('delete')" class="base unadorned" src="images/delete.gif"/></a>]
     </h2>
     <table class="content">
-        #headingRow("properties" 3)
+        #headingRow("properties" 4)
     #showProperties($version.properties $version)
     </table>
 #end

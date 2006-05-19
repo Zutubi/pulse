@@ -258,6 +258,10 @@ img {
     vertical-align: text-top;
 }
 
+img.base {
+    vertical-align: baseline;
+}
+
 img.centre {
     vertical-align: baseline;
 }

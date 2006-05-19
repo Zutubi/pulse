@@ -928,6 +928,14 @@
             <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
         </action>
 
+        <action name="editProperty" class="com.zutubi.pulse.web.admin.EditPropertyAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-property.vm</result>
+            <result name="cancel" type="redirect">/viewResource.action?id=${resourceId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+        </action>
+
         <action name="deleteProperty" class="com.zutubi.pulse.web.admin.DeletePropertyAction">
             <result name="error" type="velocity">/generic-error.vm</result>
             <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>

@@ -14,7 +14,7 @@
     #wwhidden("name=versionId")
     #wwhidden("name=resourceId")
     #wwtextfield("name=property.name" "label=%{getText('property.name')}" "required=true" "tabindex=1")
-    #wwtextfield("name=value" "label=%{getText('property.value')}" "tabindex=2")
+    #wwtextfield("name=value" "label=%{getText('property.value')}" "size=60" "tabindex=2")
 
     #saveCancel(3)
 #end
