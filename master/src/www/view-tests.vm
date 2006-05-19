@@ -55,6 +55,7 @@
                     <a href="#" id="success_toggle" onclick="toggleSuccessful(); return false;">
                         #wwtext("name=tests.hide.successful")
                     </a>
+                    ::
                     <a href="#" id="all_toggle" onclick="toggleAll(); return false;">
                         #wwtext("name=tests.collapse.all")
                     </a>

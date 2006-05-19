@@ -312,10 +312,6 @@ h3.heading, div.box, th.heading, th.note, th.content, th.content-row, td.content
     padding: 4px;
 }
 
-tr.suite-hover {
-    background: #ffd;
-}
-
 th {
     white-space: nowrap;
 }
@@ -400,22 +396,26 @@ td.image {
     text-align: center;
 }
 
+td.expand, td.collapse {
+    padding-left: 16px;
+    background-repeat: no-repeat;
+    background-position: 0 center;
+}
+
 td.expand {
-    padding-left: 20px;
-    background: url(images/bullet_toggle_plus.gif) no-repeat 0 center;
+    background-image: url(images/bullet_toggle_plus.gif);
 }
 
 td.collapse {
-    padding-left: 20px;
-    background: url(images/bullet_toggle_minus.gif) no-repeat 0 center;
+    background-image: url(images/bullet_toggle_minus.gif);
+}
+
+tr.suite-hover td {
+    background-color: #ffd;
 }
 
 span.action {
     float: right;
-}
-
-span.action a {
-    margin-left: 5px;
 }
 
     /*------------------------------

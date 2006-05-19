@@ -1708,12 +1708,12 @@
         #end
         #set($rowId = "test${parent}_${test.id}")
         <tr id="$rowId"
-        #if($test.isSuite())
+        #if($test.isSuite() && $showPassed)
             class="suite" onmouseover="getElement('$rowId').className = 'suite-hover';" onmouseout="getElement('$rowId').className = 'suite';" onclick="toggleTests('$rowId');"
         #end
         >
             <td
-        #if($test.isSuite())
+        #if($test.isSuite() && $showPassed)
                 class="$cssClass collapse"
         #else
                 class="$cssClass"
