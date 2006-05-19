@@ -630,6 +630,10 @@
             <result name="disabled" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="browse" class="com.opensymphony.xwork.ActionSupport">
+            <result name="success" type="velocity">browse.vm</result>
+        </action>
+
     </package>
 
     <package name="user" namespace="/user" extends="webwork-default-package">
@@ -977,6 +981,10 @@
         <action name="testSvn" class="com.zutubi.pulse.web.ajax.TestSvnAction">
             <result name="success" type="velocity">test-scm.vm</result>
         </action>
+
+        <action name="list" class="com.zutubi.pulse.web.tree.ListAction">
+            <result name="success" type="velocity">list.vm</result>
+        </action>
     </package>
 
     <package name="popups" namespace="/popups" extends="webwork-default-package">
@@ -990,6 +998,10 @@
         <action name="browseScm" class="com.zutubi.pulse.web.project.BrowseScmAction">
             <result name="dir" type="velocity">browse-scm-dir.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="browse-popup" class="com.opensymphony.xwork.ActionSupport">
+            <result name="success" type="velocity">tree/browse-popup.vm</result>
         </action>
 
     </package>

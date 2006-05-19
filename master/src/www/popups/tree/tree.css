@@ -1,0 +1,41 @@
+.tree ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    background-repeat: no-repeat;
+    background-position: 0 .2em;
+    padding-left: 1.6em;
+}
+
+.selected {
+    background-color:#eee;
+}
+
+li.file{
+    background-image: url(../../images/tree/tree_square.png);
+}
+
+li.folder{
+    background-image: url(../../images/tree/foldericon.png);
+}
+
+li.openfolder{
+    background-image: url(../../images/tree/openfoldericon.png);
+}
+
+/* sample node type rendering */
+
+li.txt{
+    background-image: url(../../images/tree/file.png);
+}
+
+li.music{
+    background-image: url(../../images/tree/music.gif);
+}
+
+li.news{
+    background-image: url(../../images/tree/news.gif);
+}

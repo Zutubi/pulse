@@ -1,0 +1,13 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head>
+    <title>browse</title>
+</head>
+    <body>
+
+        <p>
+            <a href="popups/browse-popup.action" onClick="window.open(this.href, 'browse_popup', 'width=500, height=350, resizable=no', false); return false">popup</a>
+        </p>
+
+    </body>
+</html>
