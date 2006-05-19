@@ -476,7 +476,7 @@ li.error, li.warning, li.info, li.artifact, li.file-artifact, li.dir-artifact, l
     line-height: 20px;
 }
 
-li.error, li.warning, li.info, li.file-artifact, li.dir-artifact, li.report-artifact, li.task, li.explore {
+li.error, li.warning, li.info, li.file-artifact, li.report-artifact, li.task, li.explore {
     padding-left: 20px;
 }
 
@@ -507,10 +507,6 @@ li.explore {
 
 li.file-artifact {
     background: url( images/page.gif ) no-repeat 0 0;
-}
-
-li.dir-artifact {
-    background: url( images/folder.gif ) no-repeat 0 0;
 }
 
 li.report-artifact {

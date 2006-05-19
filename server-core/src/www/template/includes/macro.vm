@@ -1363,11 +1363,10 @@
 #macro(commandMultiArtifact $artifact $build $result $showFeatures $showArtifactLink)
     #set($hasIndex = $artifact.hasIndexFile())
     #if($hasIndex)
-        #set($artClass = "report-artifact")
+        <li class="report-artifact">
     #else
-        #set($artClass = "dir-artifact")
+        <li class="dir-artifact"><span onclick="toggleFolderList('art_${artifact.id}');"><img alt="toggle" id="art_${artifact.id}_image" src="/images/tree/openfoldericon.png"/>
     #end
-    <li class="$artClass">
     #if($hasIndex)
         <a href="/view/$result.id/$artifact.id/$action.escapeSpaces($artifact.name)/">
     #end
@@ -1375,7 +1374,8 @@
     #if($hasIndex)
         </a>
     #else
-        <ul>
+        </span>
+        <ul id="art_${artifact.id}">
         #foreach($fileArtifact in $artifact.children)
             #commandFileArtifact($artifact $fileArtifact $build $result $showFeatures $showArtifactLink)
         #end
@@ -1405,7 +1405,7 @@
         #end
         #foreach($commandResult in $result.commandResults)
             #if($commandResult.hasArtifacts())
-        <li class="artifact"><img alt="toggle" id="${commandResult.id}_artifacts_image" src="/images/resultset_down.gif" onclick="toggleList('${commandResult.id}_artifacts');"/> #wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)
+        <li class="artifact"><span onclick="toggleList('${commandResult.id}_artifacts');"><img alt="toggle" id="${commandResult.id}_artifacts_image" src="/images/resultset_down.gif"/> #wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)</span>
             #commandArtifacts($build $commandResult false $result.completed())
         </li>
             #end
@@ -1425,7 +1425,7 @@
 ##
 #macro(recipeNodeArtifacts $build $node)
     #if($node.hasArtifacts())
-        <li class="artifact"><img alt="toggle" id="${node.result.id}_artifacts_image" src="/images/resultset_down.gif" onclick="toggleList('${node.result.id}_artifacts');"/> #wwtext("name=recipe") :: $!webwork.htmlEncode($node.result.recipeNameSafe)
+        <li class="artifact"><span onclick="toggleList('${node.result.id}_artifacts');"><img alt="toggle" id="${node.result.id}_artifacts_image" src="/images/resultset_down.gif"/> #wwtext("name=recipe") :: $!webwork.htmlEncode($node.result.recipeNameSafe)</span>
             <ul class="artifact" id="${node.result.id}_artifacts">
             #recipeArtifacts($build $node.result false)
             #foreach($child in $node.children)
