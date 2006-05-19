@@ -13,13 +13,11 @@
     </script>
 
     <style type="text/css">
-        .container{
+        .viewport{
             border-width:1px;
             border-color:blue;
             border-style:solid;
             overflow:auto;
-            width:480px;
-            height:250px;
         }
     </style>
 </head>
@@ -30,7 +28,14 @@
         Path:<span id="path"></span>
     </p>
 
-    <div id="browse" class="tree container">
+    <!--
+    is it possible to tie the viewport size to the size
+    of the window? preferably it would take up the room not used
+    by the toolbar top and form at the base of the page.
+    -->
+    <div class="viewport" style="width:480px; height:250px;">
+        <div id="browse" class="tree">
+        </div>
     </div>
 
     <p></p>

@@ -1,0 +1,14 @@
+{"listing":
+    [
+#set($sep = "")
+#foreach ($e in $results)
+        $sep {"file":"$!e.name", "type":"$!e.type", "id":"$!e.id"}
+        #set($sep = ",")
+#end
+    ],
+"path":"$!encodedPath",
+"displayPath":"$!path"
+#if($parentPath)
+    ,"parentPath":"$!parentPath"
+#end
+}
