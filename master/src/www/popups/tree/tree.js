@@ -25,7 +25,7 @@ function handleException(resp, e)
 
 function load(event)
 {
-    var currentTarget = Event.element(event);
+    var currentTarget = getCurrentTarget(event);
 
     if (this == currentTarget)
     {
@@ -197,26 +197,11 @@ function createNewNode(data)
  */
 function select(event)
 {
-    var currentTarget = Event.element(event);
+    var currentTarget = getCurrentTarget(event);
     if (this == currentTarget)
     {
         // locate the selected class.
-        var selectedNodes = document.getElementsByClassName("selected");
-
-        // remove 'selected' from the list of classes.
-        var currentNodeSelected = false;
-        if (selectedNodes)
-        {
-            for (var i = 0; i < selectedNodes.length; i++)
-            {
-                var node = selectedNodes[i];
-                Element.removeClassName(node, "selected");
-                if (node == currentTarget)
-                {
-                    currentNodeSelected = true;
-                }
-            }
-        }
+        clearSelection();
 
         Element.addClassName(currentTarget, "selected");
 
@@ -238,6 +223,21 @@ function select(event)
     }
 }
 
+function clearSelection()
+{
+    var selectedNodes = document.getElementsByClassName("selected");
+
+    // remove 'selected' from the list of classes.
+    if (selectedNodes)
+    {
+        for (var i = 0; i < selectedNodes.length; i++)
+        {
+            var node = selectedNodes[i];
+            Element.removeClassName(node, "selected");
+        }
+    }
+}
+
 function extractText(element)
 {
     return element.innerHTML;
@@ -251,7 +251,7 @@ function extractText(element)
 function toggle(event)
 {
 //    enterMethod("toggle");
-    var currentTarget = Event.element(event);
+    var currentTarget = getCurrentTarget(event);
     if (this == currentTarget)
     {
         var node = this;
@@ -302,6 +302,15 @@ function removeAllChildren(element)
     }
 }
 
+function getCurrentTarget(event)
+{
+    return Event.element(getCurrentEvent(event));
+}
+
+function getCurrentEvent(event)
+{
+    return event || window.event;
+}
 
 function enterMethod(method)
 {
