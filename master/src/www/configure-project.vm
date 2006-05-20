@@ -59,7 +59,17 @@
     #if(!$project.pulseFileDetails.type.equals("versioned"))
                     <tr>
                         #contentRowHeading("actions")
-                        #linkCell("convert.to.versioned" "convertToVersionedProject!input.action?id=$project.id")
+                        <td class="content">
+        #if(!$project.pulseFileDetails.type.equals("custom"))
+                            <a href="convertToCustomProject!input.action?id=$project.id">
+                                #wwtext("name=convert.to.custom")
+                            </a>
+                            ::
+        #end
+                            <a href="convertToVersionedProject!input.action?id=$project.id">
+                                #wwtext("name=convert.to.versioned")
+                            </a>
+                        </td>
                     </tr>
     #end
 #end

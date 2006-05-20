@@ -8,21 +8,25 @@
 <body>
     #projectTabs("configuration")
     
+<table class="columns">
+    <tr><td class="columns" width="100%">
+
     #parse("/template/includes/actionerrors.vm")
 
 #wwcform("action=convertToCustomProject.action" "heading=%{getText('convert.to.custom')}" "method=post")
     #wwhidden("name=id")
 
-    <tr>
-        <th class="label">#wwtext("name=pulse.file"): </th>
-        <td class="field"><a href="downloadProjectBuildFile.action?id=$id">#wwtext("name=download")</a></td>
-    </tr>
-    #inlineHelp("pulse.file.download.help")
-    #wwtextfield("name=details.pulseFileName" "label=%{getText('pulse.filename')}" "required=true" "size=40" "tabindex=1")
-    #inlineHelp("pulse.checked.in.filename.help")
+    #wwtextarea("name=details.pulseFile" "labelposition=top" "cssStyle=width: 98%" "label=%{getText('pulse.file')}" "required=true" "rows=30" "cols=80" "tabindex=1")
 
     #saveCancel(2)
 #end
+
+    </td><td class="columns">
+
+        #parse("template/includes/pulse-file-reference.vm")
+
+    </td></tr>
+</table>
 
     #tabEnd()
 </body>

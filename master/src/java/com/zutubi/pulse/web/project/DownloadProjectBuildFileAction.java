@@ -5,8 +5,9 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.model.PulseFileDetails;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.PulseFileDetails;
+import com.zutubi.pulse.util.XMLUtils;
 import org.apache.tools.ant.filters.StringInputStream;
 
 import java.io.InputStream;
@@ -52,7 +53,7 @@ public class DownloadProjectBuildFileAction extends ProjectActionSupport
         {
             PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
             ComponentContext.autowire(pulseFileDetails);
-            String pulseFile = pulseFileDetails.getPulseFile(0, project, null);
+            String pulseFile = XMLUtils.prettyPrint(pulseFileDetails.getPulseFile(0, project, null));
             inputStream = new StringInputStream(pulseFile);
             contentLength = pulseFile.length();
         }

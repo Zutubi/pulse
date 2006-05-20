@@ -3,20 +3,14 @@
  ********************************************************************************/
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.InitialBootstrapper;
+import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.util.TimeStamps;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.model.PulseFileDetails;
 import com.zutubi.pulse.model.BuildHostRequirements;
 import com.zutubi.pulse.model.BuildResult;
-import nu.xom.Document;
-import nu.xom.Builder;
-import nu.xom.Serializer;
-
-import java.io.ByteArrayOutputStream;
-import java.io.StringReader;
+import com.zutubi.pulse.model.PulseFileDetails;
+import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.pulse.util.XMLUtils;
 
 /**
  * A request to dispatch a recipe to some build hostRequirements, which may be restricted.
@@ -79,32 +73,6 @@ public class RecipeDispatchRequest
             lazyPulseFile.setPulseFile(pulseFileDetails.getPulseFile(request.getId(), build.getProject(), revision));
         }
 
-        request.setPulseFileSource(prettyPrint(lazyPulseFile.getPulseFile()));
-    }
-
-    private String prettyPrint(String pulseFile)
-    {
-        Builder builder = new Builder();
-        ByteArrayOutputStream os = null;
-
-        try
-        {
-            Document doc = builder.build(new StringReader(pulseFile));
-            os = new ByteArrayOutputStream();
-            Serializer serializer = new Serializer(os);
-            serializer.setIndent(4);
-            serializer.write(doc);
-            serializer.flush();
-            return os.toString();
-        }
-        catch (Exception e)
-        {
-            // Try our best to pretty print, but not fatal if we can't
-            return pulseFile;
-        }
-        finally
-        {
-            IOUtils.close(os);
-        }
+        request.setPulseFileSource(XMLUtils.prettyPrint(lazyPulseFile.getPulseFile()));
     }
 }

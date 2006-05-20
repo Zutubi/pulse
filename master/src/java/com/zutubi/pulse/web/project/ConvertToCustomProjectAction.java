@@ -3,8 +3,11 @@
  ********************************************************************************/
 package com.zutubi.pulse.web.project;
 
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.model.CustomPulseFileDetails;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.PulseFileDetails;
+import com.zutubi.pulse.util.XMLUtils;
 
 /**
  */
@@ -37,10 +40,15 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
     public String doInput()
     {
         project = lookupProject(id);
-        if(project == null)
+        if(hasErrors())
         {
             return ERROR;
         }
+
+        PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
+        ComponentContext.autowire(pulseFileDetails);
+        String pulseFile = pulseFileDetails.getPulseFile(0, project, null);
+        details.setPulseFile(XMLUtils.prettyPrint(pulseFile));
 
         return INPUT;
     }
