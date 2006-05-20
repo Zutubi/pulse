@@ -1,99 +1,103 @@
+#macro(refLink $page)
+    <a href="$helpUrl/$action.escapeSpaces($page)" onclick="window.open('$helpUrl/$action.escapeSpaces($page)', 'Reference', 'width=600,height=500,scrollbars=yes,resizable=yes'); return false;" target="_blank" title="$page">$page</a>
+#end
 <div id="reference">
     <table class="fill-content">
         #headingRow("pulse.file.reference" 1)
         <td class="content">
             <ul>
                 <li>
-                    <a href="$helpUrl/pulse+Files" title="pulse Files">pulse Files</a>
+                    #refLink("pulse Files")
                     <ul>
                         <li>
-                            <a href="$helpUrl/ant.pp" title="ant.pp">ant.pp</a>
+                            #refLink("ant.pp")
                         </li>
                         <li>
-                            <a href="$helpUrl/junit.pp" title="junit.pp">junit.pp</a>
+                            #refLink("junit.pp")
                         </li>
                         <li>
-                            <a href="$helpUrl/junit.summary.pp" title="junit.summary.pp">junit.summary.pp</a>
+                            #refLink("junit.summary.pp")
                         </li>
                         <li>
-                            <a href="$helpUrl/macro" title="macro">macro</a>
+                            #refLink("macro")
                         </li>
                         <li>
-                            <a href="$helpUrl/macro-ref" title="macro-ref">macro-ref</a>
+                            #refLink("macro-ref")
                         </li>
                         <li>
-                            <a href="$helpUrl/make.pp" title="make.pp">make.pp</a>
+                            #refLink("make.pp")
                         </li>
                         <li>
-                            <a href="$helpUrl/maven2.pp" title="maven2.pp">maven2.pp</a>
+                            #refLink("maven2.pp")
                         </li>
                         <li>
-                            <a href="$helpUrl/post-processor" title="post-processor">post-processor</a>
+                            #refLink("post-processor")
                         </li>
                         <li>
-                            <a href="$helpUrl/property" title="property">property</a>
+                            #refLink("property")
                         </li>
                         <li>
-                            <a href="$helpUrl/recipe" title="recipe">recipe</a>
+                            #refLink("recipe")
                             <ul>
                                 <li>
-                                    <a href="$helpUrl/ant" title="ant">ant</a></li><li><a href="$helpUrl/command"
-                                                                                                title="command">command</a>
+                                    #refLink("ant")
+                                </li>
+                                <li>
+                                    #refLink("command")
                                 <ul>
                                     <li>
-                                        <a href="$helpUrl/artifact" title="artifact">artifact</a>
+                                        #refLink("artifact")
                                         <ul>
                                             <li>
-                                                <a href="$helpUrl/process" title="process">process</a>
+                                                #refLink("process")
                                             </li>
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="$helpUrl/dir-artifact" title="dir-artifact">dir-artifact</a>
+                                        #refLink("dir-artifact")
                                         <ul>
                                             <li>
-                                                <a href="$helpUrl/exclude+%28dir-artifact%29" title="exclude (dir-artifact)">exclude
-                                                    (dir-artifact)</a>
+                                                #refLink("exclude (dir-artifact)")
                                             </li>
                                             <li>
-                                                <a href="$helpUrl/include" title="include">include</a>
+                                                #refLink("include")
                                             </li>
                                         </ul>
                                     </li>
                                 </ul>
                             </li>
                                 <li>
-                                    <a href="$helpUrl/executable" title="executable">executable</a>
+                                    #refLink("executable")
                                     <ul>
                                         <li>
-                                            <a href="$helpUrl/arg" title="arg">arg</a>
+                                            #refLink("arg")
                                         </li>
                                         <li>
-                                            <a href="$helpUrl/environment" title="environment">environment</a>
+                                            #refLink("environment")
                                         </li>
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="$helpUrl/make" title="make">make</a>
+                                    #refLink("make")
                                 </li>
                                 <li>
-                                    <a href="$helpUrl/maven" title="make">maven</a>
+                                    #refLink("maven")
                                 </li>
                                 <li>
-                                    <a href="$helpUrl/maven2" title="maven2">maven2</a>
+                                    #refLink("maven2")
                                 </li>
                                 <li>
-                                    <a href="$helpUrl/resource" title="resource">resource</a>
+                                    #refLink("resource")
                                 </li>
                             </ul>
                         </li>
-                        <li><a href="$helpUrl/regex.pp" title="regex.pp">regex.pp</a>
+                        <li>#refLink("regex.pp")
                             <ul>
                                 <li>
-                                    <a href="$helpUrl/pattern" title="pattern">pattern</a>
+                                    #refLink("pattern")
                                     <ul>
                                         <li>
-                                            <a href="$helpUrl/exclude" title="exclude">exclude</a>
+                                            #refLink("exclude")
                                         </li>
                                     </ul>
                                 </li>
