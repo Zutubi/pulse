@@ -5,7 +5,6 @@
     <link rel="stylesheet" type="text/css" href="/popups/tree/tree.css"/>
     <script type="text/javascript" src="/prototype.js"></script>
     <script type="text/javascript" src="tree/tree.js"></script>
-
     <script type="text/javascript">
         <!--
         window.onload = init;
@@ -24,7 +23,8 @@
 
 <body>
 
-    <p>
+
+    <p id="pathElement">
         Path:<span id="path"></span>
     </p>
 
@@ -33,17 +33,25 @@
     of the window? preferably it would take up the room not used
     by the toolbar top and form at the base of the page.
     -->
-    <div class="viewport" style="width:480px; height:250px;">
+    <div class="viewport" id="view" style="width:480px; height:150px;">
         <div id="browse" class="tree">
         </div>
     </div>
 
     <p></p>
 
-    <form action="" onsubmit="window.close();">
-        Selected:  <input id="selected" type="text" size="45"/>
-        <input type="submit" value="select"/>
-        <input type="submit" value="cancel"/>
-    </form>
+    <div id="selectForm">
+        <form action="" onsubmit="window.close();">
+            <table>
+                <tr>
+                    <td nowrap>Selected:</td>
+                    <td><input id="selected" type="text" size="45"/></td>
+                    <td><input type="submit" value="select"/></td>
+                    <td><input type="submit" value="cancel"/></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
 </body>
 </html>

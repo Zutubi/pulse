@@ -118,6 +118,7 @@ function updateFlat(originalRequest)
     var listing = jsonObj.listing;
 
     removeChild(folder);
+    clearSelection();
 
     var ul = document.createElement("ul");
     folder.appendChild(ul);
@@ -236,6 +237,7 @@ function clearSelection()
             Element.removeClassName(node, "selected");
         }
     }
+    clearBrowserTextSelection();
 }
 
 function extractText(element)
@@ -310,6 +312,14 @@ function getCurrentTarget(event)
 function getCurrentEvent(event)
 {
     return event || window.event;
+}
+
+function clearBrowserTextSelection()
+{
+    if (document.selection)
+    {
+        document.selection.empty();
+    }
 }
 
 function enterMethod(method)
