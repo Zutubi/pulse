@@ -998,7 +998,7 @@
         </action>
 
         <action name="list" class="com.zutubi.pulse.web.tree.ListAction">
-            <result name="success" type="velocity">list.vm</result>
+            <result name="success" type="json">list.xml</result>
         </action>
     </package>
 

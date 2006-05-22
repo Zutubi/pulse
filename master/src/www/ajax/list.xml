@@ -1,0 +1,14 @@
+<object>
+    <pair key="listing">
+        <array ref="results">
+            <object>
+                <pair key="file">name</pair>
+                <pair key="type">type</pair>
+                <pair key="id">id</pair>
+            </object>
+        </array>
+    </pair>
+    <pair key="path">encodedPath</pair>
+    <pair key="displayPath">path</pair>
+    <pair key="parentPath">parentPath</pair>
+</object>
