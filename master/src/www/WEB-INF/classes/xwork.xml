@@ -637,9 +637,11 @@
             <result name="disabled" type="velocity">generic-error.vm</result>
         </action>
 
+<!--
         <action name="browse" class="com.opensymphony.xwork.ActionSupport">
             <result name="success" type="velocity">browse.vm</result>
         </action>
+-->
 
     </package>
 
@@ -997,9 +999,11 @@
             <result name="success" type="velocity">test-scm.vm</result>
         </action>
 
+<!--
         <action name="list" class="com.zutubi.pulse.web.tree.ListAction">
             <result name="success" type="json">list.xml</result>
         </action>
+-->
     </package>
 
     <package name="popups" namespace="/popups" extends="webwork-default-package">
@@ -1015,9 +1019,11 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
+<!--
         <action name="browse-popup" class="com.opensymphony.xwork.ActionSupport">
             <result name="success" type="velocity">tree/browse-popup.vm</result>
         </action>
+-->
 
     </package>
 
