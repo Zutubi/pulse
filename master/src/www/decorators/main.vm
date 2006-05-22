@@ -64,7 +64,7 @@
               </td>
               <td class="user" align="right">
 #if($principle)
-                  $principle.name [ <a id="logout" href="/logout.action">logout</a> ]
+                  $principle.name [ <a id="prefs" href="/preferences.action">preferences</a> | <a id="logout" href="/logout.action">logout</a> ]
 #else
                   <a id="login" href="/login.action">login</a>
 #end
