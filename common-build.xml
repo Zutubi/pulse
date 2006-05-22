@@ -72,6 +72,10 @@
 
     <target name="common-prepare" depends="init">
 
+        <echo message="-----------------------------------"/>
+        <echo message="    Component: prepare ${module}"/>
+        <echo message="-----------------------------------"/>
+
         <!-- create necessary directories -->
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${classes.dir}"/>
@@ -204,6 +208,11 @@
     <target name="module-post-package"/>
 
     <target name="common-package" depends="init">
+        
+        <echo message="-----------------------------------"/>
+        <echo message="    Component: package ${module}"/>
+        <echo message="-----------------------------------"/>
+
         <jar file="${module.root.dir}/build/${module}.jar" basedir="${classes.dir}">
             <!-- contains license encoding details. -->
             <patternset refid="release.excludes"/>
