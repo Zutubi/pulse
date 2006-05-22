@@ -13,9 +13,9 @@ public class BlockingTask implements Task
 
     public void execute(TaskExecutionContext context)
     {
-        DefaultTriggerHandlerTest.stopWaiting();
         synchronized(lock)
         {
+            DefaultTriggerHandlerTest.stopWaiting();
             waiting = true;
             while (waiting)
             {

@@ -75,9 +75,9 @@
     #set($confirmMessage = $action.getText("subscription.delete.confirm", [$project.name]))
                     <tr>
                         #dynamicCell($project.name)
-                        #dynamicCell($contact.uid)
+                        #dynamicCell($contact.name)
                         #dynamicCell($subscription.condition)
-                        #editCell("/user/editSubscription!input.action?id=$subscription.id&login=$user.login")
+                        #editCell("/user/editSubscription!input.action?id=$subscription.id" "edit_sub_$subscription.id")
                         #deleteCell($confirmMessage "/user/deleteSubscription.action?id=$subscription.id&login=$user.login" "delete_$!webwork.htmlEncode($project.name)_$!webwork.htmlEncode($contact.uid)")
                     </tr>
 #end

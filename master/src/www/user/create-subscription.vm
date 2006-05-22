@@ -11,13 +11,13 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    #wwcform("action=createSubscription.action" "heading=%{getText('subscription.create')}" "method=post")
+    #wwcform("action=createSubscription.action" "id=subscription.create" "heading=%{getText('subscription.create')}" "method=post")
         #wwhidden("name=userId")
 
         #wwselect("name=projectId" "label=%{getText('subscription.project')}" "list=projects" "listKey=id" "listValue=name" "required=true" "tabindex=1")
         #wwselect("name=contactPointId" "label=%{getText('subscription.contact')}" "list=contactPoints" "required=true" "tabindex=2")
         #wwselect("name=condition" "label=%{getText('subscription.condition')}" "list=conditions" "required=true" "tabindex=3")
-        #createCancel(4)
+        #saveCancel(4)
     #end
 
     #tabEnd()

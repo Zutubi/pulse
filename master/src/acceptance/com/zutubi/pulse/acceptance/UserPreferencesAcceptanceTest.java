@@ -8,6 +8,8 @@ import com.zutubi.pulse.util.RandomUtils;
 import net.sourceforge.jwebunit.ExpectedRow;
 import net.sourceforge.jwebunit.ExpectedTable;
 
+import java.io.IOException;
+
 /**
  *
  *
@@ -19,6 +21,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
     private static final String CREATE_CONTACT_LINK = "create contact";
     //TODO - replace this string with a reference to the properties file.
     private static final String CONTACT_REQUIRED = "you must create a contact point before you can create a subscription";
+    private static final String JABBER_CONTACT = "myjabber";
 
     public UserPreferencesAcceptanceTest()
     {
@@ -419,9 +422,14 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
 
     public void testAddJabberContactPoint()
     {
+        addJabber(JABBER_CONTACT);
+        assertContactsTable(JABBER_CONTACT, "jabbername");
+    }
+
+    private void addJabber(String name)
+    {
         JabberContactForm jabberForm = jabberSetup();
-        jabberForm.saveFormElements("myjabber", "jabbername");
-        assertContactsTable("myjabber", "jabbername");
+        jabberForm.saveFormElements(name, "jabbername");
     }
 
     public void testAddJabberContactValidation()
@@ -470,7 +478,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         JabberContactForm form = new JabberContactForm(tester, false);
         form.assertFormPresent();
         form.cancelFormElements("newjabber", "newuid");
-        assertContactsTable("myjabber", "jabbername");
+        assertContactsTable(JABBER_CONTACT, "jabbername");
     }
 
     public void testDeleteJabberContact()
@@ -478,7 +486,41 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         testAddJabberContactPoint();
         assertAndClick("delete_myjabber");
         assertTablePresent("contacts");
-        assertTextNotPresent("myjabber");
+        assertTextNotPresent(JABBER_CONTACT);
+    }
+
+    public void testCreateSubscription()
+    {
+        addJabber("jabbier");
+
+        clickLink("subscription.create");
+        SubscriptionForm form = new SubscriptionForm(tester, true);
+        form.assertFormPresent();
+        String projectId = tester.getDialog().getOptionValuesFor("projectId")[0];
+        String projectName = tester.getDialog().getOptionsFor("projectId")[0];
+        String contactId = tester.getDialog().getOptionValuesFor("contactPointId")[0];
+        String contactName = tester.getDialog().getOptionsFor("contactPointId")[0];
+        form.saveFormElements(projectId, contactId, "all changed");
+
+        assertSubscriptionsTable(projectName, contactName, "all changed");
+    }
+
+    public void testEditSubscription()
+    {
+        addJabber("zlast");
+        testCreateSubscription();
+
+        clickLinkWithText("edit", 4);
+        SubscriptionForm form = new SubscriptionForm(tester, false);
+        form.assertFormPresent();
+
+        String projectId = tester.getDialog().getOptionValuesFor("projectId")[1];
+        String projectName = tester.getDialog().getOptionsFor("projectId")[1];
+        String contactId = tester.getDialog().getOptionValuesFor("contactPointId")[1];
+        String contactName = tester.getDialog().getOptionsFor("contactPointId")[1];
+        form.saveFormElements(projectId, contactId, "all builds");
+
+        assertSubscriptionsTable(projectName, contactName, "all builds");
     }
 
     private void assertContactsTable(String name, String uid)
@@ -487,6 +529,14 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         expectedTable.appendRow(new ExpectedRow(new String[]{"name", "uid", "actions", "actions"}));
         expectedTable.appendRow(new ExpectedRow(new String[]{name, uid, "edit", "delete"}));
         assertTableRowsEqual("contacts", 1, expectedTable);
+    }
+
+    private void assertSubscriptionsTable(String project, String contact, String condition)
+    {
+        ExpectedTable expectedTable = new ExpectedTable();
+        expectedTable.appendRow(new ExpectedRow(new String[]{"project", "contact", "condition", "actions", "actions"}));
+        expectedTable.appendRow(new ExpectedRow(new String[]{project, contact, condition, "edit", "delete"}));
+        assertTableRowsEqual("subscriptions", 1, expectedTable);
     }
 
     private void navigateToPreferences()

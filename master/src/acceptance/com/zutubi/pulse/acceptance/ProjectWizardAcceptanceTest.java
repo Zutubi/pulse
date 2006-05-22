@@ -228,7 +228,17 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
 
         if(!type.equals("versioned"))
         {
-            rows[i] = new String[] { "actions", "convert to versioned project" };
+            if(type.equals("custom"))
+            {
+                rows[i] = new String[] { "actions", "convert to versioned project" };
+            }
+            else
+            {
+                rows[i] = new String[] { "actions", "convert to custom project                            \n" +
+                        "                            ::\n" +
+                        "                                    \n" +
+                        "                                convert to versioned project" };
+            }
         }
 
         assertTablePresent("project.specifics");

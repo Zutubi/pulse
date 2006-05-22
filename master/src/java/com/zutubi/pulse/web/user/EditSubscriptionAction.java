@@ -5,6 +5,9 @@ package com.zutubi.pulse.web.user;
 
 import com.zutubi.pulse.model.NotifyConditionFactory;
 import com.zutubi.pulse.model.Subscription;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.jabber.JabberManager;
+import com.opensymphony.util.TextUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,28 +15,10 @@ import java.util.Map;
 /**
  * <class-comment/>
  */
-public class EditSubscriptionAction extends UserActionSupport
+public class EditSubscriptionAction extends SubscriptionActionSupport
 {
     private long id;
-
-    private String project;
-    private String condition;
-    private String contactPoint;
-
-    private Map<String, String> conditions;
-
-    public Map getConditions()
-    {
-        if (conditions == null)
-        {
-            conditions = new HashMap<String, String>();
-            conditions.put(NotifyConditionFactory.ALL_BUILDS, getText("condition.allbuilds"));
-            conditions.put(NotifyConditionFactory.ALL_CHANGED, getText("condition.allchanged"));
-            conditions.put(NotifyConditionFactory.ALL_FAILED, getText("condition.allfailed"));
-            conditions.put(NotifyConditionFactory.ALL_CHANGED_OR_FAILED, getText("condition.allchangedorfailed"));
-        }
-        return conditions;
-    }
+    private Subscription subscription;
 
     public long getId()
     {
@@ -45,61 +30,59 @@ public class EditSubscriptionAction extends UserActionSupport
         this.id = id;
     }
 
-    public void validate()
-    {
-        if (getSubscriptionManager().getSubscription(getId()) == null)
-        {
-            addFieldError("id", "Subscription referenced by id '"+getId()+"' could not be found.");
-        }
-    }
-
     public String doInput()
     {
-        Subscription subscription = getSubscriptionManager().getSubscription(getId());
-        project = subscription.getProject().getName();
-        contactPoint = subscription.getContactPoint().getName();
+        setup();
+        if(hasErrors())
+        {
+            return ERROR;
+        }
+
+        lookupSubscription();
+        if(hasErrors())
+        {
+            return ERROR;
+        }
+
+        projectId = subscription.getProject().getId();
+        contactPointId = subscription.getContactPoint().getId();
         condition = subscription.getCondition();
 
         return INPUT;
     }
 
+    public void validate()
+    {
+        lookupUser();
+        if(hasErrors())
+        {
+            return;
+        }
+
+        lookupSubscription();
+        if(hasErrors())
+        {
+            return;
+        }
+
+        super.validate();
+    }
+
     public String execute()
     {
-        // update condition.
-        Subscription persistentSubscription = getSubscriptionManager().getSubscription(getId());
-        persistentSubscription.setCondition(condition);
-        getSubscriptionManager().save(persistentSubscription);
-
+        subscription.setProject(project);
+        subscription.setContactPoint(contactPoint);
+        subscription.setCondition(condition);
+        getSubscriptionManager().save(subscription);
         return SUCCESS;
     }
 
-    public String getProject()
+    private void lookupSubscription()
     {
-        return project;
-    }
-
-    public String getContactPoint()
-    {
-        return contactPoint;
-    }
-
-    public String getCondition()
-    {
-        return condition;
-    }
-
-    public void setProject(String str)
-    {
-        this.project = str;
-    }
-
-    public void setContactPoint(String str)
-    {
-        this.contactPoint = str;
-    }
-
-    public void setCondition(String str)
-    {
-        this.condition = str;
+        subscription = user.getSubscription(id);
+        if(subscription == null)
+        {
+            addActionError("Unknown subscription [" + id + "]");
+        }
     }
 }

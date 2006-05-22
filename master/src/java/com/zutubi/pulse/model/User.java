@@ -198,6 +198,19 @@ public class User extends Entity implements UserDetails
         return subscriptions;
     }
 
+    public Subscription getSubscription(long id)
+    {
+        for(Subscription s: getSubscriptions())
+        {
+            if(s.getId() == id)
+            {
+                return s;
+            }
+        }
+
+        return null;
+    }
+
     public GrantedAuthority[] getAuthorities()
     {
         return getGrantedAuthorities().toArray(new GrantedAuthority[getGrantedAuthorities().size()]);

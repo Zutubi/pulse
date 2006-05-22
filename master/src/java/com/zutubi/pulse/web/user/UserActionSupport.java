@@ -103,6 +103,12 @@ public class UserActionSupport extends ActionSupport
         {
             return getUser(userLogin);
         }
+
+        Object principle = getPrinciple();
+        if(principle != null)
+        {
+            return getUser((String) principle);
+        }
         return null;
     }
 

@@ -5,21 +5,19 @@
 <head>
     <title>#wwtext("name=subscription.edit")</title>
 </head>
-<content tag="action">subscription.edit</content>
 <body>
     #dashboardTabs("preferences")
 
 #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=editSubscription.action" "heading=%{getText('subscription.edit')}" "method=post")
-    #wwhidden("name=id")
-    #wwhidden("name=login")
+    #wwcform("action=editSubscription.action" "id=subscription.edit" "heading=%{getText('subscription.edit')}" "method=post")
+        #wwhidden("name=id")
 
-    #wwtextfield("name=project" "label=%{getText('subscription.project')}" "disabled=true" "tabindex=1")
-    #wwtextfield("name=contactPoint" "label=%{getText('subscription.contact')}" "disabled=true" "tabindex=2")
-    #wwselect("name=condition" "label=%{getText('subscription.condition')}" "list=conditions" "required=true" "tabindex=3")
-    #saveCancel(4)
-#end
+        #wwselect("name=projectId" "label=%{getText('subscription.project')}" "list=projects" "listKey=id" "listValue=name" "required=true" "tabindex=1")
+        #wwselect("name=contactPointId" "label=%{getText('subscription.contact')}" "list=contactPoints" "required=true" "tabindex=2")
+        #wwselect("name=condition" "label=%{getText('subscription.condition')}" "list=conditions" "required=true" "tabindex=3")
+        #saveCancel(4)
+    #end
 
     #tabEnd()
 </body>

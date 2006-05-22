@@ -86,7 +86,7 @@ public class Subscription extends Entity
         return project;
     }
 
-    private void setProject(Project project)
+    public void setProject(Project project)
     {
         this.project = project;
     }
