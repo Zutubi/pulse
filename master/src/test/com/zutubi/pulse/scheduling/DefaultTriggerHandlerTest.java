@@ -7,8 +7,8 @@ import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.model.persistence.mock.MockTriggerDao;
 import com.zutubi.pulse.test.PulseTestCase;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * <class-comment/>
@@ -17,7 +17,7 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
 {
     private DefaultTriggerHandler handler;
     private MockTriggerDao triggerDao;
-    private ExecutorService executor;
+    private ThreadPoolExecutor executor;
 
     /**
      * This lock is used to ensure correct synchronisation between the test case requesting the execution
@@ -38,7 +38,7 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
         triggerDao = new MockTriggerDao();
         handler.setTriggerDao(triggerDao);
 
-        executor = Executors.newFixedThreadPool(2);
+        executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
     }
 
     protected void tearDown() throws Exception
@@ -73,6 +73,10 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
         // tell the executing task to stop and wait for it to stop.
         // - trigger the task to stop and then wait for it do finish.
         BlockingTask.stopWaiting();
+        while (executor.getActiveCount() > 0)
+        {
+            Thread.yield();
+        }
         // wait for thread to stop
 
         assertEquals(1, a.getTriggerCount());
