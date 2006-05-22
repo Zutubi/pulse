@@ -27,6 +27,27 @@ public class BuildSpecificationNode extends Entity
         this.stage = stage;
     }
 
+    public BuildSpecificationNode copy()
+    {
+        BuildSpecificationNode copy = new BuildSpecificationNode();
+        if(stage == null)
+        {
+            copy.stage = null;
+        }
+        else
+        {
+            copy.stage = stage.copy();
+        }
+        
+        copy.children = new LinkedList<BuildSpecificationNode>();
+        for(BuildSpecificationNode child: children)
+        {
+            copy.children.add(child.copy());
+        }
+
+        return copy;
+    }
+
     public List<BuildSpecificationNode> getChildren()
     {
         return children;
@@ -51,4 +72,5 @@ public class BuildSpecificationNode extends Entity
     {
         this.stage = stage;
     }
+
 }

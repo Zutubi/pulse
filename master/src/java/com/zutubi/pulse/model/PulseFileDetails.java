@@ -12,6 +12,8 @@ import java.util.Properties;
  */
 public abstract class PulseFileDetails extends Entity
 {
+    public abstract PulseFileDetails copy();
+
     public abstract boolean isBuiltIn();
 
     public abstract String getType();
@@ -19,4 +21,5 @@ public abstract class PulseFileDetails extends Entity
     public abstract Properties getProperties();
 
     public abstract String getPulseFile(long id, Project project, Revision revision);
+
 }

@@ -22,6 +22,22 @@ public class MavenPulseFileDetails extends TemplatePulseFileDetails
 
     private String arguments;
 
+    public MavenPulseFileDetails()
+    {
+    }
+
+    public MavenPulseFileDetails(String targets, String workingDir, String arguments)
+    {
+        this.targets = targets;
+        this.workingDir = workingDir;
+        this.arguments = arguments;
+    }
+
+    public MavenPulseFileDetails copy()
+    {
+        return new MavenPulseFileDetails(targets, workingDir, arguments);
+    }
+
     protected String getTemplateName()
     {
         return "maven.template.vm";

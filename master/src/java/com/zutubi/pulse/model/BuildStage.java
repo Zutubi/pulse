@@ -22,6 +22,14 @@ public class BuildStage
         this.recipe = recipe;
     }
 
+    public BuildStage copy()
+    {
+        BuildStage copy = new BuildStage();
+        copy.hostRequirements = hostRequirements.copy();
+        copy.recipe = recipe;
+        return copy;
+    }
+
     public BuildHostRequirements getHostRequirements()
     {
         return hostRequirements;
@@ -46,4 +54,5 @@ public class BuildStage
     {
         return RecipeResult.getRecipeSafe(recipe);
     }
+
 }

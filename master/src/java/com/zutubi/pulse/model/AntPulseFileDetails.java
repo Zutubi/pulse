@@ -47,6 +47,12 @@ public class AntPulseFileDetails extends TemplatePulseFileDetails
         this.environment = environment;
     }
 
+    public AntPulseFileDetails copy()
+    {
+        Map<String, String> env = new TreeMap<String, String>(environment);
+        return new AntPulseFileDetails(buildFile, targets, arguments, workingDir, env);
+    }
+
     protected String getTemplateName()
     {
         return "ant.template.vm";

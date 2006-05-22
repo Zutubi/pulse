@@ -3,6 +3,8 @@
  ********************************************************************************/
 package com.zutubi.pulse.scheduling;
 
+import com.zutubi.pulse.model.Project;
+
 import java.util.Date;
 
 /**
@@ -21,6 +23,13 @@ public class SimpleTrigger extends Trigger
     public SimpleTrigger()
     {
 
+    }
+
+    public SimpleTrigger copy(Project oldProject, Project newProject)
+    {
+        SimpleTrigger copy = new SimpleTrigger();
+        copyCommon(copy, oldProject, newProject);
+        return copy;
     }
 
     public SimpleTrigger(String name, String group, long interval)

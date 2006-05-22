@@ -90,6 +90,44 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         aclEntries = new LinkedList<ProjectAclEntry>();
     }
 
+    /**
+     * Returns a new project that is an exact replica of this project, but
+     * with a different name and description.
+     *
+     * @param name        the name of the new project
+     * @param description the description of the new project
+     * @return a copy of this project with the given name
+     */
+    public Project copy(String name, String description)
+    {
+        Project copy = new Project();
+        copy.name = name;
+        copy.description = description;
+        copy.url = url;
+        copy.pulseFileDetails = pulseFileDetails.copy();
+        copy.cleanupRules = new LinkedList<CleanupRule>();
+        for(CleanupRule rule: cleanupRules)
+        {
+            copy.cleanupRules.add(rule.copy());
+        }
+
+        copy.scm = scm.copy();
+        copy.checkoutScheme = checkoutScheme;
+        copy.buildSpecifications = new LinkedList<BuildSpecification>();
+        for(BuildSpecification spec: buildSpecifications)
+        {
+            copy.buildSpecifications.add(spec.copy());
+        }
+
+        copy.aclEntries = new LinkedList<ProjectAclEntry>();
+        for(ProjectAclEntry acl: aclEntries)
+        {
+            copy.aclEntries.add(acl.copy(copy));
+        }
+
+        return copy;
+    }
+
     public String getName()
     {
         return name;

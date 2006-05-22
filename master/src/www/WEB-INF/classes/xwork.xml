@@ -183,6 +183,13 @@
             <result name="success" type="velocity">find-project.vm</result>
         </action>
 
+        <action name="cloneProject" class="com.zutubi.pulse.web.project.CloneProjectAction">
+            <result name="input" type="velocity">clone-project.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${cloneId}</result>
+            <result name="cancel" type="redirect">/currentBuild.action?id=${id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="deleteProject" class="com.zutubi.pulse.web.project.DeleteProjectAction">
             <result name="input" type="velocity">confirm-project-delete.vm</result>
             <result name="success" type="redirect">/viewProjects.action</result>

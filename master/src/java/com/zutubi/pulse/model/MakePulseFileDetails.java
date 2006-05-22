@@ -46,6 +46,12 @@ public class MakePulseFileDetails extends TemplatePulseFileDetails
         this.environment = environment;
     }
 
+    public MakePulseFileDetails copy()
+    {
+        Map<String, String> env = new TreeMap<String, String>(environment);
+        return new MakePulseFileDetails(makefile, targets, arguments, workingDir, env);
+    }
+
     protected String getTemplateName()
     {
         return "make.template.vm";

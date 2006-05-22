@@ -4,12 +4,10 @@
 package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.model.Project;
 
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <class-comment/>
@@ -90,6 +88,21 @@ public abstract class Trigger extends Entity
     {
         this.name = name;
         this.group = group;
+    }
+
+    public abstract Trigger copy(Project oldProject, Project newProject);
+
+    protected void copyCommon(Trigger copy, Project oldProject, Project newProject)
+    {
+        copy.setProject(newProject.getId());
+        copy.name = name.replace(oldProject.getName(), newProject.getName());
+        copy.group = group.replace(oldProject.getName(), newProject.getName());
+        copy.dataMap = new TreeMap<Serializable, Serializable>();
+        for(Map.Entry<Serializable, Serializable> entry: dataMap.entrySet())
+        {
+            copy.dataMap.put(entry.getKey(), entry.getValue());
+        }
+        copy.taskClass = taskClass;
     }
 
     /**
@@ -235,4 +248,5 @@ public abstract class Trigger extends Entity
     {
         return false;
     }
+
 }

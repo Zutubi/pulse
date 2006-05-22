@@ -10,6 +10,10 @@ import com.zutubi.pulse.MasterBuildService;
  */
 public class MasterBuildHostRequirements extends AbstractBuildHostRequirements
 {
+    public MasterBuildHostRequirements copy()
+    {
+        return new MasterBuildHostRequirements();
+    }
 
     public boolean fulfilledBy(BuildService service)
     {

@@ -25,6 +25,11 @@ public class CustomPulseFileDetails extends PulseFileDetails
         this.pulseFile = pulseFile;
     }
 
+    public CustomPulseFileDetails copy()
+    {
+        return new CustomPulseFileDetails(pulseFile);
+    }
+
     public boolean isBuiltIn()
     {
         return false;

@@ -27,6 +27,14 @@ public class BuildSpecification extends Entity
         this.name = name;
     }
 
+    public BuildSpecification copy()
+    {
+        BuildSpecification copy = new BuildSpecification(name);
+        copy.timeout = timeout;
+        copy.root = root.copy();
+        return copy;
+    }
+
     public String getName()
     {
         return name;
@@ -68,4 +76,5 @@ public class BuildSpecification extends Entity
     {
         this.root = root;
     }
+
 }

@@ -323,6 +323,11 @@ public class ThreadedRecipeQueueTest extends TestCase
             this.type = type;
         }
 
+        public BuildHostRequirements copy()
+        {
+            return new MockBuildHostRequirements(type);
+        }
+
         public boolean fulfilledBy(BuildService service)
         {
             return ((MockBuildService) service).getType() == type;

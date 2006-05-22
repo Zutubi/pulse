@@ -63,4 +63,15 @@ public interface ProjectManager extends EntityManager<Project>
 
     @Secured({"ACL_PROJECT_WRITE"})
     void checkWrite(Project project);
+
+    /**
+     * Creates and saves a project that is a replica of the given project,
+     * but with the given name.
+     *
+     * @param project the project to copy
+     * @param name    the name of the new project
+     * @return the new project
+     */
+    @Secured({"ROLE_ADMINISTRATOR"})
+    Project cloneProject(Project project, String name, String description);
 }

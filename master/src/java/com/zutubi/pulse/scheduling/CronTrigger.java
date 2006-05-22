@@ -3,6 +3,8 @@
  ********************************************************************************/
 package com.zutubi.pulse.scheduling;
 
+import com.zutubi.pulse.model.Project;
+
 /**
  * <class-comment/>
  */
@@ -20,6 +22,14 @@ public class CronTrigger extends Trigger
     public CronTrigger(String cron, String name)
     {
         this(cron, name, DEFAULT_GROUP);
+    }
+
+    public CronTrigger copy(Project oldProject, Project newProject)
+    {
+        CronTrigger copy = new CronTrigger();
+        copyCommon(copy, oldProject, newProject);
+        copy.cron = cron;
+        return copy;
     }
 
     public CronTrigger(String cron, String name, String group)

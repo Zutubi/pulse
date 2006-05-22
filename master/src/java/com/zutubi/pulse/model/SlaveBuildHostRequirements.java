@@ -22,6 +22,12 @@ public class SlaveBuildHostRequirements extends AbstractBuildHostRequirements
         this.slave = slave;
     }
 
+    public SlaveBuildHostRequirements copy()
+    {
+        // Don't deep copy the slave reference!
+        return new SlaveBuildHostRequirements(slave);
+    }
+
     public boolean fulfilledBy(BuildService service)
     {
         if (service instanceof SlaveBuildService)

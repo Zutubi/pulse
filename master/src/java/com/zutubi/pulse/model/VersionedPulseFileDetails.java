@@ -27,6 +27,11 @@ public class VersionedPulseFileDetails extends PulseFileDetails
         this.pulseFileName = pulseFileName;
     }
 
+    public VersionedPulseFileDetails copy()
+    {
+        return new VersionedPulseFileDetails(pulseFileName);
+    }
+
     public boolean isBuiltIn()
     {
         return false;

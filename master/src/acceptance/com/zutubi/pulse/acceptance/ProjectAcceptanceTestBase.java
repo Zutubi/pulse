@@ -2,6 +2,8 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.util.RandomUtils;
 
+import java.io.IOException;
+
 /**
  */
 public class ProjectAcceptanceTestBase extends BaseAcceptanceTest

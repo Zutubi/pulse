@@ -11,6 +11,7 @@ import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.model.persistence.TriggerDao;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;
 
@@ -22,6 +23,8 @@ import org.acegisecurity.annotation.Secured;
  */
 public class DefaultProjectManager implements ProjectManager
 {
+    private static final Logger LOG = Logger.getLogger(DefaultProjectManager.class);
+
     private ProjectDao projectDao;
     private BuildSpecificationDao buildSpecificationDao;
     private TriggerDao triggerDao;
@@ -96,6 +99,28 @@ public class DefaultProjectManager implements ProjectManager
 //        {
 //            throw new AccessDeniedException("Access denied");
 //        }
+    }
+
+    public Project cloneProject(Project project, String name, String description)
+    {
+        Project copy = project.copy(name, description);
+        projectDao.save(copy);
+
+        List<Trigger> triggers = scheduler.getTriggers(project.getId());
+        for(Trigger t: triggers)
+        {
+            Trigger triggerCopy = t.copy(project, copy);
+            try
+            {
+                scheduler.schedule(triggerCopy);
+            }
+            catch (SchedulingException e)
+            {
+                LOG.severe("Unable to schedule trigger: " + e);
+            }
+        }
+
+        return copy;
     }
 
     public void initialise()

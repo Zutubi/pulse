@@ -39,6 +39,18 @@ public class CleanupRule extends Entity
         this.unit = unit;
     }
 
+    public CleanupRule copy()
+    {
+        ResultState [] clonedStates = null;
+        if(states != null)
+        {
+            clonedStates = new ResultState[states.length];
+            System.arraycopy(states, 0, clonedStates, 0, states.length);
+        }
+        
+        return new CleanupRule(workDirOnly, clonedStates, limit, unit);
+    }
+
     List<BuildResult> getMatchingResults(Project project, BuildResultDao dao)
     {
         Boolean hasWorkDir = null;

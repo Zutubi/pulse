@@ -17,10 +17,25 @@ public class Maven2PulseFileDetails extends TemplatePulseFileDetails
      * Space-separated list of goal names (persists more efficiently)
      */
     private String goals;
-
     private String workingDir;
-
     private String arguments;
+
+    public Maven2PulseFileDetails()
+    {
+
+    }
+
+    public Maven2PulseFileDetails(String goals, String workingDir, String arguments)
+    {
+        this.goals = goals;
+        this.workingDir = workingDir;
+        this.arguments = arguments;
+    }
+
+    public Maven2PulseFileDetails copy()
+    {
+        return new Maven2PulseFileDetails(goals, workingDir, arguments);
+    }
 
     protected String getTemplateName()
     {

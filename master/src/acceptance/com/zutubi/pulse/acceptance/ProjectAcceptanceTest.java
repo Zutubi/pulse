@@ -6,6 +6,8 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.*;
 import com.zutubi.pulse.util.RandomUtils;
 
+import java.io.IOException;
+
 /**
  * <class-comment/>
  */
@@ -653,6 +655,55 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertTextPresent("name is required");
     }
 
+    public void testCloneProject() throws IOException
+    {
+        String originalConfig = getResponse();
+
+        clickLinkWithText("home");
+        clickLinkWithText("clone project");
+
+        CloneProjectForm form = new CloneProjectForm(tester);
+        form.assertFormPresent();
+        String clone = "clone " + RandomUtils.randomString(5);
+        form.saveFormElements(clone, DESCRIPTION);
+
+        String newConfig = getResponse();
+        // Config should be the same, just the name and ids are different.
+        assertEquals(nukeIds(originalConfig.replace(projectName, clone)), nukeIds(newConfig));
+    }
+
+    public void testCloneSameName()
+    {
+        clickLinkWithText("home");
+        clickLinkWithText("clone project");
+
+        CloneProjectForm form = new CloneProjectForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements(projectName, DESCRIPTION);
+        form.assertFormPresent();
+        assertTextPresent("name '" + projectName + "' is already in use");
+    }
+
+    public void testCloneNoName()
+    {
+        clickLinkWithText("home");
+        clickLinkWithText("clone project");
+
+        CloneProjectForm form = new CloneProjectForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements("", DESCRIPTION);
+        form.assertFormPresent();
+        assertTextPresent("project name is required");
+    }
+
+    private String nukeIds(String text)
+    {
+        text = text.replaceAll("href=\"[^\"]*\"", "");
+        text = text.replaceAll("[iI]d=[0-9]+", "");
+        text = text.replaceAll("onclick=\"[^\"]*\"", "");
+        text = text.replaceAll("id=\"[^\"]*\"", "");
+        return text;
+    }
 /*
 
     public void testDeleteBuildSpec()

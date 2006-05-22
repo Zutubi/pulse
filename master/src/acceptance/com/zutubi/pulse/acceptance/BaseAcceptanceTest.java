@@ -7,6 +7,8 @@ import com.zutubi.pulse.acceptance.forms.CvsForm;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
 import com.meterware.httpunit.WebClient;
 
+import java.io.IOException;
+
 /**
  * <class-comment/>
  */
@@ -170,5 +172,10 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
     public boolean textInResponse(String text)
     {
         return tester.getDialog().isTextInResponse(text);
+    }
+
+    protected String getResponse() throws IOException
+    {
+        return tester.getDialog().getResponse().getText();
     }
 }

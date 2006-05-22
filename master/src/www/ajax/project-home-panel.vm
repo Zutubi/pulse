@@ -157,7 +157,14 @@
             #end
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
                 <tr>
-                    <th class="content-row">#wwtext("name=actions")</th>
+                    <th class="content-row" rowspan="2">#wwtext("name=actions")</th>
+                    <td class="content">
+                        <a href="cloneProject!input.action?id=$project.id">
+                            <img src="/images/page_copy.gif"/> #wwtext("name=project.clone")
+                        </a>
+                    </td>
+                </tr>
+                <tr>
                     <td class="content">
             #if($projectNotBuilding)
                         <a href="deleteProject!input.action?id=$project.id">

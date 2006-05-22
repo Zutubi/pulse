@@ -13,7 +13,7 @@ import java.util.Properties;
  * 
  *
  */
-public abstract class Scm extends Entity
+public abstract class Scm extends Entity implements Cloneable
 {
     private String path;
     private Properties properties;
@@ -54,5 +54,23 @@ public abstract class Scm extends Entity
     public void setPath(String path)
     {
         this.path = path;
+    }
+
+    public Scm copy()
+    {
+        try
+        {
+            Scm copy = (Scm) clone();
+            // Deep copy the properties
+            copy.properties = new Properties();
+            copy.properties.putAll(properties);
+            return copy;
+        }
+        catch (CloneNotSupportedException e)
+        {
+            // Never happens
+        }
+
+        return null;
     }
 }

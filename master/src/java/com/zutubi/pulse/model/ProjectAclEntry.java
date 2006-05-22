@@ -13,10 +13,15 @@ public class ProjectAclEntry extends SimpleAclEntry
     {
 
     }
-    
+
     public ProjectAclEntry(String recipient, Project identity, int mask)
     {
         super(recipient, identity, null, mask);
+    }
+
+    public ProjectAclEntry copy(Project project)
+    {
+        return new ProjectAclEntry((String) getRecipient(), project, getMask());
     }
 
     public long getId()

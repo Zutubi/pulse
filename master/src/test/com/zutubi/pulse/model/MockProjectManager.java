@@ -86,6 +86,11 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public Project cloneProject(Project project, String name, String description)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public void save(Project project)
     {
         if (project.getId() == 0)
