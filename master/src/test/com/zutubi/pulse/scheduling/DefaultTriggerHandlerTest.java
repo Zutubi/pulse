@@ -19,14 +19,15 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
     private MockTriggerDao triggerDao;
     private ExecutorService executor;
 
-    public DefaultTriggerHandlerTest()
-    {
-    }
-
-    public DefaultTriggerHandlerTest(String name)
-    {
-        super(name);
-    }
+    /**
+     * This lock is used to ensure correct synchronisation between the test case requesting the execution
+     * of the trigger and the task being triggered.
+     */
+    private static final Object lock = new Object();
+    /**
+     * The waiting condition.
+     */
+    private static boolean waiting;
 
     protected void setUp() throws Exception
     {
@@ -37,7 +38,7 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
         triggerDao = new MockTriggerDao();
         handler.setTriggerDao(triggerDao);
 
-        executor = Executors.newFixedThreadPool(5);
+        executor = Executors.newFixedThreadPool(2);
     }
 
     protected void tearDown() throws Exception
@@ -49,40 +50,80 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
         super.tearDown();
     }
 
-    public void testTriggerDoesNotFireConcurrently() throws SchedulingException
+    public void testTriggerDoesNotFireConcurrently() throws SchedulingException, InterruptedException
     {
-/*
         Trigger a = new NoopTrigger("a", "a");
-        a.setTaskClass(PauseTestTask.class);
+        a.setTaskClass(BlockingTask.class);
         triggerDao.save(a);
 
+        // assert that the initial trigger count is 0.
         assertEquals(0, a.getTriggerCount());
-        fire(a);
-        pause(300);
+
+        // fire the trigger in parallel, and wait for the triggered task to indicate that it has started.
+        fireAndWaitForCallback(a);
+
+        // the fired trigger is now 'executing' until we tell it to stop. Therefore, we expect the trigger count to
+        // remain at 1, regardless of how many times we fire the trigger now, since concurrent triggers are ignored.
+        assertEquals(1, a.getTriggerCount());
+        fireInline(a);
+        assertEquals(1, a.getTriggerCount());
+        fireInline(a);
+        assertEquals(1, a.getTriggerCount());
+
+        // tell the executing task to stop and wait for it to stop.
+        // - trigger the task to stop and then wait for it do finish.
+        BlockingTask.stopWaiting();
+        // wait for thread to stop
 
         assertEquals(1, a.getTriggerCount());
-        fire(a);
-        assertEquals(1, a.getTriggerCount());
-        fire(a);
-        assertEquals(1, a.getTriggerCount());
 
-        PauseTestTask.unpause();
-
-        assertEquals(1, a.getTriggerCount());
-        fire(a);
-        // ensure that the parallel thread that handles the execution of the
-        // fired trigger has a chance to do its work. Not sure why we need to
-        // wait this long - have not yet tracked down the cause of the random
-        // failures.
-        pause(600);
+        // now fire the trigger again and ensure that the trigger count is now increased as expected.
+        fireAndWaitForCallback(a);
 
         assertEquals(2, a.getTriggerCount());
 
-        PauseTestTask.unpause();
-*/
+        BlockingTask.stopWaiting();
     }
 
-    private void fire(final Trigger trigger)
+    public static void stopWaiting()
+    {
+        synchronized(lock)
+        {
+            if (waiting)
+            {
+                waiting = false;
+                lock.notifyAll();
+            }
+        }
+    }
+
+    private void fireInline(final Trigger trigger) throws SchedulingException
+    {
+        handler.fire(trigger);
+    }
+
+    private void fireAndWaitForCallback(Trigger a)
+    {
+        synchronized(lock)
+        {
+            waiting = true;
+            fireInParallel(a);
+            while (waiting)
+            {
+                try
+                {
+                    lock.wait();
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    private void fireInParallel(final Trigger trigger)
     {
         // we want this thread to execute immediately.
         executor.execute(new Runnable()
@@ -101,16 +142,6 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
         });
     }
 
-    private void pause(long milliseconds)
-    {
-        try
-        {
-            Thread.sleep(milliseconds);
-        }
-        catch (InterruptedException e)
-        {
-        }
-    }
 }
 
 
