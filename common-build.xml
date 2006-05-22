@@ -10,6 +10,10 @@
 
     <target name="common-init">
 
+        <echo message="-----------------------------------"/>
+        <echo message="    Component: init ${module}"/>
+        <echo message="-----------------------------------"/>
+
         <property name="module.root.dir" value="${project.root.dir}/${module}"/>
 
         <property name="src.dir" value="${module.root.dir}/src/java"/>
@@ -98,6 +102,10 @@
     <!-- execute the common portion of the build. -->
     <target name="common-build" depends="init">
 
+        <echo message="-----------------------------------"/>
+        <echo message="    Component: building ${module}"/>
+        <echo message="-----------------------------------"/>
+
         <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="true">
             <classpath refid="lib.path"/>
         </javac>
@@ -157,6 +165,11 @@
 
     <!-- run test cases -->
     <target name="common-test">
+
+        <echo message="-----------------------------------"/>
+        <echo message="    Component: testing ${module}"/>
+        <echo message="-----------------------------------"/>
+
         <junit printsummary="yes" fork="on" failureProperty="test.failed" errorProperty="test.failed">
             <classpath>
                 <pathelement location="${classes.dir}"/>
