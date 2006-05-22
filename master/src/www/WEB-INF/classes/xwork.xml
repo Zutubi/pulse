@@ -967,22 +967,22 @@
 
         <action name="viewProjectsPanel" class="com.zutubi.pulse.web.project.ViewProjectsAction">
             <result name="success" type="velocity">view-projects-panel.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="projectHomePanel" class="com.zutubi.pulse.web.project.ProjectHomeAction">
             <result name="success" type="velocity">project-home-panel.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="viewBuildPanel" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-build-panel.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="viewRecipeQueuePanel" class="com.zutubi.pulse.web.server.ViewRecipeQueueAction">
             <result name="success" type="velocity">view-recipe-queue-panel.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="testCVS" class="com.zutubi.pulse.web.ajax.TestCVSAction">
