@@ -133,7 +133,7 @@
         </copy>
 -->
         <copy todir="${package.root}/system/templates">
-            <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl"/>
+            <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl **/*.properties"/>
         </copy>
         <!-- place holder for the log directory -->
         <copy todir="${package.root}/system/logs">
