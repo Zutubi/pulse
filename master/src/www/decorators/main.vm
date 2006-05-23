@@ -38,9 +38,9 @@
         <link rel="icon" type="image/png" href="/favicon.png"/>
         <link href="$base/main2.css" rel="stylesheet" type="text/css" media="screen"/>
 		<link href="$base/form2.css" rel="stylesheet" type="text/css" media="screen"/>
-        #if ($rssEnabled && $projectId)
-            <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.action?projectId=$projectId"/>
-        #end
+#if ($rssEnabled && $projectId && $projectId > 0)
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.action?projectId=$projectId"/>
+#end
         <script type="text/javascript" src="/main.js"></script>
 		$head
 	</head>
