@@ -9,6 +9,9 @@
     <script type="text/javascript">
         #updater("/ajax/viewProjectsPanel.action" "panel" $principle)
     </script>
+    #if ($rssEnabled)
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.action"/>
+    #end
 </head>
 <body>
     <div id="pagecontent">

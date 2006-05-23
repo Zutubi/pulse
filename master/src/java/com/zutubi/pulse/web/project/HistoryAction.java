@@ -120,11 +120,6 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
         return null;
     }
 
-    public boolean isRssEnabled()
-    {
-        return configurationManager.getAppConfig().getRssEnabled();
-    }
-
     public void prepare() throws Exception
     {
         stateFilters = new LinkedList<String>();

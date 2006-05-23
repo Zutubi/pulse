@@ -146,4 +146,6 @@
     <bean id="postProcessorManager" class="com.zutubi.pulse.PostProcessorManager" autowire="byName"/>
 
     <bean id="guestAccessManager" class="com.zutubi.pulse.GuestAccessManager" autowire="byName" init-method="init"/>
+
+    <bean id="queries" class="com.zutubi.pulse.search.Queries" autowire="byName"/>
 </beans>

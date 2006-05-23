@@ -5,9 +5,6 @@
 <head>
     <title>$!webwork.htmlEncode($project.name)</title>
     <!-- how can we ensure that this link is included by sitemesh?.. -->
-    #if ($rssEnabled)
-        <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.action?projectId=$project.id"/>
-    #end
 </head>
 <body>
     #projectTabs("history")

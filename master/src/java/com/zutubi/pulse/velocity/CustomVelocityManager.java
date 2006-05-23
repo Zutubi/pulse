@@ -54,6 +54,9 @@ public class CustomVelocityManager extends VelocityManager
         if (data != null)
             context.put("license", data.getLicense());
 
+        ApplicationConfiguration appConfig = configManager.getAppConfig();
+        context.put("rssEnabled", appConfig.getRssEnabled());
+        
         return context;
     }
 
