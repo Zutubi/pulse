@@ -4,15 +4,26 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.condition.*;
+import com.zutubi.pulse.condition.antlr.NotifyConditionLexer;
+import com.zutubi.pulse.condition.antlr.NotifyConditionParser;
+import com.zutubi.pulse.condition.antlr.NotifyConditionTreeParser;
+import com.zutubi.pulse.util.logging.Logger;
+
+import java.io.StringReader;
+
+import antlr.collections.AST;
 
 /**
  * A subscription is a mapping from a project event to a contact point.  When
- * the event occurs, notifiaction is sent to the contact point.
+ * the event occurs, notification is sent to the contact point.
  *
  * @author jsankey
  */
 public class Subscription extends Entity
 {
+    private static final Logger LOG = Logger.getLogger(Subscription.class);
+
     /**
      * The contact point to notify.
      */
@@ -27,6 +38,8 @@ public class Subscription extends Entity
      * The project to which this subscription is associated
      */
     private Project project;
+
+    private NotifyCondition notifyCondition = null;
 
     /**
      * A reference to the systems notify condition factory, used for instantiating
@@ -56,7 +69,7 @@ public class Subscription extends Entity
     {
         this.project = project;
         this.contactPoint = contactPoint;
-        this.condition = NotifyConditionFactory.ALL_BUILDS;
+        this.condition = NotifyConditionFactory.TRUE;
 
         this.contactPoint.add(this);
     }
@@ -95,8 +108,7 @@ public class Subscription extends Entity
      * Sets the given condition as that which must be satisfied before the
      * contact point should be notified.
      *
-     * @param condition the condition to set. See NotifyConditionFactory for valid condition
-     * values.
+     * @param condition the condition to set.
      */
     public void setCondition(String condition)
     {
@@ -117,8 +129,7 @@ public class Subscription extends Entity
      */
     public boolean conditionSatisfied(BuildResult result)
     {
-        NotifyCondition nc = notifyFactory.createCondition(condition);
-        return nc.satisfied(result);
+        return getNotifyCondition().satisfied(result, contactPoint.getUser());
     }
 
     public void notify(BuildResult result)
@@ -135,5 +146,39 @@ public class Subscription extends Entity
     public void setNotifyConditionFactory(NotifyConditionFactory notifyFactory)
     {
         this.notifyFactory = notifyFactory;
+    }
+
+    public NotifyCondition getNotifyCondition()
+    {
+        if(notifyCondition == null)
+        {
+            // Need to parse our condition.
+            try
+            {
+                NotifyConditionLexer lexer = new NotifyConditionLexer(new StringReader(condition));
+
+                NotifyConditionParser parser = new NotifyConditionParser(lexer);
+                parser.orexpression();
+                AST t = parser.getAST();
+                if(t == null)
+                {
+                    // Empty expression evals to true
+                    notifyCondition = new TrueNotifyCondition();
+                }
+                else
+                {
+                    NotifyConditionTreeParser tree = new NotifyConditionTreeParser();
+                    tree.setNotifyConditionFactory(notifyFactory);
+                    notifyCondition = tree.cond(t);
+                }
+            }
+            catch (Exception e)
+            {
+                LOG.severe("Unable to parse subscription condition '" + condition + "'");
+                notifyCondition = new FalseNotifyCondition();
+            }
+        }
+
+        return notifyCondition;
     }
 }

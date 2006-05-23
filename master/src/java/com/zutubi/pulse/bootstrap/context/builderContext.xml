@@ -128,7 +128,7 @@
 
     <bean id="serverMessagesHandler" class="com.zutubi.pulse.logging.ServerMessagesHandler" init-method="init"/>
 
-    <bean id="notifyConditionFactory" class="com.zutubi.pulse.model.NotifyConditionFactory">
+    <bean id="notifyConditionFactory" class="com.zutubi.pulse.condition.NotifyConditionFactory">
         <property name="objectFactory">
             <ref bean="objectFactory"/>
         </property>

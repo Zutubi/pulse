@@ -31,14 +31,14 @@ public class CreateSubscriptionAction extends SubscriptionActionSupport
             return ERROR;
         }
 
-        if (projects.size() == 0)
+        if (getProjects().size() == 0)
         {
             addActionError("No projects available.  Please configure a project before creating a subscription.");
             return ERROR;
         }
 
         // validate that the userId has configured contact points.
-        if (user.getContactPoints().size() == 0)
+        if (getContactPoints().size() == 0)
         {
             addActionError("You do not have any contact points configured. " +
                     "Please configure a contact point before creating a subscription.");

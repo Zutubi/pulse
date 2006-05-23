@@ -1,18 +1,23 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.model;
+package com.zutubi.pulse.condition;
+
+import com.zutubi.pulse.condition.NotifyCondition;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.User;
 
 /**
  * This notify condition triggers when the received build result is the first
  * successful build after a one or more failures.
  * 
  */
-public class SuccessAfterFailureNotifyCondition implements NotifyCondition
+public class StateChangeNotifyCondition implements NotifyCondition
 {
     private BuildManager buildManager;
 
-    public SuccessAfterFailureNotifyCondition()
+    public StateChangeNotifyCondition()
     {
     }
 
@@ -26,15 +31,17 @@ public class SuccessAfterFailureNotifyCondition implements NotifyCondition
         this.buildManager = buildManager;
     }
 
-    public boolean satisfied(BuildResult result)
+    public boolean satisfied(BuildResult result, User user)
     {
-        if (!result.succeeded())
+        // retrieve the previous result. If it was a failure, then this condition is satisfied.
+        BuildResult previous = buildManager.getPreviousBuildResult(result);
+        if(previous == null)
         {
             return false;
         }
-
-        // retrieve the previous result. If it was a failure, then this condition is satisfied.
-        BuildResult previous = buildManager.getPreviousBuildResult(result);
-        return !previous.succeeded();
+        else
+        {
+            return previous.getState() != result.getState();
+        }
     }
 }

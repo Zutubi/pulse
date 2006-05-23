@@ -3,14 +3,7 @@
  ********************************************************************************/
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.model.NotifyConditionFactory;
 import com.zutubi.pulse.model.Subscription;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.jabber.JabberManager;
-import com.opensymphony.util.TextUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <class-comment/>

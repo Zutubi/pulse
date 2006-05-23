@@ -500,9 +500,9 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         String projectName = tester.getDialog().getOptionsFor("projectId")[0];
         String contactId = tester.getDialog().getOptionValuesFor("contactPointId")[0];
         String contactName = tester.getDialog().getOptionsFor("contactPointId")[0];
-        form.saveFormElements(projectId, contactId, "all changed");
+        form.saveFormElements(projectId, contactId, "changed");
 
-        assertSubscriptionsTable(projectName, contactName, "all changed");
+        assertSubscriptionsTable(projectName, contactName, "changed");
     }
 
     public void testEditSubscription()
@@ -518,9 +518,9 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         String projectName = tester.getDialog().getOptionsFor("projectId")[1];
         String contactId = tester.getDialog().getOptionValuesFor("contactPointId")[1];
         String contactName = tester.getDialog().getOptionsFor("contactPointId")[1];
-        form.saveFormElements(projectId, contactId, "all builds");
+        form.saveFormElements(projectId, contactId, "true");
 
-        assertSubscriptionsTable(projectName, contactName, "all builds");
+        assertSubscriptionsTable(projectName, contactName, "true");
     }
 
     private void assertContactsTable(String name, String uid)

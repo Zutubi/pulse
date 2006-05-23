@@ -1,7 +1,11 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.model;
+package com.zutubi.pulse.condition;
+
+import com.zutubi.pulse.condition.NotifyCondition;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.User;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,18 +29,28 @@ public class CompoundNotifyCondition implements NotifyCondition
         this.disjunctive = disjunctive;
     }
 
-    public boolean satisfied(BuildResult result)
+    public boolean satisfied(BuildResult result, User user)
     {
         boolean ret = !disjunctive;
 
         for (NotifyCondition child : children)
         {
-            if (child.satisfied(result) == disjunctive)
+            if (child.satisfied(result, user) == disjunctive)
             {
                 ret = disjunctive;
                 break;
             }
         }
         return ret;
+    }
+
+    public List<NotifyCondition> getChildren()
+    {
+        return children;
+    }
+
+    public boolean isDisjunctive()
+    {
+        return disjunctive;
     }
 }

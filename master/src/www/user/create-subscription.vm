@@ -9,6 +9,9 @@
 <body>
     #dashboardTabs("preferences")
 
+<table class="columns">
+    <tr><td class="columns">
+
     #parse("/template/includes/actionerrors.vm")
 
     #wwcform("action=createSubscription.action" "id=subscription.create" "heading=%{getText('subscription.create')}" "method=post")
@@ -16,9 +19,17 @@
 
         #wwselect("name=projectId" "label=%{getText('subscription.project')}" "list=projects" "listKey=id" "listValue=name" "required=true" "tabindex=1")
         #wwselect("name=contactPointId" "label=%{getText('subscription.contact')}" "list=contactPoints" "required=true" "tabindex=2")
-        #wwselect("name=condition" "label=%{getText('subscription.condition')}" "list=conditions" "required=true" "tabindex=3")
+        #wwcombobox("name=condition" "list=conditions" "listKey=key" "listValue=value" "size=50" "label=%{getText('subscription.condition')}" "tabindex=3")
+        #inlineHelp("condition.help")
         #saveCancel(4)
     #end
+
+    </td><td class="columns">
+
+    #parse("/user/subscription-help.vm")
+
+    </td></tr>
+</table>
 
     #tabEnd()
 </body>
