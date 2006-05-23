@@ -9,9 +9,10 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Expression;
 
 /**
- * <class-comment/>
+ * The Build result restrictions provides a set of pre-defined expressions that can be applied to Search Queries
+ * that target build resutls.
  */
-public class BuildResultRestrictions
+public class BuildResultExpressions
 {
     public static Criterion projectEq(Project project)
     {
