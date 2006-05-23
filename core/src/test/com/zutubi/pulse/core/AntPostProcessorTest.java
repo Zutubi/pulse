@@ -21,19 +21,16 @@ import java.util.List;
 public class AntPostProcessorTest extends PostProcessorTestBase
 {
     private AntPostProcessor pp;
-    private File tempDir;
-
 
     public void setUp() throws IOException
     {
         pp = new AntPostProcessor();
-        tempDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
+        super.setUp();
     }
 
     public void tearDown()
     {
-        FileSystemUtils.removeDirectory(tempDir);
-        artifact = null;
+        super.tearDown();
         pp = null;
     }
 

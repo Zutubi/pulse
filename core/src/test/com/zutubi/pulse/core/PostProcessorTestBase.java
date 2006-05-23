@@ -21,7 +21,7 @@ import java.util.List;
 public class PostProcessorTestBase extends PulseTestCase
 {
     protected StoredFileArtifact artifact;
-    private File tempDir;
+    protected File tempDir;
 
     public void setUp() throws IOException
     {

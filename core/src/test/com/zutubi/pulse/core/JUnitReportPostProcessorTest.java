@@ -12,19 +12,25 @@ import java.util.List;
 
 /**
  */
-public class JUnitReportPostProcessorTest extends PulseTestCase
+public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
 {
-    private JUnitReportPostProcessor pp;
+    public JUnitReportPostProcessorTest()
+    {
+        this(null);
+    }
+
+    public JUnitReportPostProcessorTest(String name)
+    {
+        super(name, new JUnitReportPostProcessor());
+    }
 
     public void setUp() throws Exception
     {
         super.setUp();
-        pp = new JUnitReportPostProcessor();
     }
 
     public void tearDown() throws Exception
     {
-        pp = null;
         super.tearDown();
     }
 
@@ -76,25 +82,6 @@ public class JUnitReportPostProcessorTest extends PulseTestCase
         checkCase((TestCaseResult) children.get(2), "testError", TestCaseResult.Status.ERROR, 0,
                 "java.lang.RuntimeException: whoops!\n" +
                         "\tat com.zutubi.pulse.core.JUnitReportPostProcessorTest.testError(JUnitReportPostProcessorTest.java:68)");
-    }
-
-    private StoredFileArtifact runProcessor(String name)
-    {
-        File root = getPulseRoot();
-
-        File outputDir = new File(root, FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "core"));
-
-        StoredFileArtifact artifact = new StoredFileArtifact(getClass().getSimpleName() + "." + name + ".xml");
-        pp.process(outputDir, artifact, new CommandResult("test"));
-        return artifact;
-    }
-
-    private void checkCase(TestCaseResult caseResult, String name, TestCaseResult.Status status, long duration, String message)
-    {
-        assertEquals(name, caseResult.getName());
-        assertEquals(status, caseResult.getStatus());
-        assertEquals(duration, caseResult.getDuration());
-        assertEquals(message, caseResult.getMessage());
     }
 
     private void checkWarning(TestResult testResult, String name, long duration, String contents)

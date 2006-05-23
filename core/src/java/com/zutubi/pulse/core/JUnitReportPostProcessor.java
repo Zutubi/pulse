@@ -13,7 +13,7 @@ import java.io.IOException;
 
 /**
  */
-public class JUnitReportPostProcessor implements PostProcessor
+public class JUnitReportPostProcessor extends XMLReportPostProcessor
 {
     private static final String ELEMENT_SUITE = "testsuite";
     private static final String ELEMENT_CASE = "testcase";
@@ -24,36 +24,12 @@ public class JUnitReportPostProcessor implements PostProcessor
     private static final String ATTRIBUTE_PACKAGE = "package";
     private static final String ATTRIBUTE_TIME = "time";
 
-    private String name;
-
-    public void process(File outputDir, StoredFileArtifact artifact, CommandResult result)
+    public JUnitReportPostProcessor()
     {
-        File file = new File(outputDir, artifact.getPath());
-        FileInputStream input = null;
-
-        try
-        {
-            input = new FileInputStream(file);
-            Builder builder = new Builder();
-            Document doc;
-            doc = builder.build(input);
-            processDocument(doc, artifact);
-        }
-        catch (ParsingException pex)
-        {
-            throw new BuildException("Unable to parse JUnit report '" + file.getAbsolutePath() + "': " + pex.getMessage());
-        }
-        catch (IOException e)
-        {
-            throw new BuildException("I/O error processing JUnit report '" + file.getAbsolutePath() + "': " + e.getMessage());
-        }
-        finally
-        {
-            IOUtils.close(input);
-        }
+        super("JUnit");
     }
 
-    private void processDocument(Document doc, StoredFileArtifact artifact)
+    protected void processDocument(Document doc, StoredFileArtifact artifact)
     {
         Element root = doc.getRootElement();
         if(root.getLocalName().equals(ELEMENT_SUITE))
@@ -166,20 +142,5 @@ public class JUnitReportPostProcessor implements PostProcessor
         }
 
         return duration;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public Object getValue()
-    {
-        return this;
     }
 }

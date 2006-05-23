@@ -15,19 +15,16 @@ import java.io.IOException;
 public class MavenPostProcessorTest extends PostProcessorTestBase
 {
     private MavenPostProcessor pp;
-    private File tempDir;
-
 
     public void setUp() throws IOException
     {
+        super.setUp();
         pp = new MavenPostProcessor();
-        tempDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
     }
 
     public void tearDown()
     {
-        FileSystemUtils.removeDirectory(tempDir);
-        artifact = null;
+        super.tearDown();
         pp = null;
     }
 

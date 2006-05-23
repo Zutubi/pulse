@@ -21,20 +21,17 @@ import java.util.List;
 public class Maven2PostProcessorTest extends PostProcessorTestBase
 {
     private Maven2PostProcessor pp;
-    private File tempDir;
-
 
     public void setUp() throws IOException
     {
         pp = new Maven2PostProcessor();
-        tempDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
+        super.setUp();
     }
 
     public void tearDown()
     {
-        FileSystemUtils.removeDirectory(tempDir);
-        artifact = null;
         pp = null;
+        super.tearDown();
     }
 
     public void testSuccess() throws Exception
