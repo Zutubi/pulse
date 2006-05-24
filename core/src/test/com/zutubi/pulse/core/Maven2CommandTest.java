@@ -20,8 +20,6 @@ public class Maven2CommandTest extends PulseTestCase
     File baseDir;
     File outputDir;
 
-    private boolean generateMode = false;
-
     public void setUp() throws IOException
     {
         baseDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".base");
@@ -51,8 +49,9 @@ public class Maven2CommandTest extends PulseTestCase
     {
         Maven2Command command = new Maven2Command();
         command.setGoals("compile test");
-        successRun("basic", command, "BUILD SUCCESSFUL", "[surefire] Running com.zutubi.maven2.test.AppTest",
-                "task-segment: [compile, test]", "[compiler:compile]", "[compiler:testCompile]");
+        successRun("basic", command, "BUILD SUCCESSFUL", "Running com.zutubi.maven2.test.AppTest",
+                "task-segment: [compile, test]", "[compiler:compile]", "[compiler:testCompile]", "[surefire:test]",
+                "Tests run: 1, Failures: 0, Errors: 0");
     }
 
     public void testNoPOM() throws Exception
@@ -82,17 +81,19 @@ public class Maven2CommandTest extends PulseTestCase
         command.setGoals("test");
         CommandResult result = failedRun("testfailure", command);
         List<Feature> features = result.getArtifact("command output").getFeatures(Feature.Level.ERROR);
-        assertEquals(2, features.size());
-        assertEquals("[surefire] Running com.zutubi.maven2.test.AppTest\n" +
-                "[surefire] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: x sec <<<<<<<< FAILURE !! ",
-                features.get(0).getSummary().replaceAll("elapsed: .* sec", "elapsed: x sec"));
+        // unfortunately, different versions of the maven surefire plugin (responsible for running the unit tests)
+        // result in different output, significantly to the point where a different number of features are captured.
+        // For this reason we assert that we have some features captured, not that we have exactly 2 (plugin version 1.5.3)
+        // or 3 (plugin version 2.0).
+        assertTrue(features.size() > 0);
+        assertOutputContains(features.get(0).getSummary(), "Running com.zutubi.maven2.test.AppTest", "Tests run: 1, Failures: 1, Errors: 0,", "<<<<<<<< FAILURE");
     }
 
     private CommandResult successRun(String inName, Maven2Command command, String ...contents) throws Exception
     {
         CommandResult result = runMaven(inName, command);
         assertTrue(result.succeeded());
-        checkOutput(result, contents);
+        checkOutput(contents);
         return result;
     }
 
@@ -100,7 +101,7 @@ public class Maven2CommandTest extends PulseTestCase
     {
         CommandResult result = runMaven(inName, command);
         assertTrue(result.failed());
-        checkOutput(result, contents);
+        checkOutput(contents);
         return result;
     }
 
@@ -143,24 +144,29 @@ public class Maven2CommandTest extends PulseTestCase
         return new File(getPulseRoot(), FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "core", getClass().getSimpleName() + "." + name));
     }
 
-    protected void checkOutput(CommandResult commandResult, String ...contents) throws IOException
+    protected void checkOutput(String ...contents) throws IOException
     {
         FileInputStream is = null;
         try
         {
             is = new FileInputStream(cleanOutput());
             String output = IOUtils.inputStreamToString(is);
-            for (String content : contents)
-            {
-                if (!output.contains(content))
-                {
-                    fail("Output '" + output + "' does not contain '" + content + "'");
-                }
-            }
+            assertOutputContains(output, contents);
         }
         finally
         {
             IOUtils.close(is);
+        }
+    }
+
+    private void assertOutputContains(String output, String... contents)
+    {
+        for (String content : contents)
+        {
+            if (!output.contains(content))
+            {
+                fail("Output '" + output + "' does not contain '" + content + "'");
+            }
         }
     }
 
