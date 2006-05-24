@@ -86,7 +86,7 @@ public class Maven2CommandTest extends PulseTestCase
         // For this reason we assert that we have some features captured, not that we have exactly 2 (plugin version 1.5.3)
         // or 3 (plugin version 2.0).
         assertTrue(features.size() > 0);
-        assertOutputContains(features.get(0).getSummary(), "Running com.zutubi.maven2.test.AppTest", "Tests run: 1, Failures: 1, Errors: 0,", "<<<<<<<< FAILURE");
+        assertOutputContains(features.get(0).getSummary(), "Running com.zutubi.maven2.test.AppTest", "Tests run: 1, Failures: 1, Errors: 0,");
     }
 
     private CommandResult successRun(String inName, Maven2Command command, String ...contents) throws Exception
