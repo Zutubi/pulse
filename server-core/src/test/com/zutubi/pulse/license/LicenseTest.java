@@ -42,9 +42,9 @@ public class LicenseTest extends PulseTestCase
         assertRemaining(0, "2006-04-02 00:00:00", "2006-04-01 01:01:01");
 
         // check the boundry case for expiry.
-        assertRemaining(2, "2006-04-01 00:00:00", "2006-04-02 00:00:00");
-        assertRemaining(1, "2006-04-02 00:00:00", "2006-04-02 00:00:00");
-        assertRemaining(0, "2006-04-03 00:00:00", "2006-04-02 00:00:00");
+        assertRemaining(2, "2005-04-01 00:00:00", "2005-04-02 00:00:00");
+        assertRemaining(1, "2005-04-02 00:00:00", "2005-04-02 00:00:00");
+        assertRemaining(0, "2005-04-03 00:00:00", "2005-04-02 00:00:00");
 
         // check that things are correct in the long term.
         assertRemaining(366, "2005-04-02 00:00:00", "2006-04-02 00:00:00");
