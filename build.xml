@@ -90,7 +90,7 @@
             <arg line="-r ../${package.name}.zip ${package.name}"/>
         </exec>
 
-        <tar destfile="build/${package.name}.tgz" compression="gzip">
+        <tar destfile="build/${package.name}.tar.gz" compression="gzip">
             <tarfileset dir="${package.root}/.." mode="755" username="root" group="root">
                 <include name="${package.name}/bin/*"/>
             </tarfileset>
@@ -167,7 +167,7 @@
             <arg line="-r ../${package.name}.zip ${package.name}"/>
         </exec>
 
-        <tar destfile="build/${package.name}.tgz" compression="gzip">
+        <tar destfile="build/${package.name}.tar.gz" compression="gzip">
             <tarfileset dir="${package.root}/.." mode="755" username="root" group="root">
                 <include name="${package.name}/bin/*"/>
             </tarfileset>
@@ -192,7 +192,7 @@
             </classpath>
         </javac>
 
-        <condition property="extension" value="tgz" else="zip">
+        <condition property="extension" value="tar.gz" else="zip">
             <os family="unix"/>
         </condition>
 

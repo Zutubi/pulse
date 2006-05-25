@@ -69,7 +69,7 @@ yesNo "Build release now [yN]? "
 
 svn co $svnTag $tmpDir
 pushd $tmpDir
-./build-release.sh $build $version
+./build-release.sh $buildNumber $version
 
 echo "========================================================================="
 echo "= Changes on tag $version"
