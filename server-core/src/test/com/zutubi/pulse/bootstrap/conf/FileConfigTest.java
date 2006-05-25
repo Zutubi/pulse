@@ -75,6 +75,7 @@ public class FileConfigTest extends PulseTestCase
         Properties updatedProperties = new Properties();
         updatedProperties.put("key", "anotherValue");
         IOUtils.write(updatedProperties, testProperties);
+        Thread.sleep(1000);
 
         // assert that the config has picked up these changes.
         assertEquals("anotherValue", config.getProperty("key"));
