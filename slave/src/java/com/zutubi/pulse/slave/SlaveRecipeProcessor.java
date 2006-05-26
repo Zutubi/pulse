@@ -56,7 +56,7 @@ public class SlaveRecipeProcessor
 
     public void processRecipe(String master, RecipeRequest request)
     {
-        ServerRecipePaths processorPaths = new ServerRecipePaths(request.getId(), configurationManager);
+        ServerRecipePaths processorPaths = new ServerRecipePaths(request.getId(), configurationManager.getUserPaths().getData());
         Bootstrapper bootstrapper = new ChainBootstrapper(new ServerBootstrapper(), request.getBootstrapper());
         EventListener listener = registerMasterListener(master, request.getId());
 

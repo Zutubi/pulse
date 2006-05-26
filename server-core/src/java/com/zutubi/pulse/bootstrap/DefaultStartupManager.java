@@ -6,10 +6,12 @@ package com.zutubi.pulse.bootstrap;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
+import com.zutubi.pulse.freemarker.CustomFreemarkerManager;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * <class-comment/>
@@ -126,6 +128,16 @@ public class DefaultStartupManager implements StartupManager
         try
         {
             starting = true;
+
+            CustomFreemarkerManager.initialiseLogging();
+
+            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler()
+            {
+                public void uncaughtException(Thread t, Throwable e)
+                {
+                    java.util.logging.Logger.getLogger("").log(Level.SEVERE, "Uncaught exception: " + e.getMessage(), e);
+                }
+            });
 
             // load the core context, common to all of the system configurations.
             ComponentContext.addClassPathContextDefinitions(coreContexts.toArray(new String[coreContexts.size()]));

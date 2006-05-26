@@ -33,7 +33,7 @@ public class MasterRecipeRunner implements Runnable
     public void run()
     {
         Bootstrapper bootstrapper = new ChainBootstrapper(new ServerBootstrapper(), request.getBootstrapper());
-        ServerRecipePaths recipePaths = new ServerRecipePaths(request.getId(), configurationManager);
+        ServerRecipePaths recipePaths = new ServerRecipePaths(request.getId(), configurationManager.getUserPaths().getData());
 
         try
         {

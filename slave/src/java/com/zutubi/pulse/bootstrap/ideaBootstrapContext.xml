@@ -2,14 +2,10 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager">
+    <bean id="startupManager" class="com.zutubi.pulse.slave.SlaveStartupManager">
         <property name="systemContexts">
             <list>
-                <value>com/zutubi/pulse/bootstrap/databaseBootstrapContext.xml</value>
-                <value>com/zutubi/pulse/bootstrap/coreDatabaseContext.xml</value>
                 <value>com/zutubi/pulse/bootstrap/applicationContext.xml</value>
-                <value>com/zutubi/pulse/bootstrap/webserverContext.xml</value>
-                <value>com/zutubi/pulse/bootstrap/webworkContext.xml</value>
             </list>
         </property>
         <property name="startupRunnables">
@@ -20,41 +16,20 @@
         <property name="objectFactory">
             <ref local="objectFactory"/>
         </property>
-        <property name="configurationManager">
-            <ref local="configurationManager"/>
-        </property>
     </bean>
 
-    <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleConfigurationManager">
-        <property name="systemPaths">
-            <bean class="com.zutubi.pulse.bootstrap.ConfigurableSystemPaths">
-                <property name="systemRoot">
-                    <value>slave/system</value>
-                </property>
-                <property name="contentRoot">
-                    <value>slave/src/www</value>
-                </property>
-                <property name="configRoot">
-                    <value>slave/src/etc</value>
-                </property>
-                <property name="logRoot">
-                    <value>master/system/log</value>
-                </property>
-                <property name="tmpRoot">
-                    <value>master/system/tmp</value>
-                </property>
-                <property name="templateRoots">
-                    <list>
-                        <value type="java.io.File">server-core/src/www</value>
-                        <value type="java.io.File">slave/src/www</value>
-                    </list>
-                </property>
-            </bean>
+    <bean id="paths" class="com.zutubi.pulse.slave.ConfigurableSlavePaths">
+        <property name="systemRoot">
+            <value>slave/system</value>
+        </property>
+        <property name="contentRoot">
+            <value>master/src/www</value>
+        </property>
+        <property name="configRoot">
+            <value>master/etc</value>
         </property>
     </bean>
-
-    <bean id="dataSource" class="com.zutubi.pulse.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
-
+    
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
 </beans>

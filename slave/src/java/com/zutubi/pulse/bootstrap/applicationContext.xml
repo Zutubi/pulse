@@ -2,19 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="initContext" class="com.zutubi.pulse.bootstrap.SpringContextInitialisation">
-        <property name="initBeans">
-            <list>
-                <ref bean="threadPool"/>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="databaseBootstrap" class="com.zutubi.pulse.bootstrap.DatabaseBootstrap" init-method="initialiseDatabase">
-        <property name="dataSource">
-            <ref bean="dataSource"/>
-        </property>
-    </bean>
+    <bean id="configuration" class="com.zutubi.pulse.slave.DefaultSlaveConfiguration" autowire="byName" init-method="init"/>
 
     <bean id="threadPool" class="com.zutubi.pulse.slave.SlaveThreadPool" autowire="byName"/>
 
@@ -24,28 +12,12 @@
 
     <bean id="eventManager" class="com.zutubi.pulse.events.DefaultEventManager" autowire="byName"/>
 
-    <bean id="fileResourceRepository" class="com.zutubi.pulse.core.FileResourceRepository" autowire="byName"
-          init-method="initialise"/>
-
-    <bean id="resourceRepository" class="com.zutubi.pulse.model.DatabaseResourceRepository" autowire="byName">
-        <property name="parent">
-            <ref bean="fileResourceRepository"/>
-        </property>
-    </bean>
-
-    <bean id="userConfigRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>configurationManager</value>
-        </property>
-        <property name="propertyPath">
-            <value>userPaths.userConfigRoot</value>
-        </property>
-    </bean>
-
     <bean id="customSerialiserFactory" class="com.zutubi.pulse.hessian.CustomSerialiserFactory"/>
 
     <bean id="hessianProxyFactory" class="com.zutubi.pulse.hessian.CustomHessianProxyFactory" autowire="byName"/>
 
     <bean id="masterProxyFactory" class="com.zutubi.pulse.slave.MasterProxyFactory" autowire="byName"/>
 
+    <!-- Needs a user config root -->
+    <bean id="resourceRepository" class="com.zutubi.pulse.core.FileResourceRepository"/>
 </beans>

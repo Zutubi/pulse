@@ -32,7 +32,7 @@ public class MasterBuildService implements BuildService
 
     public void collectResults(long recipeId, File outputDest, File workDest)
     {
-        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager);
+        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager.getUserPaths().getData());
         File outputDir = recipePaths.getOutputDir();
 
         if (!FileSystemUtils.rename(outputDir, outputDest, true))
@@ -50,7 +50,7 @@ public class MasterBuildService implements BuildService
     public void cleanup(long recipeId)
     {
         // We rename the output dir, so no need to remove it.
-        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager);
+        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager.getUserPaths().getData());
         File recipeRoot = recipePaths.getRecipeRoot();
 
         if (!FileSystemUtils.removeDirectory(recipeRoot))

@@ -5,11 +5,7 @@
     <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager">
         <property name="systemContexts">
             <list>
-                <value>com/zutubi/pulse/bootstrap/databaseBootstrapContext.xml</value>
-                <value>com/zutubi/pulse/bootstrap/coreDatabaseContext.xml</value>
                 <value>com/zutubi/pulse/bootstrap/applicationContext.xml</value>
-                <value>com/zutubi/pulse/bootstrap/webserverContext.xml</value>
-                <value>com/zutubi/pulse/bootstrap/webworkContext.xml</value>
             </list>
         </property>
         <property name="startupRunnables">
@@ -20,16 +16,10 @@
         <property name="objectFactory">
             <ref local="objectFactory"/>
         </property>
-        <property name="configurationManager">
-            <ref local="configurationManager"/>
-        </property>
     </bean>
 
-    <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleConfigurationManager" init-method="init">
-    </bean>
-
-    <bean id="dataSource" class="com.zutubi.pulse.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
-
+    <bean id="paths" class="com.zutubi.pulse.slave.DefaultSlavePaths"/>
+    
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
 </beans>

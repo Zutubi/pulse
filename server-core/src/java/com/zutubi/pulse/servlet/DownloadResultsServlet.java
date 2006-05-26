@@ -4,8 +4,6 @@
 package com.zutubi.pulse.servlet;
 
 import com.zutubi.pulse.ServerRecipePaths;
-import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.RandomUtils;
@@ -35,7 +33,8 @@ public class DownloadResultsServlet extends HttpServlet
             boolean output = Boolean.parseBoolean(request.getParameter("output"));
 
             // lookup the recipe location, zip it up and write to output.
-            ServerRecipePaths paths = new ServerRecipePaths(recipeId, (ConfigurationManager) ComponentContext.getBean("configurationManager"));
+            // TODO: dev-distributed: get the user data dir: spring property?
+            ServerRecipePaths paths = new ServerRecipePaths(recipeId, null);
             File dir;
             File zipFile;
 
