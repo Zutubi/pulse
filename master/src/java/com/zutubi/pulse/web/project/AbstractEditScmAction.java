@@ -17,9 +17,9 @@ import java.util.List;
 public abstract class AbstractEditScmAction extends ProjectActionSupport implements Preparable
 {
     private long id;
-    private long projectId;
     private Project project;
     private static final List<String> ID_PARAMS = Arrays.asList("id");
+    private boolean monitor;
 
     public long getId()
     {
@@ -29,6 +29,16 @@ public abstract class AbstractEditScmAction extends ProjectActionSupport impleme
     public void setId(long id)
     {
         this.id = id;
+    }
+
+    public boolean isMonitor()
+    {
+        return monitor;
+    }
+
+    public void setMonitor(boolean active)
+    {
+        this.monitor = active;
     }
 
     public Project getProject()
@@ -44,11 +54,13 @@ public abstract class AbstractEditScmAction extends ProjectActionSupport impleme
     public String doInput()
     {
         project = getProjectManager().getProject(projectId);
+        monitor = project.getScm().isMonitor();
         return INPUT;
     }
 
     public String execute()
     {
+        getScm().setMonitor(monitor);
         getScmManager().save(getScm());
         return SUCCESS;
     }

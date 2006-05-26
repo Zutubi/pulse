@@ -179,15 +179,15 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertLinkPresent("project.scm.edit");
         clickLink("project.scm.edit");
 
-        form.assertFormElements("/local", "module", "", "", "", "");
+        form.assertFormElements("/local", "module", "", "", "", "", "true");
 
         // change the root and module, verify updates as expected.
-        form.saveFormElements("/loc", "mod", "", "", "1", "1");
+        form.saveFormElements("/loc", "mod", "", "", "1", "1", "true");
         assertProjectCvsTable("cvs", "/loc[mod]");
 
         // check the form again to ensure that the path has been saved.
         clickLink("project.scm.edit");
-        form.assertFormElements("/loc", "mod", "", "", "1", "1");
+        form.assertFormElements("/loc", "mod", "", "", "1", "1", "true");
     }
 
     public void testEditScmPasswordValue()
@@ -198,50 +198,63 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         // check that we can set a password and that it is persisted
         // and visible on subsequent edit.
-        form.saveFormElements("/loc", "mod", "password", "", "", "");
+        form.saveFormElements("/loc", "mod", "password", "", "", "", "true");
         assertProjectCvsTable("cvs", "/loc[mod]");
         clickLink("project.scm.edit");
-        form.assertFormElements("/loc", "mod", "password", "", "", "");
+        form.assertFormElements("/loc", "mod", "password", "", "", "", "true");
     }
 
     public void testEditScmValidation()
     {
         CvsForm.Edit form = new CvsForm.Edit(tester);
         clickLink("project.scm.edit");
-        form.assertFormElements("/local", "module", "", "", "", "");
+        form.assertFormElements("/local", "module", "", "", "", "", "true");
 
         // check that the cvs root is a required field.
-        form.saveFormElements("", "module", "", "", "", "");
+        form.saveFormElements("", "module", "", "", "", "", "true");
         assertTextPresent("required");
-        form.assertFormElements("", "module", "", "", "", "");
+        form.assertFormElements("", "module", "", "", "", "", "true");
 
         // check that the cvs module is a required field.
-        form.saveFormElements("/local", "", "", "", "", "");
+        form.saveFormElements("/local", "", "", "", "", "", "true");
         assertTextPresent("required");
-        form.assertFormElements("/local", "", "", "", "", "");
+        form.assertFormElements("/local", "", "", "", "", "", "true");
 
         // check that the cvs root is validated correctly.
-        form.saveFormElements("an invalid arg", "mod", "", "", "", "");
+        form.saveFormElements("an invalid arg", "mod", "", "", "", "", "true");
         assertTextPresent("required");
-        form.assertFormElements("an invalid arg", "mod", "", "", "", "");
+        form.assertFormElements("an invalid arg", "mod", "", "", "", "", "true");
 
         // check the validation on the minutes field
-        form.saveFormElements("/local", "", "", "", "a", "");
+        form.saveFormElements("/local", "", "", "", "a", "", "true");
         assertTextPresent("required");
-        form.assertFormElements("/local", "", "",  "", "a", "");
+        form.assertFormElements("/local", "", "",  "", "a", "", "true");
 
-        form.saveFormElements("/local", "", "", "", "-1", "");
+        form.saveFormElements("/local", "", "", "", "-1", "", "true");
         assertTextPresent("specify a positive");
-        form.assertFormElements("/local", "", "", "", "-1", "");
+        form.assertFormElements("/local", "", "", "", "-1", "", "true");
 
         // check the validation on the seconds field
-        form.saveFormElements("/local", "", "", "", "", "a");
+        form.saveFormElements("/local", "", "", "", "", "a", "true");
         assertTextPresent("required");
-        form.assertFormElements("/local", "", "", "", "", "a");
+        form.assertFormElements("/local", "", "", "", "", "a", "true");
 
-        form.saveFormElements("/local", "", "", "", "", "-1");
+        form.saveFormElements("/local", "", "", "", "", "-1", "true");
         assertTextPresent("specify a positive");
-        form.assertFormElements("/local", "", "", "", "", "-1");
+        form.assertFormElements("/local", "", "", "", "", "-1", "true");
+    }
+
+    public void testEditScmActiveStatus()
+    {
+        CvsForm.Edit form = new CvsForm.Edit(tester);
+        clickLink("project.scm.edit");
+        form.assertFormElements("/local", "module", "", "", "", "", "true");
+        form.saveFormElements("/local", "module", "", "", "", "", "false");
+        clickLink("project.scm.edit");
+        form.assertFormElements("/local", "module", "", "", "", "", "false");
+        form.saveFormElements("/local", "module", "", "", "", "", "true");
+
+        // verify data in table.
     }
 
     public void testAddCleanupPolicy()
