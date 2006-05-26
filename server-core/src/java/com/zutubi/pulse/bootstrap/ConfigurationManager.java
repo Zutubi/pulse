@@ -9,7 +9,7 @@ import java.io.File;
  * 
  *
  */
-public interface ConfigurationManager
+public interface ConfigurationManager extends CoreConfigurationManager
 {
     /**
      * 
@@ -18,8 +18,6 @@ public interface ConfigurationManager
     ApplicationConfiguration getAppConfig();
 
     UserPaths getUserPaths();
-
-    SystemPaths getSystemPaths();
 
     void setPulseData(File pulseHome);
 

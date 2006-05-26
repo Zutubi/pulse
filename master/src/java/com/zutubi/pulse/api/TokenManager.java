@@ -27,28 +27,14 @@ import java.util.TreeSet;
 /**
  *
  */
-public class TokenManager
+public class TokenManager extends AdminTokenManager
 {
     private static final Logger LOG = Logger.getLogger(TokenManager.class);
-    private static final String TOKEN_FILE = "admin.token";
 
     private int loginCount = 0;
-    /**
-     * A random token that allows a single admin login: the token is changed
-     * each time it it used.
-     */
-    private String adminToken;
     private Set<String> validTokens = new TreeSet<String>();
     private UserManager userManager;
     private PasswordEncoder passwordEncoder;
-    private ConfigurationManager configurationManager;
-
-
-    public static File getAdminTokenFilename(ConfigurationManager configurationManager)
-    {
-        File configPath = configurationManager.getSystemPaths().getConfigRoot();
-        return new File(configPath, TOKEN_FILE);
-    }
 
     public synchronized String login(String username, String password) throws AuthenticationException
     {
@@ -114,11 +100,8 @@ public class TokenManager
 
     public void verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException
     {
-        if (token.equals(adminToken))
+        if(checkAdminToken(token))
         {
-            // Matches the sigle-use admin token.  Allow login and generate a
-            // new token.
-            newRandomToken();
             return;
         }
 
@@ -223,20 +206,6 @@ public class TokenManager
         return DigestUtils.md5Hex(username + ":" + expiryTime + ":" + password);
     }
 
-    private void newRandomToken()
-    {
-        File tokenFile = getAdminTokenFilename(configurationManager);
-        adminToken = RandomUtils.randomString(128);
-        try
-        {
-            FileSystemUtils.createFile(tokenFile, adminToken);
-        }
-        catch (IOException e)
-        {
-            LOG.severe("Unable to write admin token file: " + e.getMessage(), e);
-        }
-    }
-
     /**
      * Required resource.
      *
@@ -250,30 +219,11 @@ public class TokenManager
     /**
      * Required resource.
      *
-     * @param configurationManager
-     */
-    public void setConfigurationManager(ConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
-    }
-
-    /**
-     * Required resource.
-     *
      * @param passwordEncoder
      */
     public void setPasswordEncoder(PasswordEncoder passwordEncoder)
     {
         this.passwordEncoder = passwordEncoder;
-    }
-
-    /**
-     * Init method. Make sure that we have an admin token available for use by
-     * the command line.
-     */
-    public void init()
-    {
-        newRandomToken();
     }
 
     private void checkTokenAccessEnabled() throws AuthenticationException

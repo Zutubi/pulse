@@ -13,23 +13,30 @@
                 <value>com.zutubi.pulse.ResourceDiscoverer</value>
             </list>
         </property>
+        <property name="configurationManager">
+            <ref local="configurationManager"/>
+        </property>
         <property name="objectFactory">
             <ref local="objectFactory"/>
         </property>
     </bean>
 
-    <bean id="paths" class="com.zutubi.pulse.slave.ConfigurableSlavePaths">
-        <property name="systemRoot">
-            <value>slave/system</value>
-        </property>
-        <property name="contentRoot">
-            <value>master/src/www</value>
-        </property>
-        <property name="configRoot">
-            <value>master/etc</value>
+    <bean id="configurationManager" class="com.zutubi.pulse.slave.SlaveConfigurationManager">
+        <property name="systemPaths">
+            <bean id="paths" class="com.zutubi.pulse.bootstrap.ConfigurableSystemPaths">
+                <property name="systemRoot">
+                    <value>slave/system</value>
+                </property>
+                <property name="contentRoot">
+                    <value>slave/src/www</value>
+                </property>
+                <property name="configRoot">
+                    <value>slave/etc</value>
+                </property>
+            </bean>
         </property>
     </bean>
-    
+
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
 </beans>

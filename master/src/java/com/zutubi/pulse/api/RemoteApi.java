@@ -191,9 +191,7 @@ public class RemoteApi
         // Sigh ... this is tricky, because if we shutdown here Jetty dies
         // before this request is complete and the client gets an error :-|.
         tokenManager.verifyAdmin(token);
-
-        ShutdownRunner runner = new ShutdownRunner(force);
-        new Thread(runner).start();
+        shutdownManager.delayedShutdown(force);
         return true;
     }
 
@@ -278,27 +276,4 @@ public class RemoteApi
         this.eventManager = eventManager;
     }
 
-    private class ShutdownRunner implements Runnable
-    {
-        private boolean force;
-
-        public ShutdownRunner(boolean force)
-        {
-            this.force = force;
-        }
-
-        public void run()
-        {
-            // Oh my, is this ever dodgy...
-            try
-            {
-                Thread.sleep(500);
-            }
-            catch (InterruptedException e)
-            {
-                // Empty
-            }
-            shutdownManager.shutdown(force);
-        }
-    }
 }

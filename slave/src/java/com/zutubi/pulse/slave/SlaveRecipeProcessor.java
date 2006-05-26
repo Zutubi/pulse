@@ -26,7 +26,7 @@ public class SlaveRecipeProcessor
     private static final Logger LOG = Logger.getLogger(SlaveRecipeProcessor.class);
 
     private RecipeProcessor recipeProcessor;
-    private ConfigurationManager configurationManager;
+    private SlaveConfigurationManager configurationManager;
     private EventManager eventManager;
     private MasterProxyFactory masterProxyFactory;
 
@@ -81,7 +81,7 @@ public class SlaveRecipeProcessor
         }
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(SlaveConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

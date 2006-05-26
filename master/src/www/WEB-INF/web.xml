@@ -103,7 +103,7 @@
 
     <servlet>
         <servlet-name>XmlRpcServlet</servlet-name>
-        <servlet-class>com.zutubi.pulse.xmlrpc.XmlRpcServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.xmlrpc.MasterXmlRpcServlet</servlet-class>
     </servlet>
 
     <!--

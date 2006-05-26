@@ -4,6 +4,7 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.Startup;
 import com.zutubi.pulse.bootstrap.StartupException;
 import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.util.logging.Logger;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
@@ -13,7 +14,7 @@ import java.util.List;
 
 /**
  */
-public class SlaveStartupManager implements Startup
+public class SlaveStartupManager implements Startup, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(SlaveStartupManager.class);
 
@@ -21,21 +22,20 @@ public class SlaveStartupManager implements Startup
     private List<String> startupRunnables;
     private ObjectFactory objectFactory;
     private Server jettyServer;
-    private SlaveConfiguration configuration;
+    private SlaveConfigurationManager configurationManager;
 
     public void init() throws StartupException
     {
         ComponentContext.addClassPathContextDefinitions(systemContexts.toArray(new String[systemContexts.size()]));
-        configuration = (SlaveConfiguration) ComponentContext.getBean("configuration");
-        
+
         runStartupRunnables();
 
         jettyServer = new Server();
-        SocketListener listener = new SocketListener(new InetAddrPort(configuration.getWebappPort()));
+        SocketListener listener = new SocketListener(new InetAddrPort(configurationManager.getAppConfig().getServerPort()));
         jettyServer.addListener(listener);
         try
         {
-            jettyServer.addWebApplication("/", "slave/src/www");
+            jettyServer.addWebApplication("/", configurationManager.getSystemPaths().getContentRoot().getAbsolutePath());
             jettyServer.start();
         }
         catch (Exception e)
@@ -75,4 +75,20 @@ public class SlaveStartupManager implements Startup
         this.objectFactory = objectFactory;
     }
 
+    public void setConfigurationManager(SlaveConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+
+    public void stop(boolean force)
+    {
+        try
+        {
+            jettyServer.stop(true);
+        }
+        catch (InterruptedException e)
+        {
+            // Ignore.
+        }
+    }
 }

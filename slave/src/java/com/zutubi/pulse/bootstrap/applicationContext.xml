@@ -2,7 +2,16 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="configuration" class="com.zutubi.pulse.slave.DefaultSlaveConfiguration" autowire="byName" init-method="init"/>
+    <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>systemPaths.configRoot</value>
+        </property>
+    </bean>
+
+    <bean id="tokenManager" class="com.zutubi.pulse.api.AdminTokenManager" autowire="byName" init-method="init"/>
 
     <bean id="threadPool" class="com.zutubi.pulse.slave.SlaveThreadPool" autowire="byName"/>
 
@@ -20,4 +29,12 @@
 
     <!-- Needs a user config root -->
     <bean id="resourceRepository" class="com.zutubi.pulse.core.FileResourceRepository"/>
+
+    <bean id="shutdownManager" class="com.zutubi.pulse.ShutdownManager">
+        <property name="stoppables">
+            <list>
+                <ref bean="startupManager"/>
+            </list>
+        </property>
+    </bean>
 </beans>

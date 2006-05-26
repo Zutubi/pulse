@@ -20,6 +20,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>XmlRpcServlet</servlet-name>
+        <servlet-class>com.zutubi.pulse.slave.xmlrpc.SlaveXmlRpcServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>download</servlet-name>
         <servlet-class>com.zutubi.pulse.servlet.DownloadResultsServlet</servlet-class>
     </servlet>
@@ -27,6 +32,11 @@
     <servlet-mapping>
         <servlet-name>hessian</servlet-name>
         <url-pattern>/hessian</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>XmlRpcServlet</servlet-name>
+        <url-pattern>/xmlrpc</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

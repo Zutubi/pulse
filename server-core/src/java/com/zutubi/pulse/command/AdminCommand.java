@@ -8,7 +8,8 @@ import org.apache.xmlrpc.XmlRpcException;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.api.TokenManager;
+import com.zutubi.pulse.bootstrap.CoreConfigurationManager;
+import com.zutubi.pulse.api.AdminTokenManager;
 import com.zutubi.pulse.util.IOUtils;
 
 import java.io.IOException;
@@ -34,9 +35,9 @@ public abstract class AdminCommand implements Command
      */
     protected String adminToken;
 
-    private String loadAdminToken(ConfigurationManager configurationManager) throws IOException
+    private String loadAdminToken(CoreConfigurationManager configurationManager) throws IOException
     {
-        File tokenFile = TokenManager.getAdminTokenFilename(configurationManager);
+        File tokenFile = AdminTokenManager.getAdminTokenFilename(configurationManager.getSystemPaths().getConfigRoot());
         return IOUtils.fileToString(tokenFile);
     }
 
@@ -47,7 +48,7 @@ public abstract class AdminCommand implements Command
         // b) the admin token.
 
         SystemBootstrapManager.loadBootstrapContext();
-        ConfigurationManager configurationManager = (ConfigurationManager) ComponentContext.getBean("configurationManager");
+        CoreConfigurationManager configurationManager = (CoreConfigurationManager) ComponentContext.getBean("configurationManager");
 
         URL url;
         try

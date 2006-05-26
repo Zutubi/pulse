@@ -10,17 +10,14 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.zutubi.pulse.api.RemoteApi;
-
 public class XmlRpcServlet extends HttpServlet
 {
-    private XmlRpcServer xmlrpc = null;
+    protected XmlRpcServer xmlrpc = null;
 
     public void init(ServletConfig config) throws ServletException
     {
         super.init(config);
         xmlrpc = new XmlRpcServer();
-        xmlrpc.addHandler("RemoteApi", new RemoteApi());
     }
 
     public void destroy()

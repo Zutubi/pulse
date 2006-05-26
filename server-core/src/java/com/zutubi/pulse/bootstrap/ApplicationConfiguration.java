@@ -7,7 +7,7 @@ package com.zutubi.pulse.bootstrap;
  * 
  *
  */
-public interface ApplicationConfiguration
+public interface ApplicationConfiguration extends CoreApplicationConfiguration
 {
     //---( server configuration )---
     public static final String ADMIN_PORT = "admin.port";
@@ -55,11 +55,6 @@ public interface ApplicationConfiguration
     //---( anonymous access )---
 
     public static final String ANONYMOUS_ACCESS_ENABLED = "anon.enabled";
-
-    /**
-     * The port on which the http server will listen for connections.
-     */
-    int getServerPort();
 
     /**
      * The port on which the server will listen for admin requests.

@@ -27,9 +27,6 @@
         <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="external->external"/>
         <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="build->build"/>
 
-        <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
-        <dependency org="apache" name="xmlrpc" rev="2.0.1" conf="external,build,release->default"/>
-
         <dependency org="displaytag" name="displaytag" rev="1.0" conf="external,build,release->default"/>
 
         <dependency org="jive" name="smack" rev="2.2.0" conf="external,build,release->default"/>

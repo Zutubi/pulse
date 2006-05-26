@@ -102,6 +102,15 @@
         </property>
     </bean>
 
+    <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>systemPaths.configRoot</value>
+        </property>
+    </bean>
+    
     <bean id="slaveProxyFactory" class="com.zutubi.pulse.SlaveProxyFactory" autowire="byName"/>
 
     <bean id="fatController" class="com.zutubi.pulse.FatController" autowire="byName" init-method="init"/>

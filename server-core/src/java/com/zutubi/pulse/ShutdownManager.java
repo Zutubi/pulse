@@ -29,8 +29,38 @@ public class ShutdownManager
         System.exit(0);
     }
 
+    public void delayedShutdown(boolean force)
+    {
+        ShutdownRunner runner = new ShutdownRunner(force);
+        new Thread(runner).start();
+    }
+
     public void setStoppables(List<Stoppable> stoppables)
     {
         this.stoppables = stoppables;
+    }
+
+    private class ShutdownRunner implements Runnable
+    {
+        private boolean force;
+
+        public ShutdownRunner(boolean force)
+        {
+            this.force = force;
+        }
+
+        public void run()
+        {
+            // Oh my, is this ever dodgy...
+            try
+            {
+                Thread.sleep(500);
+            }
+            catch (InterruptedException e)
+            {
+                // Empty
+            }
+            shutdown(force);
+        }
     }
 }
