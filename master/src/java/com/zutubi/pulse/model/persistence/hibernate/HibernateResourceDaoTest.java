@@ -7,12 +7,13 @@ import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
 import com.zutubi.pulse.model.persistence.ResourceDao;
+import junit.framework.Assert;
 
 /**
  *
  *
  */
-public class HibernateResourceDaoTest extends ServerCorePersistenceTestCase
+public class HibernateResourceDaoTest extends MasterPersistenceTestCase
 {
     private ResourceDao resourceDao;
 
@@ -44,10 +45,10 @@ public class HibernateResourceDaoTest extends ServerCorePersistenceTestCase
         commitAndRefreshTransaction();
 
         Resource otherResource = resourceDao.findById(resource.getId());
-        assertEquals(resource.getName(), otherResource.getName());
-        assertTrue(otherResource.hasProperty(p1.getName()));
-        assertEquals(p1.getValue(), otherResource.getProperty(p1.getName()).getValue());
+        Assert.assertEquals(resource.getName(), otherResource.getName());
+        Assert.assertTrue(otherResource.hasProperty(p1.getName()));
+        Assert.assertEquals(p1.getValue(), otherResource.getProperty(p1.getName()).getValue());
 
-        assertTrue(otherResource.hasVersion(version.getValue()));
+        Assert.assertTrue(otherResource.hasVersion(version.getValue()));
     }
 }

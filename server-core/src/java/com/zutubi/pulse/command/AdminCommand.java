@@ -5,10 +5,9 @@ package com.zutubi.pulse.command;
 
 import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcException;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.CoreConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.CoreConfigurationManager;
 import com.zutubi.pulse.api.AdminTokenManager;
 import com.zutubi.pulse.util.IOUtils;
 

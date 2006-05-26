@@ -5,7 +5,6 @@ package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
-import com.zutubi.pulse.jetty.JettyManager;
 import com.zutubi.pulse.util.logging.Logger;
 
 /**
@@ -29,7 +28,7 @@ public class SlaveServer
     public void stop()
     {
         LOG.info("stop");
-        ((JettyManager) ComponentContext.getBean("jettyManager")).stop(true);
+        ((SlaveStartupManager) ComponentContext.getBean("startupManager")).stop(true);
     }
 
     public static void main(String argv[])

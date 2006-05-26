@@ -4,7 +4,7 @@
 package com.zutubi.pulse.slave.command;
 
 import com.zutubi.pulse.ServerRecipePaths;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.CoreConfigurationManager;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -17,7 +17,7 @@ public class CleanupRecipeCommand implements Runnable
     private static final Logger LOG = Logger.getLogger(CleanupRecipeCommand.class);
 
     private long recipeId;
-    private ConfigurationManager configurationManager;
+    private CoreConfigurationManager configurationManager;
 
     public CleanupRecipeCommand(long recipeId)
     {
@@ -34,7 +34,7 @@ public class CleanupRecipeCommand implements Runnable
         }
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(CoreConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

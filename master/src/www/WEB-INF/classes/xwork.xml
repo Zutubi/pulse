@@ -627,12 +627,6 @@
             <result name="success" type="redirect">/configureProject.action?id=${id}</result>
         </action>
 
-        <action name="shutdownServer" class="com.zutubi.pulse.web.ShutdownServerAction">
-            <interceptor-ref name="paramsStack"/>
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/serverStatus.action</result>
-        </action>
-
         <action name="rss" class="com.zutubi.pulse.web.rss.BuildResultsRssAction">
             <result name="disabled" type="velocity">generic-error.vm</result>
         </action>

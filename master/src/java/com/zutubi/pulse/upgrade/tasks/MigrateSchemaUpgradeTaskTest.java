@@ -38,7 +38,7 @@ public class MigrateSchemaUpgradeTaskTest extends PersistenceTestCase
 
     protected String[] getConfigLocations()
     {
-        return new String[]{"com/zutubi/pulse/bootstrap/testBootstrapContext.xml",
+        return new String[]{"../../../../../../../../master/src/test/com/zutubi/pulse/bootstrap/testBootstrapContext.xml",
                 "com/zutubi/pulse/upgrade/tasks/testSchemaUpgradeTaskContext.xml"};
     }
 
@@ -70,7 +70,7 @@ public class MigrateSchemaUpgradeTaskTest extends PersistenceTestCase
         // after, tet that table is there.
         assertFalse(checkColumnExists("TEST", "NEW_COLUMN"));
 
-        upgrade = newSchemaUpgrade("com/zutubi/pulse/upgrade/tasks/testSchemaMigration-v2.hbm.xml");
+        upgrade = newSchemaUpgrade("../../../../../../../../master/src/java/com/zutubi/pulse/upgrade/tasks/testSchemaMigration-v2.hbm.xml");
         upgrade.execute(new MockUpgradeContext());
 
         assertTrue(checkColumnExists("TEST", "NEW_COLUMN"));
