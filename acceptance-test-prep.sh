@@ -29,7 +29,7 @@ trap "rm -rf $tmpDir" ERR
 
 # Unpack that shiny new package
 extension="${package##*.}"
-if [[ $extension == "tar.gz" ]]
+if [[ $extension == "gz" ]]
 then
     tar -xv -C $tmpDir -f "$package"
 else
