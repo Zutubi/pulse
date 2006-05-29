@@ -125,7 +125,7 @@ public class RemoteApi
                 throw new IllegalArgumentException("Unknown build specification '" + buildSpecification + "'");
             }
 
-            BuildRequestEvent event = new BuildRequestEvent(this, project, spec.getId());
+            BuildRequestEvent event = new BuildRequestEvent(this, project, buildSpecification);
             eventManager.publish(event);
             return true;
         }

@@ -200,18 +200,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         return null;
     }
 
-    public BuildSpecification getBuildSpecification(long id)
-    {
-        for (BuildSpecification spec : buildSpecifications)
-        {
-            if (spec.getId() == id)
-            {
-                return spec;
-            }
-        }
-        return null;
-    }
-
     public boolean remove(BuildSpecification buildSpecification)
     {
         return buildSpecifications.remove(buildSpecification);

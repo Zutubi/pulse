@@ -27,24 +27,6 @@ public interface ProjectManager extends EntityManager<Project>
 
     List<Project> getProjectsWithNameLike(String s);
 
-    /**
-     * Retrieve the build specification
-     *
-     * @param id uniquely identifying the build specification.
-     *
-     * @return the requested build specification or null if it does not exist.
-     */
-    BuildSpecification getBuildSpecification(long id);
-
-    /**
-     * Retrieve the build specification
-     *
-     * @param name uniquely identifying the build specification.
-     *
-     * @return the requested build specification or null if it does not exist.
-     */
-    BuildSpecification getBuildSpecification(String name);
-
     void initialise();
 
     /**

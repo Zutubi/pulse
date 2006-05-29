@@ -45,16 +45,6 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public BuildSpecification getBuildSpecification(long id)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-    public BuildSpecification getBuildSpecification(String name)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
     public void initialise()
     {
         throw new RuntimeException("Method not implemented.");

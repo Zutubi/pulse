@@ -6,15 +6,16 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
-import com.zutubi.pulse.model.persistence.TriggerDao;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.model.persistence.TriggerDao;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.util.logging.Logger;
-import org.acegisecurity.annotation.Secured;
 
 import java.util.List;
+
+import org.acegisecurity.annotation.Secured;
 
 /**
  * 
@@ -54,16 +55,6 @@ public class DefaultProjectManager implements ProjectManager
     public List<Project> getProjectsWithNameLike(String name)
     {
         return projectDao.findByLikeName(name);
-    }
-
-    public BuildSpecification getBuildSpecification(long id)
-    {
-        return buildSpecificationDao.findById(id);
-    }
-
-    public BuildSpecification getBuildSpecification(String name)
-    {
-        return buildSpecificationDao.findByName(name);
     }
 
     private void deleteProject(Project entity)
@@ -154,8 +145,9 @@ public class DefaultProjectManager implements ProjectManager
             Class clazz = trigger.getTaskClass();
             if (clazz.equals(BuildProjectTask.class))
             {
-                long triggerSpecId = (Long) trigger.getDataMap().get(BuildProjectTask.PARAM_SPEC);
-                if (triggerSpecId == specId && trigger.isScheduled())
+                String specName = (String) trigger.getDataMap().get(BuildProjectTask.PARAM_SPEC);
+
+                if (specName.equals(spec.getName()) && trigger.isScheduled())
                 {
                     try
                     {
