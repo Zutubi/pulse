@@ -4,25 +4,31 @@
         #contentHeading("agent.name" 1)
         #contentHeading("agent.location" 1)
         #contentHeading("agent.status" 1)
+#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
         #contentHeading("actions" 2)
+#end
     </tr>
     <tr>
         #linkCell("agent.master" "viewServerStatus.action")
-        #contentCell("empty.cell")
-        #agentStatusCell("agent.online")
+        #contentCell(":$serverPort")
+        #contentCell("agent.online")
         #contentCell("empty.cell")
         #contentCell("empty.cell")
     </tr>
 #foreach($slave in $slaves)
-    #set($index = $velocityCount - 1)
+    #set($confirmMessage = $action.getText("agent.confirm.delete", [$slave.name]))
 
     <tr>
         #dynamicLinkCell($slave.name "viewServerStatus.action?id=$slave.id")
-        #
+        #staticCell("${slave.host}:${slave.port}")
+        #staticCell($slave.status.toString().toLowerCase())
+    #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+        #editCell("editAgent!input.action?id=$slave.id" "edit_$!webwork.htmlEncode($slave.name)")
+        #deleteCell($confirmMessage "deleteAgent.action?id=$slave.id" "delete_$!webwork.htmlEncode($slave.name)")
+    #end
     </tr>
 #end
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
     #addRow("add.agent" 5 "addAgent!input.action" "agent.add")
 #end
 </table>
-

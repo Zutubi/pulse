@@ -34,7 +34,7 @@ public class DefaultSlaveApplicationConfiguration implements SlaveApplicationCon
 
     public int getServerPort()
     {
-        return config.getInt(WEBAPP_PORT, 8080);
+        return config.getInt(WEBAPP_PORT, 8090);
     }
 
     public void setUserPaths(CoreUserPaths userPaths)

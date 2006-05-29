@@ -1,16 +1,17 @@
 /********************************************************************************
   @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.web;
+package com.zutubi.pulse.web.server;
 
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
  * 
  *
  */
-public class CreateSlaveAction extends ActionSupport
+public class AddAgentAction extends ActionSupport
 {
     private Slave slave = new Slave();
     private SlaveManager slaveManager;
@@ -29,10 +30,10 @@ public class CreateSlaveAction extends ActionSupport
             return;
         }
 
-        if (slaveManager.getSlave(slave.getName()) != null)
+        if (slave.getName().equals("master") || slaveManager.getSlave(slave.getName()) != null)
         {
             // slave name already in use.
-            addFieldError("slave.name", "A slave with name '" + slave.getName() + "' already exists.");
+            addFieldError("slave.name", "An agent with name '" + slave.getName() + "' already exists.");
         }
     }
 

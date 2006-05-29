@@ -22,7 +22,7 @@ public class Slave extends Entity
 
     private String name;
     private String host;
-    private int port = 8080;
+    private int port = 8090;
     private long lastPingTime = 0;
     private Status status = Status.UNKNOWN;
 

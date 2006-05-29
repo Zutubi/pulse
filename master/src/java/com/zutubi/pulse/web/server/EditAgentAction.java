@@ -1,15 +1,15 @@
 /********************************************************************************
   @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.web;
+package com.zutubi.pulse.web.server;
 
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
- * <class-comment/>
  */
-public class EditSlaveAction extends ActionSupport
+public class EditAgentAction extends ActionSupport
 {
     private SlaveManager slaveManager;
 
@@ -31,10 +31,28 @@ public class EditSlaveAction extends ActionSupport
         return slave;
     }
 
-    public String doDefault()
+    public String doInput()
     {
         slave = slaveManager.getSlave(id);
-        return SUCCESS;
+        return INPUT;
+    }
+
+    public void validate()
+    {
+        Slave persistentSlave = slaveManager.getSlave(id);
+        if(persistentSlave == null)
+        {
+            addActionError("Unknown agent [" + id + "]");
+            return;
+        }
+
+        if(!slave.getName().equals(persistentSlave.getName()))
+        {
+            if(slaveManager.getSlave(slave.getName()) != null)
+            {
+                addFieldError("slave.name", "An agent with name '" + slave.getName() + "' already exists.");
+            }
+        }
     }
 
     public String execute()

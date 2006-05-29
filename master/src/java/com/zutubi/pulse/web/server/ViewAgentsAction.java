@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.server;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 
 import java.util.List;
 
@@ -13,11 +14,17 @@ import java.util.List;
 public class ViewAgentsAction extends ActionSupport
 {
     private List<Slave> slaves;
+    private ConfigurationManager configurationManager;
     private SlaveManager slaveManager;
 
     public List<Slave> getSlaves()
     {
         return slaves;
+    }
+
+    public int getServerPort()
+    {
+        return configurationManager.getAppConfig().getServerPort();
     }
 
     public String execute() throws Exception
@@ -29,5 +36,10 @@ public class ViewAgentsAction extends ActionSupport
     public void setSlaveManager(SlaveManager slaveManager)
     {
         this.slaveManager = slaveManager;
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

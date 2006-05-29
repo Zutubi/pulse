@@ -1,0 +1,24 @@
+#helpTag("Agents")
+#authorisationTags($principle)
+<html>
+<head>
+    <title>#wwtext("name=agent.edit")</title>
+</head>
+<body>
+    <div id="pagecontent">
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editAgent.action" "heading=%{getText('agent.edit')}" "method=post")
+    #wwhidden("name=id")
+
+    #wwtextfield("name=slave.name" "label=%{getText('agent.name')}" "required=true"  "tabindex=1")
+    #wwtextfield("name=slave.host" "label=%{getText('agent.host')}" "required=true"  "tabindex=2")
+    #wwtextfield("name=slave.port" "label=%{getText('agent.port')}" "required=true"  "tabindex=3")
+
+    #saveCancel(4)
+#end
+
+    </div>
+</body>
+</html>

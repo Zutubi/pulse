@@ -46,6 +46,11 @@
             <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
 
+        <action name="viewAgents" class="com.zutubi.pulse.web.server.ViewAgentsAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="velocity">view-agents.vm</result>
+        </action>
+
         <action name="viewServerStatus" class="com.zutubi.pulse.web.server.ViewServerStatusAction">
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="velocity">view-server-status.vm</result>
@@ -503,33 +508,28 @@
             <result name="success" type="velocity">view-quartz.vm</result>
         </action>
 
-        <action name="createSlave!default" class="com.zutubi.pulse.web.CreateSlaveAction" method="doDefault">
+        <action name="createSlave!default" class="com.zutubi.pulse.web.server.AddAgentAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-slave.vm</result>
         </action>
 
-        <action name="createSlave" class="com.zutubi.pulse.web.CreateSlaveAction">
-            <result name="input" type="velocity">create-slave.vm</result>
-            <result name="cancel" type="velocity">undefined.vm</result>
-            <result name="error" type="velocity">create-slave.vm</result>
-            <result name="success" type="redirect">/serverStatus.action</result>
+        <action name="addAgent" class="com.zutubi.pulse.web.server.AddAgentAction">
+            <result name="input" type="velocity">add-agent.vm</result>
+            <result name="cancel" type="redirect">/viewAgents.action</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewAgents.action</result>
         </action>
 
-        <action name="editSlave!default" class="com.zutubi.pulse.web.EditSlaveAction" method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">edit-slave.vm</result>
+        <action name="editAgent" class="com.zutubi.pulse.web.server.EditAgentAction">
+            <result name="error" type="velocity">edit-agent.vm</result>
+            <result name="input" type="velocity">edit-agent.vm</result>
+            <result name="cancel" type="redirect">/viewAgents.action</result>
+            <result name="success" type="redirect">/viewAgents.action</result>
         </action>
 
-        <action name="editSlave" class="com.zutubi.pulse.web.EditSlaveAction">
-            <result name="error" type="velocity">edit-slave.vm</result>
-            <result name="input" type="velocity">edit-slave.vm</result>
-            <result name="cancel" type="redirect">/serverStatus.action</result>
-            <result name="success" type="redirect">/serverStatus.action</result>
-        </action>
-
-        <action name="deleteSlave" class="com.zutubi.pulse.web.DeleteSlaveAction">
-            <result name="error" type="redirect">/serverStatus.action</result>
-            <result name="success" type="redirect">/serverStatus.action</result>
+        <action name="deleteAgent" class="com.zutubi.pulse.web.server.DeleteAgentAction">
+            <result name="success" type="redirect">/viewAgents.action</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="createBuildSpecification" class="com.zutubi.pulse.web.project.CreateBuildSpecificationAction">
@@ -963,6 +963,11 @@
 
         <action name="viewBuildPanel" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-build-panel.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="viewAgentsPanel" class="com.zutubi.pulse.web.server.ViewAgentsAction">
+            <result name="success" type="velocity">view-agents-panel.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 

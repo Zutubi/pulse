@@ -1,14 +1,14 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.web;
+package com.zutubi.pulse.web.server;
 
 import com.zutubi.pulse.model.SlaveManager;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
- * <class-comment/>
  */
-public class DeleteSlaveAction extends ActionSupport
+public class DeleteAgentAction extends ActionSupport
 {
     private SlaveManager slaveManager;
 
@@ -33,7 +33,7 @@ public class DeleteSlaveAction extends ActionSupport
 
         if (slaveManager.getSlave(id) == null)
         {
-            addFieldError("id", "A slave with the id '" + id + "' does not exist.");
+            addActionError("Unknown agent [" + id + "]");
         }
     }
 
