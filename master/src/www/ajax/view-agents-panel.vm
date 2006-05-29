@@ -1,0 +1,28 @@
+<table class="content">
+    #headingRow("agents" 5)
+    <tr>
+        #contentHeading("agent.name" 1)
+        #contentHeading("agent.location" 1)
+        #contentHeading("agent.status" 1)
+        #contentHeading("actions" 2)
+    </tr>
+    <tr>
+        #linkCell("agent.master" "viewServerStatus.action")
+        #contentCell("empty.cell")
+        #agentStatusCell("agent.online")
+        #contentCell("empty.cell")
+        #contentCell("empty.cell")
+    </tr>
+#foreach($slave in $slaves)
+    #set($index = $velocityCount - 1)
+
+    <tr>
+        #dynamicLinkCell($slave.name "viewServerStatus.action?id=$slave.id")
+        #
+    </tr>
+#end
+#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+    #addRow("add.agent" 5 "addAgent!input.action" "agent.add")
+#end
+</table>
+

@@ -61,10 +61,6 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="serverStatus" class="com.zutubi.pulse.web.ServerStatusAction">
-            <result name="success" type="velocity">server-status.vm</result>
-        </action>
-
         <action name="viewResource" class="com.zutubi.pulse.web.ViewResourceAction">
             <result name="input" type="velocity">view-resource.vm</result>
             <result name="success" type="velocity">view-resource.vm</result>
