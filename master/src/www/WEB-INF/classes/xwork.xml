@@ -46,14 +46,14 @@
             <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
 
-        <action name="viewRecipeQueue" class="com.zutubi.pulse.web.server.ViewRecipeQueueAction">
+        <action name="viewServerStatus" class="com.zutubi.pulse.web.server.ViewServerStatusAction">
             <interceptor-ref name="ajaxStack"/>
-            <result name="success" type="velocity">view-recipe-queue.vm</result>
+            <result name="success" type="velocity">view-server-status.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="cancelBuild" class="com.zutubi.pulse.web.server.CancelBuildAction">
-            <result name="success" type="redirect">viewRecipeQueue.action</result>
+            <result name="success" type="redirect">viewServerStatus.action</result>
         </action>
 
         <action name="viewResources" class="com.zutubi.pulse.web.ViewResourcesAction">
@@ -775,7 +775,7 @@
         </action>
 
         <action name="toggleRecipeQueue" class="com.zutubi.pulse.web.admin.ToggleRecipeQueueAction">
-            <result name="success" type="redirect">/viewRecipeQueue.action</result>
+            <result name="success" type="redirect">/viewServerStatus.action</result>
         </action>
 
         <!--
@@ -970,8 +970,8 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="viewRecipeQueuePanel" class="com.zutubi.pulse.web.server.ViewRecipeQueueAction">
-            <result name="success" type="velocity">view-recipe-queue-panel.vm</result>
+        <action name="serverStatusPanel" class="com.zutubi.pulse.web.server.ViewServerStatusAction">
+            <result name="success" type="velocity">view-server-status-panel.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 

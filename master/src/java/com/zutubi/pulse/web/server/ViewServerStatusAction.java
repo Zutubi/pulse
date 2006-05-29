@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  */
-public class ViewRecipeQueueAction extends ActionSupport
+public class ViewServerStatusAction extends ActionSupport
 {
     private FatController fatController;
     private RecipeQueue recipeQueue;

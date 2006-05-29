@@ -93,7 +93,7 @@
         <li><a #if($selectedTab && $selectedTab == "dashboard")      class="active" #end href="/dashboard.action">dashboard</a></li>
 #end
         <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end href="/viewProjects.action">projects</a></li>
-        <li><a #if($selectedTab && $selectedTab == "server")         class="active" #end href="/viewRecipeQueue.action">server</a></li>
+        <li><a #if($selectedTab && $selectedTab == "server")         class="active" #end href="/viewServerStatus.action">server</a></li>
         #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
         <li><a #if($selectedTab && $selectedTab == "administration") class="active" #end href="/admin/serverSettings.action">administration</a></li>
       #end
