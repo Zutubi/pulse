@@ -259,6 +259,30 @@ public class JDBCUtils
         }
     }
 
+    public static void setParam(PreparedStatement ps, int col, Object obj, int type) throws SQLException
+    {
+        if (type == Types.BIGINT)
+        {
+            setLong(ps, col, (Long) obj);
+        }
+        else if (type == Types.INTEGER)
+        {
+            setInt(ps, col, (Integer)obj);
+        }
+        else if (type == Types.VARCHAR)
+        {
+            setString(ps, col, (String)obj);
+        }
+        else if (type == Types.BIT)
+        {
+            setBool(ps, col, (Boolean)obj);
+        }
+        else
+        {
+            throw new IllegalArgumentException("Unsupported type: " + type);
+        }
+    }
+
     public static String getString(ResultSet rs, String col) throws SQLException
     {
         Object result = rs.getString(col);
@@ -333,5 +357,49 @@ public class JDBCUtils
             return null;
         }
         return (Boolean)result;
+    }
+
+    public static void executeUpdate(Connection con, String sql, Object[] args, int[] types) throws SQLException
+    {
+        PreparedStatement ps = null;
+        try
+        {
+            ps = con.prepareStatement(sql);
+            for (int i = 0; i < args.length; i++)
+            {
+                JDBCUtils.setParam(ps, i + 1, args[i], types[i]);
+            }
+            ps.executeUpdate();
+        }
+        finally
+        {
+            JDBCUtils.close(ps);
+        }
+    }
+
+    public static int executeCount(Connection con, String sql, Object[] args, int[] types) throws SQLException
+    {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try
+        {
+            ps = con.prepareStatement(sql);
+            for (int i = 0; i < args.length; i++)
+            {
+                JDBCUtils.setParam(ps, i + 1, args[i], types[i]);
+            }
+            rs = ps.executeQuery();
+            int count = 0;
+            while (rs.next())
+            {
+                count++;
+            }
+            return count;
+        }
+        finally
+        {
+            JDBCUtils.close(rs);
+            JDBCUtils.close(ps);
+        }
     }
 }

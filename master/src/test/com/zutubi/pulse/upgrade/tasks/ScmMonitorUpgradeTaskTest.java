@@ -8,10 +8,7 @@ import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.util.JDBCUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.ResultSet;
+import java.sql.*;
 
 /**
  * <class-comment/>
@@ -80,45 +77,23 @@ public class ScmMonitorUpgradeTaskTest extends BaseUpgradeTaskTestCase
 
     private void assertMonitorTrue(Connection con, long l) throws SQLException
     {
-        PreparedStatement ps = null;
-        ResultSet rs;
-        try
-        {
-            ps = con.prepareStatement("SELECT monitor FROM scm WHERE id = ?");
-            JDBCUtils.setLong(ps, 1, l);
-            rs = ps.executeQuery();
-            if (rs.next())
-            {
-                assertTrue(JDBCUtils.getBool(rs, "monitor"));
-            }
-            else
-            {
-                fail();
-            }
-        }
-        finally
-        {
-            JDBCUtils.close(ps);
-        }
+        assertEquals(1, JDBCUtils.executeCount(con,
+                "SELECT monitor FROM scm WHERE id = ?",
+                new Object[]{l},
+                new int[]{Types.BIGINT}
+        ));
     }
 
     private void generateTestData(BasicDataSource dataSource) throws SQLException
     {
         Connection con = null;
-        PreparedStatement ps;
         try
         {
             con = dataSource.getConnection();
-            ps = con.prepareStatement("INSERT INTO scm (id, scmtype) values (?, ?)");
-            JDBCUtils.setLong(ps, 1, 1L);
-            JDBCUtils.setString(ps, 2, "noop");
-            ps.executeUpdate();
-            JDBCUtils.setLong(ps, 1, 2L);
-            JDBCUtils.setString(ps, 2, "noop");
-            ps.executeUpdate();
-            JDBCUtils.setLong(ps, 1, 3L);
-            JDBCUtils.setString(ps, 2, "noop");
-            ps.executeUpdate();
+            String sql = "INSERT INTO scm (id, scmtype) values (?, ?)";
+            JDBCUtils.executeUpdate(con, sql, new Object[]{1L, "noop"}, new int[]{Types.BIGINT, Types.VARCHAR});
+            JDBCUtils.executeUpdate(con, sql, new Object[]{2L, "noop"}, new int[]{Types.BIGINT, Types.VARCHAR});
+            JDBCUtils.executeUpdate(con, sql, new Object[]{3L, "noop"}, new int[]{Types.BIGINT, Types.VARCHAR});
         }
         finally
         {

@@ -27,16 +27,25 @@ public class ScmMonitorDataUpgradeTask implements UpgradeTask, DataSourceAware
 
     private List<String> errors = new LinkedList<String>();
 
+    /**
+     * @see com.zutubi.pulse.upgrade.UpgradeTask#getName()
+     */
     public String getName()
     {
         return "Scm monitor field initialisation.";
     }
 
+    /**
+     * @see com.zutubi.pulse.upgrade.UpgradeTask#getDescription()
+     */
     public String getDescription()
     {
         return "This upgrade task initialises the new scm monitor field, setting its value to true.";
     }
 
+    /**
+     * @see com.zutubi.pulse.upgrade.UpgradeTask#getBuildNumber()
+     */
     public int getBuildNumber()
     {
         return buildNumber;
@@ -47,6 +56,9 @@ public class ScmMonitorDataUpgradeTask implements UpgradeTask, DataSourceAware
         this.buildNumber = buildNumber;
     }
 
+    /**
+     * @see com.zutubi.pulse.upgrade.UpgradeTask#execute(com.zutubi.pulse.upgrade.UpgradeContext)
+     */
     public void execute(UpgradeContext context) throws UpgradeException
     {
         Connection con = null;
@@ -75,6 +87,9 @@ public class ScmMonitorDataUpgradeTask implements UpgradeTask, DataSourceAware
         }
     }
 
+    /**
+     * @see com.zutubi.pulse.upgrade.UpgradeTask#getErrors()
+     */
     public List<String> getErrors()
     {
         return errors;
@@ -90,6 +105,11 @@ public class ScmMonitorDataUpgradeTask implements UpgradeTask, DataSourceAware
         return false;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param source
+     */
     public void setDataSource(DataSource source)
     {
         this.dataSource = source;

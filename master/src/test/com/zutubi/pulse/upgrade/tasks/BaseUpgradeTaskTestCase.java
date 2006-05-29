@@ -62,4 +62,6 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
             return name.endsWith(".xml");
         }
     }
+
+
 }

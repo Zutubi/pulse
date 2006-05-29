@@ -95,45 +95,20 @@ public class UserPropsUpgradeTaskTest extends BaseUpgradeTaskTestCase
 
     private void assertRowExists(Connection con, Long userId, String key, String value) throws SQLException
     {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try
-        {
-            ps = con.prepareStatement("select 1 from USER_PROPS where user_id = ? AND key = ? AND value = ?");
-            JDBCUtils.setLong(ps, 1, userId);
-            JDBCUtils.setString(ps, 2, key);
-            JDBCUtils.setString(ps, 3, value);
-
-            rs = ps.executeQuery();
-            assertTrue(rs.next());
-            // assert that it only exists once.
-            assertFalse(rs.next());
-        }
-        finally
-        {
-            JDBCUtils.close(rs);
-            JDBCUtils.close(ps);
-        }
+        assertEquals(1, JDBCUtils.executeCount(con,
+                "select 1 from USER_PROPS where user_id = ? AND key = ? AND value = ?",
+                new Object[]{userId, key, value},
+                new int[]{Types.BIGINT, Types.VARCHAR, Types.VARCHAR}
+        ));
     }
 
     private void assertRowNotExists(Connection con, Long userId, String key) throws SQLException
     {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try
-        {
-            ps = con.prepareStatement("select 1 from USER_PROPS where user_id = ? AND key = ?");
-            JDBCUtils.setLong(ps, 1, userId);
-            JDBCUtils.setString(ps, 2, key);
-
-            rs = ps.executeQuery();
-            assertFalse(rs.next());
-        }
-        finally
-        {
-            JDBCUtils.close(rs);
-            JDBCUtils.close(ps);
-        }
+        assertEquals(0, JDBCUtils.executeCount(con,
+                "select 1 from USER_PROPS where user_id = ? AND key = ?",
+                new Object[]{userId, key},
+                new int[]{Types.BIGINT, Types.VARCHAR}
+        ));
     }
 
     public void generateTestData(DataSource dataSource) throws SQLException
@@ -154,19 +129,11 @@ public class UserPropsUpgradeTaskTest extends BaseUpgradeTaskTestCase
 
     private void insertTestData(Connection con, Long id, String defaultAction, Integer refreshInterval, Boolean showAllProjects) throws SQLException
     {
-        PreparedStatement ps = null;
-        try
-        {
-            ps = con.prepareStatement("insert into USER (id, defaultAction, refreshInterval, showAllProjects) values (?, ?, ?, ?)");
-            JDBCUtils.setLong(ps, 1, id);
-            JDBCUtils.setString(ps, 2, defaultAction);
-            JDBCUtils.setInt(ps, 3, refreshInterval);
-            JDBCUtils.setBool(ps, 4, showAllProjects);
-            ps.executeUpdate();
-        }
-        finally
-        {
-            JDBCUtils.close(ps);
-        }
+        JDBCUtils.executeUpdate(con,
+                "insert into USER (id, defaultAction, refreshInterval, showAllProjects) values (?, ?, ?, ?)",
+                new Object[]{id, defaultAction, refreshInterval, showAllProjects},
+                new int[]{Types.BIGINT, Types.VARCHAR, Types.INTEGER, Types.BIT}
+        );
     }
+
 }
