@@ -18,6 +18,11 @@ public abstract class Scm extends Entity implements Cloneable
     private String path;
     private Properties properties;
 
+    /**
+     * The active status of this SCM.
+     */
+    private boolean monitor;
+
     public abstract SCMServer createServer() throws SCMException;
 
     public boolean supportsUpdate()
@@ -54,6 +59,26 @@ public abstract class Scm extends Entity implements Cloneable
     public void setPath(String path)
     {
         this.path = path;
+    }
+
+    /**
+     * An active scm can be monitored by automated processes. Inactive scms should not.
+     *
+     * @return true if this scm can be monitored by automated processes.
+     */
+    public boolean isMonitor()
+    {
+        return monitor;
+    }
+
+    /**
+     * Set the active status of this scm configuration.
+     *
+     * @param b
+     */
+    public void setMonitor(boolean b)
+    {
+        this.monitor = b;
     }
 
     public Scm copy()

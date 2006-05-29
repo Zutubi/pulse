@@ -18,11 +18,6 @@ public abstract class CvsForm extends BaseForm
         super(tester);
     }
 
-    public String[] getFieldNames()
-    {
-        return new String[]{"cvs.root", "cvs.module", "cvs.password", "cvs.branch", "minutes", "seconds"};
-    }
-
     /**
      * The create cvs form.
      */
@@ -36,6 +31,16 @@ public abstract class CvsForm extends BaseForm
         public String getFormName()
         {
             return "cvs.setup";
+        }
+
+        public String[] getFieldNames()
+        {
+            return new String[]{"cvs.root", "cvs.module", "cvs.password", "cvs.branch", "minutes", "seconds"};
+        }
+
+        public int[] getFieldTypes()
+        {
+            return new int[]{TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD};
         }
     }
 
@@ -52,6 +57,16 @@ public abstract class CvsForm extends BaseForm
         public String getFormName()
         {
             return "cvs.edit";
+        }
+
+        public String[] getFieldNames()
+        {
+            return new String[]{"cvs.root", "cvs.module", "cvs.password", "cvs.branch", "minutes", "seconds", "monitor"};
+        }
+
+        public int[] getFieldTypes()
+        {
+            return new int[]{TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, CHECKBOX};
         }
     }
 }

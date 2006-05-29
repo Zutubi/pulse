@@ -29,6 +29,7 @@
                     #aclEditHeadingRow("project.scm" 2 "editScm!input.action?id=$project.scm.id&amp;projectId=$project.id" "project.scm.edit" "project")
                     #scmRow($project)
                     #dynamicRow("scm.location" "$project.scm.createServer().location")
+                    #dynamicRow("scm.monitor" "$project.scm.monitor")
 #acl("domainObject=project" "hasPermission=4,1")
                     <tr>
                         #contentRowHeading("actions")

@@ -61,7 +61,7 @@ public class DefaultScmManager implements ScmManager
 
     public List<Scm> getActiveScms()
     {
-        return scmDao.findAll();
+        return scmDao.findAllActive();
     }
 
     public void save(Scm entity)

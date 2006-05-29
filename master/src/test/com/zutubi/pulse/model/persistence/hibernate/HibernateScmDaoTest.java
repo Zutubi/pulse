@@ -4,7 +4,10 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.model.Svn;
+import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.model.persistence.ScmDao;
+
+import java.util.List;
 
 /**
  * 
@@ -36,5 +39,31 @@ public class HibernateScmDaoTest extends MasterPersistenceTestCase
 
         Svn otherSvn = (Svn) scmDao.findById(svn.getId());
         assertPropertyEquals(svn, otherSvn);
+    }
+
+    public void testFindAllActive()
+    {
+        Scm scm = new Svn();
+        scmDao.save(scm);
+
+        commitAndRefreshTransaction();
+
+        assertActiveScms(0);
+
+        scm = scmDao.findById(1);
+
+        scm.setMonitor(true);
+        scmDao.save(scm);
+
+        commitAndRefreshTransaction();
+
+        assertActiveScms(1);
+    }
+
+    private void assertActiveScms(int activeCount)
+    {
+        List<Scm> activeScms = scmDao.findAllActive();
+        assertNotNull(activeScms);
+        assertEquals(activeCount, activeScms.size());
     }
 }

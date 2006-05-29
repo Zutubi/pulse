@@ -29,9 +29,11 @@
     #wwtextfield("name=quiet" "template=controlfooter")
     #inlineHelp("cvs.quiet.help")
 
+    #wwcheckbox("name=monitor" "label=%{getText('scm.monitor')}" "tabindex=8")
+
     #scmTestRow()
 
-    #saveCancel(8)
+    #saveCancel(9)
  #end
 
     #tabEnd()

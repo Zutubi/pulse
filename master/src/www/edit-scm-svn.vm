@@ -25,10 +25,11 @@
     #inlineHelp("svn.passphrase.help")
     #wwtextfield("name=svn.path" "label=%{getText('scm.path')}" "size=60" "tabindex='6'")
     #inlineHelp("scm.path.help")
+    #wwcheckbox("name=monitor" "label=%{getText('scm.monitor')}" "tabindex=7")
 
     #scmTestRow()
 
-    #saveCancel(7)
+    #saveCancel(8)
  #end
 
      #tabEnd()
