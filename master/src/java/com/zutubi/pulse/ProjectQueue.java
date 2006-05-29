@@ -71,7 +71,7 @@ public class ProjectQueue
         for (int i = 1; i < projectRequests.size(); i++)
         {
             BuildRequestEvent e = projectRequests.get(i);
-            if (e.getSpecification().equals(event.getSpecification()))
+            if (e.getSpecification() == event.getSpecification())
             {
                 // This spec is already queued, no need to remember this
                 // request.

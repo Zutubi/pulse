@@ -59,7 +59,7 @@ public class TriggerBuildAction extends ProjectActionSupport
             return ERROR;
         }
 
-        BuildRequestEvent event = new BuildRequestEvent(this, project, spec.getName());
+        BuildRequestEvent event = new BuildRequestEvent(this, project, spec.getId());
         eventManager.publish(event);
 
         try

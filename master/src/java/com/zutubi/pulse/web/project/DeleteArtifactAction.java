@@ -4,7 +4,6 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.web.ActionSupport;
 
 /**

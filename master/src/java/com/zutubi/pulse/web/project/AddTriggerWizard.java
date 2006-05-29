@@ -3,6 +3,8 @@
  ********************************************************************************/
 package com.zutubi.pulse.web.project;
 
+import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.Validateable;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
@@ -14,8 +16,6 @@ import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
 import com.zutubi.pulse.web.wizard.WizardCompleteState;
-import com.opensymphony.util.TextUtils;
-import com.opensymphony.xwork.Validateable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -73,16 +73,18 @@ public class AddTriggerWizard extends BaseWizard
 
         Project project = projectManager.getProject(getProjectId());
 
+        BuildSpecification buildSpec = projectManager.getBuildSpecification(selectState.getSpec());
+
         Trigger trigger = null;
         if (CRON_STATE.equals(selectState.getType()))
         {
             trigger = new CronTrigger(configCron.cron, selectState.getName(), project.getName());
-            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, selectState.getSpec());
+            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, buildSpec.getId());
         }
         else if (MONITOR_STATE.equals(selectState.getType()))
         {
             trigger = new EventTrigger(SCMChangeEvent.class, selectState.getName(), project.getName(), SCMChangeEventFilter.class);
-            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, selectState.getSpec());
+            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, buildSpec.getId());
         }
 
         trigger.setProject(project.getId());

@@ -77,7 +77,8 @@ public abstract class AbstractEditTriggerAction extends ProjectActionSupport imp
         }
 
         Trigger trigger = getTrigger();
-        specification = (String) trigger.getDataMap().get(BuildProjectTask.PARAM_SPEC);
+        long buildSpecId = (Long)trigger.getDataMap().get(BuildProjectTask.PARAM_SPEC);
+        specification = getProjectManager().getBuildSpecification(buildSpecId).getName();
     }
 
     public String doInput()
@@ -99,10 +100,12 @@ public abstract class AbstractEditTriggerAction extends ProjectActionSupport imp
 
         try
         {
+            BuildSpecification buildSpec = getProjectManager().getBuildSpecification(specification);
+
             Scheduler scheduler = getScheduler();
 
             Trigger trigger = getTrigger();
-            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, specification);
+            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, buildSpec.getId());
             scheduler.update(trigger);
 
             return SUCCESS;

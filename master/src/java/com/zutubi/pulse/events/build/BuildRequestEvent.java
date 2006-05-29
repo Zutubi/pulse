@@ -12,17 +12,19 @@ import com.zutubi.pulse.model.Project;
 public class BuildRequestEvent extends Event
 {
     private Project project;
+
     /**
      * Only set once the bui
      */
-    private String specification;
+    private long specId;
+
     private long queued;
 
-    public BuildRequestEvent(Object source, Project project, String specification)
+    public BuildRequestEvent(Object source, Project project, long specId)
     {
         super(source);
         this.project = project;
-        this.specification = specification;
+        this.specId = specId;
         queued = System.currentTimeMillis();
     }
 
@@ -31,9 +33,9 @@ public class BuildRequestEvent extends Event
         return project;
     }
 
-    public String getSpecification()
+    public long getSpecification()
     {
-        return specification;
+        return specId;
     }
 
     public long getQueued()
