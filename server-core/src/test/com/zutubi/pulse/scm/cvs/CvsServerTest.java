@@ -142,7 +142,7 @@ public class CvsServerTest extends PulseTestCase
         }
         catch (SCMException e)
         {
-            fail();
+            fail("Unexpected exception: " + e.getClass().getName() + ": " + e.getMessage());
         }
     }
 

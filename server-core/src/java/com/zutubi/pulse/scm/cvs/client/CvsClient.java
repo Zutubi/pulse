@@ -228,7 +228,7 @@ public class CvsClient
             {
                 if (!client.executeCommand(command, globalOptions))
                 {
-                    LOG.warning("Cvs command: " + command.getCVSCommand() + " has failed.");
+                    LOG.warning("Cvs command: -d "+root+" '" + command.getCVSCommand() + "' has failed.");
                     return false;
                 }
                 return true;
