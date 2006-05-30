@@ -567,9 +567,27 @@
         </action>
 
         <action name="deleteBuildStage" class="com.zutubi.pulse.web.project.DeleteBuildStageAction">
-            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
             <result name="error" type="velocity">/generic-error.vm</result>
             <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
+        </action>
+
+        <action name="addBuildStageResource" class="com.zutubi.pulse.web.project.AddBuildStageResourceAction">
+            <result name="input" type="velocity">/add-build-stage-resource.vm</result>
+            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+        </action>
+
+        <action name="editBuildStageResource" class="com.zutubi.pulse.web.project.EditBuildStageResourceAction">
+            <result name="input" type="velocity">/edit-build-stage-resource.vm</result>
+            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+        </action>
+
+        <action name="deleteBuildStageResource" class="com.zutubi.pulse.web.project.DeleteBuildStageResourceAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
         </action>
 
         <action name="viewBuildSpecification" class="com.zutubi.pulse.web.project.ViewBuildSpecificationAction">

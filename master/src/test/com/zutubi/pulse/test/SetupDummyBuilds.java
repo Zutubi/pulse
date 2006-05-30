@@ -186,20 +186,20 @@ public class SetupDummyBuilds implements Runnable
         project.setScm(scm);
 
         BuildSpecification simpleSpec = new BuildSpecification("simple");
-        BuildStage simpleStage = new BuildStage(new MasterBuildHostRequirements(), null);
+        BuildStage simpleStage = new BuildStage("default", new MasterBuildHostRequirements(), null);
         BuildSpecificationNode simpleNode = new BuildSpecificationNode(simpleStage);
         simpleSpec.getRoot().addChild(simpleNode);
         project.addBuildSpecification(simpleSpec);
 
         BuildSpecification slaveSpec = new BuildSpecification("slave");
-        BuildStage slaveStage = new BuildStage(new SlaveBuildHostRequirements(slave), null);
+        BuildStage slaveStage = new BuildStage("default", new SlaveBuildHostRequirements(slave), null);
         BuildSpecificationNode slaveNode = new BuildSpecificationNode(slaveStage);
         slaveSpec.getRoot().addChild(slaveNode);
         project.addBuildSpecification(slaveSpec);
 
         BuildSpecification chainedSpec = new BuildSpecification("master to slave");
-        BuildStage masterStage = new BuildStage(new MasterBuildHostRequirements(), null);
-        BuildStage chainedStage = new BuildStage(new SlaveBuildHostRequirements(slave), "chained");
+        BuildStage masterStage = new BuildStage("master", new MasterBuildHostRequirements(), null);
+        BuildStage chainedStage = new BuildStage("slave", new SlaveBuildHostRequirements(slave), "chained");
         BuildSpecificationNode masterNode = new BuildSpecificationNode(masterStage);
         BuildSpecificationNode chainedNode = new BuildSpecificationNode(chainedStage);
         masterNode.addChild(chainedNode);

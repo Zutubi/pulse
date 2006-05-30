@@ -17,6 +17,8 @@ public class BuildStageActionSupport extends BuildSpecificationActionSupport imp
 {
     private long specId;
     private BuildSpecification specification;
+    private long id;
+    BuildSpecificationNode node;
 
     public long getSpecId()
     {
@@ -42,10 +44,16 @@ public class BuildStageActionSupport extends BuildSpecificationActionSupport imp
         }
     }
 
-    protected void getAgentFromStage()
+    protected void getFieldsFromStage()
     {
+        name = stage.getName();
+
         BuildHostRequirements requirements = stage.getHostRequirements();
-        if(requirements == null || requirements instanceof MasterBuildHostRequirements)
+        if(requirements == null || requirements instanceof  AnyCapableBuildHostRequirements)
+        {
+            buildHost = 0L;
+        }
+        else if(requirements instanceof MasterBuildHostRequirements)
         {
             buildHost = 1L;
         }
@@ -56,4 +64,22 @@ public class BuildStageActionSupport extends BuildSpecificationActionSupport imp
         }
     }
 
+    public long getId()
+    {
+        return id;
+    }
+
+    public void setId(long id)
+    {
+        this.id = id;
+    }
+
+    protected void lookupNode()
+    {
+        node = getSpecification().getNode(id);
+        if(node == null)
+        {
+            addActionError("Unknown stage [" + id + "]");
+        }
+    }
 }

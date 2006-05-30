@@ -10,18 +10,6 @@ import com.zutubi.pulse.xwork.interceptor.Cancelable;
  */
 public class EditBuildStageAction extends BuildStageActionSupport implements Cancelable
 {
-    private long id;
-    BuildSpecificationNode node;
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
 
     public String doInput()
     {
@@ -44,17 +32,8 @@ public class EditBuildStageAction extends BuildStageActionSupport implements Can
         }
 
         stage = node.getStage();
-        getAgentFromStage();
+        getFieldsFromStage();
         return INPUT;
-    }
-
-    private void lookupNode()
-    {
-        node = getSpecification().getNode(id);
-        if(node == null)
-        {
-            addActionError("Unknown stage [" + id + "]");
-        }
     }
 
     public void validate()
@@ -75,6 +54,12 @@ public class EditBuildStageAction extends BuildStageActionSupport implements Can
         if(hasErrors())
         {
             return;
+        }
+
+        BuildSpecificationNode withName = getSpecification().getNodeByStageName(name);
+        if(withName != null && withName.getId() != node.getId())
+        {
+            addFieldError("name", "A stage with name '" + name + "' already exists.");
         }
 
         lookupAgent();

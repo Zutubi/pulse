@@ -186,14 +186,14 @@ public class SetupFeatureTour implements Runnable
         project.setScm(scm);
 
         BuildSpecification simpleSpec = new BuildSpecification("default");
-        BuildStage simpleStage = new BuildStage(new MasterBuildHostRequirements(), null);
+        BuildStage simpleStage = new BuildStage("default", new MasterBuildHostRequirements(), null);
         BuildSpecificationNode simpleNode = new BuildSpecificationNode(simpleStage);
         simpleSpec.getRoot().addChild(simpleNode);
         project.addBuildSpecification(simpleSpec);
 
         simpleSpec = new BuildSpecification("nightly");
         simpleSpec.setTimeout(120);
-        simpleStage = new BuildStage(new MasterBuildHostRequirements(), "nightly-build");
+        simpleStage = new BuildStage("default", new MasterBuildHostRequirements(), "nightly-build");
         simpleNode = new BuildSpecificationNode(simpleStage);
         simpleSpec.getRoot().addChild(simpleNode);
         project.addBuildSpecification(simpleSpec);

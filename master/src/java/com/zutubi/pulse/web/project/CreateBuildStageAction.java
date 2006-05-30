@@ -48,6 +48,11 @@ public class CreateBuildStageAction extends BuildStageActionSupport implements C
             return;
         }
 
+        if(getSpecification().getNodeByStageName(getName()) != null)
+        {
+            addFieldError("name", "A stage with name '" + getName() + "' already exists.");
+        }
+        
         lookupAgent();
     }
 

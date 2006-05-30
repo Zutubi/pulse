@@ -1,0 +1,26 @@
+#helpTag("Project+Build+Specification+Resources")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=buildspec.stage.resource.add")</title>
+</head>
+<body>
+    #projectTabs("configuration")
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=addBuildStageResource.action" "heading=%{getText('buildspec.stage.resource.add')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=specId")
+    #wwhidden("name=projectId")
+
+    #wwtextfield("name=resourceRequirement.resource" "label=%{getText('buildspec.stage.resource')}" "tabindex=1")
+    #wwtextfield("name=resourceRequirement.version" "label=%{getText('buildspec.stage.resource.version')}" "tabindex=2")
+
+    #saveCancel(3)
+#end
+
+    #tabEnd()
+</body>
+</html>

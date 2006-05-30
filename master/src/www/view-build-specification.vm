@@ -1,3 +1,30 @@
+#macro(nodeResources $node)
+    <table class="content">
+        #headingRow("buildspec.stage.resources" 4)
+        <tr>
+            #contentHeading("resource.name" 1)
+            #contentHeading("resource.version" 1)
+    #acl("domainObject=project" "hasPermission=4,1")
+            #contentHeading("actions" 2)
+    #end
+        </tr>
+    #foreach($resource in $node.resourceRequirements)
+        #set($confirmMessage = $action.getText("buildspec.stage.resource.confirm.delete"))
+        <tr>
+            #dynamicCell($resource.resource)
+            #dynamicCell($resource.version)
+        #acl("domainObject=project" "hasPermission=4,1")
+            #editCell("editBuildStageResource!input.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id&amp;index=$velocityCount" "edit_resource_${node.id}_${velocityCount}")
+            #deleteCell($confirmMessage "deleteBuildStageResource.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id&amp;index=$velocityCount" "delete_resource_${node.id}_${velocityCount}")
+        #end
+        </tr>
+    #end
+    #acl("domainObject=project" "hasPermission=4,1")
+         #addRow("buildspec.stage.resource.add" 4 "addBuildStageResource!input.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id" "buildspec.stage.resource.add")
+    #end
+    </table>
+#end
+
 #helpTag("Project+Build+Specifications")
 #authorisationTags($principle)
 #projectTags($project)
@@ -5,7 +32,6 @@
 <head>
     <title>$!webwork.htmlEncode($specification.name)</title>
     <script type="text/javascript">
-$selectedNode
 #if($action.haveSelectedNode() || $specification.root.children.size() == 0)
         var selectedNode = "$selectedNode";
 #else
@@ -28,7 +54,7 @@ $selectedNode
 <body>
     #projectTabs("configuration")
 
-    <h2 class="section">$!webwork.htmlEncode($specification.name)</h2>
+    <h2 class="section">#wwtext("name=buildspec") $!webwork.htmlEncode($specification.name)</h2>
 
     <table class="content">
         #aclEditHeadingRow("buildspec.basics" 2 "editBuildSpecification!input.action?projectId=$project.id&amp;id=$specification.id" "edit_basics" "project")
@@ -36,60 +62,51 @@ $selectedNode
         #dynamicRow("buildspec.timeout" $specification.prettyTimeout)
     </table>
 
-    <h2 class="section">#wwtext("name=buildspec.stages")</h2>
+    #nodeResources($specification.root)
 
-#acl("domainObject=project" "hasPermission=4,1")
-    <table class="content">
-        #addRow("buildspec.stage.add" 1 "createBuildStage!input.action?projectId=$projectId&specId=$specification.id" "stage.add")
-    </table>
-#end
+    <h2 class="section" style="margin-bottom: 0px;">#wwtext("name=buildspec.stages")</h2>
 
 #if($specification.root.children.size() > 0)
     <table class="twopane">
         <tr>
             <td class="leftpane">
-                Select a stage:
-                <ul>
+                <p>
+                    Select a stage:
+                </p>
+                <ul class="panenav">
     #foreach($node in $specification.root.children)
                     <li>
                         <a href="#" id="nav_$node.id" onclick="selectNode('$node.id'); return false;">
-                            $!webwork.htmlEncode($node.stage.recipeSafe)@$node.stage.hostRequirements.summary
+                            $!webwork.htmlEncode($node.stage.name)
                         </a>
                     </li>
     #end
                 </ul>
+#acl("domainObject=project" "hasPermission=4,1")
+                <p>
+                    <a id="stage.add" href="createBuildStage!input.action?projectId=$projectId&specId=$specification.id">
+                        <img alt="add" src="/images/add.gif"/> #wwtext("name=buildspec.stage.add")
+                    </a>
+                </p>
+#end
             </td>
             <td class="rightpane">
     #foreach($node in $specification.root.children)
         #set($confirmMessage = $action.getText("buildspec.stage.confirm.delete", [$node.stage.recipeSafe, $node.stage.hostRequirements.summary]))
                 <div id="stage_$node.id" style="display: none">
-                    <div class="paneheader">
-        #acl("domainObject=project" "hasPermission=4,1")
-                        <span class="action">
-                            <a href="#" id="$id" onclick="confirmUrl('$confirmMessage', 'deleteBuildStage.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id')">
-                                <img alt="$action.getText('delete')" src="/images/delete.gif"/> #wwtext("name=buildspec.stage.delete")
-                            </a>
-                        </span>
-        #end
-                        $!webwork.htmlEncode($node.stage.recipeSafe)@$node.stage.hostRequirements.summary
-                    </div>
                     <div class="panecontent">
                         <table class="content">
                             #aclEditHeadingRow("buildspec.stage.basics" 2 "editBuildStage!input.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id" "edit_$node.id" "project")
+                            #dynamicRow("buildspec.stage.name" $node.stage.name)
                             #dynamicRow("buildspec.stage.recipe" $node.stage.recipeSafe)
                             #dynamicRow("buildspec.stage.agent" $node.stage.hostRequirements.summary)
                         </table>
-                        <table class="content">
-                            #headingRow("buildspec.stage.resources" 4)
-                            <tr>
-                                #contentHeading("resource.name" 1)
-                                #contentHeading("resource.version" 1)
-                                #contentHeading("actions" 2)
-                            </tr>
+                        #nodeResources($node)
         #acl("domainObject=project" "hasPermission=4,1")
-                            #addRow("buildspec.stage.resource.add" 4 "addBuildStageResource.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id" "buildspec.stage.resource.add")
+                        <a href="#" id="$id" onclick="confirmUrl('$confirmMessage', 'deleteBuildStage.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id')">
+                            <img alt="$action.getText('delete')" src="/images/delete.gif"/> #wwtext("name=buildspec.stage.delete")
+                        </a>
         #end
-                        </table>
                     </div>
                 </div>
     #end

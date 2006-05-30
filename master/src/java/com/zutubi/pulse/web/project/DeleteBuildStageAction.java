@@ -23,7 +23,7 @@ public class DeleteBuildStageAction extends BuildStageActionSupport implements C
         this.id = id;
     }
 
-    private void lookupNode()
+    protected void lookupNode()
     {
         node = getSpecification().getNode(id);
         if(node == null)

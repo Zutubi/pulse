@@ -17,20 +17,20 @@
     #wwcheckbox("name=timeoutEnabled" "label=%{getText('enable.timeout')}" "fieldValue=true" "onclick=setEnableState('createBuildSpecification_timeout', 'createBuildSpecification_timeoutEnabled')" "tabindex=2")
     #set($minutes = $action.getText('spec.timeout.minutes'))
     #wwtextfield("name=timeout" "label=%{getText('spec.timeout')}" "size=6" "after=$minutes" "tabindex=3")
+    #wwtextfield("name=name" "label=%{getText('buildspec.stage.name')}" "required=true" "tabindex=4")
 #if($recipes.size() > 1)
-    #wwcombobox("name=stage.recipe" "list=recipes" "label=%{getText('recipe')}" "tabindex=4")
+    #wwcombobox("name=stage.recipe" "list=recipes" "label=%{getText('recipe')}" "tabindex=5")
 #else
-    #wwtextfield("name=stage.recipe" "label=%{getText('recipe')}" "tabindex=4")
+    #wwtextfield("name=stage.recipe" "label=%{getText('recipe')}" "tabindex=5")
 #end
     #inlineHelp("spec.recipe.help")
-    #wwselect("name=buildHost" "list=buildHosts" "label=%{getText('buildspec.stage.agent')}" "required=true"  "tabindex=5")
-
+    #wwselect("name=buildHost" "list=buildHosts" "label=%{getText('buildspec.stage.agent')}" "required=true"  "tabindex=6")
 
     <script type="text/javascript">
         setEnableState('createBuildSpecification_timeout', 'createBuildSpecification_timeoutEnabled');
     </script>
 
-    #saveCancel(6)
+    #saveCancel(7)
 #end
 
     #tabEnd()

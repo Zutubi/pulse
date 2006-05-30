@@ -624,22 +624,22 @@ table.twopane td
 
 td.leftpane
 {
-    padding: 0px;
+    padding-right: 0px;
     white-space: nowrap;
 }
 
-td.leftpane ul
+td.leftpane p
 {
-    margin: 0px;
-    margin-top: 10px;
+    padding-right: 10px;
+}
+
+ul.panenav
+{
+    margin: 10px 0px 30px 0px;
     padding: 0px;
 }
 
-td.leftpane li
-{
-}
-
-td.leftpane a {
+ul.panenav a {
     display: block;
     padding: 5px;
     border: none;
@@ -650,7 +650,7 @@ td.leftpane a {
     margin-bottom: 2px;
 }
 
-td.leftpane a:hover, td.leftpane a.active {
+ul.panenav a:hover, ul.panenav a.active {
     color: #fff;
     background: #667e9f;
     border: none;
@@ -660,7 +660,7 @@ td.rightpane
 {
     width: 100%;
     padding: 0px;
-    border: solid 2px #667e9f;
+    border-left: solid 2px #667e9f;
 }
 
 div.paneheader
@@ -669,7 +669,6 @@ div.paneheader
     padding: 7px;
     font-weight: bold;
     background: #d8e0f3;
-    border-bottom: solid 2px #667e9f;
 }
 
 div.panecontent

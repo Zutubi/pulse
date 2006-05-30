@@ -18,12 +18,14 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
 {
     private static final Logger LOG = Logger.getLogger(BuildSpecificationActionSupport.class);
 
-    protected List<String> recipes = new LinkedList<String>();
+    protected List<String> recipes;
     protected ResourceRepository resourceRepository;
     protected Project project;
     private SlaveManager slaveManager;
-    protected Long buildHost = 0L;
     private Map<Long, String> buildHosts;
+
+    protected String name;
+    protected Long buildHost = 0L;
     protected BuildStage stage = new BuildStage();
 
     public Project getProject()
@@ -39,6 +41,7 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
     {
         if(recipes == null)
         {
+            recipes = new LinkedList<String>();
             populateRecipes();
         }
         return recipes;
@@ -71,6 +74,16 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
     public BuildStage getStage()
     {
         return stage;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     public Map<Long, String> getBuildHosts()
@@ -112,12 +125,13 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
 
     protected void addFieldsToStage()
     {
-        if (buildHost == 0)
+        stage.setName(name);
+
+        if (buildHost == 0L)
         {
-            // TODO: dev-distributed: AnyBuildHostRequirements
-            stage.setHostRequirements(new MasterBuildHostRequirements());
+            stage.setHostRequirements(new AnyCapableBuildHostRequirements());
         }
-        else if(buildHost == 1)
+        else if(buildHost == 1L)
         {
             stage.setHostRequirements(new MasterBuildHostRequirements());
         }

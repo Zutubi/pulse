@@ -47,7 +47,7 @@ public class ViewBuildSpecificationAction extends ProjectActionSupport
 
     public boolean haveSelectedNode()
     {
-        return selectedNode != 0L;
+        return selectedNode != 0L && selectedNode != specification.getRoot().getId();
     }
 
     public String execute()

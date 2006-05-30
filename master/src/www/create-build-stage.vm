@@ -14,15 +14,16 @@
     #wwhidden("name=specId")
     #wwhidden("name=projectId")
 
+    #wwtextfield("name=name" "label=%{getText('buildspec.stage.name')}" "required=true" "tabindex=1")
 #if($recipes.size() > 1)
-    #wwcombobox("name=stage.recipe" "list=recipes" "label=%{getText('recipe')}" "tabindex=1")
+    #wwcombobox("name=stage.recipe" "list=recipes" "label=%{getText('recipe')}" "tabindex=2")
 #else
-    #wwtextfield("name=stage.recipe" "label=%{getText('recipe')}" "tabindex=1")
+    #wwtextfield("name=stage.recipe" "label=%{getText('recipe')}" "tabindex=2")
 #end
     #inlineHelp("spec.recipe.help")
-    #wwselect("name=buildHost" "list=buildHosts" "label=%{getText('buildspec.stage.agent')}" "required=true"  "tabindex=2")
+    #wwselect("name=buildHost" "list=buildHosts" "label=%{getText('buildspec.stage.agent')}" "required=true"  "tabindex=3")
 
-    #saveCancel(3)
+    #saveCancel(4)
 #end
 
     #tabEnd()
