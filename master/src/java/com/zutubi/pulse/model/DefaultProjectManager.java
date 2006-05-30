@@ -6,16 +6,15 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
+import com.zutubi.pulse.model.persistence.TriggerDao;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.model.persistence.TriggerDao;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.util.logging.Logger;
+import org.acegisecurity.annotation.Secured;
 
 import java.util.List;
-
-import org.acegisecurity.annotation.Secured;
 
 /**
  * 
@@ -237,26 +236,51 @@ public class DefaultProjectManager implements ProjectManager
         projectDao = dao;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param buildSpecificationDao
+     */
     public void setBuildSpecificationDao(BuildSpecificationDao buildSpecificationDao)
     {
         this.buildSpecificationDao = buildSpecificationDao;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param triggerDao
+     */
     public void setTriggerDao(TriggerDao triggerDao)
     {
         this.triggerDao = triggerDao;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param scheduler
+     */
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param buildManager
+     */
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
     }
 
+    /**
+     * Required resource.
+     * 
+     * @param subscriptionManager
+     */
     public void setSubscriptionManager(SubscriptionManager subscriptionManager)
     {
         this.subscriptionManager = subscriptionManager;

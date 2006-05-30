@@ -709,6 +709,35 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertTextPresent("project name is required");
     }
 
+    /**
+     * CIB-409.
+     */
+    public void testCloneProjectCreatesDistinctScm()
+    {
+        // assert initial scm details
+        assertProjectCvsTable("cvs", "/local[module]");
+
+        // take the default project and clone it.
+        clickLinkWithText("home");
+        clickLinkWithText("clone project");
+
+        // clone it -> cloned project
+        CloneProjectForm form = new CloneProjectForm(tester);
+        form.saveFormElements("cloned " + projectName, "project b description");
+
+        // update project Bs scm
+        clickLink("project.scm.edit");
+        CvsForm.Edit cvsForm = new CvsForm.Edit(tester);
+        cvsForm.saveFormElements("/local", "updatedModule", "", "", "", "", "false");
+        assertProjectCvsTable("cvs", "/local[updatedModule]");
+
+        // ensure that project A is as expected.
+        clickLinkWithText("projects");
+        clickLink(projectName); // use the id of the link.
+        clickLinkWithText("configuration");
+        assertProjectCvsTable("cvs", "/local[module]");
+    }
+
     private String nukeIds(String text)
     {
         text = text.replaceAll("href=\"[^\"]*\"", "");

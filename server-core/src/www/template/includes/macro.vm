@@ -1572,7 +1572,7 @@
         #set($index = $velocityCount - 1)
 
         <tr>
-            <td class="content"><a href="currentBuild.action?id=$project.id">$!webwork.htmlEncode($project.name)</a></td>
+            <td class="content"><a id="$project.name" href="currentBuild.action?id=$project.id">$!webwork.htmlEncode($project.name)</a></td>
 
         #if($latestBuilds.get($index))
             #set($lastResult = $latestBuilds.get($index))
