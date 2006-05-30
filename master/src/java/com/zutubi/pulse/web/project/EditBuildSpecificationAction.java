@@ -20,7 +20,6 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
     private Project project;
     private BuildSpecification spec;
     private BuildSpecificationDao buildSpecificationDao;
-    private String recipe;
     private boolean timeoutEnabled;
     private int timeout = 60;
     private static final List<String> PREPARE_PARAMS = Arrays.asList("id", "projectId");
@@ -33,16 +32,6 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
     public long getId()
     {
         return this.id;
-    }
-
-    public String getRecipe()
-    {
-        return recipe;
-    }
-
-    public void setRecipe(String recipe)
-    {
-        this.recipe = recipe;
     }
 
     public BuildSpecification getSpec()
@@ -130,9 +119,6 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
             return ERROR;
         }
 
-        recipe = spec.getRoot().getChildren().get(0).getStage().getRecipe();
-        populateRecipes();
-        
         timeoutEnabled = spec.getTimeout() != BuildSpecification.TIMEOUT_NEVER;
         if (timeoutEnabled)
         {
@@ -148,13 +134,6 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
 
     public String execute()
     {
-        if (!TextUtils.stringSet(recipe))
-        {
-            recipe = null;
-        }
-
-        spec.getRoot().getChildren().get(0).getStage().setRecipe(recipe);
-
         if (timeoutEnabled)
         {
             spec.setTimeout(timeout);
@@ -165,7 +144,6 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
         }
 
         buildSpecificationDao.save(spec);
-
         return SUCCESS;
     }
 

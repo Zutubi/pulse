@@ -606,3 +606,73 @@ td.clearbar {
     background-color: #ffdddd;
     text-align:center;
 }
+
+    /*------------------------------
+    Two-pane, "explorer style" view
+    */
+
+table.twopane
+{
+    border-collapse: collapse;
+}
+
+table.twopane td
+{
+    margin: 0px;
+    vertical-align: top;
+}
+
+td.leftpane
+{
+    padding: 0px;
+    white-space: nowrap;
+}
+
+td.leftpane ul
+{
+    margin: 0px;
+    margin-top: 10px;
+    padding: 0px;
+}
+
+td.leftpane li
+{
+}
+
+td.leftpane a {
+    display: block;
+    padding: 5px;
+    border: none;
+    text-decoration: none;
+    color: #667e9f;
+    background: #fff;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+td.leftpane a:hover, td.leftpane a.active {
+    color: #fff;
+    background: #667e9f;
+    border: none;
+}
+
+td.rightpane
+{
+    width: 100%;
+    padding: 0px;
+    border: solid 2px #667e9f;
+}
+
+div.paneheader
+{
+    margin: 0px;
+    padding: 7px;
+    font-weight: bold;
+    background: #d8e0f3;
+    border-bottom: solid 2px #667e9f;
+}
+
+div.panecontent
+{
+    padding: 10px;
+}

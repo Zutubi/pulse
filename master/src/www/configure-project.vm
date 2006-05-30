@@ -120,10 +120,9 @@
             <!-- Build specifications -->
 
                 <table id="project.buildspecs" class="fill-content">
-                    #headingRow("project.buildspecs" 6)
+                    #headingRow("project.buildspecs" 5)
                     <tr>
                         #contentHeading("buildspec.name" 1)
-                        #contentHeading("recipe" 1)
                         #contentHeading("buildspec.timeout" 1)
 #acl("domainObject=project" "hasPermission=4,1")
                         #contentHeading("actions" 3)
@@ -134,20 +133,19 @@
         #set($confirmMessage = $action.getText("buildspec.confirm.delete", [$buildSpec.name]))
                     <tr>
                         #dynamicCell($buildSpec.name)
-                        #dynamicCell($buildSpec.root.children.get(0).stage.recipeSafe)
                         #dynamicCell($buildSpec.prettyTimeout)
         #acl("domainObject=project" "hasPermission=4,1")
                         #actionCell("buildspec.trigger" "triggerBuild.action?id=$buildSpec.id&amp;projectId=$project.id" "lightning.gif")
-                        #editCell("editBuildSpecification!input.action?projectId=$project.id&amp;id=$buildSpec.id" "edit_$!webwork.htmlEncode($buildSpec.name)")
+                        #editCell("viewBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id" "edit_$!webwork.htmlEncode($buildSpec.name)")
                         #deleteCell($confirmMessage "deleteBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id" "delete_$!webwork.htmlEncode($buildSpec.name)")
         #end
                     </tr>
     #end
 #else
-                    #contentRow("buildspec.none" 6)
+                    #contentRow("buildspec.none" 5)
 #end
 #acl("domainObject=project" "hasPermission=4,1")
-                    #addRow("buildspec.add" 6 "createBuildSpecification!input.action?projectId=$project.id" "project.buildspec.add")
+                    #addRow("buildspec.add" 5 "createBuildSpecification!input.action?projectId=$project.id" "project.buildspec.add")
 #end
                 </table>
 

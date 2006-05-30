@@ -291,3 +291,9 @@ function setText(id, text)
     var element = getElement(id);
     element.innerHTML = text;
 }
+
+function setClass(id, className)
+{
+    var element = getElement(id);
+    element.className = className;
+}

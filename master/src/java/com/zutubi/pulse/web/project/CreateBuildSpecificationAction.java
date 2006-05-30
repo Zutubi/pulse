@@ -18,23 +18,13 @@ import java.io.ByteArrayInputStream;
 public class CreateBuildSpecificationAction extends BuildSpecificationActionSupport
 {
     private BuildSpecification spec = new BuildSpecification();
-    private String recipe;
     private int timeout = 60;
     private boolean timeoutEnabled = false;
+    private long specId;
 
     public BuildSpecification getSpec()
     {
         return spec;
-    }
-
-    public String getRecipe()
-    {
-        return recipe;
-    }
-
-    public void setRecipe(String recipe)
-    {
-        this.recipe = recipe;
     }
 
     public int getTimeout()
@@ -52,6 +42,11 @@ public class CreateBuildSpecificationAction extends BuildSpecificationActionSupp
         this.spec = spec;
     }
 
+    public long getSpecId()
+    {
+        return specId;
+    }
+
     public boolean isTimeoutEnabled()
     {
         return timeoutEnabled;
@@ -65,8 +60,6 @@ public class CreateBuildSpecificationAction extends BuildSpecificationActionSupp
     public String doInput()
     {
         project = getProjectManager().getProject(projectId);
-        populateRecipes();
-
         return INPUT;
     }
 
@@ -91,18 +84,12 @@ public class CreateBuildSpecificationAction extends BuildSpecificationActionSupp
                 addFieldError("timeout", "Timeout must be a positive value");
             }
         }
+
+        lookupAgent();
     }
 
     public String execute()
     {
-        if (!TextUtils.stringSet(recipe))
-        {
-            recipe = null;
-        }
-
-        BuildSpecificationNode node = new BuildSpecificationNode(new BuildStage(new MasterBuildHostRequirements(), recipe));
-        spec.getRoot().addChild(node);
-
         if (timeoutEnabled)
         {
             spec.setTimeout(timeout);
@@ -112,8 +99,13 @@ public class CreateBuildSpecificationAction extends BuildSpecificationActionSupp
             spec.setTimeout(BuildSpecification.TIMEOUT_NEVER);
         }
 
+        addFieldsToStage();
+        BuildSpecificationNode node = new BuildSpecificationNode(stage);
+        spec.getRoot().addChild(node);
+
         project.addBuildSpecification(spec);
         getProjectManager().save(project);
+        specId = spec.getId();
         return SUCCESS;
     }
 

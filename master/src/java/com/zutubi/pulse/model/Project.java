@@ -188,6 +188,19 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         this.buildSpecifications = buildSpecifications;
     }
 
+    public BuildSpecification getBuildSpecification(long id)
+    {
+        for(BuildSpecification s: buildSpecifications)
+        {
+            if(s.getId() == id)
+            {
+                return s;
+            }
+        }
+
+        return null;
+    }
+
     public BuildSpecification getBuildSpecification(String name)
     {
         for (BuildSpecification spec : buildSpecifications)

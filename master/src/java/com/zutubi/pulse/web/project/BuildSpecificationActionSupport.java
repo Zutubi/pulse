@@ -1,13 +1,15 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.model.PulseFileDetails;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.logging.Logger;
+import com.opensymphony.util.TextUtils;
 
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.LinkedHashMap;
 import java.io.ByteArrayInputStream;
 
 /**
@@ -19,6 +21,10 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
     protected List<String> recipes = new LinkedList<String>();
     protected ResourceRepository resourceRepository;
     protected Project project;
+    private SlaveManager slaveManager;
+    protected Long buildHost = 0L;
+    private Map<Long, String> buildHosts;
+    protected BuildStage stage = new BuildStage();
 
     public Project getProject()
     {
@@ -31,6 +37,10 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
 
     public List<String> getRecipes()
     {
+        if(recipes == null)
+        {
+            populateRecipes();
+        }
         return recipes;
     }
 
@@ -56,5 +66,75 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
             // Ignore...we just don't show recipes
             LOG.warning("Unable to load pulse file for project '" + project.getName() + "': " + e.getClass().getSimpleName() + ": " + e.getMessage());
         }
+    }
+
+    public BuildStage getStage()
+    {
+        return stage;
+    }
+
+    public Map<Long, String> getBuildHosts()
+    {
+        if(buildHosts == null)
+        {
+            List<Slave> slaves = slaveManager.getAll();
+
+            buildHosts = new LinkedHashMap<Long, String>();
+            buildHosts.put(0L, "[any]");
+            buildHosts.put(1L, "[master]");
+
+            for (Slave slave : slaves)
+            {
+                buildHosts.put(slave.getId(), slave.getName());
+            }
+        }
+
+        return buildHosts;
+    }
+
+    public Long getBuildHost()
+    {
+        return buildHost;
+    }
+
+    public void setBuildHost(Long buildHost)
+    {
+        this.buildHost = buildHost;
+    }
+
+    protected void lookupAgent()
+    {
+        if (buildHost != 0 && buildHost != 1 && slaveManager.getSlave(buildHost) == null)
+        {
+            addActionError("Unknown agent [" + buildHost + "]");
+        }
+    }
+
+    protected void addFieldsToStage()
+    {
+        if (buildHost == 0)
+        {
+            // TODO: dev-distributed: AnyBuildHostRequirements
+            stage.setHostRequirements(new MasterBuildHostRequirements());
+        }
+        else if(buildHost == 1)
+        {
+            stage.setHostRequirements(new MasterBuildHostRequirements());
+        }
+        else
+        {
+            Slave slave = slaveManager.getSlave(buildHost);
+            stage.setHostRequirements(new SlaveBuildHostRequirements(slave));
+        }
+
+        if(!TextUtils.stringSet(stage.getRecipe()))
+        {
+            stage.setRecipe(null);
+        }
+    }
+
+    public void setSlaveManager(SlaveManager slaveManager)
+    {
+        this.slaveManager = slaveManager;
     }
 }

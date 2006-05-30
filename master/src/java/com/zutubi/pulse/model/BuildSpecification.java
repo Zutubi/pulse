@@ -77,4 +77,8 @@ public class BuildSpecification extends Entity
         this.root = root;
     }
 
+    public BuildSpecificationNode getNode(long id)
+    {
+        return root.getNode(id);
+    }
 }

@@ -73,4 +73,41 @@ public class BuildSpecificationNode extends Entity
         this.stage = stage;
     }
 
+    public BuildSpecificationNode getNode(long id)
+    {
+        if(id == this.getId())
+        {
+            return this;
+        }
+
+        for(BuildSpecificationNode child: children)
+        {
+            BuildSpecificationNode found = child.getNode(id);
+            if(found != null)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
+    public void removeChild(long id)
+    {
+        BuildSpecificationNode deadMan = null;
+        
+        for(BuildSpecificationNode child: children)
+        {
+            if(child.getId() == id)
+            {
+                deadMan = child;
+                break;
+            }
+        }
+
+        if(deadMan != null)
+        {
+            children.remove(deadMan);
+        }
+    }
 }

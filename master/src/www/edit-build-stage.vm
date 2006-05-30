@@ -1,0 +1,31 @@
+#helpTag("Project+Build+Specifications")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=buildspec.stage.edit")</title>
+</head>
+<body>
+    #projectTabs("configuration")
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editBuildStage.action" "heading=%{getText('buildspec.stage.edit')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=specId")
+    #wwhidden("name=projectId")
+
+#if($recipes.size() > 1)
+    #wwcombobox("name=stage.recipe" "list=recipes" "label=%{getText('recipe')}" "tabindex=1")
+#else
+    #wwtextfield("name=stage.recipe" "label=%{getText('recipe')}" "tabindex=1")
+#end
+    #inlineHelp("spec.recipe.help")
+    #wwselect("name=buildHost" "list=buildHosts" "label=%{getText('buildspec.stage.agent')}" "required=true"  "tabindex=2")
+
+    #saveCancel(3)
+#end
+
+    #tabEnd()
+</body>
+</html>
