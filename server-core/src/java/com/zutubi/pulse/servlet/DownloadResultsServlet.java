@@ -4,6 +4,8 @@
 package com.zutubi.pulse.servlet;
 
 import com.zutubi.pulse.ServerRecipePaths;
+import com.zutubi.pulse.bootstrap.CoreConfigurationManager;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.RandomUtils;
@@ -22,6 +24,7 @@ import java.io.IOException;
 public class DownloadResultsServlet extends HttpServlet
 {
     private static final Logger LOG = Logger.getLogger(DownloadResultsServlet.class);
+    private CoreConfigurationManager configurationManager;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
     {
@@ -33,8 +36,7 @@ public class DownloadResultsServlet extends HttpServlet
             boolean output = Boolean.parseBoolean(request.getParameter("output"));
 
             // lookup the recipe location, zip it up and write to output.
-            // TODO: dev-distributed: get the user data dir: spring property?
-            ServerRecipePaths paths = new ServerRecipePaths(recipeId, null);
+            ServerRecipePaths paths = new ServerRecipePaths(recipeId, getConfigurationManager().getUserPaths().getData());
             File dir;
             File zipFile;
 
@@ -96,5 +98,14 @@ public class DownloadResultsServlet extends HttpServlet
         {
             e.printStackTrace();
         }
+    }
+
+    public CoreConfigurationManager getConfigurationManager()
+    {
+        if(configurationManager == null)
+        {
+            configurationManager = (CoreConfigurationManager) ComponentContext.getBean("configurationManager");
+        }
+        return configurationManager;
     }
 }

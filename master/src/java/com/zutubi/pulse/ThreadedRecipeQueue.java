@@ -8,11 +8,14 @@ import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.SlaveAvailableEvent;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.events.build.RecipeEvent;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +26,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import java.net.MalformedURLException;
+
+import org.hibernate.persister.entity.AbstractEntityPersister;
 
 /**
  * <class-comment/>
@@ -62,6 +68,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private boolean isRunning = false;
 
     private EventManager eventManager;
+    private SlaveProxyFactory slaveProxyFactory;
 
     public ThreadedRecipeQueue()
     {
@@ -346,6 +353,14 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public void handleEvent(Event evt)
     {
+        if(evt instanceof SlaveAvailableEvent)
+        {
+            SlaveAvailableEvent event = (SlaveAvailableEvent) evt;
+            SlaveBuildService service = createSlaveService(event.getSlave());
+            available(service);
+            return;
+        }
+
         RecipeEvent event = (RecipeEvent) evt;
 
         lock.lock();
@@ -368,9 +383,25 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
+    private SlaveBuildService createSlaveService(Slave slave)
+    {
+        try
+        {
+            SlaveBuildService buildService = new SlaveBuildService(slave, slaveProxyFactory.createProxy(slave));
+            ComponentContext.autowire(buildService);
+            return buildService;
+        }
+        catch (MalformedURLException e)
+        {
+            LOG.severe("Error creating build service for slave '" + slave.getName() + "': " + e.getMessage(), e);
+        }
+
+        return null;
+    }
+
     public Class[] getHandledEvents()
     {
-        return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class};
+        return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class, SlaveAvailableEvent.class};
     }
 
     public void setEventManager(EventManager eventManager)
@@ -381,5 +412,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    public void setSlaveProxyFactory(SlaveProxyFactory slaveProxyFactory)
+    {
+        this.slaveProxyFactory = slaveProxyFactory;
     }
 }

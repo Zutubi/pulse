@@ -80,26 +80,24 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <!--
     <servlet>
         <servlet-name>hessian</servlet-name>
-        <servlet-class>com.zutubiian.CustomHessianServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.hessian.CustomHessianServlet</servlet-class>
         <init-param>
-            <param-name>data-class</param-name>
-            <param-value>com.zutubierServiceImpl</param-value>
+            <param-name>home-class</param-name>
+            <param-value>com.zutubi.pulse.MasterServiceImpl</param-value>
         </init-param>
         <init-param>
-            <param-name>data-api</param-name>
-            <param-value>com.zutubiices.MasterService</param-value>
+            <param-name>home-api</param-name>
+            <param-value>com.zutubi.pulse.services.MasterService</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet>
         <servlet-name>download</servlet-name>
-        <servlet-class>com.zutubilet.DownloadResultsServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servlet.DownloadResultsServlet</servlet-class>
     </servlet>
-    -->
 
     <servlet>
         <servlet-name>XmlRpcServlet</servlet-name>
@@ -118,24 +116,20 @@
         <servlet-class>com.zutubi.pulse.servlet.ViewFileServlet</servlet-class>
     </servlet>
 
-    <!--
     <servlet-mapping>
         <servlet-name>hessian</servlet-name>
         <url-pattern>/hessian</url-pattern>
     </servlet-mapping>
-    -->
 
     <servlet-mapping>
         <servlet-name>webwork</servlet-name>
         <url-pattern>*.action</url-pattern>
     </servlet-mapping>
 
-    <!--
     <servlet-mapping>
         <servlet-name>download</servlet-name>
         <url-pattern>/download</url-pattern>
     </servlet-mapping>
-    -->
 
     <servlet-mapping>
         <servlet-name>XmlRpcServlet</servlet-name>
