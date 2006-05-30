@@ -66,12 +66,16 @@
         <property name="buildNumber" value="1031"/>
     </bean>
 
-    <bean id="scmMonitorSchemaUpgrade" class="com.zutubi.pulse.upgrade.tasks.ScmMonitorSchemaUpgradeTask" autowire="byName">
+    <bean id="clonedProjectDataPatchUpgrade" class="com.zutubi.pulse.upgrade.tasks.ClonedProjectDataPatchUpgradeTask" autowire="byName">
         <property name="buildNumber" value="1041"/>
     </bean>
 
+    <bean id="scmMonitorSchemaUpgrade" class="com.zutubi.pulse.upgrade.tasks.ScmMonitorSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="1042"/>
+    </bean>
+
     <bean id="scmMonitorDataUpgrade" class="com.zutubi.pulse.upgrade.tasks.ScmMonitorDataUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="1041"/>
+        <property name="buildNumber" value="1042"/>
     </bean>
 
 </beans>

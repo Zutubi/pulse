@@ -17,9 +17,15 @@ public class UpgradePreviewAction extends UpgradeActionSupport
 {
     private List<UpgradeTask> upgradePreview;
 
+    /**
+     * The version that is being upgraded.
+     */
     private Version targetVersion;
 
-    private Data targetData;
+    /**
+     * The version that the upgrade process will upgrade to.
+     */
+    private Version newVersion;
 
     private ConfigurationManager configurationManager;
 
@@ -38,15 +44,28 @@ public class UpgradePreviewAction extends UpgradeActionSupport
         return upgradePreview;
     }
 
+    /**
+     * Get the version being upgraded from.
+     */
     public Version getTargetVersion()
     {
         return targetVersion;
     }
 
+    /**
+     * Get the version being upgraded too.
+     */
+    public Version getNewVersion()
+    {
+        return newVersion;
+    }
+
     public String execute()
     {
-        targetData = configurationManager.getData();
+        Data targetData = configurationManager.getData();
+
         targetVersion = targetData.getVersion();
+        newVersion = Version.getVersion();
 
         upgradeManager.prepareUpgrade(targetData);
 

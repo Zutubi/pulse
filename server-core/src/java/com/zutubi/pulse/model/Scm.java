@@ -86,6 +86,8 @@ public abstract class Scm extends Entity implements Cloneable
         try
         {
             Scm copy = (Scm) clone();
+            // ensure that the copy is considered a new instance by hibernate.
+            copy.setId(0);
             // Deep copy the properties
             copy.properties = new Properties();
             copy.properties.putAll(properties);

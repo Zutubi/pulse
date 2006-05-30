@@ -3,30 +3,18 @@
  ********************************************************************************/
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeTask;
-import com.zutubi.pulse.upgrade.DataSourceAware;
 import com.zutubi.pulse.upgrade.UpgradeContext;
-import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.util.JDBCUtils;
 
-import javax.sql.DataSource;
-import java.util.List;
-import java.util.LinkedList;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * <class-comment/>
  */
-public class ScmMonitorDataUpgradeTask implements UpgradeTask, DataSourceAware
+public class ScmMonitorDataUpgradeTask extends DatabaseUpgradeTask
 {
-    private int buildNumber;
-
-    private DataSource dataSource;
-
-    private List<String> errors = new LinkedList<String>();
-
     /**
      * @see com.zutubi.pulse.upgrade.UpgradeTask#getName()
      */
@@ -44,55 +32,21 @@ public class ScmMonitorDataUpgradeTask implements UpgradeTask, DataSourceAware
     }
 
     /**
-     * @see com.zutubi.pulse.upgrade.UpgradeTask#getBuildNumber()
-     */
-    public int getBuildNumber()
-    {
-        return buildNumber;
-    }
-
-    public void setBuildNumber(int buildNumber)
-    {
-        this.buildNumber = buildNumber;
-    }
-
-    /**
      * @see com.zutubi.pulse.upgrade.UpgradeTask#execute(com.zutubi.pulse.upgrade.UpgradeContext)
      */
-    public void execute(UpgradeContext context) throws UpgradeException
+    public void execute(UpgradeContext context, Connection con) throws SQLException
     {
-        Connection con = null;
+        PreparedStatement ps = null;
         try
         {
-            con = dataSource.getConnection();
-            PreparedStatement ps = null;
-            try
-            {
-                ps = con.prepareStatement("UPDATE scm SET monitor = ?");
-                JDBCUtils.setBool(ps, 1, true);
-                ps.executeUpdate();
-            }
-            finally
-            {
-                JDBCUtils.close(ps);
-            }
-        }
-        catch (SQLException e)
-        {
-            errors.add("SQLException: " + e.getMessage());
+            ps = con.prepareStatement("UPDATE scm SET monitor = ?");
+            JDBCUtils.setBool(ps, 1, true);
+            ps.executeUpdate();
         }
         finally
         {
-            JDBCUtils.close(con);
+            JDBCUtils.close(ps);
         }
-    }
-
-    /**
-     * @see com.zutubi.pulse.upgrade.UpgradeTask#getErrors()
-     */
-    public List<String> getErrors()
-    {
-        return errors;
     }
 
     /**
@@ -103,15 +57,5 @@ public class ScmMonitorDataUpgradeTask implements UpgradeTask, DataSourceAware
     public boolean haltOnFailure()
     {
         return false;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param source
-     */
-    public void setDataSource(DataSource source)
-    {
-        this.dataSource = source;
     }
 }

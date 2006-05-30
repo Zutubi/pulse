@@ -377,6 +377,11 @@ public class JDBCUtils
         }
     }
 
+    public static int executeCount(Connection con, String sql) throws SQLException
+    {
+        return executeCount(con, sql, new Object[]{}, new int[]{});
+    }
+
     public static int executeCount(Connection con, String sql, Object[] args, int[] types) throws SQLException
     {
         PreparedStatement ps = null;
