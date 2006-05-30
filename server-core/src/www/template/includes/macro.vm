@@ -232,10 +232,10 @@
 ##
 #macro(serverTabs $selected)
     #openTabs()
-        #serverTab("status" "viewRecipeQueue" $selected)
-        #serverTab("resources" "viewResources" $selected)
-        #serverTab("server-messages" "serverMessages" $selected)
-        #serverTab("server-info" "viewSystemInfo" $selected)
+        #serverTab("status" "/viewRecipeQueue" $selected)
+        #serverTab("resources" "/viewResources" $selected)
+        #serverTab("server-messages" "/serverMessages" $selected)
+        #serverTab("server-info" "/viewSystemInfo" $selected)
     #closeTabs()
 #end
 
