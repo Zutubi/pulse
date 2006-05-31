@@ -4,9 +4,12 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.Resource;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * Represents a slave server that builds may be farmed out to.

@@ -123,13 +123,13 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
         }
     }
 
-    protected void addFieldsToStage()
+    protected void addFieldsToStage(BuildSpecification spec, BuildSpecificationNode node)
     {
         stage.setName(name);
 
         if (buildHost == 0L)
         {
-            stage.setHostRequirements(new AnyCapableBuildHostRequirements());
+            stage.setHostRequirements(new AnyCapableBuildHostRequirements(spec, node));
         }
         else if(buildHost == 1L)
         {

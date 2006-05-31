@@ -1,7 +1,7 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.web.console;
+package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
@@ -27,7 +27,6 @@ import java.io.File;
 public class SystemInfoAction extends ActionSupport
 {
     private Properties props;
-    private License license;
     private Version version;
 
     private StartupManager startupManager;
@@ -69,7 +68,6 @@ public class SystemInfoAction extends ActionSupport
         props.put("memory.total", getTotalMemory());
 
         data = configurationManager.getData();
-        license = data.getLicense();
         version = data.getVersion();
 
         return SUCCESS;
@@ -82,31 +80,6 @@ public class SystemInfoAction extends ActionSupport
     public Map getProperties()
     {
         return props;
-    }
-
-    /**
-     * Retrieve the currently installed license.
-     *
-     * @return license
-     */
-    public License getLicense()
-    {
-        return license;
-    }
-
-    public String getExpiryDate()
-    {
-        if (license.expires())
-        {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(license.getExpiryDate());
-            cal.set(Calendar.HOUR, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            return dateFormatter.format(cal.getTime());
-        }
-        return "Never";
     }
 
     /**

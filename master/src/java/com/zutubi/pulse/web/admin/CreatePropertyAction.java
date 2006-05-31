@@ -9,46 +9,18 @@ import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
 import com.zutubi.pulse.model.persistence.ResourceDao;
 import com.zutubi.pulse.model.persistence.ResourceVersionDao;
+import com.zutubi.pulse.model.PersistentResource;
+import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.web.ActionSupport;
+import org.hsqldb.persist.HsqlProperties;
 
 /**
  * 
  *
  */
-public class CreatePropertyAction extends ActionSupport
+public class CreatePropertyAction extends ResourceActionSupport
 {
-    private long resourceId;
-    private Long versionId;
-    private Resource resource;
-    private ResourceVersion version = null;
     private Property property = new Property();
-    private ResourceDao resourceDao;
-    private ResourceVersionDao resourceVersionDao;
-
-    public long getResourceId()
-    {
-        return resourceId;
-    }
-
-    public void setResourceId(long resourceId)
-    {
-        this.resourceId = resourceId;
-    }
-
-    public Resource getResource()
-    {
-        return resource;
-    }
-
-    public Long getVersionId()
-    {
-        return versionId;
-    }
-
-    public void setVersionId(Long versionId)
-    {
-        this.versionId = versionId;
-    }
 
     public Property getProperty()
     {
@@ -75,8 +47,11 @@ public class CreatePropertyAction extends ActionSupport
 
     public String doInput()
     {
-        // setup any default data.
-        resource = resourceDao.findById(resourceId);
+        lookupResource();
+        if(hasErrors())
+        {
+            return ERROR;
+        }
         return INPUT;
     }
 
@@ -89,32 +64,30 @@ public class CreatePropertyAction extends ActionSupport
             return;
         }
 
-        resource = resourceDao.findById(resourceId);
-        if (resource == null)
+        lookupResource();
+        if(hasErrors())
         {
-            addActionError("Unknown resource [" + resourceId + "]");
             return;
         }
 
-        if (versionId != null)
+        lookupVersion();
+        if(hasErrors())
         {
-            version = resourceVersionDao.findById(versionId);
-            // TODO: use same session!
-            version = resource.getVersion(version.getValue());
+            return;
         }
 
         if (version == null)
         {
             if (resource.hasProperty(property.getName()))
             {
-                addFieldError("property.name", "this resource already contains a property with name '" + property.getName() + "'");
+                addFieldError("property.name", "This resource already contains a property with name '" + property.getName() + "'");
             }
         }
         else
         {
             if (version.hasProperty(property.getName()))
             {
-                addFieldError("property.name", "this version already contains a property with name '" + property.getName() + "'");
+                addFieldError("property.name", "This version already contains a property with name '" + property.getName() + "'");
             }
         }
     }
@@ -137,17 +110,7 @@ public class CreatePropertyAction extends ActionSupport
             // TODO we ensure this does not happen, but still looks ugly
         }
 
-        resourceDao.save(resource);
+        getResourceManager().save(resource);
         return SUCCESS;
-    }
-
-    public void setResourceDao(ResourceDao resourceDao)
-    {
-        this.resourceDao = resourceDao;
-    }
-
-    public void setResourceVersionDao(ResourceVersionDao resourceVersionDao)
-    {
-        this.resourceVersionDao = resourceVersionDao;
     }
 }

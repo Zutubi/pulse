@@ -99,9 +99,9 @@ public class CreateBuildSpecificationAction extends BuildSpecificationActionSupp
             spec.setTimeout(BuildSpecification.TIMEOUT_NEVER);
         }
 
-        addFieldsToStage();
         BuildSpecificationNode node = new BuildSpecificationNode(stage);
         spec.getRoot().addChild(node);
+        addFieldsToStage(spec, node);
 
         project.addBuildSpecification(spec);
         getProjectManager().save(project);

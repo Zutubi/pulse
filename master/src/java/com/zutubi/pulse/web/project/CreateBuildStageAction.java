@@ -52,16 +52,16 @@ public class CreateBuildStageAction extends BuildStageActionSupport implements C
         {
             addFieldError("name", "A stage with name '" + getName() + "' already exists.");
         }
-        
+
         lookupAgent();
     }
 
     public String execute()
     {
-        addFieldsToStage();
         BuildSpecificationNode parent = getSpecification().getRoot();
         BuildSpecificationNode node = new BuildSpecificationNode(getStage());
         parent.addChild(node);
+        addFieldsToStage(getSpecification(), node);
         getProjectManager().save(getProject());
         id = node.getId();
         return SUCCESS;

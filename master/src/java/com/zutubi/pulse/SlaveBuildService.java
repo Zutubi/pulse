@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
@@ -28,6 +29,7 @@ public class SlaveBuildService implements BuildService
     private SlaveService service;
     private Slave slave;
     private ConfigurationManager configurationManager;
+    private ResourceManager resourceManager;
 
     public SlaveBuildService(Slave slave, SlaveService service)
     {
@@ -38,6 +40,11 @@ public class SlaveBuildService implements BuildService
     public String getUrl()
     {
         return slave.getHost() + ":" + slave.getPort();
+    }
+
+    public boolean hasResource(String resource, String version)
+    {
+        return resourceManager.getSlaveRepository(slave).hasResource(resource, version);
     }
 
     public void build(RecipeRequest request)
@@ -135,5 +142,10 @@ public class SlaveBuildService implements BuildService
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setResourceManager(ResourceManager resourceManager)
+    {
+        this.resourceManager = resourceManager;
     }
 }

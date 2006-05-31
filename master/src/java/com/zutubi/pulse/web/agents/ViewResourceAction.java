@@ -1,46 +1,53 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.web.admin;
+package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.model.persistence.ResourceDao;
-import com.zutubi.pulse.model.PersistentResource;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.web.agents.AgentActionSupport;
+import com.zutubi.pulse.model.PersistentResource;
 
 /**
- * <class-comment/>
+ * 
+ *
  */
-public class DeleteResourceAction extends AgentActionSupport
+public class ViewResourceAction extends AgentActionSupport
 {
-    private ResourceManager resourceManager;
-    private long id;
+    private long resourceId;
     private PersistentResource resource;
+    private ResourceManager resourceManager;
 
-    public void setId(long id)
+    public long getResourceId()
     {
-        this.id = id;
+        return resourceId;
     }
 
-    public long getId()
+    public void setResourceId(long resourceId)
     {
-        return id;
+        this.resourceId = resourceId;
+    }
+
+    public Resource getResource()
+    {
+        return resource;
+    }
+
+    public void setResource(PersistentResource resource)
+    {
+        this.resource = resource;
     }
 
     public String execute()
     {
-        resource = resourceManager.findById(id);
+        resource = resourceManager.findById(resourceId);
         if (resource == null)
         {
-            addActionError("Unknown resource '" + id + "'");
+            addActionError("Unknown resource [" + resourceId + "]");
             return ERROR;
         }
 
         slave = resource.getSlave();
-        setAgentId(slave.getId());
-        resourceManager.delete(resource);
         return SUCCESS;
     }
 

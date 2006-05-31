@@ -57,12 +57,15 @@
 
         <discriminator column="REQUIREMENTS_TYPE" type="string" length="63"/>
 
-        <subclass name="com.zutubi.pulse.model.AnyCapableBuildHostRequirements" discriminator-value="ANY_CAPABLE"/>
+        <subclass name="com.zutubi.pulse.model.AnyCapableBuildHostRequirements" discriminator-value="ANY_CAPABLE">
+            <many-to-one name="specification" class="com.zutubi.pulse.model.BuildSpecification" cascade="none"/>
+            <many-to-one name="node" class="com.zutubi.pulse.model.BuildSpecificationNode" cascade="none"/>
+        </subclass>
 
         <subclass name="com.zutubi.pulse.model.MasterBuildHostRequirements" discriminator-value="MASTER"/>
 
         <subclass name="com.zutubi.pulse.model.SlaveBuildHostRequirements" discriminator-value="SLAVE">
-            <many-to-one name="slave" class="com.zutubi.pulse.model.Slave"/>
+            <many-to-one name="slave" class="com.zutubi.pulse.model.Slave" cascade="none"/>
         </subclass>
     </class>
 

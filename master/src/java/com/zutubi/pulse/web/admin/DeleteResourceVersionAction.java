@@ -10,55 +10,30 @@ import com.zutubi.pulse.web.ActionSupport;
 /**
  * <class-comment/>
  */
-public class DeleteResourceVersionAction extends ActionSupport
+public class DeleteResourceVersionAction extends ResourceActionSupport
 {
-    private ResourceVersionDao resourceVersionDao;
-    private long id;
-    private long resourceId;
-    private ResourceVersion resourceVersion;
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public long getResourceId()
-    {
-        return resourceId;
-    }
-
-    public void setResourceId(long resourceId)
-    {
-        this.resourceId = resourceId;
-    }
-
     public void validate()
     {
-        if (hasErrors())
-        {
-            return;
-        }
 
-        resourceVersion = resourceVersionDao.findById(id);
-        if (resourceVersion == null)
-        {
-            addActionError("Unknown resource version '" + id + "'");
-        }
     }
+
 
     public String execute()
     {
-        resourceVersionDao.delete(resourceVersion);
-        return SUCCESS;
-    }
+        lookupResource();
+        if(hasErrors())
+        {
+            return ERROR;
+        }
 
-    public void setResourceVersionDao(ResourceVersionDao resourceVersionDao)
-    {
-        this.resourceVersionDao = resourceVersionDao;
+        lookupVersion(true);
+        if(hasErrors())
+        {
+            return ERROR;
+        }
+
+        resource.deleteVersion(version);
+        getResourceManager().save(resource);
+        return SUCCESS;
     }
 }

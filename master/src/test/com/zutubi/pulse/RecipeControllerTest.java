@@ -328,6 +328,11 @@ public class RecipeControllerTest extends PulseTestCase
 
     class MockBuildService implements BuildService
     {
+        public boolean hasResource(String resource, String version)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
         public void build(RecipeRequest request)
         {
             throw new RuntimeException("Method not implemented.");

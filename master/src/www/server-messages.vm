@@ -1,12 +1,12 @@
-#helpTag("Server+Messages+Tab")
+#helpTag("Agent+Messages+Tab")
 #authorisationTags($principle)
-<content tag="selectedTab">server</content>
+#agentTags($slave)
 <html>
 <head>
-    <title>#wwtext("name=server")</title>
+    <title>#wwtext("name=agents")</title>
 </head>
 <body>
-    #serverTabs("server-messages")
+    #agentTabs("server-messages")
 
     <table class="fill-content">
         <tr><th colspan="5">$action.getText("messages.count", ["$pagingSupport.totalItems"])</td></tr>

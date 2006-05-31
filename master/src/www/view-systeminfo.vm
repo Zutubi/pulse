@@ -1,12 +1,12 @@
-#helpTag("Server+Info+Tab")
+#helpTag("Agent+Info+Tab")
 #authorisationTags($principle)
-<content tag="selectedTab">server</content>
+#agentTags($slave)
 <html>
 <head>
-    <title>#wwtext("name=server")</title>
+    <title>#wwtext("name=agents")</title>
 </head>
 <body>
-    #serverTabs("server-info")
+    #agentTabs("server-info")
 
 #set ($propertiesMap = $action.getProperties())
 #set ($properties = ["system.date", "system.time", "system.uptime", "java.version", "java.vendor", "java.vm.name", "java.runtime.name", "user.name", "user.timezone", "os.name", "memory.total", "memory.used", "memory.free"])
@@ -66,12 +66,6 @@
                     #headingRow("pulse.info" 2)
                     #dynamicRow("pulse.homeDir.field" $homeDir)
                     #dynamicRow("pulse.dataDir.field" $dataDir)
-                </table>
-                <table class="fill-content" id="license.info">
-                    #restrictedHeadingRow("license.info" 2 "ROLE_ADMINISTRATOR" "edit" "/admin/editLicense!input.action" "pencil.gif" "license.edit")
-                    #dynamicRow("license.name.field" $license.name)
-                    #dynamicRow("license.holder.field" $license.holder)
-                    #dynamicRow("license.expiry.field" $expiryDate)
                 </table>
             </td>
         </tr>

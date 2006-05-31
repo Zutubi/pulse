@@ -46,14 +46,14 @@
             <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
 
-        <action name="viewAgents" class="com.zutubi.pulse.web.server.ViewAgentsAction">
+        <action name="viewAgents" class="com.zutubi.pulse.web.agents.ViewAgentsAction">
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="velocity">view-agents.vm</result>
         </action>
 
-        <action name="viewServerStatus" class="com.zutubi.pulse.web.server.ViewServerStatusAction">
+        <action name="viewServerQueues" class="com.zutubi.pulse.web.server.ViewServerQueuesAction">
             <interceptor-ref name="ajaxStack"/>
-            <result name="success" type="velocity">view-server-status.vm</result>
+            <result name="success" type="velocity">view-server-queues.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
@@ -61,17 +61,22 @@
             <result name="success" type="redirect">viewServerStatus.action</result>
         </action>
 
-        <action name="viewResources" class="com.zutubi.pulse.web.ViewResourcesAction">
+        <action name="viewAgentStatus" class="com.zutubi.pulse.web.agents.ViewAgentStatusAction">
+            <result name="success" type="velocity">/view-agent-status.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="viewResources" class="com.zutubi.pulse.web.agents.ViewResourcesAction">
             <result name="success" type="velocity">view-resources.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewResource" class="com.zutubi.pulse.web.ViewResourceAction">
-            <result name="input" type="velocity">view-resource.vm</result>
-            <result name="success" type="velocity">view-resource.vm</result>
+        <action name="viewResource" class="com.zutubi.pulse.web.agents.ViewResourceAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="velocity">/view-resource.vm</result>
         </action>
 
-        <action name="serverMessages" class="com.zutubi.pulse.web.ServerMessagesAction">
+        <action name="serverMessages" class="com.zutubi.pulse.web.agents.ServerMessagesAction">
             <result name="success" type="velocity">server-messages.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
@@ -496,7 +501,7 @@
             <result name="success" type="velocity">view-triggers.vm</result>
         </action>
 
-        <action name="viewSystemInfo" class="com.zutubi.pulse.web.console.SystemInfoAction">
+        <action name="viewSystemInfo" class="com.zutubi.pulse.web.agents.SystemInfoAction">
             <result name="success" type="velocity">view-systeminfo.vm</result>
         </action>
 
@@ -508,26 +513,26 @@
             <result name="success" type="velocity">view-quartz.vm</result>
         </action>
 
-        <action name="createSlave!default" class="com.zutubi.pulse.web.server.AddAgentAction" method="doDefault">
+        <action name="createSlave!default" class="com.zutubi.pulse.web.agents.AddAgentAction" method="doDefault">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">create-slave.vm</result>
         </action>
 
-        <action name="addAgent" class="com.zutubi.pulse.web.server.AddAgentAction">
+        <action name="addAgent" class="com.zutubi.pulse.web.agents.AddAgentAction">
             <result name="input" type="velocity">add-agent.vm</result>
             <result name="cancel" type="redirect">/viewAgents.action</result>
             <result name="error" type="velocity">/generic-error.vm</result>
             <result name="success" type="redirect">/viewAgents.action</result>
         </action>
 
-        <action name="editAgent" class="com.zutubi.pulse.web.server.EditAgentAction">
+        <action name="editAgent" class="com.zutubi.pulse.web.agents.EditAgentAction">
             <result name="error" type="velocity">edit-agent.vm</result>
             <result name="input" type="velocity">edit-agent.vm</result>
             <result name="cancel" type="redirect">/viewAgents.action</result>
             <result name="success" type="redirect">/viewAgents.action</result>
         </action>
 
-        <action name="deleteAgent" class="com.zutubi.pulse.web.server.DeleteAgentAction">
+        <action name="deleteAgent" class="com.zutubi.pulse.web.agents.DeleteAgentAction">
             <result name="success" type="redirect">/viewAgents.action</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
@@ -917,52 +922,52 @@
             <result name="input" type="velocity">create-resource.vm</result>
             <result name="cancel" type="redirect">/viewResources.action</result>
             <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewResource.action?id=${resource.id}</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resource.id}</result>
         </action>
 
         <action name="deleteResource" class="com.zutubi.pulse.web.admin.DeleteResourceAction">
             <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewResources.action</result>
+            <result name="success" type="redirect">/viewResources.action?agentId=${agentId}</result>
         </action>
 
         <action name="createResourceVersion" class="com.zutubi.pulse.web.admin.CreateResourceVersionAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">create-resource-version.vm</result>
-            <result name="cancel" type="redirect">/viewResource.action?id=${resourceId}</result>
+            <result name="cancel" type="redirect">/viewResource.action?resourceId=${resourceId}</result>
             <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resourceId}</result>
         </action>
 
         <action name="deleteResourceVersion" class="com.zutubi.pulse.web.admin.DeleteResourceVersionAction">
             <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resourceId}</result>
         </action>
 
         <action name="createProperty" class="com.zutubi.pulse.web.admin.CreatePropertyAction">
             <result name="input" type="velocity">create-property.vm</result>
-            <result name="cancel" type="redirect">/viewResource.action?id=${resourceId}</result>
+            <result name="cancel" type="redirect">/viewResource.action?resourceId=${resourceId}</result>
             <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resourceId}</result>
         </action>
 
         <action name="editProperty" class="com.zutubi.pulse.web.admin.EditPropertyAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-property.vm</result>
-            <result name="cancel" type="redirect">/viewResource.action?id=${resourceId}</result>
+            <result name="cancel" type="redirect">/viewResource.action?resourceId=${resourceId}</result>
             <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resourceId}</result>
         </action>
 
         <action name="deleteProperty" class="com.zutubi.pulse.web.admin.DeletePropertyAction">
             <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewResource.action?id=${resourceId}</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resourceId}</result>
         </action>
 
         <action name="editLicense" class="com.zutubi.pulse.web.admin.ManageLicenseAction">
             <result name="error" type="velocity">/generic-error.vm</result>
             <result name="input" type="velocity">edit-license.vm</result>
-            <result name="success" type="redirect">/viewSystemInfo.action</result>
-            <result name="cancel" type="redirect">/viewSystemInfo.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
         </action>
 
     </package>
@@ -990,13 +995,13 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="viewAgentsPanel" class="com.zutubi.pulse.web.server.ViewAgentsAction">
+        <action name="viewAgentsPanel" class="com.zutubi.pulse.web.agents.ViewAgentsAction">
             <result name="success" type="velocity">view-agents-panel.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="serverStatusPanel" class="com.zutubi.pulse.web.server.ViewServerStatusAction">
-            <result name="success" type="velocity">view-server-status-panel.vm</result>
+        <action name="serverQueuesPanel" class="com.zutubi.pulse.web.server.ViewServerQueuesAction">
+            <result name="success" type="velocity">view-server-queues-panel.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 

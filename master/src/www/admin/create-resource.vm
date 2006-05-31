@@ -1,15 +1,17 @@
 #helpTag("Resource+Repository")
 #authorisationTags($principle)
+#agentTags($slave)
 <html>
 <head>
     <title>#wwtext("name=resource.add")</title>
 </head>
 <body>
-    #serverTabs("resources")
+    #agentTabs("resources")
 
     #parse("/template/includes/actionerrors.vm")
 
 #wwcform("action=createResource.action" "heading=%{getText('resource.add')}" "method=post")
+    #wwhidden("name=agentId")
     #wwtextfield("name=resource.name" "label=%{getText('resource.name')}" "required=true"  "tabindex=1")
 
     #saveCancel(2)

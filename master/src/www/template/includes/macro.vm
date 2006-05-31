@@ -34,9 +34,23 @@
 #end
 
 ##
+## Outputs sitemesh content tags for the agent links on the header bar
+##
+#macro(agentTags $slave)
+    <content tag="selectedTab">agents</content>
+    #if($slave)
+        <content tag="agentId">$slave.id</content>
+        <content tag="agentName">$!webwork.htmlEncode($slave.name)</content>
+    #else
+        <content tag="agentName">#wwtext("name=master")</content>
+    #end
+#end
+
+##
 ## Outputs sitemesh content tags for the resource links on the header bar
 ##
-#macro(resourceTags $resource)
+#macro(resourceTags $slave $resource)
+    #agentTags($slave)
     <content tag="resourceId">$resource.id</content>
     <content tag="resourceName">$!webwork.htmlEncode($resource.name)</content>
 #end
@@ -221,21 +235,26 @@
 #end
 
 ##
-## Shows a server tab of the given name with the given action name
+## Shows an agent tab of the given name with the given action name
 ##
-#macro(serverTab $name $action $selected)
-    #tabItem($name "${action}.action" $selected)
+#macro(agentTab $name $action $selected)
+    #if($slave)
+        #set($args = "?agentId=$slave.id")
+    #else
+        #set($args = "")
+    #end
+    #tabItem($name "${action}.action${args}" $selected)
 #end
 
 ##
 ## Shows the tab bar for server pages with the given tab selected.
 ##
-#macro(serverTabs $selected)
+#macro(agentTabs $selected)
     #openTabs()
-        #serverTab("status" "viewServerStatus" $selected)
-        #serverTab("resources" "viewResources" $selected)
-        #serverTab("server-messages" "serverMessages" $selected)
-        #serverTab("server-info" "viewSystemInfo" $selected)
+        #agentTab("status" "/viewAgentStatus" $selected)
+        #agentTab("resources" "/viewResources" $selected)
+        #agentTab("server-messages" "/serverMessages" $selected)
+        #agentTab("server-info" "/viewSystemInfo" $selected)
     #closeTabs()
 #end
 

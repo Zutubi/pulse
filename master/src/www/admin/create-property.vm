@@ -1,12 +1,12 @@
 #helpTag("Resource+Repository")
 #authorisationTags($principle)
-#resourceTags($resource)
+#resourceTags($slave $resource)
 <html>
 <head>
     <title>#wwtext("name=property.add")</title>
 </head>
 <body>
-    #serverTabs("resources")
+    #agentTabs("resources")
 
     #parse("/template/includes/actionerrors.vm")
 

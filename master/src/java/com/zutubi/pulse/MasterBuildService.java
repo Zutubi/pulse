@@ -5,8 +5,11 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.model.ResourceManager;
 
 import java.io.File;
 
@@ -19,10 +22,16 @@ public class MasterBuildService implements BuildService
 
     private MasterRecipeProcessor masterRecipeProcessor;
     private ConfigurationManager configurationManager;
+    private ResourceManager resourceManager;
 
     public String getUrl()
     {
         return configurationManager.getAppConfig().getHostName();
+    }
+
+    public boolean hasResource(String resource, String version)
+    {
+        return resourceManager.getMasterRepository().hasResource(resource, version);
     }
 
     public void build(RecipeRequest request)
@@ -83,5 +92,10 @@ public class MasterBuildService implements BuildService
     public boolean equals(Object obj)
     {
         return obj instanceof MasterBuildService;
+    }
+
+    public void setResourceManager(ResourceManager resourceManager)
+    {
+        this.resourceManager = resourceManager;
     }
 }

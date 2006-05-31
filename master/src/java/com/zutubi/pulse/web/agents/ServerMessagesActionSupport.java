@@ -1,9 +1,10 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.web;
+package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.logging.CustomLogRecord;
+import com.zutubi.pulse.web.ActionSupport;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

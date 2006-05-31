@@ -6,46 +6,27 @@ package com.zutubi.pulse.web.admin;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
 import com.zutubi.pulse.model.persistence.ResourceDao;
+import com.zutubi.pulse.model.PersistentResource;
 import com.zutubi.pulse.web.ActionSupport;
 
 /**
  * Used to add a new version to a resource.
  */
-public class CreateResourceVersionAction extends ActionSupport
+public class CreateResourceVersionAction extends ResourceActionSupport
 {
-    private long resourceId;
-    private Resource resource;
-    private ResourceVersion resourceVersion = new ResourceVersion();
-    private ResourceDao resourceDao;
-
-    public long getResourceId()
+    public CreateResourceVersionAction()
     {
-        return resourceId;
-    }
-
-    public void setResourceId(long resourceId)
-    {
-        this.resourceId = resourceId;
-    }
-
-    public Resource getResource()
-    {
-        return resource;
-    }
-
-    public ResourceVersion getResourceVersion()
-    {
-        return resourceVersion;
-    }
-
-    public void setResourceVersion(ResourceVersion resourceVersion)
-    {
-        this.resourceVersion = resourceVersion;
+        version = new ResourceVersion();
     }
 
     public String doInput()
     {
-        resource = resourceDao.findById(resourceId);
+        lookupResource();
+        if(hasErrors())
+        {
+            return ERROR;
+        }
+
         return INPUT;
     }
 
@@ -58,29 +39,22 @@ public class CreateResourceVersionAction extends ActionSupport
             return;
         }
 
-        resource = resourceDao.findById(resourceId);
-        if (resource == null)
+        lookupResource();
+        if(hasErrors())
         {
-            addActionError("Unknown resource [" + resourceId + "]");
             return;
         }
 
-        if (resource.hasVersion(resourceVersion.getValue()))
+        if (resource.hasVersion(version.getValue()))
         {
-            addFieldError("resourceVersion.value", "this resource already has a version '" + resourceVersion.getValue() + "'");
+            addFieldError("resourceVersion.value", "this resource already has a version '" + version.getValue() + "'");
         }
     }
 
     public String execute()
     {
-        resource.add(resourceVersion);
-        resourceDao.save(resource);
-
+        resource.add(version);
+        getResourceManager().save(resource);
         return SUCCESS;
-    }
-
-    public void setResourceDao(ResourceDao resourceDao)
-    {
-        this.resourceDao = resourceDao;
     }
 }

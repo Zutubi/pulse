@@ -4,6 +4,7 @@
 package com.zutubi.pulse.local;
 
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.util.IOUtils;
@@ -11,6 +12,7 @@ import com.zutubi.pulse.ResourceDiscoverer;
 import org.apache.commons.cli.*;
 
 import java.io.*;
+import java.util.List;
 
 /**
  * Entry point for executing local builds within a development tree.
@@ -105,7 +107,7 @@ public class LocalBuild
         }
     }
 
-    private ResourceRepository createRepository(String resourcesFile) throws PulseException
+    private FileResourceRepository createRepository(String resourcesFile) throws PulseException
     {
         if (resourcesFile == null)
         {
@@ -147,10 +149,9 @@ public class LocalBuild
     {
         printPrologue(pulseFileName, resourcesFile, outputDir);
 
-        ResourceRepository repository = createRepository(resourcesFile);
-        ResourceDiscoverer discoverer = new ResourceDiscoverer(repository);
-        discoverer.run();
-        
+        FileResourceRepository repository = createRepository(resourcesFile);
+        discoverResources(repository);
+
         RecipePaths paths = new LocalRecipePaths(baseDir, outputDir);
 
         if (!paths.getBaseDir().isDirectory())
@@ -184,6 +185,19 @@ public class LocalBuild
         }
 
         printEpilogue(logFile);
+    }
+
+    private void discoverResources(FileResourceRepository repository)
+    {
+        ResourceDiscoverer discoverer = new ResourceDiscoverer();
+        List<Resource> resources = discoverer.discover();
+        for(Resource r: resources)
+        {
+            if(!repository.hasResource(r.getName()))
+            {
+                repository.addResource(r);
+            }
+        }
     }
 
     private String loadPulseFile(File baseDir, String pulseFileName) throws PulseException

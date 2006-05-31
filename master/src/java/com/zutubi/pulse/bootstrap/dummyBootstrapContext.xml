@@ -21,7 +21,6 @@
         <property name="startupRunnables">
             <list>
                 <value>com.zutubi.pulse.test.SetupFeatureTour</value>
-                <value>com.zutubi.pulse.ResourceDiscoverer</value>
             </list>
         </property>
         <property name="configurationManager">

@@ -43,6 +43,19 @@
         </property>
     </bean>
 
+    <bean id="resourceManagerTarget" class="com.zutubi.pulse.model.DefaultResourceManager" autowire="byName"
+          init-method="init"/>
+    <bean id="resourceManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <ref bean="resourceManagerTarget"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>transactionInterceptor</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id="slaveManagerTarget" class="com.zutubi.pulse.model.DefaultSlaveManager" autowire="byName"
           init-method="init"/>
     <bean id="slaveManager" class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -83,16 +96,6 @@
             <props>
                 <prop key="*">PROPAGATION_REQUIRED</prop>
             </props>
-        </property>
-    </bean>
-
-
-    <bean id="fileResourceRepository" class="com.zutubi.pulse.core.FileResourceRepository" autowire="byName"
-          init-method="initialise"/>
-
-    <bean id="resourceRepository" class="com.zutubi.pulse.model.DatabaseResourceRepository" autowire="byName">
-        <property name="parent">
-            <ref bean="fileResourceRepository"/>
         </property>
     </bean>
 

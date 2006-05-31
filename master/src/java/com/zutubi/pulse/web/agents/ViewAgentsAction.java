@@ -1,4 +1,4 @@
-package com.zutubi.pulse.web.server;
+package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;

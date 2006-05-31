@@ -5,25 +5,24 @@ package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.model.persistence.ResourceDao;
+import com.zutubi.pulse.model.PersistentResource;
 import com.zutubi.pulse.web.ActionSupport;
 
 /**
  * 
  *
  */
-public class CreateResourceAction extends ActionSupport
+public class CreateResourceAction extends ResourceActionSupport
 {
-    private Resource resource = new Resource();
-    private ResourceDao resourceDao;
-
-    public Resource getResource()
+    public CreateResourceAction()
     {
-        return resource;
+        resource = new PersistentResource();
     }
 
     public String doInput()
     {
         // setup any default data.
+        lookupSlave();
         return INPUT;
     }
 
@@ -36,7 +35,8 @@ public class CreateResourceAction extends ActionSupport
             return;
         }
 
-        if (resourceDao.findByName(resource.getName()) != null)
+        lookupSlave();
+        if (getResourceManager().findBySlaveAndName(slave, resource.getName()) != null)
         {
             addFieldError("resource.name", "A resource with name '" + resource.getName() + "' already exists.");
         }
@@ -44,12 +44,8 @@ public class CreateResourceAction extends ActionSupport
 
     public String execute()
     {
-        resourceDao.save(resource);
+        resource.setSlave(slave);
+        getResourceManager().save(resource);
         return SUCCESS;
-    }
-
-    public void setResourceDao(ResourceDao resourceDao)
-    {
-        this.resourceDao = resourceDao;
     }
 }

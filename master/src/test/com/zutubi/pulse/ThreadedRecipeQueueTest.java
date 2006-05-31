@@ -280,6 +280,11 @@ public class ThreadedRecipeQueueTest extends TestCase
             this.type = type;
         }
 
+        public boolean hasResource(String resource, String version)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
         public void build(RecipeRequest request)
         {
             semaphore.release();

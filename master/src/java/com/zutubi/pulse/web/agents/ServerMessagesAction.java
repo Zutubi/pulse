@@ -1,10 +1,12 @@
 /********************************************************************************
  @COPYRIGHT@
  ********************************************************************************/
-package com.zutubi.pulse.web;
+package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
+import com.zutubi.pulse.web.agents.ServerMessagesActionSupport;
+import com.zutubi.pulse.web.PagingSupport;
 
 import java.util.Collections;
 import java.util.List;

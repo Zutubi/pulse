@@ -14,8 +14,27 @@ import java.util.List;
  */
 public class DatabaseResourceRepository implements ResourceRepository
 {
+    private Slave slave;
     private ResourceRepository parent;
     private ResourceDao resourceDao;
+
+    public DatabaseResourceRepository(ResourceDao resourceDao)
+    {
+        slave = null;
+        this.resourceDao = resourceDao;
+    }
+
+    public DatabaseResourceRepository(Slave slave, ResourceDao resourceDao)
+    {
+        this.slave = slave;
+        this.resourceDao = resourceDao;
+    }
+
+    public boolean hasResource(String name, String version)
+    {
+        Resource r = getResource(name);
+        return r != null && (version == null || r.hasVersion(version));
+    }
 
     public boolean hasResource(String name)
     {
@@ -30,7 +49,7 @@ public class DatabaseResourceRepository implements ResourceRepository
         }
         else
         {
-            return resourceDao.findByName(name);
+            return resourceDao.findBySlaveAndName(slave, name);
         }
     }
 
@@ -48,7 +67,7 @@ public class DatabaseResourceRepository implements ResourceRepository
             names = new LinkedList<String>();
         }
 
-        for (Resource resource : resourceDao.findAll())
+        for (PersistentResource resource : resourceDao.findAllBySlave(slave))
         {
             if (!names.contains(resource.getName()))
             {
@@ -64,12 +83,7 @@ public class DatabaseResourceRepository implements ResourceRepository
         this.parent = parent;
     }
 
-    public void setResourceDao(ResourceDao resourceDao)
-    {
-        this.resourceDao = resourceDao;
-    }
-
-    public void addResource(Resource resource)
+    public void addResource(PersistentResource resource)
     {
         resourceDao.save(resource);
     }

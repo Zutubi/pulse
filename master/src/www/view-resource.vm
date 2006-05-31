@@ -1,6 +1,6 @@
 #helpTag("Resource+View")
 #authorisationTags($principle)
-#resourceTags($resource)
+#resourceTags($slave $resource)
 #macro(showProperties $properties $version)
     #if($version)
         #set($versionLink = "&amp;versionId=$version.id")
@@ -29,7 +29,7 @@
     <title>#wwtext("name=resource") $!webwork.htmlEncode($resource.name)</title>
 </head>
 <body>
-    #serverTabs("resources")
+    #agentTabs("resources")
 
     <h2 class="section">$!webwork.htmlEncode($resource.name)</h2>
 
@@ -46,7 +46,7 @@
 #foreach($version in $resource.versions.values())
     #set($confirmMessage = $action.getText("version.confirm.delete", [$version.value]))
     <h2 class="section">
-        #wwtext("name=version") $!webwork.htmlEncode($version.value) [<a href="#" class="unadorned" onclick="confirmUrl('$confirmMessage', '/admin/deleteResourceVersion.action?id=$version.id&amp;resourceId=$resource.id')"><img alt="$action.getText('delete')" class="base unadorned" src="images/delete.gif"/></a>]
+        #wwtext("name=version") $!webwork.htmlEncode($version.value) [<a href="#" class="unadorned" onclick="confirmUrl('$confirmMessage', '/admin/deleteResourceVersion.action?versionId=$version.id&amp;resourceId=$resource.id')"><img alt="$action.getText('delete')" class="base unadorned" src="images/delete.gif"/></a>]
     </h2>
     <table class="content">
         #headingRow("properties" 4)

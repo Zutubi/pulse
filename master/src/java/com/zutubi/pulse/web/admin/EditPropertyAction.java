@@ -9,48 +9,18 @@ import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
 import com.zutubi.pulse.model.persistence.ResourceDao;
 import com.zutubi.pulse.model.persistence.ResourceVersionDao;
+import com.zutubi.pulse.model.PersistentResource;
 import com.zutubi.pulse.web.ActionSupport;
 import com.opensymphony.util.TextUtils;
 
 /**
  */
-public class EditPropertyAction extends ActionSupport
+public class EditPropertyAction extends ResourceActionSupport
 {
-    private long resourceId;
-    private Long versionId;
     private String name;
     private String newName;
     private String newValue;
-    private Resource resource;
-    private ResourceVersion version = null;
     private Property property;
-    private ResourceDao resourceDao;
-    private ResourceVersionDao resourceVersionDao;
-
-    public long getResourceId()
-    {
-        return resourceId;
-    }
-
-    public void setResourceId(long resourceId)
-    {
-        this.resourceId = resourceId;
-    }
-
-    public Resource getResource()
-    {
-        return resource;
-    }
-
-    public Long getVersionId()
-    {
-        return versionId;
-    }
-
-    public void setVersionId(Long versionId)
-    {
-        this.versionId = versionId;
-    }
 
     public String getName()
     {
@@ -89,26 +59,24 @@ public class EditPropertyAction extends ActionSupport
 
     private void lookupProperty()
     {
-        resource = resourceDao.findById(resourceId);
-        if(resource == null)
+        lookupResource();
+        if(hasErrors())
         {
-            addActionError("Unknown resource [" + resourceId + "]");
             return;
         }
 
-        if(versionId == null)
+        lookupVersion();
+        if(hasErrors())
+        {
+            return;
+        }
+
+        if(version == null)
         {
             property = resource.getProperty(name);
         }
         else
         {
-            version = resourceVersionDao.findById(versionId);
-            if(version == null)
-            {
-                addActionError("Unknown version [" + versionId + "]");
-                return;
-            }
-
             property = version.getProperty(name);
         }
 
@@ -177,14 +145,14 @@ public class EditPropertyAction extends ActionSupport
             {
                 resource.deleteProperty(name);
                 resource.addProperty(newProperty);
-                resourceDao.save(resource);
             }
             else
             {
                 version.deleteProperty(name);
                 version.addProperty(newProperty);
-                resourceVersionDao.save(version);
             }
+
+            getResourceManager().save(resource);
         }
         catch (FileLoadException e)
         {
@@ -192,15 +160,5 @@ public class EditPropertyAction extends ActionSupport
         }
 
         return SUCCESS;
-    }
-
-    public void setResourceDao(ResourceDao resourceDao)
-    {
-        this.resourceDao = resourceDao;
-    }
-
-    public void setResourceVersionDao(ResourceVersionDao resourceVersionDao)
-    {
-        this.resourceVersionDao = resourceVersionDao;
     }
 }

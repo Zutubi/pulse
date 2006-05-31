@@ -9,7 +9,7 @@
 #end
     </tr>
     <tr>
-        #linkCell("agent.master" "viewServerStatus.action")
+        #linkCell("agent.master" "viewAgentStatus.action")
         #contentCell(":$serverPort")
         #contentCell("agent.online")
         #contentCell("empty.cell")
@@ -19,7 +19,7 @@
     #set($confirmMessage = $action.getText("agent.confirm.delete", [$slave.name]))
 
     <tr>
-        #dynamicLinkCell($slave.name "viewServerStatus.action?id=$slave.id")
+        #dynamicLinkCell($slave.name "viewAgentStatus.action?agentId=$slave.id")
         #staticCell("${slave.host}:${slave.port}")
         #staticCell($slave.status.toString().toLowerCase())
     #authorize("ifAllGranted=ROLE_ADMINISTRATOR")

@@ -8,41 +8,15 @@ import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
 import com.zutubi.pulse.model.persistence.ResourceDao;
 import com.zutubi.pulse.model.persistence.ResourceVersionDao;
+import com.zutubi.pulse.model.PersistentResource;
 import com.zutubi.pulse.web.ActionSupport;
 
 /**
  * <class-comment/>
  */
-public class DeletePropertyAction extends ActionSupport
+public class DeletePropertyAction extends ResourceActionSupport
 {
-    private ResourceDao resourceDao;
-    private ResourceVersionDao resourceVersionDao;
-    private long resourceId;
-    private Long versionId;
     private String name;
-    private Resource resource;
-    private ResourceVersion resourceVersion;
-    private Property property;
-
-    public long getResourceId()
-    {
-        return resourceId;
-    }
-
-    public void setResourceId(long resourceId)
-    {
-        this.resourceId = resourceId;
-    }
-
-    public Long getVersionId()
-    {
-        return versionId;
-    }
-
-    public void setVersionId(Long versionId)
-    {
-        this.versionId = versionId;
-    }
 
     public void setName(String name)
     {
@@ -56,27 +30,26 @@ public class DeletePropertyAction extends ActionSupport
             return;
         }
 
+        lookupResource();
+        if(hasErrors())
+        {
+            return;
+        }
+
+        lookupVersion();
+        if(hasErrors())
+        {
+            return;
+        }
+
+        Property property;
         if (versionId == null)
         {
-            resource = resourceDao.findById(resourceId);
-            if (resource == null)
-            {
-                addActionError("Unknown resource '" + resourceId + "'");
-                return;
-            }
-
             property = resource.getProperty(name);
         }
         else
         {
-            resourceVersion = resourceVersionDao.findById(versionId);
-            if (resourceVersion == null)
-            {
-                addActionError("Unknown resource version '" + versionId + "'");
-                return;
-            }
-
-            property = resourceVersion.getProperty(name);
+            property = version.getProperty(name);
         }
 
         if (property == null)
@@ -87,27 +60,16 @@ public class DeletePropertyAction extends ActionSupport
 
     public String execute()
     {
-        if (resourceVersion == null)
+        if (version == null)
         {
             resource.deleteProperty(name);
-            resourceDao.save(resource);
         }
         else
         {
-            resourceVersion.deleteProperty(name);
-            resourceVersionDao.save(resourceVersion);
+            version.deleteProperty(name);
         }
 
+        getResourceManager().save(resource);
         return SUCCESS;
-    }
-
-    public void setResourceDao(ResourceDao resourceDao)
-    {
-        this.resourceDao = resourceDao;
-    }
-
-    public void setResourceVersionDao(ResourceVersionDao resourceVersionDao)
-    {
-        this.resourceVersionDao = resourceVersionDao;
     }
 }
