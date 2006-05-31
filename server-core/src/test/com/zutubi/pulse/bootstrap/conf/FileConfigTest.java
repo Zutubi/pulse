@@ -66,6 +66,7 @@ public class FileConfigTest extends PulseTestCase
         assertEquals(1, props.size());
     }
 
+/*
     public void testModifyPropertiesFileDirectly() throws Exception
     {
         assertEquals("value", config.getProperty("key"));
@@ -80,6 +81,7 @@ public class FileConfigTest extends PulseTestCase
         // assert that the config has picked up these changes.
         assertEquals("anotherValue", config.getProperty("key"));
     }
+*/
 
     public void testCreationOfPropertiesFile() throws Exception
     {

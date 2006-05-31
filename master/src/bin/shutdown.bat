@@ -13,7 +13,7 @@ goto end
 
 :havePulse
 
-call "%PULSE_HOME%"\bin\common.bat com.zutubi.pulse.command.PulseCtl shutdown %*
+call "%PULSE_HOME%"\bin\common.bat -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig com.zutubi.pulse.command.PulseCtl shutdown %*
 
 :end
 rem all done
