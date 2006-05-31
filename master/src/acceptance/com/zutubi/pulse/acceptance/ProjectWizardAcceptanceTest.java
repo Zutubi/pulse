@@ -16,6 +16,8 @@ import java.util.Map;
  */
 public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
 {
+    private static final String TEST_CVSROOT = ":pserver:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
+
     public ProjectWizardAcceptanceTest()
     {
     }
@@ -55,7 +57,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
 
         submitProjectBasicsForm(projectName, description, url, scm, type);
 
-        submitCvsSetupForm("/local", "module", "", "");
+        submitCvsSetupForm(TEST_CVSROOT, "module", "", "");
 
         assertFormElementNotEmpty(VERSIONED_SETUP_FILE);
         submitVersionedSetupForm("pulse.xml");
@@ -68,7 +70,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
 
         assertSpecifics(type, properties);
 
-        String location = "/local[module]";
+        String location = TEST_CVSROOT + "[module]";
         assertScm(scm, location);
 
         assertDefaultSetup(projectName);
@@ -177,7 +179,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
 
         String projectName = "project " + RandomUtils.randomString(5);
         submitProjectBasicsForm(projectName, "", "", "cvs", "versioned");
-        submitCvsSetupForm("/local", "module", "", "");
+        submitCvsSetupForm(TEST_CVSROOT, "module", "", "");
         submitVersionedSetupForm("pulse.xml");
         assertTablePresent("project.basics");
 

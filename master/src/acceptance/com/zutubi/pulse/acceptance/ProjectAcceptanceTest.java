@@ -89,7 +89,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         String newProject = "project " + RandomUtils.randomString(5);
         submitProjectBasicsForm(newProject, "test description", "http://test/url", "cvs", "versioned");
-        submitCvsSetupForm("/local", "module", "", "");
+        submitCvsSetupForm(TEST_CVSROOT, "module", "", "");
         submitVersionedSetupForm("pulse.xml");
 
         clickLink("project.basics.edit");
@@ -174,20 +174,20 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     {
         CvsForm.Edit form = new CvsForm.Edit(tester);
 
-        assertProjectCvsTable("cvs", "/local[module]");
+        assertProjectCvsTable("cvs", TEST_CVSROOT + "[module]");
 
         assertLinkPresent("project.scm.edit");
         clickLink("project.scm.edit");
 
-        form.assertFormElements("/local", "module", "", "", "", "", "true");
+        form.assertFormElements(TEST_CVSROOT, "module", "", "", "", "", "true");
 
         // change the root and module, verify updates as expected.
-        form.saveFormElements("/loc", "mod", "", "", "1", "1", "true");
+        form.saveFormElements("/loc", "mod", "", "", "1", "1", "false");
         assertProjectCvsTable("cvs", "/loc[mod]");
 
         // check the form again to ensure that the path has been saved.
         clickLink("project.scm.edit");
-        form.assertFormElements("/loc", "mod", "", "", "1", "1", "true");
+        form.assertFormElements("/loc", "mod", "", "", "1", "1", "false");
     }
 
     public void testEditScmPasswordValue()
@@ -198,61 +198,61 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         // check that we can set a password and that it is persisted
         // and visible on subsequent edit.
-        form.saveFormElements("/loc", "mod", "password", "", "", "", "true");
+        form.saveFormElements("/loc", "mod", "password", "", "", "", "false");
         assertProjectCvsTable("cvs", "/loc[mod]");
         clickLink("project.scm.edit");
-        form.assertFormElements("/loc", "mod", "password", "", "", "", "true");
+        form.assertFormElements("/loc", "mod", "password", "", "", "", "false");
     }
 
     public void testEditScmValidation()
     {
         CvsForm.Edit form = new CvsForm.Edit(tester);
         clickLink("project.scm.edit");
-        form.assertFormElements("/local", "module", "", "", "", "", "true");
+        form.assertFormElements(TEST_CVSROOT, "module", "", "", "", "", "true");
 
         // check that the cvs root is a required field.
-        form.saveFormElements("", "module", "", "", "", "", "true");
+        form.saveFormElements("", "module", "", "", "", "", "false");
         assertTextPresent("required");
-        form.assertFormElements("", "module", "", "", "", "", "true");
+        form.assertFormElements("", "module", "", "", "", "", "false");
 
         // check that the cvs module is a required field.
-        form.saveFormElements("/local", "", "", "", "", "", "true");
+        form.saveFormElements(TEST_CVSROOT, "", "", "", "", "", "false");
         assertTextPresent("required");
-        form.assertFormElements("/local", "", "", "", "", "", "true");
+        form.assertFormElements(TEST_CVSROOT, "", "", "", "", "", "false");
 
         // check that the cvs root is validated correctly.
-        form.saveFormElements("an invalid arg", "mod", "", "", "", "", "true");
+        form.saveFormElements("an invalid arg", "mod", "", "", "", "", "false");
         assertTextPresent("required");
-        form.assertFormElements("an invalid arg", "mod", "", "", "", "", "true");
+        form.assertFormElements("an invalid arg", "mod", "", "", "", "", "false");
 
         // check the validation on the minutes field
-        form.saveFormElements("/local", "", "", "", "a", "", "true");
+        form.saveFormElements(TEST_CVSROOT, "", "", "", "a", "", "false");
         assertTextPresent("required");
-        form.assertFormElements("/local", "", "",  "", "a", "", "true");
+        form.assertFormElements(TEST_CVSROOT, "", "",  "", "a", "", "false");
 
-        form.saveFormElements("/local", "", "", "", "-1", "", "true");
+        form.saveFormElements(TEST_CVSROOT, "", "", "", "-1", "", "false");
         assertTextPresent("specify a positive");
-        form.assertFormElements("/local", "", "", "", "-1", "", "true");
+        form.assertFormElements(TEST_CVSROOT, "", "", "", "-1", "", "false");
 
         // check the validation on the seconds field
-        form.saveFormElements("/local", "", "", "", "", "a", "true");
+        form.saveFormElements(TEST_CVSROOT, "", "", "", "", "a", "false");
         assertTextPresent("required");
-        form.assertFormElements("/local", "", "", "", "", "a", "true");
+        form.assertFormElements(TEST_CVSROOT, "", "", "", "", "a", "false");
 
-        form.saveFormElements("/local", "", "", "", "", "-1", "true");
+        form.saveFormElements(TEST_CVSROOT, "", "", "", "", "-1", "false");
         assertTextPresent("specify a positive");
-        form.assertFormElements("/local", "", "", "", "", "-1", "true");
+        form.assertFormElements(TEST_CVSROOT, "", "", "", "", "-1", "false");
     }
 
     public void testEditScmActiveStatus()
     {
         CvsForm.Edit form = new CvsForm.Edit(tester);
         clickLink("project.scm.edit");
-        form.assertFormElements("/local", "module", "", "", "", "", "true");
-        form.saveFormElements("/local", "module", "", "", "", "", "false");
+        form.assertFormElements(TEST_CVSROOT, "module", "", "", "", "", "true");
+        form.saveFormElements(TEST_CVSROOT, "module", "", "", "", "", "false");
         clickLink("project.scm.edit");
-        form.assertFormElements("/local", "module", "", "", "", "", "false");
-        form.saveFormElements("/local", "module", "", "", "", "", "true");
+        form.assertFormElements(TEST_CVSROOT, "module", "", "", "", "", "false");
+        form.saveFormElements(TEST_CVSROOT, "module", "", "", "", "", "true");
 
         // verify data in table.
     }
@@ -715,7 +715,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     public void testCloneProjectCreatesDistinctScm()
     {
         // assert initial scm details
-        assertProjectCvsTable("cvs", "/local[module]");
+        assertProjectCvsTable("cvs", TEST_CVSROOT + "[module]");
 
         // take the default project and clone it.
         clickLinkWithText("home");
@@ -728,14 +728,14 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         // update project Bs scm
         clickLink("project.scm.edit");
         CvsForm.Edit cvsForm = new CvsForm.Edit(tester);
-        cvsForm.saveFormElements("/local", "updatedModule", "", "", "", "", "false");
-        assertProjectCvsTable("cvs", "/local[updatedModule]");
+        cvsForm.saveFormElements(TEST_CVSROOT, "updatedModule", "", "", "", "", "false");
+        assertProjectCvsTable("cvs", TEST_CVSROOT + "[updatedModule]");
 
         // ensure that project A is as expected.
         clickLinkWithText("projects");
         clickLink(projectName); // use the id of the link.
         clickLinkWithText("configuration");
-        assertProjectCvsTable("cvs", "/local[module]");
+        assertProjectCvsTable("cvs", TEST_CVSROOT + "[module]");
     }
 
     private String nukeIds(String text)

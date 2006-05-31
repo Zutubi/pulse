@@ -38,8 +38,7 @@ public class CvsServerTest extends PulseTestCase
         Logger.setLogging("system");
 
         // test repository root.
-        File repositoryRoot = new File(getPulseRoot(), "server-core/src/test/com/zutubi/pulse/scm/cvs/repository");
-        cvsRoot = ":local:" + repositoryRoot.getCanonicalPath();
+        cvsRoot = ":pserver:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
 
         // cleanup the working directory.
         workdir = FileSystemUtils.createTempDirectory("CvsServer", "Test");

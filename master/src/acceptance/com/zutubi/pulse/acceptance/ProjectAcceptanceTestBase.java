@@ -2,8 +2,6 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.util.RandomUtils;
 
-import java.io.IOException;
-
 /**
  */
 public class ProjectAcceptanceTestBase extends BaseAcceptanceTest
@@ -16,6 +14,7 @@ public class ProjectAcceptanceTestBase extends BaseAcceptanceTest
 
     protected static final String DESCRIPTION = "test description";
     protected static final String URL = "http://test/url";
+    protected static final String TEST_CVSROOT = ":pserver:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
 
     protected String projectName;
     protected Type type;
@@ -45,7 +44,7 @@ public class ProjectAcceptanceTestBase extends BaseAcceptanceTest
 
         projectName = "project " + RandomUtils.randomString(5);
         submitProjectBasicsForm(projectName, DESCRIPTION, URL, "cvs", type.toString().toLowerCase());
-        submitCvsSetupForm("/local", "module", "", "");
+        submitCvsSetupForm(TEST_CVSROOT, "module", "", "");
 
         if(type == Type.ANT)
         {

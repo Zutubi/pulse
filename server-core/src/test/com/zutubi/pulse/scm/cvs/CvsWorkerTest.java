@@ -68,8 +68,7 @@ public class CvsWorkerTest extends PulseTestCase
         Logger.setLogging("system");
 
         // test repository root.
-        File repositoryRoot = new File(getPulseRoot(), "server-core/src/test/com/zutubi/pulse/scm/cvs/repository");
-        String cvsRoot = ":local:" + repositoryRoot.getCanonicalPath();
+        String cvsRoot = ":pserver:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
 
         cvs = new CvsWorker();
         cvs.setRoot(cvsRoot);
@@ -529,7 +528,7 @@ public class CvsWorkerTest extends PulseTestCase
         cvs.setModule("unit-test");
 
         List<String> dirListing = cvs.getListing();
-        assertTrue(dirListing.size() > 100);
+        assertTrue(dirListing.size() > 40);
     }
 
     public void testUpdateToHead() throws ParseException, SCMException
