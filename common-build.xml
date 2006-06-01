@@ -42,6 +42,11 @@
             <fileset refid="module.libs"/>
         </path>
 
+        <path id="custom.task.path">
+            <pathelement path="${project.root.dir}/etc/copyrighttask.jar"/>
+        </path>
+        <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
+
         <!-- resources / properties definition-->
         <patternset id="resources">
             <include name="**/*.properties"/>
@@ -155,9 +160,9 @@
         </copy>
 
         <!-- process copyright. -->
-        <replace dir="${process.src.dir}" token="@COPYRIGHT@" value="${copyright.statement}">
+        <copyright src="${process.src.dir}" value="${copyright.statement}">
             <include name="**/*.java"/>
-        </replace>
+        </copyright>
 
     </target>
 
