@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.jetty;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;

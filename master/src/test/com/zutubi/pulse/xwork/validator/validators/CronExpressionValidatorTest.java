@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.xwork.validator.validators;
 
 import com.opensymphony.xwork.validator.FieldValidator;

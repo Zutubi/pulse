@@ -6,7 +6,7 @@
     <target name="module-pre-init">
         <property name="module" value="boot"/>
         <dirname property="project.root.dir" file="../build.xml"/>
-
+        <property file="${project.root.dir}/build.properties"/>
     </target>
 
 </project>

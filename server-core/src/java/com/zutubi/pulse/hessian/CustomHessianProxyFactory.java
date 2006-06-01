@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.hessian;
 
 import com.caucho.hessian.client.HessianProxyFactory;

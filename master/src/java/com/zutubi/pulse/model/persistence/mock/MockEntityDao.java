@@ -1,6 +1,3 @@
-/********************************************************************************
-  @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.model.persistence.mock;
 
 import com.zutubi.pulse.core.model.Entity;

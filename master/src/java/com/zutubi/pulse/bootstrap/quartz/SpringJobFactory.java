@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.bootstrap.quartz;
 
 import com.zutubi.pulse.core.ObjectFactory;

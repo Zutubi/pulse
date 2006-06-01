@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.web;
 
 import com.opensymphony.webwork.ServletActionContext;

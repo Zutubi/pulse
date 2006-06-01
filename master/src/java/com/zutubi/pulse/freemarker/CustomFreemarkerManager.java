@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.freemarker;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;

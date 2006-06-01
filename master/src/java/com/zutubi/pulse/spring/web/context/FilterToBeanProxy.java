@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.spring.web.context;
 
 import org.springframework.context.ApplicationContext;

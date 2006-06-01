@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.servlet;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
@@ -105,6 +102,16 @@ public class ViewFileServlet extends HttpServlet
             return;
         }
 
-        IOUtils.joinStreams(new FileInputStream(file), httpServletResponse.getOutputStream());
+        FileInputStream fis = null;
+        try
+        {
+            fis = new FileInputStream(file);
+            IOUtils.joinStreams(fis, httpServletResponse.getOutputStream());
+        }
+        finally
+        {
+            // ensure that we close the open file.
+            IOUtils.close(fis);
+        }
     }
 }

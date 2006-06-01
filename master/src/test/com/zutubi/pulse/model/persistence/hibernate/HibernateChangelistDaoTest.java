@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.*;
@@ -143,6 +140,8 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
     {
         NumericalRevision revision = new NumericalRevision(number);
         revision.setAuthor(login);
+        // generate time stamps to provide the same ordering as the revision numbers.
+        revision.setDate(new Date(System.currentTimeMillis() + number));
         Changelist changelist = new Changelist("scm", revision);
 
         if(project != 0)

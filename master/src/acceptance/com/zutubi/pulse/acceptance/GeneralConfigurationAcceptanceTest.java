@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.GeneralConfigurationForm;

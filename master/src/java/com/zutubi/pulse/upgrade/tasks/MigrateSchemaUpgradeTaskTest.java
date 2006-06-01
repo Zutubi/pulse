@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.model.persistence.hibernate.PersistenceTestCase;

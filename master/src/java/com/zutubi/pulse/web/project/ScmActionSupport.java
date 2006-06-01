@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.web.project;
 
 public class ScmActionSupport extends ProjectActionSupport

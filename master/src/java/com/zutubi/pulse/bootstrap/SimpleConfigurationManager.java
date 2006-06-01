@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.bootstrap.conf.CompositeConfig;

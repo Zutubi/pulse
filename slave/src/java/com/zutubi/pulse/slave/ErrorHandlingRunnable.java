@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.slave;
 
 import com.caucho.hessian.client.HessianRuntimeException;

@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.bootstrap.velocity;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;

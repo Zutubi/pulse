@@ -1,6 +1,3 @@
-/********************************************************************************
-  @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.BuildSpecification;

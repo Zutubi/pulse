@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.web.rss;
 
 import com.sun.syndication.feed.module.content.ContentModule;

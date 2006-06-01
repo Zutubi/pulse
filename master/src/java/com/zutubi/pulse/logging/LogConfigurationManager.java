@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.logging;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
