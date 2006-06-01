@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.license;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;

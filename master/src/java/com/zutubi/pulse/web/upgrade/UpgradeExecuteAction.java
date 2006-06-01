@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.web.upgrade;
 
 import com.zutubi.pulse.upgrade.UpgradeProgressMonitor;

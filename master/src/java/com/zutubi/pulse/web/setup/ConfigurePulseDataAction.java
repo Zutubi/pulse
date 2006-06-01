@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.web.setup;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;

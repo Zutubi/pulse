@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.core;
 
 import com.opensymphony.xwork.validator.ValidatorContext;

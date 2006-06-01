@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.webwork.velocity;
 
 import com.opensymphony.webwork.views.velocity.components.AbstractDirective;

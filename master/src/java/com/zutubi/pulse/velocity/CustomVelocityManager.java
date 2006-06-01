@@ -1,6 +1,3 @@
-/********************************************************************************
- @COPYRIGHT@
- ********************************************************************************/
 package com.zutubi.pulse.velocity;
 
 import com.opensymphony.webwork.views.velocity.VelocityManager;
