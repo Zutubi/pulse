@@ -83,6 +83,11 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="404" class="com.zutubi.pulse.web.FourOhFourAction">
+            <result name="404" type="velocity">404.vm</result>
+            <result name="starting" type="velocity">404-starting.vm</result>
+        </action>
+
         <action name="viewProjects" class="com.zutubi.pulse.web.project.ViewProjectsAction">
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="velocity">view-projects.vm</result>
