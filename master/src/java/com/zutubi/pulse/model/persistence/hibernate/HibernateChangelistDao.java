@@ -33,7 +33,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from Changelist model where model.revision.author in (:logins) order by id desc");
+                Query queryObject = session.createQuery("from Changelist model where model.revision.author in (:logins) order by model.revision.time desc");
                 List<String> allLogins = new LinkedList<String>();
                 allLogins.add(user.getLogin());
                 allLogins.addAll(user.getAliases());
@@ -53,7 +53,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from Changelist model where :projectId in elements(model.projectIds) order by id desc");
+                Query queryObject = session.createQuery("from Changelist model where :projectId in elements(model.projectIds) order by model.revision.time desc");
                 queryObject.setParameter("projectId", project.getId());
                 queryObject.setMaxResults(max);
 
