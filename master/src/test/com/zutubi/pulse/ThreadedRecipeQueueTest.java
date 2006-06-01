@@ -4,29 +4,44 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.events.DefaultEventManager;
+import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.model.BuildHostRequirements;
+import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.agent.SlaveAgent;
 import junit.framework.TestCase;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedList;
+import java.util.TreeMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 /**
  * <class-comment/>
  */
-public class ThreadedRecipeQueueTest extends TestCase
+public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 {
     private ThreadedRecipeQueue queue;
     private Semaphore semaphore;
+    private Semaphore eventSemaphore;
+    private ThreadedRecipeQueueTest.MockAgentManager agentManager;
+    private Slave slave1000;
+    private Slave slave2000;
+    private Slave slave3000;
+    private RecipeErrorEvent recipeError;
+    private DefaultEventManager eventManager;
 
     public ThreadedRecipeQueueTest(String testName)
     {
         super(testName);
         semaphore = new Semaphore(0);
+        eventSemaphore = new Semaphore(0);
     }
 
     public void setUp() throws Exception
@@ -34,15 +49,34 @@ public class ThreadedRecipeQueueTest extends TestCase
         super.setUp();
 
         // add setup code here.
+        eventManager = new DefaultEventManager();
+        eventManager.register(this);
+
+        agentManager = new MockAgentManager();
+        slave1000 = createSlave(1000);
+        agentManager.addSlave(slave1000);
+        slave2000 = createSlave(2000);
+        agentManager.addSlave(slave2000);
+        slave3000 = createSlave(3000);
+        agentManager.addSlave(slave3000);
+
         queue = new ThreadedRecipeQueue();
-        queue.setEventManager(new DefaultEventManager());
-        queue.start();
+        queue.setEventManager(eventManager);
+        queue.setAgentManager(agentManager);
+        queue.setCheckOnEnqueue(false);
+        queue.init();
     }
 
     public void tearDown() throws Exception
     {
         // add tear down code here.
-
+        slave1000 = null;
+        slave2000 = null;
+        slave3000 = null;
+        agentManager = null;
+        eventManager = null;
+        semaphore = null;
+        queue = null;
         super.tearDown();
     }
 
@@ -58,7 +92,7 @@ public class ThreadedRecipeQueueTest extends TestCase
         assertTrue(queue.isRunning());
         assertFalse(queue.isStopped());
 
-        queue.enqueue(createDispatchRequest(0));
+        queue.enqueue(createDispatchRequest(1));
 
         Thread.sleep(100);
 
@@ -66,8 +100,8 @@ public class ThreadedRecipeQueueTest extends TestCase
         assertTrue(queue.isRunning());
         assertFalse(queue.isStopped());
 
-        queue.available(createAvailableService(0));
-        queue.available(createAvailableService(0));
+        queue.available(createAvailableAgent(0));
+        queue.available(createAvailableAgent(1));
 
         // If it takes longer than 30 seconds, something is wrong
         // Usually this will be pretty immediate.
@@ -86,7 +120,7 @@ public class ThreadedRecipeQueueTest extends TestCase
         Thread.yield();
 
         queue.enqueue(createDispatchRequest(0));
-        queue.available(createAvailableService(0));
+        queue.available(createAvailableAgent(0));
 
         // Shouldn't dispatch while stopped
         assertFalse(semaphore.tryAcquire(100, TimeUnit.MILLISECONDS));
@@ -100,7 +134,7 @@ public class ThreadedRecipeQueueTest extends TestCase
     public void testIncompatibleService() throws Exception
     {
         queue.enqueue(createDispatchRequest(0));
-        queue.available(createAvailableService(1));
+        queue.available(createAvailableAgent(1));
         assertFalse(semaphore.tryAcquire(100, TimeUnit.MILLISECONDS));
         assertEquals(1, queue.length());
     }
@@ -108,17 +142,16 @@ public class ThreadedRecipeQueueTest extends TestCase
     public void testCompatibleAndIncompatibleService() throws Exception
     {
         queue.enqueue(createDispatchRequest(0));
-        queue.available(createAvailableService(1));
+        queue.available(createAvailableAgent(1));
         assertFalse(semaphore.tryAcquire(100, TimeUnit.MILLISECONDS));
         assertEquals(1, queue.length());
-        queue.available(createAvailableService(0));
+        queue.available(createAvailableAgent(0));
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
     }
 
     public void testTwoBuildsSameService() throws Exception
     {
-        BuildService service = createAvailableService(0);
-        queue.available(service);
+        queue.available(createAvailableAgent(0));
 
         queue.enqueue(createDispatchRequest(0, 1000));
         queue.enqueue(createDispatchRequest(0, 1001));
@@ -133,8 +166,7 @@ public class ThreadedRecipeQueueTest extends TestCase
 
     public void testRecipeError() throws Exception
     {
-        BuildService service = createAvailableService(0);
-        queue.available(service);
+        queue.available(createAvailableAgent(0));
 
         queue.enqueue(createDispatchRequest(0, 1000));
         queue.enqueue(createDispatchRequest(0, 1001));
@@ -149,8 +181,7 @@ public class ThreadedRecipeQueueTest extends TestCase
 
     public void testIgnoresUnknownRecipe() throws Exception
     {
-        BuildService service = createAvailableService(0);
-        queue.available(service);
+        queue.available(createAvailableAgent(0));
 
         queue.enqueue(createDispatchRequest(0, 1000));
         queue.enqueue(createDispatchRequest(0, 1001));
@@ -165,13 +196,9 @@ public class ThreadedRecipeQueueTest extends TestCase
 
     public void testThreeServices() throws Exception
     {
-        BuildService service0 = createAvailableService(0);
-        BuildService service1 = createAvailableService(1);
-        BuildService service2 = createAvailableService(2);
-
-        queue.available(service0);
-        queue.available(service1);
-        queue.available(service2);
+        queue.available(createAvailableAgent(0));
+        queue.available(createAvailableAgent(1));
+        queue.available(createAvailableAgent(2));
 
         queue.enqueue(createDispatchRequest(0, 1000));
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -209,7 +236,7 @@ public class ThreadedRecipeQueueTest extends TestCase
         queue.enqueue(request1);
         queue.enqueue(request2);
 
-        queue.available(createAvailableService(0));
+        queue.available(createAvailableAgent(0));
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
 
         List<RecipeDispatchRequest> snapshot = queue.takeSnapshot();
@@ -233,12 +260,55 @@ public class ThreadedRecipeQueueTest extends TestCase
 
     public void testCancelAfterDispatch() throws Exception
     {
-        BuildService service = createAvailableService(0);
-        queue.available(service);
+        queue.available(createAvailableAgent(0));
 
         queue.enqueue(createDispatchRequest(0, 1000));
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertFalse(queue.cancelRequest(1000));
+    }
+
+    public void testOfflineDuringExecution() throws Exception
+    {
+        queue.enqueue(createDispatchRequest(1000, 1000));
+        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
+
+        queue.enqueue(createDispatchRequest(1000, 1001));
+        assertFalse(semaphore.tryAcquire(2, TimeUnit.SECONDS));
+
+        sendOfflineEvent(slave1000);
+        assertTrue(eventSemaphore.tryAcquire(30, TimeUnit.SECONDS));
+        assertRecipeError(1000, "Connection to agent lost during recipe execution");
+
+        assertFalse(semaphore.tryAcquire(2, TimeUnit.SECONDS));
+        sendOnlineEvent(slave1000);
+        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
+    }
+
+    public void testNoOnlineAgent() throws Exception
+    {
+        queue.setCheckOnEnqueue(true);
+        queue.enqueue(createDispatchRequest(0, 1000));
+        assertTrue(eventSemaphore.tryAcquire(30, TimeUnit.SECONDS));
+        assertRecipeError(1000, "No online agent is capable of executing the build stage");
+    }
+
+    private void assertRecipeError(long id, String message)
+    {
+        assertNotNull(recipeError);
+        assertEquals(id, recipeError.getRecipeId());
+        assertEquals(message, recipeError.getErrorMessage());
+    }
+
+    private void sendOnlineEvent(Slave slave)
+    {
+        SlaveAvailableEvent event = new SlaveAvailableEvent(this, slave);
+        queue.handleEvent(event);
+    }
+
+    private void sendOfflineEvent(Slave slave)
+    {
+        SlaveUnavailableEvent event = new SlaveUnavailableEvent(this, slave);
+        queue.handleEvent(event);
     }
 
     private void sendRecipeCompleted(long id)
@@ -253,9 +323,16 @@ public class ThreadedRecipeQueueTest extends TestCase
         queue.handleEvent(new RecipeErrorEvent(this, id, "test"));
     }
 
-    private BuildService createAvailableService(int type)
+    private Slave createSlave(long id)
     {
-        return new MockBuildService(type);
+        Slave result = new Slave("name" + id, "host" + id);
+        result.setId(id);
+        return result;
+    }
+
+    private Agent createAvailableAgent(long type)
+    {
+        return new SlaveAgent(createSlave(type), null, new MockBuildService(type));
     }
 
     private RecipeDispatchRequest createDispatchRequest(int type, long id)
@@ -271,11 +348,69 @@ public class ThreadedRecipeQueueTest extends TestCase
         return createDispatchRequest(type, -1);
     }
 
+    public void handleEvent(Event evt)
+    {
+        recipeError = (RecipeErrorEvent) evt;
+        eventSemaphore.release();
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{RecipeErrorEvent.class};
+    }
+
+    class MockAgentManager implements AgentManager
+    {
+        private Map<Long, Agent> onlineAgents = new TreeMap<Long, Agent>();
+
+        public List<Agent> getAllAgents()
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public List<Agent> getOnlineAgents()
+        {
+            return new LinkedList<Agent>(onlineAgents.values());
+        }
+
+        public Agent getAgent(Slave slave)
+        {
+            if(slave == null)
+            {
+                return onlineAgents.get(0L);
+            }
+            else
+            {
+                return onlineAgents.get(slave.getId());
+            }
+        }
+
+        public void pingSlaves()
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public void newSlave(long id)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public void slaveChanged(long id)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public void addSlave(Slave slave)
+        {
+            onlineAgents.put(slave.getId(), new SlaveAgent(slave, null, new MockBuildService(slave.getId())));
+        }
+    }
+
     class MockBuildService implements BuildService
     {
-        private int type;
+        private long type;
 
-        public MockBuildService(int type)
+        public MockBuildService(long type)
         {
             this.type = type;
         }
@@ -285,9 +420,10 @@ public class ThreadedRecipeQueueTest extends TestCase
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void build(RecipeRequest request)
+        public boolean build(RecipeRequest request)
         {
             semaphore.release();
+            return true;
         }
 
         public void collectResults(long recipeId, File outputDest, File workDest)
@@ -313,7 +449,7 @@ public class ThreadedRecipeQueueTest extends TestCase
             return null;
         }
 
-        public int getType()
+        public long getType()
         {
             return type;
         }
@@ -321,9 +457,9 @@ public class ThreadedRecipeQueueTest extends TestCase
 
     class MockBuildHostRequirements implements BuildHostRequirements
     {
-        private int type;
+        private long type;
 
-        public MockBuildHostRequirements(int type)
+        public MockBuildHostRequirements(long type)
         {
             this.type = type;
         }

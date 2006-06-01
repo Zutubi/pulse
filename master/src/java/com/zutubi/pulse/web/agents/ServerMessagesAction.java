@@ -7,6 +7,7 @@ import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.web.agents.ServerMessagesActionSupport;
 import com.zutubi.pulse.web.PagingSupport;
+import com.caucho.hessian.client.HessianRuntimeException;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +17,6 @@ import java.util.List;
  */
 public class ServerMessagesAction extends ServerMessagesActionSupport
 {
-    private ServerMessagesHandler serverMessagesHandler;
     private List<CustomLogRecord> records;
     private PagingSupport pagingSupport = new PagingSupport(10);
 
@@ -37,16 +37,20 @@ public class ServerMessagesAction extends ServerMessagesActionSupport
 
     public String execute() throws Exception
     {
-        records = serverMessagesHandler.takeSnapshot();
-        Collections.reverse(records);
-        pagingSupport.setTotalItems(records.size());
-        records = records.subList(pagingSupport.getStartOffset(), pagingSupport.getEndOffset());
+        lookupSlave();
+
+        try
+        {
+            records = getAgent().getRecentMessages();
+            Collections.reverse(records);
+            pagingSupport.setTotalItems(records.size());
+            records = records.subList(pagingSupport.getStartOffset(), pagingSupport.getEndOffset());
+        }
+        catch(HessianRuntimeException e)
+        {
+            addActionError("Unable to contact agent: " + e.getMessage());
+        }
 
         return SUCCESS;
-    }
-
-    public void setServerMessagesHandler(ServerMessagesHandler serverMessagesHandler)
-    {
-        this.serverMessagesHandler = serverMessagesHandler;
     }
 }

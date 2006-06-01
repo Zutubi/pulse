@@ -30,7 +30,6 @@ public class HibernateSlaveDaoTest extends MasterPersistenceTestCase
     public void testSaveAndLoad()
     {
         Slave slave = new Slave("test name", "test host");
-        slave.lastPing(11, false);
         slaveDao.save(slave);
         commitAndRefreshTransaction();
 

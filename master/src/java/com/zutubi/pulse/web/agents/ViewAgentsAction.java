@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.agents;
 
-import com.zutubi.pulse.model.Slave;
-import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.agent.Agent;
 
 import java.util.List;
 
@@ -13,13 +13,13 @@ import java.util.List;
  */
 public class ViewAgentsAction extends ActionSupport
 {
-    private List<Slave> slaves;
+    private List<Agent> agents;
     private ConfigurationManager configurationManager;
-    private SlaveManager slaveManager;
+    private AgentManager agentManager;
 
-    public List<Slave> getSlaves()
+    public List<Agent> getAgents()
     {
-        return slaves;
+        return agents;
     }
 
     public int getServerPort()
@@ -29,17 +29,19 @@ public class ViewAgentsAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        slaves = slaveManager.getAll();
+        // Update the statuses
+        agentManager.pingSlaves();
+        agents = agentManager.getAllAgents();
         return SUCCESS;
-    }
-
-    public void setSlaveManager(SlaveManager slaveManager)
-    {
-        this.slaveManager = slaveManager;
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
     }
 }

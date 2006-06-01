@@ -6,6 +6,7 @@ package com.zutubi.pulse.web.agents;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.agent.AgentManager;
 
 /**
  * 
@@ -14,6 +15,7 @@ import com.zutubi.pulse.web.ActionSupport;
 public class AddAgentAction extends ActionSupport
 {
     private Slave slave = new Slave();
+    private AgentManager agentManager;
     private SlaveManager slaveManager;
 
     public Slave getSlave()
@@ -40,6 +42,7 @@ public class AddAgentAction extends ActionSupport
     public String execute()
     {
         slaveManager.save(slave);
+        agentManager.newSlave(slave.getId());
         return SUCCESS;
     }
 
@@ -52,5 +55,10 @@ public class AddAgentAction extends ActionSupport
     public void setSlaveManager(SlaveManager slaveManager)
     {
         this.slaveManager = slaveManager;
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
     }
 }

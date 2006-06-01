@@ -4,12 +4,17 @@
 package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.SystemInfo;
+import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.web.ActionSupport;
+import com.sun.java_cup.internal.version;
+import com.caucho.hessian.client.HessianRuntimeException;
 
 import java.text.DateFormat;
 import java.text.MessageFormat;
@@ -24,116 +29,28 @@ import java.io.File;
  *
  *
  */
-public class SystemInfoAction extends ActionSupport
+public class SystemInfoAction extends AgentActionSupport
 {
-    private Properties props;
-    private Version version;
-
-    private StartupManager startupManager;
-    private ConfigurationManager configurationManager;
-
-    private DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
-    private DateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss z");
-    private Data data;
-
-    public void setStartupManager(StartupManager startupManager)
-    {
-        this.startupManager = startupManager;
-    }
-
-    public void setConfigurationManager(ConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
-    }
+    private SystemInfo info;
 
     /**
-     *
      */
     public String execute()
     {
-        // initialise the props object.
-        Properties systemProperties = System.getProperties();
-        props = new Properties();
-        props.putAll(systemProperties);
-        props.put("system.date", dateFormatter.format(new Date()));
-        props.put("system.time", timeFormatter.format(new Date()));
+        lookupSlave();
+        Agent agent = getAgent();
 
-        // record the time when the system startup
-        props.put("system.uptime", formatUptime(startupManager.getUptime()));
+        try
+        {
+            info = agent.getSystemInfo();
+        }
+        catch(HessianRuntimeException e)
+        {
+            addActionError("Unable to contact agent: " + e.getMessage());
+        }
 
-        props.put("os.name", systemProperties.getProperty("os.name") + " " + systemProperties.getProperty("os.version"));
-
-        props.put("memory.used", getUsedMemory());
-        props.put("memory.free", getFreeMemory());
-        props.put("memory.total", getTotalMemory());
-
-        data = configurationManager.getData();
-        version = data.getVersion();
-
+        // The UI will handle agent errors
         return SUCCESS;
-    }
-
-    /**
-     * Retrieve a set of runtime properties.
-     *
-     */
-    public Map getProperties()
-    {
-        return props;
-    }
-
-    /**
-     * Retrieve the current data version.
-     *
-     * @return version
-     */
-    public Version getVersion()
-    {
-        return version;
-    }
-
-    /**
-     * Get the configured data directory.
-     *
-     */
-    public File getDataDir()
-    {
-        return configurationManager.getDataDirectory();
-    }
-
-    public File getHomeDir()
-    {
-        return configurationManager.getHomeDirectory();
-    }
-
-    /**
-     * Get the total memory available to the runtime in MBs.
-     * @return
-     *
-     * @see Runtime#totalMemory()
-     */
-    public long getTotalMemory()
-    {
-        return Runtime.getRuntime().totalMemory() / Constants.MEGABYTE;
-    }
-
-    /**
-     * Get the total free memory available to the runtime in MBs.
-     * @return
-     * @see Runtime#freeMemory()
-     */
-    public long getFreeMemory()
-    {
-        return Runtime.getRuntime().freeMemory() / Constants.MEGABYTE;
-    }
-
-    /**
-     * Get the memory used by the runtime in MBs. This is the difference between tht total memory available
-     * to the runtime and the current free memory amount. 
-     */
-    public long getUsedMemory()
-    {
-        return getTotalMemory() - getFreeMemory();
     }
 
     // extract this into a formatter that can be used by the UI to define the format of the information.
@@ -142,21 +59,8 @@ public class SystemInfoAction extends ActionSupport
         return (long) ((((float)a)/((float)b)) * 100);
     }
 
-    // extract this into a formatter that can be used by the UI to define the format of the information.
-    private String formatUptime(long uptime)
+    public SystemInfo getInfo()
     {
-        StringBuffer buffer = new StringBuffer();
-        String sep = "";
-        long days = uptime / Constants.DAY;
-        if (days > 0)
-        {
-            buffer.append(sep).append(days).append(" day").append(((days != 1) ? "s" : ""));
-            sep = " ";
-        }
-        long hours = uptime % Constants.DAY / Constants.HOUR;
-        long minutes = uptime % Constants.DAY % Constants.HOUR / Constants.MINUTE;
-        long seconds = uptime % Constants.DAY % Constants.HOUR % Constants.MINUTE / Constants.SECOND;
-        buffer.append(sep).append(MessageFormat.format("{0,number,00}:{1,number,00}:{2,number,00}", hours, minutes, seconds));
-        return buffer.toString();
+        return info;
     }
 }

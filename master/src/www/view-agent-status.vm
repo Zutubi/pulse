@@ -3,12 +3,24 @@
 #agentTags($slave)
 <html>
 <head>
-    <title>#wwtext("name=agents")</title>
+    <title>#wwtext("name=agent.status")</title>
 </head>
 <body>
     #agentTabs("status")
 
-    okily dokily
+    <table class="content">
+        #headingRow("agent.status" 2)
+        #dynamicRow("agent.name" $agent.name)
+        #dynamicRow("agent.location" $agent.location)
+        #dynamicRow("agent.status" $agent.status.toString().toLowerCase())
+#if($agent.isSlave() && $agent.hasBeenPinged())
+        #dynamicRow("agent.last.ping" $action.getPrettyDate($agent.lastPingTime))
+        #dynamicRow("agent.since.last.ping" "$agent.secondsSincePing seconds")
+#end
+    </table>
 
+#if(!$agent.isSlave())
+    <a href="/viewServerQueues.action">#wwtext("name=view.server.queues")</a>
+#end
     #tabEnd()
 </html>

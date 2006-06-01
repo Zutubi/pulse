@@ -6,15 +6,16 @@ package com.zutubi.pulse.web.agents;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.agent.AgentManager;
 
 /**
  */
 public class EditAgentAction extends ActionSupport
 {
-    private SlaveManager slaveManager;
-
     private long id;
     private Slave slave = new Slave();
+    private AgentManager agentManager;
+    private SlaveManager slaveManager;
 
     public long getId()
     {
@@ -62,12 +63,17 @@ public class EditAgentAction extends ActionSupport
         persistentSlave.setName(slave.getName());
         persistentSlave.setPort(slave.getPort());
         slaveManager.save(persistentSlave);
-
+        agentManager.slaveChanged(persistentSlave.getId());
         return SUCCESS;
     }
 
     public void setSlaveManager(SlaveManager slaveManager)
     {
         this.slaveManager = slaveManager;
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
     }
 }

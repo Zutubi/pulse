@@ -8,9 +8,9 @@ import com.zutubi.pulse.model.Slave;
 
 /**
  */
-public class SlaveAvailableEvent extends SlaveEvent
+public class SlaveUnavailableEvent extends SlaveEvent
 {
-    public SlaveAvailableEvent(Object source, Slave slave)
+    public SlaveUnavailableEvent(Object source, Slave slave)
     {
         super(source, slave);
     }

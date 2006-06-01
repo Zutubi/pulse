@@ -8,6 +8,9 @@
 <body>
     #agentTabs("server-messages")
 
+#if($action.hasErrors())
+    #parse("/agent-error.vm")
+#else
     <table class="fill-content">
         <tr><th colspan="5">$action.getText("messages.count", ["$pagingSupport.totalItems"])</td></tr>
         #pagingRow("serverMessages.action?" $pagingSupport)
@@ -24,5 +27,6 @@
     </table>
 #end
 
+#end
     #tabEnd()
 </html>

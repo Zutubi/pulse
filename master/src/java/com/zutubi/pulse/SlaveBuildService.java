@@ -31,10 +31,12 @@ public class SlaveBuildService implements BuildService
     private ConfigurationManager configurationManager;
     private ResourceManager resourceManager;
 
-    public SlaveBuildService(Slave slave, SlaveService service)
+    public SlaveBuildService(SlaveService service, Slave slave, ConfigurationManager configurationManager, ResourceManager resourceManager)
     {
-        this.slave = slave;
         this.service = service;
+        this.slave = slave;
+        this.configurationManager = configurationManager;
+        this.resourceManager = resourceManager;
     }
 
     public String getUrl()
@@ -47,11 +49,11 @@ public class SlaveBuildService implements BuildService
         return resourceManager.getSlaveRepository(slave).hasResource(resource, version);
     }
 
-    public void build(RecipeRequest request)
+    public boolean build(RecipeRequest request)
     {
         try
         {
-            service.build(configurationManager.getAppConfig().getHostName(), request);
+            return service.build(configurationManager.getAppConfig().getHostName(), request);
         }
         catch (HessianRuntimeException e)
         {

@@ -20,7 +20,7 @@ public interface BuildService extends RemoteService
      */
     boolean hasResource(String resource, String version);
 
-    void build(RecipeRequest request);
+    boolean build(RecipeRequest request);
 
     void collectResults(long recipeId, File outputDest, File workDest);
 

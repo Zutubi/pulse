@@ -3,14 +3,20 @@ package com.zutubi.pulse.web.agents;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.agent.Agent;
 
 /**
  */
 public class AgentActionSupport extends ActionSupport
 {
+    public static String AGENT_ERROR = "agenterror";
+
     private long agentId;
+    private AgentManager agentManager;
     private SlaveManager slaveManager;
     protected Slave slave;
+    protected Agent agent;
 
     public long getAgentId()
     {
@@ -35,5 +41,19 @@ public class AgentActionSupport extends ActionSupport
     public Slave getSlave()
     {
         return slave;
+    }
+
+    public Agent getAgent()
+    {
+        if(agent == null)
+        {
+            agent = agentManager.getAgent(slave);
+        }
+        return agent;
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
     }
 }

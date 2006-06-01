@@ -10,8 +10,6 @@ public interface StartupManager extends Startup
 {
     boolean isSystemStarted();
 
-    long getUptime();
-
     long getStartTime();
 
     void startApplication();

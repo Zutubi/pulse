@@ -99,6 +99,8 @@
         </property>
     </bean>
 
+    <bean id="agentManager" class="com.zutubi.pulse.agent.DefaultAgentManager" autowire="byName" init-method="init"/>
+
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
 
     <bean id="masterRecipeProcessor" class="com.zutubi.pulse.MasterRecipeProcessor" autowire="byName"/>

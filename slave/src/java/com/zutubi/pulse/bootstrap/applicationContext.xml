@@ -27,6 +27,8 @@
 
     <bean id="masterProxyFactory" class="com.zutubi.pulse.slave.MasterProxyFactory" autowire="byName"/>
 
+    <bean id="serverMessagesHandler" class="com.zutubi.pulse.logging.ServerMessagesHandler" autowire="byName" init-method="init"/>
+
     <!-- Needs a user config root -->
     <bean id="resourceRepository" class="com.zutubi.pulse.core.FileResourceRepository"/>
 

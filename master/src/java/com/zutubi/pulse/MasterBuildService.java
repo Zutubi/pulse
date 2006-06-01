@@ -24,6 +24,13 @@ public class MasterBuildService implements BuildService
     private ConfigurationManager configurationManager;
     private ResourceManager resourceManager;
 
+    public MasterBuildService(MasterRecipeProcessor masterRecipeProcessor, ConfigurationManager configurationManager, ResourceManager resourceManager)
+    {
+        this.masterRecipeProcessor = masterRecipeProcessor;
+        this.configurationManager = configurationManager;
+        this.resourceManager = resourceManager;
+    }
+
     public String getUrl()
     {
         return configurationManager.getAppConfig().getHostName();
@@ -34,9 +41,10 @@ public class MasterBuildService implements BuildService
         return resourceManager.getMasterRepository().hasResource(resource, version);
     }
 
-    public void build(RecipeRequest request)
+    public boolean build(RecipeRequest request)
     {
         masterRecipeProcessor.processRecipe(request);
+        return true;
     }
 
     public void collectResults(long recipeId, File outputDest, File workDest)

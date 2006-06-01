@@ -23,6 +23,7 @@ public class SlaveStartupManager implements Startup, Stoppable
     private ObjectFactory objectFactory;
     private Server jettyServer;
     private SlaveConfigurationManager configurationManager;
+    private long startTime;
 
     public void init() throws StartupException
     {
@@ -37,11 +38,17 @@ public class SlaveStartupManager implements Startup, Stoppable
         {
             jettyServer.addWebApplication("/", configurationManager.getSystemPaths().getContentRoot().getAbsolutePath());
             jettyServer.start();
+            startTime = System.currentTimeMillis();
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
+    }
+
+    public long getUptime()
+    {
+        return System.currentTimeMillis() - startTime;
     }
 
     private void runStartupRunnables()

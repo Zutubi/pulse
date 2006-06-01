@@ -11,6 +11,9 @@ import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.agent.Status;
+import com.zutubi.pulse.logging.CustomLogRecord;
 
 import java.io.File;
 import java.util.*;
@@ -83,7 +86,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
-        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest(rootResult.getId(), "test"), buildService);
+        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest(rootResult.getId(), "test"), new MockAgent(buildService));
         assertTrue(recipeController.handleRecipeEvent(event));
         assertEquals(buildService.getHostName(), rootNode.getHost());
 
@@ -326,6 +329,56 @@ public class RecipeControllerTest extends PulseTestCase
         }
     }
 
+    class MockAgent implements Agent
+    {
+        private BuildService service;
+
+        public MockAgent(BuildService service)
+        {
+            this.service = service;
+        }
+
+        public long getId()
+        {
+            return 0;
+        }
+
+        public BuildService getBuildService()
+        {
+            return service;
+        }
+
+        public SystemInfo getSystemInfo()
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public List<CustomLogRecord> getRecentMessages()
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public Status getStatus()
+        {
+            return Status.IDLE;
+        }
+
+        public String getLocation()
+        {
+            return "mock";
+        }
+
+        public boolean isSlave()
+        {
+            return true;
+        }
+
+        public String getName()
+        {
+            return "mock";
+        }
+    }
+
     class MockBuildService implements BuildService
     {
         public boolean hasResource(String resource, String version)
@@ -333,7 +386,7 @@ public class RecipeControllerTest extends PulseTestCase
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void build(RecipeRequest request)
+        public boolean build(RecipeRequest request)
         {
             throw new RuntimeException("Method not implemented.");
         }

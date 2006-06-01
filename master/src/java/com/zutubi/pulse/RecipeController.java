@@ -117,7 +117,7 @@ public class RecipeController
 
     private void handleRecipeDispatch(RecipeDispatchedEvent event)
     {
-        buildService = event.getService();
+        buildService = event.getAgent().getBuildService();
         recipeResultNode.setHost(buildService.getHostName());
         buildManager.save(recipeResultNode);
     }

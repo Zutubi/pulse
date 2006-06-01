@@ -502,7 +502,7 @@
         </action>
 
         <action name="viewSystemInfo" class="com.zutubi.pulse.web.agents.SystemInfoAction">
-            <result name="success" type="velocity">view-systeminfo.vm</result>
+            <result name="success" type="velocity">/view-systeminfo.vm</result>
         </action>
 
         <action name="garbageCollect" class="com.zutubi.pulse.web.console.GarbageCollectAction">

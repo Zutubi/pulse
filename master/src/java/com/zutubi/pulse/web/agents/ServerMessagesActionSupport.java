@@ -13,7 +13,7 @@ import java.util.logging.Level;
 /**
  * Helper base class for actions that display server messages.
  */
-public class ServerMessagesActionSupport extends ActionSupport
+public class ServerMessagesActionSupport extends AgentActionSupport
 {
     public boolean isError(CustomLogRecord record)
     {
