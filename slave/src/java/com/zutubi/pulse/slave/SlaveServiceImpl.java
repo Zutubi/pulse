@@ -1,11 +1,10 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.RecipeRequest;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.CoreConfigurationManager;
 import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
 import com.zutubi.pulse.slave.command.RecipeCommand;
@@ -27,10 +26,10 @@ public class SlaveServiceImpl implements SlaveService
         // Nothing to actually do!
     }
 
-    public boolean build(String master, RecipeRequest request)
+    public boolean build(String master, long slaveId, RecipeRequest request)
     {
         // TODO: dev-distributed: check queue, return true iff queue is empty
-        RecipeCommand command = new RecipeCommand(master, request);
+        RecipeCommand command = new RecipeCommand(master, slaveId, request);
         ComponentContext.autowire(command);
         ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(master, request.getId(), command);
         ComponentContext.autowire(runnable);

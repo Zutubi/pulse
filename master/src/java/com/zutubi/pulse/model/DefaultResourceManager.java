@@ -60,7 +60,7 @@ public class DefaultResourceManager implements ResourceManager
 
     public DatabaseResourceRepository getSlaveRepository(Slave slave)
     {
-        if(slaveRepositories.containsKey(slave.getId()))
+        if(!slaveRepositories.containsKey(slave.getId()))
         {
             slaveRepositories.put(slave.getId(), new DatabaseResourceRepository(slave, resourceDao));
         }

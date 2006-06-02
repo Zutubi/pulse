@@ -61,6 +61,8 @@
             <generator class="hilo"/>
         </id>
 
+        <property name="stage" type="string"/>
+        
         <property name="host" type="string" length="255"/>
 
         <many-to-one name="result" class="com.zutubi.pulse.core.model.RecipeResult" column="RECIPE_RESULT_ID"

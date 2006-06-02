@@ -50,7 +50,7 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
     protected void populateRecipes()
     {
         recipes.add("");
-        FileLoader fileLoader = new PulseFileLoader(new ObjectFactory(), resourceRepository);
+        FileLoader fileLoader = new PulseFileLoader(new ObjectFactory());
         try
         {
             PulseFileDetails details = getProject().getPulseFileDetails();
@@ -58,7 +58,7 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
             String pulseFile = details.getPulseFile(0, project, null);
 
             PulseFile file = new PulseFile();
-            fileLoader.load(new ByteArrayInputStream(pulseFile.getBytes()), file, null, new RecipeListingPredicate());
+            fileLoader.load(new ByteArrayInputStream(pulseFile.getBytes()), file, null, resourceRepository, new RecipeListingPredicate());
             for(Recipe r: file.getRecipes())
             {
                 recipes.add(r.getName());
@@ -123,13 +123,13 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
         }
     }
 
-    protected void addFieldsToStage(BuildSpecification spec, BuildSpecificationNode node)
+    protected void addFieldsToStage()
     {
         stage.setName(name);
 
         if (buildHost == 0L)
         {
-            stage.setHostRequirements(new AnyCapableBuildHostRequirements(spec, node));
+            stage.setHostRequirements(new AnyCapableBuildHostRequirements());
         }
         else if(buildHost == 1L)
         {

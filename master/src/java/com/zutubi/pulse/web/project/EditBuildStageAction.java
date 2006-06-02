@@ -65,7 +65,7 @@ public class EditBuildStageAction extends BuildStageActionSupport implements Can
     public String execute()
     {
         node.setStage(stage);
-        addFieldsToStage(getSpecification(), node);
+        addFieldsToStage();
         getProjectManager().save(getProject());
         return SUCCESS;
     }

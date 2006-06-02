@@ -1,6 +1,6 @@
 package com.zutubi.pulse.services;
 
-import com.zutubi.pulse.RecipeRequest;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.logging.CustomLogRecord;
 
@@ -15,7 +15,7 @@ public interface SlaveService
      */
     void ping();
 
-    boolean build(String master, RecipeRequest request);
+    boolean build(String master, long slaveId, RecipeRequest request);
 
     void cleanupRecipe(long recipeId);
 

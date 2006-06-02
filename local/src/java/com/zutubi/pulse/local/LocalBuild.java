@@ -168,9 +168,10 @@ public class LocalBuild
             Bootstrapper bootstrapper = new LocalBootstrapper();
             RecipeProcessor processor = new RecipeProcessor();
             processor.setEventManager(manager);
-            processor.setResourceRepository(repository);
             processor.init();
-            processor.build(0, paths, bootstrapper, loadPulseFile(baseDir, pulseFileName), recipe);
+
+            RecipeRequest request = new RecipeRequest(0, bootstrapper, loadPulseFile(baseDir, pulseFileName), recipe, null);
+            processor.build(request, paths, repository);
         }
         catch (FileNotFoundException e)
         {

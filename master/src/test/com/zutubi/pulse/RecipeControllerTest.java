@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
@@ -42,11 +43,11 @@ public class RecipeControllerTest extends PulseTestCase
 
         rootResult = new RecipeResult("root recipe");
         rootResult.setId(100);
-        rootNode = new RecipeResultNode(rootResult);
+        rootNode = new RecipeResultNode("root stage", rootResult);
         rootNode.setId(101);
         childResult = new RecipeResult("child recipe");
         childResult.setId(102);
-        childNode = new RecipeResultNode(childResult);
+        childNode = new RecipeResultNode("child stage", childResult);
         childNode.setId(103);
         rootNode.addChild(childNode);
 

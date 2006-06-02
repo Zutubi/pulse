@@ -5,6 +5,7 @@ import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.InitialBootstrapper;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
@@ -96,31 +97,39 @@ public class BuildController implements EventListener
         TreeNode<RecipeController> root = tree.getRoot();
         buildResult = new BuildResult(project, specification.getName(), buildManager.getNextBuildNumber(project));
         buildManager.save(buildResult);
-        configure(root, buildResult.getRoot(), specification.getRoot());
+        configure(root, buildResult.getRoot(), specification, specification.getRoot());
 
         return tree;
     }
 
-    private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode, BuildSpecificationNode specNode)
+    private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode, BuildSpecification specification, BuildSpecificationNode specNode)
     {
         for (BuildSpecificationNode node : specNode.getChildren())
         {
             BuildStage stage = node.getStage();
             RecipeResult recipeResult = new RecipeResult(stage.getRecipe());
-            RecipeResultNode childResultNode = new RecipeResultNode(recipeResult);
+            RecipeResultNode childResultNode = new RecipeResultNode(stage.getName(), recipeResult);
             resultNode.addChild(childResultNode);
             buildManager.save(resultNode);
 
             MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
             recipeResult.setOutputDir(paths.getOutputDir(project, buildResult, recipeResult.getId()).getAbsolutePath());
 
-            RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe());
+            RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe(), getResourceRequirements(specification, node));
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), lazyPulseFile, recipeRequest, buildResult);
             RecipeController rc = new RecipeController(childResultNode, dispatchRequest, collector, queue, buildManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
-            configure(child, childResultNode, node);
+            configure(child, childResultNode, specification, node);
         }
+    }
+
+    private List<ResourceRequirement> getResourceRequirements(BuildSpecification specification, BuildSpecificationNode node)
+    {
+        List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
+        requirements.addAll(specification.getRoot().getResourceRequirements());
+        requirements.addAll(node.getResourceRequirements());
+        return requirements;
     }
 
     public void handleEvent(Event evt)

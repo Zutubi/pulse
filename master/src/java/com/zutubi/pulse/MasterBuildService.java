@@ -2,8 +2,7 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.ResourceRepository;
-import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.model.ResourceManager;

@@ -391,7 +391,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createComplexCommand());
         recipeResult.add(createComplexCommand());
         recipeResult.complete();
-        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        RecipeResultNode node = new RecipeResultNode(name + " stage", recipeResult);
         node.setHost("[master]");
 
         return node;
@@ -407,7 +407,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createPendingCommand());
         recipeResult.add(createPendingCommand());
 
-        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        RecipeResultNode node = new RecipeResultNode(null, recipeResult);
         node.setHost("my slave");
         return node;
     }
@@ -420,7 +420,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createComplexCommand());
         recipeResult.add(createTerminatingCommand());
         recipeResult.terminate(true);
-        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        RecipeResultNode node = new RecipeResultNode(null, recipeResult);
         node.setHost(null);
         return node;
     }
@@ -428,7 +428,7 @@ public class SetupDummyBuilds implements Runnable
     private RecipeResultNode createPendingRecipe()
     {
         RecipeResult recipeResult = new RecipeResult("my recipe");
-        return new RecipeResultNode(recipeResult);
+        return new RecipeResultNode("pending stage", recipeResult);
     }
 
     private RecipeResultNode createCommandFailedRecipe()
@@ -440,7 +440,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createComplexCommand());
         recipeResult.add(createFailedCommand());
         recipeResult.complete();
-        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        RecipeResultNode node = new RecipeResultNode("command failed stage", recipeResult);
         node.setHost("[master]");
 
         return node;
@@ -455,7 +455,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createWarningFeaturesCommand());
         recipeResult.add(createComplexCommand());
         recipeResult.complete();
-        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        RecipeResultNode node = new RecipeResultNode("warnfeat stage", recipeResult);
         node.setHost("[master]");
 
         return node;
@@ -472,7 +472,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createComplexCommand());
         recipeResult.add(createErrorFeaturesCommand(4, recipeDir));
         recipeResult.complete();
-        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        RecipeResultNode node = new RecipeResultNode("errfeat stage", recipeResult);
         node.setHost("[master]");
 
         return node;
@@ -488,7 +488,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(command);
         recipeResult.failure("command :: " + command.getCommandName() + " :: some tests broken");
         recipeResult.complete();
-        return new RecipeResultNode(recipeResult);
+        return new RecipeResultNode("testerr stage", recipeResult);
     }
 
     private CommandResult createComplexCommand()

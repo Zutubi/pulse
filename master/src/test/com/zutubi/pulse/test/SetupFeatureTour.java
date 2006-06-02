@@ -227,7 +227,7 @@ public class SetupFeatureTour implements Runnable
 
         File recipeDir = masterBuildPaths.getRecipeDir(project, build, recipe.getId());
         recipe.commence(recipeDir);
-        RecipeResultNode node = new RecipeResultNode(recipe);
+        RecipeResultNode node = new RecipeResultNode(null, recipe);
         build.getRoot().addChild(node);
 
         addChanges(previous);

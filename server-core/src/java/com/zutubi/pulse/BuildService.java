@@ -1,5 +1,7 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.core.RecipeRequest;
+
 import java.io.File;
 
 /**

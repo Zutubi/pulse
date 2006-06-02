@@ -36,7 +36,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware
         this.buildSpecification = buildSpecification;
         this.number = number;
         state = ResultState.INITIAL;
-        root = new RecipeResultNode(null);
+        root = new RecipeResultNode(null, null);
         hasWorkDir = true;
     }
 

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.events.build;
 
-import com.zutubi.pulse.BuildService;
-import com.zutubi.pulse.RecipeRequest;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.agent.Agent;
 
 /**

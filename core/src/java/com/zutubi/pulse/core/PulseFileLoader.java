@@ -7,9 +7,9 @@ import com.zutubi.pulse.core.model.Property;
  */
 public class PulseFileLoader extends FileLoader
 {
-    public PulseFileLoader(ObjectFactory factory, ResourceRepository repository)
+    public PulseFileLoader(ObjectFactory factory)
     {
-        super(factory, repository);
+        super(factory);
         register("property", Property.class);
         register("recipe", Recipe.class);
         register("def", ComponentDefinition.class);

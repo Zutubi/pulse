@@ -1,11 +1,13 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.model.BuildHostRequirements;
 import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.SlaveAgent;
@@ -466,7 +468,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             return new MockBuildHostRequirements(type);
         }
 
-        public boolean fulfilledBy(BuildService service)
+        public boolean fulfilledBy(RecipeDispatchRequest request, BuildService service)
         {
             return ((MockBuildService) service).getType() == type;
         }

@@ -98,7 +98,7 @@ public class CreateBuildSpecificationAction extends BuildSpecificationActionSupp
 
         BuildSpecificationNode node = new BuildSpecificationNode(stage);
         spec.getRoot().addChild(node);
-        addFieldsToStage(spec, node);
+        addFieldsToStage();
 
         project.addBuildSpecification(spec);
         getProjectManager().save(project);

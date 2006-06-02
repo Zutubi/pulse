@@ -2,12 +2,16 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.InitialBootstrapper;
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.BuildHostRequirements;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.PulseFileDetails;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.util.XMLUtils;
+
+import java.util.List;
 
 /**
  * A request to dispatch a recipe to some build hostRequirements, which may be restricted.

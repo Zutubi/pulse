@@ -1,7 +1,11 @@
-package com.zutubi.pulse;
+package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.Scope;
+import com.zutubi.pulse.model.ResourceRequirement;
+
+import java.util.List;
 
 /**
  * A request to execute a specific recipe.  Includes details about how to
@@ -26,12 +30,33 @@ public class RecipeRequest
      * The name of the recipe to execute, or null to execute the default.
      */
     private String recipeName;
-
+    /**
+     * Required resources for the build.
+     */
+    private List<ResourceRequirement> resourceRequirements;
 
     public RecipeRequest(long id, String recipeName)
     {
+        this(id, recipeName, null);
+    }
+
+    public RecipeRequest(long id, String recipeName, List<ResourceRequirement> resourceRequirements)
+    {
+        this(id, null, null, recipeName, resourceRequirements);
+    }
+
+    public RecipeRequest(long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName)
+    {
+        this(id, bootstrapper, pulseFileSource, recipeName, null);
+    }
+
+    public RecipeRequest(long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName, List<ResourceRequirement> resourceRequirements)
+    {
         this.id = id;
+        this.bootstrapper = bootstrapper;
+        this.pulseFileSource = pulseFileSource;
         this.recipeName = recipeName;
+        this.resourceRequirements = resourceRequirements;
     }
 
     public long getId()
@@ -67,5 +92,15 @@ public class RecipeRequest
     public void prepare() throws PulseException
     {
         bootstrapper.prepare();
+    }
+
+    public List<ResourceRequirement> getResourceRequirements()
+    {
+        return resourceRequirements;
+    }
+
+    public void setResourceRequirements(List<ResourceRequirement> resourceRequirements)
+    {
+        this.resourceRequirements = resourceRequirements;
     }
 }

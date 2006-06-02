@@ -58,7 +58,7 @@ public class CreateBuildStageAction extends BuildStageActionSupport implements C
         BuildSpecificationNode parent = getSpecification().getRoot();
         BuildSpecificationNode node = new BuildSpecificationNode(getStage());
         parent.addChild(node);
-        addFieldsToStage(getSpecification(), node);
+        addFieldsToStage();
         getProjectManager().save(getProject());
         id = node.getId();
         return SUCCESS;

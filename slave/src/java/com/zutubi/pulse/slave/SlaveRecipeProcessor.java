@@ -1,13 +1,9 @@
 package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.ChainBootstrapper;
-import com.zutubi.pulse.RecipeRequest;
 import com.zutubi.pulse.ServerBootstrapper;
 import com.zutubi.pulse.ServerRecipePaths;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.RecipeProcessor;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
@@ -32,14 +28,18 @@ public class SlaveRecipeProcessor
         // TODO on startup, clean out any existing working/output directories left around
     }
 
-    private EventListener registerMasterListener(String master, long id)
+    private EventListener registerMasterListener(MasterService service, long id)
+    {
+        EventListener listener = new ForwardingEventListener(service, id);
+        eventManager.register(listener);
+        return listener;
+    }
+
+    private MasterService getMasterProxy(String master)
     {
         try
         {
-            MasterService service = masterProxyFactory.createProxy(master);
-            EventListener listener = new ForwardingEventListener(service, id);
-            eventManager.register(listener);
-            return listener;
+            return masterProxyFactory.createProxy(master);
         }
         catch (MalformedURLException e)
         {
@@ -51,30 +51,35 @@ public class SlaveRecipeProcessor
         return null;
     }
 
-    public void processRecipe(String master, RecipeRequest request)
+    public void processRecipe(String master, long slaveId, RecipeRequest request)
     {
-        ServerRecipePaths processorPaths = new ServerRecipePaths(request.getId(), configurationManager.getUserPaths().getData());
-        Bootstrapper bootstrapper = new ChainBootstrapper(new ServerBootstrapper(), request.getBootstrapper());
-        EventListener listener = registerMasterListener(master, request.getId());
+        MasterService masterProxy = getMasterProxy(master);
+        if(masterProxy != null)
+        {
+            EventListener listener = registerMasterListener(masterProxy, request.getId());
+            ResourceRepository repo = new RemoteResourceRepository(slaveId, masterProxy);
+            ServerRecipePaths processorPaths = new ServerRecipePaths(request.getId(), configurationManager.getUserPaths().getData());
+            request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), request.getBootstrapper()));
 
-        try
-        {
-            recipeProcessor.build(request.getId(), processorPaths, bootstrapper, request.getPulseFileSource(), request.getRecipeName());
-        }
-        catch (BuildException e)
-        {
-            RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), e.getMessage());
-            eventManager.publish(error);
-        }
-        catch (Exception e)
-        {
-            LOG.severe(e);
-            RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), "Unexpected error: " + e.getMessage());
-            eventManager.publish(error);
-        }
-        finally
-        {
-            eventManager.unregister(listener);
+            try
+            {
+                recipeProcessor.build(request, processorPaths, repo);
+            }
+            catch (BuildException e)
+            {
+                RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), e.getMessage());
+                eventManager.publish(error);
+            }
+            catch (Exception e)
+            {
+                LOG.severe(e);
+                RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), "Unexpected error: " + e.getMessage());
+                eventManager.publish(error);
+            }
+            finally
+            {
+                eventManager.unregister(listener);
+            }
         }
     }
 

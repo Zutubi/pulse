@@ -103,7 +103,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         BuildResult buildResult = new BuildResult(project, spec.getName(), 11);
         buildResult.commence(new File("/tmp/buildout"));
         buildResult.setScmDetails(scmDetails);
-        RecipeResultNode recipeNode = new RecipeResultNode(recipeResult);
+        RecipeResultNode recipeNode = new RecipeResultNode("test", recipeResult);
         recipeNode.setHost("test host");
         buildResult.getRoot().addChild(recipeNode);
 

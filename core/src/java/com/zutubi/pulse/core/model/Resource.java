@@ -60,7 +60,7 @@ public class Resource extends Entity
         return versions;
     }
 
-    protected void setVersions(Map<String, ResourceVersion> versions)
+    public void setVersions(Map<String, ResourceVersion> versions)
     {
         this.versions = versions;
     }
@@ -75,7 +75,7 @@ public class Resource extends Entity
         return properties;
     }
 
-    protected void setProperties(Map<String, Property> properties)
+    public void setProperties(Map<String, Property> properties)
     {
         this.properties = properties;
     }

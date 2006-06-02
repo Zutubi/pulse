@@ -281,7 +281,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
         for(Agent a: onlineAgents.values())
         {
-            if(request.getHostRequirements().fulfilledBy(a.getBuildService()))
+            if(request.getHostRequirements().fulfilledBy(request, a.getBuildService()))
             {
                 return true;
             }
@@ -345,7 +345,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                         BuildService service = agent.getBuildService();
 
                         // can the request be sent to this service?
-                        if (request.getHostRequirements().fulfilledBy(service) && !unavailableAgents.contains(agent))
+                        if (request.getHostRequirements().fulfilledBy(request, service) && !unavailableAgents.contains(agent))
                         {
                             if(dispatchRequest(request, agent, unavailableAgents, dispatchedRequests))
                             {

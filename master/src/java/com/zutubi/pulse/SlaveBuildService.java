@@ -2,6 +2,7 @@ package com.zutubi.pulse;
 
 import com.caucho.hessian.client.HessianRuntimeException;
 import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.model.Slave;
@@ -50,7 +51,7 @@ public class SlaveBuildService implements BuildService
     {
         try
         {
-            return service.build(configurationManager.getAppConfig().getHostName(), request);
+            return service.build(configurationManager.getAppConfig().getHostName(), slave.getId(), request);
         }
         catch (HessianRuntimeException e)
         {
