@@ -2,6 +2,7 @@ package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.SystemInfo;
+import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.bootstrap.ComponentContext;
@@ -15,6 +16,8 @@ import java.util.List;
  */
 public class SlaveServiceImpl implements SlaveService
 {
+    private static final Logger LOG = Logger.getLogger(SlaveServiceImpl.class);
+
     private SlaveThreadPool threadPool;
     private SlaveConfigurationManager configurationManager;
     private SlaveStartupManager startupManager;

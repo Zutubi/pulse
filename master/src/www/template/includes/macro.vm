@@ -2008,7 +2008,7 @@
     #if($action.hasThrowable($record))
         <tr>
             <td class="content-large" colspan="4">
-                <pre>$!webwork.htmlEncode($action.getStackTrace($record))</pre>
+                <pre>$!webwork.htmlEncode($record.stackTrace))</pre>
             </td>
         </tr>
     #end

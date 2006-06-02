@@ -14,32 +14,18 @@ public class ServerMessagesActionSupport extends AgentActionSupport
 {
     public boolean isError(CustomLogRecord record)
     {
-        return record.getLevel() == Level.SEVERE;
+        return record.getLevel().intValue() == Level.SEVERE.intValue();
     }
 
     public boolean isWarning(CustomLogRecord record)
     {
-        return record.getLevel() == Level.WARNING;
+        return record.getLevel().intValue() == Level.WARNING.intValue();
     }
 
     public boolean hasThrowable(CustomLogRecord record)
     {
-        return record.getThrown() != null;
+        return record.getStackTrace().length() > 0;
     }
 
-    public String getStackTrace(CustomLogRecord record)
-    {
-        Throwable t = record.getThrown();
-        if (t != null)
-        {
-            StringWriter writer = new StringWriter();
-            t.printStackTrace(new PrintWriter(writer));
-            return writer.getBuffer().toString();
-        }
-        else
-        {
-            return "";
-        }
-    }
 
 }

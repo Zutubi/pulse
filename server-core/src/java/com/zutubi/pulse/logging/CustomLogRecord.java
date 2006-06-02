@@ -3,137 +3,100 @@ package com.zutubi.pulse.logging;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 /**
  */
 public class CustomLogRecord
 {
-    private LogRecord logRecord;
+    private Level level;
+    private String loggerName;
+    private long sequenceNumber;
+    private String sourceClassName;
+    private String sourceMethodName;
+    private String message;
+    private int threadId;
+    private long millis;
+    private String stackTrace;
+
     private int count = 1;
+
+    public CustomLogRecord()
+    {
+    }
 
     public CustomLogRecord(LogRecord logRecord)
     {
-        this.logRecord = logRecord;
+        this.level = logRecord.getLevel();
+        this.loggerName = logRecord.getLoggerName();
+        this.sequenceNumber = logRecord.getSequenceNumber();
+        this.sourceClassName = logRecord.getSourceClassName();
+        this.sourceMethodName = logRecord.getSourceMethodName();
+        this.message = logRecord.getMessage();
+        this.threadId = logRecord.getThreadID();
+        this.millis = logRecord.getMillis();
+        this.stackTrace = getStackTrace(logRecord);
     }
 
-    public String getLoggerName()
+    public static String getStackTrace(LogRecord record)
     {
-        return logRecord.getLoggerName();
-    }
-
-    public void setLoggerName(String name)
-    {
-        logRecord.setLoggerName(name);
-    }
-
-    public ResourceBundle getResourceBundle()
-    {
-        return logRecord.getResourceBundle();
-    }
-
-    public void setResourceBundle(ResourceBundle bundle)
-    {
-        logRecord.setResourceBundle(bundle);
-    }
-
-    public String getResourceBundleName()
-    {
-        return logRecord.getResourceBundleName();
-    }
-
-    public void setResourceBundleName(String name)
-    {
-        logRecord.setResourceBundleName(name);
+        Throwable t = record.getThrown();
+        if (t != null)
+        {
+            StringWriter writer = new StringWriter();
+            t.printStackTrace(new PrintWriter(writer));
+            return writer.getBuffer().toString();
+        }
+        else
+        {
+            return "";
+        }
     }
 
     public Level getLevel()
     {
-        return logRecord.getLevel();
+        return level;
     }
 
-    public void setLevel(Level level)
+    public String getLoggerName()
     {
-        logRecord.setLevel(level);
+        return loggerName;
     }
 
     public long getSequenceNumber()
     {
-        return logRecord.getSequenceNumber();
-    }
-
-    public void setSequenceNumber(long seq)
-    {
-        logRecord.setSequenceNumber(seq);
+        return sequenceNumber;
     }
 
     public String getSourceClassName()
     {
-        return logRecord.getSourceClassName();
-    }
-
-    public void setSourceClassName(String sourceClassName)
-    {
-        logRecord.setSourceClassName(sourceClassName);
+        return sourceClassName;
     }
 
     public String getSourceMethodName()
     {
-        return logRecord.getSourceMethodName();
-    }
-
-    public void setSourceMethodName(String sourceMethodName)
-    {
-        logRecord.setSourceMethodName(sourceMethodName);
+        return sourceMethodName;
     }
 
     public String getMessage()
     {
-        return logRecord.getMessage();
+        return message;
     }
 
-    public void setMessage(String message)
+    public int getThreadId()
     {
-        logRecord.setMessage(message);
-    }
-
-    public Object[] getParameters()
-    {
-        return logRecord.getParameters();
-    }
-
-    public void setParameters(Object[] parameters)
-    {
-        logRecord.setParameters(parameters);
-    }
-
-    public int getThreadID()
-    {
-        return logRecord.getThreadID();
-    }
-
-    public void setThreadID(int threadID)
-    {
-        logRecord.setThreadID(threadID);
+        return threadId;
     }
 
     public long getMillis()
     {
-        return logRecord.getMillis();
+        return millis;
     }
 
-    public void setMillis(long millis)
+    public String getStackTrace()
     {
-        logRecord.setMillis(millis);
-    }
-
-    public Throwable getThrown()
-    {
-        return logRecord.getThrown();
-    }
-
-    public void setThrown(Throwable thrown)
-    {
-        logRecord.setThrown(thrown);
+        return stackTrace;
     }
 
     public int getCount()
