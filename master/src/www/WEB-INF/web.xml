@@ -159,11 +159,9 @@
         <error-code>500</error-code>
         <location>/internalError.action</location>
     </error-page>
-<!--
     <error-page>
         <error-code>404</error-code>
         <location>/404.action</location>
     </error-page>
--->
 
 </web-app>

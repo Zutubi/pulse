@@ -5,6 +5,7 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.freemarker.CustomFreemarkerManager;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.security.AcegiSecurityManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class DefaultStartupManager implements StartupManager
      */
     private boolean starting = false;
 
-    private List<String> configContexts;
+    private List<String> setupContexts;
 
     private List<String> appContexts;
 
@@ -75,11 +76,11 @@ public class DefaultStartupManager implements StartupManager
      * Specify the spring contexts that need to be loaded to initialise the configuration
      * mode of this system.
      *
-     * @param configContexts
+     * @param setupContexts
      */
-    public void setConfigContexts(List<String> configContexts)
+    public void setSetupContexts(List<String> setupContexts)
     {
-        this.configContexts = configContexts;
+        this.setupContexts = setupContexts;
     }
 
     /**
@@ -176,7 +177,7 @@ public class DefaultStartupManager implements StartupManager
 
         // load the application context. we do not expect this to take long, so we dont worry about
         // a holding page here.
-        ComponentContext.addClassPathContextDefinitions(configContexts.toArray(new String[configContexts.size()]));
+        ComponentContext.addClassPathContextDefinitions(setupContexts.toArray(new String[setupContexts.size()]));
 
         // i) set the system starting pages (periodically refresh)
         webManager.deploySetup();
@@ -203,6 +204,10 @@ public class DefaultStartupManager implements StartupManager
 
         // load the application context.
         ComponentContext.addClassPathContextDefinitions(appContexts.toArray(new String[appContexts.size()]));
+
+        // handle the initialisation of the security manager, since this can not be done within the spring context file.
+        AcegiSecurityManager securityManager = (AcegiSecurityManager) ComponentContext.getBean("securityManager");
+        securityManager.init();
 
         // application contexts have finished loading
         // i) run startup tasks

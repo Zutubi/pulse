@@ -90,8 +90,7 @@
         </action>
 
         <action name="404" class="com.zutubi.pulse.web.FourOhFourAction">
-            <result name="404" type="velocity">404.vm</result>
-            <result name="starting" type="velocity">404-starting.vm</result>
+            <result name="success" type="velocity">404.vm</result>
         </action>
 
         <action name="viewProjects" class="com.zutubi.pulse.web.project.ViewProjectsAction">

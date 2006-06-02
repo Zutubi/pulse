@@ -3,7 +3,6 @@ package com.zutubi.pulse.bootstrap.velocity;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemPaths;
-import com.zutubi.pulse.util.logging.Logger;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.runtime.resource.loader.FileResourceLoader;
 
@@ -16,8 +15,6 @@ import java.io.File;
  */
 public class PulseTemplateVelocityResourceLoader extends FileResourceLoader
 {
-    private static final Logger LOG = Logger.getLogger(PulseTemplateVelocityResourceLoader.class);
-
     private ConfigurationManager configManager;
 
     public PulseTemplateVelocityResourceLoader()
