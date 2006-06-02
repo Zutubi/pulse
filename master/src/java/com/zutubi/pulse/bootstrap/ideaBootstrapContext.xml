@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--
+
+-->
 <beans>
 
     <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager">
@@ -13,17 +16,13 @@
                 <value>com/zutubi/pulse/bootstrap/mainSubsystemContext.xml</value>
             </list>
         </property>
-        <property name="configContexts">
+        <property name="setupContexts">
             <list>
                 <value>com/zutubi/pulse/bootstrap/configSubsystemContext.xml</value>
             </list>
         </property>
         <property name="configurationManager">
             <ref local="configurationManager"/>
-        </property>
-        <property name="startupRunnables">
-            <list>
-            </list>
         </property>
         <property name="objectFactory">
             <ref local="objectFactory"/>

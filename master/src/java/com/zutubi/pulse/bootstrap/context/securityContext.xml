@@ -13,7 +13,10 @@ The beans defined within the security subsystem need not be accessed by other co
 -->
 <beans>
 
-    <bean id="securityManager" class="com.zutubi.pulse.security.AcegiSecurityManager" init-method="init">
+    <!-- do not trigger an init from here. We need the spring context to be completely loaded before
+     doing so else the FilterToBeanProxy will be unable to locate the defined beans.
+     -->
+    <bean id="securityManager" class="com.zutubi.pulse.security.AcegiSecurityManager">
         <property name="jettyManager">
             <ref bean="jettyManager"/>
         </property>

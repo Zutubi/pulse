@@ -7,7 +7,10 @@ This context exports:
 
     logConfigurationManager: During initialisation, this manager setups up the configured logging levels.
                              Prior to the initialisation, the logging level is defined by the systems
-                             startup. By default, this is defined within the ConsoleConfig instance.
+                             startup.
+
+                             By default, the initial logging configuration defined within the ConsoleConfig instance, referenced
+                             on the commandline via -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig
 
 This context requires:
 

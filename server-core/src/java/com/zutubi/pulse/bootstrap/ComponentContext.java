@@ -1,6 +1,5 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.zutubi.pulse.spring.DelegatingApplicationContext;
 import com.zutubi.pulse.spring.SpringAutowireSupport;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -14,14 +13,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
  */
 public class ComponentContext
 {
-    // Some implementation notes:
-    // a) there are times when an IllegalStateException will be generated because ComponentContext.getBean
-    //    is called while context.getDelegate().refresh() is running. In this case, resist the urge to
-    //    isolate the loading/refresh of the context from making the context available by splitting the
-    //    new FileSystemContext and setDelegate calls. It causes other problems with acegi not being able
-    //    to initialise itself due to a ComponentContext.getContext() call that looks up a component.
-
-    private static final DelegatingApplicationContext context = new DelegatingApplicationContext();
+    private static ConfigurableApplicationContext context = null;
 
     public static ApplicationContext getContext()
     {
@@ -32,8 +24,8 @@ public class ComponentContext
     {
         if (definitions != null && definitions.length > 0)
         {
-            context.setDelegate(new FileSystemXmlApplicationContext(definitions, false, context.getDelegate()));
-            ((ConfigurableApplicationContext) context.getDelegate()).refresh();
+            FileSystemXmlApplicationContext ctx = new FileSystemXmlApplicationContext(definitions, false, context);
+            publishContext(ctx);
         }
     }
 
@@ -41,9 +33,15 @@ public class ComponentContext
     {
         if (definitions != null && definitions.length > 0)
         {
-            context.setDelegate(new ClassPathXmlApplicationContext(definitions, false, context.getDelegate()));
-            ((ConfigurableApplicationContext) context.getDelegate()).refresh();
+            ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(definitions, false, context);
+            publishContext(ctx);
         }
+    }
+
+    private static void publishContext(ConfigurableApplicationContext newContext)
+    {
+        newContext.refresh();
+        context = newContext;
     }
 
     public static Object getBean(String name)
@@ -57,7 +55,7 @@ public class ComponentContext
 
     public static void autowire(Object bean)
     {
-        if (context.getDelegate() == null)
+        if (getContext() == null)
         {
             // there is no context to use for the autowiring, so no work
             // can be done.
@@ -77,6 +75,9 @@ public class ComponentContext
 
     public static void closeAll()
     {
-        context.closeAll();
+        if (getContext() != null)
+        {
+            context.close();
+        }
     }
 }

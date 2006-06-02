@@ -7,7 +7,7 @@
 
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
-    <!-- token manager required for scripted access to the remote api. -->
+    <!-- Token manager required for scripted access to the remote api. -->
     <bean id="tokenManager" class="com.zutubi.pulse.api.TokenManager" autowire="byName" init-method="init"/>
 
     <!-- TODO: services should register themselves with the shutdown manager as they are started. -->
