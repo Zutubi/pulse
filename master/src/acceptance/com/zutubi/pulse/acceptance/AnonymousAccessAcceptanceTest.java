@@ -16,7 +16,7 @@ public class AnonymousAccessAcceptanceTest extends BaseAcceptanceTest
 
     public void testEnableDisableAccess()
     {
-        login("admin", "admin");
+        loginAsAdmin();
         clickLinkWithText("administration");
         clickLink("general.edit");
 
@@ -28,7 +28,7 @@ public class AnonymousAccessAcceptanceTest extends BaseAcceptanceTest
         assertTextPresent("projects");
         assertLinkPresent("login");
 
-        login("admin", "admin");
+        loginAsAdmin();
         clickLinkWithText("administration");
         clickLink("general.edit");
 

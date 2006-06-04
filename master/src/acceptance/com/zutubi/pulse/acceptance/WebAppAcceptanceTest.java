@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.HttpException;
+import com.meterware.httpunit.HttpNotFoundException;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -9,9 +10,8 @@ import java.io.IOException;
 /**
  * A set of acceptance tests that ensure the correct behaviour of
  * the web application.
- *
+ * <p/>
  * ie: no directory browsing is allowed.
- *
  */
 public class WebAppAcceptanceTest extends BaseAcceptanceTest
 {
@@ -49,6 +49,26 @@ public class WebAppAcceptanceTest extends BaseAcceptanceTest
         catch (HttpException e)
         {
             assertEquals(403, e.getResponseCode());
+        }
+    }
+
+    public void test404DisplaysAllInformation() throws IOException, SAXException
+    {
+        // log in.
+        loginAsAdmin();
+
+        String badAction = "anactionthatdoesnotexist";
+        try
+        {
+            beginAt("/");
+
+            String url = createUrl("/" + badAction + ".action");
+            tester.getDialog().getWebClient().getResponse(new GetMethodWebRequest(url));
+        }
+        catch (HttpNotFoundException e)
+        {
+            assertEquals(404, e.getResponseCode());
+            assertTrue(e.getMessage().indexOf(badAction) != -1);
         }
     }
 

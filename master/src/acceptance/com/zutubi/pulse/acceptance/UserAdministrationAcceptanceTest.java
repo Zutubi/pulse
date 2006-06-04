@@ -21,7 +21,7 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
     protected void setUp() throws Exception
     {
         super.setUp();
-        login("admin", "admin");
+        loginAsAdmin();
 
         // navigate to user admin tab.
         navigateToUserAdministration();

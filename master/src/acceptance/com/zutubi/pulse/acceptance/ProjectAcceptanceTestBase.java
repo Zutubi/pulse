@@ -35,7 +35,7 @@ public class ProjectAcceptanceTestBase extends BaseAcceptanceTest
         super.setUp();
 
         // create project that will be used during this set of tests.
-        login("admin", "admin");
+        loginAsAdmin();
 
         // navigate to the create project wizard.
         // fill in the form details.

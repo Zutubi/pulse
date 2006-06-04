@@ -5,8 +5,6 @@ import com.zutubi.pulse.util.RandomUtils;
 import net.sourceforge.jwebunit.ExpectedRow;
 import net.sourceforge.jwebunit.ExpectedTable;
 
-import java.io.IOException;
-
 /**
  *
  *
@@ -34,7 +32,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
         super.setUp();
 
         // create new user..
-        login("admin", "admin");
+        loginAsAdmin();
         navigateToUserAdministration();
         login = RandomUtils.randomString(7);
         submitCreateUserForm(login, login, login, login, false);

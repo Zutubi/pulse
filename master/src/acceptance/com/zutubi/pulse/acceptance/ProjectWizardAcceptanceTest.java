@@ -33,7 +33,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
     {
         super.setUp();
 
-        login("admin", "admin");
+        loginAsAdmin();
     }
 
     public void testCreateVersionedProject()
