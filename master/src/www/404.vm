@@ -1,0 +1,14 @@
+<html>
+<head>
+
+</head>
+<body>
+<h2>HTTP ERROR: $action.errorStatusCode</h2>
+<p>
+    $action.errorMessage
+</p>
+<p>
+    RequestURI=$action.errorRequestUri
+</p>
+</body>
+</html>
