@@ -8,9 +8,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 
 /**
- * A set of acceptance tests that ensure the correct behaviour of
- * the web application.
- * <p/>
+ * A set of acceptance tests that ensure the correct behaviour of the web application.
  * ie: no directory browsing is allowed.
  */
 public class WebAppAcceptanceTest extends BaseAcceptanceTest
