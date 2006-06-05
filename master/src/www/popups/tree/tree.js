@@ -1,26 +1,21 @@
+/**
+ * Initialise the tree control.
+ *
+ */
 function init ()
 {
+    var anchorId = getConfig().anchor;
+
     // need to find a way to extract the id of the root tree node from this file.
-    var rootDiv = document.getElementById("browse");
+    var anchorDiv = document.getElementById(anchorId);
 
     // add loading place holder.
     var ul = document.createElement("ul");
     ul.appendChild(createNewNode({"file":"Loading...", "type":"loading", "id":""}));
-    rootDiv.appendChild(ul);
-    rootDiv.subList = ul;
+    anchorDiv.appendChild(ul);
 
     // trigger an initial load.
-    requestUpdate("root");
-}
-
-function handleFailure(resp)
-{
-    alert("onFailure");
-}
-
-function handleException(resp, e)
-{
-    alert("onException: " + e);
+    requestUpdate("");
 }
 
 function load(event)
@@ -36,7 +31,6 @@ function load(event)
         ul.appendChild(createNewNode({"file":"Loading...", "type":"loading", "id":""}));
 
         currentTarget.appendChild(ul);
-        currentTarget.subList = ul;
 
         // now we change the onclick handler so that it handles toggling instead of loading.
         currentTarget.onclick = toggle;
@@ -50,15 +44,24 @@ function load(event)
     }
 }
 
+/**
+ * Simple encapsulation of the configuration object. This should simplify the fixing how
+ * the configuration details are passed around.
+ */
+function getConfig()
+{
+    return window.myTree;
+}
+
 function requestUpdate(id)
 {
-//    enterMethod("requestUpdate: " + id);
+    var url = getConfig().url;
+
     var ajax = new Ajax.Request(
-        "http://localhost:8080/ajax/list.action",
-        //"file:///C:/tmp/tree/listing.json",
+        url,
         {
             method: 'get',
-            onComplete: updateFlat,
+            onComplete: updateTree,
             onFailure: handleFailure,
             onException: handleException,
             parameters:"encodedPath=" + id
@@ -91,15 +94,14 @@ function updateTree(originalRequest)
     var listing = jsonObj.listing;
 
     var target = document.getElementById(jsonObj.path);
+    if (!target)
+    {
+        target = document.getElementById(getConfig().anchor);
+    }
 
     // clean the "loading..." out of the list.
-    var ul = target.subList;
-    var children = ul.childNodes;
-    for (var j = 0; j < children.length; j++)
-    {
-        var child = children[j];
-        ul.removeChild(child);
-    }
+    var ul = locateFirstChild(target, "UL");
+    removeAllChildren(ul);
 
     for (var i = 0; i < listing.length; i++)
     {
@@ -110,8 +112,7 @@ function updateTree(originalRequest)
 
 function updateFlat(originalRequest)
 {
-//    enterMethod("updateFlat");
-    var folder = document.getElementById('browse');
+    var folder = document.getElementById(getConfig().anchor);
 
     var jsonText = originalRequest.responseText;
     var jsonObj = eval("(" + jsonText + ")");
@@ -124,7 +125,7 @@ function updateFlat(originalRequest)
     folder.appendChild(ul);
 
     // add the links to the current directory.
-    if (jsonObj.path != "root")
+    if (jsonObj.path)
     {
         var path = jsonObj.path;
         var thisDirectory = createNewNode({"file":".", "type":"folder", "id":path});
@@ -155,9 +156,6 @@ function updateFlat(originalRequest)
             currentPathDisplay.appendChild(document.createTextNode(jsonObj.displayPath));
         }
     }
-
-
-//    exitMethod("updateFlat");
 }
 
 /**
@@ -168,7 +166,6 @@ function updateFlat(originalRequest)
  */
 function createNewNode(data)
 {
-//    enterMethod("createNewNode");
     var node = document.createElement("li");
     node.appendChild(document.createTextNode(data.file));
     node.setAttribute("id", data.id);
@@ -186,7 +183,6 @@ function createNewNode(data)
     {
         node.onclick = select;
     }
-//    exitMethod("createNewNode");
     return node;
 }
 
@@ -252,13 +248,13 @@ function extractText(element)
  */
 function toggle(event)
 {
-//    enterMethod("toggle");
     var currentTarget = getCurrentTarget(event);
     if (this == currentTarget)
     {
         var node = this;
-        Element.toggle(node.subList);
-        if (Element.visible(node.subList))
+        var ul = locateFirstChild(node, "UL");
+        Element.toggle(ul);
+        if (Element.visible(ul))
         {
             replaceClassName(node, "folder", "openfolder");
         }
@@ -267,41 +263,38 @@ function toggle(event)
             replaceClassName(node, "openfolder", "folder");
         }
     }
-//    exitMethod("toggle");
 }
 
 function replaceClassName(element, oldClassName, newClassName)
 {
-//    enterMethod("replaceClassName");
     Element.removeClassName(element, oldClassName);
     Element.addClassName(element, newClassName);
-//    exitMethod("replaceClassName");
 }
 
 function removeChild(element)
 {
-//    enterMethod("removeChild")
     var children = element.childNodes;
     for (var j = 0; j < children.length; j++)
     {
         var child = children[j];
-        if (child.nodeType == 1 && (child.tagName == "ul" || child.tagName == "UL"))
+        if (child.nodeType == 1 && (child.tagName.toUpperCase() == "UL"))
         {
             Element.remove(child);
         }
     }
-//    exitMethod("removeChild")
 }
 
+/**
+ * Remove all of the child nodes from the specified element.
+ */
 function removeAllChildren(element)
 {
-//    enterMethod("removeAllChildren");
-    var children = element.childNodes;
-    for (var j = 0; j < children.length; j++)
+    var children = $A(element.childNodes);
+    children.each(function(child)
     {
-        var child = children[j];
-        element.removeChild(child);
-    }
+        // remove the child element from the document.
+        Element.remove(child);
+    });
 }
 
 function getCurrentTarget(event)
@@ -322,14 +315,28 @@ function clearBrowserTextSelection()
     }
 }
 
-function enterMethod(method)
+/**
+ * Locate and return the first child of the specified element that has a nodeName property
+ * that matches the specified nodeName.
+ *
+ */
+function locateFirstChild(elem, nodeName)
 {
-    alert(method + ": enter");
-}
+    nodeName = nodeName.toUpperCase();
 
-function exitMethod(method)
-{
-    alert(method + ": exit");
+    // add Enumerable to childNodes
+    var children = $A(elem.childNodes);
+
+    var res = null;
+    children.each(function(child) {
+        var name = child.nodeName;
+        if (name && name.toUpperCase() == nodeName)
+        {
+            res = child;
+            return;
+        }
+    });
+    return res;
 }
 
 function debug(element)
@@ -351,4 +358,22 @@ function debug(element)
         i++;
     }
     alert(debugging);
+}
+
+/**
+ * Basic failure handler.
+ *
+ */
+function handleFailure(resp)
+{
+    alert("onFailure");
+}
+
+/**
+ * Basic exception handler.
+ *
+ */
+function handleException(resp, e)
+{
+    alert("onException: " + e);
 }

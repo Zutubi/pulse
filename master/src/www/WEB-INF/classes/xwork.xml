@@ -641,6 +641,10 @@
             <result name="disabled" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="browse" class="com.opensymphony.xwork.ActionSupport">
+            <result name="success" type="velocity">browse.vm</result>
+        </action>
+
     </package>
 
     <package name="user" namespace="/user" extends="webwork-default-package">
@@ -750,21 +754,6 @@
         </action>
 
     </package>
-
-    <!--
-        <package name="setup" namespace="/setup" extends="webwork-default-package">
-            <default-interceptor-ref name="completeStack"/>
-
-            <action name="setupWizard" class="com.zutubiwizard.WizardAction">
-                <interceptor-ref name="wizardStack"/>
-                <param name="wizardClass">com.zutubisetup.SetupWizard</param>
-                <result name="admin" type="velocity">/setup/create-admin.vm</result>
-                <result name="settings" type="velocity">/setup/server-settings.vm</result>
-                <result name="success" type="redirect">/</result>
-                <result name="cancel" type="redirect">/</result>
-            </action>
-        </package>
-    -->
 
     <package name="startup" namespace="/startup" extends="webwork-default-package">
         <!--
@@ -1007,11 +996,10 @@
             <result name="success" type="velocity">test-scm.vm</result>
         </action>
 
-<!--
         <action name="list" class="com.zutubi.pulse.web.tree.ListAction">
             <result name="success" type="json">list.xml</result>
         </action>
--->
+
     </package>
 
     <package name="popups" namespace="/popups" extends="webwork-default-package">
@@ -1027,11 +1015,9 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-<!--
         <action name="browse-popup" class="com.opensymphony.xwork.ActionSupport">
             <result name="success" type="velocity">tree/browse-popup.vm</result>
         </action>
--->
 
     </package>
 

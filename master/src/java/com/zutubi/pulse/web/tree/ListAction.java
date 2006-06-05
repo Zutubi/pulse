@@ -49,7 +49,7 @@ public class ListAction extends ActionSupport
         // if path is null, assume root of file system.
         // else decode the path.
         File p;
-        if (TextUtils.stringSet(encodedPath) && !"root".equals(encodedPath))
+        if (TextUtils.stringSet(encodedPath))
         {
             String decodedPath = new String(Base64.decodeBase64(encodedPath.getBytes()));
             p = new File(decodedPath);

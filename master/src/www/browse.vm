@@ -6,7 +6,7 @@
     <body>
 
         <p>
-            <a href="popups/browse-popup.action" onClick="window.open(this.href, 'browse_popup', 'width=500, height=350, resizable=no', false); return false">popup</a>
+            <a href="popups/browse-popup.action" onClick="window.open(this.href, 'browse_popup', 'width=500, height=450, resizable=yes', false); return false">popup</a>
         </p>
 
     </body>
