@@ -33,6 +33,11 @@ public class ServerRecipePaths implements RecipePaths
         return new File(getRecipesRoot(), Long.toString(id));
     }
 
+    public File getPersistentWorkDir()
+    {
+        return new File(dataDir, "work");
+    }
+
     public File getBaseDir()
     {
         return new File(getRecipeRoot(), "base");

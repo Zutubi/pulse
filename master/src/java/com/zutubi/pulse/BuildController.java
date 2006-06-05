@@ -194,8 +194,7 @@ public class BuildController implements EventListener
         }
         else
         {
-            MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-            initialBootstrapper = new ProjectRepoBootstrapper(paths.getRepoDir(project), project.getScm(), revision);
+            initialBootstrapper = new ProjectRepoBootstrapper(project.getName(), project.getScm(), revision);
         }
         PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
         ComponentContext.autowire(pulseFileDetails);

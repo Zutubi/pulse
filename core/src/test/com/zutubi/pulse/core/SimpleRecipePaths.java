@@ -15,6 +15,11 @@ public class SimpleRecipePaths implements RecipePaths
         this.outputDir = outputDir;
     }
 
+    public File getPersistentWorkDir()
+    {
+        return null;
+    }
+
     public File getBaseDir()
     {
         return baseDir;
