@@ -62,7 +62,6 @@
     #buildTabs($result "tests")
 
     #if($result.hasTests())
-        #set($recipe = $result.root.children.get(0).result)
     <table class="twopane">
         <tr>
             <td class="leftpane">
@@ -74,12 +73,15 @@
             #set($summary = $node.result.testSummary)
                     <li>
                         <a href="#" id="nav_$node.result.id" onclick="selectNode('$node.result.id'); return false;">
-                            $!webwork.htmlEncode($node.stage)
             #if($summary.allPassed())
                             <img src="/images/accept.gif"/>
-                            ($summary.total)
             #else
                             <img src="/images/exclamation.gif"/>
+            #end
+                            $!webwork.htmlEncode($node.stage)
+            #if($summary.allPassed())
+                            ($summary.total)
+            #else
                             ($summary.broken/$summary.total)
             #end
                         </a>
@@ -106,7 +108,7 @@
                                             #wwtext("name=tests.collapse.all")
                                         </a>
                                     </span>
-                                    $!webwork.htmlEncode($node.stage) :: #wwtext("name=test.results")
+                                    #wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stage) :: #wwtext("name=test.results")
                                 </th>
                             </tr>
                             <tr>
@@ -115,7 +117,7 @@
                                 #contentHeading("test.details" 1)
                                 #contentHeading("test.duration" 1)
                             </tr>
-                            #showRecipeTests($recipe true)
+                            #showRecipeTests($node.result true)
                         </table>
             #else
                         <p>

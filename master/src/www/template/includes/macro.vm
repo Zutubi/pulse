@@ -223,7 +223,7 @@
 #macro(buildTabs $result $selected)
     #openTabs()
         #buildTab($result "summary" "viewBuild" $selected)
-        #buildTab($result "command-log" "viewCommandLog" $selected)
+        #buildTab($result "detailed-view" "viewCommandLog" $selected)
         #buildTab($result "changes" "viewChanges" $selected)
         #buildTab($result "tests" "viewTests" $selected)
         #buildTab($result "build-file" "viewBuildFile" $selected)
@@ -815,11 +815,11 @@
 #end
 
 ##
-## Outputs an action cell for viewing a command log for a build
+## Outputs an action cell for viewing the details for a build
 ##
 #macro(logCell $project $result)
     <td class="content">
-        <a href="viewCommandLog.action?id=$result.id">#wwtext("name=command.log")</a>
+        <a href="viewCommandLog.action?id=$result.id">#wwtext("name=detailed.view")</a>
     </td>
 #end
 
@@ -1309,7 +1309,7 @@
 ##
 #macro(nodeMessageSummary $build $node $level)
     #if($node.hasMessages($level))
-        <li class="header">#wwtext("name=recipe") :: $!webwork.htmlEncode("$node.result.recipeNameSafe @ $node.hostSafe")
+        <li class="header">#wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stage) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.hostSafe")
             <ul>
             #recipeMessageSummary($build $node.result $level false)
             #foreach($child in $node.children)
@@ -1325,7 +1325,7 @@
 ##
 #macro(nodeTestSummary $build $node)
     #if($node.hasBrokenTests())
-    <li class="header">#wwtext("name=recipe") :: $!webwork.htmlEncode("$node.result.recipeNameSafe @ $node.hostSafe")
+    <li class="header">#wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stage) :: $!webwork.htmlEncode("$node.result.recipeNameSafe @ $node.hostSafe")
         <ul>
             #recipeTestSummary($build $node.result)
         #foreach($child in $node.children)
@@ -1472,7 +1472,7 @@
 ##
 #macro(recipeNodeArtifacts $build $node)
     #if($node.hasArtifacts())
-        <li class="artifact"><span onclick="toggleList('${node.result.id}_artifacts');"><img alt="toggle" id="${node.result.id}_artifacts_image" src="/images/resultset_down.gif"/> #wwtext("name=recipe") :: $!webwork.htmlEncode($node.result.recipeNameSafe)</span>
+        <li class="artifact"><span onclick="toggleList('${node.result.id}_artifacts');"><img alt="toggle" id="${node.result.id}_artifacts_image" src="/images/resultset_down.gif"/> #wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stage) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.hostSafe")</span>
             <ul class="artifact" id="${node.result.id}_artifacts">
             #recipeArtifacts($build $node.result false)
             #foreach($child in $node.children)
@@ -1556,7 +1556,7 @@
     <table class="content">
         <tr>
             <th class="heading" colspan="5">
-                #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stage) [$!webwork.htmlEncode($recipeNode.result.recipeNameSafe)@$!webwork.htmlEncode($recipeNode.hostSafe)]
+                #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stage) :: $!webwork.htmlEncode("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")
             </th>
         </tr>
         <tr>
