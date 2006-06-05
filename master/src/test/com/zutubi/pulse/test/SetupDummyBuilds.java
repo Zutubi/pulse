@@ -209,7 +209,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createComplexSuccess(Project project, long number)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), number);
+        BuildResult result = createBuildResult(project, number);
         buildResultDao.save(result);
 
         List<Changelist> changelists = new LinkedList<Changelist>();
@@ -269,7 +269,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createInProgress(Project project)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), 1111);
+        BuildResult result = createBuildResult(project, 1111);
 
         result.commence(new File("test"));
         RecipeResultNode node = createInProgressRecipe();
@@ -277,9 +277,14 @@ public class SetupDummyBuilds implements Runnable
         buildResultDao.save(result);
     }
 
+    private BuildResult createBuildResult(Project project, long id)
+    {
+        return new BuildResult(new TriggerBuildReason("scm trigger"), project, getSpec(project), id);
+    }
+
     private void createPendingRecipes(Project project)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), 666);
+        BuildResult result = createBuildResult(project, 666);
 
         result.commence(new File("test"));
         RecipeResultNode root = createInProgressRecipe();
@@ -298,7 +303,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createCommandFailure(Project project, long id)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), id);
+        BuildResult result = createBuildResult(project, id);
 
         result.commence(new File("/complex/build/output/dir"));
         RecipeResultNode rootResultNode = createCommandFailedRecipe();
@@ -312,7 +317,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createBuildError(Project project, long id)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), id);
+        BuildResult result = createBuildResult(project, id);
 
         result.commence(new File("/complex/build/output/dir"));
         RecipeResultNode rootResultNode = createComplexRecipe("root recipe");
@@ -329,7 +334,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createWarningFeatures(Project project, long id)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), id);
+        BuildResult result = createBuildResult(project, id);
 
         result.commence(new File("/complex/build/output/dir"));
         RecipeResultNode rootResultNode = createWarningFeaturesRecipe();
@@ -342,7 +347,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createErrorFeatures(Project project)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), 10000);
+        BuildResult result = createBuildResult(project, 10000);
         buildResultDao.save(result);
         result.commence(new File("/complex/build/output/dir"));
         RecipeResultNode rootResultNode = createErrorFeaturesRecipe(project, result);
@@ -355,7 +360,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createTerminatingBuild(Project project)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), 101);
+        BuildResult result = createBuildResult(project, 101);
 
         result.commence(new File("/complex/build/output/dir"));
         RecipeResultNode node = createTerminatingRecipe();
@@ -366,7 +371,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createTestErrors(Project project)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), 666);
+        BuildResult result = createBuildResult(project, 666);
 
         buildResultDao.save(result);
         result.commence(System.currentTimeMillis());

@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
@@ -52,7 +53,7 @@ public class RecipeControllerTest extends PulseTestCase
         rootNode.addChild(childNode);
 
         recipeRequest = new RecipeRequest(rootResult.getId(), rootResult.getRecipeName());
-        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new LazyPulseFile(), recipeRequest, null);
+        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null);
         recipeController = new RecipeController(rootNode, dispatchRequest, resultCollector, recipeQueue, buildManager);
     }
 
@@ -69,7 +70,7 @@ public class RecipeControllerTest extends PulseTestCase
     public void testDispatchRequest()
     {
         // Initialising should cause a dispatch request, and should initialise the bootstrapper
-        Bootstrapper bootstrapper = new CheckoutBootstrapper(new Svn());
+        Bootstrapper bootstrapper = new CheckoutBootstrapper(new Svn(), new BuildRevision());
         recipeController.initialise(bootstrapper);
         assertTrue(recipeQueue.hasDispatched(rootResult.getId()));
         RecipeDispatchRequest dispatched = recipeQueue.getRequest(rootResult.getId());

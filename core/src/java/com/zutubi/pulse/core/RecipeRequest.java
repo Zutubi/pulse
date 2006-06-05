@@ -23,7 +23,8 @@ public class RecipeRequest
      */
     private Bootstrapper bootstrapper;
     /**
-     * Source used to retrieve the pulse file.
+     * The pulse file, potentially set lazily as it is determined (when
+     * revision is determined).
      */
     private String pulseFileSource;
     /**
@@ -31,7 +32,8 @@ public class RecipeRequest
      */
     private String recipeName;
     /**
-     * Required resources for the build.
+     * Required resources for the build.  If the pulse file is set lazily,
+     * some requirements may be added at that time.
      */
     private List<ResourceRequirement> resourceRequirements;
 
@@ -87,11 +89,6 @@ public class RecipeRequest
     public void setPulseFileSource(String pulseFileSource)
     {
         this.pulseFileSource = pulseFileSource;
-    }
-
-    public void prepare() throws PulseException
-    {
-        bootstrapper.prepare();
     }
 
     public List<ResourceRequirement> getResourceRequirements()

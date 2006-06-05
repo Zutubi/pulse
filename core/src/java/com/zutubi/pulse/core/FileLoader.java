@@ -158,26 +158,26 @@ public class FileLoader
                 }
             }
 
-            scope = new Scope(scope);
-
-            if (ScopeAware.class.isAssignableFrom(type.getClass()))
-            {
-                ((ScopeAware) type).setScope(scope);
-            }
-
-            if (ResourceAware.class.isAssignableFrom(type.getClass()))
-            {
-                ((ResourceAware) type).setResourceRepository(resourceRepository);
-            }
-
-            if (InitComponent.class.isAssignableFrom(type.getClass()))
-            {
-                ((InitComponent) type).initBeforeChildren();
-            }
-
             boolean loadType = predicate == null || predicate.loadType(type, e);
             if(loadType)
             {
+                scope = new Scope(scope);
+
+                if (ScopeAware.class.isAssignableFrom(type.getClass()))
+                {
+                    ((ScopeAware) type).setScope(scope);
+                }
+
+                if (ResourceAware.class.isAssignableFrom(type.getClass()))
+                {
+                    ((ResourceAware) type).setResourceRepository(resourceRepository);
+                }
+
+                if (InitComponent.class.isAssignableFrom(type.getClass()))
+                {
+                    ((InitComponent) type).initBeforeChildren();
+                }
+
                 // initialise sub-elements.
                 loadSubElements(e, type, resolveReferences, scope, typeHelper, depth, resourceRepository, predicate);
             }
@@ -192,14 +192,14 @@ public class FileLoader
                 parentHelper.add(parent, type);
             }
 
-            if (InitComponent.class.isAssignableFrom(type.getClass()))
-            {
-                ((InitComponent) type).initAfterChildren();
-            }
-
-            // Apply declarative validation
             if(loadType)
             {
+                if (InitComponent.class.isAssignableFrom(type.getClass()))
+                {
+                    ((InitComponent) type).initAfterChildren();
+                }
+
+                // Apply declarative validation
                 CommandValidationManager.validate(type, name);
             }
         }

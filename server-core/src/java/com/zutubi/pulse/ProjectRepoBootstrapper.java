@@ -13,45 +13,26 @@ import java.io.IOException;
  * directory and then runs an update when necessary, copying the results into the build directory.
  *
  */
-public class ProjectRepoBootstrapper implements InitialBootstrapper
+public class ProjectRepoBootstrapper implements Bootstrapper
 {
     /**
      * The local scm working directory.
      */
     private final File localDir;
-
     private final Scm scm;
-    private ScmBootstrapper bootstrapper;
+    private BuildRevision revision;
 
-    public ProjectRepoBootstrapper(File localDir, Scm scm)
+    public ProjectRepoBootstrapper(File localDir, Scm scm, BuildRevision revision)
     {
         this.localDir = localDir;
         this.scm = scm;
-    }
-
-    public void prepare() throws PulseException
-    {
-        if (!localDir.exists() && !localDir.mkdirs())
-        {
-            throw new PulseException("Failed to initialise local scm directory: " + localDir.getAbsolutePath());
-        }
-
-        bootstrapper = selectBootstrapper();
-        bootstrapper.prepare();
-    }
-
-    public Revision getRevision()
-    {
-        if (bootstrapper != null)
-        {
-            return bootstrapper.getRevision();
-        }
-        return null;
+        this.revision = revision;
     }
 
     public void bootstrap(RecipePaths paths) throws BuildException
     {
         // run the scm bootstrapper on the local directory,
+        ScmBootstrapper bootstrapper = selectBootstrapper();
         bootstrapper.bootstrap(new RecipePaths()
         {
             public File getBaseDir()
@@ -83,14 +64,19 @@ public class ProjectRepoBootstrapper implements InitialBootstrapper
 
     private ScmBootstrapper selectBootstrapper()
     {
+        if (!localDir.exists() && !localDir.mkdirs())
+        {
+            throw new BuildException("Failed to initialise local scm directory: " + localDir.getAbsolutePath());
+        }
+
         // else we can update.
         if (localDir.list().length == 0)
         {
-            return new CheckoutBootstrapper(scm);
+            return new CheckoutBootstrapper(scm, revision);
         }
         else
         {
-            return new UpdateBootstrapper(scm);
+            return new UpdateBootstrapper(scm, revision);
         }
     }
 }

@@ -207,7 +207,7 @@ public class SetupFeatureTour implements Runnable
     private void addBuildResult()
     {
         BuildResult previous = build;
-        build = new BuildResult(project, "default", ++buildNumber);
+        build = new BuildResult(new TriggerBuildReason("scm trigger"), project, "default", ++buildNumber);
         buildResultDao.save(build);
 
         recipe = new RecipeResult(null);

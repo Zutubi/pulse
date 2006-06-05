@@ -4,8 +4,8 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.InitialBootstrapper;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
@@ -41,6 +41,8 @@ public class BuildController implements EventListener
     private static final String TIMEOUT_TRIGGER_GROUP = "timeout";
     private static final Logger LOG = Logger.getLogger(BuildController.class);
 
+    private BuildRevision revision;
+    private BuildReason reason;
     private Project project;
     private BuildSpecification specification;
     private EventManager eventManager;
@@ -53,11 +55,12 @@ public class BuildController implements EventListener
     private AsynchronousDelegatingListener asyncListener;
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private Scheduler quartzScheduler;
-    private LazyPulseFile lazyPulseFile = new LazyPulseFile();
 
-    public BuildController(Project project, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, ConfigurationManager configManager)
+    public BuildController(BuildRequestEvent event, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, ConfigurationManager configManager)
     {
-        this.project = project;
+        this.revision = event.getRevision();
+        this.reason = event.getReason();
+        this.project = event.getProject();
         this.specification = specification;
         this.eventManager = eventManager;
         this.buildManager = buildManager;
@@ -95,7 +98,7 @@ public class BuildController implements EventListener
         tree = new BuildTree();
 
         TreeNode<RecipeController> root = tree.getRoot();
-        buildResult = new BuildResult(project, specification.getName(), buildManager.getNextBuildNumber(project));
+        buildResult = new BuildResult(reason, project, specification.getName(), buildManager.getNextBuildNumber(project));
         buildManager.save(buildResult);
         configure(root, buildResult.getRoot(), specification, specification.getRoot());
 
@@ -116,7 +119,7 @@ public class BuildController implements EventListener
             recipeResult.setOutputDir(paths.getOutputDir(project, buildResult, recipeResult.getId()).getAbsolutePath());
 
             RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe(), getResourceRequirements(specification, node));
-            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), lazyPulseFile, recipeRequest, buildResult);
+            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), revision, recipeRequest, buildResult);
             RecipeController rc = new RecipeController(childResultNode, dispatchRequest, collector, queue, buildManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
@@ -183,16 +186,16 @@ public class BuildController implements EventListener
         }
 
         // check project configuration to determine which bootstrap configuration should be used.
-        InitialBootstrapper initialBootstrapper;
+        Bootstrapper initialBootstrapper;
         boolean checkoutOnly = project.getCheckoutScheme() == Project.CheckoutScheme.CHECKOUT_ONLY;
         if (checkoutOnly)
         {
-            initialBootstrapper = new CheckoutBootstrapper(project.getScm());
+            initialBootstrapper = new CheckoutBootstrapper(project.getScm(), revision);
         }
         else
         {
             MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-            initialBootstrapper = new ProjectRepoBootstrapper(paths.getRepoDir(project), project.getScm());
+            initialBootstrapper = new ProjectRepoBootstrapper(paths.getRepoDir(project), project.getScm(), revision);
         }
         PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
         ComponentContext.autowire(pulseFileDetails);
@@ -269,12 +272,13 @@ public class BuildController implements EventListener
      * commenced.  It is at this point that the build is said to have
      * commenced.
      * <p/>
-     * TODO: this probably needs some review when we go distributed (timeouts
-     * at least).
+     * TODO: dev-distributed: timeouts should apply per recipe?  Otherwise
+     * something can be queued waiting for an agent and time out?
      */
     private void handleFirstCommenced(RecipeController controller)
     {
-        RecipeRequest request = controller.getDispatchRequest().getRequest();
+        RecipeDispatchRequest dispatchRequest = controller.getDispatchRequest();
+        RecipeRequest request = dispatchRequest.getRequest();
 
         // can retreive the revision from the dispatch request here
 
@@ -287,7 +291,7 @@ public class BuildController implements EventListener
             LOG.warning("Unable to save pulse file for build: " + e.getMessage(), e);
         }
 
-        getChanges((InitialBootstrapper) request.getBootstrapper());
+        getChanges(dispatchRequest.getRevision());
         buildResult.commence(controller.getResult().getStamps().getStartTime());
         if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
         {
@@ -296,10 +300,10 @@ public class BuildController implements EventListener
         buildManager.save(buildResult);
     }
 
-    private void getChanges(InitialBootstrapper bootstrapper)
+    private void getChanges(BuildRevision buildRevision)
     {
         Scm scm = project.getScm();
-        Revision revision = bootstrapper.getRevision();
+        Revision revision = buildRevision.getRevision();
         // collect scm changes to be added to the build results.
         List<Changelist> scmChanges = null;
 

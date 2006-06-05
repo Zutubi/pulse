@@ -15,6 +15,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware
 {
     public static final String PULSE_FILE = "pulse.xml";
 
+    private BuildReason reason;
     private Project project;
     private String buildSpecification;
     private long number;
@@ -30,14 +31,25 @@ public class BuildResult extends Result implements AclObjectIdentityAware
 
     }
 
-    public BuildResult(Project project, String buildSpecification, long number)
+    public BuildResult(BuildReason reason, Project project, String buildSpecification, long number)
     {
+        this.reason = reason;
         this.project = project;
         this.buildSpecification = buildSpecification;
         this.number = number;
         state = ResultState.INITIAL;
         root = new RecipeResultNode(null, null);
         hasWorkDir = true;
+    }
+
+    public BuildReason getReason()
+    {
+        return reason;
+    }
+
+    private void setReason(BuildReason reason)
+    {
+        this.reason = reason;
     }
 
     public Project getProject()

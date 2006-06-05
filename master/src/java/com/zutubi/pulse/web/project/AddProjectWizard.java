@@ -146,8 +146,7 @@ public class AddProjectWizard extends BaseWizard
 
         // create a simple build specification that executes the default recipe.
         BuildSpecificationNode parent = buildSpecificationNodeDao.findById(buildSpec.getRoot().getId());
-        BuildStage stage = new BuildStage();
-        stage.setHostRequirements(new MasterBuildHostRequirements());
+        BuildStage stage = new BuildStage("default", new AnyCapableBuildHostRequirements(), null);
         BuildSpecificationNode node = new BuildSpecificationNode(stage);
         parent.addChild(node);
         buildSpecificationNodeDao.save(parent);
