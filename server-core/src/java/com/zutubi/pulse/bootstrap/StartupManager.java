@@ -14,4 +14,6 @@ public interface StartupManager
     long getStartTime();
 
     void startApplication();
+
+    void continueApplicationStartup();
 }

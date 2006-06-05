@@ -1,0 +1,19 @@
+<html>
+<head>
+    <meta http-equiv="refresh" content='1;url='/>
+    <title>#wwtext("name=setup.processing.heading")</title>
+</head>
+
+<body>
+
+<h1>:: #wwtext("name=setup.processing.heading") ::</h1>
+
+<p>
+    #wwtext("name=setup.processing.info")
+</p>
+<p>
+    #wwtext("name=setup.manual.refresh.info")
+</p>
+
+</body>
+</html>

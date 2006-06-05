@@ -22,6 +22,7 @@ import com.opensymphony.xwork.Validateable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.io.IOException;
+import java.util.concurrent.Executors;
 
 /**
  * <class-comment/>
@@ -98,7 +99,15 @@ public class SetupWizard extends BaseWizard
 
         try
         {
-            setupManager.setupComplete();
+            // ensure that this runs in a separate thread so that the
+            // use can receive appropriate feedback.
+            Executors.newSingleThreadExecutor().execute(new Runnable()
+            {
+                public void run()
+                {
+                    setupManager.setupComplete();
+                }
+            });
         }
         catch (Exception e)
         {

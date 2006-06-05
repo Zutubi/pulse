@@ -17,7 +17,6 @@
 
     </package>
 
-
     <package name="setup" namespace="/setup" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
@@ -35,8 +34,13 @@
             <result name="admin" type="velocity">/setup/create-admin.vm</result>
             <result name="settings" type="velocity">/setup/server-settings.vm</result>
             <result name="cancel" type="redirect">/default.action</result>
-            <result name="success" type="redirect">/</result>
+            <result name="success" type="redirect">execute.action</result>
         </action>
+
+        <action name="execute" class="com.zutubi.pulse.web.setup.SetupActionSupport">
+            <result name="success" type="velocity">/system-setup.vm</result>
+        </action>
+
     </package>
 
 

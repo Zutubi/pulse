@@ -1,20 +1,16 @@
 package com.zutubi.pulse.web.setup;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.bootstrap.SimpleConfigurationManager;
-import com.zutubi.pulse.web.ActionSupport;
 
 import java.io.File;
 
 /**
  * <class-comment/>
  */
-public class ConfigurePulseDataAction extends ActionSupport
+public class ConfigurePulseDataAction extends SetupActionSupport
 {
     private ConfigurationManager configurationManager;
-
-    private SetupManager setupManager;
 
     private String data;
 
@@ -86,10 +82,5 @@ public class ConfigurePulseDataAction extends ActionSupport
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
-    }
-
-    public void setSetupManager(SetupManager setupManager)
-    {
-        this.setupManager = setupManager;
     }
 }

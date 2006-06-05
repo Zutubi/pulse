@@ -190,6 +190,13 @@ public class DefaultStartupManager implements StartupManager
         // i) set the system starting pages (periodically refresh)
         webManager.deployStartup();
 
+        continueApplicationStartup();
+    }
+
+    public void continueApplicationStartup()
+    {
+        WebManager webManager = (WebManager) ComponentContext.getBean("webManager");
+
         // load the application context.
         ComponentContext.addClassPathContextDefinitions(appContexts.toArray(new String[appContexts.size()]));
 

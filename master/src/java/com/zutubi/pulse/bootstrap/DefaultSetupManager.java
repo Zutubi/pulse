@@ -35,7 +35,9 @@ public class DefaultSetupManager implements SetupManager
     {
         Data data = configurationManager.getData();
         if (data == null || data.getData() == null)
+        {
             throw new IllegalStateException("");
+        }
 
         try
         {
@@ -63,9 +65,10 @@ public class DefaultSetupManager implements SetupManager
     public void setupComplete()
     {
         if (systemRequiresSetup() || systemRequiresUpgrade())
+        {
             throw new IllegalStateException();
-
-        startupManager.startApplication();
+        }
+        startupManager.continueApplicationStartup();
     }
 
     /**
