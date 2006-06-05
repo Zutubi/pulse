@@ -19,6 +19,7 @@ public class ViewBuildAction extends ProjectActionSupport
     private long id;
     private BuildResult result;
     private List<Changelist> changes;
+    private long selectedNode;
 
     public long getId()
     {
@@ -28,6 +29,21 @@ public class ViewBuildAction extends ProjectActionSupport
     public void setId(long id)
     {
         this.id = id;
+    }
+
+    public long getSelectedNode()
+    {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(long selectedNode)
+    {
+        this.selectedNode = selectedNode;
+    }
+
+    public boolean haveSelectedNode()
+    {
+        return selectedNode != 0L && selectedNode != result.getId();
     }
 
     public Project getProject()

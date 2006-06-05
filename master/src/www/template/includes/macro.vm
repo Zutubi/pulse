@@ -698,6 +698,14 @@
 ##
 #macro(statusCell $result)
     <td class="$result.state.string">
+        #statusImage($result)
+    </td>
+    <td class="$result.state.string">
+        $result.state.prettyString
+    </td>
+#end
+
+#macro(statusImage $result)
     #if($result.succeeded())
         <img alt="success" src="/images/accept.gif"/>
     #elseif($result.inProgress())
@@ -711,10 +719,6 @@
     #else
         &nbsp;
     #end
-    </td>
-    <td class="$result.state.string">
-        $result.state.prettyString
-    </td>
 #end
 
 #macro(aggregateResultCell $changelist)
@@ -780,13 +784,17 @@
 ##
 ## Outputs a result test summary cell
 ##
-#macro(testResultsCell $build $result)
+#macro(testResultsCell $build $recipe $result)
     <td class="$result.state.string">
     #set($summary = $result.testSummary)
     #if($summary.total == 0)
         #wwtext("name=tests.none")
     #else
-        <a href="viewTests.action?id=$build.id">
+        #if($recipe)
+            <a href="viewTests.action?id=$build.id&amp;selectedNode=$recipe.id">
+        #else
+            <a href="viewTests.action?id=$build.id">
+        #end
         #if($summary.allPassed())
             $action.getText("tests.all.passed", ["$summary.total"])
         #else
@@ -1058,31 +1066,47 @@
 #end
 
 ##
+## Header row for recipe summary
+##
+#macro(recipeSummaryHeader)
+    <tr>
+        #contentHeading("stage.name" 1)
+        #contentHeading("stage.recipe" 1)
+        #contentHeading("stage.host" 1)
+        #contentHeading("build.status" 2)
+        #contentHeading("build.tests" 1)
+        #contentHeading("build.when" 1)
+        #contentHeading("build.elapsed" 1)
+##        #contentHeading("actions" 1)
+    </tr>
+#end
+
+##
 ## Shows a summary for a recipe result
 ##
 #macro(recipeSummary $resultNode $build)
-    <table class="content">
-        #headingRow("recipe" 6)
-        <tr>
-            #contentHeading("recipe.name" 1)
-            #contentHeading("build.status" 2)
-            #contentHeading("build.tests" 1)
-            #contentHeading("build.when" 1)
-            #contentHeading("build.elapsed" 1)
-##            #contentHeading("actions" 1)
-        </tr>
         <tr>
             #set($id = $resultNode.id)
             #set($recipe = $resultNode.result)
             #set($cssClass = $recipe.state.string)
+            #dynamicLinkCell($resultNode.stage "/viewCommandLog.action?id=$build.id&amp;selectedNode=$resultNode.id")
             #dynamicCell($recipe.recipeNameSafe)
+            #dynamicCell($resultNode.hostSafe)
             #statusCell($recipe)
-            #testResultsCell($build $recipe)
+            #testResultsCell($build $recipe $recipe)
             #dateClassCell($recipe)
             #classCell($recipe.stamps.prettyElapsed)
 ##            #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$build.project.id")
         </tr>
+#end
+
+##
+## Shows summaries for all commands in a recipe
+##
+#macro(recipeCommands $resultNode $build)
 #if($recipe.commandResults.size() > 0)
+    #set($recipe = $resultNode.result)
+    <table class="content">
         #headingRow("commands" 6)
         <tr>
             #contentHeading("command.name" 1)
@@ -1094,15 +1118,19 @@
     #foreach($command in $recipe.commandResults)
         <tr>
             #set($cssClass = $command.state.string)
-            #dynamicLinkCell($command.commandName "viewCommandLog.action?id=$build.id#command-$velocityCount")
+            <td class="content">
+                <a href="#" id="nav_$command.id" onclick="selectNode('$command.id'); return false;">
+                    $!webwork.htmlEncode($command.commandName)
+                </a>
+            </td>
             #statusCell($command)
-            #testResultsCell($build $command)
+            #testResultsCell($build $recipe $command)
             #dateClassCell($command)
             #classCell($command.stamps.prettyElapsed)
         </tr>
     #end
-#end
     </table>
+#end
 #end
 
 ##
@@ -1313,7 +1341,7 @@
 ##
 #macro(buildMessageSummary $buildResult $level)
     #if($buildResult.hasMessages($level))
-        <h4>#wwtext("name=${level.toString().toLowerCase()}.messages")</h4>
+        <h3>#wwtext("name=${level.toString().toLowerCase()}.messages")</h3>
         <ul class="$level.toString().toLowerCase()">
         #resultMessageItems($buildResult $level)
         #foreach($node in $buildResult.root.children)
@@ -1477,76 +1505,72 @@
 ## Shows the main build result view (shared with project current build)
 ##
 #macro(showBuild $buildResult $showActions)
-    <table>
-        <tr><td>
-            <table class="content">
-                #headingRow("build.summary" 13)
-                <tr>
-                    #contentHeading("build.id" 1)
-                    #contentHeading("build.spec" 1)
-                    #contentHeading("build.status" 2)
-                    #contentHeading("build.tests" 1)
-                    #contentHeading("build.when" 1)
-                    #contentHeading("build.elapsed" 1)
+    <table class="content">
+        #headingRow("build.summary" 13)
+        <tr>
+            #contentHeading("build.id" 1)
+            #contentHeading("build.spec" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.tests" 1)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
     #if($showActions)
-                    #contentHeading("actions" 2)
+            #contentHeading("actions" 2)
     #end
-                </tr>
-                <tr>
-                    #set($cssClass = $buildResult.state.string)
-                    #rightCell($buildResult.number)
-                    #classCell($buildResult.buildSpecification)
-                    #statusCell($buildResult)
-                    #testResultsCell($buildResult $buildResult)
-                    #dateClassCell($buildResult)
-                    #classCell($buildResult.stamps.prettyElapsed)
+        </tr>
+        <tr>
+            #set($cssClass = $buildResult.state.string)
+            #rightCell($buildResult.number)
+            #classCell($buildResult.buildSpecification)
+            #statusCell($buildResult)
+            #testResultsCell($buildResult false $buildResult)
+            #dateClassCell($buildResult)
+            #classCell($buildResult.stamps.prettyElapsed)
     #if($showActions)
-                    #viewCell($project $buildResult)
-                    #changesCell($project $buildResult)
+            #viewCell($project $buildResult)
+            #changesCell($project $buildResult)
     #end
-                </tr>
-            </table>
-        </td></tr>
-    #if($buildResult.hasMessages($errorLevel) || $buildResult.hasMessages($warningLevel))
-        <tr><td>
-            <table class="content">
-                #headingRow("build.features" 1)
-               <tr>
-                   <td class="content-wrap">
-                       #buildMessageSummary($buildResult $errorLevel)
-                       #buildMessageSummary($buildResult $warningLevel)
-                   </td>
-               </tr>
-            </table>
-        </td></tr>
-    #end
-    #if($buildResult.hasBrokenTests())
-        <tr><td>
-            <table class="content">
-                #headingRow("test.failures" 5)
-                <tr>
-                    #contentHeading("test.name" 1)
-                    #contentHeading("test.status" 2)
-                    #contentHeading("test.details" 1)
-                    #contentHeading("test.duration" 1)
-                </tr>
-                #showRecipeTests($buildResult.root.children.get(0).result false)
-            </table>
-        </td></tr>
-    #end
-        <tr><td>
-##            <table class="content" width="100%">
-##                #headingRow("recipe" 1)
-##                <tr>
-##                    <td class="content">
-    #if($buildResult.root.children.size() > 0)
-                          #recipeSummary($buildResult.root.children.get(0) $buildResult)
-    #end
-##                    </td>
-##                </tr>
-##            </table>
-        </td></tr>
+        </tr>
     </table>
+
+    #if($buildResult.root.children.size() > 0)
+    <table class="content">
+        #headingRow("build.stages" 8)
+        #recipeSummaryHeader()
+        #foreach($recipeNode in $buildResult.root.children)
+        #recipeSummary($recipeNode $buildResult)
+        #end
+    </table>
+    #end
+
+    #if(!$showActions)
+        #if($buildResult.hasMessages($errorLevel) || $buildResult.hasMessages($warningLevel))
+    <h2 class="section">#wwtext("name=build.features")</h2>
+    #buildMessageSummary($buildResult $errorLevel)
+    #buildMessageSummary($buildResult $warningLevel)
+        #end
+        #if($buildResult.hasBrokenTests())
+    <h2 class="section">#wwtext("name=test.failures")</h2>
+            #foreach($recipeNode in $buildResult.root.children)
+                #if($recipeNode.hasBrokenTests())
+    <table class="content">
+        <tr>
+            <th class="heading" colspan="5">
+                #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stage) [$!webwork.htmlEncode($recipeNode.result.recipeNameSafe)@$!webwork.htmlEncode($recipeNode.hostSafe)]
+            </th>
+        </tr>
+        <tr>
+            #contentHeading("test.name" 1)
+            #contentHeading("test.status" 2)
+            #contentHeading("test.details" 1)
+            #contentHeading("test.duration" 1)
+        </tr>
+        #showRecipeTests($recipeNode.result false)
+    </table>
+                #end
+            #end
+        #end
+    #end
 #end
 
 #macro( contactPointIcon $contact)
@@ -1600,7 +1624,7 @@
             <td class="content-right"><a href="viewBuild.action?id=$lastResult.id">$lastResult.number</a></td>
             #classCell($lastResult.buildSpecification)
             #statusCell($lastResult)
-            #testResultsCell($lastResult $lastResult)
+            #testResultsCell($lastResult false $lastResult)
             #dateClassCell($lastResult)
             #classCell($lastResult.stamps.prettyElapsed)
             #viewCell($project $lastResult)
@@ -1753,7 +1777,7 @@
             #end
         #end
             <td class="content" width="10%">
-                $test.prettyDuration
+                $!webwork.htmlEncode($test.prettyDuration)
             </td>
         </tr>
 

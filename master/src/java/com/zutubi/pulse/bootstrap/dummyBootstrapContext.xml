@@ -51,7 +51,6 @@
                 </property>
                 <property name="templateRoots">
                     <list>
-                        <value type="java.io.File">server-core/src/www</value>
                         <value type="java.io.File">master/src/templates</value>
                         <value type="java.io.File">master/src/www</value>
                     </list>

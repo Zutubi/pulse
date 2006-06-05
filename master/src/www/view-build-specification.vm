@@ -37,18 +37,6 @@
 #else
         var selectedNode = "$specification.root.children.get(0).id";
 #end
-
-        function selectNode(id)
-        {
-            setClass("nav_" + selectedNode, "");
-            setClass("nav_" + id, "active");
-
-            var rightPane = getElement("stage_" + selectedNode);
-            rightPane.style.display = "none";
-            rightPane = getElement("stage_" + id);
-            rightPane.style.display = "block";
-            selectedNode = id;
-        }
     </script>
 </head>
 <body>
@@ -64,7 +52,7 @@
 
     #nodeResources($specification.root)
 
-    <h2 class="section" style="margin-bottom: 0px;">#wwtext("name=buildspec.stages")</h2>
+    <h2 class="twopane">#wwtext("name=buildspec.stages")</h2>
 
 #if($specification.root.children.size() > 0)
     <table class="twopane">
@@ -93,7 +81,7 @@
             <td class="rightpane">
     #foreach($node in $specification.root.children)
         #set($confirmMessage = $action.getText("buildspec.stage.confirm.delete", [$node.stage.recipeSafe, $node.stage.hostRequirements.summary]))
-                <div id="stage_$node.id" style="display: none">
+                <div id="node_$node.id" style="display: none">
                     <div class="panecontent">
                         <table class="content">
                             #aclEditHeadingRow("buildspec.stage.basics" 2 "editBuildStage!input.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id" "edit_$node.id" "project")
