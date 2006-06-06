@@ -44,6 +44,15 @@ public class DeleteBuildStageAction extends BuildStageActionSupport implements C
         }
 
         lookupNode();
+        if(hasErrors())
+        {
+            return;
+        }
+
+        if(getSpecification().getRoot().getChildren().size() == 1)
+        {
+            addActionError("A build specification must have at least one stage.");
+        }
     }
 
     public String execute()

@@ -15,7 +15,7 @@
     #wwhidden("name=specId")
     #wwhidden("name=projectId")
 
-    #wwtextfield("name=resourceRequirement.resource" "label=%{getText('buildspec.stage.resource')}" "tabindex=1")
+    #wwtextfield("name=resourceRequirement.resource" "label=%{getText('buildspec.stage.resource')}" "required=true" "tabindex=1")
     #wwtextfield("name=resourceRequirement.version" "label=%{getText('buildspec.stage.resource.version')}" "tabindex=2")
 
     #saveCancel(3)

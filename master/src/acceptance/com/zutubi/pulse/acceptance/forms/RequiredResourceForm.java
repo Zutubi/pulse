@@ -4,11 +4,11 @@ import net.sourceforge.jwebunit.WebTester;
 
 /**
  */
-public class BuildSpecForm extends BaseForm
+public class RequiredResourceForm extends BaseForm
 {
     private boolean create;
 
-    public BuildSpecForm(WebTester tester, boolean create)
+    public RequiredResourceForm(WebTester tester, boolean create)
     {
         super(tester);
         this.create = create;
@@ -18,16 +18,16 @@ public class BuildSpecForm extends BaseForm
     {
         if(create)
         {
-            return "createBuildSpecification";
+            return "addBuildStageResource";
         }
         else
         {
-            return "spec.edit"; 
+            return "editBuildStageResource";
         }
     }
 
     public String[] getFieldNames()
     {
-        return new String[]{"spec.name", "recipe", "timeoutEnabled", "timeout"};
+        return new String[] { "resourceRequirement.resource", "resourceRequirement.version" };
     }
 }
