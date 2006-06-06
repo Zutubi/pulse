@@ -16,6 +16,19 @@
                 window.myTree.anchor = "browse";
 
                 window.onload = init;
+
+                function copySelectedToParentForm()
+                {
+                    // - we need to be able to query the state of the tree.
+                    // -> a) get path
+                    // -> b) get selected
+                    var displayPath = window.myTree.displayPath;
+                    var selectedValue = window.myTree.selectedValue;
+
+                    var formFieldObject = opener.document.forms['$formname'].elements['$fieldname'];
+                    formFieldObject.value = displayPath + '\\' + selectedValue;
+                    window.close();
+                }
         // -->
     </script>
 
@@ -49,12 +62,12 @@
     <p></p>
 
     <div id="selectForm">
-        <form action="" onsubmit="window.close();">
+        <form name="form" action="" onsubmit="window.close();">
             <table>
                 <tr>
                     <td nowrap>Selected:</td>
                     <td><input id="selected" type="text" size="40"/></td>
-                    <td><input type="submit" value="select"/></td>
+                    <td><input type="submit" value="select" onclick="copySelectedToParentForm();"/></td>
                     <td><input type="submit" value="cancel"/></td>
                 </tr>
             </table>

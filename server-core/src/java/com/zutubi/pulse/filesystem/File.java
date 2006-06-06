@@ -35,4 +35,6 @@ public interface File
     String getName();
 
     String getPath();
+
+    String getAbsolutePath();
 }

@@ -11,7 +11,7 @@ function init ()
 
     // add loading place holder.
     var ul = document.createElement("ul");
-    ul.appendChild(createNewNode({"file":"Loading...", "type":"loading", "id":""}));
+    ul.appendChild(createNewNode({"file":"Loading...", "type":"loading", "uid":""}));
     anchorDiv.appendChild(ul);
 
     // trigger an initial load.
@@ -28,7 +28,7 @@ function load(event)
         // insert another level of the tree. <ul>loading...</ul>
 
         var ul = document.createElement("ul");
-        ul.appendChild(createNewNode({"file":"Loading...", "type":"loading", "id":""}));
+        ul.appendChild(createNewNode({"file":"Loading...", "type":"loading", "uid":""}));
 
         currentTarget.appendChild(ul);
 
@@ -61,10 +61,10 @@ function requestUpdate(id)
         url,
         {
             method: 'get',
-            onComplete: updateTree,
+            onComplete: updateFlat,
             onFailure: handleFailure,
             onException: handleException,
-            parameters:"encodedPath=" + id
+            parameters:"uid=" + id
         }
     );
 }
@@ -93,7 +93,7 @@ function updateTree(originalRequest)
     var jsonObj = eval("(" + jsonText + ")");
     var listing = jsonObj.listing;
 
-    var target = document.getElementById(jsonObj.path);
+    var target = document.getElementById(jsonObj.uid);
     if (!target)
     {
         target = document.getElementById(getConfig().anchor);
@@ -102,6 +102,14 @@ function updateTree(originalRequest)
     // clean the "loading..." out of the list.
     var ul = locateFirstChild(target, "UL");
     removeAllChildren(ul);
+
+    // add the '.' directory so that it can be selected. However, we do not want it to be
+    // reloaded since it is a special case that clears out all existing content...
+    if (!jsonObj.uid)
+    {
+        var thisDirectory = createNewNode({"file":".", "type":"root", "uid":""});
+        ul.appendChild(thisDirectory);
+    }
 
     for (var i = 0; i < listing.length; i++)
     {
@@ -125,17 +133,18 @@ function updateFlat(originalRequest)
     folder.appendChild(ul);
 
     // add the links to the current directory.
-    if (jsonObj.path)
+    var path = jsonObj.uid;
+    if (!path)
     {
-        var path = jsonObj.path;
-        var thisDirectory = createNewNode({"file":".", "type":"folder", "id":path});
-        ul.appendChild(thisDirectory);
+        path = "";
     }
+    var thisDirectory = createNewNode({"file":".", "type":"folder", "uid":path});
+    ul.appendChild(thisDirectory);
 
-    if (jsonObj.parentPath)
+    if (jsonObj.puid)
     {
-        var parentPath = jsonObj.parentPath;
-        var parentDirectory = createNewNode({"file":"..", "type":"folder", "id":parentPath});
+        var puid = jsonObj.puid;
+        var parentDirectory = createNewNode({"file":"..", "type":"folder", "uid":puid});
         ul.appendChild(parentDirectory);
     }
 
@@ -146,6 +155,8 @@ function updateFlat(originalRequest)
     }
 
     // display path if it is available.
+    getConfig().displayPath = jsonObj.displayPath;
+
     var currentPathDisplay = document.getElementById('path');
     if (currentPathDisplay)
     {
@@ -168,7 +179,7 @@ function createNewNode(data)
 {
     var node = document.createElement("li");
     node.appendChild(document.createTextNode(data.file));
-    node.setAttribute("id", data.id);
+    node.setAttribute("id", data.uid);
     Element.addClassName(node, data.type);
     if (data.type == "folder")
     {
@@ -206,6 +217,8 @@ function select(event)
         {
             return;
         }
+
+        getConfig().selectedValue = extractText(currentTarget);
 
         // update selected display.
         // - what is the currently selected name?

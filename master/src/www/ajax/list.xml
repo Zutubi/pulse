@@ -4,11 +4,11 @@
             <object>
                 <pair key="file">name</pair>
                 <pair key="type">type</pair>
-                <pair key="id">id</pair>
+                <pair key="uid">uid</pair>
             </object>
         </array>
     </pair>
-    <pair key="path">encodedPath</pair>
+    <pair key="uid">uid</pair>
+    <pair key="puid">puid</pair>
     <pair key="displayPath">path</pair>
-    <pair key="parentPath">parentPath</pair>
 </object>

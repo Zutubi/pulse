@@ -5,9 +5,13 @@
 </head>
     <body>
 
-        <p>
-            <a href="popups/browse-popup.action" onClick="window.open(this.href, 'browse_popup', 'width=500, height=450, resizable=yes', false); return false">popup</a>
-        </p>
-
+    <p>blurb</p>
+    <div style="margin:5em 2em;">
+        <form name="my.form" action="dd">
+            <input type="text" name="my.input"/>
+            <input type="submit" value="browse" onClick="window.open('popups/browse-popup.action?formname=my.form&fieldname=my.input', 'browse_popup', 'width=500, height=450, resizable=yes', false); return false"/>
+            <input type="submit" value="next"/>
+        </form>
+    </div>
     </body>
 </html>

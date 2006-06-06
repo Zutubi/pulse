@@ -1015,7 +1015,7 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="browse-popup" class="com.opensymphony.xwork.ActionSupport">
+        <action name="browse-popup" class="com.zutubi.pulse.web.tree.PopupFormAction">
             <result name="success" type="velocity">tree/browse-popup.vm</result>
         </action>
 
