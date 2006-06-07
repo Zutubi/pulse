@@ -252,7 +252,7 @@
     </macrodef>
 
     <!-- the command that rules them all. -->
-    <target name="build.module" depends="clean, prepare, build,  package, publish"/>
+    <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
 
 
 </project>
