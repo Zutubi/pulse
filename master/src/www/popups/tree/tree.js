@@ -58,12 +58,20 @@ function init (event)
     // need to find a way to extract the id of the root tree node from this file.
     var anchorDiv = document.getElementById(anchorId);
 
-    // add loading place holder.
+    // ensure that the model is correctly initialised. Use the root of this model as the first location
+    // to be displayed.
+    if (!getConfig().model)
+    {
+        getConfig().model = new MyNode();
+        getConfig().model.initialize();
+    }
+
+    // LOADING FEEDBACK.
     var ul = document.createElement("ul");
     ul.appendChild(createNewNode({"file":"Loading...", "type":"loading", "uid":""}));
     anchorDiv.appendChild(ul);
 
-    // trigger an initial load.
+    // TRIGGER LOAD OF THE ROOT NODE.
     requestUpdate("");
 }
 
@@ -113,12 +121,73 @@ function requestUpdate(id)
         url,
         {
             method: 'get',
-            onComplete: updateFlat,
+            onComplete: updateModel,
             onFailure: handleFailure,
             onException: handleException,
             parameters:"uid=" + id
         }
     );
+}
+
+/**
+ * Update the data model.
+ */
+function updateModel(originalRequest)
+{
+    var jsonText = originalRequest.responseText;
+    var jsonObj = eval("(" + jsonText + ")");
+
+    // locate where in the tree this update belongs.
+    var rootNode = getConfig().model;
+    var node = locateNode(rootNode, jsonObj.uid);
+    if (!node)
+    {
+        // the default.
+        node = rootNode;
+    }
+
+    // UPDATE THE MODEL WITH THE NEW DATA.
+    for (var i = 0; i < jsonObj.listing.length; i++)
+    {
+        // sanity check that we do not add components to the model a second time. This should be
+        // caught at an earlier stage.
+        var existingNode = node.getChildren().find(function(child)
+        {
+            return (child.data.uid == jsonObj.listing[i].uid);
+        });
+        if (existingNode)
+        {
+            console.log("skipping adding node a second time.");
+            continue;
+        }
+
+        var childNode = new MyNode();
+        childNode.initialize();
+        childNode.data = jsonObj.listing[i];
+        node.addChild(childNode);
+    }
+
+    // TRIGGER AN UPDATE OF THE UI. SHOULD THIS BE HANDLED VIA AN EVENT?
+    updateFlat(originalRequest);
+}
+
+//TODO: this traversal is too slow. Should generate a map of uid to nodes and use that instead.
+function locateNode(parentNode, uid)
+{
+    var node = null;
+    parentNode.getChildren().each(function(childNode)
+    {
+        if (childNode.data.uid == uid)
+        {
+            node = childNode;
+        }
+        var n = locateNode(childNode, uid);
+        if (n)
+        {
+            node = n;
+        }
+    });
+    return node;
 }
 
 /**
@@ -176,17 +245,13 @@ function updateFlat(originalRequest)
 
     var jsonText = originalRequest.responseText;
     var jsonObj = eval("(" + jsonText + ")");
-    var listing = jsonObj.listing;
 
-    // create some nodes.
-    var rootNode = new MyNode();
-    rootNode.initialize();
-    for (var i = 0; i < listing.length; i++)
+    // lookup the root node.
+
+    var rootNode = locateNode(getConfig().model, jsonObj.uid);
+    if (!rootNode)
     {
-        var childNode = new MyNode();
-        childNode.initialize();
-        childNode.data = listing[i];
-        rootNode.addChild(childNode);
+        rootNode = getConfig().model;
     }
 
     removeChild(folder);
