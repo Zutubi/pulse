@@ -261,17 +261,23 @@ function updateFlat(originalRequest)
     folder.appendChild(ul);
 
     // add the links to the current directory.
-    var path = jsonObj.uid;
-    if (!path)
+    var uid = "";
+    if (rootNode.data)
     {
-        path = "";
+        uid = rootNode.data.uid;
     }
-    var thisDirectory = createNewNode({"file":".", "type":"folder", "uid":path});
+
+    var thisDirectory = createNewNode({"file":".", "type":"folder", "uid":uid});
     ul.appendChild(thisDirectory);
 
-    if (jsonObj.puid)
+    // show link to the parent whenever we are not at the root.
+    if (rootNode.getParent())
     {
-        var puid = jsonObj.puid;
+        var puid = ""; // value for the root.
+        if (rootNode.getParent().data)
+        {
+            puid = rootNode.getParent().data.uid;
+        }
         var parentDirectory = createNewNode({"file":"..", "type":"folder", "uid":puid});
         ul.appendChild(parentDirectory);
     }
@@ -469,6 +475,7 @@ function locateFirstChild(elem, nodeName)
     // add Enumerable to childNodes
     var children = $A(elem.childNodes);
 
+/* old implementation
     var res = null;
     children.each(function(child) {
         var name = child.nodeName;
@@ -477,6 +484,13 @@ function locateFirstChild(elem, nodeName)
             res = child;
             return;
         }
+    });
+    return res;
+*/
+    var res = children.find(function(child)
+    {
+        var name = child.nodeName;
+        return (name && name.toUpperCase() == nodeName);
     });
     return res;
 }
