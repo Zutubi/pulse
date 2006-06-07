@@ -44,7 +44,7 @@ public class CreateResourceVersionAction extends ResourceActionSupport
 
         if (resource.hasVersion(version.getValue()))
         {
-            addFieldError("resourceVersion.value", "this resource already has a version '" + version.getValue() + "'");
+            addFieldError("version.value", "this resource already has a version '" + version.getValue() + "'");
         }
     }
 

@@ -13,7 +13,7 @@
         <tr>
             #contentHeading("resource.name" 1)
             #contentHeading("version" 1)
-            #contentHeading("property.name" 1)
+            #contentHeading("resource.property" 1)
             #contentHeading("property.value" 1)
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
             #contentHeading("actions" 2)
