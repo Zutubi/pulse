@@ -66,6 +66,13 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
         loginForm.loginFormElements(user, password, "false");
     }
 
+    protected void loginAsAdmin()
+    {
+        beginAt("/login.action");
+        LoginForm loginForm = new LoginForm(tester);
+        loginForm.loginFormElements("admin", "admin", "false");
+    }
+
     /**
      * Assert that the cookie has been set as part of the conversation with the
      * server.

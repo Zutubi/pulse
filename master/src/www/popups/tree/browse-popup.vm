@@ -2,12 +2,96 @@
 <html>
 <head>
     <title>file browser</title>
+
     <link rel="stylesheet" type="text/css" href="/popups/tree/tree.css"/>
     <script type="text/javascript" src="/prototype.js"></script>
     <script type="text/javascript" src="tree/tree.js"></script>
     <script type="text/javascript">
         <!--
-        window.onload = init;
+                // define the init properties that control the tree.
+                //TODO: This works, but there must be a better way to handle the initialisation process.
+                window.myTree = new Object();
+                window.myTree.url = "http://localhost:8080/ajax/list.action";
+                window.myTree.type = "flat";
+                window.myTree.anchor = "browse";
+
+                window.onload = doInit;
+                window.onresize = resize;
+
+                function doInit(event)
+                {
+                    init(event);
+                    resize(event);
+                }
+
+                function copySelectedToParentForm()
+                {
+                    // - we need to be able to query the state of the tree.
+                    // -> a) get path
+                    // -> b) get selected
+                    var displayPath = window.myTree.displayPath;
+                    var selectedValue = window.myTree.selectedValue;
+
+                    var formFieldObject = opener.document.forms['$formname'].elements['$fieldname'];
+                    formFieldObject.value = displayPath + '\\' + selectedValue;
+                    window.close();
+                }
+
+                function resize(event)
+                {
+                    var viewport = document.getElementById("view");
+                    var viewportDimension = Element.getDimensions(viewport);
+/*
+                    logsize("viewport", viewport);
+*/
+
+//                    Element.setStyle(viewport, {"width":(viewportDimension.width - 1) + "px", "height":viewportDimension.height + "px"});
+
+                    var pathHeight = Element.getDimensions(document.getElementById("pathElement")).height;
+                    var pathWidth = Element.getDimensions(document.getElementById("pathElement")).width;
+                    var formHeight = Element.getDimensions(document.getElementById("selectForm")).height;
+                    var windowHeight = windowSize().height;
+
+                    // todo: remove this fudge factor - it represents the height of the margins.
+                    var viewHeight = windowHeight - pathHeight - formHeight - 60;
+                    console.log("new height: %s", viewHeight)
+                    Element.setStyle(viewport, {"height":viewHeight + "px"});
+                    Element.setStyle(viewport, {"width":pathWidth + "px"});
+                }
+
+                function logsize(name, element)
+                {
+                    var dimensions = Element.getDimensions(element);
+                    console.log("%s: %s, %s", name, dimensions.width, dimensions.height);
+
+                }
+
+                 /*
+                 * Return the size of the window.
+                 */
+                function windowSize()
+                {
+                    var myWidth = 0, myHeight = 0;
+                    if (typeof( window.innerWidth ) == 'number')
+                    {
+                        //Non-IE
+                        myWidth = window.innerWidth;
+                        myHeight = window.innerHeight;
+                    }
+                    else if (document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ))
+                    {
+                        //IE 6+ in 'standards compliant mode'
+                        myWidth = document.documentElement.clientWidth;
+                        myHeight = document.documentElement.clientHeight;
+                    }
+                    else if (document.body && ( document.body.clientWidth || document.body.clientHeight ))
+                    {
+                        //IE 4 compatible
+                        myWidth = document.body.clientWidth;
+                        myHeight = document.body.clientHeight;
+                    }
+                    return {"width":myWidth, "height":myHeight};
+                }
         // -->
     </script>
 
@@ -18,35 +102,41 @@
             border-style:solid;
             overflow:auto;
         }
+        .bordered{
+            border-width:1px;
+            border-color:blue;
+            border-style:solid;
+        }
+
     </style>
+
 </head>
 
-<body>
+<body id="body">
 
-
-    <p id="pathElement">
-        Path:<span id="path"></span>
+    <p class="bordered" id="pathElement">
+        Path:&nbsp;<span id="path"></span>
     </p>
 
     <!--
     is it possible to tie the viewport size to the size
-    of the window? preferably it would take up the room not used
+    of the popup window? preferably it would take up the room not used
     by the toolbar top and form at the base of the page.
     -->
-    <div class="viewport" id="view" style="width:480px; height:150px;">
+    <div class="viewport" id="view">
         <div id="browse" class="tree">
         </div>
     </div>
 
     <p></p>
 
-    <div id="selectForm">
-        <form action="" onsubmit="window.close();">
+    <div class="bordered" id="selectForm">
+        <form name="form" action="" onsubmit="window.close();">
             <table>
                 <tr>
                     <td nowrap>Selected:</td>
-                    <td><input id="selected" type="text" size="45"/></td>
-                    <td><input type="submit" value="select"/></td>
+                    <td><input id="selected" type="text" size="40"/></td>
+                    <td><input type="submit" value="select" onclick="copySelectedToParentForm();"/></td>
                     <td><input type="submit" value="cancel"/></td>
                 </tr>
             </table>

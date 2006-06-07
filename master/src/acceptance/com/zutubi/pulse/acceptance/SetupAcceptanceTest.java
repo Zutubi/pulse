@@ -1,10 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
+import com.meterware.httpunit.WebRequest;
+import com.meterware.httpunit.WebResponse;
 import com.zutubi.pulse.acceptance.forms.setup.CreateAdminForm;
+import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
 import com.zutubi.pulse.acceptance.forms.setup.ServerSettingsForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
-import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
 import com.zutubi.pulse.test.LicenseHelper;
+import com.zutubi.pulse.util.Constants;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
 
 /**
  * A setup test that covers the systems setup procedure.
@@ -40,7 +46,7 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         super.tearDown();
     }
 
-    public void testSetupProcess()
+    public void testSetupProcess() throws InterruptedException, IOException, SAXException
     {
         // first we deal with the pulse home property configuration.
         beginAt("/");
@@ -59,6 +65,16 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
 
         // step four. configuring the server essentials.
         checkServerSettings();
+
+        // step five. setup in progress - simulate the auto refresh of the browser.
+        int delay = 0;
+        while ((delay = tester.getDialog().getResponse().getRefreshDelay()) > 0)
+        {
+            assertTextPresent("system setup");
+            Thread.sleep(delay * Constants.SECOND);
+            WebRequest req = tester.getDialog().getResponse().getRefreshRequest();
+            WebResponse resp = tester.getDialog().getWebClient().getResponse(req);
+        }
 
         // one complete, we should see the home page, and it should contain the following:
         assertTextPresent(":: welcome ::");

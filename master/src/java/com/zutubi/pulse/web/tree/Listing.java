@@ -7,7 +7,8 @@ public class Listing
 {
     protected String name;
     protected String type;
-    protected String id;
+    
+    protected String uid;
 
     public void setName(String name)
     {
@@ -19,9 +20,9 @@ public class Listing
         this.type = type;
     }
 
-    public void setId(String id)
+    public void setUid(String uid)
     {
-        this.id = id;
+        this.uid = uid;
     }
 
     public String getName()
@@ -34,8 +35,8 @@ public class Listing
         return type;
     }
 
-    public String getId()
+    public String getUid()
     {
-        return id;
+        return uid;
     }
 }

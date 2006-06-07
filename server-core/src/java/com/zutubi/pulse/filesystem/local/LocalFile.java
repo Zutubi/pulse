@@ -29,7 +29,12 @@ public class LocalFile implements File, Comparable
 
     public LocalFile getParentFile()
     {
-        return new LocalFile(fileSystem, file.getParentFile());
+        java.io.File parentFile = file.getParentFile();
+        if (parentFile != null)
+        {
+            return new LocalFile(fileSystem, parentFile);
+        }
+        return null;
     }
 
     public String getMimeType()
@@ -74,6 +79,11 @@ public class LocalFile implements File, Comparable
         }
 
         return path;
+    }
+
+    public String getAbsolutePath()
+    {
+        return file.getPath();
     }
 
     public int compareTo(Object o)

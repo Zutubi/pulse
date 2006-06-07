@@ -20,7 +20,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
     {
         super.setUp();
 
-        login("admin", "admin");
+        loginAsAdmin();
     }
 
     protected void tearDown() throws Exception

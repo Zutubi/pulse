@@ -34,7 +34,7 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
     protected void setUp() throws Exception
     {
         super.setUp();
-        login("admin", "admin");
+        loginAsAdmin();
 
         // start on the system information page.
         clickLinkWithText("administration");

@@ -1,28 +1,83 @@
-function init ()
+/**
+ * Simple node object that allows us to create a node tree.
+ */
+MyNode = function(){};
+MyNode.prototype = {
+
+    /**
+     * Constructor.
+     */
+    initialize: function() {
+        this.children = new $A(),
+        this.parent = null
+    },
+
+    /**
+     * Get the nodes children.
+     */
+    getChildren: function()
+    {
+        return this.children;
+    },
+
+    /**
+     * Add a new child to this node.
+     */
+    addChild: function(child)
+    {
+        // check that the child is not already a child.
+        this.children.push(child);
+        child.parent = this;
+    },
+
+    /**
+     * Returns true if this node instance has children, false otherwise.
+     */
+    hasChildren: function()
+    {
+        return this.children.length > 0;
+    },
+
+    /**
+     * Returns the parent of this node, or null if this is the root node.
+     */
+    getParent: function()
+    {
+        return this.parent;
+    }
+};
+
+/**
+ * Initialise the tree control.
+ *
+ */
+function init (event)
 {
+    var anchorId = getConfig().anchor;
+
     // need to find a way to extract the id of the root tree node from this file.
-    var rootDiv = document.getElementById("browse");
+    var anchorDiv = document.getElementById(anchorId);
 
-    // add loading place holder.
+    // ensure that the model is correctly initialised. Use the root of this model as the first location
+    // to be displayed.
+    if (!getConfig().model)
+    {
+        getConfig().model = new MyNode();
+        getConfig().model.initialize();
+    }
+
+    // LOADING FEEDBACK.
     var ul = document.createElement("ul");
-    ul.appendChild(createNewNode({"file":"Loading...", "type":"loading", "id":""}));
-    rootDiv.appendChild(ul);
-    rootDiv.subList = ul;
+    ul.appendChild(createNewNode({"file":"Loading...", "type":"loading", "uid":""}));
+    anchorDiv.appendChild(ul);
 
-    // trigger an initial load.
-    requestUpdate("root");
+    // TRIGGER LOAD OF THE ROOT NODE.
+    requestUpdate("");
 }
 
-function handleFailure(resp)
-{
-    alert("onFailure");
-}
-
-function handleException(resp, e)
-{
-    alert("onException: " + e);
-}
-
+/**
+ * Event handler.
+ */
 function load(event)
 {
     var currentTarget = getCurrentTarget(event);
@@ -33,10 +88,9 @@ function load(event)
         // insert another level of the tree. <ul>loading...</ul>
 
         var ul = document.createElement("ul");
-        ul.appendChild(createNewNode({"file":"Loading...", "type":"loading", "id":""}));
+        ul.appendChild(createNewNode({"file":"Loading...", "type":"loading", "uid":""}));
 
         currentTarget.appendChild(ul);
-        currentTarget.subList = ul;
 
         // now we change the onclick handler so that it handles toggling instead of loading.
         currentTarget.onclick = toggle;
@@ -50,20 +104,90 @@ function load(event)
     }
 }
 
+/**
+ * Simple encapsulation of the configuration object. This should simplify the fixing how
+ * the configuration details are passed around.
+ */
+function getConfig()
+{
+    return window.myTree;
+}
+
 function requestUpdate(id)
 {
-//    enterMethod("requestUpdate: " + id);
+    var url = getConfig().url;
+
     var ajax = new Ajax.Request(
-        "http://localhost:8080/ajax/list.action",
-        //"file:///C:/tmp/tree/listing.json",
+        url,
         {
             method: 'get',
-            onComplete: updateFlat,
+            onComplete: updateModel,
             onFailure: handleFailure,
             onException: handleException,
-            parameters:"encodedPath=" + id
+            parameters:"uid=" + id
         }
     );
+}
+
+/**
+ * Update the data model.
+ */
+function updateModel(originalRequest)
+{
+    var jsonText = originalRequest.responseText;
+    var jsonObj = eval("(" + jsonText + ")");
+
+    // locate where in the tree this update belongs.
+    var rootNode = getConfig().model;
+    var node = locateNode(rootNode, jsonObj.uid);
+    if (!node)
+    {
+        // the default.
+        node = rootNode;
+    }
+
+    // UPDATE THE MODEL WITH THE NEW DATA.
+    for (var i = 0; i < jsonObj.listing.length; i++)
+    {
+        // sanity check that we do not add components to the model a second time. This should be
+        // caught at an earlier stage.
+        var existingNode = node.getChildren().find(function(child)
+        {
+            return (child.data.uid == jsonObj.listing[i].uid);
+        });
+        if (existingNode)
+        {
+            console.log("skipping adding node a second time.");
+            continue;
+        }
+
+        var childNode = new MyNode();
+        childNode.initialize();
+        childNode.data = jsonObj.listing[i];
+        node.addChild(childNode);
+    }
+
+    // TRIGGER AN UPDATE OF THE UI. SHOULD THIS BE HANDLED VIA AN EVENT?
+    updateFlat(originalRequest);
+}
+
+//TODO: this traversal is too slow. Should generate a map of uid to nodes and use that instead.
+function locateNode(parentNode, uid)
+{
+    var node = null;
+    parentNode.getChildren().each(function(childNode)
+    {
+        if (childNode.data.uid == uid)
+        {
+            node = childNode;
+        }
+        var n = locateNode(childNode, uid);
+        if (n)
+        {
+            node = n;
+        }
+    });
+    return node;
 }
 
 /**
@@ -90,15 +214,22 @@ function updateTree(originalRequest)
     var jsonObj = eval("(" + jsonText + ")");
     var listing = jsonObj.listing;
 
-    var target = document.getElementById(jsonObj.path);
+    var target = document.getElementById(jsonObj.uid);
+    if (!target)
+    {
+        target = document.getElementById(getConfig().anchor);
+    }
 
     // clean the "loading..." out of the list.
-    var ul = target.subList;
-    var children = ul.childNodes;
-    for (var j = 0; j < children.length; j++)
+    var ul = locateFirstChild(target, "UL");
+    removeAllChildren(ul);
+
+    // add the '.' directory so that it can be selected. However, we do not want it to be
+    // reloaded since it is a special case that clears out all existing content...
+    if (!jsonObj.uid)
     {
-        var child = children[j];
-        ul.removeChild(child);
+        var thisDirectory = createNewNode({"file":".", "type":"root", "uid":""});
+        ul.appendChild(thisDirectory);
     }
 
     for (var i = 0; i < listing.length; i++)
@@ -110,12 +241,18 @@ function updateTree(originalRequest)
 
 function updateFlat(originalRequest)
 {
-//    enterMethod("updateFlat");
-    var folder = document.getElementById('browse');
+    var folder = document.getElementById(getConfig().anchor);
 
     var jsonText = originalRequest.responseText;
     var jsonObj = eval("(" + jsonText + ")");
-    var listing = jsonObj.listing;
+
+    // lookup the root node.
+
+    var rootNode = locateNode(getConfig().model, jsonObj.uid);
+    if (!rootNode)
+    {
+        rootNode = getConfig().model;
+    }
 
     removeChild(folder);
     clearSelection();
@@ -124,27 +261,37 @@ function updateFlat(originalRequest)
     folder.appendChild(ul);
 
     // add the links to the current directory.
-    if (jsonObj.path != "root")
+    var uid = "";
+    if (rootNode.data)
     {
-        var path = jsonObj.path;
-        var thisDirectory = createNewNode({"file":".", "type":"folder", "id":path});
-        ul.appendChild(thisDirectory);
+        uid = rootNode.data.uid;
     }
 
-    if (jsonObj.parentPath)
+    var thisDirectory = createNewNode({"file":".", "type":"folder", "uid":uid});
+    ul.appendChild(thisDirectory);
+
+    // show link to the parent whenever we are not at the root.
+    if (rootNode.getParent())
     {
-        var parentPath = jsonObj.parentPath;
-        var parentDirectory = createNewNode({"file":"..", "type":"folder", "id":parentPath});
+        var puid = ""; // value for the root.
+        if (rootNode.getParent().data)
+        {
+            puid = rootNode.getParent().data.uid;
+        }
+        var parentDirectory = createNewNode({"file":"..", "type":"folder", "uid":puid});
         ul.appendChild(parentDirectory);
     }
 
-    for (var i = 0; i < listing.length; i++)
+    // convert the data into a dom tree representation.
+    rootNode.getChildren().each(function(child)
     {
-        var listItem = createNewNode(listing[i]);
+        var listItem = createNewNode(child.data);
         ul.appendChild(listItem);
-    }
+    });
 
     // display path if it is available.
+    getConfig().displayPath = jsonObj.displayPath;
+
     var currentPathDisplay = document.getElementById('path');
     if (currentPathDisplay)
     {
@@ -155,9 +302,6 @@ function updateFlat(originalRequest)
             currentPathDisplay.appendChild(document.createTextNode(jsonObj.displayPath));
         }
     }
-
-
-//    exitMethod("updateFlat");
 }
 
 /**
@@ -168,10 +312,9 @@ function updateFlat(originalRequest)
  */
 function createNewNode(data)
 {
-//    enterMethod("createNewNode");
     var node = document.createElement("li");
     node.appendChild(document.createTextNode(data.file));
-    node.setAttribute("id", data.id);
+    node.setAttribute("id", data.uid);
     Element.addClassName(node, data.type);
     if (data.type == "folder")
     {
@@ -186,7 +329,6 @@ function createNewNode(data)
     {
         node.onclick = select;
     }
-//    exitMethod("createNewNode");
     return node;
 }
 
@@ -210,6 +352,8 @@ function select(event)
         {
             return;
         }
+
+        getConfig().selectedValue = extractText(currentTarget);
 
         // update selected display.
         // - what is the currently selected name?
@@ -252,13 +396,13 @@ function extractText(element)
  */
 function toggle(event)
 {
-//    enterMethod("toggle");
     var currentTarget = getCurrentTarget(event);
     if (this == currentTarget)
     {
         var node = this;
-        Element.toggle(node.subList);
-        if (Element.visible(node.subList))
+        var ul = locateFirstChild(node, "UL");
+        Element.toggle(ul);
+        if (Element.visible(ul))
         {
             replaceClassName(node, "folder", "openfolder");
         }
@@ -267,41 +411,38 @@ function toggle(event)
             replaceClassName(node, "openfolder", "folder");
         }
     }
-//    exitMethod("toggle");
 }
 
 function replaceClassName(element, oldClassName, newClassName)
 {
-//    enterMethod("replaceClassName");
     Element.removeClassName(element, oldClassName);
     Element.addClassName(element, newClassName);
-//    exitMethod("replaceClassName");
 }
 
 function removeChild(element)
 {
-//    enterMethod("removeChild")
     var children = element.childNodes;
     for (var j = 0; j < children.length; j++)
     {
         var child = children[j];
-        if (child.nodeType == 1 && (child.tagName == "ul" || child.tagName == "UL"))
+        if (child.nodeType == 1 && (child.tagName.toUpperCase() == "UL"))
         {
             Element.remove(child);
         }
     }
-//    exitMethod("removeChild")
 }
 
+/**
+ * Remove all of the child nodes from the specified element.
+ */
 function removeAllChildren(element)
 {
-//    enterMethod("removeAllChildren");
-    var children = element.childNodes;
-    for (var j = 0; j < children.length; j++)
+    var children = $A(element.childNodes);
+    children.each(function(child)
     {
-        var child = children[j];
-        element.removeChild(child);
-    }
+        // remove the child element from the document.
+        Element.remove(child);
+    });
 }
 
 function getCurrentTarget(event)
@@ -322,14 +463,36 @@ function clearBrowserTextSelection()
     }
 }
 
-function enterMethod(method)
+/**
+ * Locate and return the first child of the specified element that has a nodeName property
+ * that matches the specified nodeName.
+ *
+ */
+function locateFirstChild(elem, nodeName)
 {
-    alert(method + ": enter");
-}
+    nodeName = nodeName.toUpperCase();
 
-function exitMethod(method)
-{
-    alert(method + ": exit");
+    // add Enumerable to childNodes
+    var children = $A(elem.childNodes);
+
+/* old implementation
+    var res = null;
+    children.each(function(child) {
+        var name = child.nodeName;
+        if (name && name.toUpperCase() == nodeName)
+        {
+            res = child;
+            return;
+        }
+    });
+    return res;
+*/
+    var res = children.find(function(child)
+    {
+        var name = child.nodeName;
+        return (name && name.toUpperCase() == nodeName);
+    });
+    return res;
 }
 
 function debug(element)
@@ -351,4 +514,22 @@ function debug(element)
         i++;
     }
     alert(debugging);
+}
+
+/**
+ * Basic failure handler.
+ *
+ */
+function handleFailure(resp)
+{
+    alert("onFailure");
+}
+
+/**
+ * Basic exception handler.
+ *
+ */
+function handleException(resp, e)
+{
+    alert("onException: " + e);
 }

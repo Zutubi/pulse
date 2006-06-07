@@ -31,7 +31,7 @@ public class RssAcceptanceTest extends BaseAcceptanceTest
     {
         super.setUp();
 
-        login("admin", "admin");
+        loginAsAdmin();
 
         projectName = createTestProject();
     }

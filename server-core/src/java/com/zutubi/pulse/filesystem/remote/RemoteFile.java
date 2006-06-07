@@ -107,6 +107,11 @@ public class RemoteFile implements File, Comparable
         return path;
     }
 
+    public String getAbsolutePath()
+    {
+        return null;
+    }
+
     public int compareTo(Object o)
     {
         RemoteFile other = (RemoteFile) o;
