@@ -183,7 +183,7 @@ public abstract class Result extends Entity
         return state;
     }
 
-    private void setState(ResultState state)
+    public void setState(ResultState state)
     {
         this.state = state;
     }
