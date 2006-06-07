@@ -1,8 +1,57 @@
 /**
+ * Simple node object that allows us to create a node tree.
+ */
+MyNode = function(){};
+MyNode.prototype = {
+
+    /**
+     * Constructor.
+     */
+    initialize: function() {
+        this.children = new $A(),
+        this.parent = null
+    },
+
+    /**
+     * Get the nodes children.
+     */
+    getChildren: function()
+    {
+        return this.children;
+    },
+
+    /**
+     * Add a new child to this node.
+     */
+    addChild: function(child)
+    {
+        // check that the child is not already a child.
+        this.children.push(child);
+        child.parent = this;
+    },
+
+    /**
+     * Returns true if this node instance has children, false otherwise.
+     */
+    hasChildren: function()
+    {
+        return this.children.length > 0;
+    },
+
+    /**
+     * Returns the parent of this node, or null if this is the root node.
+     */
+    getParent: function()
+    {
+        return this.parent;
+    }
+};
+
+/**
  * Initialise the tree control.
  *
  */
-function init ()
+function init (event)
 {
     var anchorId = getConfig().anchor;
 
@@ -18,6 +67,9 @@ function init ()
     requestUpdate("");
 }
 
+/**
+ * Event handler.
+ */
 function load(event)
 {
     var currentTarget = getCurrentTarget(event);
@@ -126,6 +178,17 @@ function updateFlat(originalRequest)
     var jsonObj = eval("(" + jsonText + ")");
     var listing = jsonObj.listing;
 
+    // create some nodes.
+    var rootNode = new MyNode();
+    rootNode.initialize();
+    for (var i = 0; i < listing.length; i++)
+    {
+        var childNode = new MyNode();
+        childNode.initialize();
+        childNode.data = listing[i];
+        rootNode.addChild(childNode);
+    }
+
     removeChild(folder);
     clearSelection();
 
@@ -148,11 +211,12 @@ function updateFlat(originalRequest)
         ul.appendChild(parentDirectory);
     }
 
-    for (var i = 0; i < listing.length; i++)
+    // convert the data into a dom tree representation.
+    rootNode.getChildren().each(function(child)
     {
-        var listItem = createNewNode(listing[i]);
+        var listItem = createNewNode(child.data);
         ul.appendChild(listItem);
-    }
+    });
 
     // display path if it is available.
     getConfig().displayPath = jsonObj.displayPath;

@@ -15,7 +15,14 @@
                 window.myTree.type = "flat";
                 window.myTree.anchor = "browse";
 
-                window.onload = init;
+                window.onload = doInit;
+                window.onresize = resize;
+
+                function doInit(event)
+                {
+                    init(event);
+                    resize(event);
+                }
 
                 function copySelectedToParentForm()
                 {
@@ -29,6 +36,62 @@
                     formFieldObject.value = displayPath + '\\' + selectedValue;
                     window.close();
                 }
+
+                function resize(event)
+                {
+                    var viewport = document.getElementById("view");
+                    var viewportDimension = Element.getDimensions(viewport);
+/*
+                    logsize("viewport", viewport);
+*/
+
+//                    Element.setStyle(viewport, {"width":(viewportDimension.width - 1) + "px", "height":viewportDimension.height + "px"});
+
+                    var pathHeight = Element.getDimensions(document.getElementById("pathElement")).height;
+                    var pathWidth = Element.getDimensions(document.getElementById("pathElement")).width;
+                    var formHeight = Element.getDimensions(document.getElementById("selectForm")).height;
+                    var windowHeight = windowSize().height;
+
+                    // todo: remove this fudge factor - it represents the height of the margins.
+                    var viewHeight = windowHeight - pathHeight - formHeight - 60;
+                    console.log("new height: %s", viewHeight)
+                    Element.setStyle(viewport, {"height":viewHeight + "px"});
+                    Element.setStyle(viewport, {"width":pathWidth + "px"});
+                }
+
+                function logsize(name, element)
+                {
+                    var dimensions = Element.getDimensions(element);
+                    console.log("%s: %s, %s", name, dimensions.width, dimensions.height);
+
+                }
+
+                 /*
+                 * Return the size of the window.
+                 */
+                function windowSize()
+                {
+                    var myWidth = 0, myHeight = 0;
+                    if (typeof( window.innerWidth ) == 'number')
+                    {
+                        //Non-IE
+                        myWidth = window.innerWidth;
+                        myHeight = window.innerHeight;
+                    }
+                    else if (document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ))
+                    {
+                        //IE 6+ in 'standards compliant mode'
+                        myWidth = document.documentElement.clientWidth;
+                        myHeight = document.documentElement.clientHeight;
+                    }
+                    else if (document.body && ( document.body.clientWidth || document.body.clientHeight ))
+                    {
+                        //IE 4 compatible
+                        myWidth = document.body.clientWidth;
+                        myHeight = document.body.clientHeight;
+                    }
+                    return {"width":myWidth, "height":myHeight};
+                }
         // -->
     </script>
 
@@ -39,13 +102,19 @@
             border-style:solid;
             overflow:auto;
         }
+        .bordered{
+            border-width:1px;
+            border-color:blue;
+            border-style:solid;
+        }
+
     </style>
 
 </head>
 
-<body>
+<body id="body">
 
-    <p id="pathElement">
+    <p class="bordered" id="pathElement">
         Path:&nbsp;<span id="path"></span>
     </p>
 
@@ -54,14 +123,14 @@
     of the popup window? preferably it would take up the room not used
     by the toolbar top and form at the base of the page.
     -->
-    <div class="viewport" id="view" style="width:30em; height:20em;">
+    <div class="viewport" id="view">
         <div id="browse" class="tree">
         </div>
     </div>
 
     <p></p>
 
-    <div id="selectForm">
+    <div class="bordered" id="selectForm">
         <form name="form" action="" onsubmit="window.close();">
             <table>
                 <tr>
