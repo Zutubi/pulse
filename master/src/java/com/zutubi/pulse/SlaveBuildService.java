@@ -1,19 +1,20 @@
 package com.zutubi.pulse;
 
 import com.caucho.hessian.client.HessianRuntimeException;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.model.ResourceManager;
+import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.model.Slave;
-import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.ZipInputStream;
@@ -61,37 +62,54 @@ public class SlaveBuildService implements BuildService
 
     public void collectResults(long recipeId, File outputDest, File workDest)
     {
+        collect(recipeId, true, outputDest);
+        collect(recipeId, false, workDest);
+    }
+
+    private void collect(long recipeId, boolean output, File destination)
+    {
         ZipInputStream zis = null;
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
 
         try
         {
-            // Pull down the result from the slave then explode to dir
-            URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?output=true&recipe=" + recipeId);
+            URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?output=" + output + "&recipe=" + recipeId);
             URLConnection urlConnection = resultUrl.openConnection();
 
-            // take url connection input stream and write contents to directory.
-            zis = new ZipInputStream(urlConnection.getInputStream());
-            FileSystemUtils.extractZip(zis, outputDest);
+            // originally the zip stream was unzipped as read from the
+            // servlet, however this resulted in socket errors on the
+            // servlet side (I think when the zip was bigger than a
+            // buffer).
+
+            // take url connection input stream and write contents to zip file
+            File zipFile = new File(destination.getAbsolutePath() + ".zip");
+            fos = new FileOutputStream(zipFile);
+            IOUtils.joinStreams(urlConnection.getInputStream(), fos);
+            IOUtils.close(urlConnection.getInputStream());
+            IOUtils.close(fos);
+            fos = null;
+
+            // now unzip the file
+            fis = new FileInputStream(zipFile);
+            zis = new ZipInputStream(fis);
+            FileSystemUtils.extractZip(zis, destination);
+            IOUtils.close(fis);
+            fis = null;
             IOUtils.close(zis);
             zis = null;
 
-            resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?output=false&recipe=" + recipeId);
-            urlConnection = resultUrl.openConnection();
-            zis = new ZipInputStream(urlConnection.getInputStream());
-            FileSystemUtils.extractZip(zis, workDest);
-        }
-        catch (MalformedURLException e)
-        {
-            // Programmer error
-            e.printStackTrace();
+            zipFile.delete();
         }
         catch (IOException e)
         {
-            throw new BuildException("Error downloading results from slave '" + slave.getName() + ": " + e.getMessage(), e);
+            throw new BuildException("Error downloading results from agent '" + slave.getName() + ": " + e.getMessage(), e);
         }
         finally
         {
             IOUtils.close(zis);
+            IOUtils.close(fis);
+            IOUtils.close(fos);
         }
     }
 
