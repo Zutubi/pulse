@@ -8,7 +8,7 @@
 <body>
     #agentTabs("status")
 
-    <table class="content">
+    <table id="agent.status" class="content">
         #headingRow("agent.status" 2)
         #dynamicRow("agent.name" $agent.name)
         #dynamicRow("agent.location" $agent.location)

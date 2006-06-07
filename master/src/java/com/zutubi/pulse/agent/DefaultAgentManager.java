@@ -1,25 +1,25 @@
 package com.zutubi.pulse.agent;
 
-import com.zutubi.pulse.model.Slave;
-import com.zutubi.pulse.model.SlaveManager;
-import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.MasterBuildService;
 import com.zutubi.pulse.MasterRecipeProcessor;
-import com.zutubi.pulse.SlaveProxyFactory;
 import com.zutubi.pulse.SlaveBuildService;
-import com.zutubi.pulse.logging.ServerMessagesHandler;
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.util.Sort;
-import com.zutubi.pulse.events.SlaveAvailableEvent;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.SlaveUnavailableEvent;
-import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.SlaveProxyFactory;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.SlaveAvailableEvent;
+import com.zutubi.pulse.events.SlaveUnavailableEvent;
+import com.zutubi.pulse.logging.ServerMessagesHandler;
+import com.zutubi.pulse.model.ResourceManager;
+import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.model.SlaveManager;
+import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.util.Sort;
+import com.zutubi.pulse.util.logging.Logger;
 
+import java.net.MalformedURLException;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
-import java.net.MalformedURLException;
 
 /**
  */
@@ -51,9 +51,9 @@ public class DefaultAgentManager implements AgentManager
 
     private void refreshSlaveAgents()
     {
+        lock.lock();
         try
         {
-            lock.lock();
             slaveAgents = new TreeMap<Long, SlaveAgent>();
             for (Slave slave : slaveManager.getAll())
             {
@@ -88,9 +88,9 @@ public class DefaultAgentManager implements AgentManager
 
     public void pingSlaves()
     {
+        lock.lock();
         try
         {
-            lock.lock();
             for (SlaveAgent agent: slaveAgents.values())
             {
                 pingSlave(agent);
@@ -149,10 +149,9 @@ public class DefaultAgentManager implements AgentManager
 
     public List<Agent> getOnlineAgents()
     {
+        lock.lock();
         try
         {
-            lock.lock();
-
             List<Agent> online = new LinkedList<Agent>();
             online.add(masterAgent);
 
@@ -180,9 +179,9 @@ public class DefaultAgentManager implements AgentManager
         }
         else
         {
+            lock.lock();
             try
             {
-                lock.lock();
                 return slaveAgents.get(slave.getId());
             }
             finally
@@ -192,14 +191,14 @@ public class DefaultAgentManager implements AgentManager
         }
     }
 
-    public void newSlave(long id)
+    public void slaveAdded(long id)
     {
         Slave slave = slaveManager.getSlave(id);
         if(slave != null)
         {
+            lock.lock();
             try
             {
-                lock.lock();
                 addSlaveAgent(slave);
             }
             finally
@@ -214,9 +213,9 @@ public class DefaultAgentManager implements AgentManager
         Slave slave = slaveManager.getSlave(id);
         if(slave != null)
         {
+            lock.lock();
             try
             {
-                lock.lock();
                 SlaveAgent agent = slaveAgents.remove(id);
                 eventManager.publish(new SlaveUnavailableEvent(this, agent.getSlave()));
                 addSlaveAgent(slave);
@@ -225,6 +224,20 @@ public class DefaultAgentManager implements AgentManager
             {
                 lock.unlock();
             }
+        }
+    }
+
+    public void slaveDeleted(long id)
+    {
+        lock.lock();
+        try
+        {
+            SlaveAgent agent = slaveAgents.remove(id);
+            eventManager.publish(new SlaveUnavailableEvent(this, agent.getSlave()));
+        }
+        finally
+        {
+            lock.unlock();
         }
     }
 

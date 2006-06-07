@@ -14,6 +14,7 @@ public interface AgentManager
 
     public void pingSlaves();
 
-    public void newSlave(long id);
+    public void slaveAdded(long id);
     public void slaveChanged(long id);
+    public void slaveDeleted(long id);
 }

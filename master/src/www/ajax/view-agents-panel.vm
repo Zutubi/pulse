@@ -22,8 +22,8 @@
         #staticCell($agent.status.toString().toLowerCase())
     #if($agent.isSlave())
         #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-        #editCell("editAgent!input.action?id=$agent.id" "edit_$!webwork.htmlEncode($agent.id)")
-        #deleteCell($confirmMessage "deleteAgent.action?id=$agent.id" "delete_$!webwork.htmlEncode($agent.id)")
+        #editCell("editAgent!input.action?id=$agent.id" "edit_$!webwork.htmlEncode($agent.name)")
+        #deleteCell($confirmMessage "deleteAgent.action?id=$agent.id" "delete_$!webwork.htmlEncode($agent.name)")
         #end
     #else
         #contentCell("empty.cell")

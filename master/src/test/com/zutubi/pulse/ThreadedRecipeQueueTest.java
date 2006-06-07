@@ -1,22 +1,22 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.build.RecipeCompletedEvent;
-import com.zutubi.pulse.events.build.RecipeErrorEvent;
-import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
-import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.SlaveAgent;
-import com.zutubi.pulse.scm.SCMServer;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMChangeEvent;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.build.RecipeCompletedEvent;
+import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
+import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.scm.SCMChangeEvent;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
 import junit.framework.TestCase;
 
 import java.io.File;
@@ -756,12 +756,17 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void newSlave(long id)
+        public void slaveAdded(long id)
         {
             throw new RuntimeException("Method not implemented.");
         }
 
         public void slaveChanged(long id)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public void slaveDeleted(long id)
         {
             throw new RuntimeException("Method not implemented.");
         }

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.agents;
 
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.agent.AgentManager;
 
 /**
  * 
@@ -39,7 +39,7 @@ public class AddAgentAction extends ActionSupport
     public String execute()
     {
         slaveManager.save(slave);
-        agentManager.newSlave(slave.getId());
+        agentManager.slaveAdded(slave.getId());
         return SUCCESS;
     }
 
