@@ -146,7 +146,10 @@ public class LocalFileSystem implements FileSystem
         File[] files = dir.listFiles();
         for (File file : files)
         {
-            listing.add(new LocalFile(this, file));
+            if (!file.isHidden())
+            {
+                listing.add(new LocalFile(this, file));
+            }
         }
         return listing.toArray(new LocalFile[listing.size()]);
     }

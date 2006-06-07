@@ -9,6 +9,5 @@
         </array>
     </pair>
     <pair key="uid">uid</pair>
-    <pair key="puid">puid</pair>
     <pair key="displayPath">path</pair>
 </object>

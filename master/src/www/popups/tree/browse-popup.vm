@@ -26,14 +26,8 @@
 
                 function copySelectedToParentForm()
                 {
-                    // - we need to be able to query the state of the tree.
-                    // -> a) get path
-                    // -> b) get selected
-                    var displayPath = window.myTree.displayPath;
-                    var selectedValue = window.myTree.selectedValue;
-
                     var formFieldObject = opener.document.forms['$formname'].elements['$fieldname'];
-                    formFieldObject.value = displayPath + '\\' + selectedValue;
+                    formFieldObject.value = currentSelectionValue();
                     window.close();
                 }
 

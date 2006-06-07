@@ -51,7 +51,7 @@ MyNode.prototype = {
  * Initialise the tree control.
  *
  */
-function init (event)
+function init(event)
 {
     var anchorId = getConfig().anchor;
 
@@ -68,7 +68,7 @@ function init (event)
 
     // LOADING FEEDBACK.
     var ul = document.createElement("ul");
-    ul.appendChild(createNewNode({"file":"Loading...", "type":"loading", "uid":""}));
+    ul.appendChild(createDomNode(createTemporaryNode("Loading...", "loading", "")));
     anchorDiv.appendChild(ul);
 
     // TRIGGER LOAD OF THE ROOT NODE.
@@ -88,7 +88,7 @@ function load(event)
         // insert another level of the tree. <ul>loading...</ul>
 
         var ul = document.createElement("ul");
-        ul.appendChild(createNewNode({"file":"Loading...", "type":"loading", "uid":""}));
+        ul.appendChild(createDomNode(createTemporaryNode("Loading...", "loading", "")));
 
         currentTarget.appendChild(ul);
 
@@ -168,7 +168,7 @@ function updateModel(originalRequest)
     }
 
     // TRIGGER AN UPDATE OF THE UI. SHOULD THIS BE HANDLED VIA AN EVENT?
-    updateFlat(originalRequest);
+    updateTree(originalRequest);
 }
 
 //TODO: this traversal is too slow. Should generate a map of uid to nodes and use that instead.
@@ -212,31 +212,37 @@ function updateTree(originalRequest)
 {
     var jsonText = originalRequest.responseText;
     var jsonObj = eval("(" + jsonText + ")");
-    var listing = jsonObj.listing;
 
+    // LOCATE THE POINT IN THE DOM THAT WE WILL BE UPDATING.
     var target = document.getElementById(jsonObj.uid);
     if (!target)
     {
         target = document.getElementById(getConfig().anchor);
     }
 
-    // clean the "loading..." out of the list.
+    // REMOVE ANY EXISTING LOADING MESSAGE
     var ul = locateFirstChild(target, "UL");
     removeAllChildren(ul);
 
-    // add the '.' directory so that it can be selected. However, we do not want it to be
-    // reloaded since it is a special case that clears out all existing content...
-    if (!jsonObj.uid)
+    var rootNode = locateNode(getConfig().model, jsonObj.uid);
+    if (!rootNode)
     {
-        var thisDirectory = createNewNode({"file":".", "type":"root", "uid":""});
+        rootNode = getConfig().model;
+
+        // add the '.' directory so that it can be selected. However, we do not want it to be
+        // reloaded since it is a special case that clears out all existing content...
+        var thisDirectory = createDomNode(createTemporaryNode(".", "root", ""));
         ul.appendChild(thisDirectory);
     }
 
-    for (var i = 0; i < listing.length; i++)
+    // convert the data into a dom tree representation.
+    rootNode.getChildren().each(function(child)
     {
-        var listItem = createNewNode(listing[i]);
+        var listItem = createDomNode(child);
         ul.appendChild(listItem);
-    }
+    });
+
+    updateDisplayPath(jsonObj);
 }
 
 function updateFlat(originalRequest)
@@ -267,7 +273,7 @@ function updateFlat(originalRequest)
         uid = rootNode.data.uid;
     }
 
-    var thisDirectory = createNewNode({"file":".", "type":"folder", "uid":uid});
+    var thisDirectory = createDomNode(createTemporaryNode(".", "folder", uid));
     ul.appendChild(thisDirectory);
 
     // show link to the parent whenever we are not at the root.
@@ -278,17 +284,22 @@ function updateFlat(originalRequest)
         {
             puid = rootNode.getParent().data.uid;
         }
-        var parentDirectory = createNewNode({"file":"..", "type":"folder", "uid":puid});
+        var parentDirectory = createDomNode(createTemporaryNode("..", "folder", puid));
         ul.appendChild(parentDirectory);
     }
 
     // convert the data into a dom tree representation.
     rootNode.getChildren().each(function(child)
     {
-        var listItem = createNewNode(child.data);
+        var listItem = createDomNode(child);
         ul.appendChild(listItem);
     });
 
+    updateDisplayPath(jsonObj);
+}
+
+function updateDisplayPath(jsonObj)
+{
     // display path if it is available.
     getConfig().displayPath = jsonObj.displayPath;
 
@@ -304,22 +315,31 @@ function updateFlat(originalRequest)
     }
 }
 
+function createTemporaryNode(file, type, uid)
+{
+    var tmpNode = new MyNode();
+    tmpNode.data = {"file":file, "type":type, "uid":uid}
+    return tmpNode;
+}
+
 /**
- * Create a new node.
+ * Create a visual representation of a node.
  *
  *    data: an associative array with fields id, file and type.
  *
  */
-function createNewNode(data)
+function createDomNode(node)
 {
-    var node = document.createElement("li");
-    node.appendChild(document.createTextNode(data.file));
-    node.setAttribute("id", data.uid);
-    Element.addClassName(node, data.type);
+    var data = node.data;
+
+    var domNode = document.createElement("li");
+    domNode.appendChild(document.createTextNode(data.file));
+    domNode.setAttribute("id", data.uid);
+
+    Element.addClassName(domNode, data.type);
     if (data.type == "folder")
     {
-        node.ondblclick = load;
-        node.onclick = select;
+        domNode.onclick = load;
     }
     else if (data.type == "loading")
     {
@@ -327,9 +347,9 @@ function createNewNode(data)
     }
     else
     {
-        node.onclick = select;
+        domNode.onclick = select;
     }
-    return node;
+    return domNode;
 }
 
 /**
@@ -346,8 +366,11 @@ function select(event)
         // locate the selected class.
         clearSelection();
 
-        Element.addClassName(currentTarget, "selected");
+        // record selection.
+        getConfig().selectedNode = currentTarget.id;
+        console.log("selecting %s", getConfig().selectedNode);
 
+        Element.addClassName(currentTarget, "selected");
         if (Element.hasClassName(currentTarget, "folder"))
         {
             return;
@@ -361,11 +384,33 @@ function select(event)
         if (selectedDisplay)
         {
             removeAllChildren(selectedDisplay);
-
-            //selectedDisplay.appendChild(document.createTextNode(currentTarget.id));
             selectedDisplay.value = extractText(currentTarget);
         }
     }
+}
+
+function currentSelectionValue()
+{
+    if (!getConfig().selectedNode)
+    {
+        return "";
+    }
+    var node = locateNode(getConfig().model, getConfig().selectedNode);
+
+    // construct the selection value by walking up the node hierarchy.
+    var value = "";
+    var sep = "";
+    while (node)
+    {
+        // not all nodes currently have data details.
+        if (node.data && node.data.file)
+        {
+            value = node.data.file + sep + value;
+            sep = "/"; //TODO: this is dependant on the filesystems separator char.
+        }
+        node = node.getParent();
+    }
+    return value;
 }
 
 function clearSelection()

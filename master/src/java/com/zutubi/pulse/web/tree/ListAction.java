@@ -23,11 +23,6 @@ public class ListAction extends ActionSupport
     private String uid;
 
     /**
-     * The Unique IDentifier of the Parent of the node being viewed.
-     */
-    private String puid;
-
-    /**
      * A human readable representation of the uid.
      */
     private String path;
@@ -60,16 +55,6 @@ public class ListAction extends ActionSupport
     }
 
     /**
-     * Getter for the PUID property.
-     *
-     * @return current parent uid.
-     */
-    public String getPuid()
-    {
-        return puid;
-    }
-
-    /**
      * Getter for the path property.
      *
      * @return a human readable representation of the UID.
@@ -98,12 +83,6 @@ public class ListAction extends ActionSupport
         }
 
         path = p.getPath();
-
-        // generate the parent uid.
-        if (p.getParentFile() != null)
-        {
-            puid = encode(p.getParentFile().getPath());
-        }
 
         // get listing.
         results = new LinkedList<Listing>();
