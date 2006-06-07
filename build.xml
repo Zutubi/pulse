@@ -274,12 +274,15 @@
             <include name="README.txt"/>
         </replace>
 
-        <!-- /config is for user configuration properties -->
-        <!--<copy todir="${package.root}/system/config">-->
-            <!--<fileset dir="master/etc" includes="pulse-defaults.properties,logging.properties"/>-->
-            <!--<fileset dir="master/etc" includes="logging/*.properties"/>-->
-        <!--</copy>-->
+        <copy todir="${package.root}/system/config">
+            <fileset dir="slave/etc" includes="pulse-slave.properties,logging.properties"/>
+            <fileset dir="slave/etc" includes="logging/*.properties"/>
+        </copy>
 
+        <copy todir="${package.root}/system/www">
+            <fileset dir="slave/src/www" includes="**/*"/>
+        </copy>
+        
         <copy todir="${package.root}/lib">
             <fileset dir="master/etc" includes="*.xml"/>
         </copy>
