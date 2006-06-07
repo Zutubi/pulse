@@ -28,10 +28,6 @@
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build->build"/>
 
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external,build,release->default"/>
-        <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external,build,release->default"/>
-        <dependency org="apache" name="commons-fileupload" rev="1.0" conf="external,build,release->default"/>
-        <dependency org="apache" name="jasper" rev="5.5.9" conf="external,build,release->default"/>
-        <dependency org="apache" name="commons-pool" rev="1.2" conf="external,build,release->default"/>
         <dependency org="apache" name="xmlrpc" rev="2.0.1" conf="external,build,release->default"/>
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
 
@@ -45,13 +41,9 @@
 
         <dependency org="netbeans" name="javacvs" rev="11nov2005" conf="external,build,release->default"/>
 
-        <!-- we need the portlet api at the moment since the IBM JDK on the power pc does not include it. -->
-        <dependency org="portlet-api" name="portlet-api" rev="1.0" conf="external,build,release->default"/>
-
-        <dependency org="springframework" name="spring" rev="1.2.6" conf="external,build,release->spring-beans,spring-context,spring-core,spring-support"/>
+        <dependency org="springframework" name="spring" rev="1.2.6" conf="external,build,release->spring-beans,spring-context,spring-core"/>
 
         <dependency org="sun" name="servlet" rev="2.4" conf="external,build,release->default"/>
-        <dependency org="sun" name="transaction" rev="1.0.1b" conf="external,build,release->default"/>
 
     </dependencies>
 
