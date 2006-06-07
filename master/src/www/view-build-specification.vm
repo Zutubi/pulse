@@ -54,7 +54,6 @@
 
     <h2 class="twopane">#wwtext("name=buildspec.stages")</h2>
 
-#if($specification.root.children.size() > 0)
     <table class="twopane">
         <tr>
             <td class="leftpane">
@@ -102,6 +101,7 @@
         </tr>
     </table>
 
+#if($specification.root.children.size() > 0)
     <script type="text/javascript">
         selectNode(selectedNode);
     </script>
