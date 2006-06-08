@@ -20,7 +20,7 @@
         </property>
     </bean>
 
-    <bean id="configurationManager" class="com.zutubi.pulse.slave.SlaveConfigurationManager"/>
+    <bean id="configurationManager" class="com.zutubi.pulse.slave.SlaveConfigurationManager" init-method="init"/>
 
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 

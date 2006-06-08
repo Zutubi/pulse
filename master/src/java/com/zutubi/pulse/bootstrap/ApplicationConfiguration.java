@@ -9,8 +9,6 @@ public interface ApplicationConfiguration extends CoreApplicationConfiguration
     //---( server configuration )---
     public static final String ADMIN_PORT = "admin.port";
 
-    public static final String WEBAPP_PORT = "webapp.port";
-
     public static final String HOST_NAME = "host.name";
 
     //---( help configuration )---
@@ -40,10 +38,6 @@ public interface ApplicationConfiguration extends CoreApplicationConfiguration
     public static final String JABBER_PASSWORD = "jabber.password";
 
     public static final String JABBER_FORCE_SSL = "jabber.force.ssl";
-
-    //---( logging configuration )---
-
-    public static final String LOGGING_CONFIG = "log.config";
 
     //---( rss configuration )---
     
@@ -101,8 +95,6 @@ public interface ApplicationConfiguration extends CoreApplicationConfiguration
     String getJabberPassword();
 
     void setJabberPassword(String password);
-
-    String getLogConfig();
 
     void setLogConfig(String config);
 

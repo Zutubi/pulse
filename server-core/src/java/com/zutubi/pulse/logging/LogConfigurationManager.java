@@ -1,10 +1,8 @@
 package com.zutubi.pulse.logging;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.CoreConfigurationManager;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
-import com.opensymphony.webwork.dispatcher.VelocityResult;
-import com.opensymphony.webwork.dispatcher.DispatcherUtils;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -22,16 +20,11 @@ import java.util.logging.LogRecord;
 public class LogConfigurationManager
 {
     private File logConfigDir;
-    private ConfigurationManager configurationManager;
+    private CoreConfigurationManager configurationManager;
 
     public void init()
     {
         updateConfiguration(configurationManager.getAppConfig().getLogConfig());
-
-        Logger l = Logger.getLogger(VelocityResult.class.getName());
-        l.setFilter(new BlockingFilter());
-        l = Logger.getLogger(DispatcherUtils.class.getName());
-        l.setFilter(new BlockingFilter());
     }
 
     public List<String> getAvailableConfigurations()
@@ -106,14 +99,14 @@ public class LogConfigurationManager
      *
      * @param configurationManager
      */
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(CoreConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
         File configDirectory = this.configurationManager.getSystemPaths().getConfigRoot();
         logConfigDir = new File(configDirectory, "logging");
     }
 
-    private static class BlockingFilter implements Filter
+    static class BlockingFilter implements Filter
     {
         public boolean isLoggable(LogRecord record)
         {

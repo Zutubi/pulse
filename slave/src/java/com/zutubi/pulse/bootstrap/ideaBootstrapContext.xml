@@ -20,7 +20,7 @@
         </property>
     </bean>
 
-    <bean id="configurationManager" class="com.zutubi.pulse.slave.SlaveConfigurationManager">
+    <bean id="configurationManager" class="com.zutubi.pulse.slave.SlaveConfigurationManager" init-method="init">
         <property name="systemPaths">
             <bean id="paths" class="com.zutubi.pulse.bootstrap.ConfigurableSystemPaths">
                 <property name="systemRoot">

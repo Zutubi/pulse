@@ -245,7 +245,6 @@
         <copy todir="${package.root}/bin">
             <fileset dir="core/src/bin" includes="**/*"/>
             <fileset dir="server-core/src/bin" includes="**/*"/>
-            <fileset dir="slave/src/bin" includes="**/*"/>
         </copy>
 
         <copy todir="${package.root}/licenses">
@@ -275,7 +274,7 @@
         </replace>
 
         <copy todir="${package.root}/system/config">
-            <fileset dir="slave/etc" includes="pulse-slave.properties,logging.properties"/>
+            <fileset dir="slave/etc" includes="pulse-agent.properties,logging.properties"/>
             <fileset dir="slave/etc" includes="logging/*.properties"/>
         </copy>
 
@@ -358,5 +357,4 @@
             <ant inheritAll="false" dir="slave" antfile="build.xml" target="@{target}"/>
         </sequential>
     </macrodef>
-
 </project>

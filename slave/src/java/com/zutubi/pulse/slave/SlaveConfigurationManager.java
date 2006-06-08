@@ -12,7 +12,11 @@ public class SlaveConfigurationManager extends AbstractCoreConfigurationManager
     public SlaveConfigurationManager()
     {
         userPaths = new SlaveUserPaths();
-        appConfig = new DefaultSlaveApplicationConfiguration(userPaths);
+    }
+
+    public void init()
+    {
+        appConfig = new DefaultSlaveApplicationConfiguration(userPaths, getSystemPaths());
     }
 
     public SlaveApplicationConfiguration getAppConfig()

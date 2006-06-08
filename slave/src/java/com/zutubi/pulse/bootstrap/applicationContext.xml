@@ -11,6 +11,12 @@
         </property>
     </bean>
 
+    <bean id="logConfigurationManager" class="com.zutubi.pulse.logging.LogConfigurationManager" init-method="init">
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+    </bean>
+
     <bean id="tokenManager" class="com.zutubi.pulse.api.AdminTokenManager" autowire="byName" init-method="init"/>
 
     <bean id="threadPool" class="com.zutubi.pulse.slave.SlaveThreadPool" autowire="byName"/>
