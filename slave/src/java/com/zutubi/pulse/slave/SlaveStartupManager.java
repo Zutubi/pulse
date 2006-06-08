@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.util.logging.Logger;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.servlet.WebApplicationContext;
 import org.mortbay.util.InetAddrPort;
 
 import java.util.List;
@@ -36,7 +37,8 @@ public class SlaveStartupManager implements Startup, Stoppable
         jettyServer.addListener(listener);
         try
         {
-            jettyServer.addWebApplication("/", configurationManager.getSystemPaths().getContentRoot().getAbsolutePath());
+            WebApplicationContext context = jettyServer.addWebApplication("/", configurationManager.getSystemPaths().getContentRoot().getAbsolutePath());
+            context.setDefaultsDescriptor(null);
             jettyServer.start();
             startTime = System.currentTimeMillis();
         }

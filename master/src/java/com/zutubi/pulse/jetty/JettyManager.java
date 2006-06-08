@@ -68,6 +68,7 @@ public class JettyManager implements Stoppable
         try
         {
             appContext = server.addWebApplication(contextPath, wwwRoot.getAbsolutePath());
+            appContext.setDefaultsDescriptor(null);
             server.start();
         }
         catch(MultiException e)
