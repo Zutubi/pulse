@@ -22,4 +22,6 @@ public interface Agent
     SystemInfo getSystemInfo();
 
     List<CustomLogRecord> getRecentMessages();
+
+    boolean isOnline();
 }

@@ -1,26 +1,8 @@
 package com.zutubi.pulse.web.agents;
 
-import com.zutubi.pulse.Version;
-import com.zutubi.pulse.SystemInfo;
-import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.agent.Agent;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.Data;
-import com.zutubi.pulse.bootstrap.StartupManager;
-import com.zutubi.pulse.license.License;
-import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.web.ActionSupport;
-import com.sun.java_cup.internal.version;
 import com.caucho.hessian.client.HessianRuntimeException;
-
-import java.text.DateFormat;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
-import java.io.File;
+import com.zutubi.pulse.SystemInfo;
+import com.zutubi.pulse.agent.Agent;
 
 /**
  *
@@ -37,15 +19,22 @@ public class SystemInfoAction extends AgentActionSupport
         lookupSlave();
         Agent agent = getAgent();
 
-        try
+        if(agent.isOnline())
         {
-            info = agent.getSystemInfo();
+            try
+            {
+                info = agent.getSystemInfo();
+            }
+            catch(HessianRuntimeException e)
+            {
+                addActionError("Unable to contact agent: " + e.getMessage());
+            }
         }
-        catch(HessianRuntimeException e)
+        else
         {
-            addActionError("Unable to contact agent: " + e.getMessage());
+            addActionError("Agent is not online.");
         }
-
+        
         // The UI will handle agent errors
         return SUCCESS;
     }

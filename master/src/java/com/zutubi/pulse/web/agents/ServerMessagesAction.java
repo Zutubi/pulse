@@ -1,10 +1,8 @@
 package com.zutubi.pulse.web.agents;
 
-import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.logging.ServerMessagesHandler;
-import com.zutubi.pulse.web.agents.ServerMessagesActionSupport;
-import com.zutubi.pulse.web.PagingSupport;
 import com.caucho.hessian.client.HessianRuntimeException;
+import com.zutubi.pulse.logging.CustomLogRecord;
+import com.zutubi.pulse.web.PagingSupport;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,18 +34,25 @@ public class ServerMessagesAction extends ServerMessagesActionSupport
     {
         lookupSlave();
 
-        try
+        if(getAgent().isOnline())
         {
-            records = getAgent().getRecentMessages();
-            Collections.reverse(records);
-            pagingSupport.setTotalItems(records.size());
-            records = records.subList(pagingSupport.getStartOffset(), pagingSupport.getEndOffset());
+            try
+            {
+                records = getAgent().getRecentMessages();
+                Collections.reverse(records);
+                pagingSupport.setTotalItems(records.size());
+                records = records.subList(pagingSupport.getStartOffset(), pagingSupport.getEndOffset());
+            }
+            catch(HessianRuntimeException e)
+            {
+                addActionError("Unable to contact agent: " + e.getMessage());
+            }
         }
-        catch(HessianRuntimeException e)
+        else
         {
-            addActionError("Unable to contact agent: " + e.getMessage());
+            addActionError("Agent is not online.");
         }
-
+        
         return SUCCESS;
     }
 }

@@ -506,6 +506,8 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     private void sendOfflineEvent(Slave slave)
     {
+        SlaveAgent a = (SlaveAgent) agentManager.getAgent(slave);
+        a.failedPing(0, "oops");
         SlaveUnavailableEvent event = new SlaveUnavailableEvent(this, slave);
         queue.handleEvent(event);
     }
@@ -531,7 +533,9 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     private Agent createAvailableAgent(long type)
     {
-        return new SlaveAgent(createSlave(type), null, new MockBuildService(type));
+        SlaveAgent slaveAgent = new SlaveAgent(createSlave(type), null, new MockBuildService(type));
+        slaveAgent.pinged(0, Version.getVersion().getIntBuildNumber());
+        return slaveAgent;
     }
 
     private RecipeDispatchRequest createDispatchRequest(int type, long id)
@@ -773,7 +777,9 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
         public void addSlave(Slave slave)
         {
-            onlineAgents.put(slave.getId(), new SlaveAgent(slave, null, new MockBuildService(slave.getId())));
+            SlaveAgent agent = new SlaveAgent(slave, null, new MockBuildService(slave.getId()));
+            agent.pinged(0, Version.getVersion().getIntBuildNumber());
+            onlineAgents.put(slave.getId(), agent);
         }
     }
 

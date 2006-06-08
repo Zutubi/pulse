@@ -2,9 +2,10 @@ package com.zutubi.pulse.agent;
 
 import com.zutubi.pulse.BuildService;
 import com.zutubi.pulse.SystemInfo;
+import com.zutubi.pulse.Version;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.services.SlaveService;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -14,11 +15,14 @@ import java.util.List;
  */
 public class SlaveAgent implements Agent
 {
+    private final int masterBuildNumber = Version.getVersion().getIntBuildNumber();
+
     private Slave slave;
     private Status status = Status.OFFLINE;
     private long lastPingTime = 0;
     private SlaveService slaveService;
     private BuildService buildService;
+    private String pingError = null;
 
     public SlaveAgent(Slave slave, SlaveService slaveService, BuildService buildService)
     {
@@ -114,21 +118,33 @@ public class SlaveAgent implements Agent
         lastPingTime = time;
     }
 
-    public void pinged(long time, boolean succeeded)
+    public void pinged(long time, int buildNumber)
     {
-        this.lastPingTime = time;
-        if (succeeded)
+        lastPingTime = time;
+        if(buildNumber == masterBuildNumber)
         {
-            this.status = Status.IDLE;
+            status = Status.IDLE;
         }
         else
         {
-            this.status = Status.OFFLINE;
+            status = Status.VERSION_MISMATCH;
         }
+    }
+
+    public void failedPing(long time, String message)
+    {
+        lastPingTime = time;
+        pingError = message;
+        status = Status.OFFLINE;
+    }
+
+    public String getPingError()
+    {
+        return pingError;
     }
 
     public boolean isOnline()
     {
-        return status != Status.OFFLINE;
+        return status.ordinal() >= Status.BUILDING.ordinal();
     }
 }

@@ -3,10 +3,10 @@ package com.zutubi.pulse.agent;
 import com.zutubi.pulse.BuildService;
 import com.zutubi.pulse.MasterBuildService;
 import com.zutubi.pulse.SystemInfo;
-import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
+import com.zutubi.pulse.logging.CustomLogRecord;
+import com.zutubi.pulse.logging.ServerMessagesHandler;
 
 import java.util.List;
 
@@ -45,6 +45,11 @@ public class MasterAgent implements Agent
     public List<CustomLogRecord> getRecentMessages()
     {
         return serverMessagesHandler.takeSnapshot();
+    }
+
+    public boolean isOnline()
+    {
+        return true;
     }
 
     public Status getStatus()

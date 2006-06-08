@@ -1,14 +1,15 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.SystemInfo;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.Version;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
 import com.zutubi.pulse.slave.command.RecipeCommand;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;
 
@@ -24,9 +25,9 @@ public class SlaveServiceImpl implements SlaveService
     private SlaveRecipeProcessor slaveRecipeProcessor;
     private ServerMessagesHandler serverMessagesHandler;
 
-    public void ping()
+    public int ping()
     {
-        // Nothing to actually do!
+        return Version.getVersion().getIntBuildNumber();
     }
 
     public boolean build(String master, long slaveId, RecipeRequest request)

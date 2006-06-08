@@ -1,19 +1,21 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.events.build.RecipeEvent;
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.agent.Agent;
-import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMChangeEvent;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -243,64 +245,70 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     void available(Agent agent)
     {
-        lock.lock();
-        try
+        if(agent.isOnline())
         {
-            onlineAgents.put(agent.getId(), agent);
-            newAgents.add(agent);
-            lockCondition.signal();
-        }
-        finally
-        {
-            lock.unlock();
+            lock.lock();
+            try
+            {
+                onlineAgents.put(agent.getId(), agent);
+                newAgents.add(agent);
+                lockCondition.signal();
+            }
+            finally
+            {
+                lock.unlock();
+            }
         }
     }
 
     private void unavailable(Agent agent)
     {
-        RecipeErrorEvent error = null;
-        List<RecipeDispatchRequest> unfulfillable = new LinkedList<RecipeDispatchRequest>();
-
-        lock.lock();
-        try
+        if (!agent.isOnline())
         {
-            onlineAgents.remove(agent.getId());
+            RecipeErrorEvent error = null;
+            List<RecipeDispatchRequest> unfulfillable = new LinkedList<RecipeDispatchRequest>();
 
-            // Check all queued requests may still be handled by an online
-            // agent.
-            unfulfillable.addAll(checkQueuedRequests(queuedDispatches));
-            unfulfillable.addAll(checkQueuedRequests(newDispatches));
-
-            long deadRecipe = 0;
-            for(Map.Entry<Long, Agent> entry: executingAgents.entrySet())
+            lock.lock();
+            try
             {
-                if(entry.getValue().getId() == agent.getId())
+                onlineAgents.remove(agent.getId());
+
+                // Check all queued requests may still be handled by an online
+                // agent.
+                unfulfillable.addAll(checkQueuedRequests(queuedDispatches));
+                unfulfillable.addAll(checkQueuedRequests(newDispatches));
+
+                long deadRecipe = 0;
+                for(Map.Entry<Long, Agent> entry: executingAgents.entrySet())
                 {
-                    // Agent dropped off while we were executing.
-                    deadRecipe = entry.getKey();
-                    break;
+                    if(entry.getValue().getId() == agent.getId())
+                    {
+                        // Agent dropped off while we were executing.
+                        deadRecipe = entry.getKey();
+                        break;
+                    }
+                }
+
+                if(deadRecipe != 0)
+                {
+                    // Remove it first so we don't find it when handling this event.
+                    executingAgents.remove(deadRecipe);
+                    error = new RecipeErrorEvent(this, deadRecipe, "Connection to agent lost during recipe execution");
                 }
             }
-
-            if(deadRecipe != 0)
+            finally
             {
-                // Remove it first so we don't find it when handling this event.
-                executingAgents.remove(deadRecipe);
-                error = new RecipeErrorEvent(this, deadRecipe, "Connection to agent lost during recipe execution");
+                lock.unlock();
             }
-        }
-        finally
-        {
-            lock.unlock();
-        }
 
-        if(error != null)
-        {
-            // Publish outside the lock.
-            eventManager.publish(error);
-        }
+            if(error != null)
+            {
+                // Publish outside the lock.
+                eventManager.publish(error);
+            }
 
-        publishUnfulfillable(unfulfillable);
+            publishUnfulfillable(unfulfillable);
+        }
     }
 
     private List<RecipeDispatchRequest> checkQueuedRequests(List<RecipeDispatchRequest> requests)

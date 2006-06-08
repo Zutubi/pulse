@@ -109,13 +109,12 @@ public class DefaultAgentManager implements AgentManager
 
         try
         {
-            agent.getSlaveService().ping();
-            agent.pinged(currentTime, true);
+            int build = agent.getSlaveService().ping();
+            agent.pinged(currentTime, build);
         }
         catch (Exception e)
         {
-            LOG.warning("Ping to slave '" + agent.getSlave().getName() + "' failed. Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
-            agent.pinged(currentTime, false);
+            agent.failedPing(currentTime, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
         }
 
         int newOrdinal = agent.getStatus().ordinal();

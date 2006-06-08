@@ -33,7 +33,8 @@ public class SlaveStartupManager implements Startup, Stoppable
         runStartupRunnables();
 
         jettyServer = new Server();
-        SocketListener listener = new SocketListener(new InetAddrPort(configurationManager.getAppConfig().getServerPort()));
+        int port = configurationManager.getAppConfig().getServerPort();
+        SocketListener listener = new SocketListener(new InetAddrPort(port));
         jettyServer.addListener(listener);
         try
         {
@@ -41,6 +42,7 @@ public class SlaveStartupManager implements Startup, Stoppable
             context.setDefaultsDescriptor(null);
             jettyServer.start();
             startTime = System.currentTimeMillis();
+            System.out.println("The agent is now listening on port: " + port);
         }
         catch (Exception e)
         {
