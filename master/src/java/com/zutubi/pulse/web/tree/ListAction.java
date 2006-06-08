@@ -54,6 +54,17 @@ public class ListAction extends ActionSupport
         return results;
     }
 
+    public List<Carrier> getListings()
+    {
+        List<Carrier> listings = new LinkedList<Carrier>();
+        Carrier c = new Carrier();
+        c.listing = getResults();
+        c.uid = getUid();
+        c.path = getPath();
+        listings.add(c);
+        return listings;
+    }
+
     /**
      * Getter for the path property.
      *
@@ -130,6 +141,28 @@ public class ListAction extends ActionSupport
     private LocalFileSystem getFileSystem()
     {
         return new LocalFileSystem(new java.io.File("c:/"));
+    }
+
+    public class Carrier
+    {
+        List<Listing> listing;
+        String uid;
+        String path;
+
+        public List<Listing> getResults()
+        {
+            return listing;
+        }
+
+        public String getUid()
+        {
+            return uid;
+        }
+
+        public String getPath()
+        {
+            return path;
+        }
     }
 }
 

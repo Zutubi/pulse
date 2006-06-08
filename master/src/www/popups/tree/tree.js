@@ -135,7 +135,9 @@ function requestUpdate(id)
 function updateModel(originalRequest)
 {
     var jsonText = originalRequest.responseText;
-    var jsonObj = eval("(" + jsonText + ")");
+    var jsonObjs = eval("(" + jsonText + ")");
+
+    var jsonObj = jsonObjs.results[0];
 
     // locate where in the tree this update belongs.
     var rootNode = getConfig().model;
@@ -168,7 +170,7 @@ function updateModel(originalRequest)
     }
 
     // TRIGGER AN UPDATE OF THE UI. SHOULD THIS BE HANDLED VIA AN EVENT?
-    updateTree(originalRequest);
+    updateTree(jsonObj);
 }
 
 //TODO: this traversal is too slow. Should generate a map of uid to nodes and use that instead.
@@ -208,11 +210,8 @@ function locateNode(parentNode, uid)
  *
  *    path - represents the unique id of the parent.
  */
-function updateTree(originalRequest)
+function updateTree(jsonObj)
 {
-    var jsonText = originalRequest.responseText;
-    var jsonObj = eval("(" + jsonText + ")");
-
     // LOCATE THE POINT IN THE DOM THAT WE WILL BE UPDATING.
     var target = document.getElementById(jsonObj.uid);
     if (!target)
@@ -245,15 +244,11 @@ function updateTree(originalRequest)
     updateDisplayPath(jsonObj);
 }
 
-function updateFlat(originalRequest)
+function updateFlat(jsonObj)
 {
     var folder = document.getElementById(getConfig().anchor);
 
-    var jsonText = originalRequest.responseText;
-    var jsonObj = eval("(" + jsonText + ")");
-
     // lookup the root node.
-
     var rootNode = locateNode(getConfig().model, jsonObj.uid);
     if (!rootNode)
     {
@@ -368,7 +363,6 @@ function select(event)
 
         // record selection.
         getConfig().selectedNode = currentTarget.id;
-        console.log("selecting %s", getConfig().selectedNode);
 
         Element.addClassName(currentTarget, "selected");
         if (Element.hasClassName(currentTarget, "folder"))
