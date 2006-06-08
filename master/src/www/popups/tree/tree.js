@@ -72,7 +72,7 @@ function init(event)
     anchorDiv.appendChild(ul);
 
     // TRIGGER LOAD OF THE ROOT NODE.
-    requestUpdate("");
+    requestUpdate(getConfig().initUid);
 }
 
 /**
@@ -100,7 +100,9 @@ function load(event)
         Element.addClassName(currentTarget, "openfolder");
 
         // send off the xml http request.
-        requestUpdate(currentTarget.id);
+        var uids = new Array();
+        uids.push(currentTarget.id)
+        requestUpdate(uids);
     }
 }
 
@@ -113,8 +115,16 @@ function getConfig()
     return window.myTree;
 }
 
-function requestUpdate(id)
+function requestUpdate(uids)
 {
+    var params = "";
+    var sep = "";
+    uids.each(function(uid)
+    {
+        params = params + sep + "uid=" + uid;
+        sep = "&";
+    });
+
     var url = getConfig().url;
 
     var ajax = new Ajax.Request(
@@ -124,7 +134,7 @@ function requestUpdate(id)
             onComplete: updateModel,
             onFailure: handleFailure,
             onException: handleException,
-            parameters:"uid=" + id
+            parameters:params
         }
     );
 }
@@ -134,43 +144,45 @@ function requestUpdate(id)
  */
 function updateModel(originalRequest)
 {
-    var jsonText = originalRequest.responseText;
-    var jsonObjs = eval("(" + jsonText + ")");
+    // the jsonObjs contains an array of listings.
+    var jsonObjs = eval("(" + originalRequest.responseText + ")");
 
-    var jsonObj = jsonObjs.results[0];
-
-    // locate where in the tree this update belongs.
-    var rootNode = getConfig().model;
-    var node = locateNode(rootNode, jsonObj.uid);
-    if (!node)
+    var results = $A(jsonObjs.results)
+    results.each(function(jsonObj)
     {
-        // the default.
-        node = rootNode;
-    }
-
-    // UPDATE THE MODEL WITH THE NEW DATA.
-    for (var i = 0; i < jsonObj.listing.length; i++)
-    {
-        // sanity check that we do not add components to the model a second time. This should be
-        // caught at an earlier stage.
-        var existingNode = node.getChildren().find(function(child)
+        // locate where in the tree this update belongs.
+        var rootNode = getConfig().model;
+        var node = locateNode(rootNode, jsonObj.uid);
+        if (!node)
         {
-            return (child.data.uid == jsonObj.listing[i].uid);
-        });
-        if (existingNode)
-        {
-            console.log("skipping adding node a second time.");
-            continue;
+            // the default.
+            node = rootNode;
         }
 
-        var childNode = new MyNode();
-        childNode.initialize();
-        childNode.data = jsonObj.listing[i];
-        node.addChild(childNode);
-    }
+        // UPDATE THE MODEL WITH THE NEW DATA.
+        for (var i = 0; i < jsonObj.listing.length; i++)
+        {
+            // sanity check that we do not add components to the model a second time. This should be
+            // caught at an earlier stage.
+            var existingNode = node.getChildren().find(function(child)
+            {
+                return (child.data.uid == jsonObj.listing[i].uid);
+            });
+            if (existingNode)
+            {
+                console.log("skipping adding node a second time.");
+                continue;
+            }
 
-    // TRIGGER AN UPDATE OF THE UI. SHOULD THIS BE HANDLED VIA AN EVENT?
-    updateTree(jsonObj);
+            var childNode = new MyNode();
+            childNode.initialize();
+            childNode.data = jsonObj.listing[i];
+            node.addChild(childNode);
+        }
+
+        // TRIGGER AN UPDATE OF THE UI. SHOULD THIS BE HANDLED VIA AN EVENT?
+        updateTree(jsonObj);
+    });
 }
 
 //TODO: this traversal is too slow. Should generate a map of uid to nodes and use that instead.
@@ -221,7 +233,23 @@ function updateTree(jsonObj)
 
     // REMOVE ANY EXISTING LOADING MESSAGE
     var ul = locateFirstChild(target, "UL");
-    removeAllChildren(ul);
+    if (ul) // if there are children to be removed.
+    {
+        removeAllChildren(ul);
+    }
+    else
+    {
+        // need to create the appropriate UL element.
+        ul = document.createElement("ul");
+        target.appendChild(ul);
+
+        // now we change the onclick handler so that it handles toggling instead of loading.
+        target.onclick = toggle;
+
+        // open current target.
+        Element.removeClassName(target, "folder");
+        Element.addClassName(target, "openfolder");
+    }
 
     var rootNode = locateNode(getConfig().model, jsonObj.uid);
     if (!rootNode)

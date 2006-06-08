@@ -2,11 +2,9 @@
 Create an object of the following format:
 
     object:{
-        results:
-        [
+        results: [
             {
-                listing:
-                [
+                listing: [
                     {
                         file:string,
                         type:string,
@@ -21,10 +19,10 @@ Create an object of the following format:
 -->
 <object>
     <pair key="results">
-        <array ref="listings">
+        <array ref="results">
             <object>
                 <pair key="listing">
-                    <array ref="results">
+                    <array ref="listing">
                         <object>
                             <pair key="file">name</pair>
                             <pair key="type">type</pair>

@@ -2,14 +2,24 @@
 <html>
 <head>
     <title>browse</title>
+    <script type="text/javascript">
+        <!--
+                function openPopup()
+                {
+                    var formElement = document.forms['my.form'].elements['initPath'];
+                    window.open('popups/browse-popup.action?formname=my.form&fieldname=my.input&initPath=' + formElement.value, 'browse_popup', 'width=500, height=650, resizable=yes', false);
+                    return false
+                }
+        //-->
+    </script>
 </head>
     <body>
 
     <p>blurb</p>
     <div style="margin:5em 2em;">
         <form name="my.form" action="dd">
-            <input type="text" name="my.input" size="60"/>
-            <input type="submit" value="browse" onClick="window.open('popups/browse-popup.action?formname=my.form&fieldname=my.input', 'browse_popup', 'width=500, height=650, resizable=yes', false); return false"/>
+            <input type="text" name="initPath" size="60"/>
+            <input type="submit" value="browse" onClick="return openPopup();"/>
             <input type="submit" value="next"/>
             <input type="reset" value="clear"/>
         </form>
