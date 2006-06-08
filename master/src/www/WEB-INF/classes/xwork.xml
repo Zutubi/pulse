@@ -996,8 +996,8 @@
             <result name="success" type="velocity">test-scm.vm</result>
         </action>
 
-        <action name="list" class="com.zutubi.pulse.web.tree.ListAction">
-            <result name="success" type="json">list.xml</result>
+        <action name="list" class="com.zutubi.pulse.web.fs.BrowseServerListAction">
+            <result name="success" type="json">fslistings.xml</result>
         </action>
 
     </package>

@@ -19,7 +19,7 @@ Create an object of the following format:
 -->
 <object>
     <pair key="results">
-        <array ref="results">
+        <array ref="listings">
             <object>
                 <pair key="listing">
                     <array ref="listing">

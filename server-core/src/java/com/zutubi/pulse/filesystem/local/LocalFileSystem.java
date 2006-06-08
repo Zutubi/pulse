@@ -19,6 +19,12 @@ public class LocalFileSystem implements FileSystem
 {
     private final File base;
 
+    public LocalFileSystem()
+    {
+        // set the base to the root of the file system.
+        this(new File(""));
+    }
+    
     public LocalFileSystem(File base)
     {
         this.base = base;

@@ -9,7 +9,25 @@ MyNode.prototype = {
      */
     initialize: function() {
         this.children = new $A(),
-        this.parent = null
+        this.parent = null,
+        this.name = null,
+        this.type = null,
+        this.id
+    },
+
+    getId: function()
+    {
+        return this.id;
+    },
+
+    getName: function()
+    {
+        return this.name;
+    },
+
+    getType: function()
+    {
+        return this.type;
     },
 
     /**
@@ -44,8 +62,65 @@ MyNode.prototype = {
     getParent: function()
     {
         return this.parent;
+    },
+
+    /**
+     * Returns the path of this node from the root.
+     */
+    getPath: function()
+    {
+        var path = "";
+        if (this.getParent())
+        {
+            path = this.getParent().getPath();
+        }
+        //TODO: replace hard wired '/' with file system specific value.
+        path = path + "/" + this.getName();
+        return path;
     }
 };
+
+/**
+ * Event router allows us to attach multiple event handlers to a single dom event callback.
+ *
+ * (adapted from Ajax in Action, pg 142.)
+ */
+EventRouter =function(){};
+EventRouter.prototype = {
+
+    initialize: function(el, eventType)
+    {
+        this.lsnrs = new Array();
+        this.el = el;
+        el.eventRouter = this;
+        el[eventType] = this.callback;
+    },
+
+    addListener: function(lsnr)
+    {
+        this.lsnrs.push(lsnr);
+    },
+
+    removeListener: function(lsnr)
+    {
+        this.lsnrs.remove(lsnr);
+    },
+
+    notify: function(src, event)
+    {
+        var lsnrs = $A(this.lsnrs);
+        lsnrs.each(function(lsnr)
+        {
+            lsnr.call(src, event);
+        });
+    },
+
+    callback: function(event)
+    {
+        var router = this.eventRouter;
+        router.notify(this, event);
+    }
+}
 
 /**
  * Initialise the tree control.
@@ -53,18 +128,18 @@ MyNode.prototype = {
  */
 function init(event)
 {
+    // Initialise the model root.
+    //TODO: use a root value specific to the file system.
+    getConfig().root = new MyNode();
+    getConfig().root.initialize();
+    getConfig().root.name = "ROOT";
+    getConfig().root.id = "";
+    getConfig().root.type = "";
+
     var anchorId = getConfig().anchor;
 
     // need to find a way to extract the id of the root tree node from this file.
     var anchorDiv = document.getElementById(anchorId);
-
-    // ensure that the model is correctly initialised. Use the root of this model as the first location
-    // to be displayed.
-    if (!getConfig().model)
-    {
-        getConfig().model = new MyNode();
-        getConfig().model.initialize();
-    }
 
     // LOADING FEEDBACK.
     var ul = document.createElement("ul");
@@ -73,37 +148,6 @@ function init(event)
 
     // TRIGGER LOAD OF THE ROOT NODE.
     requestUpdate(getConfig().initUid);
-}
-
-/**
- * Event handler.
- */
-function load(event)
-{
-    var currentTarget = getCurrentTarget(event);
-
-    if (this == currentTarget)
-    {
-        // WARNING: using innerHTML directly clears out any event handlers.
-        // insert another level of the tree. <ul>loading...</ul>
-
-        var ul = document.createElement("ul");
-        ul.appendChild(createDomNode(createTemporaryNode("Loading...", "loading", "")));
-
-        currentTarget.appendChild(ul);
-
-        // now we change the onclick handler so that it handles toggling instead of loading.
-        currentTarget.onclick = toggle;
-
-        // open current target.
-        Element.removeClassName(currentTarget, "folder");
-        Element.addClassName(currentTarget, "openfolder");
-
-        // send off the xml http request.
-        var uids = new Array();
-        uids.push(currentTarget.id)
-        requestUpdate(uids);
-    }
 }
 
 /**
@@ -151,7 +195,7 @@ function updateModel(originalRequest)
     results.each(function(jsonObj)
     {
         // locate where in the tree this update belongs.
-        var rootNode = getConfig().model;
+        var rootNode = getConfig().root;
         var node = locateNode(rootNode, jsonObj.uid);
         if (!node)
         {
@@ -166,7 +210,7 @@ function updateModel(originalRequest)
             // caught at an earlier stage.
             var existingNode = node.getChildren().find(function(child)
             {
-                return (child.data.uid == jsonObj.listing[i].uid);
+                return (child.getId() == jsonObj.listing[i].uid);
             });
             if (existingNode)
             {
@@ -176,22 +220,35 @@ function updateModel(originalRequest)
 
             var childNode = new MyNode();
             childNode.initialize();
-            childNode.data = jsonObj.listing[i];
+            childNode.id = jsonObj.listing[i].uid;
+            childNode.name = jsonObj.listing[i].file;
+            childNode.type = jsonObj.listing[i].type;
             node.addChild(childNode);
         }
 
-        // TRIGGER AN UPDATE OF THE UI. SHOULD THIS BE HANDLED VIA AN EVENT?
-        updateTree(jsonObj);
+        onModelUpdate(jsonObj.uid);
     });
 }
 
+/**
+ * Handler for when the model is updated.
+ *
+ *   updateId: the id of the model element updated.
+ */
+function onModelUpdate(updateId)
+{
+    // TRIGGER AN UPDATE OF THE UI. SHOULD THIS BE HANDLED VIA AN EVENT?
+    updateTree(updateId);
+
+}
+
 //TODO: this traversal is too slow. Should generate a map of uid to nodes and use that instead.
-function locateNode(parentNode, uid)
+function locateNode(root, uid)
 {
     var node = null;
-    parentNode.getChildren().each(function(childNode)
+    root.getChildren().each(function(childNode)
     {
-        if (childNode.data.uid == uid)
+        if (childNode.getId() == uid)
         {
             node = childNode;
         }
@@ -208,24 +265,11 @@ function locateNode(parentNode, uid)
  * A callback handler to process the response from a 'listing' request to the
  * server. This handler constructs a full navigable directory tree.
  *
- * This handler expected a response in the format:
- *
- *    listing:  {file, type, id}
- *    path: 'parent id'
- *
- * where
- *    file - is the name of the file
- *    type - is the type of the file (folder, file, txt etc)
- *    id - is the unique identifier for this file.
- *
- * and
- *
- *    path - represents the unique id of the parent.
  */
-function updateTree(jsonObj)
+function updateTree(id)
 {
     // LOCATE THE POINT IN THE DOM THAT WE WILL BE UPDATING.
-    var target = document.getElementById(jsonObj.uid);
+    var target = document.getElementById(id);
     if (!target)
     {
         target = document.getElementById(getConfig().anchor);
@@ -244,17 +288,17 @@ function updateTree(jsonObj)
         target.appendChild(ul);
 
         // now we change the onclick handler so that it handles toggling instead of loading.
-        target.onclick = toggle;
+        target.onclick = onToggle;
 
         // open current target.
         Element.removeClassName(target, "folder");
         Element.addClassName(target, "openfolder");
     }
 
-    var rootNode = locateNode(getConfig().model, jsonObj.uid);
+    var rootNode = locateNode(getConfig().root, id);
     if (!rootNode)
     {
-        rootNode = getConfig().model;
+        rootNode = getConfig().root;
 
         // add the '.' directory so that it can be selected. However, we do not want it to be
         // reloaded since it is a special case that clears out all existing content...
@@ -268,19 +312,17 @@ function updateTree(jsonObj)
         var listItem = createDomNode(child);
         ul.appendChild(listItem);
     });
-
-    updateDisplayPath(jsonObj);
 }
 
-function updateFlat(jsonObj)
+function updateFlat(id)
 {
     var folder = document.getElementById(getConfig().anchor);
 
     // lookup the root node.
-    var rootNode = locateNode(getConfig().model, jsonObj.uid);
+    var rootNode = locateNode(getConfig().root, id);
     if (!rootNode)
     {
-        rootNode = getConfig().model;
+        rootNode = getConfig().root;
     }
 
     removeChild(folder);
@@ -290,11 +332,7 @@ function updateFlat(jsonObj)
     folder.appendChild(ul);
 
     // add the links to the current directory.
-    var uid = "";
-    if (rootNode.data)
-    {
-        uid = rootNode.data.uid;
-    }
+    var uid = rootNode.getId();
 
     var thisDirectory = createDomNode(createTemporaryNode(".", "folder", uid));
     ul.appendChild(thisDirectory);
@@ -303,9 +341,9 @@ function updateFlat(jsonObj)
     if (rootNode.getParent())
     {
         var puid = ""; // value for the root.
-        if (rootNode.getParent().data)
+        if (rootNode.getParent().getId())
         {
-            puid = rootNode.getParent().data.uid;
+            puid = rootNode.getParent().getId();
         }
         var parentDirectory = createDomNode(createTemporaryNode("..", "folder", puid));
         ul.appendChild(parentDirectory);
@@ -317,31 +355,72 @@ function updateFlat(jsonObj)
         var listItem = createDomNode(child);
         ul.appendChild(listItem);
     });
-
-    updateDisplayPath(jsonObj);
 }
 
-function updateDisplayPath(jsonObj)
+/**
+ * Selected node change event handler.
+ *
+ */
+function onSelectionChange()
 {
-    // display path if it is available.
-    getConfig().displayPath = jsonObj.displayPath;
+    // update two locations. The path display at the top, and the selected display at the bottom.
 
+    var selectedNode = getSelection();
+    if (!selectedNode)
+    {
+        console.log("WARNING: onSelectionChange triggered but no selectedNode is available. :(")
+        return;
+    }
+
+    // A: the path element at shows the path to the currently selected node.
     var currentPathDisplay = document.getElementById('path');
     if (currentPathDisplay)
     {
+        // clear out the existing content.
         removeAllChildren(currentPathDisplay);
-        // update the current node status.
-        if (jsonObj.displayPath)
+
+        // If the current selection is a folder, show the path of that folder.
+        // If the current selection is a file, then show the path of its containing folder.
+        var pathToDisplay = null;
+        if (selectedNode.getType() == "folder")
         {
-            currentPathDisplay.appendChild(document.createTextNode(jsonObj.displayPath));
+            pathToDisplay = selectedNode.getPath();
+        }
+        else
+        {
+            if (selectedNode.getParent())
+            {
+                pathToDisplay = selectedNode.getParent().getPath();
+            }
+        }
+        if (pathToDisplay)
+        {
+            currentPathDisplay.appendChild(document.createTextNode(pathToDisplay));
         }
     }
+
+    // B: The selected element display, that shows the name of the currently selected node.
+    var selectedDisplay = document.getElementById('selected');
+    if (selectedDisplay)
+    {
+        // clear out the existing content.
+        removeAllChildren(selectedDisplay);
+        selectedDisplay.value = selectedNode.getName();
+    }
+
+    // C: The dom tree UI classes.
+    clearSelection();
+    // locate and update the dom tree node that should be appearing as selected.
+    var selectedDomNode = document.getElementById(selectedNode.getId());
+    Element.addClassName(selectedDomNode, "selected");
 }
 
 function createTemporaryNode(file, type, uid)
 {
     var tmpNode = new MyNode();
-    tmpNode.data = {"file":file, "type":type, "uid":uid}
+    tmpNode.id = uid;
+    tmpNode.type = type;
+    tmpNode.name = file;
     return tmpNode;
 }
 
@@ -353,24 +432,25 @@ function createTemporaryNode(file, type, uid)
  */
 function createDomNode(node)
 {
-    var data = node.data;
-
     var domNode = document.createElement("li");
-    domNode.appendChild(document.createTextNode(data.file));
-    domNode.setAttribute("id", data.uid);
+    domNode.appendChild(document.createTextNode(node.getName()));
+    domNode.setAttribute("id", node.getId());
 
-    Element.addClassName(domNode, data.type);
-    if (data.type == "folder")
+    Element.addClassName(domNode, node.getType());
+    if (node.getType() == "folder")
     {
-        domNode.onclick = load;
+        var eventRouter = new EventRouter();
+        eventRouter.initialize(domNode, "onclick");
+        eventRouter.addListener(onSelect);
+        eventRouter.addListener(onLoad);
     }
-    else if (data.type == "loading")
+    else if (node.getType() == "loading")
     {
         // do nothing here..
     }
     else
     {
-        domNode.onclick = select;
+        domNode.onclick = onSelect;
     }
     return domNode;
 }
@@ -381,60 +461,72 @@ function createDomNode(node)
  * Selecting an element will add the 'selected' class to its list of classes.
  * Only a single element can be selected at a time.
  */
-function select(event)
+function onSelect(event)
 {
     var currentTarget = getCurrentTarget(event);
     if (this == currentTarget)
     {
-        // locate the selected class.
-        clearSelection();
-
         // record selection.
-        getConfig().selectedNode = currentTarget.id;
-
-        Element.addClassName(currentTarget, "selected");
-        if (Element.hasClassName(currentTarget, "folder"))
-        {
-            return;
-        }
-
-        getConfig().selectedValue = extractText(currentTarget);
-
-        // update selected display.
-        // - what is the currently selected name?
-        var selectedDisplay = document.getElementById('selected');
-        if (selectedDisplay)
-        {
-            removeAllChildren(selectedDisplay);
-            selectedDisplay.value = extractText(currentTarget);
-        }
+        setSelectionById(currentTarget.id);
     }
 }
 
-function currentSelectionValue()
+/**
+ * Set the selected node, identified by the specified id.
+ */
+function setSelectionById(id)
 {
-    if (!getConfig().selectedNode)
+    var newSelection = locateNode(getConfig().root, id);
+    if (!newSelection)
     {
-        return "";
+        console.log("WARNING: failed to locate newly selected node '%s'", id);
     }
-    var node = locateNode(getConfig().model, getConfig().selectedNode);
+    getConfig().selectedNode = newSelection;
 
-    // construct the selection value by walking up the node hierarchy.
-    var value = "";
-    var sep = "";
-    while (node)
-    {
-        // not all nodes currently have data details.
-        if (node.data && node.data.file)
-        {
-            value = node.data.file + sep + value;
-            sep = "/"; //TODO: this is dependant on the filesystems separator char.
-        }
-        node = node.getParent();
-    }
-    return value;
+    // trigger the selected node change event listeners.
+    onSelectionChange();
 }
 
+function getSelection()
+{
+    return getConfig().selectedNode;
+}
+
+/**
+ * The onLoad event handler is used to trigger an ajax list request to load a part of the
+ * data model that has not been loaded.
+ *
+ */
+function onLoad(event)
+{
+    var currentTarget = getCurrentTarget(event);
+    if (this == currentTarget)
+    {
+        // WARNING: using innerHTML directly clears out any event handlers.
+        // insert another level of the tree. <ul>loading...</ul>
+
+        var ul = document.createElement("ul");
+        ul.appendChild(createDomNode(createTemporaryNode("Loading...", "loading", "")));
+
+        currentTarget.appendChild(ul);
+
+        // now we change the onclick handler so that it handles toggling instead of loading.
+        currentTarget.onclick = onToggle;
+
+        // open current target.
+        Element.removeClassName(currentTarget, "folder");
+        Element.addClassName(currentTarget, "openfolder");
+
+        // send off the xml http request.
+        var uids = new Array();
+        uids.push(currentTarget.id)
+        requestUpdate(uids);
+    }
+}
+
+/**
+ *
+ */
 function clearSelection()
 {
     var selectedNodes = document.getElementsByClassName("selected");
@@ -451,9 +543,28 @@ function clearSelection()
     clearBrowserTextSelection();
 }
 
-function extractText(element)
+/**
+ * Go back one level in the hierarchy. This means that:
+ * a) if the current node is a file, go to its folders parent.
+ * b) if the current node is a folder, go to its parent.
+ */
+function selectParentNode()
 {
-    return element.innerHTML;
+    var selectedNode = getSelection();
+    if (selectedNode)
+    {
+
+        var parentNode = selectedNode.getParent();
+        if (parentNode)
+        {
+            setSelectionById(parentNode.getId());
+        }
+        else
+        {
+            //clear the selection...
+            setSelectionById("");
+        }
+    }
 }
 
 /**
@@ -461,7 +572,7 @@ function extractText(element)
  *
  * NOTE: It only makes sense for the target node to represent a 'folder'.
  */
-function toggle(event)
+function onToggle(event)
 {
     var currentTarget = getCurrentTarget(event);
     if (this == currentTarget)

@@ -120,7 +120,7 @@
 
     <div class="bordered" id="toolbar">
         Toolbar:&nbsp;
-        <a href=""><img src="/images/cd_go.png" alt=""/></a>
+        <a href="" onclick="selectParentNode(); return false;"><img src="/images/cd_go.png" alt=""/></a>
         <a href=""><img src="/images/cd_add.png" alt=""/></a>
         <a href=""><img src="/images/cd_burn.png" alt=""/></a>
         <a href=""><img src="/images/cd_delete.png" alt=""/></a>
