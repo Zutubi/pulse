@@ -380,7 +380,8 @@
 
         <action name="editTrigger" class="com.zutubi.pulse.web.project.EditTriggerAction">
             <result name="cron" type="chain">editCronTrigger!input</result>
-            <result name="event" type="chain">editEventTrigger!input</result>
+            <result name="event.SCMChangeEvent" type="chain">editEventTrigger!input</result>
+            <result name="event.BuildCompletedEvent" type="chain">editBuildCompletedTrigger!input</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
@@ -407,6 +408,20 @@
         <action name="editEventTrigger" class="com.zutubi.pulse.web.project.EditEventTriggerAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-trigger-event.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editBuildCompletedTrigger!input" class="com.zutubi.pulse.web.project.EditBuildCompletedTriggerAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-trigger-build-completed.vm</result>
+        </action>
+
+        <action name="editBuildCompletedTrigger" class="com.zutubi.pulse.web.project.EditBuildCompletedTriggerAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-trigger-build-completed.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
@@ -493,6 +508,7 @@
             <result name="select" type="velocity">select-trigger.vm</result>
             <result name="monitor" type="velocity">configure-monitor-trigger.vm</result>
             <result name="cron" type="velocity">configure-cron-trigger.vm</result>
+            <result name="build.completed" type="velocity">configure-build-completed-trigger.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
         </action>

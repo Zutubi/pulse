@@ -1,8 +1,8 @@
 package com.zutubi.pulse.bootstrap.velocity;
 
+import com.zutubi.pulse.util.logging.Logger;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.LogSystem;
-import com.zutubi.pulse.util.logging.Logger;
 
 /**
  */
@@ -10,7 +10,7 @@ public class CustomLogSystem implements LogSystem
 {
     private static final Logger LOG = Logger.getLogger(CustomLogSystem.class);
 
-    private boolean enabled = false;
+    private boolean enabled = true;
 
     public void init(RuntimeServices runtimeServices) throws Exception
     {

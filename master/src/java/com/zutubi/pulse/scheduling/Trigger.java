@@ -108,6 +108,11 @@ public abstract class Trigger extends Entity
      */
     public abstract String getType();
 
+    public String getEditKey()
+    {
+        return getType();
+    }
+
     public Map<Serializable, Serializable> getDataMap()
     {
         if (dataMap == null)

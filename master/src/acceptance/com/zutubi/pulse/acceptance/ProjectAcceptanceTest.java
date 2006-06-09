@@ -10,7 +10,7 @@ import java.io.IOException;
  */
 public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 {
-    private static final String CRON_TRIGGER_NAME = "cron-trigger-name";
+    private static final String TRIGGER_NAME = "trigger-name";
     private static final String CRON_STRING = "0 0 0 * * ?";
     private static final String SPEC_NAME = "spec-name";
     private static final String RECIPE_NAME = "recipe-name";
@@ -680,7 +680,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertFormPresent("trigger.type");
         // default trigger type.
         // default specification.
-        setFormElement("name", CRON_TRIGGER_NAME);
+        setFormElement("name", TRIGGER_NAME);
         submit("next");
 
         // check form is available.
@@ -691,7 +691,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         assertProjectTriggerTable(new String[][]{
                 getTriggerRow(projectName + " scm trigger", "event", "default"),
-                getTriggerRow(CRON_TRIGGER_NAME, "cron", "default"),
+                getTriggerRow(TRIGGER_NAME, "cron", "default"),
         });
     }
 
@@ -759,10 +759,10 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         testAddBuildSpec();
 
         CronTriggerEditForm form = new CronTriggerEditForm(tester);
-        clickLink(getEditId(CRON_TRIGGER_NAME));
+        clickLink(getEditId(TRIGGER_NAME));
 
         form.assertFormPresent();
-        form.assertFormElements(CRON_TRIGGER_NAME, "default", CRON_STRING);
+        form.assertFormElements(TRIGGER_NAME, "default", CRON_STRING);
         assertOptionValuesEqual("specification", new String[]{"default", SPEC_NAME});
         return form;
     }
@@ -790,7 +790,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         assertProjectTriggerTable(new String[][]{
                 getTriggerRow(projectName + " scm trigger", "event", "default"),
-                getTriggerRow(CRON_TRIGGER_NAME, "cron", "default"),
+                getTriggerRow(TRIGGER_NAME, "cron", "default"),
         });
     }
 
@@ -857,6 +857,63 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         form.assertFormPresent();
         assertTextPresent("name is required");
     }
+
+    public void testAddNewBuildCompletedTrigger()
+    {
+        assertProjectTriggerTable(new String[][]{
+                getTriggerRow(projectName + " scm trigger", "event", "default"),
+        });
+
+        assertLinkPresent("project.trigger.add");
+        clickLink("project.trigger.add");
+
+        // check form is available.
+        assertFormPresent("trigger.type");
+        setFormElement("type", "build.completed");
+        // default specification.
+        setFormElement("name", TRIGGER_NAME);
+        submit("next");
+
+        // check form is available.
+        CreateBuildCompletedTriggerForm form = new CreateBuildCompletedTriggerForm(tester);
+        form.assertFormPresent();
+        String id = tester.getDialog().getValueForOption(form.getFieldNames()[0], projectName);
+        form.nextFormElements(id, "default", "FAILURE");
+
+        assertProjectTriggerTable(new String[][]{
+                getTriggerRow(projectName + " scm trigger", "event", "default"),
+                getTriggerRow(TRIGGER_NAME, "event", "default"),
+        });
+    }
+
+    private EditBuildCompletedTriggerForm editBuildCompletedTriggerHelper()
+    {
+        // First ensure we have a trigger and two build specs
+        testAddBuildSpec();
+        testAddNewBuildCompletedTrigger();
+
+        EditBuildCompletedTriggerForm form = new EditBuildCompletedTriggerForm(tester);
+        assertAndClick(getEditId(TRIGGER_NAME));
+        form.assertFormPresent();
+        return form;
+    }
+
+    // This is another case where Javascript causes HTTPUnit to barf
+//    public void testEditBuildCompletedTrigger()
+//    {
+//        EditBuildCompletedTriggerForm form = editBuildCompletedTriggerHelper();
+//        String id = tester.getDialog().getValueForOption(form.getFieldNames()[2], projectName);
+//        form.assertFormElements(TRIGGER_NAME, "default", id, "default", "FAILURE");
+//        form.saveFormElements("new name", SPEC_NAME, id, "", "SUCCESS");
+//
+//        assertProjectTriggerTable(new String[][]{
+//                getTriggerRow("new name", "event", SPEC_NAME),
+//        });
+//
+//        assertAndClick(getEditId(TRIGGER_NAME));
+//        form.assertFormPresent();
+//        form.assertFormElements("new name", SPEC_NAME, id, "", "SUCCESS");
+//    }
 
     public void testCloneProject() throws IOException
     {

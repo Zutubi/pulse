@@ -2038,3 +2038,44 @@
     #end
     </table>
 #end
+
+##
+## Outputs javascript to help changing the contents of one select box based on another
+##
+#macro(tiedSelect $name $keyList $valueMap $currentValue $keyElement $valueElement)
+    var ${name}Arrays = new Array($keyList.size());
+
+    #foreach($key in $keyList)
+        #set($i = $velocityCount - 1)
+        #set($valueList = $valueMap.get($key))
+
+        ${name}Arrays[$i] = new Array($valueList.size());
+        #foreach($value in $valueList)
+            #set($j = $velocityCount - 1)
+            ${name}Arrays[$i][$j] = new Option('$value', '$value');
+            #if($value == $currentValue)
+                ${name}Arrays[$i][$j].selected = true;
+            #end
+        #end
+    #end
+
+    function ${name}Selected()
+    {
+        var index = getElement('$keyElement').selectedIndex;
+
+        if(index < 0)
+        {
+            index = 0;
+        }
+
+        var options = ${name}Arrays[index];
+        var element = getElement('$valueElement');
+        element.options.length = 0;
+        for(i = 0; i < options.length; i++)
+        {
+            element.options[i] = options[i];
+        }
+    }
+
+    ${name}Selected();
+#end

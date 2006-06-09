@@ -50,7 +50,7 @@ public class EditTriggerAction extends ProjectActionSupport
 
         if (trigger.canEdit())
         {
-            return trigger.getType();
+            return trigger.getEditKey();
         }
 
         addActionError("Unable to edit trigger of type '" + trigger.getType() + "'");

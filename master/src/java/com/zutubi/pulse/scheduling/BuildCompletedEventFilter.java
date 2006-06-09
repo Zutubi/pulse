@@ -5,6 +5,8 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.util.logging.Logger;
 
+import java.util.List;
+
 /**
  * A filter that will only allow triggers for builds that complete in
  * certain states.
@@ -35,6 +37,28 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
             }
 
             result.append(s.toString());
+        }
+
+        return result.toString();
+    }
+
+    public static String getStatesString(List<String> stateNames)
+    {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+
+        for(String s: stateNames)
+        {
+            if(first)
+            {
+                first = false;
+            }
+            else
+            {
+                result.append(SEPARATOR);
+            }
+
+            result.append(s);
         }
 
         return result.toString();
@@ -102,4 +126,5 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
 
         return false;
     }
+
 }
