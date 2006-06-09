@@ -75,7 +75,7 @@ public class DataConfiguration implements DataResolver
         return initProps;
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         setSystemPaths(configurationManager.getSystemPaths());
     }

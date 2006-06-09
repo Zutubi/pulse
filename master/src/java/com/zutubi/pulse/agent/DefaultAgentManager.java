@@ -4,7 +4,7 @@ import com.zutubi.pulse.MasterBuildService;
 import com.zutubi.pulse.MasterRecipeProcessor;
 import com.zutubi.pulse.SlaveBuildService;
 import com.zutubi.pulse.SlaveProxyFactory;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.SlaveAvailableEvent;
@@ -34,7 +34,7 @@ public class DefaultAgentManager implements AgentManager
 
     private SlaveManager slaveManager;
     private MasterRecipeProcessor masterRecipeProcessor;
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
     private ResourceManager resourceManager;
     private EventManager eventManager;
     private SlaveProxyFactory slaveProxyFactory;
@@ -250,7 +250,7 @@ public class DefaultAgentManager implements AgentManager
         this.masterRecipeProcessor = masterRecipeProcessor;
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

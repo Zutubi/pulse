@@ -1,8 +1,8 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.CoreConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.Startup;
-import com.zutubi.pulse.bootstrap.AbstractCoreConfigurationManager;
+import com.zutubi.pulse.bootstrap.AbstractConfigurationManager;
 import com.zutubi.pulse.util.Constants;
 
 import java.util.Properties;
@@ -10,7 +10,6 @@ import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.MessageFormat;
-import java.io.File;
 
 /**
  */
@@ -23,7 +22,7 @@ public class SystemInfo
     private long usedMemory;
     private long freeMemory;
 
-    public static SystemInfo getSystemInfo(CoreConfigurationManager configurationManager, Startup startupManager)
+    public static SystemInfo getSystemInfo(ConfigurationManager configurationManager, Startup startupManager)
     {
         DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
         DateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss z");
@@ -32,9 +31,9 @@ public class SystemInfo
         Properties properties = System.getProperties();
 
         info.paths = new Properties();
-        if (properties.containsKey(AbstractCoreConfigurationManager.PULSE_HOME))
+        if (properties.containsKey(AbstractConfigurationManager.PULSE_HOME))
         {
-            info.paths.put("pulse.homeDir.field", properties.get(AbstractCoreConfigurationManager.PULSE_HOME));
+            info.paths.put("pulse.homeDir.field", properties.get(AbstractConfigurationManager.PULSE_HOME));
         }
         info.paths.put("pulse.dataDir.field", configurationManager.getUserPaths().getData());
 

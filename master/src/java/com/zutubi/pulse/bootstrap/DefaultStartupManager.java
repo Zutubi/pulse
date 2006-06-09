@@ -21,7 +21,7 @@ public class DefaultStartupManager implements StartupManager
     /**
      * The systems configuration manager.
      */
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
 
     /**
      * The systems object factory.
@@ -57,7 +57,7 @@ public class DefaultStartupManager implements StartupManager
      *
      * @param configurationManager
      */
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

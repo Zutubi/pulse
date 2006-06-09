@@ -1,7 +1,7 @@
 package com.zutubi.pulse.servlet;
 
 import com.zutubi.pulse.ServerRecipePaths;
-import com.zutubi.pulse.bootstrap.CoreConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
@@ -21,7 +21,7 @@ import java.io.IOException;
 public class DownloadResultsServlet extends HttpServlet
 {
     private static final Logger LOG = Logger.getLogger(DownloadResultsServlet.class);
-    private CoreConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
     {
@@ -97,11 +97,11 @@ public class DownloadResultsServlet extends HttpServlet
         }
     }
 
-    public CoreConfigurationManager getConfigurationManager()
+    public ConfigurationManager getConfigurationManager()
     {
         if(configurationManager == null)
         {
-            configurationManager = (CoreConfigurationManager) ComponentContext.getBean("configurationManager");
+            configurationManager = (ConfigurationManager) ComponentContext.getBean("configurationManager");
         }
         return configurationManager;
     }

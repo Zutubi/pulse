@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.admin;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.License;
@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 public class ManageLicenseAction extends ActionSupport
 {
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
 
     private EventManager eventManager;
 
@@ -97,7 +97,7 @@ public class ManageLicenseAction extends ActionSupport
      *
      * @param configurationManager
      */
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

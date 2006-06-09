@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.admin;
 
-import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.license.License;
@@ -14,13 +14,13 @@ import java.text.SimpleDateFormat;
  */
 public class ServerSettingsAction extends ActionSupport
 {
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
     private JabberManager jabberManager;
-    private ApplicationConfiguration config;
+    private MasterApplicationConfiguration config;
     private DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
     private License license;
 
-    public ApplicationConfiguration getConfig()
+    public MasterApplicationConfiguration getConfig()
     {
         return config;
     }
@@ -53,7 +53,7 @@ public class ServerSettingsAction extends ActionSupport
         return "Never";
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

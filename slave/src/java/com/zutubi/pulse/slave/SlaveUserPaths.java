@@ -1,32 +1,35 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.bootstrap.CoreUserPaths;
+import com.zutubi.pulse.bootstrap.UserPaths;
+import com.zutubi.pulse.bootstrap.SystemPaths;
 
 import java.io.File;
 
 /**
  */
-public class SlaveUserPaths implements CoreUserPaths
+public class SlaveUserPaths implements UserPaths
 {
     private static final String CONFIG_DIR = ".pulse-agent";
 
-    private File pulseData;
+    private File data;
+    private File userConfigRoot;
 
-    public SlaveUserPaths()
+    public SlaveUserPaths(SystemPaths systemPaths)
     {
-        // TODO: dev-distributed: does this always exist??  Is this even a good idea?
+        data = new File(systemPaths.getSystemRoot(), "data");
+
         String home = System.getProperty("user.home");
         File homeDir = new File(home);
-        this.pulseData = new File(homeDir, CONFIG_DIR);
+        this.userConfigRoot = new File(homeDir, CONFIG_DIR);
     }
 
     public File getData()
     {
-        return pulseData;
+        return data;
     }
 
     public File getUserConfigRoot()
     {
-        return new File(pulseData, "config");
+        return userConfigRoot;
     }
 }

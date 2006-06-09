@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.Agent;
 
@@ -14,7 +14,7 @@ import java.util.List;
 public class ViewAgentsAction extends ActionSupport
 {
     private List<Agent> agents;
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
     private AgentManager agentManager;
 
     public List<Agent> getAgents()
@@ -35,7 +35,7 @@ public class ViewAgentsAction extends ActionSupport
         return SUCCESS;
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

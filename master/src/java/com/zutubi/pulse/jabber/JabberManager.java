@@ -1,8 +1,8 @@
 package com.zutubi.pulse.jabber;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.util.logging.Logger;
 import org.jivesoftware.smack.*;
@@ -20,7 +20,7 @@ public class JabberManager implements Stoppable, PacketListener
     private static final Logger LOG = Logger.getLogger(JabberManager.class);
 
     private XMPPConnection connection = null;
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
 
     /**
      * Holds the status from when we last tried to connect.  Will be null
@@ -31,7 +31,7 @@ public class JabberManager implements Stoppable, PacketListener
     public void init()
     {
         statusMessage = null;
-        ApplicationConfiguration appConfig = configurationManager.getAppConfig();
+        MasterApplicationConfiguration appConfig = configurationManager.getAppConfig();
         if (TextUtils.stringSet(appConfig.getJabberHost()))
         {
             LOG.info("Initialising Jabber");
@@ -64,7 +64,7 @@ public class JabberManager implements Stoppable, PacketListener
         }
     }
 
-    private void openConnection(ApplicationConfiguration appConfig)
+    private void openConnection(MasterApplicationConfiguration appConfig)
             throws XMPPException
     {
         if(appConfig.getJabberForceSSL())
@@ -135,7 +135,7 @@ public class JabberManager implements Stoppable, PacketListener
         return statusMessage;
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

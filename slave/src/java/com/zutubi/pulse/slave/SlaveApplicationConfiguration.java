@@ -1,9 +1,9 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.bootstrap.CoreApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
 
 /**
  */
-public interface SlaveApplicationConfiguration extends CoreApplicationConfiguration
+public interface SlaveApplicationConfiguration extends ApplicationConfiguration
 {
 }

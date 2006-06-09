@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
@@ -15,10 +15,10 @@ public class MasterRecipeRunner implements Runnable
     private RecipeRequest request;
     private RecipeProcessor recipeProcessor;
     private EventManager eventManager;
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
     private ResourceRepository resourceRepository;
 
-    public MasterRecipeRunner(RecipeRequest request, RecipeProcessor recipeProcessor, EventManager eventManager, ConfigurationManager configurationManager, ResourceRepository resourceRepository)
+    public MasterRecipeRunner(RecipeRequest request, RecipeProcessor recipeProcessor, EventManager eventManager, MasterConfigurationManager configurationManager, ResourceRepository resourceRepository)
     {
         this.request = request;
         this.recipeProcessor = recipeProcessor;

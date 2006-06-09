@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.filesystem.local.LocalFileSystem;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
@@ -13,7 +13,7 @@ public class BrowseProjectDirAction extends AbstractBrowseDirAction
     private long buildId;
     private long recipeId;
     private BuildResult buildResult;
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
     private boolean foundBase = true;
 
 
@@ -83,7 +83,7 @@ public class BrowseProjectDirAction extends AbstractBrowseDirAction
         return super.execute(new LocalFileSystem(baseDir));
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

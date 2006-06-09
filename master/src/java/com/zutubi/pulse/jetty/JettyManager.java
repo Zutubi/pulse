@@ -1,6 +1,6 @@
 package com.zutubi.pulse.jetty;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.util.logging.Logger;
 import org.mortbay.jetty.Server;
@@ -21,7 +21,7 @@ public class JettyManager implements Stoppable
     private static final Logger LOG = Logger.getLogger(JettyManager.class);
 
     private Server server;
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
     private WebApplicationContext appContext;
 
     /**
@@ -44,7 +44,7 @@ public class JettyManager implements Stoppable
      *
      * @param configurationManager
      */
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

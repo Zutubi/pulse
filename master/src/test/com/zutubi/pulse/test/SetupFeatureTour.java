@@ -9,7 +9,7 @@ import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.JUnitReportPostProcessor;
 import com.zutubi.pulse.core.AntPostProcessor;
 import com.zutubi.pulse.core.DirectoryArtifact;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.UserDao;
@@ -20,7 +20,6 @@ import java.io.*;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Date;
-import java.util.Properties;
 
 /**
  */
@@ -33,7 +32,7 @@ public class SetupFeatureTour implements Runnable
     private BuildResultDao buildResultDao;
     private UserDao userDao;
     private UserManager userManager;
-    private ConfigurationManager configManager;
+    private MasterConfigurationManager configManager;
     private SlaveDao slaveDao;
 
     private Slave slave;
@@ -492,7 +491,7 @@ public class SetupFeatureTour implements Runnable
         this.userDao = userDao;
     }
 
-    public void setConfigurationManager(ConfigurationManager configManager)
+    public void setConfigurationManager(MasterConfigurationManager configManager)
     {
         this.configManager = configManager;
     }

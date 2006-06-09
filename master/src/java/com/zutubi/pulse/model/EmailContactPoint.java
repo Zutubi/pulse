@@ -1,8 +1,8 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
@@ -63,7 +63,7 @@ public class EmailContactPoint extends ContactPoint
     */
     public void notify(BuildResult result)
     {
-        ApplicationConfiguration config = lookupConfigManager().getAppConfig();
+        MasterApplicationConfiguration config = lookupConfigManager().getAppConfig();
         String prefix = config.getSmtpPrefix();
 
         if (prefix == null)
@@ -83,17 +83,17 @@ public class EmailContactPoint extends ContactPoint
     {
         StringWriter w = new StringWriter();
         BuildResultRenderer renderer = (BuildResultRenderer) ComponentContext.getBean("buildResultRenderer");
-        ConfigurationManager configManager = lookupConfigManager();
+        MasterConfigurationManager configManager = lookupConfigManager();
         renderer.render(configManager.getAppConfig().getHostName(), result, getType(), w);
         return w.toString();
     }
 
-    private ConfigurationManager lookupConfigManager()
+    private MasterConfigurationManager lookupConfigManager()
     {
-        return (ConfigurationManager) ComponentContext.getBean("configurationManager");
+        return (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
     }
 
-    private void sendMail(String subject, String body, final ApplicationConfiguration config)
+    private void sendMail(String subject, String body, final MasterApplicationConfiguration config)
     {
         if (!TextUtils.stringSet(config.getSmtpHost()))
         {

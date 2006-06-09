@@ -678,7 +678,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         // check form is available.
         assertFormPresent("trigger.type");
-        // default trigger type.
+        setFormElement("type", "cron");
         // default specification.
         setFormElement("name", TRIGGER_NAME);
         submit("next");
@@ -720,13 +720,14 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertFormPresent("trigger.type");
         // check that we can not create a trigger with an existing name.
         setFormElement("name", triggerName);
+        setFormElement("type", "cron");
         // go with the defaults.
         submit("next");
 
         assertFormPresent("trigger.type");
         // assert text present..
 
-        assertOptionValuesEqual("type", new String[]{"cron", "monitor"});
+        assertOptionValuesEqual("type", new String[]{"build.completed", "cron", "monitor"});
 
         // use some random name.
         setFormElement("name", "trigger " + RandomUtils.randomString(4));

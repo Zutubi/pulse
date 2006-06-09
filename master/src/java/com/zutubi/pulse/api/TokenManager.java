@@ -1,12 +1,9 @@
 package com.zutubi.pulse.api;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
@@ -14,8 +11,6 @@ import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;

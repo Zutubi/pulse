@@ -1,7 +1,7 @@
 package com.zutubi.pulse.test;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
@@ -29,7 +29,7 @@ public class SetupDummyBuilds implements Runnable
     private ProjectDao projectDao;
     private BuildResultDao buildResultDao;
     private UserDao userDao;
-    private ConfigurationManager configManager;
+    private MasterConfigurationManager configManager;
     private UserManager userManager;
     private Slave slave;
     private static final int BUILDS_IN_LONG_HISTORY_PROJECT = 100;
@@ -795,7 +795,7 @@ public class SetupDummyBuilds implements Runnable
         this.userDao = userDao;
     }
 
-    public void setConfigurationManager(ConfigurationManager configManager)
+    public void setConfigurationManager(MasterConfigurationManager configManager)
     {
         this.configManager = configManager;
     }

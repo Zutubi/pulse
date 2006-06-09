@@ -10,7 +10,7 @@ public class CustomLogSystem implements LogSystem
 {
     private static final Logger LOG = Logger.getLogger(CustomLogSystem.class);
 
-    private boolean enabled = true;
+    private boolean enabled = false;
 
     public void init(RuntimeServices runtimeServices) throws Exception
     {

@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.RecipeRequest;
@@ -19,7 +19,7 @@ public class MasterRecipeProcessor implements Stoppable
 
     private ExecutorService executor;
     private RecipeProcessor recipeProcessor;
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
     private EventManager eventManager;
     private ResourceRepository resourceRepository;
 
@@ -38,7 +38,7 @@ public class MasterRecipeProcessor implements Stoppable
         this.recipeProcessor = recipeProcessor;
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

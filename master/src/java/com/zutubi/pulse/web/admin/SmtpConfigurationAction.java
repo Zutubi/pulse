@@ -1,15 +1,15 @@
 package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
 
 /**
  * <class-comment/>
  */
 public class SmtpConfigurationAction extends ActionSupport
 {
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
 
     private SmtpConfig smtp = new SmtpConfig();
 
@@ -49,7 +49,7 @@ public class SmtpConfigurationAction extends ActionSupport
 
     private void resetConfig()
     {
-        ApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterApplicationConfiguration config = configurationManager.getAppConfig();
         config.setSmtpPrefix(null);
         config.setSmtpFrom(null);
         config.setSmtpHost(null);
@@ -59,7 +59,7 @@ public class SmtpConfigurationAction extends ActionSupport
 
     private void saveConfig()
     {
-        ApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterApplicationConfiguration config = configurationManager.getAppConfig();
         config.setSmtpPrefix(smtp.getPrefix());
         config.setSmtpFrom(smtp.getFrom());
         config.setSmtpHost(smtp.getHost());
@@ -69,7 +69,7 @@ public class SmtpConfigurationAction extends ActionSupport
 
     private void loadConfig()
     {
-        ApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterApplicationConfiguration config = configurationManager.getAppConfig();
         smtp.setPrefix(config.getSmtpPrefix());
         smtp.setFrom(config.getSmtpFrom());
         smtp.setHost(config.getSmtpHost());
@@ -82,7 +82,7 @@ public class SmtpConfigurationAction extends ActionSupport
      *
      * @param config
      */
-    public void setConfigurationManager(ConfigurationManager config)
+    public void setConfigurationManager(MasterConfigurationManager config)
     {
         this.configurationManager = config;
     }

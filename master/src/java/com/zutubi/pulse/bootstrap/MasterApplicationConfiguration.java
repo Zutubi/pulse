@@ -4,7 +4,7 @@ package com.zutubi.pulse.bootstrap;
  * 
  *
  */
-public interface ApplicationConfiguration extends CoreApplicationConfiguration
+public interface MasterApplicationConfiguration extends ApplicationConfiguration
 {
     //---( server configuration )---
     public static final String ADMIN_PORT = "admin.port";

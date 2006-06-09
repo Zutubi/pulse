@@ -4,7 +4,7 @@ import java.io.File;
 
 /**
  */
-public abstract class AbstractCoreConfigurationManager implements CoreConfigurationManager
+public abstract class AbstractConfigurationManager implements ConfigurationManager
 {
     public static final String PULSE_HOME = "pulse.home";
 

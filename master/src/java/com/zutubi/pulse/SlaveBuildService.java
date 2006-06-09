@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
 import com.caucho.hessian.client.HessianRuntimeException;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.model.ResourceManager;
@@ -27,10 +27,10 @@ public class SlaveBuildService implements BuildService
 
     private SlaveService service;
     private Slave slave;
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
     private ResourceManager resourceManager;
 
-    public SlaveBuildService(SlaveService service, Slave slave, ConfigurationManager configurationManager, ResourceManager resourceManager)
+    public SlaveBuildService(SlaveService service, Slave slave, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
     {
         this.service = service;
         this.slave = slave;
@@ -157,7 +157,7 @@ public class SlaveBuildService implements BuildService
         return false;
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

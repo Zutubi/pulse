@@ -31,7 +31,7 @@
         </property>
     </bean>
 
-    <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleConfigurationManager"/>
+    <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager"/>
 
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 

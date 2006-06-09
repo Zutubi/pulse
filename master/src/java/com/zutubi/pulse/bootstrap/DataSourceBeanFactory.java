@@ -46,7 +46,7 @@ public class DataSourceBeanFactory implements FactoryBean, ApplicationContextAwa
 
     public String getUrl()
     {
-        ConfigurationManager configManager = (ConfigurationManager) context.getBean("configurationManager");
+        MasterConfigurationManager configManager = (MasterConfigurationManager) context.getBean("configurationManager");
         File dbRoot = configManager.getUserPaths().getDatabaseRoot();
         return "jdbc:hsqldb:" + dbRoot.getAbsolutePath() + File.separator + "db";
     }

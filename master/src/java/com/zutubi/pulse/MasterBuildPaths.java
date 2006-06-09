@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 
@@ -23,7 +23,7 @@ public class MasterBuildPaths
 {
     private File rootBuildDir;
 
-    public MasterBuildPaths(ConfigurationManager configManager)
+    public MasterBuildPaths(MasterConfigurationManager configManager)
     {
         rootBuildDir = configManager.getUserPaths().getProjectRoot();
     }

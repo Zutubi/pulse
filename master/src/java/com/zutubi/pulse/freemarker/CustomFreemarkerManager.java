@@ -1,6 +1,6 @@
 package com.zutubi.pulse.freemarker;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.util.logging.Logger;
 import com.opensymphony.webwork.views.freemarker.FreemarkerManager;
@@ -19,7 +19,7 @@ public class CustomFreemarkerManager extends FreemarkerManager
 {
     private static final Logger LOG = Logger.getLogger(CustomFreemarkerManager.class);
 
-    private ConfigurationManager configManager;
+    private MasterConfigurationManager configManager;
 
     public static void initialiseLogging()
     {
@@ -63,7 +63,7 @@ public class CustomFreemarkerManager extends FreemarkerManager
         return new MultiTemplateLoader(getLoaders(superLoader));
     }
 
-    public void setConfigurationManager(ConfigurationManager configManager)
+    public void setConfigurationManager(MasterConfigurationManager configManager)
     {
          this.configManager = configManager;
     }

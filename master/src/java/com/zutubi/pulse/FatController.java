@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
@@ -44,7 +44,7 @@ public class FatController implements EventListener, Stoppable
     private EventManager eventManager;
     private AsynchronousDelegatingListener asyncListener;
     private BuildManager buildManager;
-    private ConfigurationManager configManager;
+    private MasterConfigurationManager configManager;
     private RecipeQueue recipeQueue;
 
     private ReentrantLock lock = new ReentrantLock();
@@ -403,7 +403,7 @@ public class FatController implements EventListener, Stoppable
      *
      * @param configManager
      */
-    public void setConfigurationManager(ConfigurationManager configManager)
+    public void setConfigurationManager(MasterConfigurationManager configManager)
     {
         this.configManager = configManager;
     }

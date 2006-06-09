@@ -25,7 +25,7 @@ import java.util.Properties;
  * <p/>
  * pulse.config.properties: core configuration properties, contain version and license details amongst other things
  */
-public class Data implements UserPaths
+public class Data implements MasterUserPaths
 {
     private static final Logger LOG = Logger.getLogger(Data.class);
 
@@ -173,7 +173,7 @@ public class Data implements UserPaths
     }
 
     /**
-     * @see com.zutubi.pulse.bootstrap.UserPaths#getUserConfigRoot()
+     * @see com.zutubi.pulse.bootstrap.MasterUserPaths#getUserConfigRoot()
      */
     public File getUserConfigRoot()
     {
@@ -185,7 +185,7 @@ public class Data implements UserPaths
     }
 
     /**
-     * @see com.zutubi.pulse.bootstrap.UserPaths#getDatabaseRoot()
+     * @see com.zutubi.pulse.bootstrap.MasterUserPaths#getDatabaseRoot()
      */
     public File getDatabaseRoot()
     {
@@ -197,7 +197,7 @@ public class Data implements UserPaths
     }
 
     /**
-     * @see com.zutubi.pulse.bootstrap.UserPaths#getProjectRoot()
+     * @see com.zutubi.pulse.bootstrap.MasterUserPaths#getProjectRoot()
      */
     public File getProjectRoot()
     {

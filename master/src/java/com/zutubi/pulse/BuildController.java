@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
@@ -47,7 +47,7 @@ public class BuildController implements EventListener
     private BuildSpecification specification;
     private EventManager eventManager;
     private BuildManager buildManager;
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
     private RecipeQueue queue;
     private RecipeResultCollector collector;
     private BuildTree tree;
@@ -56,7 +56,7 @@ public class BuildController implements EventListener
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private Scheduler quartzScheduler;
 
-    public BuildController(BuildRequestEvent event, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, ConfigurationManager configManager)
+    public BuildController(BuildRequestEvent event, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager)
     {
         this.revision = event.getRevision();
         this.reason = event.getReason();
@@ -447,7 +447,7 @@ public class BuildController implements EventListener
         return buildResult.getId();
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

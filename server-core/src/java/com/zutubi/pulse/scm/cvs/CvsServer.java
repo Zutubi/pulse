@@ -1,7 +1,7 @@
 package com.zutubi.pulse.scm.cvs;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.bootstrap.CoreConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.CvsRevision;
@@ -301,7 +301,7 @@ public class CvsServer extends CachingSCMServer
      *
      * @see CvsServer#setTemporarySpace(java.io.File)
      */
-    public void setConfigurationManager(CoreConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         setTemporarySpace(configurationManager.getSystemPaths().getTmpRoot());
     }

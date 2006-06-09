@@ -1,7 +1,7 @@
 package com.zutubi.pulse.bootstrap.velocity;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.runtime.resource.loader.FileResourceLoader;
@@ -15,7 +15,7 @@ import java.io.File;
  */
 public class PulseTemplateVelocityResourceLoader extends FileResourceLoader
 {
-    private ConfigurationManager configManager;
+    private MasterConfigurationManager configManager;
 
     public PulseTemplateVelocityResourceLoader()
     {
@@ -56,7 +56,7 @@ public class PulseTemplateVelocityResourceLoader extends FileResourceLoader
      *
      * @param configManager
      */
-    public void setConfigurationManager(ConfigurationManager configManager)
+    public void setConfigurationManager(MasterConfigurationManager configManager)
     {
         this.configManager = configManager;
     }

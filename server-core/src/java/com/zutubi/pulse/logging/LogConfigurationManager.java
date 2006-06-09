@@ -1,6 +1,6 @@
 package com.zutubi.pulse.logging;
 
-import com.zutubi.pulse.bootstrap.CoreConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -20,7 +20,7 @@ import java.util.logging.LogRecord;
 public class LogConfigurationManager
 {
     private File logConfigDir;
-    private CoreConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
 
     public void init()
     {
@@ -99,7 +99,7 @@ public class LogConfigurationManager
      *
      * @param configurationManager
      */
-    public void setConfigurationManager(CoreConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
         File configDirectory = this.configurationManager.getSystemPaths().getConfigRoot();

@@ -8,7 +8,7 @@ import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import org.json.JSONException;
 import org.json.JSONWriter;
 import org.w3c.dom.Document;
@@ -238,7 +238,7 @@ public class JsonResult extends WebWorkResultSupport
 
     private JsonDefinitionLoader getDefaultDefinitionLoader()
     {
-        final ConfigurationManager config = (ConfigurationManager) ComponentContext.getBean("configurationManager");
+        final MasterConfigurationManager config = (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
         return new JsonDefinitionLoader()
         {
             public InputStream load(String location) throws FileNotFoundException

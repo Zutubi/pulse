@@ -3,7 +3,7 @@ package com.zutubi.pulse.slave;
 import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
 import com.zutubi.pulse.bootstrap.conf.FileConfig;
 import com.zutubi.pulse.bootstrap.conf.CompositeConfig;
-import com.zutubi.pulse.bootstrap.CoreUserPaths;
+import com.zutubi.pulse.bootstrap.UserPaths;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -18,10 +18,10 @@ public class DefaultSlaveApplicationConfiguration implements SlaveApplicationCon
     private static final String PROPERTIES_FILE = "pulse-agent.properties";
 
     private ConfigSupport config;
-    private CoreUserPaths userPaths;
+    private UserPaths userPaths;
     private SystemPaths systemPaths;
 
-    public DefaultSlaveApplicationConfiguration(CoreUserPaths userPaths, SystemPaths systemPaths)
+    public DefaultSlaveApplicationConfiguration(UserPaths userPaths, SystemPaths systemPaths)
     {
         this.userPaths = userPaths;
         this.systemPaths = systemPaths;

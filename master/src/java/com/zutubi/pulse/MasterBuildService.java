@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -17,10 +17,10 @@ public class MasterBuildService implements BuildService
     private static final Logger LOG = Logger.getLogger(MasterBuildService.class);
 
     private MasterRecipeProcessor masterRecipeProcessor;
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
     private ResourceManager resourceManager;
 
-    public MasterBuildService(MasterRecipeProcessor masterRecipeProcessor, ConfigurationManager configurationManager, ResourceManager resourceManager)
+    public MasterBuildService(MasterRecipeProcessor masterRecipeProcessor, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
     {
         this.masterRecipeProcessor = masterRecipeProcessor;
         this.configurationManager = configurationManager;
@@ -87,7 +87,7 @@ public class MasterBuildService implements BuildService
         this.masterRecipeProcessor = masterRecipeProcessor;
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

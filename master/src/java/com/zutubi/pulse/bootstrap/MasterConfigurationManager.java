@@ -6,15 +6,15 @@ import java.io.File;
  * 
  *
  */
-public interface ConfigurationManager extends CoreConfigurationManager
+public interface MasterConfigurationManager extends ConfigurationManager
 {
     /**
      * 
      * @return system configuration.
      */
-    ApplicationConfiguration getAppConfig();
+    MasterApplicationConfiguration getAppConfig();
 
-    UserPaths getUserPaths();
+    MasterUserPaths getUserPaths();
 
     void setPulseData(File pulseHome);
 

@@ -11,30 +11,30 @@ import java.io.File;
 /**
  * <class-comment/>
  */
-public class SimpleConfigurationManager extends AbstractCoreConfigurationManager implements ConfigurationManager
+public class SimpleMasterConfigurationManager extends AbstractConfigurationManager implements MasterConfigurationManager
 {
-    private static final Logger LOG = Logger.getLogger(SimpleConfigurationManager.class);
+    private static final Logger LOG = Logger.getLogger(SimpleMasterConfigurationManager.class);
 
     private DataConfiguration dataConfig;
 
-    public ApplicationConfiguration getAppConfig()
+    public MasterApplicationConfiguration getAppConfig()
     {
-        UserPaths paths = getUserPaths();
+        MasterUserPaths paths = getUserPaths();
         if (paths != null)
         {
             Config user = new FileConfig(new File(paths.getUserConfigRoot(), "pulse.properties"));
             Config defaults = new FileConfig(new File(getSystemPaths().getConfigRoot(), "pulse-defaults.properties"));
             Config composite = new CompositeConfig(user, new ReadOnlyConfig(defaults));
-            return new ApplicationConfigurationSupport(composite);
+            return new MasterApplicationConfigurationSupport(composite);
         }
         else
         {
             Config defaults = new FileConfig(new File(getSystemPaths().getConfigRoot(), "pulse-defaults.properties"));
-            return new ApplicationConfigurationSupport(new ReadOnlyConfig(defaults));
+            return new MasterApplicationConfigurationSupport(new ReadOnlyConfig(defaults));
         }
     }
 
-    public UserPaths getUserPaths()
+    public MasterUserPaths getUserPaths()
     {
         File pulseHome = getDataDirectory();
         if (pulseHome != null)

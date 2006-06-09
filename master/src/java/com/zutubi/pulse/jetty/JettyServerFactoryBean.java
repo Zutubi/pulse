@@ -1,6 +1,6 @@
 package com.zutubi.pulse.jetty;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.util.logging.Logger;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
@@ -16,7 +16,7 @@ public class JettyServerFactoryBean implements FactoryBean
 
     private static Server instance;
 
-    private ConfigurationManager configManager = null;
+    private MasterConfigurationManager configManager = null;
 
     public Object getObject() throws Exception
     {
@@ -48,7 +48,7 @@ public class JettyServerFactoryBean implements FactoryBean
         return true;
     }
 
-    public void setConfigurationManager(ConfigurationManager configManager)
+    public void setConfigurationManager(MasterConfigurationManager configManager)
     {
         this.configManager = configManager;
     }

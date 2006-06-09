@@ -6,16 +6,16 @@ import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
 /**
  * <class-comment/>
  */
-public class ApplicationConfigurationSupport implements ApplicationConfiguration
+public class MasterApplicationConfigurationSupport implements MasterApplicationConfiguration
 {
     private final ConfigSupport config;
 
-    public ApplicationConfigurationSupport(ConfigSupport config)
+    public MasterApplicationConfigurationSupport(ConfigSupport config)
     {
         this.config = config;
     }
 
-    public ApplicationConfigurationSupport(Config config)
+    public MasterApplicationConfigurationSupport(Config config)
     {
         this.config = new ConfigSupport(config);
     }
