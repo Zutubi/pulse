@@ -130,11 +130,12 @@ function init(event)
 {
     // Initialise the model root.
     //TODO: use a root value specific to the file system.
-    getConfig().root = new MyNode();
-    getConfig().root.initialize();
-    getConfig().root.name = "ROOT";
-    getConfig().root.id = "";
-    getConfig().root.type = "";
+    var newRoot = new MyNode();
+    newRoot.initialize();
+    newRoot.name = "ROOT";
+    newRoot.id = "";
+    newRoot.type = "";
+    setRoot(newRoot);
 
     var anchorId = getConfig().anchor;
 
@@ -143,7 +144,7 @@ function init(event)
 
     // LOADING FEEDBACK.
     var ul = document.createElement("ul");
-    ul.appendChild(createDomNode(createTemporaryNode("Loading...", "loading", "")));
+    ul.appendChild(createDomNode(createVirtualNode("Loading...", "loading", "")));
     anchorDiv.appendChild(ul);
 
     // TRIGGER LOAD OF THE ROOT NODE.
@@ -195,7 +196,7 @@ function updateModel(originalRequest)
     results.each(function(jsonObj)
     {
         // locate where in the tree this update belongs.
-        var rootNode = getConfig().root;
+        var rootNode = getRoot();
         var node = locateNode(rootNode, jsonObj.uid);
         if (!node)
         {
@@ -289,20 +290,16 @@ function updateTree(id)
 
         // now we change the onclick handler so that it handles toggling instead of loading.
         target.onclick = onToggle;
-
-        // open current target.
-        Element.removeClassName(target, "folder");
-        Element.addClassName(target, "openfolder");
     }
 
-    var rootNode = locateNode(getConfig().root, id);
+    var rootNode = locateNode(getRoot(), id);
     if (!rootNode)
     {
-        rootNode = getConfig().root;
+        rootNode = getRoot();
 
         // add the '.' directory so that it can be selected. However, we do not want it to be
         // reloaded since it is a special case that clears out all existing content...
-        var thisDirectory = createDomNode(createTemporaryNode(".", "root", ""));
+        var thisDirectory = createDomNode(createVirtualNode(".", "root", ""));
         ul.appendChild(thisDirectory);
     }
 
@@ -334,7 +331,7 @@ function updateFlat(id)
     // add the links to the current directory.
     var uid = rootNode.getId();
 
-    var thisDirectory = createDomNode(createTemporaryNode(".", "folder", uid));
+    var thisDirectory = createDomNode(createVirtualNode(".", "folder", uid));
     ul.appendChild(thisDirectory);
 
     // show link to the parent whenever we are not at the root.
@@ -345,7 +342,7 @@ function updateFlat(id)
         {
             puid = rootNode.getParent().getId();
         }
-        var parentDirectory = createDomNode(createTemporaryNode("..", "folder", puid));
+        var parentDirectory = createDomNode(createVirtualNode("..", "folder", puid));
         ul.appendChild(parentDirectory);
     }
 
@@ -413,9 +410,22 @@ function onSelectionChange()
     // locate and update the dom tree node that should be appearing as selected.
     var selectedDomNode = document.getElementById(selectedNode.getId());
     Element.addClassName(selectedDomNode, "selected");
+
+    // if the selected dom node is a folder, then toggle it.
+    if (selectedNode.getType() == "folder")
+    {
+        if (Element.hasClassName(selectedDomNode, "folder"))
+        {
+            replaceClassName(selectedDomNode, "folder", "openfolder");
+        }
+        else
+        {
+            replaceClassName(selectedDomNode, "openfolder", "folder");
+        }
+    }
 }
 
-function createTemporaryNode(file, type, uid)
+function createVirtualNode(file, type, uid)
 {
     var tmpNode = new MyNode();
     tmpNode.id = uid;
@@ -476,20 +486,35 @@ function onSelect(event)
  */
 function setSelectionById(id)
 {
-    var newSelection = locateNode(getConfig().root, id);
+    var newSelection = locateNode(getRoot(), id);
     if (!newSelection)
     {
         console.log("WARNING: failed to locate newly selected node '%s'", id);
     }
-    getConfig().selectedNode = newSelection;
+    setSelection(newSelection);
 
     // trigger the selected node change event listeners.
     onSelectionChange();
 }
 
+function setSelection(newSelection)
+{
+    getConfig().selectedNode = newSelection;
+}
+
 function getSelection()
 {
     return getConfig().selectedNode;
+}
+
+function getRoot()
+{
+    return getConfig().root;
+}
+
+function setRoot(newRoot)
+{
+    getConfig().root = newRoot;
 }
 
 /**
@@ -506,7 +531,7 @@ function onLoad(event)
         // insert another level of the tree. <ul>loading...</ul>
 
         var ul = document.createElement("ul");
-        ul.appendChild(createDomNode(createTemporaryNode("Loading...", "loading", "")));
+        ul.appendChild(createDomNode(createVirtualNode("Loading...", "loading", "")));
 
         currentTarget.appendChild(ul);
 

@@ -112,6 +112,11 @@
            margin:0px;
            padding:0px;
         }
+
+        .toolbarIcon {
+            border-width:0px;
+        }
+
     </style>
 
 </head>
@@ -120,11 +125,7 @@
 
     <div class="bordered" id="toolbar">
         Toolbar:&nbsp;
-        <a href="" onclick="selectParentNode(); return false;"><img src="/images/cd_go.png" alt=""/></a>
-        <a href=""><img src="/images/cd_add.png" alt=""/></a>
-        <a href=""><img src="/images/cd_burn.png" alt=""/></a>
-        <a href=""><img src="/images/cd_delete.png" alt=""/></a>
-        <a href=""><img src="/images/cd_edit.png" alt=""/></a>
+        <a href="" onclick="selectParentNode(); return false;"><img class="toolbarIcon" src="/images/cd_go.png" alt="up"/></a>
     </div>
 
     <div class="bordered" id="pathElement">
