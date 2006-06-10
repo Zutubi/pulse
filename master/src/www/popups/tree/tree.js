@@ -1,8 +1,23 @@
 /**
  * Simple node object that allows us to create a node tree.
  */
-MyNode = function(){};
-MyNode.prototype = {
+MyNode = Class.create();
+Object.extend(MyNode.prototype = {
+
+    /**
+     * The not loaded state.
+     */
+    NOT_LOADED: 3,
+
+    /**
+     * The loading state.
+     */
+    LOADING: 4,
+
+    /**
+     * The loaded state.
+     */
+    LOADED: 5,
 
     /**
      * Constructor.
@@ -12,6 +27,7 @@ MyNode.prototype = {
         this.parent = null,
         this.name = null,
         this.type = null,
+        this.state = NOT_LOADED,
         this.id
     },
 
@@ -77,25 +93,51 @@ MyNode.prototype = {
         //TODO: replace hard wired '/' with file system specific value.
         path = path + "/" + this.getName();
         return path;
+    },
+
+    getState: function()
+    {
+        return this.state;
+    },
+
+    isLoaded: function()
+    {
+        return this.getState() == this.LOADED;
+    },
+
+    /**
+     * Returns true if the type represented by this node is a folder, false otherwise.
+     */
+    isFolder: function()
+    {
+        return this.getType() == "folder";
     }
-};
+});
 
 /**
  * Event router allows us to attach multiple event handlers to a single dom event callback.
  *
  * (adapted from Ajax in Action, pg 142.)
  */
-EventRouter =function(){};
-EventRouter.prototype = {
-
+EventRouter = Class.create();
+Object.extend(EventRouter.prototype = {
     initialize: function(el, eventType)
     {
         this.lsnrs = new Array();
         this.el = el;
-        el.eventRouter = this;
-        el[eventType] = this.callback;
+        this.eventType = eventType;
+        el[eventType + 'Router'] = this;
+        el[eventType] = this.generateCallback(eventType);
     },
 
+/*
+    extendEl: function()
+    {
+        this.el['add' + this.eventType + 'Listener'] = eval('function(lsnr){this.'+this.eventType+'Router.lsnrs.push(lsnr);}');
+        this.el['remove' + this.eventType + 'Listener'] = eval('function(lsnr){this.'+this.eventType+'Router.lsnrs.remove(lsnr);}');
+    },
+
+*/
     addListener: function(lsnr)
     {
         this.lsnrs.push(lsnr);
@@ -115,12 +157,248 @@ EventRouter.prototype = {
         });
     },
 
-    callback: function(event)
+    generateCallback: function(eventType)
     {
-        var router = this.eventRouter;
-        router.notify(this, event);
+        // you have to love javascript :)
+        // The following eval generates a callback function that 'knows' the variable name that contains
+        // this object. The problem being solved is that when the callback method is registered with the
+        // element (during init), it loses its context, and in particular, its reference to 'this'. We need
+        // 'this' to get access to the lsnrs. By dynamically creating this function, we are able to use multiple
+        // event handlers on the same object. Cool.
+        return eval('function(event){'+
+                        'var e = event || window.event; '+
+                        'var router = this.'+eventType+'Router; '+
+                        'router.notify(this, e);'+
+                    '}')
     }
-}
+});
+
+Core = Class.create();
+Object.extend(Core.prototype = {
+    initialize: function()
+    {
+        // initialize the model.
+        this.root = new MyNode();
+        this.root.name = "ROOT";
+        this.root.id = "";
+        this.root.type = "";
+
+        this.updateRouter = new EventRouter(this, "onupdate");
+        this.selectRouter = new EventRouter(this, "onselect");
+
+        this.selectedNode = null;
+
+        this.loadedNodes = {};
+    },
+
+    addOnUpdateListener: function(lsnr)
+    {
+        this.updateRouter.addListener(lsnr);
+    },
+
+    addOnSelectListener: function(lsnr)
+    {
+        this.selectRouter.addListener(lsnr);
+    },
+
+    /**
+     * Retrieve the root node of the node tree.
+     */
+    getModel: function()
+    {
+        return this.root;
+    },
+
+    /**
+     * Retrieve the node specified by the node id.
+     *
+     */
+    getNodeById: function(nodeId)
+    {
+        // lookup the node in the internal node cache.
+        return this.loadedNodes.nodeId;
+    },
+
+    getSelectedNode: function()
+    {
+        return this.selectedNode;
+    },
+
+    setSelectedNodeById: function(nodeId)
+    {
+        var node = null;
+        if (nodeId)
+        {
+            node = getNodeById(nodeId);
+        }
+        this.setSelectedNode(node);
+    },
+
+    setSelectedNode: function(node)
+    {
+        if (node == this.selectedNode)
+        {
+            // no change.
+            return;
+        }
+        this.selectedNode = node;
+
+        // generate the onselect event.
+        this.onselect(this.selectedNode);
+    },
+
+    loadNodeById:function(nodeId)
+    {
+        var nodeIds = new Array();
+        nodeIds.push(nodeId);
+        this.loadNodesById(nodeIds);
+    },
+
+    loadNodesById: function(nodeIds)
+    {
+        var nodesToLoad = new Array();
+        $A(nodeIds).each(function(nodeId)
+        {
+            var node = this.getNodeById(nodeId);
+            if (node)
+            {
+                if (node.getState() == node.NOT_LOADED)
+                {
+                    node.state = node.LOADING;
+                    nodesToLoad.push(nodeId);
+                }
+            }
+            else
+            {
+                // a node that we know nothing about. Must be during initialization.
+                nodesToLoad.push(nodeId);
+            }
+        });
+
+        if (nodesToLoad.length > 0)
+        {
+            requestUpdate(nodesToLoad);
+        }
+    },
+
+    requestUpdate: function(uids)
+    {
+        console.log("requestUpdate()");
+        var params = "";
+        var sep = "";
+        uids.each(function(uid)
+        {
+            params = params + sep + "uid=" + uid;
+            sep = "&";
+        });
+
+        var url = getConfig().url;
+
+        var ajax = new Ajax.Request(
+            url,
+            {
+                method: 'get',
+                onComplete: updateModel,
+                onFailure: handleFailure,
+                onException: handleException,
+                parameters:params
+            }
+        );
+    },
+
+    handleComplete: function(resp)
+    {
+        // the jsonObjs contains an array of listings.
+        var jsonObjs = eval("(" + resp.responseText + ")");
+
+        var results = $A(jsonObjs.results)
+        results.each(function(jsonObj)
+        {
+            // locate where in the tree this update belongs.
+            var rootNode = getCore().getModel();
+            var node = getCore().getNodeById(jsonObj.uid);
+            if (!node)
+            {
+                // the default.
+                node = rootNode;
+            }
+
+            // UPDATE THE MODEL WITH THE NEW DATA.
+            for (var i = 0; i < jsonObj.listing.length; i++)
+            {
+                // sanity check that we do not add components to the model a second time. This should be
+                // caught at an earlier stage.
+                var existingNode = node.getChildren().find(function(child)
+                {
+                    return (child.getId() == jsonObj.listing[i].uid);
+                });
+                if (existingNode)
+                {
+                    console.log("skipping adding node a second time.");
+                    continue;
+                }
+
+                var childNode = new MyNode();
+                childNode.id = jsonObj.listing[i].uid;
+                childNode.name = jsonObj.listing[i].file;
+                childNode.type = jsonObj.listing[i].type;
+                node.addChild(childNode);
+            }
+
+            getCore().onupdate(jsonObj.uid);
+        });
+    },
+
+    /**
+     * Basic failure handler.
+     *
+     */
+    handleFailure: function(resp)
+    {
+        alert("onFailure");
+    },
+
+    /**
+     * Basic exception handler.
+     *
+     */
+    handleException: function(resp, e)
+    {
+        alert("onException: " + e);
+    }
+});
+
+/**
+ * The tree view is a full node tree representation of the model.
+ *
+ */
+MyTreeView = Class.create();
+Object.extend(MyTreeView.prototype = {
+
+    initialize: function(anchorId)
+    {
+        this.anchorEl = document.getElementById(anchorId);
+
+        var ul = document.createElement("ul");
+        ul.appendChild(createDomNode(createVirtualNode("Loading...", "loading", "")));
+        this.anchorEl.appendChild(ul);
+
+        // initialize event listeners.
+    }
+});
+
+/**
+ * The flat view is a representation that shows the current level of the tree. This view
+ * also contains virtual nodes that represent the '.' and '..' directories.
+ *
+ */
+MyFlatView = Class.create();
+Object.extend(MyFlatView.prototype = {
+    initialize: function(anchorId)
+    {
+
+    }
+});
 
 /**
  * Initialise the tree control.
@@ -130,22 +408,18 @@ function init(event)
 {
     // Initialise the model root.
     //TODO: use a root value specific to the file system.
-    var newRoot = new MyNode();
-    newRoot.initialize();
-    newRoot.name = "ROOT";
-    newRoot.id = "";
-    newRoot.type = "";
-    setRoot(newRoot);
+    var core = new Core();
+    window.myTree.core = core;
 
-    var anchorId = getConfig().anchor;
+    // node select event listener.
+    core.addOnSelectListener(onSelectionUpdateDomNode)
+    core.addOnSelectListener(onSelectionUpdatePathDisplay)
+    core.addOnSelectListener(onSelectionUpdateSelectedDisplayValue);
 
-    // need to find a way to extract the id of the root tree node from this file.
-    var anchorDiv = document.getElementById(anchorId);
+    // configure the update event listeners.
+    core.addOnUpdateListener(onModelUpdate);
 
-    // LOADING FEEDBACK.
-    var ul = document.createElement("ul");
-    ul.appendChild(createDomNode(createVirtualNode("Loading...", "loading", "")));
-    anchorDiv.appendChild(ul);
+    var view = new MyTreeView(getConfig().anchor);
 
     // TRIGGER LOAD OF THE ROOT NODE.
     requestUpdate(getConfig().initUid);
@@ -162,6 +436,7 @@ function getConfig()
 
 function requestUpdate(uids)
 {
+    console.log("requestUpdate()");
     var params = "";
     var sep = "";
     uids.each(function(uid)
@@ -189,6 +464,8 @@ function requestUpdate(uids)
  */
 function updateModel(originalRequest)
 {
+    console.log("RESPONSE CALLBACK FROM SERVER: updateModel.");
+
     // the jsonObjs contains an array of listings.
     var jsonObjs = eval("(" + originalRequest.responseText + ")");
 
@@ -196,7 +473,7 @@ function updateModel(originalRequest)
     results.each(function(jsonObj)
     {
         // locate where in the tree this update belongs.
-        var rootNode = getRoot();
+        var rootNode = getCore().getModel();
         var node = locateNode(rootNode, jsonObj.uid);
         if (!node)
         {
@@ -220,14 +497,13 @@ function updateModel(originalRequest)
             }
 
             var childNode = new MyNode();
-            childNode.initialize();
             childNode.id = jsonObj.listing[i].uid;
             childNode.name = jsonObj.listing[i].file;
             childNode.type = jsonObj.listing[i].type;
             node.addChild(childNode);
         }
 
-        onModelUpdate(jsonObj.uid);
+        getCore().onupdate(jsonObj.uid);
     });
 }
 
@@ -238,6 +514,8 @@ function updateModel(originalRequest)
  */
 function onModelUpdate(updateId)
 {
+    console.log("----onModelUpdate(%s)", updateId);
+
     // TRIGGER AN UPDATE OF THE UI. SHOULD THIS BE HANDLED VIA AN EVENT?
     updateTree(updateId);
 
@@ -269,6 +547,8 @@ function locateNode(root, uid)
  */
 function updateTree(id)
 {
+    console.log("----updateTree(%s)", id);
+
     // LOCATE THE POINT IN THE DOM THAT WE WILL BE UPDATING.
     var target = document.getElementById(id);
     if (!target)
@@ -292,10 +572,10 @@ function updateTree(id)
         target.onclick = onToggle;
     }
 
-    var rootNode = locateNode(getRoot(), id);
+    var rootNode = locateNode(getCore().getModel(), id);
     if (!rootNode)
     {
-        rootNode = getRoot();
+        rootNode = getCore().getModel();
 
         // add the '.' directory so that it can be selected. However, we do not want it to be
         // reloaded since it is a special case that clears out all existing content...
@@ -358,16 +638,10 @@ function updateFlat(id)
  * Selected node change event handler.
  *
  */
-function onSelectionChange()
+function onSelectionUpdatePathDisplay(event)
 {
-    // update two locations. The path display at the top, and the selected display at the bottom.
-
-    var selectedNode = getSelection();
-    if (!selectedNode)
-    {
-        console.log("WARNING: onSelectionChange triggered but no selectedNode is available. :(")
-        return;
-    }
+    console.log("+onSelectionUpdatePathDisplay")
+    var selectedNode = event;
 
     // A: the path element at shows the path to the currently selected node.
     var currentPathDisplay = document.getElementById('path');
@@ -379,7 +653,7 @@ function onSelectionChange()
         // If the current selection is a folder, show the path of that folder.
         // If the current selection is a file, then show the path of its containing folder.
         var pathToDisplay = null;
-        if (selectedNode.getType() == "folder")
+        if (selectedNode.isFolder())
         {
             pathToDisplay = selectedNode.getPath();
         }
@@ -395,6 +669,13 @@ function onSelectionChange()
             currentPathDisplay.appendChild(document.createTextNode(pathToDisplay));
         }
     }
+}
+
+function onSelectionUpdateSelectedDisplayValue(event)
+{
+    console.log("+onSelectionUpdateSelectedDisplayValue")
+
+    var selectedNode = event;
 
     // B: The selected element display, that shows the name of the currently selected node.
     var selectedDisplay = document.getElementById('selected');
@@ -402,8 +683,23 @@ function onSelectionChange()
     {
         // clear out the existing content.
         removeAllChildren(selectedDisplay);
-        selectedDisplay.value = selectedNode.getName();
+        if (!selectedNode.isFolder())
+        {
+            selectedDisplay.value = selectedNode.getName();
+        }
     }
+}
+
+/**
+ * Event handler that listens for node selection change events. When a node is selected,
+ * this event handler updates the dom tree to ensure that the node is displayed as 'selected'
+ * ie: sets the selected class on the correct node.
+ *
+ */
+function onSelectionUpdateDomNode(event)
+{
+    console.log("+onSelectionUpdateDomNode")
+    var selectedNode = event;
 
     // C: The dom tree UI classes.
     clearSelection();
@@ -411,8 +707,9 @@ function onSelectionChange()
     var selectedDomNode = document.getElementById(selectedNode.getId());
     Element.addClassName(selectedDomNode, "selected");
 
+    //TODO: Move this into a different event handler, one that manages the toggling of nodes.
     // if the selected dom node is a folder, then toggle it.
-    if (selectedNode.getType() == "folder")
+    if (selectedNode.isFolder())
     {
         if (Element.hasClassName(selectedDomNode, "folder"))
         {
@@ -447,10 +744,9 @@ function createDomNode(node)
     domNode.setAttribute("id", node.getId());
 
     Element.addClassName(domNode, node.getType());
-    if (node.getType() == "folder")
+    if (node.isFolder())
     {
-        var eventRouter = new EventRouter();
-        eventRouter.initialize(domNode, "onclick");
+        var eventRouter = new EventRouter(domNode, "onclick");
         eventRouter.addListener(onSelect);
         eventRouter.addListener(onLoad);
     }
@@ -477,44 +773,13 @@ function onSelect(event)
     if (this == currentTarget)
     {
         // record selection.
-        setSelectionById(currentTarget.id);
+        getCore().setSelectedNodeById(currentTarget.id);
     }
 }
 
-/**
- * Set the selected node, identified by the specified id.
- */
-function setSelectionById(id)
+function getCore()
 {
-    var newSelection = locateNode(getRoot(), id);
-    if (!newSelection)
-    {
-        console.log("WARNING: failed to locate newly selected node '%s'", id);
-    }
-    setSelection(newSelection);
-
-    // trigger the selected node change event listeners.
-    onSelectionChange();
-}
-
-function setSelection(newSelection)
-{
-    getConfig().selectedNode = newSelection;
-}
-
-function getSelection()
-{
-    return getConfig().selectedNode;
-}
-
-function getRoot()
-{
-    return getConfig().root;
-}
-
-function setRoot(newRoot)
-{
-    getConfig().root = newRoot;
+    return window.myTree.core;
 }
 
 /**
@@ -575,7 +840,7 @@ function clearSelection()
  */
 function selectParentNode()
 {
-    var selectedNode = getSelection();
+    var selectedNode = getCore().getSelectedNode();
     if (selectedNode)
     {
 
@@ -719,20 +984,3 @@ function debug(element)
     alert(debugging);
 }
 
-/**
- * Basic failure handler.
- *
- */
-function handleFailure(resp)
-{
-    alert("onFailure");
-}
-
-/**
- * Basic exception handler.
- *
- */
-function handleException(resp, e)
-{
-    alert("onException: " + e);
-}
