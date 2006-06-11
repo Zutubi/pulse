@@ -54,7 +54,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         recipeRequest = new RecipeRequest(rootResult.getId(), rootResult.getRecipeName());
         dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null);
-        recipeController = new RecipeController(rootNode, dispatchRequest, resultCollector, recipeQueue, buildManager);
+        recipeController = new RecipeController(rootNode, dispatchRequest, resultCollector, recipeQueue, buildManager, null);
     }
 
     protected void tearDown() throws Exception

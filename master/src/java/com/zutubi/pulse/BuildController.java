@@ -4,8 +4,8 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
@@ -18,6 +18,7 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.quartz.TimeoutBuildJob;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.TreeNode;
@@ -55,8 +56,9 @@ public class BuildController implements EventListener
     private AsynchronousDelegatingListener asyncListener;
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private Scheduler quartzScheduler;
+    private ServiceTokenManager serviceTokenManager;
 
-    public BuildController(BuildRequestEvent event, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager)
+    public BuildController(BuildRequestEvent event, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager, ServiceTokenManager serviceTokenManager)
     {
         this.revision = event.getRevision();
         this.reason = event.getReason();
@@ -69,6 +71,7 @@ public class BuildController implements EventListener
         this.quartzScheduler = quartScheduler;
         this.asyncListener = new AsynchronousDelegatingListener(this);
         this.configurationManager = configManager;
+        this.serviceTokenManager = serviceTokenManager;
     }
 
     public void run()
@@ -120,7 +123,7 @@ public class BuildController implements EventListener
 
             RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe(), getResourceRequirements(specification, node));
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), revision, recipeRequest, buildResult);
-            RecipeController rc = new RecipeController(childResultNode, dispatchRequest, collector, queue, buildManager);
+            RecipeController rc = new RecipeController(childResultNode, dispatchRequest, collector, queue, buildManager, serviceTokenManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
             configure(child, childResultNode, specification, node);

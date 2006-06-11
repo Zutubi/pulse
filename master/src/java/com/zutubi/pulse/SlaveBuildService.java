@@ -1,14 +1,12 @@
 package com.zutubi.pulse;
 
-import com.caucho.hessian.client.HessianRuntimeException;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.Slave;
-import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.services.InvalidTokenException;
+import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
@@ -78,7 +76,7 @@ public class SlaveBuildService implements BuildService
 
         try
         {
-            URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?output=" + output + "&recipe=" + recipeId);
+            URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&output=" + output + "&recipe=" + recipeId);
             URLConnection urlConnection = resultUrl.openConnection();
 
             // originally the zip stream was unzipped as read from the
