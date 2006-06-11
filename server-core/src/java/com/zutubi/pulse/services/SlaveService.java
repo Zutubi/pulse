@@ -19,13 +19,13 @@ public interface SlaveService
      */
     int ping();
 
-    boolean build(String master, long slaveId, RecipeRequest request);
+    boolean build(String token, String master, long slaveId, RecipeRequest request) throws InvalidTokenException;
 
-    void cleanupRecipe(long recipeId);
+    void cleanupRecipe(String token, long recipeId) throws InvalidTokenException;
 
-    void terminateRecipe(long recipeId);
+    void terminateRecipe(String token, long recipeId) throws InvalidTokenException;
 
-    SystemInfo getSystemInfo();
+    SystemInfo getSystemInfo(String token) throws InvalidTokenException;
 
-    List<CustomLogRecord> getRecentMessages();
+    List<CustomLogRecord> getRecentMessages(String token) throws InvalidTokenException;
 }

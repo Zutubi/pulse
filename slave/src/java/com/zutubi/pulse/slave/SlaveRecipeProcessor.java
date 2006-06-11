@@ -8,6 +8,7 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.services.MasterService;
+import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.MalformedURLException;
@@ -22,6 +23,7 @@ public class SlaveRecipeProcessor
     private SlaveConfigurationManager configurationManager;
     private EventManager eventManager;
     private MasterProxyFactory masterProxyFactory;
+    private ServiceTokenManager serviceTokenManager;
 
     public SlaveRecipeProcessor()
     {
@@ -30,7 +32,7 @@ public class SlaveRecipeProcessor
 
     private EventListener registerMasterListener(MasterService service, long id)
     {
-        EventListener listener = new ForwardingEventListener(service, id);
+        EventListener listener = new ForwardingEventListener(service, serviceTokenManager, id);
         eventManager.register(listener);
         return listener;
     }
@@ -57,7 +59,7 @@ public class SlaveRecipeProcessor
         if(masterProxy != null)
         {
             EventListener listener = registerMasterListener(masterProxy, request.getId());
-            ResourceRepository repo = new RemoteResourceRepository(slaveId, masterProxy);
+            ResourceRepository repo = new RemoteResourceRepository(slaveId, masterProxy, serviceTokenManager);
             ServerRecipePaths processorPaths = new ServerRecipePaths(request.getId(), configurationManager.getUserPaths().getData());
             request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), request.getBootstrapper()));
 
@@ -113,5 +115,10 @@ public class SlaveRecipeProcessor
         {
             LOG.warning("Interrupted while terminating recipe", e);
         }
+    }
+
+    public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
+    {
+        this.serviceTokenManager = serviceTokenManager;
     }
 }

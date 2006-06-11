@@ -533,7 +533,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     private Agent createAvailableAgent(long type)
     {
-        SlaveAgent slaveAgent = new SlaveAgent(createSlave(type), null, new MockBuildService(type));
+        SlaveAgent slaveAgent = new SlaveAgent(createSlave(type), null, null, new MockBuildService(type));
         slaveAgent.pinged(0, Version.getVersion().getIntBuildNumber());
         return slaveAgent;
     }
@@ -777,7 +777,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
         public void addSlave(Slave slave)
         {
-            SlaveAgent agent = new SlaveAgent(slave, null, new MockBuildService(slave.getId()));
+            SlaveAgent agent = new SlaveAgent(slave, null, null, new MockBuildService(slave.getId()));
             agent.pinged(0, Version.getVersion().getIntBuildNumber());
             onlineAgents.put(slave.getId(), agent);
         }

@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.services.MasterService;
+import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.logging.Logger;
 import com.caucho.hessian.client.HessianRuntimeException;
 
@@ -17,11 +18,13 @@ public class RemoteResourceRepository implements ResourceRepository
 
     private long slaveId;
     private MasterService masterProxy;
+    private ServiceTokenManager serviceTokenManager;
 
-    public RemoteResourceRepository(long slaveId, MasterService masterProxy)
+    public RemoteResourceRepository(long slaveId, MasterService masterProxy, ServiceTokenManager serviceTokenManager)
     {
         this.slaveId = slaveId;
         this.masterProxy = masterProxy;
+        this.serviceTokenManager = serviceTokenManager;
     }
 
     public boolean hasResource(String name, String version)
@@ -39,9 +42,9 @@ public class RemoteResourceRepository implements ResourceRepository
     {
         try
         {
-            return masterProxy.getResource(slaveId, name);
+            return masterProxy.getResource(serviceTokenManager.getToken(), slaveId, name);
         }
-        catch (HessianRuntimeException e)
+        catch (RuntimeException e)
         {
             LOG.severe(e);
             throw new BuildException("Unable to retrieve details of resource '" + name + "' from master: " + e.getMessage());
@@ -50,6 +53,6 @@ public class RemoteResourceRepository implements ResourceRepository
 
     public List<String> getResourceNames()
     {
-        return masterProxy.getResourceNames(slaveId);
+        return masterProxy.getResourceNames(serviceTokenManager.getToken(), slaveId);
     }
 }

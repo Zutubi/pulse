@@ -6,6 +6,7 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.services.ServiceTokenManager;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -21,13 +22,15 @@ public class SlaveAgent implements Agent
     private Status status = Status.OFFLINE;
     private long lastPingTime = 0;
     private SlaveService slaveService;
+    private ServiceTokenManager serviceTokenManager;
     private BuildService buildService;
     private String pingError = null;
 
-    public SlaveAgent(Slave slave, SlaveService slaveService, BuildService buildService)
+    public SlaveAgent(Slave slave, SlaveService slaveService, ServiceTokenManager serviceTokenManager, BuildService buildService)
     {
         this.slave = slave;
         this.slaveService = slaveService;
+        this.serviceTokenManager = serviceTokenManager;
         this.buildService = buildService;
     }
 
@@ -43,12 +46,12 @@ public class SlaveAgent implements Agent
 
     public SystemInfo getSystemInfo()
     {
-        return slaveService.getSystemInfo();
+        return slaveService.getSystemInfo(serviceTokenManager.getToken());
     }
 
     public List<CustomLogRecord> getRecentMessages()
     {
-        return slaveService.getRecentMessages();
+        return slaveService.getRecentMessages(serviceTokenManager.getToken());
     }
 
     public String getName()

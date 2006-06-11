@@ -176,4 +176,7 @@
     <bean id="guestAccessManager" class="com.zutubi.pulse.GuestAccessManager" autowire="byName" init-method="init"/>
 
     <bean id="queries" class="com.zutubi.pulse.search.Queries" autowire="byName"/>
+
+    <bean id="serviceTokenManager" class="com.zutubi.pulse.services.ServiceTokenManager" autowire="byName" init-method="init"/>
+    
 </beans>

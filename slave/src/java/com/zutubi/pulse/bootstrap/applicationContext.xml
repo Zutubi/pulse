@@ -33,6 +33,12 @@
 
     <bean id="masterProxyFactory" class="com.zutubi.pulse.slave.MasterProxyFactory" autowire="byName"/>
 
+    <bean id="serviceTokenManager" class="com.zutubi.pulse.services.ServiceTokenManager" autowire="byName" init-method="init">
+        <property name="generate">
+            <value>false</value>
+        </property>
+    </bean>
+
     <bean id="serverMessagesHandler" class="com.zutubi.pulse.logging.ServerMessagesHandler" autowire="byName" init-method="init"/>
 
     <!-- Needs a user config root -->

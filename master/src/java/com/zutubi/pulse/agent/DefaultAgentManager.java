@@ -14,6 +14,7 @@ import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.Sort;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -40,6 +41,7 @@ public class DefaultAgentManager implements AgentManager
     private SlaveProxyFactory slaveProxyFactory;
     private StartupManager startupManager;
     private ServerMessagesHandler serverMessagesHandler;
+    private ServiceTokenManager serviceTokenManager;
 
     public void init()
     {
@@ -75,7 +77,8 @@ public class DefaultAgentManager implements AgentManager
         try
         {
             SlaveService service = slaveProxyFactory.createProxy(slave);
-            SlaveAgent agent = new SlaveAgent(slave, service, new SlaveBuildService(service, slave, configurationManager, resourceManager));
+            SlaveBuildService buildService = new SlaveBuildService(service, serviceTokenManager, slave, configurationManager, resourceManager);
+            SlaveAgent agent = new SlaveAgent(slave, service, serviceTokenManager, buildService);
             slaveAgents.put(slave.getId(), agent);
             return agent;
         }
@@ -278,5 +281,10 @@ public class DefaultAgentManager implements AgentManager
     public void setServerMessagesHandler(ServerMessagesHandler serverMessagesHandler)
     {
         this.serverMessagesHandler = serverMessagesHandler;
+    }
+
+    public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
+    {
+        this.serviceTokenManager = serviceTokenManager;
     }
 }

@@ -9,8 +9,8 @@ import java.util.List;
  */
 public interface MasterService
 {
-    void handleEvent(Event event);
+    void handleEvent(String token, Event event) throws InvalidTokenException;
 
-    Resource getResource(long slaveId, String name);
-    List<String> getResourceNames(long slaveId);
+    Resource getResource(String token, long slaveId, String name) throws InvalidTokenException;
+    List<String> getResourceNames(String token, long slaveId) throws InvalidTokenException;
 }

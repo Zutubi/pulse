@@ -43,7 +43,7 @@ public class ServerMessagesAction extends ServerMessagesActionSupport
                 pagingSupport.setTotalItems(records.size());
                 records = records.subList(pagingSupport.getStartOffset(), pagingSupport.getEndOffset());
             }
-            catch(HessianRuntimeException e)
+            catch(RuntimeException e)
             {
                 addActionError("Unable to contact agent: " + e.getMessage());
             }

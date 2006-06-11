@@ -7,6 +7,8 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.services.InvalidTokenException;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
@@ -29,10 +31,12 @@ public class SlaveBuildService implements BuildService
     private Slave slave;
     private MasterConfigurationManager configurationManager;
     private ResourceManager resourceManager;
+    private ServiceTokenManager serviceTokenManager;
 
-    public SlaveBuildService(SlaveService service, Slave slave, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
+    public SlaveBuildService(SlaveService service, ServiceTokenManager serviceTokenManager, Slave slave, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
     {
         this.service = service;
+        this.serviceTokenManager = serviceTokenManager;
         this.slave = slave;
         this.configurationManager = configurationManager;
         this.resourceManager = resourceManager;
@@ -52,9 +56,9 @@ public class SlaveBuildService implements BuildService
     {
         try
         {
-            return service.build(configurationManager.getAppConfig().getHostName(), slave.getId(), request);
+            return service.build(serviceTokenManager.getToken(), configurationManager.getAppConfig().getHostName(), slave.getId(), request);
         }
-        catch (HessianRuntimeException e)
+        catch (RuntimeException e)
         {
             throw convertException("Unable to dispatch recipe request '" + request.getId() + "' to slave '" + slave.getName() + "'", e);
         }
@@ -117,7 +121,7 @@ public class SlaveBuildService implements BuildService
     {
         try
         {
-            service.cleanupRecipe(recipeId);
+            service.cleanupRecipe(serviceTokenManager.getToken(), recipeId);
         }
         catch (Exception e)
         {
@@ -127,7 +131,14 @@ public class SlaveBuildService implements BuildService
 
     public void terminateRecipe(long recipeId)
     {
-        service.terminateRecipe(recipeId);
+        try
+        {
+            service.terminateRecipe(serviceTokenManager.getToken(), recipeId);
+        }
+        catch (RuntimeException e)
+        {
+            LOG.severe("Unable to terminate recipe: " + e.getMessage(), e);
+        }
     }
 
     public String getHostName()
@@ -140,7 +151,7 @@ public class SlaveBuildService implements BuildService
         return slave;
     }
 
-    private BuildException convertException(String context, HessianRuntimeException e)
+    private BuildException convertException(String context, RuntimeException e)
     {
         return new BuildException(context + ": " + e.getMessage(), e);
     }

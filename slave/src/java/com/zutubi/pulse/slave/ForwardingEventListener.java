@@ -4,6 +4,7 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.RecipeEvent;
 import com.zutubi.pulse.services.MasterService;
+import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.logging.Logger;
 
 /**
@@ -13,10 +14,12 @@ public class ForwardingEventListener implements EventListener
     private static final Logger LOG = Logger.getLogger(ForwardingEventListener.class);
 
     private MasterService service;
+    private ServiceTokenManager serviceTokenManager;
     private long id;
 
-    public ForwardingEventListener(MasterService service, long id)
+    public ForwardingEventListener(MasterService service, ServiceTokenManager serviceTokenManager, long id)
     {
+        this.serviceTokenManager = serviceTokenManager;
         this.service = service;
         this.id = id;
     }
@@ -29,7 +32,7 @@ public class ForwardingEventListener implements EventListener
             try
             {
                 event.setSource(null);
-                service.handleEvent(event);
+                service.handleEvent(serviceTokenManager.getToken(), event);
             }
             catch (Exception e)
             {

@@ -25,7 +25,7 @@ public class SystemInfoAction extends AgentActionSupport
             {
                 info = agent.getSystemInfo();
             }
-            catch(HessianRuntimeException e)
+            catch(RuntimeException e)
             {
                 addActionError("Unable to contact agent: " + e.getMessage());
             }
