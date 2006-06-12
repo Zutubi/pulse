@@ -214,6 +214,9 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="authenticationEntryPoint">
             <ref local="ajaxEntryPoint"/>
         </property>
+        <property name="createSessionAllowed">
+            <value>false</value>
+        </property>
     </bean>
 
     <!--
