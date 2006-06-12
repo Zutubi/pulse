@@ -12,11 +12,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class FourOhFourAction extends ActionSupport
 {
-    private static final String ERROR_MESSAGE = "javax.servlet.error.message";
-    private static final String ERROR_REQUEST_URI = "javax.servlet.error.request_uri";
-    private static final String ERROR_STATUS_CODE = "javax.servlet.error.status_code";
-    private static final String ERROR_EXCEPTION = "javax.servlet.error.exception";
-
     private String errorRequestUri;
     private String errorMessage;
     private int errorStatusCode;

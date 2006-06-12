@@ -1,21 +1,18 @@
 package com.zutubi.pulse.web;
 
+import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.TextProvider;
+import com.opensymphony.xwork.util.OgnlValueStack;
+import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.TimeStamps;
-import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;
-import com.opensymphony.xwork.TextProvider;
-import com.opensymphony.xwork.ActionContext;
-import com.opensymphony.xwork.util.OgnlValueStack;
-import com.opensymphony.webwork.views.util.TextUtil;
-import com.opensymphony.webwork.ServletActionContext;
-import com.opensymphony.util.TextUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * 
@@ -23,6 +20,11 @@ import java.util.Locale;
  */
 public class ActionSupport extends com.opensymphony.xwork.ActionSupport implements Cancelable
 {
+    protected static final String ERROR_REQUEST_URI = "javax.servlet.error.request_uri";
+    protected static final String ERROR_MESSAGE = "javax.servlet.error.message";
+    protected static final String ERROR_STATUS_CODE = "javax.servlet.error.status_code";
+    protected static final String ERROR_EXCEPTION = "javax.servlet.error.exception";
+
     /**
      * Use our own text provider implementation. It would be nice if there was a way to replace
      * the textProvider used by the default action support.
