@@ -60,6 +60,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private EventManager eventManager;
 
+    private MasterRecipeProcessor masterRecipeProcessor;
+
     public ThreadedRecipeQueue()
     {
 
@@ -69,7 +71,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         try
         {
+            // manually wire the master recipe processor.
             MasterBuildService buildService = objectFactory.buildBean(MasterBuildService.class);
+            buildService.setMasterRecipeProcessor(masterRecipeProcessor);
             availableServices.add(buildService);
             eventManager.register(this);
             start();
@@ -378,5 +382,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    public void setMasterRecipeProcessor(MasterRecipeProcessor masterRecipeProcessor)
+    {
+        this.masterRecipeProcessor = masterRecipeProcessor;
     }
 }
