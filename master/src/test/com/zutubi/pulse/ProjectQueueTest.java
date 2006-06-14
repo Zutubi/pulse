@@ -2,6 +2,8 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ManualTriggerBuildReason;
+import com.zutubi.pulse.model.BuildReason;
 import com.zutubi.pulse.test.PulseTestCase;
 
 /**
@@ -22,22 +24,22 @@ public class ProjectQueueTest extends PulseTestCase
 
     public void testSimpleQueue()
     {
-        assertTrue(queue.buildRequested(new BuildRequestEvent(this, p1, "spec1")));
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
         assertNull(queue.buildCompleted(p1));
     }
 
     public void testQueueTwice()
     {
-        assertTrue(queue.buildRequested(new BuildRequestEvent(this, p1, "spec1")));
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
         assertNull(queue.buildCompleted(p1));
-        assertTrue(queue.buildRequested(new BuildRequestEvent(this, p1, "spec1")));
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
         assertNull(queue.buildCompleted(p1));
     }
 
     public void testSimpleWait()
     {
-        assertTrue(queue.buildRequested(new BuildRequestEvent(this, p1, "spec1")));
-        BuildRequestEvent request2 = new BuildRequestEvent(this, p1, "spec2");
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
+        BuildRequestEvent request2 = createEvent(p1, "spec2");
         assertFalse(queue.buildRequested(request2));
         assertEquals(request2, queue.buildCompleted(p1));
         assertNull(queue.buildCompleted(p1));
@@ -45,8 +47,8 @@ public class ProjectQueueTest extends PulseTestCase
 
     public void testWaitSameSpec()
     {
-        assertTrue(queue.buildRequested(new BuildRequestEvent(this, p1, "spec1")));
-        BuildRequestEvent request2 = new BuildRequestEvent(this, p1, "spec1");
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
+        BuildRequestEvent request2 = createEvent(p1, "spec1");
         assertFalse(queue.buildRequested(request2));
         assertEquals(request2, queue.buildCompleted(p1));
         assertNull(queue.buildCompleted(p1));
@@ -54,18 +56,18 @@ public class ProjectQueueTest extends PulseTestCase
 
     public void testMultiProjects()
     {
-        assertTrue(queue.buildRequested(new BuildRequestEvent(this, p1, "spec1-1")));
-        assertTrue(queue.buildRequested(new BuildRequestEvent(this, p2, "spec2-1")));
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1-1")));
+        assertTrue(queue.buildRequested(createEvent(p2, "spec2-1")));
         assertNull(queue.buildCompleted(p1));
         assertNull(queue.buildCompleted(p2));
     }
 
     public void testQueueMultipleSpecs()
     {
-        assertTrue(queue.buildRequested(new BuildRequestEvent(this, p1, "spec1")));
-        BuildRequestEvent request2 = new BuildRequestEvent(this, p1, "spec2");
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
+        BuildRequestEvent request2 = createEvent(p1, "spec2");
         assertFalse(queue.buildRequested(request2));
-        BuildRequestEvent request3 = new BuildRequestEvent(this, p1, "spec3");
+        BuildRequestEvent request3 = createEvent(p1, "spec3");
         assertFalse(queue.buildRequested(request2));
         assertFalse(queue.buildRequested(request3));
         assertEquals(request2, queue.buildCompleted(p1));
@@ -75,13 +77,26 @@ public class ProjectQueueTest extends PulseTestCase
 
     public void testQueueSameSpecTwice()
     {
-        assertTrue(queue.buildRequested(new BuildRequestEvent(this, p1, "spec1")));
-        BuildRequestEvent request2 = new BuildRequestEvent(this, p1, "spec2");
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
+        BuildRequestEvent request2 = createEvent(p1, "spec2");
         assertFalse(queue.buildRequested(request2));
-        BuildRequestEvent request3 = new BuildRequestEvent(this, p1, "spec2");
+        BuildRequestEvent request3 = createEvent(p1, "spec2");
         assertFalse(queue.buildRequested(request2));
         assertFalse(queue.buildRequested(request3));
         assertEquals(request2, queue.buildCompleted(p1));
         assertNull(queue.buildCompleted(p1));
+    }
+
+    private BuildRequestEvent createEvent(Project project, String spec)
+    {
+        return new BuildRequestEvent(this, new MockBuildReason(), project, spec);
+    }
+
+    private class MockBuildReason implements BuildReason
+    {
+        public String getSummary()
+        {
+            return "mock";
+        }
     }
 }

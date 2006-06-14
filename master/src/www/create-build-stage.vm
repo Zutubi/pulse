@@ -1,0 +1,31 @@
+#helpTag("Project+Build+Specifications")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=buildspec.stage.add")</title>
+</head>
+<body>
+    #projectTabs("configuration")
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=createBuildStage.action" "heading=%{getText('buildspec.stage.add')}" "method=post")
+    #wwhidden("name=specId")
+    #wwhidden("name=projectId")
+
+    #wwtextfield("name=name" "label=%{getText('buildspec.stage.name')}" "required=true" "tabindex=1")
+#if($recipes.size() > 1)
+    #wwcombobox("name=stage.recipe" "list=recipes" "label=%{getText('recipe')}" "tabindex=2")
+#else
+    #wwtextfield("name=stage.recipe" "label=%{getText('recipe')}" "tabindex=2")
+#end
+    #inlineHelp("spec.recipe.help")
+    #wwselect("name=buildHost" "list=buildHosts" "label=%{getText('buildspec.stage.agent')}" "required=true"  "tabindex=3")
+
+    #saveCancel(4)
+#end
+
+    #tabEnd()
+</body>
+</html>

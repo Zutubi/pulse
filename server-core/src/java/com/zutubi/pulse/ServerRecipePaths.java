@@ -1,6 +1,5 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.RecipePaths;
 
 import java.io.File;
@@ -16,22 +15,27 @@ import java.io.File;
 public class ServerRecipePaths implements RecipePaths
 {
     private long id;
-    private ConfigurationManager configurationManager;
+    private File dataDir;
 
-    public ServerRecipePaths(long id, ConfigurationManager configurationManager)
+    public ServerRecipePaths(long id, File dataDir)
     {
         this.id = id;
-        this.configurationManager = configurationManager;
+        this.dataDir = dataDir;
     }
 
     private File getRecipesRoot()
     {
-        return new File(configurationManager.getUserPaths().getData(), "recipes");
+        return new File(dataDir, "recipes");
     }
 
     public File getRecipeRoot()
     {
         return new File(getRecipesRoot(), Long.toString(id));
+    }
+
+    public File getPersistentWorkDir()
+    {
+        return new File(dataDir, "work");
     }
 
     public File getBaseDir()

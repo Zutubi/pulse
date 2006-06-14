@@ -5,8 +5,14 @@
         <license name="Apache" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
     </info>
 
+    <configurations>
+        <conf name="default" visibility="public"/>
+        <conf name="directoryscanner" visibility="public"/>
+    </configurations>
+
     <publications>
-        <artifact name="ant" type="jar"/>
+        <artifact name="ant" type="jar" conf="default"/>
+        <artifact name="apache-ant-directoryscanner" type="jar" conf="directoryscanner"/>
     </publications>
 
 </ivy-module>

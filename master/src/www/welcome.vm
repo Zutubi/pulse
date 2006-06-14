@@ -51,7 +51,7 @@
                <a href="viewProjects.action">view all projects</a> :: at the projects view (projects)
            </li>
            <li class="explore">
-               <a href="viewRecipeQueue.action">view server activity</a> :: at the server status view (server &gt; status )
+               <a href="viewServerStatus.action">view server activity</a> :: at the server status view (server &gt; status )
            </li>
        </ul>
     </div>

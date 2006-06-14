@@ -29,7 +29,6 @@
         </property>
     </bean>
 
-
     <bean id="projectManagerTarget" class="com.zutubi.pulse.model.DefaultProjectManager" autowire="byName"
           init-method="initialise"/>
     <bean id="projectManager" class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -40,6 +39,32 @@
             <list>
                 <value>transactionInterceptor</value>
                 <value>securityInterceptor</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="resourceManagerTarget" class="com.zutubi.pulse.model.DefaultResourceManager" autowire="byName"
+          init-method="init"/>
+    <bean id="resourceManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <ref bean="resourceManagerTarget"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>transactionInterceptor</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="slaveManagerTarget" class="com.zutubi.pulse.model.DefaultSlaveManager" autowire="byName"
+          init-method="init"/>
+    <bean id="slaveManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <ref bean="slaveManagerTarget"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>transactionInterceptor</value>
             </list>
         </property>
     </bean>
@@ -74,15 +99,7 @@
         </property>
     </bean>
 
-
-    <bean id="fileResourceRepository" class="com.zutubi.pulse.core.FileResourceRepository" autowire="byName"
-          init-method="initialise"/>
-
-    <bean id="resourceRepository" class="com.zutubi.pulse.model.DatabaseResourceRepository" autowire="byName">
-        <property name="parent">
-            <ref bean="fileResourceRepository"/>
-        </property>
-    </bean>
+    <bean id="agentManager" class="com.zutubi.pulse.agent.DefaultAgentManager" autowire="byName" init-method="init"/>
 
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
 
@@ -102,7 +119,18 @@
         </property>
     </bean>
 
+    <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>systemPaths.configRoot</value>
+        </property>
+    </bean>
+    
     <bean id="slaveProxyFactory" class="com.zutubi.pulse.SlaveProxyFactory" autowire="byName"/>
+
+    <bean id="hessianProxyFactory" class="com.zutubi.pulse.hessian.CustomHessianProxyFactory" autowire="byName"/>
 
     <bean id="fatController" class="com.zutubi.pulse.FatController" autowire="byName" init-method="init"/>
 
@@ -148,4 +176,7 @@
     <bean id="guestAccessManager" class="com.zutubi.pulse.GuestAccessManager" autowire="byName" init-method="init"/>
 
     <bean id="queries" class="com.zutubi.pulse.search.Queries" autowire="byName"/>
+
+    <bean id="serviceTokenManager" class="com.zutubi.pulse.services.ServiceTokenManager" autowire="byName" init-method="init"/>
+    
 </beans>

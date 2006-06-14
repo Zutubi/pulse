@@ -8,6 +8,7 @@ import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.logging.Logger;
 
 /**
@@ -22,12 +23,13 @@ public class RecipeController
     private RecipeDispatchRequest dispatchRequest;
     private RecipeResultCollector collector;
     private BuildManager buildManager;
+    private ServiceTokenManager serviceTokenManager;
     private boolean finished = false;
 
     private RecipeQueue queue;
     private BuildService buildService;
 
-    public RecipeController(RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager)
+    public RecipeController(RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager, ServiceTokenManager serviceTokenManager)
     {
         this.recipeResultNode = recipeResultNode;
         this.recipeResult = recipeResultNode.getResult();
@@ -35,6 +37,7 @@ public class RecipeController
         this.collector = collector;
         this.queue = queue;
         this.buildManager = manager;
+        this.serviceTokenManager = serviceTokenManager;
     }
 
     public void prepare(BuildResult buildResult)
@@ -114,7 +117,7 @@ public class RecipeController
 
     private void handleRecipeDispatch(RecipeDispatchedEvent event)
     {
-        buildService = event.getService();
+        buildService = event.getAgent().getBuildService();
         recipeResultNode.setHost(buildService.getHostName());
         buildManager.save(recipeResultNode);
     }
@@ -206,7 +209,7 @@ public class RecipeController
     {
         // use the service details to configure the copy bootstrapper.
         String url = buildService.getUrl();
-        return new CopyBootstrapper(url, recipeResult.getId());
+        return new CopyBootstrapper(url, serviceTokenManager.getToken(), recipeResult.getId());
     }
 
     public String getRecipeName()

@@ -1,10 +1,7 @@
 package com.zutubi.pulse.renderer;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.BuildScmDetails;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.IOUtils;
 import freemarker.template.Configuration;
@@ -183,21 +180,21 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     private BuildResult createSuccessfulBuild()
     {
-        BuildResult result = new BuildResult(new Project("test project", "test description"), "test spec", 101);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), new Project("test project", "test description"), "test spec", 101);
         result.setId(11);
         result.setScmDetails(new BuildScmDetails());
         result.commence(10000);
 
         RecipeResult recipeResult = new RecipeResult("first recipe");
-        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        RecipeResultNode node = new RecipeResultNode("first stage", recipeResult);
         result.getRoot().addChild(node);
 
         recipeResult = new RecipeResult("second recipe");
-        node = new RecipeResultNode(recipeResult);
+        node = new RecipeResultNode("second stage", recipeResult);
         result.getRoot().addChild(node);
 
         recipeResult = new RecipeResult("nested recipe");
-        node = new RecipeResultNode(recipeResult);
+        node = new RecipeResultNode("nested stage", recipeResult);
         result.getRoot().getChildren().get(0).addChild(node);
 
         result.complete();

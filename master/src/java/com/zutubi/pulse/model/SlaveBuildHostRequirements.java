@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.BuildService;
 import com.zutubi.pulse.SlaveBuildService;
+import com.zutubi.pulse.RecipeDispatchRequest;
 
 /**
  */
@@ -25,7 +26,7 @@ public class SlaveBuildHostRequirements extends AbstractBuildHostRequirements
         return new SlaveBuildHostRequirements(slave);
     }
 
-    public boolean fulfilledBy(BuildService service)
+    public boolean fulfilledBy(RecipeDispatchRequest request, BuildService service)
     {
         if (service instanceof SlaveBuildService)
         {

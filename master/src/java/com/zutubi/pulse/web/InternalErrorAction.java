@@ -2,6 +2,7 @@ package com.zutubi.pulse.web;
 
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
+import com.zutubi.pulse.web.agents.ServerMessagesActionSupport;
 
 import java.util.Collections;
 import java.util.List;

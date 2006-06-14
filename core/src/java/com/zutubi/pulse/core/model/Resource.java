@@ -9,9 +9,7 @@ import java.util.TreeMap;
 public class Resource extends Entity
 {
     private String name;
-
     private Map<String, Property> properties = new TreeMap<String, Property>();
-
     private Map<String, ResourceVersion> versions = new TreeMap<String, ResourceVersion>();
 
     public Resource()
@@ -44,14 +42,32 @@ public class Resource extends Entity
         return versions.get(id);
     }
 
+    public ResourceVersion getVersion(long id)
+    {
+        for(ResourceVersion v: versions.values())
+        {
+            if(v.getId() == id)
+            {
+                return v;
+            }
+        }
+
+        return null;
+    }
+
     public Map<String, ResourceVersion> getVersions()
     {
         return versions;
     }
 
-    private void setVersions(Map<String, ResourceVersion> versions)
+    public void setVersions(Map<String, ResourceVersion> versions)
     {
         this.versions = versions;
+    }
+
+    public void deleteVersion(ResourceVersion version)
+    {
+        versions.remove(version.getValue());
     }
 
     public Map<String, Property> getProperties()
@@ -59,7 +75,7 @@ public class Resource extends Entity
         return properties;
     }
 
-    private void setProperties(Map<String, Property> properties)
+    public void setProperties(Map<String, Property> properties)
     {
         this.properties = properties;
     }

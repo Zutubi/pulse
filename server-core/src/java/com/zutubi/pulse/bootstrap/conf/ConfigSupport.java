@@ -29,6 +29,15 @@ public class ConfigSupport implements Config
         config.removeProperty(key);
     }
 
+    public String getProperty(String key, String defaultValue)
+    {
+        if(hasProperty(key))
+        {
+            return getProperty(key);
+        }
+        return defaultValue;
+    }
+
     public void setProperty(String key, String value)
     {
         if (value != null)

@@ -2,6 +2,9 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
 
+import java.util.List;
+import java.util.LinkedList;
+
 /**
  * Describes the steps (recipes) required for a build, and where they should
  * be executed.
@@ -74,4 +77,13 @@ public class BuildSpecification extends Entity
         this.root = root;
     }
 
+    public BuildSpecificationNode getNode(long id)
+    {
+        return root.getNode(id);
+    }
+
+    public BuildSpecificationNode getNodeByStageName(String name)
+    {
+        return root.getNodeByStageName(name);
+    }
 }

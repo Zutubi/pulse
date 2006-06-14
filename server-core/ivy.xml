@@ -27,21 +27,11 @@
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="release->release"/>
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build->build"/>
 
-        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.0-RC1" conf="external,build,release->default"/>
-
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external,build,release->default"/>
-        <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external,build,release->default"/>
-        <dependency org="apache" name="commons-fileupload" rev="1.0" conf="external,build,release->default"/>
-        <dependency org="apache" name="jasper" rev="5.5.9" conf="external,build,release->default"/>
-        <dependency org="apache" name="commons-pool" rev="1.2" conf="external,build,release->default"/>
+        <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
+        <dependency org="apache" name="xmlrpc" rev="2.0.1" conf="external,build,release->default"/>
 
         <dependency org="caucho" name="hessian" rev="3.0.13" conf="external,build,release->default"/>
-
-        <dependency org="ehcache" name="ehcache" rev="1.1" conf="external,build,release->default"/>
-
-        <dependency org="hibernate" name="hibernate" rev="3.1.1" conf="external,build,release->default"/>
-
-        <dependency org="hsqldb" name="hsqldb" rev="1.8.0.1" conf="external,build,release->default"/>
 
         <dependency org="javasvn" name="javasvn" rev="0.9.2" conf="external,build,release->default"/>
 
@@ -49,20 +39,11 @@
 
         <dependency org="jssh" name="jssh" rev="0.2.7" conf="external,build,release->default"/>
 
-        <dependency org="jwebunit" name="jwebunit" rev="1.2" conf="external,build->default"/>
-        
         <dependency org="netbeans" name="javacvs" rev="11nov2005" conf="external,build,release->default"/>
 
-        <dependency org="opensymphony" name="sitemesh" rev="2.2.1" conf="external,build,release->default"/>
-        <dependency org="opensymphony" name="webwork" rev="2.2.1" conf="external,build,release->default"/>
-
-        <!-- we need the portlet api at the moment since the IBM JDK on the power pc does not include it. -->
-        <dependency org="portlet-api" name="portlet-api" rev="1.0" conf="external,build,release->default"/>
-
-        <dependency org="springframework" name="spring" rev="1.2.6" conf="external,build,release->spring-aop,spring-jdbc,spring-beans,spring-context,spring-core,spring-orm,spring-hibernate3,spring-support"/>
+        <dependency org="springframework" name="spring" rev="1.2.6" conf="external,build,release->spring-beans,spring-context,spring-core"/>
 
         <dependency org="sun" name="servlet" rev="2.4" conf="external,build,release->default"/>
-        <dependency org="sun" name="transaction" rev="1.0.1b" conf="external,build,release->default"/>
 
     </dependencies>
 

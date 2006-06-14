@@ -1,10 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.MockBuildManager;
-import com.zutubi.pulse.model.MockProjectManager;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
 
 /**
@@ -38,7 +35,7 @@ public class BuildAborterTest extends PulseTestCase
     public void testCompletedBuild()
     {
         Project project = new Project("test", "project");
-        BuildResult result = new BuildResult(project, null, 1);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, null, 1);
         result.commence(10);
         result.complete();
 
@@ -53,7 +50,7 @@ public class BuildAborterTest extends PulseTestCase
     public void testIncompleteBuild()
     {
         Project project = new Project("test", "project");
-        BuildResult result = new BuildResult(project, null, 1);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, null, 1);
         result.commence(10);
 
         projectManager.save(project);

@@ -13,47 +13,38 @@ import java.io.IOException;
  * directory and then runs an update when necessary, copying the results into the build directory.
  *
  */
-public class ProjectRepoBootstrapper implements InitialBootstrapper
+public class ProjectRepoBootstrapper implements Bootstrapper
 {
-    /**
-     * The local scm working directory.
-     */
-    private final File localDir;
-
+    private final String projectName;
     private final Scm scm;
-    private ScmBootstrapper bootstrapper;
+    private BuildRevision revision;
 
-    public ProjectRepoBootstrapper(File localDir, Scm scm)
+    public ProjectRepoBootstrapper(String projectName, Scm scm, BuildRevision revision)
     {
-        this.localDir = localDir;
+        this.projectName = projectName;
         this.scm = scm;
+        this.revision = revision;
     }
 
-    public void prepare() throws PulseException
+    public void bootstrap(final RecipePaths paths) throws BuildException
     {
-        if (!localDir.exists() && !localDir.mkdirs())
+        if(paths.getPersistentWorkDir() == null)
         {
-            throw new PulseException("Failed to initialise local scm directory: " + localDir.getAbsolutePath());
+            throw new BuildException("Attempt to use update bootstrapping when no persistent working directory is available.");
         }
+        
+        File reposDir = new File(paths.getPersistentWorkDir(), "repos");
+        final File localDir = new File(reposDir, projectName);
 
-        bootstrapper = selectBootstrapper();
-        bootstrapper.prepare();
-    }
-
-    public Revision getRevision()
-    {
-        if (bootstrapper != null)
-        {
-            return bootstrapper.getRevision();
-        }
-        return null;
-    }
-
-    public void bootstrap(RecipePaths paths) throws BuildException
-    {
         // run the scm bootstrapper on the local directory,
+        ScmBootstrapper bootstrapper = selectBootstrapper(localDir);
         bootstrapper.bootstrap(new RecipePaths()
         {
+            public File getPersistentWorkDir()
+            {
+                return paths.getPersistentWorkDir();
+            }
+
             public File getBaseDir()
             {
                 return localDir;
@@ -81,16 +72,21 @@ public class ProjectRepoBootstrapper implements InitialBootstrapper
         }
     }
 
-    private ScmBootstrapper selectBootstrapper()
+    private ScmBootstrapper selectBootstrapper(final File localDir)
     {
+        if (!localDir.exists() && !localDir.mkdirs())
+        {
+            throw new BuildException("Failed to initialise local scm directory: " + localDir.getAbsolutePath());
+        }
+
         // else we can update.
         if (localDir.list().length == 0)
         {
-            return new CheckoutBootstrapper(scm);
+            return new CheckoutBootstrapper(scm, revision);
         }
         else
         {
-            return new UpdateBootstrapper(scm);
+            return new UpdateBootstrapper(scm, revision);
         }
     }
 }

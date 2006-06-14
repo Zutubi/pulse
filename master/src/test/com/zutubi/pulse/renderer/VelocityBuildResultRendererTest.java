@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.BuildScmDetails;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.TriggerBuildReason;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.IOUtils;
 import org.apache.velocity.app.VelocityEngine;
@@ -69,7 +70,7 @@ public class VelocityBuildResultRendererTest extends PulseTestCase
 
     private BuildResult createSuccessfulBuild()
     {
-        BuildResult result = new BuildResult(new Project("test project", "test description"), "test spec", 101);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), new Project("test project", "test description"), "test spec", 101);
         result.setId(11);
         result.commence(System.currentTimeMillis() - 10000);
         result.complete();

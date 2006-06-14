@@ -354,7 +354,7 @@ public class FileSystemUtils
         {
             ZipEntry entry = new ZipEntry(sourcePath);
             entry.setTime(modifiedTime);
-            entry.setExtra(Integer.toOctalString(getPermissions(source)).getBytes());
+            //entry.setExtra(Integer.toOctalString(getPermissions(source)).getBytes());
             os.putNextEntry(entry);
 
             FileInputStream is = null;
@@ -385,12 +385,12 @@ public class FileSystemUtils
             else
             {
                 unzip(zin, file);
-                String octalPermissions = new String(entry.getExtra());
-                int permissions = Integer.parseInt(octalPermissions, 8);
-                if (permissions != 0)
-                {
-                    setPermissions(file, permissions);
-                }
+//                String octalPermissions = new String(entry.getExtra());
+//                int permissions = Integer.parseInt(octalPermissions, 8);
+//                if (permissions != 0)
+//                {
+//                    setPermissions(file, permissions);
+//                }
             }
 
             file.setLastModified(entry.getTime());

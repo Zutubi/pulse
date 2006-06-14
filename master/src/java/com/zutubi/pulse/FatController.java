@@ -1,22 +1,26 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.events.build.BuildCompletedEvent;
+import com.zutubi.pulse.events.build.BuildRequestEvent;
+import com.zutubi.pulse.events.build.BuildTerminationRequestEvent;
+import com.zutubi.pulse.events.build.BuildTimeoutEvent;
+import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseEvent;
+import com.zutubi.pulse.license.LicenseExpiredEvent;
+import com.zutubi.pulse.license.LicenseUpdateEvent;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.scheduling.quartz.TimeoutBuildJob;
+import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.license.LicenseExpiredEvent;
-import com.zutubi.pulse.license.LicenseUpdateEvent;
-import com.zutubi.pulse.license.License;
-import com.zutubi.pulse.license.LicenseEvent;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -44,7 +48,7 @@ public class FatController implements EventListener, Stoppable
     private EventManager eventManager;
     private AsynchronousDelegatingListener asyncListener;
     private BuildManager buildManager;
-    private ConfigurationManager configManager;
+    private MasterConfigurationManager configManager;
     private RecipeQueue recipeQueue;
 
     private ReentrantLock lock = new ReentrantLock();
@@ -54,6 +58,7 @@ public class FatController implements EventListener, Stoppable
     private Set<BuildController> runningBuilds = new HashSet<BuildController>();
     private Scheduler quartzScheduler;
     private ProjectManager projectManager;
+    private ServiceTokenManager serviceTokenManager;
 
     /**
      * When the fat controller is enabled, it will handle incoming build requests.
@@ -258,7 +263,7 @@ public class FatController implements EventListener, Stoppable
             {
                 projectManager.buildCommenced(project.getId());
                 RecipeResultCollector collector = new DefaultRecipeResultCollector(project, configManager);
-                BuildController controller = new BuildController(project, buildSpec, eventManager, buildManager, recipeQueue, collector, quartzScheduler, configManager);
+                BuildController controller = new BuildController(event, buildSpec, eventManager, buildManager, recipeQueue, collector, quartzScheduler, configManager, serviceTokenManager);
                 controller.run();
                 runningBuilds.add(controller);
             }
@@ -403,7 +408,7 @@ public class FatController implements EventListener, Stoppable
      *
      * @param configManager
      */
-    public void setConfigurationManager(ConfigurationManager configManager)
+    public void setConfigurationManager(MasterConfigurationManager configManager)
     {
         this.configManager = configManager;
     }
@@ -416,5 +421,10 @@ public class FatController implements EventListener, Stoppable
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
+    {
+        this.serviceTokenManager = serviceTokenManager;
     }
 }

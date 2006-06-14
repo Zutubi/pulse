@@ -1,13 +1,13 @@
 #helpTag("License+Management")
 #authorisationTags($principle)
-<content tag="selectedTab">server</content>
+<content tag="selectedTab">administration</content>
 <html>
 <head>
     <title>#wwtext("name=license.edit")</title>
 </head>
 
 <body>
-    #serverTabs("server-info")
+    #adminTabs("settings")
 
     #parse("/template/includes/actionerrors.vm")
 

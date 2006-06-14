@@ -12,6 +12,7 @@ import java.util.List;
  */
 public class RecipeResultNode extends Entity
 {
+    private String stage;
     private String host;
     private RecipeResult result;
     private List<RecipeResultNode> children;
@@ -20,10 +21,21 @@ public class RecipeResultNode extends Entity
     {
     }
 
-    public RecipeResultNode(RecipeResult result)
+    public RecipeResultNode(String stage, RecipeResult result)
     {
+        this.stage = stage;
         this.result = result;
         children = new LinkedList<RecipeResultNode>();
+    }
+
+    public String getStage()
+    {
+        return stage;
+    }
+
+    public void setStage(String stage)
+    {
+        this.stage = stage;
     }
 
     public String getHost()

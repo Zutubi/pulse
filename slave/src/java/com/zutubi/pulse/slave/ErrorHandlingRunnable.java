@@ -4,6 +4,7 @@ import com.caucho.hessian.client.HessianRuntimeException;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.services.MasterService;
+import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.MalformedURLException;
@@ -15,13 +16,15 @@ public class ErrorHandlingRunnable implements Runnable
     private static final Logger LOG = Logger.getLogger(ErrorHandlingRunnable.class);
 
     private String master;
+    private ServiceTokenManager serviceTokenManager;
     private long recipeId;
     private Runnable delegate;
     private MasterProxyFactory masterProxyFactory;
 
-    public ErrorHandlingRunnable(String master, long recipeId, Runnable delegate)
+    public ErrorHandlingRunnable(String master, ServiceTokenManager serviceTokenManager, long recipeId, Runnable delegate)
     {
         this.master = master;
+        this.serviceTokenManager = serviceTokenManager;
         this.recipeId = recipeId;
         this.delegate = delegate;
     }
@@ -51,15 +54,15 @@ public class ErrorHandlingRunnable implements Runnable
         try
         {
             MasterService service = masterProxyFactory.createProxy(master);
-            service.handleEvent(event);
+            service.handleEvent(serviceTokenManager.getToken(), event);
         }
         catch (MalformedURLException e)
         {
             LOG.warning(e);
         }
-        catch (HessianRuntimeException e)
+        catch (RuntimeException e)
         {
-            LOG.warning("Unable to send error to master '" + master + "'", e);
+            LOG.warning("Unable to send error to master '" + master + "': " + e.getMessage(), e);
         }
     }
 

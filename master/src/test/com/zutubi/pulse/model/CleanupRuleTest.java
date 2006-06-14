@@ -106,7 +106,7 @@ public class CleanupRuleTest extends MasterPersistenceTestCase
 
     private BuildResult createBuild(Project project, String spec, long number, long startTime, ResultState state, boolean hasWorkDir)
     {
-        BuildResult result = new BuildResult(project, spec, number);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec, number);
         result.commence(startTime);
         switch (state)
         {

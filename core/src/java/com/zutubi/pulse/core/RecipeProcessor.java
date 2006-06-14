@@ -1,8 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.Property;
-import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.CommandCommencedEvent;
@@ -10,6 +8,7 @@ import com.zutubi.pulse.events.build.CommandCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeCommencedEvent;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.model.ResourceRequirement;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -26,7 +25,6 @@ public class RecipeProcessor
     private static final Logger LOG = Logger.getLogger(RecipeProcessor.class);
 
     private EventManager eventManager;
-    private ResourceRepository resourceRepository;
     private Lock runningLock = new ReentrantLock();
     private long runningRecipe = 0;
     private Command runningCommand = null;
@@ -41,7 +39,7 @@ public class RecipeProcessor
     {
         if (fileLoader == null)
         {
-            fileLoader = new PulseFileLoader(new ObjectFactory(), resourceRepository);
+            fileLoader = new PulseFileLoader(new ObjectFactory());
         }
     }
 
@@ -53,33 +51,34 @@ public class RecipeProcessor
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    public void build(long recipeId, RecipePaths paths, Bootstrapper bootstrapper, String pulseFileSource, String recipeName)
+    public void build(RecipeRequest request, RecipePaths paths, ResourceRepository resourceRepository)
     {
         // This result holds only the recipe details (stamps, state etc), not
         // the command results.  A full recipe result with command results is
         // assembled elsewhere.
-        RecipeResult result = new RecipeResult(recipeName);
-        result.setId(recipeId);
+        RecipeResult result = new RecipeResult(request.getRecipeName());
+        result.setId(request.getId());
         result.commence(paths.getOutputDir());
 
-        runningRecipe = recipeId;
-        eventManager.publish(new RecipeCommencedEvent(this, recipeId, recipeName, result.getStamps().getStartTime()));
+        runningRecipe = request.getId();
+        eventManager.publish(new RecipeCommencedEvent(this, request.getId(), request.getRecipeName(), result.getStamps().getStartTime()));
 
         try
         {
             // Wrap bootstrapper in a command and run it.
-            BootstrapCommand bootstrapCommand = new BootstrapCommand(bootstrapper);
+            BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
             CommandResult bootstrapResult = new CommandResult(bootstrapCommand.getName());
             File commandOutput = new File(paths.getOutputDir(), getCommandDirName(0, bootstrapResult));
 
-            executeCommand(recipeId, bootstrapResult, paths, commandOutput, bootstrapCommand);
+            executeCommand(request.getId(), bootstrapResult, paths, commandOutput, bootstrapCommand);
 
             if (bootstrapResult.succeeded())
             {
                 // Now we can load the recipe from the pulse file
-                PulseFile pulseFile = loadPulseFile(paths.getBaseDir(), pulseFileSource, recipeName);
+                PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository);
                 Recipe recipe;
 
+                String recipeName = request.getRecipeName();
                 if (recipeName == null)
                 {
                     recipeName = pulseFile.getDefaultRecipe();
@@ -95,7 +94,7 @@ public class RecipeProcessor
                     throw new BuildException("Undefined recipe '" + recipeName + "'");
                 }
 
-                build(recipeId, recipe, paths);
+                build(request.getId(), recipe, paths);
             }
         }
         catch (BuildException e)
@@ -184,17 +183,20 @@ public class RecipeProcessor
         }
     }
 
-    private PulseFile loadPulseFile(File baseDir, String pulseFileSource, String recipeName) throws BuildException
+    private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository) throws BuildException
     {
         List<Reference> properties = new LinkedList<Reference>();
         Property property = new Property("base.dir", baseDir.getAbsolutePath());
         properties.add(property);
+
+        importResources(resourceRepository, request.getResourceRequirements(), properties);
 
         InputStream stream = null;
 
         try
         {
             // CIB-286: special case empty file for better reporting
+            String pulseFileSource = request.getPulseFileSource();
             if(pulseFileSource.trim().length() == 0)
             {
                 throw new ParseException("File is empty");
@@ -202,7 +204,7 @@ public class RecipeProcessor
 
             stream = new ByteArrayInputStream(pulseFileSource.getBytes());
             PulseFile result = new PulseFile();
-            fileLoader.load(stream, result, properties, new RecipeLoadPredicate(result, recipeName));
+            fileLoader.load(stream, result, properties, resourceRepository, new RecipeLoadPredicate(result, request.getRecipeName()));
             return result;
         }
         catch (Exception e)
@@ -215,9 +217,31 @@ public class RecipeProcessor
         }
     }
 
-    public void setResourceRepository(ResourceRepository resourceRepository)
+    private void importResources(ResourceRepository resourceRepository, List<ResourceRequirement> resourceRequirements, List<Reference> properties)
     {
-        this.resourceRepository = resourceRepository;
+        if (resourceRequirements != null)
+        {
+            for(ResourceRequirement requirement: resourceRequirements)
+            {
+                Resource resource = resourceRepository.getResource(requirement.getResource());
+                if(resource == null)
+                {
+                    throw new BuildException("Unable to import required resource '" + requirement.getResource() + "'");
+                }
+
+                properties.addAll(resource.getProperties().values());
+                if(requirement.getVersion() != null)
+                {
+                    ResourceVersion version = resource.getVersion(requirement.getVersion());
+                    if(version == null)
+                    {
+                        throw new BuildException("Reference to non-existant version '" + requirement.getVersion() + "' of resource '" + requirement.getResource() + "'");
+                    }
+
+                    properties.addAll(version.getProperties().values());
+                }
+            }
+        }
     }
 
     /**

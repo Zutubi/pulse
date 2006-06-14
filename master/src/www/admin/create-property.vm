@@ -1,0 +1,24 @@
+#helpTag("Resource+Repository")
+#authorisationTags($principle)
+#resourceTags($slave $resource)
+<html>
+<head>
+    <title>#wwtext("name=property.add")</title>
+</head>
+<body>
+    #agentTabs("resources")
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=createProperty.action" "heading=%{getText('property.add')}" "method=post")
+    #wwhidden("name=versionId")
+    #wwhidden("name=resourceId")
+    #wwtextfield("name=property.name" "label=%{getText('property.name')}" "required=true" "tabindex=1")
+    #wwtextfield("name=value" "label=%{getText('property.value')}" "size=60" "tabindex=2")
+
+    #saveCancel(3)
+#end
+
+    #tabEnd()
+</body>
+</html>

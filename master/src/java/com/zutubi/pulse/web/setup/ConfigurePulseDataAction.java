@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.setup;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.SimpleConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager;
 
 import java.io.File;
 
@@ -10,7 +10,7 @@ import java.io.File;
  */
 public class ConfigurePulseDataAction extends SetupActionSupport
 {
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
 
     private String data;
 
@@ -38,7 +38,7 @@ public class ConfigurePulseDataAction extends SetupActionSupport
     public String doInput() throws Exception
     {
         // set the default.
-        String data = System.getProperty(SimpleConfigurationManager.PULSE_HOME);
+        String data = System.getProperty(SimpleMasterConfigurationManager.PULSE_HOME);
         if (data == null)
         {
             this.data = "data";
@@ -79,7 +79,7 @@ public class ConfigurePulseDataAction extends SetupActionSupport
         }
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

@@ -1,14 +1,20 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.events.build.RecipeEvent;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.scm.SCMChangeEvent;
+import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.LinkedList;
@@ -28,11 +34,13 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 {
     private static final Logger LOG = Logger.getLogger(ThreadedRecipeQueue.class);
 
-    private ObjectFactory objectFactory;
+    private boolean checkOnEnqueue = true;
 
     private final ReentrantLock lock = new ReentrantLock();
 
     private final Condition lockCondition = lock.newCondition();
+
+    private final Map<Long, Agent> onlineAgents = new TreeMap<Long, Agent>();
 
     /**
      * The queue to which new dispatch requests are added.
@@ -44,13 +52,13 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
      */
     private final List<RecipeDispatchRequest> queuedDispatches = new LinkedList<RecipeDispatchRequest>();
 
-    private final List<BuildService> newServices = new LinkedList<BuildService>();
-    private final List<BuildService> availableServices = new LinkedList<BuildService>();
+    private final List<Agent> newAgents = new LinkedList<Agent>();
+    private final Map<Long, Agent> availableAgents = new TreeMap<Long, Agent>();
 
     /**
-     * Maps from recipe ID to the build service executing the recipe.
+     * Maps from recipe ID to the agent executing the recipe.
      */
-    private final Map<Long, BuildService> executingServices = new TreeMap<Long, BuildService>();
+    private final Map<Long, Agent> executingAgents = new TreeMap<Long, Agent>();
 
     private ExecutorService executor;
 
@@ -58,9 +66,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private boolean isRunning = false;
 
+    private AgentManager agentManager;
     private EventManager eventManager;
 
-    private MasterRecipeProcessor masterRecipeProcessor;
 
     public ThreadedRecipeQueue()
     {
@@ -71,10 +79,12 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         try
         {
-            // manually wire the master recipe processor.
-            MasterBuildService buildService = objectFactory.buildBean(MasterBuildService.class);
-            buildService.setMasterRecipeProcessor(masterRecipeProcessor);
-            availableServices.add(buildService);
+            // Get all agents
+            for(Agent a: agentManager.getOnlineAgents())
+            {
+                available(a);
+            }
+
             eventManager.register(this);
             start();
         }
@@ -107,17 +117,63 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
      */
     public void enqueue(RecipeDispatchRequest dispatchRequest)
     {
+        RecipeErrorEvent error = null;
+
         lock.lock();
         try
         {
-            newDispatches.add(dispatchRequest);
-            dispatchRequest.queued();
-            lockCondition.signal();
+            try
+            {
+                determineRevision(dispatchRequest);
+
+                if(requestMayBeFulfilled(dispatchRequest))
+                {
+                    newDispatches.add(dispatchRequest);
+                    dispatchRequest.queued();
+                    lockCondition.signal();
+                }
+                else
+                {
+                    error = new RecipeErrorEvent(this, dispatchRequest.getRequest().getId(), "No online agent is capable of executing the build stage");
+                }
+            }
+            catch (Exception e)
+            {
+                error = new RecipeErrorEvent(this, dispatchRequest.getRequest().getId(), "Unable to determine revision to build: " + e.getMessage());
+            }
         }
         finally
         {
             lock.unlock();
         }
+
+        if(error != null)
+        {
+            // Publish outside the lock.
+            eventManager.publish(error);
+        }
+    }
+
+    private void determineRevision(RecipeDispatchRequest dispatchRequest) throws BuildException, SCMException
+    {
+        BuildRevision buildRevision = dispatchRequest.getRevision();
+        if(!buildRevision.isInitialised())
+        {
+            // Let's initialise it
+            Project project = dispatchRequest.getBuild().getProject();
+            Scm scm = project.getScm();
+            Revision revision = scm.createServer().getLatestRevision();
+
+            // May throw a BuildException
+            updateRevision(dispatchRequest, revision);
+        }
+    }
+
+    private void updateRevision(RecipeDispatchRequest dispatchRequest, Revision revision) throws BuildException
+    {
+        Project project = dispatchRequest.getBuild().getProject();
+        String pulseFile = project.getPulseFileDetails().getPulseFile(dispatchRequest.getRequest().getId(), project, revision);
+        dispatchRequest.getRevision().update(revision, pulseFile);
     }
 
     public List<RecipeDispatchRequest> takeSnapshot()
@@ -187,18 +243,107 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         return removed;
     }
 
-    public void available(BuildService buildService)
+    void available(Agent agent)
     {
-        lock.lock();
-        try
+        if(agent.isOnline())
         {
-            newServices.add(buildService);
-            lockCondition.signal();
+            lock.lock();
+            try
+            {
+                onlineAgents.put(agent.getId(), agent);
+                newAgents.add(agent);
+                lockCondition.signal();
+            }
+            finally
+            {
+                lock.unlock();
+            }
         }
-        finally
+    }
+
+    private void unavailable(Agent agent)
+    {
+        if (!agent.isOnline())
         {
-            lock.unlock();
+            RecipeErrorEvent error = null;
+            List<RecipeDispatchRequest> unfulfillable = new LinkedList<RecipeDispatchRequest>();
+
+            lock.lock();
+            try
+            {
+                onlineAgents.remove(agent.getId());
+
+                // Check all queued requests may still be handled by an online
+                // agent.
+                unfulfillable.addAll(checkQueuedRequests(queuedDispatches));
+                unfulfillable.addAll(checkQueuedRequests(newDispatches));
+
+                long deadRecipe = 0;
+                for(Map.Entry<Long, Agent> entry: executingAgents.entrySet())
+                {
+                    if(entry.getValue().getId() == agent.getId())
+                    {
+                        // Agent dropped off while we were executing.
+                        deadRecipe = entry.getKey();
+                        break;
+                    }
+                }
+
+                if(deadRecipe != 0)
+                {
+                    // Remove it first so we don't find it when handling this event.
+                    executingAgents.remove(deadRecipe);
+                    error = new RecipeErrorEvent(this, deadRecipe, "Connection to agent lost during recipe execution");
+                }
+            }
+            finally
+            {
+                lock.unlock();
+            }
+
+            if(error != null)
+            {
+                // Publish outside the lock.
+                eventManager.publish(error);
+            }
+
+            publishUnfulfillable(unfulfillable);
         }
+    }
+
+    private List<RecipeDispatchRequest> checkQueuedRequests(List<RecipeDispatchRequest> requests)
+    {
+        assert(lock.isHeldByCurrentThread());
+
+        List<RecipeDispatchRequest> unfulfillable = new LinkedList<RecipeDispatchRequest>();
+        for(RecipeDispatchRequest request: requests)
+        {
+            if(!requestMayBeFulfilled(request))
+            {
+                unfulfillable.add(request);
+            }
+        }
+
+        removeUnfulfillable(unfulfillable, requests);
+        return unfulfillable;
+    }
+
+    private boolean requestMayBeFulfilled(RecipeDispatchRequest request)
+    {
+        if(!checkOnEnqueue)
+        {
+            return true;
+        }
+
+        for(Agent a: onlineAgents.values())
+        {
+            if(request.getHostRequirements().fulfilledBy(request, a.getBuildService()))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void run()
@@ -218,7 +363,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             LOG.debug("lock.lock();");
             try
             {
-                if (newDispatches.size() == 0 && newServices.size() == 0)
+                if (newDispatches.size() == 0 && newAgents.size() == 0)
                 {
                     try
                     {
@@ -239,27 +384,39 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
                 queuedDispatches.addAll(newDispatches);
                 newDispatches.clear();
-                availableServices.addAll(newServices);
-                newServices.clear();
+
+                for(Agent a: newAgents)
+                {
+                    availableAgents.put(a.getId(), a);
+                }
+                newAgents.clear();
 
                 List<RecipeDispatchRequest> dispatchedRequests = new LinkedList<RecipeDispatchRequest>();
-                List<BuildService> unavailableServices = new LinkedList<BuildService>();
+                List<Agent> unavailableAgents = new LinkedList<Agent>();
 
                 for (RecipeDispatchRequest request : queuedDispatches)
                 {
-                    for (BuildService service : availableServices)
+                    for (Agent agent: availableAgents.values())
                     {
+                        BuildService service = agent.getBuildService();
+
                         // can the request be sent to this service?
-                        if (request.getHostRequirements().fulfilledBy(service) && !unavailableServices.contains(service))
+                        if (request.getHostRequirements().fulfilledBy(request, service) && !unavailableAgents.contains(agent))
                         {
-                            dispatchRequest(request, service, unavailableServices, dispatchedRequests);
-                            break;
+                            if(dispatchRequest(request, agent, unavailableAgents, dispatchedRequests))
+                            {
+                                break;
+                            }
                         }
                     }
                 }
 
                 queuedDispatches.removeAll(dispatchedRequests);
-                availableServices.removeAll(unavailableServices);
+
+                for(Agent a: unavailableAgents)
+                {
+                    availableAgents.remove(a.getId());
+                }
             }
             finally
             {
@@ -273,33 +430,26 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         isRunning = false;
     }
 
-    private void dispatchRequest(RecipeDispatchRequest request, BuildService service, List<BuildService> unavailableServices, List<RecipeDispatchRequest> dispatchedRequests)
+    private boolean dispatchRequest(RecipeDispatchRequest request, Agent agent, List<Agent> unavailableAgents, List<RecipeDispatchRequest> dispatchedRequests)
     {
-        dispatchedRequests.add(request);
+        request.getRevision().apply(request.getRequest());
 
-        try
+        if(agent.getBuildService().build(request.getRequest()))
         {
-            request.prepare();
-        }
-        catch (Exception e)
-        {
-            eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), "Error dispatching recipe: " + e.getMessage()));
-            return;
-        }
+            dispatchedRequests.add(request);
+            unavailableAgents.add(agent);
 
-        service.build(request.getRequest());
-        unavailableServices.add(service);
-        lock.lock();
-        try
-        {
-            executingServices.put(request.getRequest().getId(), service);
-        }
-        finally
-        {
-            lock.unlock();
-        }
+            // We can no longer update the revision once we have dispatched a request.
+            request.getRevision().fix();
+            executingAgents.put(request.getRequest().getId(), agent);
 
-        eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest(), service));
+            eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest(), agent));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public void stop(boolean force)
@@ -345,22 +495,49 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    public void handleEvent(Event evt)
+    public int executingCount()
     {
-        RecipeEvent event = (RecipeEvent) evt;
-
         lock.lock();
         try
         {
-            BuildService service = executingServices.get(event.getRecipeId());
+            return executingAgents.size();
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
 
-            // The service could be null if there was a temporary loss of
-            // communication with the build service leading to abortion of the
-            // recipe on the master.
-            if (service != null)
+    public void handleEvent(Event evt)
+    {
+        if(evt instanceof RecipeEvent)
+        {
+            handleRecipeEvent((RecipeEvent) evt);
+        }
+        else if(evt instanceof SlaveEvent)
+        {
+            handleSlaveEvent((SlaveEvent)evt);
+        }
+        else if(evt instanceof SCMChangeEvent)
+        {
+            handleScmChange((SCMChangeEvent)evt);
+        }
+    }
+
+    private void handleRecipeEvent(RecipeEvent event)
+    {
+        lock.lock();
+        try
+        {
+            Agent agent = executingAgents.get(event.getRecipeId());
+
+            // The agent could be null if there was a loss of communication
+            // with the agent leading to abortion of the recipe on the master.
+            // In that case, the agent is not now available.
+            if (agent != null)
             {
-                executingServices.remove(event.getRecipeId());
-                available(service);
+                executingAgents.remove(event.getRecipeId());
+                available(agent);
             }
         }
         finally
@@ -369,9 +546,91 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
+    private void handleSlaveEvent(SlaveEvent event)
+    {
+        Agent a = agentManager.getAgent(event.getSlave());
+        if(event instanceof SlaveAvailableEvent)
+        {
+            available(a);
+        }
+        else
+        {
+            unavailable(a);
+        }
+    }
+
+    private void handleScmChange(SCMChangeEvent event)
+    {
+        List<RecipeDispatchRequest> unfulfillable = new LinkedList<RecipeDispatchRequest>();
+        Scm changedScm = event.getScm();
+        lock.lock();
+        try
+        {
+            unfulfillable.addAll(checkQueueForChanges(changedScm, event, newDispatches));
+            unfulfillable.addAll(checkQueueForChanges(changedScm, event, queuedDispatches));
+        }
+        finally
+        {
+            lock.unlock();
+        }
+
+        // Publish events outside the lock
+        publishUnfulfillable(unfulfillable);
+    }
+
+    private void publishUnfulfillable(List<RecipeDispatchRequest> unfulfillable)
+    {
+        for(RecipeDispatchRequest request: unfulfillable)
+        {
+            eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), "No online agent is capable of executing the build stage"));
+        }
+    }
+
+    private List<RecipeDispatchRequest> checkQueueForChanges(Scm changedScm, SCMChangeEvent event, List<RecipeDispatchRequest> requests)
+    {
+        List<RecipeDispatchRequest> unfulfillable = new LinkedList<RecipeDispatchRequest>();
+
+        for(RecipeDispatchRequest request: requests)
+        {
+            Scm requestScm = request.getBuild().getProject().getScm();
+            if(!request.getRevision().isFixed() && requestScm.getId() == changedScm.getId())
+            {
+                try
+                {
+                    updateRevision(request, event.getNewRevision());
+                    if(!requestMayBeFulfilled(request))
+                    {
+                        unfulfillable.add(request);
+                    }
+                }
+                catch(Exception e)
+                {
+                    // We already have a revision, so this is not fatal.
+                    LOG.warning("Unable to check build revision: " + e.getMessage(), e);
+                }
+            }
+        }
+
+        removeUnfulfillable(unfulfillable, requests);
+        return unfulfillable;
+    }
+
+    private void removeUnfulfillable(List<RecipeDispatchRequest> unfulfillable, List<RecipeDispatchRequest> requests)
+    {
+        for(RecipeDispatchRequest request: unfulfillable)
+        {
+            requests.remove(request);
+        }
+    }
+
+    public void setCheckOnEnqueue(boolean checkOnEnqueue)
+    {
+        this.checkOnEnqueue = checkOnEnqueue;
+    }
+
     public Class[] getHandledEvents()
     {
-        return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class};
+        return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class, SCMChangeEvent.class, SlaveEvent.class};
     }
 
     public void setEventManager(EventManager eventManager)
@@ -379,13 +638,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         this.eventManager = eventManager;
     }
 
-    public void setObjectFactory(ObjectFactory objectFactory)
+    public void setAgentManager(AgentManager agentManager)
     {
-        this.objectFactory = objectFactory;
-    }
-
-    public void setMasterRecipeProcessor(MasterRecipeProcessor masterRecipeProcessor)
-    {
-        this.masterRecipeProcessor = masterRecipeProcessor;
+        this.agentManager = agentManager;
     }
 }

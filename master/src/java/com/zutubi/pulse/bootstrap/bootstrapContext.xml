@@ -21,7 +21,6 @@
         <property name="startupRunnables">
             <list>
                 <value>com.zutubi.pulse.BuildAborter</value>
-                <value>com.zutubi.pulse.ResourceDiscoverer</value>
             </list>
         </property>
         <property name="configurationManager">
@@ -32,7 +31,7 @@
         </property>
     </bean>
 
-    <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleConfigurationManager"/>
+    <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager"/>
 
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 

@@ -8,11 +8,12 @@ import java.util.List;
  */
 public interface ResourceRepository
 {
+    boolean hasResource(String name, String version);
+
     boolean hasResource(String name);
 
     Resource getResource(String name);
 
     List<String> getResourceNames();
 
-    void addResource(Resource resource);
 }

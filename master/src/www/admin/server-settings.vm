@@ -13,6 +13,12 @@
     <table class="columns" width="90%">
         <tr>
             <td class="columns" width="40%">
+                <table class="fill-content" id="license.info">
+                    #restrictedHeadingRow("license.info" 2 "ROLE_ADMINISTRATOR" "edit" "/admin/editLicense!input.action" "pencil.gif" "license.edit")
+                    #dynamicRow("license.name.field" $license.name)
+                    #dynamicRow("license.holder.field" $license.holder)
+                    #dynamicRow("license.expiry.field" $expiryDate)
+                </table>
                 <table id="general.config" class="fill-content">
                     #adminHeadingRow("general.config" "/admin/editGeneral!input.action" "general.edit" "/admin/general!reset.action" "general.reset")
                     #dynamicRow("general.host" $config.hostName)

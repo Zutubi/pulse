@@ -10,10 +10,14 @@ import java.io.IOException;
  */
 public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 {
-    private static final String CRON_TRIGGER_NAME = "cron-trigger-name";
+    private static final String TRIGGER_NAME = "trigger-name";
     private static final String CRON_STRING = "0 0 0 * * ?";
     private static final String SPEC_NAME = "spec-name";
     private static final String RECIPE_NAME = "recipe-name";
+    private static final String STAGE_NAME = "stage-name";
+    private static final String NEW_RECIPE = "new-recipe";
+    private static final String VERSION_VALUE = "version-value";
+    private static final String RESOURCE_NAME = "resource-name";
 
     public ProjectAcceptanceTest()
     {
@@ -382,48 +386,58 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertProjectCleanupTable(null);
     }
 
-    public void testAddNewBuildSpec()
+    public void testAddBuildSpec()
     {
-        BuildSpecForm form = new BuildSpecForm(tester, true);
+        addSpec(SPEC_NAME);
+
+        assertBuildSpecification(SPEC_NAME, true, 100, new String[] { STAGE_NAME, RECIPE_NAME, "[master]"});
+
+        // Check back on the configuration tab: ensure spec appears
+        clickLinkWithText("configuration");
+        assertProjectBuildSpecTable(new String[][]{
+                createBuildSpecRow("default", "[never]"),
+                createBuildSpecRow(SPEC_NAME, "100 minutes")
+        });
+    }
+
+    private void addSpec(String name)
+    {
+        AddBuildSpecForm form = new AddBuildSpecForm(tester);
 
         assertProjectBuildSpecTable(new String[][]{
-                createBuildSpecRow("default", "[default]", "[never]")
+                createBuildSpecRow("default", "[never]")
         });
 
         assertAndClick("project.buildspec.add");
         form.assertFormPresent();
-        form.saveFormElements(SPEC_NAME, RECIPE_NAME, "true", "100");
-
-        assertProjectBuildSpecTable(new String[][]{
-                createBuildSpecRow("default", "[default]", "[never]"),
-                createBuildSpecRow(SPEC_NAME, RECIPE_NAME, "100 minutes")
-        });
+        form.saveFormElements(name, "true", "100", STAGE_NAME, RECIPE_NAME, "1");
     }
 
     public void testAddBuildSpecValidation()
     {
-        BuildSpecForm form = new BuildSpecForm(tester, true);
+        AddBuildSpecForm form = new AddBuildSpecForm(tester);
 
         assertProjectBuildSpecTable(new String[][]{
-                createBuildSpecRow("default", "[default]", "[never]")
+                createBuildSpecRow("default", "[never]")
         });
 
         assertAndClick("project.buildspec.add");
         form.assertFormPresent();
-        form.saveFormElements("", "", "true", "-100");
+        form.saveFormElements("", "true", "-100", "", "", "1");
         form.assertFormPresent();
 
         assertTextPresent("name is required");
         assertTextPresent("Timeout must be a positive value");
+        assertTextPresent("stage name is required");
     }
 
     public void testAddBuildSpecDuplicate()
     {
-        BuildSpecForm form = new BuildSpecForm(tester, true);
+        AddBuildSpecForm form = new AddBuildSpecForm(tester);
 
         assertAndClick("project.buildspec.add");
         form.assertFormPresent();
-        form.saveFormElements("default", "", "true", "100");
+        form.saveFormElements("default", "true", "100", STAGE_NAME, RECIPE_NAME, "1");
         form.assertFormPresent();
 
         assertTextPresent("'default' already exists");
@@ -431,29 +445,31 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
     public void testEditBuildSpec()
     {
-        testAddNewBuildSpec();
-        assertAndClick("edit_" + SPEC_NAME);
+        addSpec(SPEC_NAME);
+        assertAndClick("edit_basics");
 
-        BuildSpecForm form = new BuildSpecForm(tester, false);
+        EditBuildSpecForm form = new EditBuildSpecForm(tester);
         form.assertFormPresent();
-        form.assertFormElements(SPEC_NAME, RECIPE_NAME, "true", "100");
-        form.saveFormElements(SPEC_NAME + "edited", RECIPE_NAME + "edited", null, null);
+        form.assertFormElements(SPEC_NAME, "true", "100");
+        form.saveFormElements(SPEC_NAME + "_edited", null, null);
 
+        assertBuildSpecification(SPEC_NAME + "_edited", false, 0);
+
+        clickLinkWithText("configuration");
         assertProjectBuildSpecTable(new String[][]{
-                createBuildSpecRow("default", "[default]", "[never]"),
-                createBuildSpecRow(SPEC_NAME + "edited", RECIPE_NAME + "edited", "100 minutes")
+                createBuildSpecRow("default", "[never]"),
+                createBuildSpecRow(SPEC_NAME + "_edited", "[never]")
         });
     }
 
     public void testEditBuildSpecValidation()
     {
-        testAddNewBuildSpec();
-        assertAndClick("edit_" + SPEC_NAME);
+        addSpec(SPEC_NAME);
+        assertAndClick("edit_basics");
 
-        BuildSpecForm form = new BuildSpecForm(tester, false);
+        EditBuildSpecForm form = new EditBuildSpecForm(tester);
         form.assertFormPresent();
-        form.assertFormElements(SPEC_NAME, RECIPE_NAME, "true", "100");
-        form.saveFormElements("", "", "true", "-100");
+        form.saveFormElements("", "true", "-100");
         form.assertFormPresent();
 
         assertTextPresent("name is required");
@@ -462,16 +478,193 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
     public void testEditBuildSpecDuplicate()
     {
-        testAddNewBuildSpec();
-        assertAndClick("edit_" + SPEC_NAME);
+        addSpec(SPEC_NAME);
+        assertAndClick("edit_basics");
 
-        BuildSpecForm form = new BuildSpecForm(tester, false);
+        EditBuildSpecForm form = new EditBuildSpecForm(tester);
         form.assertFormPresent();
-        form.assertFormElements(SPEC_NAME, RECIPE_NAME, "true", "100");
-        form.saveFormElements("default", "", "true", "100");
+        form.saveFormElements("default", "true", "100");
         form.assertFormPresent();
 
         assertTextPresent("'default' already exists");
+    }
+
+    public void testDeleteBuildSpec()
+    {
+        testAddBuildSpec();
+        assertTextPresent("scm trigger");
+
+        clickLinkWithText("delete");
+        assertProjectBuildSpecTable(new String[][]{
+                createBuildSpecRow(SPEC_NAME, "100 minutes")
+        });
+
+        assertTextNotPresent("scm trigger");
+    }
+
+    public void testAddBuildStage()
+    {
+        addSpec(SPEC_NAME);
+        addStage("new-stage");
+
+        assertBuildStage("new-stage", NEW_RECIPE, "[master]");
+    }
+
+    private void addStage(String name)
+    {
+        clickLink("stage.add");
+
+        BuildStageForm form = new BuildStageForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements(name, NEW_RECIPE, "1");
+    }
+
+    public void testAddBuildStageValidation()
+    {
+        addSpec(SPEC_NAME);
+        clickLink("stage.add");
+
+        BuildStageForm form = new BuildStageForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements("", "", "1");
+
+        form.assertFormPresent();
+        assertTextPresent("stage name is required");
+    }
+
+    public void testAddBuildStageDuplicate()
+    {
+        addSpec(SPEC_NAME);
+        clickLink("stage.add");
+
+        BuildStageForm form = new BuildStageForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements(STAGE_NAME, "", "1");
+
+        form.assertFormPresent();
+        assertTextPresent("A stage with name '" + STAGE_NAME + "' already exists");
+    }
+
+    public void testEditBuildStage() throws IOException
+    {
+        addSpec(SPEC_NAME);
+        clickLinkWithText("edit", 1);
+
+        BuildStageForm form = new BuildStageForm(tester, false);
+        form.assertFormPresent();
+        form.assertFormElements(STAGE_NAME, RECIPE_NAME, "1");
+        form.saveFormElements(STAGE_NAME + "_edited", RECIPE_NAME + "_edited", "0");
+
+        assertBuildStage(STAGE_NAME + "_edited", RECIPE_NAME + "_edited", "[any]");
+        clickLinkWithText("edit", 2);
+        form.assertFormPresent();
+        form.assertFormElements(STAGE_NAME + "_edited", RECIPE_NAME + "_edited", "0");
+    }
+
+    public void testEditBuildStageValidation() throws IOException
+    {
+        addSpec(SPEC_NAME);
+        clickLinkWithText("edit", 1);
+
+        BuildStageForm form = new BuildStageForm(tester, false);
+        form.assertFormPresent();
+        form.saveFormElements("", "", "0");
+
+        form.assertFormPresent();
+        assertTextPresent("stage name is required");
+    }
+
+    public void testEditBuildStageDuplicate() throws IOException
+    {
+        addSpec(SPEC_NAME);
+        addStage("aneditablestage");
+
+        clickLinkWithText("edit", 3);
+
+        BuildStageForm form = new BuildStageForm(tester, false);
+        form.assertFormPresent();
+        form.assertFormElements("aneditablestage", NEW_RECIPE, "1");
+        form.saveFormElements(STAGE_NAME, "", "0");
+
+        form.assertFormPresent();
+        assertTextPresent("A stage with name '" + STAGE_NAME + "' already exists");
+    }
+
+    public void testDeleteBuildStage()
+    {
+        // httpunit canna handle it :|
+//        addSpec(SPEC_NAME);
+//        addStage("deleta");
+//
+//        assertTextPresent("deleta");
+//        clickLink("delete_deleta");
+//        assertTextNotPresent("deleta");
+    }
+
+    public void testAddBuildSpecResource()
+    {
+        addSpec(SPEC_NAME);
+        addResource(RESOURCE_NAME, 0);
+
+        assertResourceRequirements("", new String[] { RESOURCE_NAME, VERSION_VALUE });
+    }
+
+    private void addResource(String name, int index)
+    {
+        clickLinkWithText("add required resource", index);
+
+        RequiredResourceForm form = new RequiredResourceForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements(name, VERSION_VALUE);
+    }
+
+    public void testAddBuildSpecResourceValidation()
+    {
+        addSpec(SPEC_NAME);
+        clickLinkWithText("add required resource");
+
+        RequiredResourceForm form = new RequiredResourceForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements("", "");
+
+        form.assertFormPresent();
+        assertTextPresent("resource name is required");
+    }
+
+    public void testEditBuildSpecResource()
+    {
+        addSpec(SPEC_NAME);
+        addResource(RESOURCE_NAME, 0);
+
+        clickLinkWithText("edit", 1);
+        RequiredResourceForm form = new RequiredResourceForm(tester, false);
+        form.assertFormPresent();
+        form.assertFormElements(RESOURCE_NAME, VERSION_VALUE);
+        form.saveFormElements(RESOURCE_NAME + "_edited", VERSION_VALUE + "_edited");
+
+        assertResourceRequirements("", new String[] { RESOURCE_NAME + "_edited", VERSION_VALUE + "_edited" });
+    }
+
+    public void testAddBuildStageResource()
+    {
+        addSpec(SPEC_NAME);
+        addResource(RESOURCE_NAME, 1);
+
+        assertResourceRequirements(STAGE_NAME, new String[] { RESOURCE_NAME, VERSION_VALUE });
+    }
+
+    public void testEditBuildStageResource()
+    {
+        addSpec(SPEC_NAME);
+        addResource(RESOURCE_NAME, 1);
+
+        clickLinkWithText("edit", 2);
+        RequiredResourceForm form = new RequiredResourceForm(tester, false);
+        form.assertFormPresent();
+        form.assertFormElements(RESOURCE_NAME, VERSION_VALUE);
+        form.saveFormElements(RESOURCE_NAME + "_edited", VERSION_VALUE + "_edited");
+
+        assertResourceRequirements(STAGE_NAME, new String[] { RESOURCE_NAME + "_edited", VERSION_VALUE + "_edited" });
     }
 
     public void testAddNewTrigger()
@@ -485,9 +678,9 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         // check form is available.
         assertFormPresent("trigger.type");
-        // default trigger type.
+        setFormElement("type", "cron");
         // default specification.
-        setFormElement("name", CRON_TRIGGER_NAME);
+        setFormElement("name", TRIGGER_NAME);
         submit("next");
 
         // check form is available.
@@ -498,7 +691,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         assertProjectTriggerTable(new String[][]{
                 getTriggerRow(projectName + " scm trigger", "event", "default"),
-                getTriggerRow(CRON_TRIGGER_NAME, "cron", "default"),
+                getTriggerRow(TRIGGER_NAME, "cron", "default"),
         });
     }
 
@@ -527,13 +720,14 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertFormPresent("trigger.type");
         // check that we can not create a trigger with an existing name.
         setFormElement("name", triggerName);
+        setFormElement("type", "cron");
         // go with the defaults.
         submit("next");
 
         assertFormPresent("trigger.type");
         // assert text present..
 
-        assertOptionValuesEqual("type", new String[]{"cron", "monitor"});
+        assertOptionValuesEqual("type", new String[]{"build.completed", "cron", "monitor"});
 
         // use some random name.
         setFormElement("name", "trigger " + RandomUtils.randomString(4));
@@ -563,13 +757,13 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     {
         // First ensure we have a cron trigger and two build specs
         testAddNewTrigger();
-        testAddNewBuildSpec();
+        testAddBuildSpec();
 
         CronTriggerEditForm form = new CronTriggerEditForm(tester);
-        clickLink(getEditId(CRON_TRIGGER_NAME));
+        clickLink(getEditId(TRIGGER_NAME));
 
         form.assertFormPresent();
-        form.assertFormElements(CRON_TRIGGER_NAME, "default", CRON_STRING);
+        form.assertFormElements(TRIGGER_NAME, "default", CRON_STRING);
         assertOptionValuesEqual("specification", new String[]{"default", SPEC_NAME});
         return form;
     }
@@ -597,7 +791,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         assertProjectTriggerTable(new String[][]{
                 getTriggerRow(projectName + " scm trigger", "event", "default"),
-                getTriggerRow(CRON_TRIGGER_NAME, "cron", "default"),
+                getTriggerRow(TRIGGER_NAME, "cron", "default"),
         });
     }
 
@@ -624,7 +818,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     private EventTriggerEditForm editEventTriggerHelper()
     {
         // First ensure we have a two build specs
-        testAddNewBuildSpec();
+        testAddBuildSpec();
 
         EventTriggerEditForm form = new EventTriggerEditForm(tester);
         assertAndClick(getEditId(projectName + " scm trigger"));
@@ -664,6 +858,63 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         form.assertFormPresent();
         assertTextPresent("name is required");
     }
+
+    public void testAddNewBuildCompletedTrigger()
+    {
+        assertProjectTriggerTable(new String[][]{
+                getTriggerRow(projectName + " scm trigger", "event", "default"),
+        });
+
+        assertLinkPresent("project.trigger.add");
+        clickLink("project.trigger.add");
+
+        // check form is available.
+        assertFormPresent("trigger.type");
+        setFormElement("type", "build.completed");
+        // default specification.
+        setFormElement("name", TRIGGER_NAME);
+        submit("next");
+
+        // check form is available.
+        CreateBuildCompletedTriggerForm form = new CreateBuildCompletedTriggerForm(tester);
+        form.assertFormPresent();
+        String id = tester.getDialog().getValueForOption(form.getFieldNames()[0], projectName);
+        form.nextFormElements(id, "default", "FAILURE");
+
+        assertProjectTriggerTable(new String[][]{
+                getTriggerRow(projectName + " scm trigger", "event", "default"),
+                getTriggerRow(TRIGGER_NAME, "event", "default"),
+        });
+    }
+
+    private EditBuildCompletedTriggerForm editBuildCompletedTriggerHelper()
+    {
+        // First ensure we have a trigger and two build specs
+        testAddBuildSpec();
+        testAddNewBuildCompletedTrigger();
+
+        EditBuildCompletedTriggerForm form = new EditBuildCompletedTriggerForm(tester);
+        assertAndClick(getEditId(TRIGGER_NAME));
+        form.assertFormPresent();
+        return form;
+    }
+
+    // This is another case where Javascript causes HTTPUnit to barf
+//    public void testEditBuildCompletedTrigger()
+//    {
+//        EditBuildCompletedTriggerForm form = editBuildCompletedTriggerHelper();
+//        String id = tester.getDialog().getValueForOption(form.getFieldNames()[2], projectName);
+//        form.assertFormElements(TRIGGER_NAME, "default", id, "default", "FAILURE");
+//        form.saveFormElements("new name", SPEC_NAME, id, "", "SUCCESS");
+//
+//        assertProjectTriggerTable(new String[][]{
+//                getTriggerRow("new name", "event", SPEC_NAME),
+//        });
+//
+//        assertAndClick(getEditId(TRIGGER_NAME));
+//        form.assertFormPresent();
+//        form.assertFormElements("new name", SPEC_NAME, id, "", "SUCCESS");
+//    }
 
     public void testCloneProject() throws IOException
     {
@@ -743,6 +994,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         text = text.replaceAll("id=\"[^\"]*\"", "");
         return text;
     }
+
 /*
 
     public void testDeleteBuildSpec()
@@ -826,9 +1078,50 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertTableRowsEqual("project.buildspecs", 2, rows);
     }
 
-    private String[] createBuildSpecRow(String name, String recipe, String timeout)
+    private void assertBuildSpecification(String specName, boolean timeoutEnabled, int timeout, String[]... stages)
     {
-        return new String[]{name, recipe, timeout, "trigger", "edit", "delete"};
+        String timeoutText = "[never]";
+
+        if(timeoutEnabled)
+        {
+            timeoutText = Integer.toString(timeout) + " minutes";
+        }
+
+        assertTableRowsEqual("spec.basics", 1, new String[][] {
+                new String[]{ "name", specName },
+                new String[]{ "timeout", timeoutText }
+        });
+
+        for(String[] stage: stages)
+        {
+            assertBuildStage(stage[0], stage[1], stage[2]);
+        }
+    }
+
+    private void assertBuildStage(String name, String recipe, String agent)
+    {
+        assertLinkPresentWithText(name);
+        assertTableRowsEqual("stage_" + name, 1, new String[][] {
+                new String[] { "stage name", name },
+                new String[] { "stage recipe", recipe },
+                new String[] { "agent", agent },
+        });
+    }
+
+    private void assertResourceRequirements(String stage, String[]... resources)
+    {
+        String [][] resourceRows = new String[resources.length][4];
+        for(int i = 0; i < resources.length; i++)
+        {
+            resourceRows[i] = new String[] { resources[i][0], resources[i][1], "edit", "delete" };
+        }
+
+        assertTableRowsEqual("resources_" + stage, 2, resourceRows);
+    }
+
+    private String[] createBuildSpecRow(String name, String timeout)
+    {
+        return new String[]{name, timeout, "trigger", "edit", "delete"};
     }
 
     private void assertProjectTriggerTable(String[][] rows)

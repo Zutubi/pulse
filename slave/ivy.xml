@@ -16,7 +16,7 @@
     </configurations>
 
     <publications>
-        <!-- to be completed when we start working with slaves again. -->
+        <artifact name="slave" type="jar" conf="release,build"/>
     </publications>
 
     <dependencies>

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 
 /**
@@ -9,7 +10,7 @@ public class ViewBuildSpecificationAction extends ProjectActionSupport
 {
     private BuildSpecification specification;
     private long id;
-    private BuildSpecificationDao buildSpecificationDao;
+    private long selectedNode;
 
     public BuildSpecification getSpecification()
     {
@@ -31,27 +32,36 @@ public class ViewBuildSpecificationAction extends ProjectActionSupport
         this.id = id;
     }
 
-    public void setBuildSpecificationDao(BuildSpecificationDao buildSpecificationDao)
+    public long getSelectedNode()
     {
-        this.buildSpecificationDao = buildSpecificationDao;
+        return selectedNode;
     }
 
-    public void validate()
+    public void setSelectedNode(long selectedNode)
     {
-        if (hasErrors())
-        {
-            return;
-        }
+        this.selectedNode = selectedNode;
+    }
 
-        specification = buildSpecificationDao.findById(id);
-        if (specification == null)
-        {
-            addActionError("Unknown build specification '" + Long.toString(id) + "'");
-        }
+    public boolean haveSelectedNode()
+    {
+        return selectedNode != 0L && selectedNode != specification.getRoot().getId();
     }
 
     public String execute()
     {
+        lookupProject(projectId);
+        if (hasErrors())
+        {
+            return ERROR;
+        }
+
+        specification = getProject().getBuildSpecification(id);
+        if (specification == null)
+        {
+            addActionError("Unknown build specification [" + id + "]");
+            return ERROR;
+        }
+
         return SUCCESS;
     }
 }

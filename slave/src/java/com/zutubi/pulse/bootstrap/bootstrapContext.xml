@@ -2,33 +2,25 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager">
+    <bean id="startupManager" class="com.zutubi.pulse.slave.SlaveStartupManager">
         <property name="systemContexts">
             <list>
-                <value>com/zutubi/pulse/bootstrap/databaseBootstrapContext.xml</value>
-                <value>com/zutubi/pulse/bootstrap/coreDatabaseContext.xml</value>
                 <value>com/zutubi/pulse/bootstrap/applicationContext.xml</value>
-                <value>com/zutubi/pulse/bootstrap/webserverContext.xml</value>
-                <value>com/zutubi/pulse/bootstrap/webworkContext.xml</value>
             </list>
         </property>
         <property name="startupRunnables">
             <list>
-                <value>com.zutubi.pulse.ResourceDiscoverer</value>
             </list>
-        </property>
-        <property name="objectFactory">
-            <ref local="objectFactory"/>
         </property>
         <property name="configurationManager">
             <ref local="configurationManager"/>
         </property>
+        <property name="objectFactory">
+            <ref local="objectFactory"/>
+        </property>
     </bean>
 
-    <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleConfigurationManager" init-method="init">
-    </bean>
-
-    <bean id="dataSource" class="com.zutubi.pulse.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
+    <bean id="configurationManager" class="com.zutubi.pulse.slave.SlaveConfigurationManager" init-method="init"/>
 
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 

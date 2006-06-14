@@ -1,0 +1,101 @@
+#helpTag("Resource+View")
+#authorisationTags($principle)
+#resourceTags($slave $resource)
+#macro(showProperties $properties $version)
+    #if($version)
+        #set($versionLink = "&amp;versionId=$version.id")
+    #else
+        #set($versionLink = "")
+    #end
+    <tr>
+        #contentHeading("property.name" 1)
+        #contentHeading("property.value" 1)
+        #contentHeading("actions" 2)
+    </tr>
+    #foreach($property in $properties)
+        #set($confirmMessage = $action.getText("property.confirm.delete", [$property.name]))
+    <tr>
+        #dynamicCell($property.name)
+        #dynamicCell($property.value)
+        #editCell("/admin/editProperty!input.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)" "edit_$!webwork.htmlEncode($property.name)")
+        #deleteCell($confirmMessage "/admin/deleteProperty.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)" "delete_$!webwork.htmlEncode($property.name)")
+    <tr>
+    #end
+    #addRow("property.add" 4 "/admin/createProperty!input.action?resourceId=$resource.id$versionLink" "property.add_$!webwork.htmlEncode($version.value)")
+#end
+
+<html>
+<head>
+    <title>#wwtext("name=resource") $!webwork.htmlEncode($resource.name)</title>
+    <script type="text/javascript">
+#if($action.haveSelectedNode() || $versions.size() == 0)
+        var selectedNode = "$selectedNode";
+#else
+        var selectedNode = "$versions.get(0).id";
+#end
+    </script>
+</head>
+<body>
+    #agentTabs("resources")
+
+    <h2 class="section">#wwtext("name=resource") $!webwork.htmlEncode($resource.name)</h2>
+
+    <table id="properties_" class="content">
+        #headingRow("resource.default.properties" 4)
+#showProperties($resource.properties null)
+    </table>
+
+    <h2 class="twopane">#wwtext("name=resource.versions")</h2>
+
+    <table class="twopane">
+        <tr>
+            <td class="leftpane">
+                <p>
+                    Select a version:
+                </p>
+                <ul class="panenav">
+    #foreach($version in $versions)
+                    <li>
+                        <a href="#" id="nav_$version.id" onclick="selectNode('$version.id'); return false;">
+                            $!webwork.htmlEncode($version.value)
+                        </a>
+                    </li>
+    #end
+                </ul>
+                <p>
+                    <a id="version.add" href="/admin/createResourceVersion!input.action?resourceId=$resource.id">
+                        <img alt="add" src="/images/add.gif"/> #wwtext("name=version.add")
+                    </a>
+                </p>
+            </td>
+
+
+            <td class="rightpane">
+    #foreach($version in $versions)
+        #set($confirmMessage = $action.getText("version.confirm.delete", [$version.value]))
+                <div id="node_$version.id" style="display: none">
+                    <div class="panecontent">
+                        <table id="properties_$!webwork.htmlEncode($version.value)" class="content">
+                            #headingRow("resource.version.properties" 4)
+                            #showProperties($version.properties $version)
+                        </table>
+                        <a href="#" class="unadorned" onclick="confirmUrl('$confirmMessage', '/admin/deleteResourceVersion.action?versionId=$version.id&amp;resourceId=$resource.id')">
+                            <img alt="$action.getText('delete')" class="unadorned" src="images/delete.gif"/>
+                            #wwtext("name=version.delete")
+                        </a>
+                    </div>
+                </div>
+#end
+            </td>
+        </tr>
+    </table>
+
+#if($versions.size() > 0)
+    <script type="text/javascript">
+        selectNode(selectedNode);
+    </script>
+#end
+
+    #tabEnd()
+</body>
+</html>

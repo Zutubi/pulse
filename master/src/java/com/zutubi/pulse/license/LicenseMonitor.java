@@ -1,6 +1,6 @@
 package com.zutubi.pulse.license;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.scheduling.*;
 import com.zutubi.pulse.util.logging.Logger;
@@ -21,7 +21,7 @@ public class LicenseMonitor implements Task
     /**
      * Used to lookup the data -> license.
      */
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
 
     /**
      * Used to deliver the LicenseExpiredEvent when necessary.
@@ -38,7 +38,7 @@ public class LicenseMonitor implements Task
      *
      * @param configurationManager
      */
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

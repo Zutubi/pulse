@@ -1,6 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMException;
 
@@ -11,9 +12,9 @@ import java.io.File;
  */
 public class CheckoutBootstrapper extends ScmBootstrapper
 {
-    public CheckoutBootstrapper(Scm scm)
+    public CheckoutBootstrapper(Scm scm, BuildRevision revision)
     {
-        super(scm);
+        super(scm, revision);
     }
 
     void bootstrap(File workDir)
@@ -23,7 +24,7 @@ public class CheckoutBootstrapper extends ScmBootstrapper
             // the recipe id is not used by any of the scm servers, and is a detail they should
             // not need to be aware of.
             int recipeId = 0;
-            scm.createServer().checkout(recipeId, workDir, getRevision(), null);
+            scm.createServer().checkout(recipeId, workDir, revision.getRevision(), null);
         }
         catch (SCMException e)
         {

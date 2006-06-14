@@ -1,45 +1,80 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.RecipeRequest;
+import com.zutubi.pulse.SystemInfo;
+import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.logging.CustomLogRecord;
+import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.services.InvalidTokenException;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
 import com.zutubi.pulse.slave.command.RecipeCommand;
+import com.zutubi.pulse.util.logging.Logger;
+
+import java.util.List;
 
 /**
  */
 public class SlaveServiceImpl implements SlaveService
 {
-    private SlaveThreadPool threadPool;
-    private SlaveRecipeProcessor slaveRecipeProcessor;
+    private static final Logger LOG = Logger.getLogger(SlaveServiceImpl.class);
 
-    public void ping()
+    private ServiceTokenManager serviceTokenManager;
+    private SlaveThreadPool threadPool;
+    private SlaveConfigurationManager configurationManager;
+    private SlaveStartupManager startupManager;
+    private SlaveRecipeProcessor slaveRecipeProcessor;
+    private ServerMessagesHandler serverMessagesHandler;
+
+    public int ping()
     {
-        // Nothing to actually do!
+        return Version.getVersion().getIntBuildNumber();
     }
 
-    public void build(String master, RecipeRequest request)
+    public boolean build(String token, String master, long slaveId, RecipeRequest request) throws InvalidTokenException
     {
-        RecipeCommand command = new RecipeCommand(master, request);
+        serviceTokenManager.validateToken(token);
+
+        // TODO: dev-distributed: check queue, return true iff queue is empty
+        RecipeCommand command = new RecipeCommand(master, slaveId, request);
         ComponentContext.autowire(command);
-        ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(master, request.getId(), command);
+        ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(master, serviceTokenManager, request.getId(), command);
         ComponentContext.autowire(runnable);
 
         threadPool.executeCommand(runnable);
+        return true;
     }
 
-    public void cleanupRecipe(long recipeId)
+    public void cleanupRecipe(String token, long recipeId) throws InvalidTokenException
     {
+        serviceTokenManager.validateToken(token);
+
         CleanupRecipeCommand command = new CleanupRecipeCommand(recipeId);
         // TODO more dodgy wiring :-/
         ComponentContext.autowire(command);
         threadPool.executeCommand(command);
     }
 
-    public void terminateRecipe(long recipeId)
+    public void terminateRecipe(String token, long recipeId) throws InvalidTokenException
     {
+        serviceTokenManager.validateToken(token);
+
         // Do this request synchronously
         slaveRecipeProcessor.terminateRecipe(recipeId);
+    }
+
+    public SystemInfo getSystemInfo(String token) throws InvalidTokenException
+    {
+        serviceTokenManager.validateToken(token);
+        return SystemInfo.getSystemInfo(configurationManager, startupManager);
+    }
+
+    public List<CustomLogRecord> getRecentMessages(String token) throws InvalidTokenException
+    {
+        serviceTokenManager.validateToken(token);
+        return serverMessagesHandler.takeSnapshot();
     }
 
     public void setThreadPool(SlaveThreadPool threadPool)
@@ -50,5 +85,30 @@ public class SlaveServiceImpl implements SlaveService
     public void setSlaveRecipeProcessor(SlaveRecipeProcessor slaveRecipeProcessor)
     {
         this.slaveRecipeProcessor = slaveRecipeProcessor;
+    }
+
+    public void setConfigurationManager(SlaveConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+
+    public void setStartupManager(SlaveStartupManager startupManager)
+    {
+        this.startupManager = startupManager;
+    }
+
+    public void setServerMessagesHandler(ServerMessagesHandler serverMessagesHandler)
+    {
+        this.serverMessagesHandler = serverMessagesHandler;
+    }
+
+    public ServiceTokenManager getServiceTokenManager()
+    {
+        return serviceTokenManager;
+    }
+
+    public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
+    {
+        this.serviceTokenManager = serviceTokenManager;
     }
 }

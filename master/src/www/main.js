@@ -291,3 +291,23 @@ function setText(id, text)
     var element = getElement(id);
     element.innerHTML = text;
 }
+
+function setClass(id, className)
+{
+    var element = getElement(id);
+    element.className = className;
+}
+
+// Used in left/right pane navigation to handle selection of a new node in
+// the left pane.
+function selectNode(id)
+{
+    setClass("nav_" + selectedNode, "");
+    setClass("nav_" + id, "active");
+
+    var rightPane = getElement("node_" + selectedNode);
+    rightPane.style.display = "none";
+    rightPane = getElement("node_" + id);
+    rightPane.style.display = "block";
+    selectedNode = id;
+}

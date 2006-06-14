@@ -1,0 +1,2 @@
+<h1>:: #wwtext("name=agent.error") ::</h1>
+#parse("/template/includes/actionerrors.vm")

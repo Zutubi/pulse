@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<project default-recipe="default">
+    <property name="foo" value="bar"/>
+
+    <recipe name="default">
+        <resource name="noversion"/>
+
+        <property name="baz" value="quux"/>
+
+        <resource name="withversion" version="1"/>
+
+        <resource name="notrequired" required="false"/>
+    </recipe>
+</project>

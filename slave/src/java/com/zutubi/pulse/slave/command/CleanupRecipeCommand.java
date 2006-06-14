@@ -23,7 +23,7 @@ public class CleanupRecipeCommand implements Runnable
 
     public void run()
     {
-        ServerRecipePaths recipeProcessorPaths = new ServerRecipePaths(recipeId, configurationManager);
+        ServerRecipePaths recipeProcessorPaths = new ServerRecipePaths(recipeId, configurationManager.getUserPaths().getData());
         File recipeRoot = recipeProcessorPaths.getRecipeRoot();
         if (!FileSystemUtils.removeDirectory(recipeRoot))
         {

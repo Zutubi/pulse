@@ -5,77 +5,140 @@
 <head>
     <title>#wwtext("name=build") $result.number</title>
     <script type="text/javascript">
-        var successfulShowing = true;
-        var allShowing = true;
+        var successfulShowing = {
+#foreach($node in $result.root.children)
+            "$node.result.id": true,
+#end
+        };
 
-        function toggleSuccessful()
+        var allShowing = {
+#foreach($node in $result.root.children)
+            "$node.result.id": true,
+#end
+        };
+
+        function toggleSuccessful(id)
         {
-            if(successfulShowing)
+            if(successfulShowing[id])
             {
                 text = "#wwtext("name=tests.show.successful")";
-                successfulShowing = false;
+                successfulShowing[id] = false;
             }
             else
             {
                 text = "#wwtext("name=tests.hide.successful")";
-                successfulShowing = true;
+                successfulShowing[id] = true;
             }
 
-            toggleRowsWithClass('test-results', 'success', successfulShowing);
-            setText("success_toggle", text);
+            toggleRowsWithClass('test-results_' + id, 'success', successfulShowing[id]);
+            setText("success_toggle_" + id, text);
         }
 
-        function toggleAll()
+        function toggleAll(id)
         {
-            if(allShowing)
+            if(allShowing[id])
             {
                 text ="#wwtext("name=tests.expand.all")";
-                allShowing = false;
+                allShowing[id] = false;
             }
             else
             {
                 text ="#wwtext("name=tests.collapse.all")";
-                allShowing = true;
+                allShowing[id] = true;
             }
 
-            toggleAllTests("test-results", allShowing);
-            setText("all_toggle", text);
+            toggleAllTests("test-results_" + id, allShowing[id]);
+            setText("all_toggle_" + id, text);
         }
+
+#if($action.haveSelectedNode() || $result.root.children.size() == 0)
+        var selectedNode = "$selectedNode";
+#else
+        var selectedNode = "$result.root.children.get(0).result.id";
+#end
     </script>
 </head>
 <body>
     #buildTabs($result "tests")
 
     #if($result.hasTests())
-        #set($recipe = $result.root.children.get(0).result)
-    <table class="fill-content" id="test-results">
+    <table class="twopane">
         <tr>
-            <th class="heading" colspan="5">
-                <span class="action">
-                    <a href="#" id="success_toggle" onclick="toggleSuccessful(); return false;">
-                        #wwtext("name=tests.hide.successful")
-                    </a>
-                    ::
-                    <a href="#" id="all_toggle" onclick="toggleAll(); return false;">
-                        #wwtext("name=tests.collapse.all")
-                    </a>
-                </span>
-                #wwtext("name=test.results")
-            </th>
+            <td class="leftpane">
+                <p>
+                    Select stage:
+                </p>
+                <ul class="panenav">
+        #foreach($node in $result.root.children)
+            #set($summary = $node.result.testSummary)
+                    <li>
+                        <a href="#" id="nav_$node.result.id" onclick="selectNode('$node.result.id'); return false;">
+            #if($summary.allPassed())
+                            <img src="/images/accept.gif"/>
+            #else
+                            <img src="/images/exclamation.gif"/>
+            #end
+                            $!webwork.htmlEncode($node.stage)
+            #if($summary.allPassed())
+                            ($summary.total)
+            #else
+                            ($summary.broken/$summary.total)
+            #end
+                        </a>
+                    </li>
+        #end
+                </ul>
+            </td>
+
+
+            <td class="rightpane">
+        #foreach($node in $result.root.children)
+                <div id="node_$node.result.id" style="display: none">
+                    <div class="panecontent">
+            #if($node.result.hasTests())
+                        <table class="fill-content" id="test-results_$node.result.id">
+                            <tr>
+                                <th class="heading" colspan="5">
+                                    <span class="action">
+                                        <a href="#" id="success_toggle_$node.result.id" onclick="toggleSuccessful('$node.result.id'); return false;">
+                                            #wwtext("name=tests.hide.successful")
+                                        </a>
+                                        ::
+                                        <a href="#" id="all_toggle_$node.result.id" onclick="toggleAll('$node.result.id'); return false;">
+                                            #wwtext("name=tests.collapse.all")
+                                        </a>
+                                    </span>
+                                    #wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stage) :: #wwtext("name=test.results")
+                                </th>
+                            </tr>
+                            <tr>
+                                #contentHeading("test.name" 1)
+                                #contentHeading("test.status" 2)
+                                #contentHeading("test.details" 1)
+                                #contentHeading("test.duration" 1)
+                            </tr>
+                            #showRecipeTests($node.result true)
+                        </table>
+            #else
+                        <p>
+                            #wwtext("name=build.stage.no.tests")
+                        </p>
+            #end
+                    </div>
+                </div>
+        #end
+            </td>
         </tr>
-        <tr>
-            #contentHeading("test.name" 1)
-            #contentHeading("test.status" 2)
-            #contentHeading("test.details" 1)
-            #contentHeading("test.duration" 1)
-        </tr>
-        #showRecipeTests($recipe true)
     </table>
     #else
     <p>
         #wwtext("name=build.no.tests")
     </p>
     #end
+
+    <script type="text/javascript">
+        selectNode(selectedNode);
+    </script>
 
     #tabEnd()
 </html>

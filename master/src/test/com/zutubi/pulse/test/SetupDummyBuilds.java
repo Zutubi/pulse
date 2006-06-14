@@ -1,7 +1,7 @@
 package com.zutubi.pulse.test;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
@@ -29,7 +29,7 @@ public class SetupDummyBuilds implements Runnable
     private ProjectDao projectDao;
     private BuildResultDao buildResultDao;
     private UserDao userDao;
-    private ConfigurationManager configManager;
+    private MasterConfigurationManager configManager;
     private UserManager userManager;
     private Slave slave;
     private static final int BUILDS_IN_LONG_HISTORY_PROJECT = 100;
@@ -183,20 +183,20 @@ public class SetupDummyBuilds implements Runnable
         project.setScm(scm);
 
         BuildSpecification simpleSpec = new BuildSpecification("simple");
-        BuildStage simpleStage = new BuildStage(new MasterBuildHostRequirements(), null);
+        BuildStage simpleStage = new BuildStage("default", new MasterBuildHostRequirements(), null);
         BuildSpecificationNode simpleNode = new BuildSpecificationNode(simpleStage);
         simpleSpec.getRoot().addChild(simpleNode);
         project.addBuildSpecification(simpleSpec);
 
         BuildSpecification slaveSpec = new BuildSpecification("slave");
-        BuildStage slaveStage = new BuildStage(new SlaveBuildHostRequirements(slave), null);
+        BuildStage slaveStage = new BuildStage("default", new SlaveBuildHostRequirements(slave), null);
         BuildSpecificationNode slaveNode = new BuildSpecificationNode(slaveStage);
         slaveSpec.getRoot().addChild(slaveNode);
         project.addBuildSpecification(slaveSpec);
 
         BuildSpecification chainedSpec = new BuildSpecification("master to slave");
-        BuildStage masterStage = new BuildStage(new MasterBuildHostRequirements(), null);
-        BuildStage chainedStage = new BuildStage(new SlaveBuildHostRequirements(slave), "chained");
+        BuildStage masterStage = new BuildStage("master", new MasterBuildHostRequirements(), null);
+        BuildStage chainedStage = new BuildStage("slave", new SlaveBuildHostRequirements(slave), "chained");
         BuildSpecificationNode masterNode = new BuildSpecificationNode(masterStage);
         BuildSpecificationNode chainedNode = new BuildSpecificationNode(chainedStage);
         masterNode.addChild(chainedNode);
@@ -209,7 +209,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createComplexSuccess(Project project, long number)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), number);
+        BuildResult result = createBuildResult(project, number);
         buildResultDao.save(result);
 
         List<Changelist> changelists = new LinkedList<Changelist>();
@@ -269,7 +269,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createInProgress(Project project)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), 1111);
+        BuildResult result = createBuildResult(project, 1111);
 
         result.commence(new File("test"));
         RecipeResultNode node = createInProgressRecipe();
@@ -277,9 +277,14 @@ public class SetupDummyBuilds implements Runnable
         buildResultDao.save(result);
     }
 
+    private BuildResult createBuildResult(Project project, long id)
+    {
+        return new BuildResult(new TriggerBuildReason("scm trigger"), project, getSpec(project), id);
+    }
+
     private void createPendingRecipes(Project project)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), 666);
+        BuildResult result = createBuildResult(project, 666);
 
         result.commence(new File("test"));
         RecipeResultNode root = createInProgressRecipe();
@@ -298,7 +303,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createCommandFailure(Project project, long id)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), id);
+        BuildResult result = createBuildResult(project, id);
 
         result.commence(new File("/complex/build/output/dir"));
         RecipeResultNode rootResultNode = createCommandFailedRecipe();
@@ -312,7 +317,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createBuildError(Project project, long id)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), id);
+        BuildResult result = createBuildResult(project, id);
 
         result.commence(new File("/complex/build/output/dir"));
         RecipeResultNode rootResultNode = createComplexRecipe("root recipe");
@@ -329,7 +334,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createWarningFeatures(Project project, long id)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), id);
+        BuildResult result = createBuildResult(project, id);
 
         result.commence(new File("/complex/build/output/dir"));
         RecipeResultNode rootResultNode = createWarningFeaturesRecipe();
@@ -342,7 +347,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createErrorFeatures(Project project)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), 10000);
+        BuildResult result = createBuildResult(project, 10000);
         buildResultDao.save(result);
         result.commence(new File("/complex/build/output/dir"));
         RecipeResultNode rootResultNode = createErrorFeaturesRecipe(project, result);
@@ -355,7 +360,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createTerminatingBuild(Project project)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), 101);
+        BuildResult result = createBuildResult(project, 101);
 
         result.commence(new File("/complex/build/output/dir"));
         RecipeResultNode node = createTerminatingRecipe();
@@ -366,7 +371,7 @@ public class SetupDummyBuilds implements Runnable
 
     private void createTestErrors(Project project)
     {
-        BuildResult result = new BuildResult(project, getSpec(project), 666);
+        BuildResult result = createBuildResult(project, 666);
 
         buildResultDao.save(result);
         result.commence(System.currentTimeMillis());
@@ -391,7 +396,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createComplexCommand());
         recipeResult.add(createComplexCommand());
         recipeResult.complete();
-        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        RecipeResultNode node = new RecipeResultNode(name + " stage", recipeResult);
         node.setHost("[master]");
 
         return node;
@@ -407,7 +412,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createPendingCommand());
         recipeResult.add(createPendingCommand());
 
-        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        RecipeResultNode node = new RecipeResultNode(null, recipeResult);
         node.setHost("my slave");
         return node;
     }
@@ -420,7 +425,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createComplexCommand());
         recipeResult.add(createTerminatingCommand());
         recipeResult.terminate(true);
-        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        RecipeResultNode node = new RecipeResultNode(null, recipeResult);
         node.setHost(null);
         return node;
     }
@@ -428,7 +433,7 @@ public class SetupDummyBuilds implements Runnable
     private RecipeResultNode createPendingRecipe()
     {
         RecipeResult recipeResult = new RecipeResult("my recipe");
-        return new RecipeResultNode(recipeResult);
+        return new RecipeResultNode("pending stage", recipeResult);
     }
 
     private RecipeResultNode createCommandFailedRecipe()
@@ -440,7 +445,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createComplexCommand());
         recipeResult.add(createFailedCommand());
         recipeResult.complete();
-        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        RecipeResultNode node = new RecipeResultNode("command failed stage", recipeResult);
         node.setHost("[master]");
 
         return node;
@@ -455,7 +460,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createWarningFeaturesCommand());
         recipeResult.add(createComplexCommand());
         recipeResult.complete();
-        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        RecipeResultNode node = new RecipeResultNode("warnfeat stage", recipeResult);
         node.setHost("[master]");
 
         return node;
@@ -472,7 +477,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createComplexCommand());
         recipeResult.add(createErrorFeaturesCommand(4, recipeDir));
         recipeResult.complete();
-        RecipeResultNode node = new RecipeResultNode(recipeResult);
+        RecipeResultNode node = new RecipeResultNode("errfeat stage", recipeResult);
         node.setHost("[master]");
 
         return node;
@@ -488,7 +493,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(command);
         recipeResult.failure("command :: " + command.getCommandName() + " :: some tests broken");
         recipeResult.complete();
-        return new RecipeResultNode(recipeResult);
+        return new RecipeResultNode("testerr stage", recipeResult);
     }
 
     private CommandResult createComplexCommand()
@@ -790,7 +795,7 @@ public class SetupDummyBuilds implements Runnable
         this.userDao = userDao;
     }
 
-    public void setConfigurationManager(ConfigurationManager configManager)
+    public void setConfigurationManager(MasterConfigurationManager configManager)
     {
         this.configManager = configManager;
     }

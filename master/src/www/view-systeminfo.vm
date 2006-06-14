@@ -1,14 +1,18 @@
-#helpTag("Server+Info+Tab")
+#helpTag("Agent+Info+Tab")
 #authorisationTags($principle)
-<content tag="selectedTab">server</content>
+#agentTags($slave)
 <html>
 <head>
-    <title>#wwtext("name=server")</title>
+    <title>#wwtext("name=agents")</title>
 </head>
 <body>
-    #serverTabs("server-info")
+    #agentTabs("server-info")
 
-#set ($propertiesMap = $action.getProperties())
+#if($action.hasErrors())
+        #parse("agent-error.vm")
+#else
+
+#set ($propertiesMap = $info.systemProperties)
 #set ($properties = ["system.date", "system.time", "system.uptime", "java.version", "java.vendor", "java.vm.name", "java.runtime.name", "user.name", "user.timezone", "os.name", "memory.total", "memory.used", "memory.free"])
 
     <table class="columns" width="90%">
@@ -18,11 +22,11 @@
     <table class="fill-content">
         #headingRow("system.info" 2)
 #foreach ($key in $properties)
-        #dynamicRow($action.getText($key) $propertiesMap.get($key))
+        #dynamicRow($key $propertiesMap.get($key))
 #end
 
-#set ($percentageUsed = $action.getPercentage($action.getUsedMemory(), $action.getTotalMemory()))
-#set ($percentageFree = $action.getPercentage($action.getFreeMemory(), $action.getTotalMemory()))
+#set ($percentageUsed = $action.getPercentage($info.getUsedMemory(), $info.getTotalMemory()))
+#set ($percentageFree = $action.getPercentage($info.getFreeMemory(), $info.getTotalMemory()))
     <tr>
         <th class="content-row">#wwtext("name=memory.usage")</th>
         <td class="content">
@@ -49,7 +53,7 @@
                             </td>
                         </table>
                     </td>
-                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free.percent", ["$percentageFree"]) #authorize("ifAllGranted=ROLE_ADMINISTRATOR") (<a href="garbageCollect.action">gc</a>) #end </td>
+                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free.percent", ["$percentageFree"]) #if(!$agent.isSlave()) #authorize("ifAllGranted=ROLE_ADMINISTRATOR") (<a href="garbageCollect.action">gc</a>) #end #end </td>
                 </tr>
             </table>
         </td>
@@ -59,23 +63,20 @@
             <td class="columns" width="40%">
                 <table class="fill-content" id="version.info">
                     #headingRow("version.info" 2)
-                    #dynamicRow("version.versionNumber.field" $version.versionNumber)
-                    #dynamicRow("version.buildNumber.field" $version.buildNumber)
+                    #dynamicRow("version.versionNumber.field" $info.version.versionNumber)
+                    #dynamicRow("version.buildNumber.field" $info.version.buildNumber)
                 </table>
                 <table class="fill-content" id="pulse.info">
                     #headingRow("pulse.info" 2)
-                    #dynamicRow("pulse.homeDir.field" $homeDir)
-                    #dynamicRow("pulse.dataDir.field" $dataDir)
-                </table>
-                <table class="fill-content" id="license.info">
-                    #restrictedHeadingRow("license.info" 2 "ROLE_ADMINISTRATOR" "edit" "/admin/editLicense!input.action" "pencil.gif" "license.edit")
-                    #dynamicRow("license.name.field" $license.name)
-                    #dynamicRow("license.holder.field" $license.holder)
-                    #dynamicRow("license.expiry.field" $expiryDate)
+#foreach($property in $info.paths.entrySet())
+                    #dynamicRow($property.key $property.value)
+#end
                 </table>
             </td>
         </tr>
     </table>
+
+#end
 
     #tabEnd()
 </html>

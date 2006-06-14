@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.GrantedAuthority;
 import org.acegisecurity.GrantedAuthorityImpl;
 import org.acegisecurity.providers.anonymous.AnonymousProcessingFilter;
@@ -11,7 +11,7 @@ import org.acegisecurity.userdetails.memory.UserAttribute;
 public class GuestAccessManager
 {
     private AnonymousProcessingFilter anonymousProcessingFilter;
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
 
     public void init()
     {
@@ -34,7 +34,7 @@ public class GuestAccessManager
         this.anonymousProcessingFilter = anonymousProcessingFilter;
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

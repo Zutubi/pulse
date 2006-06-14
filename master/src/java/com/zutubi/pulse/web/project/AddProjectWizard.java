@@ -146,8 +146,7 @@ public class AddProjectWizard extends BaseWizard
 
         // create a simple build specification that executes the default recipe.
         BuildSpecificationNode parent = buildSpecificationNodeDao.findById(buildSpec.getRoot().getId());
-        BuildStage stage = new BuildStage();
-        stage.setHostRequirements(new MasterBuildHostRequirements());
+        BuildStage stage = new BuildStage("default", new AnyCapableBuildHostRequirements(), null);
         BuildSpecificationNode node = new BuildSpecificationNode(stage);
         parent.addChild(node);
         buildSpecificationNodeDao.save(parent);
@@ -662,8 +661,8 @@ public class AddProjectWizard extends BaseWizard
 
             try
             {
-                PulseFileLoader loader = new PulseFileLoader(new ObjectFactory(), resourceRepository);
-                loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile(), new LinkedList<Reference>(), new CustomProjectValidationPredicate());
+                PulseFileLoader loader = new PulseFileLoader(new ObjectFactory());
+                loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile(), new LinkedList<Reference>(), resourceRepository, new CustomProjectValidationPredicate());
             }
             catch(ParseException pe)
             {

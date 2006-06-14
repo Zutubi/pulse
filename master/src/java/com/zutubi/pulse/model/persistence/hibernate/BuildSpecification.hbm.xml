@@ -24,12 +24,22 @@
         </id>
 
         <component name="stage" class="com.zutubi.pulse.model.BuildStage">
+            <property name="name" type="string" length="255"/>
+
             <many-to-one name="hostRequirements" class="com.zutubi.pulse.model.AbstractBuildHostRequirements"
                          column="BUILD_HOST_REQUIREMENTS_ID"
                          cascade="all" unique="true"/>
 
             <property name="recipe" type="string" length="255"/>
         </component>
+
+        <bag name="resourceRequirements" cascade="all-delete-orphan" table="RESOURCE_REQUIREMENTS" lazy="false">
+            <key column="NODE_ID"/>
+            <composite-element class="com.zutubi.pulse.model.ResourceRequirement">
+                <property name="resource" type="string" not-null="true"/>
+                <property name="version" type="string"/>
+            </composite-element>
+        </bag>
 
         <list name="children" cascade="all-delete-orphan" lazy="false">
             <key column="PARENT_ID"/>
@@ -47,11 +57,12 @@
 
         <discriminator column="REQUIREMENTS_TYPE" type="string" length="63"/>
 
-        <subclass name="com.zutubi.pulse.model.MasterBuildHostRequirements" discriminator-value="MASTER">
-        </subclass>
+        <subclass name="com.zutubi.pulse.model.AnyCapableBuildHostRequirements" discriminator-value="ANY_CAPABLE"/>
+
+        <subclass name="com.zutubi.pulse.model.MasterBuildHostRequirements" discriminator-value="MASTER"/>
 
         <subclass name="com.zutubi.pulse.model.SlaveBuildHostRequirements" discriminator-value="SLAVE">
-            <many-to-one name="slave" class="com.zutubi.pulse.model.Slave"/>
+            <many-to-one name="slave" class="com.zutubi.pulse.model.Slave" cascade="none"/>
         </subclass>
     </class>
 

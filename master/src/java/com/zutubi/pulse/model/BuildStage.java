@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.RecipeResult;
  */
 public class BuildStage
 {
+    private String name;
     private BuildHostRequirements hostRequirements;
     private String recipe;
 
@@ -13,8 +14,9 @@ public class BuildStage
     {
     }
 
-    public BuildStage(BuildHostRequirements hostRequirements, String recipe)
+    public BuildStage(String name, BuildHostRequirements hostRequirements, String recipe)
     {
+        this.name = name;
         this.hostRequirements = hostRequirements;
         this.recipe = recipe;
     }
@@ -22,9 +24,20 @@ public class BuildStage
     public BuildStage copy()
     {
         BuildStage copy = new BuildStage();
+        copy.name = name;
         copy.hostRequirements = hostRequirements.copy();
         copy.recipe = recipe;
         return copy;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     public BuildHostRequirements getHostRequirements()

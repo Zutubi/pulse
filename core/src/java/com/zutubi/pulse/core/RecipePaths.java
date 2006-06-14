@@ -9,6 +9,12 @@ import java.io.File;
 public interface RecipePaths
 {
     /**
+     * @return a working area that persists across builds, or null if no such
+     *         area is available
+     */
+    File getPersistentWorkDir();
+
+    /**
      * The base directory is the root directory for execution of a recipe.
      *
      * @return the base directory

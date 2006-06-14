@@ -1,8 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.InitialBootstrapper;
-import com.zutubi.pulse.core.PulseException;
-import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMServer;
@@ -13,25 +11,15 @@ import java.io.File;
  * A bootstrapper that populates the working directory by checking out from one SCM.
  * 
  */
-public abstract class ScmBootstrapper implements InitialBootstrapper
+public abstract class ScmBootstrapper implements Bootstrapper
 {
     protected Scm scm;
+    protected BuildRevision revision;
 
-    protected Revision revision;
-
-    public ScmBootstrapper(Scm scm)
+    public ScmBootstrapper(Scm scm, BuildRevision revision)
     {
         this.scm = scm;
-    }
-
-    public void prepare() throws PulseException
-    {
-        // If we do have not yet have one, get the revision.
-        if (revision == null)
-        {
-            SCMServer server = scm.createServer();
-            revision = server.getLatestRevision();
-        }
+        this.revision = revision;
     }
 
     public void bootstrap(RecipePaths paths)
@@ -47,11 +35,6 @@ public abstract class ScmBootstrapper implements InitialBootstrapper
             workDir = paths.getBaseDir();
         }
         bootstrap(workDir);
-    }
-
-    public Revision getRevision()
-    {
-        return revision;
     }
 
     abstract void bootstrap(File workDir);

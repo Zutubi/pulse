@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.setup;
 
-import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
@@ -35,7 +35,7 @@ public class SetupWizard extends BaseWizard
     private CreateAdminState createAdminState;
     private ServerSettingsState serverSettingsState;
 
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
     private UserManager userManager;
     private SetupManager setupManager;
 
@@ -86,7 +86,7 @@ public class SetupWizard extends BaseWizard
         userManager.save(admin);
 
         // apply the settings
-        ApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterApplicationConfiguration config = configurationManager.getAppConfig();
         config.setHostName(serverSettingsState.getHostname());
         config.setSmtpFrom(serverSettingsState.getFromAddress());
         config.setSmtpHost(serverSettingsState.getSmtpHost());
@@ -131,7 +131,7 @@ public class SetupWizard extends BaseWizard
      *
      * @param configurationManager
      */
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

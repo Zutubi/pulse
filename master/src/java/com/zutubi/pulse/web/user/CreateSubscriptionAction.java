@@ -1,15 +1,9 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.ProjectNameComparator;
 import com.zutubi.pulse.jabber.JabberManager;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.*;
 import com.opensymphony.util.TextUtils;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  *
@@ -17,7 +11,7 @@ import java.util.TreeMap;
  */
 public class CreateSubscriptionAction extends SubscriptionActionSupport
 {
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
     private JabberManager jabberManager;
 
     public String doInput()
@@ -59,7 +53,7 @@ public class CreateSubscriptionAction extends SubscriptionActionSupport
         return SUCCESS;
     }
 
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }
