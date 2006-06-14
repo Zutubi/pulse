@@ -126,12 +126,6 @@
 
             <table id="project.buildspecs" class="fill-content">
                 #headingRow("project.buildspecs" 2)
-                <tr>
-                    #contentHeading("buildspec.name" 1)
-#acl("domainObject=project" "hasPermission=4,1")
-                    #contentHeading("actions" 1)
-#end
-                </tr>
     #foreach($buildSpec in $project.buildSpecifications)
                 <tr>
                     #dynamicCell($buildSpec.name)

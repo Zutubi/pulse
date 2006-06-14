@@ -20,105 +20,64 @@ public class ListAction extends ActionSupport
     /**
      * The Unique IDentifier that specifies the node that is being viewed.
      */
-    private String uid;
+    private String[] uids;
 
-    /**
-     * The Unique IDentifier of the Parent of the node being viewed.
-     */
-    private String puid;
-
-    /**
-     * A human readable representation of the uid.
-     */
-    private String path;
-
-    private List<Listing> results;
-
-    /**
-     * Getter for the UID property.
-     *
-     * @return current node uid
-     */
-    public String getUid()
-    {
-        return uid;
-    }
+    private List<Carrier> results;
 
     /**
      * Setter for the UID property.
      *
-     * @param uid
+     * @param uids
      */
-    public void setUid(String uid)
+    public void setUid(String[] uids)
     {
-        this.uid = uid;
+        this.uids = uids;
     }
 
-    public List<Listing> getResults()
+    public List<Carrier> getResults()
     {
         return results;
     }
 
-    /**
-     * Getter for the PUID property.
-     *
-     * @return current parent uid.
-     */
-    public String getPuid()
-    {
-        return puid;
-    }
-
-    /**
-     * Getter for the path property.
-     *
-     * @return a human readable representation of the UID.
-     */
-    public String getPath()
-    {
-        return path;
-    }
-
     public String execute() throws IOException, FileSystemException
+    {
+        results = new LinkedList<Carrier>();
+        for (String uid : uids)
+        {
+            results.add(generateListing(uid));
+        }
+
+        return SUCCESS;
+    }
+
+    private Carrier generateListing(String uid) throws FileSystemException
     {
         FileSystem fileSystem = getFileSystem();
 
         // if path is null, assume root of file system.
         // else decode the path.
-        File p;
+        
+        File path = fileSystem.getFile(""); // filesystem default.
         if (TextUtils.stringSet(uid))
         {
             String decodedPath = decode(uid);
-            p = fileSystem.getFile(decodedPath);
-        }
-        else
-        {
-            // filesystem default.
-            p = fileSystem.getFile("");
-        }
-
-        path = p.getPath();
-
-        // generate the parent uid.
-        if (p.getParentFile() != null)
-        {
-            puid = encode(p.getParentFile().getPath());
+            path = fileSystem.getFile(decodedPath);
         }
 
         // get listing.
-        results = new LinkedList<Listing>();
-        File[] listing = fileSystem.list(p);
+        List<Listing> res = new LinkedList<Listing>();
+        File[] listing = fileSystem.list(path);
         for (File f : listing)
         {
             Listing l = new Listing();
             l.name = f.getName();
             l.type = (f.isFile() ? "file" : "folder");
             l.uid = encode(f.getPath());
-            results.add(l);
+            res.add(l);
         }
 
         // sort, directories first.
-        Collections.sort(results, new Comparator<Listing>()
+        Collections.sort(res, new Comparator<Listing>()
         {
             public int compare(Listing o1, Listing o2)
             {
@@ -134,8 +93,11 @@ public class ListAction extends ActionSupport
                 return 0;
             }
         });
-
-        return SUCCESS;
+        Carrier c = new Carrier();
+        c.listing = res;
+        c.path = path.getPath();
+        c.uid = uid;
+        return c;
     }
 
     private String encode(String uid)
@@ -151,6 +113,28 @@ public class ListAction extends ActionSupport
     private LocalFileSystem getFileSystem()
     {
         return new LocalFileSystem(new java.io.File("c:/"));
+    }
+
+    public class Carrier
+    {
+        List<Listing> listing;
+        String uid;
+        String path;
+
+        public List<Listing> getListing()
+        {
+            return listing;
+        }
+
+        public String getUid()
+        {
+            return uid;
+        }
+
+        public String getPath()
+        {
+            return path;
+        }
     }
 }
 

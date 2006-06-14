@@ -8,130 +8,141 @@
     <script type="text/javascript" src="tree/tree.js"></script>
     <script type="text/javascript">
         <!--
-                // define the init properties that control the tree.
-                //TODO: This works, but there must be a better way to handle the initialisation process.
-                window.myTree = new Object();
-                window.myTree.url = "http://localhost:8080/ajax/list.action";
-                window.myTree.type = "flat";
-                window.myTree.anchor = "browse";
+            // define the init properties that control the tree.
+            //TODO: This works, but there must be a better way to handle the initialisation process.
+            window.myTree = new Object();
+            window.myTree.url = "http://localhost:8080/ajax/list.action";
+            window.myTree.anchor = "browse";
 
-                window.onload = doInit;
-                window.onresize = resize;
+            // initialise the initial visible path.
+            window.myTree.initUid = new Array();
+#foreach($uid in $action.uids)
+        window.myTree.initUid.push('$uid');
+#end
 
-                function doInit(event)
+            window.onload = onInit;
+            window.onresize = onResize;
+
+            function onInit(event)
+            {
+                // resize the viewport so that it is the correct size.
+                onResize(event);
+                // initialise the tree view.
+                init(event);
+            }
+
+            function copySelectedToParentForm()
+            {
+                var formFieldObject = opener.document.forms['$formname'].elements['$fieldname'];
+                formFieldObject.value = currentSelectionValue();
+                window.close();
+            }
+
+            /*
+             * Handle the resizing of the viewport to ensure that it is the correct size for
+             * the open window.
+             */
+            function onResize(event)
+            {
+                var vElem = document.getElementById("view");
+
+                var pElem = document.getElementById("pathElement");
+                var fElem = document.getElementById("selectForm");
+                var tElem = document.getElementById("toolbar");
+
+                var pDim = Element.getDimensions(pElem);
+                var fDim = Element.getDimensions(fElem);
+                var tDim = Element.getDimensions(tElem);
+                var wDim = windowSize();
+
+                // work out the fudge factor - ie: the margin values.
+                var fudgeFactor = 70;
+
+                // todo: remove this fudge factor - it represents the height of the margins.
+                var viewHeight = wDim.height - tDim.height - pDim.height - fDim.height - fudgeFactor;
+                Element.setStyle(vElem, {"height":viewHeight + "px"});
+                Element.setStyle(vElem, {"width":pDim.width + "px"});
+            }
+
+            /*
+             * Return the dimensions of the window.
+             *
+             *    width: the window width.
+             *    height: the window height.
+             */
+            function windowSize()
+            {
+                var myWidth = 0, myHeight = 0;
+                if (typeof( window.innerWidth ) == 'number')
                 {
-                    init(event);
-                    resize(event);
+                    //Non-IE
+                    myWidth = window.innerWidth;
+                    myHeight = window.innerHeight;
                 }
-
-                function copySelectedToParentForm()
+                else if (document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ))
                 {
-                    // - we need to be able to query the state of the tree.
-                    // -> a) get path
-                    // -> b) get selected
-                    var displayPath = window.myTree.displayPath;
-                    var selectedValue = window.myTree.selectedValue;
-
-                    var formFieldObject = opener.document.forms['$formname'].elements['$fieldname'];
-                    formFieldObject.value = displayPath + '\\' + selectedValue;
-                    window.close();
+                    //IE 6+ in 'standards compliant mode'
+                    myWidth = document.documentElement.clientWidth;
+                    myHeight = document.documentElement.clientHeight;
                 }
-
-                function resize(event)
+                else if (document.body && ( document.body.clientWidth || document.body.clientHeight ))
                 {
-                    var viewport = document.getElementById("view");
-                    var viewportDimension = Element.getDimensions(viewport);
-/*
-                    logsize("viewport", viewport);
-*/
-
-//                    Element.setStyle(viewport, {"width":(viewportDimension.width - 1) + "px", "height":viewportDimension.height + "px"});
-
-                    var pathHeight = Element.getDimensions(document.getElementById("pathElement")).height;
-                    var pathWidth = Element.getDimensions(document.getElementById("pathElement")).width;
-                    var formHeight = Element.getDimensions(document.getElementById("selectForm")).height;
-                    var windowHeight = windowSize().height;
-
-                    // todo: remove this fudge factor - it represents the height of the margins.
-                    var viewHeight = windowHeight - pathHeight - formHeight - 60;
-                    console.log("new height: %s", viewHeight)
-                    Element.setStyle(viewport, {"height":viewHeight + "px"});
-                    Element.setStyle(viewport, {"width":pathWidth + "px"});
+                    //IE 4 compatible
+                    myWidth = document.body.clientWidth;
+                    myHeight = document.body.clientHeight;
                 }
-
-                function logsize(name, element)
-                {
-                    var dimensions = Element.getDimensions(element);
-                    console.log("%s: %s, %s", name, dimensions.width, dimensions.height);
-
-                }
-
-                 /*
-                 * Return the size of the window.
-                 */
-                function windowSize()
-                {
-                    var myWidth = 0, myHeight = 0;
-                    if (typeof( window.innerWidth ) == 'number')
-                    {
-                        //Non-IE
-                        myWidth = window.innerWidth;
-                        myHeight = window.innerHeight;
-                    }
-                    else if (document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ))
-                    {
-                        //IE 6+ in 'standards compliant mode'
-                        myWidth = document.documentElement.clientWidth;
-                        myHeight = document.documentElement.clientHeight;
-                    }
-                    else if (document.body && ( document.body.clientWidth || document.body.clientHeight ))
-                    {
-                        //IE 4 compatible
-                        myWidth = document.body.clientWidth;
-                        myHeight = document.body.clientHeight;
-                    }
-                    return {"width":myWidth, "height":myHeight};
-                }
+                return {"width":myWidth, "height":myHeight};
+            }
         // -->
     </script>
 
     <style type="text/css">
         .viewport{
-            border-width:1px;
-            border-color:blue;
-            border-style:solid;
             overflow:auto;
         }
+
         .bordered{
+            margin:0px 0px 10px 0px;
             border-width:1px;
             border-color:blue;
             border-style:solid;
+        }
+
+        .nofluff {
+           margin:0px;
+           padding:0px;
+        }
+
+        .toolbarIcon {
+            border-width:0px;
         }
 
     </style>
 
 </head>
 
-<body id="body">
+<body>
 
-    <p class="bordered" id="pathElement">
+    <div class="bordered" id="toolbar">
+        Toolbar:&nbsp;
+        <a href="" onclick="selectParentNode(); return false;"><img class="toolbarIcon" src="/images/cd_go.png" alt="up"/></a>
+    </div>
+
+    <div class="bordered" id="pathElement">
         Path:&nbsp;<span id="path"></span>
-    </p>
-
+    </div>
     <!--
     is it possible to tie the viewport size to the size
     of the popup window? preferably it would take up the room not used
     by the toolbar top and form at the base of the page.
     -->
-    <div class="viewport" id="view">
+    <div class="viewport bordered" id="view">
         <div id="browse" class="tree">
         </div>
     </div>
 
-    <p></p>
-
     <div class="bordered" id="selectForm">
-        <form name="form" action="" onsubmit="window.close();">
+        <form class="nofluff" name="form" action="" onsubmit="window.close();">
             <table>
                 <tr>
                     <td nowrap>Selected:</td>

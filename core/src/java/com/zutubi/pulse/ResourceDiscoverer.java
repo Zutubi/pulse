@@ -69,7 +69,16 @@ public class ResourceDiscoverer
 
     private void discoverMaven2(List<Resource> resources)
     {
-        File mvn = SystemUtils.findInPath("mvn");
+        File mvn = null;
+        if (SystemUtils.isWindows())
+        {
+            mvn = SystemUtils.findInPath("mvn.bat");
+        }
+        else
+        {
+            mvn = SystemUtils.findInPath("mvn");
+        }
+                    
         if (mvn != null)
         {
             Resource mvnResource = new Resource("maven2");

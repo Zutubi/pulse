@@ -19,6 +19,12 @@ public class LocalFileSystem implements FileSystem
 {
     private final File base;
 
+    public LocalFileSystem()
+    {
+        // set the base to the root of the file system.
+        this(new File(""));
+    }
+    
     public LocalFileSystem(File base)
     {
         this.base = base;
@@ -146,7 +152,10 @@ public class LocalFileSystem implements FileSystem
         File[] files = dir.listFiles();
         for (File file : files)
         {
-            listing.add(new LocalFile(this, file));
+            if (!file.isHidden())
+            {
+                listing.add(new LocalFile(this, file));
+            }
         }
         return listing.toArray(new LocalFile[listing.size()]);
     }
