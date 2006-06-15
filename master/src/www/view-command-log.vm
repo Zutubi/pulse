@@ -55,6 +55,7 @@
                             #headingRow("build.stage.summary" 9)
                             #recipeSummaryHeader()
                             #recipeSummary($node $result)
+                            #directMessages($node.result 9)
                         </table>
                         #recipeCommands($node $result)
                     </div>
@@ -80,28 +81,7 @@
                                 #dateClassCell($commandResult)
                                 #classCell($commandResult.stamps.prettyElapsed)
                             </tr>
-            #if($commandResult.hasDirectMessages($errorLevel))
-                            <tr>
-                                <td class="error" colspan="6">
-                                    <ul>
-                #foreach($feature in $commandResult.getFeatures($errorLevel))
-                                        <li class="error">$!webwork.htmlEncode($feature.summary)</li>
-                #end
-                                    </ul>
-                                </td>
-                            </tr>
-            #end
-            #if($commandResult.hasDirectMessages($warningLevel))
-                            <tr>
-                                <td class="warning" colspan="6">
-                                    <ul>
-                #foreach($feature in $commandResult.getFeatures($warningLevel))
-                                        <li class="warning">$!webwork.htmlEncode($feature.summary)</li>
-                #end
-                                    </ul>
-                                </td>
-                            </tr>
-            #end
+                            #directMessages($commandResult 6)
                         </table>
 
             #if($commandResult.properties.size() > 0)

@@ -23,7 +23,6 @@
         </property>
         <property name="startupRunnables">
             <list>
-                <value>com.zutubi.pulse.ResourceDiscoverer</value>
             </list>
         </property>
         <property name="configurationManager">

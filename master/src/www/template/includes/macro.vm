@@ -1082,22 +1082,50 @@
 #end
 
 ##
+## Shows direct error and warning messages on a result in table cells
+##
+#macro(directMessages $result $span)
+    #if($result.hasDirectMessages($errorLevel))
+                    <tr>
+                        <td class="error" colspan="$span">
+                            <ul>
+        #foreach($feature in $result.getFeatures($errorLevel))
+                                <li class="error">$!webwork.htmlEncode($feature.summary)</li>
+        #end
+                            </ul>
+                        </td>
+                    </tr>
+    #end
+    #if($result.hasDirectMessages($warningLevel))
+                    <tr>
+                        <td class="warning" colspan="$span">
+                            <ul>
+        #foreach($feature in $result.getFeatures($warningLevel))
+                                <li class="warning">$!webwork.htmlEncode($feature.summary)</li>
+        #end
+                            </ul>
+                        </td>
+                    </tr>
+    #end
+#end
+
+##
 ## Shows a summary for a recipe result
 ##
 #macro(recipeSummary $resultNode $build)
-        <tr>
-            #set($id = $resultNode.id)
-            #set($recipe = $resultNode.result)
-            #set($cssClass = $recipe.state.string)
-            #dynamicLinkCell($resultNode.stage "/viewCommandLog.action?id=$build.id&amp;selectedNode=$resultNode.id")
-            #dynamicCell($recipe.recipeNameSafe)
-            #dynamicCell($resultNode.hostSafe)
-            #statusCell($recipe)
-            #testResultsCell($build $recipe $recipe)
-            #dateClassCell($recipe)
-            #classCell($recipe.stamps.prettyElapsed)
-##            #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$build.project.id")
-        </tr>
+    <tr>
+        #set($id = $resultNode.id)
+        #set($recipe = $resultNode.result)
+        #set($cssClass = $recipe.state.string)
+        #dynamicLinkCell($resultNode.stage "/viewCommandLog.action?id=$build.id&amp;selectedNode=$resultNode.id")
+        #dynamicCell($recipe.recipeNameSafe)
+        #dynamicCell($resultNode.hostSafe)
+        #statusCell($recipe)
+        #testResultsCell($build $recipe $recipe)
+        #dateClassCell($recipe)
+        #classCell($recipe.stamps.prettyElapsed)
+##        #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$build.project.id")
+    </tr>
 #end
 
 ##

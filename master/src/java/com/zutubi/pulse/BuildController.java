@@ -15,7 +15,7 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.scheduling.quartz.TimeoutBuildJob;
+import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.services.ServiceTokenManager;
@@ -157,10 +157,18 @@ public class BuildController implements EventListener
             {
                 handleBuildTerminationRequest((BuildTerminationRequestEvent) evt);
             }
-            else
+            else if (evt instanceof RecipeTimeoutEvent)
+            {
+                handleRecipeTimeout((RecipeTimeoutEvent)evt);
+            }
+            else if (evt instanceof RecipeEvent)
             {
                 RecipeEvent e = (RecipeEvent) evt;
                 handleRecipeEvent(e);
+            }
+            else
+            {
+                LOG.warning("Build controller received unexpected event of type " + evt.getClass().getName());
             }
         }
         catch (BuildException e)
@@ -207,9 +215,9 @@ public class BuildController implements EventListener
         initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
     }
 
-    private String getTriggerName()
+    private String getTriggerName(long recipeId)
     {
-        return String.format("build-%d", buildResult.getId());
+        return String.format("recipe-%d", recipeId);
     }
 
     private void handleBuildTerminationRequest(BuildTerminationRequestEvent event)
@@ -222,6 +230,19 @@ public class BuildController implements EventListener
         }
 
         buildResult.terminate(event.isTimeout());
+    }
+
+    private void handleRecipeTimeout(RecipeTimeoutEvent event)
+    {
+        for (TreeNode<RecipeController> controllerNode : executingControllers)
+        {
+            RecipeController controller = controllerNode.getData();
+            if(controller.getResult().getId() == event.getRecipeId())
+            {
+                controller.getResult().terminate(true);
+                controller.terminateRecipe(true);
+            }
+        }
     }
 
     private void initialiseNodes(Bootstrapper bootstrapper, List<TreeNode<RecipeController>> nodes)
@@ -260,9 +281,33 @@ public class BuildController implements EventListener
         {
             // If we got here we are sure that the event was for one of our
             // recipes.
-            if (!buildResult.commenced() && e instanceof RecipeCommencedEvent)
+            if (e instanceof RecipeCommencedEvent)
             {
-                handleFirstCommenced(foundNode.getData());
+                if (!buildResult.commenced())
+                {
+                    handleFirstCommenced(foundNode.getData());
+                }
+
+                if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
+                {
+                    scheduleTimeout(e.getRecipeId());
+                }
+            }
+            else if (e instanceof RecipeCompletedEvent)
+            {
+                try
+                {
+                    // during a system shutdown, the scheduler is shutdown before the
+                    // builds are completed. This makes it unnecessary to unschedule the job.
+                    if (!quartzScheduler.isShutdown())
+                    {
+                        quartzScheduler.unscheduleJob(getTriggerName(e.getRecipeId()), TIMEOUT_TRIGGER_GROUP);
+                    }
+                }
+                catch (SchedulerException ex)
+                {
+                    LOG.warning("Unable to unschedule timeout trigger: " + ex.getMessage(), ex);
+                }
             }
 
             checkNodeStatus(foundNode);
@@ -273,9 +318,6 @@ public class BuildController implements EventListener
      * Called when the first recipe for this build is successfully
      * commenced.  It is at this point that the build is said to have
      * commenced.
-     * <p/>
-     * TODO: dev-distributed: timeouts should apply per recipe?  Otherwise
-     * something can be queued waiting for an agent and time out?
      */
     private void handleFirstCommenced(RecipeController controller)
     {
@@ -295,10 +337,6 @@ public class BuildController implements EventListener
 
         getChanges(dispatchRequest.getRevision());
         buildResult.commence(controller.getResult().getStamps().getStartTime());
-        if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
-        {
-            scheduleTimeout();
-        }
         buildManager.save(buildResult);
     }
 
@@ -363,15 +401,16 @@ public class BuildController implements EventListener
         return result;
     }
 
-    private void scheduleTimeout()
+    private void scheduleTimeout(long recipeId)
     {
-        String name = getTriggerName();
+        String name = getTriggerName(recipeId);
         Date time = new Date(System.currentTimeMillis() + specification.getTimeout() * Constants.MINUTE);
 
         Trigger timeoutTrigger = new SimpleTrigger(name, TIMEOUT_TRIGGER_GROUP, time);
         timeoutTrigger.setJobName(FatController.TIMEOUT_JOB_NAME);
         timeoutTrigger.setJobGroup(FatController.TIMEOUT_JOB_GROUP);
-        timeoutTrigger.getJobDataMap().put(TimeoutBuildJob.PARAM_ID, buildResult.getId());
+        timeoutTrigger.getJobDataMap().put(TimeoutRecipeJob.PARAM_BUILD_ID, buildResult.getId());
+        timeoutTrigger.getJobDataMap().put(TimeoutRecipeJob.PARAM_RECIPE_ID, recipeId);
 
         try
         {
@@ -417,20 +456,6 @@ public class BuildController implements EventListener
 
     private void completeBuild()
     {
-        try
-        {
-            // during a system shutdown, the scheduler is shutdown before the
-            // builds are completed. This makes it unnecessary to unschedule the job.
-            if (!quartzScheduler.isShutdown())
-            {
-                quartzScheduler.unscheduleJob(getTriggerName(), TIMEOUT_TRIGGER_GROUP);
-            }
-        }
-        catch (SchedulerException e)
-        {
-            LOG.warning("Unable to unschedule timeout trigger: " + e.getMessage(), e);
-        }
-
         buildResult.abortUnfinishedRecipes();
         tree.cleanup(buildResult);
         buildResult.complete();

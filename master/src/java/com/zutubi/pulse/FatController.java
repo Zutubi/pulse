@@ -9,7 +9,7 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildTerminationRequestEvent;
-import com.zutubi.pulse.events.build.BuildTimeoutEvent;
+import com.zutubi.pulse.events.build.RecipeTimeoutEvent;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseEvent;
 import com.zutubi.pulse.license.LicenseExpiredEvent;
@@ -18,7 +18,7 @@ import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.scheduling.quartz.TimeoutBuildJob;
+import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.logging.Logger;
 import org.quartz.JobDetail;
@@ -75,7 +75,7 @@ public class FatController implements EventListener, Stoppable
         asyncListener = new AsynchronousDelegatingListener(this);
         eventManager.register(asyncListener);
 
-        JobDetail detail = new JobDetail(TIMEOUT_JOB_NAME, TIMEOUT_JOB_GROUP, TimeoutBuildJob.class);
+        JobDetail detail = new JobDetail(TIMEOUT_JOB_NAME, TIMEOUT_JOB_GROUP, TimeoutRecipeJob.class);
         detail.getJobDataMap().put(PARAM_EVENT_MANAGER, eventManager);
         detail.setDurability(true); // will stay around after the trigger has gone.
         quartzScheduler.addJob(detail, true);
@@ -191,9 +191,9 @@ public class FatController implements EventListener, Stoppable
         {
             handleBuildCompleted((BuildCompletedEvent) event);
         }
-        else if (event instanceof BuildTimeoutEvent)
+        else if (event instanceof RecipeTimeoutEvent)
         {
-            handleBuildTimeout((BuildTimeoutEvent) event);
+            handleRecipeTimeout((RecipeTimeoutEvent) event);
         }
         else if (event instanceof LicenseEvent)
         {
@@ -274,10 +274,25 @@ public class FatController implements EventListener, Stoppable
         }
     }
 
-    private void handleBuildTimeout(BuildTimeoutEvent event)
+    private void handleRecipeTimeout(RecipeTimeoutEvent event)
     {
         // No worries if we don't find the controller: it may have finished
-        terminateBuild(event.getBuildId(), true);
+        lock.lock();
+        try
+        {
+            for (BuildController controller : runningBuilds)
+            {
+                if (controller.getBuildId() == event.getBuildId())
+                {
+                    controller.handleEvent(event);
+                    break;
+                }
+            }
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     public void terminateBuild(long id, boolean timeout)
@@ -338,7 +353,7 @@ public class FatController implements EventListener, Stoppable
     {
         return new Class[]{BuildRequestEvent.class,
                 BuildCompletedEvent.class,
-                BuildTimeoutEvent.class,
+                RecipeTimeoutEvent.class,
                 LicenseExpiredEvent.class,
                 LicenseUpdateEvent.class
         };
