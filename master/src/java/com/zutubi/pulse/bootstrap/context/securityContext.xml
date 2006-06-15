@@ -51,8 +51,8 @@ The beans defined within the security subsystem need not be accessed by other co
             <value>
                 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
                 PATTERN_TYPE_APACHE_ANT
-                /ajax/**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,ajaxSecurityEnforcementFilter
-                /**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,securityEnforcementFilter
+                /ajax/**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,ajaxExceptionTranslationFilter,filterInvocationInterceptor
+                /**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor
             </value>
         </property>
     </bean>
@@ -134,6 +134,9 @@ The beans defined within the security subsystem need not be accessed by other co
     c) FilterChainProxy
     -->
     <bean id="rememberMeProcessingFilter" class="org.acegisecurity.ui.rememberme.RememberMeProcessingFilter">
+        <property name="authenticationManager">
+            <ref local="authenticationManager"/>
+        </property>
         <property name="rememberMeServices">
             <ref local="rememberMeServices"/>
         </property>
@@ -198,19 +201,13 @@ The beans defined within the security subsystem need not be accessed by other co
     Not exactly sure what this one does.... other than redirecting a user to the login endpoint
     if they do not comply with the authorization requirements?
     -->
-    <bean id="securityEnforcementFilter" class="org.acegisecurity.intercept.web.SecurityEnforcementFilter">
-        <property name="filterSecurityInterceptor">
-            <ref local="filterInvocationInterceptor"/>
-        </property>
+    <bean id="exceptionTranslationFilter" class="org.acegisecurity.ui.ExceptionTranslationFilter">
         <property name="authenticationEntryPoint">
             <ref local="authenticationProcessingFilterEntryPoint"/>
         </property>
     </bean>
 
-    <bean id="ajaxSecurityEnforcementFilter" class="org.acegisecurity.intercept.web.SecurityEnforcementFilter">
-        <property name="filterSecurityInterceptor">
-            <ref local="filterInvocationInterceptor"/>
-        </property>
+    <bean id="ajaxExceptionTranslationFilter" class="org.acegisecurity.ui.ExceptionTranslationFilter">
         <property name="authenticationEntryPoint">
             <ref local="ajaxEntryPoint"/>
         </property>

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.security;
 
 import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.intercept.web.AuthenticationEntryPoint;
+import org.acegisecurity.ui.AuthenticationEntryPoint;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
