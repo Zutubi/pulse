@@ -31,4 +31,14 @@ public class RecipeCommand implements Runnable
     {
         this.recipeProcessor = recipeProcessor;
     }
+
+    public String getMaster()
+    {
+        return master;
+    }
+
+    public RecipeRequest getRequest()
+    {
+        return request;
+    }
 }

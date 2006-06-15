@@ -21,6 +21,8 @@
 
     <bean id="threadPool" class="com.zutubi.pulse.slave.SlaveThreadPool" autowire="byName"/>
 
+    <bean id="slaveQueue" class="com.zutubi.pulse.slave.SlaveQueue" autowire="byName" init-method="start"/>
+
     <bean id="slaveRecipeProcessor" class="com.zutubi.pulse.slave.SlaveRecipeProcessor" autowire="byName"/>
 
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
