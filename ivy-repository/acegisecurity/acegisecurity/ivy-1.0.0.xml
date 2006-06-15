@@ -33,7 +33,7 @@
         <!--
         Webapp integration. This is required to provide support for the acegi filters.
         -->
-        <dependency org="springframework" name="spring" rev="1.2.6" conf="default->spring-web"/>
+        <dependency org="springframework" name="spring" rev="2.0-M5" conf="default->spring-web"/>
 
     </dependencies>
 

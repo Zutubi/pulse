@@ -6,6 +6,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.core.io.Resource;
 
 import java.util.Map;
@@ -54,6 +55,11 @@ public class DelegatingApplicationContext implements ConfigurableApplicationCont
         return null;
     }
 
+    public AutowireCapableBeanFactory getAutowireCapableBeanFactory() throws IllegalStateException
+    {
+        return delegate.getAutowireCapableBeanFactory();
+    }
+
     public long getStartupDate()
     {
         return delegate.getStartupDate();
@@ -77,11 +83,6 @@ public class DelegatingApplicationContext implements ConfigurableApplicationCont
     public String[] getBeanDefinitionNames()
     {
         return delegate.getBeanDefinitionNames();
-    }
-
-    public String[] getBeanDefinitionNames(Class type)
-    {
-        return delegate.getBeanDefinitionNames(type);
     }
 
     public String[] getBeanNamesForType(Class type)
@@ -137,6 +138,11 @@ public class DelegatingApplicationContext implements ConfigurableApplicationCont
     public BeanFactory getParentBeanFactory()
     {
         return delegate.getParentBeanFactory();
+    }
+
+    public boolean containsLocalBean(String string)
+    {
+        return delegate.containsLocalBean(string);
     }
 
     public String getMessage(String code, Object[] args, String defaultMessage, Locale locale)
@@ -197,5 +203,20 @@ public class DelegatingApplicationContext implements ConfigurableApplicationCont
             parent.close();
             parent = (ConfigurableApplicationContext) parent.getParent();
         }
+    }
+
+    public void start()
+    {
+        delegate.start();
+    }
+
+    public void stop()
+    {
+        delegate.stop();
+    }
+
+    public boolean isRunning()
+    {
+        return delegate.isRunning();
     }
 }

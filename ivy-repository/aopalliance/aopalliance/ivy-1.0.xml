@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="aopalliance" module="aopalliance" revision="1.0" status="release" publication="">
+        <license name="Public Domain"/>
+        <description homepage="http://aopalliance.sourceforge.net/">
+          The AOP Alliance project is a joint open-source project between several software engineering people who are interested in AOP and Java.
+        </description>
+    </info>
+
+    <publications>
+        <artifact name="aopalliance" type="jar" conf="default"/>
+    </publications>
+
+</ivy-module>
