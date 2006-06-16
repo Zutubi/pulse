@@ -1,5 +1,3 @@
-// Function to toggle the enable state of a control based on the state of a
-// checkbox.
 function getElement(id)
 {
     var element;
@@ -20,10 +18,43 @@ function getElement(id)
     return element;
 }
 
-function setEnableState(id, checkboxId)
+// Function to toggle the enable state of a control based on the state of a
+// checkbox.
+function setEnableState(id, checkboxId, inverse)
 {
     var element = getElement(id);
-    element.disabled = !document.getElementById(checkboxId).checked;
+    var disabled = !getElement(checkboxId).checked;
+
+    if(inverse)
+    {
+        disabled = !disabled;
+    }
+
+    element.disabled = disabled;
+}
+
+// Sets the enabled state of all controls in a form (excepting the checkbox
+// itself and submits (buttons)) based on the state of a checkbox.
+function setFormEnableState(formId, checkboxId, includeSubmit, inverse)
+{
+    var disabled = !getElement(checkboxId).checked;
+
+    if(inverse)
+    {
+        disabled = !disabled;
+    }
+
+    var form = getElement(formId);
+    var fields = form.elements;
+
+    for(var i = 0; i < fields.length; i++)
+    {
+        var field = fields[i];
+        if(field.id != checkboxId && (includeSubmit || field.type && field.type != "submit"))
+        {
+            fields[i].disabled = disabled;
+        }
+    }
 }
 
 function confirmUrl(message, url)

@@ -3,12 +3,13 @@ package com.zutubi.pulse.web.admin;
 import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.jabber.JabberManager;
-import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.security.ldap.LdapManager;
+import com.zutubi.pulse.web.ActionSupport;
 
-import java.util.Calendar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  */
@@ -19,6 +20,7 @@ public class ServerSettingsAction extends ActionSupport
     private MasterApplicationConfiguration config;
     private DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
     private License license;
+    private LdapManager ldapManager;
 
     public MasterApplicationConfiguration getConfig()
     {
@@ -28,6 +30,11 @@ public class ServerSettingsAction extends ActionSupport
     public String getJabberStatus()
     {
         return jabberManager.getStatusMessage();
+    }
+
+    public String getLdapStatus()
+    {
+        return ldapManager.getStatusMessage();
     }
 
     public String execute() throws Exception
@@ -61,5 +68,10 @@ public class ServerSettingsAction extends ActionSupport
     public void setJabberManager(JabberManager jabberManager)
     {
         this.jabberManager = jabberManager;
+    }
+
+    public void setLdapManager(LdapManager ldapManager)
+    {
+        this.ldapManager = ldapManager;
     }
 }

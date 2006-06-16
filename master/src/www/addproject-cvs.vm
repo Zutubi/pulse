@@ -31,7 +31,7 @@
     #wwtextfield("name=quiet" "template=controlfooter")
     #inlineHelp("cvs.quiet.help")
 
-    #scmTestRow()
+    #testSettingsRow()
 
     #previousNextCancel(7)
 #end

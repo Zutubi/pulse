@@ -1927,16 +1927,16 @@
 ##
 ## A row in an SCM settings form with a link to test the settings
 ##
-#macro(scmTestRow)
+#macro(testSettingsRow)
     <tr>
         <td>
             &nbsp;
         </td>
         <td style="padding: 6px; padding-top: 10px;">
             <p>
-                <a href="#" onclick="testScm()">#wwtext("name=settings.test")</a>
+                <a href="#" onclick="testSettings(); return false;">#wwtext("name=settings.test")</a>
             </p>
-            <div id="scm">
+            <div id="test-results">
             </div>
         </td>
     </tr>
@@ -1947,9 +1947,9 @@
 ##
 #macro(p4TestScript $form)
     <script type="text/javascript">
-        function testScm()
+        function testSettings()
         {
-            #testInProgress("scm")
+            #testInProgress("test-results")
 
             var port = escape($F("${form}_p4_port"));
             var user = escape($F("${form}_p4_user"));
@@ -1957,7 +1957,7 @@
             var client = escape($F("${form}_p4_client"));
             var params = "port=" + port + "&user=" + user + "&password=" + password + "&client=" + client;
 
-            var updater = new Ajax.Updater({success: 'scm'},
+            var updater = new Ajax.Updater({success: 'test-results'},
                                            "ajax/testP4.action",
                                            {
                                                method: 'get',
@@ -1965,7 +1965,7 @@
                                                onFailure: reportError
                                            });
 
-            #ajaxError("scm")
+            #ajaxError("test-results")
         }
 
     </script>
@@ -1976,9 +1976,9 @@
 ##
 #macro(svnTestScript $form)
     <script type="text/javascript">
-        function testScm()
+        function testSettings()
         {
-            #testInProgress("scm")
+            #testInProgress("test-results")
 
             var username = escape($F("${form}_svn_username"));
             var password = escape($F("${form}_svn_password"));
@@ -1987,7 +1987,7 @@
             var passphrase = escape($F("${form}_svn_passphrase"));
             var params = "username=" + username + "&password=" + password + "&url=" + url + "&keyfile=" + keyfile + "&passphrase=" + passphrase;
 
-            var updater = new Ajax.Updater({success: 'scm'},
+            var updater = new Ajax.Updater({success: 'test-results'},
                                            "ajax/testSvn.action",
                                            {
                                                method: 'get',
@@ -1995,7 +1995,7 @@
                                                onFailure: reportError
                                            });
 
-            #ajaxError("scm")
+            #ajaxError("test-results")
         }
 
     </script>
@@ -2006,16 +2006,16 @@
 ##
 #macro(cvsTestScript $form)
     <script type="text/javascript">
-        function testScm()
+        function testSettings()
         {
-            #testInProgress("scm")
+            #testInProgress("test-results")
 
             var root = escape($F("${form}_cvs_root"));
             var module = escape($F("${form}_cvs_module"));
             var password = escape($F("${form}_cvs_password"));
             var params = "root=" + root + "&password=" + password + "&module=" + module;
 
-            var updater = new Ajax.Updater({success: 'scm'},
+            var updater = new Ajax.Updater({success: 'test-results'},
                                            "ajax/testCVS.action",
                                            {
                                                method: 'get',
@@ -2023,7 +2023,7 @@
                                                onFailure: reportError
                                            });
 
-            #ajaxError("scm")
+            #ajaxError("test-results")
         }
 
     </script>

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.acceptance.forms.admin.EditPasswordForm;
+import com.zutubi.pulse.util.RandomUtils;
 
 /**
  * <class-comment/>
@@ -101,14 +101,6 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         assertTextPresent("required");
         assertLinkNotPresentWithText(login);
         assertFormElementEmpty(USER_CREATE_LOGIN);
-        assertFormElementEquals(USER_CREATE_NAME, login);
-
-        // check validation - password is required.
-        submitCreateUserForm(login, login, "", "", false);
-
-        assertTextPresent("required");
-        assertLinkNotPresentWithText(login);
-        assertFormElementEquals(USER_CREATE_LOGIN, login);
         assertFormElementEquals(USER_CREATE_NAME, login);
 
         // check validation - password and confirmation mismatch

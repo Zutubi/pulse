@@ -25,7 +25,7 @@
     #wwpassword("name=svn.passphrase" "label=%{getText('svn.passphrase')}" "tabindex=5" "showPassword=true""onkeypress=return submitenter(this,event)")
     #inlineHelp("svn.passphrase.help")
 
-    #scmTestRow()
+    #testSettingsRow()
 
     #previousNextCancel(6)
 #end

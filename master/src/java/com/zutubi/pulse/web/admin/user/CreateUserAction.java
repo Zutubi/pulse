@@ -1,10 +1,7 @@
 package com.zutubi.pulse.web.admin.user;
 
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.GrantedAuthority;
-import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.web.user.UserActionSupport;
-import com.zutubi.pulse.web.DefaultAction;
 
 import java.util.Arrays;
 
@@ -15,6 +12,7 @@ public class CreateUserAction extends UserActionSupport
 {
     private User newUser = new User();
     private String confirm;
+    private boolean ldapAuthentication = false;
     private boolean grantAdminPermissions;
 
     public User getNewUser()
@@ -30,6 +28,16 @@ public class CreateUserAction extends UserActionSupport
     public void setConfirm(String confirm)
     {
         this.confirm = confirm;
+    }
+
+    public boolean isLdapAuthentication()
+    {
+        return ldapAuthentication;
+    }
+
+    public void setLdapAuthentication(boolean ldapAuthentication)
+    {
+        this.ldapAuthentication = ldapAuthentication;
     }
 
     public boolean isAdmin()
@@ -50,10 +58,14 @@ public class CreateUserAction extends UserActionSupport
             // completed successfully.
             return;
         }
-        // check the password confirmation.
-        if (!confirm.equals(newUser.getPassword()))
+
+        if (!ldapAuthentication)
         {
-            addFieldError("confirm", getText("password.confirm.mismatch"));
+            // check the password confirmation.
+            if (!confirm.equals(newUser.getPassword()))
+            {
+                addFieldError("confirm", getText("password.confirm.mismatch"));
+            }
         }
 
         // check that the user does not already exist.
@@ -66,21 +78,7 @@ public class CreateUserAction extends UserActionSupport
 
     public String execute() throws Exception
     {
-        // ensure that the user has the correct authorities to login.
-        newUser.add(GrantedAuthority.USER);
-        if (grantAdminPermissions)
-        {
-            newUser.add(GrantedAuthority.ADMINISTRATOR);
-        }
-        newUser.setEnabled(true);
-        newUser.setDefaultAction(DefaultAction.WELCOME_ACTION);
-        UserManager userManager = getUserManager();
-        userManager.save(newUser);
-        // can only update the password on a persistent user since the password salt relies
-        // upon the users id.
-        userManager.setPassword(newUser, newUser.getPassword());
-        userManager.save(newUser);
-        
+        getUserManager().addUser(newUser, grantAdminPermissions, ldapAuthentication);
         doReset();
         return SUCCESS;
     }

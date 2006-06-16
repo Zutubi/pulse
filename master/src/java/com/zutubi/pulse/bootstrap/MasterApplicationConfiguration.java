@@ -47,6 +47,16 @@ public interface MasterApplicationConfiguration extends ApplicationConfiguration
 
     public static final String ANONYMOUS_ACCESS_ENABLED = "anon.enabled";
 
+    //--- ( ldap integration )---
+
+    public static final String LDAP_ENABLED = "ldap.enabled";
+    public static final String LDAP_HOST_URL = "ldap.host";
+    public static final String LDAP_BASE_DN = "ldap.base.dn";
+    public static final String LDAP_MANAGER_DN = "ldap.manager.dn";
+    public static final String LDAP_MANAGER_PASSWORD = "ldap.manager.password";
+    public static final String LDAP_USER_FILTER = "ldap.user.filter";
+    public static final String LDAP_AUTO_ADD = "ldap.auto.add";
+
     /**
      * The port on which the server will listen for admin requests.
      */
@@ -110,4 +120,31 @@ public interface MasterApplicationConfiguration extends ApplicationConfiguration
 
     void setAnonymousAccessEnabled(Boolean anonEnabled);
 
+    Boolean getLdapEnabled();
+
+    void setLdapEnabled(Boolean enabled);
+
+    String getLdapHostUrl();
+
+    void setLdapHostUrl(String hostUrl);
+
+    String getLdapBaseDn();
+
+    void setLdapBaseDn(String baseDn);
+
+    String getLdapManagerDn();
+
+    void setLdapManagerDn(String managerDn);
+
+    String getLdapManagerPassword();
+
+    void setLdapManagerPassword(String managerPassword);
+
+    String getLdapUserFilter();
+
+    void setLdapUserFilter(String userFilter);
+
+    Boolean getLdapAutoAdd();
+
+    void setLdapAutoAdd(Boolean autoAdd);
 }

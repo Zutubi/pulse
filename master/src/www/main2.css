@@ -354,7 +354,7 @@ h3.heading, th.heading {
 
 .note {
     background: #ffffc0;
-    white-space: nowrap;
+    white-space: normal;
 }
 
 td.content {

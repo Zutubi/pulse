@@ -16,8 +16,9 @@
             <table class="fill-content">
                 #wwcform("action=editUser.action" "heading=%{getText('user.edit')}" "method=post")
                     #wwhidden("name=userId")
-                    #wwcheckbox("name=admin" "label=%{getText('user.admin')}" "tabindex=1")
-                    #saveCancel(2)
+                    #wwcheckbox("name=ldapAuthentication" "label=%{getText('user.ldap.authentication')}" "tabindex=1" "onclick=setFormEnableState('password.edit', 'editUser_ldapAuthentication', true, true)")
+                    #wwcheckbox("name=admin" "label=%{getText('user.admin')}" "tabindex=2")
+                    #saveCancel(3)
                 #end
             </table>
             <table class="fill-content">
@@ -36,6 +37,10 @@
         </td>
     </tr>
 </table>
+
+    <script type="text/javascript">
+        setFormEnableState('password.edit', 'editUser_ldapAuthentication', true, true);
+    </script>
 
     #tabEnd()
 </body>

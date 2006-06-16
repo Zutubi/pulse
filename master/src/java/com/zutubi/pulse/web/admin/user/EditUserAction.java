@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.admin.user;
 
+import static com.zutubi.pulse.model.GrantedAuthority.ADMINISTRATOR;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.web.user.UserActionSupport;
-import static com.zutubi.pulse.model.GrantedAuthority.*;
 import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.web.user.UserActionSupport;
 
 /**
  *
@@ -12,6 +12,7 @@ import com.zutubi.pulse.security.AcegiUtils;
 public class EditUserAction extends UserActionSupport
 {
     private boolean admin;
+    private boolean ldapAuthentication;
 
     public boolean isAdmin()
     {
@@ -23,10 +24,21 @@ public class EditUserAction extends UserActionSupport
         this.admin = admin;
     }
 
+    public boolean isLdapAuthentication()
+    {
+        return ldapAuthentication;
+    }
+
+    public void setLdapAuthentication(boolean ldapAuthentication)
+    {
+        this.ldapAuthentication = ldapAuthentication;
+    }
+
     public String doInput()
     {
         User user = getUser();
         admin = user.hasAuthority(ADMINISTRATOR);
+        ldapAuthentication = user.getLdapAuthentication();
         return INPUT;
     }
 
@@ -52,7 +64,6 @@ public class EditUserAction extends UserActionSupport
             if (!persistentUser.hasAuthority(ADMINISTRATOR))
             {
                 persistentUser.add(ADMINISTRATOR);
-                getUserManager().save(persistentUser);
             }
         }
         else
@@ -60,9 +71,11 @@ public class EditUserAction extends UserActionSupport
             if (persistentUser.hasAuthority(ADMINISTRATOR))
             {
                 persistentUser.remove(ADMINISTRATOR);
-                getUserManager().save(persistentUser);
             }
         }
+
+        persistentUser.setLdapAuthentication(ldapAuthentication);
+        getUserManager().save(persistentUser);
         return SUCCESS;
     }
 }

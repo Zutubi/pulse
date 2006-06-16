@@ -4,10 +4,10 @@ import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.web.DefaultAction;
 import org.acegisecurity.userdetails.UserDetails;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * 
@@ -56,6 +56,7 @@ public class User extends Entity implements UserDetails
      * may be interacting with (e.g. SCMs).
      */
     private List<String> aliases;
+    private static final String PROPERTY_LDAP_AUTHENTICATION = "user.ldapAuthentication";
 
 
     public User()
@@ -427,5 +428,20 @@ public class User extends Entity implements UserDetails
     public void setRefreshInterval(int refreshInterval)
     {
         setProperty("user.refreshInterval", Integer.toString(refreshInterval));
+    }
+
+    public boolean getLdapAuthentication()
+    {
+        if (hasProperty(PROPERTY_LDAP_AUTHENTICATION))
+        {
+            return Boolean.valueOf(getProperty(PROPERTY_LDAP_AUTHENTICATION));
+        }
+
+        return false;
+    }
+
+    public void setLdapAuthentication(boolean useLdap)
+    {
+        setProperty(PROPERTY_LDAP_AUTHENTICATION, Boolean.toString(useLdap));
     }
 }

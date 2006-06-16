@@ -53,6 +53,21 @@
                     <!-- Probably best we don't show the password -->
                     #dynamicRow("jabber.force.ssl" $config.jabberForceSSL.toString().toLowerCase())
                 </table>
+                <table id="ldap.config" class="fill-content">
+                    #adminHeadingRow("ldap.config" "/admin/editLdap!input.action" "ldap.edit" "/admin/ldap!reset.action" "ldap.reset")
+#if($ldapStatus)
+                    <tr>
+                        <th class="note" colspan="2">$!webwork.htmlEncode($ldapStatus)</th>
+                    </tr>
+#end
+                    #dynamicRow("ldap.enabled" $config.ldapEnabled)
+                    #dynamicRow("ldap.host.url" $config.ldapHostUrl)
+                    #dynamicRow("ldap.base.dn" $config.ldapBaseDn)
+                    #dynamicRow("ldap.manager.dn" $config.ldapManagerDn)
+                    <!-- Probably best we don't show the password -->
+                    #dynamicRow("ldap.user.filter" $config.ldapUserFilter)
+                    #dynamicRow("ldap.auto.add" $config.ldapAutoAdd.toString().toLowerCase())
+                </table>
             </td>
         </tr>
     </table>

@@ -20,6 +20,15 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="jettyManager">
             <ref bean="jettyManager"/>
         </property>
+        <property name="authenticationManager">
+            <ref bean="authenticationManager"/>
+        </property>
+    </bean>
+
+    <bean id="ldapManager" class="com.zutubi.pulse.security.ldap.AcegiLdapManager" init-method="init">
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
     </bean>
 
     <!-- ============================================================= -->
@@ -28,18 +37,21 @@ The beans defined within the security subsystem need not be accessed by other co
     <bean id="authenticationManager" class="org.acegisecurity.providers.ProviderManager">
         <property name="providers">
             <list>
-                <ref local="daoAuthenticationProvider"/>
+                <ref local="customAuthenticationProvider"/>
                 <ref local="rememberMeAuthenticationProvider"/>
             </list>
         </property>
     </bean>
 
-    <bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
-        <property name="userDetailsService">
+    <bean id="customAuthenticationProvider" class="com.zutubi.pulse.security.CustomAuthenticationProvider">
+        <property name="userManager">
             <ref bean="userManager"/>
         </property>
         <property name="passwordEncoder">
             <ref bean="passwordEncoder"/>
+        </property>
+        <property name="ldapManager">
+            <ref bean="ldapManager"/>
         </property>
     </bean>
 

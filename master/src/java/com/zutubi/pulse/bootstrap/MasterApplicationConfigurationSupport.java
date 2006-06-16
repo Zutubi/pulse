@@ -120,6 +120,76 @@ public class MasterApplicationConfigurationSupport implements MasterApplicationC
         config.setBooleanProperty(ANONYMOUS_ACCESS_ENABLED, anonEnabled);
     }
 
+    public Boolean getLdapEnabled()
+    {
+        return config.getBooleanProperty(LDAP_ENABLED, false);
+    }
+
+    public void setLdapEnabled(Boolean enabled)
+    {
+        config.setBooleanProperty(LDAP_ENABLED, enabled);
+    }
+
+    public String getLdapHostUrl()
+    {
+        return config.getProperty(LDAP_HOST_URL);
+    }
+
+    public void setLdapHostUrl(String hostUrl)
+    {
+        config.setProperty(LDAP_HOST_URL, hostUrl);
+    }
+
+    public String getLdapBaseDn()
+    {
+        return config.getProperty(LDAP_BASE_DN);
+    }
+
+    public void setLdapBaseDn(String baseDn)
+    {
+        config.setProperty(LDAP_BASE_DN, baseDn);
+    }
+
+    public String getLdapManagerDn()
+    {
+        return config.getProperty(LDAP_MANAGER_DN);
+    }
+
+    public void setLdapManagerDn(String managerDn)
+    {
+        config.setProperty(LDAP_MANAGER_DN, managerDn);
+    }
+
+    public String getLdapManagerPassword()
+    {
+        return config.getProperty(LDAP_MANAGER_PASSWORD);
+    }
+
+    public void setLdapManagerPassword(String managerPassword)
+    {
+        config.setProperty(LDAP_MANAGER_PASSWORD, managerPassword);
+    }
+
+    public String getLdapUserFilter()
+    {
+        return config.getProperty(LDAP_USER_FILTER);
+    }
+
+    public void setLdapUserFilter(String userFilter)
+    {
+        config.setProperty(LDAP_USER_FILTER, userFilter);
+    }
+
+    public Boolean getLdapAutoAdd()
+    {
+        return config.getBooleanProperty(LDAP_AUTO_ADD, false);
+    }
+
+    public void setLdapAutoAdd(Boolean autoAdd)
+    {
+        config.setBooleanProperty(LDAP_AUTO_ADD, autoAdd);
+    }
+
     public String getSmtpPrefix()
     {
         return config.getProperty(SMTP_PREFIX);

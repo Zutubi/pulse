@@ -24,7 +24,7 @@
     #wwtextfield("name=p4.client" "label=%{getText('p4.client')}" "required=true" "tabindex=4" "onkeypress=return submitenter(this,event)")
     #inlineHelp("p4.client.help")
 
-    #scmTestRow()
+    #testSettingsRow()
 
     #previousNextCancel(5)
  #end

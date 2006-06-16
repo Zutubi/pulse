@@ -1,12 +1,13 @@
 package com.zutubi.pulse.security;
 
 import com.zutubi.pulse.jetty.JettyManager;
-import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.spring.web.context.FilterToBeanProxy;
-import org.mortbay.jetty.servlet.WebApplicationHandler;
-import org.mortbay.jetty.servlet.FilterHolder;
-import org.mortbay.jetty.servlet.Dispatcher;
+import com.zutubi.pulse.util.logging.Logger;
+import org.acegisecurity.providers.ProviderManager;
 import org.acegisecurity.util.FilterChainProxy;
+import org.mortbay.jetty.servlet.Dispatcher;
+import org.mortbay.jetty.servlet.FilterHolder;
+import org.mortbay.jetty.servlet.WebApplicationHandler;
 
 /**
  * The security manager is responsible for handling security related functionality.
@@ -18,6 +19,7 @@ public class AcegiSecurityManager implements SecurityManager
 
     private static final Logger LOG = Logger.getLogger(AcegiSecurityManager.class);
 
+    private ProviderManager authenticationManager;
     private JettyManager jettyManager;
 
     public void init()
@@ -61,5 +63,10 @@ public class AcegiSecurityManager implements SecurityManager
     public void setJettyManager(JettyManager jettyManager)
     {
         this.jettyManager = jettyManager;
+    }
+
+    public void setAuthenticationManager(ProviderManager authenticationManager)
+    {
+        this.authenticationManager = authenticationManager;
     }
 }
