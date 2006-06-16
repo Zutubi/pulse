@@ -1062,6 +1062,10 @@
             <result name="success" type="velocity">test-settings.vm</result>
         </action>
 
+        <action name="testJabber" class="com.zutubi.pulse.web.ajax.TestJabberAction">
+            <result name="success" type="velocity">test-settings.vm</result>
+        </action>
+
         <action name="testLdap" class="com.zutubi.pulse.web.ajax.TestLdapAction">
             <result name="success" type="velocity">test-settings.vm</result>
         </action>

@@ -67,17 +67,51 @@ public class JabberManager implements Stoppable, PacketListener
     private void openConnection(MasterApplicationConfiguration appConfig)
             throws XMPPException
     {
-        if(appConfig.getJabberForceSSL())
+        connection = openConnection(appConfig.getJabberHost(), appConfig.getJabberPort(), appConfig.getJabberUsername(), appConfig.getJabberPassword(), appConfig.getJabberForceSSL());
+        connection.addPacketListener(this, new MessageTypeFilter(Message.Type.ERROR));
+    }
+
+    private XMPPConnection openConnection(String host, int port, String username, String password, boolean forceSSL)
+            throws XMPPException
+    {
+        XMPPConnection connection = null;
+
+        if(forceSSL)
         {
-            connection = new SSLXMPPConnection(appConfig.getJabberHost(), appConfig.getJabberPort());
+            connection = new SSLXMPPConnection(host, port);
         }
         else
         {
-            connection = new XMPPConnection(appConfig.getJabberHost(), appConfig.getJabberPort());
+            connection = new XMPPConnection(host, port);
         }
-        
-        connection.login(appConfig.getJabberUsername(), appConfig.getJabberPassword());
-        connection.addPacketListener(this, new MessageTypeFilter(Message.Type.ERROR));
+
+        connection.login(username, password);
+        return connection;
+    }
+
+    public void testConnection(String host, int port, String username, String password, boolean forceSSL) throws XMPPException
+    {
+        XMPPConnection connection = null;
+
+        try
+        {
+            try
+            {
+                connection = openConnection(host, port, username, password, forceSSL);
+            }
+            catch (XMPPException e)
+            {
+                // Second try to workaround SSL negotiation issues
+                connection = openConnection(host, port, username, password, forceSSL);
+            }
+        }
+        finally
+        {
+            if(connection != null)
+            {
+                connection.close();
+            }
+        }
     }
 
     public XMPPConnection getConnection()

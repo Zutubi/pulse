@@ -51,8 +51,8 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTest
         assertLdapTable("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "(uid={0})", "true");
 
         assertAndClick("ldap.edit");
-        form.assertFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "", "(uid={0})", "true");
-        form.cancelFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "", "(uid={0})", "true");
+        form.assertFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true");
+        form.cancelFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true");
     }
 
     public void testReset() throws Exception

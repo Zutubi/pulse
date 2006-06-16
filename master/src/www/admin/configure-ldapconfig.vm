@@ -45,7 +45,7 @@
     #inlineHelp("ldap.base.dn.help")
     #wwtextfield("name=ldap.managerDn" "label=%{getText('ldap.manager.dn')}" "size=60" "tabindex=4")
     #inlineHelp("ldap.manager.dn.help")
-    #wwpassword("name=ldap.managerPassword" "label=%{getText('ldap.manager.password')}" "tabindex=5")
+    #wwpassword("name=ldap.managerPassword" "label=%{getText('ldap.manager.password')}" "showPassword=true" "tabindex=5")
     #inlineHelp("ldap.manager.password.help")
     #wwtextfield("name=ldap.userFilter" "label=%{getText('ldap.user.filter')}" "size=60" "required=true" "tabindex=6")
     #inlineHelp("ldap.user.filter.help")
