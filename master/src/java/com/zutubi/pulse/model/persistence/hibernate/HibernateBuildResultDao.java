@@ -40,7 +40,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.project = :project order by id desc");
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project order by model.number desc");
                 queryObject.setEntity("project", project);
                 queryObject.setFirstResult(first);
                 queryObject.setMaxResults(max);
@@ -58,9 +58,9 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.id < :id order by id desc");
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.number < :number order by model.number desc");
                 queryObject.setEntity("project", result.getProject());
-                queryObject.setLong("id", result.getId());
+                queryObject.setLong("number", result.getNumber());
                 queryObject.setMaxResults(1);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
@@ -76,7 +76,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.buildSpecification = :spec and model.stateName != :initial and model.stateName != :inProgress order by id desc");
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.buildSpecification = :spec and model.stateName != :initial and model.stateName != :inProgress order by model.number desc");
                 queryObject.setEntity("project", project);
                 queryObject.setParameter("spec", spec);
                 queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
@@ -116,7 +116,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.stateName != :initial and model.stateName != :inProgress order by id asc");
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.stateName != :initial and model.stateName != :inProgress order by model.number asc");
                 queryObject.setEntity("project", project);
                 queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
                 queryObject.setParameter("inProgress", ResultState.IN_PROGRESS.toString(), Hibernate.STRING);
