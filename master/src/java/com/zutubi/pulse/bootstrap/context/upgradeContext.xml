@@ -21,6 +21,8 @@
                 <ref local="flexibleConditionUpgrade"/>
                 <ref local="scmMonitorSchemaUpgrade"/>
                 <ref local="scmMonitorDataUpgrade"/>
+                <ref local="distributedSchemaUpgrade"/>
+                <ref local="distributedDataUpgrade"/>
             </list>
         </property>
     </bean>
@@ -76,6 +78,22 @@
 
     <bean id="scmMonitorDataUpgrade" class="com.zutubi.pulse.upgrade.tasks.ScmMonitorDataUpgradeTask" autowire="byName">
         <property name="buildNumber" value="1042"/>
+    </bean>
+
+    <bean id="distributedSchemaUpgrade" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="100999001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0100999001/BuildResult.hbm.xml</value>
+                <value>com/zutubi/pulse/upgrade/schema/build_0100999001/BuildSpecification.hbm.xml</value>
+                <value>com/zutubi/pulse/upgrade/schema/build_0100999001/Resource.hbm.xml</value>
+                <value>com/zutubi/pulse/upgrade/schema/build_0100999001/Slave.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="distributedDataUpgrade" class="com.zutubi.pulse.upgrade.tasks.DistributedUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="100999002"/>
     </bean>
 
 </beans>

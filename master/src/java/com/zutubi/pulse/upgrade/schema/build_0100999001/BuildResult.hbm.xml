@@ -33,13 +33,4 @@
 
     </class>
 
-    <class name="com.zutubi.pulse.model.RecipeResultNode" table="RECIPE_RESULT_NODE" lazy="false">
-
-        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
-            <generator class="hilo"/>
-        </id>
-
-        <property name="stage" type="string"/>
-    </class>
-
 </hibernate-mapping>

@@ -8,10 +8,6 @@
             <generator class="hilo"/>
         </id>
 
-        <component name="stage" class="com.zutubi.pulse.model.BuildStage">
-            <property name="name" type="string" length="255"/>
-        </component>
-
         <bag name="resourceRequirements" cascade="all-delete-orphan" table="RESOURCE_REQUIREMENTS" lazy="false">
             <key column="NODE_ID"/>
             <composite-element class="com.zutubi.pulse.model.ResourceRequirement">
