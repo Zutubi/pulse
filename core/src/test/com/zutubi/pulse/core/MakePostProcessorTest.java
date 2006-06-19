@@ -69,7 +69,7 @@ public class MakePostProcessorTest extends PulseTestCase
     private List<Feature> getFeatures(String name) throws URISyntaxException
     {
         MakePostProcessor pp = new MakePostProcessor();
-        URL url = getInputURL(name, ".txt");
+        URL url = getInputURL(name, "txt");
         File file = new File(url.toURI());
         StoredFileArtifact artifact = new StoredFileArtifact(file.getName());
         pp.process(file.getParentFile(), artifact, new CommandResult("w00t"));

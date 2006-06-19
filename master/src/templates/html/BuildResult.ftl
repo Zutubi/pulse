@@ -10,7 +10,6 @@ body {
 }
 
 h1 {
-    color: #bbb;
     font-size: 150%;
 }
 
@@ -122,7 +121,7 @@ pre.feature {
     </style>
 </head>
 <body>
-    <h1 style="font-size: 150%; color: #bbb">
+    <h1 style="font-size: 150%">
         project ::
         <a href="http://${hostname}/currentBuild.action?id=${result.project.id?c}">${result.project.name?html}</a> ::
         <a href="http://${hostname}/viewBuild.action?id=${result.id?c}">build ${result.number?c}</a>
@@ -139,6 +138,7 @@ pre.feature {
             [@contentHeader cc="id"/]
             [@contentHeader cc="status"/]
             [@contentHeader cc="spec"/]
+            [@contentHeader cc="reason"/]
             [@contentHeader cc="when"/]
             [@contentHeader cc="elapsed"/]
             <th class="content" colspan="3" style="border: 1px solid #bbb; padding: 4px; text-align: left;">actions</th>
@@ -148,6 +148,7 @@ pre.feature {
             [@classCell cc=result.number?c/]
             [@classCell cc=result.stateName?lower_case/]
             [@classCell cc=result.buildSpecification/]
+            [@classCell cc=result.reason.summary/]
             [@classCell cc=result.stamps.prettyStartTime/]
             [@classCell cc=result.stamps.prettyElapsed/]
             [@linkCell cc="view" url="http://${hostname}/viewBuild.action?id=${result.id?c}"/]
@@ -156,7 +157,36 @@ pre.feature {
         </tr>
     </table>
 </td></tr>
-
+<tr><td>
+    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
+        <tr>
+            <th class="heading" colspan="7" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
+                stages
+            </th>
+        </tr>
+        <tr>
+            [@contentHeader cc="stage"/]
+            [@contentHeader cc="recipe"/]
+            [@contentHeader cc="host"/]
+            [@contentHeader cc="status"/]
+            [@contentHeader cc="when"/]
+            [@contentHeader cc="elapsed"/]
+            <th class="content" colspan="1" style="border: 1px solid #bbb; padding: 4px; text-align: left;">actions</th>
+        </tr>
+[#list result.root.children as child]
+        <tr>
+            [#assign class = child.result.state.string]
+            [@classCell cc=child.stage/]
+            [@classCell cc=child.result.recipeNameSafe/]
+            [@classCell cc=child.hostSafe/]
+            [@classCell cc=child.result.stateName?lower_case/]
+            [@classCell cc=child.result.stamps.prettyStartTime/]
+            [@classCell cc=child.result.stamps.prettyElapsed/]
+            [@linkCell cc="view" url="http://${hostname}/commandLog.action?id=${result.id?c}&amp;selectedNode=${child.id?c}"/]
+        </tr>
+[/#list]
+    </table>
+</td></tr>
 [#if result.scmDetails?exists]
     [#assign changes = result.scmDetails.changelists]
 <tr><td>

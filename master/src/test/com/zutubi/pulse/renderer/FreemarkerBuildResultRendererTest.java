@@ -7,10 +7,8 @@ import com.zutubi.pulse.util.IOUtils;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
+import java.io.*;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,6 +16,8 @@ import java.util.List;
  */
 public class FreemarkerBuildResultRendererTest extends PulseTestCase
 {
+    private boolean generate = false;
+
     FreemarkerBuildResultRenderer renderer;
 
     protected void setUp() throws Exception
@@ -40,40 +40,40 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         super.tearDown();
     }
 
-    public void testBasicSuccess() throws IOException
+    public void testBasicSuccess() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
         createAndVerify("basic", "test.url:8080", result);
     }
 
-    public void testWithChanges() throws IOException
+    public void testWithChanges() throws Exception
     {
         BuildResult result = createBuildWithChanges();
 
         createAndVerify("changes", "another.url", result);
     }
 
-    public void testWithErrors() throws IOException
+    public void testWithErrors() throws Exception
     {
         errorsHelper("plain");
     }
 
-    public void testHTMLWithErrors() throws IOException
+    public void testHTMLWithErrors() throws Exception
     {
         errorsHelper("html");
     }
 
-    public void testWithFailures() throws IOException
+    public void testWithFailures() throws Exception
     {
         failuresHelper("plain");
     }
 
-    public void testHTMLWithFailures() throws IOException
+    public void testHTMLWithFailures() throws Exception
     {
         failuresHelper("html");
     }
 
-    private void errorsHelper(String type) throws IOException
+    private void errorsHelper(String type) throws Exception
     {
         BuildResult result = createBuildWithChanges();
         result.error("test error message");
@@ -111,7 +111,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         createAndVerify("errors", type, "another.url", result);
     }
 
-    private void failuresHelper(String type) throws IOException
+    private void failuresHelper(String type) throws Exception
     {
         BuildResult result = createSuccessfulBuild();
         result.failure("test failed tests");
@@ -202,12 +202,12 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         return result;
     }
 
-    protected void createAndVerify(String expectedName, String hostUrl, BuildResult result) throws IOException
+    protected void createAndVerify(String expectedName, String hostUrl, BuildResult result) throws Exception
     {
         createAndVerify(expectedName, "plain", hostUrl, result);
     }
 
-    protected void createAndVerify(String expectedName, String type, String hostUrl, BuildResult result) throws IOException
+    protected void createAndVerify(String expectedName, String type, String hostUrl, BuildResult result) throws IOException, URISyntaxException
     {
         String extension = "txt";
         if (type.equals("html"))
@@ -215,21 +215,42 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
             extension = "html";
         }
 
-        InputStream expectedStream = null;
-
-        try
+        if (generate)
         {
-            expectedStream = getInput(expectedName, extension);
+            File expected = getTestDataFile("master", expectedName, extension);
+            OutputStream outStream = null;
+            Writer writer = null;
 
-            StringWriter writer = new StringWriter();
-            renderer.render(hostUrl, result, type, writer);
-            String got = replaceTimestamps(writer.getBuffer().toString());
-            String expected = replaceTimestamps(IOUtils.inputStreamToString(expectedStream));
-            assertEquals(expected, got);
+            try
+            {
+                outStream = new FileOutputStream(expected);
+                writer = new OutputStreamWriter(outStream);
+                renderer.render(hostUrl, result, type, writer);
+            }
+            finally
+            {
+                IOUtils.close(outStream);
+                IOUtils.close(writer);
+            }
         }
-        finally
+        else
         {
-            IOUtils.close(expectedStream);
+            InputStream expectedStream = null;
+
+            try
+            {
+                expectedStream = getInput(expectedName, extension);
+
+                StringWriter writer = new StringWriter();
+                renderer.render(hostUrl, result, type, writer);
+                String got = replaceTimestamps(writer.getBuffer().toString());
+                String expected = replaceTimestamps(IOUtils.inputStreamToString(expectedStream));
+                assertEquals(expected, got);
+            }
+            finally
+            {
+                IOUtils.close(expectedStream);
+            }
         }
     }
 

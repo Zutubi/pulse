@@ -8,6 +8,15 @@ You can view the full build result at:
 
 http://${hostname}/viewBuild.action?id=${result.id?c}
 
+[#if result.reason?exists]
+Build reason: ${result.reason.summary}.
+
+[/#if]
+Build stages:
+[#list result.root.children as child]
+  * ${child.stage} :: ${child.result.recipeNameSafe}@${child.hostSafe} :: ${result.state.prettyString}
+[/#list]
+
 [#if result.scmDetails?exists]
     [#assign changes = result.scmDetails.changelists]
     [#if changes?size &gt; 0]

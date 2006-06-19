@@ -7,22 +7,30 @@ You can view the full build result at:
 
 http://host.url/viewBuild.action?id=11
 
+Build reason: trigger 'scm trigger'.
+
+Build stages:
+  * first stage :: first recipe@[pending] :: failure
+  * second stage :: second recipe@[pending] :: failure
+
 There were no new changes in this build.
 
 Error messages:
   * test failed tests
-  - first recipe
+  - stage first stage :: first recipe@[pending]
     * tests failed dude
-  - first recipe :: nested recipe
+  - stage first stage :: first recipe@[pending] :: stage nested
+    stage :: nested recipe@[pending]
     * tests failed nested dude
-  - second recipe
+  - stage second stage :: second recipe@[pending]
     * Command 'failing tests' failed
-  - second recipe :: failing tests
+  - stage second stage :: second recipe@[pending] :: failing tests
     * tests let me down
 
 
 Broken tests (total: 9, errors: 2, failures: 3):
-  - second recipe :: failing tests :: first-artifact
+  - second stage :: second recipe@[pending] :: failing tests ::
+    first-artifact
     first-artifact/testpath
     * root test suite
       total: 8, errors: 2, failures: 2
@@ -38,7 +46,8 @@ Broken tests (total: 9, errors: 2, failures: 3):
       the extreme but in this case just to wrap a bit
     * root test suite :: nested suite :: n2 error (error)
       short error
-  - second recipe :: failing tests :: second-artifact
+  - second stage :: second recipe@[pending] :: failing tests ::
+    second-artifact
     second-artifact/this/time/a/very/very/very/very/long/pathname/wh
     ich/will/look/ugly/i/have/no/doubt
     * test case at top level (failure)
