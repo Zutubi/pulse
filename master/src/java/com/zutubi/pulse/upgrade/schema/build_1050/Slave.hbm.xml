@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <class name="com.zutubi.pulse.model.Slave" table="SLAVE" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="name" column="NAME" type="string" length="255"/>
+
+        <property name="host" column="HOST" type="string" length="255"/>
+
+        <property name="port" column="PORT" type="int"/>
+
+    </class>
+
+    <query name="findSlaveByName"><![CDATA[
+        from Slave slave
+        where slave.name = :name
+    ]]></query>
+
+</hibernate-mapping>
