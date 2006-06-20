@@ -4,7 +4,10 @@ import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 
+import java.util.List;
 import java.util.Properties;
+import java.util.LinkedList;
+import java.util.Enumeration;
 
 /**
  * 
@@ -76,6 +79,71 @@ public abstract class Scm extends Entity implements Cloneable
     public void setMonitor(boolean b)
     {
         this.monitor = b;
+    }
+
+    /**
+     * Returns true if scm filtering is enabled for this scm, false otherwise.
+     *
+     * @return true if scm filtering is enabled.
+     */
+    public boolean isFilterEnabled()
+    {
+        return getFilteredPaths().size() > 0;
+    }
+
+    public List<String> getFilteredPaths()
+    {
+        // reconstruct the filter paths, or an empty list if no paths are stored.
+        Properties props = getProperties();
+        if (!props.containsKey("filters.length"))
+        {
+            return new LinkedList<String>();
+        }
+        int length = Integer.valueOf(props.getProperty("filters.length"));
+        List<String> paths = new LinkedList<String>();
+        for (int i = 0; i < length; i++)
+        {
+            paths.add(i, props.getProperty("filters." + i));
+        }
+        return paths;
+    }
+
+    public void setFilteredPaths(List<String> paths)
+    {
+        // we need to update the contents of the properties object.
+        Properties props = getProperties();
+
+        // remove any existing content.
+        Enumeration propertyNames = props.propertyNames();
+        while (propertyNames.hasMoreElements())
+        {
+            String name = (String) propertyNames.nextElement();
+            if (name.startsWith("filters"))
+            {
+                props.remove(name);
+            }
+        }
+
+        // add the new content.
+        props.setProperty("filters.length", Integer.toString(paths.size()));
+        int index = 0;
+        for (String path: paths)
+        {
+            props.put("filters." + index, path);
+            index++;
+        }
+    }
+
+    public boolean addExcludedPath(String str)
+    {
+        List<String> paths = getFilteredPaths();
+        if (!paths.contains(str))
+        {
+            paths.add(str);
+            setFilteredPaths(paths);
+            return true;
+        }
+        return false;
     }
 
     public Scm copy()

@@ -168,4 +168,14 @@
         where project.name = :name
     ]]></query>
 
+    <query name="findByScm"><![CDATA[
+        from Project project
+        where project.scm = :scm
+    ]]></query>
+
+    <query name="findByScmId"><![CDATA[
+        from Project project
+        where project.scm.id = :scmId
+    ]]></query>
+
 </hibernate-mapping>

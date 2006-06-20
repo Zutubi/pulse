@@ -282,6 +282,23 @@
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
+        <action name="filterScm" class="com.zutubi.pulse.web.project.ManageScmFiltersAction">
+            <result name="success" type="velocity">edit-scm-filters.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="addExcludedPath" class="com.zutubi.pulse.web.project.ManageScmFiltersAction" method="doAdd">
+            <result name="input" type="velocity">edit-scm-filters.vm</result>
+            <result name="success" type="velocity">edit-scm-filters.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="deleteExcludedPath" class="com.zutubi.pulse.web.project.ManageScmFiltersAction" method="doDelete">
+            <result name="input" type="velocity">edit-scm-filters.vm</result>
+            <result name="success" type="velocity">edit-scm-filters.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="editPulseFileDetails" class="com.zutubi.pulse.web.project.EditPulseFileDetailsAction">
             <result name="custom" type="chain">editCustomDetails!input</result>
             <result name="versioned" type="chain">editVersionedDetails!input</result>

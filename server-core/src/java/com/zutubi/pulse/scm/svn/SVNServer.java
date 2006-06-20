@@ -7,6 +7,8 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.FilepathFilter;
+import com.zutubi.pulse.scm.ScmFilepathFilter;
 import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationProvider;
@@ -36,6 +38,7 @@ public class SVNServer implements SCMServer
 {
     private static final int CHECKOUT_RETRIES = 1;
 
+    private List<String> excludedPaths;
     private SVNRepository repository;
     ISVNAuthenticationManager authenticationManager;
 
@@ -221,6 +224,11 @@ public class SVNServer implements SCMServer
         initialiseRepository(url);
     }
 
+    public void setExcludedPaths(List<String> excludedPaths)
+    {
+        this.excludedPaths = excludedPaths;
+    }
+
     //=======================================================================
     // SCMServer interface
     //=======================================================================
@@ -320,6 +328,8 @@ public class SVNServer implements SCMServer
             {
                 List<SVNLogEntry> logs = new LinkedList<SVNLogEntry>();
 
+                FilepathFilter filter = new ScmFilepathFilter(null);
+
                 repository.log(paths, logs, fromNumber, toNumber, true, true);
                 for (SVNLogEntry entry : logs)
                 {
@@ -335,10 +345,16 @@ public class SVNServer implements SCMServer
                     for (Object value : files.values())
                     {
                         SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
-                        list.addChange(new Change(entryPath.getPath(), list.getRevision().toString(), decodeAction(entryPath.getType())));
+                        if (filter.accept(entryPath.getPath()))
+                        {
+                            list.addChange(new Change(entryPath.getPath(), list.getRevision().toString(), decodeAction(entryPath.getType())));
+                        }
                     }
 
-                    result.add(list);
+                    if (list.getChanges().size() > 0)
+                    {
+                        result.add(list);
+                    }
                 }
             }
             catch (SVNException e)

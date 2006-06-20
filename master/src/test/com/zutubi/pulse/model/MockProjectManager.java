@@ -32,6 +32,11 @@ public class MockProjectManager implements ProjectManager
         return projects.get(id);
     }
 
+    public Project getProjectByScm(long scmId)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public List<Project> getAllProjects()
     {
         return new LinkedList<Project>(projects.values());

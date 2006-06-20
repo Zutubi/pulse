@@ -36,7 +36,7 @@
                           #contentCell("user.authentication.password")
 #end
                           #editCell("editUser!input.action?userId=$user.id" "edit_$!webwork.htmlEncode($user.login)")
-                          #deleteCell($confirmMessage "deleteUser.action?userId=$user.id" "delete_$!webwork.htmlEncode($user.login)")
+                          #deleteCell("delete_$!webwork.htmlEncode($user.login)" "deleteUser.action?userId=$user.id" $confirmMessage)
                       </tr>
                       #end
                   </table>

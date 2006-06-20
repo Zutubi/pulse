@@ -43,6 +43,11 @@ public class DefaultProjectManager implements ProjectManager
         return projectDao.findById(id);
     }
 
+    public Project getProjectByScm(long scmId)
+    {
+        return projectDao.findByScmId(scmId);
+    }
+
     public List<Project> getAllProjects()
     {
         return projectDao.findAll();

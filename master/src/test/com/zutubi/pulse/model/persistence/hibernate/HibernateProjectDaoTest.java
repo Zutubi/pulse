@@ -178,5 +178,31 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         commitAndRefreshTransaction();
         assertNotNull(projectDao.findByName("nameA"));
     }
+
+    public void testFindByScm()
+    {
+        // create the test project with a test scm.
+        Project project = new Project("test-project", "This is a test project");
+        project.setScm(new Svn());
+        projectDao.save(project);
+        commitAndRefreshTransaction();
+
+        // assert that we get the right project back.
+        assertNotNull(projectDao.findByScm(project.getScm()));
+        assertEquals(project.getId(), projectDao.findByScm(project.getScm()).getId());
+    }
+
+    public void testFindByScmId()
+    {
+        // create the test project with a test scm.
+        Project project = new Project("test-project", "This is a test project");
+        project.setScm(new Svn());
+        projectDao.save(project);
+        commitAndRefreshTransaction();
+
+        // assert that we get the right project back.
+        assertNotNull(projectDao.findByScmId(project.getScm().getId()));
+        assertEquals(project.getId(), projectDao.findByScmId(project.getScm().getId()).getId());
+    }
 }
 

@@ -23,7 +23,7 @@
     #if($agent.isSlave())
         #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
         #editCell("editAgent!input.action?id=$agent.id" "edit_$!webwork.htmlEncode($agent.name)")
-        #deleteCell($confirmMessage "deleteAgent.action?id=$agent.id" "delete_$!webwork.htmlEncode($agent.name)")
+        #deleteCell("delete_$!webwork.htmlEncode($agent.name)" "deleteAgent.action?id=$agent.id" $confirmMessage)
         #end
     #else
         #contentCell("empty.cell")

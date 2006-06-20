@@ -20,6 +20,8 @@ public interface ProjectManager extends EntityManager<Project>
 
     Project getProject(long id);
 
+    Project getProjectByScm(long scmId);
+
     List<Project> getAllProjects();
 
     List<Project> getProjectsWithNameLike(String s);

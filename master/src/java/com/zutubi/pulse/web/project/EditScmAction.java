@@ -9,7 +9,6 @@ import com.zutubi.pulse.model.*;
 public class EditScmAction extends ProjectActionSupport
 {
     private long id;
-    private Project project;
 
     public long getId()
     {
@@ -21,15 +20,8 @@ public class EditScmAction extends ProjectActionSupport
         this.id = id;
     }
 
-    public Project getProject()
-    {
-        return project;
-    }
-
     public String doInput()
     {
-        project = getProjectManager().getProject(projectId);
-
         Scm scm = getScmManager().getScm(id);
         if (scm == null)
         {

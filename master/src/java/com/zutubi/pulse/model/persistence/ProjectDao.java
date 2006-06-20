@@ -14,6 +14,10 @@ public interface ProjectDao extends EntityDao<Project>
 
     List<Project> findByLikeName(String name);
 
+    Project findByScm(Scm scm);
+    
+    Project findByScmId(long id);
+
     void save(VersionedPulseFileDetails details);
 
     VersionedPulseFileDetails findVersionedPulseFileDetails(long id);

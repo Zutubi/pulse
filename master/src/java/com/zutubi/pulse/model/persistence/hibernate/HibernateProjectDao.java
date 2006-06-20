@@ -29,6 +29,16 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
         return findByNamedQuery("findByLikeName", "name", name);
     }
 
+    public Project findByScm(Scm scm)
+    {
+        return (Project) findUniqueByNamedQuery("findByScm", "scm", scm);
+    }
+
+    public Project findByScmId(long id)
+    {
+        return (Project) findUniqueByNamedQuery("findByScmId", "scmId", id);
+    }
+
     public void save(VersionedPulseFileDetails details)
     {
         getHibernateTemplate().saveOrUpdate(details);

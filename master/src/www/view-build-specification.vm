@@ -15,7 +15,7 @@
             #dynamicCell($resource.version)
         #acl("domainObject=project" "hasPermission=4,1")
             #editCell("editBuildStageResource!input.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id&amp;index=$velocityCount" "edit_resource_${node.id}_${velocityCount}")
-            #deleteCell($confirmMessage "deleteBuildStageResource.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id&amp;index=$velocityCount" "delete_resource_${node.id}_${velocityCount}")
+            #deleteCell("delete_resource_${node.id}_${velocityCount}" "deleteBuildStageResource.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id&amp;index=$velocityCount" $confirmMessage)
         #end
         </tr>
     #end

@@ -8,6 +8,7 @@ import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.scm.CachingSCMServer;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMFileCache;
+import com.zutubi.pulse.scm.ScmFilepathFilter;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -58,6 +59,12 @@ public class P4Server extends CachingSCMServer
     private String port;
     private Pattern lineSplitterPattern;
     private Pattern syncPattern;
+    private List<String> excludedPaths;
+
+    public void setExcludedPaths(List<String> filteredPaths)
+    {
+        this.excludedPaths = filteredPaths;
+    }
 
     private class P4Result
     {
@@ -681,13 +688,23 @@ public class P4Server extends CachingSCMServer
         revision.setComment(comment);
         // branch??
 
+        ScmFilepathFilter filter = new ScmFilepathFilter(this.excludedPaths);
         Changelist changelist = new Changelist(getUid(), revision);
 
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {
-            changelist.addChange(getChangelistChange(lines[i]));
+            Change change = getChangelistChange(lines[i]);
+            if (filter.accept(change.getFilename()))
+            {
+                changelist.addChange(change);
+            }
         }
 
+        // if all of the changes have been filtered out, then there is no changelist so we return null.
+        if (changelist.getChanges().size() == 0)
+        {
+            return null;
+        }
         return changelist;
     }
 
@@ -936,6 +953,7 @@ public class P4Server extends CachingSCMServer
         try
         {
             String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
+            // we need to take into account file filtering, so unfortunately it is no longer as simple as this...
             return getLatestRevisionForFiles(clientName, root).getRevisionNumber() > ((NumericalRevision) since).getRevisionNumber();
         }
         finally

@@ -24,18 +24,19 @@
                 </table>
 
             <!-- SCM configuration -->
-
                 <table id="project.scm" class="fill-content">
                     #aclEditHeadingRow("project.scm" 2 "editScm!input.action?id=$project.scm.id&amp;projectId=$project.id" "project.scm.edit" "project")
                     #scmRow($project)
                     #dynamicRow("scm.location" "$project.scm.createServer().location")
                     #dynamicRow("scm.monitor" "$project.scm.monitor")
+                    #enabledDisabledRow("scm.filters" $project.scm.filterEnabled)
 #acl("domainObject=project" "hasPermission=4,1")
                     <tr>
                         #contentRowHeading("actions")
                         <td class="content">
                             <a href="#" onclick="window.open('/popups/viewScmInfo.action?id=$project.id', 'scm info', 'status=yes,resizable=yes,top=100,left=100,width=600,height=400,scrollbars=yes'); return false;">#wwtext("name=scm.info")</a>
                             | <a href="browseProjectScm.action?id=$project.id">#wwtext("name=scm.browse")</a>
+                            | <a id="project.scm.filter" href="filterScm.action?id=$project.scm.id&projectId=$project.id">#wwtext("name=scm.filters")</a>
                         </td>
                     </tr>
 #end
@@ -102,7 +103,7 @@
                         #dynamicCell($capture.type)
         #acl("domainObject=project" "hasPermission=4,1")
                         #editCell("editArtifact!input.action?projectId=$project.id&amp;id=$capture.id" "edit_$!webwork.htmlEncode($capture.name)")
-                        #deleteCell($confirmMessage "deleteArtifact.action?projectId=$project.id&amp;id=$capture.id" "delete_$!webwork.htmlEncode($capture.name)")
+                        #deleteCell("delete_$!webwork.htmlEncode($capture.name)" "deleteArtifact.action?projectId=$project.id&amp;id=$capture.id" $confirmMessage)
         #end
                      </tr>
     #end
@@ -137,7 +138,7 @@
         #acl("domainObject=project" "hasPermission=4,1")
                         #actionCell("buildspec.trigger" "triggerBuild.action?id=$buildSpec.id&amp;projectId=$project.id" "lightning.gif")
                         #editCell("viewBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id" "edit_$!webwork.htmlEncode($buildSpec.name)")
-                        #deleteCell($confirmMessage "deleteBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id" "delete_$!webwork.htmlEncode($buildSpec.name)")
+                        #deleteCell("delete_$!webwork.htmlEncode($buildSpec.name)" "deleteBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id" $confirmMessage )
         #end
                     </tr>
     #end
@@ -170,7 +171,7 @@
                         #dynamicCell($trigger.dataMap.spec)
         #acl("domainObject=project" "hasPermission=4,1")
                         #editCell("editTrigger!input.action?id=$trigger.id&amp;projectId=$project.id" "edit_$!webwork.htmlEncode($trigger.name)")
-                        #deleteCell($confirmMessage "deleteTrigger.action?id=$trigger.id" "delete_$!webwork.htmlEncode($trigger.name)")
+                        #deleteCell("delete_$!webwork.htmlEncode($trigger.name)" "deleteTrigger.action?id=$trigger.id" $confirmMessage )
         #end
                     </tr>
     #end
@@ -207,7 +208,7 @@
                         #contentCell($rule.prettyWhen)
         #acl("domainObject=project" "hasPermission=4,1")
                         #editCell("editCleanupRule!input.action?projectId=$project.id&amp;id=$rule.id" "edit_cleanup_$rule.id")
-                        #deleteCell($confirmMessage "deleteCleanupRule.action?projectId=$project.id&amp;id=$rule.id" "delete_cleanup_$rule.id")
+                        #deleteCell("delete_cleanup_$rule.id" "deleteCleanupRule.action?projectId=$project.id&amp;id=$rule.id" $confirmMessage)
         #end
                     </tr>
     #end

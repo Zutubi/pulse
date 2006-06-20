@@ -986,6 +986,50 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertProjectCvsTable("cvs", TEST_CVSROOT + "[module]");
     }
 
+    /**
+     * Test that by default, the scm filters row in the scm table on the project configuration page
+     * shows that filters are disabled.
+     */
+    public void testScmFilterDefaultDisplay()
+    {
+        assertTablePresent("project.scm");
+        assertTableRowEqual("project.scm", 4, new String[]{"filters", "disabled"});
+    }
+
+    public void testScmFilterAddDeleteExclusion()
+    {
+        clickLink("project.scm.filter");
+
+        assertTextNotPresent("some/path/to/exclude/**");
+
+        // assert that the form is present.
+        AddScmFilterForm form = new AddScmFilterForm(tester);
+        form.assertFormPresent();
+        form.addFormElements("some/path/to/exclude/**");
+
+        // assert that the data is now in the table
+        assertTableRowEqual("scm.filters", 2, new String[]{"some/path/to/exclude/**", "delete"});
+
+        // assert that the form has reset itself.
+        form.assertFormElements("");
+
+        // now ensure that we can delete it.
+        clickLink("delete_0");
+        assertTextNotPresent("some/path/to/exclude/**");
+    }
+
+    public void testScmFilterAddValidation()
+    {
+        clickLink("project.scm.filter");
+
+        AddScmFilterForm form = new AddScmFilterForm(tester);
+        form.assertFormPresent();
+        form.addFormElements("");
+
+        // assert that the table contains no data.
+        assertLinkNotPresent("delete_0");
+    }
+
     private String nukeIds(String text)
     {
         text = text.replaceAll("href=\"[^\"]*\"", "");
@@ -994,26 +1038,6 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         text = text.replaceAll("id=\"[^\"]*\"", "");
         return text;
     }
-
-/*
-
-    public void testDeleteBuildSpec()
-    {
-        // not yet implemented.
-
-        // - delete build spec with associated trigger - ensure trigger deleted.
-    }
-
-    public void testEditBuildSpec()
-    {
-        // not yet implemented.
-    }
-
-    public void testDeleteProject()
-    {
-        // not yet implemented.
-    }
-*/
 
     private void assertProjectSpecificsTable(String type, String file)
     {

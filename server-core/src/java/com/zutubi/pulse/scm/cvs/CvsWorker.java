@@ -191,12 +191,12 @@ public class CvsWorker
 
         String dateFilter = "";
         String del = "<=";
-        if (from.getDate() != null)
+        if (from != null && from.getDate() != null)
         {
             dateFilter = SERVER_DATE.format(from.getDate()) + del;
             del = "";
         }
-        if (to.getDate() != null)
+        if (to != null && to.getDate() != null)
         {
             dateFilter += del + SERVER_DATE.format(to.getDate());
         }

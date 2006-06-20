@@ -2,6 +2,7 @@ package com.zutubi.pulse.command;
 
 import org.apache.commons.cli.*;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  * The start command is used as the entry point to starting the system.
@@ -10,6 +11,8 @@ import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
  */
 public class StartCommand implements Command
 {
+    private static final Logger LOG = Logger.getLogger(StartCommand.class);
+
     public void parse(String argv[]) throws ParseException
     {
         Options options = new Options();
@@ -27,6 +30,7 @@ public class StartCommand implements Command
         }
         catch (Exception e)
         {
+            LOG.error(e);
             return 1;
         }
     }

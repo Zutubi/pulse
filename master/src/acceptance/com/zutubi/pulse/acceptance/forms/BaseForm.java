@@ -69,6 +69,12 @@ public abstract class BaseForm
         return null;
     }
 
+    public void addFormElements(String... args)
+    {
+        setFormElements(args);
+        tester.submit("add");
+    }
+
     public void saveFormElements(String... args)
     {
         setFormElements(args);

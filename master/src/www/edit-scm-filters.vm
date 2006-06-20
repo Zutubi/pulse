@@ -1,0 +1,56 @@
+#helpTag("CVS")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=edit.cvs")</title>
+</head>
+<body>
+    #projectTabs("configuration")
+
+    #parse("/template/includes/actionerrors.vm")
+
+    <table class="columns" width="98%">
+        <tr>
+            <td class="columns" width="50%">
+                <table id="scm.filters"  class="fill-content">
+                    #headingRow("scm.filters" 2)
+                    <tr>
+                        #contentHeading("scm.filters.excluded.paths" 1)
+                        #contentHeading("actions" 1)
+                    </tr>
+                    #if($project.scm.filteredPaths.size() > 0)
+                        #foreach($path in $project.scm.filteredPaths)
+                    <tr>
+                        #set($index = $velocityCount - 1)
+                        #contentCell("$path")
+                        #deleteCell("delete_$index" "deleteExcludedPath.action?id=$id&projectId=$projectId&index=$index" "")
+                    </tr>
+                        #end
+                    #end
+                    <tr>
+                        <form action="addExcludedPath.action" id="scm.filter.excluded.add" method="post">
+                            #wwhidden("name=id")
+                            #wwhidden("name=projectId")
+                        <td  class="content">
+                            #wwtextfield("theme=simple" "template=ctext" "name=excludedPath" "size=60" "tabindex=1")
+                        </td>
+                        <td  class="content">
+                            <a id="add" href="#" onclick="document.forms[0].submit(); return false;"><img alt="add" src="/images/add.gif"/> #wwtext("name=add.name")</a>
+                        </td>
+
+                        </form>
+                    </tr>
+                </table>
+                <p>
+                    Go back to <a href="configureProject.action?id=$projectId">project configuration</a>.
+                </p>
+            </td>
+            <td></td>
+
+        </tr>
+    </table>
+
+
+</body>
+</html>

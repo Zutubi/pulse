@@ -8,9 +8,7 @@ import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.model.Cvs;
-import com.zutubi.pulse.scm.CachingSCMServer;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMFileCache;
+import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.scm.cvs.client.CvsClient;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -21,9 +19,7 @@ import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * The Cvs Server provides all interactions with a cvs repository.
@@ -35,6 +31,11 @@ public class CvsServer extends CachingSCMServer
     private static final Logger LOG = Logger.getLogger(CvsServer.class);
 
     private CvsWorker cvs;
+
+    /**
+     * A list of ant style path expressions that define what should be excluded from being considered as a change.
+     */
+    private List<String> excludedPaths = new LinkedList<String>();
 
     public CvsServer(String root, String module, String password, String branch)
     {
@@ -48,8 +49,27 @@ public class CvsServer extends CachingSCMServer
     public CvsServer(Cvs cvs)
     {
         this(cvs.getRoot(), cvs.getModule(), cvs.getPassword(), cvs.getBranch());
+        setExcludedPaths(cvs.getFilteredPaths());
     }
 
+    public void setExcludedPaths(List<String> excluded)
+    {
+        this.excludedPaths = excluded;
+    }
+
+    /**
+     * Get access to the servers properties. These include:
+     * <ul>
+     * <li>location: the location property.</li>
+     * <li>version: the version of the remote server.</li>
+     * </ul>
+     *
+     * @return
+     *
+     * @see #getLocation()
+     *
+     * @throws SCMException
+     */
     public Map<String, String> getServerInfo() throws SCMException
     {
         Map<String, String> info = new TreeMap<String, String>();
@@ -58,6 +78,11 @@ public class CvsServer extends CachingSCMServer
         return info;
     }
 
+    /**
+     * Returns the unique identifier for this scm server. For CVS servers, this is the cvs root.
+     *
+     * @see com.zutubi.pulse.scm.SCMServer#getUid()
+     */
     public String getUid()
     {
         return getRoot();
@@ -70,21 +95,41 @@ public class CvsServer extends CachingSCMServer
         return buffer.toString();
     }
 
+    /**
+     * Get the configured cvs root property.
+     *
+     * @return cvs root.
+     */
     public String getRoot()
     {
         return cvs.getRoot();
     }
 
+    /**
+     * Get the configured cvs password property.
+     *
+     * @return connection password.
+     */
     public String getPassword()
     {
         return cvs.getPassword();
     }
 
+    /**
+     * Get the configured cvs module property.
+     *
+     * @return module
+     */
     public String getModule()
     {
         return cvs.getModule();
     }
 
+    /**
+     * Get the branch to which this cvs server instance is bound.
+     *
+     * @return branch name.
+     */
     public String getBranch()
     {
         return cvs.getBranch();
@@ -93,51 +138,16 @@ public class CvsServer extends CachingSCMServer
     /**
      * Run some diagnostics on the cvs configuration.
      *
-     * @throws SCMException
+     * @throws SCMException is thrown if there is a problem with the server connection or configuration that
+     * prevents us from querying the cvs repository.
      */
     public void testConnection() throws SCMException
     {
-        // Check the connection to the cvs repository. This covers the cvs root and authentication.
+        // Check the connection to the cvs repository.  This covers the cvs root and authentication.
         cvs.testConnection();
 
         // Check that the module is valid.
         checkModuleIsValid();
-    }
-
-    /**
-     * Check that the module is valid.
-     *
-     * @throws SCMException
-     */
-    private void checkModuleIsValid() throws SCMException
-    {
-        File tmpDir = null;
-        try
-        {
-            tmpDir = createTemporaryDirectory();
-
-            cvs.checkout(tmpDir, CvsRevision.HEAD, getModule());
-
-            // check that something was checked out.
-            if (tmpDir.list().length == 0)
-            {
-                throw new SCMException("failed to locate the module " + getModule());
-            }
-        }
-        catch (IOException e)
-        {
-            throw new SCMException(e);
-        }
-        finally
-        {
-            // and lets not forget to clean up after ourselves.
-            FileSystemUtils.removeDirectory(tmpDir);
-        }
-    }
-
-    private File createTemporaryDirectory() throws IOException
-    {
-        return FileSystemUtils.createTempDirectory("cvs", "checkout", tmpSpace);
     }
 
     /**
@@ -153,6 +163,11 @@ public class CvsServer extends CachingSCMServer
         cvs.update(workingDirectory, (CvsRevision) rev);
     }
 
+    /**
+     * Returns true since this scm implementation supports the update command.
+     *
+     * @return true.
+     */
     public boolean supportsUpdate()
     {
         return true;
@@ -165,27 +180,6 @@ public class CvsServer extends CachingSCMServer
         cvs.checkout(toDirectory, (CvsRevision)revision);
 
         return revision;
-    }
-
-    /**
-     * Throw an IllegalArgumentException if either of the following are true:
-     * <ul>
-     * <li>The revision is null</li>
-     * <li>The revision is not of type CvsRevision</li>
-     * </ul>
-     *
-     * @param r
-     */
-    private void assertRevisionArgValid(Revision r)
-    {
-        if (r == null)
-        {
-            throw new IllegalArgumentException("Revision is a required argument.");
-        }
-        if (!(r instanceof CvsRevision))
-        {
-            throw new IllegalArgumentException("Unsupported revision type: " + r.getClass() + ".");
-        }
     }
 
     public String checkout(long id, Revision revision, String file) throws SCMException
@@ -248,18 +242,44 @@ public class CvsServer extends CachingSCMServer
 
         List<Changelist> changes = cvs.getChangesBetween(getUid(), (CvsRevision)from, (CvsRevision)to);
 
-        // ensure that the lower bound of the changes is excluded.
+        // process excludes from the changelist.
+        changes = filterExcludes(changes, new ScmFilepathFilter(excludedPaths));
+
         if (changes.size() == 0)
         {
             return changes;
         }
 
+        // ensure that the lower bound of the changes is excluded.
         Changelist firstChange = changes.get(0);
         if (firstChange.getRevision().compareTo(from) == 0)
         {
             return changes.subList(1, changes.size());
         }
         return changes;
+    }
+
+    private List<Changelist> filterExcludes(List<Changelist> changelists, FilepathFilter filter)
+    {
+        Iterator<Changelist> changelist = changelists.iterator();
+        while (changelist.hasNext())
+        {
+            Changelist ch = changelist.next();
+            Iterator<Change> i = ch.getChanges().iterator();
+            while (i.hasNext())
+            {
+                Change c = i.next();
+                if (filter != null && !filter.accept(c.getFilename()))
+                {
+                    i.remove();
+                }
+            }
+            if (ch.getChanges().size() == 0)
+            {
+                changelist.remove();
+            }
+        }
+        return changelists;
     }
 
     /**
@@ -277,7 +297,9 @@ public class CvsServer extends CachingSCMServer
             throw new IllegalArgumentException("since revision date can not be null.");
         }
 
-        return cvs.getLatestChange(getUid(), (CvsRevision)since) != null;
+        List<Changelist> changelists = getChanges(since, null);
+        changelists = filterExcludes(changelists, new ScmFilepathFilter(excludedPaths));
+        return changelists.size() > 0;
     }
 
     public CvsRevision getLatestRevision() throws SCMException
@@ -352,4 +374,62 @@ public class CvsServer extends CachingSCMServer
             return false;
         }
     }
+
+    /**
+     * Check that the module is valid.
+     *
+     * @throws SCMException
+     */
+    private void checkModuleIsValid() throws SCMException
+    {
+        File tmpDir = null;
+        try
+        {
+            tmpDir = createTemporaryDirectory();
+
+            cvs.checkout(tmpDir, CvsRevision.HEAD, getModule());
+
+            // check that something was checked out.
+            if (tmpDir.list().length == 0)
+            {
+                throw new SCMException("failed to locate the module " + getModule());
+            }
+        }
+        catch (IOException e)
+        {
+            throw new SCMException(e);
+        }
+        finally
+        {
+            // and lets not forget to clean up after ourselves.
+            FileSystemUtils.removeDirectory(tmpDir);
+        }
+    }
+
+    private File createTemporaryDirectory() throws IOException
+    {
+        return FileSystemUtils.createTempDirectory("cvs", "checkout", tmpSpace);
+    }
+
+    /**
+     * Throw an IllegalArgumentException if either of the following are true:
+     * <ul>
+     * <li>The revision is null</li>
+     * <li>The revision is not of type CvsRevision</li>
+     * </ul>
+     *
+     * @param r
+     */
+    private void assertRevisionArgValid(Revision r)
+    {
+        if (r == null)
+        {
+            throw new IllegalArgumentException("Revision is a required argument.");
+        }
+        if (!(r instanceof CvsRevision))
+        {
+            throw new IllegalArgumentException("Unsupported revision type: " + r.getClass() + ".");
+        }
+    }
+
 }
