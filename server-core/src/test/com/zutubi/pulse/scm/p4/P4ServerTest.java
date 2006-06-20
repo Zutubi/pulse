@@ -3,10 +3,10 @@ package com.zutubi.pulse.scm.p4;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,20 +17,31 @@ import java.util.List;
  */
 public class P4ServerTest extends PulseTestCase
 {
-    P4Server server;
+    private P4Server server;
     private File tmpDir;
+    private File repoDir;
+    private File workDir;
+    private Process p4dProcess;
     private boolean generateMode = false;
 
     protected void setUp() throws Exception
     {
         super.setUp();
         tmpDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
+
+        repoDir = new File(tmpDir, "repo");
+        FileSystemUtils.copyRecursively(new File(getDataRoot(), "repo"), repoDir);
+
+        p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath()});
+        workDir = new File(tmpDir, "work");
+        workDir.mkdirs();
     }
 
     protected void tearDown() throws Exception
     {
         server = null;
-        FileSystemUtils.removeDirectory(tmpDir);
+        p4dProcess.destroy();
+        removeDirectory(tmpDir);
         super.tearDown();
     }
 
@@ -50,7 +61,7 @@ public class P4ServerTest extends PulseTestCase
     {
         getServer("depot-client");
         List<Change> changes = new LinkedList<Change>();
-        NumericalRevision revision = (NumericalRevision) server.checkout(randomInt(), tmpDir, null, changes);
+        NumericalRevision revision = (NumericalRevision) server.checkout(randomInt(), workDir, null, changes);
         assertEquals(8, revision.getRevisionNumber());
 
         assertEquals(10, changes.size());
@@ -83,7 +94,7 @@ public class P4ServerTest extends PulseTestCase
     public void testCheckoutRevision() throws Exception
     {
         getServer("depot-client");
-        NumericalRevision revision = (NumericalRevision) server.checkout(randomInt(), tmpDir, new NumericalRevision(1), null);
+        NumericalRevision revision = (NumericalRevision) server.checkout(randomInt(), workDir, new NumericalRevision(1), null);
         assertEquals(1, revision.getRevisionNumber());
         checkDirectory("checkoutRevision");
     }
@@ -232,6 +243,49 @@ public class P4ServerTest extends PulseTestCase
         assertFalse(remoteFile.isDirectory());
     }
 
+    public void testTag() throws SCMException
+    {
+        getServer("test-client");
+        assertFalse(server.labelExists("test-client", "test-tag"));
+        server.tag(new NumericalRevision(5), "test-tag", false);
+        assertTrue(server.labelExists("test-client", "test-tag"));
+        P4Server.P4Result result = server.runP4(null, "p4", "-c", "test-client", "sync", "-f", "-n", "@test-tag");
+        assertTrue(result.stdout.toString().contains("//depot2/file9#1"));
+    }
+
+    public void testMoveTag() throws SCMException
+    {
+        testTag();
+        server.tag(new NumericalRevision(7), "test-tag", true);
+        assertTrue(server.labelExists("test-client", "test-tag"));
+        P4Server.P4Result result = server.runP4(null, "p4", "-c", "test-client", "sync", "-f", "-n", "@test-tag");
+        assertTrue(result.stdout.toString().contains("//depot2/file9#2"));
+    }
+
+    public void testUnmovableTag() throws SCMException
+    {
+        getServer("test-client");
+        server.tag(new NumericalRevision(5), "test-tag", false);
+        assertTrue(server.labelExists("test-client", "test-tag"));
+        try
+        {
+            server.tag(new NumericalRevision(7), "test-tag", false);
+            fail();
+        }
+        catch(SCMException e)
+        {
+            assertEquals(e.getMessage(), "Cannot create label 'test-tag': label already exists");
+        }
+    }
+
+    public void testTagSameRevision() throws SCMException
+    {
+        getServer("test-client");    
+        server.tag(new NumericalRevision(5), "test-tag", false);
+        assertTrue(server.labelExists("test-client", "test-tag"));
+        server.tag(new NumericalRevision(5), "test-tag", true);
+    }
+
     private void getServer(String client)
     {
         server = new P4Server(":1666", "test-user", "", client);
@@ -250,11 +304,11 @@ public class P4ServerTest extends PulseTestCase
 
         if (generateMode)
         {
-            tmpDir.renameTo(expectedDir);
+            workDir.renameTo(expectedDir);
         }
         else
         {
-            assertDirectoriesEqual(expectedDir, tmpDir);
+            assertDirectoriesEqual(expectedDir, workDir);
         }
     }
 

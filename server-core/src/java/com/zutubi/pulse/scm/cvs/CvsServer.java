@@ -173,6 +173,12 @@ public class CvsServer extends CachingSCMServer
         return true;
     }
 
+    public void tag(Revision revision, String name, boolean moveExisting) throws SCMException
+    {
+        assertRevisionArgValid(revision);
+        cvs.tag((CvsRevision) revision, name, moveExisting);
+    }
+
     public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
     {
         assertRevisionArgValid(revision);

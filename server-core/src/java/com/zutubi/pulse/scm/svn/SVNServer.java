@@ -5,10 +5,11 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
+import com.zutubi.pulse.scm.FilepathFilter;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
-import com.zutubi.pulse.scm.FilepathFilter;
 import com.zutubi.pulse.scm.ScmFilepathFilter;
+import com.zutubi.pulse.util.logging.Logger;
 import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationProvider;
@@ -18,9 +19,7 @@ import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
-import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc.SVNUpdateClient;
-import org.tmatesoft.svn.core.wc.SVNWCUtil;
+import org.tmatesoft.svn.core.wc.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,6 +35,7 @@ import java.util.TreeMap;
  */
 public class SVNServer implements SCMServer
 {
+    private static final Logger LOG = Logger.getLogger(SCMServer.class);
     private static final int CHECKOUT_RETRIES = 1;
 
     private List<String> excludedPaths;
@@ -54,7 +54,7 @@ public class SVNServer implements SCMServer
      */
     private SCMException convertException(SVNException e)
     {
-        e.printStackTrace();
+        LOG.error(e);
         return new SCMException(e.getMessage(), e);
     }
 
@@ -467,6 +467,37 @@ public class SVNServer implements SCMServer
     public boolean supportsUpdate()
     {
         return false;
+    }
+
+    public void tag(Revision revision, String name, boolean moveExisting) throws SCMException
+    {
+        try
+        {
+            SVNURL svnUrl = SVNURL.parseURIEncoded(name);
+            SVNRepository repo = SVNRepositoryFactory.create(svnUrl);
+            repo.setAuthenticationManager(authenticationManager);
+            SVNDirEntry dir = repo.info("", SVNRevision.HEAD.getNumber());
+            if(dir != null)
+            {
+                if(moveExisting)
+                {
+                    // Delete existing path
+                    SVNCommitClient commitClient = new SVNCommitClient(authenticationManager, null);
+                    commitClient.doDelete(new SVNURL[]{ svnUrl }, "[pulse] deleting old tag");
+                }
+                else
+                {
+                    throw new SCMException("Unable to apply tag: path '" + name + "' already exists in the repository");
+                }
+            }
+
+            SVNCopyClient copyClient = new SVNCopyClient(authenticationManager, null);
+            copyClient.doCopy(repository.getLocation(), convertRevision(revision), svnUrl, false, "[pulse] applying tag");
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
     }
 
     //=======================================================================

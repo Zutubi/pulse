@@ -36,6 +36,9 @@ public class P4Server extends CachingSCMServer
     private static final String COMMAND_DESCRIBE = "describe";
     private static final String COMMAND_FILES = "files";
     private static final String COMMAND_INFO = "info";
+    private static final String COMMAND_LABEL = "label";
+    private static final String COMMAND_LABELS = "labels";
+    private static final String COMMAND_LABELSYNC = "labelsync";
     private static final String COMMAND_SYNC = "sync";
     private static final String COMMAND_WHERE = "where";
     private static final String FLAG_CLIENT = "-c";
@@ -43,6 +46,7 @@ public class P4Server extends CachingSCMServer
     private static final String FLAG_DELETE = "-d";
     private static final String FLAG_FORCE = "-f";
     private static final String FLAG_INPUT = "-i";
+    private static final String FLAG_LABEL = "-l";
     private static final String FLAG_MAXIMUM = "-m";
     private static final String FLAG_OUTPUT = "-o";
     private static final String FLAG_PREVIEW = "-n";
@@ -66,7 +70,7 @@ public class P4Server extends CachingSCMServer
         this.excludedPaths = filteredPaths;
     }
 
-    private class P4Result
+    class P4Result
     {
         public StringBuffer stdout;
         public StringBuffer stderr;
@@ -81,12 +85,12 @@ public class P4Server extends CachingSCMServer
         }
     }
 
-    private P4Result runP4(String input, String ...commands) throws SCMException
+    P4Result runP4(String input, String ...commands) throws SCMException
     {
         return runP4(true, input, commands);
     }
 
-    private P4Result runP4(boolean throwOnStderr, String input, String ...commands) throws SCMException
+    P4Result runP4(boolean throwOnStderr, String input, String ...commands) throws SCMException
     {
         P4Result result = new P4Result();
         Process child;
@@ -237,7 +241,9 @@ public class P4Server extends CachingSCMServer
                     localFile = localFile.substring((int) clientRoot.getAbsolutePath().length());
                 }
 
-                if(localFile.startsWith("/") || localFile.startsWith("\\"))
+                // Separators must be normalised
+                localFile = localFile.replace('\\', '/');
+                if(localFile.startsWith("/"))
                 {
                     localFile = localFile.substring(1);
                 }
@@ -975,6 +981,53 @@ public class P4Server extends CachingSCMServer
     public boolean supportsUpdate()
     {
         return false;
+    }
+
+    public void tag(Revision revision, String name, boolean moveExisting) throws SCMException
+    {
+        String clientName = updateClient(0, null);
+        try
+        {
+            if(!labelExists(clientName, name))
+            {
+                createLabel(clientName, name);
+            }
+            else if(!moveExisting)
+            {
+                throw new SCMException("Cannot create label '" + name + "': label already exists");
+            }
+
+            runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_LABELSYNC, FLAG_LABEL, name, clientRoot.getAbsoluteFile() + "/...@" + revision.toString());
+        }
+        finally
+        {
+            deleteClient(clientName);
+        }
+    }
+
+    public boolean labelExists(String client, String name) throws SCMException
+    {
+        P4Result p4Result = runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABELS);
+
+        // $ p4 labels
+        // Label jim 2006/06/20 'Created by Jason. '
+        Pattern splitter = Pattern.compile("^Label (.+) [0-9/]+ '.*'$", Pattern.MULTILINE);
+        Matcher matcher = splitter.matcher(p4Result.stdout);
+        while (matcher.find())
+        {
+            if(matcher.group(1).equals(name))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void createLabel(String client, String name) throws SCMException
+    {
+        P4Result p4Result = runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABEL, FLAG_OUTPUT, name);
+        runP4(p4Result.stdout.toString(), P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABEL, FLAG_INPUT);
     }
 
     public static void main(String argv[])

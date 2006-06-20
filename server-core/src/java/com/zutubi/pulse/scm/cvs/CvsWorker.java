@@ -12,6 +12,7 @@ import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
+import org.netbeans.lib.cvsclient.command.tag.RtagCommand;
 import org.netbeans.lib.cvsclient.command.update.UpdateCommand;
 
 import java.io.File;
@@ -406,4 +407,29 @@ public class CvsWorker
         return new VersionCommand();
     }
 
+    public void tag(CvsRevision revision, String name, boolean moveExisting) throws SCMException
+    {
+        LOG.entering();
+
+        RtagCommand tag = new RtagCommand();
+        tag.setModules(new String[] { module });
+
+        if(TextUtils.stringSet(branch))
+        {
+            tag.setTagByRevision(branch);
+        }
+        
+        if (revision.getDate() != null)
+        {
+            tag.setTagByDate(SERVER_DATE.format(revision.getDate()));
+        }
+
+        tag.setTag(name);
+        tag.setOverrideExistingTag(moveExisting);
+
+        CvsClient client = getClient();
+        client.executeCommand(tag);
+
+        LOG.exiting();
+    }
 }
