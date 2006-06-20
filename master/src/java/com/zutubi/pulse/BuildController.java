@@ -459,6 +459,12 @@ public class BuildController implements EventListener
         buildResult.abortUnfinishedRecipes();
         tree.cleanup(buildResult);
         buildResult.complete();
+
+        for(PostBuildAction action: buildResult.getProject().getPostBuildActions())
+        {
+            action.execute(buildResult);
+        }
+
         buildManager.save(buildResult);
         eventManager.unregister(asyncListener);
         eventManager.publish(new BuildCompletedEvent(this, buildResult));

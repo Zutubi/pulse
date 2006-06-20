@@ -1,5 +1,9 @@
 package com.zutubi.pulse.core.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public enum ResultState
 {
     INITIAL
@@ -78,5 +82,72 @@ public enum ResultState
     public abstract String getPrettyString();
 
     public abstract String getString();
+
+    public static final String SEPARATOR = ",";
+
+    public static List<String> getNames(List<ResultState> states)
+    {
+        List<String> result = new ArrayList<String>(states.size());
+        for(ResultState state: states)
+        {
+            result.add(state.toString());
+        }
+        return result;
+    }
+
+    public static String getStatesString(ResultState... states)
+    {
+        return getStateNamesString(getNames(Arrays.asList(states)));
+    }
+
+    public static String getStatesString(List<ResultState> states)
+    {
+        return getStateNamesString(getNames(states));
+    }
+
+    public static String getStateNamesString(List<String> stateNames)
+    {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+
+        for(String s: stateNames)
+        {
+            if(first)
+            {
+                first = false;
+            }
+            else
+            {
+                result.append(SEPARATOR);
+            }
+
+            result.append(s);
+        }
+
+        return result.toString();
+    }
+
+    public static List<String> getNamesList(String value)
+    {
+        return getNames(getStatesList(value));
+    }
+
+    public static List<ResultState> getStatesList(String value)
+    {
+        return Arrays.asList(getStates(value));
+    }
+
+    public static ResultState[] getStates(String value)
+    {
+        String[] parts = value.split(SEPARATOR);
+        ResultState[] states = new ResultState[parts.length];
+
+        for(int i = 0; i < parts.length; i++)
+        {
+            states[i] = ResultState.valueOf(parts[i]);
+        }
+
+        return states;
+    }
 
 }

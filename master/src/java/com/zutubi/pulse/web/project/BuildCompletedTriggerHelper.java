@@ -55,7 +55,7 @@ public class BuildCompletedTriggerHelper
 
         if(filterStateNames != null && filterStateNames.size() > 0)
         {
-            dataMap.put(BuildCompletedEventFilter.PARAM_STATES, BuildCompletedEventFilter.getStatesString(filterStateNames));
+            dataMap.put(BuildCompletedEventFilter.PARAM_STATES, ResultState.getStateNamesString(filterStateNames));
         }
     }
 

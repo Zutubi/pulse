@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Entity;
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.model.Entity;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
@@ -58,6 +58,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private String description;
     private String url;
     private PulseFileDetails pulseFileDetails;
+    private List<PostBuildAction> postBuildActions = new LinkedList<PostBuildAction>();
     private List<CleanupRule> cleanupRules = new LinkedList<CleanupRule>();
     private Scm scm;
     private State state = State.IDLE;
@@ -223,6 +224,39 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public void setPulseFileDetails(PulseFileDetails pulseFileDetails)
     {
         this.pulseFileDetails = pulseFileDetails;
+    }
+
+    public List<PostBuildAction> getPostBuildActions()
+    {
+        return postBuildActions;
+    }
+
+    private void setPostBuildActions(List<PostBuildAction> postBuildActions)
+    {
+        this.postBuildActions = postBuildActions;
+    }
+
+    public void addPostBuildAction(PostBuildAction action)
+    {
+        postBuildActions.add(action);
+    }
+
+    public void removePostBuildAction(long id)
+    {
+        PostBuildAction deadActionWalking = null;
+        for(PostBuildAction action: postBuildActions)
+        {
+            if(action.getId() == id)
+            {
+                deadActionWalking = action;
+                break;
+            }
+        }
+
+        if(deadActionWalking != null)
+        {
+            postBuildActions.remove(deadActionWalking);
+        }
     }
 
     public List<CleanupRule> getCleanupRules()

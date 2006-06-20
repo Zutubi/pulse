@@ -63,6 +63,11 @@ public class Scope
         {
             throw new FileLoadException("'" + reference.getName() + "' is already defined in this scope.");
         }
+        add(reference);
+    }
+
+    public void add(Reference reference)
+    {
         references.put(reference.getName(), reference);
     }
 

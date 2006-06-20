@@ -8,6 +8,9 @@ import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -93,6 +96,23 @@ public class SVNServerTest extends PulseTestCase
 
         FileSystemUtils.extractZip(new ZipInputStream(new FileInputStream(dataFile)), repoDir);
         serverProcess = Runtime.getRuntime().exec("svnserve -d -r " + repoDir.getAbsolutePath());
+
+        int retries = 0;
+        while(retries < 10)
+        {
+            Socket s = new Socket();
+            try
+            {
+                s.connect(new InetSocketAddress("localhost", 3690));
+                break;
+            }
+            catch(IOException e)
+            {
+                retries++;
+                Thread.sleep(500);
+            }
+        }
+
         server = new SVNServer("svn://localhost/test/trunk", "jsankey", "password");
     }
 

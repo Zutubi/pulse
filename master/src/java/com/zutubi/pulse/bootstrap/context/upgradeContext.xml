@@ -86,6 +86,7 @@
             <list>
                 <value>com/zutubi/pulse/upgrade/schema/build_0100999001/BuildResult.hbm.xml</value>
                 <value>com/zutubi/pulse/upgrade/schema/build_0100999001/BuildSpecification.hbm.xml</value>
+                <value>com/zutubi/pulse/upgrade/schema/build_0100999001/Project.hbm.xml</value>
                 <value>com/zutubi/pulse/upgrade/schema/build_0100999001/Resource.hbm.xml</value>
                 <value>com/zutubi/pulse/upgrade/schema/build_0100999001/Slave.hbm.xml</value>
             </list>

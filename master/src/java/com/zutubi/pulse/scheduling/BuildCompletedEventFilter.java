@@ -5,8 +5,6 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.util.List;
-
 /**
  * A filter that will only allow triggers for builds that complete in
  * certain states.
@@ -19,71 +17,6 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
     public static final String PARAM_SPECIFICATION = "other.spec";
     public static final String PARAM_STATES = "build.states";
     public static final String SEPARATOR = ",";
-
-    public static String getStatesString(ResultState... states)
-    {
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-
-        for(ResultState s: states)
-        {
-            if(first)
-            {
-                first = false;
-            }
-            else
-            {
-                result.append(SEPARATOR);
-            }
-
-            result.append(s.toString());
-        }
-
-        return result.toString();
-    }
-
-    public static String getStatesString(List<String> stateNames)
-    {
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-
-        for(String s: stateNames)
-        {
-            if(first)
-            {
-                first = false;
-            }
-            else
-            {
-                result.append(SEPARATOR);
-            }
-
-            result.append(s);
-        }
-
-        return result.toString();
-    }
-
-    public static ResultState[] getStates(String value)
-    {
-        try
-        {
-            String[] parts = value.split(SEPARATOR);
-            ResultState[] states = new ResultState[parts.length];
-
-            for(int i = 0; i < parts.length; i++)
-            {
-                states[i] = ResultState.valueOf(parts[i]);
-            }
-
-            return states;
-        }
-        catch (IllegalArgumentException e)
-        {
-            LOG.severe(e);
-            return null;
-        }
-    }
 
     public boolean accept(Trigger trigger, Event event)
     {
@@ -111,17 +44,24 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
             return true;
         }
 
-        ResultState[] states = getStates(stateString);
-        if(states != null)
+        try
         {
-            ResultState state = event.getResult().getState();
-            for(ResultState s: states)
+            ResultState[] states = ResultState.getStates(stateString);
+            if(states != null)
             {
-                if(s == state)
+                ResultState state = event.getResult().getState();
+                for(ResultState s: states)
                 {
-                    return true;
+                    if(s == state)
+                    {
+                        return true;
+                    }
                 }
             }
+        }
+        catch (IllegalArgumentException e)
+        {
+            // Fall through to false
         }
 
         return false;

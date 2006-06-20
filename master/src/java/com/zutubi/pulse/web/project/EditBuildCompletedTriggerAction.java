@@ -74,7 +74,7 @@ public class EditBuildCompletedTriggerAction extends AbstractEditTriggerAction
         filterSpecification = (String) dataMap.get(BuildCompletedEventFilter.PARAM_SPECIFICATION);
         String states = (String) dataMap.get(BuildCompletedEventFilter.PARAM_STATES);
         filterStateNames = new LinkedList<String>();
-        for(ResultState r: BuildCompletedEventFilter.getStates(states))
+        for(ResultState r: ResultState.getStates(states))
         {
             filterStateNames.add(r.toString());
         }
