@@ -4,8 +4,8 @@ import org.apache.commons.cli.*;
 import org.apache.xmlrpc.XmlRpcException;
 
 import java.io.IOException;
-import java.util.Vector;
 import java.util.Arrays;
+import java.util.Vector;
 
 /**
  *
@@ -47,6 +47,21 @@ public class SetPasswordCommand extends AdminCommand
         xmlRpcClient.execute("RemoteApi.setPassword", new Vector<Object>(Arrays.asList(
                 new Object[]{adminToken, user, password})));
         return 0;
+    }
+
+    public static void main(String argv[])
+    {
+        SetPasswordCommand command = new SetPasswordCommand();
+        try
+        {
+            command.parse(argv);
+            System.exit(command.execute());
+        }
+        catch (ParseException e)
+        {
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }
 

@@ -15,8 +15,6 @@ import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  */
@@ -212,8 +210,6 @@ public class SetupDummyBuilds implements Runnable
         BuildResult result = new BuildResult(project, getSpec(project), number);
         buildResultDao.save(result);
 
-        List<Changelist> changelists = new LinkedList<Changelist>();
-
         NumericalRevision userRevision = new NumericalRevision(101);
         userRevision.setAuthor("jason");
         userRevision.setComment("a short comment");
@@ -228,7 +224,6 @@ public class SetupDummyBuilds implements Runnable
         list.addChange(new Change("/home/jsankey/some/branched/file4", "1", Change.Action.BRANCH));
         list.addProjectId(result.getProject().getId());
         list.addResultId(result.getId());
-        changelists.add(list);
 
         userRevision = new NumericalRevision(9101);
         userRevision.setAuthor("jsankey");
@@ -238,7 +233,6 @@ public class SetupDummyBuilds implements Runnable
         list.addChange(new Change("/home/jsankey/some/branched/file/with/a/very/long/filename/to/test/the/display/handling/of/such/things", "1", Change.Action.BRANCH));
         list.addProjectId(result.getProject().getId());
         list.addResultId(result.getId());
-        changelists.add(list);
 
         userRevision = new NumericalRevision(9103);
         userRevision.setAuthor("jsankey");
@@ -248,9 +242,8 @@ public class SetupDummyBuilds implements Runnable
         list.addChange(new Change("/home/jsankey/some/file", "120", Change.Action.BRANCH));
         list.addProjectId(result.getProject().getId());
         list.addResultId(result.getId());
-        changelists.add(list);
 
-        BuildScmDetails scmDetails = new BuildScmDetails(new NumericalRevision(16672), changelists);
+        BuildScmDetails scmDetails = new BuildScmDetails(new NumericalRevision(16672));
         result.setScmDetails(scmDetails);
 
         result.commence(new File("/complex/build/output/dir"));

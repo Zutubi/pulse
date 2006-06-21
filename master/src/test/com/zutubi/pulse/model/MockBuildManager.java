@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.*;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -13,12 +14,14 @@ public class MockBuildManager implements BuildManager
     private Map<Long, BuildResult> buildResults = new TreeMap<Long, BuildResult>();
     private Map<Long, RecipeResultNode> recipeResultNodes = new TreeMap<Long, RecipeResultNode>();
     private Map<Long, RecipeResult> recipeResults = new TreeMap<Long, RecipeResult>();
+    private Map<Long, Changelist> changelists = new TreeMap<Long, Changelist>();
 
     public void clear()
     {
         buildResults.clear();
         recipeResultNodes.clear();
         recipeResults.clear();
+        changelists.clear();
     }
 
     public void save(BuildResult result)
@@ -38,6 +41,11 @@ public class MockBuildManager implements BuildManager
     public void save(RecipeResult result)
     {
         recipeResults.put(result.getId(), result);
+    }
+
+    public void save(Changelist changelist)
+    {
+        changelists.put(changelist.getId(), changelist);
     }
 
     public BuildResult getBuildResult(long id)
@@ -151,6 +159,19 @@ public class MockBuildManager implements BuildManager
     public List<Changelist> getLatestChangesForProject(Project project, int max)
     {
         throw new RuntimeException("Method not implemented.");
+    }
+
+    public List<Changelist> getChangesForBuild(BuildResult result)
+    {
+        List<Changelist> lists = new LinkedList<Changelist>();
+        for(Changelist c: changelists.values())
+        {
+            if(c.getResultIds().contains(result.getId()))
+            {
+                lists.add(c);
+            }
+        }
+        return lists;
     }
 
     public void deleteAllBuilds(Project project)

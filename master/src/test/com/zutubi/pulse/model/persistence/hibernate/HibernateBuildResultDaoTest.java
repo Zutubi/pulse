@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
+import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 
 import java.io.File;
@@ -19,6 +20,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     private BuildResultDao buildResultDao;
     private ProjectDao projectDao;
     private BuildSpecificationDao buildSpecificationDao;
+    private ChangelistDao changelistDao;
 
     public void setUp() throws Exception
     {
@@ -26,6 +28,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         buildResultDao = (BuildResultDao) context.getBean("buildResultDao");
         projectDao = (ProjectDao) context.getBean("projectDao");
         buildSpecificationDao = (BuildSpecificationDao) context.getBean("buildSpecificationDao");
+        changelistDao = (ChangelistDao) context.getBean("changelistDao");
     }
 
     public void tearDown() throws Exception
@@ -33,6 +36,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         buildSpecificationDao = null;
         projectDao = null;
         buildResultDao = null;
+        changelistDao = null;
 
         try
         {
@@ -78,19 +82,12 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     {
         RecipeResult recipeResult = createRecipe();
 
-        BuildScmDetails scmDetails = new BuildScmDetails(new NumericalRevision(42), null);
+        BuildScmDetails scmDetails = new BuildScmDetails(new NumericalRevision(42));
 
         Revision revision = new NumericalRevision(12345);
         revision.setDate(Calendar.getInstance().getTime());
         revision.setAuthor("user");
         revision.setComment("i like fruit");
-
-        Changelist changes = new Changelist("scm", revision);
-        changes.addChange(new Change("/filename.1", "1.0", Change.Action.ADD));
-        changes.addChange(new Change("/filename.2", "2.0", Change.Action.DELETE));
-        changes.addChange(new Change("/filename.3", "3.0", Change.Action.EDIT));
-
-        scmDetails.add(changes);
 
         // Need to save the Project as it is *not* cascaded from BuildResult
         Project project = new Project();
@@ -389,6 +386,29 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(2, latestCompleted.size());
         assertPropertyEquals(r4, latestCompleted.get(0));
         assertPropertyEquals(r3, latestCompleted.get(1));
+    }
+
+    public void testDeleteBuildRetainChangelist()
+    {
+        Project p = new Project("p", "test");
+        projectDao.save(p);
+
+        BuildResult result = createCompletedBuild(p, 1);
+        result.setScmDetails(new BuildScmDetails(new NumericalRevision(10)));
+        buildResultDao.save(result);
+
+        Changelist list = new Changelist("uid", new NumericalRevision(10));
+        list.addProjectId(p.getId());
+        list.addResultId(result.getId());
+        changelistDao.save(list);
+
+        commitAndRefreshTransaction();
+        assertNotNull(changelistDao.findById(list.getId()));
+        commitAndRefreshTransaction();
+
+        buildResultDao.delete(result);
+        commitAndRefreshTransaction();
+        assertNotNull(changelistDao.findById(list.getId()));
     }
 
     private BuildResult createCompletedBuild(Project project, long number)

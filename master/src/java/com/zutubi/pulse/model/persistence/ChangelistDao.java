@@ -31,4 +31,6 @@ public interface ChangelistDao extends EntityDao<Changelist>
     List<Changelist> findLatestByProject(Project project, int max);
 
     Changelist findByRevision(String serverUid, Revision revision);
+
+    List<Changelist> findByResult(long id);
 }

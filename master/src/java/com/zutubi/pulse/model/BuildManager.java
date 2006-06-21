@@ -16,6 +16,8 @@ public interface BuildManager
 
     void save(RecipeResult result);
 
+    void save(Changelist changelist);
+
     BuildResult getBuildResult(long id);
 
     RecipeResultNode getRecipeResultNode(long id);
@@ -89,7 +91,10 @@ public interface BuildManager
 
     List<Changelist> getLatestChangesForProject(Project project, int max);
 
+    List<Changelist> getChangesForBuild(BuildResult result);
+
     void deleteAllBuilds(Project project);
 
     Changelist getChangelistByRevision(String serverUid, Revision revision);
+
 }

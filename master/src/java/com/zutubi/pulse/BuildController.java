@@ -291,8 +291,6 @@ public class BuildController implements EventListener
     {
         Scm scm = project.getScm();
         Revision revision = bootstrapper.getRevision();
-        // collect scm changes to be added to the build results.
-        List<Changelist> scmChanges = null;
 
         try
         {
@@ -307,7 +305,7 @@ public class BuildController implements EventListener
                     Revision previousRevision = previousScmDetails.getRevision();
                     if (previousRevision != null)
                     {
-                        scmChanges = getChangeSince(server, previousRevision, revision, scmChanges);
+                        getChangeSince(server, previousRevision, revision);
                     }
                 }
             }
@@ -317,15 +315,15 @@ public class BuildController implements EventListener
             LOG.warning("Unable to retrieve changelist details from SCM server: " + e.getMessage(), e);
         }
 
-        BuildScmDetails scmDetails = new BuildScmDetails(revision, scmChanges);
+        BuildScmDetails scmDetails = new BuildScmDetails(revision);
         buildResult.setScmDetails(scmDetails);
     }
 
-    private List<Changelist> getChangeSince(SCMServer server, Revision previousRevision, Revision revision, List<Changelist> scmChanges)
+    private List<Changelist> getChangeSince(SCMServer server, Revision previousRevision, Revision revision)
             throws SCMException
     {
         List<Changelist> result = new LinkedList<Changelist>();
-        scmChanges = server.getChanges(previousRevision, revision, "");
+        List<Changelist> scmChanges = server.getChanges(previousRevision, revision, "");
 
         // Get the uid after the changes as Svn requires a connection to be
         // made first

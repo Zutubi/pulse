@@ -77,4 +77,20 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
             }
         });
     }
+
+    public List<Changelist> findByResult(final long id)
+    {
+        return (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from Changelist model where :resultId in elements(model.resultIds) order by model.revision.time desc");
+                queryObject.setParameter("resultId", id);
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.list();
+            }
+        });
+    }
 }

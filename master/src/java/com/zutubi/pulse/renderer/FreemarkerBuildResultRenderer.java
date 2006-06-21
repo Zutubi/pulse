@@ -1,8 +1,9 @@
 package com.zutubi.pulse.renderer;
 
+import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -10,6 +11,7 @@ import freemarker.template.Template;
 import java.io.File;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,7 +22,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 
     private Configuration freemarkerConfiguration;
 
-    public void render(String hostUrl, BuildResult result, String type, Writer writer)
+    public void render(String hostUrl, BuildResult result, List<Changelist> changelists, String type, Writer writer)
     {
         Map<String, Object> dataMap = new HashMap<String, Object>();
 
@@ -28,6 +30,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         dataMap.put("type", type);
         dataMap.put("hostname", hostUrl);
         dataMap.put("result", result);
+        dataMap.put("changelists", changelists);
         dataMap.put("model", result);
         dataMap.put("errorLevel", Feature.Level.ERROR);
         dataMap.put("warningLevel", Feature.Level.WARNING);

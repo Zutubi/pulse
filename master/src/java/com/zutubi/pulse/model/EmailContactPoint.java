@@ -1,11 +1,11 @@
 package com.zutubi.pulse.model;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -83,8 +83,9 @@ public class EmailContactPoint extends ContactPoint
     {
         StringWriter w = new StringWriter();
         BuildResultRenderer renderer = (BuildResultRenderer) ComponentContext.getBean("buildResultRenderer");
+        BuildManager buildManager = (BuildManager) ComponentContext.getBean("buildManager");
         ConfigurationManager configManager = lookupConfigManager();
-        renderer.render(configManager.getAppConfig().getHostName(), result, getType(), w);
+        renderer.render(configManager.getAppConfig().getHostName(), result, buildManager.getChangesForBuild(result), getType(), w);
         return w.toString();
     }
 
