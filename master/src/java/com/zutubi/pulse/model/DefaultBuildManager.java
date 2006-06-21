@@ -290,10 +290,14 @@ public class DefaultBuildManager implements BuildManager, EventListener
         }
 
         // Remove records of this build from changelists
-        for(Changelist change: build.getScmDetails().getChangelists())
+        BuildScmDetails scmDetails = build.getScmDetails();
+        if(scmDetails != null)
         {
-            change.removeResultId(build.getId());
-            changelistDao.save(change);
+            for(Changelist change: scmDetails.getChangelists())
+            {
+                change.removeResultId(build.getId());
+                changelistDao.save(change);
+            }
         }
 
         buildResultDao.delete(build);
