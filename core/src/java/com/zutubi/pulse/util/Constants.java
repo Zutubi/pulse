@@ -1,5 +1,7 @@
 package com.zutubi.pulse.util;
 
+import java.util.Date;
+
 /**
  * <class-comment/>
  */
@@ -13,6 +15,8 @@ public class Constants
     public static final long DAY = 24 * HOUR;
     public static final long WEEK = 7 * DAY;
     public static final long YEAR = 365 * DAY;
+
+    public static final Date DAY_0 = new Date(0);
 
     // Line separator string.  This is the value of the line.separator
     // property at the moment that the StdOutErrReader was created.
