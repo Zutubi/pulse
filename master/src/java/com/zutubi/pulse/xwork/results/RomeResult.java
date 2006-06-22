@@ -9,6 +9,7 @@ import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.WireFeedOutput;
+import com.zutubi.pulse.util.Constants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -79,7 +80,20 @@ public class RomeResult extends WebWorkResultSupport
         response.setContentType("application/rss+xml; charset=UTF-8");
         response.setHeader("Content-Disposition", "filename=rss.xml");
 
-        Date lastModified = new Date(request.getDateHeader(IF_MODIFIED_SINCE));
+        // The last modified date from the request header may be invalid. If that is the case, then
+        // we need to default to something workable.
+        Date ifModifiedSince;
+        try
+        {
+            ifModifiedSince = new Date(request.getDateHeader(IF_MODIFIED_SINCE));
+        }
+        catch (Throwable t)
+        {
+            ifModifiedSince = Constants.DAY_0;
+        }
+
+        Date lastModified = ifModifiedSince;
+        
         List entries = feed.getEntries();
         if (entries.size() > 0)
         {
@@ -111,7 +125,7 @@ public class RomeResult extends WebWorkResultSupport
                 TextUtils.stringSet(request.getHeader(IF_MODIFIED_SINCE)))
         {
             if (etag.equals(request.getHeader(IF_NONE_MATCH)) &&
-                    lastModified.getTime() == request.getDateHeader(IF_MODIFIED_SINCE))
+                    lastModified.getTime() == ifModifiedSince.getTime())
             {
                 // if response is not required, send 304 Not modified.
                 response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
