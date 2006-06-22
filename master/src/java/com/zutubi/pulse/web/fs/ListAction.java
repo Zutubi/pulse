@@ -1,8 +1,7 @@
 package com.zutubi.pulse.web.fs;
 
-import com.zutubi.pulse.filesystem.File;
-import com.zutubi.pulse.filesystem.FileSystem;
-import com.zutubi.pulse.filesystem.FileSystemException;
+import com.zutubi.pulse.filesystem.*;
+import com.zutubi.pulse.filesystem.local.LocalFile;
 import org.apache.commons.codec.binary.Base64;
 
 import java.util.*;
@@ -15,6 +14,18 @@ public abstract class ListAction extends FileSystemActionSupport
     private List<Object> listings;
 
     private String[] uids;
+
+    private boolean dirOnly = false;
+
+    public void setDirOnly(boolean dirOnly)
+    {
+        this.dirOnly = dirOnly;
+    }
+
+    public boolean isDirOnly()
+    {
+        return this.dirOnly;
+    }
 
     public void setUid(String[] paths)
     {
@@ -45,12 +56,60 @@ public abstract class ListAction extends FileSystemActionSupport
 
         //todo: validate path.
         Listing listing = new Listing();
-        listing.files = fs.list(file);
+        try
+        {
+            listing.files = fs.list(file);
+        }
+        catch (FileNotFoundException e)
+        {
+            listing.files = new File[]{new DummyFile()
+            {
+                public String getName()
+                {
+                    return "ERROR: File not found";
+                }
+
+                public boolean isDirectory()
+                {
+                    return false;
+                }
+
+                public boolean isFile()
+                {
+                    return true;
+                }
+            }};
+        }
+
         listing.path = decodedPath;
+
+        if (isDirOnly())
+        {
+            filter(listing, new FileFilter()
+            {
+                public boolean accept(File f)
+                {
+                    return f.isDirectory();
+                }
+            });
+        }
 
         sort(listing.files);
 
         return listing;
+    }
+
+    private void filter(Listing listing, FileFilter filter)
+    {
+        List<File> filtered = new LinkedList<File>();
+        for (File f : listing.files)
+        {
+            if (filter.accept(f))
+            {
+                filtered.add(f);
+            }
+        }
+        listing.files = filtered.toArray(new File[filtered.size()]);
     }
 
     private void sort(File[] files)
@@ -68,7 +127,7 @@ public abstract class ListAction extends FileSystemActionSupport
                 {
                     return 1;
                 }
-                return 0;
+                return o1.getName().compareTo(o2.getName());
             }
         });
 
@@ -164,14 +223,49 @@ public abstract class ListAction extends FileSystemActionSupport
 
         public String getType()
         {
-            if (file.isFile())
-            {
-                return "file";
-            }
-            else
+            if (file.isDirectory())
             {
                 return "folder";
             }
+            else
+            {
+                return "file";
+            }
+        }
+    }
+
+    private class DummyFile implements File
+    {
+        public boolean isDirectory() {
+            return false;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public boolean isFile() {
+            return false;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public File getParentFile() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public String getMimeType() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public long length() {
+            return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public String getName() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public String getPath() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public String getAbsolutePath() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 }

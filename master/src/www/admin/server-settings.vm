@@ -15,7 +15,10 @@
             <td class="columns" width="40%">
                 <table class="fill-content" id="license.info">
                     #restrictedHeadingRow("license.info" 2 "ROLE_ADMINISTRATOR" "edit" "/admin/editLicense!input.action" "pencil.gif" "license.edit")
-                    #dynamicRow("license.name.field" $license.name)
+                    <tr>
+                        #contentRowHeading("license.name.field")
+                        #contentCell("license.type.$license.type")
+                    </tr>
                     #dynamicRow("license.holder.field" $license.holder)
                     #dynamicRow("license.expiry.field" $expiryDate)
                 </table>

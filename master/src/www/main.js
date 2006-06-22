@@ -109,18 +109,10 @@ function openBrowseWindow(selectDir, elementId, extraArgs)
     browseWindow.focus();
 }
 
-// Toggles the display attribute of an element between '' and 'none' to
-// show/hide it.
+// @deprecated. Use the Prototype function Element.toggle instead.
 function toggleElementDisplay(element)
 {
-    if(!element.style.display)
-    {
-        element.style.display = 'none';
-    }
-    else
-    {
-        element.style.display = '';
-    }
+    Element.toggle(element);
 }
 
 function toggleDisplay(id)
@@ -204,6 +196,14 @@ function hideChildren(id)
 {
     var element = getElement(id);
 
+    $A(element.childNodes).each(function(child)
+    {
+        if (child.nodeType == 1)
+        {
+            Element.hide(child);
+        }
+    });
+/* use prototype.js support.
     for(var i = 0; i < element.childNodes.length; i++)
     {
         var child = element.childNodes[i];
@@ -219,6 +219,7 @@ function hideChildren(id)
             }
         }
     }
+*/
 }
 
 // Toggle display for all rows under the given table with a first cell of the given class
@@ -342,3 +343,34 @@ function selectNode(id)
     rightPane.style.display = "block";
     selectedNode = id;
 }
+
+/*
+ * Return the dimensions of the window.
+ *
+ *    width: the window width.
+ *    height: the window height.
+ */
+function windowSize()
+{
+    var myWidth = 0, myHeight = 0;
+    if (typeof( window.innerWidth ) == 'number')
+    {
+        //Non-IE
+        myWidth = window.innerWidth;
+        myHeight = window.innerHeight;
+    }
+    else if (document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ))
+    {
+        //IE 6+ in 'standards compliant mode'
+        myWidth = document.documentElement.clientWidth;
+        myHeight = document.documentElement.clientHeight;
+    }
+    else if (document.body && ( document.body.clientWidth || document.body.clientHeight ))
+    {
+        //IE 4 compatible
+        myWidth = document.body.clientWidth;
+        myHeight = document.body.clientHeight;
+    }
+    return {"width":myWidth, "height":myHeight};
+}
+
