@@ -19,6 +19,9 @@
         <delete dir="master/system"/>
         <delete file="master/etc/admin.token"/>
         <delete file="master/etc/pulse-init.properties"/>
+        <mkdir dir="master/system"/>
+        <mkdir dir="master/system/log"/>
+        <mkdir dir="master/system/tmp"/>
     </target>
 
     <target name="build.boot">

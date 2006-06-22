@@ -3,17 +3,18 @@ package com.zutubi.pulse.license;
 import com.zutubi.pulse.core.PulseException;
 
 /**
- * <class-comment/>
+ * The License Exception is the base exception for License related exceptions.
+ *
  */
 public class LicenseException extends PulseException
 {
+    public LicenseException()
+    {
+    }
+
     public LicenseException(String errorMessage)
     {
         super(errorMessage);
-    }
-
-    public LicenseException()
-    {
     }
 
     public LicenseException(Throwable cause)

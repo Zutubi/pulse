@@ -40,13 +40,17 @@ public class LicenseEncodeDecodeTest extends PulseTestCase
 
     public void testSimpleLicenseEncoding() throws Exception
     {
-        License l = new License("dummy", "S. O MeBody", null);
-        assertEquals(l, decoder.decode(encoder.encode(l)));
+        License e = new License(LicenseType.EVALUATION, "S. O MeBody", null);
+        assertEquals(e, decoder.decode(encoder.encode(e)));
+        License c = new License(LicenseType.COMMERCIAL, "Nob. Ody", null);
+        assertEquals(c, decoder.decode(encoder.encode(c)));
+        License n = new License(LicenseType.NON_PROFIT, "S. O MeBody", null);
+        assertEquals(n, decoder.decode(encoder.encode(n)));
     }
 
     public void testLongLicenseEncoding() throws LicenseException
     {
-        License l = new License("dummy", RandomUtils.randomString(128), null);
+        License l = new License(LicenseType.EVALUATION, RandomUtils.randomString(128), null);
         assertEquals(l, decoder.decode(encoder.encode(l)));
     }
 
@@ -56,7 +60,7 @@ public class LicenseEncodeDecodeTest extends PulseTestCase
         Calendar now = Calendar.getInstance();
         now.set(Calendar.MILLISECOND, 0);
 
-        License l = new License("dummy", "S. O. MeBody", now.getTime());
+        License l = new License(LicenseType.EVALUATION, "S. O. MeBody", now.getTime());
         assertEquals(l, decoder.decode(encoder.encode(l)));
     }
 

@@ -78,24 +78,30 @@ public class LicenseDecoder
         try
         {
             LineNumberReader reader = new LineNumberReader(new StringReader(data));
-            String name = reader.readLine();
+            String typeStr = reader.readLine();
             String holder = reader.readLine();
             String expiryString = reader.readLine();
 
             // verify that all of the expected fields where available.
-            if (!TextUtils.stringSet(name) ||
+            if (!TextUtils.stringSet(typeStr) ||
                     !TextUtils.stringSet(holder) ||
                     !TextUtils.stringSet(expiryString))
             {
                 return null;
             }
 
+            LicenseType type = LicenseType.valueOf(Integer.valueOf(typeStr));
+            if (type == null)
+            {
+                return null;
+            }
+            
             Date expiryDate = null;
             if (!expiryString.equals("Never"))
             {
                 expiryDate = DATE_FORMAT.parse(expiryString);
             }
-            return new License(name, holder, expiryDate);
+            return new License(type, holder, expiryDate);
         }
         catch (IOException e)
         {

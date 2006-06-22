@@ -48,9 +48,9 @@ public class LicenseEncoder implements LicenseKeyFactory
             // create resulting license string.
             ByteArrayOutputStream baos = new ByteArrayOutputStream(4 + data.length + sig.length);
             DataOutputStream dos = new DataOutputStream(baos);
-            dos.writeInt(data.length);
-            dos.write(data);
-            dos.write(sig);
+            dos.writeInt(data.length);  // length 4.
+            dos.write(data);            // length data.length.
+            dos.write(sig);             // length sig.length.
             dos.close();
 
             // use base 64 encoding to make it transfer (email/webpage) friendly
@@ -65,7 +65,7 @@ public class LicenseEncoder implements LicenseKeyFactory
     private String toString(License license)
     {
         StringBuffer buffer = new StringBuffer();
-        buffer.append(license.getName()).append("\n");
+        buffer.append(license.getType().ordinal()).append("\n");
         buffer.append(license.getHolder()).append("\n");
         if (license.expires())
         {
@@ -104,11 +104,11 @@ public class LicenseEncoder implements LicenseKeyFactory
         {
             SimpleDateFormat expiryFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-            String type = argv[0];
+            int type = Integer.valueOf(argv[0]);
             String name = argv[1];
             Date expiry = expiryFormat.parse(argv[2]);
 
-            License license = new License(type, name, expiry);
+            License license = new License(LicenseType.valueOf(type), name, expiry);
 
             LicenseEncoder encoder = new LicenseEncoder();
             byte[] licenseKey = encoder.encode(license);

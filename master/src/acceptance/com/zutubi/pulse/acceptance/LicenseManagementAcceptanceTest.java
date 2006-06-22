@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.LicenseEditForm;
 import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.test.LicenseHelper;
+import com.zutubi.pulse.license.LicenseType;
 
 /**
  * <class-comment/>
@@ -12,15 +13,10 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
     // we use two dummy licenses for testing, alternating between them to
     // ensure that the details are updated correctly.
 
-    public static final String INVALID_LICENSE =
-            "AAAFWR1bW15IGxpY2Vuc2UuCkldmVyCj7MZ9Rsw+pryhZkbpgHuL4Akqun\n" +
-            "i/c+99kObsCxELNgkpDK1lZ5VNonwhjSN7M3o+B7AvKBabulzKnQrRHlvF\n" +
-            "r6ox7okk99Lt/+dsMCnRrArEIFgIOoBGLxwHKi17DLW3/OKtWjGEegLWG+\n" +
-            "/FslH3cL2L9kHJyj55L0+Hq";
-
     private String newLicenseKey;
     private String newLicenseHolder;
     private String expiredLicenseKey;
+    private String invalidLicenseKey;
 
     public LicenseManagementAcceptanceTest()
     {
@@ -40,8 +36,9 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
         clickLinkWithText("administration");
 
         newLicenseHolder = RandomUtils.randomString(10);
-        newLicenseKey = LicenseHelper.newLicenseKey("dummy", newLicenseHolder, null);
-        expiredLicenseKey = LicenseHelper.newExpiredLicenseKey("dummy", "S. O. MeBody");
+        newLicenseKey = LicenseHelper.newLicenseKey(LicenseType.CUSTOM, newLicenseHolder, null);
+        expiredLicenseKey = LicenseHelper.newExpiredLicenseKey(LicenseType.CUSTOM, "S. O. MeBody");
+        invalidLicenseKey = LicenseHelper.newInvalidLicenseKey(LicenseType.CUSTOM, "S. O. MeBody");
     }
 
     protected void tearDown() throws Exception
@@ -75,9 +72,9 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
         assertTextPresent("required");
 
         // b) an invalid license.
-        form.saveFormElements(INVALID_LICENSE);
+        form.saveFormElements(invalidLicenseKey);
         form.assertFormPresent();
-        form.assertFormElements(INVALID_LICENSE);
+        form.assertFormElements(invalidLicenseKey);
         assertTextPresent("invalid");
 
         // c) a valid license is accepted

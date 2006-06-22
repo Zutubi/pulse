@@ -1,7 +1,8 @@
 package com.zutubi.pulse.license;
 
 /**
- * <class-comment/>
+ * A license event indicating that a license has expired.
+ *
  */
 public class LicenseExpiredEvent extends LicenseEvent
 {

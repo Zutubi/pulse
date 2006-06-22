@@ -43,7 +43,7 @@ public class Change extends Entity
         /**
          * An unrecognised action.
          */
-        UNKNOWN;
+        UNKNOWN
     }
 
     private String filename;

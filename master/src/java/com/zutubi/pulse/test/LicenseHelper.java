@@ -1,9 +1,6 @@
 package com.zutubi.pulse.test;
 
-import com.zutubi.pulse.license.License;
-import com.zutubi.pulse.license.LicenseKeyFactory;
-import com.zutubi.pulse.license.LicenseException;
-import com.zutubi.pulse.license.LicenseUtils;
+import com.zutubi.pulse.license.*;
 
 import java.util.Date;
 import java.util.Calendar;
@@ -42,27 +39,36 @@ public class LicenseHelper
     /**
      * Generate a license key for a license that does not expire.
      */
-    public static String newLicenseKey(String name, String holder) throws LicenseException
+    public static String newLicenseKey(LicenseType type, String holder) throws LicenseException
     {
-        return newLicenseKey(name, holder, null);
+        return newLicenseKey(type, holder, null);
     }
 
     /**
      * Generate a license key for a license that has expired.
      */
-    public static String newExpiredLicenseKey(String name, String holder) throws LicenseException
+    public static String newExpiredLicenseKey(LicenseType type, String holder) throws LicenseException
     {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.YEAR, -1);
-        return newLicenseKey(name, holder, cal.getTime());
+        return newLicenseKey(type, holder, cal.getTime());
+    }
+
+    /**
+     * Generate an invalid license key.
+     */
+    public static String newInvalidLicenseKey(LicenseType type, String holder) throws LicenseException
+    {
+        String validKey = newLicenseKey(type, holder, null);
+        return validKey.substring(2, validKey.length() - 2);
     }
 
     /**
      * Generate a license key with the specified details.
      */
-    public static String newLicenseKey(String name, String holder, Date expiry) throws LicenseException
+    public static String newLicenseKey(LicenseType type, String holder, Date expiry) throws LicenseException
     {
-        byte[] licenseKey = getKeyFactory().encode(new License(name, holder, expiry));
+        byte[] licenseKey = getKeyFactory().encode(new License(type, holder, expiry));
 
         // insert '\n' characters at regular intervals so that the resulting string is
         // the same in format as those pasted via the UI.

@@ -64,6 +64,8 @@ public class LicenseMonitor implements Task
     }
 
     /**
+     * The execution of this task is to check whether or not the license is expired. If the
+     * installed license is expired, then generate an appropriate LicenseEvent.
      *
      * @param context
      */
@@ -83,6 +85,8 @@ public class LicenseMonitor implements Task
      */
     public void init()
     {
+        //TODO: We need to ensure that this task can not be unscheduled.
+
         // check if the trigger exists. if not, create and schedule.
         Trigger trigger = scheduler.getTrigger("license", "monitor");
         if (trigger != null)
