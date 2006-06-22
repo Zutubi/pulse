@@ -1,13 +1,13 @@
 package com.zutubi.pulse.web.wizard;
 
-import com.zutubi.pulse.core.ObjectFactory;
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ActionSupport;
 import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.xwork.TextProviderSupport;
 
 import java.util.List;
 import java.util.Map;
@@ -80,6 +80,11 @@ public class WizardAction extends ActionSupport
      * executed at that point. We need to wait until the action is being processed.
      */
     private boolean requiresInitialisation = false;
+
+    public boolean isInitialised()
+    {
+        return !requiresInitialisation;
+    }
 
     /**
      * Set the wizard class.

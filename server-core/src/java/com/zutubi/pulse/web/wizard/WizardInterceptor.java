@@ -62,15 +62,23 @@ public class WizardInterceptor implements Interceptor
             if (actionRequested)
             {
                 // ensure state is in sync.
-                String[] actualStates = (String[]) parameters.get("state");
-                String actualState = (actualStates.length > 0) ? actualStates[0] : null;
-                String expectedState = wizardAction.getCurrentState().getStateName();
-                if (!expectedState.equals(actualState))
+                if(wizardAction.isInitialised())
                 {
-                    if (!wizardAction.getWizard().traverseBackwardTo(actualState))
+                    String[] actualStates = (String[]) parameters.get("state");
+                    String actualState = (actualStates.length > 0) ? actualStates[0] : null;
+                    String expectedState = wizardAction.getCurrentState().getStateName();
+                    if (!expectedState.equals(actualState))
                     {
-                        shortCircuit = wizardAction.getWizard().restart();
+                        if (!wizardAction.getWizard().traverseBackwardTo(actualState))
+                        {
+                            shortCircuit = wizardAction.getWizard().restart();
+                        }
                     }
+                }
+                else
+                {
+                    wizardAction.getWizard().addActionError(wizardAction.getText("wizard.state.lost"));
+                    shortCircuit = wizardAction.getWizard().restart();
                 }
             }
 
