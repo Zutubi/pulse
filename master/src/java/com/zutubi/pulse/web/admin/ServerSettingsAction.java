@@ -4,6 +4,7 @@ import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.security.ldap.LdapManager;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -17,6 +18,7 @@ public class ServerSettingsAction extends ActionSupport
 {
     private MasterConfigurationManager configurationManager;
     private JabberManager jabberManager;
+    private LicenseManager licenseManager;
     private MasterApplicationConfiguration config;
     private DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
     private License license;
@@ -40,7 +42,7 @@ public class ServerSettingsAction extends ActionSupport
     public String execute() throws Exception
     {
         config = configurationManager.getAppConfig();
-        license = configurationManager.getData().getLicense();
+        license = licenseManager.getLicense();
         
         return SUCCESS;
     }
@@ -73,5 +75,10 @@ public class ServerSettingsAction extends ActionSupport
     public void setLdapManager(LdapManager ldapManager)
     {
         this.ldapManager = ldapManager;
+    }
+
+    public void setLicenseManager(LicenseManager licenseManager)
+    {
+        this.licenseManager = licenseManager;
     }
 }

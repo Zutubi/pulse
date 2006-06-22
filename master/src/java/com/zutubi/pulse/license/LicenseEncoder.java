@@ -64,18 +64,32 @@ public class LicenseEncoder implements LicenseKeyFactory
 
     private String toString(License license)
     {
+        // format:
         StringBuffer buffer = new StringBuffer();
-        buffer.append(license.getType().ordinal()).append("\n");
-        buffer.append(license.getHolder()).append("\n");
+        // 1) license type.
+        writeLineTo(buffer, license.getType().getCode());
+        // 2) holder name.
+        writeLineTo(buffer, license.getHolder());
+        // 3) expiry date.
         if (license.expires())
         {
-            buffer.append(DATE_FORMAT.format(license.getExpiryDate())).append("\n");
+            writeLineTo(buffer, DATE_FORMAT.format(license.getExpiryDate()));
         }
         else
         {
-            buffer.append("Never").append("\n");
+            writeLineTo(buffer, "Never");
         }
+        // 4) supported entities.
+        writeLineTo(buffer, String.valueOf(license.getSupportedAgents()));
+        writeLineTo(buffer, String.valueOf(license.getSupportedProjects()));
+        writeLineTo(buffer, String.valueOf(license.getSupportedUsers()));
+
         return buffer.toString();
+    }
+
+    private void writeLineTo(StringBuffer buffer, String content)
+    {
+        buffer.append(content).append("\n");
     }
 
     /**
@@ -104,11 +118,34 @@ public class LicenseEncoder implements LicenseKeyFactory
         {
             SimpleDateFormat expiryFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-            int type = Integer.valueOf(argv[0]);
+            String code = argv[0];
             String name = argv[1];
             Date expiry = expiryFormat.parse(argv[2]);
 
-            License license = new License(LicenseType.valueOf(type), name, expiry);
+            LicenseType type = LicenseType.valueBy(code);
+
+            License license = new License(type, name, expiry);
+
+            // setup some default supported entity values until they are added to the interface and we want to be
+            // able to vary them.
+            if (type == LicenseType.EVALUATION)
+            {
+                // keep default values of License.UNDEFINED.
+                license.setSupported(License.UNDEFINED, License.UNDEFINED, License.UNDEFINED);
+            }
+            else if (type == LicenseType.COMMERCIAL)
+            {
+                // keep default values of License.UNDEFINED.
+                license.setSupported(License.UNDEFINED, License.UNDEFINED, License.UNDEFINED);
+            }
+            else if (type == LicenseType.NON_PROFIT)
+            {
+                license.setSupported(5, 10, License.UNDEFINED);
+            }
+            else if (type == LicenseType.PERSONAL)
+            {
+                license.setSupported(1, 3, 1);
+            }
 
             LicenseEncoder encoder = new LicenseEncoder();
             byte[] licenseKey = encoder.encode(license);

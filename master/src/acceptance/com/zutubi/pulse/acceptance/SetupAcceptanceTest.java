@@ -31,9 +31,9 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
     {
         super.setUp();
 
-        licenseKey = LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "S. O. MeBody");
-        expiredLicenseKey = LicenseHelper.newExpiredLicenseKey(LicenseType.CUSTOM, "S. O. MeBody");
-        invalidLicenseKey = LicenseHelper.newInvalidLicenseKey(LicenseType.CUSTOM, "S. O. MeBody");
+        licenseKey = LicenseHelper.newLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
+        expiredLicenseKey = LicenseHelper.newExpiredLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
+        invalidLicenseKey = LicenseHelper.newInvalidLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
     }
 
     protected void tearDown() throws Exception

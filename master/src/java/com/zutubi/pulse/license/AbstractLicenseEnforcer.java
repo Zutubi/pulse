@@ -3,7 +3,7 @@ package com.zutubi.pulse.license;
 /**
  * <class-comment/>
  */
-public abstract class AbstractLicenseManager implements LicenseManager
+public abstract class AbstractLicenseEnforcer implements LicenseEnforcer
 {
     protected LicenseProvider provider;
 

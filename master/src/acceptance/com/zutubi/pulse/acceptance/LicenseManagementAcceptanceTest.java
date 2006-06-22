@@ -36,9 +36,9 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
         clickLinkWithText("administration");
 
         newLicenseHolder = RandomUtils.randomString(10);
-        newLicenseKey = LicenseHelper.newLicenseKey(LicenseType.CUSTOM, newLicenseHolder, null);
-        expiredLicenseKey = LicenseHelper.newExpiredLicenseKey(LicenseType.CUSTOM, "S. O. MeBody");
-        invalidLicenseKey = LicenseHelper.newInvalidLicenseKey(LicenseType.CUSTOM, "S. O. MeBody");
+        newLicenseKey = LicenseHelper.newLicenseKey(LicenseType.EVALUATION, newLicenseHolder, null);
+        expiredLicenseKey = LicenseHelper.newExpiredLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
+        invalidLicenseKey = LicenseHelper.newInvalidLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
     }
 
     protected void tearDown() throws Exception

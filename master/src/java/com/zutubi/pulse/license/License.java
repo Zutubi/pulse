@@ -18,11 +18,26 @@ public class License
     private String holder;
     private Date expiryDate;
 
+    public static final int UNDEFINED = -1;
+
+    private int supportedProjects = UNDEFINED;
+
+    private int supportedUsers = UNDEFINED;
+
+    private int supportedAgents = UNDEFINED;
+
     public License(LicenseType type, String holder, Date expiry)
     {
         this.type = type;
         this.holder = holder;
         this.expiryDate = expiry;
+    }
+
+    public void setSupported(int agents, int projects, int users)
+    {
+        this.supportedAgents = agents;
+        this.supportedProjects = projects;
+        this.supportedUsers = users;
     }
 
     /**
@@ -55,6 +70,36 @@ public class License
         return type;
     }
 
+    /**
+     * Get the number of projects supported by this license.
+     *
+     * @return the number of projects allowed by this license.
+     */
+    public int getSupportedProjects()
+    {
+        return supportedProjects;
+    }
+
+    /**
+     * Get the number of users supported by this license.
+     *
+     * @return the number of projects allowed by this license.
+     */
+    public int getSupportedUsers()
+    {
+        return supportedUsers;
+    }
+
+    /**
+     * Get the number of agents supported by this license.
+     *
+     * @return the number of agents allowed by this license.
+     */
+    public int getSupportedAgents()
+    {
+        return supportedAgents;
+    }
+
     public boolean equals(Object o)
     {
         if (!(o instanceof License))
@@ -65,7 +110,10 @@ public class License
 
         return ObjectUtils.equals(holder, other.holder) &&
                 ObjectUtils.equals(expiryDate, other.expiryDate) &&
-                ObjectUtils.equals(type, other.type);
+                ObjectUtils.equals(type, other.type) &&
+                ObjectUtils.equals(supportedAgents, other.supportedAgents) &&
+                ObjectUtils.equals(supportedUsers, other.supportedUsers) &&
+                ObjectUtils.equals(supportedProjects, other.supportedProjects);
     }
 
 

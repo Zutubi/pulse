@@ -8,38 +8,38 @@ public enum LicenseType
 {
     EVALUATION
     {
-        public String getKey()
+        public final String getCode()
         {
-            return "license.type.evaluation";
+            return "e";
         }
     },
     COMMERCIAL
     {
-        public String getKey()
+        public final String getCode()
         {
-            return "license.type.commercial";
+            return "c";
         }
     },
     NON_PROFIT
     {
-        public String getKey()
+        public final String getCode()
         {
-            return "license.type.nonprofit";
+            return "n";
         }
     },
-    CUSTOM
+    PERSONAL
     {
-        public String getKey()
+        public final String getCode()
         {
-            return "license.type.custom";
+            return "p";
         }
     };
 
-    public static LicenseType valueOf(int i)
+    public static LicenseType valueBy(String code)
     {
         for (LicenseType type : LicenseType.values())
         {
-            if (type.ordinal() == i)
+            if (type.getCode().equals(code))
             {
                 return type;
             }
@@ -47,5 +47,5 @@ public enum LicenseType
         return null;
     }
 
-    public abstract String getKey();
+    public abstract String getCode();
 }

@@ -69,4 +69,11 @@ public class LicenseEncodeDecodeTest extends PulseTestCase
         LicenseDecoder decoder = new LicenseDecoder();
         assertNull(decoder.decode("SADFA".getBytes()));
     }
+
+    public void testEncodingOfSupportedEntities() throws LicenseException
+    {
+        License l = new License(LicenseType.EVALUATION, "S. O. MeBody", null);
+        l.setSupported(12, 34, 56);
+        assertEquals(l, decoder.decode(encoder.encode(l)));
+    }
 }

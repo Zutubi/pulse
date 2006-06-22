@@ -6,7 +6,7 @@ import java.io.File;
  * 
  *
  */
-public interface MasterConfigurationManager extends ConfigurationManager
+public interface MasterConfigurationManager extends ConfigurationManager, DataResolver
 {
     /**
      * 
