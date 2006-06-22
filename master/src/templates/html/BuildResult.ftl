@@ -187,8 +187,7 @@ pre.feature {
 [/#list]
     </table>
 </td></tr>
-[#if result.scmDetails?exists]
-    [#assign changes = result.scmDetails.changelists]
+[#if changelists?exists]
 <tr><td>
     <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
         <th class="heading" colspan="5" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
@@ -201,8 +200,8 @@ pre.feature {
             [@contentHeader cc="comment"/]
             [@contentHeader cc="actions"/]
         </tr>
-    [#if changes?size &gt; 0]
-        [#list changes as change]
+    [#if changelists?size &gt; 0]
+        [#list changelists as change]
         <tr>
             [@dynamicCell cc=change.revision.revisionString/]
             [@dynamicCell cc=change.user/]

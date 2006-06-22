@@ -24,7 +24,6 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     {
         super.setUp();
         renderer = new FreemarkerBuildResultRenderer();
-
         File pulseRoot = new File(getPulseRoot(), "master/src/templates");
 
         Configuration freemarkerConfiguration = new Configuration();
@@ -43,14 +42,15 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testBasicSuccess() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
-        createAndVerify("basic", "test.url:8080", result);
+        createAndVerify("basic", "test.url:8080", result, new LinkedList<Changelist>());
     }
 
     public void testWithChanges() throws Exception
     {
-        BuildResult result = createBuildWithChanges();
+        List<Changelist> changes = getChanges();
+        BuildResult result = createBuildWithChanges(changes);
 
-        createAndVerify("changes", "another.url", result);
+        createAndVerify("changes", "another.url", result, changes);
     }
 
     public void testWithErrors() throws Exception
@@ -75,7 +75,8 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     private void errorsHelper(String type) throws Exception
     {
-        BuildResult result = createBuildWithChanges();
+        List<Changelist> changes = getChanges();
+        BuildResult result = createBuildWithChanges(changes);
         result.error("test error message");
         result.addFeature(Feature.Level.WARNING, "warning message on result");
         RecipeResultNode firstNode = result.getRoot().getChildren().get(0);
@@ -108,7 +109,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         secondResult.add(command);
 
-        createAndVerify("errors", type, "another.url", result);
+        createAndVerify("errors", type, "another.url", result, changes);
     }
 
     private void failuresHelper(String type) throws Exception
@@ -160,22 +161,32 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         createAndVerify("failures", type, "host.url", result);
     }
 
-    private BuildResult createBuildWithChanges()
+    private BuildResult createBuildWithChanges(List<Changelist> changes)
     {
         BuildResult result = createSuccessfulBuild();
 
         Revision buildRevision = new Revision();
         buildRevision.setRevisionString("656");
 
+        BuildScmDetails details = new BuildScmDetails(buildRevision);
+        result.setScmDetails(details);
+
+        for(Changelist change: changes)
+        {
+            change.addResultId(result.getId());
+        }
+
+        return result;
+    }
+
+    private List<Changelist> getChanges()
+    {
         List<Changelist> changes = new LinkedList<Changelist>();
         Changelist list = new Changelist("scm", new Revision("test author", "short comment", 324252, "655"));
         changes.add(list);
         list = new Changelist("scm", new Revision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output dadada da dadad ad ad adadad ad ad ada d adada dad ad ad d ad ada da d", 310000, "656"));
         changes.add(list);
-
-        BuildScmDetails details = new BuildScmDetails(buildRevision, changes);
-        result.setScmDetails(details);
-        return result;
+        return changes;
     }
 
     private BuildResult createSuccessfulBuild()
@@ -202,12 +213,17 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         return result;
     }
 
-    protected void createAndVerify(String expectedName, String hostUrl, BuildResult result) throws Exception
+    protected void createAndVerify(String expectedName, String hostUrl, BuildResult result, List<Changelist> changelists) throws IOException
     {
-        createAndVerify(expectedName, "plain", hostUrl, result);
+        createAndVerify(expectedName, "plain", hostUrl, result, changelists);
     }
 
     protected void createAndVerify(String expectedName, String type, String hostUrl, BuildResult result) throws IOException, URISyntaxException
+    {
+        createAndVerify(expectedName, type, hostUrl, result, new LinkedList<Changelist>());
+    }
+
+    protected void createAndVerify(String expectedName, String type, String hostUrl, BuildResult result, List<Changelist> changelists) throws IOException
     {
         String extension = "txt";
         if (type.equals("html"))
@@ -225,7 +241,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
             {
                 outStream = new FileOutputStream(expected);
                 writer = new OutputStreamWriter(outStream);
-                renderer.render(hostUrl, result, type, writer);
+                renderer.render(hostUrl, result, changelists, type, writer);
             }
             finally
             {
@@ -242,7 +258,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
                 expectedStream = getInput(expectedName, extension);
 
                 StringWriter writer = new StringWriter();
-                renderer.render(hostUrl, result, type, writer);
+                renderer.render(hostUrl, result, changelists, type, writer);
                 String got = replaceTimestamps(writer.getBuffer().toString());
                 String expected = replaceTimestamps(IOUtils.inputStreamToString(expectedStream));
                 assertEquals(expected, got);

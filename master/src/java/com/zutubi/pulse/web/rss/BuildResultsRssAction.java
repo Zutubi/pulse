@@ -7,9 +7,9 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
+import com.zutubi.pulse.search.BuildResultExpressions;
 import com.zutubi.pulse.search.Queries;
 import com.zutubi.pulse.search.SearchQuery;
-import com.zutubi.pulse.search.BuildResultExpressions;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
 import org.hibernate.criterion.Order;
 
@@ -66,7 +66,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         query.add(BuildResultExpressions.projectEq(project));
         query.setFirstResult(0);
         query.setMaxResults(10);
-        query.add(Order.desc("id"));
+        query.add(Order.desc("number"));
 
         // build the rss feed.
         feed = new SyndFeedImpl();
@@ -120,7 +120,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         SearchQuery<BuildResult> query = queries.getBuildResults();
         query.setFirstResult(0);
         query.setMaxResults(10);
-        query.add(Order.desc("id"));
+        query.add(Order.desc("number"));
 
         // build the rss feed.
         feed = new SyndFeedImpl();
@@ -184,6 +184,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         StringWriter w = new StringWriter();
         buildResultRenderer.render(configurationManager.getAppConfig().getHostName(),
                 result,
+                getBuildManager().getChangesForBuild(result),
                 BuildResultRenderer.TYPE_HTML , w);
         return w.toString();
     }

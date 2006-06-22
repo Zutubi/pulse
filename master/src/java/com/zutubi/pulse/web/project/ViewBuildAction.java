@@ -18,7 +18,7 @@ public class ViewBuildAction extends ProjectActionSupport
 {
     private long id;
     private BuildResult result;
-    private List<Changelist> changes;
+    private List<Changelist> changelists;
     private long selectedNode;
 
     public long getId()
@@ -94,13 +94,13 @@ public class ViewBuildAction extends ProjectActionSupport
         }
     }
 
-    public List<Changelist> getChanges()
+    public List<Changelist> getChangelists()
     {
-        return changes;
+        if(changelists == null)
+        {
+            changelists = getBuildManager().getChangesForBuild(getResult());
+        }
+        return changelists;
     }
 
-    public void setChanges(List<Changelist> changes)
-    {
-        this.changes = changes;
-    }
 }

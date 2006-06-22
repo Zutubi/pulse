@@ -17,9 +17,8 @@
             <td class="content" colspan="5">#wwtext("name=changes.checkedout") $scmDetails.revision</td>
         </tr>
 #end
-#set($changes = $scmDetails.changelists)
-#if($changes.size() > 0)
-    #foreach($change in $changes)
+#if($changelists.size() > 0)
+    #foreach($change in $changelists)
         <tr>
             #contentHeading("change.revision" 1)
             #contentHeading("change.who" 1)

@@ -1,25 +1,26 @@
 package com.zutubi.pulse.test;
 
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.core.RecipeProcessor;
-import com.zutubi.pulse.core.JUnitReportPostProcessor;
+import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.core.AntPostProcessor;
 import com.zutubi.pulse.core.DirectoryArtifact;
+import com.zutubi.pulse.core.RecipeProcessor;
+import com.zutubi.pulse.core.JUnitReportPostProcessor;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.persistence.ProjectDao;
-import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.UserDao;
 import com.zutubi.pulse.model.persistence.SlaveDao;
+import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.*;
 
-import java.io.*;
-import java.util.List;
-import java.util.LinkedList;
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -283,7 +284,7 @@ public class SetupFeatureTour implements Runnable
             }
         }
 
-        BuildScmDetails details = new BuildScmDetails(new NumericalRevision(400), changes);
+        BuildScmDetails details = new BuildScmDetails(new NumericalRevision(400));
         build.setScmDetails(details);
     }
 

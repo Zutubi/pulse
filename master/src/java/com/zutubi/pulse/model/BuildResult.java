@@ -82,11 +82,6 @@ public class BuildResult extends Result implements AclObjectIdentityAware
         this.number = number;
     }
 
-    public boolean hasChanges()
-    {
-        return scmDetails.getRevision() != null || scmDetails.getChangelists().size() > 0;
-    }
-
     public RecipeResultNode getRoot()
     {
         return root;

@@ -1,10 +1,11 @@
 package com.zutubi.pulse.condition;
 
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.condition.NotifyCondition;
+import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.BuildScmDetails;
+
+import java.util.List;
 
 /**
  * 
@@ -12,6 +13,8 @@ import com.zutubi.pulse.model.BuildScmDetails;
  */
 public class ChangedNotifyCondition implements NotifyCondition
 {
+    private BuildManager buildManager;
+
     /**
      * Create a new condition
      */
@@ -22,18 +25,20 @@ public class ChangedNotifyCondition implements NotifyCondition
     public boolean satisfied(BuildResult result, User user)
     {
         // look for a change.
-        BuildScmDetails scmDetails = result.getScmDetails();
-        if (scmDetails != null && scmDetails.getChangelists() != null)
+        List<Changelist> changelists = buildManager.getChangesForBuild(result);
+        for (Changelist changelist : changelists)
         {
-            for (Changelist changelist : scmDetails.getChangelists())
+            if (changelist.getChanges() != null && changelist.getChanges().size() > 0)
             {
-                if (changelist.getChanges() != null && changelist.getChanges().size() > 0)
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
         return false;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 }

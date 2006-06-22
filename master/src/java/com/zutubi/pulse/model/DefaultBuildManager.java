@@ -98,6 +98,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         buildResultDao.save(result);
     }
 
+    public void save(Changelist changelist)
+    {
+        changelistDao.save(changelist);
+    }
+
     public BuildResult getBuildResult(long id)
     {
         return buildResultDao.findById(id);
@@ -223,6 +228,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return changelistDao.findLatestByProject(project, max);
     }
 
+    public List<Changelist> getChangesForBuild(BuildResult result)
+    {
+        return changelistDao.findByResult(result.getId());
+    }
+
     public void deleteAllBuilds(Project project)
     {
         int offset = 0;
@@ -293,7 +303,8 @@ public class DefaultBuildManager implements BuildManager, EventListener
         BuildScmDetails scmDetails = build.getScmDetails();
         if(scmDetails != null)
         {
-            for(Changelist change: scmDetails.getChangelists())
+            List<Changelist> changelists = changelistDao.findByResult(build.getId());
+            for(Changelist change: changelists)
             {
                 change.removeResultId(build.getId());
                 changelistDao.save(change);

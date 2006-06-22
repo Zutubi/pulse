@@ -1,20 +1,25 @@
 package com.zutubi.pulse.condition;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.BuildScmDetails;
+import com.zutubi.pulse.model.MockBuildManager;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Change;
-
-import java.util.Arrays;
+import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  */
 public class ChangedByMeNotificationConditionTest extends PulseTestCase
 {
+    private MockBuildManager buildManager = new MockBuildManager();
     private ChangedByMeNotifyCondition condition = new ChangedByMeNotifyCondition();
+
+    protected void setUp() throws Exception
+    {
+        condition.setBuildManager(buildManager);
+    }
 
     public void testChangedByMe()
     {
@@ -48,7 +53,12 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
     private BuildResult getBuildWithChanges(Changelist ...changes)
     {
         BuildResult result = new BuildResult();
-        BuildScmDetails details = new BuildScmDetails(new Revision(), Arrays.asList(changes));
+        for(Changelist list: changes)
+        {
+            list.addResultId(result.getId());
+            buildManager.save(list);
+        }
+        BuildScmDetails details = new BuildScmDetails(new Revision());
         result.setScmDetails(details);
         return result;
     }
@@ -59,4 +69,5 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
         change.addChange(new Change("file", "rev", Change.Action.EDIT));
         return change;
     }
+
 }

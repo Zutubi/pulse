@@ -17,11 +17,10 @@ Build stages:
   * ${child.stage} :: ${child.result.recipeNameSafe}@${child.hostSafe} :: ${result.state.prettyString}
 [/#list]
 
-[#if result.scmDetails?exists]
-    [#assign changes = result.scmDetails.changelists]
-    [#if changes?size &gt; 0]
+[#if changelists?exists]
+    [#if changelists?size &gt; 0]
 New changes in this build:
-        [#list changes as change]
+        [#list changelists as change]
             [#assign revision = change.revision]
   * ${revision.revisionString} by ${revision.author}:
     ${renderer.wrapString(renderer.trimmedString(revision.comment, 180), "    ")}

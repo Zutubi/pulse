@@ -69,13 +69,7 @@
 
         <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all"
                      unique="true"/>
-
-        <list name="changelists" cascade="all-delete-orphan" lazy="false">
-            <key column="BUILD_SCM_DETAILS_ID"/>
-            <index column="ORDINAL"/>
-            <one-to-many class="com.zutubi.pulse.core.model.Changelist"/>
-        </list>
-
+        
     </class>
 
     <class name="com.zutubi.pulse.model.RecipeResultNode" table="RECIPE_RESULT_NODE" lazy="false">
