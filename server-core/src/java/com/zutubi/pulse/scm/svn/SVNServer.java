@@ -328,7 +328,7 @@ public class SVNServer implements SCMServer
             {
                 List<SVNLogEntry> logs = new LinkedList<SVNLogEntry>();
 
-                FilepathFilter filter = new ScmFilepathFilter(null);
+                FilepathFilter filter = new ScmFilepathFilter(excludedPaths);
 
                 repository.log(paths, logs, fromNumber, toNumber, true, true);
                 for (SVNLogEntry entry : logs)
