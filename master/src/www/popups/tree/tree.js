@@ -182,10 +182,9 @@ Object.extend(ZUTUBI.widget.TreeView.prototype = {
      */
     _selectionHandler: function(event)
     {
-        var src = Event.element(getCurrentEvent(event));
+        var src = Event.element(event);
         if (src == this)
         {
-            console.log("_selectionHandler.");
             // NOTE: this requires that all ids are in the format xyz_index
             var index = src.getAttribute("id").substring(src.getAttribute("id").indexOf('_') + 1);
             var node = ZUTUBI.widget.View.getNodeByIndex(index);
@@ -223,7 +222,6 @@ Object.extend(ZUTUBI.widget.TreeView.prototype = {
 
     removeNode: function(node)
     {
-        console.log("removing node: %s", node.getPath());
         // can not remove the root node.
         if (node.isRoot())
         {
@@ -232,7 +230,6 @@ Object.extend(ZUTUBI.widget.TreeView.prototype = {
 
         var p = node.parent;
 
-        console.log("this._deleteNode(%s)", node);
         this._deleteNode(node);
 
         if (p)
@@ -245,11 +242,9 @@ Object.extend(ZUTUBI.widget.TreeView.prototype = {
 
     removeChildren: function(node)
     {
-        console.log("removeChildren: %s", node.getPath());
         var self = this;
         $A(node.children).each(function(child)
         {
-            console.log("this._deleteNode(%s)", child);
             self._deleteNode(child);
         });
     },
@@ -257,7 +252,6 @@ Object.extend(ZUTUBI.widget.TreeView.prototype = {
     _deleteNode: function(node)
     {
         // first remove all of the children.
-        console.log("_deleteNode: %s", node);
         this.removeChildren(node);
 
         // remove this node from its parent.
@@ -267,7 +261,6 @@ Object.extend(ZUTUBI.widget.TreeView.prototype = {
         node._unrender();
 
         // free the memory.
-        console.log("delete ZUTUBI.widget.View._nodes[%s]", node.index);
         delete ZUTUBI.widget.View._nodes[node.index];
     },
 
@@ -670,7 +663,7 @@ Object.extend(ZUTUBI.widget.Node.prototype = {
 
         if (!this.isLoaded)
         {
-            console.log("INFO: Triggering a load for node(%s)", this.index);
+//            console.log("INFO: Triggering a load for node(%s)", this.index);
             // trigger a load and render 'Loading...' feedback.
             var ul = this.getChildrenEl();
             var li = document.createElement("li");
@@ -708,10 +701,10 @@ Object.extend(ZUTUBI.widget.Node.prototype = {
 
     _onclickHandler: function(event)
     {
-        var src = Event.element(getCurrentEvent(event));
+        var src = Event.element((event));
         if (src == this)
         {
-            console.log("_ONCLICKHANDLER:");
+//            console.log("_ONCLICKHANDLER:");
             var id = src.getAttribute("id").substring(src.getAttribute("id").indexOf('_') + 1);
             var node = ZUTUBI.widget.View.getNodeByIndex(id);
             if (node.hasChildren())
@@ -730,7 +723,7 @@ Object.extend(ZUTUBI.widget.Node.prototype = {
      */
     loadComplete: function()
     {
-        console.log("INFO: loadComplete for node(%s)", this.index);
+//        console.log("INFO: loadComplete for node(%s)", this.index);
         // record the fact that we have loaded.
         this.isLoaded = true;
 
@@ -752,7 +745,7 @@ Object.extend(ZUTUBI.widget.Node.prototype = {
 
     refresh: function()
     {
-        console.log("INFO: refresh triggered on node(%s)", this.index);
+//        console.log("INFO: refresh triggered on node(%s)", this.index);
         this.invalidate();
         this._render();
     },
@@ -920,7 +913,7 @@ ZUTUBI.widget.RootNode.prototype._render = function()
     this._renderChildren();
 };
 
-ZUTUBI.widget.RootNode.prototype.isRendered = function()
+ZUTUBI.widget.RootNode.prototype._isRendered = function()
 {
     return this.getChildrenEl() != null;
 }
@@ -954,7 +947,6 @@ ZUTUBI.widget.FileNode.prototype.isFolder = function()
 
 ZUTUBI.widget.FileNode.prototype._renderNode = function()
 {
-    console.log("_renderNode:");
     // the element is the element that would be returned by this.getNodeEl();
     var anchorPoint = this.getNodeEl();
     // replace any existing content.
@@ -999,7 +991,6 @@ ZUTUBI.widget.FileNode.prototype._renderNode = function()
 
 ZUTUBI.widget.FileNode.prototype.onExpand = function()
 {
-    console.log("onExpand:");
     // open the folder.
     var element = this.getNodeEl();
 
@@ -1009,7 +1000,6 @@ ZUTUBI.widget.FileNode.prototype.onExpand = function()
 
 ZUTUBI.widget.FileNode.prototype.onCollapse = function()
 {
-    console.log("onCollapse:")
     // open the folder.
     var element = this.getNodeEl();
 
@@ -1045,22 +1035,4 @@ ZUTUBI.widget.FileNode.prototype.getPath = function()
 function getCurrentEvent(event)
 {
     return event || window.event;
-}
-
-function dump(obj)
-{
-    var dump = "Object dump: [";
-    var i = 0;
-    for (property in obj)
-    {
-        i++;
-        dump = dump + " " + property;
-        if (i > 5)
-        {
-            dump = dump + "\n";
-            i = 0;
-        }
-    }
-    dump = dump + "]";
-    console.log(dump);
 }

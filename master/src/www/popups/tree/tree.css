@@ -43,22 +43,3 @@ li.closed {
 li.empty {
     background-image: url(../../images/tree/empty.png);
 }
-
-li.file {
-    background-image: url(../../images/tree/page_white.png);
-}
-
-li.folder, li.root {
-    background-image: url(../../images/tree/foldericon.png);
-}
-
-li.openfolder {
-    background-image: url(../../images/tree/openfoldericon.png);
-}
-
-/* sample node type rendering */
-
-li.txt {
-    background-image: url(../../images/tree/page_white.png);
-}
-

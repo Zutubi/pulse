@@ -20,6 +20,21 @@ ZUTUBI.fs.list = function(node)
         return;
     }
 
+    // generate id path.
+    var path = "";
+    var sep = "";
+    while (node)
+    {
+        if (node.data)
+        {
+            path = node.data.id + sep + path;
+            sep = "/";
+        }
+        node = node.parent;
+    }
+
+    console.log("GENERATED ID: %s", path);
+
     var ajax = new Ajax.Request(
         "http://localhost:8080/ajax/list.action",
         {
@@ -27,7 +42,7 @@ ZUTUBI.fs.list = function(node)
             onComplete: ZUTUBI.fs.listResponse,
             onFailure: handleFailure,
             onException: handleException,
-            parameters: "uid=" + loadById //+ "&dirOnly=true"
+            parameters: "pid=" + path //+ "&dirOnly=true"
         }
     );
 }
@@ -36,7 +51,7 @@ ZUTUBI.fs.list = function(node)
 // respones and adding them to the specified node.
 ZUTUBI.fs.listResponse = function(response)
 {
-    console.log("process data from server");
+//    console.log("process data from server");
     var jsonObjs = eval("(" + response.responseText + ")");
 
     var tree = ZUTUBI.widget.View.getTreeById('browse');
@@ -60,17 +75,17 @@ ZUTUBI.fs.listResponse = function(response)
             // caught at an earlier stage.
             var existingNode = $A(parentNode.getChildren()).find(function(child)
             {
-                return (child.data.id == jsonObj.listing[i].uid);
+                return (child.data.id == jsonObj.listing[i].fid);
             });
             if (existingNode)
             {
-                console.log("WARNING: skipping adding node a second time.");
+                console.log("WARNING: skipping adding node a second time. UID: '%s'", jsonObj.listing[i].uid);
                 continue;
             }
 
             var newNode = new ZUTUBI.widget.FileNode(parentNode, false);
             newNode.data = {
-                "id":jsonObj.listing[i].uid,
+                "id":jsonObj.listing[i].fid,
                 "name":jsonObj.listing[i].file,
                 "type":jsonObj.listing[i].type
             };
@@ -204,16 +219,32 @@ ZUTUBI.fs.getNode = function(uid, tree)
 {
     // locate the node identified by the server uid. This node will become the parent.
     // need access to all of the trees to look up the node.
-    var node = (!uid && tree.root) || ZUTUBI.widget.View.getNodeByProperty(function(node)
+
+    if (!uid)
     {
-        if (node.data)
+        return tree.root;
+    }
+
+    var n = tree.root;
+    var pathElements = $A(uid.split("/"));
+    pathElements.each(function(path)
+    {
+        var c = $A(n.children).find(function(child)
         {
-            return node.data.id == uid;
+            return (child.data.id == path);
+        });
+        if (c)
+        {
+            n = c;
         }
-        return false;
+        else
+        {
+            // return virtual node?
+            return null;
+        }
     });
 
-    return node;
+    return n;
 };
 
 handleFailure = function(e, e2)

@@ -1,10 +1,11 @@
 package com.zutubi.pulse.web.fs;
 
-import com.zutubi.pulse.filesystem.*;
-import com.zutubi.pulse.filesystem.local.LocalFile;
+import com.opensymphony.util.TextUtils;
 import org.apache.commons.codec.binary.Base64;
 
 import java.util.*;
+import java.io.File;
+import java.io.FileFilter;
 
 /**
  * <class-comment/>
@@ -13,7 +14,7 @@ public abstract class ListAction extends FileSystemActionSupport
 {
     private List<Object> listings;
 
-    private String[] uids;
+    private String[] pids;
 
     private boolean dirOnly = false;
 
@@ -27,9 +28,9 @@ public abstract class ListAction extends FileSystemActionSupport
         return this.dirOnly;
     }
 
-    public void setUid(String[] paths)
+    public void setPid(String[] pids)
     {
-        this.uids = paths;
+        this.pids = pids;
     }
 
     public List<Object> getListings()
@@ -40,48 +41,55 @@ public abstract class ListAction extends FileSystemActionSupport
     public String execute() throws Exception
     {
         listings = new LinkedList<Object>();
-        for (String uid : uids)
+        for (String uid : pids)
         {
             listings.add(new JsonListingWrapper(list(uid)));
         }
         return SUCCESS;
     }
 
-    private Listing list(String encodedPath) throws FileSystemException
+    private boolean isRoot(File f)
     {
-        String decodedPath = decode(encodedPath);
-        FileSystem fs = getFileSystem();
+        return f.isAbsolute() && !TextUtils.stringSet(f.getName());
+    }
 
-        File file = fs.getFile(decodedPath);
-
+    private Listing list(String encodedPath)
+    {
         //todo: validate path.
-        Listing listing = new Listing();
-        try
+        File file = null;
+        StringTokenizer tokens = new StringTokenizer(encodedPath, "/", false);
+        while (tokens.hasMoreTokens())
         {
-            listing.files = fs.list(file);
-        }
-        catch (FileNotFoundException e)
-        {
-            listing.files = new File[]{new DummyFile()
+            String t = tokens.nextToken();
+            if (file == null)
             {
-                public String getName()
-                {
-                    return "ERROR: File not found";
-                }
-
-                public boolean isDirectory()
-                {
-                    return false;
-                }
-
-                public boolean isFile()
-                {
-                    return true;
-                }
-            }};
+                file = new java.io.File(decode(t));
+            }
+            else
+            {
+                file = new java.io.File(file, decode(t));
+            }
         }
 
-        listing.path = decodedPath;
+        Listing listing = new Listing();
+        listing.path = encodedPath;
+
+        if (file != null)
+        {
+            listing.files = file.listFiles();
+        }
+        else
+        {
+            listing.files = File.listRoots();
+        }
+
+        filter(listing, new FileFilter()
+        {
+            public boolean accept(File f)
+            {
+                return !f.isHidden();
+            }
+        });
 
         if (isDirOnly())
         {
@@ -101,36 +109,41 @@ public abstract class ListAction extends FileSystemActionSupport
 
     private void filter(Listing listing, FileFilter filter)
     {
-        List<File> filtered = new LinkedList<File>();
-        for (File f : listing.files)
+        if (listing.files != null)
         {
-            if (filter.accept(f))
+            List<File> filtered = new LinkedList<File>();
+            for (File f : listing.files)
             {
-                filtered.add(f);
+                if (filter.accept(f))
+                {
+                    filtered.add(f);
+                }
             }
+            listing.files = filtered.toArray(new File[filtered.size()]);
         }
-        listing.files = filtered.toArray(new File[filtered.size()]);
     }
 
     private void sort(File[] files)
     {
-        Collections.sort(Arrays.asList(files), new Comparator<File>()
+        if (files != null)
         {
-            public int compare(File o1, File o2)
+            Collections.sort(Arrays.asList(files), new Comparator<File>()
             {
-                // folders first.
-                if (o1.isDirectory())
+                public int compare(File o1, File o2)
                 {
-                    return -1;
+                    // folders first.
+                    if (o1.isDirectory())
+                    {
+                        return -1;
+                    }
+                    if (o2.isDirectory())
+                    {
+                        return 1;
+                    }
+                    return o1.getName().compareTo(o2.getName());
                 }
-                if (o2.isDirectory())
-                {
-                    return 1;
-                }
-                return o1.getName().compareTo(o2.getName());
-            }
-        });
-
+            });
+        }
     }
 
     private String encode(String uid)
@@ -168,18 +181,18 @@ public abstract class ListAction extends FileSystemActionSupport
     {
         private String uid;
 
-        private String path;
-
         private List<JsonFileWrapper> files;
 
         public JsonListingWrapper(Listing l)
         {
-            path = l.path;
-            uid = encode(l.path);
+            uid = l.path;
             files = new LinkedList<JsonFileWrapper>();
-            for (File f : l.files)
+            if (l.files != null)
             {
-                files.add(new JsonFileWrapper(f));
+                for (File f : l.files)
+                {
+                    files.add(new JsonFileWrapper(f));
+                }
             }
         }
 
@@ -191,11 +204,6 @@ public abstract class ListAction extends FileSystemActionSupport
         public String getUid()
         {
             return uid;
-        }
-
-        public String getPath()
-        {
-            return path;
         }
     }
 
@@ -213,6 +221,10 @@ public abstract class ListAction extends FileSystemActionSupport
 
         public String getName()
         {
+            if (isRoot(this.file))
+            {
+                return this.file.getAbsolutePath();
+            }
             return this.file.getName();
         }
 
@@ -221,9 +233,14 @@ public abstract class ListAction extends FileSystemActionSupport
             return encode(this.file.getPath());
         }
 
+        public String getFid()
+        {
+            return encode(this.getName());
+        }
+
         public String getType()
         {
-            if (file.isDirectory())
+            if (file.isDirectory() || isRoot(file))
             {
                 return "folder";
             }
@@ -231,41 +248,6 @@ public abstract class ListAction extends FileSystemActionSupport
             {
                 return "file";
             }
-        }
-    }
-
-    private class DummyFile implements File
-    {
-        public boolean isDirectory() {
-            return false;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        public boolean isFile() {
-            return false;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        public File getParentFile() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        public String getMimeType() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        public long length() {
-            return 0;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        public String getName() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        public String getPath() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        public String getAbsolutePath() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 }
