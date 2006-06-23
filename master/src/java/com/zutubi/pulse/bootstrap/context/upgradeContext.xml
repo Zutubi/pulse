@@ -21,6 +21,8 @@
                 <ref local="flexibleConditionUpgrade"/>
                 <ref local="scmMonitorSchemaUpgrade"/>
                 <ref local="scmMonitorDataUpgrade"/>
+                <ref local="dropBuildChangelistsUpgrade"/>
+                <ref local="repairUniqueKeyUpgradeUpgrade"/>
                 <ref local="distributedSchemaUpgrade"/>
                 <ref local="distributedDataUpgrade"/>
             </list>
@@ -78,6 +80,14 @@
 
     <bean id="scmMonitorDataUpgrade" class="com.zutubi.pulse.upgrade.tasks.ScmMonitorDataUpgradeTask" autowire="byName">
         <property name="buildNumber" value="1042"/>
+    </bean>
+
+    <bean id="dropBuildChangelistsUpgrade" class="com.zutubi.pulse.upgrade.tasks.DropBuildChangelistsUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="1051"/>
+    </bean>
+
+    <bean id="repairUniqueKeyUpgradeUpgrade" class="com.zutubi.pulse.upgrade.tasks.RepairUniqueKeyUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="1051"/>
     </bean>
 
     <bean id="distributedSchemaUpgrade" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
