@@ -393,12 +393,13 @@ public class CvsServer extends CachingSCMServer
         {
             tmpDir = createTemporaryDirectory();
 
-            cvs.checkout(tmpDir, CvsRevision.HEAD, getModule());
-
-            // check that something was checked out.
-            if (tmpDir.list().length == 0)
+            try
             {
-                throw new SCMException("failed to locate the module " + getModule());
+                cvs.checkout(tmpDir, CvsRevision.HEAD, getModule());
+            }
+            catch (SCMException e)
+            {
+                throw new SCMException("Failed to locate the module " + getModule());
             }
         }
         catch (IOException e)
