@@ -21,12 +21,12 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
     public ProjectAcceptanceTest()
     {
-        super(Type.VERSIONED);
+        super(Type.ANT);
     }
 
     public ProjectAcceptanceTest(String name)
     {
-        super(name, Type.VERSIONED);
+        super(name, Type.ANT);
     }
 
     public void testEditProjectBasics()
@@ -101,59 +101,6 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         // assert the error message.
         assertTextPresent("select a different project");
-    }
-
-    public void testEditVersionedSpecifics()
-    {
-        VersionedProjectEditForm form = new VersionedProjectEditForm(tester);
-
-        // verify what we have to start with.
-        assertProjectSpecificsTable("versioned", "pulse.xml");
-
-        assertLinkPresent("project.specifics.edit");
-        clickLink("project.specifics.edit");
-
-        // assert that the form is pre populated with the expected data.
-        form.assertFormElements("pulse.xml");
-
-        form.saveFormElements("versioned.xml");
-
-        // assert that the data has been updated.
-        assertProjectSpecificsTable("versioned", "versioned.xml");
-    }
-
-    public void testEditVersionedSpecificsValidation()
-    {
-        VersionedProjectEditForm form = new VersionedProjectEditForm(tester);
-
-        assertProjectSpecificsTable("versioned", "pulse.xml");
-
-        assertLinkPresent("project.specifics.edit");
-        clickLink("project.specifics.edit");
-
-        form.assertFormElements("pulse.xml");
-
-        form.saveFormElements("");
-
-        assertTextPresent("required");
-        form.assertFormElements("");
-    }
-
-    public void testEditVersionedSpecificsCancel()
-    {
-        VersionedProjectEditForm form = new VersionedProjectEditForm(tester);
-
-        // test the editing of versioned specifics.
-        assertProjectSpecificsTable("versioned", "pulse.xml");
-
-        assertLinkPresent("project.specifics.edit");
-        clickLink("project.specifics.edit");
-
-        form.assertFormElements("pulse.xml");
-
-        form.cancelFormElements("versioned.xml");
-
-        assertProjectSpecificsTable("versioned", "pulse.xml");
     }
 
     public void testEditCheckoutScheme()
@@ -321,7 +268,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         // using the index of the link is brittle, but since the links id
         // contains a reference to the id of the object (which we do not know)
         // there are not many options available.
-        clickLinkWithText("edit", 6);
+        clickLinkWithText("edit", 7);
 
         form.assertFormElements(null, null, "10", "builds");
         assertOptionsEqual(CleanupRuleForm.WORK_DIR_ONLY, new String[]{ "whole build results", "working directories only" });
@@ -337,7 +284,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertProjectCleanupTable(new String[][] { getCleanupRow(false, "error, success", "2 days") });
 
         // Check form is correctly populated again
-        clickLinkWithText("edit", 6);
+        clickLinkWithText("edit", 7);
 
         form.assertFormElements(null, null, "2", "days");
         assertSelectionValues(CleanupRuleForm.WORK_DIR_ONLY, new String[]{ "false" });
@@ -353,7 +300,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         // using the index of the link is brittle, but since the links id
         // contains a reference to the id of the object (which we do not know)
         // there are not many options available.
-        clickLinkWithText("edit", 6);
+        clickLinkWithText("edit", 7);
 
         form.assertFormElements(null, null, "10", "builds");
         tester.selectOption(CleanupRuleForm.WORK_DIR_ONLY, "whole build results");
@@ -372,7 +319,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         // using the index of the link is brittle, but since the links id
         // contains a reference to the id of the object (which we do not know)
         // there are not many options available.
-        clickLinkWithText("edit", 6);
+        clickLinkWithText("edit", 7);
 
         form.saveFormElements(null, null, "0", "days");
         form.assertFormPresent();
@@ -1037,15 +984,6 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         text = text.replaceAll("onclick=\"[^\"]*\"", "");
         text = text.replaceAll("id=\"[^\"]*\"", "");
         return text;
-    }
-
-    private void assertProjectSpecificsTable(String type, String file)
-    {
-        assertTablePresent("project.specifics");
-        assertTableRowsEqual("project.specifics", 1, new String[][]{
-                new String[]{"type", type},
-                new String[]{"pulse file", file}
-        });
     }
 
     private void assertProjectBasicsTable(String name, String description, String url)

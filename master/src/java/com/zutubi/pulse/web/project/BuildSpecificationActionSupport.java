@@ -1,16 +1,18 @@
 package com.zutubi.pulse.web.project;
 
+import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.LinkedHashMap;
 import java.io.ByteArrayInputStream;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 /**
  */
@@ -50,24 +52,48 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
     protected void populateRecipes()
     {
         recipes.add("");
-        FileLoader fileLoader = new PulseFileLoader(new ObjectFactory());
+        final List<String> pulseFileRecipes = new LinkedList<String>();
+        final Semaphore doneSemaphore = new Semaphore(0);
+
+        Thread populator = new Thread(new Runnable()
+        {
+            public void run()
+            {
+                FileLoader fileLoader = new PulseFileLoader(new ObjectFactory());
+                try
+                {
+                    PulseFileDetails details = getProject().getPulseFileDetails();
+                    ComponentContext.autowire(details);
+                    String pulseFile = details.getPulseFile(0, project, null);
+
+                    PulseFile file = new PulseFile();
+                    fileLoader.load(new ByteArrayInputStream(pulseFile.getBytes()), file, null, resourceRepository, new RecipeListingPredicate());
+                    for(Recipe r: file.getRecipes())
+                    {
+                        pulseFileRecipes.add(r.getName());
+                    }
+                }
+                catch(Exception e)
+                {
+                    // Ignore...we just don't show recipes
+                    LOG.warning("Unable to load pulse file for project '" + project.getName() + "': " + e.getClass().getSimpleName() + ": " + e.getMessage());
+                }
+
+                doneSemaphore.release();
+            }
+        });
+        populator.run();
+
         try
         {
-            PulseFileDetails details = getProject().getPulseFileDetails();
-            ComponentContext.autowire(details);
-            String pulseFile = details.getPulseFile(0, project, null);
-
-            PulseFile file = new PulseFile();
-            fileLoader.load(new ByteArrayInputStream(pulseFile.getBytes()), file, null, resourceRepository, new RecipeListingPredicate());
-            for(Recipe r: file.getRecipes())
+            if(doneSemaphore.tryAcquire(10, TimeUnit.SECONDS))
             {
-                recipes.add(r.getName());
+                recipes.addAll(pulseFileRecipes);
             }
         }
-        catch(Exception e)
+        catch (InterruptedException e)
         {
-            // Ignore...we just don't show recipes
-            LOG.warning("Unable to load pulse file for project '" + project.getName() + "': " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            LOG.warning(e);
         }
     }
 
