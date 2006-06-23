@@ -238,7 +238,7 @@ public class P4Server extends CachingSCMServer
                 String localFile = matcher.group(4);
                 if(localFile.startsWith(clientRoot.getAbsolutePath()))
                 {
-                    localFile = localFile.substring((int) clientRoot.getAbsolutePath().length());
+                    localFile = localFile.substring(clientRoot.getAbsolutePath().length());
                 }
 
                 // Separators must be normalised
@@ -694,7 +694,7 @@ public class P4Server extends CachingSCMServer
         revision.setComment(comment);
         // branch??
 
-        ScmFilepathFilter filter = new ScmFilepathFilter(this.excludedPaths);
+        ScmFilepathFilter filter = new ScmFilepathFilter(excludedPaths);
         Changelist changelist = new Changelist(getUid(), revision);
 
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
@@ -959,13 +959,41 @@ public class P4Server extends CachingSCMServer
         try
         {
             String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
-            // we need to take into account file filtering, so unfortunately it is no longer as simple as this...
-            return getLatestRevisionForFiles(clientName, root).getRevisionNumber() > ((NumericalRevision) since).getRevisionNumber();
+            long latestRevision = getLatestRevisionForFiles(clientName, root).getRevisionNumber();
+            long sinceRevision = ((NumericalRevision) since).getRevisionNumber();
+            if(latestRevision > sinceRevision)
+            {
+                if(excludedPaths != null && excludedPaths.size() > 0)
+                {
+                    // We have to find a change that includes a non-excluded
+                    // path.
+                    return nonExcludedChange(clientName, sinceRevision, latestRevision);
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
         finally
         {
             deleteClient(clientName);
         }
+    }
+
+    private boolean nonExcludedChange(String clientName, long sinceRevision, long latestRevision) throws SCMException
+    {
+        for(long revision = sinceRevision + 1; revision <= latestRevision; revision++)
+        {
+            if(getChangelist(clientName, revision) != null)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void update(File workDir, Revision rev) throws SCMException

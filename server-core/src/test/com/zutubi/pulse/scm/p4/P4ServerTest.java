@@ -10,6 +10,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -125,8 +126,35 @@ public class P4ServerTest extends PulseTestCase
         assertFalse(server.hasChangedSince(new NumericalRevision(6)));
     }
 
+    public void testHasChangeSinceExcluded() throws Exception
+    {
+        getServer("test-client");
+        server.setExcludedPaths(Arrays.asList("//depot2/**"));
+        assertFalse(server.hasChangedSince(new NumericalRevision(6)));
+    }
+
+    public void testHasChangeSinceSomeExcluded() throws Exception
+    {
+        getServer("test-client");
+        server.setExcludedPaths(Arrays.asList("//depot2/**"));
+        assertTrue(server.hasChangedSince(new NumericalRevision(3)));
+    }
+
+    public void testHasChangeNoneExcluded() throws Exception
+    {
+        getServer("test-client");
+        server.setExcludedPaths(Arrays.asList("//depot1/**"));
+        assertTrue(server.hasChangedSince(new NumericalRevision(6)));
+    }
+
     public void testGetChanges() throws Exception
     {
+        // [{ uid: :1666, rev: 7, changes: [//depot2/test-branch/file9#2 - INTEGRATE] },
+        //  { uid: :1666, rev: 6, changes: [//depot2/file9#2 - EDIT] },
+        //  { uid: :1666, rev: 5, changes: [//depot2/test-branch/file1#1 - BRANCH, //depot2/test-branch/file2#1 - BRANCH, //depot2/test-branch/file3#1 - BRANCH, //depot2/test-branch/file4#1 - BRANCH, //depot2/test-branch/file5#1 - BRANCH, //depot2/test-branch/file6#1 - BRANCH, //depot2/test-branch/file7#1 - BRANCH, //depot2/test-branch/file8#1 - BRANCH, //depot2/test-branch/file9#1 - BRANCH] },
+        //  { uid: :1666, rev: 4, changes: [//depot/file2#2 - EDIT, //depot2/file2#2 - EDIT] },
+        //  { uid: :1666, rev: 3, changes: [//depot2/file1#2 - EDIT, //depot2/file10#2 - DELETE] },
+        //  { uid: :1666, rev: 2, changes: [//depot2/file1#1 - ADD, //depot2/file10#1 - ADD, //depot2/file2#1 - ADD, //depot2/file3#1 - ADD, //depot2/file4#1 - ADD, //depot2/file5#1 - ADD, //depot2/file6#1 - ADD, //depot2/file7#1 - ADD, //depot2/file8#1 - ADD, //depot2/file9#1 - ADD] }]
         getServer("test-client");
         List<Changelist> changes = server.getChanges(new NumericalRevision(1), new NumericalRevision(7), "");
         assertEquals(6, changes.size());
@@ -280,7 +308,7 @@ public class P4ServerTest extends PulseTestCase
 
     public void testTagSameRevision() throws SCMException
     {
-        getServer("test-client");    
+        getServer("test-client");
         server.tag(new NumericalRevision(5), "test-tag", false);
         assertTrue(server.labelExists("test-client", "test-tag"));
         server.tag(new NumericalRevision(5), "test-tag", true);

@@ -106,4 +106,9 @@ public class Change extends Entity
     {
         this.action = Action.valueOf(action);
     }
+
+    public String toString()
+    {
+        return filename + "#" + revision.toString() + " - " + action.toString();
+    }
 }
