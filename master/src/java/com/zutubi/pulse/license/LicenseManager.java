@@ -2,6 +2,10 @@ package com.zutubi.pulse.license;
 
 import com.zutubi.pulse.bootstrap.DataResolver;
 import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.license.authorisation.CommercialLicenseAuthorisation;
+import com.zutubi.pulse.license.authorisation.EvaluationLicenseAuthorisation;
+import com.zutubi.pulse.license.authorisation.NonProfitLicenseAuthorisation;
+import com.zutubi.pulse.license.authorisation.PersonalLicenseAuthorisation;
 
 import java.io.IOException;
 
@@ -20,26 +24,26 @@ public class LicenseManager
         return resolver.getData().getLicense();
     }
 
-    public LicenseEnforcer getEnforcer() throws LicenseException
+    public LicenseAuthorisation getAuthorisation() throws LicenseException
     {
         try
         {
             License license = resolver.getData().getLicense();
             if (license.getType() == LicenseType.EVALUATION)
             {
-                return objectFactory.buildBean(EvaluationLicenseEnforcer.class);
+                return objectFactory.buildBean(EvaluationLicenseAuthorisation.class);
             }
             else if (license.getType() == LicenseType.COMMERCIAL)
             {
-                return objectFactory.buildBean(CommercialLicenseEnforcer.class);
+                return objectFactory.buildBean(CommercialLicenseAuthorisation.class);
             }
             else if (license.getType() == LicenseType.NON_PROFIT)
             {
-                return null;
+                return objectFactory.buildBean(NonProfitLicenseAuthorisation.class);
             }
             else if (license.getType() == LicenseType.PERSONAL)
             {
-                return null;
+                return objectFactory.buildBean(PersonalLicenseAuthorisation.class);
             }
             return null;
         }
@@ -51,10 +55,10 @@ public class LicenseManager
 
     public boolean isLicensed() throws LicenseException
     {
-        LicenseEnforcer e = getEnforcer();
+        LicenseAuthorisation e = getAuthorisation();
         if (e != null)
         {
-            return e.isLicensed();
+            return e.canRunPulse();
         }
         return false;
     }

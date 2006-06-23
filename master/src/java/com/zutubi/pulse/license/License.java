@@ -18,13 +18,13 @@ public class License
     private String holder;
     private Date expiryDate;
 
-    public static final int UNDEFINED = -1;
+    public static final int UNRESTRICTED = -1;
 
-    private int supportedProjects = UNDEFINED;
+    private int supportedProjects = UNRESTRICTED;
 
-    private int supportedUsers = UNDEFINED;
+    private int supportedUsers = UNRESTRICTED;
 
-    private int supportedAgents = UNDEFINED;
+    private int supportedAgents = UNRESTRICTED;
 
     public License(LicenseType type, String holder, Date expiry)
     {

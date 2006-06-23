@@ -58,6 +58,11 @@ public class DefaultProjectManager implements ProjectManager
         return projectDao.findByLikeName(name);
     }
 
+    public int getProjectCount()
+    {
+        return projectDao.count();
+    }
+
     private void deleteProject(Project entity)
     {
         buildManager.deleteAllBuilds(entity);

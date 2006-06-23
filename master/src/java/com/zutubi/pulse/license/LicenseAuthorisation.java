@@ -3,13 +3,13 @@ package com.zutubi.pulse.license;
 /**
  * <class-comment/>
  */
-public interface LicenseEnforcer
+public interface LicenseAuthorisation
 {
     /**
      * Returns true if the installed license enables pulse.
      *
      */
-    boolean isLicensed();
+    boolean canRunPulse();
 
     /**
      * Returns true if the installed license allows another project to be created.

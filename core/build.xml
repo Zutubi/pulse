@@ -19,6 +19,7 @@
         <replace file="${version.properties}" token="@VERSION@" value="${pulse.version}"/>
         <replace file="${version.properties}" token="@BUILD_DATE@" value="${build.date}"/>
         <replace file="${version.properties}" token="@BUILD_NUMBER@" value="${pulse.build}"/>
+        <replace file="${version.properties}" token="@RELEASE_DATE@" value="${pulse.release.date}"/>
     </target>
 
 </project>

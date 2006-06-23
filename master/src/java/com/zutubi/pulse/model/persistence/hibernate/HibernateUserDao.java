@@ -64,19 +64,6 @@ public class HibernateUserDao extends HibernateEntityDao<User> implements UserDa
         });
     }
 
-    public int getUserCount()
-    {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
-        {
-            public Object doInHibernate(Session session) throws HibernateException
-            {
-                Criteria criteria = session.createCriteria(User.class);
-                criteria.setProjection(Projections.rowCount());
-                return criteria.uniqueResult();
-            }
-        });
-    }
-
     public List<Project> getProjects(final User user)
     {
         User u = (User) getHibernateTemplate().execute(new HibernateCallback(){

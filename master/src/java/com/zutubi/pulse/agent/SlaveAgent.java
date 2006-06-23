@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class SlaveAgent implements Agent
 {
-    private final int masterBuildNumber = Version.getVersion().getIntBuildNumber();
+    private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
 
     private Slave slave;
     private Status status = Status.OFFLINE;

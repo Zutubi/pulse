@@ -99,8 +99,8 @@ public class DefaultUpgradeManager implements UpgradeManager
             return requiredTasks;
         }
 
-        int from = fromVersion.getIntBuildNumber();
-        int to = toVersion.getIntBuildNumber();
+        int from = fromVersion.getBuildNumberAsInt();
+        int to = toVersion.getBuildNumberAsInt();
 
         for (UpgradeTask task : upgradeTasks)
         {
@@ -115,12 +115,12 @@ public class DefaultUpgradeManager implements UpgradeManager
 
     private boolean checkVersions(Version from, Version to)
     {
-        if (from.getIntBuildNumber() == Version.INVALID)
+        if (from.getBuildNumberAsInt() == Version.INVALID)
         {
             LOG.warning("invalid from version build number detected: '"+from.getBuildNumber()+"'");
             return false;
         }
-        if (to.getIntBuildNumber() == Version.INVALID)
+        if (to.getBuildNumberAsInt() == Version.INVALID)
         {
             LOG.warning("invalid 'to' version build number detected: '"+to.getBuildNumber()+"'");
             return false;

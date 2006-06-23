@@ -105,6 +105,11 @@ public class DefaultAgentManager implements AgentManager
         }
     }
 
+    public int getAgentCount()
+    {
+        return getOnlineAgents().size();
+    }
+
     private void pingSlave(SlaveAgent agent)
     {
         long currentTime = System.currentTimeMillis();

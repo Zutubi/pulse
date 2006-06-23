@@ -47,6 +47,11 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public int getProjectCount()
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public void initialise()
     {
         throw new RuntimeException("Method not implemented.");

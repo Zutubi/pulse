@@ -2,10 +2,8 @@ package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.model.persistence.EntityDao;
-import org.hibernate.HibernateException;
-import org.hibernate.ObjectNotFoundException;
-import org.hibernate.Query;
-import org.hibernate.Session;
+import org.hibernate.*;
+import org.hibernate.criterion.Projections;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateObjectRetrievalFailureException;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
@@ -63,6 +61,20 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
     public void refresh(T entity)
     {
         getHibernateTemplate().refresh(entity);
+    }
+
+    public int count()
+    {
+        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = session.createCriteria(persistentClass());
+                criteria.setProjection(Projections.rowCount());
+                SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
+                return criteria.uniqueResult();
+            }
+        });
     }
 
     public <U> List<U> findByNamedQuery(final String queryName)

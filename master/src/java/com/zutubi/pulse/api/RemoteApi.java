@@ -35,7 +35,7 @@ public class RemoteApi
     public int getVersion()
     {
         Version v = Version.getVersion();
-        return v.getIntBuildNumber();
+        return v.getBuildNumberAsInt();
     }
 
     public String login(String username, String password) throws AuthenticationException

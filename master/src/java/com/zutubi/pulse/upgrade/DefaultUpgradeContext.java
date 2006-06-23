@@ -69,7 +69,7 @@ public class DefaultUpgradeContext implements UpgradeContext
      */
     public int getFromBuild()
     {
-        return from.getIntBuildNumber();
+        return from.getBuildNumberAsInt();
     }
 
     /**
@@ -80,7 +80,7 @@ public class DefaultUpgradeContext implements UpgradeContext
      */
     public int getToBuild()
     {
-        return to.getIntBuildNumber();
+        return to.getBuildNumberAsInt();
     }
 
     public void setTasks(List<UpgradeTask> tasks)

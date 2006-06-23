@@ -26,6 +26,8 @@ public interface ProjectManager extends EntityManager<Project>
 
     List<Project> getProjectsWithNameLike(String s);
 
+    int getProjectCount();
+
     /**
      * Deletes a build specification *and* all triggers that refer to it.
      *

@@ -154,8 +154,6 @@
             </fileset>
             <fileset dir="${test.dir}">
                 <include name="**/*.java"/>
-                <!-- contains license details. -->
-                <exclude name="**/SetupAcceptanceTest.java"/>
             </fileset>
         </copy>
 
@@ -191,6 +189,8 @@
                 <fileset dir="${test.dir}">
                     <include name="**/*Test.java"/>
                     <exclude name="**/P4*"/>
+                    <!-- temporarily exclude this test since it relies on a repo not located on windows. -->
+                    <exclude name="**/SVN*"/>
                     <!--<exclude name="**/Cvs*"/>-->
                     <!-- temporarily exclude this test since maven is not available on the build box.. -->
                     <exclude name="**/MavenCommandTest.java"/>

@@ -106,7 +106,7 @@ public class DefaultUserManager implements UserManager
 
     public int getUserCount()
     {
-        return userDao.getUserCount();
+        return userDao.count();
     }
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException

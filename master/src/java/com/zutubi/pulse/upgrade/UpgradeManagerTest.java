@@ -38,8 +38,8 @@ public class UpgradeManagerTest extends TestCase
         upgradeManager.addTask(new MockUpgradeTask(40));
         upgradeManager.addTask(new MockUpgradeTask(20));
 
-        Version fromVersion = new Version("x", "y", "2");
-        Version toVersion = new Version("xx", "yy", "35");
+        Version fromVersion = new Version("x", "y", "2", "z");
+        Version toVersion = new Version("xx", "yy", "35", "zz");
 
         assertTrue(upgradeManager.isUpgradeRequired(fromVersion, toVersion));
 

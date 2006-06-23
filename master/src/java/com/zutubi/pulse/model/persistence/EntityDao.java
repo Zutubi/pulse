@@ -21,4 +21,6 @@ public interface EntityDao<T extends Entity>
     void delete(T entity);
 
     void refresh(T entity);
+
+    int count();
 }

@@ -534,7 +534,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private Agent createAvailableAgent(long type)
     {
         SlaveAgent slaveAgent = new SlaveAgent(createSlave(type), null, null, new MockBuildService(type));
-        slaveAgent.pinged(0, Version.getVersion().getIntBuildNumber());
+        slaveAgent.pinged(0, Version.getVersion().getBuildNumberAsInt());
         return slaveAgent;
     }
 
@@ -765,6 +765,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
+        public int getAgentCount()
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
         public void slaveAdded(long id)
         {
             throw new RuntimeException("Method not implemented.");
@@ -783,7 +788,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public void addSlave(Slave slave)
         {
             SlaveAgent agent = new SlaveAgent(slave, null, null, new MockBuildService(slave.getId()));
-            agent.pinged(0, Version.getVersion().getIntBuildNumber());
+            agent.pinged(0, Version.getVersion().getBuildNumberAsInt());
             onlineAgents.put(slave.getId(), agent);
         }
     }

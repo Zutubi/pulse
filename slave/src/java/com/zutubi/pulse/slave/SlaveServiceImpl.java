@@ -31,7 +31,7 @@ public class SlaveServiceImpl implements SlaveService
 
     public int ping()
     {
-        return Version.getVersion().getIntBuildNumber();
+        return Version.getVersion().getBuildNumberAsInt();
     }
 
     public boolean build(String token, String master, long slaveId, RecipeRequest request) throws InvalidTokenException

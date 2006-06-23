@@ -131,16 +131,16 @@ public class LicenseEncoder implements LicenseKeyFactory
             if (type == LicenseType.EVALUATION)
             {
                 // keep default values of License.UNDEFINED.
-                license.setSupported(License.UNDEFINED, License.UNDEFINED, License.UNDEFINED);
+                license.setSupported(License.UNRESTRICTED, License.UNRESTRICTED, License.UNRESTRICTED);
             }
             else if (type == LicenseType.COMMERCIAL)
             {
                 // keep default values of License.UNDEFINED.
-                license.setSupported(License.UNDEFINED, License.UNDEFINED, License.UNDEFINED);
+                license.setSupported(License.UNRESTRICTED, License.UNRESTRICTED, License.UNRESTRICTED);
             }
             else if (type == LicenseType.NON_PROFIT)
             {
-                license.setSupported(5, 10, License.UNDEFINED);
+                license.setSupported(5, 10, License.UNRESTRICTED);
             }
             else if (type == LicenseType.PERSONAL)
             {

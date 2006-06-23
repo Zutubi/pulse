@@ -22,6 +22,11 @@ public abstract class MockEntityDao<T extends Entity> implements EntityDao<T>
         entities.remove(entity);
     }
 
+    public int count()
+    {
+        return entities.size();
+    }
+
     public List<T> findAll()
     {
         return new LinkedList<T>(entities);
