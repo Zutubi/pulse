@@ -1102,6 +1102,96 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertTextPresent("This project already has a post build action with name 'dupit'");
     }
 
+    public void testAddExeAction()
+    {
+        addExeAction("test-action");
+
+        assertProjectActionTable(new String[][] { getActionRow("test-action", "run executable") });
+
+        assertAndClick("edit_test-action");
+        EditExeActionForm editForm = new EditExeActionForm(tester);
+        editForm.assertFormPresent();
+        editForm.assertFormElements("test-action", null, null, "true", "thecommand", "theargs");
+    }
+
+    private void addExeAction(String name)
+    {
+        assertAndClick("project.post.build.action.add");
+
+        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester);
+        typeForm.assertFormPresent();
+        typeForm.nextFormElements(name, "exe", null, null, "true");
+
+        AddExeActionForm exeForm = new AddExeActionForm(tester);
+        exeForm.assertFormPresent();
+        exeForm.nextFormElements("thecommand", "theargs");
+    }
+
+    public void testAddExeActionValidation()
+    {
+        assertAndClick("project.post.build.action.add");
+
+        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester);
+        typeForm.assertFormPresent();
+        typeForm.nextFormElements("", "tag", null, null, "true");
+        typeForm.assertFormPresent();
+        assertTextPresent("name is required");
+
+        typeForm.nextFormElements("my-action", "tag", null, null, "true");
+        AddTagActionForm tagForm = new AddTagActionForm(tester);
+        tagForm.assertFormPresent();
+        tagForm.nextFormElements("", "true");
+        tagForm.assertFormPresent();
+        assertTextPresent("tag name is required");
+
+        tagForm.nextFormElements("${unknown}", "true");
+        tagForm.assertFormPresent();
+        assertTextPresent("Reference to unknown variable 'unknown'");
+    }
+
+    public void testEditExeAction()
+    {
+        addExeAction("myexe");
+
+        assertAndClick("edit_myexe");
+        EditExeActionForm form = new EditExeActionForm(tester);
+        form.assertFormPresent();
+        String id = tester.getDialog().getValueForOption("specIds", "default");
+        form.saveFormElements("editedexe", id, "SUCCESS", "false", "command", "${project} ${number} ${status}");
+
+        assertProjectActionTable(new String[][] { getActionRow("editedexe", "run executable") });
+        assertAndClick("edit_editedexe");
+        form.assertFormPresent();
+        form.assertFormElements("editedexe", id, "SUCCESS", "false", "command", "${project} ${number} ${status}");
+    }
+
+    public void testEditExeActionValidation()
+    {
+        addExeAction("myexe");
+
+        assertAndClick("edit_myexe");
+        EditExeActionForm form = new EditExeActionForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements("", null, null, "false", "", "");
+        form.assertFormPresent();
+        assertTextPresent("name is required");
+        assertTextPresent("command is required");
+
+        form.saveFormElements("newname", null, null, "false", "", "${unknown}");
+        assertTextPresent("Reference to unknown variable 'unknown'");
+    }
+
+    public void testEditExeActionSameName()
+    {
+        addExeAction("myexe");
+
+        assertAndClick("edit_myexe");
+        EditExeActionForm form = new EditExeActionForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements("myexe", null, null, "false", "command", "args");
+        assertProjectActionTable(new String[][] { getActionRow("myexe", "run executable") });
+    }
+
     public void testDeletePostBuildAction()
     {
         addTagAction("deadtag");

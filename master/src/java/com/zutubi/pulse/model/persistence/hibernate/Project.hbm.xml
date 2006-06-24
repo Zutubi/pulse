@@ -167,6 +167,11 @@
 
         <property name="failOnError" type="boolean"/>
 
+        <subclass name="com.zutubi.pulse.model.RunExecutablePostBuildAction" discriminator-value="EXECUTABLE" lazy="false">
+            <property name="command" type="string"/>
+            <property name="arguments" type="string" length="1023"/>
+        </subclass>
+
         <subclass name="com.zutubi.pulse.model.TagPostBuildAction" discriminator-value="TAG" lazy="false">
             <property name="tag" type="string"/>
             <property name="moveExisting" type="boolean"/>

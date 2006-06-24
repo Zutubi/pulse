@@ -2,6 +2,9 @@ package com.zutubi.pulse.util;
 
 import com.zutubi.pulse.test.PulseTestCase;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  */
 public class StringUtilsTest extends PulseTestCase
@@ -139,5 +142,98 @@ public class StringUtilsTest extends PulseTestCase
     public void testGetLinePastEnd()
     {
         assertNull(StringUtils.getLine("some\nlines\nhere", 4));
+    }
+
+    public void testSplitEmpty()
+    {
+        splitHelper("");
+    }
+
+    public void testSplitSpace()
+    {
+        splitHelper(" ");
+    }
+
+    public void testSplitSpaces()
+    {
+        splitHelper("   ");
+    }
+
+    public void testSplitSimple()
+    {
+        splitHelper("one two", "one", "two");
+    }
+
+    public void testSplitMore()
+    {
+        splitHelper("one two  three   four", "one", "two", "three", "four");
+    }
+
+    public void testSplitEscape()
+    {
+        splitHelper("one\\ two", "one two");
+    }
+
+    public void testSplitEscapeBackslash()
+    {
+        splitHelper("one\\\\ two", "one\\", "two");
+    }
+
+    public void testSplitQuotes()
+    {
+        splitHelper("hello \"you idiot\" there", "hello", "you idiot", "there");
+    }
+
+    public void testSplitEscapeQuote()
+    {
+        splitHelper("one\\\" two", "one\"", "two");
+    }
+
+    public void testSplitEscapeQuoteInQuotes()
+    {
+        splitHelper("\"one\\\"two\"", "one\"two");
+    }
+
+    public void testQuoteEmpty()
+    {
+        splitHelper("\"\"", "");
+    }
+
+    public void testQuoteEmptyAmongst()
+    {
+        splitHelper("wow \"\" empty", "wow", "", "empty");
+    }
+
+    public void testEndsInBackslash()
+    {
+        try
+        {
+            StringUtils.split("bad ending \\");
+            fail();
+        }
+        catch(IllegalArgumentException e)
+        {
+            assertEquals("Unexpected end of input after backslash (\\)", e.getMessage());
+        }
+    }
+
+    public void testUnfinishedQuotes()
+    {
+        try
+        {
+            StringUtils.split("\"bad ending");
+            fail();
+        }
+        catch(IllegalArgumentException e)
+        {
+            assertEquals("Unexpected end of input looking for end of quote (\")", e.getMessage());
+        }
+    }
+    
+    private void splitHelper(String s, String... expected)
+    {
+        List<String> expectedParts = Arrays.asList(expected);
+        List<String> gotParts = StringUtils.split(s);
+        assertEquals(expectedParts, gotParts);
     }
 }

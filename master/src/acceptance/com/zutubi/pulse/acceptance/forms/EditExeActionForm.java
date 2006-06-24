@@ -4,32 +4,31 @@ import net.sourceforge.jwebunit.WebTester;
 
 /**
  */
-public class AddPostBuildActionForm extends BaseForm
+public class EditExeActionForm extends BaseForm
 {
-    public AddPostBuildActionForm(WebTester tester)
+    public EditExeActionForm(WebTester tester)
     {
         super(tester);
     }
 
     public String getFormName()
     {
-        return "post.build.action.type";
+        return "edit.exe.post.build.action";
     }
 
     public String[] getFieldNames()
     {
-        return new String[]{ "name", "type", "specIds", "stateNames", "failOnError" };
+        return new String[]{ "newName", "specIds", "stateNames", "failOnError", "postBuildAction.command", "postBuildAction.arguments" };
     }
 
     public int[] getFieldTypes()
     {
-        return new int[] { TEXTFIELD, SELECT, SELECT, SELECT, CHECKBOX };
+        return new int[] { TEXTFIELD, SELECT, SELECT, CHECKBOX, TEXTFIELD, TEXTFIELD };
     }
 
     public void assertFormPresent()
     {
         super.assertFormPresent();
-        tester.assertOptionValuesEqual("type", new String[]{ "tag", "exe" });
         tester.assertOptionValuesEqual("stateNames", new String[] { "ERROR", "FAILURE", "SUCCESS" });
     }
 }

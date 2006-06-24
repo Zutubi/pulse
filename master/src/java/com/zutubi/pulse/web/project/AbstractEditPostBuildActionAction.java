@@ -145,7 +145,7 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
         }
 
         PostBuildAction a = getProject().getPostBuildAction(newName);
-        if(a != null)
+        if(a != null && a.getId() != getPostBuildAction().getId())
         {
             addFieldError("newName", "This project already has a post build action with name '" + newName + "'");
         }

@@ -51,7 +51,7 @@ public class PostBuildActionTest extends PulseTestCase
         action.setFailOnError(true);
         BuildResult result = testResult(ResultState.SUCCESS);
         assertEquals(ResultState.ERROR, result.getState());
-        assertEquals("test error", result.getFeatures(Feature.Level.ERROR).get(0).getSummary());
+        assertEquals("Executing post build action 'mock': test error", result.getFeatures(Feature.Level.ERROR).get(0).getSummary());
     }
 
     private BuildResult testResult(String spec)
@@ -72,6 +72,11 @@ public class PostBuildActionTest extends PulseTestCase
     private class MockPostBuildAction extends PostBuildAction
     {
         private String error = null;
+
+        public MockPostBuildAction()
+        {
+            setName("mock");
+        }
 
         protected void internalExecute(BuildResult result)
         {

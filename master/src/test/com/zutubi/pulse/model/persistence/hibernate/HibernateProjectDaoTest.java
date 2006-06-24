@@ -182,6 +182,23 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         assertPropertyEquals(action, otherAction);
     }
 
+    public void testLoadSaveExecutableAction()
+    {
+        BuildSpecification spec = new BuildSpecification("test");
+        buildSpecificationDao.save(spec);
+
+        RunExecutablePostBuildAction action = new RunExecutablePostBuildAction();
+        action.setSpecifications(Arrays.asList(new BuildSpecification[] {spec}));
+        action.setStates(Arrays.asList(new ResultState[] {ResultState.SUCCESS}));
+        action.setCommand("command");
+        action.setArguments("args");
+        projectDao.save(action);
+        commitAndRefreshTransaction();
+
+        RunExecutablePostBuildAction otherAction = projectDao.findRunExecutablePostBuildAction(action.getId());
+        assertPropertyEquals(action, otherAction);
+    }
+
     public void testFindByLikeName()
     {
         Project projectA = new Project("nameA", "description");

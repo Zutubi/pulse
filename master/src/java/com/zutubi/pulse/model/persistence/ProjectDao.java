@@ -28,9 +28,14 @@ public interface ProjectDao extends EntityDao<Project>
 
     void save(TagPostBuildAction action);
 
+    void save(RunExecutablePostBuildAction action);
+
     AntPulseFileDetails findAntPulseFileSource(long id);
 
     MakePulseFileDetails findMakePulseFileSource(long id);
 
     TagPostBuildAction findTagPostBuildAction(long id);
+
+    RunExecutablePostBuildAction findRunExecutablePostBuildAction(long id);
+
 }

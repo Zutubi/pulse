@@ -1,16 +1,16 @@
-#helpTag("Project+Tag+Post+Build+Actions")
+#helpTag("Project+Run+Executable+Post+Build+Actions")
 #authorisationTags($principle)
 #projectTags($project)
 <html>
 <head>
-    <title>#wwtext("name=edit.tag.post.build.action")</title>
+    <title>#wwtext("name=edit.exe.post.build.action")</title>
 </head>
 <body>
     #projectTabs("configuration")
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=editTagAction.action" "id=edit.tag.post.build.action" "heading=%{getText('edit.tag.post.build.action')}" "method=post")
+#wwcform("action=editExeAction.action" "id=edit.exe.post.build.action" "heading=%{getText('edit.exe.post.build.action')}" "method=post")
     #wwhidden("name=id")
     #wwhidden("name=projectId")
 
@@ -21,14 +21,10 @@
     #inlineHelp("post.build.action.states.help")
     #wwcheckbox("name=failOnError" "label=%{getText('post.build.action.fail.on.error')}" "tabindex=4")
     #inlineHelp("post.build.action.fail.on.error.help")
-    #wwtextfield("name=postBuildAction.tag" "label=%{getText('post.build.action.tag.name')}" "required=true" "size=60" "tabindex=5" "onkeypress=return submitenter(this,event)")
-#if ($project.scm.class.name == 'com.zutubi.pulse.model.Svn')
-    #inlineHelp("post.build.action.tag.name.help.svn")
-#else
-    #inlineHelp("post.build.action.tag.name.help")
-#end
-    #wwcheckbox("name=moveExisting" "label=%{getText('post.build.action.tag.move')}" "tabindex=6")
-    #inlineHelp("post.build.action.tag.move.help")
+    #wwtextfield("name=postBuildAction.command" "label=%{getText('post.build.action.exe.command')}" "required=true" "tabindex=5" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("post.build.action.exe.command.help")
+    #wwtextfield("name=postBuildAction.arguments" "label=%{getText('post.build.action.exe.arguments')}" "tabindex=6" "size=60" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("post.build.action.exe.arguments.help")
 
     #saveCancel(7)
 

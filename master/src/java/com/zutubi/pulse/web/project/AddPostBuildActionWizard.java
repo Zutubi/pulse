@@ -16,6 +16,7 @@ import java.util.*;
  */
 public class AddPostBuildActionWizard extends BaseWizard
 {
+    private static final String EXE_STATE = "exe";
     private static final String TAG_STATE = "tag";
 
 
@@ -25,15 +26,18 @@ public class AddPostBuildActionWizard extends BaseWizard
 
     private SelectActionType selectState;
     private ConfigureTag configTag;
+    private ConfigureExe configExe;
 
     public AddPostBuildActionWizard()
     {
         selectState = new SelectActionType(this, "select");
         configTag = new ConfigureTag(this, TAG_STATE);
+        configExe = new ConfigureExe(this, EXE_STATE);
         WizardCompleteState finalState = new WizardCompleteState(this, "success");
 
         addInitialState("select", selectState);
         addState(configTag);
+        addState(configExe);
         addFinalState("success", finalState);
     }
 
@@ -57,7 +61,7 @@ public class AddPostBuildActionWizard extends BaseWizard
         Project project = getProject();
 
         PostBuildAction action = null;
-        if (AddPostBuildActionWizard.TAG_STATE.equals(selectState.getType()))
+        if (TAG_STATE.equals(selectState.getType()))
         {
             action = new TagPostBuildAction(selectState.getName(),
                     project.lookupBuildSpecifications(selectState.getSpecIds()),
@@ -66,6 +70,16 @@ public class AddPostBuildActionWizard extends BaseWizard
                     configTag.getTagName(),
                     configTag.getMoveExisting());
         }
+        else if (EXE_STATE.equals(selectState.getType()))
+        {
+            action = new RunExecutablePostBuildAction(selectState.getName(),
+                    project.lookupBuildSpecifications(selectState.getSpecIds()),
+                    ResultState.getStatesList(selectState.getStateNames()),
+                    selectState.getFailOnError(),
+                    configExe.getCommand(),
+                    configExe.getArguments());
+        }
+
 
         project.addPostBuildAction(action);
         projectManager.save(project);
@@ -203,8 +217,9 @@ public class AddPostBuildActionWizard extends BaseWizard
 
             if (types == null)
             {
-                types = new TreeMap<String, String>();
+                types = new LinkedHashMap<String, String>();
                 types.put(TAG_STATE, "apply tag");
+                types.put(EXE_STATE, "run executable");
             }
 
         }
@@ -216,6 +231,54 @@ public class AddPostBuildActionWizard extends BaseWizard
                 return type;
             }
             return super.getStateName();
+        }
+    }
+
+    public class ConfigureExe extends BaseWizardState implements Validateable
+    {
+        private String command;
+        private String arguments;
+
+        public ConfigureExe(Wizard wizard, String stateName)
+        {
+            super(wizard, stateName);
+        }
+
+        public String getCommand()
+        {
+            return command;
+        }
+
+        public void setCommand(String command)
+        {
+            this.command = command;
+        }
+
+        public String getArguments()
+        {
+            return arguments;
+        }
+
+        public void setArguments(String arguments)
+        {
+            this.arguments = arguments;
+        }
+
+        public String getNextStateName()
+        {
+            return "success";
+        }
+
+        public void validate()
+        {
+            try
+            {
+                RunExecutablePostBuildAction.validateArguments(arguments);
+            }
+            catch (Exception e)
+            {
+                addFieldError("arguments", e.getMessage());
+            }
         }
     }
 

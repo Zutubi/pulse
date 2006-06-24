@@ -14,7 +14,7 @@
     #wwhidden("name=state")
     #wwhidden("name=submit")
 
-    #wwtextfield("name=tagName" "label=%{getText('post.build.action.tag.name')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=tagName" "label=%{getText('post.build.action.tag.name')}" "required=true" "size=60" "tabindex=1" "onkeypress=return submitenter(this,event)")
 #if ($project.scm.class.name == 'com.zutubi.pulse.model.Svn')
     #inlineHelp("post.build.action.tag.name.help.svn")
 #else

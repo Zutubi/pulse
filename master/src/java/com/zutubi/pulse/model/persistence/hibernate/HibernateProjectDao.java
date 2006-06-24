@@ -64,6 +64,11 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
         getHibernateTemplate().saveOrUpdate(action);
     }
 
+    public void save(RunExecutablePostBuildAction action)
+    {
+        getHibernateTemplate().saveOrUpdate(action);
+    }
+
     public AntPulseFileDetails findAntPulseFileSource(long id)
     {
         return (AntPulseFileDetails) getHibernateTemplate().load(AntPulseFileDetails.class, id);
@@ -77,5 +82,10 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
     public TagPostBuildAction findTagPostBuildAction(long id)
     {
         return (TagPostBuildAction) getHibernateTemplate().load(TagPostBuildAction.class, id);
+    }
+
+    public RunExecutablePostBuildAction findRunExecutablePostBuildAction(long id)
+    {
+        return  (RunExecutablePostBuildAction) getHibernateTemplate().load(RunExecutablePostBuildAction.class, id);
     }
 }
