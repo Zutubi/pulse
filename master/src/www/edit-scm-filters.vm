@@ -3,10 +3,12 @@
 #projectTags($project)
 <html>
 <head>
-    <title>#wwtext("name=edit.cvs")</title>
+    <title>#wwtext("name=scm.filters")</title>
 </head>
 <body>
     #projectTabs("configuration")
+
+    <h1>:: #wwtext("name=scm.filters") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
 
@@ -46,7 +48,28 @@
                     Go back to <a href="configureProject.action?id=$projectId">project configuration</a>.
                 </p>
             </td>
-            <td></td>
+            <td class="columns" width="50%">
+                <p>The Scm Filter allows you to filter out modifications that are used to trigger a build. If for example,
+                   you have certain files (such as web pages or document files) under source control that you don't want
+                   to have trigger the build, you can use an Scm Filter to ensure that their changes will not trigger a new build.
+                </p>
+                <p>
+                    <h3>Format:</h3>
+                    The format of the Scm Filter string is the same as that used by Apache Ant patterns.
+                    <ul>
+                        <li><b>**</b> matches any number of directories.</li>
+                        <li><b>*</b> matches any number of characters within a particular directory.</li>
+                        <li><b>/</b> is a directory separator.</li>
+                    </ul>
+                </p>
+                <p>
+                   <h3>Examples:</h3>
+                    <ul>
+                        <li>The following scm filter will exclude all html files. <b>**/*.html</b></li>
+                        <li>The following scm filter will exclude the contents of the docs directory <b>**/docs/**/*</b></li>
+                    </ul>
+                </p>
+            </td>
 
         </tr>
     </table>
