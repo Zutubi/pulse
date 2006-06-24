@@ -1,17 +1,16 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.ChangelistUtils;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.persistence.BuildResultDao;
+import com.zutubi.pulse.model.NamedEntityComparator;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.ProjectNameComparator;
 
-import java.util.List;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  */
@@ -85,7 +84,7 @@ public class ViewChangelistAction extends ActionSupport
         {
             public int compare(BuildResult b1, BuildResult b2)
             {
-                ProjectNameComparator comparator = new ProjectNameComparator();
+                NamedEntityComparator comparator = new NamedEntityComparator();
                 int result = comparator.compare(b1.getProject(), b2.getProject());
                 if(result == 0)
                 {

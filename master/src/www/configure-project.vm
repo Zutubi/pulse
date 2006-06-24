@@ -183,6 +183,37 @@
 #end
                 </table>
 
+                <!-- Post Build Action -->
+
+                <table id="project.post.build.actions" class="fill-content">
+                    #headingRow("project.post.build.actions" 4)
+                    <tr>
+                        #contentHeading("post.build.action.name" 1)
+                        #contentHeading("post.build.action.type" 1)
+#acl("domainObject=project" "hasPermission=4,1")
+                        #contentHeading("actions" 2)
+#end
+                    </tr>
+#if($project.postBuildActions.size() > 0)
+    #foreach($post in $project.postBuildActions)
+        #set($confirmMessage = $action.getText("post.build.action.confirm.delete", [$post.name]))
+                    <tr>
+                        #dynamicCell($post.name)
+                        #dynamicCell($post.type)
+        #acl("domainObject=project" "hasPermission=4,1")
+                        #editCell("editPostBuildAction!input.action?id=$post.id&amp;projectId=$project.id" "edit_$!webwork.htmlEncode($post.name)")
+                        #deleteCell("delete_$!webwork.htmlEncode($post.name)" "deletePostBuildAction.action?id=$post.id&amp;projectId=$project.id" $confirmMessage)
+        #end
+                    </tr>
+    #end
+#else
+                    #contentRow("post.build.actions.none" 4)
+#end
+#acl("domainObject=project" "hasPermission=4,1")
+                    #addRow("post.build.action.add" 4 "addPostBuildAction.action?projectId=$project.id" "project.post.build.action.add")
+#end
+                </table>
+
                 <!-- Cleanup rules -->
 
                 <table id="project.cleanup" class="fill-content">

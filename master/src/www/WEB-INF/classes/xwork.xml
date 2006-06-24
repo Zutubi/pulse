@@ -538,6 +538,37 @@
             <result name="success" type="velocity">view-triggers.vm</result>
         </action>
 
+        <action name="addPostBuildAction" class="com.zutubi.pulse.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.zutubi.pulse.web.project.AddPostBuildActionWizard</param>
+            <result name="select" type="velocity">select-post-build-action.vm</result>
+            <result name="tag" type="velocity">configure-tag-action.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
+        </action>
+
+        <action name="deletePostBuildAction" class="com.zutubi.pulse.web.project.DeletePostBuildAction">
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="editPostBuildAction" class="com.zutubi.pulse.web.project.EditPostBuildActionAction">
+            <result name="apply tag" type="chain">editTagAction!input</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editTagAction!input" class="com.zutubi.pulse.web.project.EditTagActionAction" method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-action-tag.vm</result>
+        </action>
+
+        <action name="editTagAction" class="com.zutubi.pulse.web.project.EditTagActionAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-action-tag.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
         <action name="viewSystemInfo" class="com.zutubi.pulse.web.agents.SystemInfoAction">
             <result name="success" type="velocity">/view-systeminfo.vm</result>
         </action>

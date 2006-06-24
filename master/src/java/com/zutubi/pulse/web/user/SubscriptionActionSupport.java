@@ -1,17 +1,14 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.ProjectNameComparator;
+import antlr.collections.AST;
 import com.zutubi.pulse.condition.NotifyConditionFactory;
-import com.zutubi.pulse.condition.FalseNotifyCondition;
 import com.zutubi.pulse.condition.antlr.NotifyConditionLexer;
 import com.zutubi.pulse.condition.antlr.NotifyConditionParser;
 import com.zutubi.pulse.condition.antlr.NotifyConditionTreeParser;
 import com.zutubi.pulse.model.*;
 
-import java.util.*;
 import java.io.StringReader;
-
-import antlr.collections.AST;
+import java.util.*;
 
 /**
  *
@@ -89,7 +86,7 @@ public class SubscriptionActionSupport extends UserActionSupport
         if(projects == null)
         {
             projects = projectManager.getAllProjects();
-            Collections.sort(projects, new ProjectNameComparator());
+            Collections.sort(projects, new NamedEntityComparator());
         }
         return projects;
     }

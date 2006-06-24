@@ -10,12 +10,12 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.SlaveAvailableEvent;
 import com.zutubi.pulse.events.SlaveUnavailableEvent;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
+import com.zutubi.pulse.model.NamedEntityComparator;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
-import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.util.Sort;
+import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.MalformedURLException;
@@ -141,14 +141,7 @@ public class DefaultAgentManager implements AgentManager
     public List<Agent> getAllAgents()
     {
         List<Agent> result = new LinkedList<Agent>(slaveAgents.values());
-        final Comparator<String> comparator = new Sort.StringComparator();
-        Collections.sort(result, new Comparator<Agent>()
-        {
-            public int compare(Agent a1, Agent a2)
-            {
-                return comparator.compare(a1.getName(), a2.getName());
-            }
-        });
+        Collections.sort(result, new NamedEntityComparator());
 
         result.add(0, masterAgent);
         return result;

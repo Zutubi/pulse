@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.ProjectNameComparator;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.model.NamedEntityComparator;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.scheduling.BuildCompletedEventFilter;
@@ -26,7 +26,7 @@ public class BuildCompletedTriggerHelper
         filterSpecifications = new LinkedHashMap<Long, List<String>>();
 
         List<Project> projects = projectManager.getAllProjects();
-        Collections.sort(projects, new ProjectNameComparator());
+        Collections.sort(projects, new NamedEntityComparator());
         for(Project p: projects)
         {
             filterProjects.put(p.getId(), p.getName());

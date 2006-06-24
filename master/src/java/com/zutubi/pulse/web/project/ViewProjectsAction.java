@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.ProjectNameComparator;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.NamedEntityComparator;
 import com.zutubi.pulse.model.Project;
 
 import java.util.Collections;
@@ -35,7 +35,7 @@ public class ViewProjectsAction extends ProjectActionSupport
     public String execute()
     {
         projects = getProjectManager().getAllProjects();
-        Collections.sort(projects, new ProjectNameComparator());
+        Collections.sort(projects, new NamedEntityComparator());
 
         latestBuilds = new LinkedList<BuildResult>();
 

@@ -1,12 +1,14 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.model.NamedEntity;
+
 import java.util.Map;
 import java.util.TreeMap;
 
 /**
  * <class-comment/>
  */
-public class Resource extends Entity
+public class Resource extends Entity implements NamedEntity
 {
     private String name;
     private Map<String, Property> properties = new TreeMap<String, Property>();

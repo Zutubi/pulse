@@ -82,6 +82,11 @@ public class PostBuildActionTest extends PulseTestCase
             }
         }
 
+        public String getType()
+        {
+            return "mock";
+        }
+
         public void setError(String error)
         {
             this.error = error;

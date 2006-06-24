@@ -2,14 +2,11 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
 
-import java.util.List;
-import java.util.LinkedList;
-
 /**
  * Describes the steps (recipes) required for a build, and where they should
  * be executed.
  */
-public class BuildSpecification extends Entity
+public class BuildSpecification extends Entity implements NamedEntity
 {
     public static final int TIMEOUT_NEVER = 0;
 

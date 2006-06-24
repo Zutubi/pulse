@@ -1,6 +1,7 @@
 package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.model.NamedEntity;
 import com.zutubi.pulse.model.Project;
 
 import java.io.Serializable;
@@ -9,7 +10,7 @@ import java.util.*;
 /**
  * <class-comment/>
  */
-public abstract class Trigger extends Entity
+public abstract class Trigger extends Entity implements NamedEntity
 {
     /**
      * The default group to be used when no group is specified.

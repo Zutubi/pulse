@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.opensymphony.util.TextUtils;
+
+import java.util.*;
 
 public enum ResultState
 {
@@ -137,8 +137,26 @@ public enum ResultState
         return Arrays.asList(getStates(value));
     }
 
+    public static List<ResultState> getStatesList(List<String> names)
+    {
+        List<ResultState> result = new LinkedList<ResultState>();
+        if (names != null)
+        {
+            for(String name: names)
+            {
+                result.add(ResultState.valueOf(name));
+            }
+        }
+        return result;
+    }
+
     public static ResultState[] getStates(String value)
     {
+        if(!TextUtils.stringSet(value))
+        {
+            return new ResultState[0];
+        }
+
         String[] parts = value.split(SEPARATOR);
         ResultState[] states = new ResultState[parts.length];
 
@@ -150,4 +168,13 @@ public enum ResultState
         return states;
     }
 
+    public static Map<String, String> getCompletedStatesMap()
+    {
+        Map<String, String> states = new LinkedHashMap<String, String>();
+        states.put(ResultState.ERROR.toString(), "error");
+        states.put(ResultState.FAILURE.toString(), "failure");
+        states.put(ResultState.SUCCESS.toString(), "success");
+
+        return states;
+    }
 }

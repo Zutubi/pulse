@@ -12,7 +12,7 @@ import java.util.List;
  * 
  *
  */
-public class Project extends Entity implements AclObjectIdentity, AclObjectIdentityAware
+public class Project extends Entity implements AclObjectIdentity, AclObjectIdentityAware, NamedEntity
 {
     public enum State
     {
@@ -216,6 +216,35 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         return buildSpecifications.remove(buildSpecification);
     }
 
+    public List<Long> getBuildSpecificationIds()
+    {
+        List<Long> ids = new LinkedList<Long>();
+        for(BuildSpecification spec: buildSpecifications)
+        {
+            ids.add(spec.getId());
+        }
+
+        return ids;
+    }
+
+    public List<BuildSpecification> lookupBuildSpecifications(List<Long> ids)
+    {
+        List<BuildSpecification> result = new LinkedList<BuildSpecification>();
+        if (ids != null)
+        {
+            for(Long id: ids)
+            {
+                BuildSpecification buildSpecification = getBuildSpecification(id);
+                if(buildSpecification != null)
+                {
+                    result.add(buildSpecification);
+                }
+            }
+        }
+
+        return result;
+    }
+
     public PulseFileDetails getPulseFileDetails()
     {
         return pulseFileDetails;
@@ -257,6 +286,32 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         {
             postBuildActions.remove(deadActionWalking);
         }
+    }
+
+    public PostBuildAction getPostBuildAction(String name)
+    {
+        for(PostBuildAction p: postBuildActions)
+        {
+            if(p.getName().equals(name))
+            {
+                return p;
+            }
+        }
+
+        return null;
+    }
+
+    public PostBuildAction getPostBuildAction(long id)
+    {
+        for(PostBuildAction a: postBuildActions)
+        {
+            if(a.getId() == id)
+            {
+                return a;
+            }
+        }
+
+        return null;
     }
 
     public List<CleanupRule> getCleanupRules()

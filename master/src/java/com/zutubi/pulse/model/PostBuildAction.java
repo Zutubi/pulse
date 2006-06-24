@@ -21,6 +21,18 @@ public abstract class PostBuildAction extends Entity
     private boolean failOnError = false;
     private List<String> errors = new LinkedList<String>();
 
+    protected PostBuildAction()
+    {
+    }
+
+    protected PostBuildAction(String name, List<BuildSpecification> specifications, List<ResultState> states, boolean failOnError)
+    {
+        this.name = name;
+        this.specifications = specifications;
+        this.states = states;
+        this.failOnError = failOnError;
+    }
+
     public void execute(BuildResult result)
     {
         if(resultMatches(result))
@@ -101,6 +113,17 @@ public abstract class PostBuildAction extends Entity
         this.specifications = specifications;
     }
 
+    public List<Long> getBuildSpecificationIds()
+    {
+        List<Long> ids = new LinkedList<Long>();
+        for(BuildSpecification spec: specifications)
+        {
+            ids.add(spec.getId());
+        }
+
+        return ids;
+    }
+
     public List<ResultState> getStates()
     {
         return states;
@@ -121,7 +144,7 @@ public abstract class PostBuildAction extends Entity
         states = ResultState.getStatesList(value);
     }
 
-    public boolean isFailOnError()
+    public boolean getFailOnError()
     {
         return failOnError;
     }
@@ -137,5 +160,7 @@ public abstract class PostBuildAction extends Entity
     }
 
     protected abstract void internalExecute(BuildResult result);
+
+    public abstract String getType();
 
 }
