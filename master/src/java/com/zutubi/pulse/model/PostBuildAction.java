@@ -156,7 +156,7 @@ public abstract class PostBuildAction extends Entity
 
     protected void addError(String error)
     {
-        errors.add(error);
+        errors.add("Executing post build action '" + name + "': " + error);
     }
 
     protected abstract void internalExecute(BuildResult result);

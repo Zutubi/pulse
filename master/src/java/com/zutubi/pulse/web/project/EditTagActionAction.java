@@ -53,13 +53,15 @@ public class EditTagActionAction extends AbstractEditPostBuildActionAction
 
     public void validate()
     {
+        super.validate();
+
         try
         {
             TagPostBuildAction.validateTag(action.getTag());
         }
         catch (Exception e)
         {
-            addFieldError("action.tag", e.getMessage());
+            addFieldError("postBuildAction.tag", e.getMessage());
         }
     }
 

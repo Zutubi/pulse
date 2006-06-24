@@ -17,6 +17,7 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
     private long id;
     private Project project;
 
+    private String newName;
     private boolean failOnError = false;
     private List<Long> specIds;
     private List<String> stateNames;
@@ -39,6 +40,16 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
     public Project getProject()
     {
         return project;
+    }
+
+    public String getNewName()
+    {
+        return newName;
+    }
+
+    public void setNewName(String newName)
+    {
+        this.newName = newName;
     }
 
     public boolean getFailOnError()
@@ -119,10 +130,25 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
             return ERROR;
         }
 
+        newName = getPostBuildAction().getName();
         failOnError = getPostBuildAction().getFailOnError();
         specIds = getPostBuildAction().getBuildSpecificationIds();
         stateNames = ResultState.getNames(getPostBuildAction().getStates());
         return INPUT;
+    }
+
+    public void validate()
+    {
+        if(hasErrors())
+        {
+            return;
+        }
+
+        PostBuildAction a = getProject().getPostBuildAction(newName);
+        if(a != null)
+        {
+            addFieldError("newName", "This project already has a post build action with name '" + newName + "'");
+        }
     }
 
     public String execute()
@@ -133,6 +159,7 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
         }
 
         PostBuildAction action = getPostBuildAction();
+        action.setName(newName);
         action.setSpecifications(project.lookupBuildSpecifications(specIds));
         action.setStates(ResultState.getStatesList(stateNames));
         action.setFailOnError(failOnError);

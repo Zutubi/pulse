@@ -14,7 +14,7 @@
     #wwhidden("name=id")
     #wwhidden("name=projectId")
 
-    #wwtextfield("name=postBuildAction.name" "label=%{getText('post.build.action.name')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=newName" "label=%{getText('post.build.action.name')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
     #wwselect("name=specIds" "label=%{getText('post.build.action.specs')}" "list=specs" "multiple=true" "tabindex=2" "onkeypress=return submitenter(this,event)")
     #inlineHelp("post.build.action.specs.help")
     #wwselect("name=stateNames" "label=%{getText('post.build.action.states')}" "list=states" "multiple=true" "tabindex=3" "onkeypress=return submitenter(this,event)")

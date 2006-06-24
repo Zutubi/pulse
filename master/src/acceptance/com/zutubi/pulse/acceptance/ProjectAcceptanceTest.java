@@ -351,10 +351,6 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     {
         AddBuildSpecForm form = new AddBuildSpecForm(tester);
 
-        assertProjectBuildSpecTable(new String[][]{
-                createBuildSpecRow("default", "[never]")
-        });
-
         assertAndClick("project.buildspec.add");
         form.assertFormPresent();
         form.saveFormElements(name, "true", "100", STAGE_NAME, RECIPE_NAME, "1");
@@ -977,6 +973,143 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertLinkNotPresent("delete_0");
     }
 
+    public void testAddTagAction()
+    {
+        addTagAction("test-action");
+
+        assertProjectActionTable(new String[][] { getActionRow("test-action", "apply tag") });
+
+        assertAndClick("edit_test-action");
+        EditTagActionForm editForm = new EditTagActionForm(tester);
+        editForm.assertFormPresent();
+        editForm.assertFormElements("test-action", null, null, "true", "my tag", "true");
+    }
+
+    private void addTagAction(String name)
+    {
+        assertAndClick("project.post.build.action.add");
+
+        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester);
+        typeForm.assertFormPresent();
+        typeForm.nextFormElements(name, "tag", null, null, "true");
+
+        AddTagActionForm tagForm = new AddTagActionForm(tester);
+        tagForm.assertFormPresent();
+        tagForm.nextFormElements("my tag", "true");
+    }
+
+    public void testAddTagSpecsAndStates()
+    {
+        addSpec("aspec");
+        clickLinkWithText("configuration");
+
+        assertAndClick("project.post.build.action.add");
+
+        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester);
+        typeForm.assertFormPresent();
+        String id = tester.getDialog().getValueForOption("specIds", "aspec");
+        typeForm.nextFormElements("test-action", "tag", id, "FAILURE", "false");
+
+        AddTagActionForm tagForm = new AddTagActionForm(tester);
+        tagForm.assertFormPresent();
+        tagForm.nextFormElements("my tag", "false");
+
+        assertProjectActionTable(new String[][] { getActionRow("test-action", "apply tag") });
+
+        assertAndClick("edit_test-action");
+        EditTagActionForm editForm = new EditTagActionForm(tester);
+        editForm.assertFormPresent();
+        editForm.assertFormElements("test-action", id, "FAILURE", "false", "my tag", "false");
+    }
+
+    public void testAddTagActionValidation()
+    {
+        assertAndClick("project.post.build.action.add");
+
+        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester);
+        typeForm.assertFormPresent();
+        typeForm.nextFormElements("", "tag", null, null, "true");
+        typeForm.assertFormPresent();
+        assertTextPresent("name is required");
+
+        typeForm.nextFormElements("my-action", "tag", null, null, "true");
+        AddTagActionForm tagForm = new AddTagActionForm(tester);
+        tagForm.assertFormPresent();
+        tagForm.nextFormElements("", "true");
+        tagForm.assertFormPresent();
+        assertTextPresent("tag name is required");
+
+        tagForm.nextFormElements("${unknown}", "true");
+        tagForm.assertFormPresent();
+        assertTextPresent("Reference to unknown variable 'unknown'");
+    }
+
+    public void testAddTagActionDuplicate()
+    {
+        addTagAction("dupit");
+
+        assertAndClick("project.post.build.action.add");
+
+        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester);
+        typeForm.assertFormPresent();
+        typeForm.nextFormElements("dupit", "tag", null, null, "true");
+        typeForm.assertFormPresent();
+        assertTextPresent("This project already has a post build action with name 'dupit'");
+    }
+
+    public void testEditTagAction()
+    {
+        addTagAction("mytag");
+
+        assertAndClick("edit_mytag");
+        EditTagActionForm form = new EditTagActionForm(tester);
+        form.assertFormPresent();
+        String id = tester.getDialog().getValueForOption("specIds", "default");
+        form.saveFormElements("editedtag", id, "SUCCESS", "false", "${project}", "false");
+
+        assertProjectActionTable(new String[][] { getActionRow("editedtag", "apply tag") });
+        assertAndClick("edit_editedtag");
+        form.assertFormPresent();
+        form.assertFormElements("editedtag", id, "SUCCESS", "false", "${project}", "false");
+    }
+
+    public void testEditTagActionValidation()
+    {
+        addTagAction("mytag");
+
+        assertAndClick("edit_mytag");
+        EditTagActionForm form = new EditTagActionForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements("", null, null, "false", "", "false");
+        form.assertFormPresent();
+        assertTextPresent("tag name is required");
+
+        form.saveFormElements("", null, null, "false", "${unknown}", "false");
+        assertTextPresent("name is required");
+        assertTextPresent("Reference to unknown variable 'unknown'");
+    }
+
+    public void testEditTagActionDuplicate()
+    {
+        addTagAction("mytag");
+        addTagAction("dupit");
+
+        assertAndClick("edit_mytag");
+        EditTagActionForm form = new EditTagActionForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements("dupit", null, null, "false", "${status}", "false");
+        form.assertFormPresent();
+        assertTextPresent("This project already has a post build action with name 'dupit'");
+    }
+
+    public void testDeletePostBuildAction()
+    {
+        addTagAction("deadtag");
+        assertTextPresent("deadtag");
+        assertAndClick("delete_deadtag");
+        assertTextNotPresent("deadtag");
+    }
+
     private String nukeIds(String text)
     {
         text = text.replaceAll("href=\"[^\"]*\"", "");
@@ -1097,4 +1230,14 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         return new String[]{name, type, spec, "edit", "delete"};
     }
 
+    private void assertProjectActionTable(String[][] rows)
+    {
+        assertTablePresent("project.post.build.actions");
+        assertTableRowsEqual("project.post.build.actions", 2, rows);
+    }
+
+    private String[] getActionRow(String name, String type)
+    {
+        return new String[]{name, type, "edit", "delete"};
+    }
 }

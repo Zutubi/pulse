@@ -557,7 +557,7 @@
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editTagAction!input" class="com.zutubi.pulse.web.project.EditTagActionAction" method="doInput">
+        <action name="editTagAction!input" class="com.zutubi.pulse.web.project.EditTagActionAction" method="input">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-action-tag.vm</result>
         </action>
