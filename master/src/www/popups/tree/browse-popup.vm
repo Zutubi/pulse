@@ -12,14 +12,6 @@
     <script type="text/javascript">
         <!--
             // define the init properties that control the tree.
-            //TODO: This works, but there must be a better way to handle the initialisation process.
-            window.myTree = new Object();
-
-            // initialise the initial visible path.
-            window.myTree.initUid = new Array();
-#foreach($uid in $action.uids)
-        window.myTree.initUid.push('$uid');
-#end
 
             window.onload = onInit;
             window.onresize = onResize;
@@ -29,22 +21,78 @@
                 // manually resize the viewport so that it is the correct size.
                 onResize(event);
 
-//                showDebug();
-
                 // initialise the tree view.
                 var treeView = new ZUTUBI.widget.TreeView("browse");
                 treeView.dataLoader = ZUTUBI.fs.list;
                 treeView.onSelect = onSelectCallback;
                 treeView.draw();
+
+                // trigger a load of the initially required path.
+                window.initialPath = ["C:\\", "tmp", "empty"];
+                window.retry = 20;
+                expandToPath();
+            }
+
+            function expandToPath()
+            {
+                if (window.retry <= 0)
+                {
+                    return;
+                }
+                window.retry = window.retry - 1;
+
+                var initialPath = window.initialPath;
+
+                var treeView = ZUTUBI.widget.View.getTreeById("browse");
+                var node = treeView.getRoot();
+
+                // search for node with name initialPath.
+                for (var i = 0; i < initialPath.length; i++)
+                {
+                    var path = initialPath[i];
+                    if (!node.expanded)
+                    {
+                        node._expand();
+                    }
+
+                    if (node.isLoaded)
+                    {
+                        // node is loaded, so lets go to  the next one.
+                        node = $A(node.children).find(function(child)
+                        {
+                            return child.data.name == path;
+                        });
+                        if (!node)
+                        {
+                            // unable to locate the requested node.
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        // node is still loading, so lets wait.
+                        setTimeout(expandToPath, 250);
+                        return;
+                    }
+                }
+
+                // select the node.
+                if (node)
+                {
+                    treeView._select(node);
+                }
             }
 
             function onSelectCallback(node)
             {
-                console.log("node selected: %s", node);
                 // a) display the path to the currently selected node.
                 // construct the path.
-                var currentPathDisplay = document.getElementById('path');
-                removeAll(currentPathDisplay);
+                var currentPathDisplay = document.getElementById('path');                
+                $A(currentPathDisplay.childNodes).each(function(child)
+                {
+                    Element.remove(child);
+                });
+
                 var pathToDisplay = "";
                 if (node && !node.isRoot())
                 {

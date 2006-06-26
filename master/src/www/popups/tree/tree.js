@@ -264,6 +264,12 @@ Object.extend(ZUTUBI.widget.TreeView.prototype = {
         delete ZUTUBI.widget.View._nodes[node.index];
     },
 
+    //TODO: should this be in the public interface?
+    getRoot: function()
+    {
+        return this.root;
+    },
+
     isSelected: function(node)
     {
         return (this.selectedNode == node);
@@ -725,7 +731,6 @@ Object.extend(ZUTUBI.widget.Node.prototype = {
      */
     loadComplete: function()
     {
-//        console.log("INFO: loadComplete for node(%s)", this.index);
         // record the fact that we have loaded.
         this.isLoaded = true;
 
@@ -747,7 +752,6 @@ Object.extend(ZUTUBI.widget.Node.prototype = {
 
     refresh: function()
     {
-//        console.log("INFO: refresh triggered on node(%s)", this.index);
         this._invalidate();
         this._render();
     },

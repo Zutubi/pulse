@@ -8,8 +8,6 @@ ZUTUBI.fs = new Object();
 
 ZUTUBI.fs.list = function(node)
 {
-    console.log("INFO: list: %s", node.getPath());
-
     // take node data, and request a listing from the server.
     var loadById = node.data && node.data.id || "";
 
@@ -32,8 +30,6 @@ ZUTUBI.fs.list = function(node)
         }
         node = node.parent;
     }
-
-    console.log("GENERATED ID: %s", path);
 
     var ajax = new Ajax.Request(
         "http://localhost:8080/ajax/list.action",
