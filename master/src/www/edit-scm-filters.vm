@@ -1,4 +1,4 @@
-#helpTag("CVS")
+#helpTag("SCM+Filters")
 #authorisationTags($principle)
 #projectTags($project)
 <html>
