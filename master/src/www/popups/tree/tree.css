@@ -32,6 +32,10 @@ span.openfolder {
     background-image: url(../../images/tree/openfoldericon.png);
 }
 
+span.file {
+    background-image: url(../../images/tree/file.png);
+}
+
 li.opened {
     background-image: url(../../images/tree/opened.PNG);
 }
