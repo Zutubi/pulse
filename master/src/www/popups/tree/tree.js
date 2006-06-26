@@ -529,10 +529,12 @@ Object.extend(ZUTUBI.widget.Node.prototype = {
         this.invalidated = true;
 
         // is this node visible? if so, we need to render it.
+/*
         if (this.isVisible())
         {
             this._render();
         }
+*/
     },
 
     _unrender: function()
@@ -746,7 +748,7 @@ Object.extend(ZUTUBI.widget.Node.prototype = {
     refresh: function()
     {
 //        console.log("INFO: refresh triggered on node(%s)", this.index);
-        this.invalidate();
+        this._invalidate();
         this._render();
     },
 
@@ -810,6 +812,7 @@ Object.extend(ZUTUBI.widget.Node.prototype = {
         // we have a state change for this node, therefore invalidate it to
         // trigger a render.
         this._invalidate();
+        this._render();
 
         // On expand callback.
         this.tree.onExpand(this);
@@ -826,6 +829,7 @@ Object.extend(ZUTUBI.widget.Node.prototype = {
         this.expanded = false;
 
         this._invalidate();
+        this._render();
 
         // trigger the onCollapse callback.
         this.tree.onCollapse(this);

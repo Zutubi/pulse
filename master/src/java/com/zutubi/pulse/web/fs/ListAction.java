@@ -6,6 +6,7 @@ import org.apache.commons.codec.binary.Base64;
 import java.util.*;
 import java.io.File;
 import java.io.FileFilter;
+import java.text.Collator;
 
 /**
  * <class-comment/>
@@ -125,6 +126,7 @@ public abstract class ListAction extends FileSystemActionSupport
 
     private void sort(File[] files)
     {
+        final Collator c = Collator.getInstance();
         if (files != null)
         {
             Collections.sort(Arrays.asList(files), new Comparator<File>()
@@ -132,15 +134,16 @@ public abstract class ListAction extends FileSystemActionSupport
                 public int compare(File o1, File o2)
                 {
                     // folders first.
-                    if (o1.isDirectory())
+                    if ((o1.isDirectory() || isRoot(o1)) && (!o2.isDirectory() && !isRoot(o2)))
                     {
                         return -1;
                     }
-                    if (o2.isDirectory())
+                    if ((o2.isDirectory() || isRoot(o2)) && (!o1.isDirectory() && !isRoot(o1)))
                     {
                         return 1;
                     }
-                    return o1.getName().compareTo(o2.getName());
+                    // then sort alphabetically
+                    return c.compare(o1.getAbsolutePath(), o2.getAbsolutePath());
                 }
             });
         }
