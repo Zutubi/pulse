@@ -1,15 +1,14 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
-
-import java.util.LinkedList;
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  * A capture defines an artifact to be captured and post-processed in some well-defined
  * way.  It is used for built-in projects only.
  */
-public abstract class Capture extends Entity implements NamedEntity
+public abstract class Capture extends Entity
 {
     /**
      * The capture's name, which is also the name of the artifact.

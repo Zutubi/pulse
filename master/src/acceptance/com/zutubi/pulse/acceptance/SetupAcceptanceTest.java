@@ -8,7 +8,6 @@ import com.zutubi.pulse.acceptance.forms.setup.ServerSettingsForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
 import com.zutubi.pulse.test.LicenseHelper;
 import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.license.LicenseType;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -25,15 +24,21 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
 {
     public String licenseKey;
     public String expiredLicenseKey;
-    public String invalidLicenseKey;
+
+    public static final String INVALID_LICENSE_KEY =
+            "AAAAaXNvbUgY29tcGFueSBhbmQgc29tZSBvdGhlciBkYXRhIHRoYXQgd2ls\n" +
+                    "bBjb21lIGZyb20gb3RoZXIgZmllbGRzIgluIHRoZSBmdXR1cmUuCjIwMDYt\n" +
+                    "MQtMTggMTA6Mjc6MTUgRVNUCk+U6cAyaORQLoB7r+IDKasLJjamRU7YMYjm\n" +
+                    "sT2VU3Mz5ZY67+fAc5o35/TjNnrWEqkhdha36DdMx5+0ADEAMh/UvE8E2hk\n" +
+                    "iA0MLr3lR3etbPQKn3PYFLhSM6C3CSXU5V9a9uclezgQIkxP+/eoJdOYeAy\n" +
+                    "Q/Zs7NGNWH+TB79";
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        licenseKey = LicenseHelper.newLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
-        expiredLicenseKey = LicenseHelper.newExpiredLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
-        invalidLicenseKey = LicenseHelper.newInvalidLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
+        licenseKey = LicenseHelper.newLicenseKey("dummy", "S. O. MeBody");
+        expiredLicenseKey = LicenseHelper.newExpiredLicenseKey("dummy", "S. O. MeBody");
     }
 
     protected void tearDown() throws Exception
@@ -117,9 +122,9 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         assertTextPresent("required");
 
         // check that license validation works.
-        licenseForm.nextFormElements(invalidLicenseKey);
+        licenseForm.nextFormElements(INVALID_LICENSE_KEY);
         licenseForm.assertFormPresent();
-        licenseForm.assertFormElements(invalidLicenseKey);
+        licenseForm.assertFormElements(INVALID_LICENSE_KEY);
         assertTextPresent("invalid");
 
         // check that an expired license is not accepted.

@@ -3,9 +3,9 @@ package com.zutubi.pulse.velocity;
 import com.opensymphony.webwork.views.velocity.VelocityManager;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class CustomVelocityManager extends VelocityManager
 {
-    private MasterConfigurationManager configManager;
+    private ConfigurationManager configManager;
 
     private UserManager userManager;
 
@@ -31,7 +31,7 @@ public class CustomVelocityManager extends VelocityManager
     public Context createContext(OgnlValueStack stack, HttpServletRequest req, HttpServletResponse res)
     {
         Context context = super.createContext(stack, req, res);
-        MasterApplicationConfiguration config = configManager.getAppConfig();
+        ApplicationConfiguration config = configManager.getAppConfig();
         context.put("helpUrl", config.getHelpUrl());
 
         String login = AcegiUtils.getLoggedInUser();
@@ -51,13 +51,13 @@ public class CustomVelocityManager extends VelocityManager
         if (data != null)
             context.put("license", data.getLicense());
 
-        MasterApplicationConfiguration appConfig = configManager.getAppConfig();
+        ApplicationConfiguration appConfig = configManager.getAppConfig();
         context.put("rssEnabled", appConfig.getRssEnabled());
         
         return context;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configManager)
+    public void setConfigurationManager(ConfigurationManager configManager)
     {
         this.configManager = configManager;
     }

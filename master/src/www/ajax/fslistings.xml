@@ -8,10 +8,11 @@ Create an object of the following format:
                     {
                         file:string,
                         type:string,
-                        fid:string
+                        uid:string
                     },....
                 ],
-                uid:string
+                uid:string,
+                displayPath:string
             },....
         ]
     }
@@ -25,11 +26,12 @@ Create an object of the following format:
                         <object>
                             <pair key="file">name</pair>
                             <pair key="type">type</pair>
-                            <pair key="fid">fid</pair>
+                            <pair key="uid">uid</pair>
                         </object>
                     </array>
                 </pair>
                 <pair key="uid">uid</pair>
+                <pair key="displayPath">path</pair>
             </object>
         </array>
     </pair>

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.admin;
 
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -11,7 +11,7 @@ import com.zutubi.pulse.web.ActionSupport;
  */
 public class JabberConfigurationAction extends ActionSupport
 {
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
 
     private JabberConfig jabber = new JabberConfig();
     private JabberManager jabberManager;
@@ -52,7 +52,7 @@ public class JabberConfigurationAction extends ActionSupport
 
     private void resetConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        ApplicationConfiguration config = configurationManager.getAppConfig();
         config.setJabberHost(null);
         config.setJabberPort(JabberManager.DEFAULT_PORT);
         config.setJabberUsername(null);
@@ -63,7 +63,7 @@ public class JabberConfigurationAction extends ActionSupport
 
     private void saveConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        ApplicationConfiguration config = configurationManager.getAppConfig();
         config.setJabberHost(jabber.getHost());
         config.setJabberPort(jabber.getPort());
         config.setJabberUsername(jabber.getUsername());
@@ -75,7 +75,7 @@ public class JabberConfigurationAction extends ActionSupport
 
     private void loadConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        ApplicationConfiguration config = configurationManager.getAppConfig();
         jabber.setHost(config.getJabberHost());
         jabber.setPort(config.getJabberPort());
         jabber.setUsername(config.getJabberUsername());
@@ -88,7 +88,7 @@ public class JabberConfigurationAction extends ActionSupport
      *
      * @param config
      */
-    public void setConfigurationManager(MasterConfigurationManager config)
+    public void setConfigurationManager(ConfigurationManager config)
     {
         this.configurationManager = config;
     }

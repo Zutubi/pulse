@@ -13,7 +13,6 @@ import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
 import java.util.List;
-import java.util.Arrays;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 
@@ -110,41 +109,9 @@ public class CvsServerTest extends PulseTestCase
         CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test/CvsServerTest/testGetChangesBetweenTwoRevisions", null, null);
         CvsRevision from = new CvsRevision("daniel", "", "", SERVER_DATE.parse("2006-05-08 11:12:24 GMT"));
         CvsRevision to = new CvsRevision("daniel", "", "", SERVER_DATE.parse("2006-05-08 11:16:16 GMT"));
-        List<Changelist> changes = cvsServer.getChanges(from, to);
+        List<Changelist> changes = cvsServer.getChanges(from, to, "");
         assertNotNull(changes);
         assertEquals(1, changes.size());
-    }
-
-    public void testGetChangesCorrectlyFiltersResults() throws ParseException, SCMException
-    {
-        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test/CvsServerTest/testGetChangesCorrectlyFiltersResults", null, null);
-        CvsRevision from = new CvsRevision("", "", "", SERVER_DATE.parse("2006-06-19 00:00:00 GMT"));
-        CvsRevision to = new CvsRevision("", "", "", SERVER_DATE.parse("2006-06-21 00:00:00 GMT"));
-
-        // filter nothing.
-        List<Changelist> changes = cvsServer.getChanges(from, to);
-        assertEquals(6, changes.get(0).getChanges().size());
-
-        // filter all .txt files
-        cvsServer.setExcludedPaths(Arrays.asList("**/*.txt"));
-        changes = cvsServer.getChanges(from, to);
-        assertEquals(4, changes.get(0).getChanges().size());
-
-        // filter the file.txt files in the subdirectory.
-        cvsServer.setExcludedPaths(Arrays.asList("**/directory/file.txt"));
-        changes = cvsServer.getChanges(from, to);
-        assertEquals(5, changes.get(0).getChanges().size());
-
-        // filter .txt and everything from the directory subdirectory.
-        cvsServer.setExcludedPaths(Arrays.asList("**/*.txt", "**/directory/*"));
-        changes = cvsServer.getChanges(from, to);
-        assertEquals(2, changes.get(0).getChanges().size());
-
-        // filter everything.
-        cvsServer.setExcludedPaths(Arrays.asList("**/*"));
-        changes = cvsServer.getChanges(from, to);
-        assertEquals(0, changes.size());
-        assertFalse(cvsServer.hasChangedSince(from));
     }
 
     public void testListingNonExistent()

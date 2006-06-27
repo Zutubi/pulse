@@ -1,7 +1,7 @@
 package com.zutubi.pulse.events.build;
 
-import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.BuildService;
+import com.zutubi.pulse.RecipeRequest;
 
 /**
  * Raised when a recipe has been dispatched to a build host.
@@ -13,16 +13,16 @@ public class RecipeDispatchedEvent extends RecipeEvent
      */
     RecipeRequest request;
     /**
-     * The agent the recipe was dispatched to.
+     * The service the recipe was dispatched to.
      */
-    private Agent agent;
+    private BuildService service;
 
 
-    public RecipeDispatchedEvent(Object source, RecipeRequest request, Agent agent)
+    public RecipeDispatchedEvent(Object source, RecipeRequest request, BuildService service)
     {
         super(source, request.getId());
         this.request = request;
-        this.agent = agent;
+        this.service = service;
     }
 
     public RecipeRequest getRequest()
@@ -30,8 +30,9 @@ public class RecipeDispatchedEvent extends RecipeEvent
         return request;
     }
 
-    public Agent getAgent()
+    public BuildService getService()
     {
-        return agent;
+        return service;
     }
+
 }

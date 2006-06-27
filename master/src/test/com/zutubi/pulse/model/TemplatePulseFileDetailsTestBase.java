@@ -65,7 +65,7 @@ public abstract class TemplatePulseFileDetailsTestBase extends PulseTestCase
         }
 
         // Ensure syntactic correctness
-        PulseFileLoader loader = new PulseFileLoader(new ObjectFactory());
+        PulseFileLoader loader = new PulseFileLoader(new ObjectFactory(), new FileResourceRepository());
         List<Reference> references = new LinkedList<Reference>();
         references.add(new Property("base.dir", "testbase"));
         FileInputStream input = null;
@@ -73,7 +73,7 @@ public abstract class TemplatePulseFileDetailsTestBase extends PulseTestCase
         try
         {
             input = new FileInputStream(file);
-            loader.load(input, new PulseFile(), references, new FileResourceRepository(), null);
+            loader.load(input, new PulseFile(), references, null);
         }
         finally
         {

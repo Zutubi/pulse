@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.DatabaseBootstrap;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.Event;
@@ -40,7 +40,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
     private ChangelistDao changelistDao;
     private ProjectManager projectManager;
     private Scheduler scheduler;
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
     private EventManager eventManager;
 
     private static final String CLEANUP_NAME = "cleanup";
@@ -372,7 +372,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
         this.fileArtifactDao = fileArtifactDao;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

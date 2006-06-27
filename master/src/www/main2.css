@@ -201,15 +201,11 @@ h2 {
     font-size: 20px;
 }
 
-h2.section, h2.twopane {
-    margin-top: 1.5em;
+h2.section {
+    margin-top: 0.8em;
     color: #3e4e6a;
     font-size: 20px;
     border-bottom: solid 2px #667e9f;
-}
-
-h2.twopane {
-    margin-bottom: 0px;
 }
 
 h2.top {
@@ -354,7 +350,7 @@ h3.heading, th.heading {
 
 .note {
     background: #ffffc0;
-    white-space: normal;
+    white-space: nowrap;
 }
 
 td.content {
@@ -609,73 +605,4 @@ td.clearbar {
     border-color: #c00000;
     background-color: #ffdddd;
     text-align:center;
-}
-
-    /*------------------------------
-    Two-pane, "explorer style" view
-    */
-
-table.twopane
-{
-    border-collapse: collapse;
-}
-
-table.twopane td
-{
-    margin: 0px;
-    vertical-align: top;
-}
-
-td.leftpane
-{
-    padding-right: 0px;
-    white-space: nowrap;
-}
-
-td.leftpane p
-{
-    padding-right: 10px;
-}
-
-ul.panenav
-{
-    margin: 10px 0px 30px 0px;
-    padding: 0px;
-}
-
-ul.panenav a {
-    display: block;
-    padding: 5px;
-    border: none;
-    text-decoration: none;
-    color: #667e9f;
-    background: #fff;
-    margin-top: 2px;
-    margin-bottom: 2px;
-}
-
-ul.panenav a:hover, ul.panenav a.active {
-    color: #fff;
-    background: #667e9f;
-    border: none;
-}
-
-td.rightpane
-{
-    width: 100%;
-    padding: 0px;
-    border-left: solid 2px #667e9f;
-}
-
-div.paneheader
-{
-    margin: 0px;
-    padding: 7px;
-    font-weight: bold;
-    background: #d8e0f3;
-}
-
-div.panecontent
-{
-    padding: 10px;
 }

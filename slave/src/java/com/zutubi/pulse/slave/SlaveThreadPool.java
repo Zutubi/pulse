@@ -1,12 +1,11 @@
 package com.zutubi.pulse.slave;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  */
-public class SlaveThreadPool implements Executor
+public class SlaveThreadPool
 {
     private static ExecutorService pool;
 
@@ -15,7 +14,7 @@ public class SlaveThreadPool implements Executor
         pool = Executors.newCachedThreadPool();
     }
 
-    public void execute(Runnable command)
+    public void executeCommand(Runnable command)
     {
         pool.execute(command);
     }

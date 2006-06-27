@@ -11,12 +11,6 @@
 #if($page.getProperty("page.buildNumber"))
     #set ($buildNumber = $page.getProperty("page.buildNumber"))
 #end
-#if($page.getProperty("page.agentId"))
-    #set ($agentId = $page.getProperty("page.agentId"))
-#end
-#if($page.getProperty("page.agentName"))
-    #set ($agentName = $page.getProperty("page.agentName"))
-#end
 #if($page.getProperty("page.resourceId"))
     #set ($resourceId = $page.getProperty("page.resourceId"))
 #end
@@ -44,7 +38,7 @@
         <link rel="icon" type="image/png" href="/favicon.png"/>
         <link href="$base/main2.css" rel="stylesheet" type="text/css" media="screen"/>
 		<link href="$base/form2.css" rel="stylesheet" type="text/css" media="screen"/>
-#if ($rssEnabled && $projectId && $projectId != "0")
+#if ($rssEnabled && $projectId && $projectId > 0)
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.action?projectId=$projectId"/>
 #end
         <script type="text/javascript" src="/main.js"></script>
@@ -67,16 +61,8 @@
 #if($buildId && $buildId != "0")
                   :: <a href="/viewBuild.action?id=${buildId}">build $buildNumber</a>
 #end
-#if($agentName)
-    #if($agentId && $agentId != "0")
-        #set($args = "?agentId=$agentId")
-    #else
-        #set($args = "")
-    #end
-                  <a href="/viewAgentStatus.action${args}">$agentName</a>
-#end
 #if($resourceId && $resourceId != "0")
-                  :: <a href="/viewResource.action?resourceId=${resourceId}">$resourceName</a>
+                  <a href="/viewResource.action?id=${resourceId}">$resourceName</a>
 #end
               </td>
               <td class="user" align="right">
@@ -107,8 +93,7 @@
         <li><a #if($selectedTab && $selectedTab == "dashboard")      class="active" #end href="/dashboard.action">dashboard</a></li>
 #end
         <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end href="/viewProjects.action">projects</a></li>
-        <li><a #if($selectedTab && $selectedTab == "queues")         class="active" #end href="/viewServerQueues.action">queues</a></li>
-        <li><a #if($selectedTab && $selectedTab == "agents")         class="active" #end href="/viewAgents.action">agents</a></li>
+        <li><a #if($selectedTab && $selectedTab == "server")         class="active" #end href="/viewRecipeQueue.action">server</a></li>
         #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
         <li><a #if($selectedTab && $selectedTab == "administration") class="active" #end href="/admin/serverSettings.action">administration</a></li>
       #end

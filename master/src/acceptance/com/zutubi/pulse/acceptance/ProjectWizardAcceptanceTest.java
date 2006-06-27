@@ -264,11 +264,11 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
 
         assertTablePresent("project.buildspecs");
         assertTableRowsEqual("project.buildspecs", 1, new String[][]{
-                new String[]{"name", "timeout", "actions", "actions", "actions"},
-                new String[]{"default", "[never]", "trigger", "edit", "delete"},
+                new String[]{"name", "recipe", "timeout", "actions", "actions", "actions"},
+                new String[]{"default", "[default]", "[never]", "trigger", "edit", "delete"},
                 new String[]{"add new build specification", "add new build specification",
                         "add new build specification", "add new build specification",
-                        "add new build specification"}
+                        "add new build specification", "add new build specification"}
         });
 
         assertTablePresent("project.triggers");

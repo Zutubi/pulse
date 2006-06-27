@@ -1,14 +1,19 @@
 package com.zutubi.pulse.renderer;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.BuildScmDetails;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.IOUtils;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 
-import java.io.*;
-import java.net.URISyntaxException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,8 +21,6 @@ import java.util.List;
  */
 public class FreemarkerBuildResultRendererTest extends PulseTestCase
 {
-    private boolean generate = false;
-
     FreemarkerBuildResultRenderer renderer;
 
     protected void setUp() throws Exception
@@ -39,13 +42,13 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         super.tearDown();
     }
 
-    public void testBasicSuccess() throws Exception
+    public void testBasicSuccess() throws IOException
     {
         BuildResult result = createSuccessfulBuild();
         createAndVerify("basic", "test.url:8080", result, new LinkedList<Changelist>());
     }
 
-    public void testWithChanges() throws Exception
+    public void testWithChanges() throws IOException
     {
         List<Changelist> changes = getChanges();
         BuildResult result = createBuildWithChanges(changes);
@@ -53,27 +56,27 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         createAndVerify("changes", "another.url", result, changes);
     }
 
-    public void testWithErrors() throws Exception
+    public void testWithErrors() throws IOException
     {
         errorsHelper("plain");
     }
 
-    public void testHTMLWithErrors() throws Exception
+    public void testHTMLWithErrors() throws IOException
     {
         errorsHelper("html");
     }
 
-    public void testWithFailures() throws Exception
+    public void testWithFailures() throws IOException
     {
         failuresHelper("plain");
     }
 
-    public void testHTMLWithFailures() throws Exception
+    public void testHTMLWithFailures() throws IOException
     {
         failuresHelper("html");
     }
 
-    private void errorsHelper(String type) throws Exception
+    private void errorsHelper(String type) throws IOException
     {
         List<Changelist> changes = getChanges();
         BuildResult result = createBuildWithChanges(changes);
@@ -112,7 +115,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         createAndVerify("errors", type, "another.url", result, changes);
     }
 
-    private void failuresHelper(String type) throws Exception
+    private void failuresHelper(String type) throws IOException
     {
         BuildResult result = createSuccessfulBuild();
         result.failure("test failed tests");
@@ -191,21 +194,21 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     private BuildResult createSuccessfulBuild()
     {
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), new Project("test project", "test description"), "test spec", 101);
+        BuildResult result = new BuildResult(new Project("test project", "test description"), "test spec", 101);
         result.setId(11);
         result.setScmDetails(new BuildScmDetails());
         result.commence(10000);
 
         RecipeResult recipeResult = new RecipeResult("first recipe");
-        RecipeResultNode node = new RecipeResultNode("first stage", recipeResult);
+        RecipeResultNode node = new RecipeResultNode(recipeResult);
         result.getRoot().addChild(node);
 
         recipeResult = new RecipeResult("second recipe");
-        node = new RecipeResultNode("second stage", recipeResult);
+        node = new RecipeResultNode(recipeResult);
         result.getRoot().addChild(node);
 
         recipeResult = new RecipeResult("nested recipe");
-        node = new RecipeResultNode("nested stage", recipeResult);
+        node = new RecipeResultNode(recipeResult);
         result.getRoot().getChildren().get(0).addChild(node);
 
         result.complete();
@@ -218,7 +221,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         createAndVerify(expectedName, "plain", hostUrl, result, changelists);
     }
 
-    protected void createAndVerify(String expectedName, String type, String hostUrl, BuildResult result) throws IOException, URISyntaxException
+    protected void createAndVerify(String expectedName, String type, String hostUrl, BuildResult result) throws IOException
     {
         createAndVerify(expectedName, type, hostUrl, result, new LinkedList<Changelist>());
     }
@@ -231,42 +234,21 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
             extension = "html";
         }
 
-        if (generate)
-        {
-            File expected = getTestDataFile("master", expectedName, extension);
-            OutputStream outStream = null;
-            Writer writer = null;
+        InputStream expectedStream = null;
 
-            try
-            {
-                outStream = new FileOutputStream(expected);
-                writer = new OutputStreamWriter(outStream);
-                renderer.render(hostUrl, result, changelists, type, writer);
-            }
-            finally
-            {
-                IOUtils.close(outStream);
-                IOUtils.close(writer);
-            }
+        try
+        {
+            expectedStream = getInput(expectedName, extension);
+
+            StringWriter writer = new StringWriter();
+            renderer.render(hostUrl, result, changelists, type, writer);
+            String got = replaceTimestamps(writer.getBuffer().toString());
+            String expected = replaceTimestamps(IOUtils.inputStreamToString(expectedStream));
+            assertEquals(expected, got);
         }
-        else
+        finally
         {
-            InputStream expectedStream = null;
-
-            try
-            {
-                expectedStream = getInput(expectedName, extension);
-
-                StringWriter writer = new StringWriter();
-                renderer.render(hostUrl, result, changelists, type, writer);
-                String got = replaceTimestamps(writer.getBuffer().toString());
-                String expected = replaceTimestamps(IOUtils.inputStreamToString(expectedStream));
-                assertEquals(expected, got);
-            }
-            finally
-            {
-                IOUtils.close(expectedStream);
-            }
+            IOUtils.close(expectedStream);
         }
     }
 

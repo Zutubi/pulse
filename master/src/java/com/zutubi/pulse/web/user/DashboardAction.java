@@ -1,5 +1,6 @@
 package com.zutubi.pulse.web.user;
 
+import com.zutubi.pulse.ProjectNameComparator;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.AcegiUtils;
@@ -66,7 +67,7 @@ public class DashboardAction extends ActionSupport
             projects = userManager.getDashboardProjects(user);
         }
         
-        Collections.sort(projects, new NamedEntityComparator());
+        Collections.sort(projects, new ProjectNameComparator());
         latestBuilds = new LinkedList<BuildResult>();
 
         for (Project p : projects)

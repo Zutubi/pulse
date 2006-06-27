@@ -1,3 +1,5 @@
+// Function to toggle the enable state of a control based on the state of a
+// checkbox.
 function getElement(id)
 {
     var element;
@@ -18,43 +20,10 @@ function getElement(id)
     return element;
 }
 
-// Function to toggle the enable state of a control based on the state of a
-// checkbox.
-function setEnableState(id, checkboxId, inverse)
+function setEnableState(id, checkboxId)
 {
     var element = getElement(id);
-    var disabled = !getElement(checkboxId).checked;
-
-    if(inverse)
-    {
-        disabled = !disabled;
-    }
-
-    element.disabled = disabled;
-}
-
-// Sets the enabled state of all controls in a form (excepting the checkbox
-// itself and submits (buttons)) based on the state of a checkbox.
-function setFormEnableState(formId, checkboxId, includeSubmit, inverse)
-{
-    var disabled = !getElement(checkboxId).checked;
-
-    if(inverse)
-    {
-        disabled = !disabled;
-    }
-
-    var form = getElement(formId);
-    var fields = form.elements;
-
-    for(var i = 0; i < fields.length; i++)
-    {
-        var field = fields[i];
-        if(field.id != checkboxId && (includeSubmit || field.type && field.type != "submit"))
-        {
-            fields[i].disabled = disabled;
-        }
-    }
+    element.disabled = !document.getElementById(checkboxId).checked;
 }
 
 function confirmUrl(message, url)
@@ -109,10 +78,18 @@ function openBrowseWindow(selectDir, elementId, extraArgs)
     browseWindow.focus();
 }
 
-// @deprecated. Use the Prototype function Element.toggle instead.
+// Toggles the display attribute of an element between '' and 'none' to
+// show/hide it.
 function toggleElementDisplay(element)
 {
-    Element.toggle(element);
+    if(!element.style.display)
+    {
+        element.style.display = 'none';
+    }
+    else
+    {
+        element.style.display = '';
+    }
 }
 
 function toggleDisplay(id)
@@ -196,14 +173,6 @@ function hideChildren(id)
 {
     var element = getElement(id);
 
-    $A(element.childNodes).each(function(child)
-    {
-        if (child.nodeType == 1)
-        {
-            Element.hide(child);
-        }
-    });
-/* use prototype.js support.
     for(var i = 0; i < element.childNodes.length; i++)
     {
         var child = element.childNodes[i];
@@ -219,7 +188,6 @@ function hideChildren(id)
             }
         }
     }
-*/
 }
 
 // Toggle display for all rows under the given table with a first cell of the given class
@@ -323,54 +291,3 @@ function setText(id, text)
     var element = getElement(id);
     element.innerHTML = text;
 }
-
-function setClass(id, className)
-{
-    var element = getElement(id);
-    element.className = className;
-}
-
-// Used in left/right pane navigation to handle selection of a new node in
-// the left pane.
-function selectNode(id)
-{
-    setClass("nav_" + selectedNode, "");
-    setClass("nav_" + id, "active");
-
-    var rightPane = getElement("node_" + selectedNode);
-    rightPane.style.display = "none";
-    rightPane = getElement("node_" + id);
-    rightPane.style.display = "block";
-    selectedNode = id;
-}
-
-/*
- * Return the dimensions of the window.
- *
- *    width: the window width.
- *    height: the window height.
- */
-function windowSize()
-{
-    var myWidth = 0, myHeight = 0;
-    if (typeof( window.innerWidth ) == 'number')
-    {
-        //Non-IE
-        myWidth = window.innerWidth;
-        myHeight = window.innerHeight;
-    }
-    else if (document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ))
-    {
-        //IE 6+ in 'standards compliant mode'
-        myWidth = document.documentElement.clientWidth;
-        myHeight = document.documentElement.clientHeight;
-    }
-    else if (document.body && ( document.body.clientWidth || document.body.clientHeight ))
-    {
-        //IE 4 compatible
-        myWidth = document.body.clientWidth;
-        myHeight = document.body.clientHeight;
-    }
-    return {"width":myWidth, "height":myHeight};
-}
-

@@ -4,9 +4,6 @@ import com.zutubi.pulse.util.IOUtils;
 
 import java.io.*;
 import java.util.Properties;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
 
 /**
  * This class provides a java interface to the contents of the version.properties
@@ -35,38 +32,17 @@ public class Version implements Comparable
      */
     private static final String BUILD_NUMBER = "build.number";
 
-    /**
-     * The release date property name.
-     */
-    private static final String RELEASE_DATE = "release.date";
-
     public static final int INVALID = -1;
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d-MMMM-yyyy");
-
-    /**
-     * The value of the version number property.
-     */
     private String versionNumber;
-
-    /**
-     * The value of the build date property.
-     */
     private String buildDate;
-
-    /**
-     * The value of the build number property.
-     */
     private String buildNumber;
 
-    private String releaseDate;
-
-    public Version(String versionNumber, String buildDate, String buildNumber, String releaseDate)
+    public Version(String versionNumber, String buildDate, String buildNumber)
     {
         this.versionNumber = versionNumber;
         this.buildDate = buildDate;
         this.buildNumber = buildNumber;
-        this.releaseDate = releaseDate;
     }
 
     /**
@@ -87,42 +63,6 @@ public class Version implements Comparable
         return buildDate;
     }
 
-    public Date getBuildDateAsDate()
-    {
-        try
-        {
-            return DATE_FORMAT.parse(getBuildDate());
-        }
-        catch (ParseException e)
-        {
-            return null;
-        }
-    }
-
-    /**
-     * The release date is a string representing the date on which the latest major.minor
-     * version was released. For example, all 1.1.x builds would have the same release date.
-     *
-     * This is used to distinguish between a 'software release date' (releaseDate) and a
-     * 'patch release date' (buildDate)
-     */
-    public String getReleaseDate()
-    {
-        return releaseDate;
-    }
-
-    public Date getReleaseDateAsDate()
-    {
-        try
-        {
-            return DATE_FORMAT.parse(getReleaseDate());
-        }
-        catch (ParseException e)
-        {
-            return null;
-        }
-    }
-
     /**
      * The build number is a machine friendly representation of the current version of the
      * system.
@@ -132,7 +72,7 @@ public class Version implements Comparable
         return buildNumber;
     }
 
-    public int getBuildNumberAsInt()
+    public int getIntBuildNumber()
     {
         try
         {
@@ -154,8 +94,7 @@ public class Version implements Comparable
     {
         return new Version(properties.getProperty(VERSION_NUMBER),
                 properties.getProperty(BUILD_DATE),
-                properties.getProperty(BUILD_NUMBER),
-                properties.getProperty(RELEASE_DATE)
+                properties.getProperty(BUILD_NUMBER)
         );
     }
 
@@ -182,7 +121,6 @@ public class Version implements Comparable
         props.setProperty(VERSION_NUMBER, getVersionNumber());
         props.setProperty(BUILD_DATE, getBuildDate());
         props.setProperty(BUILD_NUMBER, getBuildNumber());
-        props.setProperty(RELEASE_DATE, getReleaseDate());
     }
 
     /**
@@ -234,7 +172,7 @@ public class Version implements Comparable
         }
         catch (IOException e)
         {
-            return new Version("N/A", "N/A", "N/A", "N/A");
+            return new Version("N/A", "N/A", "N/A");
         }
         finally
         {
@@ -246,8 +184,8 @@ public class Version implements Comparable
     {
         Version otherVersion = (Version) o;
 
-        Integer i = getBuildNumberAsInt();
-        Integer j = otherVersion.getBuildNumberAsInt();
+        Integer i = getIntBuildNumber();
+        Integer j = otherVersion.getIntBuildNumber();
 
         return i.compareTo(j);
     }

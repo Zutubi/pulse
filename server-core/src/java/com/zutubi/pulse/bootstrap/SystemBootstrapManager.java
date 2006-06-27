@@ -1,6 +1,10 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.zutubi.pulse.freemarker.CustomFreemarkerManager;
+
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This manager handles the first stage of system startup.
@@ -12,6 +16,11 @@ public class SystemBootstrapManager
      */
     public static final String DEFAULT_BOOTSTRAP_CONTEXT = "com/zutubi/pulse/bootstrap/bootstrapContext.xml";
     public static final String BOOTSTRAP_CONTEXT_PROPERTY = "bootstrap";
+
+    /**
+     * The name of the configuration manager bean. This bean is REQUIRED in the initial context.
+     */
+    private static final String CONFIGURATION_MANAGER_BEAN = "configurationManager";
 
     /**
      * The name of the startup manager bean. This bean is REQUIRED in the initial context.
@@ -44,7 +53,18 @@ public class SystemBootstrapManager
     public void bootstrapSystem()
     {
         loadBootstrapContext();
-        ((Startup) ComponentContext.getBean(STARTUP_MANAGER_BEAN)).init();
+
+        CustomFreemarkerManager.initialiseLogging();
+
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler()
+        {
+            public void uncaughtException(Thread t, Throwable e)
+            {
+                Logger.getLogger("").log(Level.SEVERE, "Uncaught exception: " + e.getMessage(), e);
+            }
+        });
+
+        ((StartupManager) ComponentContext.getBean(STARTUP_MANAGER_BEAN)).init();
     }
 
     public static void main(String argv[])

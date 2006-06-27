@@ -6,7 +6,7 @@ import com.zutubi.pulse.model.HistoryPage;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.web.PagingSupport;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.opensymphony.util.TextUtils;
 
 import java.util.LinkedList;
@@ -40,14 +40,14 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
     /**
      * The system configuration manager.
      */
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
 
     /**
      * Required resource.
      *
      * @param configurationManager
      */
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

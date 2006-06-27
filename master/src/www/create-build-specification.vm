@@ -10,27 +10,25 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=createBuildSpecification.action" "id=spec.add" "heading=%{getText('add.spec')}" "method=post")
+#wwcform("action=createBuildSpecification.action" "heading=%{getText('add.spec')}" "method=post")
     #wwhidden("name=projectId")
 
     #wwtextfield("name=spec.name" "label=%{getText('spec.name')}" "required=true"  "tabindex=1")
-    #wwcheckbox("name=timeoutEnabled" "label=%{getText('enable.timeout')}" "fieldValue=true" "onclick=setEnableState('spec.add_timeout', 'spec.add_timeoutEnabled')" "tabindex=2")
-    #set($minutes = $action.getText('spec.timeout.minutes'))
-    #wwtextfield("name=timeout" "label=%{getText('spec.timeout')}" "size=6" "after=$minutes" "tabindex=3")
-    #wwtextfield("name=name" "label=%{getText('buildspec.stage.name')}" "required=true" "tabindex=4")
 #if($recipes.size() > 1)
-    #wwcombobox("name=stage.recipe" "list=recipes" "label=%{getText('recipe')}" "tabindex=5")
+    #wwcombobox("name=recipe" "list=recipes" "label=%{getText('recipe')}" "tabindex=2")
 #else
-    #wwtextfield("name=stage.recipe" "label=%{getText('recipe')}" "tabindex=5")
+    #wwtextfield("name=recipe" "label=%{getText('recipe')}" "tabindex=2")
 #end
     #inlineHelp("spec.recipe.help")
-    #wwselect("name=buildHost" "list=buildHosts" "label=%{getText('buildspec.stage.agent')}" "required=true"  "tabindex=6")
+    #wwcheckbox("name=timeoutEnabled" "label=%{getText('enable.timeout')}" "fieldValue=true" "onclick=setEnableState('createBuildSpecification_timeout', 'createBuildSpecification_timeoutEnabled')" "tabindex=3")
+    #set($minutes = $action.getText('spec.timeout.minutes'))
+    #wwtextfield("name=timeout" "label=%{getText('spec.timeout')}" "size=6" "after=$minutes" "tabindex=4")
 
     <script type="text/javascript">
-        setEnableState('spec.add_timeout', 'spec.add_timeoutEnabled');
+        setEnableState('createBuildSpecification_timeout', 'createBuildSpecification_timeoutEnabled');
     </script>
 
-    #saveCancel(7)
+    #saveCancel(5)
 #end
 
     #tabEnd()

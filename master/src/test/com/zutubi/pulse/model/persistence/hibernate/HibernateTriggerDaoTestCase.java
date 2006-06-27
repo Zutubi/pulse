@@ -35,7 +35,7 @@ public class HibernateTriggerDaoTestCase extends MasterPersistenceTestCase
 
     protected String[] getConfigLocations()
     {
-        return new String[]{"../../../bootstrap/testBootstrapContext.xml",
+        return new String[]{"com/zutubi/pulse/bootstrap/testBootstrapContext.xml",
                 "com/zutubi/pulse/model/persistence/hibernate/HibernateTriggerDaoContext.xml"
         };
     }

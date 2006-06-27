@@ -6,9 +6,4 @@
             <message></message>
         </field-validator>
     </field>
-    <field name="name">
-        <field-validator type="requiredstring">
-            <message key="buildspec.stage.name.required">stage name is required.</message>
-        </field-validator>
-    </field>
 </validators>

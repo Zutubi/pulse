@@ -1,8 +1,15 @@
 package com.zutubi.pulse.web.admin;
 
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.license.*;
+import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseDecoder;
+import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.license.LicenseUpdateEvent;
 import com.zutubi.pulse.web.ActionSupport;
+
+import java.io.IOException;
 
 /**
  * The manage license action supports updating the license currently installed
@@ -12,7 +19,7 @@ import com.zutubi.pulse.web.ActionSupport;
  */
 public class ManageLicenseAction extends ActionSupport
 {
-    private LicenseManager licenseManager;
+    private ConfigurationManager configurationManager;
 
     private EventManager eventManager;
 
@@ -67,11 +74,13 @@ public class ManageLicenseAction extends ActionSupport
     public String execute()
     {
         // update the license string.
+        Data data = configurationManager.getData();
+
         try
         {
-            licenseManager.updateLicenseKey(license);
+            data.updateLicenseKey(license);
         }
-        catch (LicenseException e)
+        catch (IOException e)
         {
             addActionError(getText("license.key.update.error", e.getMessage()));
             return ERROR;
@@ -79,18 +88,18 @@ public class ManageLicenseAction extends ActionSupport
 
         // todo: move this into the business logic layer.. will need to move the updating license
         // todo: into a system license store / manager object..
-        eventManager.publish(new LicenseUpdateEvent(licenseManager.getLicense()));
+        eventManager.publish(new LicenseUpdateEvent(data.getLicense()));
         return SUCCESS;
     }
 
     /**
      * Required resource.
      *
-     * @param licenseManager
+     * @param configurationManager
      */
-    public void setLicenseManager(LicenseManager licenseManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
-        this.licenseManager = licenseManager;
+        this.configurationManager = configurationManager;
     }
 
     /**

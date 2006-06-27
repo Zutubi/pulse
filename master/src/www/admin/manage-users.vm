@@ -21,7 +21,6 @@
                       <tr>
                           #contentHeading("user.login" 1)
                           #contentHeading("user.name" 1)
-                          #contentHeading("user.authentication" 1)
                           #contentHeading("actions" 3)
                       </tr>
                       #foreach($user in $a.users)
@@ -30,13 +29,12 @@
 
                           #dynamicLinkCell($user.login "viewUser.action?userId=$user.id")
                           #dynamicCell($user.name)
-#if($user.ldapAuthentication)
-                          #contentCell("user.authentication.ldap")
-#else
-                          #contentCell("user.authentication.password")
-#end
                           #editCell("editUser!input.action?userId=$user.id" "edit_$!webwork.htmlEncode($user.login)")
-                          #deleteCell("delete_$!webwork.htmlEncode($user.login)" "deleteUser.action?userId=$user.id" $confirmMessage)
+                          #deleteCell($confirmMessage "deleteUser.action?userId=$user.id" "delete_$!webwork.htmlEncode($user.login)")
+                          <!--
+                          #actionCell2("password.edit" "editPassword!input.action?userId=$user.id")
+                          #actionCell2("password.reset" "editPassword!reset.action?userId=$user.id")
+                          -->
                       </tr>
                       #end
                   </table>
@@ -45,11 +43,10 @@
                   #wwcform("action=createUser.action" "name=newUser.create" "heading=%{getText('user.create')}" "method=post")
                       #wwtextfield("name=newUser.login" "label=%{getText('user.login')}" "required=true" "tabindex=1")
                       #wwtextfield("name=newUser.name" "label=%{getText('user.name')}" "required=true" "tabindex=2")
-                      #wwcheckbox("name=ldapAuthentication" "label=%{getText('user.ldap.authentication')}" "tabindex=3" "onclick=setEnableState('createUser_newUser_password', 'createUser_ldapAuthentication', true); setEnableState('createUser_confirm', 'createUser_ldapAuthentication', true);")
-                      #wwpassword("name=newUser.password" "label=%{getText('user.password')}" "tabindex=4")
-                      #wwpassword("name=confirm" "label=%{getText('user.confirm')}" "tabindex=5")
-                      #wwcheckbox("name=admin" "label=%{getText('user.admin')}" "tabindex=6")
-                      #saveCancel(7)
+                      #wwpassword("name=newUser.password" "label=%{getText('user.password')}" "required=true" "tabindex=3")
+                      #wwpassword("name=confirm" "label=%{getText('user.confirm')}" "required=true" "tabindex=4")
+                      #wwcheckbox("name=admin" "label=%{getText('user.admin')}" "tabindex=5")
+                      #saveCancel(6)
                   #end
               </td>
           </tr>

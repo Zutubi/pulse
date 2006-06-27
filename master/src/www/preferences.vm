@@ -28,7 +28,7 @@
     #set($confirmMessage = $action.getText("alias.delete.confirm", [$!webwork.htmlEncode($alias)]))
                     <tr>
                         #dynamicCell($alias)
-                        #deleteCell("deleteAlias$velocityCount" "/user/deleteAlias.action?userId=$user.id&index=$velocityCount" $confirmMessage)
+                        #deleteCell($confirmMessage "/user/deleteAlias.action?userId=$user.id&index=$velocityCount" "deleteAlias$velocityCount")
                     </tr>
 #end
                     #addRow("alias.add" 2 "/user/addAlias!input.action?userId=$user.id" "alias.add")
@@ -54,7 +54,7 @@
                         #dynamicCell($contact.name)
                         #dynamicCell($contact.uid)
                         #editCell("/user/editContactPoint!default.action?id=$contact.id&userId=$user.id" "edit_$!webwork.htmlEncode($contact.name)")
-                        #deleteCell("delete_$!webwork.htmlEncode($contact.name)" "/user/deleteContactPoint.action?id=$contact.id&userId=$user.id" $confirmMessage)
+                        #deleteCell($confirmMessage "/user/deleteContactPoint.action?id=$contact.id&userId=$user.id" "delete_$!webwork.htmlEncode($contact.name)")
                     </tr>
 #end
                     #addRow("contact.create" 4 "/user/contactWizard.action?userId=$user.id" "contact.create")
@@ -77,7 +77,7 @@
                         #dynamicCell($contact.name)
                         #dynamicCell($subscription.condition)
                         #editCell("/user/editSubscription!input.action?id=$subscription.id" "edit_sub_$subscription.id")
-                        #deleteCell("delete_$!webwork.htmlEncode($project.name)_$!webwork.htmlEncode($contact.uid)" "/user/deleteSubscription.action?id=$subscription.id&login=$user.login" $confirmMessage)
+                        #deleteCell($confirmMessage "/user/deleteSubscription.action?id=$subscription.id&login=$user.login" "delete_$!webwork.htmlEncode($project.name)_$!webwork.htmlEncode($contact.uid)")
                     </tr>
 #end
                 <!--

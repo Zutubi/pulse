@@ -2,12 +2,10 @@ package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ContactPointDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.SubscriptionDao;
 
-import java.util.Arrays;
 import java.util.TreeMap;
 
 /**
@@ -17,7 +15,6 @@ import java.util.TreeMap;
 public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 {
     private ProjectDao projectDao;
-    private BuildSpecificationDao buildSpecificationDao;
     private SubscriptionDao subscriptionDao;
     private ContactPointDao contactDao;
 
@@ -25,7 +22,6 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
     {
         super.setUp();
         projectDao = (ProjectDao) context.getBean("projectDao");
-        buildSpecificationDao = (BuildSpecificationDao) context.getBean("buildSpecificationDao");
         subscriptionDao = (SubscriptionDao) context.getBean("subscriptionDao");
         contactDao = (ContactPointDao) context.getBean("contactPointDao");
     }
@@ -33,7 +29,6 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
     public void tearDown() throws Exception
     {
         projectDao = null;
-        buildSpecificationDao = null;
         subscriptionDao = null;
         contactDao = null;
         super.tearDown();
@@ -165,40 +160,6 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         assertPropertyEquals(capture, otherDetails.getCaptures().get(0));
     }
 
-    public void testLoadSaveTagAction()
-    {
-        BuildSpecification spec = new BuildSpecification("test");
-        buildSpecificationDao.save(spec);
-
-        TagPostBuildAction action = new TagPostBuildAction();
-        action.setSpecifications(Arrays.asList(new BuildSpecification[] {spec}));
-        action.setStates(Arrays.asList(new ResultState[] {ResultState.SUCCESS}));
-        action.setTag("tag-name");
-        action.setMoveExisting(true);
-        projectDao.save(action);
-        commitAndRefreshTransaction();
-
-        TagPostBuildAction otherAction = projectDao.findTagPostBuildAction(action.getId());
-        assertPropertyEquals(action, otherAction);
-    }
-
-    public void testLoadSaveExecutableAction()
-    {
-        BuildSpecification spec = new BuildSpecification("test");
-        buildSpecificationDao.save(spec);
-
-        RunExecutablePostBuildAction action = new RunExecutablePostBuildAction();
-        action.setSpecifications(Arrays.asList(new BuildSpecification[] {spec}));
-        action.setStates(Arrays.asList(new ResultState[] {ResultState.SUCCESS}));
-        action.setCommand("command");
-        action.setArguments("args");
-        projectDao.save(action);
-        commitAndRefreshTransaction();
-
-        RunExecutablePostBuildAction otherAction = projectDao.findRunExecutablePostBuildAction(action.getId());
-        assertPropertyEquals(action, otherAction);
-    }
-
     public void testFindByLikeName()
     {
         Project projectA = new Project("nameA", "description");
@@ -216,32 +177,6 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         projectDao.save(projectA);
         commitAndRefreshTransaction();
         assertNotNull(projectDao.findByName("nameA"));
-    }
-
-    public void testFindByScm()
-    {
-        // create the test project with a test scm.
-        Project project = new Project("test-project", "This is a test project");
-        project.setScm(new Svn());
-        projectDao.save(project);
-        commitAndRefreshTransaction();
-
-        // assert that we get the right project back.
-        assertNotNull(projectDao.findByScm(project.getScm()));
-        assertEquals(project.getId(), projectDao.findByScm(project.getScm()).getId());
-    }
-
-    public void testFindByScmId()
-    {
-        // create the test project with a test scm.
-        Project project = new Project("test-project", "This is a test project");
-        project.setScm(new Svn());
-        projectDao.save(project);
-        commitAndRefreshTransaction();
-
-        // assert that we get the right project back.
-        assertNotNull(projectDao.findByScmId(project.getScm().getId()));
-        assertEquals(project.getId(), projectDao.findByScmId(project.getScm().getId()).getId());
     }
 }
 

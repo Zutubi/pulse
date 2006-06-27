@@ -3,6 +3,8 @@ package com.zutubi.pulse.logging;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import com.opensymphony.webwork.dispatcher.VelocityResult;
+import com.opensymphony.webwork.dispatcher.DispatcherUtils;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -25,6 +27,11 @@ public class LogConfigurationManager
     public void init()
     {
         updateConfiguration(configurationManager.getAppConfig().getLogConfig());
+
+        Logger l = Logger.getLogger(VelocityResult.class.getName());
+        l.setFilter(new BlockingFilter());
+        l = Logger.getLogger(DispatcherUtils.class.getName());
+        l.setFilter(new BlockingFilter());
     }
 
     public List<String> getAvailableConfigurations()
@@ -106,7 +113,7 @@ public class LogConfigurationManager
         logConfigDir = new File(configDirectory, "logging");
     }
 
-    static class BlockingFilter implements Filter
+    private static class BlockingFilter implements Filter
     {
         public boolean isLoggable(LogRecord record)
         {

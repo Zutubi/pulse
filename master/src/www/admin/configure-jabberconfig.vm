@@ -4,32 +4,6 @@
 <html>
 <head>
     <title>#wwtext("name=jabber.config")</title>
-
-    <script type="text/javascript" src="/prototype.js"></script>
-    <script type="text/javascript">
-        #ajaxError("test-results")
-
-        function testSettings()
-        {
-            #testInProgress("test-results")
-
-            var host = escape($F("jabber.config_jabber_host"));
-            var port = escape($F("jabber.config_jabber_port"));
-            var username = escape($F("jabber.config_jabber_username"));
-            var password = escape($F("jabber.config_jabber_password"));
-            var forceSSL = escape($F("jabber.config_jabber_forceSSL"));
-            var params = "host=" + host + "&port=" + port + "&username=" + username + "&password=" + password + "&forceSSL=" + forceSSL;
-
-            var updater = new Ajax.Updater({success: 'test-results'},
-                                           "/ajax/testJabber.action",
-                                           {
-                                               method: 'get',
-                                               parameters: params,
-                                               onFailure: reportError
-                                           });
-
-        }
-    </script>
 </head>
 <body>
     #adminTabs("settings")
@@ -44,8 +18,6 @@
     #wwpassword("name=jabber.password" "label=%{getText('jabber.password')}" "showPassword=true" "tabindex=4")
     #wwcheckbox("name=jabber.forceSSL" "label=%{getText('jabber.force.ssl')}" "tabindex=5")
     #inlineHelp("jabber.force.ssl.help")
-
-    #testSettingsRow()
 
     #saveCancel(6)
 #end

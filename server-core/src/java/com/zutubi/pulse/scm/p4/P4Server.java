@@ -8,7 +8,6 @@ import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.scm.CachingSCMServer;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMFileCache;
-import com.zutubi.pulse.scm.ScmFilepathFilter;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -36,9 +35,6 @@ public class P4Server extends CachingSCMServer
     private static final String COMMAND_DESCRIBE = "describe";
     private static final String COMMAND_FILES = "files";
     private static final String COMMAND_INFO = "info";
-    private static final String COMMAND_LABEL = "label";
-    private static final String COMMAND_LABELS = "labels";
-    private static final String COMMAND_LABELSYNC = "labelsync";
     private static final String COMMAND_SYNC = "sync";
     private static final String COMMAND_WHERE = "where";
     private static final String FLAG_CLIENT = "-c";
@@ -46,7 +42,6 @@ public class P4Server extends CachingSCMServer
     private static final String FLAG_DELETE = "-d";
     private static final String FLAG_FORCE = "-f";
     private static final String FLAG_INPUT = "-i";
-    private static final String FLAG_LABEL = "-l";
     private static final String FLAG_MAXIMUM = "-m";
     private static final String FLAG_OUTPUT = "-o";
     private static final String FLAG_PREVIEW = "-n";
@@ -63,14 +58,8 @@ public class P4Server extends CachingSCMServer
     private String port;
     private Pattern lineSplitterPattern;
     private Pattern syncPattern;
-    private List<String> excludedPaths;
 
-    public void setExcludedPaths(List<String> filteredPaths)
-    {
-        this.excludedPaths = filteredPaths;
-    }
-
-    class P4Result
+    private class P4Result
     {
         public StringBuffer stdout;
         public StringBuffer stderr;
@@ -85,12 +74,12 @@ public class P4Server extends CachingSCMServer
         }
     }
 
-    P4Result runP4(String input, String ...commands) throws SCMException
+    private P4Result runP4(String input, String ...commands) throws SCMException
     {
         return runP4(true, input, commands);
     }
 
-    P4Result runP4(boolean throwOnStderr, String input, String ...commands) throws SCMException
+    private P4Result runP4(boolean throwOnStderr, String input, String ...commands) throws SCMException
     {
         P4Result result = new P4Result();
         Process child;
@@ -238,12 +227,10 @@ public class P4Server extends CachingSCMServer
                 String localFile = matcher.group(4);
                 if(localFile.startsWith(clientRoot.getAbsolutePath()))
                 {
-                    localFile = localFile.substring(clientRoot.getAbsolutePath().length());
+                    localFile = localFile.substring((int) clientRoot.getAbsolutePath().length());
                 }
 
-                // Separators must be normalised
-                localFile = localFile.replace('\\', '/');
-                if(localFile.startsWith("/"))
+                if(localFile.startsWith("/") || localFile.startsWith("\\"))
                 {
                     localFile = localFile.substring(1);
                 }
@@ -694,23 +681,13 @@ public class P4Server extends CachingSCMServer
         revision.setComment(comment);
         // branch??
 
-        ScmFilepathFilter filter = new ScmFilepathFilter(excludedPaths);
         Changelist changelist = new Changelist(getUid(), revision);
 
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {
-            Change change = getChangelistChange(lines[i]);
-            if (filter.accept(change.getFilename()))
-            {
-                changelist.addChange(change);
-            }
+            changelist.addChange(getChangelistChange(lines[i]));
         }
 
-        // if all of the changes have been filtered out, then there is no changelist so we return null.
-        if (changelist.getChanges().size() == 0)
-        {
-            return null;
-        }
         return changelist;
     }
 
@@ -959,41 +936,12 @@ public class P4Server extends CachingSCMServer
         try
         {
             String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
-            long latestRevision = getLatestRevisionForFiles(clientName, root).getRevisionNumber();
-            long sinceRevision = ((NumericalRevision) since).getRevisionNumber();
-            if(latestRevision > sinceRevision)
-            {
-                if(excludedPaths != null && excludedPaths.size() > 0)
-                {
-                    // We have to find a change that includes a non-excluded
-                    // path.
-                    return nonExcludedChange(clientName, sinceRevision, latestRevision);
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return getLatestRevisionForFiles(clientName, root).getRevisionNumber() > ((NumericalRevision) since).getRevisionNumber();
         }
         finally
         {
             deleteClient(clientName);
         }
-    }
-
-    private boolean nonExcludedChange(String clientName, long sinceRevision, long latestRevision) throws SCMException
-    {
-        for(long revision = sinceRevision + 1; revision <= latestRevision; revision++)
-        {
-            if(getChangelist(clientName, revision) != null)
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public void update(File workDir, Revision rev) throws SCMException
@@ -1009,53 +957,6 @@ public class P4Server extends CachingSCMServer
     public boolean supportsUpdate()
     {
         return false;
-    }
-
-    public void tag(Revision revision, String name, boolean moveExisting) throws SCMException
-    {
-        String clientName = updateClient(0, null);
-        try
-        {
-            if(!labelExists(clientName, name))
-            {
-                createLabel(clientName, name);
-            }
-            else if(!moveExisting)
-            {
-                throw new SCMException("Cannot create label '" + name + "': label already exists");
-            }
-
-            runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_LABELSYNC, FLAG_LABEL, name, clientRoot.getAbsoluteFile() + "/...@" + revision.toString());
-        }
-        finally
-        {
-            deleteClient(clientName);
-        }
-    }
-
-    public boolean labelExists(String client, String name) throws SCMException
-    {
-        P4Result p4Result = runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABELS);
-
-        // $ p4 labels
-        // Label jim 2006/06/20 'Created by Jason. '
-        Pattern splitter = Pattern.compile("^Label (.+) [0-9/]+ '.*'$", Pattern.MULTILINE);
-        Matcher matcher = splitter.matcher(p4Result.stdout);
-        while (matcher.find())
-        {
-            if(matcher.group(1).equals(name))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private void createLabel(String client, String name) throws SCMException
-    {
-        P4Result p4Result = runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABEL, FLAG_OUTPUT, name);
-        runP4(p4Result.stdout.toString(), P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABEL, FLAG_INPUT);
     }
 
     public static void main(String argv[])

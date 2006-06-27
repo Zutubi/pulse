@@ -36,12 +36,11 @@ public class VersionTest extends PulseTestCase
         assertEquals("@BUILD_DATE@", v.getBuildDate());
         assertEquals("@BUILD_NUMBER@", v.getBuildNumber());
         assertEquals("@VERSION@", v.getVersionNumber());
-        assertEquals("@RELEASE_DATE@", v.getReleaseDate());
     }
 
     public void testReadWriteVersion() throws IOException
     {
-        Version v = new Version("a", "b", "c", "d");
+        Version v = new Version("a", "b", "c");
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         v.write(out);
@@ -51,6 +50,5 @@ public class VersionTest extends PulseTestCase
         assertEquals(v.getVersionNumber(), v2.getVersionNumber());
         assertEquals(v.getBuildNumber(), v2.getBuildNumber());
         assertEquals(v.getBuildDate(), v2.getBuildDate());
-        assertEquals(v.getReleaseDate(), v2.getReleaseDate());
     }
 }

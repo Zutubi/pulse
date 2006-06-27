@@ -31,12 +31,6 @@ public class FileResourceRepository implements ResourceRepository
         resources.put(r.getName(), r);
     }
 
-    public boolean hasResource(String name, String version)
-    {
-        Resource r = getResource(name);
-        return r != null && (version == null || r.hasVersion(version));        
-    }
-
     public boolean hasResource(String name)
     {
         return resources.containsKey(name);

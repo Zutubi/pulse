@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Properties;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.FileInputStream;
 
 /**
@@ -20,7 +21,7 @@ public class PostProcessorManager
 
     private static final Logger LOG = Logger.getLogger(PostProcessorManager.class);
 
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
 
     public Map<String, String> getAvailableProcessors()
     {
@@ -83,7 +84,7 @@ public class PostProcessorManager
         }
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

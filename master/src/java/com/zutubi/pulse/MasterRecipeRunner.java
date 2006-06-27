@@ -1,7 +1,9 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.util.logging.Logger;
@@ -15,26 +17,24 @@ public class MasterRecipeRunner implements Runnable
     private RecipeRequest request;
     private RecipeProcessor recipeProcessor;
     private EventManager eventManager;
-    private MasterConfigurationManager configurationManager;
-    private ResourceRepository resourceRepository;
+    private ConfigurationManager configurationManager;
 
-    public MasterRecipeRunner(RecipeRequest request, RecipeProcessor recipeProcessor, EventManager eventManager, MasterConfigurationManager configurationManager, ResourceRepository resourceRepository)
+    public MasterRecipeRunner(RecipeRequest request, RecipeProcessor recipeProcessor, EventManager eventManager, ConfigurationManager configurationManager)
     {
         this.request = request;
         this.recipeProcessor = recipeProcessor;
         this.eventManager = eventManager;
         this.configurationManager = configurationManager;
-        this.resourceRepository = resourceRepository;
     }
 
     public void run()
     {
-        request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), request.getBootstrapper()));
-        ServerRecipePaths recipePaths = new ServerRecipePaths(request.getId(), configurationManager.getUserPaths().getData());
+        Bootstrapper bootstrapper = new ChainBootstrapper(new ServerBootstrapper(), request.getBootstrapper());
+        ServerRecipePaths recipePaths = new ServerRecipePaths(request.getId(), configurationManager);
 
         try
         {
-            recipeProcessor.build(request, recipePaths, resourceRepository);
+            recipeProcessor.build(request.getId(), recipePaths, bootstrapper, request.getPulseFileSource(), request.getRecipeName());
         }
         catch (BuildException e)
         {

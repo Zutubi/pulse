@@ -44,7 +44,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
         assertTextNotPresent("saved.host.net");
         assertTextNotPresent("saved.help.url");
 
-        clickLink("general.edit");
+        clickLinkWithText("edit");
 
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
 
@@ -56,7 +56,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
         assertTextPresent("saved.host.net");
         assertTextPresent("saved.help.url");
 
-        clickLink("general.edit");
+        clickLinkWithText("edit");
         form.assertFormPresent();
         form.assertFormElements("saved.host.net", "saved.help.url", "true", "true");
         form.saveFormElements("saved.host.net", "saved.help.url", "true", "false");
@@ -68,7 +68,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
         // ensure that we are not starting with the email address we using for this test.
         assertTextNotPresent("cancelled.host.com");
 
-        clickLink("general.edit");
+        clickLinkWithText("edit");
 
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
         form.assertFormPresent();

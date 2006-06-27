@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
-import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.Entity;
+import com.opensymphony.util.TextUtils;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * 
  *
  */
-public class Project extends Entity implements AclObjectIdentity, AclObjectIdentityAware, NamedEntity
+public class Project extends Entity implements AclObjectIdentity, AclObjectIdentityAware
 {
     public enum State
     {
@@ -58,7 +58,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private String description;
     private String url;
     private PulseFileDetails pulseFileDetails;
-    private List<PostBuildAction> postBuildActions = new LinkedList<PostBuildAction>();
     private List<CleanupRule> cleanupRules = new LinkedList<CleanupRule>();
     private Scm scm;
     private State state = State.IDLE;
@@ -186,19 +185,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         this.buildSpecifications = buildSpecifications;
     }
 
-    public BuildSpecification getBuildSpecification(long id)
-    {
-        for(BuildSpecification s: buildSpecifications)
-        {
-            if(s.getId() == id)
-            {
-                return s;
-            }
-        }
-
-        return null;
-    }
-
     public BuildSpecification getBuildSpecification(String name)
     {
         for (BuildSpecification spec : buildSpecifications)
@@ -216,35 +202,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         return buildSpecifications.remove(buildSpecification);
     }
 
-    public List<Long> getBuildSpecificationIds()
-    {
-        List<Long> ids = new LinkedList<Long>();
-        for(BuildSpecification spec: buildSpecifications)
-        {
-            ids.add(spec.getId());
-        }
-
-        return ids;
-    }
-
-    public List<BuildSpecification> lookupBuildSpecifications(List<Long> ids)
-    {
-        List<BuildSpecification> result = new LinkedList<BuildSpecification>();
-        if (ids != null)
-        {
-            for(Long id: ids)
-            {
-                BuildSpecification buildSpecification = getBuildSpecification(id);
-                if(buildSpecification != null)
-                {
-                    result.add(buildSpecification);
-                }
-            }
-        }
-
-        return result;
-    }
-
     public PulseFileDetails getPulseFileDetails()
     {
         return pulseFileDetails;
@@ -253,65 +210,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public void setPulseFileDetails(PulseFileDetails pulseFileDetails)
     {
         this.pulseFileDetails = pulseFileDetails;
-    }
-
-    public List<PostBuildAction> getPostBuildActions()
-    {
-        return postBuildActions;
-    }
-
-    private void setPostBuildActions(List<PostBuildAction> postBuildActions)
-    {
-        this.postBuildActions = postBuildActions;
-    }
-
-    public void addPostBuildAction(PostBuildAction action)
-    {
-        postBuildActions.add(action);
-    }
-
-    public void removePostBuildAction(long id)
-    {
-        PostBuildAction deadActionWalking = null;
-        for(PostBuildAction action: postBuildActions)
-        {
-            if(action.getId() == id)
-            {
-                deadActionWalking = action;
-                break;
-            }
-        }
-
-        if(deadActionWalking != null)
-        {
-            postBuildActions.remove(deadActionWalking);
-        }
-    }
-
-    public PostBuildAction getPostBuildAction(String name)
-    {
-        for(PostBuildAction p: postBuildActions)
-        {
-            if(p.getName().equals(name))
-            {
-                return p;
-            }
-        }
-
-        return null;
-    }
-
-    public PostBuildAction getPostBuildAction(long id)
-    {
-        for(PostBuildAction a: postBuildActions)
-        {
-            if(a.getId() == id)
-            {
-                return a;
-            }
-        }
-
-        return null;
     }
 
     public List<CleanupRule> getCleanupRules()

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.upgrade;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 
@@ -24,14 +24,14 @@ public class UpgradePreviewAction extends UpgradeActionSupport
      */
     private Version newVersion;
 
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
 
     /**
      * Required resource.
      *
      * @param configurationManager
      */
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

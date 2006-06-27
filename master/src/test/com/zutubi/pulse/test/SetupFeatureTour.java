@@ -1,20 +1,19 @@
 package com.zutubi.pulse.test;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.AntPostProcessor;
 import com.zutubi.pulse.core.DirectoryArtifact;
-import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.JUnitReportPostProcessor;
+import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.UserDao;
-import com.zutubi.pulse.model.persistence.SlaveDao;
-import com.zutubi.pulse.model.persistence.BuildResultDao;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,14 +32,12 @@ public class SetupFeatureTour implements Runnable
     private BuildResultDao buildResultDao;
     private UserDao userDao;
     private UserManager userManager;
-    private MasterConfigurationManager configManager;
-    private SlaveDao slaveDao;
+    private ConfigurationManager configManager;
 
-    private Slave slave;
     private Project project;
     private BuildResult build;
-    private RecipeResult recipes[];
-    private CommandResult commands[];
+    private RecipeResult recipe;
+    private CommandResult command;
     private long buildNumber = 0;
     private int commandIndex = 0;
 
@@ -72,8 +69,6 @@ public class SetupFeatureTour implements Runnable
 
         if (projectDao.findAll().size() == 0)
         {
-            setupSlaves();
-
             project = setupProject("ant", "Apache ant build tools");
             project.setUrl("http://ant.apache.org/");
             successfulBuild();
@@ -96,7 +91,6 @@ public class SetupFeatureTour implements Runnable
 
             project = setupProject("pulse", "The pulse automated build server");
             project.setUrl("http://zutubi.com/products/pulse/");
-            addBuildStage("remote", slave);
             for (int i = 0; i < 54; i++)
             {
                 successfulBuild();
@@ -106,12 +100,6 @@ public class SetupFeatureTour implements Runnable
             setupUsers(project);
             createLogMessages();
         }
-    }
-
-    private void setupSlaves()
-    {
-        slave = new Slave("linux64", "localhost", 8090);
-        slaveDao.save(slave);
     }
 
     private void createLogMessages()
@@ -199,14 +187,14 @@ public class SetupFeatureTour implements Runnable
         project.setScm(scm);
 
         BuildSpecification simpleSpec = new BuildSpecification("default");
-        BuildStage simpleStage = new BuildStage("default", new MasterBuildHostRequirements(), null);
+        BuildStage simpleStage = new BuildStage(new MasterBuildHostRequirements(), null);
         BuildSpecificationNode simpleNode = new BuildSpecificationNode(simpleStage);
         simpleSpec.getRoot().addChild(simpleNode);
         project.addBuildSpecification(simpleSpec);
 
         simpleSpec = new BuildSpecification("nightly");
         simpleSpec.setTimeout(120);
-        simpleStage = new BuildStage("default", new MasterBuildHostRequirements(), "nightly-build");
+        simpleStage = new BuildStage(new MasterBuildHostRequirements(), "nightly-build");
         simpleNode = new BuildSpecificationNode(simpleStage);
         simpleSpec.getRoot().addChild(simpleNode);
         project.addBuildSpecification(simpleSpec);
@@ -217,37 +205,14 @@ public class SetupFeatureTour implements Runnable
         return project;
     }
 
-    private void addBuildStage(String name, Slave slave)
-    {
-        BuildSpecification spec = project.getBuildSpecifications().get(0);
-        BuildStage stage = new BuildStage(name, new SlaveBuildHostRequirements(slave), null);
-        BuildSpecificationNode node = new BuildSpecificationNode(stage);
-        node.addResourceRequirement(new ResourceRequirement("ant", "1.6.5"));
-        spec.getRoot().addChild(node);
-        projectDao.save(project);
-    }
-
     private void addBuildResult()
     {
         BuildResult previous = build;
-        build = new BuildResult(new TriggerBuildReason("scm trigger"), project, "default", ++buildNumber);
+        build = new BuildResult(project, "default", ++buildNumber);
         buildResultDao.save(build);
 
-        BuildSpecification spec = project.getBuildSpecifications().get(0);
-        int i = 0;
-        recipes = new RecipeResult[spec.getRoot().getChildren().size()];
-
-        for(BuildSpecificationNode specNode: spec.getRoot().getChildren())
-        {
-            recipes[i] = new RecipeResult(null);
-            buildResultDao.save(recipes[i]);
-
-            File recipeDir = masterBuildPaths.getRecipeDir(project, build, recipes[i].getId());
-            recipes[i].commence(recipeDir);
-            RecipeResultNode node = new RecipeResultNode(specNode.getStage().getName(), recipes[i]);
-            build.getRoot().addChild(node);
-            i++;
-        }
+        recipe = new RecipeResult(null);
+        buildResultDao.save(recipe);
 
         File buildDir = masterBuildPaths.getBuildDir(project, build);
         build.commence(buildDir);
@@ -260,6 +225,11 @@ public class SetupFeatureTour implements Runnable
         {
             e.printStackTrace();
         }
+
+        File recipeDir = masterBuildPaths.getRecipeDir(project, build, recipe.getId());
+        recipe.commence(recipeDir);
+        RecipeResultNode node = new RecipeResultNode(recipe);
+        build.getRoot().addChild(node);
 
         addChanges(previous);
 
@@ -304,37 +274,23 @@ public class SetupFeatureTour implements Runnable
 
     private void completeBuildResult()
     {
-        for(RecipeResult recipe: recipes)
-        {
-            recipe.complete();
-        }
+        recipe.complete();
         build.complete();
         buildResultDao.save(build);
     }
 
     private void addCommandResult(String name)
     {
-        int i = 0;
-        commands = new CommandResult[recipes.length];
-        for(RecipeResult recipe: recipes)
-        {
-            commands[i] = new CommandResult(name);
-            File commandDir = new File(recipe.getOutputDir(), RecipeProcessor.getCommandDirName(commandIndex, commands[i]));
-            File outputDir = new File(commandDir, "output");
-            commands[i].commence(outputDir);
-            i++;
-        }
-
-        commandIndex++;
+        command = new CommandResult(name);
+        File commandDir = new File(recipe.getOutputDir(), RecipeProcessor.getCommandDirName(commandIndex++, command));
+        File outputDir = new File(commandDir, "output");
+        command.commence(outputDir);
     }
 
     private void completeCommandResult()
     {
-        for (int i = 0; i < recipes.length; i++)
-        {
-            recipes[i].add(commands[i]);
-            commands[i].complete();
-        }
+        recipe.add(command);
+        command.complete();
     }
 
     private void successfulBuild()
@@ -353,21 +309,13 @@ public class SetupFeatureTour implements Runnable
         addFailedTestArtifact();
         addTestReportArtifact();
         completeCommandResult();
-
-        for(BuildSpecificationNode node: project.getBuildSpecifications().get(0).getRoot().getChildren())
-        {
-            build.failure("Stage " + node.getStage().getName() + " failed.");
-        }
-
+        build.failure("Recipe [default] failed.");
         completeBuildResult();
 
         File f = getDataFile("base");
         try
         {
-            for (RecipeResult recipe: recipes)
-            {
-                FileSystemUtils.copyRecursively(f, new File(recipe.getOutputDir(), "base"));
-            }
+            FileSystemUtils.copyRecursively(f, new File(recipe.getOutputDir(), "base"));
         }
         catch (IOException e)
         {
@@ -377,52 +325,40 @@ public class SetupFeatureTour implements Runnable
 
     private void addAntFailedArtifact()
     {
-        AntPostProcessor pp = new AntPostProcessor();
-        File dummy = getDataFile("ant-failed.txt");
-
-        for (CommandResult command: commands)
+        try
         {
-            try
-            {
-                StoredFileArtifact fileArtifact = addArtifact(command, dummy, "output.txt", "command output", "text/plain");
-                pp.process(new File(command.getOutputDir()), fileArtifact, command);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+            File dummy = getDataFile("ant-failed.txt");
+            StoredFileArtifact fileArtifact = addArtifact(dummy, "output.txt", "command output", "text/plain");
+            AntPostProcessor pp = new AntPostProcessor();
+            pp.process(new File(command.getOutputDir()), fileArtifact, command);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
     private void addFailedTestArtifact()
     {
-        File dummy = getDataFile("junit-failed.xml");
-        JUnitReportPostProcessor pp = new JUnitReportPostProcessor();
-
-        for (CommandResult command: commands)
+        try
         {
-            try
-            {
-                StoredFileArtifact fileArtifact = addArtifact(command, dummy, "TESTS-TestSuites.xml", "JUnit XML Report", "text/html");
-                pp.process(new File(command.getOutputDir()), fileArtifact, command);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+            File dummy = getDataFile("junit-failed.xml");
+            StoredFileArtifact fileArtifact = addArtifact(dummy, "TESTS-TestSuites.xml", "JUnit XML Report", "text/html");
+            JUnitReportPostProcessor pp = new JUnitReportPostProcessor();
+            pp.process(new File(command.getOutputDir()), fileArtifact, command);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
     private void addTestReportArtifact()
     {
         File dir = getDataFile("junit-report");
-
-        for (CommandResult command: commands)
-        {
-            DirectoryArtifact da = new DirectoryArtifact();
-            da.setName("JUnit HTML Report");
-            da.capture(command, dir, new File(command.getOutputDir()));
-        }
+        DirectoryArtifact da = new DirectoryArtifact();
+        da.setName("JUnit HTML Report");
+        da.capture(command, dir, new File(command.getOutputDir()));
     }
 
     private File getDataFile(String name)
@@ -431,7 +367,7 @@ public class SetupFeatureTour implements Runnable
         return new File(root, FileSystemUtils.composeFilename("master", "src", "test", "com", "zutubi", "pulse", "test", name));
     }
 
-    private StoredFileArtifact addArtifact(CommandResult command, File from, String to, String name, String type)
+    private StoredFileArtifact addArtifact(File from, String to, String name, String type)
     {
         File dir = new File(command.getOutputDir(), name);
         File file = new File(dir, to);
@@ -492,7 +428,7 @@ public class SetupFeatureTour implements Runnable
         this.userDao = userDao;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configManager)
+    public void setConfigurationManager(ConfigurationManager configManager)
     {
         this.configManager = configManager;
     }
@@ -500,10 +436,5 @@ public class SetupFeatureTour implements Runnable
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
-    }
-
-    public void setSlaveDao(SlaveDao slaveDao)
-    {
-        this.slaveDao = slaveDao;
     }
 }

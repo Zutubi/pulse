@@ -1,9 +1,12 @@
 package com.zutubi.pulse.api;
 
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
@@ -11,6 +14,8 @@ import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -19,14 +24,28 @@ import java.util.TreeSet;
 /**
  *
  */
-public class TokenManager extends AdminTokenManager
+public class TokenManager
 {
     private static final Logger LOG = Logger.getLogger(TokenManager.class);
+    private static final String TOKEN_FILE = "admin.token";
 
     private int loginCount = 0;
+    /**
+     * A random token that allows a single admin login: the token is changed
+     * each time it it used.
+     */
+    private String adminToken;
     private Set<String> validTokens = new TreeSet<String>();
     private UserManager userManager;
     private PasswordEncoder passwordEncoder;
+    private ConfigurationManager configurationManager;
+
+
+    public static File getAdminTokenFilename(ConfigurationManager configurationManager)
+    {
+        File configPath = configurationManager.getSystemPaths().getConfigRoot();
+        return new File(configPath, TOKEN_FILE);
+    }
 
     public synchronized String login(String username, String password) throws AuthenticationException
     {
@@ -92,8 +111,11 @@ public class TokenManager extends AdminTokenManager
 
     public void verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException
     {
-        if(checkAdminToken(token))
+        if (token.equals(adminToken))
         {
+            // Matches the sigle-use admin token.  Allow login and generate a
+            // new token.
+            newRandomToken();
             return;
         }
 
@@ -198,6 +220,20 @@ public class TokenManager extends AdminTokenManager
         return DigestUtils.md5Hex(username + ":" + expiryTime + ":" + password);
     }
 
+    private void newRandomToken()
+    {
+        File tokenFile = getAdminTokenFilename(configurationManager);
+        adminToken = RandomUtils.randomString(128);
+        try
+        {
+            FileSystemUtils.createFile(tokenFile, adminToken);
+        }
+        catch (IOException e)
+        {
+            LOG.severe("Unable to write admin token file: " + e.getMessage(), e);
+        }
+    }
+
     /**
      * Required resource.
      *
@@ -211,11 +247,30 @@ public class TokenManager extends AdminTokenManager
     /**
      * Required resource.
      *
+     * @param configurationManager
+     */
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+
+    /**
+     * Required resource.
+     *
      * @param passwordEncoder
      */
     public void setPasswordEncoder(PasswordEncoder passwordEncoder)
     {
         this.passwordEncoder = passwordEncoder;
+    }
+
+    /**
+     * Init method. Make sure that we have an admin token available for use by
+     * the command line.
+     */
+    public void init()
+    {
+        newRandomToken();
     }
 
     private void checkTokenAccessEnabled() throws AuthenticationException

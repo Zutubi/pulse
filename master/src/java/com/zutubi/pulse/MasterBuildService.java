@@ -1,11 +1,9 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.model.ResourceManager;
 
 import java.io.File;
 
@@ -17,35 +15,21 @@ public class MasterBuildService implements BuildService
     private static final Logger LOG = Logger.getLogger(MasterBuildService.class);
 
     private MasterRecipeProcessor masterRecipeProcessor;
-    private MasterConfigurationManager configurationManager;
-    private ResourceManager resourceManager;
-
-    public MasterBuildService(MasterRecipeProcessor masterRecipeProcessor, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
-    {
-        this.masterRecipeProcessor = masterRecipeProcessor;
-        this.configurationManager = configurationManager;
-        this.resourceManager = resourceManager;
-    }
+    private ConfigurationManager configurationManager;
 
     public String getUrl()
     {
         return configurationManager.getAppConfig().getHostName();
     }
 
-    public boolean hasResource(String resource, String version)
-    {
-        return resourceManager.getMasterRepository().hasResource(resource, version);
-    }
-
-    public boolean build(RecipeRequest request)
+    public void build(RecipeRequest request)
     {
         masterRecipeProcessor.processRecipe(request);
-        return true;
     }
 
     public void collectResults(long recipeId, File outputDest, File workDest)
     {
-        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager.getUserPaths().getData());
+        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager);
         File outputDir = recipePaths.getOutputDir();
 
         if (!FileSystemUtils.rename(outputDir, outputDest, true))
@@ -63,7 +47,7 @@ public class MasterBuildService implements BuildService
     public void cleanup(long recipeId)
     {
         // We rename the output dir, so no need to remove it.
-        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager.getUserPaths().getData());
+        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager);
         File recipeRoot = recipePaths.getRecipeRoot();
 
         if (!FileSystemUtils.removeDirectory(recipeRoot))
@@ -87,7 +71,7 @@ public class MasterBuildService implements BuildService
         this.masterRecipeProcessor = masterRecipeProcessor;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }
@@ -96,10 +80,5 @@ public class MasterBuildService implements BuildService
     public boolean equals(Object obj)
     {
         return obj instanceof MasterBuildService;
-    }
-
-    public void setResourceManager(ResourceManager resourceManager)
-    {
-        this.resourceManager = resourceManager;
     }
 }

@@ -1,10 +1,10 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.model.NamedEntityComparator;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.ProjectNameComparator;
 
 import java.util.*;
 
@@ -63,7 +63,7 @@ public class ConfigureDashboardProjectsAction extends UserActionSupport
 
         enableSelection = !user.getShowAllProjects();
         List<Project> all = projectManager.getAllProjects();
-        Collections.sort(all, new NamedEntityComparator());
+        Collections.sort(all, new ProjectNameComparator());
         allProjects = new LinkedHashMap<Long, String>();
 
         for(Project p: all)

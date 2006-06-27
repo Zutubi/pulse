@@ -149,9 +149,4 @@ public class Changelist extends Entity
             resultIds.remove(i);
         }
     }
-
-    public String toString()
-    {
-        return "{ uid: " + serverUid + ", rev: " + revision.toString() + ", changes: " + changes.toString() + " }";
-    }
 }

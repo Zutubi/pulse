@@ -3,7 +3,7 @@ package com.zutubi.pulse.web.rss;
 import com.sun.syndication.feed.module.content.ContentModule;
 import com.sun.syndication.feed.module.content.ContentModuleImpl;
 import com.sun.syndication.feed.synd.*;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
@@ -24,7 +24,7 @@ import java.util.List;
 public class BuildResultsRssAction extends ProjectActionSupport
 {
     private BuildResultRenderer buildResultRenderer;
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
 
     private Queries queries;
 
@@ -189,7 +189,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         return w.toString();
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

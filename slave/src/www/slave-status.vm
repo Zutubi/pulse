@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <title>slave status</title>
+    <link href="build.css" rel="stylesheet" type="text/css">
+  </head>
+
+  <content tag="selectedTab">server-status</content>
+
+  <body>
+    <h1 class="build-log">:: slave status ::</h1>
+    <h2 class="command-info">resources</h2>
+    <div class="command-content">
+      <table>
+        <tr>
+          <th class="command-detail">resource</th>
+          <th class="command-detail">action</th>
+        <tr>
+#foreach($resource in $resources)
+        <tr>
+          <td class="command-detail"><a href="viewResource.action?id=$resource.id">$resource.name</a></td>
+          <td class="command-detail"><a href="deleteResource.action?id=$resource.id">delete</a></td>
+        </tr>
+#end
+        <tr>
+          <td class="command-detail" colspan="2"><b>+</b> <a href="createResource!default.action">add new resource</a></td>
+        </tr>
+      </table>
+    </div>
+
+  </body>
+</html>

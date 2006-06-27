@@ -5,7 +5,6 @@ import com.zutubi.pulse.util.ListUtils;
 import com.zutubi.pulse.util.Predicate;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.UnknownBuildReason;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
@@ -75,7 +74,7 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     private void createBuild(Project project, String spec, int number, ResultState state, int start, int end, boolean hasWorkDir)
     {
-        BuildResult result = new BuildResult(new UnknownBuildReason(), project, spec, number);
+        BuildResult result = new BuildResult(project, spec, number);
         result.commence(start);
         switch (state)
         {

@@ -43,11 +43,6 @@ public class DefaultProjectManager implements ProjectManager
         return projectDao.findById(id);
     }
 
-    public Project getProjectByScm(long scmId)
-    {
-        return projectDao.findByScmId(scmId);
-    }
-
     public List<Project> getAllProjects()
     {
         return projectDao.findAll();
@@ -56,11 +51,6 @@ public class DefaultProjectManager implements ProjectManager
     public List<Project> getProjectsWithNameLike(String name)
     {
         return projectDao.findByLikeName(name);
-    }
-
-    public int getProjectCount()
-    {
-        return projectDao.count();
     }
 
     private void deleteProject(Project entity)

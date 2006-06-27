@@ -1,9 +1,0 @@
-<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
-        "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
-<validators>
-    <field name="command">
-        <field-validator type="requiredstring">
-            <message key="post.build.action.exe.comand.required">command is required.</message>
-        </field-validator>
-    </field>
-</validators>

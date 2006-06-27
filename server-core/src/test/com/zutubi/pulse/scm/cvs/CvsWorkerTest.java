@@ -226,7 +226,8 @@ public class CvsWorkerTest extends PulseTestCase
         assertTrue(new File(workdir, module + "/file3.txt").exists());
 
         // now checkout head and ensure that file3 is not there.
-        FileSystemUtils.cleanOutputDir(workdir);
+        removeDirectory(workdir);
+        workdir = FileSystemUtils.createTempDirectory(CvsWorkerTest.class.getName(), "");
 
         cvs.setBranch(null);
         cvs.checkout(workdir, CvsRevision.HEAD);
@@ -565,65 +566,6 @@ public class CvsWorkerTest extends PulseTestCase
 
         // verify that file x is now there.
         assertTrue(x.exists());
-    }
-
-    public void testTagContent() throws SCMException, IOException
-    {
-        String module = "unit-test/CvsWorkerTest/testTagContent";
-        cvs.setModule(module);
-
-        File baseCheckoutDir = new File(workdir, module);
-
-        // create a random tag for testing.
-        String tagName = "T_" + String.valueOf(System.currentTimeMillis());
-
-        // checkout by tag and verify that no content is there.
-        CvsRevision tag = new CvsRevision(null, tagName, null, null);
-        try
-        {
-            cvs.checkout(workdir, tag);
-            fail();
-        }
-        catch (SCMException e)
-        {
-            // expect exception because tag should not exist.
-        }
-
-        // clean out the working directory.
-        FileSystemUtils.cleanOutputDir(workdir);
-
-        // tag the content.
-        cvs.tag(CvsRevision.HEAD, tagName, false);
-
-        // checkout by tag and verify that the expected content is there.
-        cvs.checkout(workdir, tag);
-        assertTrue(new File(baseCheckoutDir, "file.txt").exists());
-    }
-
-    public void testDeleteTag() throws SCMException, IOException
-    {
-        String module = "unit-test/CvsWorkerTest/testTagContent";
-        cvs.setModule(module);
-        String tagName = "T_" + String.valueOf(System.currentTimeMillis());
-
-        // create tag.
-        cvs.tag(CvsRevision.HEAD, tagName, false);
-
-        // checkout to ensure that the tag has been created.
-        CvsRevision tag = new CvsRevision(null, tagName, null, null);
-        cvs.checkout(workdir, tag);
-
-        FileSystemUtils.cleanOutputDir(workdir);
-
-        // delete tag.
-        cvs.deleteTag(tag);
-
-        // ensure that tag contains nothing.
-        tag = new CvsRevision(null, tagName, null, null);
-        cvs.checkout(workdir, tag);
-        // because we have created the tag in the past, the subsequent checkout will succeed, but should
-        // generate an empty checkout directory.
-        assertFalse(new File(workdir, module + "/file.txt").exists());
     }
 
     private void assertContents(String expected, File file) throws IOException

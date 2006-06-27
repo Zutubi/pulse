@@ -6,89 +6,110 @@ import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;
-import java.util.List;
-import java.util.LinkedList;
 
 /**
  */
-public class ResourceDiscoverer
+public class ResourceDiscoverer implements Runnable
 {
-    public List<Resource> discover()
+    private ResourceRepository resourceRepository;
+
+    public ResourceDiscoverer()
     {
-        List<Resource> result = new LinkedList<Resource>();
-        discoverAnt(result);
-        discoverMake(result);
-        discoverMaven2(result);
-        discoverJava(result);
-        return result;
     }
 
-    private void discoverAnt(List<Resource> resources)
+    public ResourceDiscoverer(ResourceRepository resourceRepository)
     {
-        String home = System.getenv("ANT_HOME");
-        if (home != null)
-        {
-            Resource antResource = new Resource("ant");
-            antResource.addProperty(new Property("ant.home", home));
-            File antBin;
+        this.resourceRepository = resourceRepository;
+    }
 
+    public void run()
+    {
+        discoverAnt();
+        discoverMake();
+        discoverMaven2();
+        discoverJava();
+    }
+
+    private void discoverAnt()
+    {
+        if (!resourceRepository.hasResource("ant"))
+        {
+            String home = System.getenv("ANT_HOME");
+            if (home != null)
+            {
+                Resource antResource = new Resource("ant");
+                antResource.addProperty(new Property("ant.home", home));
+                File antBin;
+
+                if (SystemUtils.isWindows())
+                {
+                    antBin = new File(home, "bin/ant.bat");
+                }
+                else
+                {
+                    antBin = new File(home, "bin/ant");
+                }
+
+                if (antBin.isFile())
+                {
+                    antResource.addProperty(new Property("ant.bin", antBin.getAbsolutePath()));
+                }
+
+                File antLib = new File(home, "lib");
+                if (antLib.isDirectory())
+                {
+                    antResource.addProperty(new Property("ant.lib.dir", antLib.getAbsolutePath()));
+                }
+
+                resourceRepository.addResource(antResource);
+            }
+        }
+    }
+
+    private void discoverMake()
+    {
+        if (!resourceRepository.hasResource("make"))
+        {
+            File makeBin = SystemUtils.findInPath("make");
+            if (makeBin != null)
+            {
+                Resource makeResource = new Resource("make");
+                makeResource.addProperty(new Property("make.bin", makeBin.getAbsolutePath()));
+                resourceRepository.addResource(makeResource);
+            }
+        }
+    }
+
+    private void discoverMaven2()
+    {
+        if (!resourceRepository.hasResource("maven2"))
+        {
+            File mvn = null;
             if (SystemUtils.isWindows())
             {
-                antBin = new File(home, "bin/ant.bat");
+                mvn = SystemUtils.findInPath("mvn.bat");
             }
             else
             {
-                antBin = new File(home, "bin/ant");
+                mvn = SystemUtils.findInPath("mvn");
             }
 
-            if (antBin.isFile())
+            if (mvn != null)
             {
-                antResource.addProperty(new Property("ant.bin", antBin.getAbsolutePath()));
+                Resource mvnResource = new Resource("maven2");
+                mvnResource.addProperty(new Property("maven2.bin", mvn.getAbsolutePath()));
+                resourceRepository.addResource(mvnResource);
             }
-
-            File antLib = new File(home, "lib");
-            if (antLib.isDirectory())
-            {
-                antResource.addProperty(new Property("ant.lib.dir", antLib.getAbsolutePath()));
-            }
-
-            resources.add(antResource);
         }
     }
 
-    private void discoverMake(List<Resource> resources)
+    private void discoverJava()
     {
-        File makeBin = SystemUtils.findInPath("make");
-        if (makeBin != null)
+        if (resourceRepository.hasResource("java"))
         {
-            Resource makeResource = new Resource("make");
-            makeResource.addProperty(new Property("make.bin", makeBin.getAbsolutePath()));
-            resources.add(makeResource);
+            return;
         }
-    }
 
-    private void discoverMaven2(List<Resource> resources)
-    {
-        File mvn = null;
-        if (SystemUtils.isWindows())
-        {
-            mvn = SystemUtils.findInPath("mvn.bat");
-        }
-        else
-        {
-            mvn = SystemUtils.findInPath("mvn");
-        }
-                    
-        if (mvn != null)
-        {
-            Resource mvnResource = new Resource("maven2");
-            mvnResource.addProperty(new Property("maven2.bin", mvn.getAbsolutePath()));
-            resources.add(mvnResource);
-        }
-    }
-
-    private void discoverJava(List<Resource> resources)
-    {
         //TODO: look for java on the path.
 
         // look for JAVA_HOME in the environment.
@@ -110,7 +131,12 @@ public class ResourceDiscoverer
         if (javaBin.isFile())
         {
             javaResource.addProperty(new Property("java.bin", javaBin.getAbsolutePath()));
-            resources.add(javaResource);
+            resourceRepository.addResource(javaResource);
         }
+    }
+
+    public void setResourceRepository(ResourceRepository resourceRepository)
+    {
+        this.resourceRepository = resourceRepository;
     }
 }

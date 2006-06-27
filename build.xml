@@ -19,9 +19,6 @@
         <delete dir="master/system"/>
         <delete file="master/etc/admin.token"/>
         <delete file="master/etc/pulse-init.properties"/>
-        <mkdir dir="master/system"/>
-        <mkdir dir="master/system/log"/>
-        <mkdir dir="master/system/tmp"/>
     </target>
 
     <target name="build.boot">
@@ -143,6 +140,7 @@
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
         <copy todir="${package.root}/system/www">
+            <fileset dir="server-core/src/www" includes="**/*"/>
             <fileset dir="master/src/www" includes="**/*"/>
         </copy>
 
@@ -237,74 +235,6 @@
               if="test.failed"/>
     </target>
 
-    <target name="package.slave" depends="init, clean, build.local, build.slave">
-
-        <property name="package.name" value="pulse-agent-${pulse.version}"/>
-        <property name="package.root" value="build/package/${package.name}"/>
-
-        <delete dir="${package.root}"/>
-        <mkdir dir="${package.root}"/>
-
-        <copy todir="${package.root}/bin">
-            <fileset dir="core/src/bin" includes="**/*"/>
-            <fileset dir="server-core/src/bin" includes="**/*"/>
-        </copy>
-
-        <copy todir="${package.root}/licenses">
-            <fileset dir="ivy-repository" includes="**/*.txt"/>
-        </copy>
-
-        <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
-        <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh" verbose="true"/>
-
-        <retrieve.dependencies module="." conf="local" dest="${package.root}/lib"/>
-        <retrieve.dependencies module="." conf="slave" dest="${package.root}/lib"/>
-
-        <!-- place holder for package documentation -->
-<!--
-        <copy todir="${package.root}/docs">
-            <fileset dir="etc" includes="delete-me.txt"/>
-        </copy>
--->
-        <!-- place holder for the log directory -->
-        <copy todir="${package.root}/system/logs">
-            <fileset dir="etc" includes="delete-me.txt"/>
-        </copy>
-
-        <!-- copy the readme file. -->
-        <replace dir="${package.root}" token="@VERSION@" value="${pulse.version}">
-            <include name="README.txt"/>
-        </replace>
-
-        <copy todir="${package.root}/system/config">
-            <fileset dir="slave/etc" includes="pulse-agent.properties,logging.properties"/>
-            <fileset dir="slave/etc" includes="logging/*.properties"/>
-        </copy>
-
-        <copy todir="${package.root}/system/www">
-            <fileset dir="slave/src/www" includes="**/*"/>
-        </copy>
-        
-        <copy todir="${package.root}/lib">
-            <fileset dir="master/etc" includes="*.xml"/>
-        </copy>
-
-        <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
-        <exec executable="zip" dir="${package.root}/..">
-            <arg line="-r ../${package.name}.zip ${package.name}"/>
-        </exec>
-
-        <tar destfile="build/${package.name}.tar.gz" compression="gzip">
-            <tarfileset dir="${package.root}/.." mode="755" username="root" group="root">
-                <include name="${package.name}/bin/*"/>
-            </tarfileset>
-            <tarfileset dir="${package.root}/.." username="root" group="root">
-                <include name="${package.name}/**/*"/>
-                <exclude name="${package.name}/bin/*"/>
-            </tarfileset>
-        </tar>
-    </target>
-
     <target name="init">
         <property name="project.root.dir" value="."/>
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
@@ -357,7 +287,8 @@
             <ant inheritAll="false" dir="local" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="server-core" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="master" antfile="build.xml" target="@{target}"/>
-            <ant inheritAll="false" dir="slave" antfile="build.xml" target="@{target}"/>
+            <!--<ant inheritAll="false" dir="slave" antfile="build.xml" target="@{target}"/>-->
         </sequential>
     </macrodef>
+
 </project>

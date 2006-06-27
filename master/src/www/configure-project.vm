@@ -24,19 +24,18 @@
                 </table>
 
             <!-- SCM configuration -->
+
                 <table id="project.scm" class="fill-content">
                     #aclEditHeadingRow("project.scm" 2 "editScm!input.action?id=$project.scm.id&amp;projectId=$project.id" "project.scm.edit" "project")
                     #scmRow($project)
                     #dynamicRow("scm.location" "$project.scm.createServer().location")
                     #dynamicRow("scm.monitor" "$project.scm.monitor")
-                    #enabledDisabledRow("scm.filters" $project.scm.filterEnabled)
 #acl("domainObject=project" "hasPermission=4,1")
                     <tr>
                         #contentRowHeading("actions")
                         <td class="content">
                             <a href="#" onclick="window.open('/popups/viewScmInfo.action?id=$project.id', 'scm info', 'status=yes,resizable=yes,top=100,left=100,width=600,height=400,scrollbars=yes'); return false;">#wwtext("name=scm.info")</a>
                             | <a href="browseProjectScm.action?id=$project.id">#wwtext("name=scm.browse")</a>
-                            | <a id="project.scm.filter" href="filterScm.action?id=$project.scm.id&projectId=$project.id">#wwtext("name=scm.filters")</a>
                         </td>
                     </tr>
 #end
@@ -103,7 +102,7 @@
                         #dynamicCell($capture.type)
         #acl("domainObject=project" "hasPermission=4,1")
                         #editCell("editArtifact!input.action?projectId=$project.id&amp;id=$capture.id" "edit_$!webwork.htmlEncode($capture.name)")
-                        #deleteCell("delete_$!webwork.htmlEncode($capture.name)" "deleteArtifact.action?projectId=$project.id&amp;id=$capture.id" $confirmMessage)
+                        #deleteCell($confirmMessage "deleteArtifact.action?projectId=$project.id&amp;id=$capture.id" "delete_$!webwork.htmlEncode($capture.name)")
         #end
                      </tr>
     #end
@@ -121,9 +120,10 @@
             <!-- Build specifications -->
 
                 <table id="project.buildspecs" class="fill-content">
-                    #headingRow("project.buildspecs" 5)
+                    #headingRow("project.buildspecs" 6)
                     <tr>
                         #contentHeading("buildspec.name" 1)
+                        #contentHeading("recipe" 1)
                         #contentHeading("buildspec.timeout" 1)
 #acl("domainObject=project" "hasPermission=4,1")
                         #contentHeading("actions" 3)
@@ -134,19 +134,20 @@
         #set($confirmMessage = $action.getText("buildspec.confirm.delete", [$buildSpec.name]))
                     <tr>
                         #dynamicCell($buildSpec.name)
+                        #dynamicCell($buildSpec.root.children.get(0).stage.recipeSafe)
                         #dynamicCell($buildSpec.prettyTimeout)
         #acl("domainObject=project" "hasPermission=4,1")
                         #actionCell("buildspec.trigger" "triggerBuild.action?id=$buildSpec.id&amp;projectId=$project.id" "lightning.gif")
-                        #editCell("viewBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id" "edit_$!webwork.htmlEncode($buildSpec.name)")
-                        #deleteCell("delete_$!webwork.htmlEncode($buildSpec.name)" "deleteBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id" $confirmMessage )
+                        #editCell("editBuildSpecification!input.action?projectId=$project.id&amp;id=$buildSpec.id" "edit_$!webwork.htmlEncode($buildSpec.name)")
+                        #deleteCell($confirmMessage "deleteBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id" "delete_$!webwork.htmlEncode($buildSpec.name)")
         #end
                     </tr>
     #end
 #else
-                    #contentRow("buildspec.none" 5)
+                    #contentRow("buildspec.none" 6)
 #end
 #acl("domainObject=project" "hasPermission=4,1")
-                    #addRow("buildspec.add" 5 "createBuildSpecification!input.action?projectId=$project.id" "project.buildspec.add")
+                    #addRow("buildspec.add" 6 "createBuildSpecification!input.action?projectId=$project.id" "project.buildspec.add")
 #end
                 </table>
 
@@ -171,7 +172,7 @@
                         #dynamicCell($trigger.dataMap.spec)
         #acl("domainObject=project" "hasPermission=4,1")
                         #editCell("editTrigger!input.action?id=$trigger.id&amp;projectId=$project.id" "edit_$!webwork.htmlEncode($trigger.name)")
-                        #deleteCell("delete_$!webwork.htmlEncode($trigger.name)" "deleteTrigger.action?id=$trigger.id" $confirmMessage )
+                        #deleteCell($confirmMessage "deleteTrigger.action?id=$trigger.id" "delete_$!webwork.htmlEncode($trigger.name)")
         #end
                     </tr>
     #end
@@ -180,37 +181,6 @@
 #end
 #acl("domainObject=project" "hasPermission=4,1")
                     #addRow("trigger.add" 5 "addTrigger.action?projectId=$project.id" "project.trigger.add")
-#end
-                </table>
-
-                <!-- Post Build Action -->
-
-                <table id="project.post.build.actions" class="fill-content">
-                    #headingRow("project.post.build.actions" 4)
-                    <tr>
-                        #contentHeading("post.build.action.name" 1)
-                        #contentHeading("post.build.action.type" 1)
-#acl("domainObject=project" "hasPermission=4,1")
-                        #contentHeading("actions" 2)
-#end
-                    </tr>
-#if($project.postBuildActions.size() > 0)
-    #foreach($post in $project.postBuildActions)
-        #set($confirmMessage = $action.getText("post.build.action.confirm.delete", [$post.name]))
-                    <tr>
-                        #dynamicCell($post.name)
-                        #dynamicCell($post.type)
-        #acl("domainObject=project" "hasPermission=4,1")
-                        #editCell("editPostBuildAction!input.action?id=$post.id&amp;projectId=$project.id" "edit_$!webwork.htmlEncode($post.name)")
-                        #deleteCell("delete_$!webwork.htmlEncode($post.name)" "deletePostBuildAction.action?id=$post.id&amp;projectId=$project.id" $confirmMessage)
-        #end
-                    </tr>
-    #end
-#else
-                    #contentRow("post.build.actions.none" 4)
-#end
-#acl("domainObject=project" "hasPermission=4,1")
-                    #addRow("post.build.action.add" 4 "addPostBuildAction.action?projectId=$project.id" "project.post.build.action.add")
 #end
                 </table>
 
@@ -239,7 +209,7 @@
                         #contentCell($rule.prettyWhen)
         #acl("domainObject=project" "hasPermission=4,1")
                         #editCell("editCleanupRule!input.action?projectId=$project.id&amp;id=$rule.id" "edit_cleanup_$rule.id")
-                        #deleteCell("delete_cleanup_$rule.id" "deleteCleanupRule.action?projectId=$project.id&amp;id=$rule.id" $confirmMessage)
+                        #deleteCell($confirmMessage "deleteCleanupRule.action?projectId=$project.id&amp;id=$rule.id" "delete_cleanup_$rule.id")
         #end
                     </tr>
     #end

@@ -26,11 +26,6 @@
             <one-to-many class="com.zutubi.pulse.model.BuildSpecification"/>
         </bag>
 
-        <bag name="postBuildActions" cascade="all-delete-orphan" lazy="false">
-            <key column="PROJECT_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.PostBuildAction"/>
-        </bag>
-
         <bag name="cleanupRules" cascade="all-delete-orphan" lazy="false">
             <key column="PROJECT_ID"/>
             <one-to-many class="com.zutubi.pulse.model.CleanupRule"/>
@@ -149,35 +144,6 @@
         </subclass>
     </class>
 
-    <class name="com.zutubi.pulse.model.PostBuildAction" table="POST_BUILD_ACTION">
-        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
-            <generator class="hilo"/>
-        </id>
-
-        <discriminator column="TYPE" type="string" length="31"/>
-
-        <property name="name" type="string"/>
-
-        <bag name="specifications" table="POST_BUILD_ACTION_SPECIFICATIONS" lazy="false">
-            <key column="ACTION_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.BuildSpecification"/>
-        </bag>
-
-        <property name="statesString" type="string"/>
-
-        <property name="failOnError" type="boolean"/>
-
-        <subclass name="com.zutubi.pulse.model.RunExecutablePostBuildAction" discriminator-value="EXECUTABLE" lazy="false">
-            <property name="command" type="string"/>
-            <property name="arguments" type="string" length="1023"/>
-        </subclass>
-
-        <subclass name="com.zutubi.pulse.model.TagPostBuildAction" discriminator-value="TAG" lazy="false">
-            <property name="tag" type="string"/>
-            <property name="moveExisting" type="boolean"/>
-        </subclass>
-    </class>
-
     <class name="com.zutubi.pulse.model.CleanupRule" table="CLEANUP_RULE" lazy="false">
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -200,16 +166,6 @@
     <query name="findByName"><![CDATA[
         from Project project
         where project.name = :name
-    ]]></query>
-
-    <query name="findByScm"><![CDATA[
-        from Project project
-        where project.scm = :scm
-    ]]></query>
-
-    <query name="findByScmId"><![CDATA[
-        from Project project
-        where project.scm.id = :scmId
     ]]></query>
 
 </hibernate-mapping>

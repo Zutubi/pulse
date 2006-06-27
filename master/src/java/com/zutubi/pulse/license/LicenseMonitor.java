@@ -1,6 +1,6 @@
 package com.zutubi.pulse.license;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.scheduling.*;
 import com.zutubi.pulse.util.logging.Logger;
@@ -21,7 +21,7 @@ public class LicenseMonitor implements Task
     /**
      * Used to lookup the data -> license.
      */
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
 
     /**
      * Used to deliver the LicenseExpiredEvent when necessary.
@@ -38,7 +38,7 @@ public class LicenseMonitor implements Task
      *
      * @param configurationManager
      */
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }
@@ -64,8 +64,6 @@ public class LicenseMonitor implements Task
     }
 
     /**
-     * The execution of this task is to check whether or not the license is expired. If the
-     * installed license is expired, then generate an appropriate LicenseEvent.
      *
      * @param context
      */
@@ -85,8 +83,6 @@ public class LicenseMonitor implements Task
      */
     public void init()
     {
-        //TODO: We need to ensure that this task can not be unscheduled.
-
         // check if the trigger exists. if not, create and schedule.
         Trigger trigger = scheduler.getTrigger("license", "monitor");
         if (trigger != null)

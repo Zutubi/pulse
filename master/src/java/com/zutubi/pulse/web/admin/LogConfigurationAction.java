@@ -2,7 +2,7 @@ package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.logging.LogConfigurationManager;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class LogConfigurationAction extends ActionSupport
 
     private LogConfigurationManager logConfigurationManager;
 
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
 
     public String doReset()
     {
@@ -84,7 +84,7 @@ public class LogConfigurationAction extends ActionSupport
         this.logConfigurationManager = logConfigurationManager;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

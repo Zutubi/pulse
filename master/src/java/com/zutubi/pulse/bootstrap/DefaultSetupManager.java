@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class DefaultSetupManager implements SetupManager
 {
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
     private StartupManager startupManager;
     private UpgradeManager upgradeManager;
 
@@ -96,7 +96,7 @@ public class DefaultSetupManager implements SetupManager
      *
      * @param configurationManager
      */
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

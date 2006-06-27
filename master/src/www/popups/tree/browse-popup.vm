@@ -5,158 +5,37 @@
 
     <link rel="stylesheet" type="text/css" href="/popups/tree/tree.css"/>
     <script type="text/javascript" src="/prototype.js"></script>
-    <!--<script type="text/javascript" src="tree/console.js"></script>-->
     <script type="text/javascript" src="tree/tree.js"></script>
-    <script type="text/javascript" src="tree/fs.js"></script>
-    <script type="text/javascript" src="/main.js"></script>
     <script type="text/javascript">
         <!--
             // define the init properties that control the tree.
+            //TODO: This works, but there must be a better way to handle the initialisation process.
+            window.myTree = new Object();
+            window.myTree.url = "http://localhost:8080/ajax/list.action";
+            window.myTree.anchor = "browse";
+
+            // initialise the initial visible path.
+            window.myTree.initUid = new Array();
+#foreach($uid in $action.uids)
+        window.myTree.initUid.push('$uid');
+#end
 
             window.onload = onInit;
             window.onresize = onResize;
 
             function onInit(event)
             {
-                // manually resize the viewport so that it is the correct size.
+                // resize the viewport so that it is the correct size.
                 onResize(event);
-
                 // initialise the tree view.
-                var treeView = new ZUTUBI.widget.TreeView("browse");
-                treeView.dataLoader = ZUTUBI.fs.list;
-                treeView.onSelect = onSelectCallback;
-                treeView.draw();
-
-                // trigger a load of the initially required path.
-                window.initialPath = ["C:\\", "tmp", "empty"];
-                window.retry = 20;
-                expandToPath();
-            }
-
-            function expandToPath()
-            {
-                if (window.retry <= 0)
-                {
-                    return;
-                }
-                window.retry = window.retry - 1;
-
-                var initialPath = window.initialPath;
-
-                var treeView = ZUTUBI.widget.View.getTreeById("browse");
-                var node = treeView.getRoot();
-
-                // search for node with name initialPath.
-                for (var i = 0; i < initialPath.length; i++)
-                {
-                    var path = initialPath[i];
-                    if (!node.expanded)
-                    {
-                        node._expand();
-                    }
-
-                    if (node.isLoaded)
-                    {
-                        // node is loaded, so lets go to  the next one.
-                        node = $A(node.children).find(function(child)
-                        {
-                            return child.data.name == path;
-                        });
-                        if (!node)
-                        {
-                            // unable to locate the requested node.
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        // node is still loading, so lets wait.
-                        setTimeout(expandToPath, 250);
-                        return;
-                    }
-                }
-
-                // select the node.
-                if (node)
-                {
-                    treeView._select(node);
-                }
-            }
-
-            function onSelectCallback(node)
-            {
-                // a) display the path to the currently selected node.
-                // construct the path.
-                var currentPathDisplay = document.getElementById('path');                
-                $A(currentPathDisplay.childNodes).each(function(child)
-                {
-                    Element.remove(child);
-                });
-
-                var pathToDisplay = "";
-                if (node && !node.isRoot())
-                {
-                    if (node.isFolder())
-                    {
-                        pathToDisplay = node.getPath();
-                    }
-                    else
-                    {
-                        if (node.getParent())
-                        {
-                            pathToDisplay = node.getParent().getPath();
-                        }
-                    }
-                }
-                currentPathDisplay.appendChild(document.createTextNode(pathToDisplay));
-
-                // b) display the name of the currently selected node.
-                // clear out the existing content.
-                var selectedDisplay = document.getElementById('selected');
-                selectedDisplay.value = "";
-                if (node && !node.isRoot())
-                {
-                    if (!node.isFolder())
-                    {
-                        selectedDisplay.value = node.data.name;
-                    }
-                }
-            }
-
-            function removeAll(element)
-            {
-                $A(element.childNodes).each(function(child)
-                {
-                    Element.remove(child);
-                });
+                init(event);
             }
 
             function copySelectedToParentForm()
             {
                 var formFieldObject = opener.document.forms['$formname'].elements['$fieldname'];
-                var tree = ZUTUBI.widget.View.getTreeById("browse");
-                if (tree.selectedNode)
-                {
-                    formFieldObject.value = tree.selectedNode.getPath();
-                }
-                return false;
-            }
-
-            function deleteSelection()
-            {
-                try
-                {
-                    var tree = ZUTUBI.widget.View.getTreeById("browse");
-                    if (tree.selectedNode)
-                    {
-                        ZUTUBI.fs.deleteFile(tree.selectedNode);
-                    }
-                }
-                catch (e)
-                {
-                    console.log(e);
-                }
-                return false;
+                formFieldObject.value = currentSelectionValue();
+                window.close();
             }
 
             /*
@@ -185,13 +64,36 @@
                 Element.setStyle(vElem, {"width":pDim.width + "px"});
             }
 
-
-            function openNewFolderPopup()
+            /*
+             * Return the dimensions of the window.
+             *
+             *    width: the window width.
+             *    height: the window height.
+             */
+            function windowSize()
             {
-                window.open('/popups/new-folder.action', 'new_folder', 'width=400, height=120, resizable=yes', false);
-                return false
+                var myWidth = 0, myHeight = 0;
+                if (typeof( window.innerWidth ) == 'number')
+                {
+                    //Non-IE
+                    myWidth = window.innerWidth;
+                    myHeight = window.innerHeight;
+                }
+                else if (document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ))
+                {
+                    //IE 6+ in 'standards compliant mode'
+                    myWidth = document.documentElement.clientWidth;
+                    myHeight = document.documentElement.clientHeight;
+                }
+                else if (document.body && ( document.body.clientWidth || document.body.clientHeight ))
+                {
+                    //IE 4 compatible
+                    myWidth = document.body.clientWidth;
+                    myHeight = document.body.clientHeight;
+                }
+                return {"width":myWidth, "height":myHeight};
             }
-            //-->
+        // -->
     </script>
 
     <style type="text/css">
@@ -223,11 +125,7 @@
 
     <div class="bordered" id="toolbar">
         Toolbar:&nbsp;
-        <a href="http://www.google.com" onclick="ZUTUBI.widget.View.getTreeById('browse').goUp(); return false;"><img class="toolbarIcon" src="" alt="up"/></a>
-        <a href="http://www.google.com" onclick="return openNewFolderPopup(); return false;"><img class="toolbarIcon" src="" alt="new"/></a>
-        <a href="http://www.google.com" onclick="return deleteSelection(); return false;"><img class="toolbarIcon" src="" alt="delete"/></a>
-        <a href="http://www.google.com" onclick="return false;"><img class="toolbarIcon" src="" alt="refresh"/></a>
-        <a href="http://www.google.com" onclick="return false;"><img class="toolbarIcon" src="" alt="pulse home"/></a>
+        <a href="" onclick="selectParentNode(); return false;"><img class="toolbarIcon" src="/images/cd_go.png" alt="up"/></a>
     </div>
 
     <div class="bordered" id="pathElement">
@@ -244,7 +142,7 @@
     </div>
 
     <div class="bordered" id="selectForm">
-        <form class="nofluff" name="form" action="" onSubmit="window.close();">
+        <form class="nofluff" name="form" action="" onsubmit="window.close();">
             <table>
                 <tr>
                     <td nowrap>Selected:</td>

@@ -1,10 +1,10 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.core.ObjectFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,9 +20,9 @@ public class EventSchedulerStrategy implements SchedulerStrategy
 
     private TriggerHandler triggerHandler;
 
-    private Map<Long, EventListener> activeListenerMap = new HashMap<Long, EventListener>();
+    private Map<Trigger, EventListener> activeListenerMap = new HashMap<Trigger, EventListener>();
 
-    private Map<Long, EventListener> pausedListenerMap = new HashMap<Long, EventListener>();
+    private Map<Trigger, EventListener> pausedListenerMap = new HashMap<Trigger, EventListener>();
     private ObjectFactory objectFactory;
 
     public String canHandle()
@@ -73,44 +73,44 @@ public class EventSchedulerStrategy implements SchedulerStrategy
             }
         };
         
-        activeListenerMap.put(eventTrigger.getId(), eventListener);
+        activeListenerMap.put(eventTrigger, eventListener);
         eventManager.register(eventListener);
         trigger.setState(TriggerState.SCHEDULED);
     }
 
     public void unschedule(Trigger trigger) throws SchedulingException
     {
-        if (activeListenerMap.containsKey(trigger.getId()))
+        if (activeListenerMap.containsKey(trigger))
         {
-            EventListener listener = activeListenerMap.remove(trigger.getId());
+            EventListener listener = activeListenerMap.remove(trigger);
             eventManager.unregister(listener);
             trigger.setState(TriggerState.NONE);
         }
-        else if (pausedListenerMap.containsKey(trigger.getId()))
+        else if (pausedListenerMap.containsKey(trigger))
         {
-            pausedListenerMap.remove(trigger.getId());
+            pausedListenerMap.remove(trigger);
             trigger.setState(TriggerState.NONE);
         }
     }
 
     public void pause(Trigger trigger) throws SchedulingException
     {
-        if (activeListenerMap.containsKey(trigger.getId()))
+        if (activeListenerMap.containsKey(trigger))
         {
-            EventListener listener = activeListenerMap.remove(trigger.getId());
+            EventListener listener = activeListenerMap.remove(trigger);
             eventManager.unregister(listener);
-            pausedListenerMap.put(trigger.getId(), listener);
+            pausedListenerMap.put(trigger, listener);
             trigger.setState(TriggerState.PAUSED);
         }
     }
 
     public void resume(Trigger trigger) throws SchedulingException
     {
-        if (pausedListenerMap.containsKey(trigger.getId()))
+        if (pausedListenerMap.containsKey(trigger))
         {
-            EventListener listener = pausedListenerMap.remove(trigger.getId());
+            EventListener listener = pausedListenerMap.remove(trigger);
             eventManager.register(listener);
-            activeListenerMap.put(trigger.getId(), listener);
+            activeListenerMap.put(trigger, listener);
             trigger.setState(TriggerState.SCHEDULED);
         }
     }

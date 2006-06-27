@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.GuestAccessManager;
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.web.ActionSupport;
 
 /**
@@ -10,7 +10,7 @@ import com.zutubi.pulse.web.ActionSupport;
  */
 public class GeneralConfigurationAction extends ActionSupport
 {
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
     private GuestAccessManager guestAccessManager;
 
     private String hostName;
@@ -89,7 +89,7 @@ public class GeneralConfigurationAction extends ActionSupport
 
     private void resetConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        ApplicationConfiguration config = configurationManager.getAppConfig();
         config.setHostName(null);
         config.setHelpUrl(null);
         config.setRssEnabled(null);
@@ -99,7 +99,7 @@ public class GeneralConfigurationAction extends ActionSupport
 
     private void saveConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        ApplicationConfiguration config = configurationManager.getAppConfig();
         config.setHostName(hostName);
         config.setHelpUrl(helpUrl);
         config.setRssEnabled(rssEnabled);
@@ -109,7 +109,7 @@ public class GeneralConfigurationAction extends ActionSupport
 
     private void loadConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        ApplicationConfiguration config = configurationManager.getAppConfig();
         hostName = config.getHostName();
         helpUrl = config.getHelpUrl();
         rssEnabled = config.getRssEnabled();
@@ -121,7 +121,7 @@ public class GeneralConfigurationAction extends ActionSupport
      *
      * @param configurationManager
      */
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

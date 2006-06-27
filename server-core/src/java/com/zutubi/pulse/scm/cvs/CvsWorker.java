@@ -12,7 +12,6 @@ import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
-import org.netbeans.lib.cvsclient.command.tag.RtagCommand;
 import org.netbeans.lib.cvsclient.command.update.UpdateCommand;
 
 import java.io.File;
@@ -121,7 +120,7 @@ public class CvsWorker
         // there have been any changes since that time. We jump through hoops (as mentioned below)
         // to handle possible time differences between the local and remote server machines. If
         // times were in sync, then the latest revision would be now. However, since times are not
-        // in sync, we go back a few hours and have a look.
+        // in sync, we go back a few hours and have a look. 
 
         // We jump through hoops to handle the possible time difference between the hosts.
 
@@ -168,10 +167,7 @@ public class CvsWorker
 
         List<LogInformation> response = new LinkedList<LogInformation>();
 
-        if (!client.executeCommand(log, new LogCommandListener(response)))
-        {
-            throw new SCMException("Failed to retrieve the cvs server latest change details.");
-        }
+        client.executeCommand(log, new LogCommandListener(response));
 
         Date date = analyser.latestUpdate(response);
         CvsRevision result = null;
@@ -195,12 +191,12 @@ public class CvsWorker
 
         String dateFilter = "";
         String del = "<=";
-        if (from != null && from.getDate() != null)
+        if (from.getDate() != null)
         {
             dateFilter = SERVER_DATE.format(from.getDate()) + del;
             del = "";
         }
-        if (to != null && to.getDate() != null)
+        if (to.getDate() != null)
         {
             dateFilter += del + SERVER_DATE.format(to.getDate());
         }
@@ -210,10 +206,7 @@ public class CvsWorker
         }
 
         List<LogInformation> response = new LinkedList<LogInformation>();
-        if (!getClient().executeCommand(rlog, new LogCommandListener(response)))
-        {
-            throw new SCMException("Failed to retrieve the cvs server changes between details.");
-        }
+        getClient().executeCommand(rlog, new LogCommandListener(response));
 
         List<Changelist> changelists = getAnalyser(uid).extract(response);
         LOG.exiting(changelists.size());
@@ -232,10 +225,7 @@ public class CvsWorker
         CvsClient client = getClient();
         client.setLocalPath(workdir);
 
-        if (!client.executeCommand(checkout))
-        {
-            throw new SCMException("Failed to checkout.");
-        }
+        client.executeCommand(checkout);
         LOG.exiting(revision);
         return revision;
     }
@@ -251,13 +241,16 @@ public class CvsWorker
         checkout.setRecursive(false);
         checkout.setModule(file);
 
+        // the revisions branch/tag overrides the default branch.
+        if (TextUtils.stringSet(revision.getBranch()))
+        {
+            checkout.setCheckoutByRevision(revision.getBranch());
+        }
+
         CvsClient client = getClient();
         client.setLocalPath(workdir);
 
-        if (!client.executeCommand(checkout))
-        {
-            throw new SCMException("Failed to checkout.");
-        }
+        client.executeCommand(checkout);
         LOG.exiting(revision);
         return revision;
     }
@@ -267,19 +260,16 @@ public class CvsWorker
      * An update requires that a checkout is executed to the same working directory.
      *
      * @param workdir
-     * @param rev
+     * @param byDate
      * @throws SCMException
      */
-    public void update(File workdir, CvsRevision rev) throws SCMException
+    public void update(File workdir, CvsRevision byDate) throws SCMException
     {
         LOG.entering();
-        UpdateCommand update = newUpdateCommand(rev);
+        UpdateCommand update = newUpdateCommand(byDate);
         CvsClient client = getClient();
         client.setLocalPath(new File(workdir, module));
-        if (!client.executeCommand(update))
-        {
-            throw new SCMException("Failed to update working directory.");
-        }
+        client.executeCommand(update);
         LOG.exiting();
     }
 
@@ -293,10 +283,7 @@ public class CvsWorker
         LogDirectoryBuilder builder = new LogDirectoryBuilder();
         log.setBuilder(builder);
 
-        if (!getClient().executeCommand(log))
-        {
-            throw new SCMException("Failed to get cvs server listing.");
-        }
+        getClient().executeCommand(log);
 
         List<String> directories = builder.getDirectories();
         LOG.exiting(directories.size());
@@ -383,11 +370,7 @@ public class CvsWorker
         checkout.setRecursive(true);
 
         // bind the checkout to the specified tag.
-        if (TextUtils.stringSet(revision.getBranch()))
-        {
-            checkout.setCheckoutByRevision(revision.getBranch());
-        }
-        else if (TextUtils.stringSet(branch))
+        if (TextUtils.stringSet(branch))
         {
             checkout.setCheckoutByRevision(branch);
         }
@@ -407,11 +390,7 @@ public class CvsWorker
         update.setBuildDirectories(true);
         update.setResetStickyOnes(true);
 
-        if (TextUtils.stringSet(revision.getBranch()))
-        {
-            update.setUpdateByRevision(revision.getBranch());
-        }
-        else if (TextUtils.stringSet(branch))
+        if (TextUtils.stringSet(branch))
         {
             update.setUpdateByRevision(branch);
         }
@@ -427,55 +406,4 @@ public class CvsWorker
         return new VersionCommand();
     }
 
-    public void tag(CvsRevision revision, String name, boolean moveExisting) throws SCMException
-    {
-        LOG.entering();
-
-        RtagCommand tag = newRtagCommand(revision);
-        tag.setTag(name);
-        tag.setOverrideExistingTag(moveExisting);
-        tag.setRecursive(true);
-
-        CvsClient client = getClient();
-        if (!client.executeCommand(tag))
-        {
-            throw new SCMException("Failed to create tag.");
-        }
-
-        LOG.exiting();
-    }
-
-    public void deleteTag(CvsRevision revision) throws SCMException
-    {
-        LOG.entering();
-
-        RtagCommand tag = newRtagCommand(revision);
-        tag.setTag(revision.getBranch());
-        tag.setDeleteTag(true);
-        tag.setRecursive(true);
-        tag.setClearFromRemoved(true);
-
-        CvsClient client = getClient();
-        if (!client.executeCommand(tag))
-        {
-            throw new SCMException("Failed to delete tag " + revision.getBranch());
-        }
-        LOG.exiting();
-    }
-
-    private RtagCommand newRtagCommand(CvsRevision revision)
-    {
-        RtagCommand tag = new RtagCommand();
-        tag.setModules(new String[] { module });
-
-        if(TextUtils.stringSet(branch))
-        {
-            tag.setTagByRevision(branch);
-        }
-        if (revision.getDate() != null)
-        {
-            tag.setTagByDate(SERVER_DATE.format(revision.getDate()));
-        }
-        return tag;
-    }
 }

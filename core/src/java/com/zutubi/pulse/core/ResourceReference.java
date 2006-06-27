@@ -82,11 +82,6 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
         this.repository = repo;
     }
 
-    public String getName()
-    {
-        return name;
-    }
-
     /**
      * The name of the resource being referenced.
      *
@@ -97,11 +92,6 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    public String getVersion()
-    {
-        return version;
     }
 
     /**
@@ -116,11 +106,6 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
         this.version = version;
     }
 
-    public boolean isRequired()
-    {
-        return required;
-    }
-
     /**
      * Indicate whether or not this resource referenced must be resolved. If set to true
      * and the resource is not located, an exception will be thrown during the build process.
@@ -133,5 +118,4 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
     {
         this.required = required;
     }
-
 }

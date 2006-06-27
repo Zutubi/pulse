@@ -1,16 +1,11 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.agent.Agent;
-import com.zutubi.pulse.agent.Status;
-import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.events.build.*;
-import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
 
@@ -44,17 +39,17 @@ public class RecipeControllerTest extends PulseTestCase
 
         rootResult = new RecipeResult("root recipe");
         rootResult.setId(100);
-        rootNode = new RecipeResultNode("root stage", rootResult);
+        rootNode = new RecipeResultNode(rootResult);
         rootNode.setId(101);
         childResult = new RecipeResult("child recipe");
         childResult.setId(102);
-        childNode = new RecipeResultNode("child stage", childResult);
+        childNode = new RecipeResultNode(childResult);
         childNode.setId(103);
         rootNode.addChild(childNode);
 
         recipeRequest = new RecipeRequest(rootResult.getId(), rootResult.getRecipeName());
-        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null);
-        recipeController = new RecipeController(rootNode, dispatchRequest, resultCollector, recipeQueue, buildManager, null);
+        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new LazyPulseFile(), recipeRequest, null);
+        recipeController = new RecipeController(rootNode, dispatchRequest, resultCollector, recipeQueue, buildManager);
     }
 
     protected void tearDown() throws Exception
@@ -70,7 +65,7 @@ public class RecipeControllerTest extends PulseTestCase
     public void testDispatchRequest()
     {
         // Initialising should cause a dispatch request, and should initialise the bootstrapper
-        Bootstrapper bootstrapper = new CheckoutBootstrapper(new Svn(), new BuildRevision());
+        Bootstrapper bootstrapper = new CheckoutBootstrapper(new Svn());
         recipeController.initialise(bootstrapper);
         assertTrue(recipeQueue.hasDispatched(rootResult.getId()));
         RecipeDispatchRequest dispatched = recipeQueue.getRequest(rootResult.getId());
@@ -85,7 +80,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
-        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest(rootResult.getId(), "test"), new MockAgent(buildService));
+        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest(rootResult.getId(), "test"), buildService);
         assertTrue(recipeController.handleRecipeEvent(event));
         assertEquals(buildService.getHostName(), rootNode.getHost());
 
@@ -328,69 +323,9 @@ public class RecipeControllerTest extends PulseTestCase
         }
     }
 
-    class MockAgent implements Agent
-    {
-        private BuildService service;
-
-        public MockAgent(BuildService service)
-        {
-            this.service = service;
-        }
-
-        public long getId()
-        {
-            return 0;
-        }
-
-        public BuildService getBuildService()
-        {
-            return service;
-        }
-
-        public SystemInfo getSystemInfo()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public List<CustomLogRecord> getRecentMessages()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public boolean isOnline()
-        {
-            return true;
-        }
-
-        public Status getStatus()
-        {
-            return Status.IDLE;
-        }
-
-        public String getLocation()
-        {
-            return "mock";
-        }
-
-        public boolean isSlave()
-        {
-            return true;
-        }
-
-        public String getName()
-        {
-            return "mock";
-        }
-    }
-
     class MockBuildService implements BuildService
     {
-        public boolean hasResource(String resource, String version)
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public boolean build(RecipeRequest request)
+        public void build(RecipeRequest request)
         {
             throw new RuntimeException("Method not implemented.");
         }

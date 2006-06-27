@@ -1,0 +1,27 @@
+#authorisationTags($principle)
+<html>
+<head>
+    <title>edit slave</title>
+</head>
+<content tag="action">slave.edit</content>
+<body>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#bodytag (Form "action='editSlave.action'" "method='post'")
+    <h3>edit slave: $slave.name</h3>
+        #tag (Hidden "name='id'")
+    <fieldset>
+        #tag (TextField "required='true'" "name='slave.name'" "tabindex='1'")
+        #tag (TextField "required='true'" "name='slave.host'" "tabindex='2'")
+        #tag (TextField "name='slave.port'" "tabindex='3'")
+    </fieldset>
+
+    <fieldset class="submit">
+        #tag (Submit "value=getText('save.name')" "name='save'" "tabindex='4'")
+        #tag (Submit "value=getText('cancel.name')" "name='cancel'" "tabindex='5'")
+    </fieldset>
+#end
+
+</body>
+</html>

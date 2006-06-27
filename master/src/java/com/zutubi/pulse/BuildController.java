@@ -1,11 +1,10 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.InitialBootstrapper;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
@@ -15,10 +14,9 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
+import com.zutubi.pulse.scheduling.quartz.TimeoutBuildJob;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
-import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.TreeNode;
@@ -42,13 +40,11 @@ public class BuildController implements EventListener
     private static final String TIMEOUT_TRIGGER_GROUP = "timeout";
     private static final Logger LOG = Logger.getLogger(BuildController.class);
 
-    private BuildRevision revision;
-    private BuildReason reason;
     private Project project;
     private BuildSpecification specification;
     private EventManager eventManager;
     private BuildManager buildManager;
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
     private RecipeQueue queue;
     private RecipeResultCollector collector;
     private BuildTree tree;
@@ -56,13 +52,11 @@ public class BuildController implements EventListener
     private AsynchronousDelegatingListener asyncListener;
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private Scheduler quartzScheduler;
-    private ServiceTokenManager serviceTokenManager;
+    private LazyPulseFile lazyPulseFile = new LazyPulseFile();
 
-    public BuildController(BuildRequestEvent event, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager, ServiceTokenManager serviceTokenManager)
+    public BuildController(Project project, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, ConfigurationManager configManager)
     {
-        this.revision = event.getRevision();
-        this.reason = event.getReason();
-        this.project = event.getProject();
+        this.project = project;
         this.specification = specification;
         this.eventManager = eventManager;
         this.buildManager = buildManager;
@@ -71,7 +65,6 @@ public class BuildController implements EventListener
         this.quartzScheduler = quartScheduler;
         this.asyncListener = new AsynchronousDelegatingListener(this);
         this.configurationManager = configManager;
-        this.serviceTokenManager = serviceTokenManager;
     }
 
     public void run()
@@ -101,41 +94,33 @@ public class BuildController implements EventListener
         tree = new BuildTree();
 
         TreeNode<RecipeController> root = tree.getRoot();
-        buildResult = new BuildResult(reason, project, specification.getName(), buildManager.getNextBuildNumber(project));
+        buildResult = new BuildResult(project, specification.getName(), buildManager.getNextBuildNumber(project));
         buildManager.save(buildResult);
-        configure(root, buildResult.getRoot(), specification, specification.getRoot());
+        configure(root, buildResult.getRoot(), specification.getRoot());
 
         return tree;
     }
 
-    private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode, BuildSpecification specification, BuildSpecificationNode specNode)
+    private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode, BuildSpecificationNode specNode)
     {
         for (BuildSpecificationNode node : specNode.getChildren())
         {
             BuildStage stage = node.getStage();
             RecipeResult recipeResult = new RecipeResult(stage.getRecipe());
-            RecipeResultNode childResultNode = new RecipeResultNode(stage.getName(), recipeResult);
+            RecipeResultNode childResultNode = new RecipeResultNode(recipeResult);
             resultNode.addChild(childResultNode);
             buildManager.save(resultNode);
 
             MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
             recipeResult.setOutputDir(paths.getOutputDir(project, buildResult, recipeResult.getId()).getAbsolutePath());
 
-            RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe(), getResourceRequirements(specification, node));
-            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), revision, recipeRequest, buildResult);
-            RecipeController rc = new RecipeController(childResultNode, dispatchRequest, collector, queue, buildManager, serviceTokenManager);
+            RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe());
+            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), lazyPulseFile, recipeRequest, buildResult);
+            RecipeController rc = new RecipeController(childResultNode, dispatchRequest, collector, queue, buildManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
-            configure(child, childResultNode, specification, node);
+            configure(child, childResultNode, node);
         }
-    }
-
-    private List<ResourceRequirement> getResourceRequirements(BuildSpecification specification, BuildSpecificationNode node)
-    {
-        List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
-        requirements.addAll(specification.getRoot().getResourceRequirements());
-        requirements.addAll(node.getResourceRequirements());
-        return requirements;
     }
 
     public void handleEvent(Event evt)
@@ -157,18 +142,10 @@ public class BuildController implements EventListener
             {
                 handleBuildTerminationRequest((BuildTerminationRequestEvent) evt);
             }
-            else if (evt instanceof RecipeTimeoutEvent)
-            {
-                handleRecipeTimeout((RecipeTimeoutEvent)evt);
-            }
-            else if (evt instanceof RecipeEvent)
+            else
             {
                 RecipeEvent e = (RecipeEvent) evt;
                 handleRecipeEvent(e);
-            }
-            else
-            {
-                LOG.warning("Build controller received unexpected event of type " + evt.getClass().getName());
             }
         }
         catch (BuildException e)
@@ -197,15 +174,16 @@ public class BuildController implements EventListener
         }
 
         // check project configuration to determine which bootstrap configuration should be used.
-        Bootstrapper initialBootstrapper;
+        InitialBootstrapper initialBootstrapper;
         boolean checkoutOnly = project.getCheckoutScheme() == Project.CheckoutScheme.CHECKOUT_ONLY;
         if (checkoutOnly)
         {
-            initialBootstrapper = new CheckoutBootstrapper(project.getScm(), revision);
+            initialBootstrapper = new CheckoutBootstrapper(project.getScm());
         }
         else
         {
-            initialBootstrapper = new ProjectRepoBootstrapper(project.getName(), project.getScm(), revision);
+            MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+            initialBootstrapper = new ProjectRepoBootstrapper(paths.getRepoDir(project), project.getScm());
         }
         PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
         ComponentContext.autowire(pulseFileDetails);
@@ -215,9 +193,9 @@ public class BuildController implements EventListener
         initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
     }
 
-    private String getTriggerName(long recipeId)
+    private String getTriggerName()
     {
-        return String.format("recipe-%d", recipeId);
+        return String.format("build-%d", buildResult.getId());
     }
 
     private void handleBuildTerminationRequest(BuildTerminationRequestEvent event)
@@ -230,19 +208,6 @@ public class BuildController implements EventListener
         }
 
         buildResult.terminate(event.isTimeout());
-    }
-
-    private void handleRecipeTimeout(RecipeTimeoutEvent event)
-    {
-        for (TreeNode<RecipeController> controllerNode : executingControllers)
-        {
-            RecipeController controller = controllerNode.getData();
-            if(controller.getResult().getId() == event.getRecipeId())
-            {
-                controller.getResult().terminate(true);
-                controller.terminateRecipe(true);
-            }
-        }
     }
 
     private void initialiseNodes(Bootstrapper bootstrapper, List<TreeNode<RecipeController>> nodes)
@@ -281,33 +246,9 @@ public class BuildController implements EventListener
         {
             // If we got here we are sure that the event was for one of our
             // recipes.
-            if (e instanceof RecipeCommencedEvent)
+            if (!buildResult.commenced() && e instanceof RecipeCommencedEvent)
             {
-                if (!buildResult.commenced())
-                {
-                    handleFirstCommenced(foundNode.getData());
-                }
-
-                if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
-                {
-                    scheduleTimeout(e.getRecipeId());
-                }
-            }
-            else if (e instanceof RecipeCompletedEvent)
-            {
-                try
-                {
-                    // during a system shutdown, the scheduler is shutdown before the
-                    // builds are completed. This makes it unnecessary to unschedule the job.
-                    if (!quartzScheduler.isShutdown())
-                    {
-                        quartzScheduler.unscheduleJob(getTriggerName(e.getRecipeId()), TIMEOUT_TRIGGER_GROUP);
-                    }
-                }
-                catch (SchedulerException ex)
-                {
-                    LOG.warning("Unable to unschedule timeout trigger: " + ex.getMessage(), ex);
-                }
+                handleFirstCommenced(foundNode.getData());
             }
 
             checkNodeStatus(foundNode);
@@ -318,11 +259,13 @@ public class BuildController implements EventListener
      * Called when the first recipe for this build is successfully
      * commenced.  It is at this point that the build is said to have
      * commenced.
+     * <p/>
+     * TODO: this probably needs some review when we go distributed (timeouts
+     * at least).
      */
     private void handleFirstCommenced(RecipeController controller)
     {
-        RecipeDispatchRequest dispatchRequest = controller.getDispatchRequest();
-        RecipeRequest request = dispatchRequest.getRequest();
+        RecipeRequest request = controller.getDispatchRequest().getRequest();
 
         // can retreive the revision from the dispatch request here
 
@@ -335,15 +278,19 @@ public class BuildController implements EventListener
             LOG.warning("Unable to save pulse file for build: " + e.getMessage(), e);
         }
 
-        getChanges(dispatchRequest.getRevision());
+        getChanges((InitialBootstrapper) request.getBootstrapper());
         buildResult.commence(controller.getResult().getStamps().getStartTime());
+        if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
+        {
+            scheduleTimeout();
+        }
         buildManager.save(buildResult);
     }
 
-    private void getChanges(BuildRevision buildRevision)
+    private void getChanges(InitialBootstrapper bootstrapper)
     {
         Scm scm = project.getScm();
-        Revision revision = buildRevision.getRevision();
+        Revision revision = bootstrapper.getRevision();
 
         try
         {
@@ -399,16 +346,15 @@ public class BuildController implements EventListener
         return result;
     }
 
-    private void scheduleTimeout(long recipeId)
+    private void scheduleTimeout()
     {
-        String name = getTriggerName(recipeId);
+        String name = getTriggerName();
         Date time = new Date(System.currentTimeMillis() + specification.getTimeout() * Constants.MINUTE);
 
         Trigger timeoutTrigger = new SimpleTrigger(name, TIMEOUT_TRIGGER_GROUP, time);
         timeoutTrigger.setJobName(FatController.TIMEOUT_JOB_NAME);
         timeoutTrigger.setJobGroup(FatController.TIMEOUT_JOB_GROUP);
-        timeoutTrigger.getJobDataMap().put(TimeoutRecipeJob.PARAM_BUILD_ID, buildResult.getId());
-        timeoutTrigger.getJobDataMap().put(TimeoutRecipeJob.PARAM_RECIPE_ID, recipeId);
+        timeoutTrigger.getJobDataMap().put(TimeoutBuildJob.PARAM_ID, buildResult.getId());
 
         try
         {
@@ -454,15 +400,23 @@ public class BuildController implements EventListener
 
     private void completeBuild()
     {
+        try
+        {
+            // during a system shutdown, the scheduler is shutdown before the
+            // builds are completed. This makes it unnecessary to unschedule the job.
+            if (!quartzScheduler.isShutdown())
+            {
+                quartzScheduler.unscheduleJob(getTriggerName(), TIMEOUT_TRIGGER_GROUP);
+            }
+        }
+        catch (SchedulerException e)
+        {
+            LOG.warning("Unable to unschedule timeout trigger: " + e.getMessage(), e);
+        }
+
         buildResult.abortUnfinishedRecipes();
         tree.cleanup(buildResult);
         buildResult.complete();
-
-        for(PostBuildAction action: buildResult.getProject().getPostBuildActions())
-        {
-            action.execute(buildResult);
-        }
-
         buildManager.save(buildResult);
         eventManager.unregister(asyncListener);
         eventManager.publish(new BuildCompletedEvent(this, buildResult));
@@ -479,7 +433,7 @@ public class BuildController implements EventListener
         return buildResult.getId();
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }

@@ -20,6 +20,14 @@ public class ChainBootstrapper implements Bootstrapper
         this.bootstrappers.addAll(Arrays.asList(bootstrappers));
     }
 
+    public void prepare() throws PulseException
+    {
+        for (Bootstrapper bootstrapper : bootstrappers)
+        {
+            bootstrapper.prepare();
+        }
+    }
+
     public void bootstrap(RecipePaths paths) throws BuildException
     {
         for (Bootstrapper bootstrapper : bootstrappers)

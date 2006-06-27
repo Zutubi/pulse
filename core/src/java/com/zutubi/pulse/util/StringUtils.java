@@ -1,8 +1,5 @@
 package com.zutubi.pulse.util;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  */
 public class StringUtils
@@ -87,14 +84,14 @@ public class StringUtils
             // Check for existing newlines in this span
             int j;
             boolean alreadySplit = false;
-            for (j = i + effectiveLineLength; j >= i; j--)
+            for(j = i + effectiveLineLength; j >= i; j--)
             {
-                if (s.charAt(j) == '\n')
+                if(s.charAt(j) == '\n')
                 {
                     // Already split at this point, continue from the split
                     alreadySplit = true;
                     result.append(s.substring(i, j + 1));
-                    if (prefix != null)
+                    if(prefix != null)
                     {
                         result.append(prefix);
                     }
@@ -103,7 +100,7 @@ public class StringUtils
                 }
             }
 
-            if (!alreadySplit)
+            if(!alreadySplit)
             {
                 // Need to find a place to trim, starting at i + effectiveLineLength
                 int candidate = i + effectiveLineLength;
@@ -150,14 +147,14 @@ public class StringUtils
      * Returns the line'th line in the given string, where lines are
      * separated by any one of \r, \n or \r\n.
      *
-     * @param s    the string to extract the line from
-     * @param line the one-based number of the line to extract
+     * @param s      the string to extract the line from
+     * @param line   the one-based number of the line to extract
      * @return the given line, or null if there are not that many lines
      */
     public static String getLine(String s, int line)
     {
         String [] lines = s.split("\r\n|\n|\r");
-        if (lines.length >= line)
+        if(lines.length >= line)
         {
             return lines[line - 1];
         }
@@ -165,92 +162,5 @@ public class StringUtils
         {
             return null;
         }
-    }
-
-    /**
-     * Splits the given string at spaces, allowing use of quoting to override
-     * spaces (i.e. foo bar is split into [foo, bar] but "foo bar" gives
-     * [foo bar]).  Backslashes may be used to escape quotes or spaces.
-     *
-     * @param s the string to split
-     * @return a list containing the split parts of the string
-     * @throws IllegalArgumentException if the string is poorly formatted
-     */
-    public static List<String> split(String s)
-    {
-        List<String> result = new LinkedList<String>();
-        boolean inQuotes = false;
-        boolean escaped = false;
-        StringBuilder current = new StringBuilder();
-
-        for (int i = 0; i < s.length(); i++)
-        {
-            char c = s.charAt(i);
-            if (escaped)
-            {
-                current.append(c);
-                escaped = false;
-            }
-            else
-            {
-                switch (c)
-                {
-                    case '\\':
-                    {
-                        escaped = true;
-                        break;
-                    }
-                    case ' ':
-                    {
-                        if (inQuotes)
-                        {
-                            current.append(c);
-                        }
-                        else if (current.length() > 0)
-                        {
-                            result.add(current.toString());
-                            current.delete(0, current.length());
-                        }
-
-                        break;
-                    }
-                    case '"':
-                    {
-                        if (inQuotes)
-                        {
-                            result.add(current.toString());
-                            current.delete(0, current.length());
-                            inQuotes = false;
-                        }
-                        else
-                        {
-                            inQuotes = true;
-                        }
-
-                        break;
-                    }
-                    default:
-                    {
-                        current.append(c);
-                    }
-                }
-            }
-        }
-
-        if(escaped)
-        {
-            throw new IllegalArgumentException("Unexpected end of input after backslash (\\)");
-        }
-        if(inQuotes)
-        {
-            throw new IllegalArgumentException("Unexpected end of input looking for end of quote (\")");
-        }
-
-        if (current.length() > 0)
-        {
-            result.add(current.toString());
-        }
-
-        return result;
     }
 }

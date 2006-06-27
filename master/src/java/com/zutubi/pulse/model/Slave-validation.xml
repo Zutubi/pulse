@@ -11,13 +11,4 @@
             <message>host is required.</message>
         </field-validator>
     </field>
-    <field name="port">
-        <field-validator type="required">
-            <message>port is required</message>
-        </field-validator>
-        <field-validator type="int">
-            <param name="min">0</param>
-            <message>port must be a positive integer</message>
-        </field-validator>
-    </field>
 </validators>

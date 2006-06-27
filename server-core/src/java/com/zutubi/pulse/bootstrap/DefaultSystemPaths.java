@@ -24,7 +24,6 @@ public class DefaultSystemPaths implements SystemPaths
         this.pulseHome = pulseHome;
     }
 
-    
     public File getSystemRoot()
     {
         if (systemRoot == null)

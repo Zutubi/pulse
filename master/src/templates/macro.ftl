@@ -71,9 +71,9 @@ results as a flat list but with context.
 [#macro recipeNodeMessages node level context=""]
     [#if node.hasMessages(level)]
         [#if context?length &gt; 0]
-            [#local nestedContext = "${context} :: stage ${node.stage?html} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+            [#local nestedContext = "${context} :: ${node.result.recipeNameSafe}"]
         [#else]
-            [#local nestedContext = "stage ${node.stage?html} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+            [#local nestedContext = node.result.recipeNameSafe]
         [/#if]
         [@recipeResultMessages result=node.result level=level context=nestedContext/]
         [#list node.children as child]
@@ -158,9 +158,9 @@ A macro to show the failed tests in a recipe node as a flat plain text list.
 ---------------------------------------------------------------------------->
 [#macro recipeNodeFailedTests node context=""]
     [#if context?length &gt; 0]
-        [#local nestedContext = "${context} :: ${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+        [#local nestedContext = "${context} :: ${node.result.recipeNameSafe}"]
     [#else]
-        [#local nestedContext = "${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+        [#local nestedContext = node.result.recipeNameSafe]
     [/#if]
     [#if node.result?exists]
         [@recipeFailedTests result=node.result context=nestedContext/]
@@ -258,7 +258,7 @@ results as a HTML nested list.
 ---------------------------------------------------------------------------->
 [#macro recipeNodeMessagesHTML result node level]
     [#if node.hasMessages(level)]
-<li class="header">stage ${node.stage?html} :: ${node.result.recipeNameSafe?html}@${node.hostSafe?html}
+<li class="header">recipe :: ${node.result.recipeNameSafe?html}
     <ul>
         [@recipeResultMessagesHTML result=result recipe=node.result level=level/]
         [#list node.children as child]

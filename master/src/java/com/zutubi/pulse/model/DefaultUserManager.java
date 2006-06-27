@@ -2,10 +2,9 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.model.persistence.ContactPointDao;
 import com.zutubi.pulse.model.persistence.UserDao;
-import com.zutubi.pulse.web.DefaultAction;
-import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
+import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.springframework.dao.DataAccessException;
 
 import java.util.List;
@@ -46,29 +45,6 @@ public class DefaultUserManager implements UserManager
         return userDao.getProjects(user);
     }
 
-    public void addUser(User newUser, boolean grantAdminPermissions)
-    {
-        addUser(newUser, grantAdminPermissions, false);
-    }
-
-    public void addUser(User newUser, boolean grantAdminPermissions, boolean useLdapAuthencation)
-    {
-        // ensure that the user has the correct authorities to login.
-        newUser.add(GrantedAuthority.USER);
-        if (grantAdminPermissions)
-        {
-            newUser.add(GrantedAuthority.ADMINISTRATOR);
-        }
-        newUser.setEnabled(true);
-        newUser.setDefaultAction(DefaultAction.WELCOME_ACTION);
-        newUser.setLdapAuthentication(useLdapAuthencation);
-        save(newUser);
-        // can only update the password on a persistent user since the password salt relies
-        // upon the users id.
-        setPassword(newUser, newUser.getPassword());
-        save(newUser);
-    }
-
     public User getUser(String login)
     {
         return userDao.findByLogin(login);
@@ -106,7 +82,7 @@ public class DefaultUserManager implements UserManager
 
     public int getUserCount()
     {
-        return userDao.count();
+        return userDao.getUserCount();
     }
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException

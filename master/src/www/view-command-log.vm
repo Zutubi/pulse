@@ -4,111 +4,89 @@
 <html>
 <head>
     <title>#wwtext("name=build") $result.number</title>
-    <script type="text/javascript">
-#if($action.haveSelectedNode() || $result.root.children.size() == 0)
-        var selectedNode = "$selectedNode";
-#else
-        var selectedNode = "$result.root.children.get(0).id";
-#end
-    </script>
 </head>
 <body>
-    #buildTabs($result "detailed-view")
+    #buildTabs($result "command-log")
 
-    <table class="twopane">
-        <tr>
-            <td class="leftpane">
-                <p>
-                    Select stage/command:
-                </p>
-                <ul class="panenav">
-    #foreach($node in $result.root.children)
-                    <li>
-                        <a href="#" id="nav_$node.id" onclick="selectNode('$node.id'); return false;">
-                            #statusImage($node.result)
-                            $!webwork.htmlEncode($node.stage)
-                        </a>
-        #if($node.result.commandResults.size() > 0)
-                       <ul>
-            #foreach($commandResult in $node.result.commandResults)
-                           <li>
-                               <a href="#" id="nav_$commandResult.id" onclick="selectNode('$commandResult.id'); return false;">
-                                   #statusImage($commandResult)
-                                   $!webwork.htmlEncode($commandResult.commandName)
-                               </a>
-                           </li>
-            #end
-                       </ul>
-        #end
-                    </li>
+#set($recipeResult = $result.root.children.get(0).result)
+#if($recipeResult.commandResults.size() > 0)
+    <p>
+    <a name="top" class="unadorned">
+        <b>#wwtext("name=jump.to")</b>
+    </a>
+    #foreach($commandResult in $recipeResult.commandResults)
+        :: <a href="#command-$velocityCount">$!webwork.htmlEncode($commandResult.commandName)</a>
     #end
+    </p>
+
+    #foreach($commandResult in $recipeResult.commandResults)
+        <h2 class="section">
+    <a name="command-$velocityCount">
+           <a href="#top" class="unadorned"><img alt="top" src="images/arrow_up.gif"/></a>
+            $!webwork.htmlEncode($commandResult.commandName)
+    </a>
+        </h2>
+
+    <table class="content">
+        #headingRow("summary" 6)
+        <tr>
+            #contentHeading("command.name" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.tests" 1)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
+        </tr>
+        <tr>
+            #set($cssClass = $commandResult.state.string)
+            #contentCell($commandResult.commandName)
+            #statusCell($commandResult)
+            #testResultsCell($result $commandResult)
+            #dateClassCell($commandResult)
+            #classCell($commandResult.stamps.prettyElapsed)
+        </tr>
+        #if($commandResult.hasDirectMessages($errorLevel))
+        <tr>
+            <td class="error" colspan="6">
+                <ul>
+            #foreach($feature in $commandResult.getFeatures($errorLevel))
+                    <li class="error">$!webwork.htmlEncode($feature.summary)</li>
+            #end
                 </ul>
             </td>
-
-
-            <td class="rightpane">
-    #foreach($node in $result.root.children)
-        #set($recipeResult = $node.result)
-                <div id="node_$node.id" style="display: none">
-                    <div class="panecontent">
-                        <table class="content">
-                            #headingRow("build.stage.summary" 9)
-                            #recipeSummaryHeader()
-                            #recipeSummary($node $result)
-                            #directMessages($node.result 9)
-                        </table>
-                        #recipeCommands($node $result)
-                    </div>
-                </div>
-
-        #foreach($commandResult in $recipeResult.commandResults)
-                <div id="node_$commandResult.id" style="display: none">
-                    <div class="panecontent">
-                        <table class="content">
-                            #headingRow("command.summary" 6)
-                            <tr>
-                                #contentHeading("command.name" 1)
-                                #contentHeading("build.status" 2)
-                                #contentHeading("build.tests" 1)
-                                #contentHeading("build.when" 1)
-                                #contentHeading("build.elapsed" 1)
-                            </tr>
-                            <tr>
-                                #set($cssClass = $commandResult.state.string)
-                                #contentCell($commandResult.commandName)
-                                #statusCell($commandResult)
-                                #testResultsCell($result  $recipeResult $commandResult)
-                                #dateClassCell($commandResult)
-                                #classCell($commandResult.stamps.prettyElapsed)
-                            </tr>
-                            #directMessages($commandResult 6)
-                        </table>
-
-            #if($commandResult.properties.size() > 0)
-                        <table class="content">
-                            #headingRow("command.properties" 2)
-                #foreach($property in $commandResult.properties.entrySet())
-                            #propertyRow($property)
-                #end
-                        </table>
-            #end
-
-            #if($commandResult.hasArtifacts())
-                        <h3>#wwtext("name=command.artifacts")</h3>
-                        #commandArtifacts($result $commandResult true $recipeResult.completed())
-            #end
-
-                    </div>
-                </div>
+        </tr>
         #end
-    #end
+        #if($commandResult.hasDirectMessages($warningLevel))
+        <tr>
+            <td class="warning" colspan="6">
+                <ul>
+            #foreach($feature in $commandResult.getFeatures($warningLevel))
+                    <li class="warning">$!webwork.htmlEncode($feature.summary)</li>
+            #end
+                </ul>
             </td>
         </tr>
+        #end
     </table>
 
-    <script type="text/javascript">
-        selectNode(selectedNode);
-    </script>
+        #if($commandResult.properties.size() > 0)
+    <table class="content">
+        #headingRow("command.properties" 2)
+            #foreach($property in $commandResult.properties.entrySet())
+        #propertyRow($property)
+            #end
+    </table>
+        #end
+
+        #if($commandResult.hasArtifacts())
+    <h3>#wwtext("name=command.artifacts")</h3>
+    #commandArtifacts($result $commandResult true $recipeResult.completed())
+        #end
+    #end
+#else
+    <p>
+        #wwtext("name=commands.none")
+    </p>
+#end
 
     #tabEnd()
 </html>

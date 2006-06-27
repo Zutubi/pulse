@@ -1,0 +1,20 @@
+#helpTag("Resource+Repository")
+#authorisationTags($principle)
+<html>
+<head>
+    <title>#wwtext("name=resource.add")</title>
+</head>
+<body>
+    #serverTabs("resources")
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=createResource.action" "heading=%{getText('resource.add')}" "method=post")
+    #wwtextfield("name=resource.name" "label=%{getText('resource.name')}" "required=true"  "tabindex=1")
+
+    #saveCancel(2)
+#end
+
+    #tabEnd()
+</body>
+</html>

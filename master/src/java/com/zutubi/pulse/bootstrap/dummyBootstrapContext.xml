@@ -21,6 +21,7 @@
         <property name="startupRunnables">
             <list>
                 <value>com.zutubi.pulse.test.SetupFeatureTour</value>
+                <value>com.zutubi.pulse.ResourceDiscoverer</value>
             </list>
         </property>
         <property name="configurationManager">
@@ -31,7 +32,7 @@
         </property>
     </bean>
 
-    <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager">
+    <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleConfigurationManager">
         <property name="systemPaths">
             <bean class="com.zutubi.pulse.bootstrap.ConfigurableSystemPaths">
                 <property name="systemRoot">
@@ -51,6 +52,7 @@
                 </property>
                 <property name="templateRoots">
                     <list>
+                        <value type="java.io.File">server-core/src/www</value>
                         <value type="java.io.File">master/src/templates</value>
                         <value type="java.io.File">master/src/www</value>
                     </list>

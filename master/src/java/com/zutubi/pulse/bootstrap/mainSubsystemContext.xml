@@ -4,6 +4,7 @@
 
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/databaseContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/hibernateContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/eventContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/schedulingContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/userContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/builderContext.xml"/>

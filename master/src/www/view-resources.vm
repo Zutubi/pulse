@@ -1,19 +1,19 @@
-#helpTag("Agent+Resources+Tab")
+#helpTag("Server+Resources+Tab")
 #authorisationTags($principle)
-#agentTags($slave)
+<content tag="selectedTab">server</content>
 <html>
 <head>
-    <title>#wwtext("name=agents")</title>
+    <title>#wwtext("name=server")</title>
 </head>
 <body>
-    #agentTabs("resources")
+    #serverTabs("resources")
 
     <table class="content">
         #headingRow("resources.all" 6)
         <tr>
             #contentHeading("resource.name" 1)
             #contentHeading("version" 1)
-            #contentHeading("resource.property" 1)
+            #contentHeading("property.name" 1)
             #contentHeading("property.value" 1)
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
             #contentHeading("actions" 2)
@@ -39,7 +39,7 @@
                 #if($firstRow)
                     #set($firstRow = false)
                     #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-                        #editCellSpan("/viewResource.action?resourceId=$resource.id" "edit_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
+                        #editCellSpan("/viewResource.action?id=$resource.id" "edit_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
                         #deleteCellSpan($confirmMessage "/admin/deleteResource.action?id=$resource.id" "delete_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
                     #end
                 #end
@@ -52,7 +52,7 @@
                     #contentCell("empty.cell")
                     #contentCell("empty.cell")
                     #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-                        #editCellSpan("/viewResource.action?resourceId=$resource.id" "edit_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
+                        #editCellSpan("/viewResource.action?id=$resource.id" "edit_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
                         #deleteCellSpan($confirmMessage "/admin/deleteResource.action?id=$resource.id" "delete_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
                     #end
         </tr>
@@ -85,13 +85,7 @@
         #contentRow("resources.none" 6)
 #end
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-    #if($slave)
-        #set($args = "?agentId=$slave.id")
-    #else
-        #set($args = "")
-    #end
-
-        #addRow("resource.add" 6 "/admin/createResource!input.action${args}" "resource.add")
+        #addRow("resource.add" 6 "/admin/createResource!input.action" "resource.add")
 #end
     </table>
 

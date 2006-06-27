@@ -41,14 +41,13 @@ public class HibernateBuildSpecificationDaoTest extends MasterPersistenceTestCas
         BuildSpecification spec = new BuildSpecification("test spec");
 
         spec.setTimeout(100);
-        BuildSpecificationNode masterNode = new BuildSpecificationNode(new BuildStage("parent", new MasterBuildHostRequirements(), "recipe 1"));
-        masterNode.addResourceRequirement(new ResourceRequirement("resource", "version"));
+        BuildSpecificationNode masterNode = new BuildSpecificationNode(new BuildStage(new MasterBuildHostRequirements(), "recipe 1"));
         spec.getRoot().addChild(masterNode);
 
         Slave slave = new Slave("test slave", "test host");
         slaveDao.save(slave);
 
-        BuildSpecificationNode slaveNode = new BuildSpecificationNode(new BuildStage("child", new SlaveBuildHostRequirements(slave), "recipe 2"));
+        BuildSpecificationNode slaveNode = new BuildSpecificationNode(new BuildStage(new SlaveBuildHostRequirements(slave), "recipe 2"));
         masterNode.addChild(slaveNode);
 
         buildSpecificationDao.save(spec);

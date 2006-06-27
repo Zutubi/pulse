@@ -5,10 +5,18 @@ import com.zutubi.pulse.model.Slave;
 
 /**
  */
-public class SlaveAvailableEvent extends SlaveEvent
+public class SlaveAvailableEvent extends Event
 {
+    private Slave slave;
+
     public SlaveAvailableEvent(Object source, Slave slave)
     {
-        super(source, slave);
+        super(source);
+        this.slave = slave;
+    }
+
+    public Slave getSlave()
+    {
+        return slave;
     }
 }

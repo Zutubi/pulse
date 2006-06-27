@@ -18,9 +18,7 @@ public class P4 extends Scm
     @Override
     public SCMServer createServer() throws SCMException
     {
-        P4Server server = new P4Server(getPort(), getUser(), getPassword(), getClient());
-        server.setExcludedPaths(getFilteredPaths());
-        return server;
+        return new P4Server(getPort(), getUser(), getPassword(), getClient());
     }
 
     public String getPort()

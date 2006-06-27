@@ -11,4 +11,9 @@
             <message key="user.login.required">required field.</message>
         </field-validator>
     </field>
+    <field name="password">
+        <field-validator type="requiredstring">
+            <message key="user.password.required">required field.</message>
+        </field-validator>
+    </field>
 </validators>

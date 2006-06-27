@@ -25,7 +25,6 @@
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/loggingContext.xml"/>
-    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/eventContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/webserverContext.xml"/>
 
 </beans>

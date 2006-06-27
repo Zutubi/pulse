@@ -154,6 +154,8 @@
             </fileset>
             <fileset dir="${test.dir}">
                 <include name="**/*.java"/>
+                <!-- contains license details. -->
+                <exclude name="**/SetupAcceptanceTest.java"/>
             </fileset>
         </copy>
 
@@ -164,15 +166,14 @@
 
     </target>
 
-    <target name="test" depends="init, module-pre-test, common-test, module-post-test" unless="skip.tests"/>
+    <target name="test" depends="init, module-pre-test, common-test, module-post-test"/>
 
-    <target name="module-pre-test" unless="skip.tests"/>
+    <target name="module-pre-test"/>
     
-    <target name="module-post-test" unless="skip.tests"/>
+    <target name="module-post-test"/>
 
     <!-- run test cases -->
-    <target name="common-test" unless="skip.tests">
-
+    <target name="common-test">
 
         <echo message="-----------------------------------"/>
         <echo message="    Component: testing ${module}"/>
@@ -189,8 +190,6 @@
                 <fileset dir="${test.dir}">
                     <include name="**/*Test.java"/>
                     <exclude name="**/P4*"/>
-                    <!-- temporarily exclude this test since it relies on a repo not located on windows. -->
-                    <exclude name="**/SVN*"/>
                     <!--<exclude name="**/Cvs*"/>-->
                     <!-- temporarily exclude this test since maven is not available on the build box.. -->
                     <exclude name="**/MavenCommandTest.java"/>

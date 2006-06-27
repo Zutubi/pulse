@@ -140,15 +140,4 @@ public interface SCMServer
      * @return true if update is supported, false otherwise.
      */
     boolean supportsUpdate();
-
-    /**
-     * Applies a tag to the given revision of all files in the server's view .
-     *
-     * @param revision     the revision to be tagged
-     * @param name         the name of the tag, which has an SCM-specific format
-     * @param moveExisting if true and a tag of the same name already exists,
-     *                     that tag will be moved to the new revision and files
-     * @throws SCMException
-     */
-    void tag(Revision revision, String name, boolean moveExisting) throws SCMException;
 }

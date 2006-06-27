@@ -43,7 +43,7 @@ public class Change extends Entity
         /**
          * An unrecognised action.
          */
-        UNKNOWN
+        UNKNOWN;
     }
 
     private String filename;
@@ -105,10 +105,5 @@ public class Change extends Entity
     private void setActionName(String action)
     {
         this.action = Action.valueOf(action);
-    }
-
-    public String toString()
-    {
-        return filename + "#" + revision.toString() + " - " + action.toString();
     }
 }

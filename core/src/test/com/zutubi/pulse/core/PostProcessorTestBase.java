@@ -3,9 +3,9 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +43,7 @@ public class PostProcessorTestBase extends PulseTestCase
 
     protected void createArtifact(String name) throws Exception
     {
-        URL url = getInputURL(name, "txt");
+        URL url = getInputURL(name, ".txt");
         File fromFile = new File(url.toURI());
         File toFile = new File(tempDir, fromFile.getName());
         IOUtils.copyFile(fromFile, toFile);

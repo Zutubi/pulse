@@ -12,10 +12,6 @@ public class LicenseEvent extends Event<License>
         super(source);
     }
 
-    /**
-     * Get the license associated with this event.
-     *  
-     */
     public License getLicense()
     {
         return getSource();

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -63,7 +63,7 @@ public class EmailContactPoint extends ContactPoint
     */
     public void notify(BuildResult result)
     {
-        MasterApplicationConfiguration config = lookupConfigManager().getAppConfig();
+        ApplicationConfiguration config = lookupConfigManager().getAppConfig();
         String prefix = config.getSmtpPrefix();
 
         if (prefix == null)
@@ -84,17 +84,17 @@ public class EmailContactPoint extends ContactPoint
         StringWriter w = new StringWriter();
         BuildResultRenderer renderer = (BuildResultRenderer) ComponentContext.getBean("buildResultRenderer");
         BuildManager buildManager = (BuildManager) ComponentContext.getBean("buildManager");
-        MasterConfigurationManager configManager = lookupConfigManager();
+        ConfigurationManager configManager = lookupConfigManager();
         renderer.render(configManager.getAppConfig().getHostName(), result, buildManager.getChangesForBuild(result), getType(), w);
         return w.toString();
     }
 
-    private MasterConfigurationManager lookupConfigManager()
+    private ConfigurationManager lookupConfigManager()
     {
-        return (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
+        return (ConfigurationManager) ComponentContext.getBean("configurationManager");
     }
 
-    private void sendMail(String subject, String body, final MasterApplicationConfiguration config)
+    private void sendMail(String subject, String body, final ApplicationConfiguration config)
     {
         if (!TextUtils.stringSet(config.getSmtpHost()))
         {

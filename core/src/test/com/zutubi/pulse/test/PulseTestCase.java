@@ -234,17 +234,12 @@ public abstract class PulseTestCase extends TestCase
 
     protected URL getInputURL(String testName)
     {
-        return getInputURL(testName, "xml");
+        return getInputURL(testName, ".xml");
     }
 
     protected URL getInputURL(String testName, String extension)
     {
-        return getClass().getResource(getClass().getSimpleName() + "." + testName + "." + extension);
-    }
-
-    protected File getTestDataFile(String module, String testName, String extension)
-    {
-        return new File(getPulseRoot(), FileSystemUtils.composeFilename(module, "src", "test", getClass().getName().replace('.', File.separatorChar) + "." + testName + "." + extension));
+        return getClass().getResource(getClass().getSimpleName() + "." + testName + extension);
     }
 
     public static File getPulseRoot()

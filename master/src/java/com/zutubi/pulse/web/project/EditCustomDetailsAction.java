@@ -47,8 +47,8 @@ public class EditCustomDetailsAction extends AbstractEditDetailsAction implement
 
         try
         {
-            PulseFileLoader loader = new PulseFileLoader(new ObjectFactory());
-            loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile(), new LinkedList<Reference>(), resourceRepository, new CustomProjectValidationPredicate());
+            PulseFileLoader loader = new PulseFileLoader(new ObjectFactory(), resourceRepository);
+            loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile(), new LinkedList<Reference>(), new CustomProjectValidationPredicate());
         }
         catch(ParseException pe)
         {

@@ -1,25 +1,12 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.RecipeRequest;
-
 import java.io.File;
 
 /**
  */
 public interface BuildService extends RemoteService
 {
-    /**
-     * Returns true iff the service has the given version of the given
-     * resource.
-     *
-     * @param resource the name of the required resource
-     * @param version  the required version, or null if no specific version
-     *                 is required
-     * @return true iff this service has the give resource version
-     */
-    boolean hasResource(String resource, String version);
-
-    boolean build(RecipeRequest request);
+    void build(RecipeRequest request);
 
     void collectResults(long recipeId, File outputDest, File workDest);
 

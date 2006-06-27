@@ -4,7 +4,6 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ManualTriggerBuildReason;
 
 import java.util.List;
 
@@ -57,7 +56,7 @@ public class TriggerBuildAction extends ProjectActionSupport
             return ERROR;
         }
 
-        BuildRequestEvent event = new BuildRequestEvent(this, new ManualTriggerBuildReason((String)getPrinciple()), project, spec.getName());
+        BuildRequestEvent event = new BuildRequestEvent(this, project, spec.getName());
         eventManager.publish(event);
 
         try

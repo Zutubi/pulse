@@ -21,12 +21,10 @@ public class CopyBootstrapper extends BootstrapperSupport
 {
     private String url;
     private long previousRecipeId;
-    private String token;
 
-    public CopyBootstrapper(String url, String token, long previousRecipeId)
+    public CopyBootstrapper(String url, long previousRecipeId)
     {
         this.url = url;
-        this.token = token;
         this.previousRecipeId = previousRecipeId;
     }
 
@@ -35,7 +33,7 @@ public class CopyBootstrapper extends BootstrapperSupport
         try
         {
             // Pull down the result from the slave then explode to dir
-            URL resultUrl = new URL("http://" + url + "/download?token=" + token + "&output=false&recipe=" + previousRecipeId);
+            URL resultUrl = new URL("http://" + url + "/download?output=false&recipe=" + previousRecipeId);
             URLConnection urlConnection = resultUrl.openConnection();
 
             // take url connection input stream and write contents to directory.

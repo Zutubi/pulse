@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.PulseFileDetails;
 import com.zutubi.pulse.util.XMLUtils;
-import org.hsqldb.lib.StringInputStream;
+import org.apache.tools.ant.filters.StringInputStream;
 
 import java.io.InputStream;
 

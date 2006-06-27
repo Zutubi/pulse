@@ -1,9 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import com.meterware.httpunit.WebClient;
 import com.zutubi.pulse.acceptance.forms.CvsForm;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
-import junit.framework.Assert;
+import com.meterware.httpunit.WebClient;
 
 import java.io.IOException;
 
@@ -182,30 +181,5 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
     protected String getResponse() throws IOException
     {
         return tester.getDialog().getResponse().getText();
-    }
-
-    /**
-     * An adaptation of the assertTableRowsEquals that allows us to assert a single row in a table.
-     *
-     * @param tableSummaryOrId
-     * @param row
-     * @param expectedValues
-     */
-    public void assertTableRowEqual(String tableSummaryOrId, int row, String[] expectedValues)
-    {
-        assertTablePresent(tableSummaryOrId);
-        String[][] sparseTableCellValues = tester.getDialog().getSparseTableBySummaryOrId(tableSummaryOrId);
-        if (sparseTableCellValues.length <= row)
-        {
-            Assert.fail("Expected row["+row+"] does not exist. Actual number of rows is " + sparseTableCellValues.length);
-        }
-        for (int j = 0; j < expectedValues.length; j++) {
-            if (expectedValues.length != sparseTableCellValues[row].length)
-                Assert.fail("Unequal number of columns for row " + row + " of table " + tableSummaryOrId +
-                        ". Expected [" + expectedValues.length + "] found [" + sparseTableCellValues[row].length + "].");
-            String expectedString = expectedValues[j];
-            Assert.assertEquals("Expected " + tableSummaryOrId + " value at [" + row + "," + j + "] not found.",
-                    expectedString, tester.getTestContext().toEncodedString(sparseTableCellValues[row][j].trim()));
-        }
     }
 }

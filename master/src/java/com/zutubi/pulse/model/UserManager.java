@@ -12,9 +12,6 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
 {
     String ANONYMOUS_LOGIN = "anonymous";
 
-    void addUser(User newUser, boolean grantAdminPermissions);
-    void addUser(User newUser, boolean grantAdminPermissions, boolean useLdapAuthencation);
-
     /**
      * Retrieve an instance of the user identified by the login name
      * @param login
@@ -34,6 +31,7 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
     List<User> getUsersWithLoginLike(String name);
     List<User> getAllUsers();
 
+    
     ContactPoint getContactPoint(long id);
     void delete(ContactPoint contact);
 

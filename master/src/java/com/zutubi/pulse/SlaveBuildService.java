@@ -1,20 +1,17 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.caucho.hessian.client.HessianRuntimeException;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.model.Slave;
-import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.ZipInputStream;
@@ -27,17 +24,12 @@ public class SlaveBuildService implements BuildService
 
     private SlaveService service;
     private Slave slave;
-    private MasterConfigurationManager configurationManager;
-    private ResourceManager resourceManager;
-    private ServiceTokenManager serviceTokenManager;
+    private ConfigurationManager configurationManager;
 
-    public SlaveBuildService(SlaveService service, ServiceTokenManager serviceTokenManager, Slave slave, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
+    public SlaveBuildService(Slave slave, SlaveService service)
     {
-        this.service = service;
-        this.serviceTokenManager = serviceTokenManager;
         this.slave = slave;
-        this.configurationManager = configurationManager;
-        this.resourceManager = resourceManager;
+        this.service = service;
     }
 
     public String getUrl()
@@ -45,18 +37,13 @@ public class SlaveBuildService implements BuildService
         return slave.getHost() + ":" + slave.getPort();
     }
 
-    public boolean hasResource(String resource, String version)
-    {
-        return resourceManager.getSlaveRepository(slave).hasResource(resource, version);
-    }
-
-    public boolean build(RecipeRequest request)
+    public void build(RecipeRequest request)
     {
         try
         {
-            return service.build(serviceTokenManager.getToken(), configurationManager.getAppConfig().getHostName(), slave.getId(), request);
+            service.build(configurationManager.getAppConfig().getHostName(), request);
         }
-        catch (RuntimeException e)
+        catch (HessianRuntimeException e)
         {
             throw convertException("Unable to dispatch recipe request '" + request.getId() + "' to slave '" + slave.getName() + "'", e);
         }
@@ -64,54 +51,37 @@ public class SlaveBuildService implements BuildService
 
     public void collectResults(long recipeId, File outputDest, File workDest)
     {
-        collect(recipeId, true, outputDest);
-        collect(recipeId, false, workDest);
-    }
-
-    private void collect(long recipeId, boolean output, File destination)
-    {
         ZipInputStream zis = null;
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
 
         try
         {
-            URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&output=" + output + "&recipe=" + recipeId);
+            // Pull down the result from the slave then explode to dir
+            URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?output=true&recipe=" + recipeId);
             URLConnection urlConnection = resultUrl.openConnection();
 
-            // originally the zip stream was unzipped as read from the
-            // servlet, however this resulted in socket errors on the
-            // servlet side (I think when the zip was bigger than a
-            // buffer).
-
-            // take url connection input stream and write contents to zip file
-            File zipFile = new File(destination.getAbsolutePath() + ".zip");
-            fos = new FileOutputStream(zipFile);
-            IOUtils.joinStreams(urlConnection.getInputStream(), fos);
-            IOUtils.close(urlConnection.getInputStream());
-            IOUtils.close(fos);
-            fos = null;
-
-            // now unzip the file
-            fis = new FileInputStream(zipFile);
-            zis = new ZipInputStream(fis);
-            FileSystemUtils.extractZip(zis, destination);
-            IOUtils.close(fis);
-            fis = null;
+            // take url connection input stream and write contents to directory.
+            zis = new ZipInputStream(urlConnection.getInputStream());
+            FileSystemUtils.extractZip(zis, outputDest);
             IOUtils.close(zis);
             zis = null;
 
-            zipFile.delete();
+            resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?output=false&recipe=" + recipeId);
+            urlConnection = resultUrl.openConnection();
+            zis = new ZipInputStream(urlConnection.getInputStream());
+            FileSystemUtils.extractZip(zis, workDest);
+        }
+        catch (MalformedURLException e)
+        {
+            // Programmer error
+            e.printStackTrace();
         }
         catch (IOException e)
         {
-            throw new BuildException("Error downloading results from agent '" + slave.getName() + ": " + e.getMessage(), e);
+            throw new BuildException("Error downloading results from slave '" + slave.getName() + ": " + e.getMessage(), e);
         }
         finally
         {
             IOUtils.close(zis);
-            IOUtils.close(fis);
-            IOUtils.close(fos);
         }
     }
 
@@ -119,7 +89,7 @@ public class SlaveBuildService implements BuildService
     {
         try
         {
-            service.cleanupRecipe(serviceTokenManager.getToken(), recipeId);
+            service.cleanupRecipe(recipeId);
         }
         catch (Exception e)
         {
@@ -129,14 +99,7 @@ public class SlaveBuildService implements BuildService
 
     public void terminateRecipe(long recipeId)
     {
-        try
-        {
-            service.terminateRecipe(serviceTokenManager.getToken(), recipeId);
-        }
-        catch (RuntimeException e)
-        {
-            LOG.severe("Unable to terminate recipe: " + e.getMessage(), e);
-        }
+        service.terminateRecipe(recipeId);
     }
 
     public String getHostName()
@@ -149,7 +112,7 @@ public class SlaveBuildService implements BuildService
         return slave;
     }
 
-    private BuildException convertException(String context, RuntimeException e)
+    private BuildException convertException(String context, HessianRuntimeException e)
     {
         return new BuildException(context + ": " + e.getMessage(), e);
     }
@@ -166,13 +129,8 @@ public class SlaveBuildService implements BuildService
         return false;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
-    }
-
-    public void setResourceManager(ResourceManager resourceManager)
-    {
-        this.resourceManager = resourceManager;
     }
 }

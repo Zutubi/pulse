@@ -33,29 +33,29 @@ public class EventTrigger extends Trigger
         return copy;
     }
 
-    public EventTrigger(Class<? extends Event> trigger)
+    public EventTrigger(Class trigger)
     {
         this(trigger, null);
     }
 
-    public EventTrigger(Class<? extends Event> trigger, String name)
+    public EventTrigger(Class trigger, String name)
     {
         this(trigger, name, DEFAULT_GROUP);
     }
 
-    public EventTrigger(Class<? extends Event> trigger, String name, Class<? extends EventTriggerFilter> filterClass)
+    public EventTrigger(Class trigger, String name, Class<? extends EventTriggerFilter> filterClass)
     {
         this(trigger, name, DEFAULT_GROUP);
         this.filterClass = filterClass;
     }
 
-    public EventTrigger(Class<? extends Event> trigger, String name, String group)
+    public EventTrigger(Class trigger, String name, String group)
     {
         super(name, group);
         triggers = new Class[]{trigger};
     }
 
-    public EventTrigger(Class<? extends Event> trigger, String name, String group, Class<? extends EventTriggerFilter> filterClass)
+    public EventTrigger(Class trigger, String name, String group, Class<? extends EventTriggerFilter> filterClass)
     {
         super(name, group);
         triggers = new Class[]{trigger};
@@ -65,19 +65,6 @@ public class EventTrigger extends Trigger
     public String getType()
     {
         return TYPE;
-    }
-
-    public String getEditKey()
-    {
-        String result = getType();
-
-        for(Class c: triggers)
-        {
-            result += '.';
-            result += c.getSimpleName();
-        }
-
-        return result;
     }
 
     /**
@@ -101,9 +88,9 @@ public class EventTrigger extends Trigger
     /**
      * Used by hibernate.
      */
-    private void setTriggerEvent(Class<? extends Event> event)
+    private void setTriggerEvent(Class event)
     {
-        triggers = new Class[]{ event };
+        getTriggerEvents()[0] = event;
     }
 
     public Class<? extends EventTriggerFilter> getFilterClass()

@@ -19,24 +19,21 @@ public class Svn extends Scm
     @Override
     public SCMServer createServer() throws SCMException
     {
-        SVNServer server;
         if (getKeyfile() == null || getKeyfile().length() == 0)
         {
-            server = new SVNServer(getUrl(), getUsername(), getPassword());
+            return new SVNServer(getUrl(), getUsername(), getPassword());
         }
         else
         {
             if (getPassphrase() == null || getPassphrase().length() == 0)
             {
-                server = new SVNServer(getUrl(), getUsername(), getPassword(), getKeyfile());
+                return new SVNServer(getUrl(), getUsername(), getPassword(), getKeyfile());
             }
             else
             {
-                server = new SVNServer(getUrl(), getUsername(), getPassword(), getKeyfile(), getPassphrase());
+                return new SVNServer(getUrl(), getUsername(), getPassword(), getKeyfile(), getPassphrase());
             }
         }
-        server.setExcludedPaths(this.getFilteredPaths());
-        return server;
     }
 
     public String getUrl()

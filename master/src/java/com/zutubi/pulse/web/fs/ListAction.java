@@ -1,12 +1,14 @@
+/********************************************************************************
+ @COPYRIGHT@
+ ********************************************************************************/
 package com.zutubi.pulse.web.fs;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.filesystem.File;
+import com.zutubi.pulse.filesystem.FileSystem;
+import com.zutubi.pulse.filesystem.FileSystemException;
 import org.apache.commons.codec.binary.Base64;
 
 import java.util.*;
-import java.io.File;
-import java.io.FileFilter;
-import java.text.Collator;
 
 /**
  * <class-comment/>
@@ -15,23 +17,11 @@ public abstract class ListAction extends FileSystemActionSupport
 {
     private List<Object> listings;
 
-    private String[] pids;
+    private String[] uids;
 
-    private boolean dirOnly = false;
-
-    public void setDirOnly(boolean dirOnly)
+    public void setUid(String[] paths)
     {
-        this.dirOnly = dirOnly;
-    }
-
-    public boolean isDirOnly()
-    {
-        return this.dirOnly;
-    }
-
-    public void setPid(String[] pids)
-    {
-        this.pids = pids;
+        this.uids = paths;
     }
 
     public List<Object> getListings()
@@ -42,111 +32,49 @@ public abstract class ListAction extends FileSystemActionSupport
     public String execute() throws Exception
     {
         listings = new LinkedList<Object>();
-        for (String uid : pids)
+        for (String uid : uids)
         {
             listings.add(new JsonListingWrapper(list(uid)));
         }
         return SUCCESS;
     }
 
-    private boolean isRoot(File f)
+    private Listing list(String encodedPath) throws FileSystemException
     {
-        return f.isAbsolute() && !TextUtils.stringSet(f.getName());
-    }
+        String decodedPath = decode(encodedPath);
+        FileSystem fs = getFileSystem();
 
-    private Listing list(String encodedPath)
-    {
+        File file = fs.getFile(decodedPath);
+
         //todo: validate path.
-        File file = null;
-        StringTokenizer tokens = new StringTokenizer(encodedPath, "/", false);
-        while (tokens.hasMoreTokens())
-        {
-            String t = tokens.nextToken();
-            if (file == null)
-            {
-                file = new java.io.File(decode(t));
-            }
-            else
-            {
-                file = new java.io.File(file, decode(t));
-            }
-        }
-
         Listing listing = new Listing();
-        listing.path = encodedPath;
-
-        if (file != null)
-        {
-            listing.files = file.listFiles();
-        }
-        else
-        {
-            listing.files = File.listRoots();
-        }
-
-        filter(listing, new FileFilter()
-        {
-            public boolean accept(File f)
-            {
-                return !f.isHidden();
-            }
-        });
-
-        if (isDirOnly())
-        {
-            filter(listing, new FileFilter()
-            {
-                public boolean accept(File f)
-                {
-                    return f.isDirectory();
-                }
-            });
-        }
+        listing.files = fs.list(file);
+        listing.path = decodedPath;
 
         sort(listing.files);
 
         return listing;
     }
 
-    private void filter(Listing listing, FileFilter filter)
-    {
-        if (listing.files != null)
-        {
-            List<File> filtered = new LinkedList<File>();
-            for (File f : listing.files)
-            {
-                if (filter.accept(f))
-                {
-                    filtered.add(f);
-                }
-            }
-            listing.files = filtered.toArray(new File[filtered.size()]);
-        }
-    }
-
     private void sort(File[] files)
     {
-        final Collator c = Collator.getInstance();
-        if (files != null)
+        Collections.sort(Arrays.asList(files), new Comparator<File>()
         {
-            Collections.sort(Arrays.asList(files), new Comparator<File>()
+            public int compare(File o1, File o2)
             {
-                public int compare(File o1, File o2)
+                // folders first.
+                if (o1.isDirectory())
                 {
-                    // folders first.
-                    if ((o1.isDirectory() || isRoot(o1)) && (!o2.isDirectory() && !isRoot(o2)))
-                    {
-                        return -1;
-                    }
-                    if ((o2.isDirectory() || isRoot(o2)) && (!o1.isDirectory() && !isRoot(o1)))
-                    {
-                        return 1;
-                    }
-                    // then sort alphabetically
-                    return c.compare(o1.getAbsolutePath(), o2.getAbsolutePath());
+                    return -1;
                 }
-            });
-        }
+                if (o2.isDirectory())
+                {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+
     }
 
     private String encode(String uid)
@@ -184,18 +112,18 @@ public abstract class ListAction extends FileSystemActionSupport
     {
         private String uid;
 
+        private String path;
+
         private List<JsonFileWrapper> files;
 
         public JsonListingWrapper(Listing l)
         {
-            uid = l.path;
+            path = l.path;
+            uid = encode(l.path);
             files = new LinkedList<JsonFileWrapper>();
-            if (l.files != null)
+            for (File f : l.files)
             {
-                for (File f : l.files)
-                {
-                    files.add(new JsonFileWrapper(f));
-                }
+                files.add(new JsonFileWrapper(f));
             }
         }
 
@@ -207,6 +135,11 @@ public abstract class ListAction extends FileSystemActionSupport
         public String getUid()
         {
             return uid;
+        }
+
+        public String getPath()
+        {
+            return path;
         }
     }
 
@@ -224,10 +157,6 @@ public abstract class ListAction extends FileSystemActionSupport
 
         public String getName()
         {
-            if (isRoot(this.file))
-            {
-                return this.file.getAbsolutePath();
-            }
             return this.file.getName();
         }
 
@@ -236,20 +165,15 @@ public abstract class ListAction extends FileSystemActionSupport
             return encode(this.file.getPath());
         }
 
-        public String getFid()
-        {
-            return encode(this.getName());
-        }
-
         public String getType()
         {
-            if (file.isDirectory() || isRoot(file))
+            if (file.isFile())
             {
-                return "folder";
+                return "file";
             }
             else
             {
-                return "file";
+                return "folder";
             }
         }
     }

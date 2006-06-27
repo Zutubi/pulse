@@ -1,7 +1,7 @@
 package com.zutubi.pulse.bootstrap.freemarker;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.util.logging.Logger;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -42,7 +42,7 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
 
     private TemplateLoader getMultiLoader()
     {
-        MasterConfigurationManager manager = (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
+        ConfigurationManager manager = (ConfigurationManager) ComponentContext.getBean("configurationManager");
 
         List<File> templateRoots = manager.getSystemPaths().getTemplateRoots();
         FileTemplateLoader loaders[] = new FileTemplateLoader[templateRoots.size()];

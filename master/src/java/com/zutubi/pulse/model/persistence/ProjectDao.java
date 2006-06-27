@@ -14,10 +14,6 @@ public interface ProjectDao extends EntityDao<Project>
 
     List<Project> findByLikeName(String name);
 
-    Project findByScm(Scm scm);
-    
-    Project findByScmId(long id);
-
     void save(VersionedPulseFileDetails details);
 
     VersionedPulseFileDetails findVersionedPulseFileDetails(long id);
@@ -26,16 +22,7 @@ public interface ProjectDao extends EntityDao<Project>
 
     void save(MakePulseFileDetails source);
 
-    void save(TagPostBuildAction action);
-
-    void save(RunExecutablePostBuildAction action);
-
     AntPulseFileDetails findAntPulseFileSource(long id);
 
     MakePulseFileDetails findMakePulseFileSource(long id);
-
-    TagPostBuildAction findTagPostBuildAction(long id);
-
-    RunExecutablePostBuildAction findRunExecutablePostBuildAction(long id);
-
 }

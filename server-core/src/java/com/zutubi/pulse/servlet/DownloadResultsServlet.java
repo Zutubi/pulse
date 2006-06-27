@@ -3,8 +3,6 @@ package com.zutubi.pulse.servlet;
 import com.zutubi.pulse.ServerRecipePaths;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.services.InvalidTokenException;
-import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.RandomUtils;
@@ -23,8 +21,6 @@ import java.io.IOException;
 public class DownloadResultsServlet extends HttpServlet
 {
     private static final Logger LOG = Logger.getLogger(DownloadResultsServlet.class);
-    private ConfigurationManager configurationManager;
-    private ServiceTokenManager serviceTokenManager;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
     {
@@ -32,21 +28,11 @@ public class DownloadResultsServlet extends HttpServlet
 
         try
         {
-            String token = request.getParameter("token");
-            try
-            {
-                getServiceTokenManager().validateToken(token);
-            }
-            catch (InvalidTokenException e)
-            {
-                response.sendError(403, "Invalid token");
-            }
-
             long recipeId = Long.parseLong(id);
             boolean output = Boolean.parseBoolean(request.getParameter("output"));
 
             // lookup the recipe location, zip it up and write to output.
-            ServerRecipePaths paths = new ServerRecipePaths(recipeId, getConfigurationManager().getUserPaths().getData());
+            ServerRecipePaths paths = new ServerRecipePaths(recipeId, (ConfigurationManager) ComponentContext.getBean("configurationManager"));
             File dir;
             File zipFile;
 
@@ -101,30 +87,12 @@ public class DownloadResultsServlet extends HttpServlet
             }
             catch (IOException e1)
             {
-                LOG.warning(e1);
+                e1.printStackTrace();
             }
         }
         catch (IOException e)
         {
-            LOG.warning(e);
+            e.printStackTrace();
         }
-    }
-
-    public ConfigurationManager getConfigurationManager()
-    {
-        if(configurationManager == null)
-        {
-            configurationManager = (ConfigurationManager) ComponentContext.getBean("configurationManager");
-        }
-        return configurationManager;
-    }
-
-    public ServiceTokenManager getServiceTokenManager()
-    {
-        if(serviceTokenManager == null)
-        {
-            serviceTokenManager = (ServiceTokenManager) ComponentContext.getBean("serviceTokenManager");
-        }
-        return serviceTokenManager;
     }
 }

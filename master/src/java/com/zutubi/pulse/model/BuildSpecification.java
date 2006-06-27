@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.model.Entity;
  * Describes the steps (recipes) required for a build, and where they should
  * be executed.
  */
-public class BuildSpecification extends Entity implements NamedEntity
+public class BuildSpecification extends Entity
 {
     public static final int TIMEOUT_NEVER = 0;
 
@@ -74,13 +74,4 @@ public class BuildSpecification extends Entity implements NamedEntity
         this.root = root;
     }
 
-    public BuildSpecificationNode getNode(long id)
-    {
-        return root.getNode(id);
-    }
-
-    public BuildSpecificationNode getNodeByStageName(String name)
-    {
-        return root.getNodeByStageName(name);
-    }
 }

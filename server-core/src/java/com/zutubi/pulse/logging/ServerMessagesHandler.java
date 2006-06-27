@@ -35,7 +35,7 @@ public class ServerMessagesHandler extends Handler
                 {
                     CustomLogRecord previous = records.getElement(records.getCount() - 1);
                     if(nullSafeEquals(previous.getMessage(), record.getMessage()) &&
-                       nullSafeEquals(previous.getStackTrace(), CustomLogRecord.getStackTrace(record)))
+                       nullSafeEquals(previous.getThrown(), record.getThrown()))
                     {
                         previous.repeated();
                         return;

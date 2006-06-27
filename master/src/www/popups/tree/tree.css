@@ -11,39 +11,24 @@ li {
 }
 
 .selected {
-    color:white;
-    background-color:blue;
-    border-width:1px;
-    border-color:#000;
-    border-style:solid;
+    background-color:#eee;
 }
 
-span.node {
-    background-repeat: no-repeat;
-    background-position: 0 .2em;
-    padding-left: 1.6em;
+li.file {
+    background-image: url(../../images/tree/page_white.png);
 }
 
-span.folder {
+li.folder, li.root {
     background-image: url(../../images/tree/foldericon.png);
 }
 
-span.openfolder {
+li.openfolder {
     background-image: url(../../images/tree/openfoldericon.png);
 }
 
-span.file {
-    background-image: url(../../images/tree/file.png);
+/* sample node type rendering */
+
+li.txt {
+    background-image: url(../../images/tree/page_white.png);
 }
 
-li.opened {
-    background-image: url(../../images/tree/opened.PNG);
-}
-
-li.closed {
-    background-image: url(../../images/tree/closed.png);
-}
-
-li.empty {
-    background-image: url(../../images/tree/empty.png);
-}

@@ -29,16 +29,6 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
         return findByNamedQuery("findByLikeName", "name", name);
     }
 
-    public Project findByScm(Scm scm)
-    {
-        return (Project) findUniqueByNamedQuery("findByScm", "scm", scm);
-    }
-
-    public Project findByScmId(long id)
-    {
-        return (Project) findUniqueByNamedQuery("findByScmId", "scmId", id);
-    }
-
     public void save(VersionedPulseFileDetails details)
     {
         getHibernateTemplate().saveOrUpdate(details);
@@ -59,16 +49,6 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
         getHibernateTemplate().saveOrUpdate(source);
     }
 
-    public void save(TagPostBuildAction action)
-    {
-        getHibernateTemplate().saveOrUpdate(action);
-    }
-
-    public void save(RunExecutablePostBuildAction action)
-    {
-        getHibernateTemplate().saveOrUpdate(action);
-    }
-
     public AntPulseFileDetails findAntPulseFileSource(long id)
     {
         return (AntPulseFileDetails) getHibernateTemplate().load(AntPulseFileDetails.class, id);
@@ -77,15 +57,5 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
     public MakePulseFileDetails findMakePulseFileSource(long id)
     {
         return (MakePulseFileDetails) getHibernateTemplate().load(MakePulseFileDetails.class, id);
-    }
-
-    public TagPostBuildAction findTagPostBuildAction(long id)
-    {
-        return (TagPostBuildAction) getHibernateTemplate().load(TagPostBuildAction.class, id);
-    }
-
-    public RunExecutablePostBuildAction findRunExecutablePostBuildAction(long id)
-    {
-        return  (RunExecutablePostBuildAction) getHibernateTemplate().load(RunExecutablePostBuildAction.class, id);
     }
 }

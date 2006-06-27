@@ -27,7 +27,7 @@
     #inlineHelp("scm.path.help")
     #wwcheckbox("name=monitor" "label=%{getText('scm.monitor')}" "tabindex=7")
 
-    #testSettingsRow()
+    #scmTestRow()
 
     #saveCancel(8)
  #end

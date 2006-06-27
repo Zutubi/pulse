@@ -1,7 +1,6 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMException;
 
@@ -12,16 +11,16 @@ import java.io.File;
  */
 public class UpdateBootstrapper extends ScmBootstrapper
 {
-    public UpdateBootstrapper(Scm scm, BuildRevision revision)
+    public UpdateBootstrapper(Scm scm)
     {
-        super(scm, revision);
+        super(scm);
     }
 
     void bootstrap(File workDir)
     {
         try
         {
-            scm.createServer().update(workDir, revision.getRevision());
+            scm.createServer().update(workDir, getRevision());
         }
         catch (SCMException e)
         {

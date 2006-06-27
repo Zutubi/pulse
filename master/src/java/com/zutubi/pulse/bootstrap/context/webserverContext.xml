@@ -11,8 +11,6 @@ This context exports:
 -->
 <beans>
 
-    <bean id="customSerialiserFactory" class="com.zutubi.pulse.hessian.CustomSerialiserFactory"/>
-
     <bean id="jettyManager" class="com.zutubi.pulse.jetty.JettyManager">
         <property name="jettyServer">
             <ref local="jettyServer"/>
