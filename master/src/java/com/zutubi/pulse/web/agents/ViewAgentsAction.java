@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.agents;
 
-import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.List;
 
@@ -29,8 +29,6 @@ public class ViewAgentsAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        // Update the statuses
-        agentManager.pingSlaves();
         agents = agentManager.getAllAgents();
         return SUCCESS;
     }

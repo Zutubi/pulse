@@ -20,7 +20,7 @@ public class SlaveQueue implements Runnable
 {
     private static final Logger LOG = Logger.getLogger(SlaveQueue.class);
 
-    private Executor executor;
+    private Executor executor = new SlaveThreadPool();
     private List<Runnable> recipes = new LinkedList<Runnable>();
     private Lock recipesLock = new ReentrantLock();
     private Condition recipesCondition = recipesLock.newCondition();

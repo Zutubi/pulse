@@ -2,6 +2,7 @@ package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.logging.CustomLogRecord;
@@ -9,6 +10,7 @@ import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.services.InvalidTokenException;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
 import com.zutubi.pulse.slave.command.RecipeCommand;
 import com.zutubi.pulse.util.logging.Logger;
@@ -32,6 +34,20 @@ public class SlaveServiceImpl implements SlaveService
     public int ping()
     {
         return Version.getVersion().getBuildNumberAsInt();
+    }
+
+    public SlaveStatus getStatus(String token)
+    {
+        // Synchronous request
+        long recipe = slaveRecipeProcessor.getBuildingRecipe();
+        if(recipe != 0)
+        {
+            return new SlaveStatus(Status.BUILDING, recipe);
+        }
+        else
+        {
+            return new SlaveStatus(Status.IDLE, 0);
+        }
     }
 
     public boolean build(String token, String master, long slaveId, RecipeRequest request) throws InvalidTokenException

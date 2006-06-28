@@ -1,22 +1,21 @@
 package com.zutubi.pulse.events;
 
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.agent.SlaveAgent;
 
 /**
  */
 public class SlaveEvent extends Event
 {
-    private Slave slave;
+    private SlaveAgent agent;
 
-    public SlaveEvent(Object source, Slave slave)
+    public SlaveEvent(Object source, SlaveAgent agent)
     {
         super(source);
-        this.slave = slave;
+        this.agent = agent;
     }
 
-    public Slave getSlave()
+    public SlaveAgent getAgent()
     {
-        return slave;
+        return agent;
     }
 }

@@ -1,14 +1,11 @@
 package com.zutubi.pulse.agent;
 
-import com.zutubi.pulse.MasterBuildService;
-import com.zutubi.pulse.MasterRecipeProcessor;
-import com.zutubi.pulse.SlaveBuildService;
-import com.zutubi.pulse.SlaveProxyFactory;
+import com.zutubi.pulse.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.SlaveAvailableEvent;
-import com.zutubi.pulse.events.SlaveUnavailableEvent;
+import com.zutubi.pulse.events.SlaveAgentRemovedEvent;
+import com.zutubi.pulse.events.SlaveStatusEvent;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.model.NamedEntityComparator;
 import com.zutubi.pulse.model.ResourceManager;
@@ -16,6 +13,7 @@ import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.MalformedURLException;
@@ -27,6 +25,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DefaultAgentManager implements AgentManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultAgentManager.class);
+
+    private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
 
     private MasterAgent masterAgent;
 
@@ -107,35 +107,39 @@ public class DefaultAgentManager implements AgentManager
 
     public int getAgentCount()
     {
-        return getOnlineAgents().size();
+        return slaveAgents.size() + 1;
     }
 
     private void pingSlave(SlaveAgent agent)
     {
-        long currentTime = System.currentTimeMillis();
-        Status oldStatus = agent.getStatus();
+        if (agent.isEnabled())
+        {
+            long currentTime = System.currentTimeMillis();
+            Status oldStatus = agent.getStatus();
 
-        try
-        {
-            int build = agent.getSlaveService().ping();
-            agent.pinged(currentTime, build);
-        }
-        catch (Exception e)
-        {
-            agent.failedPing(currentTime, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
-        }
+            try
+            {
+                int build = agent.getSlaveService().ping();
+                if(build == masterBuildNumber)
+                {
+                    SlaveStatus status = agent.getSlaveService().getStatus(serviceTokenManager.getToken());
+                    agent.pinged(currentTime, status);
+                }
+                else
+                {
+                    agent.versionMismatch(currentTime);
+                }
+            }
+            catch (Exception e)
+            {
+                agent.failedPing(currentTime, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
+            }
 
-        int newOrdinal = agent.getStatus().ordinal();
-        int oldOrdinal = oldStatus.ordinal();
-        if(newOrdinal > oldOrdinal)
-        {
-            eventManager.publish(new SlaveAvailableEvent(this, agent.getSlave()));
+            if(oldStatus != agent.getStatus())
+            {
+                eventManager.publish(new SlaveStatusEvent(this, oldStatus, agent));
+            }
         }
-        else if(newOrdinal < oldOrdinal)
-        {
-            eventManager.publish(new SlaveUnavailableEvent(this, agent.getSlave()));
-        }
-
     }
 
     public List<Agent> getAllAgents()
@@ -216,8 +220,7 @@ public class DefaultAgentManager implements AgentManager
             lock.lock();
             try
             {
-                SlaveAgent agent = slaveAgents.remove(id);
-                eventManager.publish(new SlaveUnavailableEvent(this, agent.getSlave()));
+                removeSlaveAgent(id);
                 addSlaveAgent(slave);
             }
             finally
@@ -232,13 +235,18 @@ public class DefaultAgentManager implements AgentManager
         lock.lock();
         try
         {
-            SlaveAgent agent = slaveAgents.remove(id);
-            eventManager.publish(new SlaveUnavailableEvent(this, agent.getSlave()));
+            removeSlaveAgent(id);
         }
         finally
         {
             lock.unlock();
         }
+    }
+
+    private void removeSlaveAgent(long id)
+    {
+        SlaveAgent agent = slaveAgents.remove(id);
+        eventManager.publish(new SlaveAgentRemovedEvent(this, agent));
     }
 
     public void setSlaveManager(SlaveManager slaveManager)

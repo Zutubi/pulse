@@ -14,6 +14,8 @@
 
         <property name="port" column="PORT" type="int"/>
 
+        <property name="enabled" column="ENABLED" type="boolean"/>
+        
     </class>
 
     <query name="findSlaveByName"><![CDATA[

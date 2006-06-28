@@ -1,12 +1,6 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.core.model.Resource;
-
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.LinkedList;
 
 /**
  * Represents a slave server that builds may be farmed out to.
@@ -16,6 +10,7 @@ public class Slave extends Entity
     private String name;
     private String host;
     private int port = 8090;
+    private boolean enabled = true;
 
     public Slave()
     {
@@ -66,4 +61,13 @@ public class Slave extends Entity
         this.port = port;
     }
 
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
+    }
 }

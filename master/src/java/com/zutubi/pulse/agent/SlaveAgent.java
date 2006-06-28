@@ -5,8 +5,9 @@ import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.Slave;
-import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.services.SlaveStatus;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -19,7 +20,7 @@ public class SlaveAgent implements Agent
     private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
 
     private Slave slave;
-    private Status status = Status.OFFLINE;
+    private Status status;
     private long lastPingTime = 0;
     private SlaveService slaveService;
     private ServiceTokenManager serviceTokenManager;
@@ -32,6 +33,7 @@ public class SlaveAgent implements Agent
         this.slaveService = slaveService;
         this.serviceTokenManager = serviceTokenManager;
         this.buildService = buildService;
+        status = slave.isEnabled() ? Status.OFFLINE : Status.DISABLED;
     }
 
     public long getId()
@@ -121,17 +123,16 @@ public class SlaveAgent implements Agent
         lastPingTime = time;
     }
 
-    public void pinged(long time, int buildNumber)
+    public void pinged(long time, SlaveStatus slaveStatus)
     {
         lastPingTime = time;
-        if(buildNumber == masterBuildNumber)
-        {
-            status = Status.IDLE;
-        }
-        else
-        {
-            status = Status.VERSION_MISMATCH;
-        }
+        status = slaveStatus.getStatus();
+    }
+
+    public void versionMismatch(long time)
+    {
+        lastPingTime = time;
+        status = Status.VERSION_MISMATCH;
     }
 
     public void failedPing(long time, String message)
@@ -148,6 +149,16 @@ public class SlaveAgent implements Agent
 
     public boolean isOnline()
     {
-        return status.ordinal() >= Status.BUILDING.ordinal();
+        return status == Status.IDLE || status == Status.BUILDING;
+    }
+
+    public boolean isEnabled()
+    {
+        return slave.isEnabled();
+    }
+
+    public boolean isAvailable()
+    {
+        return status == Status.IDLE;
     }
 }

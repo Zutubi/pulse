@@ -1,10 +1,14 @@
 package com.zutubi.pulse.agent;
 
-// IMPORTANT: more available statuses must appear later (ordinals are
-// compared).
-
 public enum Status
 {
+    DISABLED
+            {
+                public String getPrettyString()
+                {
+                    return "disabled";
+                }
+            },
     OFFLINE
             {
                 public String getPrettyString()

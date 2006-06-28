@@ -1,14 +1,14 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.CommandCommencedEvent;
 import com.zutubi.pulse.events.build.CommandCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeCommencedEvent;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
-import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -292,5 +292,10 @@ public class RecipeProcessor
         {
             runningLock.unlock();
         }
+    }
+
+    public long getBuildingRecipe()
+    {
+        return runningRecipe;
     }
 }
