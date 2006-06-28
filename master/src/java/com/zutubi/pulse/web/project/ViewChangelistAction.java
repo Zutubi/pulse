@@ -1,10 +1,7 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.ChangelistUtils;
-import com.zutubi.pulse.model.NamedEntityComparator;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -20,6 +17,7 @@ public class ViewChangelistAction extends ActionSupport
     private Changelist changelist;
     private ChangelistDao changelistDao;
     private BuildManager buildManager;
+    private CommitMessageHelper commitMessageHelper;
     private long buildId;
     /** This is the build result we have drilled down from, if any. */
     private BuildResult buildResult;
@@ -101,6 +99,11 @@ public class ViewChangelistAction extends ActionSupport
         return SUCCESS;
     }
 
+    public String transformComment(Changelist changelist)
+    {
+        return commitMessageHelper.applyTransforms(changelist);
+    }
+
     public void setChangelistDao(ChangelistDao changelistDao)
     {
         this.changelistDao = changelistDao;
@@ -114,5 +117,10 @@ public class ViewChangelistAction extends ActionSupport
     public List<BuildResult> getBuildResults()
     {
         return buildResults;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        commitMessageHelper = new CommitMessageHelper(projectManager);
     }
 }

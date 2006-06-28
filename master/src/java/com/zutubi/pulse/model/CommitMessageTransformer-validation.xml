@@ -1,0 +1,22 @@
+<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
+        "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
+<validators>
+    <field name="name">
+        <field-validator type="requiredstring">
+            <message key="commit.message.link.name.required">name is required</message>
+        </field-validator>
+    </field>
+    <field name="expression">
+        <field-validator type="requiredstring">
+            <message key="commit.message.link.expression.required">expression is required</message>
+        </field-validator>
+        <field-validator type="regex">
+            <message>${message}</message>
+        </field-validator>
+    </field>
+    <field name="replacement">
+        <field-validator type="requiredstring">
+            <message key="commit.message.link.url.required">url is required</message>
+        </field-validator>
+    </field>
+</validators>

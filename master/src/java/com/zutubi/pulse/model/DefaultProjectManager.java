@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
+import com.zutubi.pulse.model.persistence.CommitMessageTransformerDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.TriggerDao;
 import com.zutubi.pulse.scheduling.Scheduler;
@@ -24,6 +25,7 @@ public class DefaultProjectManager implements ProjectManager
     private ProjectDao projectDao;
     private BuildSpecificationDao buildSpecificationDao;
     private TriggerDao triggerDao;
+    private CommitMessageTransformerDao commitMessageTransformerDao;
     private Scheduler scheduler;
     private BuildManager buildManager;
     private SubscriptionManager subscriptionManager;
@@ -291,5 +293,40 @@ public class DefaultProjectManager implements ProjectManager
     public void setSubscriptionManager(SubscriptionManager subscriptionManager)
     {
         this.subscriptionManager = subscriptionManager;
+    }
+
+    public void save(CommitMessageTransformer transformer)
+    {
+        commitMessageTransformerDao.save(transformer);
+    }
+
+    public CommitMessageTransformer getCommitMessageTransformer(long id)
+    {
+        return commitMessageTransformerDao.findById(id);
+    }
+
+    public void delete(CommitMessageTransformer transformer)
+    {
+        commitMessageTransformerDao.delete(transformer);
+    }
+
+    public List<CommitMessageTransformer> getCommitMessageTransformers()
+    {
+        return commitMessageTransformerDao.findAll();
+    }
+
+    public List<CommitMessageTransformer> findCommitMessageTransformersByProject(Project project)
+    {
+        return commitMessageTransformerDao.findByProject(project);
+    }
+
+    public CommitMessageTransformer findCommitMessageTransformerByName(String name)
+    {
+        return commitMessageTransformerDao.findByName(name);
+    }
+
+    public void setCommitMessageTransformerDao(CommitMessageTransformerDao commitMessageTransformerDao)
+    {
+        this.commitMessageTransformerDao = commitMessageTransformerDao;
     }
 }

@@ -1082,6 +1082,26 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
+        <action name="addCommitMessageLink" class="com.zutubi.pulse.web.admin.CreateCommitMessageLinkAction">
+            <result name="input" type="velocity">/admin/create-commit-message-link.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="editCommitMessageLink" class="com.zutubi.pulse.web.admin.EditCommitMessageLinkAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">/admin/edit-commit-message-link.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="deleteCommitMessageLink" class="com.zutubi.pulse.web.admin.DeleteCommitMessageLinkAction">
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
     </package>
 
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">

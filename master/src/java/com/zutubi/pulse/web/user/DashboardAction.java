@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.web.project.CommitMessageHelper;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,6 +24,7 @@ public class DashboardAction extends ActionSupport
     private ProjectManager projectManager;
     private BuildManager buildManager;
     private UserManager userManager;
+    private CommitMessageHelper commitMessageHelper;
 
     public User getUser()
     {
@@ -136,5 +138,15 @@ public class DashboardAction extends ActionSupport
             // Compare the date.
             return -c1.getDate().compareTo(c2.getDate());
         }
+    }
+
+    public String transformComment(Changelist changelist)
+    {
+        if(commitMessageHelper == null)
+        {
+            commitMessageHelper = new CommitMessageHelper(projectManager);
+        }
+
+        return commitMessageHelper.applyTransforms(changelist, 60);
     }
 }

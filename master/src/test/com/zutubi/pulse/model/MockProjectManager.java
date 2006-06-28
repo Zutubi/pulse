@@ -98,6 +98,36 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public void save(CommitMessageTransformer transformer)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public CommitMessageTransformer getCommitMessageTransformer(long id)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public void delete(CommitMessageTransformer transformer)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public List<CommitMessageTransformer> getCommitMessageTransformers()
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public List<CommitMessageTransformer> findCommitMessageTransformersByProject(Project project)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public CommitMessageTransformer findCommitMessageTransformerByName(String name)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public void save(Project project)
     {
         if (project.getId() == 0)

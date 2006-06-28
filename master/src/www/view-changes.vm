@@ -30,7 +30,7 @@
             #rightCell($change.revision)
             #dynamicCell($change.user)
             #dateCell($change)
-            #dynamicCell($action.trimmedString($change.comment, 60))
+            #contentCell($action.transformComment($change))
             #linkCell("view" "viewChangelist.action?id=$change.id&buildId=$result.id")
         </tr>
         #if($change.changes.size() > 0)

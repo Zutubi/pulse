@@ -5,9 +5,7 @@ import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ChangelistUtils;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -22,6 +20,7 @@ public class ProjectHomeAction extends ProjectActionSupport
     private BuildResult currentBuild;
     private List<Changelist> latestChanges;
     private List<BuildResult> recentBuilds;
+    private CommitMessageHelper commitMessageHelper;
 
     public long getId()
     {
@@ -134,6 +133,16 @@ public class ProjectHomeAction extends ProjectActionSupport
         }
 
         return SUCCESS;
+    }
+
+    public String transformComment(Changelist changelist)
+    {
+        if(commitMessageHelper == null)
+        {
+            commitMessageHelper = new CommitMessageHelper(getProjectManager());
+        }
+
+        return commitMessageHelper.applyTransforms(changelist, 60);
     }
 
 }

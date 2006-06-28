@@ -20,6 +20,7 @@ public class ViewBuildAction extends ProjectActionSupport
     private BuildResult result;
     private List<Changelist> changelists;
     private long selectedNode;
+    private CommitMessageHelper commitMessageHelper;
 
     public long getId()
     {
@@ -103,4 +104,13 @@ public class ViewBuildAction extends ProjectActionSupport
         return changelists;
     }
 
+    public String transformComment(Changelist changelist)
+    {
+        if(commitMessageHelper == null)
+        {
+            commitMessageHelper = new CommitMessageHelper(getProjectManager());
+        }
+
+        return commitMessageHelper.applyTransforms(changelist, 60);
+    }
 }

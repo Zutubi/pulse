@@ -1,20 +1,17 @@
 package com.zutubi.pulse.test;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.AntPostProcessor;
 import com.zutubi.pulse.core.DirectoryArtifact;
-import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.JUnitReportPostProcessor;
+import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.model.persistence.ProjectDao;
-import com.zutubi.pulse.model.persistence.UserDao;
-import com.zutubi.pulse.model.persistence.SlaveDao;
-import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.persistence.*;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +32,8 @@ public class SetupFeatureTour implements Runnable
     private UserManager userManager;
     private MasterConfigurationManager configManager;
     private SlaveDao slaveDao;
+    private CommitMessageTransformerDao commitMessageTransformerDao;
+    private ChangelistDao changelistDao;
 
     private Slave slave;
     private Project project;
@@ -105,6 +104,7 @@ public class SetupFeatureTour implements Runnable
 
             setupUsers(project);
             createLogMessages();
+            createCommitLinks();
         }
     }
 
@@ -145,6 +145,12 @@ public class SetupFeatureTour implements Runnable
         {
             SetupFeatureTour.LOG.error("testing out the error method on our own custom logger too to see if it is any different to using the severe method on a regular logger (it shouldn't be, it is just an alias!)", e);
         }
+    }
+
+    private void createCommitLinks()
+    {
+        CommitMessageTransformer t = new CommitMessageTransformer("Jira", "CIB-[0-9]+", "http://jira.zutubi.com/browse/$0");
+        commitMessageTransformerDao.save(t);
     }
 
     private void throwMeSomething(String s)
@@ -272,7 +278,7 @@ public class SetupFeatureTour implements Runnable
     {
         List<Changelist> changes = new LinkedList<Changelist>();
 
-        while (Math.random() < 0.20)
+        while (Math.random() > 0.20)
         {
             String author = Math.random() > 0.3 ? "jsankey" : "dostermeier"; // ;)
 
@@ -474,6 +480,7 @@ public class SetupFeatureTour implements Runnable
             list.addChange(new Change(file, "3", Change.Action.EDIT));
         }
 
+        changelistDao.save(list);
         return list;
     }
 
@@ -505,5 +512,15 @@ public class SetupFeatureTour implements Runnable
     public void setSlaveDao(SlaveDao slaveDao)
     {
         this.slaveDao = slaveDao;
+    }
+
+    public void setCommitMessageTransformerDao(CommitMessageTransformerDao commitMessageTransformerDao)
+    {
+        this.commitMessageTransformerDao = commitMessageTransformerDao;
+    }
+
+    public void setChangelistDao(ChangelistDao changelistDao)
+    {
+        this.changelistDao = changelistDao;
     }
 }

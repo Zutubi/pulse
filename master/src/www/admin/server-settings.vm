@@ -22,6 +22,7 @@
                     #dynamicRow("license.holder.field" $license.holder)
                     #dynamicRow("license.expiry.field" $expiryDate)
                 </table>
+
                 <table id="general.config" class="fill-content">
                     #adminHeadingRow("general.config" "/admin/editGeneral!input.action" "general.edit" "/admin/general!reset.action" "general.reset")
                     #dynamicRow("general.host" $config.hostName)
@@ -29,9 +30,33 @@
                     #enabledDisabledRow("general.rss.enabled" $config.rssEnabled)
                     #enabledDisabledRow("general.anonymous" $config.anonymousAccessEnabled)
                 </table>
+
                 <table id="logging.config" class="fill-content">
                     #adminHeadingRow("logging.config" "/admin/editLogConfig!input.action" "logging.edit" "/admin/logConfig!reset.action" "logging.reset")
                     #dynamicRow("logging.level" $config.logConfig)
+                </table>
+
+                <table id="commit.message.links" class="fill-content">
+                    #headingRow("commit.message.links" 4)
+                    <tr>
+                        #contentHeading("commit.message.link.name" 1)
+                        #contentHeading("commit.message.link.expression" 1)
+                        #contentHeading("actions" 2)
+                    </tr>
+#if($commitMessageTransformers.size() > 0)
+    #foreach($link in $commitMessageTransformers)
+        #set($confirmMessage = $action.getText("commit.message.link.confirm.delete", [$link.name]))
+                    <tr>
+                        #dynamicCell($link.name)
+                        #dynamicCell($link.expression)
+                        #editCell("editCommitMessageLink!input.action?id=$link.id" "edit_$!webwork.htmlEncode($link.name)")
+                        #deleteCell("delete_$!webwork.htmlEncode($link.name)" "deleteCommitMessageLink.action?id=$link.id" $confirmMessage)
+                    </tr>
+    #end
+#else
+                    #contentRow("commit.message.links.none" 4)
+#end
+                    #addRow("commit.message.link.add" 4 "addCommitMessageLink!input.action" "commit.message.link.add")
                 </table>
             </td>
             <td class="columns" width="40%">
@@ -43,6 +68,7 @@
                     #dynamicRow("smtp.username" $config.smtpUsername)
                     <!-- Probably best we don't show the password -->
                 </table>
+
                 <table id="jabber.config" class="fill-content">
                     #adminHeadingRow("jabber.config" "/admin/editJabber!input.action" "jabber.edit" "/admin/jabber!reset.action" "jabber.reset")
 #if($jabberStatus)
@@ -56,6 +82,7 @@
                     <!-- Probably best we don't show the password -->
                     #dynamicRow("jabber.force.ssl" $config.jabberForceSSL.toString().toLowerCase())
                 </table>
+
                 <table id="ldap.config" class="fill-content">
                     #adminHeadingRow("ldap.config" "/admin/editLdap!input.action" "ldap.edit" "/admin/ldap!reset.action" "ldap.reset")
 #if($ldapStatus)

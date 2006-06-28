@@ -65,7 +65,7 @@
                     #rightCell($changelist.revision)
                     #dynamicCell($changelist.user)
                     #dateCell($changelist)
-                    #dynamicCell($action.trimmedString($changelist.comment, 60))
+                    #contentCell($action.transformComment($changelist))
                     #linkCell("view" "viewChangelist.action?id=$changelist.id")
                 </tr>
             #end

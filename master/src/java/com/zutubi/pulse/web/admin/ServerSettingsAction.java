@@ -5,12 +5,15 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseManager;
+import com.zutubi.pulse.model.CommitMessageTransformer;
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.security.ldap.LdapManager;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  */
@@ -23,6 +26,8 @@ public class ServerSettingsAction extends ActionSupport
     private DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
     private License license;
     private LdapManager ldapManager;
+    private List<CommitMessageTransformer> commitMessageTransformers;
+    private ProjectManager projectManager;
 
     public MasterApplicationConfiguration getConfig()
     {
@@ -39,11 +44,16 @@ public class ServerSettingsAction extends ActionSupport
         return ldapManager.getStatusMessage();
     }
 
+    public List<CommitMessageTransformer> getCommitMessageTransformers()
+    {
+        return commitMessageTransformers;
+    }
+
     public String execute() throws Exception
     {
         config = configurationManager.getAppConfig();
         license = licenseManager.getLicense();
-        
+        commitMessageTransformers = projectManager.getCommitMessageTransformers();
         return SUCCESS;
     }
 
@@ -80,5 +90,10 @@ public class ServerSettingsAction extends ActionSupport
     public void setLicenseManager(LicenseManager licenseManager)
     {
         this.licenseManager = licenseManager;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }
