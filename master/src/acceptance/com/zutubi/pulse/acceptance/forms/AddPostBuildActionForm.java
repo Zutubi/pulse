@@ -30,6 +30,6 @@ public class AddPostBuildActionForm extends BaseForm
     {
         super.assertFormPresent();
         tester.assertOptionValuesEqual("type", new String[]{ "tag", "exe" });
-        tester.assertOptionValuesEqual("stateNames", new String[] { "ERROR", "FAILURE", "SUCCESS" });
+        tester.assertOptionValuesEqual("stateNames", new String[] { "SUCCESS", "FAILURE", "ERROR" });
     }
 }

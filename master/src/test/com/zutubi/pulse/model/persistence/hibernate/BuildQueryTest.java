@@ -1,14 +1,14 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.util.ListUtils;
-import com.zutubi.pulse.util.Predicate;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.UnknownBuildReason;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
+import com.zutubi.pulse.util.ListUtils;
+import com.zutubi.pulse.util.Predicate;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,24 +48,24 @@ public class BuildQueryTest extends MasterPersistenceTestCase
         allResults = new LinkedList<BuildResult>();
 
         createBuild(p1, "default", 1, ResultState.SUCCESS, 10000, 11000, false);
-        createBuild(p2, "default", 1, ResultState.SUCCESS, 11500, 11900);
-        createBuild(p1, "overnight", 2, ResultState.SUCCESS, 12000, 13000, false);
-        createBuild(p2, "overnight", 2, ResultState.SUCCESS, 13333, 13999);
-        createBuild(p1, "default", 3, ResultState.FAILURE, 14000, 15000);
-        createBuild(p2, "borken", 3, ResultState.ERROR, 15000, 15821);
-        createBuild(p1, "default", 4, ResultState.SUCCESS, 16000, 17000);
-        createBuild(p2, "borken", 4, ResultState.ERROR, 17777, 17777);
-        createBuild(p1, "default", 5, ResultState.ERROR, 18000, 19000);
-        createBuild(p2, "borken", 5, ResultState.ERROR, 19005, 19006);
-        createBuild(p1, "overnight", 6, ResultState.ERROR, 20000, 21000, false);
-        createBuild(p2, "borken", 6, ResultState.ERROR, 21100, 21900);
-        createBuild(p1, "default", 7, ResultState.SUCCESS, 22000, 23000);
-        createBuild(p2, "default", 7, ResultState.SUCCESS, 23332, 23880);
-        createBuild(p1, "default", 8, ResultState.SUCCESS, 24000, 25000);
-        createBuild(p1, "overnight", 9, ResultState.FAILURE, 26000, 27000);
-        createBuild(p1, "default", 10, ResultState.SUCCESS, 28000, 29000);
-        createBuild(p2, "default", 8, ResultState.SUCCESS, 29001, 29999);
-        createBuild(p2, "overnight", 9, ResultState.FAILURE, 30000, 31000);
+        createBuild(p2, "default", 2, ResultState.SUCCESS, 11500, 11900);
+        createBuild(p1, "overnight", 3, ResultState.SUCCESS, 12000, 13000, false);
+        createBuild(p2, "overnight", 4, ResultState.SUCCESS, 13333, 13999);
+        createBuild(p1, "default", 5, ResultState.FAILURE, 14000, 15000);
+        createBuild(p2, "borken", 6, ResultState.ERROR, 15000, 15821);
+        createBuild(p1, "default", 7, ResultState.SUCCESS, 16000, 17000);
+        createBuild(p2, "borken", 8, ResultState.ERROR, 17777, 17777);
+        createBuild(p1, "default", 9, ResultState.ERROR, 18000, 19000);
+        createBuild(p2, "borken", 10, ResultState.ERROR, 19005, 19006);
+        createBuild(p1, "overnight", 11, ResultState.ERROR, 20000, 21000, false);
+        createBuild(p2, "borken", 12, ResultState.ERROR, 21100, 21900);
+        createBuild(p1, "default", 13, ResultState.SUCCESS, 22000, 23000);
+        createBuild(p2, "default", 14, ResultState.SUCCESS, 23332, 23880);
+        createBuild(p1, "default", 15, ResultState.SUCCESS, 24000, 25000);
+        createBuild(p2, "default", 16, ResultState.SUCCESS, 29001, 29999);
+        createBuild(p1, "overnight", 17, ResultState.FAILURE, 26000, 27000);
+        createBuild(p2, "overnight", 18, ResultState.FAILURE, 30000, 31000);
+        createBuild(p1, "default", 19, ResultState.SUCCESS, 28000, 29000);
     }
 
     private void createBuild(Project project, String spec, int number, ResultState state, int start, int end)

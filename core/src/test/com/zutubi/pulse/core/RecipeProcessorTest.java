@@ -3,14 +3,14 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,7 +71,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertCommandCompleted(1, ResultState.SUCCESS);
         assertRecipeCompleted(1, ResultState.SUCCESS);
         assertNoMoreEvents();
-        assertOutputFile(1, "greeting", "hello world\n");
+        assertOutputFile(1, "greeting", "hello world" + System.getProperty("line.separator"));
     }
 
     public void testExceptionDuringBootstrap() throws Exception

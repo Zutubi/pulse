@@ -29,6 +29,6 @@ public class EditTagActionForm extends BaseForm
     public void assertFormPresent()
     {
         super.assertFormPresent();
-        tester.assertOptionValuesEqual("stateNames", new String[] { "ERROR", "FAILURE", "SUCCESS" });
+        tester.assertOptionValuesEqual("stateNames", new String[] { "SUCCESS", "FAILURE", "ERROR" });
     }
 }

@@ -168,13 +168,20 @@ public enum ResultState
         return states;
     }
 
+    public static ResultState[] getCompletedStates()
+    {
+        return new ResultState[] { SUCCESS, FAILURE, ERROR };
+    }
+
     public static Map<String, String> getCompletedStatesMap()
     {
         Map<String, String> states = new LinkedHashMap<String, String>();
-        states.put(ResultState.ERROR.toString(), "error");
-        states.put(ResultState.FAILURE.toString(), "failure");
-        states.put(ResultState.SUCCESS.toString(), "success");
+        for(ResultState state: getCompletedStates())
+        {
+            states.put(state.toString(), state.toString().toLowerCase());
+        }
 
         return states;
     }
+
 }
