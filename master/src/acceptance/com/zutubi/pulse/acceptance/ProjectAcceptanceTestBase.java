@@ -14,7 +14,6 @@ public class ProjectAcceptanceTestBase extends BaseAcceptanceTest
 
     protected static final String DESCRIPTION = "test description";
     protected static final String URL = "http://test/url";
-    protected static final String TEST_CVSROOT = ":pserver:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
 
     protected String projectName;
     protected Type type;

@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.util.logging.Logger;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,7 +20,7 @@ public class CommitMessageTransformer extends Entity implements NamedEntity
     private static final Logger LOG = Logger.getLogger(CommitMessageTransformer.class);
 
     private String name;
-    private List<Long> projects;
+    private List<Long> projects = new LinkedList<Long>();
     /**
      * The regular expression to search for in commit messages.
      */

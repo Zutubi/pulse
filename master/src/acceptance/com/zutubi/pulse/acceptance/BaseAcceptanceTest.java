@@ -4,14 +4,20 @@ import com.meterware.httpunit.WebClient;
 import com.zutubi.pulse.acceptance.forms.CvsForm;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
 import junit.framework.Assert;
+import org.apache.xmlrpc.XmlRpcClient;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Vector;
 
 /**
  * <class-comment/>
  */
 public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
 {
+    protected static final String TEST_CVSROOT = ":pserver:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
+
     //---( administrations create user form )---
     private static final String FO_USER_CREATE = "newUser.create";
     protected static final String USER_CREATE_LOGIN = "newUser.login";
@@ -72,6 +78,31 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
         beginAt("/login.action");
         LoginForm loginForm = new LoginForm(tester);
         loginForm.loginFormElements("admin", "admin", "false");
+    }
+
+    protected Object callRemoteApi(String function, Object... args) throws Exception
+    {
+        URL url = new URL("http", "127.0.0.1", Integer.valueOf(port), "/xmlrpc");
+        XmlRpcClient client = new XmlRpcClient(url);
+        Vector<Object> argVector = new Vector<Object>();
+
+        // login as admin
+        argVector.add("admin");
+        argVector.add("admin");
+        String token = (String) client.execute("RemoteApi.login", argVector);
+
+        // Actual call
+        argVector.clear();
+        argVector.add(token);
+        argVector.addAll(Arrays.asList(args));
+        Object result = client.execute("RemoteApi." + function, argVector);
+
+        // Logout
+        argVector.clear();
+        argVector.add(token);
+        client.execute("RemoteApi.logout", argVector);
+
+        return result;
     }
 
     /**
@@ -161,6 +192,19 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
         setFormElement(PROJECT_BASICS_SCM, scm);
         setFormElement(PROJECT_BASICS_TYPE, type);
         submit("next");
+    }
+
+    protected void ensureProject(String name) throws Exception
+    {
+        Vector<String> projects = (Vector<String>) callRemoteApi("getAllProjectNames");
+        if(!projects.contains(name))
+        {
+            clickLinkWithText("projects");
+            clickLink("project.add");
+            submitProjectBasicsForm(name, "desc", "url", "cvs", "ant");
+            submitCvsSetupForm(TEST_CVSROOT, "module", "", "");
+            submitAntSetupForm();
+        }
     }
 
     public void assertAndClick(String name)

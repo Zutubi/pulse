@@ -193,7 +193,7 @@ public class RemoteApi
     }
 
     /**
-     * Update the specified users password.
+     * Updates the specified users password.
      *
      * @param token used to authenticate the request.
      *
@@ -216,6 +216,25 @@ public class RemoteApi
         userManager.setPassword(user, password);
         userManager.save(user);
         return true;
+    }
+
+    /**
+     * Deletes all commit message links, primarily for testing purposes.
+     *
+     * @param token used to authenticate the request
+     * @return the number of commit message links deleted
+     * @throws AuthenticationException if the token does not authorise administrator access
+     */
+    public int deleteAllCommitMessageLinks(String token) throws AuthenticationException
+    {
+        tokenManager.verifyAdmin(token);
+        List<CommitMessageTransformer> transformers = projectManager.getCommitMessageTransformers();
+        int result = transformers.size();
+        for(CommitMessageTransformer t: transformers)
+        {
+            projectManager.delete(t);
+        }
+        return result;
     }
 
     /**
