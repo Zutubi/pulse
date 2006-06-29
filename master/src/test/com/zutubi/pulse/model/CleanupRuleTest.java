@@ -2,10 +2,10 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.hibernate.MasterPersistenceTestCase;
+import com.zutubi.pulse.util.Constants;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,6 +41,8 @@ public class CleanupRuleTest extends MasterPersistenceTestCase
         b3 = createBuild(p1, "otherspec", 3, System.currentTimeMillis() - Constants.DAY * 3, ResultState.SUCCESS, true);
         b4 = createBuild(p1, 4, System.currentTimeMillis() - Constants.DAY * 2, ResultState.SUCCESS, true);
         b5 = createBuild(p1, 5, System.currentTimeMillis() - Constants.DAY * 1, ResultState.FAILURE, true);
+        // Create a build that has started but is not in progress yet: -1 timestamp
+        createBuild(p1, 6, -1, ResultState.INITIAL, true);
     }
 
     protected void tearDown() throws Exception
@@ -107,18 +109,21 @@ public class CleanupRuleTest extends MasterPersistenceTestCase
     private BuildResult createBuild(Project project, String spec, long number, long startTime, ResultState state, boolean hasWorkDir)
     {
         BuildResult result = new BuildResult(project, spec, number);
-        result.commence(startTime);
-        switch (state)
+        if(startTime >= 0)
         {
+            result.commence(startTime);
+            switch (state)
+            {
 
-            case ERROR:
-                result.error("wow");
-                break;
-            case FAILURE:
-                result.failure();
-                break;
+                case ERROR:
+                    result.error("wow");
+                    break;
+                case FAILURE:
+                    result.failure();
+                    break;
+            }
+            result.complete();
         }
-        result.complete();
         result.setHasWorkDir(hasWorkDir);
         buildResultDao.save(result);
         return result;

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project default-recipe="default">
     <recipe name="default">
-        <executable name="greeting" exe="echo" args="hello world"/>
+        <print name="greeting" message="hello world"/>
     </recipe>
 
     <recipe name="failure">

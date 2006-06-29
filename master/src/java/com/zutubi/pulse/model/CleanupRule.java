@@ -2,8 +2,8 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
+import com.zutubi.pulse.util.Constants;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -56,22 +56,28 @@ public class CleanupRule extends Entity
             hasWorkDir = true;
         }
 
+        ResultState[] allowedStates = states;
+        if(allowedStates == null)
+        {
+            allowedStates = ResultState.getCompletedStates();
+        }
+
         if(unit == CleanupUnit.BUILDS)
         {
             // See if there are too many builds of our states.  We assume here
             // we are called from within the build manager (so these two dao
             // calls are within the same transaction).
-            int total = dao.getBuildCount(project, states, hasWorkDir);
+            int total = dao.getBuildCount(project, allowedStates, hasWorkDir);
             if(total > limit)
             {
                 // Clean out the difference
-                return dao.queryBuilds(new Project[] { project }, states, null, 0, 0, hasWorkDir, 0, total - limit, false);
+                return dao.queryBuilds(new Project[] { project }, allowedStates, null, 0, 0, hasWorkDir, 0, total - limit, false);
             }
         }
         else
         {
             long startTime = System.currentTimeMillis() - limit * Constants.DAY;
-            return dao.queryBuilds(new Project[] { project }, states, null, 0, startTime, hasWorkDir, -1, -1, false);
+            return dao.queryBuilds(new Project[] { project }, allowedStates, null, 0, startTime, hasWorkDir, -1, -1, false);
         }
 
         return new LinkedList<BuildResult>();

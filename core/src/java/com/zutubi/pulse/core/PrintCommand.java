@@ -27,8 +27,16 @@ public class PrintCommand extends CommandSupport
      */
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
 
+    private boolean terminated = false;
+
     public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult result)
     {
+        if(terminated)
+        {
+            result.error("Terminated");
+            return;
+        }
+
         File outputFileDir = new File(outputDir, "command output");
         if (!outputFileDir.mkdir())
         {
@@ -73,5 +81,10 @@ public class PrintCommand extends CommandSupport
         ProcessArtifact p = new ProcessArtifact();
         processes.add(p);
         return p;
-    }    
+    }
+
+    public void terminate()
+    {
+        terminated = true;
+    }
 }

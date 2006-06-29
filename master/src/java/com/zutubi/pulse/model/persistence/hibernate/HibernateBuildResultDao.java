@@ -270,11 +270,11 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 
                 if(mostRecentFirst)
                 {
-                    criteria.addOrder(Order.desc("id"));
+                    criteria.addOrder(Order.desc("number"));
                 }
                 else
                 {
-                    criteria.addOrder(Order.asc("id"));
+                    criteria.addOrder(Order.asc("number"));
                 }
 
                 return criteria.list();
@@ -337,6 +337,8 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
         if(latestStartTime > 0)
         {
+            // CIB-446: Don't accept timestamps that are uninitialised
+            criteria.add(Expression.ge("stamps.startTime", 0L));
             criteria.add(Expression.le("stamps.startTime", latestStartTime));
         }
     }

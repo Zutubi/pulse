@@ -79,4 +79,8 @@ public enum ResultState
 
     public abstract String getString();
 
+    public static ResultState[] getCompletedStates()
+    {
+        return new ResultState[] { SUCCESS, FAILURE, ERROR };
+    }
 }
