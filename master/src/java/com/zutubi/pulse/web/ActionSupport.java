@@ -25,6 +25,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     protected static final String ERROR_STATUS_CODE = "javax.servlet.error.status_code";
     protected static final String ERROR_EXCEPTION = "javax.servlet.error.exception";
 
+    
     /**
      * Use our own text provider implementation. It would be nice if there was a way to replace
      * the textProvider used by the default action support.
