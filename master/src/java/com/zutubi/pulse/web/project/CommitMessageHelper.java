@@ -3,7 +3,6 @@ package com.zutubi.pulse.web.project;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.CommitMessageTransformer;
-import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.util.StringUtils;
 
 import java.util.List;
@@ -14,9 +13,9 @@ public class CommitMessageHelper
 {
     private List<CommitMessageTransformer> transformers;
 
-    public CommitMessageHelper(ProjectManager projectManager)
+    public CommitMessageHelper(List<CommitMessageTransformer> transformers)
     {
-        transformers = projectManager.getCommitMessageTransformers();
+        this.transformers = transformers;
     }
 
     public String applyTransforms(Changelist changelist)

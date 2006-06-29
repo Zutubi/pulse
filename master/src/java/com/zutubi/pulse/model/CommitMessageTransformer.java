@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -15,6 +16,8 @@ import java.util.regex.Pattern;
  */
 public class CommitMessageTransformer extends Entity implements NamedEntity
 {
+    private static final Logger LOG = Logger.getLogger(CommitMessageTransformer.class);
+
     private String name;
     private List<Long> projects;
     /**
@@ -105,7 +108,16 @@ public class CommitMessageTransformer extends Entity implements NamedEntity
 
         Matcher matcher = pattern.matcher(message);
         String r = "<a href='" + replacement + "'>$0</a>";
-        return matcher.replaceAll(r);
+
+        try
+        {
+            return matcher.replaceAll(r);
+        }
+        catch (IndexOutOfBoundsException e)
+        {
+            LOG.warning("Unable to apply commit message link '" + name + "': " + e.getMessage(), e);
+            return message;
+        }
     }
 
 }

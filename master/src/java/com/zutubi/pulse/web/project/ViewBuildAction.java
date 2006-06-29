@@ -108,7 +108,7 @@ public class ViewBuildAction extends ProjectActionSupport
     {
         if(commitMessageHelper == null)
         {
-            commitMessageHelper = new CommitMessageHelper(getProjectManager());
+            commitMessageHelper = new CommitMessageHelper(getProjectManager().getCommitMessageTransformers());
         }
 
         return commitMessageHelper.applyTransforms(changelist, 60);

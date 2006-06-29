@@ -144,7 +144,7 @@ public class DashboardAction extends ActionSupport
     {
         if(commitMessageHelper == null)
         {
-            commitMessageHelper = new CommitMessageHelper(projectManager);
+            commitMessageHelper = new CommitMessageHelper(projectManager.getCommitMessageTransformers());
         }
 
         return commitMessageHelper.applyTransforms(changelist, 60);

@@ -121,6 +121,6 @@ public class ViewChangelistAction extends ActionSupport
 
     public void setProjectManager(ProjectManager projectManager)
     {
-        commitMessageHelper = new CommitMessageHelper(projectManager);
+        commitMessageHelper = new CommitMessageHelper(projectManager.getCommitMessageTransformers());
     }
 }
