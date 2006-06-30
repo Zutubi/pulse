@@ -1,4 +1,4 @@
-#helpTag("Project+Artifact+Processors")
+#helpTag("Project+Post+Processors")
 #authorisationTags($principle)
 #projectTags($wizard.project)
 <html>
