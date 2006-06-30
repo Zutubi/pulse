@@ -6,5 +6,6 @@ package com.zutubi.pulse.bootstrap;
 public interface Startup
 {
     void init() throws StartupException;
+    
     long getUptime();
 }

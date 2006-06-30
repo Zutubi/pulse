@@ -64,30 +64,6 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
         return getDataConfig().getData();
     }
 
-    public boolean requiresSetup()
-    {
-        // At the moment, this is nice and simple. Do we have a data configured?
-        // and if so, is it valid.
-        Data data = getData();
-        if (data == null)
-        {
-            return true;
-        }
-        if (!data.isInitialised())
-        {
-            return true;
-        }
-
-        return false;
-
-        // In future, we may want to add further checks here to handle cases where
-        // the setup process has failed. ie:
-        // a) ensure that the database has been configured - checking a simple property in
-        //    the config will do.
-        // b) that an admin user exists...
-        // c) .. whatever else comes up...
-    }
-
     private DataConfiguration getDataConfig()
     {
         if (dataConfig == null)

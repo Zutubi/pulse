@@ -9,21 +9,24 @@
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/hibernateContext.xml</value>
             </list>
         </property>
+        <property name="upgradeContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/upgradeContext.xml</value>
+            </list>
+        </property>
         <property name="setupContexts">
             <list>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/userContext.xml</value>
             </list>
         </property>
+        <property name="startupContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/schedulingContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/builderContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/securityContext.xml</value>
+            </list>
+        </property>
     </bean>
-
-    <!--
-    Need to fix the loading of the upgradeContext.xml. At this point, no dataSource is defined,
-    forcing the upgradeManager to look it up using the ComponentContext. It would be preferable to
-    do something like is done above with the setupManager where it is given contexts to load.
-    Let the upgradeManager load these context first, then load the upgradeContext. A few things
-    will need to be rearranged if this is to be done.
-    -->
-    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/upgradeContext.xml"/>
 
     <!-- this spring object factory will ensure that WebWork Actions are autowired. -->
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>

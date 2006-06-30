@@ -1,8 +1,10 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.opensymphony.xwork.spring.SpringObjectFactory;
+import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -12,93 +14,146 @@ public class DefaultSetupManager implements SetupManager
 {
     private MasterConfigurationManager configurationManager;
     private StartupManager startupManager;
+    private UserManager userManager;
     private UpgradeManager upgradeManager;
 
     private List<String> daoContexts;
     private List<String> setupContexts;
+    private List<String> upgradeContexts;
+    private List<String> startupContexts;
 
-    public void setDaoContexts(List<String> daoContexts)
+    private SetupState state;
+
+    public SetupState getCurrentState()
     {
-        this.daoContexts = daoContexts;
+        return state;
     }
 
-    public void setSetupContexts(List<String> setupContexts)
+    public void startSetupWorkflow()
     {
-        this.setupContexts = setupContexts;
+        state = SetupState.STARTING;
+        if (isDataRequired())
+        {
+            // request data input.
+            state = SetupState.DATA;
+            return;
+        }
+        requestDataComplete();
     }
 
-    /**
-     * Prepare for the setup processing.
-     *
-     */
-    public void prepareSetup()
+    public void requestDataComplete()
     {
-        Data data = configurationManager.getData();
-        if (data == null || data.getData() == null)
+        state = SetupState.STARTING;
+        if (isLicenseRequired())
         {
-            throw new IllegalStateException("");
+            state = SetupState.LICENSE;
+            return;
         }
+        requestLicenseComplete();
+    }
 
-        try
-        {
-            data.init();
-        }
-        catch (IOException e)
-        {
-            throw new StartupException("Failed to initialise data directory.");
-        }
+    public void requestLicenseComplete()
+    {
+        state = SetupState.STARTING;
 
-        // load database context.
-        ComponentContext.addClassPathContextDefinitions(daoContexts.toArray(new String[daoContexts.size()]));
+        // load db contexts...
+        loadContexts(daoContexts);
 
         // create the database based on the hibernate configuration.
         DatabaseBootstrap dbBootstrap = (DatabaseBootstrap) ComponentContext.getBean("databaseBootstrap");
-        dbBootstrap.initialiseDatabase();
+        if (!dbBootstrap.schemaExists())
+        {
+            dbBootstrap.initialiseDatabase();
+        }
 
-        // load the setup contexts containing the beans required to continue the setup process.
-        ComponentContext.addClassPathContextDefinitions(setupContexts.toArray(new String[setupContexts.size()]));
+        loadContexts(upgradeContexts);
+
+        if (isUpgradeRequired())
+        {
+
+            state = SetupState.UPGRADE;
+            return;
+        }
+
+        requestUpgradeComplete();
     }
 
-    /**
-     * The setup processing is complete. We can now start the application.
-     */
-    public void setupComplete()
+    public void requestUpgradeComplete()
     {
-        if (systemRequiresSetup() || systemRequiresUpgrade())
+        state = SetupState.STARTING;
+
+        // load the setup contexts containing the beans required to continue the setup process.
+        loadContexts(setupContexts);
+
+        if (isSetupRequired())
         {
-            throw new IllegalStateException();
+            state = SetupState.SETUP;
+            return;
         }
+        requestSetupComplete();
+    }
+
+    public void requestSetupComplete()
+    {
+        state = SetupState.STARTING;
+
+        // load the remaining contexts.
+        loadContexts(startupContexts);
+
         startupManager.continueApplicationStartup();
     }
 
-    /**
-     * Check if the setup processing is required.
-     *
-     * @return true if the system requires setup, false otherwise.
-     */
-    public boolean systemRequiresSetup()
+    private void loadContexts(List<String> contexts)
     {
-        return !configurationManager.getData().isInitialised();
+        ComponentContext.addClassPathContextDefinitions(contexts.toArray(new String[contexts.size()]));
+        ComponentContext.autowire(this);
+
+        // xwork object factory refresh - need to ensure that it has a reference to the latest spring context.
+        SpringObjectFactory objFact = (SpringObjectFactory) ComponentContext.getBean("xworkObjectFactory");
+        if (objFact != null)
+        {
+            objFact.setApplicationContext(ComponentContext.getContext());
+        }
     }
 
-    /**
-     * Check if upgrading is required.
-     *
-     * @return true if the system data requires an upgrade, false otherwise.
-     */
-    public boolean systemRequiresUpgrade()
+    private boolean isDataRequired()
+    {
+        return configurationManager.getData() == null;
+    }
+
+    private boolean isLicenseRequired()
+    {
+        License l = configurationManager.getData().getLicense();
+        if (l != null)
+        {
+            //TODO: check if it is able to run the installed version.
+            return false;
+        }
+        else
+        {
+            // the license is invalid / failed to decode. We need a new one before continuing.
+            return true;
+        }
+    }
+
+    private boolean isUpgradeRequired()
     {
         return upgradeManager.isUpgradeRequired(configurationManager.getData());
     }
 
-    /**
-     * Required resources.
-     *
-     * @param configurationManager
-     */
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    private boolean isSetupRequired()
     {
-        this.configurationManager = configurationManager;
+        return userManager.getUserCount() == 0;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param userManager
+     */
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 
     /**
@@ -120,4 +175,35 @@ public class DefaultSetupManager implements SetupManager
     {
         this.upgradeManager = upgradeManager;
     }
+
+    /**
+     * Required resources.
+     *
+     * @param configurationManager
+     */
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+
+    public void setDaoContexts(List<String> daoContexts)
+    {
+        this.daoContexts = daoContexts;
+    }
+
+    public void setSetupContexts(List<String> setupContexts)
+    {
+        this.setupContexts = setupContexts;
+    }
+
+    public void setStartupContexts(List<String> startupContexts)
+    {
+        this.startupContexts = startupContexts;
+    }
+
+    public void setUpgradeContexts(List<String> upgradeContexts)
+    {
+        this.upgradeContexts = upgradeContexts;
+    }
+
 }

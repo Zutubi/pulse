@@ -9,7 +9,5 @@ public interface StartupManager extends Startup
 
     long getStartTime();
 
-    void startApplication();
-
     void continueApplicationStartup();
 }

@@ -2,15 +2,17 @@ package com.zutubi.pulse.web.setup;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.SetupManager;
 
 import java.io.File;
 
 /**
  * <class-comment/>
  */
-public class ConfigurePulseDataAction extends SetupActionSupport
+public class SetupDataAction extends SetupActionSupport
 {
     private MasterConfigurationManager configurationManager;
+    private SetupManager setupManager;
 
     private String data;
 
@@ -31,7 +33,7 @@ public class ConfigurePulseDataAction extends SetupActionSupport
         File data = new File(this.data);
         if (!data.exists() && !data.mkdirs())
         {
-            addFieldError("data", getText(""));
+            addFieldError("data", getText("Failed to create the specified data directory."));
         }
     }
 
@@ -54,33 +56,33 @@ public class ConfigurePulseDataAction extends SetupActionSupport
         return INPUT;
     }
 
-    public String execute()
+    public String execute() throws Exception
     {
         File home = new File(this.data);
         configurationManager.setPulseData(home);
-
-        // next we need to know if we need to upgrade or setup.
-        if (setupManager.systemRequiresSetup())
-        {
-            // need to setup the database
-            setupManager.prepareSetup();
-
-            return "setup";
-        }
-        else if (setupManager.systemRequiresUpgrade())
-        {
-            return "upgrade";
-        }
-        else
-        {
-            // this may take a little while, need to provide some user feedback.
-            setupManager.setupComplete();
-            return SUCCESS;
-        }
+        configurationManager.getData().init();
+        setupManager.requestDataComplete();
+        
+        return SUCCESS;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param configurationManager
+     */
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param setupManager
+     */
+    public void setSetupManager(SetupManager setupManager)
+    {
+        this.setupManager = setupManager;
     }
 }

@@ -60,7 +60,7 @@ public class DatabaseBootstrap implements ApplicationContextAware, Stoppable
         }
     }
 
-    private boolean schemaExists()
+    public boolean schemaExists()
     {
         return JDBCUtils.tableExists(dataSource, schemaTestTable);
     }

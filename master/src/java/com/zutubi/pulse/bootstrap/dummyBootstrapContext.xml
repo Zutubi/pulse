@@ -8,11 +8,6 @@
                 <value>com/zutubi/pulse/bootstrap/coreSubsystemContext.xml</value>
             </list>
         </property>
-        <property name="appContexts">
-            <list>
-                <value>com/zutubi/pulse/bootstrap/mainSubsystemContext.xml</value>
-            </list>
-        </property>
         <property name="setupContexts">
             <list>
                 <value>com/zutubi/pulse/bootstrap/configSubsystemContext.xml</value>

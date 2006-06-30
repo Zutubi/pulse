@@ -13,28 +13,6 @@
             <result name="success" type="redirect">/startup/starting.action</result>
         </action>
 
-        <!--
-        security should not be enabled at this stage, however, just in case the acegi
-        filter kickes in a little early, redirect to default.
-        -->
-        <action name="404" class="com.zutubi.pulse.web.StartupRedirectAction">
-            <result name="error" type="httpheader">
-                <param name="status">404</param>
-            </result>
-            <result name="success" type="redirect">/startup/starting.action</result>
-        </action>
-        
-        <!--
-        Add monitoring of the system startup - progress bar or something similar.
-        Feedback is king!
-        -->
-
-        <action name="404" class="com.zutubi.pulse.web.StartupRedirectAction">
-            <result name="error" type="httpheader">
-                <param name="status">404</param>
-            </result>
-            <result name="success" type="redirect">/startup/starting.action</result>
-        </action>
 
     </package>
 

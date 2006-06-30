@@ -11,7 +11,7 @@ public class PostUpgradeAction extends UpgradeActionSupport
 
     public String execute() throws Exception
     {
-        setupManager.setupComplete();
+        setupManager.requestUpgradeComplete();
         return SUCCESS;
     }
 

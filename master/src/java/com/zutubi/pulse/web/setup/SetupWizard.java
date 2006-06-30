@@ -1,5 +1,7 @@
 package com.zutubi.pulse.web.setup;
 
+import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.Validateable;
 import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
@@ -7,21 +9,15 @@ import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.web.DefaultAction;
 import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
 import com.zutubi.pulse.web.wizard.WizardCompleteState;
-import com.zutubi.pulse.license.LicenseDecoder;
-import com.zutubi.pulse.license.License;
-import com.zutubi.pulse.license.LicenseException;
-import com.zutubi.pulse.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
-import com.opensymphony.xwork.Validateable;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.io.IOException;
 import java.util.concurrent.Executors;
 
 /**
@@ -31,7 +27,6 @@ public class SetupWizard extends BaseWizard
 {
     private static final Logger LOG = Logger.getLogger(SetupWizard.class);
 
-    private LicenseState licenseState;
     private CreateAdminState createAdminState;
     private ServerSettingsState serverSettingsState;
 
@@ -42,12 +37,10 @@ public class SetupWizard extends BaseWizard
     public SetupWizard()
     {
         // create the admin user.
-        licenseState = new LicenseState(this, "license");
         createAdminState = new CreateAdminState(this, "admin");
         serverSettingsState = new ServerSettingsState(this, "settings");
 
-        addInitialState("license", licenseState);
-        addState("admin", createAdminState);
+        addInitialState("admin", createAdminState);
         addState("settings", serverSettingsState);
         addFinalState("success", new WizardCompleteState(this, "success"));
     }
@@ -55,20 +48,6 @@ public class SetupWizard extends BaseWizard
     public void process()
     {
         super.process();
-
-        // record the license details.
-        String licenseKey = licenseState.getLicense();
-        licenseKey = licenseKey.replaceAll("\n", "");
-        try
-        {
-            configurationManager.getData().updateLicenseKey(licenseKey);
-        }
-        catch (IOException e)
-        {
-            addActionError(e.getMessage());
-            LOG.severe(e.getMessage(), e);
-            return;
-        }
 
         // create the admin user.
         User admin = createAdminState.getAdmin();
@@ -105,7 +84,7 @@ public class SetupWizard extends BaseWizard
             {
                 public void run()
                 {
-                    setupManager.setupComplete();
+                    setupManager.requestSetupComplete();
                 }
             });
         }
@@ -144,56 +123,6 @@ public class SetupWizard extends BaseWizard
     public void setSetupManager(SetupManager setupManager)
     {
         this.setupManager = setupManager;
-    }
-
-    public class LicenseState extends BaseWizardState implements Validateable
-    {
-        private String license;
-
-        public LicenseState(Wizard wizard, String name)
-        {
-            super(wizard, name);
-        }
-
-        public String getLicense()
-        {
-            return license;
-        }
-
-        public void setLicense(String license)
-        {
-            this.license = license;
-        }
-
-        public String getNextStateName()
-        {
-            return createAdminState.getStateName();
-        }
-
-        public void validate()
-        {
-            // take the license string, strip out any '\n' chars and check it.
-            String licenseKey = license.replaceAll("\n", "");
-            LicenseDecoder decoder = new LicenseDecoder();
-            try
-            {
-                License l = decoder.decode(licenseKey.getBytes());
-                if (l == null)
-                {
-                    addFieldError("license", getTextProvider().getText("license.key.invalid"));
-                    return;
-                }
-                if (l.isExpired())
-                {
-                    addFieldError("license", getTextProvider().getText("license.key.expired"));
-
-                }
-            }
-            catch (LicenseException e)
-            {
-                addFieldError("license", getTextProvider().getText("license.decode.error"));
-            }
-        }
     }
 
     /**

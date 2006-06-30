@@ -46,8 +46,6 @@ public class DefaultStartupManager implements StartupManager
 
     private List<String> setupContexts;
 
-    private List<String> appContexts;
-
     private List<String> coreContexts;
 
     private List<String> startupRunnables = new LinkedList<String>();
@@ -81,16 +79,6 @@ public class DefaultStartupManager implements StartupManager
     public void setSetupContexts(List<String> setupContexts)
     {
         this.setupContexts = setupContexts;
-    }
-
-    /**
-     * Specify the spring contexts that need to be loaded to initialise the main system.
-     *
-     * @param appContexts
-     */
-    public void setAppContexts(List<String> appContexts)
-    {
-        this.appContexts = appContexts;
     }
 
     /**
@@ -137,17 +125,7 @@ public class DefaultStartupManager implements StartupManager
                 }
             });
 
-            // load the core context, common to all of the system configurations.
-            ComponentContext.addClassPathContextDefinitions(coreContexts.toArray(new String[coreContexts.size()]));
-
-            if (configurationManager.requiresSetup())
-            {
-                startConfiguration();
-            }
-            else
-            {
-                startApplication();
-            }
+            startApplicationSetup();
         }
         catch (Exception e)
         {
@@ -155,62 +133,39 @@ public class DefaultStartupManager implements StartupManager
         }
     }
 
-    public void continueStartup() throws Exception
-    {
-        // somehow we need to unload the setup spring context to ensure that its clear what is where.
-        // this includes shutting down the database connections if necessary....
-        // make sure that we dont 'unload/shutdown' the web server.
-
-        // now we start the application proper.
-        startApplication();
-    }
-
     /**
      * Start the configuration context.
      *
      * @throws Exception
      */
-    private void startConfiguration() throws Exception
+    private void startApplicationSetup() throws Exception
     {
+        // load the core context, common to all of the system configurations.
+        ComponentContext.addClassPathContextDefinitions(coreContexts.toArray(new String[coreContexts.size()]));
+
+        // load the setup context. we do not expect this to take long, so we dont worry about a holding page here.
+        ComponentContext.addClassPathContextDefinitions(setupContexts.toArray(new String[setupContexts.size()]));
+
         // startup the web server.
         WebManager webManager = (WebManager) ComponentContext.getBean("webManager");
-
-        // load the application context. we do not expect this to take long, so we dont worry about
-        // a holding page here.
-        ComponentContext.addClassPathContextDefinitions(setupContexts.toArray(new String[setupContexts.size()]));
 
         // i) set the system starting pages (periodically refresh)
         webManager.deploySetup();
 
         // let the user know that they should continue / complete the setup process via the Web UI.
         int serverPort = configurationManager.getAppConfig().getServerPort();
-        System.err.println("Now go to http://localhost:"+serverPort+" to complete the setup.");
-    }
 
-    /**
-     * Start the main application context.
-     *
-     */
-    public void startApplication()
-    {
-        // loading here will take some time. So, we need to provide some feedback to the
-        // user about what is going on. We do this by loading a temporary webapp that contains a startup ui.
+        //TODO: I18N this message - note, this also only works if the user is installing on the local
+        //TODO: machine. We need to provide a better (widely applicable) URL.
+        System.err.println("Now go to http://localhost:"+serverPort+" and follow the prompts.");
 
-        // startup the web server.
-        WebManager webManager = (WebManager) ComponentContext.getBean("webManager");
-
-        // i) set the system starting pages (periodically refresh)
-        webManager.deployStartup();
-
-        continueApplicationStartup();
+        SetupManager setupManager = (SetupManager) ComponentContext.getBean("setupManager");
+        setupManager.startSetupWorkflow();
     }
 
     public void continueApplicationStartup()
     {
         WebManager webManager = (WebManager) ComponentContext.getBean("webManager");
-
-        // load the application context.
-        ComponentContext.addClassPathContextDefinitions(appContexts.toArray(new String[appContexts.size()]));
 
         // handle the initialisation of the security manager, since this can not be done within the spring context file.
         AcegiSecurityManager securityManager = (AcegiSecurityManager) ComponentContext.getBean("securityManager");
@@ -221,7 +176,6 @@ public class DefaultStartupManager implements StartupManager
         runStartupTasks();
 
         // ii) time to deploy the may application.
-
         webManager.deployMain();
 
         // record the start time
@@ -233,6 +187,8 @@ public class DefaultStartupManager implements StartupManager
 
         // let the user know that the system is now up and running.
         int serverPort = configurationManager.getAppConfig().getServerPort();
+
+        //TODO: I18N this message.
         System.err.println("The server is now available at http://localhost:"+serverPort+".");
     }
 

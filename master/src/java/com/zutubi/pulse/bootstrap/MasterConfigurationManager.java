@@ -22,12 +22,5 @@ public interface MasterConfigurationManager extends ConfigurationManager, DataRe
 
     Data getData();
 
-    /**
-     * Returns true if the system is not completely configured.
-     *
-     * @return true if further configuration is required.
-     */
-    boolean requiresSetup();
-
     File getHomeDirectory();
 }

@@ -5,11 +5,15 @@ package com.zutubi.pulse.bootstrap;
  */
 public interface SetupManager
 {
-    void prepareSetup();
+    SetupState getCurrentState();
 
-    void setupComplete();
+    void startSetupWorkflow();
 
-    boolean systemRequiresSetup();
+    void requestDataComplete();
 
-    boolean systemRequiresUpgrade();
+    void requestLicenseComplete();
+
+    void requestUpgradeComplete();
+
+    void requestSetupComplete();
 }

@@ -7,7 +7,7 @@
         <default-interceptor-ref name="completeStack"/>
 
         <action name="default" class="com.zutubi.pulse.web.ActionSupport">
-            <result name="success" type="redirect">/setup/setup!input.action</result>
+            <result name="success" type="redirect">/setup/setup.action</result>
         </action>
 
         <action name="404" class="com.zutubi.pulse.web.FourOhFourAction">
@@ -15,22 +15,41 @@
             <result name="starting" type="velocity">404-starting.vm</result>
         </action>
 
+<!--
+        <action name="404" class="com.zutubi.pulse.web.StartupRedirectAction">
+            <result name="error" type="httpheader">
+                <param name="status">404</param>
+            </result>
+            <result name="success" type="redirect">/startup/starting.action</result>
+        </action>
+-->
+
     </package>
 
     <package name="setup" namespace="/setup" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="setup" class="com.zutubi.pulse.web.setup.ConfigurePulseDataAction">
-            <result name="input" type="velocity">/setup/configure-pulsedata.vm</result>
+        <action name="setup" class="com.zutubi.pulse.web.setup.SetupWorkflowAction">
+            <result name="data" type="redirect">/setup/setupData!input.action</result>
             <result name="setup" type="redirect">/setup/setupWizard.action</result>
+            <result name="license" type="redirect">/setup/setupLicense!input.action</result>
             <result name="upgrade" type="redirect">/upgrade/preview.action</result>
+            <result name="success" type="redirect">/</result>
+        </action>
+
+        <action name="setupData" class="com.zutubi.pulse.web.setup.SetupDataAction">
+            <result name="input" type="velocity">/setup/configure-pulsedata.vm</result>
+            <result name="success" type="redirect">/</result>
+        </action>
+
+        <action name="setupLicense" class="com.zutubi.pulse.web.setup.SetupLicenseAction">
+            <result name="input" type="velocity">/setup/configure-license.vm</result>
             <result name="success" type="redirect">/</result>
         </action>
 
         <action name="setupWizard" class="com.zutubi.pulse.web.wizard.WizardAction">
             <interceptor-ref name="wizardStack"/>
             <param name="wizardClass">com.zutubi.pulse.web.setup.SetupWizard</param>
-            <result name="license" type="velocity">/setup/configure-license.vm</result>
             <result name="admin" type="velocity">/setup/create-admin.vm</result>
             <result name="settings" type="velocity">/setup/server-settings.vm</result>
             <result name="cancel" type="redirect">/default.action</result>
@@ -64,5 +83,13 @@
 
     </package>
 
+    <package name="startup" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="starting" class="com.zutubi.pulse.web.ActionSupport">
+            <result name="success" type="velocity">system-starting.vm</result>
+        </action>
+
+    </package>
 
 </xwork>
