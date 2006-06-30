@@ -231,11 +231,17 @@ public abstract class ListAction extends FileSystemActionSupport
             return this.file.getName();
         }
 
+/*
         public String getUid()
         {
             return encode(this.file.getPath());
         }
-
+*/
+        public String getSeparator()
+        {
+            return File.separator;
+        }
+        
         public String getFid()
         {
             return encode(this.getName());
@@ -243,7 +249,11 @@ public abstract class ListAction extends FileSystemActionSupport
 
         public String getType()
         {
-            if (file.isDirectory() || isRoot(file))
+            if (isRoot(file))
+            {
+                return "root";
+            }
+            else if (file.isDirectory())
             {
                 return "folder";
             }

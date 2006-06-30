@@ -24,6 +24,10 @@ span.node {
     padding-left: 1.6em;
 }
 
+span.root {
+    background-image: url(../../images/tree/drive.png);
+}
+
 span.folder {
     background-image: url(../../images/tree/foldericon.png);
 }

@@ -26,6 +26,7 @@ Create an object of the following format:
                             <pair key="file">name</pair>
                             <pair key="type">type</pair>
                             <pair key="fid">fid</pair>
+                            <pair key="separator">separator</pair>
                         </object>
                     </array>
                 </pair>

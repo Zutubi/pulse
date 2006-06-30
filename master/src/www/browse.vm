@@ -4,22 +4,38 @@
     <title>browse</title>
     <script type="text/javascript">
         <!--
-                function openPopup()
-                {
-                    var formElement = document.forms['my.form'].elements['initPath'];
-                    window.open('popups/browse-popup.action?formname=my.form&fieldname=initPath&initPath=' + formElement.value, 'browse_popup', 'width=500, height=650, resizable=yes', false);
-                    return false
-                }
+        function openPopup()
+        {
+            var formElement = document.forms['my.form'].elements['initPath'];
+            window.open('popups/browse-popup.action?formname=my.form&fieldname=initPath&initPath=' + formElement.value, 'browse_popup', 'width=500, height=650, resizable=yes', false);
+            return false
+        }
+
+        function openPopup2()
+        {
+            var formElement = document.forms['my.form'].elements['initPath'];
+            window.open('popups/browse-yahoo.action?formname=my.other.form&fieldname=other.initPath&initPath=' + formElement.value, 'browse_popup', 'width=500, height=650, resizable=yes', false);
+            return false
+        }
         //-->
     </script>
 </head>
     <body>
 
-    <p>blurb</p>
+    <p>Home grown.</p>
     <div style="margin:5em 2em;">
         <form name="my.form" action="dd">
             <input type="text" name="initPath" size="60"/>
             <input type="submit" value="browse" onClick="return openPopup();"/>
+            <input type="submit" value="next"/>
+            <input type="reset" value="clear"/>
+        </form>
+    </div>
+    <p>Yahoo browse.</p>
+    <div style="margin:5em 2em;">
+        <form name="my.other.form" action="blah">
+            <input type="text" name="other.initPath" size="60"/>
+            <input type="submit" value="browse" onClick="return openPopup2();"/>
             <input type="submit" value="next"/>
             <input type="reset" value="clear"/>
         </form>

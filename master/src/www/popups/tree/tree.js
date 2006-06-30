@@ -882,14 +882,8 @@ Object.extend(ZUTUBI.widget.Node.prototype = {
 
         // select this node.
         Element.addClassName(this.getNodeEl(), "selected");
-    },
-
-    getPath: function()
-    {
-        return "";
     }
 });
-
 
 /**
  * The Root node is the base node for the TreeView. This node is not displayed, but rather
@@ -903,142 +897,165 @@ ZUTUBI.widget.RootNode = function(tree)
 	this.tree = tree;
 };
 
-ZUTUBI.widget.RootNode.prototype = new ZUTUBI.widget.Node();
-
-/**
- * Override the default implementation of getHtml(), the root node
- * only displays its children, not itself.
- */
-ZUTUBI.widget.RootNode.prototype._render = function()
-{
-    // create the children structural anchor point and then render the children.
-    if (!this._isRendered())
+Object.extend(ZUTUBI.widget.RootNode.prototype, ZUTUBI.widget.Node.prototype);
+Object.extend(ZUTUBI.widget.RootNode.prototype, {
+    /**
+     * Override the default implementation of getHtml(), the root node
+     * only displays its children, not itself.
+     *
+     * @Override
+     */
+    _render: function()
     {
-        // render structure to the dom.
-        this._renderStructure();
-    }
-
-    this._renderChildren();
-};
-
-ZUTUBI.widget.RootNode.prototype._isRendered = function()
-{
-    return this.getChildrenEl() != null;
-}
-
-ZUTUBI.widget.RootNode.prototype._renderStructure = function()
-{
-    var anchorPoint = document.getElementById(this.tree.id);
-
-    var ul = document.createElement("ul");
-    ul.setAttribute("id", this.getChildrenElId());
-
-    anchorPoint.appendChild(ul);
-}
-
-/**
- *
- *
- *
- */
-ZUTUBI.widget.FileNode = function(parent)
-{
-    this.initialize(parent);
-}
-
-ZUTUBI.widget.FileNode.prototype = new ZUTUBI.widget.Node();
-
-ZUTUBI.widget.FileNode.prototype.isFolder = function()
-{
-    return this.data.type == "folder";
-}
-
-ZUTUBI.widget.FileNode.prototype._renderNode = function()
-{
-    // the element is the element that would be returned by this.getNodeEl();
-    var anchorPoint = this.getNodeEl();
-    // replace any existing content.
-    $A(anchorPoint.childNodes).each(function(element)
-    {
-        Element.remove(element);
-    });
-
-    // render image.
-    if (this.isFolder())
-    {
-        if (this.expanded)
+        // create the children structural anchor point and then render the children.
+        if (!this._isRendered())
         {
-            Element.addClassName(anchorPoint, "openfolder");
+            // render structure to the dom.
+            this._renderStructure();
+        }
+
+        this._renderChildren();
+    },
+
+    /**
+     * @Override
+     */
+    _isRendered: function()
+    {
+        return this.getChildrenEl() != null;
+    },
+
+    /**
+     * @Override
+     */
+    _renderStructure: function()
+    {
+        var anchorPoint = document.getElementById(this.tree.id);
+
+        var ul = document.createElement("ul");
+        ul.setAttribute("id", this.getChildrenElId());
+
+        anchorPoint.appendChild(ul);
+    }
+});
+
+
+ZUTUBI.widget.FileNode = Class.create();
+
+Object.extend(ZUTUBI.widget.FileNode.prototype, ZUTUBI.widget.Node.prototype);
+Object.extend(ZUTUBI.widget.FileNode.prototype, {
+
+    isFolder: function()
+    {
+        return this.data.type == "folder" || this.isRoot();
+    },
+
+    isRoot: function()
+    {
+        return this.data.type == "root";
+    },
+
+    _renderNode: function()
+    {
+        // the element is the element that would be returned by this.getNodeEl();
+        var anchorPoint = this.getNodeEl();
+        // replace any existing content.
+        $A(anchorPoint.childNodes).each(function(element)
+        {
+            Element.remove(element);
+        });
+
+        // render image.
+        if (this.isFolder() && !this.isRoot())
+        {
+            if (this.expanded)
+            {
+                Element.addClassName(anchorPoint, "openfolder");
+            }
+            else
+            {
+                Element.addClassName(anchorPoint, "folder");
+            }
         }
         else
         {
-            Element.addClassName(anchorPoint, "folder");
+            Element.addClassName(anchorPoint, this.data.type);
         }
-    }
-    else
+        Element.addClassName(anchorPoint, "node");
+
+        // render text.
+        var span = document.createElement("span");
+        span.appendChild(document.createTextNode(this.data.name));
+        span.setAttribute("id", "fn_" + this.index);
+
+        anchorPoint.appendChild(span);
+
+        // is this node selected?
+        if (this.tree.isSelected(this))
+        {
+            Element.addClassName(span, "selected");
+        }
+
+        Event.observe(span, 'click', this.tree._selectionHandler.bindAsEventListener(span), true);
+    },
+
+    onExpand: function()
     {
-        Element.addClassName(anchorPoint, this.data.type);
-    }
-    Element.addClassName(anchorPoint, "node");
+        if (this.isRoot())
+        {
+            return;
+        }
+        // open the folder.
+        var element = this.getNodeEl();
+        Element.removeClassName(element, "folder");
+        Element.addClassName(element, "openfolder");
+    },
 
-    // render text.
-    var span = document.createElement("span");
-    span.appendChild(document.createTextNode(this.data.name));
-    span.setAttribute("id", "fn_" + this.index);
-
-    anchorPoint.appendChild(span);
-
-    // is this node selected?
-    if (this.tree.isSelected(this))
+    onCollapse: function()
     {
-        Element.addClassName(span, "selected");
-    }
+        if (this.isRoot())
+        {
+            return;
+        }
+        // open the folder.
+        var element = this.getNodeEl();
 
-    Event.observe(span, 'click', this.tree._selectionHandler.bindAsEventListener(span), true);
-}
+        Element.removeClassName(element, "openfolder");
+        Element.addClassName(element, "folder");
+    },
 
-ZUTUBI.widget.FileNode.prototype.onExpand = function()
-{
-    // open the folder.
-    var element = this.getNodeEl();
-
-    Element.removeClassName(element, "folder");
-    Element.addClassName(element, "openfolder");
-}
-
-ZUTUBI.widget.FileNode.prototype.onCollapse = function()
-{
-    // open the folder.
-    var element = this.getNodeEl();
-
-    Element.removeClassName(element, "openfolder");
-    Element.addClassName(element, "folder");
-}
-
-ZUTUBI.widget.FileNode.prototype.onSelect = function()
-{
-    var selectedEls = document.getElementsByClassName("selected");
-    $A(selectedEls).each(function(element)
+    onSelect: function()
     {
-        Element.removeClassName(element, "selected");
-    });
+        var selectedEls = document.getElementsByClassName("selected");
+        $A(selectedEls).each(function(element)
+        {
+            Element.removeClassName(element, "selected");
+        });
 
-    var text = document.getElementById("fn_" + this.index);
-    Element.addClassName(text, "selected");
-}
+        var text = document.getElementById("fn_" + this.index);
+        Element.addClassName(text, "selected");
+    },
 
-ZUTUBI.widget.FileNode.prototype.getPath = function()
-{
-    var path = "";
-    // need to be a little careful. the root node does not have a path function.
-    if (this.getParent() && this.getParent().getPath)
+    getPath: function()
     {
-        path = this.getParent().getPath();
+        var path = this.data.name;
+        // need to be a little careful. the root node does not have a path function.
+        if (this.getParent() && this.getParent().getPath)
+        {
+            if (this.getParent().isRoot())
+            {
+                path = this.getParent().getPath() + path;
+            }
+            else
+            {
+                path = this.getParent().getPath() + this.data.separator + path;
+            }
+        }
+        //TODO: replace hard wired '/' with file system specific value.
+//        console.log("FileNode: %s, %s, %s", this.isRoot(), this.data.name, this.data.type);
+        return path;
     }
-    //TODO: replace hard wired '/' with file system specific value.
-    path = path + "/" + this.data.name;
-    return path;
-}
+});
 
 function getCurrentEvent(event)
 {

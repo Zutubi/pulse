@@ -83,7 +83,8 @@ ZUTUBI.fs.listResponse = function(response)
             newNode.data = {
                 "id":jsonObj.listing[i].fid,
                 "name":jsonObj.listing[i].file,
-                "type":jsonObj.listing[i].type
+                "type":jsonObj.listing[i].type,
+                "separator":jsonObj.listing[i].separator
             };
             newNode.isLeaf = !newNode.isFolder();
         }
