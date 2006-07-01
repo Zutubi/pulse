@@ -223,6 +223,11 @@ public class DefaultUpgradeManager implements UpgradeManager
                 {
                     monitor.start(task);
                     task.execute(context);
+                    if (task.hasFailed())
+                    {
+                        // use an exception to break out to the task failure handling.
+                        throw new UpgradeException();
+                    }
                     monitor.complete(task);
                 }
                 else
@@ -241,6 +246,10 @@ public class DefaultUpgradeManager implements UpgradeManager
         }
 
         monitor.setPercentageComplete(99);
+
+        // TODO: improve UI feedback for abort situation so that the user knows what is going on.
+        // if upgrade aborted due to a failure, then the user will need to go back to there backup
+        // of the data directory and upgrade again once the problem has been sorted out.
 
         // commit the upgrade by updating the data version details.
         try

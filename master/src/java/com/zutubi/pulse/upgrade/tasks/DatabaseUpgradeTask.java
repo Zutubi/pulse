@@ -70,5 +70,10 @@ public abstract class DatabaseUpgradeTask implements UpgradeTask, DataSourceAwar
         }
     }
 
+    public boolean hasFailed()
+    {
+        return getErrors().size() > 0;
+    }
+
     public abstract void execute(UpgradeContext context, Connection con) throws SQLException;
 }

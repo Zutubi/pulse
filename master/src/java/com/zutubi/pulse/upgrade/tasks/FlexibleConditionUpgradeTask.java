@@ -153,6 +153,11 @@ public class FlexibleConditionUpgradeTask implements UpgradeTask, DataSourceAwar
         return errors;
     }
 
+    public boolean hasFailed()
+    {
+        return getErrors().size() > 0;
+    }
+
     public boolean haltOnFailure()
     {
         return false;
