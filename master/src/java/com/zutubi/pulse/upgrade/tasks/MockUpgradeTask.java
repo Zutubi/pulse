@@ -48,6 +48,11 @@ public class MockUpgradeTask implements UpgradeTask
         return Collections.EMPTY_LIST;
     }
 
+    public boolean hasFailed()
+    {
+        return getErrors().size() > 0;
+    }
+
     public boolean haltOnFailure()
     {
         return false;

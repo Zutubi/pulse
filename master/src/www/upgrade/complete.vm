@@ -5,7 +5,7 @@
 
 <body>
 
-<h1>Upgrade Complete</h1>
+<h1>Upgrade #if ($monitor.isSuccessful()) Complete.#else Failed#end</h1>
 
 <p>
     The upgrade has been#if ($monitor.isSuccessful()) successful.#else unsuccessful#end
@@ -45,7 +45,12 @@
     Total time: $monitor.getElaspedTime()
 </p>
 <p>
-The upgrade has completed. <a href="continue.action">continue</a>.
+#if ($monitor.isSuccessful())
+    The upgrade has completed. <a href="continue.action">continue</a>.
+#else
+    The upgrade has failed. Please report this failure to <a href="mailto:support@zutubi.com">zutubi support</a>,
+    including a screenshot of this page and your server log files.
+#end
 </p>
 </body>
 </html>

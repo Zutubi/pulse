@@ -57,4 +57,11 @@ public interface UpgradeTask
      * then we can continue.
      */
     boolean haltOnFailure();
+
+    /**
+     * Indicates whether or not the processing of this upgrade task has failed.
+     *
+     * @return true if the task has failed, false otherwise.
+     */
+    boolean hasFailed();
 }

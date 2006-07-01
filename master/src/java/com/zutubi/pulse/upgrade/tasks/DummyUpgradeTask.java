@@ -76,6 +76,11 @@ public class DummyUpgradeTask implements UpgradeTask
         return null;
     }
 
+    public boolean hasFailed()
+    {
+        return false;
+    }
+
     public boolean haltOnFailure()
     {
         return haltOnError;

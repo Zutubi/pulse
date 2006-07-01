@@ -44,12 +44,17 @@ public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
 
     public String getName()
     {
-        return "Schema upgrade";
+        return "Schema upgrade (" + getBuildNumber() + ")";
     }
 
     public List<String> getErrors()
     {
         return errors;
+    }
+
+    public boolean hasFailed()
+    {
+        return getErrors().size() > 0;
     }
 
     public boolean haltOnFailure()
@@ -82,6 +87,9 @@ public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
 
             // run the schema update.
             new SchemaUpdate(config, props).execute(true, true);
+
+            //TODO: Somehow we need to monitor the SchemaUpdate to check for failures. Currently, it just
+            //TODO: swallows any exceptions :|
         }
         catch (IOException e)
         {
