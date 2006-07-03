@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.core.model.ResourceProperty;
+
+import java.util.*;
 
 /**
  * <class-comment/>
@@ -12,6 +13,16 @@ public class Scope
     private Scope parent;
 
     private Map<String, Reference> references = new HashMap<String, Reference>();
+    /**
+     * Variables to add to the environment when launching child processes in
+     * this scope.
+     */
+    private Map<String, String> environment = new TreeMap<String, String>();
+    /**
+     * Directories search before the PATH when launching child processed in this
+     * scope.
+     */
+    private Map<String, String> pathDirectories = new TreeMap<String, String>();
 
     public Scope()
     {
@@ -84,6 +95,54 @@ public class Scope
         for (Reference v : references.values())
         {
             setReference(v);
+        }
+    }
+
+    public Map<String, String> getEnvironment()
+    {
+        Map<String, String> merged = new TreeMap<String, String>();
+        if(parent != null)
+        {
+            merged.putAll(parent.getEnvironment());
+        }
+
+        merged.putAll(environment);
+        return merged;
+    }
+
+    public Map<String, String> getPathDirectories()
+    {
+        Map<String, String> merged = new TreeMap<String, String>();
+        if(parent != null)
+        {
+            merged.putAll(parent.getPathDirectories());
+        }
+
+        merged.putAll(pathDirectories);
+        return merged;
+    }
+
+    public void add(Collection<ResourceProperty> properties)
+    {
+        for(ResourceProperty resourceProperty: properties)
+        {
+            add(resourceProperty);
+        }
+    }
+
+    public void add(ResourceProperty resourceProperty)
+    {
+        Property property = new Property(resourceProperty.getName(), resourceProperty.getValue());
+        add(property);
+
+        if(resourceProperty.getAddToEnvironment())
+        {
+            environment.put(property.getName(), property.getValue());
+        }
+
+        if(resourceProperty.getAddToPath())
+        {
+            pathDirectories.put(property.getName(), property.getValue());
         }
     }
 }

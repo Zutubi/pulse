@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResourceVersion;
 
 import java.io.InputStream;
@@ -30,7 +30,7 @@ public class ResourceFileLoader
         loader.setObjectFactory(new ObjectFactory());
         loader.register("resource", Resource.class);
         loader.register("version", ResourceVersion.class);
-        loader.register("property", Property.class);
+        loader.register("property", ResourceProperty.class);
         return loader;
     }
 }

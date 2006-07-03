@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResourceVersion;
 import com.zutubi.pulse.test.PulseTestCase;
 
@@ -42,7 +42,7 @@ public class ResourceRepositoryTest extends PulseTestCase
 
         Resource resource = repo.getResource("aResource");
         assertNotNull(resource);
-        Map<String, Property> props = resource.getProperties();
+        Map<String, ResourceProperty> props = resource.getProperties();
         assertEquals(1, props.size());
         assertEquals("b", props.get("a").getValue());
     }
@@ -60,7 +60,7 @@ public class ResourceRepositoryTest extends PulseTestCase
         ResourceVersion version = resource.getVersion("aVersion");
         assertNotNull(version);
 
-        Map<String, Property> props = version.getProperties();
+        Map<String, ResourceProperty> props = version.getProperties();
         assertEquals(2, props.size());
         assertEquals("c", props.get("b").getValue());
         assertEquals("e", props.get("d").getValue());

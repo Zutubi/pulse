@@ -17,8 +17,12 @@
 
     #wwtextfield("name=newName" "label=%{getText('property.name')}" "required=true" "tabindex=1")
     #wwtextfield("name=newValue" "label=%{getText('property.value')}" "size=60" "tabindex=2")
+    #wwcheckbox("name=newAddToEnvironment" "label=%{getText('property.add.to.environment')}" "tabindex=3")
+    #inlineHelp("property.add.to.environment.help")
+    #wwcheckbox("name=newAddToPath" "label=%{getText('property.add.to.path')}" "tabindex=4")
+    #inlineHelp("property.add.to.path.help")
 
-    #saveCancel(3)
+    #saveCancel(5)
 #end
 
     #tabEnd()

@@ -3,9 +3,9 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.model.ResourceRequirement;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.io.ByteArrayInputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Convenience class for creating loaders for pulse files with types registered.
@@ -43,7 +43,7 @@ public class PulseFileLoader extends FileLoader
 
         PulseFile file = new PulseFile();
         ResourceRequirementsPredicate predicate = new ResourceRequirementsPredicate(file, recipe);
-        load(new ByteArrayInputStream(pulseFile.getBytes()), file, new LinkedList<Reference>(), new FileResourceRepository(), predicate);
+        load(new ByteArrayInputStream(pulseFile.getBytes()), file, new Scope(), new FileResourceRepository(), predicate);
 
         for(ResourceReference reference: predicate.getReferences())
         {

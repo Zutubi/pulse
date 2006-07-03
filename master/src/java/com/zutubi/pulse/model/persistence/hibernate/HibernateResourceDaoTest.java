@@ -1,12 +1,12 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResourceVersion;
-import com.zutubi.pulse.model.persistence.ResourceDao;
-import com.zutubi.pulse.model.persistence.SlaveDao;
 import com.zutubi.pulse.model.PersistentResource;
 import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.model.persistence.ResourceDao;
+import com.zutubi.pulse.model.persistence.SlaveDao;
 import junit.framework.Assert;
 
 import java.util.List;
@@ -37,11 +37,11 @@ public class HibernateResourceDaoTest extends MasterPersistenceTestCase
     public void testLoadSave() throws Exception
     {
         PersistentResource resource = new PersistentResource("resource name");
-        Property p1 = new Property("test name", "test value");
+        ResourceProperty p1 = new ResourceProperty("test name", "test value", true, true);
         resource.addProperty(p1);
 
         ResourceVersion version = new ResourceVersion("version value");
-        Property p2 = new Property("test name", "test value");
+        ResourceProperty p2 = new ResourceProperty("test name", "test value", true, true);
         version.addProperty(p2);
         resource.add(version);
 

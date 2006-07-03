@@ -14,9 +14,11 @@
         <map name="properties" lazy="false" table="RESOURCE_VERSION_PROPERTIES">
             <key column="RESOURCE_VERSION_ID"/>
             <index type="string" column="PROPERTY_NAME"/>
-            <composite-element class="com.zutubi.pulse.core.model.Property">
+            <composite-element class="com.zutubi.pulse.core.model.ResourceProperty">
                 <property name="name" column="NAME" type="string" length="1023" not-null="true"/>
                 <property name="value" column="VALUE" type="string" length="1023"/>
+                <property name="addToEnvironment" column="ADD_TO_ENVIRONMENT" type="boolean"/>
+                <property name="addToPath" column="ADD_TO_PATH" type="boolean"/>
             </composite-element>
         </map>
 
@@ -37,9 +39,11 @@
         <map name="properties" lazy="false" table="RESOURCE_PROPERTIES" cascade="all">
             <key column="RESOURCE_VERSION_ID"/>
             <index type="string" column="PROPERTY_NAME"/>
-            <composite-element class="com.zutubi.pulse.core.model.Property">
+            <composite-element class="com.zutubi.pulse.core.model.ResourceProperty">
                 <property name="name" column="NAME" type="string" length="1023" not-null="true"/>
                 <property name="value" column="VALUE" type="string" length="1023" not-null="true"/>
+                <property name="addToEnvironment" column="ADD_TO_ENVIRONMENT" type="boolean"/>
+                <property name="addToPath" column="ADD_TO_PATH" type="boolean"/>
             </composite-element>
         </map>
     </class>

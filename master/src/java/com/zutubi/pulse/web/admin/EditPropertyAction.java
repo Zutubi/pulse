@@ -1,14 +1,8 @@
 package com.zutubi.pulse.web.admin;
 
-import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.model.Property;
-import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.core.model.ResourceVersion;
-import com.zutubi.pulse.model.persistence.ResourceDao;
-import com.zutubi.pulse.model.persistence.ResourceVersionDao;
-import com.zutubi.pulse.model.PersistentResource;
-import com.zutubi.pulse.web.ActionSupport;
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.model.ResourceProperty;
 
 /**
  */
@@ -17,7 +11,9 @@ public class EditPropertyAction extends ResourceActionSupport
     private String name;
     private String newName;
     private String newValue;
-    private Property property;
+    private boolean newAddToEnvironment = false;
+    private boolean newAddToPath = false;
+    private ResourceProperty property;
 
     public String getName()
     {
@@ -29,7 +25,7 @@ public class EditPropertyAction extends ResourceActionSupport
         this.name = name;
     }
 
-    public Property getProperty()
+    public ResourceProperty getProperty()
     {
         return property;
     }
@@ -52,6 +48,26 @@ public class EditPropertyAction extends ResourceActionSupport
     public void setNewValue(String newValue)
     {
         this.newValue = newValue;
+    }
+
+    public boolean getNewAddToEnvironment()
+    {
+        return newAddToEnvironment;
+    }
+
+    public void setNewAddToEnvironment(boolean newAddToEnvironment)
+    {
+        this.newAddToEnvironment = newAddToEnvironment;
+    }
+
+    public boolean getNewAddToPath()
+    {
+        return newAddToPath;
+    }
+
+    public void setNewAddToPath(boolean newAddToPath)
+    {
+        this.newAddToPath = newAddToPath;
     }
 
     private void lookupProperty()
@@ -93,6 +109,8 @@ public class EditPropertyAction extends ResourceActionSupport
 
         newName = property.getName();
         newValue = property.getValue();
+        newAddToEnvironment = property.getAddToEnvironment();
+        newAddToPath = property.getAddToPath();
 
         return INPUT;
     }
@@ -134,7 +152,7 @@ public class EditPropertyAction extends ResourceActionSupport
 
     public String execute()
     {
-        Property newProperty = new Property(newName, newValue);
+        ResourceProperty newProperty = new ResourceProperty(newName, newValue, newAddToEnvironment, newAddToPath);
 
         try
         {

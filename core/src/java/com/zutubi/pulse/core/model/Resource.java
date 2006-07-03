@@ -11,7 +11,7 @@ import java.util.TreeMap;
 public class Resource extends Entity implements NamedEntity
 {
     private String name;
-    private Map<String, Property> properties = new TreeMap<String, Property>();
+    private Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
     private Map<String, ResourceVersion> versions = new TreeMap<String, ResourceVersion>();
 
     public Resource()
@@ -72,12 +72,12 @@ public class Resource extends Entity implements NamedEntity
         versions.remove(version.getValue());
     }
 
-    public Map<String, Property> getProperties()
+    public Map<String, ResourceProperty> getProperties()
     {
         return properties;
     }
 
-    public void setProperties(Map<String, Property> properties)
+    public void setProperties(Map<String, ResourceProperty> properties)
     {
         this.properties = properties;
     }
@@ -87,12 +87,12 @@ public class Resource extends Entity implements NamedEntity
         return properties.containsKey(name);
     }
 
-    public Property getProperty(String name)
+    public ResourceProperty getProperty(String name)
     {
         return properties.get(name);
     }
 
-    public void addProperty(Property p)
+    public void addProperty(ResourceProperty p)
     {
         String name = p.getName();
         properties.put(name, p);

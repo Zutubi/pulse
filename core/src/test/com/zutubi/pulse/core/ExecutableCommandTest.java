@@ -1,12 +1,10 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.SystemUtils;
-import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +14,7 @@ import java.util.List;
  * 
  *
  */
-public class ExecutableCommandTest extends TestCase
+public class ExecutableCommandTest extends PulseTestCase
 {
     private File baseDirectory;
     private File outputDirectory;
@@ -133,5 +131,43 @@ public class ExecutableCommandTest extends TestCase
         CommandResult result = new CommandResult("work");
         command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
         assertTrue(result.succeeded());
+    }
+
+    public void testExtraPathInScope() throws IOException
+    {
+        File data = getTestDataFile("core", "scope", "bin");
+        Scope scope = new Scope();
+        scope.add(new ResourceProperty("mypath", data.getAbsolutePath(), false, true));
+
+        ExecutableCommand command = new ExecutableCommand();
+        command.setExe("custom");
+        command.setScope(scope);
+
+        CommandResult result = new CommandResult("work");
+        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
+        assertTrue(result.succeeded());
+    }
+
+    public void testEnvironmentVariableFromScope() throws IOException
+    {
+        File data = getTestDataFile("core", "scope", "bin");
+        Scope scope = new Scope();
+        scope.add(new ResourceProperty("mypath", data.getAbsolutePath(), false, true));
+        scope.add(new ResourceProperty("TESTVAR", "test variable value", true, false));
+
+        ExecutableCommand command = new ExecutableCommand();
+        command.setExe("custom");
+        command.setScope(scope);
+
+        CommandResult result = new CommandResult("work");
+        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
+        assertTrue(result.succeeded());
+        String output = getOutput();
+        assertTrue(output.contains("test variable value"));
+    }
+
+    private String getOutput() throws IOException
+    {
+        return IOUtils.fileToString(new File(outputDirectory, "command output/output.txt"));
     }
 }

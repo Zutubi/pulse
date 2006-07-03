@@ -1,13 +1,12 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.ResourceRepository;
-import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -29,27 +28,33 @@ public class ResourceDiscoverer
         if (home != null)
         {
             Resource antResource = new Resource("ant");
-            antResource.addProperty(new Property("ant.home", home));
-            File antBin;
+            antResource.addProperty(new ResourceProperty("ANT_HOME", home, true, false));
 
-            if (SystemUtils.isWindows())
+            File binDir = new File(home, "bin");
+            if (binDir.isDirectory())
             {
-                antBin = new File(home, "bin/ant.bat");
-            }
-            else
-            {
-                antBin = new File(home, "bin/ant");
-            }
+                antResource.addProperty(new ResourceProperty("ant.bin.dir", binDir.getAbsolutePath(), false, true));
 
-            if (antBin.isFile())
-            {
-                antResource.addProperty(new Property("ant.bin", antBin.getAbsolutePath()));
+                File bin;
+                if(SystemUtils.isWindows())
+                {
+                    bin = new File("ant.bat");
+                }
+                else
+                {
+                    bin = new File(binDir, "ant");
+                }
+
+                if(bin.isFile())
+                {
+                    antResource.addProperty(new ResourceProperty("ant.bin", bin.getAbsolutePath(), false, false));
+                }
             }
 
             File antLib = new File(home, "lib");
             if (antLib.isDirectory())
             {
-                antResource.addProperty(new Property("ant.lib.dir", antLib.getAbsolutePath()));
+                antResource.addProperty(new ResourceProperty("ant.lib.dir", antLib.getAbsolutePath(), false, false));
             }
 
             resources.add(antResource);
@@ -62,55 +67,54 @@ public class ResourceDiscoverer
         if (makeBin != null)
         {
             Resource makeResource = new Resource("make");
-            makeResource.addProperty(new Property("make.bin", makeBin.getAbsolutePath()));
+            makeResource.addProperty(new ResourceProperty("make.bin", makeBin.getAbsolutePath(), false, false));
             resources.add(makeResource);
         }
     }
 
     private void discoverMaven2(List<Resource> resources)
     {
-        File mvn = null;
-        if (SystemUtils.isWindows())
-        {
-            mvn = SystemUtils.findInPath("mvn.bat");
-        }
-        else
-        {
-            mvn = SystemUtils.findInPath("mvn");
-        }
-                    
+        File mvn = SystemUtils.findInPath("mvn");
+
         if (mvn != null)
         {
             Resource mvnResource = new Resource("maven2");
-            mvnResource.addProperty(new Property("maven2.bin", mvn.getAbsolutePath()));
+            mvnResource.addProperty(new ResourceProperty("maven2.bin", mvn.getAbsolutePath(), false, false));
             resources.add(mvnResource);
         }
     }
 
     private void discoverJava(List<Resource> resources)
     {
-        //TODO: look for java on the path.
-
+        // TODO: look for java on the path.
         // look for JAVA_HOME in the environment.
         String home = System.getenv("JAVA_HOME");
 
         Resource javaResource = new Resource("java");
-        javaResource.addProperty(new Property("java.home", home));
+        javaResource.addProperty(new ResourceProperty("JAVA_HOME", home, true, false));
 
-        File javaBin;
-        if (SystemUtils.isWindows())
+        File binDir = new File(home, "bin");
+        if (binDir.isDirectory())
         {
-            javaBin = new File(home, "bin/java.exe");
-        }
-        else
-        {
-            javaBin = new File(home, "bin/java");
+            javaResource.addProperty(new ResourceProperty("java.bin.dir", binDir.getAbsolutePath(), false, true));
+
+            File bin;
+            if(SystemUtils.isWindows())
+            {
+                bin = new File("java.exe");
+            }
+            else
+            {
+                bin = new File(binDir, "java");
+            }
+
+            if(bin.isFile())
+            {
+                javaResource.addProperty(new ResourceProperty("java.bin", bin.getAbsolutePath(), false, false));
+            }
+
         }
 
-        if (javaBin.isFile())
-        {
-            javaResource.addProperty(new Property("java.bin", javaBin.getAbsolutePath()));
-            resources.add(javaResource);
-        }
+        resources.add(javaResource);
     }
 }

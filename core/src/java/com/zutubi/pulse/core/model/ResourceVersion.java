@@ -11,7 +11,7 @@ import java.util.TreeMap;
 public class ResourceVersion extends Entity
 {
     private String value;
-    private Map<String, Property> properties = new TreeMap<String, Property>();
+    private Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
 
     public ResourceVersion()
     {
@@ -33,12 +33,12 @@ public class ResourceVersion extends Entity
         this.value = value;
     }
 
-    public Map<String, Property> getProperties()
+    public Map<String, ResourceProperty> getProperties()
     {
         return properties;
     }
 
-    private void setProperties(Map<String, Property> properties)
+    private void setProperties(Map<String, ResourceProperty> properties)
     {
         this.properties = properties;
     }
@@ -48,12 +48,12 @@ public class ResourceVersion extends Entity
         return properties.containsKey(name);
     }
 
-    public Property getProperty(String name)
+    public ResourceProperty getProperty(String name)
     {
         return properties.get(name);
     }
 
-    public void addProperty(Property p) throws FileLoadException
+    public void addProperty(ResourceProperty p) throws FileLoadException
     {
         String name = p.getName();
         if (hasProperty(name))

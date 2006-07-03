@@ -13,7 +13,6 @@ import com.zutubi.pulse.util.logging.Logger;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -185,11 +184,11 @@ public class RecipeProcessor
 
     private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository) throws BuildException
     {
-        List<Reference> properties = new LinkedList<Reference>();
+        Scope globalScope = new Scope();
         Property property = new Property("base.dir", baseDir.getAbsolutePath());
-        properties.add(property);
+        globalScope.add(property);
 
-        importResources(resourceRepository, request.getResourceRequirements(), properties);
+        importResources(resourceRepository, request.getResourceRequirements(), globalScope);
 
         InputStream stream = null;
 
@@ -204,7 +203,7 @@ public class RecipeProcessor
 
             stream = new ByteArrayInputStream(pulseFileSource.getBytes());
             PulseFile result = new PulseFile();
-            fileLoader.load(stream, result, properties, resourceRepository, new RecipeLoadPredicate(result, request.getRecipeName()));
+            fileLoader.load(stream, result, globalScope, resourceRepository, new RecipeLoadPredicate(result, request.getRecipeName()));
             return result;
         }
         catch (Exception e)
@@ -217,7 +216,7 @@ public class RecipeProcessor
         }
     }
 
-    private void importResources(ResourceRepository resourceRepository, List<ResourceRequirement> resourceRequirements, List<Reference> properties)
+    private void importResources(ResourceRepository resourceRepository, List<ResourceRequirement> resourceRequirements, Scope scope)
     {
         if (resourceRequirements != null)
         {
@@ -229,7 +228,7 @@ public class RecipeProcessor
                     throw new BuildException("Unable to import required resource '" + requirement.getResource() + "'");
                 }
 
-                properties.addAll(resource.getProperties().values());
+                scope.add(resource.getProperties().values());
                 if(requirement.getVersion() != null)
                 {
                     ResourceVersion version = resource.getVersion(requirement.getVersion());
@@ -238,7 +237,7 @@ public class RecipeProcessor
                         throw new BuildException("Reference to non-existant version '" + requirement.getVersion() + "' of resource '" + requirement.getResource() + "'");
                     }
 
-                    properties.addAll(version.getProperties().values());
+                    scope.add(version.getProperties().values());
                 }
             }
         }

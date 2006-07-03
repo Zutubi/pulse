@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,7 +53,7 @@ public class FileLoader
         load(input, root, null, new FileResourceRepository(), null);
     }
 
-    public void load(InputStream input, Object root, List<Reference> references, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws PulseException
+    public void load(InputStream input, Object root, Scope globalScope, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws PulseException
     {
         try
         {
@@ -74,10 +73,9 @@ public class FileLoader
                 throw new ParseException(e);
             }
 
-            Scope globalScope = new Scope();
-            if (references != null)
+            if (globalScope == null)
             {
-                globalScope.add(references);
+                globalScope = new Scope();
             }
 
             // brief bootstraping of the loading process

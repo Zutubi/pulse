@@ -18,6 +18,11 @@ public class EditResourcePropertyForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[] { "newName", "newValue" };
+        return new String[] { "newName", "newValue", "newAddToEnvironment", "newAddToPath" };
+    }
+
+    public int[] getFieldTypes()
+    {
+        return new int[] { TEXTFIELD, TEXTFIELD, CHECKBOX, CHECKBOX };
     }
 }

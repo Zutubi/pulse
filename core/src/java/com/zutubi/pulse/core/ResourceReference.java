@@ -53,7 +53,7 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
             return;
         }
 
-        scope.getParent().add(resource.getProperties());
+        scope.getParent().add(resource.getProperties().values());
 
         if (version != null)
         {
@@ -68,7 +68,7 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
                 return;
             }
 
-            scope.getParent().add(resourceVersion.getProperties());
+            scope.getParent().add(resourceVersion.getProperties().values());
         }
     }
 

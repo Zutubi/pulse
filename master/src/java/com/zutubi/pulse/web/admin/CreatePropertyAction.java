@@ -1,15 +1,7 @@
 package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.model.Property;
-import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.core.model.ResourceVersion;
-import com.zutubi.pulse.model.persistence.ResourceDao;
-import com.zutubi.pulse.model.persistence.ResourceVersionDao;
-import com.zutubi.pulse.model.PersistentResource;
-import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.web.ActionSupport;
-import org.hsqldb.persist.HsqlProperties;
+import com.zutubi.pulse.core.model.ResourceProperty;
 
 /**
  * 
@@ -17,14 +9,14 @@ import org.hsqldb.persist.HsqlProperties;
  */
 public class CreatePropertyAction extends ResourceActionSupport
 {
-    private Property property = new Property();
+    private ResourceProperty property = new ResourceProperty();
 
-    public Property getProperty()
+    public ResourceProperty getProperty()
     {
         return property;
     }
 
-    public void setProperty(Property property)
+    public void setProperty(ResourceProperty property)
     {
         this.property = property;
     }

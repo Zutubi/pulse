@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Tests for RegexPostProcessor.
  */
-public class PostProcessorTestBase extends PulseTestCase
+public abstract class PostProcessorTestBase extends PulseTestCase
 {
     protected StoredFileArtifact artifact;
     protected File tempDir;

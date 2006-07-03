@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResourceVersion;
 import com.zutubi.pulse.model.persistence.ResourceVersionDao;
 import junit.framework.Assert;
@@ -27,8 +27,8 @@ public class HibernateResourceVersionDaoTest extends MasterPersistenceTestCase
     public void testLoadSave() throws Exception
     {
         ResourceVersion version = new ResourceVersion("version value");
-        Property p1 = new Property("test name", "test value");
-        Property p2 = new Property("another name", "and value");
+        ResourceProperty p1 = new ResourceProperty("test name", "test value", true, true);
+        ResourceProperty p2 = new ResourceProperty("another name", "and value", true, true);
         version.addProperty(p1);
         version.addProperty(p2);
         resourceVersionDao.save(version);

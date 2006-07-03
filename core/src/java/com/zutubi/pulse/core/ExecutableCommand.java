@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
@@ -11,12 +12,13 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
  *
  */
-public class ExecutableCommand implements Command
+public class ExecutableCommand implements Command, ScopeAware
 {
     private static final Logger LOG = Logger.getLogger(ExecutableCommand.class);
 
@@ -28,44 +30,16 @@ public class ExecutableCommand implements Command
     private File workingDir;
     private List<Environment> env = new LinkedList<Environment>();
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
+    private Scope scope;
 
     private Process child;
     private volatile boolean terminated = false;
 
     public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult cmdResult)
     {
-        List<String> command = new LinkedList<String>();
-        command.add(exe);
-
-        if (args != null)
-        {
-            for (Arg arg : args)
-            {
-                command.add(arg.getText());
-            }
-        }
-
-        ProcessBuilder builder = new ProcessBuilder(command);
-        if (workingDir == null)
-        {
-            builder.directory(paths.getBaseDir());
-        }
-        else
-        {
-            if(workingDir.isAbsolute())
-            {
-                builder.directory(workingDir);
-            }
-            else
-            {
-                builder.directory(new File(paths.getBaseDir(), workingDir.getPath()));
-            }
-        }
-
-        for (Environment setting : env)
-        {
-            builder.environment().put(setting.getName(), setting.getValue());
-        }
+        ProcessBuilder builder = new ProcessBuilder(constructCommand());
+        updateWorkingDir(builder, paths);
+        updateChildEnvironment(builder);
 
         builder.redirectErrorStream(true);
 
@@ -145,6 +119,70 @@ public class ExecutableCommand implements Command
         catch (InterruptedException e)
         {
             throw new BuildException(e);
+        }
+    }
+
+    private List<String> constructCommand()
+    {
+        String binary = exe;
+
+        File exeFile = new File(exe);
+        if(!exeFile.isAbsolute())
+        {
+            exeFile = SystemUtils.findInPath(exe, scope == null ? null : scope.getPathDirectories().values());
+            if(exeFile != null)
+            {
+                binary = exeFile.getAbsolutePath();
+            }
+        }
+
+        List<String> command = new LinkedList<String>();
+        command.add(binary);
+
+        if (args != null)
+        {
+            for (Arg arg : args)
+            {
+                command.add(arg.getText());
+            }
+        }
+        return command;
+    }
+
+    private void updateWorkingDir(ProcessBuilder builder, RecipePaths paths)
+    {
+        if (workingDir == null)
+        {
+            builder.directory(paths.getBaseDir());
+        }
+        else
+        {
+            if(workingDir.isAbsolute())
+            {
+                builder.directory(workingDir);
+            }
+            else
+            {
+                builder.directory(new File(paths.getBaseDir(), workingDir.getPath()));
+            }
+        }
+    }
+
+    private void updateChildEnvironment(ProcessBuilder builder)
+    {
+        Map<String, String> childEnvironment = builder.environment();
+
+        if (scope != null)
+        {
+            for(Map.Entry<String, String> setting: scope.getEnvironment().entrySet())
+            {
+                childEnvironment.put(setting.getKey(), setting.getValue());
+            }
+        }
+
+        for (Environment setting : env)
+        {
+            childEnvironment.put(setting.getName(), setting.getValue());
         }
     }
 
@@ -262,6 +300,11 @@ public class ExecutableCommand implements Command
     List<Arg> getArgs()
     {
         return args;
+    }
+
+    public void setScope(Scope scope)
+    {
+        this.scope = scope;
     }
 
     /**

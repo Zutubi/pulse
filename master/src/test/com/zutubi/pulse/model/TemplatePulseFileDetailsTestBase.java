@@ -1,16 +1,15 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 import org.apache.velocity.app.VelocityEngine;
 
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.LinkedList;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 /**
  */
@@ -66,14 +65,14 @@ public abstract class TemplatePulseFileDetailsTestBase extends PulseTestCase
 
         // Ensure syntactic correctness
         PulseFileLoader loader = new PulseFileLoader(new ObjectFactory());
-        List<Reference> references = new LinkedList<Reference>();
-        references.add(new Property("base.dir", "testbase"));
+        Scope scope = new Scope();
+        scope.add(new Property("base.dir", "testbase"));
         FileInputStream input = null;
 
         try
         {
             input = new FileInputStream(file);
-            loader.load(input, new PulseFile(), references, new FileResourceRepository(), null);
+            loader.load(input, new PulseFile(), scope, new FileResourceRepository(), null);
         }
         finally
         {

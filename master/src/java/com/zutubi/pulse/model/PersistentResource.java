@@ -1,9 +1,9 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.core.model.ResourceVersion;
-import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.core.model.ResourceVersion;
 
 /**
  */
@@ -43,19 +43,19 @@ public class PersistentResource extends Resource
     {
         // Deep copy the other way: don't want hibernate proxies in result.
         Resource resource = new Resource(getName());
-        for(Property p: getProperties().values())
+        for(ResourceProperty p: getProperties().values())
         {
-            resource.addProperty(new Property(p.getName(), p.getValue()));
+            resource.addProperty(new ResourceProperty(p.getName(), p.getValue(), p.getAddToEnvironment(), p.getAddToPath()));
         }
 
         for(ResourceVersion v: getVersions().values())
         {
             ResourceVersion copy = new ResourceVersion(v.getValue());
-            for(Property p: v.getProperties().values())
+            for(ResourceProperty p: v.getProperties().values())
             {
                 try
                 {
-                    copy.addProperty(new Property(p.getName(), p.getValue()));
+                    copy.addProperty(new ResourceProperty(p.getName(), p.getValue(), p.getAddToEnvironment(), p.getAddToPath()));
                 }
                 catch (FileLoadException e)
                 {

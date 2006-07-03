@@ -20,7 +20,7 @@
     </table>
 
 #if(!$agent.isSlave())
-    <a href="/viewServerQueues.action">#wwtext("name=view.server.queues")</a>
+    <a href="/viewerverQueues.action">#wwtext("name=view.server.queues")</a>
 #end
     #tabEnd()
 </html>

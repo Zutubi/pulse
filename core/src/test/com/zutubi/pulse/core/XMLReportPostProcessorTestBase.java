@@ -1,14 +1,14 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 
 /**
  */
-public class XMLReportPostProcessorTestBase extends PulseTestCase
+public abstract class XMLReportPostProcessorTestBase extends PulseTestCase
 {
     protected PostProcessor pp;
 

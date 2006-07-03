@@ -88,7 +88,7 @@ public class MakeCommandTest extends CommandTestBase
     protected void checkOutput(CommandResult commandResult, String ...contents) throws IOException
     {
         assertTrue(commandResult.getProperties().containsKey("command line"));
-        assertTrue(commandResult.getProperties().get("command line").toString().startsWith("make"));
+        assertTrue(commandResult.getProperties().get("command line").toString().contains("make"));
         super.checkOutput(commandResult, contents);
     }
 }

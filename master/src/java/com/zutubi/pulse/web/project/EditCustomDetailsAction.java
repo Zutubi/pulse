@@ -1,16 +1,14 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.PulseFileDetails;
-import com.zutubi.pulse.model.CustomPulseFileDetails;
-import com.zutubi.pulse.model.CustomProjectValidationPredicate;
-import com.zutubi.pulse.xwork.interceptor.Preparable;
-import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.StringUtils;
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.model.CustomProjectValidationPredicate;
+import com.zutubi.pulse.model.CustomPulseFileDetails;
+import com.zutubi.pulse.model.PulseFileDetails;
+import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.pulse.xwork.interceptor.Preparable;
 
 import java.io.ByteArrayInputStream;
-import java.util.LinkedList;
 
 /**
  *
@@ -48,7 +46,7 @@ public class EditCustomDetailsAction extends AbstractEditDetailsAction implement
         try
         {
             PulseFileLoader loader = new PulseFileLoader(new ObjectFactory());
-            loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile(), new LinkedList<Reference>(), resourceRepository, new CustomProjectValidationPredicate());
+            loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile(), new Scope(), resourceRepository, new CustomProjectValidationPredicate());
         }
         catch(ParseException pe)
         {

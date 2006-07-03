@@ -21,7 +21,6 @@ import com.zutubi.pulse.web.wizard.WizardCompleteState;
 import org.acegisecurity.AccessDeniedException;
 
 import java.io.ByteArrayInputStream;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -662,7 +661,7 @@ public class AddProjectWizard extends BaseWizard
             try
             {
                 PulseFileLoader loader = new PulseFileLoader(new ObjectFactory());
-                loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile(), new LinkedList<Reference>(), resourceRepository, new CustomProjectValidationPredicate());
+                loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile(), new Scope(), resourceRepository, new CustomProjectValidationPredicate());
             }
             catch(ParseException pe)
             {

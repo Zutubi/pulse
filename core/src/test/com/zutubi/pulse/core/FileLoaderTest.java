@@ -3,7 +3,6 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.util.SystemUtils;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -69,11 +68,11 @@ public class FileLoaderTest extends FileLoaderTestBase
     public void testSampleProject() throws Exception
     {
         PulseFile bf = new PulseFile();
-        List<Reference> properties = new LinkedList<Reference>();
+        Scope scope = new Scope();
         Property property = new Property("base.dir", "/whatever");
-        properties.add(property);
+        scope.add(property);
 
-        loader.load(getInput("testSampleProject"), bf, properties, new FileResourceRepository(), null);
+        loader.load(getInput("testSampleProject"), bf, scope, new FileResourceRepository(), null);
     }
 
     public void testDependency() throws Exception
