@@ -4,6 +4,7 @@ import com.zutubi.pulse.test.PulseTestCase;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * <class-comment/>
@@ -29,6 +30,51 @@ public class LicenseTest extends PulseTestCase
     protected void tearDown() throws Exception
     {
         super.tearDown();
+    }
+
+    public void testExpires()
+    {
+        License a = new License(LicenseType.EVALUATION, "holder", null);
+        assertFalse(a.expires());
+        License b = new License(LicenseType.EVALUATION, "holder", new Date());
+        assertTrue(b.expires());
+    }
+
+    public void testLicenseTypeInEqualsMethod()
+    {
+        License a = new License(LicenseType.EVALUATION, "holder", null);
+        License b = new License(LicenseType.EVALUATION, "holder", null);
+        License c = new License(LicenseType.COMMERCIAL, "holder", null);
+
+        assertTrue(a.equals(b));
+        assertFalse(a.equals(c));
+    }
+
+    public void testSupportedValuesInEqualsMethod()
+    {
+        License a = new License(LicenseType.EVALUATION, "holder", null);
+        License b = new License(LicenseType.EVALUATION, "holder", null);
+
+        // check agents.
+        assertTrue(a.equals(b));
+        a.setSupportedAgents(1);
+        assertFalse(a.equals(b));
+        b.setSupportedAgents(1);
+        assertTrue(a.equals(b));
+
+        // check projects
+        assertTrue(a.equals(b));
+        a.setSupportedProjects(2);
+        assertFalse(a.equals(b));
+        b.setSupportedProjects(2);
+        assertTrue(a.equals(b));
+
+        // check users.
+        assertTrue(a.equals(b));
+        a.setSupportedUsers(5);
+        assertFalse(a.equals(b));
+        b.setSupportedUsers(5);
+        assertTrue(a.equals(b));
     }
 
     public void testCalculateDaysRemaining() throws ParseException

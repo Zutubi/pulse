@@ -4,8 +4,8 @@
     <!-- initialise configuration -->
     <target name="init">
 
-        <property name="src.dir" value="src/java"/>
-        <property name="core.src.dir" value="../core/src/java"/>
+        <property name="src.dir" value="master/src/java"/>
+        <property name="core.src.dir" value="core/src/java"/>
 
         <property name="build.dir" value="build"/>
         <property name="build.lib.dir" value="build/lib"/>
@@ -35,6 +35,7 @@
         <mkdir dir="${build.lib.dir}"/>
         <mkdir dir="${classes.dir}"/>
 
+        <!-- TODO: need to make this system independent -->
         <copy todir="${build.lib.dir}">
             <fileset dir="C:\projects\repository\apache\commons-codec\jars">
                 <include name="commons-codec-1.3.jar"/>
@@ -57,6 +58,7 @@
             <classpath refid="lib.path"/>
             <classpath location="${classes.dir}"/>
             <include name="**/LicenseEncoder.java"/>
+            <include name="**/LicenseType.java"/>
             <include name="**/LicensingException.java"/>
         </javac>
 
@@ -67,12 +69,22 @@
         <unzip src="${build.lib.dir}/commons-codec-1.3.jar" dest="${classes.dir}"/>
 
         <jar file="build/encoder.jar" basedir="${classes.dir}">
+            <exclude name="**/*.html"/>
+            <exclude name="**/*.txt"/>
             <manifest>
                 <attribute name="Main-Class" value="com.zutubi.pulse.license.LicenseEncoder"/>
             </manifest>
         </jar>
     </target>
 
-    <target name="package" depends="prepare, jar"/>
+    <target name="check">
+        <java jar="build/encoder.jar" fork="true">
+            <arg value="e"/> <!-- license type -->
+            <arg value="S O MeBody"/> <!-- license holder -->
+            <arg value="2001-10-10 10:10:10"/> <!-- license expiry -->
+        </java>
+    </target>
+
+    <target name="package" depends="prepare, jar, check"/>
 
 </project>

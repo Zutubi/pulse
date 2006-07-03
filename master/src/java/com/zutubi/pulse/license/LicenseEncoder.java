@@ -112,17 +112,27 @@ public class LicenseEncoder implements LicenseKeyFactory
 
     public static void main(String argv[])
     {
-        // todo: some form of validation would be nice.
-        // todo: support multiple license types
         try
         {
             SimpleDateFormat expiryFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
             String code = argv[0];
             String name = argv[1];
-            Date expiry = expiryFormat.parse(argv[2]);
+            String expiryStr = argv[2];
 
+            // Validation:
             LicenseType type = LicenseType.valueBy(code);
+            if (type == null)
+            {
+                throw new IllegalArgumentException("Unknown license type "+ code +".");
+            }
+
+            if (name == null || name.trim().length() == 0)
+            {
+                throw new IllegalArgumentException("The name of the license holder is required.");
+            }
+
+            Date expiry = expiryFormat.parse(expiryStr);
 
             License license = new License(type, name, expiry);
 

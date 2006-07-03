@@ -35,8 +35,23 @@ public class License
 
     public void setSupported(int agents, int projects, int users)
     {
+        setSupportedAgents(agents);
+        setSupportedProjects(projects);
+        setSupportedUsers(users);
+    }
+
+    public void setSupportedAgents(int agents)
+    {
         this.supportedAgents = agents;
+    }
+
+    public void setSupportedProjects(int projects)
+    {
         this.supportedProjects = projects;
+    }
+
+    public void setSupportedUsers(int users)
+    {
         this.supportedUsers = users;
     }
 
