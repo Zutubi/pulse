@@ -1,5 +1,8 @@
 package com.zutubi.pulse.util;
 
+import java.util.List;
+import java.util.LinkedList;
+
 /**
  * <class-comment/>
  */
@@ -16,5 +19,18 @@ public class ObjectUtils
             return false;
         }
         return a.equals(b);
+    }
+
+    /**
+     * A simple utility for creating a list that contain the parameters.
+     */
+    public static <T> List<T> asList(T... o)
+    {
+        List<T> l = new LinkedList<T>();
+        for (T obj : o)
+        {
+            l.add(obj);
+        }
+        return l;
     }
 }

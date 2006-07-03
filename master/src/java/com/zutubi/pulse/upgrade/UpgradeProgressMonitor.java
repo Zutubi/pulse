@@ -2,16 +2,23 @@ package com.zutubi.pulse.upgrade;
 
 import com.zutubi.pulse.util.TimeStamps;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
- * <class-comment/>
+ * The Upgrade Progress Monitor is a class used to help track and display the status of the upgrade.
+ *
+ *
  */
 public class UpgradeProgressMonitor
 {
+    /**
+     * The upgrade process start time.
+     */
     private long startTimestamp;
+
+    /**
+     * The upgrade process finish time
+     */
     private long finishTimestamp;
 
     private int taskCount;
@@ -23,10 +30,13 @@ public class UpgradeProgressMonitor
 
     /**
      * Implementation note:
+     *
      * Use a list here to ensure that the order of the task progress entries
      * remain in the same order as was passed to this monitor.
      */
-    private List<UpgradeTaskProgress> taskProgress = new LinkedList<UpgradeTaskProgress>();
+    private List<UpgradeTaskProgress> orderedProgressDetails = new LinkedList<UpgradeTaskProgress>();
+
+    private Map<UpgradeTask, UpgradeTaskProgress> progressLookupMap = new HashMap<UpgradeTask, UpgradeTaskProgress>();
 
     /**
      * Start the progress monitor.
@@ -45,30 +55,54 @@ public class UpgradeProgressMonitor
         finishTimestamp = System.currentTimeMillis();
     }
 
+    /**
+     * Inform the progress monitor that the specified task has started.
+     *
+     * @param task
+     */
     protected void start(UpgradeTask task)
     {
-        getTaskProgress(task.getName()).setStatus(UpgradeTaskProgress.IN_PROGRESS);
+        getTaskProgress(task).setStatus(UpgradeTaskProgress.IN_PROGRESS);
     }
 
+    /**
+     * Inform the progress montior that the specified task has completed.
+     *
+     * @param task
+     */
     protected void complete(UpgradeTask task)
     {
-        getTaskProgress(task.getName()).setStatus(UpgradeTaskProgress.COMPLETE);
+        getTaskProgress(task).setStatus(UpgradeTaskProgress.COMPLETE);
         tasksFinishedCount++;
     }
 
+    /**
+     * Inform the progress monitor that the specified task has failed.
+     *
+     * @param task
+     */
     protected void failed(UpgradeTask task)
     {
-        getTaskProgress(task.getName()).setStatus(UpgradeTaskProgress.FAILED);
+        getTaskProgress(task).setStatus(UpgradeTaskProgress.FAILED);
         tasksFinishedCount++;
         error = true;
     }
 
+    /**
+     * Inform the progress monitor that the specified task has been aborted.
+     *
+     * @param task
+     */
     protected void aborted(UpgradeTask task)
     {
-        getTaskProgress(task.getName()).setStatus(UpgradeTaskProgress.ABORTED);
+        getTaskProgress(task).setStatus(UpgradeTaskProgress.ABORTED);
         tasksFinishedCount++;
     }
 
+    /**
+     * Returns true if all of the upgrade tasks being monitored have been completed, failed or aborted.
+     *
+     */
     public boolean isComplete()
     {
         return tasksFinishedCount == taskCount && taskCount != 0;
@@ -91,19 +125,21 @@ public class UpgradeProgressMonitor
      */
     public String getElaspedTime()
     {
+        // if start timestamp is zero, we have not started.
         if (startTimestamp == 0)
         {
             return TimeStamps.getPrettyElapsed(0);
         }
 
         long elapsedTime;
-        if (finishTimestamp != 0)
+        // if finish time is zero, then we have not finished.
+        if (finishTimestamp == 0)
         {
-            elapsedTime = finishTimestamp - startTimestamp;
+            elapsedTime = System.currentTimeMillis() - startTimestamp;
         }
         else
         {
-            elapsedTime = System.currentTimeMillis() - startTimestamp;
+            elapsedTime = finishTimestamp - startTimestamp;
         }
         return TimeStamps.getPrettyElapsed(elapsedTime);
     }
@@ -117,6 +153,12 @@ public class UpgradeProgressMonitor
         return (int) (100 * ((float) tasksFinishedCount) / ((float) taskCount));
     }
 
+    /**
+     * Manually specify the percentage complete value. If not set, then the percentage complete will
+     * be reported as the percentage of tasks finished.
+     *
+     * @param percentageComplete
+     */
     public void setPercentageComplete(int percentageComplete)
     {
         this.percentageComplete = percentageComplete;
@@ -132,7 +174,9 @@ public class UpgradeProgressMonitor
     {
         for (UpgradeTask task : monitoredTasks)
         {
-            taskProgress.add(new UpgradeTaskProgress(task));
+            UpgradeTaskProgress progress = new UpgradeTaskProgress(task);
+            progressLookupMap.put(task, progress);
+            orderedProgressDetails.add(progress);
         }
         taskCount = monitoredTasks.size();
     }
@@ -144,22 +188,15 @@ public class UpgradeProgressMonitor
      */
     public List<UpgradeTaskProgress> getTaskProgress()
     {
-        return Collections.unmodifiableList(this.taskProgress);
+        return Collections.unmodifiableList(this.orderedProgressDetails);
     }
 
     /**
      * Retrieve information about the status of the individual upgrade tasks.
      *
      */
-    public UpgradeTaskProgress getTaskProgress(String taskName)
+    public UpgradeTaskProgress getTaskProgress(UpgradeTask task)
     {
-        for (UpgradeTaskProgress progress : taskProgress)
-        {
-            if (progress.getName().equals(taskName))
-            {
-                return progress;
-            }
-        }
-        return null;
+        return progressLookupMap.get(task);
     }
 }

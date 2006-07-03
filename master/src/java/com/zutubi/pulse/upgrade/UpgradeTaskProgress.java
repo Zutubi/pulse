@@ -5,6 +5,7 @@ package com.zutubi.pulse.upgrade;
  */
 public class UpgradeTaskProgress
 {
+    //TODO: I18N: These status values should be i18n keys.
     public static final String PENDING = "pending";
     public static final String IN_PROGRESS = "in progress";
     public static final String COMPLETE = "complete";
