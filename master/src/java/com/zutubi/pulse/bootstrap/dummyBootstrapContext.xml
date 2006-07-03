@@ -57,14 +57,5 @@
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
-
-    <bean id="licenseManager" class="com.zutubi.pulse.license.LicenseManager" autowire="byName">
-        <property name="resolver">
-            <ref local="configurationManager"/>
-        </property>
-        <property name="objectFactory">
-            <ref local="objectFactory"/>
-        </property>
-    </bean>
     
 </beans>

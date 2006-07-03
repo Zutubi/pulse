@@ -28,7 +28,6 @@ public class GuestAccessManager
         anonymousProcessingFilter.setUserAttribute(newAttribute);
     }
 
-
     public void setAnonymousProcessingFilter(AnonymousProcessingFilter anonymousProcessingFilter)
     {
         this.anonymousProcessingFilter = anonymousProcessingFilter;

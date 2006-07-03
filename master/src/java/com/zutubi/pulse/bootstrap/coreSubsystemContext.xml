@@ -27,5 +27,6 @@
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/loggingContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/eventContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/webserverContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/licenseContext.xml"/>
 
 </beans>

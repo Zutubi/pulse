@@ -1,27 +1,29 @@
 package com.zutubi.pulse.license.authorisation;
 
+import com.zutubi.pulse.license.LicenseAuthorisation;
+
 /**
  * <class-comment/>
  */
-public class PersonalLicenseAuthorisation extends AbstractLicenseAuthorisation
+public class NoAuthorisation implements LicenseAuthorisation
 {
     public boolean canRunPulse()
     {
-        return true;
+        return false;
     }
 
     public boolean canAddProject()
     {
-        return true;
+        return false;
     }
 
     public boolean canAddUser()
     {
-        return true;
+        return false;
     }
 
     public boolean canAddAgent()
     {
-        return true;
+        return false;
     }
 }

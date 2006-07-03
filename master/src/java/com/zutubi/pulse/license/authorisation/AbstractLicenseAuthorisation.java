@@ -1,6 +1,7 @@
 package com.zutubi.pulse.license.authorisation;
 
 import com.zutubi.pulse.license.LicenseAuthorisation;
+import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.LicenseProvider;
 
 /**
@@ -8,10 +9,15 @@ import com.zutubi.pulse.license.LicenseProvider;
  */
 public abstract class AbstractLicenseAuthorisation implements LicenseAuthorisation
 {
-    protected LicenseProvider provider;
+    private LicenseManager licenseManager;
 
-    public void setProvider(LicenseProvider provider)
+    public void setLicenseManager(LicenseManager licenseManager)
     {
-        this.provider = provider;
+        this.licenseManager = licenseManager;
+    }
+
+    protected LicenseProvider getProvider()
+    {
+        return licenseManager;
     }
 }

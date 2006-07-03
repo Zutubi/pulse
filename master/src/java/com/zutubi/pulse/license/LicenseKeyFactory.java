@@ -5,6 +5,7 @@ package com.zutubi.pulse.license;
  * not the actual license key generator. This will help to ensure that
  * code dependent on the license key generator will at least compile
  * without it being available. 
+ *
  */
 public interface LicenseKeyFactory
 {

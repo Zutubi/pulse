@@ -2,10 +2,7 @@ package com.zutubi.pulse.license;
 
 import com.zutubi.pulse.bootstrap.DataResolver;
 import com.zutubi.pulse.core.ObjectFactory;
-import com.zutubi.pulse.license.authorisation.CommercialLicenseAuthorisation;
-import com.zutubi.pulse.license.authorisation.EvaluationLicenseAuthorisation;
-import com.zutubi.pulse.license.authorisation.NonProfitLicenseAuthorisation;
-import com.zutubi.pulse.license.authorisation.PersonalLicenseAuthorisation;
+import com.zutubi.pulse.license.authorisation.*;
 
 import java.io.IOException;
 
@@ -13,7 +10,7 @@ import java.io.IOException;
  *
  *
  */
-public class LicenseManager
+public class LicenseManager implements LicenseProvider
 {
     private DataResolver resolver;
 
@@ -28,7 +25,12 @@ public class LicenseManager
     {
         try
         {
-            License license = resolver.getData().getLicense();
+            License license = this.getLicense();
+            if (license == null)
+            {
+                return objectFactory.buildBean(NoAuthorisation.class);
+            }
+
             if (license.getType() == LicenseType.EVALUATION)
             {
                 return objectFactory.buildBean(EvaluationLicenseAuthorisation.class);
@@ -39,13 +41,14 @@ public class LicenseManager
             }
             else if (license.getType() == LicenseType.NON_PROFIT)
             {
-                return objectFactory.buildBean(NonProfitLicenseAuthorisation.class);
+                return objectFactory.buildBean(CustomLicenseAuthorisation.class);
             }
             else if (license.getType() == LicenseType.PERSONAL)
             {
-                return objectFactory.buildBean(PersonalLicenseAuthorisation.class);
+                return objectFactory.buildBean(CustomLicenseAuthorisation.class);
             }
-            return null;
+
+            return objectFactory.buildBean(NoAuthorisation.class);
         }
         catch (Exception e)
         {
@@ -55,12 +58,7 @@ public class LicenseManager
 
     public boolean isLicensed() throws LicenseException
     {
-        LicenseAuthorisation e = getAuthorisation();
-        if (e != null)
-        {
-            return e.canRunPulse();
-        }
-        return false;
+        return getAuthorisation().canRunPulse();
     }
 
     public void updateLicenseKey(String newKey) throws LicenseException
@@ -86,6 +84,11 @@ public class LicenseManager
         this.resolver = resolver;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param objectFactory
+     */
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;

@@ -7,7 +7,7 @@ public class EvaluationLicenseAuthorisation extends AbstractLicenseAuthorisation
 {
     public boolean canRunPulse()
     {
-        return !provider.getLicense().isExpired();
+        return !getProvider().getLicense().isExpired();
     }
 
     public boolean canAddProject()

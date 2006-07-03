@@ -1,7 +1,10 @@
 package com.zutubi.pulse.license;
 
 /**
- * <class-comment/>
+ * The license provider interface provides allows the location / source of the license to be decoupled
+ * from its use.
+ *
+ * 
  */
 public interface LicenseProvider
 {

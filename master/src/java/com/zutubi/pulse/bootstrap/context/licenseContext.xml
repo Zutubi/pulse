@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <bean id="licenseManager" class="com.zutubi.pulse.license.LicenseManager" autowire="byName">
+        <property name="resolver">
+            <ref bean="configurationManager"/>
+        </property>
+        <property name="objectFactory">
+            <ref bean="objectFactory"/>
+        </property>
+    </bean>
+
+</beans>

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.license;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.scheduling.*;
 import com.zutubi.pulse.util.logging.Logger;
@@ -18,10 +17,7 @@ public class LicenseMonitor implements Task
      */
     private static final Logger LOG = Logger.getLogger(LicenseMonitor.class);
 
-    /**
-     * Used to lookup the data -> license.
-     */
-    private MasterConfigurationManager configurationManager;
+    private LicenseProvider licenseProvider;
 
     /**
      * Used to deliver the LicenseExpiredEvent when necessary.
@@ -32,16 +28,6 @@ public class LicenseMonitor implements Task
      * The systems scheduler, required so that this monitor can schedule itself during startup.
      */
     private Scheduler scheduler;
-
-    /**
-     * Required resource
-     *
-     * @param configurationManager
-     */
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
-    }
 
     /**
      * Required resource.
@@ -64,6 +50,16 @@ public class LicenseMonitor implements Task
     }
 
     /**
+     * Required resource.
+     * 
+     * @param licenseProvider
+     */
+    public void setLicenseProvider(LicenseProvider licenseProvider)
+    {
+        this.licenseProvider = licenseProvider;
+    }
+
+    /**
      * The execution of this task is to check whether or not the license is expired. If the
      * installed license is expired, then generate an appropriate LicenseEvent.
      *
@@ -71,7 +67,7 @@ public class LicenseMonitor implements Task
      */
     public void execute(TaskExecutionContext context)
     {
-        License license = configurationManager.getData().getLicense();
+        License license = licenseProvider.getLicense();
         if (license.isExpired())
         {
             eventManager.publish(new LicenseExpiredEvent(license));
@@ -104,6 +100,8 @@ public class LicenseMonitor implements Task
         }
         catch (SchedulingException e)
         {
+            // if there is a problem scheduling this, then license expiry checks will not
+            // be run. Should the system startup continue?
             LOG.severe(e);
         }
     }
