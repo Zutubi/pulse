@@ -27,6 +27,12 @@ public class BuildAborter implements Runnable
                 lastBuild.complete();
                 buildManager.save(lastBuild);
             }
+
+            if(project.getState() == Project.State.BUILDING || project.getState() == Project.State.PAUSING)
+            {
+                project.buildCompleted();
+                projectManager.save(project);
+            }
         }
     }
 
