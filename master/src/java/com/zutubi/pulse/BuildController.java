@@ -393,6 +393,7 @@ public class BuildController implements EventListener
 
             change.addProjectId(buildResult.getProject().getId());
             change.addResultId(buildResult.getId());
+            buildManager.save(change);
             result.add(change);
         }
 
