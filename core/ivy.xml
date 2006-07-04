@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="pulse-core" status="integration">
+    <info organisation="zutubi" module="pulse-core" status="release" revision="1.0.7">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
             The pulse core module defines the core components that are common
@@ -23,9 +23,9 @@
 
     <dependencies>
 
-        <dependency org="zutubi" name="pulse-boot" rev="latest.integration" conf="release->release"/>
-        <dependency org="zutubi" name="pulse-boot" rev="latest.integration" conf="external->external"/>
-        <dependency org="zutubi" name="pulse-boot" rev="latest.integration" conf="build->build"/>
+        <dependency org="zutubi" name="pulse-boot" rev="1.0.7" conf="release->release"/>
+        <dependency org="zutubi" name="pulse-boot" rev="1.0.7" conf="external->external"/>
+        <dependency org="zutubi" name="pulse-boot" rev="1.0.7" conf="build->build"/>
 
         <dependency org="apache" name="ant" rev="1.6.5" conf="external,build,release->default"/>
         <dependency org="apache" name="velocity" rev="1.3.1" conf="external,build,release->default"/>
