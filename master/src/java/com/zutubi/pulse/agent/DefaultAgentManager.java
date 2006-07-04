@@ -3,6 +3,7 @@ package com.zutubi.pulse.agent;
 import com.zutubi.pulse.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
+import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.SlaveAgentRemovedEvent;
 import com.zutubi.pulse.events.SlaveStatusEvent;
@@ -122,8 +123,17 @@ public class DefaultAgentManager implements AgentManager
                 int build = agent.getSlaveService().ping();
                 if(build == masterBuildNumber)
                 {
-                    SlaveStatus status = agent.getSlaveService().getStatus(serviceTokenManager.getToken());
+                    String token = serviceTokenManager.getToken();
+                    SlaveStatus status = agent.getSlaveService().getStatus(token);
                     agent.pinged(currentTime, status);
+
+                    // If the slave has just come online, run resource
+                    // discovery
+                    if(!oldStatus.isOnline() && status.getStatus().isOnline())
+                    {
+                        List<Resource> resources = agent.getSlaveService().discoverResources(token);
+                        resourceManager.addDiscoveredResources(agent.getSlave(), resources);
+                    }
                 }
                 else
                 {

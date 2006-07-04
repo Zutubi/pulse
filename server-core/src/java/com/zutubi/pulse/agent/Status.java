@@ -8,12 +8,22 @@ public enum Status
                 {
                     return "disabled";
                 }
+
+                public boolean isOnline()
+                {
+                    return false;
+                }
             },
     OFFLINE
             {
                 public String getPrettyString()
                 {
                     return "offline";
+                }
+
+                public boolean isOnline()
+                {
+                    return false;
                 }
             },
     VERSION_MISMATCH
@@ -22,12 +32,22 @@ public enum Status
                 {
                     return "version mismatch";
                 }
+
+                public boolean isOnline()
+                {
+                    return false;
+                }
             },
     BUILDING
             {
                 public String getPrettyString()
                 {
                     return "building";
+                }
+
+                public boolean isOnline()
+                {
+                    return true;
                 }
             },
     IDLE
@@ -36,7 +56,14 @@ public enum Status
                 {
                     return "idle";
                 }
+
+                public boolean isOnline()
+                {
+                    return true;
+                }
             };
 
     public abstract String getPrettyString();
+
+    public abstract boolean isOnline();
 }

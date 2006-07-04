@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.model.Resource;
 
 import java.util.List;
 
@@ -14,4 +14,6 @@ public interface ResourceManager extends EntityManager<PersistentResource>
 
     DatabaseResourceRepository getMasterRepository();
     DatabaseResourceRepository getSlaveRepository(Slave slave);
+
+    void addDiscoveredResources(Slave slave, List<Resource> resources);
 }

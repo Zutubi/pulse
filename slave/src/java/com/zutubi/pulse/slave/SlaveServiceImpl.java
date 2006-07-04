@@ -1,10 +1,12 @@
 package com.zutubi.pulse.slave;
 
+import com.zutubi.pulse.ResourceDiscoverer;
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.services.InvalidTokenException;
@@ -90,6 +92,12 @@ public class SlaveServiceImpl implements SlaveService
     {
         serviceTokenManager.validateToken(token);
         return serverMessagesHandler.takeSnapshot();
+    }
+
+    public List<Resource> discoverResources(String token)
+    {
+        ResourceDiscoverer discoverer = new ResourceDiscoverer();
+        return discoverer.discover();
     }
 
     public void setThreadPool(SlaveThreadPool threadPool)

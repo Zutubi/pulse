@@ -1,13 +1,12 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.ResourceDiscoverer;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.model.persistence.ResourceDao;
-import com.zutubi.pulse.ResourceDiscoverer;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.List;
 
 /**
  */
@@ -23,14 +22,7 @@ public class DefaultResourceManager implements ResourceManager
 
         ResourceDiscoverer discoverer = new ResourceDiscoverer();
         List<Resource> resources = discoverer.discover();
-        for(Resource r: resources)
-        {
-            if(!masterResourceRepository.hasResource(r.getName()))
-            {
-                PersistentResource persistent = new PersistentResource(r, null);
-                masterResourceRepository.addResource(persistent);
-            }
-        }
+        addDiscoveredResources(null, resources);
     }
 
     public void save(PersistentResource entity)
@@ -66,6 +58,28 @@ public class DefaultResourceManager implements ResourceManager
         }
 
         return slaveRepositories.get(slave.getId());
+    }
+
+    public void addDiscoveredResources(Slave slave, List<Resource> resources)
+    {
+        DatabaseResourceRepository repository;
+        if(slave == null)
+        {
+            repository = masterResourceRepository;
+        }
+        else
+        {
+            repository = getSlaveRepository(slave);
+        }
+
+        for(Resource r: resources)
+        {
+            if(!repository.hasResource(r.getName()))
+            {
+                PersistentResource persistent = new PersistentResource(r, slave);
+                repository.addResource(persistent);
+            }
+        }
     }
 
     public List<PersistentResource> findBySlave(Slave slave)

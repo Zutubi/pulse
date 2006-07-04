@@ -2,6 +2,7 @@ package com.zutubi.pulse.services;
 
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
 
 import java.util.List;
@@ -42,4 +43,6 @@ public interface SlaveService
     SystemInfo getSystemInfo(String token) throws InvalidTokenException;
 
     List<CustomLogRecord> getRecentMessages(String token) throws InvalidTokenException;
+
+    List<Resource> discoverResources(String token);
 }

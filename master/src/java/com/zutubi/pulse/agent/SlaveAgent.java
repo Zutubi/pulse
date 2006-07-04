@@ -149,7 +149,7 @@ public class SlaveAgent implements Agent
 
     public boolean isOnline()
     {
-        return status == Status.IDLE || status == Status.BUILDING;
+        return status.isOnline();
     }
 
     public boolean isEnabled()
