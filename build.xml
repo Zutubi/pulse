@@ -164,6 +164,15 @@
             <fileset dir="master/etc" includes="*.xml"/>
         </copy>
 
+        <replace dir="${package.root}/bin" replacefilterfile="master/subst.properties">
+            <include name="**/*.in"/>
+        </replace>
+
+        <move todir="${package.root}/bin">
+            <fileset dir="${package.root}/bin"/>
+            <mapper type="glob" from="*.in" to="*"/>
+        </move>
+
         <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
         <exec executable="zip" dir="${package.root}/..">
             <arg line="-r ../${package.name}.zip ${package.name}"/>
@@ -288,6 +297,15 @@
         <copy todir="${package.root}/lib">
             <fileset dir="master/etc" includes="*.xml"/>
         </copy>
+
+        <replace dir="${package.root}/bin" replacefilterfile="slave/subst.properties">
+            <include name="**/*.in"/>
+        </replace>
+
+        <move todir="${package.root}/bin">
+            <fileset dir="${package.root}/bin"/>
+            <mapper type="glob" from="*.in" to="*"/>
+        </move>
 
         <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
         <exec executable="zip" dir="${package.root}/..">

@@ -61,7 +61,7 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
 
     public void testUserContactPoints()
     {
-        User user = new User();
+        User user = new User("login", "name");
         userDao.save(user);
         EmailContactPoint email = new EmailContactPoint();
         email.setName("home");
