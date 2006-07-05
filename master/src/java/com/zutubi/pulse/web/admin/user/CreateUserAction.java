@@ -14,6 +14,7 @@ public class CreateUserAction extends UserActionSupport
     private String confirm;
     private boolean ldapAuthentication = false;
     private boolean grantAdminPermissions;
+    private int startPage = 0;
 
     public User getNewUser()
     {
@@ -50,6 +51,11 @@ public class CreateUserAction extends UserActionSupport
         this.grantAdminPermissions = admin;
     }
 
+    public int getStartPage()
+    {
+        return startPage;
+    }
+
     public void validate()
     {
         if (hasErrors())
@@ -79,6 +85,7 @@ public class CreateUserAction extends UserActionSupport
     public String execute() throws Exception
     {
         getUserManager().addUser(newUser, grantAdminPermissions, ldapAuthentication);
+        startPage = getUserStartPage(newUser);
         doReset();
         return SUCCESS;
     }

@@ -1710,7 +1710,7 @@
         #if($pager.startPage > 0)
                         <a href="${url}startPage=0" class="unadorned">
         #end
-                            #image("images/resultset_first.gif" "page.latest") #wwtext("name=page.latest")
+                            #image("/images/resultset_first.gif" "page.latest") #wwtext("name=page.latest")
         #if($pager.startPage > 0)
                         </a>
         #end
@@ -1719,7 +1719,7 @@
         #if($pager.startPage > 0)
                         <a href="${url}startPage=$previousPage" class="unadorned">
         #end
-                            #image("images/resultset_previous.gif" "page.newer") #wwtext("name=page.newer")
+                            #image("/images/resultset_previous.gif" "page.newer") #wwtext("name=page.newer")
         #if($pager.startPage > 0)
                         </a>
         #end
@@ -1739,7 +1739,7 @@
         #if($pager.startPage < $lastPage)
                         <a href="${url}startPage=$nextPage" class="unadorned">
         #end
-                            #wwtext("name=page.older") #image("images/resultset_next.gif" "page.older")
+                            #wwtext("name=page.older") #image("/images/resultset_next.gif" "page.older")
         #if($pager.startPage < $lastPage)
                         </a>
         #end
@@ -1748,7 +1748,7 @@
         #if($pager.startPage < $lastPage)
                         <a href="${url}startPage=$lastPage" class="unadorned">
         #end
-                            #wwtext("name=page.oldest") #image("images/resultset_last.gif" "page.oldeset")
+                            #wwtext("name=page.oldest") #image("/images/resultset_last.gif" "page.oldest")
         #if($pager.startPage < $lastPage)
                         </a>
         #end

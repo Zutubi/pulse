@@ -444,4 +444,19 @@ public class User extends Entity implements UserDetails
     {
         setProperty(PROPERTY_LDAP_AUTHENTICATION, Boolean.toString(useLdap));
     }
+
+    public boolean equals(Object other)
+    {
+        if(other == null || !(other instanceof User))
+        {
+            return false;
+        }
+
+        return login.equals(((User)other).login);
+    }
+
+    public int hashCode()
+    {
+        return login.hashCode();
+    }
 }

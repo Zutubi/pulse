@@ -13,6 +13,7 @@ public class EditUserAction extends UserActionSupport
 {
     private boolean admin;
     private boolean ldapAuthentication;
+    private int startPage = 0;
 
     public boolean isAdmin()
     {
@@ -34,9 +35,15 @@ public class EditUserAction extends UserActionSupport
         this.ldapAuthentication = ldapAuthentication;
     }
 
+    public int getStartPage()
+    {
+        return startPage;
+    }
+
     public String doInput()
     {
         User user = getUser();
+        startPage = getUserStartPage(user);
         admin = user.hasAuthority(ADMINISTRATOR);
         ldapAuthentication = user.getLdapAuthentication();
         return INPUT;
@@ -76,6 +83,7 @@ public class EditUserAction extends UserActionSupport
 
         persistentUser.setLdapAuthentication(ldapAuthentication);
         getUserManager().save(persistentUser);
+        startPage = getUserStartPage(persistentUser);
         return SUCCESS;
     }
 }

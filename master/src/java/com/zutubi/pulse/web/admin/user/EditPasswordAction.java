@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.admin.user;
 
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.web.user.UserActionSupport;
-import com.zutubi.pulse.model.User;
 
 /**
  * <class-comment/>
@@ -13,11 +13,11 @@ public class EditPasswordAction extends UserActionSupport
      * The new password.
      */
     private String password;
-
     /**
      * The new password confirmation.
      */
     private String confirm;
+    private int startPage = 0;
 
     public String getPassword()
     {
@@ -37,6 +37,11 @@ public class EditPasswordAction extends UserActionSupport
     public void setConfirm(String confirm)
     {
         this.confirm = confirm;
+    }
+
+    public int getStartPage()
+    {
+        return startPage;
     }
 
     public void validate()
@@ -68,6 +73,7 @@ public class EditPasswordAction extends UserActionSupport
         User user = getUser();
         getUserManager().setPassword(user, rawPassword);
         getUserManager().save(user);
+        startPage = getUserStartPage(user);
         return SUCCESS;
     }
 
@@ -80,6 +86,7 @@ public class EditPasswordAction extends UserActionSupport
         User user = getUser();
         getUserManager().setPassword(user, password);
         getUserManager().save(user);
+        startPage = getUserStartPage(user);
         return SUCCESS;
     }
 }

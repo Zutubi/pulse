@@ -16,6 +16,7 @@
             <table class="fill-content">
                 #wwcform("action=editUser.action" "heading=%{getText('user.edit')}" "method=post")
                     #wwhidden("name=userId")
+                    #wwhidden("name=startPage")
                     #wwcheckbox("name=ldapAuthentication" "label=%{getText('user.ldap.authentication')}" "tabindex=1" "onclick=setFormEnableState('password.edit', 'editUser_ldapAuthentication', true, true)")
                     #wwcheckbox("name=admin" "label=%{getText('user.admin')}" "tabindex=2")
                     #saveCancel(3)
@@ -24,6 +25,7 @@
             <table class="fill-content">
                 #wwcform("action=editPassword.action" "id=password.edit" "heading=%{getText('password.edit')}" "method=post")
                     #wwhidden("name=userId")
+                    #wwhidden("name=startPage")
                     #wwpassword("name=password" "label=%{getText('password.new')}" "required=true" "tabindex=4")
                     #wwpassword("name=confirm" "label=%{getText('password.confirm')}" "required=true" "tabindex=5")
                     #saveCancel(6)

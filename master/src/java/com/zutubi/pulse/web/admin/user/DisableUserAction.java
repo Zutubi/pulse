@@ -1,13 +1,20 @@
 package com.zutubi.pulse.web.admin.user;
 
-import com.zutubi.pulse.web.user.UserActionSupport;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.web.user.UserActionSupport;
 
 /**
  * <class-comment/>
  */
 public class DisableUserAction extends UserActionSupport
 {
+    private int startPage = 0;
+
+    public int getStartPage()
+    {
+        return startPage;
+    }
+
     public void validate()
     {
         if (getUser() == null)
@@ -23,6 +30,7 @@ public class DisableUserAction extends UserActionSupport
         {
             user.setEnabled(false);
             getUserManager().save(user);
+            startPage = getUserStartPage(user);
         }
         return SUCCESS;
     }

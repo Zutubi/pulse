@@ -1,12 +1,16 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.model.SubscriptionManager;
-import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.web.ActionSupport;
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.UserLoginComparator;
+import com.zutubi.pulse.model.SubscriptionManager;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.web.admin.user.ViewUsersAction;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -141,5 +145,13 @@ public class UserActionSupport extends ActionSupport
         {
             addFieldError("userLogin", "Unknown user '" + userLogin + "'");
         }
+    }
+
+    protected int getUserStartPage(User user)
+    {
+        List<User> all = getUserManager().getAllUsers();
+        Collections.sort(all, new UserLoginComparator());
+        int index = all.indexOf(user);
+        return index / ViewUsersAction.USERS_PER_PAGE;
     }
 }
