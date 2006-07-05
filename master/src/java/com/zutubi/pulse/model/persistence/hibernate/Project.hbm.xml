@@ -42,6 +42,9 @@
             <key column="PROJECT_ID"/>
             <one-to-many class="com.zutubi.pulse.model.ProjectAclEntry"/>
         </bag>
+
+        <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
+        
     </class>
 
     <class name="com.zutubi.pulse.model.ProjectAclEntry" table="PROJECT_ACL_ENTRY" lazy="false">

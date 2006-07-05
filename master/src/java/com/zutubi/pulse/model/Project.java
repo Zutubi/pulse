@@ -62,6 +62,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private List<CleanupRule> cleanupRules = new LinkedList<CleanupRule>();
     private Scm scm;
     private State state = State.IDLE;
+    private long nextBuildNumber = 1;
 
     private CheckoutScheme checkoutScheme = CheckoutScheme.CHECKOUT_ONLY;
 
@@ -534,5 +535,15 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         {
             aclEntries.remove(remove);
         }
+    }
+
+    public long getNextBuildNumber()
+    {
+        return nextBuildNumber;
+    }
+
+    public void setNextBuildNumber(long nextBuildNumber)
+    {
+        this.nextBuildNumber = nextBuildNumber;
     }
 }

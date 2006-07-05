@@ -1,8 +1,8 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.DatabaseBootstrap;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
@@ -194,20 +194,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.queryBuilds(projects, states, specs, earliestStartTime, latestStartTime, hasWorkDir, first, max, mostRecentFirst);
     }
 
-    public long getNextBuildNumber(Project project)
-    {
-        long number = 1;
-        List<BuildResult> builds = getLatestBuildResultsForProject(project, 1);
-        BuildResult previousBuildResult;
-
-        if (builds.size() > 0)
-        {
-            previousBuildResult = builds.get(0);
-            number = previousBuildResult.getNumber() + 1;
-        }
-        return number;
-    }
-
     public void cleanupBuilds()
     {
         // Lookup project cleanup info, query for old builds, cleanup where necessary
@@ -260,6 +246,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
     public Changelist getChangelistByRevision(String serverUid, Revision revision)
     {
         return changelistDao.findByRevision(serverUid, revision);
+    }
+
+    public void delete(BuildResult result)
+    {
+        cleanupResult(result.getProject(), result);
     }
 
     public BuildResult getPreviousBuildResult(BuildResult result)

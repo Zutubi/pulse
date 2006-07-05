@@ -47,6 +47,7 @@ public class BuildController implements EventListener
     private Project project;
     private BuildSpecification specification;
     private EventManager eventManager;
+    private ProjectManager projectManager;
     private BuildManager buildManager;
     private MasterConfigurationManager configurationManager;
     private RecipeQueue queue;
@@ -58,13 +59,14 @@ public class BuildController implements EventListener
     private Scheduler quartzScheduler;
     private ServiceTokenManager serviceTokenManager;
 
-    public BuildController(BuildRequestEvent event, BuildSpecification specification, EventManager eventManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager, ServiceTokenManager serviceTokenManager)
+    public BuildController(BuildRequestEvent event, BuildSpecification specification, EventManager eventManager, ProjectManager projectManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager, ServiceTokenManager serviceTokenManager)
     {
         this.revision = event.getRevision();
         this.reason = event.getReason();
         this.project = event.getProject();
         this.specification = specification;
         this.eventManager = eventManager;
+        this.projectManager = projectManager;
         this.buildManager = buildManager;
         this.queue = queue;
         this.collector = collector;
@@ -101,7 +103,7 @@ public class BuildController implements EventListener
         tree = new BuildTree();
 
         TreeNode<RecipeController> root = tree.getRoot();
-        buildResult = new BuildResult(reason, project, specification.getName(), buildManager.getNextBuildNumber(project));
+        buildResult = new BuildResult(reason, project, specification.getName(), projectManager.getNextBuildNumber(project));
         buildManager.save(buildResult);
         configure(root, buildResult.getRoot(), specification, specification.getRoot());
 

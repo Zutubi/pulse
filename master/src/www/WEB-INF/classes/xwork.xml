@@ -716,6 +716,11 @@
             <result name="success" type="redirect">/configureProject.action?id=${id}</result>
         </action>
 
+        <action name="deleteBuild" class="com.zutubi.pulse.web.project.DeleteBuildAction">
+            <result name="success" type="redirect">/currentBuild.action?id=${result.project.id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="rss" class="com.zutubi.pulse.web.rss.BuildResultsRssAction">
             <result name="disabled" type="velocity">generic-error.vm</result>
         </action>

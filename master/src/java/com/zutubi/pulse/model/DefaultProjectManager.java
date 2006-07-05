@@ -173,6 +173,15 @@ public class DefaultProjectManager implements ProjectManager
         }
     }
 
+    public long getNextBuildNumber(Project project)
+    {
+        project = getProject(project.getId());
+        long number = project.getNextBuildNumber();
+        project.setNextBuildNumber(number + 1);
+        save(project);
+        return number;
+    }
+
     private void requestBuildOfRevision(BuildReason reason, Project project, String specification, Revision revision)
     {
         try

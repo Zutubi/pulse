@@ -104,6 +104,11 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public long getNextBuildNumber(Project project)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public void save(CommitMessageTransformer transformer)
     {
         throw new RuntimeException("Method not implemented.");

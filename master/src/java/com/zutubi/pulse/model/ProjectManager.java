@@ -92,6 +92,8 @@ public interface ProjectManager extends EntityManager<Project>
      */
     void triggerBuild(Project project, String specification, BuildReason reason, BuildRevision revision, boolean force);
 
+    long getNextBuildNumber(Project project);
+
     void save(CommitMessageTransformer transformer);
     CommitMessageTransformer getCommitMessageTransformer(long id);
     void delete(CommitMessageTransformer transformer);

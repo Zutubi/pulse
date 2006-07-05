@@ -76,8 +76,6 @@ public interface BuildManager
      */
     BuildResult getPreviousBuildResult(BuildResult result);
 
-    long getNextBuildNumber(Project project);
-
     void cleanupBuilds();
 
     /**
@@ -97,4 +95,5 @@ public interface BuildManager
 
     Changelist getChangelistByRevision(String serverUid, Revision revision);
 
+    void delete(BuildResult result);
 }

@@ -183,4 +183,9 @@ public class MockBuildManager implements BuildManager
     {
         throw new RuntimeException("Method not implemented.");
     }
+
+    public void delete(BuildResult result)
+    {
+        buildResults.remove(result.getId());
+    }
 }
