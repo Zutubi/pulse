@@ -88,6 +88,16 @@ public interface SCMServer
     List<Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException;
 
     /**
+     * Returns a list of revisions occuring between the given revision and now.
+     * The from revision itself it NOT included in the result.
+     *
+     * @param from the revision before the first revision to return
+     * @return a list of revisions for all changes since from
+     * @throws SCMException if an error occurs talking to the server
+     */
+    List<Revision> getRevisionsSince(Revision from) throws SCMException;
+
+    /**
      * Returns a boolean indicated whether or not a change has occured since the specified revision.
      *
      * @param since

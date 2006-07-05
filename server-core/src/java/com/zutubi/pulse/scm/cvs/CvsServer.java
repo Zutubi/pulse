@@ -265,6 +265,26 @@ public class CvsServer extends CachingSCMServer
         return changes;
     }
 
+    public List<Revision> getRevisionsSince(Revision from) throws SCMException
+    {
+        List<Changelist> changes = getChanges(from, null, "");
+        Collections.sort(changes, new Comparator<Changelist>()
+        {
+            public int compare(Changelist o1, Changelist o2)
+            {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
+
+        List<Revision> result = new LinkedList<Revision>();
+        for(Changelist c: changes)
+        {
+            result.add(c.getRevision());
+        }
+
+        return result;
+    }
+
     private List<Changelist> filterExcludes(List<Changelist> changelists, FilepathFilter filter)
     {
         Iterator<Changelist> changelist = changelists.iterator();

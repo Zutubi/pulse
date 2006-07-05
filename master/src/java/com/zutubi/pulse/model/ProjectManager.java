@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.core.BuildRevision;
 import org.acegisecurity.annotation.Secured;
 
 import java.util.List;
@@ -74,6 +75,22 @@ public interface ProjectManager extends EntityManager<Project>
     @Secured({"ROLE_ADMINISTRATOR"})
     Project cloneProject(Project project, String name, String description);
 
+    /**
+     * Triggers a build of the given specification of the given project by
+     * raising appropriate build request events.  Multiple events may be
+     * raised depending on configuration, for example if the build
+     * specification is marked for changelist isolation.
+     *
+     * @param project       the project to trigger a build of
+     * @param specification name of the specification to build
+     * @param reason        the reason the build was triggered
+     * @param revision      the revision to build, may be fixed to indicate
+     *                      a specific revision, if not fixed then changelist
+     *                      isolation may result in multiple build requests
+     * @param force         if true, force a build to occur even if the
+     *                      latest has been built
+     */
+    void triggerBuild(Project project, String specification, BuildReason reason, BuildRevision revision, boolean force);
 
     void save(CommitMessageTransformer transformer);
     CommitMessageTransformer getCommitMessageTransformer(long id);

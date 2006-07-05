@@ -668,6 +668,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
+        public List<Revision> getRevisionsSince(Revision from) throws SCMException
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
         public boolean hasChangedSince(Revision since) throws SCMException
         {
             throw new RuntimeException("Method not implemented.");

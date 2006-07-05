@@ -151,7 +151,7 @@ public class AddProjectWizard extends BaseWizard
         buildSpecificationNodeDao.save(parent);
 
         // schedule the event trigger - unique to this project.
-        EventTrigger trigger = new EventTrigger(SCMChangeEvent.class, project.getName() + " scm trigger", "scm event triggers", SCMChangeEventFilter.class);
+        EventTrigger trigger = new EventTrigger(SCMChangeEvent.class, "scm trigger", project.getName(), SCMChangeEventFilter.class);
         trigger.setProject(project.getId());
         trigger.setTaskClass(BuildProjectTask.class);
         trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, "default");

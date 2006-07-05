@@ -26,6 +26,8 @@
                 <ref local="distributedSchemaUpgrade"/>
                 <ref local="distributedDataUpgrade"/>
                 <ref local="resourceEnvironment"/>
+                <ref local="changelistIsolationSchemaUpgrade"/>
+                <ref local="triggerForce"/>
             </list>
         </property>
     </bean>
@@ -111,6 +113,19 @@
 
     <bean id="resourceEnvironment" class="com.zutubi.pulse.upgrade.tasks.ResourceEnvironmentUpgradeTask" autowire="byName">
         <property name="buildNumber" value="101000001"/>
+    </bean>
+
+    <bean id="changelistIsolationSchemaUpgrade" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="101000001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0101000001/BuildSpecification.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="triggerForce" class="com.zutubi.pulse.upgrade.tasks.TriggerForceUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="101000002"/>
     </bean>
 
 </beans>

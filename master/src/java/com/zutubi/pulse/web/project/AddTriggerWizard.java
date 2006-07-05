@@ -76,6 +76,7 @@ public class AddTriggerWizard extends BaseWizard
         Project project = projectManager.getProject(getProjectId());
 
         Trigger trigger = null;
+        boolean force = true;
         if (CRON_STATE.equals(selectState.getType()))
         {
             trigger = new CronTrigger(configCron.cron, selectState.getName(), project.getName());
@@ -83,6 +84,7 @@ public class AddTriggerWizard extends BaseWizard
         else if (MONITOR_STATE.equals(selectState.getType()))
         {
             trigger = new EventTrigger(SCMChangeEvent.class, selectState.getName(), project.getName(), SCMChangeEventFilter.class);
+            force = false;
         }
         else if (BUILD_COMPLETED_STATE.equals(selectState.getType()))
         {
@@ -94,6 +96,10 @@ public class AddTriggerWizard extends BaseWizard
         trigger.setTaskClass(BuildProjectTask.class);
         trigger.getDataMap().put(BuildProjectTask.PARAM_PROJECT, project.getId());
         trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, selectState.getSpec());
+        if(force)
+        {
+            trigger.getDataMap().put(BuildProjectTask.PARAM_FORCE, true);
+        }
 
         try
         {

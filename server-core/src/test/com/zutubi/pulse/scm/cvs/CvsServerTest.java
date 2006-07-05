@@ -3,19 +3,20 @@
  */
 package com.zutubi.pulse.scm.cvs;
 
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.core.model.CvsRevision;
-import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.util.FileSystemUtils;
 import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
-import java.util.List;
-import java.util.Arrays;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.List;
 
 public class CvsServerTest extends PulseTestCase
 {
@@ -187,5 +188,15 @@ public class CvsServerTest extends PulseTestCase
         {
             assertTrue(e.getMessage().contains("module"));
         }
+    }
+
+    public void testGetRevisionsSince() throws ParseException, SCMException
+    {
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test/CvsServerTest/testGetChangesBetweenSingleRevision", null, null);
+        CvsRevision from = new CvsRevision("", "", "", SERVER_DATE.parse("2006-05-08 11:07:00 GMT"));
+        CvsRevision to = new CvsRevision("", "", "", SERVER_DATE.parse("2006-05-08 11:08:00 GMT"));
+        List<Revision> revisions = cvsServer.getRevisionsSince(from);
+        assertNotNull(revisions);
+        assertEquals(1, revisions.size());
     }
 }

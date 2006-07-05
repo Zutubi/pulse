@@ -11,6 +11,7 @@ public class BuildSpecification extends Entity implements NamedEntity
     public static final int TIMEOUT_NEVER = 0;
 
     private String name;
+    private boolean isolateChangelists = false;
     private int timeout = TIMEOUT_NEVER;
     private BuildSpecificationNode root = new BuildSpecificationNode(null);
 
@@ -40,6 +41,21 @@ public class BuildSpecification extends Entity implements NamedEntity
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public Boolean getIsolateChangelists()
+    {
+        return isolateChangelists;
+    }
+
+    public void setIsolateChangelists(Boolean isolateChangelists)
+    {
+        if(isolateChangelists == null)
+        {
+            isolateChangelists = Boolean.FALSE;
+        }
+
+        this.isolateChangelists = isolateChangelists;
     }
 
     public int getTimeout()

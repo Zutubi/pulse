@@ -1,10 +1,10 @@
 package com.zutubi.pulse.web.project;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
-import com.opensymphony.util.TextUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +17,7 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
     private Project project;
     private BuildSpecification spec;
     private BuildSpecificationDao buildSpecificationDao;
+    private boolean isolateChangelists;
     private boolean timeoutEnabled;
     private int timeout = 60;
     private static final List<String> PREPARE_PARAMS = Arrays.asList("id", "projectId");
@@ -34,6 +35,16 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
     public BuildSpecification getSpec()
     {
         return spec;
+    }
+
+    public boolean isIsolateChangelists()
+    {
+        return isolateChangelists;
+    }
+
+    public void setIsolateChangelists(boolean isolateChangelists)
+    {
+        this.isolateChangelists = isolateChangelists;
     }
 
     public boolean isTimeoutEnabled()
@@ -116,6 +127,8 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
             return ERROR;
         }
 
+        isolateChangelists = spec.getIsolateChangelists();
+
         timeoutEnabled = spec.getTimeout() != BuildSpecification.TIMEOUT_NEVER;
         if (timeoutEnabled)
         {
@@ -131,6 +144,8 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
 
     public String execute()
     {
+        spec.setIsolateChangelists(isolateChangelists);
+
         if (timeoutEnabled)
         {
             spec.setTimeout(timeout);

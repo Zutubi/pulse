@@ -3,6 +3,7 @@ package com.zutubi.pulse.scm.p4;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
@@ -158,7 +159,7 @@ public class P4ServerTest extends PulseTestCase
         getServer("test-client");
         List<Changelist> changes = server.getChanges(new NumericalRevision(1), new NumericalRevision(7), "");
         assertEquals(6, changes.size());
-        Changelist list = changes.get(4);
+        Changelist list = changes.get(1);
         assertEquals("Delete and edit files in depot2.", list.getComment());
         assertEquals("test-user", list.getUser());
         assertEquals(3, ((NumericalRevision) list.getRevision()).getRevisionNumber());
@@ -312,6 +313,22 @@ public class P4ServerTest extends PulseTestCase
         server.tag(new NumericalRevision(5), "test-tag", false);
         assertTrue(server.labelExists("test-client", "test-tag"));
         server.tag(new NumericalRevision(5), "test-tag", true);
+    }
+
+    public void testGetRevisionsSince() throws SCMException
+    {
+        getServer("test-client");
+        List<Revision> revisions = server.getRevisionsSince(new NumericalRevision(5));
+        assertEquals(2, revisions.size());
+        assertEquals("6", revisions.get(0).getRevisionString());
+        assertEquals("7", revisions.get(1).getRevisionString());
+    }
+
+    public void testGetRevisionsSinceLatest() throws SCMException
+    {
+        getServer("test-client");
+        List<Revision> revisions = server.getRevisionsSince(new NumericalRevision(7));
+        assertEquals(0, revisions.size());
     }
 
     private void getServer(String client)

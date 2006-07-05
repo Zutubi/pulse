@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.core.BuildRevision;
 import org.acegisecurity.annotation.Secured;
 
 import java.util.LinkedList;
@@ -94,6 +95,11 @@ public class MockProjectManager implements ProjectManager
     }
 
     public Project cloneProject(Project project, String name, String description)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public void triggerBuild(Project project, String specification, BuildReason reason, BuildRevision revision, boolean force)
     {
         throw new RuntimeException("Method not implemented.");
     }

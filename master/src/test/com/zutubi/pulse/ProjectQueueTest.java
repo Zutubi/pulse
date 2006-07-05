@@ -1,9 +1,9 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.BuildReason;
+import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.test.PulseTestCase;
 
 /**
@@ -89,7 +89,7 @@ public class ProjectQueueTest extends PulseTestCase
 
     private BuildRequestEvent createEvent(Project project, String spec)
     {
-        return new BuildRequestEvent(this, new MockBuildReason(), project, spec);
+        return new BuildRequestEvent(this, new MockBuildReason(), project, spec, new BuildRevision());
     }
 
     private class MockBuildReason implements BuildReason

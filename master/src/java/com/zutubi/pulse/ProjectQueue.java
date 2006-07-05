@@ -64,15 +64,20 @@ public class ProjectQueue
 
     private void enqueueRequest(List<BuildRequestEvent> projectRequests, BuildRequestEvent event)
     {
-        // Ignore the running build.
-        for (int i = 1; i < projectRequests.size(); i++)
+        // Fixed revisions are always accepted, floating will be filtered out
+        // if there is already a floater for the same project + specification
+        if (!event.getRevision().isFixed())
         {
-            BuildRequestEvent e = projectRequests.get(i);
-            if (e.getSpecification().equals(event.getSpecification()))
+            // Ignore the running build.
+            for (int i = 1; i < projectRequests.size(); i++)
             {
-                // This spec is already queued, no need to remember this
-                // request.
-                return;
+                BuildRequestEvent e = projectRequests.get(i);
+                if (e.getSpecification().equals(event.getSpecification()))
+                {
+                    // This spec is already queued, no need to remember this
+                    // request.
+                    return;
+                }
             }
         }
 

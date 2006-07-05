@@ -1,12 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.util.RandomUtils;
-import com.zutubi.pulse.acceptance.forms.SubversionForm;
 import com.zutubi.pulse.acceptance.forms.CustomDetailsForm;
 import com.zutubi.pulse.acceptance.forms.Maven2DetailsForm;
+import com.zutubi.pulse.acceptance.forms.SubversionForm;
+import com.zutubi.pulse.util.RandomUtils;
 
-import java.util.Properties;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * <class-comment/>
@@ -274,7 +274,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         assertTablePresent("project.triggers");
         assertTableRowsEqual("project.triggers", 1, new String[][]{
                 new String[]{"name", "type", "build specification", "actions", "actions"},
-                new String[]{projectName + " scm trigger", "event", "default", "edit", "delete"},
+                new String[]{"scm trigger", "event", "default", "edit", "delete"},
                 new String[]{"add new trigger", "add new trigger", "add new trigger", "add new trigger", "add new trigger"}
         });
     }

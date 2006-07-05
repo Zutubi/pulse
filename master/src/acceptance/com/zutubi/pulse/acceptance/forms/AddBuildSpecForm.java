@@ -18,11 +18,11 @@ public class AddBuildSpecForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"spec.name", "timeoutEnabled", "timeout", "name", "stage.recipe", "buildHost"};
+        return new String[]{"spec.name", "spec.isolateChangelists", "timeoutEnabled", "timeout", "name", "stage.recipe", "buildHost"};
     }
 
     public int[] getFieldTypes()
     {
-        return new int[] { TEXTFIELD, CHECKBOX, TEXTFIELD, TEXTFIELD, TEXTFIELD, SELECT };
+        return new int[] { TEXTFIELD, CHECKBOX, CHECKBOX, TEXTFIELD, TEXTFIELD, TEXTFIELD, SELECT };
     }
 }

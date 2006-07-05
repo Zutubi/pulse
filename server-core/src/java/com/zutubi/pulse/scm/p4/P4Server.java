@@ -921,11 +921,28 @@ public class P4Server extends CachingSCMServer
     public List<Changelist> getChanges(Revision from, Revision to, String... paths) throws SCMException
     {
         List<Changelist> result = new LinkedList<Changelist>();
+        getRevisions(from, to, result);
+        return result;
+    }
+
+    public List<Revision> getRevisionsSince(Revision from) throws SCMException
+    {
+        return getRevisions(from, null, null);
+    }
+
+    private List<Revision> getRevisions(Revision from, Revision to, List<Changelist> changes) throws SCMException
+    {
+        List<Revision> result = new LinkedList<Revision>();
+
+        String clientName = updateClient(0, null);
+
+        if(to == null)
+        {
+            to = getLatestRevision(clientName);
+        }
 
         long start = ((NumericalRevision) from).getRevisionNumber() + 1;
         long end = ((NumericalRevision) to).getRevisionNumber();
-
-        String clientName = updateClient(0, null);
 
         try
         {
@@ -936,11 +953,17 @@ public class P4Server extends CachingSCMServer
 
                 while (matcher.find())
                 {
-                    Changelist list = getChangelist(clientName, Long.parseLong(matcher.group(1)));
+                    NumericalRevision revision = new NumericalRevision(Long.parseLong(matcher.group(1)));
+                    result.add(0, revision);
 
-                    if (list != null)
+                    if(changes != null)
                     {
-                        result.add(list);
+                        Changelist list = getChangelist(clientName, revision.getRevisionNumber());
+
+                        if (list != null)
+                        {
+                            changes.add(0, list);
+                        }
                     }
                 }
             }

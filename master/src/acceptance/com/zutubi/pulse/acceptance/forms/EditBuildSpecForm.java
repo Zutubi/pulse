@@ -18,11 +18,11 @@ public class EditBuildSpecForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"spec.name", "timeoutEnabled", "timeout"};
+        return new String[]{"spec.name", "isolateChangelists", "timeoutEnabled", "timeout"};
     }
 
     public int[] getFieldTypes()
     {
-        return new int[] { TEXTFIELD, CHECKBOX, TEXTFIELD };
+        return new int[] { TEXTFIELD, CHECKBOX, CHECKBOX, TEXTFIELD };
     }
 }

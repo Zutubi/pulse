@@ -4,9 +4,9 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.model.*;
 
 import java.util.Date;
@@ -122,8 +122,7 @@ public class RemoteApi
                 throw new IllegalArgumentException("Unknown build specification '" + buildSpecification + "'");
             }
 
-            BuildRequestEvent event = new BuildRequestEvent(this, new RemoteTriggerBuildReason(), project, buildSpecification);
-            eventManager.publish(event);
+            projectManager.triggerBuild(project, buildSpecification, new RemoteTriggerBuildReason(), new BuildRevision(), true);
             return true;
         }
         finally

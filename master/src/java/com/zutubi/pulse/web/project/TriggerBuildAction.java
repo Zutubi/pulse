@@ -1,17 +1,15 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.BuildRequestEvent;
+import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.model.BuildSpecification;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
+import com.zutubi.pulse.model.Project;
 
 import java.util.List;
 
 public class TriggerBuildAction extends ProjectActionSupport
 {
     private long id;
-    private EventManager eventManager;
 
     public long getId()
     {
@@ -57,8 +55,7 @@ public class TriggerBuildAction extends ProjectActionSupport
             return ERROR;
         }
 
-        BuildRequestEvent event = new BuildRequestEvent(this, new ManualTriggerBuildReason((String)getPrinciple()), project, spec.getName());
-        eventManager.publish(event);
+        getProjectManager().triggerBuild(project, spec.getName(), new ManualTriggerBuildReason((String)getPrinciple()), new BuildRevision(), true);
 
         try
         {
@@ -70,10 +67,5 @@ public class TriggerBuildAction extends ProjectActionSupport
         }
 
         return SUCCESS;
-    }
-
-    public void setEventManager(EventManager eventManager)
-    {
-        this.eventManager = eventManager;
     }
 }

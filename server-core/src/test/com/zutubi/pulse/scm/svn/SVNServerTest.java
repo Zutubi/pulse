@@ -1,6 +1,9 @@
 package com.zutubi.pulse.scm.svn;
 
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
@@ -195,6 +198,42 @@ public class SVNServerTest extends PulseTestCase
         {
             assertEquals("Unable to apply tag: path '" + TAG_PATH + "' already exists in the repository", e.getMessage());
         }
+    }
+
+    public void testChangesSince() throws SCMException
+    {
+        List<Changelist> changes = server.getChanges(new NumericalRevision(2), null, "");
+        assertEquals(2, changes.size());
+        Changelist changelist = changes.get(0);
+        assertEquals("3", changelist.getRevision().getRevisionString());
+        assertEquals(1, changelist.getChanges().size());
+        assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getFilename());
+        assertEquals(Change.Action.ADD, changelist.getChanges().get(0).getAction());
+        changelist = changes.get(1);
+        assertEquals("4", changelist.getRevision().getRevisionString());
+        assertEquals(1, changelist.getChanges().size());
+        assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getFilename());
+        assertEquals(Change.Action.DELETE, changelist.getChanges().get(0).getAction());
+    }
+
+    public void testRevisionsSince() throws SCMException
+    {
+        List<Revision> revisions = server.getRevisionsSince(new NumericalRevision(2));
+        assertEquals(2, revisions.size());
+        assertEquals("3", revisions.get(0).getRevisionString());
+        assertEquals("4", revisions.get(1).getRevisionString());
+    }
+
+    public void testRevisionsSinceLatestInFiles() throws SCMException
+    {
+        List<Revision> revisions = server.getRevisionsSince(new NumericalRevision(6));
+        assertEquals(0, revisions.size());
+    }
+
+    public void testRevisionsSincePastHead() throws SCMException
+    {
+        List<Revision> revisions = server.getRevisionsSince(new NumericalRevision(9));
+        assertEquals(0, revisions.size());
     }
 
     private List<RemoteFile> getSortedListing(SVNServer confirmServer)

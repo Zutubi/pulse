@@ -1,6 +1,12 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseRuntimeException;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.CommitMessageTransformerDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
@@ -9,6 +15,7 @@ import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
+import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
 
@@ -29,6 +36,8 @@ public class DefaultProjectManager implements ProjectManager
     private Scheduler scheduler;
     private BuildManager buildManager;
     private SubscriptionManager subscriptionManager;
+    private EventManager eventManager;
+    private ChangelistIsolator changelistIsolator;
 
     public void save(Project project)
     {
@@ -131,8 +140,57 @@ public class DefaultProjectManager implements ProjectManager
         return copy;
     }
 
+    public void triggerBuild(Project project, String specification, BuildReason reason, BuildRevision revision, boolean force)
+    {
+        BuildSpecification spec = project.getBuildSpecification(specification);
+        if(spec == null)
+        {
+            LOG.warning("Request to build unknown specification '" + specification + "' of project '" + project.getName() + "'");
+            return;
+        }
+
+        if(!revision.isFixed() && spec.getIsolateChangelists())
+        {
+            // In this case we need to check if there are multiple
+            // outstanding revisions and if so create requests for each one.
+            try
+            {
+                List<Revision> revisions = changelistIsolator.getRevisionsToRequest(project, spec, force);
+                for(Revision r: revisions)
+                {
+                    requestBuildOfRevision(reason, project, specification, r);
+                }
+            }
+            catch (SCMException e)
+            {
+                LOG.error("Unable to determine revisions to build for project '" + project.getName() + "', specification '" + specification + "': " + e.getMessage(), e);
+            }
+        }
+        else
+        {
+            // Just raise one request.
+            eventManager.publish(new BuildRequestEvent(this, reason, project, specification, revision));
+        }
+    }
+
+    private void requestBuildOfRevision(BuildReason reason, Project project, String specification, Revision revision)
+    {
+        try
+        {
+            PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
+            ComponentContext.autowire(pulseFileDetails);
+            String pulseFile = pulseFileDetails.getPulseFile(0, project, revision);
+            eventManager.publish(new BuildRequestEvent(this, reason, project, specification, new BuildRevision(revision, pulseFile)));
+        }
+        catch (BuildException e)
+        {
+            LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision " + revision.getRevisionString() + ": " + e.getMessage(), e);
+        }
+    }
+
     public void initialise()
     {
+        changelistIsolator = new ChangelistIsolator(buildManager);
     }
 
     public void deleteBuildSpecification(Project project, long specId)
@@ -328,5 +386,10 @@ public class DefaultProjectManager implements ProjectManager
     public void setCommitMessageTransformerDao(CommitMessageTransformerDao commitMessageTransformerDao)
     {
         this.commitMessageTransformerDao = commitMessageTransformerDao;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }

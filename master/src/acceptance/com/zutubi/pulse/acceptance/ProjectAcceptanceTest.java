@@ -337,7 +337,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     {
         addSpec(SPEC_NAME);
 
-        assertBuildSpecification(SPEC_NAME, true, 100, new String[] { STAGE_NAME, RECIPE_NAME, "[master]"});
+        assertBuildSpecification(SPEC_NAME, true, true, 100, new String[] { STAGE_NAME, RECIPE_NAME, "[master]"});
 
         // Check back on the configuration tab: ensure spec appears
         clickLinkWithText("configuration");
@@ -353,7 +353,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         assertAndClick("project.buildspec.add");
         form.assertFormPresent();
-        form.saveFormElements(name, "true", "100", STAGE_NAME, RECIPE_NAME, "1");
+        form.saveFormElements(name, "true", "true", "100", STAGE_NAME, RECIPE_NAME, "1");
     }
 
     public void testAddBuildSpecValidation()
@@ -366,7 +366,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         assertAndClick("project.buildspec.add");
         form.assertFormPresent();
-        form.saveFormElements("", "true", "-100", "", "", "1");
+        form.saveFormElements("", "true", "true", "-100", "", "", "1");
         form.assertFormPresent();
 
         assertTextPresent("name is required");
@@ -380,7 +380,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         assertAndClick("project.buildspec.add");
         form.assertFormPresent();
-        form.saveFormElements("default", "true", "100", STAGE_NAME, RECIPE_NAME, "1");
+        form.saveFormElements("default", "false", "true", "100", STAGE_NAME, RECIPE_NAME, "1");
         form.assertFormPresent();
 
         assertTextPresent("'default' already exists");
@@ -393,10 +393,10 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         EditBuildSpecForm form = new EditBuildSpecForm(tester);
         form.assertFormPresent();
-        form.assertFormElements(SPEC_NAME, "true", "100");
-        form.saveFormElements(SPEC_NAME + "_edited", null, null);
+        form.assertFormElements(SPEC_NAME, "true", "true", "100");
+        form.saveFormElements(SPEC_NAME + "_edited", "false", null, null);
 
-        assertBuildSpecification(SPEC_NAME + "_edited", false, 0);
+        assertBuildSpecification(SPEC_NAME + "_edited", false, false, 0);
 
         clickLinkWithText("configuration");
         assertProjectBuildSpecTable(new String[][]{
@@ -412,7 +412,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         EditBuildSpecForm form = new EditBuildSpecForm(tester);
         form.assertFormPresent();
-        form.saveFormElements("", "true", "-100");
+        form.saveFormElements("", "true", "true", "-100");
         form.assertFormPresent();
 
         assertTextPresent("name is required");
@@ -426,7 +426,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         EditBuildSpecForm form = new EditBuildSpecForm(tester);
         form.assertFormPresent();
-        form.saveFormElements("default", "true", "100");
+        form.saveFormElements("default", "true", "true", "100");
         form.assertFormPresent();
 
         assertTextPresent("'default' already exists");
@@ -613,7 +613,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     public void testAddNewTrigger()
     {
         assertProjectTriggerTable(new String[][]{
-                getTriggerRow(projectName + " scm trigger", "event", "default"),
+                getTriggerRow("scm trigger", "event", "default"),
         });
 
         assertLinkPresent("project.trigger.add");
@@ -633,14 +633,14 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         submit("next");
 
         assertProjectTriggerTable(new String[][]{
-                getTriggerRow(projectName + " scm trigger", "event", "default"),
+                getTriggerRow("scm trigger", "event", "default"),
                 getTriggerRow(TRIGGER_NAME, "cron", "default"),
         });
     }
 
     public void testDeleteTrigger()
     {
-        String triggerName = projectName + " scm trigger";
+        String triggerName = "scm trigger";
         assertProjectTriggerTable(new String[][]{
                 getTriggerRow(triggerName, "event", "default"),
         });
@@ -654,7 +654,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     public void testCreateTriggerValidation()
     {
         // ensure that the name remains unique.
-        String triggerName = projectName + " scm trigger"; // this is the default trigger name.
+        String triggerName = "scm trigger"; // this is the default trigger name.
         assertProjectTriggerTable(new String[][]{
                 getTriggerRow(triggerName, "event", "default")
         });
@@ -717,7 +717,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         form.saveFormElements("new name", SPEC_NAME, "0 0 1 * * ?");
 
         assertProjectTriggerTable(new String[][]{
-                getTriggerRow(projectName + " scm trigger", "event", "default"),
+                getTriggerRow("scm trigger", "event", "default"),
                 getTriggerRow("new name", "cron", SPEC_NAME)
         });
 
@@ -733,7 +733,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         form.cancelFormElements("new name", SPEC_NAME, "0 0 1 * * ?");
 
         assertProjectTriggerTable(new String[][]{
-                getTriggerRow(projectName + " scm trigger", "event", "default"),
+                getTriggerRow("scm trigger", "event", "default"),
                 getTriggerRow(TRIGGER_NAME, "cron", "default"),
         });
     }
@@ -764,10 +764,10 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         testAddBuildSpec();
 
         EventTriggerEditForm form = new EventTriggerEditForm(tester);
-        assertAndClick(getEditId(projectName + " scm trigger"));
+        assertAndClick(getEditId("scm trigger"));
 
         form.assertFormPresent();
-        form.assertFormElements(projectName + " scm trigger", "default");
+        form.assertFormElements("scm trigger", "default");
         assertOptionValuesEqual("specification", new String[]{"default", SPEC_NAME});
         return form;
     }
@@ -788,7 +788,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         form.cancelFormElements("new name", SPEC_NAME);
 
         assertProjectTriggerTable(new String[][]{
-                getTriggerRow(projectName + " scm trigger", "event", "default"),
+                getTriggerRow("scm trigger", "event", "default"),
         });
     }
 
@@ -805,7 +805,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     public void testAddNewBuildCompletedTrigger()
     {
         assertProjectTriggerTable(new String[][]{
-                getTriggerRow(projectName + " scm trigger", "event", "default"),
+                getTriggerRow("scm trigger", "event", "default"),
         });
 
         assertLinkPresent("project.trigger.add");
@@ -825,7 +825,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         form.nextFormElements(id, "default", "FAILURE");
 
         assertProjectTriggerTable(new String[][]{
-                getTriggerRow(projectName + " scm trigger", "event", "default"),
+                getTriggerRow("scm trigger", "event", "default"),
                 getTriggerRow(TRIGGER_NAME, "event", "default"),
         });
     }
@@ -1263,7 +1263,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertTableRowsEqual("project.buildspecs", 2, rows);
     }
 
-    private void assertBuildSpecification(String specName, boolean timeoutEnabled, int timeout, String[]... stages)
+    private void assertBuildSpecification(String specName, boolean isolateChangelists, boolean timeoutEnabled, int timeout, String[]... stages)
     {
         String timeoutText = "[never]";
 
@@ -1274,6 +1274,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         assertTableRowsEqual("spec.basics", 1, new String[][] {
                 new String[]{ "name", specName },
+                new String[]{ "isolate changelists", Boolean.toString(isolateChangelists) },
                 new String[]{ "timeout", timeoutText }
         });
 

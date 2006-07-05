@@ -23,10 +23,7 @@ import org.tmatesoft.svn.core.wc.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * A connection to a subversion server.
@@ -318,6 +315,11 @@ public class SVNServer implements SCMServer
 
     public List<Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException
     {
+        if(to == null)
+        {
+            to = getLatestRevision();
+        }
+        
         List<Changelist>  result = new LinkedList<Changelist>();
         long fromNumber = convertRevision(from).getNumber() + 1;
         long toNumber = convertRevision(to).getNumber();
@@ -361,6 +363,26 @@ public class SVNServer implements SCMServer
             {
                 throw convertException(e);
             }
+        }
+
+        return result;
+    }
+
+    public List<Revision> getRevisionsSince(Revision from) throws SCMException
+    {
+        List<Changelist> changes = getChanges(from, null, "");
+        Collections.sort(changes, new Comparator<Changelist>()
+        {
+            public int compare(Changelist o1, Changelist o2)
+            {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
+
+        List<Revision> result = new LinkedList<Revision>();
+        for(Changelist change: changes)
+        {
+            result.add(change.getRevision());
         }
 
         return result;

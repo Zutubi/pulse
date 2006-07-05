@@ -1,7 +1,6 @@
 package com.zutubi.pulse.scheduling.tasks;
 
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.BuildRequestEvent;
+import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.TriggerBuildReason;
@@ -10,6 +9,9 @@ import com.zutubi.pulse.scheduling.TaskExecutionContext;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.util.logging.Logger;
 
+import java.io.Serializable;
+import java.util.Map;
+
 /**
  * <class-comment/>
  */
@@ -17,33 +19,30 @@ public class BuildProjectTask implements Task
 {
     public static final String PARAM_SPEC = "spec";
     public static final String PARAM_PROJECT = "project";
+    public static final String PARAM_FORCE = "force";
 
     private static final Logger LOG = Logger.getLogger(BuildProjectTask.class);
 
-    private EventManager eventManager;
     private ProjectManager projectManager;
 
     public void execute(TaskExecutionContext context)
     {
         Trigger trigger = context.getTrigger();
-        String spec = (String) trigger.getDataMap().get(PARAM_SPEC);
-        long projectId = (Long)trigger.getDataMap().get(PARAM_PROJECT);
-        Project project = projectManager.getProject(projectId);
+        Map<Serializable, Serializable> dataMap = trigger.getDataMap();
+        String spec = (String) dataMap.get(PARAM_SPEC);
+        long projectId = (Long)dataMap.get(PARAM_PROJECT);
+        boolean force = dataMap.containsKey(PARAM_FORCE);
 
+        Project project = projectManager.getProject(projectId);
         if (project != null)
         {
             // generate build request.
-            eventManager.publish(new BuildRequestEvent(this, new TriggerBuildReason(trigger.getName()), project, spec));
+            projectManager.triggerBuild(project, spec, new TriggerBuildReason(trigger.getName()), new BuildRevision(), force);
         }
         else
         {
             LOG.warning("Build project task fired for unknown project '" + projectId + "' (trigger '" + trigger.getName() + "')");
         }
-    }
-
-    public void setEventManager(EventManager eventManager)
-    {
-        this.eventManager = eventManager;
     }
 
     public void setProjectManager(ProjectManager projectManager)

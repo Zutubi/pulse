@@ -149,4 +149,19 @@ public class Revision extends Entity implements Comparable<Revision>
         // Oh well, go for lexical ordering then
         return revisionString.compareTo(r.revisionString);
     }
+
+    public boolean equals(Object other)
+    {
+        if(other == null || !(other instanceof Revision))
+        {
+            return false;
+        }
+
+        return revisionString.equals(((Revision)other).revisionString);
+    }
+
+    public int hashCode()
+    {
+        return revisionString.hashCode();
+    }
 }
