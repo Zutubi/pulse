@@ -70,17 +70,19 @@
             {
                 onResize(event);
 
-                document.title = "Select path";
+                document.title = "Select directory";
 
                 var initialPath = getFormValue();
 
                 // initialise toolbar items.
                 var goUpTree = new ToolbarItem('up');
+                goUpTree.setTooltip('Go up a directory');
                 goUpTree.onClick = function()
                 {
                     YAHOO.widget.TreeView.getTree('browseTree').goUp();
                 };
                 var goToHome = new ToolbarItem('home');
+                goToHome.setTooltip('Go to home');
                 goToHome.onClick = function()
                 {
                     //TODO: configure pulse home directory.
@@ -239,8 +241,9 @@
 <body>
 
     <div>
-        <b>Select pulse data directory</b>
         <p>
+            <b>Select pulse data directory</b>
+            <br/>
             All pulse data files will be stored in this directory.
         </p>
     </div>

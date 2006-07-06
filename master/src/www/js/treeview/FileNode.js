@@ -316,8 +316,16 @@ FileNode.prototype.getNodeHtml = function() {
     sb[sb.length] = ' id="' + this.getFileElId() + '"';
     sb[sb.length] = ' class="' + this.getFileStyle(false) + '"';
     sb[sb.length] = ' onclick="javascript:' + this.getFileToggleLink(true) + '"';
+    if (this.hasChildren(true))
+    {
+        sb[sb.length] = ' onmouseover="document.getElementById(\'';
+        sb[sb.length] = this.getToggleElId() + '\').className=';
+        sb[sb.length] = getNode + '.getHoverStyle()"';
+        sb[sb.length] = ' onmouseout="document.getElementById(\'';
+        sb[sb.length] = this.getToggleElId() + '\').className=';
+        sb[sb.length] = getNode + '.getStyle()"';
+    }
     sb[sb.length] = '>';
-//    sb[sb.length] = '&nbsp';
     sb[sb.length] = '</td>';
 
     // label rendering.
@@ -329,15 +337,6 @@ FileNode.prototype.getNodeHtml = function() {
 	sb[sb.length] = ' target="' + this.target + '"';
 	sb[sb.length] = ' onclick="return ' + getNode + '.onLabelClick(' + getNode +')"';
 	sb[sb.length] = ' ondblclick="return ' + getNode + '.onLabelDblClick(' + getNode +')"';
-	if (this.hasChildren(true))
-    {
-		sb[sb.length] = ' onmouseover="document.getElementById(\'';
-		sb[sb.length] = this.getToggleElId() + '\').className=';
-		sb[sb.length] = getNode + '.getHoverStyle()"';
-		sb[sb.length] = ' onmouseout="document.getElementById(\'';
-		sb[sb.length] = this.getToggleElId() + '\').className=';
-		sb[sb.length] = getNode + '.getStyle()"';
-	}
 	sb[sb.length] = ' >';
 	sb[sb.length] = this.label;
 	sb[sb.length] = '</a>';

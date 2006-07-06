@@ -1,4 +1,4 @@
-/* Copyright (c) 2006 Yahoo! Inc. All rights reserved. */
+/*---( Yahoo treeview folder styles )---*/
 
 /* first or middle sibling, no children */
 .ygtvtn { background: url(../../images/treeview/tn.gif) 0 0 no-repeat; width:17px; height:22px; }
@@ -46,13 +46,13 @@
 .ygtvchildren { }  
 * html .ygtvchildren { height:1%; }  
 
-/* the style of the text label in ygTextNode */
+/* the style of the text label */
 .ygtvlabel, .ygtvlabel:link, .ygtvlabel:visited, .ygtvlabel:hover { 
 	margin-left:2px;
 	text-decoration: none;
 }
 
-/* node type styles */
+/*---( Treeview node styles )---*/
 .file {
     background: url(../../images/treeview/file.gif); 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
 }
@@ -66,23 +66,24 @@
 }
 
 .selected {
-    color:white; background-color:#316AC5;
+    color:white;
+    background-color:#316AC5;
     border-width:1px; border-color:#316AC5; border-style:solid;
 }
 
-/* toolbar styles */
+/*---( Toolbar styles )---*/
+
 .up {
     background-image: url(../../images/arrow_up.gif);
 }
 
 .home {
-    background-image: url(../../images/house.png);
+    background-image: url(../../images/house.gif);
 }
 
 .toolbaritem {
-    width:22px;
-    height:22px;
-    padding-right:5px;
+    width:27px;
+    height:27px;
     background-position:5px;
     background-repeat:no-repeat;
 
@@ -100,9 +101,23 @@
 }
 
 #toolbar .selected {
-    background-color:#316AC5;
+    background-color:#B5BED6;
     border-width:1px;
     border-color:blue;
+    /*border-color:#08246B;*/
     border-style:solid;
 }
 
+/*---( Tooltip styles)---*/
+
+#tooltip {
+    padding: 3px;
+    background: #f9f9f9;
+    border: 1px solid black;
+    text-align: center;
+    font-size: smaller;
+}
+
+.tip {
+    border-bottom: 1px solid #eee;
+}
