@@ -374,3 +374,15 @@ function windowSize()
     return {"width":myWidth, "height":myHeight};
 }
 
+function openDebugAlert(obj)
+{
+    if (obj)
+    {
+        var temp = "";
+        for (x in obj)
+        {
+            temp += x + ": " + obj[x] + "\n";
+        }
+        alert (temp);
+    }
+}

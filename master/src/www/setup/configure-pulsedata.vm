@@ -1,6 +1,17 @@
 <html>
 <head>
     <title>#wwtext("name=data.setup")</title>
+    <script type="text/javascript">
+        <!--
+        function openPopup()
+        {
+            var formElement = document.forms['setup.data'].elements['data'];
+            window.open('/popups/browse-dir.action?formname=setup.data&fieldname=data&initPath=' + formElement.value, 'browse_popup', 'width=400, height=550, resizable=yes', false);
+            return false
+        }
+        //-->
+    </script>
+
 </head>
 
 <body>
@@ -10,7 +21,10 @@
 
 #wwcform("action=setupData.action" "heading=%{getText('data.setup')}" "name=setup.data" "method=post")
 
-    #wwtextfield("name=data" "label=%{getText('data.field')}" "required=true" "size=60" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("template=controlheader" "name=data" "required=true" "label=%{getText('data.field')}")
+    #wwtextfield("theme=simple" "template=ctext" "name=data" "size=60" "tabindex=1" "onkeypress=return submitenter(this,event);")
+    #wwsubmit("theme=simple" "name=browse" "value=..." "onclick=openPopup(); return false;")
+    #wwtextfield("template=controlfooter" "name=data")
     #inlineHelp("data.help")
 
     #next(2)

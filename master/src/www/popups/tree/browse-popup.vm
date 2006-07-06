@@ -33,96 +33,6 @@
                 expandToPath();
             }
 
-            function expandToPath()
-            {
-                if (window.retry <= 0)
-                {
-                    return;
-                }
-                window.retry = window.retry - 1;
-
-                var initialPath = window.initialPath;
-
-                var treeView = ZUTUBI.widget.View.getTreeById("browse");
-                var node = treeView.getRoot();
-
-                // search for node with name initialPath.
-                for (var i = 0; i < initialPath.length; i++)
-                {
-                    var path = initialPath[i];
-                    if (!node.expanded)
-                    {
-                        node._expand();
-                    }
-
-                    if (node.isLoaded)
-                    {
-                        // node is loaded, so lets go to  the next one.
-                        node = $A(node.children).find(function(child)
-                        {
-                            return child.data.name == path;
-                        });
-                        if (!node)
-                        {
-                            // unable to locate the requested node.
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        // node is still loading, so lets wait.
-                        setTimeout(expandToPath, 250);
-                        return;
-                    }
-                }
-
-                // select the node.
-                if (node)
-                {
-                    treeView._select(node);
-                }
-            }
-
-            function onSelectCallback(node)
-            {
-                // a) display the path to the currently selected node.
-                // construct the path.
-                var currentPathDisplay = document.getElementById('path');                
-                $A(currentPathDisplay.childNodes).each(function(child)
-                {
-                    Element.remove(child);
-                });
-
-                var pathToDisplay = "";
-                if (node && !node.isRoot())
-                {
-                    if (node.isFolder())
-                    {
-                        pathToDisplay = node.getPath();
-                    }
-                    else
-                    {
-                        if (node.getParent())
-                        {
-                            pathToDisplay = node.getParent().getPath();
-                        }
-                    }
-                }
-                currentPathDisplay.appendChild(document.createTextNode(pathToDisplay));
-
-                // b) display the name of the currently selected node.
-                // clear out the existing content.
-                var selectedDisplay = document.getElementById('selected');
-                selectedDisplay.value = "";
-                if (node && !node.isRoot())
-                {
-                    if (!node.isFolder())
-                    {
-                        selectedDisplay.value = node.data.name;
-                    }
-                }
-            }
-
             function removeAll(element)
             {
                 $A(element.childNodes).each(function(child)
@@ -158,33 +68,6 @@
                 }
                 return false;
             }
-
-            /*
-             * Handle the resizing of the viewport to ensure that it is the correct size for
-             * the open window.
-             */
-            function onResize(event)
-            {
-                var vElem = document.getElementById("view");
-
-                var pElem = document.getElementById("pathElement");
-                var fElem = document.getElementById("selectForm");
-                var tElem = document.getElementById("toolbar");
-
-                var pDim = Element.getDimensions(pElem);
-                var fDim = Element.getDimensions(fElem);
-                var tDim = Element.getDimensions(tElem);
-                var wDim = windowSize();
-
-                // work out the fudge factor - ie: the margin values.
-                var fudgeFactor = 70;
-
-                // todo: remove this fudge factor - it represents the height of the margins.
-                var viewHeight = wDim.height - tDim.height - pDim.height - fDim.height - fudgeFactor;
-                Element.setStyle(vElem, {"height":viewHeight + "px"});
-                Element.setStyle(vElem, {"width":pDim.width + "px"});
-            }
-
 
             function openNewFolderPopup()
             {

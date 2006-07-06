@@ -101,6 +101,13 @@ YAHOO.widget.TreeView.prototype.expandTo = function(requestPath)
 
 YAHOO.widget.TreeView.prototype.expandToPath = function(requestPath)
 {
+    if (!requestPath)
+    {
+        return;
+    }
+
+    // split the request path into its components.
+
     var status = this.expandTo(requestPath);
     if (status == 1)
     {

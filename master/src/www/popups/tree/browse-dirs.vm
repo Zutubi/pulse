@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head>
+    <title>file browser</title>
+
+    <link rel="stylesheet" type="text/css" href="/css/treeview/tree.css"/>
+
+    <script type="text/javascript" src="/prototype.js"></script>
+    <script type="text/javascript" src="/js/yahoo/yahoo.js"></script>
+    <script type="text/javascript" src="/js/yahoo/treeview.js"></script>
+    <script type="text/javascript" src="/js/treeview/FileNode.js"></script>
+    <script type="text/javascript" src="/js/Toolbar.js"></script>
+    <script type="text/javascript" src="/main.js"></script>
+    <script type="text/javascript">
+        <!--
+            // define the init properties that control the tree.
+
+            window.onload = onInit;
+            window.onresize = onResize;
+
+            function qs()
+            {
+                var qsParm = new Array();
+                var query = window.location.search.substring(1);
+                var parms = query.split('&');
+                for (var i=0; i<parms.length; i++) {
+                    var pos = parms[i].indexOf('=');
+                    if (pos > 0) {
+                        var key = parms[i].substring(0,pos);
+                        var val = parms[i].substring(pos+1);
+                        qsParm[key] = val;
+                    }
+                }
+                return qsParm;
+            }
+
+            function getFormValue()
+            {
+                // this form is what it is all about, providing an easy graphical method for
+                // setting a value quickly, easily and accurately.
+                var params = qs();
+                var formname = params['formname'];
+                var fieldname = params['fieldname'];
+
+                var formFieldObject = opener.document.forms[formname].elements[fieldname];
+                return formFieldObject.value;
+            }
+
+            function setFormValue(newValue)
+            {
+                var params = qs();
+                var formname = params['formname'];
+                var fieldname = params['fieldname'];
+
+                var formFieldObject = opener.document.forms[formname].elements[fieldname];
+                formFieldObject.value = newValue;
+            }
+
+            function copySelectedToParentForm()
+            {
+                var tree = YAHOO.widget.TreeView.getTree('browseTree');
+                if (tree.selected)
+                {
+                    setFormValue(tree.selected.getPath());
+                }
+                return false;
+            }
+
+            function onInit(event)
+            {
+                onResize(event);
+
+                var initialPath = getFormValue();
+
+                // initialise toolbar items.
+                var goUpTree = new ToolbarItem('up');
+                goUpTree.onClick = function()
+                {
+                    YAHOO.widget.TreeView.getTree('browseTree').goUp();
+                };
+                var goToHome = new ToolbarItem('home');
+                goToHome.onClick = function()
+                {
+                    //TODO: configure pulse home directory.
+                    YAHOO.widget.TreeView.getTree('browseTree').expandToPath(['C:\\', 'backup', 'SD0033']);
+                }
+
+                // construct the toolbar.
+                var toolbar = new Toolbar('toolbar');
+                toolbar.add(goUpTree);
+                toolbar.add(goToHome);
+                toolbar.draw();
+
+                // construct the directory browser.
+                var tree = new YAHOO.widget.TreeView('browseTree');
+                var dirOnly = true;
+
+                tree.setDynamicLoad(function(node, onCompleteCallback)
+                {
+                    list(node, onCompleteCallback, dirOnly);
+                }, 1);
+
+                tree.onActivate = function(node)
+                {
+                    if (node.hasChildren(true))
+                    {
+                        node.fileToggle();
+                    }
+                    else
+                    {
+                        // this node has been selected.
+                    }
+                };
+
+                // load the root nodes for the file system, then draw the tree.
+                list(tree.getRoot(), function()
+                {
+                    tree.draw();
+
+//                    var initialPath = ["C:\\", "tmp", "empty"];
+                    tree.expandToPath(initialPath);
+                });
+            }
+
+            /*
+             * Handle the resizing of the viewport to ensure that it is the correct size for
+             * the open window.
+             */
+            function onResize(event)
+            {
+                var vElem = document.getElementById("view");
+
+                var tElem = document.getElementById("toolbar");
+
+                var tDim = Element.getDimensions(tElem);
+                var wDim = windowSize();
+
+                // work out the fudge factor - ie: the margin values.
+                var fudgeFactor = 90;
+
+                var viewHeight = wDim.height - tDim.height - fudgeFactor;
+                Element.setStyle(vElem, {"height":viewHeight + "px"});
+            }
+
+            function list(node, onCompleteCallback, dirOnly)
+            {
+                // generate id path.
+                var n = node;
+                var path = "";
+                var p = ""
+                var sep = "";
+                while (n)
+                {
+                    if (n.data)
+                    {
+                        path = n.data.id + sep + path;
+                        p = n.data.name + sep + p;
+                        sep = "/";
+                    }
+                    n = n.parent;
+                }
+
+                var ajax = new Ajax.Request(
+                    "/ajax/list.action",
+                    {
+                        method: 'get',
+                        onComplete: listResponse(node, onCompleteCallback),
+                        onFailure: handleFailure,
+                        onException: handleException,
+                        parameters: "pid=" + path + (dirOnly && "&dirOnly=true" || "")
+                    }
+                );
+            }
+
+            function listResponse(parentNode, callback)
+            {
+                return function(response)
+                {
+                    var jsonObjs = eval("(" + response.responseText + ")");
+
+                    var results = $A(jsonObjs.results);
+                    results.each(function(jsonObj)
+                    {
+                        // create the new nodes and add them to the parent.
+                        for (var i = 0; i < jsonObj.listing.length; i++)
+                        {
+                            var data = {
+                                "id":jsonObj.listing[i].fid,
+                                "name":jsonObj.listing[i].file,
+                                "label":jsonObj.listing[i].file,
+                                "type":jsonObj.listing[i].type,
+                                "separator":jsonObj.listing[i].separator
+                            };
+                            new FileNode(data, parentNode, false);
+                        }
+                    });
+                    if (callback)
+                    {
+                        callback();
+                    }
+                };
+            }
+
+            handleFailure = function(e, e2)
+            {
+                alert("handleFailure");
+            }
+
+            handleException = function(e, e2)
+            {
+                openDebugAlert(e2);
+            }
+
+            //-->
+    </script>
+
+    <style type="text/css">
+        .viewport{
+            overflow:auto;
+        }
+
+        .bordered{
+            margin:0px 0px 10px 0px;
+            border-width:1px;
+            border-color:blue;
+            border-style:solid;
+        }
+
+        .nofluff {
+           margin:0px;
+           padding:0px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="bordered" id="toolbar">
+    </div>
+
+    <div class="viewport bordered" id="view">
+        <div id="browseTree"></div>
+    </div>
+
+    <form class="nofluff" name="form" action="" onSubmit="window.close();">
+        <table width="100%">
+            <tr width="100%">
+                <td align="right">
+                    <input type="submit" value="okay" onclick="copySelectedToParentForm();"/>
+                    <input type="submit" value="cancel"/>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</body>
+</html>

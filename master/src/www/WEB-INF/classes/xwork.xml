@@ -724,13 +724,6 @@
         <action name="rss" class="com.zutubi.pulse.web.rss.BuildResultsRssAction">
             <result name="disabled" type="velocity">generic-error.vm</result>
         </action>
-
-<!--
-        <action name="browse" class="com.opensymphony.xwork.ActionSupport">
-            <result name="success" type="velocity">browse.vm</result>
-        </action>
--->
-
     </package>
 
     <package name="user" namespace="/user" extends="webwork-default-package">
@@ -1166,6 +1159,14 @@
             <result name="success" type="json">fslistings.xml</result>
         </action>
 
+        <action name="add" class="com.zutubi.pulse.web.fs.MakeDirectoryAction">
+            <result name="success" type="json">addedfolder.xml</result>
+        </action>
+
+        <action name="delete" class="com.zutubi.pulse.web.fs.DeleteFileAction">
+            <result name="success" type="json">deletefile.xml</result>
+        </action>
+
     </package>
 
     <package name="popups" namespace="/popups" extends="webwork-default-package">
@@ -1181,11 +1182,17 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-<!--
         <action name="browse-popup" class="com.zutubi.pulse.web.tree.PopupFormAction">
             <result name="success" type="velocity">tree/browse-popup.vm</result>
         </action>
--->
+
+        <action name="browse-dir" class="com.zutubi.pulse.web.ActionSupport">
+            <result name="success" type="velocity">tree/browse-dir.vm</result>
+        </action>
+
+        <action name="new-folder" class="com.zutubi.pulse.web.ActionSupport">
+            <result name="success" type="velocity">tree/browse-new-folder.vm</result>
+        </action>
 
     </package>
 
