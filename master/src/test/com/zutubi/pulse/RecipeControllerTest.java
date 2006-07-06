@@ -133,7 +133,8 @@ public class RecipeControllerTest extends PulseTestCase
         // A command completed event should result in the command result
         // in the event being applied to the recipe result.
         CommandResult commandResult = new CommandResult("test command");
-        commandResult.commence(new File("/some/dir"));
+        commandResult.commence();
+        commandResult.setOutputDir("dummy");
         commandResult.complete();
         CommandCompletedEvent event = new CommandCompletedEvent(this, rootResult.getId(), commandResult);
 

@@ -57,7 +57,7 @@ public class RecipeProcessor
         // assembled elsewhere.
         RecipeResult result = new RecipeResult(request.getRecipeName());
         result.setId(request.getId());
-        result.commence(paths.getOutputDir());
+        result.commence();
 
         runningRecipe = request.getId();
         eventManager.publish(new RecipeCommencedEvent(this, request.getId(), request.getRecipeName(), result.getStamps().getStartTime()));
@@ -154,7 +154,8 @@ public class RecipeProcessor
 
     private void executeCommand(long recipeId, CommandResult result, RecipePaths paths, File commandOutput, Command command)
     {
-        result.commence(commandOutput);
+        result.commence();
+        result.setOutputDir(commandOutput.getPath());
         eventManager.publish(new CommandCommencedEvent(this, recipeId, result.getCommandName(), result.getStamps().getStartTime()));
 
         try

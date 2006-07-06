@@ -246,7 +246,7 @@ public class SetupDummyBuilds implements Runnable
         BuildScmDetails scmDetails = new BuildScmDetails(new NumericalRevision(16672));
         result.setScmDetails(scmDetails);
 
-        result.commence(new File("/complex/build/output/dir"));
+        result.commence();
         RecipeResultNode rootResultNode = createComplexRecipe("root recipe");
         RecipeResultNode childNode = createComplexRecipe("child recipe");
         rootResultNode.addChild(childNode);
@@ -264,7 +264,7 @@ public class SetupDummyBuilds implements Runnable
     {
         BuildResult result = createBuildResult(project, 1111);
 
-        result.commence(new File("test"));
+        result.commence();
         RecipeResultNode node = createInProgressRecipe();
         result.getRoot().addChild(node);
         buildResultDao.save(result);
@@ -279,7 +279,7 @@ public class SetupDummyBuilds implements Runnable
     {
         BuildResult result = createBuildResult(project, 666);
 
-        result.commence(new File("test"));
+        result.commence();
         RecipeResultNode root = createInProgressRecipe();
         RecipeResultNode pending1 = createPendingRecipe();
         RecipeResultNode pending2 = createPendingRecipe();
@@ -298,7 +298,7 @@ public class SetupDummyBuilds implements Runnable
     {
         BuildResult result = createBuildResult(project, id);
 
-        result.commence(new File("/complex/build/output/dir"));
+        result.commence();
         RecipeResultNode rootResultNode = createCommandFailedRecipe();
         RecipeResultNode childNode = createCommandFailedRecipe();
         rootResultNode.addChild(childNode);
@@ -312,7 +312,7 @@ public class SetupDummyBuilds implements Runnable
     {
         BuildResult result = createBuildResult(project, id);
 
-        result.commence(new File("/complex/build/output/dir"));
+        result.commence();
         RecipeResultNode rootResultNode = createComplexRecipe("root recipe");
         result.getRoot().addChild(rootResultNode);
         result.error("something real bad happened");
@@ -329,7 +329,7 @@ public class SetupDummyBuilds implements Runnable
     {
         BuildResult result = createBuildResult(project, id);
 
-        result.commence(new File("/complex/build/output/dir"));
+        result.commence();
         RecipeResultNode rootResultNode = createWarningFeaturesRecipe();
         RecipeResultNode childNode = createComplexRecipe("root recipe");
         rootResultNode.addChild(childNode);
@@ -342,7 +342,7 @@ public class SetupDummyBuilds implements Runnable
     {
         BuildResult result = createBuildResult(project, 10000);
         buildResultDao.save(result);
-        result.commence(new File("/complex/build/output/dir"));
+        result.commence();
         RecipeResultNode rootResultNode = createErrorFeaturesRecipe(project, result);
         RecipeResultNode childNode = createComplexRecipe("child recipe");
         rootResultNode.addChild(childNode);
@@ -355,7 +355,7 @@ public class SetupDummyBuilds implements Runnable
     {
         BuildResult result = createBuildResult(project, 101);
 
-        result.commence(new File("/complex/build/output/dir"));
+        result.commence();
         RecipeResultNode node = createTerminatingRecipe();
         result.getRoot().addChild(node);
         result.terminate(true);
@@ -367,7 +367,7 @@ public class SetupDummyBuilds implements Runnable
         BuildResult result = createBuildResult(project, 666);
 
         buildResultDao.save(result);
-        result.commence(System.currentTimeMillis());
+        result.commence();
         RecipeResultNode resultNode = createTestErrorsRecipe(project, result);
         result.getRoot().addChild(resultNode);
         result.failure("recipe :: " + resultNode.getResult().getRecipeNameSafe() + " :: some tests broken");
@@ -384,7 +384,7 @@ public class SetupDummyBuilds implements Runnable
     {
         RecipeResult recipeResult = new RecipeResult(name);
 
-        recipeResult.commence(new File("/complex/recipe/output/dir"));
+        recipeResult.commence();
         recipeResult.add(createComplexCommand());
         recipeResult.add(createComplexCommand());
         recipeResult.add(createComplexCommand());
@@ -399,7 +399,7 @@ public class SetupDummyBuilds implements Runnable
     {
         RecipeResult recipeResult = new RecipeResult(null);
 
-        recipeResult.commence(new File("/complex/recipe/output/dir"));
+        recipeResult.commence();
         recipeResult.add(createComplexCommand());
         recipeResult.add(createInProgressCommand());
         recipeResult.add(createPendingCommand());
@@ -414,7 +414,7 @@ public class SetupDummyBuilds implements Runnable
     {
         RecipeResult recipeResult = new RecipeResult(null);
 
-        recipeResult.commence(new File("/complex/recipe/output/dir"));
+        recipeResult.commence();
         recipeResult.add(createComplexCommand());
         recipeResult.add(createTerminatingCommand());
         recipeResult.terminate(true);
@@ -433,7 +433,7 @@ public class SetupDummyBuilds implements Runnable
     {
         RecipeResult recipeResult = new RecipeResult(null);
 
-        recipeResult.commence(new File("/complex/recipe/output/dir"));
+        recipeResult.commence();
         recipeResult.add(createComplexCommand());
         recipeResult.add(createComplexCommand());
         recipeResult.add(createFailedCommand());
@@ -448,7 +448,7 @@ public class SetupDummyBuilds implements Runnable
     {
         RecipeResult recipeResult = new RecipeResult(null);
 
-        recipeResult.commence(new File("/complex/recipe/output/dir"));
+        recipeResult.commence();
         recipeResult.add(createComplexCommand());
         recipeResult.add(createWarningFeaturesCommand());
         recipeResult.add(createComplexCommand());
@@ -464,7 +464,7 @@ public class SetupDummyBuilds implements Runnable
         RecipeResult recipeResult = new RecipeResult(null);
         buildResultDao.save(recipeResult);
         File recipeDir = masterBuildPaths.getRecipeDir(project, buildResult, recipeResult.getId());
-        recipeResult.commence(recipeDir);
+        recipeResult.commence();
         recipeResult.add(createComplexCommand());
         recipeResult.add(createWarningFeaturesCommand());
         recipeResult.add(createComplexCommand());
@@ -481,7 +481,7 @@ public class SetupDummyBuilds implements Runnable
         RecipeResult recipeResult = new RecipeResult(null);
         buildResultDao.save(recipeResult);
         File recipeDir = masterBuildPaths.getRecipeDir(project, buildResult, recipeResult.getId());
-        recipeResult.commence(recipeDir);
+        recipeResult.commence();
         CommandResult command = createTestErrorsCommand(0, recipeDir);
         recipeResult.add(command);
         recipeResult.failure("command :: " + command.getCommandName() + " :: some tests broken");
@@ -492,7 +492,7 @@ public class SetupDummyBuilds implements Runnable
     private CommandResult createComplexCommand()
     {
         CommandResult result = new CommandResult("complex command");
-        result.commence(new File("/complex/command/output/dir"));
+        result.commence();
         result.getProperties().put("command line", "/usr/local/bin/make -f my/path/to/Makefile build");
         result.getProperties().put("exit code", "0");
         result.addArtifact(createInfoArtifact("command output", "output.txt"));
@@ -505,14 +505,14 @@ public class SetupDummyBuilds implements Runnable
     private CommandResult createInProgressCommand()
     {
         CommandResult result = new CommandResult("in progress command");
-        result.commence(new File("wowsers"));
+        result.commence();
         return result;
     }
 
     private CommandResult createTerminatingCommand()
     {
         CommandResult result = new CommandResult("in progress command");
-        result.commence(new File("wowsers"));
+        result.commence();
         result.terminate(true);
         return result;
     }
@@ -525,7 +525,7 @@ public class SetupDummyBuilds implements Runnable
     private CommandResult createFailedCommand()
     {
         CommandResult result = new CommandResult("complex command");
-        result.commence(new File("/complex/command/output/dir"));
+        result.commence();
         result.getProperties().put("command line", "/usr/local/bin/make -f my/path/to/Makefile build");
         result.getProperties().put("exit code", "1");
         result.failure("Command 'command/line/here' exited with code '1'");
@@ -536,7 +536,7 @@ public class SetupDummyBuilds implements Runnable
     private CommandResult createWarningFeaturesCommand()
     {
         CommandResult result = new CommandResult("complex command");
-        result.commence(new File("/complex/command/output/dir"));
+        result.commence();
         result.getProperties().put("command line", "/usr/local/bin/make -f my/path/to/Makefile build");
         result.getProperties().put("exit code", "0");
         result.addArtifact(createInfoArtifact("command output", "output.txt"));
@@ -551,7 +551,7 @@ public class SetupDummyBuilds implements Runnable
         CommandResult result = new CommandResult("error features command");
         File commandDir = new File(recipeDir, RecipeProcessor.getCommandDirName(index, result));
         File outputDir = new File(commandDir, "output");
-        result.commence(outputDir);
+        result.commence();
         result.addArtifact(createInfoArtifact("command output", "output.txt"));
         result.addArtifact(createWarningArtifact("warnings here", "this/file/is/nested/several/dirs/down"));
         result.addArtifact(createErrorArtifact(outputDir, "errors be here", "errors.txt"));
@@ -567,7 +567,7 @@ public class SetupDummyBuilds implements Runnable
         CommandResult result = new CommandResult("test errors command");
         File commandDir = new File(recipeDir, RecipeProcessor.getCommandDirName(index, result));
         File outputDir = new File(commandDir, "output");
-        result.commence(outputDir);
+        result.commence();
         result.addArtifact(createTestErrorsArtifact(outputDir, "test errors artifact", "errors.txt"));
         result.failure("Some tests broken");
         result.complete();

@@ -86,7 +86,8 @@ public class BuildController implements EventListener
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File buildDir = paths.getBuildDir(project, buildResult);
-        buildResult.queue(buildDir);
+        buildResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), buildDir);
+        buildResult.queue();
         buildManager.save(buildResult);
 
         // We handle this event ourselves: this ensures that all processing of
@@ -121,7 +122,7 @@ public class BuildController implements EventListener
             buildManager.save(resultNode);
 
             MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-            recipeResult.setOutputDir(paths.getOutputDir(project, buildResult, recipeResult.getId()).getAbsolutePath());
+            recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), paths.getOutputDir(project, buildResult, recipeResult.getId()));
 
             RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe(), getResourceRequirements(specification, node));
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), revision, recipeRequest, buildResult);
@@ -192,7 +193,7 @@ public class BuildController implements EventListener
         // result is commenced and saved to the database, so that the
         // database knows of the possibility of some other persistent
         // artifacts, even if an error occurs very early in the build.
-        File buildDir = new File(buildResult.getOutputDir());
+        File buildDir = buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
         if (!buildDir.mkdirs())
         {
             throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
@@ -330,7 +331,7 @@ public class BuildController implements EventListener
 
         try
         {
-            FileSystemUtils.createFile(new File(buildResult.getOutputDir(), BuildResult.PULSE_FILE), request.getPulseFileSource());
+            FileSystemUtils.createFile(new File(buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()), BuildResult.PULSE_FILE), request.getPulseFileSource());
         }
         catch(IOException e)
         {

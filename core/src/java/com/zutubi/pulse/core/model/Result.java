@@ -14,7 +14,7 @@ public abstract class Result extends Entity
 
     protected ResultState state = ResultState.INITIAL;
     protected TimeStamps stamps = new TimeStamps();
-    protected File outputDir;
+    private File outputDir;
     protected List<Feature> features = new LinkedList<Feature>();
 
     public boolean pending()
@@ -57,15 +57,13 @@ public abstract class Result extends Entity
         return succeeded() || errored() || failed();
     }
 
-    public void queue(File outputDir)
+    public void queue()
     {
-        this.outputDir = outputDir;
         stamps.setQueueTime(System.currentTimeMillis());
     }
 
-    public void commence(File outputDir)
+    public void commence()
     {
-        this.outputDir = outputDir;
         state = ResultState.IN_PROGRESS;
         stamps = new TimeStamps();
         stamps.setStartTime(System.currentTimeMillis());
@@ -225,6 +223,40 @@ public abstract class Result extends Entity
         return result;
     }
 
+    /**
+     * Returns the absolute output path, based on the given data root.
+     *
+     * @param dataRoot the PULSE_DATA directory
+     * @return the absolute path of the output directory for this result.
+     */
+    public File getAbsoluteOutputDir(File dataRoot)
+    {
+        return new File(dataRoot, outputDir.getPath());
+    }
+
+    /**
+     * Sets the output path based on the given data root and absolute output
+     * directory.
+     *
+     * @param dataRoot the PULSE_DATA directory
+     * @param outputDir absolute path of the output directory to set
+     */
+    public void setAbsoluteOutputDir(File dataRoot, File outputDir)
+    {
+        String dataPath = dataRoot.getAbsolutePath();
+        String outputPath = outputDir.getAbsolutePath();
+        if(outputPath.startsWith(dataPath))
+        {
+            outputPath = outputPath.substring(dataPath.length());
+            if(outputPath.startsWith(File.separator) || outputPath.startsWith("/"))
+            {
+                outputPath = outputPath.substring(1);
+            }
+        }
+
+        this.outputDir = new File(outputPath);
+    }
+
     public String getOutputDir()
     {
         if (outputDir == null)
@@ -233,7 +265,7 @@ public abstract class Result extends Entity
         }
         else
         {
-            return outputDir.getAbsolutePath();
+            return outputDir.getPath();
         }
     }
 

@@ -3,10 +3,10 @@ package com.zutubi.pulse.core.model;
 import com.zutubi.pulse.util.Sort;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
@@ -67,7 +67,7 @@ public class RecipeResult extends Result
         // Adjust the command's output directory to the local one
         File remoteDir = new File(result.getOutputDir());
         File localDir = new File(getOutputDir(), remoteDir.getName());
-        result.setOutputDir(localDir.getAbsolutePath());
+        result.setOutputDir(localDir.getPath());
     }
 
     public void update(RecipeResult result)

@@ -208,6 +208,8 @@ public class DefaultUpgradeManager implements UpgradeManager
      */
     public void executeUpgrade()
     {
+        currentContext.setData(upgradeTarget);
+
         List<UpgradeTask> tasksToExecute = currentContext.getTasks();
         UpgradeContext context = currentContext;
 

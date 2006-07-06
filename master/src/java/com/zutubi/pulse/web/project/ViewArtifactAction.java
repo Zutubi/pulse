@@ -1,16 +1,17 @@
 package com.zutubi.pulse.web.project;
 
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.PlainFeature;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Iterator;
 
 /**
  * 
@@ -28,6 +29,7 @@ public class ViewArtifactAction extends ProjectActionSupport
     private StoredFileArtifact artifact;
     private BufferedReader reader;
     private Map<Long, Feature.Level> lineLevels;
+    private MasterConfigurationManager configurationManager;
 
     public long getId()
     {
@@ -135,7 +137,7 @@ public class ViewArtifactAction extends ProjectActionSupport
 
     public String execute()
     {
-        File artifactFile = new File(commandResult.getOutputDir(), artifact.getPath());
+        File artifactFile = new File(commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()), artifact.getPath());
         if(!artifactFile.isFile())
         {
             addActionError("Artifact file '" + artifactFile.getAbsolutePath() + "' does not exist");
@@ -155,6 +157,11 @@ public class ViewArtifactAction extends ProjectActionSupport
         determineLineLevels();
 
         return SUCCESS;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 
     class ReaderIterator implements Iterator

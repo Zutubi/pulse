@@ -1,11 +1,12 @@
 package com.zutubi.pulse.servlet;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.util.IOUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,12 +22,17 @@ import java.net.URLConnection;
 public class ViewFileServlet extends HttpServlet
 {
     private BuildManager buildManager;
+    private MasterConfigurationManager configurationManager;
 
     protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException
     {
         if (buildManager == null)
         {
             buildManager = (BuildManager) ComponentContext.getBean("buildManager");
+        }
+        if (configurationManager == null)
+        {
+            configurationManager =  (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
         }
 
         String path = httpServletRequest.getPathInfo();
@@ -72,7 +78,7 @@ public class ViewFileServlet extends HttpServlet
             filePath = filePath.substring(0, filePath.length() - 1);
         }
 
-        File file = new File(result.getOutputDir(), filePath);
+        File file = new File(result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), filePath);
         if (filePath.equals(artifact.getName()))
         {
             String index = artifact.findIndexFile();

@@ -249,14 +249,16 @@ public class SetupFeatureTour implements Runnable
             buildResultDao.save(recipes[i]);
 
             File recipeDir = masterBuildPaths.getRecipeDir(project, build, recipes[i].getId());
-            recipes[i].commence(recipeDir);
+            recipes[i].commence();
+            recipes[i].setAbsoluteOutputDir(configManager.getDataDirectory(), recipeDir);
             RecipeResultNode node = new RecipeResultNode(specNode.getStage().getName(), recipes[i]);
             build.getRoot().addChild(node);
             i++;
         }
 
         File buildDir = masterBuildPaths.getBuildDir(project, build);
-        build.commence(buildDir);
+        build.commence();
+        build.setAbsoluteOutputDir(configManager.getDataDirectory(), buildDir);
         buildDir.mkdirs();
         try
         {
@@ -325,9 +327,10 @@ public class SetupFeatureTour implements Runnable
         for(RecipeResult recipe: recipes)
         {
             commands[i] = new CommandResult(name);
-            File commandDir = new File(recipe.getOutputDir(), RecipeProcessor.getCommandDirName(commandIndex, commands[i]));
+            File commandDir = new File(recipe.getAbsoluteOutputDir(configManager.getDataDirectory()), RecipeProcessor.getCommandDirName(commandIndex, commands[i]));
             File outputDir = new File(commandDir, "output");
-            commands[i].commence(outputDir);
+            commands[i].commence();
+            commands[i].setAbsoluteOutputDir(configManager.getDataDirectory(), outputDir);
             i++;
         }
 
@@ -372,7 +375,7 @@ public class SetupFeatureTour implements Runnable
         {
             for (RecipeResult recipe: recipes)
             {
-                FileSystemUtils.copyRecursively(f, new File(recipe.getOutputDir(), "base"));
+                FileSystemUtils.copyRecursively(f, new File(recipe.getAbsoluteOutputDir(configManager.getDataDirectory()), "base"));
             }
         }
         catch (IOException e)
@@ -391,7 +394,7 @@ public class SetupFeatureTour implements Runnable
             try
             {
                 StoredFileArtifact fileArtifact = addArtifact(command, dummy, "output.txt", "command output", "text/plain");
-                pp.process(new File(command.getOutputDir()), fileArtifact, command);
+                pp.process(command.getAbsoluteOutputDir(configManager.getDataDirectory()), fileArtifact, command);
             }
             catch (Exception e)
             {
@@ -410,7 +413,7 @@ public class SetupFeatureTour implements Runnable
             try
             {
                 StoredFileArtifact fileArtifact = addArtifact(command, dummy, "TESTS-TestSuites.xml", "JUnit XML Report", "text/html");
-                pp.process(new File(command.getOutputDir()), fileArtifact, command);
+                pp.process(command.getAbsoluteOutputDir(configManager.getDataDirectory()), fileArtifact, command);
             }
             catch (Exception e)
             {
@@ -427,7 +430,7 @@ public class SetupFeatureTour implements Runnable
         {
             DirectoryArtifact da = new DirectoryArtifact();
             da.setName("JUnit HTML Report");
-            da.capture(command, dir, new File(command.getOutputDir()));
+            da.capture(command, dir, command.getAbsoluteOutputDir(configManager.getDataDirectory()));
         }
     }
 
@@ -439,7 +442,7 @@ public class SetupFeatureTour implements Runnable
 
     private StoredFileArtifact addArtifact(CommandResult command, File from, String to, String name, String type)
     {
-        File dir = new File(command.getOutputDir(), name);
+        File dir = new File(command.getAbsoluteOutputDir(configManager.getDataDirectory()), name);
         File file = new File(dir, to);
         StoredFileArtifact fileArtifact = new StoredFileArtifact(name + "/" + to, type);
         StoredArtifact artifact = new StoredArtifact(name, fileArtifact);

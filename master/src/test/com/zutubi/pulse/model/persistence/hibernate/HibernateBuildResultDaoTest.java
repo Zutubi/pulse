@@ -7,7 +7,6 @@ import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 
-import java.io.File;
 import java.util.Calendar;
 import java.util.List;
 
@@ -98,7 +97,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         buildSpecificationDao.save(spec);
 
         BuildResult buildResult = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec.getName(), 11);
-        buildResult.commence(new File("/tmp/buildout"));
+        buildResult.commence();
         buildResult.setScmDetails(scmDetails);
         RecipeResultNode recipeNode = new RecipeResultNode("test", recipeResult);
         recipeNode.setHost("test host");
@@ -114,7 +113,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     private RecipeResult createRecipe()
     {
         RecipeResult recipeResult = new RecipeResult("project");
-        recipeResult.commence(new File("/tmp/buildout"));
+        recipeResult.commence();
         recipeResult.complete();
 
         CommandResult result = createArtifactCommand();
@@ -129,7 +128,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     private RecipeResult createErroredRecipe()
     {
         RecipeResult recipeResult = new RecipeResult("project");
-        recipeResult.commence(new File("/tmp/buildout"));
+        recipeResult.commence();
         recipeResult.error("Random explosion");
         recipeResult.complete();
         return recipeResult;
@@ -155,7 +154,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     {
         CommandResult result;
         result = new CommandResult("command name");
-        result.commence(new File("/tmp/commandout"));
+        result.commence();
         result.error("woops!");
         return result;
     }
@@ -164,7 +163,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     {
         CommandResult result;
         result = new CommandResult("command name");
-        result.commence(new File("/tmp/commandout"));
+        result.commence();
         result.failure("oh no!");
         return result;
     }
@@ -172,7 +171,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     private CommandResult createArtifactCommand()
     {
         CommandResult result = new CommandResult("command name");
-        result.commence(new File("/tmp/commandout"));
+        result.commence();
         result.success();
         StoredFileArtifact artifact = new StoredFileArtifact("to file");
         PlainFeature feature = new PlainFeature(Feature.Level.ERROR, "getSummary here", 7);
@@ -350,7 +349,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         BuildResult r1 = createCompletedBuild(p1, b1, 1);
         BuildResult r2 = new BuildResult(new TriggerBuildReason("scm trigger"), p1, b1.getName(), 2);
-        r2.commence(new File("test"));
+        r2.commence();
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);

@@ -1,11 +1,12 @@
 package com.zutubi.pulse.web.project;
 
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
 
-import java.io.FileInputStream;
 import java.io.File;
-import java.io.InputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * An action to download the pulse file used in a specific build.
@@ -15,6 +16,7 @@ public class DownloadBuildFileAction extends ProjectActionSupport
     private long id;
     private InputStream inputStream;
     private long contentLength;
+    private MasterConfigurationManager configurationManager;
 
     public void setId(long id)
     {
@@ -47,7 +49,7 @@ public class DownloadBuildFileAction extends ProjectActionSupport
 
         try
         {
-            File file = new File(result.getOutputDir(), BuildResult.PULSE_FILE);
+            File file = new File(result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), BuildResult.PULSE_FILE);
             contentLength = file.length();
             inputStream = new FileInputStream(file);
         }
@@ -58,5 +60,10 @@ public class DownloadBuildFileAction extends ProjectActionSupport
         }
 
         return SUCCESS;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

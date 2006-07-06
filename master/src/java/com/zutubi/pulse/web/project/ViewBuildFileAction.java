@@ -1,11 +1,15 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.util.IOUtils;
+import com.uwyn.jhighlight.renderer.XmlXhtmlRenderer;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.uwyn.jhighlight.renderer.XmlXhtmlRenderer;
+import com.zutubi.pulse.util.IOUtils;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * An action to show the build file used for a build.  The file is
@@ -17,6 +21,7 @@ public class ViewBuildFileAction extends ProjectActionSupport
     private BuildResult result;
     private String classes;
     private String highlightedFile;
+    private MasterConfigurationManager configurationManager;
 
     public long getId()
     {
@@ -62,7 +67,7 @@ public class ViewBuildFileAction extends ProjectActionSupport
 
         try
         {
-            is = new FileInputStream(new File(result.getOutputDir(), BuildResult.PULSE_FILE));
+            is = new FileInputStream(new File(result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), BuildResult.PULSE_FILE));
             os = new ByteArrayOutputStream();
             XmlXhtmlRenderer renderer = new XmlXhtmlRenderer();
             renderer.highlight(BuildResult.PULSE_FILE, is, os, null, true);
@@ -79,5 +84,10 @@ public class ViewBuildFileAction extends ProjectActionSupport
         }
 
         return SUCCESS;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }
