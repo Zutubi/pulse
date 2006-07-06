@@ -156,7 +156,7 @@ function toggleList(id)
 
 function toggleFolderList(id)
 {
-    toggleList(id, 'images/tree/foldericon.png', 'images/tree/openfoldericon.png');
+    toggleList(id, 'images/treeview/c.gif', 'images/treeview/o.gif');
 }
 
 // Changes display style for all lists under the given node
@@ -182,13 +182,13 @@ function styleAllLists(id, style, imageSource)
 // Expands all lists under the given node
 function expandAllLists(id)
 {
-    styleAllLists(id, '', function(element) { if(element.parentNode.className == "dir-artifact") { return '/images/tree/openfoldericon.png'; } else { return '/images/resultset_down.gif'; } });
+    styleAllLists(id, '', function(element) { if(element.parentNode.className == "dir-artifact") { return '/images/treeview/o.gif'; } else { return '/images/resultset_down.gif'; } });
 }
 
 // Collapses all lists under the given node
 function collapseAllLists(id)
 {
-    styleAllLists(id, 'none', function(element) { if(element.parentNode.className == "dir-artifact") { return '/images/tree/foldericon.png'; } else { return '/images/resultset_next.gif'; } });
+    styleAllLists(id, 'none', function(element) { if(element.parentNode.className == "dir-artifact") { return '/images/treeview/c.gif'; } else { return '/images/resultset_next.gif'; } });
 }
 
 // Hides all children of the element with the given id

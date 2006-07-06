@@ -8,7 +8,7 @@
             <h2 class="section top">#wwtext("name=current.build")</h2>
 
         #if($currentBuild)
-            #showBuild($currentBuild true)
+            #showBuild($currentBuild true false)
         #else
             <p>
                 #wwtext("name=never.built")

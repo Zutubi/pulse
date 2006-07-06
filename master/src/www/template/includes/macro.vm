@@ -1130,12 +1130,20 @@
 ##
 ## Shows a summary for a recipe result
 ##
-#macro(recipeSummary $resultNode $build)
+#macro(recipeSummary $resultNode $build $detailedView)
     <tr>
         #set($id = $resultNode.id)
         #set($recipe = $resultNode.result)
         #set($cssClass = $recipe.state.string)
+    #if($detailedView)
+        <td class="content">
+            <a href="#" onclick="selectNode('$resultNode.id'); return false">
+                $!webwork.htmlEncode($resultNode.stage)
+            </a>
+        </td>
+    #else
         #dynamicLinkCell($resultNode.stage "/viewCommandLog.action?id=$build.id&amp;selectedNode=$resultNode.id")
+    #end
         #dynamicCell($recipe.recipeNameSafe)
         #dynamicCell($resultNode.hostSafe)
         #statusCell($recipe)
@@ -1165,7 +1173,7 @@
         <tr>
             #set($cssClass = $command.state.string)
             <td class="content">
-                <a href="#" id="nav_$command.id" onclick="selectNode('$command.id'); return false;">
+                <a href="#" onclick="selectNode('$command.id'); return false;">
                     $!webwork.htmlEncode($command.commandName)
                 </a>
             </td>
@@ -1458,7 +1466,7 @@
     #if($hasIndex)
         <li class="report-artifact">
     #else
-        <li class="dir-artifact"><span onclick="toggleFolderList('art_${artifact.id}');"><img alt="toggle" id="art_${artifact.id}_image" src="/images/tree/openfoldericon.png"/>
+        <li class="dir-artifact"><span onclick="toggleFolderList('art_${artifact.id}');"><img alt="toggle" id="art_${artifact.id}_image" src="/images/treeview/o.gif"/>
     #end
     #if($hasIndex)
         <a href="/view/$result.id/$artifact.id/$action.escapeSpaces($artifact.name)/">
@@ -1550,7 +1558,7 @@
 ##
 ## Shows the main build result view (shared with project current build)
 ##
-#macro(showBuild $buildResult $showActions)
+#macro(showBuild $buildResult $showActions $detailedView)
     <table class="content">
         #headingRow("build.summary" 10)
         <tr>
@@ -1579,6 +1587,9 @@
             #changesCell($project $buildResult)
     #end
         </tr>
+    #if($detailedView)
+        #directMessages($buildResult 10)
+    #end
     </table>
 
     #if($buildResult.root.children.size() > 0)
@@ -1586,12 +1597,12 @@
         #headingRow("build.stages" 8)
         #recipeSummaryHeader()
         #foreach($recipeNode in $buildResult.root.children)
-        #recipeSummary($recipeNode $buildResult)
+        #recipeSummary($recipeNode $buildResult $detailedView)
         #end
     </table>
     #end
 
-    #if(!$showActions)
+    #if(!$detailedView && !$showActions)
         #if($buildResult.hasMessages($errorLevel) || $buildResult.hasMessages($warningLevel))
     <h2 class="section">#wwtext("name=build.features")</h2>
     #buildMessageSummary($buildResult $errorLevel)

@@ -5,10 +5,10 @@
 <head>
     <title>#wwtext("name=build") $result.number</title>
     <script type="text/javascript">
-#if($action.haveSelectedNode() || $result.root.children.size() == 0)
+#if($action.haveSelectedNode())
         var selectedNode = "$selectedNode";
 #else
-        var selectedNode = "$result.root.children.get(0).id";
+        var selectedNode = "$result.root.id";
 #end
     </script>
 </head>
@@ -19,34 +19,50 @@
         <tr>
             <td class="leftpane">
                 <p>
-                    Select stage/command:
+                    Select build/stage/command:
                 </p>
                 <ul class="panenav">
-    #foreach($node in $result.root.children)
                     <li>
-                        <a href="#" id="nav_$node.id" onclick="selectNode('$node.id'); return false;">
-                            #statusImage($node.result)
-                            $!webwork.htmlEncode($node.stage)
+                        <a href="#" id="nav_$result.root.id" onclick="selectNode('$result.root.id'); return false;">
+                            #statusImage($result)
+                            #wwtext("name=build") $result.number
                         </a>
-        #if($node.result.commandResults.size() > 0)
-                       <ul>
-            #foreach($commandResult in $node.result.commandResults)
-                           <li>
-                               <a href="#" id="nav_$commandResult.id" onclick="selectNode('$commandResult.id'); return false;">
-                                   #statusImage($commandResult)
-                                   $!webwork.htmlEncode($commandResult.commandName)
-                               </a>
-                           </li>
+    #if($result.root.children.size() > 0)
+                        <ul>
+        #foreach($node in $result.root.children)
+                            <li>
+                                <a href="#" id="nav_$node.id" onclick="selectNode('$node.id'); return false;">
+                                    #statusImage($node.result)
+                                    $!webwork.htmlEncode($node.stage)
+                                </a>
+            #if($node.result.commandResults.size() > 0)
+                               <ul>
+                #foreach($commandResult in $node.result.commandResults)
+                                   <li>
+                                       <a href="#" id="nav_$commandResult.id" onclick="selectNode('$commandResult.id'); return false;">
+                                           #statusImage($commandResult)
+                                           $!webwork.htmlEncode($commandResult.commandName)
+                                       </a>
+                                   </li>
+                #end
+                               </ul>
             #end
-                       </ul>
+                            </li>
         #end
-                    </li>
+                        </ul>
     #end
+                    </li>
                 </ul>
             </td>
 
 
             <td class="rightpane">
+                <div id="node_$result.root.id" style="display: none">
+                    <div class="panecontent">
+                        #showBuild($result false true)
+                    </div>
+                </div>
+
     #foreach($node in $result.root.children)
         #set($recipeResult = $node.result)
                 <div id="node_$node.id" style="display: none">
@@ -54,7 +70,7 @@
                         <table class="content">
                             #headingRow("build.stage.summary" 9)
                             #recipeSummaryHeader()
-                            #recipeSummary($node $result)
+                            #recipeSummary($node $result true)
                             #directMessages($node.result 9)
                         </table>
                         #recipeCommands($node $result)
