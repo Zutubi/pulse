@@ -1552,11 +1552,12 @@
 ##
 #macro(showBuild $buildResult $showActions)
     <table class="content">
-        #headingRow("build.summary" 13)
+        #headingRow("build.summary" 10)
         <tr>
             #contentHeading("build.id" 1)
             #contentHeading("build.spec" 1)
             #contentHeading("build.status" 2)
+            #contentHeading("build.reason" 1)
             #contentHeading("build.tests" 1)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
@@ -1569,6 +1570,7 @@
             #rightCell($buildResult.number)
             #classCell($buildResult.buildSpecification)
             #statusCell($buildResult)
+            #classCell($buildResult.reason.summary)
             #testResultsCell($buildResult false $buildResult)
             #dateClassCell($buildResult)
             #classCell($buildResult.stamps.prettyElapsed)
@@ -1645,12 +1647,13 @@
 ##
 #macro(recentBuilds $projects $showAdd $actionKey $url $image)
     <table class="content">
-        #actionHeadingRow("latest.builds" 10 $actionKey $url $image "recent.builds")
+        #actionHeadingRow("latest.builds" 11 $actionKey $url $image "recent.builds")
         <tr>
             #contentHeading("project.name" 1)
             #contentHeading("build.id" 1)
             #contentHeading("build.spec" 1)
             #contentHeading("build.status" 2)
+            #contentHeading("build.reason" 1)
             #contentHeading("build.tests" 1)
             #contentHeading("last.built" 1)
             #contentHeading("build.elapsed" 1)
@@ -1670,6 +1673,7 @@
             <td class="content-right"><a href="viewBuild.action?id=$lastResult.id">$lastResult.number</a></td>
             #classCell($lastResult.buildSpecification)
             #statusCell($lastResult)
+            #classCell($lastResult.reason.summary)
             #testResultsCell($lastResult false $lastResult)
             #dateClassCell($lastResult)
             #classCell($lastResult.stamps.prettyElapsed)
@@ -1681,6 +1685,7 @@
             #contentCell("empty.cell")
             #contentCell("not.applicable")
             #contentCell("not.applicable")
+            #contentCell("not.applicable")
             #contentCell("built.never")
             #contentCell("not.applicable")
             #contentCell("empty.cell")
@@ -1690,7 +1695,7 @@
     #end
     #if($showAdd)
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-        #addRow("add.project" 10 "addProject!input.action" "project.add")
+        #addRow("add.project" 11 "addProject!input.action" "project.add")
 #end
     #end
         </table>
