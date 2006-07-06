@@ -72,7 +72,7 @@ ToolbarItem.prototype.getToolElId = function()
 
 ToolbarItem.prototype.getToolStyle = function()
 {
-    return this.id + " tool";
+    return this.id + " toolbaritem";
 };
 
 ToolbarItem.prototype.getHtml = function()

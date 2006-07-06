@@ -70,6 +70,8 @@
             {
                 onResize(event);
 
+                document.title = "Select path";
+
                 var initialPath = getFormValue();
 
                 // initialise toolbar items.
@@ -136,7 +138,7 @@
                 var wDim = windowSize();
 
                 // work out the fudge factor - ie: the margin values.
-                var fudgeFactor = 90;
+                var fudgeFactor = 160;
 
                 var viewHeight = wDim.height - tDim.height - fudgeFactor;
                 Element.setStyle(vElem, {"height":viewHeight + "px"});
@@ -236,7 +238,14 @@
 
 <body>
 
-    <div class="bordered" id="toolbar">
+    <div>
+        <b>Select pulse data directory</b>
+        <p>
+            All pulse data files will be stored in this directory.
+        </p>
+    </div>
+
+    <div id="toolbar">
     </div>
 
     <div class="viewport bordered" id="view">

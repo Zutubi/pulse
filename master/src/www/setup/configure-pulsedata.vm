@@ -23,7 +23,7 @@
 
     #wwtextfield("template=controlheader" "name=data" "required=true" "label=%{getText('data.field')}")
     #wwtextfield("theme=simple" "template=ctext" "name=data" "size=60" "tabindex=1" "onkeypress=return submitenter(this,event);")
-    #wwsubmit("theme=simple" "name=browse" "value=..." "onclick=openPopup(); return false;")
+    #wwsubmit("theme=simple" "name=browse" "value=browse" "onclick=openPopup(); return false;")
     #wwtextfield("template=controlfooter" "name=data")
     #inlineHelp("data.help")
 
