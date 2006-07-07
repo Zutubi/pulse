@@ -56,6 +56,16 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         return "run executable";
     }
 
+    public PostBuildAction copy()
+    {
+        RunExecutablePostBuildAction copy = new RunExecutablePostBuildAction();
+        copyCommon(copy);
+        copy.command = command;
+        copy.arguments = arguments;
+
+        return copy;
+    }
+
     private void addArguments(List<String> commandLine, BuildResult result) throws FileLoadException
     {
         List<String> args = StringUtils.split(arguments);

@@ -37,4 +37,9 @@ public class ResourceRequirement
     {
         this.version = version;
     }
+
+    public ResourceRequirement copy()
+    {
+        return new ResourceRequirement(resource, version);
+    }
 }

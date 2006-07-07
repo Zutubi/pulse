@@ -37,7 +37,13 @@ public class BuildSpecificationNode extends Entity
         {
             copy.stage = stage.copy();
         }
-        
+
+        copy.resourceRequirements = new LinkedList<ResourceRequirement>();
+        for(ResourceRequirement r: resourceRequirements)
+        {
+            copy.resourceRequirements.add(r.copy());
+        }
+
         copy.children = new LinkedList<BuildSpecificationNode>();
         for(BuildSpecificationNode child: children)
         {

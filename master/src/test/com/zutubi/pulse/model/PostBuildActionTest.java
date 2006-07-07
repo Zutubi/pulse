@@ -92,6 +92,11 @@ public class PostBuildActionTest extends PulseTestCase
             return "mock";
         }
 
+        public PostBuildAction copy()
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
         public void setError(String error)
         {
             this.error = error;

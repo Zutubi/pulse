@@ -19,7 +19,7 @@ public abstract class PostBuildAction extends Entity
     private List<BuildSpecification> specifications = new LinkedList<BuildSpecification>();
     private List<ResultState> states = new LinkedList<ResultState>();
     private boolean failOnError = false;
-    private List<String> errors = new LinkedList<String>();
+    private List<String> errors;
 
     protected PostBuildAction()
     {
@@ -33,8 +33,18 @@ public abstract class PostBuildAction extends Entity
         this.failOnError = failOnError;
     }
 
+    protected void copyCommon(PostBuildAction copy)
+    {
+        copy.name = name;
+        copy.specifications = new LinkedList<BuildSpecification>(specifications);
+        copy.states = new LinkedList<ResultState>(states);
+        copy.failOnError = failOnError;
+    }
+
     public void execute(BuildResult result)
     {
+        errors = new LinkedList<String>();
+
         if(resultMatches(result))
         {
             internalExecute(result);
@@ -163,4 +173,5 @@ public abstract class PostBuildAction extends Entity
 
     public abstract String getType();
 
+    public abstract PostBuildAction copy();
 }

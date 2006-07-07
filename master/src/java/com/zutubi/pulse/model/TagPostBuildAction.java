@@ -48,6 +48,16 @@ public class TagPostBuildAction extends PostBuildAction
         return "apply tag";
     }
 
+    public PostBuildAction copy()
+    {
+        TagPostBuildAction copy = new TagPostBuildAction();
+        copyCommon(copy);
+        copy.tag = tag;
+        copy.moveExisting = moveExisting;
+
+        return copy;
+    }
+
     private String substituteVariables(String tag, BuildResult result) throws FileLoadException
     {
         Scope scope = new Scope();

@@ -118,6 +118,12 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
             copy.buildSpecifications.add(spec.copy());
         }
 
+        copy.postBuildActions = new LinkedList<PostBuildAction>();
+        for(PostBuildAction action: postBuildActions)
+        {
+            copy.postBuildActions.add(action.copy());
+        }
+
         copy.aclEntries = new LinkedList<ProjectAclEntry>();
         for(ProjectAclEntry acl: aclEntries)
         {
