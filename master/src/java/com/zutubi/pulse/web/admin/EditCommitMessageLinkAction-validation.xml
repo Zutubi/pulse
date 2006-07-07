@@ -1,6 +1,11 @@
 <!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
         "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
 <validators>
+    <field name="newName">
+        <field-validator type="requiredstring">
+            <message key="commit.message.link.name.required">name is required</message>
+        </field-validator>
+    </field>
     <field name="transformer">
         <field-validator type="visitor">
             <message></message>

@@ -88,7 +88,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         clickLinkWithText("projects");
         clickLinkWithText("add new project");
 
-        String newProject = "project " + RandomUtils.randomString(5);
+        String newProject = "proect " + RandomUtils.randomString(5);
         submitProjectBasicsForm(newProject, "test description", "http://test/url", "cvs", "versioned");
         submitCvsSetupForm(TEST_CVSROOT, "module", "", "");
         submitVersionedSetupForm("pulse.xml");

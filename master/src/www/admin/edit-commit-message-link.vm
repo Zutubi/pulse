@@ -13,7 +13,7 @@
 #wwcform("action=editCommitMessageLink.action" "heading=%{getText('edit.commit.message.link')}" "method=post" "id=edit.commit.message.link")
     #wwhidden("name=id")
     
-    #wwtextfield("name=transformer.name" "label=%{getText('commit.message.link.name')}" "required=true" "tabindex=1")
+    #wwtextfield("name=newName" "label=%{getText('commit.message.link.name')}" "required=true" "tabindex=1")
     #wwtextfield("name=transformer.expression" "label=%{getText('commit.message.link.expression')}" "required=true" "size=60" "tabindex=2")
     #inlineHelp("commit.message.link.expression.help")
     #wwtextfield("name=transformer.replacement" "label=%{getText('commit.message.link.url')}" "required=true" "size=60" "tabindex=3")

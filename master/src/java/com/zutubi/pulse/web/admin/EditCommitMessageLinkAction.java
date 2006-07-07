@@ -10,11 +10,22 @@ import java.util.List;
  */
 public class EditCommitMessageLinkAction extends CommitMessageTransformerActionSupport implements Preparable
 {
+    private String newName;
     private CommitMessageTransformer transformer;
 
     public CommitMessageTransformer getTransformer()
     {
         return transformer;
+    }
+
+    public String getNewName()
+    {
+        return newName;
+    }
+
+    public void setNewName(String newName)
+    {
+        this.newName = newName;
     }
 
     public List<String> getPrepareParameterNames()
@@ -39,6 +50,7 @@ public class EditCommitMessageLinkAction extends CommitMessageTransformerActionS
         }
 
         setSelectedProjects(transformer.getProjects());
+        newName = transformer.getName();
 
         return INPUT;
     }
@@ -50,15 +62,16 @@ public class EditCommitMessageLinkAction extends CommitMessageTransformerActionS
             return;
         }
 
-        CommitMessageTransformer t = getProjectManager().findCommitMessageTransformerByName(transformer.getName());
+        CommitMessageTransformer t = getProjectManager().findCommitMessageTransformerByName(newName);
         if(t != null && t.getId() != getId())
         {
-            addFieldError("transformer.name", "A commit message link with name '" + transformer.getName() + "' already exists");
+            addFieldError("newName", "A commit message link with name '" + newName + "' already exists");
         }
     }
 
     public String execute() throws Exception
     {
+        transformer.setName(newName);
         List<Long> projects = transformer.getProjects();
         projects.clear();
         projects.addAll(getSelectedProjects());

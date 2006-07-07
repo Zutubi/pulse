@@ -28,7 +28,12 @@ public class CommitMessageLinkForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"transformer.name", "transformer.expression", "transformer.replacement", "selectedProjects"};
+        String nameField = "newName";
+        if(create)
+        {
+            nameField = "transformer.name";
+        }
+        return new String[]{nameField, "transformer.expression", "transformer.replacement", "selectedProjects"};
     }
 
     public int[] getFieldTypes()
