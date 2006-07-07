@@ -14,7 +14,7 @@
         <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all"
                      unique="true"/>
 
-        <list name="changes" cascade="all-delete-orphan" lazy="false">
+        <list name="changes" cascade="all-delete-orphan" lazy="true">
             <key column="CHANGELIST_ID"/>
             <index column="ORDINAL"/>
             <one-to-many class="com.zutubi.pulse.core.model.Change"/>

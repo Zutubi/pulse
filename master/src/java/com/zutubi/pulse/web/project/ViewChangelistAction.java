@@ -92,10 +92,7 @@ public class ViewChangelistAction extends ActionSupport
                 return result;
             }
         });
-        
-        // TODO dodgy walking of tree: hibernate eager/lazy loading!
-        changelist.getRevision();
-        changelist.getChanges();
+
         return SUCCESS;
     }
 

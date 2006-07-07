@@ -20,14 +20,14 @@
 
         <property name="outputDir" type="string" length="1023"/>
 
-        <bag name="features" cascade="all-delete-orphan" lazy="false">
+        <bag name="features" cascade="all-delete-orphan" lazy="true">
             <key column="COMMAND_RESULT_ID"/>
             <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
         </bag>
 
         <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.util.PropertiesType" length="4096"/>
 
-        <list name="artifacts" cascade="all-delete-orphan" lazy="false">
+        <list name="artifacts" cascade="all-delete-orphan" lazy="true">
             <key column="COMMAND_RESULT_ID"/>
             <index column="ORDINAL"/>
             <one-to-many class="com.zutubi.pulse.core.model.StoredArtifact"/>
