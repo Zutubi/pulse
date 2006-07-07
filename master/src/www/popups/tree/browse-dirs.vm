@@ -5,7 +5,7 @@
 
     <link rel="stylesheet" type="text/css" href="/css/treeview/tree.css"/>
 
-    <script type="text/javascript" src="/prototype.js"></script>
+    <script type="text/javascript" src="/js/prototype.js"></script>
     <script type="text/javascript" src="/js/yahoo/yahoo.js"></script>
     <script type="text/javascript" src="/js/yahoo/treeview.js"></script>
     <script type="text/javascript" src="/js/yahoo/animation.js"></script>
@@ -13,7 +13,7 @@
     <script type="text/javascript" src="/js/yahoo/dom.js"></script>
     <script type="text/javascript" src="/js/treeview/FileNode.js"></script>
     <script type="text/javascript" src="/js/Toolbar.js"></script>
-    <script type="text/javascript" src="/main.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
     <script type="text/javascript">
         <!--
             // define the init properties that control the tree.

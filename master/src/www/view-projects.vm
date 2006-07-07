@@ -5,7 +5,7 @@
 <html>
 <head>
     <title>#wwtext("name=projects")</title>
-    <script type="text/javascript" src="/prototype.js"></script>
+    <script type="text/javascript" src="/js/prototype.js"></script>
     <script type="text/javascript">
         #updater("/ajax/viewProjectsPanel.action" "panel" $principle)
     </script>

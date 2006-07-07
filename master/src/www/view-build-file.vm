@@ -4,7 +4,7 @@
 <html>
 <head>
     <title>#wwtext("name=build") $result.number</title>
-    <link href="/highlight.css" rel="stylesheet" type="text/css" media="screen"/>
+    <link href="/css/highlight.css" rel="stylesheet" type="text/css" media="screen"/>
 </head>
 <body>
     #buildTabs($result "build-file")

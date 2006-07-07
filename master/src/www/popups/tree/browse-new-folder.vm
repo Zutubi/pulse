@@ -1,8 +1,8 @@
 <html>
 <head>
     <title>New folder</title>
-    <script type="text/javascript" src="/prototype.js"></script>
-    <script type="text/javascript" src="/main.js"></script>
+    <script type="text/javascript" src="/js/prototype.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
     <!--<script type="text/javascript" src="tree/console.js"></script>-->
     <script type="text/javascript" src="tree/tree.js"></script>
     <script type="text/javascript" src="tree/fs.js"></script>

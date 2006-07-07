@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>triggers</title>
-    <link href="build.css" rel="stylesheet" type="text/css">
+    <link href="/css/build.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <h1 class="build-log">:: triggers ::</h1>

@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>#wwtext("name=error")</title>
-    <link href="/main2.css" rel="stylesheet" type="text/css" media="screen"/>
+    <link href="/css/main.css" rel="stylesheet" type="text/css" media="screen"/>
 </head>
 <body>
     <div id="pagecontent">

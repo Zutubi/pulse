@@ -1,8 +1,8 @@
 <html>
 <head>
     <title>$!webwork.htmlEncode($path)</title>
-    <link href="$base/main2.css" rel="stylesheet" type="text/css" media="screen"/>
-    <script type="text/javascript" src="/prototype.js"></script>
+    <link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"/>
+    <script type="text/javascript" src="/js/prototype.js"></script>
     <script type="text/javascript">
         function selectFile(value)
         {

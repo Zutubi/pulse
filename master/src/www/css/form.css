@@ -1,0 +1,54 @@
+table.form {
+    border: 1px solid #bbb;
+    margin-bottom: 16px;
+}
+
+th.label, td.field, td.submit, th.error-label, th.error-message, td.error-field, td.inline-help, th.textarea, th.error-textarea {
+    padding: 5px;
+}
+
+th.label, th.error-label {
+    text-align: right;
+    font-weight: normal;
+}
+
+th.textarea, th.error-textarea {
+    vertical-align: top;
+    text-align: right;
+    font-weight: normal;
+}
+
+th.error-message {
+    text-align: left;
+}
+
+th.error-label, td.error-field, th.error-message, th.error-textarea {
+    background-color: #ffdddd;
+}
+
+th.error-message {
+    color: #dd0000;
+}
+
+td.inline-help {
+    font-style: italic;
+    font-size: 80%;
+}
+
+td.submit {
+    border-top: 1px solid #bbb;
+    text-align: center;
+}
+
+input.submit {
+    width: 8em;
+    padding: 0.20em;
+    font-size: 80%;
+    font-weight: bold;
+}
+
+.required {
+    color: #CC0000;
+    font-weight: bold;
+    letter-spacing: 3px;
+}

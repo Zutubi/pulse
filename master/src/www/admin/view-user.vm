@@ -4,7 +4,7 @@
 <html>
     <head>
         <title>$user.name</title>
-        <link href="build.css" rel="stylesheet" type="text/css">
+        <link href="/css/build.css" rel="stylesheet" type="text/css">
         <content tag="action">user.view</content>
     </head>
     <body>    
