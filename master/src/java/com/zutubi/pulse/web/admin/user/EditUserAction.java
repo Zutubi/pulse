@@ -57,9 +57,15 @@ public class EditUserAction extends UserActionSupport
         User user = getUser();
 
         String loggedInUser = AcegiUtils.getLoggedInUser();
-        if (user.getLogin().equals(loggedInUser) && (!admin))
+        String login = user.getLogin();
+        if (login.equals(loggedInUser) && (!admin))
         {
             addFieldError("admin", getText("admin.permission.self"));
+        }
+
+        if(isAdminUser(user))
+        {
+            addActionError(getText("user.edit.admin"));
         }
     }
 

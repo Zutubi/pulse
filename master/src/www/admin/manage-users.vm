@@ -17,6 +17,15 @@
 
               <td class="columns" width="40%">
                   <table class="fill-content">
+                      #headingRow("user.admin.user" 3)
+                      <tr>
+                          #dynamicLinkCell($adminUser.login "viewUser.action?userId=$adminUser.id")
+                          #dynamicCell($adminUser.name)
+                          #editCell("editUser!input.action?userId=$adminUser.id" "editadmin")
+                      </tr>
+                  </table>
+
+                  <table class="fill-content">
                       #headingRow("users" 5)
                       <tr>
                           #contentHeading("user.login" 1)
@@ -26,6 +35,7 @@
                       </tr>
                       #foreach($user in $a.users)
                       <tr>
+                          #set($isAdminUser = $a.isAdminUser($user))
                           #set($confirmMessage = $action.getText("user.delete.confirm", [$user.name]))
 
                           #dynamicLinkCell($user.login "viewUser.action?userId=$user.id")
@@ -36,7 +46,11 @@
                           #contentCell("user.authentication.password")
 #end
                           #editCell("editUser!input.action?userId=$user.id" "edit_$!webwork.htmlEncode($user.login)")
+#if($isAdminUser)
+                          #contentCell("user.admin.user")
+#else
                           #deleteCell("delete_$!webwork.htmlEncode($user.login)" "deleteUser.action?userId=$user.id" $confirmMessage)
+#end
                       </tr>
                       #end
                   </table>

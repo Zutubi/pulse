@@ -49,11 +49,14 @@ public class SetupWizard extends BaseWizard
     {
         super.process();
 
+        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+
         // create the admin user.
         User admin = createAdminState.getAdmin();
         admin.setEnabled(true);
         admin.add(GrantedAuthority.USER);
         admin.add(GrantedAuthority.ADMINISTRATOR);
+        config.setAdminLogin(admin.getLogin());
 
         // Send the admin to a welcome page by default
         admin.setDefaultAction(DefaultAction.WELCOME_ACTION);
@@ -65,7 +68,6 @@ public class SetupWizard extends BaseWizard
         userManager.save(admin);
 
         // apply the settings
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
         config.setHostName(serverSettingsState.getHostname());
         config.setSmtpFrom(serverSettingsState.getFromAddress());
         config.setSmtpHost(serverSettingsState.getSmtpHost());

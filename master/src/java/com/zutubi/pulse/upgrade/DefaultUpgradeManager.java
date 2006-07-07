@@ -3,6 +3,7 @@ package com.zutubi.pulse.upgrade;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.Data;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -32,6 +33,8 @@ public class DefaultUpgradeManager implements UpgradeManager
     private UpgradeProgressMonitor monitor;
 
     private Data upgradeTarget;
+
+    private MasterConfigurationManager configurationManager;
 
     /**
      * Register an upgrade task with this upgrade manager.
@@ -174,6 +177,11 @@ public class DefaultUpgradeManager implements UpgradeManager
             {
                 ((DataSourceAware)task).setDataSource(dataSource);
             }
+            
+            if(ConfigurationAware.class.isAssignableFrom(task.getClass()))
+            {
+                ((ConfigurationAware)task).setConfigurationManager(configurationManager);
+            }
         }
 
         // copy the tasks...
@@ -287,5 +295,10 @@ public class DefaultUpgradeManager implements UpgradeManager
         {
             throw new IllegalArgumentException();
         }
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

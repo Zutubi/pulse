@@ -17,6 +17,8 @@ public class User extends Entity implements UserDetails
 {
     public static int REFRESH_DISABLED = 0;
 
+    private static final String PROPERTY_LDAP_AUTHENTICATION = "user.ldapAuthentication";
+
     /**
      * The login name is used to identify this user.
      */
@@ -56,7 +58,6 @@ public class User extends Entity implements UserDetails
      * may be interacting with (e.g. SCMs).
      */
     private List<String> aliases;
-    private static final String PROPERTY_LDAP_AUTHENTICATION = "user.ldapAuthentication";
 
 
     public User()

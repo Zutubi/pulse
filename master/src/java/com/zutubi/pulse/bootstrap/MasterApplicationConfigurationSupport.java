@@ -20,14 +20,19 @@ public class MasterApplicationConfigurationSupport implements MasterApplicationC
         this.config = new ConfigSupport(config);
     }
 
-    public int getAdminPort()
-    {
-        return config.getInt(ADMIN_PORT);
-    }
-
     public int getServerPort()
     {
         return config.getInt(WEBAPP_PORT);
+    }
+
+    public String getAdminLogin()
+    {
+        return config.getProperty(ADMIN_LOGIN);
+    }
+
+    public void setAdminLogin(String login)
+    {
+        config.setProperty(ADMIN_LOGIN, login);
     }
 
     public String getHostName()

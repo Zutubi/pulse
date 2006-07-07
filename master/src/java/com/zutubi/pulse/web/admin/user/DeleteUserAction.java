@@ -18,16 +18,24 @@ public class DeleteUserAction extends UserActionSupport
 
     public void validate()
     {
-        if (getUser() == null)
+        User user = getUser();
+        if (user == null)
         {
             addUnknownUserActionError();
+            return;
         }
 
         // check if the user is currently logged in.
         String loggedInUser = AcegiUtils.getLoggedInUser();
-        if (getUser().getLogin().equals(loggedInUser))
+        String login = user.getLogin();
+        if (login.equals(loggedInUser))
         {
             addActionError(getText("user.delete.self"));
+        }
+
+        if(isAdminUser(user))
+        {
+            addActionError(getText("user.delete.admin"));
         }
     }
 

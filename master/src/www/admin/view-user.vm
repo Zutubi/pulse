@@ -11,14 +11,24 @@
 
      #adminTabs("users")
 
+#if($user.ldapAuthentication)
+    #set($authentication = $action.getText("user.authentication.ldap"))
+#else
+    #set($authentication = $action.getText("user.authentication.password"))
+#end
+
         <table class="columns" width="50%">
             <tr>
                 <td class="columns" width="40%">
                     <table id="user" class="fill-content">
-                        #headingRow("user" 2)
+                        #editHeadingRow("user" 2 "editUser!input.action?userId=$user.id" "user.edit")
                         #dynamicRow("user.login" $user.login)
                         #dynamicRow("user.name" $user.name)
+                        #dynamicRow("user.authentication" $authentication)
+                        #dynamicRow("user.granted.admin" $admin)
+                        #dynamicRow("user.admin.user" $action.isAdminUser($user))
                     </table>
+#if($user.contactPoints.size() > 0)
                     <table id="contacts" class="fill-content">
                         #headingRow("contacts" 2)
                         <tr>
@@ -33,6 +43,8 @@
                         </tr>
                         #end
                     </table>
+#end
+#if($user.subscriptions.size() > 0)
                     <table id="subscriptions" class="fill-content">
                         #headingRow("subscriptions" 3)
                         <tr>
@@ -51,6 +63,7 @@
                         </tr>
                     #end
                     </table>
+#end
                 </td>
             </tr>
 

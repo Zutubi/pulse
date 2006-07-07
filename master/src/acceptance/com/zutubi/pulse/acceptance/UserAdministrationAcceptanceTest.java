@@ -167,10 +167,6 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         });
 
         // switch to user, create contacts and subscriptions, assert they appear.
-
-        assertTablePresent("contacts");
-
-        assertTablePresent("subscriptions");
     }
 
     public void testChangeUserPassword()

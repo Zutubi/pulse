@@ -2,6 +2,7 @@ package com.zutubi.pulse.web.user;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.UserLoginComparator;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.SubscriptionManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
@@ -24,6 +25,7 @@ public class UserActionSupport extends ActionSupport
     private UserManager userManager;
 
     private SubscriptionManager subscriptionManager;
+    private MasterConfigurationManager configurationManager;
 
     /**
      * static long indicating that a value has not been specified.
@@ -113,6 +115,21 @@ public class UserActionSupport extends ActionSupport
         return null;
     }
 
+    public User getAdminUser()
+    {
+        return userManager.getUser(getAdminLogin());
+    }
+
+    public boolean isAdminUser(User user)
+    {
+        return user.getLogin().equals(getAdminLogin());
+    }
+
+    private String getAdminLogin()
+    {
+        return getConfigurationManager().getAppConfig().getAdminLogin();
+    }
+
     protected User getUser(String userLogin)
     {
         return userManager.getUser(userLogin);
@@ -153,5 +170,15 @@ public class UserActionSupport extends ActionSupport
         Collections.sort(all, new UserLoginComparator());
         int index = all.indexOf(user);
         return index / ViewUsersAction.USERS_PER_PAGE;
+    }
+
+    public MasterConfigurationManager getConfigurationManager()
+    {
+        return configurationManager;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

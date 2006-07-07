@@ -7,7 +7,7 @@ package com.zutubi.pulse.bootstrap;
 public interface MasterApplicationConfiguration extends ApplicationConfiguration
 {
     //---( server configuration )---
-    public static final String ADMIN_PORT = "admin.port";
+    public static final String ADMIN_LOGIN = "admin.login";
 
     public static final String HOST_NAME = "host.name";
 
@@ -57,10 +57,9 @@ public interface MasterApplicationConfiguration extends ApplicationConfiguration
     public static final String LDAP_USER_FILTER = "ldap.user.filter";
     public static final String LDAP_AUTO_ADD = "ldap.auto.add";
 
-    /**
-     * The port on which the server will listen for admin requests.
-     */
-    int getAdminPort();
+    String getAdminLogin();
+
+    void setAdminLogin(String login);
 
     String getHostName();
 

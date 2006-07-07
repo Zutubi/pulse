@@ -13,6 +13,7 @@
 <table class="columns" width="90%">
     <tr>
         <td class="columns" width="40%">
+#if(!$action.isAdminUser($user))
             <table class="fill-content">
                 #wwcform("action=editUser.action" "heading=%{getText('user.edit')}" "method=post")
                     #wwhidden("name=userId")
@@ -22,6 +23,7 @@
                     #saveCancel(3)
                 #end
             </table>
+#end
             <table class="fill-content">
                 #wwcform("action=editPassword.action" "id=password.edit" "heading=%{getText('password.edit')}" "method=post")
                     #wwhidden("name=userId")
@@ -40,9 +42,11 @@
     </tr>
 </table>
 
+#if(!$action.isAdminUser($user))
     <script type="text/javascript">
         setFormEnableState('password.edit', 'editUser_ldapAuthentication', true, true);
     </script>
+#end
 
     #tabEnd()
 </body>
