@@ -8,6 +8,9 @@
     <script type="text/javascript" src="/prototype.js"></script>
     <script type="text/javascript" src="/js/yahoo/yahoo.js"></script>
     <script type="text/javascript" src="/js/yahoo/treeview.js"></script>
+    <script type="text/javascript" src="/js/yahoo/animation.js"></script>
+    <script type="text/javascript" src="/js/yahoo/event.js"></script>
+    <script type="text/javascript" src="/js/yahoo/dom.js"></script>
     <script type="text/javascript" src="/js/treeview/FileNode.js"></script>
     <script type="text/javascript" src="/js/Toolbar.js"></script>
     <script type="text/javascript" src="/main.js"></script>
@@ -66,6 +69,42 @@
                 return false;
             }
 
+            function ensureVisible()
+            {
+                var tree = YAHOO.widget.TreeView.getTree('browseTree');
+                var s = (tree.selected && tree.selected.getLabelEl() || null);
+
+                if (s)
+                {
+                    var v = document.getElementById('view');
+                    var t = document.getElementById('browseTree');
+
+                    var cs = Position.cumulativeOffset(s);
+                    var ct = Position.cumulativeOffset(t);
+
+                    var rt = Position.realOffset(t);
+
+                    var hv = Element.getHeight(v);
+                    var hs = Element.getHeight(s);
+
+                    var diff = rt[1] - (cs[1] - ct[1]);
+                    if (diff > 0)
+                    {
+                        // scroll down.
+                        var duration = 0.1;
+                        var view = new YAHOO.util.Scroll(v, {scroll: { to: [0, cs[1] - ct[1] - hs] } }, duration);
+                        view.animate();
+                    }
+                    diff = (cs[1] - ct[1]) - (hv + rt[1])
+                    if (diff > 0)
+                    {
+                        var duration = 0.1;
+                        var view = new YAHOO.util.Scroll(v, {scroll: { to: [0, cs[1] - ct[1] - hv + (2 * hs)] } }, duration);
+                        view.animate();
+                    }
+                }
+            }
+
             function onInit(event)
             {
                 onResize(event);
@@ -75,24 +114,67 @@
                 var initialPath = getFormValue();
 
                 // initialise toolbar items.
+/*
                 var goUpTree = new ToolbarItem('up');
                 goUpTree.setTooltip('Go up a directory');
                 goUpTree.onClick = function()
                 {
                     YAHOO.widget.TreeView.getTree('browseTree').goUp();
                 };
+*/
                 var goToHome = new ToolbarItem('home');
                 goToHome.setTooltip('Go to home');
                 goToHome.onClick = function()
                 {
                     //TODO: configure pulse home directory.
                     YAHOO.widget.TreeView.getTree('browseTree').expandToPath(['C:\\', 'backup', 'SD0033']);
-                }
+                };
+
+                var createFolder = new ToolbarItem('create');
+                createFolder.setTooltip('Create folder');
+                createFolder.onClick = function()
+                {
+                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
+                    var p = tree.selected;
+                    if (p)
+                    {
+                        var data = {
+                            "id":"id",
+                            "name":"New folder",
+                            "label":"New folder",
+                            "type":"folder",
+                            "separator":"/"
+                        };
+                        new FileNode(data, p, false);
+                        if (!p.expanded)
+                        {
+                            p.fileToggle();
+                        }
+                        else
+                        {
+                            p.refresh();
+                        }
+                    }
+                };
+
+                var deleteFolder = new ToolbarItem('delete');
+                deleteFolder.setTooltip('Delete folder');
+                deleteFolder.onClick = function()
+                {
+                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
+                    var n = tree.selected;
+                    if (n)
+                    {
+                        tree.removeNode(n, true);
+                    }
+                };
 
                 // construct the toolbar.
                 var toolbar = new Toolbar('toolbar');
-                toolbar.add(goUpTree);
+                /*toolbar.add(goUpTree);*/
                 toolbar.add(goToHome);
+                toolbar.add(createFolder);
+                toolbar.add(deleteFolder);
                 toolbar.draw();
 
                 // construct the directory browser.
@@ -103,6 +185,11 @@
                 {
                     list(node, onCompleteCallback, dirOnly);
                 }, 1);
+
+                tree.onSelect = function(node)
+                {
+                    ensureVisible();
+                }
 
                 tree.onActivate = function(node)
                 {
@@ -121,7 +208,6 @@
                 {
                     tree.draw();
 
-//                    var initialPath = ["C:\\", "tmp", "empty"];
                     tree.expandToPath(initialPath);
                 });
             }

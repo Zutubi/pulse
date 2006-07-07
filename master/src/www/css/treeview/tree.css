@@ -81,6 +81,18 @@
     background-image: url(../../images/house.gif);
 }
 
+.create {
+    background-image: url(../../images/folder_add.png);
+}
+
+.delete {
+    background-image: url(../../images/folder_delete.png);
+}
+
+.refresh {
+    background-image: url(../../images/arrow_refresh.png);
+}
+
 .toolbaritem {
     width:27px;
     height:27px;
