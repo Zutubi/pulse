@@ -272,6 +272,8 @@ public class SetupDummyBuilds implements Runnable
 
     private BuildResult createBuildResult(Project project, long id)
     {
+        project.setNextBuildNumber(id + 1);
+        projectDao.save(project);
         return new BuildResult(new TriggerBuildReason("scm trigger"), project, getSpec(project), id);
     }
 

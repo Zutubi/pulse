@@ -143,6 +143,14 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="downloadDirectoryArtifact" class="com.zutubi.pulse.web.project.DownloadDirectoryArtifactAction">
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="contentDisposition">filename="${filename}"</param>
+            </result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="viewRecipe" class="com.zutubi.pulse.web.project.ViewRecipeAction">
             <result name="success" type="velocity">view-recipe.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>

@@ -1476,6 +1476,11 @@
         </a>
     #else
         </span>
+    #end
+
+        <a class="unadorned" href="downloadDirectoryArtifact.action?commandId=$result.id&amp;id=$artifact.id"><img alt="archive" src="/images/compress.gif"></a>
+
+    #if(!$hasIndex)
         <ul id="art_${artifact.id}">
         #foreach($fileArtifact in $artifact.children)
             #commandFileArtifact($artifact $fileArtifact $build $result $showFeatures $showArtifactLink)
