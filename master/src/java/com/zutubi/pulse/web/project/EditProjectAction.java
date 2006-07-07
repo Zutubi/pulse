@@ -13,7 +13,8 @@ import java.util.List;
 public class EditProjectAction extends ProjectActionSupport implements Preparable
 {
     private long id;
-    private Project project;// = new Project();
+    private String newName;
+    private Project project;
 
     private static final List<String> ID_PARAMS = Arrays.asList("id");
 
@@ -25,6 +26,16 @@ public class EditProjectAction extends ProjectActionSupport implements Preparabl
     public long getId()
     {
         return this.id;
+    }
+
+    public String getNewName()
+    {
+        return newName;
+    }
+
+    public void setNewName(String newName)
+    {
+        this.newName = newName;
     }
 
     public Project getProject()
@@ -66,10 +77,10 @@ public class EditProjectAction extends ProjectActionSupport implements Preparabl
         }
 
         // check that the requested projects name is not already in use.
-        Project existingProject = getProjectManager().getProject(project.getName());
+        Project existingProject = getProjectManager().getProject(newName);
         if (existingProject != null && getId() != existingProject.getId())
         {
-            addFieldError("project.name", getText("project.name.exists", Arrays.asList(new String[]{project.getName()})));
+            addFieldError("newName", getText("project.name.exists", Arrays.asList(new String[]{project.getName()})));
         }
     }
 
@@ -80,11 +91,13 @@ public class EditProjectAction extends ProjectActionSupport implements Preparabl
             return ERROR;
         }
 
+        newName = project.getName();
         return INPUT;
     }
 
     public String execute()
     {
+        project.setName(newName);
         getProjectManager().save(project);
         return SUCCESS;
     }

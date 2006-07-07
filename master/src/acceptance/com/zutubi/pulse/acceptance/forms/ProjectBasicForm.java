@@ -8,7 +8,7 @@ import net.sourceforge.jwebunit.WebTester;
 public class ProjectBasicForm extends BaseForm
 {
     public static final String FORM_NAME = "project.edit";
-    public static final String NAME_FIELD = "project.name";
+    public static final String NAME_FIELD = "newName";
     public static final String DESCRIPTION_FIELD = "project.description";
     public static final String URL_FIELD = "project.url";
 
