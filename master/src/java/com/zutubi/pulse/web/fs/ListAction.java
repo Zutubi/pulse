@@ -3,10 +3,10 @@ package com.zutubi.pulse.web.fs;
 import com.opensymphony.util.TextUtils;
 import org.apache.commons.codec.binary.Base64;
 
-import java.util.*;
 import java.io.File;
 import java.io.FileFilter;
 import java.text.Collator;
+import java.util.*;
 
 /**
  * <class-comment/>
@@ -78,19 +78,19 @@ public abstract class ListAction extends FileSystemActionSupport
         if (file != null)
         {
             listing.files = file.listFiles();
+
+            filter(listing, new FileFilter()
+            {
+                public boolean accept(File f)
+                {
+                    return !f.isHidden();
+                }
+            });
         }
         else
         {
             listing.files = File.listRoots();
         }
-
-        filter(listing, new FileFilter()
-        {
-            public boolean accept(File f)
-            {
-                return !f.isHidden();
-            }
-        });
 
         if (isDirOnly())
         {
