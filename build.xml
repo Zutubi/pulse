@@ -168,10 +168,10 @@
             <include name="**/*.in"/>
         </replace>
 
-        <move todir="${package.root}/bin">
+        <copy todir="${package.root}/bin">
             <fileset dir="${package.root}/bin"/>
             <mapper type="glob" from="*.in" to="*"/>
-        </move>
+        </copy>
 
         <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
         <exec executable="zip" dir="${package.root}/..">
@@ -187,6 +187,20 @@
                 <exclude name="${package.name}/bin/*"/>
             </tarfileset>
         </tar>
+    </target>
+
+    <target name="nsis.master">
+        <property name="package.name" value="pulse-${pulse.version}"/>
+        <property name="package.root" value="build/package/${package.name}"/>
+
+        <replace file="installer/pulse.nsi.in" token="__VERSION__" value="${pulse.version}"/>
+        <copy file="installer/pulse.nsi.in" tofile="${package.root}/pulse.nsi"/>
+        <copy file="installer/env.nsh" todir="${package.root}"/>
+        <copy file="installer/pulse.ico" todir="${package.root}"/>
+
+        <exec executable="makensis" dir="${package.root}">
+            <arg line="pulse.nsi"/>
+        </exec>
     </target>
 
     <target name="accept.master" depends="package.master">
