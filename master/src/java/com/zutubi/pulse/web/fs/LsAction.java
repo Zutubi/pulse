@@ -61,17 +61,13 @@ public class LsAction extends ActionSupport
     private Listing list(String path)
     {
         //todo: validate path.
-        File file = null;
-        if (TextUtils.stringSet(path))
-        {
-            file = new File(path);
-        }
-
         Listing listing = new Listing();
         listing.path = path;
 
-        if (file != null)
+        if (TextUtils.stringSet(path))
         {
+            File file = new File(path);
+
             listing.files = file.listFiles();
 
             filter(listing, new FileFilter()

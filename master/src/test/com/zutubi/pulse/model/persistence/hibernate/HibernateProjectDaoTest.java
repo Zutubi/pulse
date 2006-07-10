@@ -3,9 +3,7 @@ package com.zutubi.pulse.model.persistence.hibernate;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
-import com.zutubi.pulse.model.persistence.ContactPointDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
-import com.zutubi.pulse.model.persistence.SubscriptionDao;
 
 import java.util.Arrays;
 import java.util.TreeMap;
@@ -18,24 +16,18 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 {
     private ProjectDao projectDao;
     private BuildSpecificationDao buildSpecificationDao;
-    private SubscriptionDao subscriptionDao;
-    private ContactPointDao contactDao;
 
     public void setUp() throws Exception
     {
         super.setUp();
         projectDao = (ProjectDao) context.getBean("projectDao");
         buildSpecificationDao = (BuildSpecificationDao) context.getBean("buildSpecificationDao");
-        subscriptionDao = (SubscriptionDao) context.getBean("subscriptionDao");
-        contactDao = (ContactPointDao) context.getBean("contactPointDao");
     }
 
     public void tearDown() throws Exception
     {
         projectDao = null;
         buildSpecificationDao = null;
-        subscriptionDao = null;
-        contactDao = null;
         super.tearDown();
     }
 
@@ -98,7 +90,7 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         TreeMap<String, String> environment = new TreeMap<String, String>();
         environment.put("PATH", "/bin");
 
-        AntPulseFileDetails details = new AntPulseFileDetails("build.xml", "build test", "arg1", "workdir");
+        AntPulseFileDetails details = new AntPulseFileDetails("build.xml", "build test", "arg1", "workdir", environment);
         details.setEnvironment(environment);
 
         projectDao.save(details);

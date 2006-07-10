@@ -477,7 +477,7 @@ public class AddProjectWizard extends BaseWizard
 
     private class AntDetails extends BaseWizardState
     {
-        private AntPulseFileDetails details = new AntPulseFileDetails("build.xml", null, null, null);
+        private AntPulseFileDetails details = new AntPulseFileDetails("build.xml", null, null, null, null);
 
         public AntDetails(Wizard wizard, String name)
         {
