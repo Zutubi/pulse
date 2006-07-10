@@ -10,6 +10,8 @@
 #if($buildResult.completed())
     #if($foundBase)
         #showDirectoryListing("base.dir" "browseProjectDir.action?buildId=$buildResult.id&amp;recipeId=$recipeId&amp;" false false)
+
+        <!--<div id="browseTree"></div>-->
     #else
     <p>
         #wwtext("name=working.dir.cleaned")

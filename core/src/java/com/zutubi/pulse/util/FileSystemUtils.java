@@ -548,4 +548,13 @@ public class FileSystemUtils
             IOUtils.copyFile(from, to);
         }
     }
+
+    /**
+     * This method returns true if the specified file is the root of a file system.
+     * @param f
+     */
+    public static boolean isRoot(File f)
+    {
+        return f.getParentFile() == null;
+    }
 }

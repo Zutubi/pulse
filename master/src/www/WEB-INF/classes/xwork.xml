@@ -179,6 +179,10 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="lsProjDir" class="com.zutubi.pulse.web.fs.ListProjectDirectoryAction">
+            <result name="success" type="json">ls.xml</result>
+        </action>
+        
         <action name="browseProjectScm" class="com.zutubi.pulse.web.project.BrowseProjectScmAction">
             <result name="dir" type="velocity">browse-project-scm-dir.vm</result>
             <result name="file" type="stream">
