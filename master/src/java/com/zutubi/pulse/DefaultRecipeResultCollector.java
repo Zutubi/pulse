@@ -1,9 +1,9 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 
 import java.io.File;
 
@@ -30,21 +30,24 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
         }
     }
 
-    public void collect(BuildResult result, long recipeId, BuildService buildService)
+    public void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, BuildService buildService)
     {
         if (buildService != null)
         {
             File outputDest = paths.getOutputDir(project, result, recipeId);
-            File workDest = paths.getBaseDir(project, result, recipeId);
-
             if (!outputDest.mkdirs())
             {
                 throw new BuildException("Unable to create output destination '" + outputDest.getAbsolutePath() + "'");
             }
 
-            if (!workDest.mkdirs())
+            File workDest = null;
+            if (collectWorkingCopy)
             {
-                throw new BuildException("Unable to create work destination '" + workDest.getAbsolutePath() + "'");
+                workDest = paths.getBaseDir(project, result, recipeId);
+                if (!workDest.mkdirs())
+                {
+                    throw new BuildException("Unable to create work destination '" + workDest.getAbsolutePath() + "'");
+                }
             }
 
             buildService.collectResults(recipeId, outputDest, workDest);

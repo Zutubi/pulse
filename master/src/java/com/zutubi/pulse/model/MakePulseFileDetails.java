@@ -23,7 +23,7 @@ public class MakePulseFileDetails extends TemplatePulseFileDetails
      * Path relative to work.dir in which to execute the make.
      */
     private String workingDir;
-    private Map<String, String> environment;
+    private Map<String, String> environment = new TreeMap<String, String>();
 
     public MakePulseFileDetails()
     {
@@ -31,22 +31,21 @@ public class MakePulseFileDetails extends TemplatePulseFileDetails
         targets = null;
         arguments = null;
         workingDir = null;
-        environment = new TreeMap<String, String>();
     }
 
-    public MakePulseFileDetails(String buildFile, String targets, String arguments, String workingDir, Map<String, String> environment)
+    public MakePulseFileDetails(String buildFile, String targets, String arguments, String workingDir)
     {
         this.makefile = buildFile;
         this.targets = targets;
         this.arguments = arguments;
         this.workingDir = workingDir;
-        this.environment = environment;
     }
 
     public MakePulseFileDetails copy()
     {
-        Map<String, String> env = new TreeMap<String, String>(environment);
-        return new MakePulseFileDetails(makefile, targets, arguments, workingDir, env);
+        MakePulseFileDetails copy = new MakePulseFileDetails(makefile, targets, arguments, workingDir);
+        copy.environment = new TreeMap<String, String>(environment);
+        return copy;
     }
 
     protected String getTemplateName()

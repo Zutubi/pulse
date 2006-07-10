@@ -3,9 +3,9 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.model.ResourceManager;
 
 import java.io.File;
 
@@ -53,10 +53,13 @@ public class MasterBuildService implements BuildService
             throw new BuildException("Unable to rename output directory '" + outputDir.getAbsolutePath() + "' to '" + outputDest.getAbsolutePath() + "'");
         }
 
-        File workDir = recipePaths.getBaseDir();
-        if (!FileSystemUtils.rename(workDir, workDest, true))
+        if (workDest != null)
         {
-            throw new BuildException("Unable to rename work directory '" + workDir.getAbsolutePath() + "' to '" + workDest.getAbsolutePath() + "'");
+            File workDir = recipePaths.getBaseDir();
+            if (!FileSystemUtils.rename(workDir, workDest, true))
+            {
+                throw new BuildException("Unable to rename work directory '" + workDir.getAbsolutePath() + "' to '" + workDest.getAbsolutePath() + "'");
+            }
         }
     }
 

@@ -258,7 +258,7 @@ public class RecipeControllerTest extends PulseTestCase
             preparedRecipes.add(recipeId);
         }
 
-        public void collect(BuildResult result, long recipeId, BuildService buildService)
+        public void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, BuildService buildService)
         {
             collectedRecipes.put(recipeId, buildService);
         }

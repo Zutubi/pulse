@@ -98,7 +98,8 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         TreeMap<String, String> environment = new TreeMap<String, String>();
         environment.put("PATH", "/bin");
 
-        AntPulseFileDetails details = new AntPulseFileDetails("build.xml", "build test", "arg1", "workdir", environment);
+        AntPulseFileDetails details = new AntPulseFileDetails("build.xml", "build test", "arg1", "workdir");
+        details.setEnvironment(environment);
 
         projectDao.save(details);
         commitAndRefreshTransaction();
@@ -119,8 +120,8 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         TreeMap<String, String> environment = new TreeMap<String, String>();
         environment.put("PATH", "/bin");
 
-        MakePulseFileDetails details = new MakePulseFileDetails("Makefile", "build test", "arg1", "workdir", environment);
-
+        MakePulseFileDetails details = new MakePulseFileDetails("Makefile", "build test", "arg1", "workdir");
+        details.setEnvironment(environment);
         projectDao.save(details);
         commitAndRefreshTransaction();
 

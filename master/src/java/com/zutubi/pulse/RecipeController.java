@@ -177,11 +177,11 @@ public class RecipeController
         return finished;
     }
 
-    public void collect(BuildResult buildResult)
+    public void collect(BuildResult buildResult, boolean collectWorkingCopy)
     {
         try
         {
-            collector.collect(buildResult, recipeResult.getId(), buildService);
+            collector.collect(buildResult, recipeResult.getId(), collectWorkingCopy, buildService);
         }
         catch (BuildException e)
         {

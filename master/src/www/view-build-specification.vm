@@ -48,6 +48,7 @@
         #aclEditHeadingRow("buildspec.basics" 2 "editBuildSpecification!input.action?projectId=$project.id&amp;id=$specification.id" "edit_basics" "project")
         #dynamicRow("buildspec.name" $specification.name)
         #dynamicRow("buildspec.isolate.changelists" $specification.isolateChangelists)
+        #dynamicRow("buildspec.retain.working.copy" $specification.retainWorkingCopy)
         #dynamicRow("buildspec.timeout" $specification.prettyTimeout)
     </table>
 

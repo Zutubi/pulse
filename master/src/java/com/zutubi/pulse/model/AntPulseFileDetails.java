@@ -24,7 +24,7 @@ public class AntPulseFileDetails extends TemplatePulseFileDetails
      * Path relative to work.dir in which to execute the make.
      */
     private String workingDir;
-    private Map<String, String> environment;
+    private Map<String, String> environment = new TreeMap<String, String>();
 
     public AntPulseFileDetails()
     {
@@ -32,22 +32,21 @@ public class AntPulseFileDetails extends TemplatePulseFileDetails
         targets = null;
         arguments = null;
         workingDir = null;
-        environment = new TreeMap<String, String>();
     }
 
-    public AntPulseFileDetails(String buildFile, String targets, String arguments, String workingDir, Map<String, String> environment)
+    public AntPulseFileDetails(String buildFile, String targets, String arguments, String workingDir)
     {
         this.buildFile = buildFile;
         this.targets = targets;
         this.arguments = arguments;
         this.workingDir = workingDir;
-        this.environment = environment;
     }
 
     public AntPulseFileDetails copy()
     {
-        Map<String, String> env = new TreeMap<String, String>(environment);
-        return new AntPulseFileDetails(buildFile, targets, arguments, workingDir, env);
+        AntPulseFileDetails copy = new AntPulseFileDetails(buildFile, targets, arguments, workingDir);
+        copy.environment = new TreeMap<String, String>(environment);
+        return copy;
     }
 
     protected String getTemplateName()

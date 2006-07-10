@@ -469,7 +469,7 @@ public class AddProjectWizard extends BaseWizard
 
     private class AntDetails extends BaseWizardState
     {
-        private AntPulseFileDetails details = new AntPulseFileDetails("build.xml", null, null, null, null);
+        private AntPulseFileDetails details = new AntPulseFileDetails("build.xml", null, null, null);
 
         public AntDetails(Wizard wizard, String name)
         {
@@ -512,7 +512,7 @@ public class AddProjectWizard extends BaseWizard
 
     private class MakeDetails extends BaseWizardState
     {
-        private MakePulseFileDetails details = new MakePulseFileDetails("Makefile", null, null, null, null);
+        private MakePulseFileDetails details = new MakePulseFileDetails("Makefile", null, null, null);
 
         public MakeDetails(Wizard wizard, String name)
         {

@@ -65,7 +65,10 @@ public class SlaveBuildService implements BuildService
     public void collectResults(long recipeId, File outputDest, File workDest)
     {
         collect(recipeId, true, outputDest);
-        collect(recipeId, false, workDest);
+        if (workDest != null)
+        {
+            collect(recipeId, false, workDest);
+        }
     }
 
     private void collect(long recipeId, boolean output, File destination)

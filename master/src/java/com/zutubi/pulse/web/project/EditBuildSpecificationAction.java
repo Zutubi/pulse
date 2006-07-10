@@ -18,6 +18,7 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
     private BuildSpecification spec;
     private BuildSpecificationDao buildSpecificationDao;
     private boolean isolateChangelists;
+    private boolean retainWorkingCopy;
     private boolean timeoutEnabled;
     private int timeout = 60;
     private static final List<String> PREPARE_PARAMS = Arrays.asList("id", "projectId");
@@ -45,6 +46,16 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
     public void setIsolateChangelists(boolean isolateChangelists)
     {
         this.isolateChangelists = isolateChangelists;
+    }
+
+    public boolean isRetainWorkingCopy()
+    {
+        return retainWorkingCopy;
+    }
+
+    public void setRetainWorkingCopy(boolean retainWorkingCopy)
+    {
+        this.retainWorkingCopy = retainWorkingCopy;
     }
 
     public boolean isTimeoutEnabled()
@@ -128,6 +139,7 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
         }
 
         isolateChangelists = spec.getIsolateChangelists();
+        retainWorkingCopy = spec.getRetainWorkingCopy();
 
         timeoutEnabled = spec.getTimeout() != BuildSpecification.TIMEOUT_NEVER;
         if (timeoutEnabled)
@@ -145,6 +157,7 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
     public String execute()
     {
         spec.setIsolateChangelists(isolateChangelists);
+        spec.setRetainWorkingCopy(retainWorkingCopy);
 
         if (timeoutEnabled)
         {

@@ -430,7 +430,7 @@ public class BuildController implements EventListener
 
         if (controller.isFinished())
         {
-            controller.collect(buildResult);
+            controller.collect(buildResult, specification.getRetainWorkingCopy());
             executingControllers.remove(node);
 
             RecipeResult result = controller.getResult();
@@ -460,6 +460,7 @@ public class BuildController implements EventListener
     {
         buildResult.abortUnfinishedRecipes();
         tree.cleanup(buildResult);
+        buildResult.setHasWorkDir(specification.getRetainWorkingCopy());        
         buildResult.complete();
 
         for(PostBuildAction action: buildResult.getProject().getPostBuildActions())

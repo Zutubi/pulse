@@ -12,6 +12,7 @@ public class BuildSpecification extends Entity implements NamedEntity
 
     private String name;
     private boolean isolateChangelists = false;
+    private boolean retainWorkingCopy = false;
     private int timeout = TIMEOUT_NEVER;
     private BuildSpecificationNode root = new BuildSpecificationNode(null);
 
@@ -57,6 +58,16 @@ public class BuildSpecification extends Entity implements NamedEntity
         }
 
         this.isolateChangelists = isolateChangelists;
+    }
+
+    public boolean getRetainWorkingCopy()
+    {
+        return retainWorkingCopy;
+    }
+
+    public void setRetainWorkingCopy(boolean retainWorkingCopy)
+    {
+        this.retainWorkingCopy = retainWorkingCopy;
     }
 
     public int getTimeout()

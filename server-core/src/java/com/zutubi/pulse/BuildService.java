@@ -21,6 +21,16 @@ public interface BuildService extends RemoteService
 
     boolean build(RecipeRequest request);
 
+    /**
+     * Collects files produced by the recipe execution to the given local
+     * directories.  Note that working copy collection is optional.
+     *
+     * @param recipeId   id of the recipe to collect results for
+     * @param outputDest local directory to receive the output files
+     *                   (artifacts)
+     * @param workDest   local directory to receive the working copy, or null
+     *                   if the working copy should not be collected
+     */
     void collectResults(long recipeId, File outputDest, File workDest);
 
     void cleanup(long recipeId);

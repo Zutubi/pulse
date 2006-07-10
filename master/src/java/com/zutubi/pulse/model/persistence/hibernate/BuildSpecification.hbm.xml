@@ -12,6 +12,8 @@
 
         <property name="isolateChangelists" column="ISOLATE_CHANGELISTS" type="boolean"/>
 
+        <property name="retainWorkingCopy" column="RETAIN_WORKING_COPY" type="boolean"/>
+
         <property name="timeout" column="TIMEOUT" type="int"/>
 
         <many-to-one name="root" class="com.zutubi.pulse.model.BuildSpecificationNode"
