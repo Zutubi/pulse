@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.opensymphony.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
 import java.util.Map;
@@ -55,22 +56,22 @@ public class MakePulseFileDetails extends TemplatePulseFileDetails
 
     protected void populateContext(VelocityContext context)
     {
-        if (makefile != null)
+        if (TextUtils.stringSet(makefile))
         {
             context.put("makefile", makefile);
         }
 
-        if (targets != null)
+        if (TextUtils.stringSet(targets))
         {
             context.put("targets", targets);
         }
 
-        if (arguments != null)
+        if (TextUtils.stringSet(arguments))
         {
             context.put("arguments", arguments);
         }
 
-        if (workingDir != null)
+        if (TextUtils.stringSet(workingDir))
         {
             context.put("workingDir", workingDir);
         }
@@ -143,28 +144,28 @@ public class MakePulseFileDetails extends TemplatePulseFileDetails
         // TODO i18n
         Properties result = new Properties();
 
-        if (makefile != null)
+        if (TextUtils.stringSet(makefile))
         {
             result.put("makefile", makefile);
         }
 
-        if (targets != null)
+        if (TextUtils.stringSet(targets))
         {
             result.put("targets", targets);
         }
 
-        if (workingDir != null)
+        if (TextUtils.stringSet(workingDir))
         {
             result.put("working directory", workingDir);
         }
 
-        if (arguments != null)
+        if (TextUtils.stringSet(arguments))
         {
             result.put("arguments", arguments);
         }
 
         String env = getEnvironmentString();
-        if (env.length() > 0)
+        if (TextUtils.stringSet(env))
         {
             result.put("environment", env);
         }
@@ -175,22 +176,14 @@ public class MakePulseFileDetails extends TemplatePulseFileDetails
     private String getEnvironmentString()
     {
         StringBuilder result = new StringBuilder();
-        boolean first = true;
-
+        String sep = "";
         for (Map.Entry entry : environment.entrySet())
         {
-            if (first)
-            {
-                first = false;
-            }
-            else
-            {
-                result.append("; ");
-            }
-
+            result.append(sep);
             result.append(entry.getKey());
             result.append('=');
             result.append(entry.getValue());
+            sep = "; ";
         }
 
         return result.toString();

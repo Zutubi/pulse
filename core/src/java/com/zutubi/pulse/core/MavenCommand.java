@@ -8,7 +8,7 @@ import java.io.File;
 /**
  * <class-comment/>
  */
-public class MavenCommand extends ExecutableCommand implements Command, ScopeAware
+public class MavenCommand extends ExecutableCommand
 {
     private Scope scope;
     private String targets;

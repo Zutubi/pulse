@@ -6,7 +6,7 @@ import java.io.File;
 
 /**
  */
-public class MakeCommand extends ExecutableCommand implements Command, ScopeAware
+public class MakeCommand extends ExecutableCommand
 {
     private Scope scope;
     private String makefile;

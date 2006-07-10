@@ -205,7 +205,8 @@ public class ExecutableCommand implements Command, ScopeAware
     {
         for (String arg : args.split(" "))
         {
-            this.args.add(new Arg(arg));
+            Arg a = createArg();
+            a.addText(arg);
         }
     }
 

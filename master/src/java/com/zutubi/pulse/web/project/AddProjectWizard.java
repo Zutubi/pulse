@@ -41,6 +41,7 @@ public class AddProjectWizard extends BaseWizard
     private MakeDetails makeDetails;
     private MavenDetails mavenDetails;
     private Maven2Details maven2Details;
+    private XCodeDetails xcodeDetails;
 
     private WizardCompleteState completeState;
 
@@ -67,6 +68,7 @@ public class AddProjectWizard extends BaseWizard
         maven2Details = new Maven2Details(this, "maven2");
         customDetails = new CustomDetails(this, "custom");
         versionedDetails = new VersionedDetails(this, "versioned");
+        xcodeDetails = new XCodeDetails(this, "xcode");
 
         // finished.
         completeState = new WizardCompleteState(this, "success");
@@ -81,6 +83,7 @@ public class AddProjectWizard extends BaseWizard
         addState(maven2Details);
         addState(customDetails);
         addState(versionedDetails);
+        addState(xcodeDetails);
         addFinalState(completeState.getStateName(), completeState);
     }
 
@@ -132,6 +135,10 @@ public class AddProjectWizard extends BaseWizard
         else if ("versioned".equals(projectType))
         {
             details = versionedDetails.getDetails();
+        }
+        else if ("xcode".equals(projectType))
+        {
+            details = xcodeDetails.getDetails();
         }
         project.setPulseFileDetails(details);
 
@@ -248,6 +255,7 @@ public class AddProjectWizard extends BaseWizard
                 types.put("maven", "maven project");
                 types.put("maven2", "maven 2 project");
                 types.put("versioned", "versioned project");
+//                types.put("xcode", "xcode project");
             }
             return types;
         }
@@ -481,32 +489,9 @@ public class AddProjectWizard extends BaseWizard
             return ((AddProjectWizard) getWizard()).completeState.getStateName();
         }
 
-        public AntPulseFileDetails getDetails()
+        public PulseFileDetails getDetails()
         {
             return details;
-        }
-
-        public void execute()
-        {
-            if (!TextUtils.stringSet(details.getBuildFile()))
-            {
-                details.setBuildFile(null);
-            }
-
-            if (!TextUtils.stringSet(details.getTargets()))
-            {
-                details.setTargets(null);
-            }
-
-            if (!TextUtils.stringSet(details.getArguments()))
-            {
-                details.setArguments(null);
-            }
-
-            if (!TextUtils.stringSet(details.getWorkingDir()))
-            {
-                details.setWorkingDir(null);
-            }
         }
     }
 
@@ -524,32 +509,9 @@ public class AddProjectWizard extends BaseWizard
             return ((AddProjectWizard) getWizard()).completeState.getStateName();
         }
 
-        public MakePulseFileDetails getDetails()
+        public PulseFileDetails getDetails()
         {
             return details;
-        }
-
-        public void execute()
-        {
-            if (!TextUtils.stringSet(details.getMakefile()))
-            {
-                details.setMakefile(null);
-            }
-
-            if (!TextUtils.stringSet(details.getTargets()))
-            {
-                details.setTargets(null);
-            }
-
-            if (!TextUtils.stringSet(details.getArguments()))
-            {
-                details.setArguments(null);
-            }
-
-            if (!TextUtils.stringSet(details.getWorkingDir()))
-            {
-                details.setWorkingDir(null);
-            }
         }
     }
 
@@ -574,16 +536,6 @@ public class AddProjectWizard extends BaseWizard
 
         public void execute()
         {
-            if (!TextUtils.stringSet(details.getTargets()))
-            {
-                details.setTargets(null);
-            }
-
-            if (!TextUtils.stringSet(details.getWorkingDir()))
-            {
-                details.setWorkingDir(null);
-            }
-
             DirectoryCapture testCapture = new DirectoryCapture("test reports");
             testCapture.setIncludes("**/target/test-reports/TEST-*.xml");
             testCapture.addProcessor("junit");
@@ -612,16 +564,6 @@ public class AddProjectWizard extends BaseWizard
 
         public void execute()
         {
-            if (!TextUtils.stringSet(details.getGoals()))
-            {
-                details.setGoals(null);
-            }
-
-            if (!TextUtils.stringSet(details.getWorkingDir()))
-            {
-                details.setWorkingDir(null);
-            }
-
             DirectoryCapture testCapture = new DirectoryCapture("test reports");
             testCapture.setIncludes("**/target/surefire-reports/TEST-*.xml");
             testCapture.addProcessor("junit");
@@ -648,7 +590,6 @@ public class AddProjectWizard extends BaseWizard
         {
             return details;
         }
-
 
         public void validate()
         {
@@ -692,6 +633,26 @@ public class AddProjectWizard extends BaseWizard
         private PulseFileDetails details = new VersionedPulseFileDetails("pulse.xml");
 
         public VersionedDetails(Wizard wizard, String name)
+        {
+            super(wizard, name);
+        }
+
+        public String getNextStateName()
+        {
+            return ((AddProjectWizard) getWizard()).completeState.getStateName();
+        }
+
+        public PulseFileDetails getDetails()
+        {
+            return details;
+        }
+    }
+
+    private class XCodeDetails extends BaseWizardState
+    {
+        private XCodePulseFileDetails details = new XCodePulseFileDetails();
+
+        public XCodeDetails(Wizard wizard, String name)
         {
             super(wizard, name);
         }

@@ -12,6 +12,13 @@ public class MavenPostProcessor extends PostProcessorGroup
 {
     public MavenPostProcessor()
     {
+        this(null);
+    }
+
+    public MavenPostProcessor(String name)
+    {
+        setName(name);
+
         // Add a JUnit summary post processor.  It comes first as the output
         // appears as the tests are run.
         add(new JUnitSummaryPostProcessor());
@@ -35,11 +42,5 @@ public class MavenPostProcessor extends PostProcessorGroup
         maven.setLeadingContext(1);
         maven.setTrailingContext(6);
         add(maven);
-    }
-
-    public MavenPostProcessor(String name)
-    {
-        this();
-        setName(name);
     }
 }

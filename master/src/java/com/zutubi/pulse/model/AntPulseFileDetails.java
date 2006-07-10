@@ -24,7 +24,7 @@ public class AntPulseFileDetails extends TemplatePulseFileDetails
      * Path relative to work.dir in which to execute the make.
      */
     private String workingDir;
-    private Map<String, String> environment = new TreeMap<String, String>();
+    private Map<String, String> environment;
 
     public AntPulseFileDetails()
     {
@@ -32,21 +32,22 @@ public class AntPulseFileDetails extends TemplatePulseFileDetails
         targets = null;
         arguments = null;
         workingDir = null;
+        environment = new TreeMap<String, String>();
     }
 
-    public AntPulseFileDetails(String buildFile, String targets, String arguments, String workingDir)
+    public AntPulseFileDetails(String buildFile, String targets, String arguments, String workingDir, Map<String, String> environment)
     {
         this.buildFile = buildFile;
         this.targets = targets;
         this.arguments = arguments;
         this.workingDir = workingDir;
+        this.environment = environment;
     }
 
     public AntPulseFileDetails copy()
     {
-        AntPulseFileDetails copy = new AntPulseFileDetails(buildFile, targets, arguments, workingDir);
-        copy.environment = new TreeMap<String, String>(environment);
-        return copy;
+        Map<String, String> env = new TreeMap<String, String>(environment);
+        return new AntPulseFileDetails(buildFile, targets, arguments, workingDir, env);
     }
 
     protected String getTemplateName()
@@ -56,22 +57,22 @@ public class AntPulseFileDetails extends TemplatePulseFileDetails
 
     protected void populateContext(VelocityContext context)
     {
-        if (buildFile != null)
+        if (TextUtils.stringSet(buildFile))
         {
             context.put("buildFile", buildFile);
         }
 
-        if (targets != null)
+        if (TextUtils.stringSet(targets))
         {
             context.put("targets", targets);
         }
 
-        if (arguments != null)
+        if (TextUtils.stringSet(arguments))
         {
             context.put("arguments", arguments);
         }
 
-        if (workingDir != null)
+        if (TextUtils.stringSet(workingDir))
         {
             context.put("workingDir", workingDir);
         }
@@ -176,22 +177,14 @@ public class AntPulseFileDetails extends TemplatePulseFileDetails
     private String getEnvironmentString()
     {
         StringBuilder result = new StringBuilder();
-        boolean first = true;
-
+        String sep = "";
         for (Map.Entry entry : environment.entrySet())
         {
-            if (first)
-            {
-                first = false;
-            }
-            else
-            {
-                result.append("; ");
-            }
-
+            result.append(sep);
             result.append(entry.getKey());
             result.append('=');
             result.append(entry.getValue());
+            sep = "; ";
         }
 
         return result.toString();

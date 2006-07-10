@@ -7,7 +7,7 @@ import java.io.File;
 
 /**
  */
-public class AntCommand extends ExecutableCommand implements Command, ScopeAware
+public class AntCommand extends ExecutableCommand
 {
     private Scope scope;
     private String buildFile;

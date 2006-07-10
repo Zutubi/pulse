@@ -122,6 +122,16 @@
                 <property name="goals" column="TARGETS" type="string" length="255"/>
                 <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
             </subclass>
+
+            <subclass name="com.zutubi.pulse.model.XCodePulseFileDetails" discriminator-value="XCODE" lazy="false">
+                <property name="workingDir" column="BASE_DIR" type="string" length="255"/>
+                <property name="target" column="TARGETS" type="string" length="255"/>
+                <property name="project" column="PROJECT" type="string" length="1023"/>
+                <property name="config" column="CONFIG" type="string" length="1023"/>
+                <property name="action" column="BUILDACTION" type="string" length="1023"/>
+                <property name="settings" column="ARGUMENTS" type="string" length="1023"/>
+            </subclass>
+
         </subclass>
     </class>
 

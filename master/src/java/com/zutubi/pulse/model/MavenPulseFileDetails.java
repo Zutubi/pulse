@@ -50,7 +50,6 @@ public class MavenPulseFileDetails extends TemplatePulseFileDetails
         {
             context.put("workingDir", workingDir.trim());
         }
-
         if (TextUtils.stringSet(arguments))
         {
             context.put("arguments", arguments);

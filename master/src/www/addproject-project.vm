@@ -55,6 +55,12 @@
                 #contentRowHeading("project.type.versioned")
                 #staticWrapCell("project.type.versioned.description")
             </tr>
+<!--
+            <tr>
+                #contentRowHeading("project.type.xcode")
+                #staticWrapCell("project.type.xcode.description")
+            </tr>
+-->
         </table>
 
     </td></tr>
