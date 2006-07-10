@@ -179,10 +179,13 @@ public class MakePulseFileDetails extends TemplatePulseFileDetails
 
         for (Map.Entry entry : environment.entrySet())
         {
-            if (!first)
+            if (first)
+            {
+                first = false;
+            }
+            else
             {
                 result.append("; ");
-                first = false;
             }
 
             result.append(entry.getKey());
