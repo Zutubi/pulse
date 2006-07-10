@@ -14,14 +14,14 @@
 ;General
 
   ;Name and file
-  Name "Zutubi Pulse"
-  OutFile "..\pulse-1.1.1-dev.exe"
+  Name "Zutubi __SERVICE_NAME__"
+  OutFile "..\__PACKAGE_NAME__.exe"
 
   ;Default installation folder
-  InstallDir "$PROGRAMFILES\Zutubi\Pulse"
+  InstallDir "$PROGRAMFILES\Zutubi\__SERVICE_NAME__"
   
   ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\Zutubi\Pulse" ""
+  InstallDirRegKey HKCU "Software\Zutubi\__SERVICE_NAME__" ""
 
 ;--------------------------------
 ;Interface Settings
@@ -41,7 +41,7 @@
   !insertmacro MUI_PAGE_DIRECTORY
 
   !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU" 
-  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Zutubi\Pulse" 
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Zutubi\__SERVICE_NAME__" 
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
   
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
@@ -61,7 +61,7 @@
 
 Function InstallJRE
   DetailPrint "Downloading the JRE setup"
-  NSISdl::download /TIMEOUT=30000 http://localhost:8000/download/jre.exe "$TEMP\pulse_jre_setup.exe"
+  NSISdl::download /TIMEOUT=30000 http://zutubi.com/download/jre.exe "$TEMP\pulse_jre_setup.exe"
   Pop $0 ;Get the return value
   StrCmp $0 "success" RunInstall 0
   StrCmp $0 "cancel" 0 +3
@@ -97,7 +97,7 @@ FunctionEnd
 ;--------------------------------
 ;Installer Sections
 
-Section "Pulse Server" SecMain
+Section "Pulse" SecMain
   SetOutPath "$INSTDIR"
   
   Push "PULSE_HOME"
@@ -109,7 +109,7 @@ Section "Pulse Server" SecMain
   Exec '"$INSTDIR\bin\install-service.bat"'
 
   ;Store installation folder
-  WriteRegStr HKCU "Software\Zutubi\Pulse" "" $INSTDIR
+  WriteRegStr HKCU "Software\Zutubi\__SERVICE_NAME__" "" $INSTDIR
   
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
@@ -127,7 +127,7 @@ SectionEnd
 ;Descriptions
 
   ;Language strings
-  LangString DESC_SecMain ${LANG_ENGLISH} "Install pulse server."
+  LangString DESC_SecMain ${LANG_ENGLISH} "Install pulse."
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -154,6 +154,6 @@ Section "un.Uninstall"
 
   RMDir /r "$INSTDIR"
 
-  DeleteRegKey /ifempty HKCU "Software\Zutubi\Pulse"
+  DeleteRegKey /ifempty HKCU "Software\Zutubi\__SERVICE_NAME__"
 
 SectionEnd

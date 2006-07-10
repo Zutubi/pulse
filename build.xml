@@ -193,10 +193,13 @@
         <property name="package.name" value="pulse-${pulse.version}"/>
         <property name="package.root" value="build/package/${package.name}"/>
 
-        <replace file="installer/pulse.nsi.in" token="__VERSION__" value="${pulse.version}"/>
-        <copy file="installer/pulse.nsi.in" tofile="${package.root}/pulse.nsi"/>
         <copy file="installer/env.nsh" todir="${package.root}"/>
         <copy file="installer/pulse.ico" todir="${package.root}"/>
+        <copy file="installer/pulse.nsi.in" tofile="${package.root}/pulse.nsi"/>
+
+        <replace file="${package.root}/pulse.nsi" replacefilterfile="master/subst.properties">
+            <replacefilter token="__PACKAGE_NAME__" value="${package.name}"/>
+        </replace>
 
         <exec executable="makensis" dir="${package.root}">
             <arg line="pulse.nsi"/>
@@ -335,6 +338,23 @@
                 <exclude name="${package.name}/bin/*"/>
             </tarfileset>
         </tar>
+    </target>
+
+    <target name="nsis.slave">
+        <property name="package.name" value="pulse-agent-${pulse.version}"/>
+        <property name="package.root" value="build/package/${package.name}"/>
+
+        <copy file="installer/env.nsh" todir="${package.root}"/>
+        <copy file="installer/pulse.ico" todir="${package.root}"/>
+        <copy file="installer/pulse.nsi.in" tofile="${package.root}/pulse.nsi"/>
+
+        <replace file="${package.root}/pulse.nsi" replacefilterfile="slave/subst.properties">
+            <replacefilter token="__PACKAGE_NAME__" value="${package.name}"/>
+        </replace>
+
+        <exec executable="makensis" dir="${package.root}">
+            <arg line="pulse.nsi"/>
+        </exec>
     </target>
 
     <target name="init">
