@@ -96,7 +96,7 @@
 
         <default-interceptor-ref name="ajaxStack"/>
 
-        <action name="ls" class="com.zutubi.pulse.web.fs.BrowseServerListAction">
+        <action name="ls" class="com.zutubi.pulse.web.fs.LsAction">
             <result name="success" type="json">ls.xml</result>
         </action>
 

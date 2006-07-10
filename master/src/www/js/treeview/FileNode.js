@@ -144,6 +144,11 @@ YAHOO.widget.RootNode.prototype.isRoot = function()
     return true;
 };
 
+YAHOO.widget.RootNode.prototype.getPath = function()
+{
+    return "";
+};
+
 //---( FILE NODE )---
 
 /**

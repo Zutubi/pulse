@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.fs;
 
 import com.opensymphony.util.TextUtils;
-import org.apache.commons.codec.binary.Base64;
+import com.zutubi.pulse.web.ActionSupport;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -11,11 +11,11 @@ import java.util.*;
 /**
  * <class-comment/>
  */
-public abstract class ListAction extends FileSystemActionSupport
+public class LsAction extends ActionSupport
 {
-    private List<Object> listings;
+    private List<Object> listing;
 
-    private String pid;
+    private String path;
 
     private boolean dirOnly = false;
 
@@ -29,20 +29,27 @@ public abstract class ListAction extends FileSystemActionSupport
         return this.dirOnly;
     }
 
-    public void setPid(String pid)
+    public void setPath(String path)
     {
-        this.pid = pid;
+        this.path = path;
     }
 
-    public List<Object> getListings()
+    public List<Object> getListing()
     {
-        return listings;
+        return listing;
     }
 
     public String execute() throws Exception
     {
-        listings = new LinkedList<Object>();
-        listings.add(new JsonListingWrapper(list(pid)));
+        listing = new LinkedList<Object>();
+        Listing ls = list(path);
+        if (ls != null && ls.files != null)
+        {
+            for (File f : ls.files)
+            {
+                listing.add(new JsonFileWrapper(f));
+            }
+        }
         return SUCCESS;
     }
 
@@ -51,26 +58,17 @@ public abstract class ListAction extends FileSystemActionSupport
         return f.isAbsolute() && !TextUtils.stringSet(f.getName());
     }
 
-    private Listing list(String encodedPath)
+    private Listing list(String path)
     {
         //todo: validate path.
         File file = null;
-        StringTokenizer tokens = new StringTokenizer(encodedPath, "/", false);
-        while (tokens.hasMoreTokens())
+        if (TextUtils.stringSet(path))
         {
-            String t = tokens.nextToken();
-            if (file == null)
-            {
-                file = new java.io.File(decode(t));
-            }
-            else
-            {
-                file = new java.io.File(file, decode(t));
-            }
+            file = new File(path);
         }
 
         Listing listing = new Listing();
-        listing.path = encodedPath;
+        listing.path = path;
 
         if (file != null)
         {
@@ -146,16 +144,6 @@ public abstract class ListAction extends FileSystemActionSupport
         }
     }
 
-    private String encode(String uid)
-    {
-        return new String(Base64.encodeBase64(uid.getBytes()));
-    }
-
-    private String decode(String encodedUid)
-    {
-        return new String(Base64.decodeBase64(encodedUid.getBytes()));
-    }
-
     /**
      * A data carrier object that holds information about a file system listing.
      *
@@ -171,40 +159,6 @@ public abstract class ListAction extends FileSystemActionSupport
          * The listing result: the files located at the specified path.
          */
         File[] files;
-    }
-
-    /**
-     * A wrapper that converts a file listing into a format used by the json response.
-     *
-     */
-    public class JsonListingWrapper
-    {
-        private String uid;
-
-        private List<JsonFileWrapper> files;
-
-        public JsonListingWrapper(Listing l)
-        {
-            uid = l.path;
-            files = new LinkedList<JsonFileWrapper>();
-            if (l.files != null)
-            {
-                for (File f : l.files)
-                {
-                    files.add(new JsonFileWrapper(f));
-                }
-            }
-        }
-
-        public List<JsonFileWrapper> getListing()
-        {
-            return files;
-        }
-
-        public String getUid()
-        {
-            return uid;
-        }
     }
 
     /**
@@ -228,20 +182,9 @@ public abstract class ListAction extends FileSystemActionSupport
             return this.file.getName();
         }
 
-/*
-        public String getUid()
-        {
-            return encode(this.file.getPath());
-        }
-*/
         public String getSeparator()
         {
             return File.separator;
-        }
-        
-        public String getFid()
-        {
-            return encode(this.getName());
         }
 
         public String getType()

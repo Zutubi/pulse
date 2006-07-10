@@ -214,27 +214,10 @@
                 Element.setStyle(vElem, {"height":viewHeight + "px"});
             }
 
-            function getNodeIdPath(node)
-            {
-                // generate id path.
-                var path = "";
-                var sep = "";
-                while (node)
-                {
-                    if (node.data)
-                    {
-                        path = node.data.id + sep + path;
-                        sep = "/";
-                    }
-                    node = node.parent;
-                }
-                return path;
-            }
-
             function ls(node, onCompleteCallback, dirOnly)
             {
                 // generate id path.
-                var path = getNodeIdPath(node);
+                var p = node.getPath();
 
                 var ajax = new Ajax.Request(
                     "/ajax/ls.action",
@@ -243,7 +226,7 @@
                         onComplete: lsResponse(node, onCompleteCallback),
                         onFailure: handleFailure,
                         onException: handleException,
-                        parameters: "pid=" + path + (dirOnly && "&dirOnly=true" || "")
+                        parameters: "path=" + p + (dirOnly && "&dirOnly=true" || "")
                     }
                 );
             }
@@ -252,23 +235,18 @@
             {
                 return function(response)
                 {
-                    var jsonObjs = eval("(" + response.responseText + ")");
+                    var jsonObj = eval("(" + response.responseText + ")");
 
-                    var results = $A(jsonObjs.results);
-                    results.each(function(jsonObj)
+                    var results = $A(jsonObj.listing);
+                    results.each(function(obj)
                     {
-                        // create the new nodes and add them to the parent.
-                        for (var i = 0; i < jsonObj.listing.length; i++)
-                        {
-                            var data = {
-                                "id":jsonObj.listing[i].fid,
-                                "name":jsonObj.listing[i].file,
-                                "label":jsonObj.listing[i].file,
-                                "type":jsonObj.listing[i].type,
-                                "separator":jsonObj.listing[i].separator
-                            };
-                            new FileNode(data, parentNode, false);
-                        }
+                        var data = {
+                            "name":obj.file,            // name of the file.
+                            "label":obj.file,           // Yahoo reads the label field and uses it as the display text.
+                            "type":obj.type,            // the type of this file, used to define the class associated with this node.
+                            "separator":obj.separator
+                        };
+                        new FileNode(data, parentNode, false);
                     });
                     if (callback)
                     {
@@ -283,7 +261,7 @@
                 var node = YAHOO.widget.TreeView.getTree('browseTree').selected;
 
                 // generate id path.
-                var path = getNodeIdPath(node);
+                var p = node.getPath();
 
                 var ajax = new Ajax.Request(
                     "/ajax/mkdir.action",
@@ -292,7 +270,7 @@
                         onComplete: mkdirResponse(node, name),
                         onFailure: handleFailure,
                         onException: handleException,
-                        parameters: "pid=" + path + "&name=" + name
+                        parameters: "path=" + p + "&name=" + name
                     }
                 );
             }
@@ -323,7 +301,7 @@
                 var node = YAHOO.widget.TreeView.getTree('browseTree').selected;
 
                 // generate id path.
-                var path = getNodeIdPath(node);
+                var p = node.getPath();
 
                 var ajax = new Ajax.Request(
                     "/ajax/rmdir.action",
@@ -332,7 +310,7 @@
                         onComplete: rmdirResponse(node),
                         onFailure: handleFailure,
                         onException: handleException,
-                        parameters: "pid=" + path
+                        parameters: "path=" + p
                     }
                 );
             }
