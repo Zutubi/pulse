@@ -40,7 +40,7 @@
 .ygtvblankdepthcell { width:17px; height:22px; }
 
 /* the style of the div around each node */
-.ygtvitem { }  
+.ygtvitem { }
 
 /* the style of the div around each node's collection of children */
 .ygtvchildren { }  
@@ -50,6 +50,7 @@
 .ygtvlabel, .ygtvlabel:link, .ygtvlabel:visited, .ygtvlabel:hover { 
 	margin-left:2px;
 	text-decoration: none;
+    color:black;
 }
 
 /*---( Treeview node styles )---*/
@@ -71,26 +72,43 @@
     border-width:1px; border-color:#316AC5; border-style:solid;
 }
 
-/*---( Toolbar styles )---*/
+.selected:link, .selected:visited, .selected:hover {
+    color:white;
+}
 
+/*---( Toolbar styles )---*/
 .up {
-    background-image: url(../../images/arrow_up.gif);
+    background-image: url(../../images/arrow_up.gif); width:16px;
 }
 
 .home {
-    background-image: url(../../images/house.gif);
+    background-image: url(../../images/house.gif); width:16px;
+}
+
+.pulsehome {
+    background-image: url(../../favicon.png); width:16px;
+}
+
+.toolbarseparator {
+    width:1px;
+    height:27px;
+    background-color:black;
+
+    border-width:2px;
+    border-style:solid;
+    border-color:white;
 }
 
 .create {
-    background-image: url(../../images/folder_add.png);
+    background-image: url(../../images/folder_add.png); width:16px;
 }
 
 .delete {
-    background-image: url(../../images/folder_delete.png);
+    background-image: url(../../images/folder_delete.png); width:16px;
 }
 
 .refresh {
-    background-image: url(../../images/arrow_refresh.png);
+    background-image: url(../../images/arrow_refresh.png); width:16px;
 }
 
 .toolbaritem {
@@ -116,7 +134,6 @@
     background-color:#B5BED6;
     border-width:1px;
     border-color:blue;
-    /*border-color:#08246B;*/
     border-style:solid;
 }
 

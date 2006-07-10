@@ -5,6 +5,8 @@ import com.zutubi.pulse.filesystem.FileSystem;
 import com.zutubi.pulse.filesystem.FileSystemException;
 import com.zutubi.pulse.filesystem.local.LocalFileSystem;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.opensymphony.util.TextUtils;
 import org.apache.commons.codec.binary.Base64;
 
@@ -15,10 +17,14 @@ import java.util.LinkedList;
  */
 public class PopupFormAction extends ActionSupport
 {
+    private MasterConfigurationManager configurationManager;
+
     private String formname;
     private String fieldname;
+
+    private String pulseHome;
+    private String userHome;
     private String initPath;
-    private LinkedList<String> uids;
 
     public String getFormname()
     {
@@ -40,43 +46,51 @@ public class PopupFormAction extends ActionSupport
         this.fieldname = fieldname;
     }
 
-    public void setInitPath(String path)
+    public String getPulseHome()
     {
-        this.initPath = path;
+        return pulseHome;
     }
 
-    public LinkedList<String> getUids()
+    public String getUserHome()
     {
-        return uids;
+        return userHome;
     }
 
-    public String execute() throws FileSystemException
+    public void setInitPath(String initPath)
     {
-        uids = new LinkedList<String>();
+        this.initPath = initPath;
+    }
 
-        if (TextUtils.stringSet(initPath))
+    public String getInitPath()
+    {
+        return initPath;
+    }
+
+    public String execute() throws Exception
+    {
+        // pulse home
+        java.io.File f = configurationManager.getHomeDirectory();
+        if (f != null)
         {
-            FileSystem fileSystem = getFileSystem();
-            File f = fileSystem.getFile(initPath);
-            while (f != null)
-            {
-                uids.addFirst(encode(f.getPath()));
-                f = f.getParentFile();
-            }
+            pulseHome = f.getAbsolutePath();
+            pulseHome = pulseHome.replace("\\", "\\\\");
         }
-        uids.addFirst("");
 
+        // user home
+        userHome = System.getProperty("user.home");
+        userHome = userHome.replace("\\", "\\\\");
+
+        initPath = initPath.replace("\\", "\\\\");
         return SUCCESS;
     }
 
-    private LocalFileSystem getFileSystem()
+    /**
+     * Required resource.
+     *
+     * @param configurationManager
+     */
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
-        return new LocalFileSystem(new java.io.File("c:/"));
+        this.configurationManager = configurationManager;
     }
-
-    private String encode(String uid)
-    {
-        return new String(Base64.encodeBase64(uid.getBytes()));
-    }
-
 }

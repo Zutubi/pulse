@@ -60,7 +60,9 @@ YAHOO.widget.TreeView.prototype.expandTo = function(requestPath)
 {
     var node = this.getRoot();
 
-    // search for node with name initialPath.
+    // search for node with name initPath.
+    //TODO: remove hard coding of '\' separator char.
+    requestPath = requestPath.split('\\');
     for (var i = 0; i < requestPath.length; i++)
     {
         var path = requestPath[i];
@@ -74,7 +76,14 @@ YAHOO.widget.TreeView.prototype.expandTo = function(requestPath)
             // node is loaded, so lets go to  the next one.
             node = $A(node.children).find(function(child)
             {
-                return child.data.name == path;
+                var n = child.data.name;
+
+                // ensure that trailing '\\' are removed.
+                if (n.indexOf('\\') == n.length - 1)
+                {
+                    n = n.substring(0, n.length - 1);
+                }
+                return n == path;
             });
             if (!node)
             {

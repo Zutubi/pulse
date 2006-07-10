@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 <head>
-    <title>file browser</title>
+    <title>Select directory</title>
 
     <link rel="stylesheet" type="text/css" href="/css/treeview/tree.css"/>
 
@@ -109,26 +109,22 @@
             {
                 onResize(event);
 
-                document.title = "Select directory";
-
-                var initialPath = getFormValue();
-
                 // initialise toolbar items.
-/*
-                var goUpTree = new ToolbarItem('up');
-                goUpTree.setTooltip('Go up a directory');
-                goUpTree.onClick = function()
-                {
-                    YAHOO.widget.TreeView.getTree('browseTree').goUp();
-                };
-*/
                 var goToHome = new ToolbarItem('home');
-                goToHome.setTooltip('Go to home');
+                goToHome.setTooltip('Go to user home');
                 goToHome.onClick = function()
                 {
-                    //TODO: configure pulse home directory.
-                    YAHOO.widget.TreeView.getTree('browseTree').expandToPath(['C:\\', 'backup', 'SD0033']);
+                    YAHOO.widget.TreeView.getTree('browseTree').expandToPath('$!userHome');
                 };
+
+                var goToPulseHome = new ToolbarItem('pulsehome');
+                goToPulseHome.setTooltip('Go to pulse home');
+                goToPulseHome.onClick = function()
+                {
+                    YAHOO.widget.TreeView.getTree('browseTree').expandToPath('$!pulseHome');
+                };
+
+                var separator = new ToolbarSeparator();
 
                 var createFolder = new ToolbarItem('create');
                 createFolder.setTooltip('Create folder');
@@ -173,6 +169,8 @@
                 var toolbar = new Toolbar('toolbar');
                 /*toolbar.add(goUpTree);*/
                 toolbar.add(goToHome);
+                toolbar.add(goToPulseHome);
+                toolbar.add(separator);
                 toolbar.add(createFolder);
                 toolbar.add(deleteFolder);
                 toolbar.draw();
@@ -208,7 +206,7 @@
                 {
                     tree.draw();
 
-                    tree.expandToPath(initialPath);
+                    tree.expandToPath('$!initPath');
                 });
             }
 
@@ -325,7 +323,6 @@
 </head>
 
 <body>
-
     <div>
         <p>
             <b>Select pulse data directory</b>

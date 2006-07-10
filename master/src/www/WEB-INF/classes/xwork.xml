@@ -1190,12 +1190,8 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="browse-popup" class="com.zutubi.pulse.web.tree.PopupFormAction">
-            <result name="success" type="velocity">tree/browse-popup.vm</result>
-        </action>
-
-        <action name="browse-dir" class="com.zutubi.pulse.web.ActionSupport">
-            <result name="success" type="velocity">tree/browse-dir.vm</result>
+        <action name="browse-dirs" class="com.zutubi.pulse.web.tree.PopupFormAction">
+            <result name="success" type="velocity">tree/browse-dirs.vm</result>
         </action>
 
         <action name="new-folder" class="com.zutubi.pulse.web.ActionSupport">

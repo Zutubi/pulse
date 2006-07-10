@@ -134,6 +134,41 @@ ToolbarItem.prototype.getHtml = function()
 };
 
 /**
+ * A toolbar separator is an inactive component in a toolbar used as a
+ * separator between groups of related toolbar items.
+ *
+ * The toolbar separator does not reactive to mouse or lick events.
+ */
+ToolbarSeparator = function()
+{
+    this.initialize();
+}
+
+// extend the toolbar item for convenience, although very little of this
+// prototype is required. most of the work is handled by the css styling.
+ToolbarSeparator.prototype = new ToolbarItem();
+
+ToolbarSeparator.prototype.getToolStyle = function()
+{
+    return "toolbarseparator";
+};
+/**
+ * override default onmouseover behaviour.
+ */
+ToolbarSeparator.prototype.onMouseOver = function(event)
+{
+    // the separator is a passive component, do nothing.
+}
+
+/**
+ * override default onmouseout behaviour.
+ */
+ToolbarSeparator.prototype.onMouseOut = function(event)
+{
+    // the separator is a passive component, do nothing.
+}
+
+/**
  * Tooltip for the toolbar items.
  *
  */
