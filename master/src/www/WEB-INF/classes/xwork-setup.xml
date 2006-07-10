@@ -93,21 +93,20 @@
     </package>
 
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">
+
         <default-interceptor-ref name="ajaxStack"/>
 
-        <action name="list" class="com.zutubi.pulse.web.fs.BrowseServerListAction">
-            <result name="success" type="json">fslistings.xml</result>
+        <action name="ls" class="com.zutubi.pulse.web.fs.BrowseServerListAction">
+            <result name="success" type="json">ls.xml</result>
         </action>
 
-<!--
-        <action name="add" class="com.zutubi.pulse.web.fs.MakeDirectoryAction">
-            <result name="success" type="json">addedfolder.xml</result>
+        <action name="mkdir" class="com.zutubi.pulse.web.fs.MkdirAction">
+            <result name="success" type="json">mkdir.xml</result>
         </action>
 
-        <action name="delete" class="com.zutubi.pulse.web.fs.DeleteFileAction">
-            <result name="success" type="json">deletefile.xml</result>
+        <action name="rmdir" class="com.zutubi.pulse.web.fs.RmdirAction">
+            <result name="success" type="json">rmdir.xml</result>
         </action>
--->
 
     </package>
 

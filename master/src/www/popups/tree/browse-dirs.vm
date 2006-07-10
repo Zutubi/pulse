@@ -124,33 +124,14 @@
                     YAHOO.widget.TreeView.getTree('browseTree').expandToPath('$!pulseHome');
                 };
 
+/*
                 var separator = new ToolbarSeparator();
 
                 var createFolder = new ToolbarItem('create');
                 createFolder.setTooltip('Create folder');
                 createFolder.onClick = function()
                 {
-                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
-                    var p = tree.selected;
-                    if (p)
-                    {
-                        var data = {
-                            "id":"id",
-                            "name":"New folder",
-                            "label":"New folder",
-                            "type":"folder",
-                            "separator":"/"
-                        };
-                        new FileNode(data, p, false);
-                        if (!p.expanded)
-                        {
-                            p.fileToggle();
-                        }
-                        else
-                        {
-                            p.refresh();
-                        }
-                    }
+                    mkdir('New Folder');
                 };
 
                 var deleteFolder = new ToolbarItem('delete');
@@ -161,18 +142,21 @@
                     var n = tree.selected;
                     if (n)
                     {
-                        tree.removeNode(n, true);
+                        rmdir();
                     }
                 };
 
+*/
                 // construct the toolbar.
                 var toolbar = new Toolbar('toolbar');
                 /*toolbar.add(goUpTree);*/
                 toolbar.add(goToHome);
                 toolbar.add(goToPulseHome);
+/*
                 toolbar.add(separator);
                 toolbar.add(createFolder);
                 toolbar.add(deleteFolder);
+*/
                 toolbar.draw();
 
                 // construct the directory browser.
@@ -181,7 +165,7 @@
 
                 tree.setDynamicLoad(function(node, onCompleteCallback)
                 {
-                    list(node, onCompleteCallback, dirOnly);
+                    ls(node, onCompleteCallback, dirOnly);
                 }, 1);
 
                 tree.onSelect = function(node)
@@ -202,7 +186,7 @@
                 };
 
                 // load the root nodes for the file system, then draw the tree.
-                list(tree.getRoot(), function()
+                ls(tree.getRoot(), function()
                 {
                     tree.draw();
 
@@ -230,29 +214,33 @@
                 Element.setStyle(vElem, {"height":viewHeight + "px"});
             }
 
-            function list(node, onCompleteCallback, dirOnly)
+            function getNodeIdPath(node)
             {
                 // generate id path.
-                var n = node;
                 var path = "";
-                var p = ""
                 var sep = "";
-                while (n)
+                while (node)
                 {
-                    if (n.data)
+                    if (node.data)
                     {
-                        path = n.data.id + sep + path;
-                        p = n.data.name + sep + p;
+                        path = node.data.id + sep + path;
                         sep = "/";
                     }
-                    n = n.parent;
+                    node = node.parent;
                 }
+                return path;
+            }
+
+            function ls(node, onCompleteCallback, dirOnly)
+            {
+                // generate id path.
+                var path = getNodeIdPath(node);
 
                 var ajax = new Ajax.Request(
-                    "/ajax/list.action",
+                    "/ajax/ls.action",
                     {
                         method: 'get',
-                        onComplete: listResponse(node, onCompleteCallback),
+                        onComplete: lsResponse(node, onCompleteCallback),
                         onFailure: handleFailure,
                         onException: handleException,
                         parameters: "pid=" + path + (dirOnly && "&dirOnly=true" || "")
@@ -260,7 +248,7 @@
                 );
             }
 
-            function listResponse(parentNode, callback)
+            function lsResponse(parentNode, callback)
             {
                 return function(response)
                 {
@@ -287,6 +275,78 @@
                         callback();
                     }
                 };
+            }
+
+            function mkdir(name)
+            {
+                // grab selected file.
+                var node = YAHOO.widget.TreeView.getTree('browseTree').selected;
+
+                // generate id path.
+                var path = getNodeIdPath(node);
+
+                var ajax = new Ajax.Request(
+                    "/ajax/mkdir.action",
+                    {
+                        method: 'get',
+                        onComplete: mkdirResponse(node, name),
+                        onFailure: handleFailure,
+                        onException: handleException,
+                        parameters: "pid=" + path + "&name=" + name
+                    }
+                );
+            }
+
+            function mkdirResponse(node, name)
+            {
+                return function(response)
+                {
+                    // if response indicates success, refresh the folder response.
+                    if (!node.expanded)
+                    {
+                        node.fileToggle();
+                    }
+                    else
+                    {
+                        var tree = YAHOO.widget.TreeView.getTree('browseTree');
+//                        tree.removeNode(node, true);
+//                        node.fileToggle();
+                    }
+
+                    // need to select the newly created folder.
+                };
+            }
+
+            function rmdir()
+            {
+                // grab selected file.
+                var node = YAHOO.widget.TreeView.getTree('browseTree').selected;
+
+                // generate id path.
+                var path = getNodeIdPath(node);
+
+                var ajax = new Ajax.Request(
+                    "/ajax/rmdir.action",
+                    {
+                        method: 'get',
+                        onComplete: rmdirResponse(node),
+                        onFailure: handleFailure,
+                        onException: handleException,
+                        parameters: "pid=" + path
+                    }
+                );
+            }
+
+            function rmdirResponse(node)
+            {
+                return function(response)
+                {
+                    // check response. if success, remove the node from the tree.
+                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
+                    tree.removeNode(node, true);
+
+                    // if error, present the error to the user.
+                }
             }
 
             handleFailure = function(e, e2)

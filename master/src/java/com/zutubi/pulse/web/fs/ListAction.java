@@ -15,7 +15,7 @@ public abstract class ListAction extends FileSystemActionSupport
 {
     private List<Object> listings;
 
-    private String[] pids;
+    private String pid;
 
     private boolean dirOnly = false;
 
@@ -29,9 +29,9 @@ public abstract class ListAction extends FileSystemActionSupport
         return this.dirOnly;
     }
 
-    public void setPid(String[] pids)
+    public void setPid(String pid)
     {
-        this.pids = pids;
+        this.pid = pid;
     }
 
     public List<Object> getListings()
@@ -42,10 +42,7 @@ public abstract class ListAction extends FileSystemActionSupport
     public String execute() throws Exception
     {
         listings = new LinkedList<Object>();
-        for (String uid : pids)
-        {
-            listings.add(new JsonListingWrapper(list(uid)));
-        }
+        listings.add(new JsonListingWrapper(list(pid)));
         return SUCCESS;
     }
 
