@@ -6,13 +6,14 @@
     <link rel="stylesheet" type="text/css" href="/css/treeview/tree.css"/>
 
     <script type="text/javascript" src="/js/prototype.js"></script>
+    <script type="text/javascript" src="/js/zutubi.js"></script>
     <script type="text/javascript" src="/js/yahoo/yahoo.js"></script>
     <script type="text/javascript" src="/js/yahoo/treeview.js"></script>
     <script type="text/javascript" src="/js/yahoo/animation.js"></script>
     <script type="text/javascript" src="/js/yahoo/event.js"></script>
     <script type="text/javascript" src="/js/yahoo/dom.js"></script>
-    <script type="text/javascript" src="/js/treeview/FileNode.js"></script>
-    <script type="text/javascript" src="/js/Toolbar.js"></script>
+    <script type="text/javascript" src="/js/widget/treeview.js"></script>
+    <script type="text/javascript" src="/js/widget/toolbar.js"></script>
     <script type="text/javascript" src="/js/main.js"></script>
     <script type="text/javascript">
         <!--
@@ -110,14 +111,14 @@
                 onResize(event);
 
                 // initialise toolbar items.
-                var goToHome = new ToolbarItem('home');
+                var goToHome = new ZUTUBI.widget.ToolbarItem('home');
                 goToHome.setTooltip('Go to user home');
                 goToHome.onClick = function()
                 {
                     YAHOO.widget.TreeView.getTree('browseTree').expandToPath('$!userHome');
                 };
 
-                var goToPulseHome = new ToolbarItem('pulsehome');
+                var goToPulseHome = new ZUTUBI.widget.ToolbarItem('pulsehome');
                 goToPulseHome.setTooltip('Go to pulse home');
                 goToPulseHome.onClick = function()
                 {
@@ -125,16 +126,16 @@
                 };
 
 /*
-                var separator = new ToolbarSeparator();
+                var separator = new ZUTUBI.widget.ToolbarSeparator();
 
-                var createFolder = new ToolbarItem('create');
+                var createFolder = new ZUTUBI.widget.ToolbarItem('create');
                 createFolder.setTooltip('Create folder');
                 createFolder.onClick = function()
                 {
                     mkdir('New Folder');
                 };
 
-                var deleteFolder = new ToolbarItem('delete');
+                var deleteFolder = new ZUTUBI.widget.ToolbarItem('delete');
                 deleteFolder.setTooltip('Delete folder');
                 deleteFolder.onClick = function()
                 {
@@ -148,7 +149,7 @@
 
 */
                 // construct the toolbar.
-                var toolbar = new Toolbar('toolbar');
+                var toolbar = new ZUTUBI.widget.Toolbar('toolbar');
                 /*toolbar.add(goUpTree);*/
                 toolbar.add(goToHome);
                 toolbar.add(goToPulseHome);

@@ -202,7 +202,7 @@ YAHOO.widget.RootNode.prototype.getPath = function()
 /**
  * Constructor.
  */
-var FileNode = function(oData, oParent, expanded) {
+ZUTUBI.widget.FileNode = function(oData, oParent, expanded) {
 
     this.type = "FileNode";
 	if (oParent) {
@@ -212,24 +212,24 @@ var FileNode = function(oData, oParent, expanded) {
 	}
 };
 
-FileNode.prototype = new YAHOO.widget.TextNode();
+ZUTUBI.widget.FileNode.prototype = new YAHOO.widget.TextNode();
 
-FileNode.prototype.isRoot = function()
+ZUTUBI.widget.FileNode.prototype.isRoot = function()
 {
     return false;
 };
 
-FileNode.prototype.getSeparator = function()
+ZUTUBI.widget.FileNode.prototype.getSeparator = function()
 {
     return this.data.separator;
 };
 
-FileNode.prototype.getName = function()
+ZUTUBI.widget.FileNode.prototype.getName = function()
 {
     return this.data.name;
 };
 
-FileNode.prototype.getPath = function()
+ZUTUBI.widget.FileNode.prototype.getPath = function()
 {
     return this.tree.getDisplayPath(this);
 };
@@ -238,7 +238,7 @@ FileNode.prototype.getPath = function()
  * Override the base hasChildren method to add knowledge of the file type. Only folders
  * and root nodes (containers) can be opened.
  */
-FileNode.prototype.hasChildren = function(checkForLazyLoad) {
+ZUTUBI.widget.FileNode.prototype.hasChildren = function(checkForLazyLoad) {
 
     if (!this.isContainer())
     {
@@ -252,22 +252,22 @@ FileNode.prototype.hasChildren = function(checkForLazyLoad) {
 /**
  * Check if this node represents a container, a node that may contain children.
  */
-FileNode.prototype.isContainer = function()
+ZUTUBI.widget.FileNode.prototype.isContainer = function()
 {
     return this.data.container == true;
 };
 
-FileNode.prototype.getFileElId = function()
+ZUTUBI.widget.FileNode.prototype.getFileElId = function()
 {
     return "ygtvfile" + this.index;
 };
 
-FileNode.prototype.getFileEl = function()
+ZUTUBI.widget.FileNode.prototype.getFileEl = function()
 {
     return document.getElementById(this.getFileElId());
 }
 
-FileNode.prototype.getFileStyle = function(openIfLoading)
+ZUTUBI.widget.FileNode.prototype.getFileStyle = function(openIfLoading)
 {
     var type = this.data.type;
     if (this.isContainer())
@@ -284,7 +284,7 @@ FileNode.prototype.getFileStyle = function(openIfLoading)
  * If the node has been rendered, update the html to reflect the current
  * state of the node.
  */
-FileNode.prototype.updateFileHtml = function()
+ZUTUBI.widget.FileNode.prototype.updateFileHtml = function()
 {
 	if (this.parent && this.parent.childrenRendered)
     {
@@ -292,13 +292,13 @@ FileNode.prototype.updateFileHtml = function()
 	}
 };
 
-FileNode.prototype.getFileToggleLink = function(selectNode)
+ZUTUBI.widget.FileNode.prototype.getFileToggleLink = function(selectNode)
 {
     return "YAHOO.widget.TreeView.getNode(\'" + this.tree.id + "\'," +
         this.index + ").fileToggle("+(selectNode || "")+")";
 },
 
-FileNode.prototype.fileToggle = function(selectNode)
+ZUTUBI.widget.FileNode.prototype.fileToggle = function(selectNode)
 {
     if (selectNode)
     {
@@ -308,24 +308,24 @@ FileNode.prototype.fileToggle = function(selectNode)
     this.updateFileHtml();
 }
 
-FileNode.prototype.select = function()
+ZUTUBI.widget.FileNode.prototype.select = function()
 {
     this.tree.select(this);
 }
 
-FileNode.prototype.onLabelClick = function(me)
+ZUTUBI.widget.FileNode.prototype.onLabelClick = function(me)
 {
     this.select();
     return false;
 };
 
-FileNode.prototype.onLabelDblClick = function(me)
+ZUTUBI.widget.FileNode.prototype.onLabelDblClick = function(me)
 {
     this.tree.onActivate(this);
     return false;
 }
 
-FileNode.prototype.getNodeHtml = function() {
+ZUTUBI.widget.FileNode.prototype.getNodeHtml = function() {
 	var sb = [];
 
 	sb[sb.length] = '<table border="0" cellpadding="0" cellspacing="0">';
@@ -337,8 +337,7 @@ FileNode.prototype.getNodeHtml = function() {
 		sb[sb.length] = '<td class="' + this.getDepthStyle(i) + '">&nbsp;</td>';
 	}
 
-	var getNode = 'YAHOO.widget.TreeView.getNode(\'' +
-					this.tree.id + '\',' + this.index + ')';
+	var getNode = 'YAHOO.widget.TreeView.getNode(\'' + this.tree.id + '\',' + this.index + ')';
 
     // toggle link rendering.
     sb[sb.length] = '<td';
@@ -412,7 +411,7 @@ function lsResponse(parentNode, callback)
                 "container":obj.container,
                 "separator":obj.separator
             };
-            new FileNode(data, parentNode, false);
+            new ZUTUBI.widget.FileNode(data, parentNode, false);
         });
         if (callback)
         {
