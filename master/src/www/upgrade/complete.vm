@@ -26,6 +26,7 @@
     </table>
 </p>
 
+#if($monitor.taskProgress.size() > 0)
 <p>
     The following upgrade tasks were executed with the status indicated.
     <table class="columns" width="40%">
@@ -40,6 +41,7 @@
         </tr>
     </table>
 </p>
+#end
 
 <p>
     Total time: $monitor.getElaspedTime()

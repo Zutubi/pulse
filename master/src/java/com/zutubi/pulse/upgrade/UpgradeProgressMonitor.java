@@ -99,15 +99,6 @@ public class UpgradeProgressMonitor
         tasksFinishedCount++;
     }
 
-    /**
-     * Returns true if all of the upgrade tasks being monitored have been completed, failed or aborted.
-     *
-     */
-    public boolean isComplete()
-    {
-        return tasksFinishedCount == taskCount && taskCount != 0;
-    }
-
     public boolean isSuccessful()
     {
         return !error;
@@ -150,7 +141,15 @@ public class UpgradeProgressMonitor
         {
             return percentageComplete;
         }
-        return (int) (100 * ((float) tasksFinishedCount) / ((float) taskCount));
+
+        if(taskCount == 0)
+        {
+            return 100;
+        }
+        else
+        {
+            return (int) (100 * ((float) tasksFinishedCount) / ((float) taskCount));
+        }
     }
 
     /**

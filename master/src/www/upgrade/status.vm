@@ -36,6 +36,7 @@
 
 </p>
 
+#if($monitor.taskProgress.size() > 0)
 <p>
     To use this directory we will need to execute the following upgrade tasks.
     <table class="columns" width="40%">
@@ -50,6 +51,7 @@
         </tr>
     </table>
 </p>
+#end
 
 <p>
     Elapsed time: $monitor.getElaspedTime()
