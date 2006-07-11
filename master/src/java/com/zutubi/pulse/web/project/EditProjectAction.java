@@ -2,6 +2,7 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
+import com.zutubi.pulse.scheduling.SchedulingException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -83,10 +84,9 @@ public class EditProjectAction extends ProjectActionSupport implements Preparabl
         return INPUT;
     }
 
-    public String execute()
+    public String execute() throws SchedulingException
     {
-        getProjectManager().save(project);
+        getProjectManager().updateProjectDetails(project, project.getName(), project.getDescription(), project.getUrl());
         return SUCCESS;
     }
-
 }

@@ -195,6 +195,19 @@ public class DefaultScheduler implements Scheduler, EventListener
         triggerDao.save(trigger);
     }
 
+    public void renameProjectTriggers(long project, String name) throws SchedulingException
+    {
+        List<Trigger> projectTriggers = getTriggers(project);
+        for(Trigger trigger: projectTriggers)
+        {
+            SchedulerStrategy impl = getStrategy(trigger);
+            impl.unschedule(trigger);
+            trigger.setGroup(name);
+            triggerDao.save(trigger);
+            impl.schedule(trigger);
+        }
+    }
+
     /**
      * Retrieve the first registered strategy that is able to handle this trigger.
      *

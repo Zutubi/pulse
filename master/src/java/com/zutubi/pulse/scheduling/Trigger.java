@@ -185,7 +185,7 @@ public abstract class Trigger extends Entity
     /**
      * Used by hibernate.
      */
-    private void setGroup(String group)
+    void setGroup(String group)
     {
         this.group = group;
     }

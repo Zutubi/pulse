@@ -4,6 +4,8 @@ import org.acegisecurity.annotation.Secured;
 
 import java.util.List;
 
+import com.zutubi.pulse.scheduling.SchedulingException;
+
 /**
  * 
  *
@@ -69,4 +71,16 @@ public interface ProjectManager extends EntityManager<Project>
      */
     @Secured({"ROLE_ADMINISTRATOR"})
     Project cloneProject(Project project, String name, String description);
+
+    /**
+     * Updates the basic details of a project to the given values, adjusting
+     * other persistent entities where necessary (e.g. trigger groups).
+     *
+     * @param project     the project to be updated
+     * @param name        the new name for the project
+     * @param description the new description for the project
+     * @param url         the new url for the project
+     */
+    @Secured({"ACL_PROJECT_WRITE"})
+    void updateProjectDetails(Project project, String name, String description, String url) throws SchedulingException;
 }
