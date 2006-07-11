@@ -2,7 +2,7 @@
 Copyright (c) 2006, Yahoo! Inc. All rights reserved.                                                                                                    
 Code licensed under the BSD License:                                                                                                                    
 http://developer.yahoo.net/yui/license.txt                                                                                                              
-version: 0.10.0                                                                                                                                         
+version: 0.11.0                                                                                                                                         
 */ 
 
 /**
@@ -16,7 +16,8 @@ version: 0.10.0
  *                 the window object.  The listener can override this.
  * @constructor
  */
-YAHOO.util.CustomEvent = function(type, oScope) {
+YAHOO.util.CustomEvent = function(type, oScope, silent) {
+
     /**
      * The type of event, returned to subscribers when the event fires
      * @type string
@@ -31,6 +32,13 @@ YAHOO.util.CustomEvent = function(type, oScope) {
     this.scope = oScope || window;
 
     /**
+     * By default all custom events are logged in the debug build, set silent
+     * to true to disable logging for this event.
+     * @type boolean
+     */
+    this.silent = silent;
+
+    /**
      * The subscribers to this event
      * @type Subscriber[]
      */
@@ -40,6 +48,9 @@ YAHOO.util.CustomEvent = function(type, oScope) {
     // so that CustomEvent can be used independently of pe.event
     if (YAHOO.util.Event) { 
         YAHOO.util.Event.regCE(this);
+    }
+
+    if (!this.silent) {
     }
 };
 
@@ -87,11 +98,24 @@ YAHOO.util.CustomEvent.prototype = {
      * @param {Array} an arbitrary set of parameters to pass to the handler
      */
     fire: function() {
-        for (var i=0, len=this.subscribers.length; i<len; ++i) {
+        var len=this.subscribers.length;
+
+        var args = [];
+
+        for (var i=0; i<arguments.length; ++i) {
+            args.push(arguments[i]);
+        }
+
+        if (!this.silent) {
+        }
+
+        for (i=0; i<len; ++i) {
             var s = this.subscribers[i];
             if (s) {
+                if (!this.silent) {
+                }
                 var scope = (s.override) ? s.obj : this.scope;
-                s.fn.call(scope, this.type, arguments, s.obj);
+                s.fn.call(scope, this.type, args, s.obj);
             }
         }
     },
@@ -116,6 +140,12 @@ YAHOO.util.CustomEvent.prototype = {
         }
 
         delete this.subscribers[index];
+    },
+
+    toString: function() {
+         return "CustomEvent: " + "'" + this.type  + "', " + 
+             "scope: " + this.scope;
+
     }
 };
 
@@ -166,8 +196,10 @@ YAHOO.util.Subscriber.prototype.contains = function(fn, obj) {
     return (this.fn == fn && this.obj == obj);
 };
 
-/* Copyright (c) 2006 Yahoo! Inc. All rights reserved. */
-
+YAHOO.util.Subscriber.prototype.toString = function() {
+    return "Subscriber { obj: " + (this.obj || "")  + 
+           ", override: " +  (this.override || "no") + " }";
+};
 // Only load this library once.  If it is loaded a second time, existing
 // events cannot be detached.
 if (!YAHOO.util.Event) {
@@ -456,7 +488,6 @@ if (!YAHOO.util.Event) {
                     return true;
                 }
 
-
                 // if the user chooses to override the scope, we use the custom
                 // object passed in, otherwise the executing scope will be the
                 // HTML element that the event is registered on
@@ -501,7 +532,7 @@ if (!YAHOO.util.Event) {
                 // DOM2 Event model
                 } else if (el.addEventListener) {
                     el.addEventListener(sType, wrappedFn, false);
-                // Internet Explorer abstraction
+                // IE
                 } else if (el.attachEvent) {
                     el.attachEvent("on" + sType, wrappedFn);
                 }
@@ -645,7 +676,6 @@ if (!YAHOO.util.Event) {
                     return false;
                 }
 
-
                 if (el.removeEventListener) {
                     el.removeEventListener(sType, cacheItem[this.WFN], false);
                 } else if (el.detachEvent) {
@@ -666,16 +696,28 @@ if (!YAHOO.util.Event) {
              * @param {Event} ev the event
              * @param {boolean} resolveTextNode when set to true the target's
              *                  parent will be returned if the target is a 
-             *                  text node
+             *                  text node.  @deprecated, the text node is
+             *                  now resolved automatically
              * @return {HTMLElement} the event's target
              */
             getTarget: function(ev, resolveTextNode) {
                 var t = ev.target || ev.srcElement;
+                return this.resolveTextNode(t);
+            },
 
-                if (resolveTextNode && t && "#text" == t.nodeName) {
-                    return t.parentNode;
+            /**
+             * In some cases, some browsers will return a text node inside
+             * the actual element that was targeted.  This normalizes the
+             * return value for getTarget and getRelatedTarget.
+             * @param {HTMLElement} node to resolve
+             * @return  the normized node
+             */
+            resolveTextNode: function(node) {
+                if (node && node.nodeName && 
+                        "#TEXT" == node.nodeName.toUpperCase()) {
+                    return node.parentNode;
                 } else {
-                    return t;
+                    return node;
                 }
             },
 
@@ -738,7 +780,7 @@ if (!YAHOO.util.Event) {
                     }
                 }
 
-                return t;
+                return this.resolveTextNode(t);
             },
 
             /**
@@ -857,7 +899,8 @@ if (!YAHOO.util.Event) {
                 var id = el.id;
 
                 if (!id) {
-                    id = "yuievtautoid-" + (counter++);
+                    id = "yuievtautoid-" + counter;
+                    ++counter;
                     el.id = id;
                 }
 
@@ -927,7 +970,7 @@ if (!YAHOO.util.Event) {
 
             /**
              * Polling function that runs before the onload event fires, 
-             * attempting * to attach to DOM Nodes as soon as they are 
+             * attempting to attach to DOM Nodes as soon as they are 
              * available
              * @private
              */
@@ -938,7 +981,6 @@ if (!YAHOO.util.Event) {
                 }
 
                 this.locked = true;
-
 
                 // keep trying until after the page is loaded.  We need to 
                 // check the page load state prior to trying to bind the 
@@ -975,7 +1017,7 @@ if (!YAHOO.util.Event) {
                 delayedListeners = stillDelayed;
 
                 // onAvailable
-                notAvail = [];
+                var notAvail = [];
                 for (i=0,len=onAvailStack.length; i<len ; ++i) {
                     var item = onAvailStack[i];
                     if (item) {
@@ -1000,6 +1042,68 @@ if (!YAHOO.util.Event) {
 
                 this.locked = false;
 
+                return true;
+
+            },
+
+            /**
+             * Removes all listeners attached to the given element via addListener.
+             * Optionally, the node's children can also be purged.
+             * Optionally, you can specify a specific type of event to remove.
+             * @param {HTMLElement} el the element to purge
+             * @param {boolean} recurse recursively purge this element's children
+             * as well.  Use with caution.
+             * @param {string} sType optional type of listener to purge. If
+             * left out, all listeners will be removed
+             */
+            purgeElement: function(el, recurse, sType) {
+                var elListeners = this.getListeners(el, sType);
+                if (elListeners) {
+                    for (var i=0,len=elListeners.length; i<len ; ++i) {
+                        var l = elListeners[i];
+                        this.removeListener(el, l.type, l.fn, l.index);
+                    }
+                }
+
+                if (recurse && el && el.childNodes) {
+                    for (i=0,len=el.childNodes.length; i<len ; ++i) {
+                        this.purgeElement(el.childNodes[i], recurse, sType);
+                    }
+                }
+            },
+
+            /**
+             * Returns all listeners attached to the given element via addListener.
+             * Optionally, you can specify a specific type of event to return.
+             * @param el {HTMLElement} the element to inspect 
+             * @param sType {string} optional type of listener to return. If
+             * left out, all listeners will be returned
+             * @return {Object} the listener. Contains the following fields:
+             *    type:   (string)   the type of event
+             *    fn:     (function) the callback supplied to addListener
+             *    obj:    (object)   the custom object supplied to addListener
+             *    adjust: (boolean)  whether or not to adjust the default scope
+             *    index:  (int)      its position in the Event util listener cache
+             */           
+            getListeners: function(el, sType) {
+                var elListeners = [];
+                if (listeners && listeners.length > 0) {
+                    for (var i=0,len=listeners.length; i<len ; ++i) {
+                        var l = listeners[i];
+                        if ( l  && l[this.EL] === el && 
+                                (!sType || sType === l[this.TYPE]) ) {
+                            elListeners.push({
+                                type:   l[this.TYPE],
+                                fn:     l[this.FN],
+                                obj:    l[this.SCOPE],
+                                adjust: l[this.ADJ_SCOPE],
+                                index:  i
+                            });
+                        }
+                    }
+                }
+
+                return (elListeners.length) ? elListeners : null;
             },
 
             /**

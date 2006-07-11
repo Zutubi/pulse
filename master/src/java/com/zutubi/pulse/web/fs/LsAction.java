@@ -48,7 +48,7 @@ public class LsAction extends FileSystemActionSupport
         {
             for (File f : files)
             {
-                listing.add(new JsonFileWrapper(f));
+                listing.add(new JavaFileNode(f));
             }
         }
         return SUCCESS;

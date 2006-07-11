@@ -3,15 +3,81 @@
 <html>
 <head>
     <title>$!webwork.htmlEncode($path)</title>
+
+    <link rel="stylesheet" type="text/css" href="/css/treeview/tree.css"/>
+
+    <script type="text/javascript" src="/js/prototype.js"></script>
+    <script type="text/javascript" src="/js/yahoo/yahoo.js"></script>
+    <script type="text/javascript" src="/js/yahoo/treeview.js"></script>
+    <script type="text/javascript" src="/js/yahoo/animation.js"></script>
+    <script type="text/javascript" src="/js/yahoo/event.js"></script>
+    <script type="text/javascript" src="/js/yahoo/dom.js"></script>
+    <script type="text/javascript" src="/js/treeview/FileNode.js"></script>
+    <script type="text/javascript" src="/js/Toolbar.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
+    <script type="text/javascript">
+        window.onload = initialize;
+
+        function initialize()
+        {
+            var tree = new YAHOO.widget.TreeView('browseTree');
+            var dirOnly = false;
+
+            tree.setDynamicLoad(function(node, onCompleteCallback)
+            {
+                ls(node, onCompleteCallback, dirOnly);
+            }, 1);
+
+            tree.onActivate = function(node)
+            {
+                if (!node.isContainer())
+                {
+                    // display the contents of that node..
+                }
+            };
+
+            // load the root nodes for the file system, then draw the tree.
+            ls(tree.getRoot(), function()
+            {
+                tree.draw();
+            });
+        }
+
+        function ls(node, onCompleteCallback, dirOnly)
+        {
+            // generate id path.
+            var p = node.tree.getIdPath(node);
+
+            var ajax = new Ajax.Request(
+                "/lsProjDir.action",
+                {
+                    method: 'get',
+                    onComplete: lsResponse(node, onCompleteCallback),
+                    onFailure: handleFailure,
+                    onException: handleException,
+                    parameters: "path=" + p + "&buildId=$buildResult.id"
+                }
+            );
+        }
+
+        handleFailure = function(e, e2)
+        {
+            alert("handleFailure");
+        }
+
+        handleException = function(e, e2)
+        {
+            openDebugAlert(e2);
+        }
+
+    </script>
 </head>
 <body>
     #buildTabs($buildResult "working-dir")
 
 #if($buildResult.completed())
     #if($foundBase)
-        #showDirectoryListing("base.dir" "browseProjectDir.action?buildId=$buildResult.id&amp;recipeId=$recipeId&amp;" false false)
-
-        <!--<div id="browseTree"></div>-->
+        <div id="browseTree"></div>
     #else
     <p>
         #wwtext("name=working.dir.cleaned")

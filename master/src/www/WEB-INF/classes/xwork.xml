@@ -180,9 +180,15 @@
         </action>
 
         <action name="lsProjDir" class="com.zutubi.pulse.web.fs.ListProjectDirectoryAction">
-            <result name="success" type="json">ls.xml</result>
+            <result name="success" type="json">/ajax/ls.xml</result>
         </action>
-        
+
+        <action name="cat" class="com.zutubi.pulse.web.fs.CatAction">
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+            </result>
+        </action>
+
         <action name="browseProjectScm" class="com.zutubi.pulse.web.project.BrowseProjectScmAction">
             <result name="dir" type="velocity">browse-project-scm-dir.vm</result>
             <result name="file" type="stream">

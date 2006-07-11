@@ -1,10 +1,9 @@
 package com.zutubi.pulse.web.fs;
 
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.MasterBuildPaths;
+import com.zutubi.pulse.core.model.RecipeResult;
 import com.opensymphony.util.TextUtils;
 
 import java.io.File;
@@ -19,23 +18,17 @@ import java.util.Arrays;
 public class ListProjectDirectoryAction extends FileSystemActionSupport
 {
     private long buildId;
-    private long recipeId;
 
     private String path;
 
     private MasterConfigurationManager configurationManager;
     private BuildManager buildManager;
     private ProjectManager projectManager;
-    private List<Object> listing;
+    private List<INode> listing;
 
     public void setBuildId(long buildId)
     {
         this.buildId = buildId;
-    }
-
-    public void setRecipeId(long recipeId)
-    {
-        this.recipeId = recipeId;
     }
 
     public void setPath(String path)
@@ -43,7 +36,7 @@ public class ListProjectDirectoryAction extends FileSystemActionSupport
         this.path = path;
     }
 
-    public List<Object> getListing()
+    public List<INode> getListing()
     {
         return listing;
     }
@@ -56,24 +49,115 @@ public class ListProjectDirectoryAction extends FileSystemActionSupport
             return SUCCESS;
         }
 
-        projectManager.checkWrite(buildResult.getProject());
+        // if build is pending, then there is nothing that we can display.
 
-        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File baseDir = paths.getBaseDir(buildResult.getProject(), buildResult, recipeId);
+        Project project = buildResult.getProject();
+        projectManager.checkWrite(project);
 
-        File f = baseDir;
-        if (TextUtils.stringSet(path))
+        final String separator = File.separator;
+
+        // if path is empty, then show roots - build roots.
+        if (!TextUtils.stringSet(path))
         {
-            f = new File(baseDir, path);
+            List<INode> details = new LinkedList<INode>();
+            RecipeResultNode node = buildResult.getRoot();
+            for (final RecipeResultNode child : node.getChildren())
+            {
+                final RecipeResult result = child.getResult();
+                details.add(new INode()
+                {
+                    public boolean isContainer()
+                    {
+                        return true;
+                    }
+
+                    public String getName()
+                    {
+                        return "stage :: " + child.getStage() + " :: " + child.getResult().getRecipeNameSafe() + "@" + child.getHostSafe();
+                    }
+
+                    public String getSeparator()
+                    {
+                        return separator;
+                    }
+
+                    public String getType()
+                    {
+                        return "stage";
+                    }
+
+                    public String getId()
+                    {
+                        return String.valueOf(result.getId());
+                    }
+                });
+            }
+            listing = details;
+            return SUCCESS;
         }
 
-        listing = new LinkedList<Object>();
+        // the first component of the path should be the recipe id.
+        String recipeId = path;
+        String remainingPath = "";
+
+        int indexOfSep = path.indexOf(separator);
+        if (indexOfSep != -1)
+        {
+            recipeId = path.substring(0, indexOfSep);
+            remainingPath = path.substring(indexOfSep + 1);
+        }
+
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        File baseDir = paths.getBaseDir(project, buildResult, Long.valueOf(recipeId));
+
+        if (!baseDir.isDirectory())
+        {
+            // we are unable to get a listing of the base directory, likely because it has been cleaned
+            // up. Return the appropriate message.
+            List l = Arrays.asList(new INode()
+            {
+                public boolean isContainer()
+                {
+                    return false;
+                }
+
+                public String getName()
+                {
+                    return "listing not available.";
+                }
+
+                public String getSeparator()
+                {
+                    return separator;
+                }
+
+                public String getType()
+                {
+                    return "file";
+                }
+
+                public String getId()
+                {
+                    return null;
+                }
+            });
+            listing = l;
+            return SUCCESS;
+        }
+
+        File f = baseDir;
+        if (TextUtils.stringSet(remainingPath))
+        {
+            f = new File(baseDir, remainingPath);
+        }
+
+        listing = new LinkedList<INode>();
         File[] files = list(f);
         if (files != null)
         {
             for (File file : files)
             {
-                listing.add(new JsonFileWrapper(file));
+                listing.add(new JavaFileNode(file));
             }
         }
         return SUCCESS;

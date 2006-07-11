@@ -231,30 +231,6 @@
                 );
             }
 
-            function lsResponse(parentNode, callback)
-            {
-                return function(response)
-                {
-                    var jsonObj = eval("(" + response.responseText + ")");
-
-                    var results = $A(jsonObj.listing);
-                    results.each(function(obj)
-                    {
-                        var data = {
-                            "name":obj.file,            // name of the file.
-                            "label":obj.file,           // Yahoo reads the label field and uses it as the display text.
-                            "type":obj.type,            // the type of this file, used to define the class associated with this node.
-                            "separator":obj.separator
-                        };
-                        new FileNode(data, parentNode, false);
-                    });
-                    if (callback)
-                    {
-                        callback();
-                    }
-                };
-            }
-
             function mkdir(name)
             {
                 // grab selected file.

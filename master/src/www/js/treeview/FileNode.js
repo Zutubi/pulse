@@ -32,6 +32,10 @@ YAHOO.widget.TreeView.prototype.onActivate = function(node)
 
 };
 
+/**
+ * Select the currently selected nodes parent. If there is no selected node
+ * or the node does not have a parent, no change is made.
+ */
 YAHOO.widget.TreeView.prototype.goUp = function()
 {
     // is there a selected node?
@@ -137,6 +141,50 @@ YAHOO.widget.TreeView.prototype.expandToPath = function(requestPath)
     }
 };
 
+/**
+ * Construct a human readable path that identifies the specified node.
+ */
+YAHOO.widget.TreeView.prototype.getDisplayPath = function(node)
+{
+    return this._getPath(node, function(data)
+    {
+        return data.name;
+    });
+}
+
+YAHOO.widget.TreeView.prototype.getIdPath = function(node)
+{
+    return this._getPath(node, function(data)
+    {
+        return data.id;
+    });
+}
+
+YAHOO.widget.TreeView.prototype._getPath = function(node, getValue)
+{
+    var sep = "";
+    var path = "";
+
+    while (node)
+    {
+        if (node.data)
+        {
+            var name = getValue(node.data);
+            if (name.indexOf('\\') != -1)
+            {
+                path = name + path
+            }
+            else
+            {
+                path = name + sep + path
+            }
+            sep = "\\";
+        }
+        node = node.parent;
+    }
+    return path;
+}
+
 
 
 YAHOO.widget.RootNode.prototype.isRoot = function()
@@ -183,25 +231,7 @@ FileNode.prototype.getName = function()
 
 FileNode.prototype.getPath = function()
 {
-    var path = this.getName();
-
-    // need to be a little careful. the root node does not have a path function.
-    if (this.parent && !this.parent.isRoot())
-    {
-        // ensure that the parent path does not end with the separator char.
-        var sep = this.getSeparator();
-        var parentPath = this.parent.getPath();
-
-        if (parentPath.indexOf(sep) == parentPath.length - 1)
-        {
-            path = parentPath + path;
-        }
-        else
-        {
-            path = parentPath + sep + path;
-        }
-    }
-    return path;
+    return this.tree.getDisplayPath(this);
 };
 
 /**
@@ -224,7 +254,7 @@ FileNode.prototype.hasChildren = function(checkForLazyLoad) {
  */
 FileNode.prototype.isContainer = function()
 {
-    return this.data.type == "folder" || this.data.type == "root";
+    return this.data.container == true;
 };
 
 FileNode.prototype.getFileElId = function()
@@ -239,14 +269,15 @@ FileNode.prototype.getFileEl = function()
 
 FileNode.prototype.getFileStyle = function(openIfLoading)
 {
-    if (this.data.type == "folder")
+    var type = this.data.type;
+    if (this.isContainer())
     {
         // check if we are open.
         if (this.hasChildren(true) || (this.isDynamic() && !this.getIconMode())) {
-            return (this.expanded || (openIfLoading && this.isDynamic && !this.dynamicLoadComplete)) ? "openfolder" : "folder";
+            return (this.expanded || (openIfLoading && this.isDynamic && !this.dynamicLoadComplete)) ? type + "_o" : type;
         }
     }
-    return this.data.type
+    return type
 }
 
 /**
@@ -360,4 +391,33 @@ FileNode.prototype.getNodeHtml = function() {
 
 	return sb.join("");
 };
+
+
+//---( functions that help interact with nodes. )---
+
+function lsResponse(parentNode, callback)
+{
+    return function(response)
+    {
+        var jsonObj = eval("(" + response.responseText + ")");
+
+        var results = $A(jsonObj.listing);
+        results.each(function(obj)
+        {
+            var data = {
+                "id":obj.id,
+                "name":obj.file,            // name of the file.
+                "label":obj.file,           // Yahoo reads the label field and uses it as the display text.
+                "type":obj.type,            // the type of this file, used to define the class associated with this node.
+                "container":obj.container,
+                "separator":obj.separator
+            };
+            new FileNode(data, parentNode, false);
+        });
+        if (callback)
+        {
+            callback();
+        }
+    };
+}
 

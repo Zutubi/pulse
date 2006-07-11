@@ -62,7 +62,7 @@
     background: url(../../images/treeview/c.gif); 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
-.openfolder {
+.folder_o {
     background: url(../../images/treeview/o.gif); 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
 }
 

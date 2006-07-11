@@ -7,11 +7,11 @@ import java.io.File;
 /**
  * <class-comment/>
  */
-public class JsonFileWrapper
+public class JavaFileNode implements INode
 {
     private final File file;
 
-    public JsonFileWrapper(File f)
+    public JavaFileNode(File f)
     {
         this.file = f;
     }
@@ -46,4 +46,13 @@ public class JsonFileWrapper
         }
     }
 
+    public String getId()
+    {
+        return getName();
+    }
+
+    public boolean isContainer()
+    {
+        return file.isDirectory() || FileSystemUtils.isRoot(file);
+    }
 }
