@@ -197,6 +197,21 @@ public class DefaultProjectManager implements ProjectManager
         }
     }
 
+    public void updateProjectDetails(Project project, String name, String description, String url) throws SchedulingException
+    {
+        project = getProject(project.getId());
+        if(!project.getName().equals(name))
+        {
+            // Name has changed, triggers must be updated
+            scheduler.renameProjectTriggers(project.getId(), name);
+        }
+
+        project.setName(name);
+        project.setDescription(description);
+        project.setUrl(url);
+        projectDao.save(project);
+    }
+
     public void initialise()
     {
         changelistIsolator = new ChangelistIsolator(buildManager);

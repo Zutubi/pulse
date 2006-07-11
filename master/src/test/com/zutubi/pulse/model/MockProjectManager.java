@@ -139,6 +139,11 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public void updateProjectDetails(Project project, String name, String description, String url)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public void save(Project project)
     {
         if (project.getId() == 0)
