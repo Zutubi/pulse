@@ -85,11 +85,24 @@ options {
 }
 
 // Words, which include our operators
-WORD: ('a'..'z' | 'A'..'Z' | '.')+ ;
+WORD
+options {
+    paraphrase = "a word";
+}
+    : ('a'..'z' | 'A'..'Z' | '.')+ ;
 
 // Grouping
-LEFT_PAREN: '(';
-RIGHT_PAREN: ')';
+LEFT_PAREN
+options {
+    paraphrase = "an opening parenthesis '('";
+}
+    : '(';
+
+RIGHT_PAREN
+options {
+    paraphrase = "a closing parenthesis ')'";
+}
+    : ')';
 
 WHITESPACE
     :   (' ' | '\t' | '\r' | '\n') { $setType(Token.SKIP); }

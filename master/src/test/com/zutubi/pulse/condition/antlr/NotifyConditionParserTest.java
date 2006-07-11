@@ -1,12 +1,11 @@
 package com.zutubi.pulse.condition.antlr;
 
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.core.ObjectFactory;
-import com.zutubi.pulse.condition.*;
-import com.zutubi.pulse.model.Subscription;
+import antlr.MismatchedTokenException;
 import antlr.collections.AST;
-import antlr.TokenStreamException;
-import antlr.RecognitionException;
+import com.zutubi.pulse.condition.*;
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.model.Subscription;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.StringReader;
 
@@ -154,5 +153,32 @@ public class NotifyConditionParserTest extends PulseTestCase
         factory.setObjectFactory(new ObjectFactory());
         s.setNotifyConditionFactory(factory);
         return s.getNotifyCondition();
+    }
+
+    public static void main(String argv[])
+    {
+        try
+        {
+            NotifyConditionLexer lexer = new NotifyConditionLexer(new StringReader("failure or (changed and success"));
+            NotifyConditionParser parser = new NotifyConditionParser(lexer);
+            parser.orexpression();
+            AST t = parser.getAST();
+        }
+        catch(MismatchedTokenException mte)
+        {
+            if(mte.token.getText() == null)
+            {
+                System.err.println("Caught error: line " + mte.getLine() + ":" + mte.getColumn() + ": end of input when expecting " + NotifyConditionParser._tokenNames[mte.expecting]);
+            }
+            else
+            {
+                System.err.println("Caught error: " + mte.toString());
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println("Caught error: " + e.toString());
+        }
+
     }
 }

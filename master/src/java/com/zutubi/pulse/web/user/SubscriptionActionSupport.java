@@ -1,5 +1,6 @@
 package com.zutubi.pulse.web.user;
 
+import antlr.MismatchedTokenException;
 import antlr.collections.AST;
 import com.zutubi.pulse.condition.NotifyConditionFactory;
 import com.zutubi.pulse.condition.antlr.NotifyConditionLexer;
@@ -164,9 +165,20 @@ public class SubscriptionActionSupport extends UserActionSupport
                 tree.cond(t);
             }
         }
+        catch(MismatchedTokenException mte)
+        {
+            if(mte.token.getText() == null)
+            {
+                addFieldError("condition", "line " + mte.getLine() + ":" + mte.getColumn() + ": end of input when expecting " + NotifyConditionParser._tokenNames[mte.expecting]);
+            }
+            else
+            {
+                addFieldError("condition", mte.toString());
+            }
+        }
         catch (Exception e)
         {
-            addFieldError("condition", e.getMessage());
+            addFieldError("condition", e.toString());
         }
     }
 

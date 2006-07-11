@@ -2,23 +2,13 @@
 
     package com.zutubi.pulse.condition.antlr;
 
-import antlr.TreeParser;
-import antlr.Token;
-import antlr.collections.AST;
-import antlr.RecognitionException;
-import antlr.ANTLRException;
 import antlr.NoViableAltException;
-import antlr.MismatchedTokenException;
-import antlr.SemanticException;
-import antlr.collections.impl.BitSet;
-import antlr.ASTPair;
-import antlr.collections.impl.ASTArray;
-
-    import com.zutubi.pulse.bootstrap.ComponentContext;
-    import com.zutubi.pulse.condition.NotifyCondition;
-    import com.zutubi.pulse.condition.NotifyConditionFactory;
-    import com.zutubi.pulse.condition.CompoundNotifyCondition;
-    import com.zutubi.pulse.condition.NotNotifyCondition;
+import antlr.RecognitionException;
+import antlr.collections.AST;
+import com.zutubi.pulse.condition.CompoundNotifyCondition;
+import com.zutubi.pulse.condition.NotNotifyCondition;
+import com.zutubi.pulse.condition.NotifyCondition;
+import com.zutubi.pulse.condition.NotifyConditionFactory;
 
 
 public class NotifyConditionTreeParser extends antlr.TreeParser       implements NotifyConditionTreeParserTokenTypes
@@ -50,7 +40,7 @@ public NotifyConditionTreeParser() {
 			case LITERAL_and:
 			{
 				AST __t2 = _t;
-				AST tmp1_AST_in = (AST)_t;
+				AST tmp14_AST_in = (AST)_t;
 				match(_t,LITERAL_and);
 				_t = _t.getFirstChild();
 				a=cond(_t);
@@ -65,7 +55,7 @@ public NotifyConditionTreeParser() {
 			case LITERAL_or:
 			{
 				AST __t3 = _t;
-				AST tmp2_AST_in = (AST)_t;
+				AST tmp15_AST_in = (AST)_t;
 				match(_t,LITERAL_or);
 				_t = _t.getFirstChild();
 				a=cond(_t);
@@ -80,7 +70,7 @@ public NotifyConditionTreeParser() {
 			case LITERAL_not:
 			{
 				AST __t4 = _t;
-				AST tmp3_AST_in = (AST)_t;
+				AST tmp16_AST_in = (AST)_t;
 				match(_t,LITERAL_not);
 				_t = _t.getFirstChild();
 				a=cond(_t);
@@ -118,66 +108,66 @@ public NotifyConditionTreeParser() {
 		_retTree = _t;
 		return r;
 	}
-	
+
 	public final void condition(AST _t) throws RecognitionException {
-		
+
 		AST condition_AST_in = (_t == ASTNULL) ? null : (AST)_t;
-		
+
 		try {      // for error handling
 			if (_t==null) _t=ASTNULL;
 			switch ( _t.getType()) {
 			case LITERAL_true:
 			{
-				AST tmp4_AST_in = (AST)_t;
+				AST tmp17_AST_in = (AST)_t;
 				match(_t,LITERAL_true);
 				_t = _t.getNextSibling();
 				break;
 			}
 			case LITERAL_false:
 			{
-				AST tmp5_AST_in = (AST)_t;
+				AST tmp18_AST_in = (AST)_t;
 				match(_t,LITERAL_false);
 				_t = _t.getNextSibling();
 				break;
 			}
 			case LITERAL_success:
 			{
-				AST tmp6_AST_in = (AST)_t;
+				AST tmp19_AST_in = (AST)_t;
 				match(_t,LITERAL_success);
 				_t = _t.getNextSibling();
 				break;
 			}
 			case LITERAL_failure:
 			{
-				AST tmp7_AST_in = (AST)_t;
+				AST tmp20_AST_in = (AST)_t;
 				match(_t,LITERAL_failure);
 				_t = _t.getNextSibling();
 				break;
 			}
 			case LITERAL_error:
 			{
-				AST tmp8_AST_in = (AST)_t;
+				AST tmp21_AST_in = (AST)_t;
 				match(_t,LITERAL_error);
 				_t = _t.getNextSibling();
 				break;
 			}
 			case LITERAL_changed:
 			{
-				AST tmp9_AST_in = (AST)_t;
+				AST tmp22_AST_in = (AST)_t;
 				match(_t,LITERAL_changed);
 				_t = _t.getNextSibling();
 				break;
 			}
 			case 13:
 			{
-				AST tmp10_AST_in = (AST)_t;
+				AST tmp23_AST_in = (AST)_t;
 				match(_t,13);
 				_t = _t.getNextSibling();
 				break;
 			}
 			case 14:
 			{
-				AST tmp11_AST_in = (AST)_t;
+				AST tmp24_AST_in = (AST)_t;
 				match(_t,14);
 				_t = _t.getNextSibling();
 				break;
@@ -194,8 +184,8 @@ public NotifyConditionTreeParser() {
 		}
 		_retTree = _t;
 	}
-	
-	
+
+
 	public static final String[] _tokenNames = {
 		"<0>",
 		"EOF",
@@ -212,9 +202,9 @@ public NotifyConditionTreeParser() {
 		"\"changed\"",
 		"\"changed.by.me\"",
 		"\"state.change\"",
-		"LEFT_PAREN",
-		"RIGHT_PAREN",
-		"WORD",
+		"an opening parenthesis '('",
+		"a closing parenthesis ')'",
+		"a word",
 		"WHITESPACE"
 	};
 	

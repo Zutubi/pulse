@@ -11,7 +11,7 @@ LITERAL_error="error"=11
 LITERAL_changed="changed"=12
 "changed.by.me"=13
 "state.change"=14
-LEFT_PAREN=15
-RIGHT_PAREN=16
-WORD=17
+LEFT_PAREN("an opening parenthesis '('")=15
+RIGHT_PAREN("a closing parenthesis ')'")=16
+WORD("a word")=17
 WHITESPACE=18

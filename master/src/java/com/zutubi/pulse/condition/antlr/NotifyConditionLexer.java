@@ -2,29 +2,11 @@
 
     package com.zutubi.pulse.condition.antlr;
 
+import antlr.*;
+
 import java.io.InputStream;
-import antlr.TokenStreamException;
-import antlr.TokenStreamIOException;
-import antlr.TokenStreamRecognitionException;
-import antlr.CharStreamException;
-import antlr.CharStreamIOException;
-import antlr.ANTLRException;
 import java.io.Reader;
 import java.util.Hashtable;
-import antlr.CharScanner;
-import antlr.InputBuffer;
-import antlr.ByteBuffer;
-import antlr.CharBuffer;
-import antlr.Token;
-import antlr.CommonToken;
-import antlr.RecognitionException;
-import antlr.NoViableAltForCharException;
-import antlr.MismatchedCharException;
-import antlr.TokenStream;
-import antlr.ANTLRHashString;
-import antlr.LexerSharedInputState;
-import antlr.collections.impl.BitSet;
-import antlr.SemanticException;
 
 public class NotifyConditionLexer extends antlr.CharScanner implements NotifyConditionTreeParserTokenTypes, TokenStream
  {
@@ -44,13 +26,13 @@ public NotifyConditionLexer(LexerSharedInputState state) {
 	literals = new Hashtable();
 	literals.put(new ANTLRHashString("or", this), new Integer(5));
 	literals.put(new ANTLRHashString("state.change", this), new Integer(14));
-	literals.put(new ANTLRHashString("false", this), new Integer(8));
-	literals.put(new ANTLRHashString("failure", this), new Integer(10));
-	literals.put(new ANTLRHashString("true", this), new Integer(7));
 	literals.put(new ANTLRHashString("changed.by.me", this), new Integer(13));
+	literals.put(new ANTLRHashString("true", this), new Integer(7));
 	literals.put(new ANTLRHashString("and", this), new Integer(4));
+	literals.put(new ANTLRHashString("failure", this), new Integer(10));
 	literals.put(new ANTLRHashString("changed", this), new Integer(12));
 	literals.put(new ANTLRHashString("success", this), new Integer(9));
+	literals.put(new ANTLRHashString("false", this), new Integer(8));
 	literals.put(new ANTLRHashString("not", this), new Integer(6));
 	literals.put(new ANTLRHashString("error", this), new Integer(11));
 }

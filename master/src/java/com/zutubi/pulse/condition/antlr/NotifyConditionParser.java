@@ -2,24 +2,8 @@
 
     package com.zutubi.pulse.condition.antlr;
 
-import antlr.TokenBuffer;
-import antlr.TokenStreamException;
-import antlr.TokenStreamIOException;
-import antlr.ANTLRException;
-import antlr.LLkParser;
-import antlr.Token;
-import antlr.TokenStream;
-import antlr.RecognitionException;
-import antlr.NoViableAltException;
-import antlr.MismatchedTokenException;
-import antlr.SemanticException;
-import antlr.ParserSharedInputState;
-import antlr.collections.impl.BitSet;
+import antlr.*;
 import antlr.collections.AST;
-import java.util.Hashtable;
-import antlr.ASTFactory;
-import antlr.ASTPair;
-import antlr.collections.impl.ASTArray;
 
 public class NotifyConditionParser extends antlr.LLkParser       implements NotifyConditionTreeParserTokenTypes
  {
@@ -65,9 +49,9 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		_loop8:
 		do {
 			if ((LA(1)==LITERAL_or)) {
-				AST tmp12_AST = null;
-				tmp12_AST = astFactory.create(LT(1));
-				astFactory.makeASTRoot(currentAST, tmp12_AST);
+				AST tmp1_AST = null;
+				tmp1_AST = astFactory.create(LT(1));
+				astFactory.makeASTRoot(currentAST, tmp1_AST);
 				match(LITERAL_or);
 				andexpression();
 				astFactory.addASTChild(currentAST, returnAST);
@@ -75,28 +59,28 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			else {
 				break _loop8;
 			}
-			
+
 		} while (true);
 		}
 		orexpression_AST = (AST)currentAST.root;
 		returnAST = orexpression_AST;
 	}
-	
+
 	public final void andexpression() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST andexpression_AST = null;
-		
+
 		notexpression();
 		astFactory.addASTChild(currentAST, returnAST);
 		{
 		_loop11:
 		do {
 			if ((LA(1)==LITERAL_and)) {
-				AST tmp13_AST = null;
-				tmp13_AST = astFactory.create(LT(1));
-				astFactory.makeASTRoot(currentAST, tmp13_AST);
+				AST tmp2_AST = null;
+				tmp2_AST = astFactory.create(LT(1));
+				astFactory.makeASTRoot(currentAST, tmp2_AST);
 				match(LITERAL_and);
 				notexpression();
 				astFactory.addASTChild(currentAST, returnAST);
@@ -104,26 +88,26 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			else {
 				break _loop11;
 			}
-			
+
 		} while (true);
 		}
 		andexpression_AST = (AST)currentAST.root;
 		returnAST = andexpression_AST;
 	}
-	
+
 	public final void notexpression() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST notexpression_AST = null;
-		
+
 		{
 		switch ( LA(1)) {
 		case LITERAL_not:
 		{
-			AST tmp14_AST = null;
-			tmp14_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp14_AST);
+			AST tmp3_AST = null;
+			tmp3_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp3_AST);
 			match(LITERAL_not);
 			break;
 		}
@@ -150,13 +134,13 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		notexpression_AST = (AST)currentAST.root;
 		returnAST = notexpression_AST;
 	}
-	
+
 	public final void atom() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST atom_AST = null;
-		
+
 		switch ( LA(1)) {
 		case LITERAL_true:
 		case LITERAL_false:
@@ -188,82 +172,82 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		}
 		returnAST = atom_AST;
 	}
-	
+
 	public final void condition() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST condition_AST = null;
-		
+
 		switch ( LA(1)) {
 		case LITERAL_true:
 		{
-			AST tmp17_AST = null;
-			tmp17_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp17_AST);
+			AST tmp6_AST = null;
+			tmp6_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp6_AST);
 			match(LITERAL_true);
 			condition_AST = (AST)currentAST.root;
 			break;
 		}
 		case LITERAL_false:
 		{
-			AST tmp18_AST = null;
-			tmp18_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp18_AST);
+			AST tmp7_AST = null;
+			tmp7_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp7_AST);
 			match(LITERAL_false);
 			condition_AST = (AST)currentAST.root;
 			break;
 		}
 		case LITERAL_success:
 		{
-			AST tmp19_AST = null;
-			tmp19_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp19_AST);
+			AST tmp8_AST = null;
+			tmp8_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp8_AST);
 			match(LITERAL_success);
 			condition_AST = (AST)currentAST.root;
 			break;
 		}
 		case LITERAL_failure:
 		{
-			AST tmp20_AST = null;
-			tmp20_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp20_AST);
+			AST tmp9_AST = null;
+			tmp9_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp9_AST);
 			match(LITERAL_failure);
 			condition_AST = (AST)currentAST.root;
 			break;
 		}
 		case LITERAL_error:
 		{
-			AST tmp21_AST = null;
-			tmp21_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp21_AST);
+			AST tmp10_AST = null;
+			tmp10_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp10_AST);
 			match(LITERAL_error);
 			condition_AST = (AST)currentAST.root;
 			break;
 		}
 		case LITERAL_changed:
 		{
-			AST tmp22_AST = null;
-			tmp22_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp22_AST);
+			AST tmp11_AST = null;
+			tmp11_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp11_AST);
 			match(LITERAL_changed);
 			condition_AST = (AST)currentAST.root;
 			break;
 		}
 		case 13:
 		{
-			AST tmp23_AST = null;
-			tmp23_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp23_AST);
+			AST tmp12_AST = null;
+			tmp12_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp12_AST);
 			match(13);
 			condition_AST = (AST)currentAST.root;
 			break;
 		}
 		case 14:
 		{
-			AST tmp24_AST = null;
-			tmp24_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp24_AST);
+			AST tmp13_AST = null;
+			tmp13_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp13_AST);
 			match(14);
 			condition_AST = (AST)currentAST.root;
 			break;
@@ -275,8 +259,8 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		}
 		returnAST = condition_AST;
 	}
-	
-	
+
+
 	public static final String[] _tokenNames = {
 		"<0>",
 		"EOF",
@@ -293,9 +277,9 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		"\"changed\"",
 		"\"changed.by.me\"",
 		"\"state.change\"",
-		"LEFT_PAREN",
-		"RIGHT_PAREN",
-		"WORD",
+		"an opening parenthesis '('",
+		"a closing parenthesis ')'",
+		"a word",
 		"WHITESPACE"
 	};
 	
