@@ -10,9 +10,6 @@
     <script type="text/javascript" src="/js/zutubi.js"></script>
     <script type="text/javascript" src="/js/yahoo/yahoo.js"></script>
     <script type="text/javascript" src="/js/yahoo/treeview.js"></script>
-    <script type="text/javascript" src="/js/yahoo/animation.js"></script>
-    <script type="text/javascript" src="/js/yahoo/event.js"></script>
-    <script type="text/javascript" src="/js/yahoo/dom.js"></script>
     <script type="text/javascript" src="/js/widget/treeview.js"></script>
     <script type="text/javascript" src="/js/main.js"></script>
     <script type="text/javascript">
@@ -29,13 +26,11 @@
             }
 
             var tree = new YAHOO.widget.TreeView('browseTree');
-            var dirOnly = false;
-
+            tree.setSeparator('$separator');
             tree.setDynamicLoad(function(node, onCompleteCallback)
             {
-                ls(node, onCompleteCallback, dirOnly);
+                ls(node, onCompleteCallback, false);
             }, 1);
-
             tree.onActivate = function(node)
             {
                 if (!node.isContainer())
@@ -68,6 +63,41 @@
             );
         }
 
+        function lsResponse(parentNode, callback)
+        {
+            return function(response)
+            {
+                var jsonObj = eval("(" + response.responseText + ")");
+
+                var results = $A(jsonObj.listing);
+                results.each(function(obj)
+                {
+                    var data = {
+                        "id":obj.id,
+                        "name":obj.file,
+                        "label":obj.file,
+                        "type":obj.type,
+                        "container":obj.container
+                    };
+                    var node = new ZUTUBI.widget.FileNode(data, parentNode, false);
+                    //node.href = "/cat.action?path=" + node.getPath();
+
+                    // override the default onclick behaviour to trigger the download.
+/*
+                    node.onLabelClick = function(me)
+                    {
+                        return (!this.isContainer());
+                    };
+*/
+
+                });
+                if (callback)
+                {
+                    callback();
+                }
+            };
+        }
+
         handleFailure = function(e, e2)
         {
             alert("handleFailure");
@@ -84,13 +114,7 @@
     #buildTabs($buildResult "working-dir")
 
 #if($buildResult.completed())
-    #if($foundBase)
-        <div id="browseTree"></div>
-    #else
-    <p>
-        #wwtext("name=working.dir.cleaned")
-    </p>
-    #end
+    <div id="browseTree"></div>
 #else
     <p>
         #wwtext("name=working.dir.pending")

@@ -22,26 +22,8 @@
             window.onload = onInit;
             window.onresize = onResize;
 
-            function qs()
-            {
-                var qsParm = new Array();
-                var query = window.location.search.substring(1);
-                var parms = query.split('&');
-                for (var i=0; i<parms.length; i++) {
-                    var pos = parms[i].indexOf('=');
-                    if (pos > 0) {
-                        var key = parms[i].substring(0,pos);
-                        var val = parms[i].substring(pos+1);
-                        qsParm[key] = val;
-                    }
-                }
-                return qsParm;
-            }
-
             function getFormValue()
             {
-                // this form is what it is all about, providing an easy graphical method for
-                // setting a value quickly, easily and accurately.
                 var params = qs();
                 var formname = params['formname'];
                 var fieldname = params['fieldname'];
@@ -150,48 +132,40 @@
 */
                 // construct the toolbar.
                 var toolbar = new ZUTUBI.widget.Toolbar('toolbar');
-                /*toolbar.add(goUpTree);*/
                 toolbar.add(goToHome);
                 toolbar.add(goToPulseHome);
-/*
-                toolbar.add(separator);
-                toolbar.add(createFolder);
-                toolbar.add(deleteFolder);
-*/
                 toolbar.draw();
 
                 // construct the directory browser.
                 var tree = new YAHOO.widget.TreeView('browseTree');
-                var dirOnly = true;
+                tree.setSeparator('$separator');
 
+                // register event handlers and callbacks.
                 tree.setDynamicLoad(function(node, onCompleteCallback)
                 {
-                    ls(node, onCompleteCallback, dirOnly);
+                    ls(node, onCompleteCallback, true);
                 }, 1);
 
+                // when a node is selected, ensure that it is visible.
                 tree.onSelect = function(node)
                 {
                     ensureVisible();
                 }
 
+                // when a node is activated (dblclicked), toggle it.
                 tree.onActivate = function(node)
                 {
                     if (node.hasChildren(true))
                     {
                         node.fileToggle();
                     }
-                    else
-                    {
-                        // this node has been selected.
-                    }
                 };
 
-                // load the root nodes for the file system, then draw the tree.
+                // load the root nodes for the file system, then draw and open the tree.
                 ls(tree.getRoot(), function()
                 {
                     tree.draw();
-
-                    tree.expandToPath('$!initPath');
+                    tree.expandToPath(getFormValue());
                 });
             }
 
@@ -230,6 +204,31 @@
                         parameters: "path=" + p + (dirOnly && "&dirOnly=true" || "")
                     }
                 );
+            }
+
+            function lsResponse(parentNode, callback)
+            {
+                return function(response)
+                {
+                    var jsonObj = eval("(" + response.responseText + ")");
+
+                    var results = $A(jsonObj.listing);
+                    results.each(function(obj)
+                    {
+                        var data = {
+                            "id":obj.id,
+                            "name":obj.file,            // name of the file.
+                            "label":obj.file,           // Yahoo reads the label field and uses it as the display text.
+                            "type":obj.type,            // the type of this file, used to define the class associated with this node.
+                            "container":obj.container
+                        };
+                        new ZUTUBI.widget.FileNode(data, parentNode, false);
+                    });
+                    if (callback)
+                    {
+                        callback();
+                    }
+                };
             }
 
             function mkdir(name)

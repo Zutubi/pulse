@@ -32,6 +32,12 @@ YAHOO.widget.TreeView.prototype.onActivate = function(node)
 
 };
 
+YAHOO.widget.TreeView.prototype.separator = '/';
+YAHOO.widget.TreeView.prototype.setSeparator = function(sep)
+{
+    this.separator = sep;
+};
+
 /**
  * Select the currently selected nodes parent. If there is no selected node
  * or the node does not have a parent, no change is made.
@@ -65,8 +71,9 @@ YAHOO.widget.TreeView.prototype.expandTo = function(requestPath)
     var node = this.getRoot();
 
     // search for node with name initPath.
-    //TODO: remove hard coding of '\' separator char.
-    requestPath = requestPath.split('\\');
+    var sep = this.separator;
+    requestPath = requestPath.split(sep);
+
     for (var i = 0; i < requestPath.length; i++)
     {
         var path = requestPath[i];
@@ -81,9 +88,8 @@ YAHOO.widget.TreeView.prototype.expandTo = function(requestPath)
             node = $A(node.children).find(function(child)
             {
                 var n = child.data.name;
-
                 // ensure that trailing '\\' are removed.
-                if (n.indexOf('\\') == n.length - 1)
+                if (n.indexOf(sep) == n.length - 1)
                 {
                     n = n.substring(0, n.length - 1);
                 }
@@ -170,7 +176,7 @@ YAHOO.widget.TreeView.prototype._getPath = function(node, getValue)
         if (node.data)
         {
             var name = getValue(node.data);
-            if (name.indexOf('\\') != -1)
+            if (name.indexOf(this.separator) != -1)
             {
                 path = name + path
             }
@@ -178,7 +184,7 @@ YAHOO.widget.TreeView.prototype._getPath = function(node, getValue)
             {
                 path = name + sep + path
             }
-            sep = "\\";
+            sep = this.separator;
         }
         node = node.parent;
     }
@@ -207,9 +213,12 @@ ZUTUBI.widget.FileNode = function(oData, oParent, expanded) {
     this.type = "FileNode";
 	if (oParent) {
 		this.init(oData, oParent, expanded);
-		this.setUpLabel(oData);
-        this.href = "javascript:" + this.getFileToggleLink();
 	}
+    this.setUpLabel(oData);
+    if (!this.href)
+    {
+        this.href = "javascript:" + this.getFileToggleLink();
+    }
 };
 
 ZUTUBI.widget.FileNode.prototype = new YAHOO.widget.TextNode();
@@ -217,11 +226,6 @@ ZUTUBI.widget.FileNode.prototype = new YAHOO.widget.TextNode();
 ZUTUBI.widget.FileNode.prototype.isRoot = function()
 {
     return false;
-};
-
-ZUTUBI.widget.FileNode.prototype.getSeparator = function()
-{
-    return this.data.separator;
 };
 
 ZUTUBI.widget.FileNode.prototype.getName = function()
@@ -394,29 +398,4 @@ ZUTUBI.widget.FileNode.prototype.getNodeHtml = function() {
 
 //---( functions that help interact with nodes. )---
 
-function lsResponse(parentNode, callback)
-{
-    return function(response)
-    {
-        var jsonObj = eval("(" + response.responseText + ")");
-
-        var results = $A(jsonObj.listing);
-        results.each(function(obj)
-        {
-            var data = {
-                "id":obj.id,
-                "name":obj.file,            // name of the file.
-                "label":obj.file,           // Yahoo reads the label field and uses it as the display text.
-                "type":obj.type,            // the type of this file, used to define the class associated with this node.
-                "container":obj.container,
-                "separator":obj.separator
-            };
-            new ZUTUBI.widget.FileNode(data, parentNode, false);
-        });
-        if (callback)
-        {
-            callback();
-        }
-    };
-}
 

@@ -3,6 +3,8 @@ package com.zutubi.pulse.web.fs;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.File;
 
 /**
  * <class-comment/>
@@ -35,8 +37,10 @@ public class CatAction extends ActionSupport
         // locate the file specified by the path.
 
         // get its content type.
+//        contentType = "text/plain";
 
         // open the input stream.
+//        inputStream = new FileInputStream(new File("C:\\projects\\trunk\\velocity.log"));
 
         // sorted.
 

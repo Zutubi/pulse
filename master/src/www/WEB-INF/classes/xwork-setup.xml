@@ -111,10 +111,13 @@
     </package>
 
     <package name="popups" namespace="/popups" extends="webwork-default-package">
+
         <default-interceptor-ref name="completeStack"/>
-        <action name="browse-dirs" class="com.zutubi.pulse.web.tree.PopupFormAction">
+
+        <action name="browse-dirs" class="com.zutubi.pulse.web.tree.SelectDirectoryAction">
             <result name="success" type="velocity">tree/browse-dirs.vm</result>
         </action>
+
     </package>
 
 </xwork>

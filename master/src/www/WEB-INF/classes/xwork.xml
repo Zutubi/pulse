@@ -172,10 +172,7 @@
         </action>
 
         <action name="browseProjectDir" class="com.zutubi.pulse.web.project.BrowseProjectDirAction">
-            <result name="dir" type="velocity">browse-project-dir.vm</result>
-            <result name="file" type="stream">
-                <param name="contentType">${contentType}</param>
-            </result>
+            <result name="success" type="velocity">browse-project-dir.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
@@ -1205,7 +1202,7 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="browse-dirs" class="com.zutubi.pulse.web.tree.PopupFormAction">
+        <action name="browse-dirs" class="com.zutubi.pulse.web.tree.SelectDirectoryAction">
             <result name="success" type="velocity">tree/browse-dirs.vm</result>
         </action>
 

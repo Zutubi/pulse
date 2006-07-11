@@ -5,16 +5,15 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 
+import java.io.File;
+
 /**
  */
 public class BrowseProjectDirAction extends ProjectActionSupport
 {
     private long buildId;
-    private long recipeId;
     private BuildResult buildResult;
-    private MasterConfigurationManager configurationManager;
-    private boolean foundBase = true;
-
+    private String separator;
 
     public long getBuildId()
     {
@@ -26,19 +25,14 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         this.buildId = buildId;
     }
 
-    public long getRecipeId()
-    {
-        return recipeId;
-    }
-
-    public void setRecipeId(long recipeId)
-    {
-        this.recipeId = recipeId;
-    }
-
     public BuildResult getBuildResult()
     {
         return buildResult;
+    }
+
+    public String getSeparator()
+    {
+        return separator;
     }
 
     public Project getProject()
@@ -49,11 +43,6 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         }
 
         return null;
-    }
-
-    public boolean getFoundBase()
-    {
-        return foundBase;
     }
 
     public String execute() throws Exception
@@ -67,23 +56,10 @@ public class BrowseProjectDirAction extends ProjectActionSupport
 
         getProjectManager().checkWrite(buildResult.getProject());
 
-        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        java.io.File baseDir = paths.getBaseDir(buildResult.getProject(), buildResult, recipeId);
+        // this value is going to be written to the vm template and evaluated by javascript, so
+        // we need to ensure that we escape the escape char.
+        separator = File.separator.replace("\\", "\\\\");
 
-        // First check if the build is complete and has a working directory
-        // If not, we forward to the same page, which tells the user the bad
-        // news.
-        if (!buildResult.completed() || !baseDir.isDirectory())
-        {
-            foundBase = false;
-            return "dir";
-        }
-
-        return "dir";
-    }
-
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
+        return SUCCESS;
     }
 }
