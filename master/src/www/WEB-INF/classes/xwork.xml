@@ -58,7 +58,7 @@
         </action>
 
         <action name="cancelBuild" class="com.zutubi.pulse.web.server.CancelBuildAction">
-            <result name="success" type="redirect">viewServerStatus.action</result>
+            <result name="success" type="redirect">viewServerQueues.action</result>
         </action>
 
         <action name="viewAgentStatus" class="com.zutubi.pulse.web.agents.ViewAgentStatusAction">
@@ -898,7 +898,7 @@
         </action>
 
         <action name="toggleRecipeQueue" class="com.zutubi.pulse.web.admin.ToggleRecipeQueueAction">
-            <result name="success" type="redirect">/viewServerStatus.action</result>
+            <result name="success" type="redirect">/viewServerQueues.action</result>
         </action>
 
         <!--
