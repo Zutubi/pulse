@@ -64,15 +64,7 @@ public class DefaultUpgradeManager implements UpgradeManager
      */
     public boolean isUpgradeRequired(Version fromVersion, Version toVersion)
     {
-        if ( fromVersion.compareTo(toVersion) < 0 )
-        {
-            List<UpgradeTask> requiredTasks = determineRequiredUpgradeTasks(fromVersion, toVersion);
-            if (requiredTasks.size() > 0)
-            {
-                return true;
-            }
-        }
-        return false;
+        return fromVersion.compareTo(toVersion) < 0;
     }
 
     public List<UpgradeTask> previewUpgrade(Version fromVersion, Version toVersion)

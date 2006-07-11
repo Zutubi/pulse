@@ -69,11 +69,6 @@ public class UpgradeProgressMonitor
         tasksFinishedCount++;
     }
 
-    public boolean isComplete()
-    {
-        return tasksFinishedCount == taskCount && taskCount != 0;
-    }
-
     public boolean isSuccessful()
     {
         return !error;
@@ -114,7 +109,15 @@ public class UpgradeProgressMonitor
         {
             return percentageComplete;
         }
-        return (int) (100 * ((float) tasksFinishedCount) / ((float) taskCount));
+
+        if(taskCount == 0)
+        {
+            return 100;
+        }
+        else
+        {
+            return (int) (100 * ((float) tasksFinishedCount) / ((float) taskCount));
+        }
     }
 
     public void setPercentageComplete(int percentageComplete)
