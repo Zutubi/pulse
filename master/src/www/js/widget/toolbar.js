@@ -27,11 +27,16 @@ ZUTUBI.widget.Toolbar.prototype = {
         document.getElementById(this.id).innerHTML = html;
     },
 
+    getElId: function()
+    {
+        return 'zttb';
+    },
+
     getHtml: function()
     {
         var sb = [];
 
-        sb[sb.length] = '<table border="0" cellpadding="0" cellspacing="0" id="zttb">';
+        sb[sb.length] = '<table border="0" cellpadding="0" cellspacing="0" id="' + this.getElId() + '">';
         sb[sb.length] = '<tr>';
 
         // draw icons.
@@ -61,7 +66,7 @@ ZUTUBI.widget.ToolbarItem.items = [];
 
 ZUTUBI.widget.ToolbarItem.prototype = {
 
-    enabled:false,
+    enabled:true,
 
     initialize: function(id)
     {
@@ -115,11 +120,21 @@ ZUTUBI.widget.ToolbarItem.prototype = {
 
     getToolStyle: function()
     {
-        return this.id + " zttbi";
+        var style = "zttbi" + (this.isEnabled() ? "" : "_d");
+        if (this.id)
+        {
+            style = style + " " + this.id;
+        }
+        return style;
     },
 
     onMouseOver: function(event)
     {
+        if (!this.isEnabled())
+        {
+            return;
+        }
+
         Element.addClassName(this.getToolEl(), 'selected');
 
         // show the tooltip if one is configured.
@@ -133,11 +148,24 @@ ZUTUBI.widget.ToolbarItem.prototype = {
 
     onMouseOut: function(event)
     {
+        if (!this.isEnabled())
+        {
+            return;
+        }
+
         Element.removeClassName(this.getToolEl(), 'selected');
 
         // hide the tooltip if one is visible.
         var tooltip = ZUTUBI.widget.TooltipFactory.getTooltip();
         tooltip.hide();
+    },
+
+    _onClick: function(node)
+    {
+        if (this.isEnabled())
+        {
+            this.onClick(this);
+        }
     },
 
     getHtml: function()
@@ -148,7 +176,7 @@ ZUTUBI.widget.ToolbarItem.prototype = {
         sb[sb.length] = '<td';
         sb[sb.length] = ' id="' + this.getToolElId() + '"';
         sb[sb.length] = ' class="' + this.getToolStyle() + '"';
-        sb[sb.length] = ' onclick="javascript:' + getTool + '.onClick('+getTool+');"';
+        sb[sb.length] = ' onclick="javascript:' + getTool + '.onClick();"';
         sb[sb.length] = ' onmouseover="javascript:' + getTool + '.onMouseOver('+getTool+');" ';
         sb[sb.length] = ' onmouseout="javascript:' + getTool + '.onMouseOut('+getTool+');" ';
         sb[sb.length] = '>';
