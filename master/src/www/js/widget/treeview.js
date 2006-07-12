@@ -79,7 +79,7 @@ YAHOO.widget.TreeView.prototype.expandTo = function(requestPath)
         var path = requestPath[i];
         if (!node.expanded)
         {
-            node.fileToggle(true);
+            node.toggle();
         }
 
         if (!node.isDynamic() || node.dynamicLoadComplete)
@@ -192,7 +192,6 @@ YAHOO.widget.TreeView.prototype._getPath = function(node, getValue)
 }
 
 
-
 YAHOO.widget.RootNode.prototype.isRoot = function()
 {
     return true;
@@ -205,6 +204,22 @@ YAHOO.widget.RootNode.prototype.getPath = function()
 
 //---( FILE NODE )---
 
+YAHOO.widget.TreeView.prototype.onExpand = function(node)
+{
+    // the onexpand callback is triggered before the this.expanded is set to true
+    if (node.getFileEl())
+    {
+        node.getFileEl().className = node.data.type + "_o";
+    }
+}
+YAHOO.widget.TreeView.prototype.onCollapse = function(node)
+{
+    if (node.getFileEl())
+    {
+        node.getFileEl().className = node.data.type;
+    }
+}
+
 /**
  * Constructor.
  */
@@ -215,10 +230,6 @@ ZUTUBI.widget.FileNode = function(oData, oParent, expanded) {
 		this.init(oData, oParent, expanded);
 	}
     this.setUpLabel(oData);
-    if (!this.href)
-    {
-        this.href = "javascript:" + this.getFileToggleLink();
-    }
 };
 
 ZUTUBI.widget.FileNode.prototype = new YAHOO.widget.TextNode();
@@ -274,42 +285,14 @@ ZUTUBI.widget.FileNode.prototype.getFileEl = function()
 ZUTUBI.widget.FileNode.prototype.getFileStyle = function(openIfLoading)
 {
     var type = this.data.type;
-    if (this.isContainer())
+
+    // check if we are open.
+    if (this.hasChildren(true) || (this.isDynamic() && !this.getIconMode()))
     {
-        // check if we are open.
-        if (this.hasChildren(true) || (this.isDynamic() && !this.getIconMode())) {
-            return (this.expanded || (openIfLoading && this.isDynamic && !this.dynamicLoadComplete)) ? type + "_o" : type;
-        }
+        return (this.expanded || (openIfLoading && this.isDynamic && !this.dynamicLoadComplete)) ? type + "_o" : type;
     }
+
     return type
-}
-
-/**
- * If the node has been rendered, update the html to reflect the current
- * state of the node.
- */
-ZUTUBI.widget.FileNode.prototype.updateFileHtml = function()
-{
-	if (this.parent && this.parent.childrenRendered)
-    {
-		this.getFileEl().className = this.getFileStyle(true);
-	}
-};
-
-ZUTUBI.widget.FileNode.prototype.getFileToggleLink = function(selectNode)
-{
-    return "YAHOO.widget.TreeView.getNode(\'" + this.tree.id + "\'," +
-        this.index + ").fileToggle("+(selectNode || "")+")";
-},
-
-ZUTUBI.widget.FileNode.prototype.fileToggle = function(selectNode)
-{
-    if (selectNode)
-    {
-        this.select();
-    }
-    this.toggle();
-    this.updateFileHtml();
 }
 
 ZUTUBI.widget.FileNode.prototype.select = function()
@@ -353,7 +336,7 @@ ZUTUBI.widget.FileNode.prototype.getNodeHtml = function() {
 		sb[sb.length] = ' onmouseout="this.className=';
 		sb[sb.length] = getNode + '.getStyle()"';
 	}
-	sb[sb.length] = ' onclick="javascript:' + this.getFileToggleLink() + '">';
+	sb[sb.length] = ' onclick="javascript:' + this.getToggleLink() + '">';
 
 	sb[sb.length] = '&nbsp;';
 
@@ -363,7 +346,7 @@ ZUTUBI.widget.FileNode.prototype.getNodeHtml = function() {
     sb[sb.length] = '<td';
     sb[sb.length] = ' id="' + this.getFileElId() + '"';
     sb[sb.length] = ' class="' + this.getFileStyle(false) + '"';
-    sb[sb.length] = ' onclick="javascript:' + this.getFileToggleLink(true) + '"';
+    sb[sb.length] = ' onclick="javascript:' + this.getToggleLink(true) + '"';
     if (this.hasChildren(true))
     {
         sb[sb.length] = ' onmouseover="document.getElementById(\'';
@@ -394,8 +377,5 @@ ZUTUBI.widget.FileNode.prototype.getNodeHtml = function() {
 
 	return sb.join("");
 };
-
-
-//---( functions that help interact with nodes. )---
 
 

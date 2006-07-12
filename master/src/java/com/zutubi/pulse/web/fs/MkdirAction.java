@@ -15,16 +15,16 @@ public class MkdirAction extends ActionSupport
     /**
      * The path identifier specifying the working directory for this command.
      */
-    private String pid;
+    private String path;
 
     /**
      * The name of the new directory to be created.
      */
     private String name;
 
-    public void setPid(String pid)
+    public void setPath(String path)
     {
-        this.pid = pid;
+        this.path = path;
     }
 
     public void setName(String name)
@@ -35,7 +35,7 @@ public class MkdirAction extends ActionSupport
     public String execute() throws Exception
     {
         // convert path to location on file system.
-        File path = decodePath(pid);
+        File path = decodePath(this.path);
         if (path == null)
         {
             return ERROR;
@@ -45,11 +45,13 @@ public class MkdirAction extends ActionSupport
         File newFolder = new File(path, name);
 
         // return success / error response.
+/*
         if (!newFolder.mkdirs())
         {
             return ERROR;
         }
-        
+*/
+
         return SUCCESS;
     }
 

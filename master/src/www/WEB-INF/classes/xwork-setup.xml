@@ -118,6 +118,10 @@
             <result name="success" type="velocity">tree/browse-dirs.vm</result>
         </action>
 
+        <action name="mkdir" class="com.zutubi.pulse.web.ActionSupport">
+            <result name="success" type="velocity">tree/browse-new-folder.vm</result>
+        </action>
+
     </package>
 
 </xwork>

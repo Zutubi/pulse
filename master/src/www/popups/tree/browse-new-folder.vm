@@ -3,9 +3,6 @@
     <title>New folder</title>
     <script type="text/javascript" src="/js/prototype.js"></script>
     <script type="text/javascript" src="/js/main.js"></script>
-    <!--<script type="text/javascript" src="tree/console.js"></script>-->
-    <script type="text/javascript" src="tree/tree.js"></script>
-    <script type="text/javascript" src="tree/fs.js"></script>
     <script type="text/javascript">
         <!--
             function addNewFolder()
@@ -13,11 +10,20 @@
                 var folderName = document.forms['newfolder'].elements['newfolder'].value;
                 if (folderName)
                 {
-                    var tree = opener.ZUTUBI.widget.View.getTreeById('browse');
-                    var parentNode = tree.selectedNode || tree.root;
-                    opener.ZUTUBI.fs.virtualAdd(parentNode, folderName);
+                    opener.triggerMkdir(folderName);
                 }
             }
+
+/*
+            window.onunload = function()
+            {
+                alert('action %s' + action);
+                if (action == 'submit')
+                {
+                    addNewFolder();
+                }
+            };
+*/
         //-->
     </script>
 </head>
@@ -31,10 +37,12 @@
         </td>
     </tr>
     <tr>
-        <td align="right"><input type="submit" value="okies" onclick="addNewFolder(); return false;"/><input type="submit" value="cancel"/></td>
+        <td align="right">
+            <input type="submit" value="okay" onclick="addNewFolder(); return true;"/>
+            <input type="submit" value="cancel"/>
+        </td>
     </tr>
     </form>
 </table>
-<a href="" onclick="window.close(); return false;">close window</a>.
 </body>
 </html>

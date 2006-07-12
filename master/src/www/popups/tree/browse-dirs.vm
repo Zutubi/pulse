@@ -108,15 +108,17 @@
                 };
 
 /*
-                var separator = new ZUTUBI.widget.ToolbarSeparator();
-
                 var createFolder = new ZUTUBI.widget.ToolbarItem('create');
                 createFolder.setTooltip('Create folder');
                 createFolder.onClick = function()
                 {
-                    mkdir('New Folder');
+                    // open popup requesting the new folder name.
+                    window.open('/popups/mkdir.action', 'create_folder', 'width=400, height=150, resizable=yes', false);
+                    return false;
                 };
+*/
 
+/*
                 var deleteFolder = new ZUTUBI.widget.ToolbarItem('delete');
                 deleteFolder.setTooltip('Delete folder');
                 deleteFolder.onClick = function()
@@ -128,12 +130,16 @@
                         rmdir();
                     }
                 };
-
 */
+
                 // construct the toolbar.
                 var toolbar = new ZUTUBI.widget.Toolbar('toolbar');
                 toolbar.add(goToHome);
                 toolbar.add(goToPulseHome);
+/*
+                toolbar.add(new ZUTUBI.widget.ToolbarSeparator());
+                toolbar.add(createFolder);
+*/
                 toolbar.draw();
 
                 // construct the directory browser.
@@ -231,10 +237,24 @@
                 };
             }
 
+            function triggerMkdir(name)
+            {
+                setTimeout(function()
+                {
+                    mkdir(name);
+                }, 100);
+            }
+
             function mkdir(name)
             {
                 // grab selected file.
                 var node = YAHOO.widget.TreeView.getTree('browseTree').selected;
+                if (!node)
+                {
+                    // should not be getting here... the mkdir toolbar item should not be
+                    // available unless a node is selected.
+                    return;
+                }
 
                 // generate id path.
                 var p = node.getPath();
@@ -255,19 +275,30 @@
             {
                 return function(response)
                 {
+                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
+
                     // if response indicates success, refresh the folder response.
+
                     if (!node.expanded)
                     {
-                        node.fileToggle();
-                    }
-                    else
-                    {
-                        var tree = YAHOO.widget.TreeView.getTree('browseTree');
-//                        tree.removeNode(node, true);
-//                        node.fileToggle();
+                        node.toggle();
+                        // need to delay the node creation and selection until after the
+                        // node has been expanded. can anyone say PITA?
                     }
 
+                    var data = {
+                        "id":name,
+                        "name":name,
+                        "label":name,
+                        "type":"folder",
+                        "container":true
+                    };
+
+                    var newFolder = new ZUTUBI.widget.FileNode(data, node, false);
+                    node.refresh();
+
                     // need to select the newly created folder.
+                    tree.select(newFolder);
                 };
             }
 
