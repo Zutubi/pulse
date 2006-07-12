@@ -44,7 +44,7 @@
 
 /* the style of the div around each node's collection of children */
 .ygtvchildren { }  
-/* html .ygtvchildren { height:1%; }*/
+* html .ygtvchildren { height:1%; }
 
 /* the style of the text label */
 .ygtvlabel, .ygtvlabel:link, .ygtvlabel:visited, .ygtvlabel:hover {
@@ -66,32 +66,57 @@
     background: url(../../images/treeview/o.gif) 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
-.selected {
-    color:white;
+/* TODO: view reference needs to be removed, and replaced with a generic reference defined within the treeview.js */
+
+#view .selected {
     background-color:#316AC5;
     border-width:1px; border-color:#316AC5; border-style:solid;
 }
 
-.selected:link, .selected:visited, .selected:hover {
+#view .selected:link, .selected:visited, .selected:hover {
     color:white;
 }
 
 /*---( Toolbar styles )---*/
-.up {
-    background-image: url(../../images/arrow_up.gif);
+.toolbaritem {
+    /* a size 16x16 image will sit nicely in the center */
+    width:26px;
+    height:26px;
+    background-position:5px;
+    background-repeat:no-repeat;
+
+    /* an invisible border that acts as the placeholder for the 'selected' border. */
+    border-width:1px;
+    border-style:solid;
+    border-color:white;
 }
 
-.home {
-    background-image: url(../../images/house.gif);
+/*#ztbr  {
+    border-width:1px;
+    border-color:red;
+    border-style:solid;
 }
 
-.pulsehome {
-    background-image: url(../../images/pulse_home.gif);
+#ztbr .selected {
+    border-color:blue;
+    border-style:solid;
+    border-width:1px;
+}*/
+
+
+
+#toolbar {
+    padding-bottom:5px;
+}
+
+#toolbar .selected {
+    background-color:#B5BED6;
+    border-color:blue;
 }
 
 .toolbarseparator {
     width:1px;
-    height:27px;
+    height:26px;
     background-color:black;
 
     border-width:2px;
@@ -111,30 +136,20 @@
     background-image: url(../../images/arrow_refresh.png);
 }
 
-.toolbaritem {
-    width:27px;
-    height:27px;
-    background-position:5px;
-    background-repeat:no-repeat;
+.up {
+    background-image: url(../../images/arrow_up.gif);
+}
 
-    border-width:1px;
-    border-style:solid;
-    border-color:white;
+.home {
+    background-image: url(../../images/house.gif);
+}
+
+.pulsehome {
+    background-image: url(../../images/pulse_home.gif);
 }
 
 #view {
     cursor:default;
-}
-
-#toolbar {
-    padding-bottom:5px;
-}
-
-#toolbar .selected {
-    background-color:#B5BED6;
-    border-width:1px;
-    border-color:blue;
-    border-style:solid;
 }
 
 /*---( Tooltip styles)---*/
