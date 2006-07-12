@@ -44,10 +44,10 @@
 
 /* the style of the div around each node's collection of children */
 .ygtvchildren { }  
-* html .ygtvchildren { height:1%; }  
+/* html .ygtvchildren { height:1%; }*/
 
 /* the style of the text label */
-.ygtvlabel, .ygtvlabel:link, .ygtvlabel:visited, .ygtvlabel:hover { 
+.ygtvlabel, .ygtvlabel:link, .ygtvlabel:visited, .ygtvlabel:hover {
 	margin-left:2px;
 	text-decoration: none;
     color:black;
@@ -55,15 +55,15 @@
 
 /*---( Treeview node styles )---*/
 .file {
-    background: url(../../images/treeview/file.gif); 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
+    background: url(../../images/treeview/file.gif) 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
 .folder {
-    background: url(../../images/treeview/c.gif); 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
+    background: url(../../images/treeview/c.gif) 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
 .folder_o {
-    background: url(../../images/treeview/o.gif); 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
+    background: url(../../images/treeview/o.gif) 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
 .selected {
@@ -78,15 +78,15 @@
 
 /*---( Toolbar styles )---*/
 .up {
-    background-image: url(../../images/arrow_up.gif); width:16px;
+    background-image: url(../../images/arrow_up.gif);
 }
 
 .home {
-    background-image: url(../../images/house.gif); width:16px;
+    background-image: url(../../images/house.gif);
 }
 
 .pulsehome {
-    background-image: url(../../favicon.png); width:16px;
+    background-image: url(../../images/pulse_home.gif);
 }
 
 .toolbarseparator {
@@ -100,15 +100,15 @@
 }
 
 .create {
-    background-image: url(../../images/folder_add.png); width:16px;
+    background-image: url(../../images/folder_add.png);
 }
 
 .delete {
-    background-image: url(../../images/folder_delete.png); width:16px;
+    background-image: url(../../images/folder_delete.png);
 }
 
 .refresh {
-    background-image: url(../../images/arrow_refresh.png); width:16px;
+    background-image: url(../../images/arrow_refresh.png);
 }
 
 .toolbaritem {
