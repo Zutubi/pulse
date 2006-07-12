@@ -255,7 +255,7 @@ public class AddProjectWizard extends BaseWizard
                 types.put("maven", "maven project");
                 types.put("maven2", "maven 2 project");
                 types.put("versioned", "versioned project");
-//                types.put("xcode", "xcode project");
+                types.put("xcode", "xcode project");
             }
             return types;
         }

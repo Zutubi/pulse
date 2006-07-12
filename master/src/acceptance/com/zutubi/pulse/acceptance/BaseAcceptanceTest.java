@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.meterware.httpunit.WebClient;
 import com.zutubi.pulse.acceptance.forms.CvsForm;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
+import com.zutubi.pulse.acceptance.forms.AddProjectWizard;
 import junit.framework.Assert;
 import org.apache.xmlrpc.XmlRpcClient;
 
@@ -27,12 +28,6 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
     protected static final String USER_CREATE_ADMIN = "admin";
 
     //---( add project wizard forms )---
-    protected static final String FO_PROJECT_BASICS = "project.basics";
-    protected static final String PROJECT_BASICS_NAME = "name";
-    protected static final String PROJECT_BASICS_DESCRIPTION = "description";
-    protected static final String PROJECT_BASICS_URL = "url";
-    protected static final String PROJECT_BASICS_SCM = "scm";
-    protected static final String PROJECT_BASICS_TYPE = "type";
     protected static final String FO_ANT_SETUP = "ant.setup";
     protected static final String FO_VERSIONED_SETUP = "versioned.setup";
     protected static final String VERSIONED_SETUP_FILE = "details.pulseFileName";
@@ -184,14 +179,9 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
 
     protected void submitProjectBasicsForm(String projectName, String description, String url, String scm, String type)
     {
-        assertFormPresent(FO_PROJECT_BASICS);
-        setWorkingForm(FO_PROJECT_BASICS);
-        setFormElement(PROJECT_BASICS_NAME, projectName);
-        setFormElement(PROJECT_BASICS_DESCRIPTION, description);
-        setFormElement(PROJECT_BASICS_URL, url);
-        setFormElement(PROJECT_BASICS_SCM, scm);
-        setFormElement(PROJECT_BASICS_TYPE, type);
-        submit("next");
+        AddProjectWizard.Select form = new AddProjectWizard.Select(tester);
+        form.assertFormPresent();
+        form.nextFormElements(projectName, description, url, scm, type);
     }
 
     protected void ensureProject(String name) throws Exception

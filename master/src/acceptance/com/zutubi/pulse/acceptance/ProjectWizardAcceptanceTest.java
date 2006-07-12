@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.CustomDetailsForm;
 import com.zutubi.pulse.acceptance.forms.Maven2DetailsForm;
 import com.zutubi.pulse.acceptance.forms.SubversionForm;
+import com.zutubi.pulse.acceptance.forms.AddProjectWizard;
 import com.zutubi.pulse.util.RandomUtils;
 
 import java.util.Map;
@@ -39,12 +40,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
     public void testCreateVersionedProject()
     {
         // navigate to project panel.
-        beginAt("/");
-        clickLinkWithText("projects");
-        assertLinkPresentWithText("add new project");
-
-        clickLinkWithText("add new project");
-        assertFormPresent(FO_PROJECT_BASICS);
+        startAddProjectWizard();
 
         String projectName = "test project " + RandomUtils.randomString(3);
         String description = "this is a test project created by the automated project wizard acceptance test.";
@@ -80,12 +76,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
     public void testCreateCustomProject()
     {
         // navigate to project panel.
-        beginAt("/");
-        clickLinkWithText("projects");
-        assertLinkPresentWithText("add new project");
-
-        clickLinkWithText("add new project");
-        assertFormPresent(FO_PROJECT_BASICS);
+        startAddProjectWizard();
 
         String projectName = "custom project " + RandomUtils.randomString(3);
         String description = "this is a custom project created by the automated project wizard acceptance test.";
@@ -119,12 +110,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
     public void testCreateMaven2Project()
     {
         // navigate to project panel.
-        beginAt("/");
-        clickLinkWithText("projects");
-        assertLinkPresentWithText("add new project");
-
-        clickLinkWithText("add new project");
-        assertFormPresent(FO_PROJECT_BASICS);
+        startAddProjectWizard();
 
         String projectName = "maven2 project " + RandomUtils.randomString(3);
         String description = "this is a maven2 project created by the automated project wizard acceptance test.";
@@ -169,10 +155,18 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         assertLinkPresentWithText(projectName);
     }
 
+    private void startAddProjectWizard()
+    {
+        beginAt("/");
+        clickLinkWithText("projects");
+        assertLinkPresent("project.add");
+        clickLink("project.add");
+    }
+
     public void testProjectNameUnique()
     {
-        clickLinkWithText("projects");
-        clickLink("project.add");
+        // create a project with the specified name (or look up an existing project?)..
+        startAddProjectWizard();
 
         String projectName = "project " + RandomUtils.randomString(5);
         submitProjectBasicsForm(projectName, "", "", "cvs", "versioned");
@@ -180,11 +174,16 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         submitVersionedSetupForm("pulse.xml");
         assertTablePresent("project.basics");
 
-        clickLinkWithText("projects");
-        clickLink("project.add");
+        // attempt to create another project with that same name.
+        startAddProjectWizard();
 
-        submitProjectBasicsForm(projectName, "", "", "cvs", "versioned");
-        assertFormPresent(FO_PROJECT_BASICS);
+        AddProjectWizard.Select form = new AddProjectWizard.Select(tester);
+        form.assertFormPresent();
+        form.nextFormElements(projectName, "", "", "cvs", "versioned");
+
+        // assert that the form is still there and that we get an error message.
+        form.assertFormPresent();
+        assertTextPresent("already being used");
     }
 
     private String submitSubversion()
