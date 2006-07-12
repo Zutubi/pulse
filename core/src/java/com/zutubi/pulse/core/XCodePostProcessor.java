@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.util.SystemUtils;
 
 import java.util.regex.Pattern;
 
@@ -48,11 +47,6 @@ public class XCodePostProcessor extends PostProcessorGroup
             RegexPattern pattern = xcode.createPattern();
             pattern.setPattern(Pattern.compile(warnRegex));
             pattern.setCategory(Feature.Level.WARNING);
-        }
-
-        if (!SystemUtils.isWindows())
-        {
-            xcode.setFailOnError(false);
         }
 
         xcode.setLeadingContext(1);

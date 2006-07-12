@@ -6,7 +6,7 @@
     <recipe name="xcode build">
         <command name="build">
             <!-- the build command. -->
-            <xcode
+            <xcodebuild
 #if($workingDir)
                 working-dir="${base.dir}/$workingDir"
 #end
@@ -27,7 +27,7 @@
 #end
             >
                 #parse("pulse-file/output.processors.vm")
-            </xcode>
+            </xcodebuild>
 
             #parse("pulse-file/artifacts.vm")
 

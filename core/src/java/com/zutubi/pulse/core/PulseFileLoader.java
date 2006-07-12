@@ -28,12 +28,14 @@ public class PulseFileLoader extends FileLoader
         register("maven.pp", MavenPostProcessor.class);
         register("maven2.pp", Maven2PostProcessor.class);
         register("regex.pp", RegexPostProcessor.class);
+        register("xcodebuild.pp", XCodePostProcessor.class);
         register("ant", AntCommand.class);
         register("maven", MavenCommand.class);
         register("maven2", Maven2Command.class);
         register("executable", ExecutableCommand.class);
         register("print", PrintCommand.class);
         register("make", MakeCommand.class);
+        register("xcodebuild", XCodeCommand.class);
         register("resource", ResourceReference.class);
     }
 
