@@ -109,12 +109,11 @@ YAHOO.widget.TreeView.prototype.expandTo = function(requestPath)
     // found path and loaded.
     if (node.isContainer() && !node.expanded)
     {
-        node.fileToggle(true);
+        node.toggle();
     }
-    else
-    {
-        this.select(node);
-    }
+    
+    // always mark the open node as selected.
+    this.select(node);
     return 0;
 };
 
