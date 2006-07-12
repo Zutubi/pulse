@@ -38,6 +38,6 @@ public class CommitMessageLinkForm extends BaseForm
 
     public int[] getFieldTypes()
     {
-        return new int[] { TEXTFIELD, TEXTFIELD, TEXTFIELD, SELECT};
+        return new int[] { TEXTFIELD, TEXTFIELD, TEXTFIELD, MULTI_SELECT};
     }
 }

@@ -45,6 +45,20 @@ public class CommitMessageLinkAcceptanceTest extends BaseAcceptanceTest
         editForm.assertFormElements("mylink", "expr", "repl", id);
     }
 
+    public void testAddCommitLinkNoProjects() throws Exception
+    {
+        assertAndClick("commit.message.link.add");
+        CommitMessageLinkForm addForm = new CommitMessageLinkForm(tester, true);
+        addForm.assertFormPresent();
+        addForm.saveFormElements("mylink", "expr", "repl", "");
+
+        assertCommitLinks(new String[][] { getLinkRow("mylink", "expr") });
+        CommitMessageLinkForm editForm = new CommitMessageLinkForm(tester, false);
+        assertAndClick("edit_mylink");
+        editForm.assertFormPresent();
+        editForm.assertFormElements("mylink", "expr", "repl", "");
+    }
+
     private String addLink(String name)
     {
         assertAndClick("commit.message.link.add");
@@ -103,6 +117,21 @@ public class CommitMessageLinkAcceptanceTest extends BaseAcceptanceTest
         clickLink("edit_edited");
         form.assertFormPresent();
         form.assertFormElements("edited", "edited_expr", "edited_repl", null);
+    }
+
+    public void testEditCommitLinkNoProjects() throws Exception
+    {
+        String id = addLink("mylink");
+        clickLink("edit_mylink");
+        CommitMessageLinkForm form = new CommitMessageLinkForm(tester, false);
+        form.assertFormPresent();
+        form.assertFormElements("mylink", "expr", "repl", id);
+        form.saveFormElements("edited", "edited_expr", "edited_repl", "");
+
+        assertCommitLinks(new String[][] { getLinkRow("edited", "edited_expr") });
+        clickLink("edit_edited");
+        form.assertFormPresent();
+        form.assertFormElements("edited", "edited_expr", "edited_repl", "");
     }
 
     public void testEditCommitLinkValidation() throws Exception
