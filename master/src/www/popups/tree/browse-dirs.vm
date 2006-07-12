@@ -163,7 +163,7 @@
                 {
                     if (node.hasChildren(true))
                     {
-                        node.fileToggle();
+                        node.toggle();
                     }
                 };
 
