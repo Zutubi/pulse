@@ -78,7 +78,7 @@
 }
 
 /*---( Toolbar styles )---*/
-.toolbaritem {
+.zttbi {
     /* a size 16x16 image will sit nicely in the center */
     width:26px;
     height:26px;
@@ -91,30 +91,16 @@
     border-color:white;
 }
 
-/*#ztbr  {
-    border-width:1px;
-    border-color:red;
-    border-style:solid;
-}
-
-#ztbr .selected {
-    border-color:blue;
-    border-style:solid;
-    border-width:1px;
-}*/
-
-
-
-#toolbar {
+#zttb {
     padding-bottom:5px;
 }
 
-#toolbar .selected {
+#zttb .selected {
     background-color:#B5BED6;
     border-color:blue;
 }
 
-.toolbarseparator {
+.zttbs {
     width:1px;
     height:26px;
     background-color:black;

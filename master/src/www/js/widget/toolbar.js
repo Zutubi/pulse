@@ -31,7 +31,7 @@ ZUTUBI.widget.Toolbar.prototype = {
     {
         var sb = [];
 
-        sb[sb.length] = '<table border="0" cellpadding="0" cellspacing="0">';
+        sb[sb.length] = '<table border="0" cellpadding="0" cellspacing="0" id="zttb">';
         sb[sb.length] = '<tr>';
 
         // draw icons.
@@ -61,6 +61,8 @@ ZUTUBI.widget.ToolbarItem.items = [];
 
 ZUTUBI.widget.ToolbarItem.prototype = {
 
+    enabled:false,
+
     initialize: function(id)
     {
         this.id = id;
@@ -73,6 +75,16 @@ ZUTUBI.widget.ToolbarItem.prototype = {
 
     onClick: function(me)
     {
+    },
+
+    setEnabled: function(b)
+    {
+        this.enabled = (b == true);
+    },
+
+    isEnabled: function()
+    {
+        return this.enabled;
     },
 
     /**
@@ -93,7 +105,7 @@ ZUTUBI.widget.ToolbarItem.prototype = {
 
     getToolElId: function()
     {
-        return "ztbt" + this.index;
+        return "zttbi" + this.index;
     },
 
     getToolEl: function()
@@ -103,7 +115,7 @@ ZUTUBI.widget.ToolbarItem.prototype = {
 
     getToolStyle: function()
     {
-        return this.id + " toolbaritem";
+        return this.id + " zttbi";
     },
 
     onMouseOver: function(event)
@@ -165,7 +177,7 @@ ZUTUBI.widget.ToolbarSeparator.prototype = {
 
     getToolStyle: function()
     {
-        return "toolbarseparator";
+        return "zttbs";
     },
 
     getHtml: function()
