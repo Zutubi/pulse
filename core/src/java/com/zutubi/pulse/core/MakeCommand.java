@@ -2,8 +2,6 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 
-import java.io.File;
-
 /**
  */
 public class MakeCommand extends ExecutableCommand
@@ -32,7 +30,7 @@ public class MakeCommand extends ExecutableCommand
         }
     }
 
-    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult cmdResult)
+    public void execute(long recipeId, CommandContext context, CommandResult cmdResult)
     {
         checkExe();
 
@@ -48,7 +46,7 @@ public class MakeCommand extends ExecutableCommand
             cmdResult.getProperties().put("targets", targets);
         }
 
-        super.execute(recipeId, paths, outputDir, cmdResult);
+        super.execute(recipeId, context, cmdResult);
     }
 
     public String getMakefile()

@@ -29,7 +29,7 @@ public class PrintCommand extends CommandSupport
 
     private boolean terminated = false;
 
-    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult result)
+    public void execute(long recipeId, CommandContext context, CommandResult result)
     {
         if(terminated)
         {
@@ -37,7 +37,7 @@ public class PrintCommand extends CommandSupport
             return;
         }
 
-        File outputFileDir = new File(outputDir, "command output");
+        File outputFileDir = new File(context.getOutputDir(), "command output");
         if (!outputFileDir.mkdir())
         {
             throw new BuildException("Unable to create directory for output artifact '" + outputFileDir.getAbsolutePath() + "'");
@@ -63,7 +63,7 @@ public class PrintCommand extends CommandSupport
             IOUtils.close(writer);
         }
 
-        ProcessSupport.postProcess(processes, outputFileDir, outputFile, outputDir, result);
+        ProcessSupport.postProcess(processes, outputFileDir, outputFile, context.getOutputDir(), result);
     }
 
     public void setMessage(String message)

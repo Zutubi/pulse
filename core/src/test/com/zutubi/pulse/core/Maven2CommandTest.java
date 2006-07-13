@@ -2,9 +2,9 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.*;
 import java.util.List;
@@ -112,7 +112,8 @@ public class Maven2CommandTest extends PulseTestCase
         removeInExtension(baseDir);
 
         CommandResult result = new CommandResult("maven2-test");
-        command.execute(0, new SimpleRecipePaths(baseDir, null), outputDir, result);
+        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDir, null), outputDir);
+        command.execute(0, context, result);
 
         return result;
     }

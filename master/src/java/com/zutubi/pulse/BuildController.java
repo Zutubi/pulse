@@ -122,11 +122,13 @@ public class BuildController implements EventListener
             buildManager.save(resultNode);
 
             MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-            recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), paths.getOutputDir(project, buildResult, recipeResult.getId()));
+            File recipeOutputDir = paths.getOutputDir(project, buildResult, recipeResult.getId());
+            recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
 
             RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe(), getResourceRequirements(specification, node));
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), revision, recipeRequest, buildResult);
-            RecipeController rc = new RecipeController(childResultNode, dispatchRequest, collector, queue, buildManager, serviceTokenManager);
+            DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(project, buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
+            RecipeController rc = new RecipeController(childResultNode, dispatchRequest, logger, collector, queue, buildManager, serviceTokenManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
             configure(child, childResultNode, specification, node);
@@ -460,7 +462,7 @@ public class BuildController implements EventListener
     {
         buildResult.abortUnfinishedRecipes();
         tree.cleanup(buildResult);
-        buildResult.setHasWorkDir(specification.getRetainWorkingCopy());        
+        buildResult.setHasWorkDir(specification.getRetainWorkingCopy());
         buildResult.complete();
 
         for(PostBuildAction action: buildResult.getProject().getPostBuildActions())

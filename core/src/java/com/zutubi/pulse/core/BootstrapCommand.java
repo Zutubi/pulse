@@ -2,9 +2,8 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 
-import java.io.File;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * An adaptation between the command and Bootstrap interfaces that allows
@@ -23,9 +22,9 @@ public class BootstrapCommand implements Command
         this.bootstrapper = bootstrapper;
     }
 
-    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult result)
+    public void execute(long recipeId, CommandContext context, CommandResult result)
     {
-        bootstrapper.bootstrap(paths);
+        bootstrapper.bootstrap(context.getPaths());
     }
 
     public List<String> getArtifactNames()

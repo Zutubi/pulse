@@ -3,8 +3,6 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.util.SystemUtils;
 
-import java.io.File;
-
 /**
  * <class-comment/>
  */
@@ -41,7 +39,7 @@ public class MavenCommand extends ExecutableCommand
         }
     }
 
-    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult cmdResult)
+    public void execute(long recipeId, CommandContext context, CommandResult cmdResult)
     {
         checkExe();
 
@@ -51,10 +49,10 @@ public class MavenCommand extends ExecutableCommand
             cmdResult.getProperties().put("targets", targets);
         }
 
-        super.execute(recipeId, paths, outputDir, cmdResult);
+        super.execute(recipeId, context, cmdResult);
 
         MavenPostProcessor pp = new MavenPostProcessor("maven.pp");
-        pp.process(outputDir, cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);
+        pp.process(context.getOutputDir(), cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);
     }
 
     public String getTargets()

@@ -39,7 +39,7 @@ public class ExecutableCommandTest extends PulseTestCase
         command.setExe("echo");
         command.setArgs("hello world");
         CommandResult result = new CommandResult("success");
-        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
+        execute(command, result);
         assertEquals(result.getState(), ResultState.SUCCESS);
     }
 
@@ -49,7 +49,7 @@ public class ExecutableCommandTest extends PulseTestCase
         command.setExe("dir");
         command.setArgs("w");
         CommandResult result = new CommandResult("failure");
-        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
+        execute(command, result);
         assertEquals(result.getState(), ResultState.FAILURE);
     }
 
@@ -58,7 +58,7 @@ public class ExecutableCommandTest extends PulseTestCase
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("netstat");
         CommandResult result = new CommandResult("no arg");
-        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
+        execute(command, result);
         assertEquals(result.getState(), ResultState.SUCCESS);
     }
 
@@ -69,7 +69,7 @@ public class ExecutableCommandTest extends PulseTestCase
         command.setArgs("command");
         try
         {
-            command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, new CommandResult("exception"));
+            execute(command, new CommandResult("exception"));
             assertTrue(false);
         }
         catch (BuildException e)
@@ -93,7 +93,7 @@ public class ExecutableCommandTest extends PulseTestCase
         processArtifact.setProcessor(processor);
 
         CommandResult cmdResult = new CommandResult("processed");
-        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, cmdResult);
+        execute(command, cmdResult);
         assertEquals(ResultState.FAILURE, cmdResult.getState());
 
         StoredArtifact artifact = cmdResult.getArtifact(ExecutableCommand.OUTPUT_NAME);
@@ -129,7 +129,7 @@ public class ExecutableCommandTest extends PulseTestCase
         command.setExe(file.getPath());
 
         CommandResult result = new CommandResult("work");
-        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
+        execute(command, result);
         assertTrue(result.succeeded());
     }
 
@@ -144,7 +144,7 @@ public class ExecutableCommandTest extends PulseTestCase
         command.setScope(scope);
 
         CommandResult result = new CommandResult("work");
-        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
+        execute(command, result);
         assertTrue(result.succeeded());
     }
 
@@ -160,7 +160,7 @@ public class ExecutableCommandTest extends PulseTestCase
         command.setScope(scope);
 
         CommandResult result = new CommandResult("work");
-        command.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
+        execute(command, result);
         assertTrue(result.succeeded());
         String output = getOutput();
         assertTrue(output.contains("test variable value"));
@@ -169,5 +169,11 @@ public class ExecutableCommandTest extends PulseTestCase
     private String getOutput() throws IOException
     {
         return IOUtils.fileToString(new File(outputDirectory, "command output/output.txt"));
+    }
+
+    private void execute(ExecutableCommand command, CommandResult result)
+    {
+        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory);
+        command.execute(0, context, result);
     }
 }

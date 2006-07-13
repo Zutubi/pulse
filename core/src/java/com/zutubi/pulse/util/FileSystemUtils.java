@@ -528,6 +528,25 @@ public class FileSystemUtils
         return path;
     }
 
+    /**
+     * Converts any separator characters (/ or \) to the local separator
+     * character.
+     *
+     * @param path path to convert
+     * @return the path with all separators in local form
+     */
+    public static String localiseSeparators(String path)
+    {
+        if(File.separatorChar == '/')
+        {
+            return path.replace('\\', '/');
+        }
+        else
+        {
+            return path.replace('/', '\\');
+        }
+    }
+
     // WARNING: will not handle recursive symlinks
     public static void copyRecursively(File from, File to) throws IOException
     {

@@ -1,7 +1,10 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.RecipeProcessor;
+import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.util.logging.Logger;
@@ -34,7 +37,7 @@ public class MasterRecipeRunner implements Runnable
 
         try
         {
-            recipeProcessor.build(request, recipePaths, resourceRepository);
+            recipeProcessor.build(request, recipePaths, resourceRepository, true);
         }
         catch (BuildException e)
         {

@@ -33,6 +33,7 @@ public class RecipeControllerTest extends PulseTestCase
     private RecipeDispatchRequest dispatchRequest;
     private RecipeRequest recipeRequest;
     private RecipeController recipeController;
+    private RecipeLogger logger;
 
     protected void setUp() throws Exception
     {
@@ -41,6 +42,7 @@ public class RecipeControllerTest extends PulseTestCase
         recipeQueue = new MockRecipeQueue();
         buildManager = new MockBuildManager();
         buildService = new MockBuildService();
+        logger = new MockRecipeLogger();
 
         rootResult = new RecipeResult("root recipe");
         rootResult.setId(100);
@@ -54,7 +56,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         recipeRequest = new RecipeRequest(rootResult.getId(), rootResult.getRecipeName());
         dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null);
-        recipeController = new RecipeController(rootNode, dispatchRequest, resultCollector, recipeQueue, buildManager, null);
+        recipeController = new RecipeController(rootNode, dispatchRequest, logger, resultCollector, recipeQueue, buildManager, null);
     }
 
     protected void tearDown() throws Exception
@@ -419,6 +421,45 @@ public class RecipeControllerTest extends PulseTestCase
         public String getUrl()
         {
             throw new RuntimeException("Method not implemented.");
+        }
+    }
+
+    public class MockRecipeLogger implements RecipeLogger
+    {
+        public void log(RecipeDispatchedEvent event)
+        {
+        }
+
+        public void log(RecipeCommencedEvent event)
+        {
+        }
+
+        public void log(CommandCommencedEvent event)
+        {
+        }
+
+        public void log(CommandOutputEvent event)
+        {
+        }
+
+        public void log(CommandCompletedEvent event)
+        {
+        }
+
+        public void log(RecipeCompletedEvent event)
+        {
+        }
+
+        public void log(RecipeErrorEvent event)
+        {
+        }
+
+        public void prepare()
+        {
+        }
+
+        public void complete()
+        {
         }
     }
 }

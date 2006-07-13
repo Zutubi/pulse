@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -235,13 +235,19 @@ public class CommandGroupTest extends PulseTestCase
     private CommandResult testSuccessWithOutput(CommandGroup group, String output) throws IOException
     {
         CommandResult result = new CommandResult("test");
-        group.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
+        execute(group, result);
         assertEquals(ResultState.SUCCESS, result.getState());
         StoredArtifact artifact = result.getArtifact(ExecutableCommand.OUTPUT_NAME);
         File outputFile = new File(outputDirectory, artifact.getFile().getPath());
         assertEquals(output, IOUtils.fileToString(outputFile));
 
         return result;
+    }
+
+    private void execute(CommandGroup group, CommandResult result)
+    {
+        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory);
+        group.execute(0, context, result);
     }
 
     private CommandResult testSuccess(CommandGroup group) throws IOException
@@ -255,7 +261,7 @@ public class CommandGroupTest extends PulseTestCase
         try
         {
             result = new CommandResult("test");
-            group.execute(0, new SimpleRecipePaths(baseDirectory, null), outputDirectory, result);
+            execute(group, result);
         }
         catch (BuildException e)
         {

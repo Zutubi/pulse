@@ -1,14 +1,12 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.util.ForkOutputStream;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,15 +33,15 @@ public class ExecutableCommand implements Command, ScopeAware
     private Process child;
     private volatile boolean terminated = false;
 
-    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult cmdResult)
+    public void execute(long recipeId, CommandContext context, CommandResult cmdResult)
     {
         ProcessBuilder builder = new ProcessBuilder(constructCommand());
-        updateWorkingDir(builder, paths);
+        updateWorkingDir(builder, context.getPaths());
         updateChildEnvironment(builder);
 
         builder.redirectErrorStream(true);
 
-        File outputFileDir = new File(outputDir, "command output");
+        File outputFileDir = new File(context.getOutputDir(), "command output");
         if (!outputFileDir.mkdir())
         {
             throw new BuildException("Unable to create directory for output artifact '" + outputFileDir.getAbsolutePath() + "'");
@@ -77,10 +75,16 @@ public class ExecutableCommand implements Command, ScopeAware
         try
         {
             File outputFile = new File(outputFileDir, "output.txt");
-            FileOutputStream output = null;
+            OutputStream output = null;
+
             try
             {
                 output = new FileOutputStream(outputFile);
+                if(context.getOutputStream() != null)
+                {
+                    output = new ForkOutputStream(output, context.getOutputStream());
+                }
+
                 InputStream input = child.getInputStream();
 
                 IOUtils.joinStreams(input, output);
@@ -110,7 +114,7 @@ public class ExecutableCommand implements Command, ScopeAware
                 cmdResult.getProperties().put("working directory", builder.directory().getAbsolutePath());
             }
 
-            ProcessSupport.postProcess(processes, outputFileDir, outputFile, outputDir, cmdResult);
+            ProcessSupport.postProcess(processes, outputFileDir, outputFile, context.getOutputDir(), cmdResult);
         }
         catch (IOException e)
         {

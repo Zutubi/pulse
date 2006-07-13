@@ -1,9 +1,7 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.CommandResult;
 import com.opensymphony.util.TextUtils;
-
-import java.io.File;
+import com.zutubi.pulse.core.model.CommandResult;
 
 /**
  * <class-comment/>
@@ -39,7 +37,7 @@ public class XCodeCommand extends ExecutableCommand
         }
     }
 
-    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult cmdResult)
+    public void execute(long recipeId, CommandContext context, CommandResult cmdResult)
     {
         checkExe();
 
@@ -73,10 +71,10 @@ public class XCodeCommand extends ExecutableCommand
             cmdResult.getProperties().put("settings", settings);
         }
 
-        super.execute(recipeId, paths, outputDir, cmdResult);
+        super.execute(recipeId, context, cmdResult);
 
         XCodePostProcessor pp = new XCodePostProcessor("xcode.pp");
-        pp.process(outputDir, cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);
+        pp.process(context.getOutputDir(), cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);
     }
 
     public void setTarget(String target)

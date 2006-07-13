@@ -68,7 +68,7 @@ public class SlaveRecipeProcessor
 
             try
             {
-                recipeProcessor.build(request, processorPaths, repo);
+                recipeProcessor.build(request, processorPaths, repo, true);
             }
             catch (BuildException e)
             {

@@ -3,8 +3,6 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.util.SystemUtils;
 
-import java.io.File;
-
 /**
  */
 public class AntCommand extends ExecutableCommand
@@ -40,7 +38,7 @@ public class AntCommand extends ExecutableCommand
         }
     }
 
-    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult cmdResult)
+    public void execute(long recipeId, CommandContext context, CommandResult cmdResult)
     {
         checkExe();
 
@@ -56,10 +54,10 @@ public class AntCommand extends ExecutableCommand
             cmdResult.getProperties().put("targets", targets);
         }
 
-        super.execute(recipeId, paths, outputDir, cmdResult);
+        super.execute(recipeId, context, cmdResult);
 
         AntPostProcessor pp = new AntPostProcessor("ant.pp");
-        pp.process(outputDir, cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);
+        pp.process(context.getOutputDir(), cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);
     }
 
     public String getBuildFile()

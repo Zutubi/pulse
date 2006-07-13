@@ -2,7 +2,6 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public abstract class CommandSupport implements Command
         this.name = name;
     }
 
-    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult result)
+    public void execute(long recipeId, CommandContext context, CommandResult result)
     {
     }
 

@@ -2,9 +2,9 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.*;
 
@@ -60,7 +60,8 @@ public abstract class CommandTestBase extends PulseTestCase
     {
         command.setWorkingDir(baseDir);
         CommandResult commandResult = new CommandResult("test");
-        command.execute(0, new SimpleRecipePaths(baseDir, null), outputDir, commandResult);
+        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDir, null), outputDir);
+        command.execute(0, context, commandResult);
         return commandResult;
     }
 

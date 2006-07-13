@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import java.io.File;
+import java.io.OutputStream;
 
 /**
  * Information passed to all commands as they execute, allowing the command
@@ -9,6 +10,7 @@ import java.io.File;
 public class CommandContext
 {
     private RecipePaths paths;
+    private OutputStream outputStream;
     private File outputDir;
 
     public CommandContext(RecipePaths paths, File outputDir)
@@ -25,5 +27,15 @@ public class CommandContext
     public File getOutputDir()
     {
         return outputDir;
+    }
+
+    public OutputStream getOutputStream()
+    {
+        return outputStream;
+    }
+
+    public void setOutputStream(OutputStream outputStream)
+    {
+        this.outputStream = outputStream;
     }
 }

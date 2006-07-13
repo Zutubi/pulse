@@ -2,8 +2,8 @@ package com.zutubi.pulse.core;
 
 import nu.xom.Element;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -49,7 +49,7 @@ public class ResourceRequirementsPredicate implements TypeLoadPredicate
 
     public boolean resolveReferences(Object type, Element element)
     {
-        return true;
+        return type instanceof ResourceReference;
     }
 
     public List<ResourceReference> getReferences()

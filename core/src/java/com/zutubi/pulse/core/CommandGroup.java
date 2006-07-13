@@ -1,11 +1,10 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.validation.Validateable;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.validator.ValidatorContext;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.validation.Validateable;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -66,12 +65,12 @@ public class CommandGroup implements Command, Validateable
         return customArtifact;
     }
 
-    public void execute(long recipeId, RecipePaths paths, File outputDir, CommandResult result)
+    public void execute(long recipeId, CommandContext context, CommandResult result)
     {
-        command.execute(recipeId, paths, outputDir, result);
+        command.execute(recipeId, context, result);
         for(Artifact artifact: artifacts)
         {
-            artifact.capture(result, paths.getBaseDir(), outputDir);
+            artifact.capture(result, context.getPaths().getBaseDir(), context.getOutputDir());
         }
     }
 

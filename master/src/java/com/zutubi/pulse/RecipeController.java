@@ -21,6 +21,7 @@ public class RecipeController
     private RecipeResultNode recipeResultNode;
     private RecipeResult recipeResult;
     private RecipeDispatchRequest dispatchRequest;
+    private RecipeLogger logger;
     private RecipeResultCollector collector;
     private BuildManager buildManager;
     private ServiceTokenManager serviceTokenManager;
@@ -29,11 +30,12 @@ public class RecipeController
     private RecipeQueue queue;
     private BuildService buildService;
 
-    public RecipeController(RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager, ServiceTokenManager serviceTokenManager)
+    public RecipeController(RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, RecipeLogger logger, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager, ServiceTokenManager serviceTokenManager)
     {
         this.recipeResultNode = recipeResultNode;
         this.recipeResult = recipeResultNode.getResult();
         this.dispatchRequest = dispatchRequest;
+        this.logger = logger;
         this.collector = collector;
         this.queue = queue;
         this.buildManager = manager;
@@ -44,6 +46,7 @@ public class RecipeController
     {
         // Errors handled by BuildController
         collector.prepare(buildResult, recipeResultNode.getResult().getId());
+        logger.prepare();
     }
 
     public void initialise(Bootstrapper bootstrapper)
@@ -90,6 +93,10 @@ public class RecipeController
             {
                 handleCommandCommenced((CommandCommencedEvent) event);
             }
+            else if(event instanceof CommandOutputEvent)
+            {
+                handleCommandOutput((CommandOutputEvent)event);
+            }
             else if (event instanceof CommandCompletedEvent)
             {
                 handleCommandCompleted((CommandCompletedEvent) event);
@@ -117,6 +124,7 @@ public class RecipeController
 
     private void handleRecipeDispatch(RecipeDispatchedEvent event)
     {
+        logger.log(event);
         buildService = event.getAgent().getBuildService();
         recipeResultNode.setHost(buildService.getHostName());
         buildManager.save(recipeResultNode);
@@ -124,6 +132,7 @@ public class RecipeController
 
     private void handleRecipeCommenced(RecipeCommencedEvent event)
     {
+        logger.log(event);
         recipeResult.commence(event.getName(), System.currentTimeMillis());
         if (recipeResult.terminating())
         {
@@ -136,14 +145,21 @@ public class RecipeController
 
     private void handleCommandCommenced(CommandCommencedEvent event)
     {
+        logger.log(event);
         CommandResult result = new CommandResult(event.getName());
         result.commence(System.currentTimeMillis());
         recipeResult.add(result);
         buildManager.save(recipeResult);
     }
 
+    private void handleCommandOutput(CommandOutputEvent event)
+    {
+        logger.log(event);
+    }
+
     private void handleCommandCompleted(CommandCompletedEvent event)
     {
+        logger.log(event);
         CommandResult result = event.getResult();
         result.getStamps().setEndTime(System.currentTimeMillis());
         recipeResult.update(result);
@@ -152,6 +168,7 @@ public class RecipeController
 
     private void handleRecipeCompleted(RecipeCompletedEvent event)
     {
+        logger.log(event);
         RecipeResult result = event.getResult();
         result.getStamps().setEndTime(System.currentTimeMillis());
         recipeResult.update(event.getResult());
@@ -160,12 +177,14 @@ public class RecipeController
 
     private void handleRecipeError(RecipeErrorEvent event)
     {
+        logger.log(event);
         recipeResult.error(event.getErrorMessage());
         complete();
     }
 
     private void complete()
     {
+        logger.complete();
         recipeResult.complete();
         recipeResult.abortUnfinishedCommands();
         buildManager.save(recipeResult);

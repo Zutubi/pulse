@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.Sort;
 
 import java.io.File;
@@ -14,6 +15,8 @@ import java.util.List;
  */
 public class RecipeResult extends Result
 {
+    public static final String RECIPE_LOG = "recipe.log";
+
     private String recipeName;
     private List<CommandResult> results = new LinkedList<CommandResult>();
 
@@ -65,7 +68,7 @@ public class RecipeResult extends Result
         add(result);
 
         // Adjust the command's output directory to the local one
-        File remoteDir = new File(result.getOutputDir());
+        File remoteDir = new File(FileSystemUtils.localiseSeparators(result.getOutputDir()));
         File localDir = new File(getOutputDir(), remoteDir.getName());
         result.setOutputDir(localDir.getPath());
     }
