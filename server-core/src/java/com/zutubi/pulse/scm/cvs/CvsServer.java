@@ -257,8 +257,12 @@ public class CvsServer extends CachingSCMServer
         }
 
         // ensure that the lower bound of the changes is excluded.
+        // TODO: comparing the date here as the since revision does not have
+        // a user.  Ideally, we should fix this situation, but it requires a
+        // better way to get the latest revision, and we have no such way as
+        // yet.
         Changelist firstChange = changes.get(0);
-        if (firstChange.getRevision().compareTo(from) == 0)
+        if (firstChange.getRevision().getDate().equals(from.getDate()))
         {
             return changes.subList(1, changes.size());
         }
