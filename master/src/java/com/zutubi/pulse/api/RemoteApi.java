@@ -6,7 +6,6 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.model.*;
 
 import java.util.Date;
@@ -24,7 +23,6 @@ public class RemoteApi
     private BuildManager buildManager;
     private ProjectManager projectManager;
     private UserManager userManager;
-    private EventManager eventManager;
 
     public RemoteApi()
     {
@@ -46,6 +44,11 @@ public class RemoteApi
     public boolean logout(String token)
     {
         return tokenManager.logout(token);
+    }
+
+    public String ping()
+    {
+        return "pong";
     }
 
     public Vector<String> getAllProjectNames(String token) throws AuthenticationException
@@ -285,10 +288,4 @@ public class RemoteApi
         }
         return project;
     }
-
-    public void setEventManager(EventManager eventManager)
-    {
-        this.eventManager = eventManager;
-    }
-
 }

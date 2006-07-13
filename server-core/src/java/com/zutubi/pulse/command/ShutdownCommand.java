@@ -17,15 +17,21 @@ public class ShutdownCommand extends AdminCommand
 {
     private boolean force;
 
+    public void setForce(boolean b)
+    {
+        this.force = b;
+    }
+
     @SuppressWarnings({"ACCESS_STATIC_VIA_INSTANCE"})
-    public void parse(String argv[]) throws ParseException
+    public void parse(String... argv) throws ParseException
     {
         Options options = new Options();
         options.addOption(new Option("force", "force shutdown"));
 
         CommandLineParser parser = new PosixParser();
         CommandLine commandLine = parser.parse(options, argv, true);
-        force = (commandLine.hasOption("force"));
+        
+        setForce(commandLine.hasOption("force"));
     }
 
     public int doExecute() throws XmlRpcException, IOException

@@ -17,7 +17,7 @@ public class SetPasswordCommand extends AdminCommand
     private String password;
 
     @SuppressWarnings({"ACCESS_STATIC_VIA_INSTANCE"})
-    public void parse(String argv[]) throws ParseException
+    public void parse(String... argv) throws ParseException
     {
         Options options = new Options();
         options.addOption(OptionBuilder.withLongOpt("user")

@@ -34,7 +34,11 @@ public abstract class AdminCommand implements Command
     private String loadAdminToken(ConfigurationManager configurationManager) throws IOException
     {
         File tokenFile = AdminTokenManager.getAdminTokenFilename(configurationManager.getSystemPaths().getConfigRoot());
-        return IOUtils.fileToString(tokenFile);
+        if (tokenFile.exists())
+        {
+            return IOUtils.fileToString(tokenFile);
+        }
+        return null;
     }
 
     public int execute()

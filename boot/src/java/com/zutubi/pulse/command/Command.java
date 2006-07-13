@@ -15,7 +15,7 @@ public interface Command
      * @param argv
      *
      */
-    public void parse(String argv[]) throws Exception;
+    public void parse(String... argv) throws Exception;
 
     /**
      * Execute this command

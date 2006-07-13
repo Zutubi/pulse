@@ -8,7 +8,7 @@ public class LocalBuildCommand implements Command
 {
     private String argv[];
 
-    public void parse(String argv[]) throws Exception
+    public void parse(String... argv) throws Exception
     {
         this.argv = argv;
     }

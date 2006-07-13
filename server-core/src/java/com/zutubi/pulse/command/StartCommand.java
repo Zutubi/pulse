@@ -13,7 +13,7 @@ public class StartCommand implements Command
 {
     private static final Logger LOG = Logger.getLogger(StartCommand.class);
 
-    public void parse(String argv[]) throws ParseException
+    public void parse(String... argv) throws ParseException
     {
         Options options = new Options();
         CommandLineParser parser = new PosixParser();
