@@ -132,6 +132,7 @@
         <servlet-class>com.zutubi.pulse.servlet.DownloadResultsServlet</servlet-class>
     </servlet>
 
+    <!-- Entry point for xmlrpc services. -->
     <servlet>
         <servlet-name>XmlRpcServlet</servlet-name>
         <servlet-class>com.zutubi.pulse.xmlrpc.MasterXmlRpcServlet</servlet-class>

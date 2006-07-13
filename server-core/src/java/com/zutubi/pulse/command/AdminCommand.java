@@ -47,7 +47,9 @@ public abstract class AdminCommand implements Command
         // a) the xml rpc client
         // b) the admin token.
 
-        SystemBootstrapManager.loadBootstrapContext();
+        SystemBootstrapManager sbm = new SystemBootstrapManager();
+        sbm.loadBootstrapContext();
+        
         ConfigurationManager configurationManager = (ConfigurationManager) ComponentContext.getBean("configurationManager");
 
         URL url;

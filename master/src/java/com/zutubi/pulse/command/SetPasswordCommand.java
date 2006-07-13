@@ -16,6 +16,25 @@ public class SetPasswordCommand extends AdminCommand
     private String user;
     private String password;
 
+    /**
+     * Set the username identifying the account for which the password will be updated.
+     * @param username
+     */
+    public void setUser(String username)
+    {
+        this.user = username;
+    }
+
+    /**
+     * Set the new password that will be set.
+     *
+     * @param newPassword
+     */
+    public void setPassword(String newPassword)
+    {
+        this.password = newPassword;
+    }
+
     @SuppressWarnings({"ACCESS_STATIC_VIA_INSTANCE"})
     public void parse(String... argv) throws ParseException
     {
@@ -38,8 +57,8 @@ public class SetPasswordCommand extends AdminCommand
         CommandLine commandLine = parser.parse(options, argv, true);
 
         // process the command.
-        user = commandLine.getOptionValue('u');
-        password = commandLine.getOptionValue('p');
+        setUser(commandLine.getOptionValue('u'));
+        setPassword(commandLine.getOptionValue('p'));
     }
 
     public int doExecute() throws XmlRpcException, IOException
@@ -47,21 +66,6 @@ public class SetPasswordCommand extends AdminCommand
         xmlRpcClient.execute("RemoteApi.setPassword", new Vector<Object>(Arrays.asList(
                 new Object[]{adminToken, user, password})));
         return 0;
-    }
-
-    public static void main(String argv[])
-    {
-        SetPasswordCommand command = new SetPasswordCommand();
-        try
-        {
-            command.parse(argv);
-            System.exit(command.execute());
-        }
-        catch (ParseException e)
-        {
-            e.printStackTrace();
-            System.exit(1);
-        }
     }
 }
 

@@ -3,7 +3,12 @@ package com.zutubi.pulse.bootstrap;
 import java.io.File;
 
 /**
- * This manager handles the first stage of system startup.
+ * This manager handles the first stage of system startup. It loads the defined bootstrap spring context
+ * and retrieves the required startupManager bean.
+ *
+ * The default bootstrapContext can be overriden by using the -Dbootstrap=<bootstrapContext> option. The
+ * specified bootstrap context can be either a fully qualified file name OR a classpath reference.
+ *
  */
 public class SystemBootstrapManager
 {
@@ -11,6 +16,10 @@ public class SystemBootstrapManager
      * The default bootstrapContext file.
      */
     public static final String DEFAULT_BOOTSTRAP_CONTEXT = "com/zutubi/pulse/bootstrap/bootstrapContext.xml";
+
+    /**
+     * The bootstrap context property.
+     */
     public static final String BOOTSTRAP_CONTEXT_PROPERTY = "bootstrap";
 
     /**
@@ -21,7 +30,7 @@ public class SystemBootstrapManager
     /**
      * Load the systems bootstrap context.
      */
-    public static void loadBootstrapContext()
+    public void loadBootstrapContext()
     {
         // lookup bootstrap context via the system properties.
         String contextName = System.getProperty(BOOTSTRAP_CONTEXT_PROPERTY, DEFAULT_BOOTSTRAP_CONTEXT);
@@ -31,13 +40,13 @@ public class SystemBootstrapManager
         // b) try the classpath.
 
         File contextFile = new File(contextName);
-        if (contextFile.exists())
+        if (contextFile.isFile())
         {
-            ComponentContext.addFileContextDefinitions(new String[]{contextName});
+            ComponentContext.addFileContextDefinitions(contextName);
         }
         else // look it up on the classpath.
         {
-            ComponentContext.addClassPathContextDefinitions(new String[]{contextName});
+            ComponentContext.addClassPathContextDefinitions(contextName);
         }
     }
 
@@ -47,6 +56,9 @@ public class SystemBootstrapManager
         ((Startup) ComponentContext.getBean(STARTUP_MANAGER_BEAN)).init();
     }
 
+    /**
+     * @deprecated use StartCommand instead.
+     */
     public static void main(String argv[])
     {
         new SystemBootstrapManager().bootstrapSystem();

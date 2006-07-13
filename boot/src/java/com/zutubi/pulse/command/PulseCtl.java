@@ -12,9 +12,15 @@ import java.net.URLClassLoader;
 /**
  * Pulse bootstrap handler. Controls the initialisation of the pulse class loader
  * and then triggers the requested command.
+ *
+ * Use the -Ddebug=true command line option to print the pulse application classpath to standard error.
  */
 public class PulseCtl
 {
+    private static final String PULSE_HOME = "pulse.home";
+
+    private static final String DEBUG = "debug";
+
     private static final Map<String, String> COMMANDS = new HashMap<String, String>();
 
     static
@@ -43,14 +49,14 @@ public class PulseCtl
                 // print warning, unknown command requested.
                 printError("Unknown command " + commandName);
                 printHelp();
-                return 2;
+                return 1;
             }
 
             String[] commandArgs = new String[argv.length - 1];
             System.arraycopy(argv, 1, commandArgs, 0, commandArgs.length);
 
             // setup the class loader context.
-            String pulseHomeStr = System.getProperty("pulse.home");
+            String pulseHomeStr = System.getProperty(PULSE_HOME);
             File pulseHome = new File(pulseHomeStr);
 
             // validate pulseHome.
@@ -62,8 +68,7 @@ public class PulseCtl
             }
             catch (MalformedURLException e)
             {
-                System.err.println("ERROR: problem loading jar: " + e.getMessage());
-                e.printStackTrace();
+                printError(e);
                 return 2;
             }
 
@@ -77,7 +82,7 @@ public class PulseCtl
         catch (Exception e)
         {
             printError(e);
-            return 1;
+            return 3;
         }
     }
 
@@ -102,6 +107,11 @@ public class PulseCtl
         System.err.println("To see specific help information about any of these commands, type admin 'command' --help");
     }
 
+    private static boolean isDebugEnabled()
+    {
+        return Boolean.getBoolean(DEBUG);
+    }
+
     public static void main(String argv[])
     {
         int exitStatus = new PulseCtl().process(argv);
@@ -109,10 +119,10 @@ public class PulseCtl
         {
             System.exit(exitStatus);
         }
-        // can not trigger a system exit here if since that would abort the app.
+        // DO NOT CALL System.exit(0). This would abort the app. if start was the command.
     }
 
-    private static ClassLoader makeClassLoader(File apphome) throws MalformedURLException
+    private static ClassLoader makeClassLoader(File pulseHome) throws Exception
     {
         ClassLoader parent = PulseCtl.class.getClassLoader();
         if (parent == null)
@@ -120,11 +130,10 @@ public class PulseCtl
             parent = ClassLoader.getSystemClassLoader();
         }
 
-        File libdir = new File(apphome, "lib");
+        File libdir = new File(pulseHome, "lib");
         if (!libdir.isDirectory())
         {
-            System.err.println("ERROR: lib is not a directory (or not found): " + libdir.getAbsolutePath());
-            System.exit(1);
+            throw new Exception("ERROR: lib is not a directory (or not found): " + libdir.getAbsolutePath());
         }
 
         List<URL> classpath = new LinkedList<URL>();
@@ -137,10 +146,10 @@ public class PulseCtl
         //  LOCALCLASSPATH="$LOCALCLASSPATH":"$i"
         //done
 
-        classpath.add(new File(apphome, asPath("system", "www", "WEB-INF", "classes")).toURL());
-        classpath.add(new File(apphome, asPath("lib")).toURL());
+        classpath.add(new File(pulseHome, asPath("system", "www", "WEB-INF", "classes")).toURL());
+        classpath.add(new File(pulseHome, asPath("lib")).toURL());
 
-        // add the jdks tools.jar to the start of the classpath.
+        // add the jdks tools.jar to the classpath.
         addToolsJar(classpath);
 
         final File[] files = libdir.listFiles();
@@ -148,6 +157,16 @@ public class PulseCtl
         appendToClasspath(files, ".xml", classpath);
 
         URL[] urls = classpath.toArray(new URL[0]);
+        if (isDebugEnabled())
+        {
+            // print the classpath to the Std error for debugging.
+            System.err.println("Pulse Classpath:");
+            for (URL url : urls)
+            {
+                System.err.println(" - " + url);
+            }
+        }
+
         return new URLClassLoader(urls, parent);
     }
 
@@ -176,18 +195,22 @@ public class PulseCtl
         return buffer.toString();
     }
 
-    private static void addToolsJar(List<URL> jarUrls) throws MalformedURLException {
+    private static void addToolsJar(List<URL> jarUrls) throws MalformedURLException
+    {
         File javaHome = new File(System.getProperty("java.home"));
 
         File tools;
 
-        tools = new File(javaHome, "lib/tools.jar");
-        if (tools.isFile()) {
+        tools = new File(javaHome, asPath("lib", "tools.jar"));
+        if (tools.isFile())
+        {
             jarUrls.add(tools.toURL());
+            return;
         }
 
-        tools = new File(javaHome, "../lib/tools.jar");
-        if (tools.isFile()) {
+        tools = new File(javaHome, asPath("..", "lib", "tools.jar"));
+        if (tools.isFile())
+        {
             jarUrls.add(tools.toURL());
         }
     }

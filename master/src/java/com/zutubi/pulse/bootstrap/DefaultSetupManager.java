@@ -19,9 +19,24 @@ public class DefaultSetupManager implements SetupManager
     private UserManager userManager;
     private UpgradeManager upgradeManager;
 
+    /**
+     * Contexts for Stage A: the database.
+     */
     private List<String> daoContexts;
-    private List<String> setupContexts;
+
+    /**
+     * Contexts for Stage B: the upgrade system.
+     */
     private List<String> upgradeContexts;
+
+    /**
+     * Contexts for Stage C: setup / configuration.
+     */
+    private List<String> setupContexts;
+
+    /**
+     * Contexts for Stage D: application startup.
+     */
     private List<String> startupContexts;
 
     private SetupState state;

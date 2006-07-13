@@ -20,7 +20,7 @@
             </bean>
         </property>
     </bean>
-    
+
     <!-- TODO: services should register themselves with the shutdown manager as they are started. -->
     <!--
     the shutdown manager at this point only needs to shutdown jetty.
@@ -33,6 +33,7 @@
         </property>
     </bean>
 
+    <!-- can this be moved into the webserverContext? it does not seem appropriate here... -->
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/loggingContext.xml"/>

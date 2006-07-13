@@ -5,7 +5,7 @@
 -->
 <beans>
 
-    <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager">
+    <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager" autowire="byName">
         <property name="coreContexts">
             <list>
                 <value>com/zutubi/pulse/bootstrap/coreSubsystemContext.xml</value>
@@ -15,16 +15,6 @@
             <list>
                 <value>com/zutubi/pulse/bootstrap/configSubsystemContext.xml</value>
             </list>
-        </property>
-        <property name="startupRunnables">
-            <list>
-            </list>
-        </property>
-        <property name="configurationManager">
-            <ref local="configurationManager"/>
-        </property>
-        <property name="objectFactory">
-            <ref local="objectFactory"/>
         </property>
     </bean>
 
@@ -58,6 +48,7 @@
 
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
+    <!-- TODO: Do we still require this here? We dont really need it until the webapp is up... -->
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
     
 </beans>

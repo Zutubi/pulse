@@ -29,6 +29,7 @@
     </bean>
 
     <!-- this spring object factory will ensure that WebWork Actions are autowired. -->
+    <!-- TODO: DO WE STILL NEED THIS HERE??-->
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 
 </beans>

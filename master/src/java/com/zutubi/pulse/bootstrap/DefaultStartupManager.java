@@ -44,9 +44,9 @@ public class DefaultStartupManager implements StartupManager
      */
     private boolean starting = false;
 
-    private List<String> setupContexts;
-
     private List<String> coreContexts;
+
+    private List<String> setupContexts;
 
     private List<String> startupRunnables = new LinkedList<String>();
 
