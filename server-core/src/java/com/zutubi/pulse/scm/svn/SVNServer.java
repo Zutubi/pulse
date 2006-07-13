@@ -478,17 +478,20 @@ public class SVNServer implements SCMServer
 
     public void update(File workDir, Revision rev) throws SCMException
     {
-        throw new RuntimeException("nyi");
+        SVNUpdateClient client = new SVNUpdateClient(authenticationManager, null);
+        try
+        {
+            client.doUpdate(workDir, convertRevision(rev), true);
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
     }
 
-    /**
-     * Indicate that update is currently not supported.
-     *
-     * @return false.
-     */
     public boolean supportsUpdate()
     {
-        return false;
+        return true;
     }
 
     public void tag(Revision revision, String name, boolean moveExisting) throws SCMException

@@ -27,6 +27,8 @@ public class SVNServerTest extends PulseTestCase
 {
     private SVNServer server;
     private File tmpDir;
+    private File gotDir;
+    private File expectedDir;
     private File repoDir;
     private Process serverProcess;
     private static final String TAG_PATH = "svn://localhost/test/tags/test-tag";
@@ -96,6 +98,12 @@ public class SVNServerTest extends PulseTestCase
         tmpDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
         repoDir = new File(tmpDir, "repo");
         repoDir.mkdirs();
+
+        expectedDir = new File(repoDir, "expected");
+        expectedDir.mkdirs();
+
+        gotDir = new File(repoDir, "got");
+        gotDir.mkdirs();
 
         FileSystemUtils.extractZip(new ZipInputStream(new FileInputStream(dataFile)), repoDir);
         serverProcess = Runtime.getRuntime().exec("svnserve -d -r " + repoDir.getAbsolutePath());
@@ -234,6 +242,34 @@ public class SVNServerTest extends PulseTestCase
     {
         List<Revision> revisions = server.getRevisionsSince(new NumericalRevision(9));
         assertEquals(0, revisions.size());
+    }
+
+    public void testCheckout() throws SCMException, IOException
+    {
+        server.checkout(0, gotDir, new NumericalRevision(1), null);
+        assertRevision(gotDir, 1);
+    }
+
+    public void testUpdate() throws SCMException, IOException
+    {
+        server.checkout(0, gotDir, new NumericalRevision(1), null);
+        server.update(gotDir, new NumericalRevision(4));
+        assertRevision(gotDir, 4);
+    }
+
+    public void testMultiUpdate() throws SCMException, IOException
+    {
+        server.checkout(0, gotDir, new NumericalRevision(1), null);
+        server.update(gotDir, new NumericalRevision(4));
+        server.update(gotDir, new NumericalRevision(8));
+        assertRevision(gotDir, 8);
+    }
+
+    private void assertRevision(File dir, int revision) throws IOException
+    {
+        File dataFile = getTestDataFile("server-core", Integer.toString(revision), "zip");
+        FileSystemUtils.extractZip(new ZipInputStream(new FileInputStream(dataFile)), expectedDir);
+        assertDirectoriesEqual(new File(new File(expectedDir, "test"), "trunk"), dir);
     }
 
     private List<RemoteFile> getSortedListing(SVNServer confirmServer)
