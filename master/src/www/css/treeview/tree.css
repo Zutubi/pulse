@@ -89,6 +89,8 @@
     border-width:1px;
     border-style:solid;
     border-color:white;
+
+    float:left;
 }
 
 #zttb {
@@ -136,6 +138,7 @@
 
 #view {
     cursor:default;
+    clear:both;
 }
 
 /*---( Tooltip styles)---*/

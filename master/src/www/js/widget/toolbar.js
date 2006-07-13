@@ -36,8 +36,7 @@ ZUTUBI.widget.Toolbar.prototype = {
     {
         var sb = [];
 
-        sb[sb.length] = '<table border="0" cellpadding="0" cellspacing="0" id="' + this.getElId() + '">';
-        sb[sb.length] = '<tr>';
+        sb[sb.length] = '<div id="'+this.getElId()+'">';
 
         // draw icons.
         $A(this.tools).each(function(toolbarItem)
@@ -45,8 +44,7 @@ ZUTUBI.widget.Toolbar.prototype = {
             sb[sb.length] = toolbarItem.getHtml();
         });
 
-        sb[sb.length] = '</tr>';
-        sb[sb.length] = '</table>';
+        sb[sb.length] = '</div>';
 
         return sb.join("");
     }
@@ -173,14 +171,14 @@ ZUTUBI.widget.ToolbarItem.prototype = {
         var getTool = 'ZUTUBI.widget.ToolbarItem.items[\'' + this.index + '\']';
 
         var sb = [];
-        sb[sb.length] = '<td';
+        sb[sb.length] = '<div';
         sb[sb.length] = ' id="' + this.getToolElId() + '"';
         sb[sb.length] = ' class="' + this.getToolStyle() + '"';
         sb[sb.length] = ' onclick="javascript:' + getTool + '.onClick();"';
         sb[sb.length] = ' onmouseover="javascript:' + getTool + '.onMouseOver('+getTool+');" ';
         sb[sb.length] = ' onmouseout="javascript:' + getTool + '.onMouseOut('+getTool+');" ';
         sb[sb.length] = '>';
-        sb[sb.length] = '</td>';
+        sb[sb.length] = '</div>';
         return sb.join("");
     }
 };
