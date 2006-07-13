@@ -172,4 +172,9 @@ public class BuildResult extends Result implements AclObjectIdentityAware
     {
         return project;
     }
+
+    public RecipeResultNode findResultNode(long id)
+    {
+        return root.findNode(id);
+    }
 }

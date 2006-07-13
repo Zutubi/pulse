@@ -47,7 +47,13 @@ public class DefaultRecipeLogger implements RecipeLogger
 
     public void log(RecipeCommencedEvent event)
     {
-        logMarker("Recipe '" + event.getName() + "' commenced", event.getStartTime());
+        String name = event.getName();
+        if(name == null)
+        {
+            name = "[default]";
+        }
+        
+        logMarker("Recipe '" + name + "' commenced", event.getStartTime());
     }
 
     public void log(CommandCommencedEvent event)

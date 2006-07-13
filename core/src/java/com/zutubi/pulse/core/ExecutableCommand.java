@@ -75,14 +75,19 @@ public class ExecutableCommand implements Command, ScopeAware
         try
         {
             File outputFile = new File(outputFileDir, "output.txt");
+            FileOutputStream outputFileStream = null;
             OutputStream output = null;
 
             try
             {
-                output = new FileOutputStream(outputFile);
+                outputFileStream = new FileOutputStream(outputFile);
                 if(context.getOutputStream() != null)
                 {
-                    output = new ForkOutputStream(output, context.getOutputStream());
+                    output = new ForkOutputStream(outputFileStream, context.getOutputStream());
+                }
+                else
+                {
+                    output = outputFileStream;
                 }
 
                 InputStream input = child.getInputStream();
@@ -91,7 +96,7 @@ public class ExecutableCommand implements Command, ScopeAware
             }
             finally
             {
-                IOUtils.close(output);
+                IOUtils.close(outputFileStream);
             }
 
             final int result = child.waitFor();

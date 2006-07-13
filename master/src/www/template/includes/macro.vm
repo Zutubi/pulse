@@ -34,6 +34,15 @@
 #end
 
 ##
+## Outputs sitemesh content tags for stage links on the header bar
+##
+#macro(stageTags $buildResult $resultNode)
+    #buildTags($buildResult.project $buildResult)
+    <content tag="resultNodeId">$resultNode.id</content>
+    <content tag="stageName">$!webwork.htmlEncode($resultNode.stage)</content>
+#end
+
+##
 ## Outputs sitemesh content tags for the agent links on the header bar
 ##
 #macro(agentTags $slave)
@@ -1095,7 +1104,7 @@
         #contentHeading("build.tests" 1)
         #contentHeading("build.when" 1)
         #contentHeading("build.elapsed" 1)
-##        #contentHeading("actions" 1)
+        #contentHeading("actions" 1)
     </tr>
 #end
 
@@ -1150,7 +1159,7 @@
         #testResultsCell($build $recipe $recipe)
         #dateClassCell($recipe)
         #classCell($recipe.stamps.prettyElapsed)
-##        #linkCell("view" "viewRecipe.action?id=$id&amp;projectId=$build.project.id")
+        #linkCell("stage.log" "tailRecipeLog.action?id=$id&amp;buildId=$build.id")
     </tr>
 #end
 
@@ -1481,7 +1490,7 @@
     #if($showArtifactLink)
         <a class="unadorned" href="downloadDirectoryArtifact.action?commandId=$result.id&amp;id=$artifact.id"><img alt="archive" src="/images/compress.gif"></a>
     #end
-    
+
     #if(!$hasIndex)
         <ul id="art_${artifact.id}">
         #foreach($fileArtifact in $artifact.children)
@@ -1601,7 +1610,7 @@
 
     #if($buildResult.root.children.size() > 0)
     <table class="content">
-        #headingRow("build.stages" 8)
+        #headingRow("build.stages" 9)
         #recipeSummaryHeader()
         #foreach($recipeNode in $buildResult.root.children)
         #recipeSummary($recipeNode $buildResult $detailedView)
@@ -1872,13 +1881,17 @@
 ## about errors.
 ##
 #macro(updater $url $panelId $user)
-    #if($user.refreshInterval != 0)
+    #if($refreshInterval || $user.refreshInterval != 0)
     var updater = new Ajax.PeriodicalUpdater(
                       {success: "$panelId"},
                       "$url",
                       {
                           method: 'get',
+#if($refreshInterval)
+                          frequency: $refreshInterval
+#else
                           frequency: $user.refreshInterval
+#end
                       });
     #end
 #end

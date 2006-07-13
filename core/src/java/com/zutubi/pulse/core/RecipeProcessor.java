@@ -157,6 +157,7 @@ public class RecipeProcessor
         result.commence();
         result.setOutputDir(commandOutput.getPath());
         eventManager.publish(new CommandCommencedEvent(this, recipeId, result.getCommandName(), result.getStamps().getStartTime()));
+        CommandOutputStream outputStream = null;
 
         try
         {
@@ -168,7 +169,8 @@ public class RecipeProcessor
             CommandContext context = new CommandContext(paths, commandOutput);
             if(capture)
             {
-                context.setOutputStream(new CommandOutputStream(eventManager, recipeId, true));
+                outputStream = new CommandOutputStream(eventManager, recipeId, true);
+                context.setOutputStream(outputStream);
             }
 
             command.execute(recipeId, context, result);
@@ -184,6 +186,7 @@ public class RecipeProcessor
         }
         finally
         {
+            IOUtils.close(outputStream);
             result.complete();
             eventManager.publish(new CommandCompletedEvent(this, recipeId, result));
         }

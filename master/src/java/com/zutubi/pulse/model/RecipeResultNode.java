@@ -171,4 +171,23 @@ public class RecipeResultNode extends Entity
             r.accumulateTestSummary(summary);
         }
     }
+
+    public RecipeResultNode findNode(long id)
+    {
+        if(id == getId())
+        {
+            return this;
+        }
+
+        for(RecipeResultNode child: children)
+        {
+            RecipeResultNode found = child.findNode(id);
+            if(found != null)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
 }

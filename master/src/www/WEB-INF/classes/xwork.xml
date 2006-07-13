@@ -132,6 +132,7 @@
         <action name="downloadBuildFile" class="com.zutubi.pulse.web.project.DownloadBuildFileAction">
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
+                <param name="contentDisposition">filename="pulse.xml"</param>
             </result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
@@ -153,6 +154,19 @@
 
         <action name="viewRecipe" class="com.zutubi.pulse.web.project.ViewRecipeAction">
             <result name="success" type="velocity">view-recipe.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="tailRecipeLog" class="com.zutubi.pulse.web.project.TailRecipeLogAction">
+            <result name="success" type="velocity">tail-recipe-log.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewRecipeLog" class="com.zutubi.pulse.web.project.ViewRecipeLogAction">
+            <result name="success" type="stream">
+                <param name="contentType">text/plain</param>
+                <param name="contentDisposition">filename="recipe.log"</param>
+            </result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
@@ -1154,6 +1168,11 @@
 
         <action name="viewBuildPanel" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-build-panel.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="tailRecipeLogPanel" class="com.zutubi.pulse.web.project.TailRecipeLogAction">
+            <result name="success" type="velocity">tail-recipe-log-panel.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 

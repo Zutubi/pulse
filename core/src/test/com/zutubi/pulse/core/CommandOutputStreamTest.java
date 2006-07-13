@@ -29,6 +29,11 @@ public class CommandOutputStreamTest extends PulseTestCase implements EventListe
         receivedEvents = new LinkedList<CommandOutputEvent>();
     }
 
+    protected void tearDown() throws Exception
+    {
+        stream.close();
+    }
+
     public void testWriteOneByte()
     {
         // Make sure a single byte write is not sent until flushed

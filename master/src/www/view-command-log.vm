@@ -68,10 +68,10 @@
                 <div id="node_$node.id" style="display: none">
                     <div class="panecontent">
                         <table class="content">
-                            #headingRow("build.stage.summary" 9)
+                            #headingRow("build.stage.summary" 10)
                             #recipeSummaryHeader()
                             #recipeSummary($node $result true)
-                            #directMessages($node.result 9)
+                            #directMessages($node.result 10)
                         </table>
                         #recipeCommands($node $result)
                     </div>

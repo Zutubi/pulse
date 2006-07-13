@@ -11,6 +11,12 @@
 #if($page.getProperty("page.buildNumber"))
     #set ($buildNumber = $page.getProperty("page.buildNumber"))
 #end
+#if($page.getProperty("page.resultNodeId"))
+    #set ($resultNodeId = $page.getProperty("page.resultNodeId"))
+#end
+#if($page.getProperty("page.stageName"))
+    #set ($stageName = $page.getProperty("page.stageName"))
+#end
 #if($page.getProperty("page.agentId"))
     #set ($agentId = $page.getProperty("page.agentId"))
 #end
@@ -66,6 +72,9 @@
 #end
 #if($buildId && $buildId != "0")
                   :: <a href="/viewBuild.action?id=${buildId}">build $buildNumber</a>
+#end
+#if($stageName)
+                  :: <a href="/viewCommandLog.action?id=${buildId}&amp;selectedNode=$resultNodeId">stage $stageName</a>
 #end
 #if($agentName)
     #if($agentId && $agentId != "0")
