@@ -9,6 +9,7 @@ import com.zutubi.pulse.scm.FilepathFilter;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.scm.ScmFilepathFilter;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
@@ -23,6 +24,8 @@ import org.tmatesoft.svn.core.wc.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -271,7 +274,7 @@ public class SVNServer implements SCMServer
     /**
      * @see SCMServer#checkout(long, File, Revision, List<Change>)
      */
-    public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
+    public Revision checkout(long id, File toDirectory, Revision revision, final List<Change> changes) throws SCMException
     {
         SVNRevision svnRevision;
         SVNUpdateClient updateClient = new SVNUpdateClient(repository.getAuthenticationManager(), null);
@@ -283,6 +286,11 @@ public class SVNServer implements SCMServer
         else
         {
             svnRevision = convertRevision(revision);
+        }
+
+        if (changes != null)
+        {
+            updateClient.setEventHandler(new ChangeEventHandler(changes));
         }
 
         try
@@ -476,9 +484,15 @@ public class SVNServer implements SCMServer
         return result;
     }
 
-    public void update(File workDir, Revision rev) throws SCMException
+    public void update(File workDir, Revision rev, List<Change> changes) throws SCMException
     {
         SVNUpdateClient client = new SVNUpdateClient(authenticationManager, null);
+
+        if(changes != null)
+        {
+            client.setEventHandler(new ChangeEventHandler(changes));
+        }
+
         try
         {
             client.doUpdate(workDir, convertRevision(rev), true);
@@ -525,6 +539,23 @@ public class SVNServer implements SCMServer
         }
     }
 
+    public void writeConnectionDetails(File outputDir) throws SCMException, IOException
+    {
+        Properties props = new Properties();
+        props.put("location", getLocation());
+
+        FileOutputStream os = null;
+        try
+        {
+            os = new FileOutputStream(new File(outputDir, "svn.properties"));
+            props.store(os, "Subversion connection properties");
+        }
+        finally
+        {
+            IOUtils.close(os);
+        }
+    }
+
     //=======================================================================
     // Testing use only
     //=======================================================================
@@ -555,6 +586,44 @@ public class SVNServer implements SCMServer
         catch (SCMException e)
         {
             e.printStackTrace();
+        }
+    }
+
+    private static class ChangeEventHandler implements ISVNEventHandler
+    {
+        private List<Change> changes;
+
+        public ChangeEventHandler(List<Change> changes)
+        {
+            this.changes = changes;
+        }
+
+        public void handleEvent(SVNEvent event, double progress)
+        {
+            Change.Action action = null;
+
+            SVNEventAction svnAction = event.getAction();
+            if(svnAction == SVNEventAction.UPDATE_ADD)
+            {
+                action = Change.Action.ADD;
+            }
+            else if(svnAction == SVNEventAction.UPDATE_DELETE)
+            {
+                action = Change.Action.DELETE;
+            }
+            else if(svnAction == SVNEventAction.UPDATE_UPDATE)
+            {
+                action = Change.Action.EDIT;
+            }
+
+            if(action != null)
+            {
+                changes.add(new Change(event.getPath(), Long.toString(event.getRevision()), action));
+            }
+        }
+
+        public void checkCancelled()
+        {
         }
     }
 }

@@ -253,15 +253,15 @@ public class SVNServerTest extends PulseTestCase
     public void testUpdate() throws SCMException, IOException
     {
         server.checkout(0, gotDir, new NumericalRevision(1), null);
-        server.update(gotDir, new NumericalRevision(4));
+        server.update(gotDir, new NumericalRevision(4), null);
         assertRevision(gotDir, 4);
     }
 
     public void testMultiUpdate() throws SCMException, IOException
     {
         server.checkout(0, gotDir, new NumericalRevision(1), null);
-        server.update(gotDir, new NumericalRevision(4));
-        server.update(gotDir, new NumericalRevision(8));
+        server.update(gotDir, new NumericalRevision(4), null);
+        server.update(gotDir, new NumericalRevision(8), null);
         assertRevision(gotDir, 8);
     }
 

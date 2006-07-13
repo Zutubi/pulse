@@ -1,7 +1,6 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.util.FileSystemUtils;
 
@@ -11,7 +10,6 @@ import java.io.IOException;
 /**
  * The Project Repo Bootstrapper checks out a project into a the project-root/project-name/repo
  * directory and then runs an update when necessary, copying the results into the build directory.
- *
  */
 public class ProjectRepoBootstrapper implements Bootstrapper
 {
@@ -26,19 +24,20 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         this.revision = revision;
     }
 
-    public void bootstrap(final RecipePaths paths) throws BuildException
+    public void bootstrap(final CommandContext context) throws BuildException
     {
-        if(paths.getPersistentWorkDir() == null)
+        final RecipePaths paths = context.getPaths();
+        if (paths.getPersistentWorkDir() == null)
         {
             throw new BuildException("Attempt to use update bootstrapping when no persistent working directory is available.");
         }
-        
+
         File reposDir = new File(paths.getPersistentWorkDir(), "repos");
         final File localDir = new File(reposDir, projectName);
 
         // run the scm bootstrapper on the local directory,
         ScmBootstrapper bootstrapper = selectBootstrapper(localDir);
-        bootstrapper.bootstrap(new RecipePaths()
+        bootstrapper.bootstrap(new CommandContext(new RecipePaths()
         {
             public File getPersistentWorkDir()
             {
@@ -54,7 +53,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
             {
                 return null;
             }
-        });
+        }, context.getOutputDir()));
 
         // copy these details to the base directory.
         File baseDir = paths.getBaseDir();

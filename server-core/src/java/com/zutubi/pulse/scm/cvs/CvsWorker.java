@@ -1,19 +1,18 @@
 package com.zutubi.pulse.scm.cvs;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.cvs.client.CvsClient;
-import com.zutubi.pulse.scm.cvs.client.LogCommandListener;
-import com.zutubi.pulse.scm.cvs.client.LogDirectoryBuilder;
-import com.zutubi.pulse.scm.cvs.client.VersionCommand;
+import com.zutubi.pulse.scm.cvs.client.*;
 import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
 import org.netbeans.lib.cvsclient.command.tag.RtagCommand;
 import org.netbeans.lib.cvsclient.command.update.UpdateCommand;
+import org.netbeans.lib.cvsclient.event.CVSListener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -224,7 +223,7 @@ public class CvsWorker
      * Execute a cvs checkout into the given directory.
      *
      */
-    public CvsRevision checkout(File workdir, CvsRevision revision) throws SCMException
+    public CvsRevision checkout(File workdir, CvsRevision revision, List<Change> changes) throws SCMException
     {
         LOG.entering();
         CheckoutCommand checkout = newCheckoutCommand(revision);
@@ -232,7 +231,13 @@ public class CvsWorker
         CvsClient client = getClient();
         client.setLocalPath(workdir);
 
-        if (!client.executeCommand(checkout))
+        CVSListener listener = null;
+        if(changes != null)
+        {
+            listener = new UpdateListener(changes);
+        }
+
+        if (!client.executeCommand(checkout, listener))
         {
             throw new SCMException("Failed to checkout.");
         }
@@ -244,7 +249,7 @@ public class CvsWorker
      * Checkout the requested file / directory only.
      *
      */
-    public CvsRevision checkout(File workdir, CvsRevision revision, String file) throws SCMException
+    public CvsRevision checkoutFile(File workdir, CvsRevision revision, String file) throws SCMException
     {
         LOG.entering();
         CheckoutCommand checkout = newCheckoutCommand(revision);
@@ -270,13 +275,20 @@ public class CvsWorker
      * @param rev
      * @throws SCMException
      */
-    public void update(File workdir, CvsRevision rev) throws SCMException
+    public void update(File workdir, CvsRevision rev, List<Change> changes) throws SCMException
     {
         LOG.entering();
         UpdateCommand update = newUpdateCommand(rev);
         CvsClient client = getClient();
         client.setLocalPath(new File(workdir, module));
-        if (!client.executeCommand(update))
+
+        CVSListener listener = null;
+        if(changes != null)
+        {
+            listener = new UpdateListener(changes);
+        }
+
+        if (!client.executeCommand(update, listener))
         {
             throw new SCMException("Failed to update working directory.");
         }

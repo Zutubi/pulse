@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -138,10 +139,13 @@ public interface SCMServer
      *
      * @param workDir contains a local copy (checkout) of the module.
      * @param rev to to which the local copy will be updated.
+     * @param changes     if not null, receives a list of change objects
+     *                    indicating the files that were checked out (the
+     *                    action will be ADD)
      *
      * @throws SCMException
      */
-    void update(File workDir, Revision rev) throws SCMException;
+    void update(File workDir, Revision rev, List<Change> changes) throws SCMException;
 
     /**
      * Allows the scm server to indicate whether or not it supports the update
@@ -161,4 +165,6 @@ public interface SCMServer
      * @throws SCMException
      */
     void tag(Revision revision, String name, boolean moveExisting) throws SCMException;
+
+    void writeConnectionDetails(File outputDir) throws SCMException, IOException;
 }

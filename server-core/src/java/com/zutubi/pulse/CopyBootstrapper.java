@@ -2,7 +2,7 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.BootstrapperSupport;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.core.CommandContext;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 
@@ -30,7 +30,7 @@ public class CopyBootstrapper extends BootstrapperSupport
         this.previousRecipeId = previousRecipeId;
     }
 
-    public void bootstrap(RecipePaths paths) throws BuildException
+    public void bootstrap(CommandContext context) throws BuildException
     {
         try
         {
@@ -40,7 +40,7 @@ public class CopyBootstrapper extends BootstrapperSupport
 
             // take url connection input stream and write contents to directory.
             FileOutputStream zos = null;
-            File zipName = new File(paths.getBaseDir().getAbsolutePath() + ".zip");
+            File zipName = new File(context.getPaths().getBaseDir().getAbsolutePath() + ".zip");
 
             try
             {
@@ -58,7 +58,7 @@ public class CopyBootstrapper extends BootstrapperSupport
             try
             {
                 zis = new ZipInputStream(new FileInputStream(zipName));
-                FileSystemUtils.extractZip(zis, paths.getBaseDir());
+                FileSystemUtils.extractZip(zis, context.getPaths().getBaseDir());
             }
             finally
             {

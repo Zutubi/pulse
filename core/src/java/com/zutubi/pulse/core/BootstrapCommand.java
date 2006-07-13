@@ -1,7 +1,11 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.util.FileSystemUtils;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,7 +17,8 @@ import java.util.List;
  */
 public class BootstrapCommand implements Command
 {
-    private static final String OUTPUT_NAME = "bootstrap output";
+    public static final String OUTPUT_NAME = "bootstrap output";
+    public static final String CHANGES_FILE = "changes.txt";
 
     private Bootstrapper bootstrapper;
 
@@ -24,7 +29,22 @@ public class BootstrapCommand implements Command
 
     public void execute(long recipeId, CommandContext context, CommandResult result)
     {
-        bootstrapper.bootstrap(context.getPaths());
+        bootstrapper.bootstrap(context);
+
+        File artifactDir = new File(context.getOutputDir(), OUTPUT_NAME);
+        if(artifactDir.isDirectory())
+        {
+            String[] files = artifactDir.list();
+            if(files.length > 0)
+            {
+                StoredArtifact artifact = new StoredArtifact(OUTPUT_NAME);
+                for(String file: files)
+                {
+                    artifact.add(new StoredFileArtifact(FileSystemUtils.composeFilename(OUTPUT_NAME, file)));
+                }
+                result.addArtifact(artifact);
+            }
+        }
     }
 
     public List<String> getArtifactNames()

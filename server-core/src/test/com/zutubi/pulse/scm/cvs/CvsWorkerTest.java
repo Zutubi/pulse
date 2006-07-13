@@ -6,9 +6,9 @@ import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.Constants;
 import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
@@ -140,7 +140,7 @@ public class CvsWorkerTest extends PulseTestCase
         String module = "unit-test/CvsWorkerTest/testCheckout";
         cvs.setModule(module);
 
-        cvs.checkout(workdir, CvsRevision.HEAD);
+        cvs.checkout(workdir, CvsRevision.HEAD, null);
 
         assertTrue(new File(workdir, module + "/file1.txt").exists());
         assertTrue(new File(workdir, module + "/file2.txt").exists());
@@ -155,7 +155,7 @@ public class CvsWorkerTest extends PulseTestCase
 
         // test checkout based on date before the files were added to the repository.
         CvsRevision byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-03-11 02:30:00 GMT"));
-        CvsRevision checkedOutRevision = cvs.checkout(workdir, byDate);
+        CvsRevision checkedOutRevision = cvs.checkout(workdir, byDate, null);
         assertNotNull(checkedOutRevision);
 
         assertFalse(new File(workdir, module + "/file1.txt").exists());
@@ -170,7 +170,7 @@ public class CvsWorkerTest extends PulseTestCase
 
         CvsRevision byHead = CvsRevision.HEAD;
         String file = module + "/file1.txt";
-        cvs.checkout(workdir, byHead, file);
+        cvs.checkoutFile(workdir, byHead, file);
 
         assertContents("file1.txt latests contents", new File(workdir, file));
     }
@@ -182,11 +182,11 @@ public class CvsWorkerTest extends PulseTestCase
 
         CvsRevision byRevision = new CvsRevision(null, "1.2", null, null);
         String file = module + "/file1.txt";
-        cvs.checkout(workdir, byRevision, file);
+        cvs.checkoutFile(workdir, byRevision, file);
         assertContents("file1.txt revision 1.2 contents", new File(workdir, file));
 
         byRevision = new CvsRevision(null, "1.1", null, null);
-        cvs.checkout(workdir, byRevision, file);
+        cvs.checkoutFile(workdir, byRevision, file);
         assertContents("file1.txt revision 1.1 contents", new File(workdir, file));
     }
 
@@ -198,7 +198,7 @@ public class CvsWorkerTest extends PulseTestCase
         // checkout the revision of the file based on date.
         CvsRevision byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-03-11 03:10:07 GMT"));
         String file = module + "/file1.txt";
-        cvs.checkout(workdir, byDate, file);
+        cvs.checkoutFile(workdir, byDate, file);
         assertContents("file1.txt revision 1.2 contents", new File(workdir, file));
     }
 
@@ -207,7 +207,7 @@ public class CvsWorkerTest extends PulseTestCase
         String module = "module";
         cvs.setModule(module);
 
-        cvs.checkout(workdir, CvsRevision.HEAD);
+        cvs.checkout(workdir, CvsRevision.HEAD, null);
 
         assertTrue(new File(workdir, "unit-test/CvsWorkerTest/testCheckoutModule/dir1/file1.txt").exists());
         assertTrue(new File(workdir, "unit-test/CvsWorkerTest/testCheckoutModule/dir2/file2.txt").exists());
@@ -218,7 +218,7 @@ public class CvsWorkerTest extends PulseTestCase
         String module = "unit-test/CvsWorkerTest/testCheckoutBranch";
         cvs.setModule(module);
         cvs.setBranch("BRANCH");
-        cvs.checkout(workdir, CvsRevision.HEAD);
+        cvs.checkout(workdir, CvsRevision.HEAD, null);
 
         // check that the selected files exist.
         assertTrue(new File(workdir, module + "/file1.txt").exists());
@@ -229,7 +229,7 @@ public class CvsWorkerTest extends PulseTestCase
         FileSystemUtils.cleanOutputDir(workdir);
 
         cvs.setBranch(null);
-        cvs.checkout(workdir, CvsRevision.HEAD);
+        cvs.checkout(workdir, CvsRevision.HEAD, null);
 
         // check that the selected files exist.
         assertTrue(new File(workdir, module + "/file1.txt").exists());
@@ -534,14 +534,14 @@ public class CvsWorkerTest extends PulseTestCase
 
         // checkout is required first.    2006.05.10.13.33.54
         CvsRevision byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-05-10 13:33:00 GMT"));
-        cvs.checkout(workdir, byDate);
+        cvs.checkout(workdir, byDate, null);
 
         // verify that file x is not there.
         File x = new File(workdir, module + "/file1.txt");
         assertFalse(x.exists());
 
         // cvs update to a specific date.
-        cvs.update(workdir, CvsRevision.HEAD);
+        cvs.update(workdir, CvsRevision.HEAD, null);
 
         // verify that file x is now there.
         assertTrue(x.exists());
@@ -554,14 +554,14 @@ public class CvsWorkerTest extends PulseTestCase
 
         // checkout is required first.    2006.05.10.13.33.54
         CvsRevision byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-05-10 13:33:00 GMT"));
-        cvs.checkout(workdir, byDate);
+        cvs.checkout(workdir, byDate, null);
 
         // verify that file x is not there.
         File x = new File(workdir, module + "/file1.txt");
         assertFalse(x.exists());
 
         // cvs update to a specific date.
-        cvs.update(workdir, new CvsRevision(null, null, null, SERVER_DATE.parse("2006-05-10 13:34:00 GMT")));
+        cvs.update(workdir, new CvsRevision(null, null, null, SERVER_DATE.parse("2006-05-10 13:34:00 GMT")), null);
 
         // verify that file x is now there.
         assertTrue(x.exists());
@@ -581,7 +581,7 @@ public class CvsWorkerTest extends PulseTestCase
         CvsRevision tag = new CvsRevision(null, tagName, null, null);
         try
         {
-            cvs.checkout(workdir, tag);
+            cvs.checkout(workdir, tag, null);
             fail();
         }
         catch (SCMException e)
@@ -596,7 +596,7 @@ public class CvsWorkerTest extends PulseTestCase
         cvs.tag(CvsRevision.HEAD, tagName, false);
 
         // checkout by tag and verify that the expected content is there.
-        cvs.checkout(workdir, tag);
+        cvs.checkout(workdir, tag, null);
         assertTrue(new File(baseCheckoutDir, "file.txt").exists());
     }
 
@@ -611,7 +611,7 @@ public class CvsWorkerTest extends PulseTestCase
 
         // checkout to ensure that the tag has been created.
         CvsRevision tag = new CvsRevision(null, tagName, null, null);
-        cvs.checkout(workdir, tag);
+        cvs.checkout(workdir, tag, null);
 
         FileSystemUtils.cleanOutputDir(workdir);
 
@@ -620,7 +620,7 @@ public class CvsWorkerTest extends PulseTestCase
 
         // ensure that tag contains nothing.
         tag = new CvsRevision(null, tagName, null, null);
-        cvs.checkout(workdir, tag);
+        cvs.checkout(workdir, tag, null);
         // because we have created the tag in the past, the subsequent checkout will succeed, but should
         // generate an empty checkout directory.
         assertFalse(new File(workdir, module + "/file.txt").exists());

@@ -22,6 +22,7 @@ import com.zutubi.pulse.services.SlaveStatus;
 import junit.framework.TestCase;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -700,7 +701,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void update(File workDir, Revision rev) throws SCMException
+        public void update(File workDir, Revision rev, List<Change> changes) throws SCMException
         {
             throw new RuntimeException("Method not implemented.");
         }
@@ -713,6 +714,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public void tag(Revision revision, String name, boolean moveExisting) throws SCMException
         {
             throw new RuntimeException("Method not implemented");
+        }
+
+        public void writeConnectionDetails(File outputDir) throws SCMException, IOException
+        {
+            throw new RuntimeException("Method not implemented.");
         }
     }
 

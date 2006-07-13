@@ -2,10 +2,13 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMException;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <class-comment/>
@@ -17,11 +20,13 @@ public class UpdateBootstrapper extends ScmBootstrapper
         super(scm, revision);
     }
 
-    void bootstrap(File workDir)
+    List<Change> bootstrap(File workDir)
     {
+        List<Change> changes = new LinkedList<Change>();
         try
         {
-            scm.createServer().update(workDir, revision.getRevision());
+            scm.createServer().update(workDir, revision.getRevision(), changes);
+            return changes;
         }
         catch (SCMException e)
         {

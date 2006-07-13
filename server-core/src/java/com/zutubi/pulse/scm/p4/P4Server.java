@@ -9,6 +9,7 @@ import com.zutubi.pulse.scm.CachingSCMServer;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMFileCache;
 import com.zutubi.pulse.scm.ScmFilepathFilter;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -1019,7 +1020,7 @@ public class P4Server extends CachingSCMServer
         return false;
     }
 
-    public void update(File workDir, Revision rev) throws SCMException
+    public void update(File workDir, Revision rev, List<Change> changes) throws SCMException
     {
         throw new RuntimeException("nyi");
     }
@@ -1054,6 +1055,15 @@ public class P4Server extends CachingSCMServer
         {
             deleteClient(clientName);
         }
+    }
+
+    public void writeConnectionDetails(File outputDir) throws SCMException, IOException
+    {
+        P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_INFO);
+        FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
+
+        result = runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
+        FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
     }
 
     public boolean labelExists(String client, String name) throws SCMException

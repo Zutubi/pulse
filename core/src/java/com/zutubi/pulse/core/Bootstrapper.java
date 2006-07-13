@@ -7,6 +7,6 @@ public interface Bootstrapper
 {
     /**
      */
-    void bootstrap(RecipePaths paths) throws BuildException;
+    void bootstrap(CommandContext context) throws BuildException;
 
 }

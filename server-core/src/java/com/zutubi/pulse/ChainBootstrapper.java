@@ -1,9 +1,8 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.core.CommandContext;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -20,11 +19,11 @@ public class ChainBootstrapper implements Bootstrapper
         this.bootstrappers.addAll(Arrays.asList(bootstrappers));
     }
 
-    public void bootstrap(RecipePaths paths) throws BuildException
+    public void bootstrap(CommandContext context) throws BuildException
     {
         for (Bootstrapper bootstrapper : bootstrappers)
         {
-            bootstrapper.bootstrap(paths);
+            bootstrapper.bootstrap(context);
         }
     }
 

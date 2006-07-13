@@ -18,6 +18,7 @@ import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -156,11 +157,12 @@ public class CvsServer extends CachingSCMServer
      *
      * @param workingDirectory
      * @param rev
+     * @param changes
      */
-    public void update(File workingDirectory, Revision rev) throws SCMException
+    public void update(File workingDirectory, Revision rev, List<Change> changes) throws SCMException
     {
         assertRevisionArgValid(rev);
-        cvs.update(workingDirectory, (CvsRevision) rev);
+        cvs.update(workingDirectory, (CvsRevision) rev, changes);
     }
 
     /**
@@ -179,11 +181,34 @@ public class CvsServer extends CachingSCMServer
         cvs.tag((CvsRevision) revision, name, moveExisting);
     }
 
+    public void writeConnectionDetails(File outputDir) throws SCMException, IOException
+    {
+        Properties props = new Properties();
+        props.put("root", cvs.getRoot());
+        if(cvs.getBranch() != null)
+        {
+            props.put("branch", cvs.getBranch());
+        }
+
+        props.put("module", cvs.getModule());
+
+        FileOutputStream os = null;
+        try
+        {
+            os = new FileOutputStream(new File(outputDir, "cvs.properties"));
+            props.store(os, "CVS connection properties");
+        }
+        finally
+        {
+            IOUtils.close(os);
+        }
+    }
+
     public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
     {
         assertRevisionArgValid(revision);
 
-        cvs.checkout(toDirectory, (CvsRevision)revision);
+        cvs.checkout(toDirectory, (CvsRevision)revision, changes);
 
         return revision;
     }
@@ -205,7 +230,7 @@ public class CvsServer extends CachingSCMServer
         {
             tmpDir = createTemporaryDirectory();
 
-            cvs.checkout(tmpDir, (CvsRevision)revision, file);
+            cvs.checkoutFile(tmpDir, (CvsRevision)revision, file);
 
             // read checked out file.
             File checkedOutFile = new File(tmpDir, file);
@@ -419,7 +444,7 @@ public class CvsServer extends CachingSCMServer
 
             try
             {
-                cvs.checkout(tmpDir, CvsRevision.HEAD, getModule());
+                cvs.checkoutFile(tmpDir, CvsRevision.HEAD, getModule());
             }
             catch (SCMException e)
             {
