@@ -8,8 +8,19 @@
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
     <!-- Token manager required for scripted access to the remote api. -->
-    <bean id="tokenManager" class="com.zutubi.pulse.api.TokenManager" autowire="byName" init-method="init"/>
-
+    <bean id="adminTokenManager" class="com.zutubi.pulse.api.AdminTokenManager" autowire="byName" init-method="init">
+        <property name="configRoot">
+            <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName">
+                    <value>configurationManager</value>
+                </property>
+                <property name="propertyPath">
+                    <value>systemPaths.configRoot</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+    
     <!-- TODO: services should register themselves with the shutdown manager as they are started. -->
     <!--
     the shutdown manager at this point only needs to shutdown jetty.

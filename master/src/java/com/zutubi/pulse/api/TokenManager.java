@@ -4,7 +4,6 @@ import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.util.logging.Logger;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
@@ -19,14 +18,13 @@ import java.util.TreeSet;
 /**
  *
  */
-public class TokenManager extends AdminTokenManager
+public class TokenManager
 {
-    private static final Logger LOG = Logger.getLogger(TokenManager.class);
-
     private int loginCount = 0;
     private Set<String> validTokens = new TreeSet<String>();
     private UserManager userManager;
     private PasswordEncoder passwordEncoder;
+    private AdminTokenManager adminTokenManager;
 
     public synchronized String login(String username, String password) throws AuthenticationException
     {
@@ -92,6 +90,7 @@ public class TokenManager extends AdminTokenManager
 
     public void verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException
     {
+        // if the token is the admin token, then we are happy.
         if(checkAdminToken(token))
         {
             return;
@@ -110,6 +109,11 @@ public class TokenManager extends AdminTokenManager
         }
 
         throw new AuthenticationException("Access denied");
+    }
+
+    private boolean checkAdminToken(String token)
+    {
+        return adminTokenManager != null && adminTokenManager.checkAdminToken(token);
     }
 
     public void loginUser(String token) throws AuthenticationException
@@ -198,6 +202,14 @@ public class TokenManager extends AdminTokenManager
         return DigestUtils.md5Hex(username + ":" + expiryTime + ":" + password);
     }
 
+    private void checkTokenAccessEnabled() throws AuthenticationException
+    {
+        if (userManager == null)
+        {
+            throw new AuthenticationException("Token based login disabled.");
+        }
+    }
+
     /**
      * Required resource.
      *
@@ -218,12 +230,13 @@ public class TokenManager extends AdminTokenManager
         this.passwordEncoder = passwordEncoder;
     }
 
-    private void checkTokenAccessEnabled() throws AuthenticationException
+    /**
+     * Required resource.
+     *
+     * @param adminTokenManager
+     */
+    public void setAdminTokenManager(AdminTokenManager adminTokenManager)
     {
-        if (userManager == null)
-        {
-            throw new AuthenticationException("Token based login disabled.");
-        }
+        this.adminTokenManager = adminTokenManager;
     }
-
 }

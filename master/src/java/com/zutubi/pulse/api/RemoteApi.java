@@ -18,7 +18,9 @@ import java.util.Vector;
  */
 public class RemoteApi
 {
+    private AdminTokenManager adminTokenManager;
     private TokenManager tokenManager;
+
     private ShutdownManager shutdownManager;
     private BuildManager buildManager;
     private ProjectManager projectManager;
@@ -187,9 +189,19 @@ public class RemoteApi
 
     public boolean shutdown(String token, boolean force) throws AuthenticationException
     {
+        // check the tokenmanager. If we have one, then lets us it. If not, then its very early in
+        // the setup process, so fallback to the admin token manager.
+        if (tokenManager != null)
+        {
+            tokenManager.verifyAdmin(token);
+        }
+        else
+        {
+            adminTokenManager.checkAdminToken(token);
+        }
+
         // Sigh ... this is tricky, because if we shutdown here Jetty dies
         // before this request is complete and the client gets an error :-|.
-        tokenManager.verifyAdmin(token);
         shutdownManager.delayedShutdown(force);
         return true;
     }
@@ -277,6 +289,11 @@ public class RemoteApi
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setAdminTokenManager(AdminTokenManager adminTokenManager)
+    {
+        this.adminTokenManager = adminTokenManager;
     }
 
     private Project getProject(String projectName)
