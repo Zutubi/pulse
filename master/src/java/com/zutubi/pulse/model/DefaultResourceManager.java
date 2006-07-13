@@ -82,6 +82,11 @@ public class DefaultResourceManager implements ResourceManager
         }
     }
 
+    public List<PersistentResource> findAll()
+    {
+        return resourceDao.findAll();
+    }
+
     public List<PersistentResource> findBySlave(Slave slave)
     {
         return resourceDao.findAllBySlave(slave);

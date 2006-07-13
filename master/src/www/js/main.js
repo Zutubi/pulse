@@ -98,13 +98,23 @@ function submitenter(field, evt)
     }
 }
 
-// Function for opening an SCM browse window used on several forms\
+// Function for opening an SCM browse window used on several forms.
 //   - selectDir: set to true for selecting a directory, false for a file
 //   - elementId: ID of textbox to set the value of to the selected path
 //   - extraArgs: optional extra arguments for param string (e.g. "&prefix=foo")
 function openBrowseWindow(selectDir, elementId, extraArgs)
 {
     var browseWindow = window.open("/popups/browseScm.action?selectDir=" + selectDir + "&elementId=" + elementId + extraArgs, "browse scm", 'status=yes,resizable=yes,top=100,left=100,width=600,height=600,scrollbars=yes');
+    browseWindow.opener = self;
+    browseWindow.focus();
+}
+
+// Function for opening a resource browse window used on several forms.
+//   - resourceId: ID of textbox to to receive the resource name
+//   - versionId: ID of textbox to receive the resource version
+function openResourceBrowser(resourceId, versionId)
+{
+    var browseWindow = window.open("/popups/browseResources.action?resourceId=" + resourceId + "&versionId=" + versionId, "resource browser", 'status=yes,resizable=yes,top=100,left=100,width=600,height=600,scrollbars=yes');
     browseWindow.opener = self;
     browseWindow.focus();
 }

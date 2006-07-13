@@ -16,4 +16,6 @@ public interface ResourceManager extends EntityManager<PersistentResource>
     DatabaseResourceRepository getSlaveRepository(Slave slave);
 
     void addDiscoveredResources(Slave slave, List<Resource> resources);
+
+    List<PersistentResource> findAll();
 }
