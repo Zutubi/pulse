@@ -1468,18 +1468,20 @@
     #else
         <li class="dir-artifact"><span onclick="toggleFolderList('art_${artifact.id}');"><img alt="toggle" id="art_${artifact.id}_image" src="/images/treeview/o.gif"/>
     #end
-    #if($hasIndex)
+    #if($hasIndex && $showArtifactLink)
         <a href="/view/$result.id/$artifact.id/$action.escapeSpaces($artifact.name)/">
     #end
             $!webwork.htmlEncode($artifact.name)
-    #if($hasIndex)
+    #if($hasIndex && $showArtifactLink)
         </a>
     #else
         </span>
     #end
 
+    #if($showArtifactLink)
         <a class="unadorned" href="downloadDirectoryArtifact.action?commandId=$result.id&amp;id=$artifact.id"><img alt="archive" src="/images/compress.gif"></a>
-
+    #end
+    
     #if(!$hasIndex)
         <ul id="art_${artifact.id}">
         #foreach($fileArtifact in $artifact.children)
