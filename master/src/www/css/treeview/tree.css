@@ -85,6 +85,10 @@
     background-position:5px;
     background-repeat:no-repeat;
 
+    /* position the toolbar item in the middle of the toolbar. */
+    position:relative;
+    top:5px;
+
     /* an invisible border that acts as the placeholder for the 'selected' border. */
     border-width:1px;
     border-style:solid;
@@ -93,11 +97,12 @@
     float:left;
 }
 
-#zttb {
-    padding-bottom:5px;
+#toolbar {
+    /* give the toolbar items some space */
+    height:38px;
 }
 
-#zttb .selected {
+#toolbar .selected {
     background-color:#B5BED6;
     border-color:blue;
 }
@@ -138,7 +143,6 @@
 
 #view {
     cursor:default;
-    clear:both;
 }
 
 /*---( Tooltip styles)---*/

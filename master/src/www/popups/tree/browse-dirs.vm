@@ -168,8 +168,10 @@
                 };
 
                 // load the root nodes for the file system, then draw and open the tree.
+                Element.show($('loading'));
                 ls(tree.getRoot(), function()
                 {
+                    Element.hide($('loading'));
                     tree.draw();
                     tree.expandToPath(getFormValue());
                 });
@@ -368,17 +370,21 @@
 </head>
 
 <body>
-    <div>
-        <p>
+    <!-- banner -->
+    <div style="padding-bottom:10px;">
+        <div style="float:left;">
             <b>Select pulse data directory</b>
             <br/>
             All pulse data files will be stored in this directory.
-        </p>
+        </div>
+        <div id="loading" style="float:right;display:none;"><img src="/images/treeview/loading.gif" alt="loading..."/></div>
+        <div style="clear:both;"></div>
     </div>
 
-    <div id="toolbar">
-    </div>
+    <!--toolbar-->
+    <div id="toolbar"></div>
 
+    <!--directory view-->
     <div class="viewport bordered" id="view">
         <div id="browseTree"></div>
     </div>

@@ -3,12 +3,22 @@ ZUTUBI.widget.Toolbar = function(id)
     this.initialize(id);
 }
 
+ZUTUBI.widget.Toolbar.toolbars = {};
+
+ZUTUBI.widget.Toolbar.getToolbar = function(id)
+{
+    return ZUTUBI.widget.Toolbar.toolbars[id];
+}
+
 ZUTUBI.widget.Toolbar.prototype = {
 
     initialize: function(id)
     {
         this.id = id;
         this.tools = [];
+
+        // register this toolbar with the global list.
+        ZUTUBI.widget.Toolbar.toolbars[id] = this;
     },
 
     getToolByIndex: function(index)
@@ -16,9 +26,11 @@ ZUTUBI.widget.Toolbar.prototype = {
         return this.tools[index];
     },
 
-    add: function(tool)
+    add: function(item)
     {
-        this.tools[this.tools.length] = tool;
+        this.tools[this.tools.length] = item;
+        // add a reference to the owning toolbar to the toolbar item.
+        item.toolbar = this;
     },
 
     draw: function()
@@ -36,7 +48,9 @@ ZUTUBI.widget.Toolbar.prototype = {
     {
         var sb = [];
 
-        sb[sb.length] = '<div id="'+this.getElId()+'">';
+        sb[sb.length] = '<div';
+        sb[sb.length] = ' id="'+this.getElId()+'"';
+        sb[sb.length] = '>';
 
         // draw icons.
         $A(this.tools).each(function(toolbarItem)
@@ -66,6 +80,8 @@ ZUTUBI.widget.ToolbarItem.prototype = {
 
     enabled:true,
 
+    toolbar:null,
+
     initialize: function(id)
     {
         this.id = id;
@@ -76,6 +92,10 @@ ZUTUBI.widget.ToolbarItem.prototype = {
         this.tooltip = null;
     },
 
+    /**
+     * onClick callback. This callback should be implemented with functionality that you want
+     * triggered when this toolbar item is clicked.
+     */
     onClick: function(me)
     {
     },
@@ -209,10 +229,10 @@ ZUTUBI.widget.ToolbarSeparator.prototype = {
     getHtml: function()
     {
         var sb = [];
-        sb[sb.length] = '<td';
+        sb[sb.length] = '<div';
         sb[sb.length] = ' class="' + this.getToolStyle() + '"';
         sb[sb.length] = '>';
-        sb[sb.length] = '</td>';
+        sb[sb.length] = '</div>';
         return sb.join("");
     }
 };
