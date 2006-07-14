@@ -1648,6 +1648,41 @@
     #end
 #end
 
+#
+# Shows a table with recent builds for a project
+#
+#macro(projectRecentBuilds $id $key $recentBuilds)
+    <table id="$id" class="content">
+        #headingRow($key 10)
+        <tr>
+            #contentHeading("build.id" 1)
+            #contentHeading("build.spec" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.reason" 1)
+            #contentHeading("build.tests" 1)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
+            #contentHeading("actions" 2)
+        </tr>
+
+    #foreach($buildResult in $recentBuilds)
+        <tr>
+            #set($cssClass = $buildResult.state.string)
+
+            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
+            #classCell($buildResult.buildSpecification)
+            #statusCell($buildResult)
+            #classCell($buildResult.reason.summary)
+            #testResultsCell($buildResult false $buildResult)
+            #dateClassCell($buildResult)
+            #classCell($buildResult.stamps.prettyElapsed)
+            #viewCell($project $buildResult)
+            #changesCell($project $buildResult)
+        </tr>
+    #end
+    </table>
+#end
+
 #macro( contactPointIcon $contact)
     #if ($contact.class.name == 'com.zutubi.pulse.model.EmailContactPoint')<img alt="email" src="/images/email_16.png"/>#end
     #if ($contact.class.name == 'com.zutubi.pulse.model.YahooContactPoint')<img alt="jabber" src="/images/yahoo_16.png"/>#end
@@ -1682,7 +1717,7 @@
             #contentHeading("build.status" 2)
             #contentHeading("build.reason" 1)
             #contentHeading("build.tests" 1)
-            #contentHeading("last.built" 1)
+            #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
             #contentHeading("actions" 2)
         </tr>

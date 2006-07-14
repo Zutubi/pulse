@@ -18,35 +18,7 @@
         #if($recentBuilds.size() > 0)
             <h2 class="section">#wwtext("name=recent.builds")</h2>
 
-            <table class="content">
-                #headingRow("recent.builds" 10)
-                <tr>
-                    #contentHeading("build.id" 1)
-                    #contentHeading("build.spec" 1)
-                    #contentHeading("build.status" 2)
-                    #contentHeading("build.reason" 1)
-                    #contentHeading("build.tests" 1)
-                    #contentHeading("build.when" 1)
-                    #contentHeading("build.elapsed" 1)
-                    #contentHeading("actions" 2)
-                </tr>
-
-            #foreach($buildResult in $recentBuilds)
-                <tr>
-                    #set($cssClass = $buildResult.state.string)
-
-                    <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
-                    #classCell($buildResult.buildSpecification)
-                    #statusCell($buildResult)
-                    #classCell($buildResult.reason.summary)
-                    #testResultsCell($buildResult false $buildResult)
-                    #dateClassCell($buildResult)
-                    #classCell($buildResult.stamps.prettyElapsed)
-                    #viewCell($project $buildResult)
-                    #changesCell($project $buildResult)
-                </tr>
-            #end
-            </table>
+            #projectRecentBuilds("recent.builds" "recent.builds" $recentBuilds)
         #end
 
             <h2 class="section">#wwtext("name=latest.changes")</h2>

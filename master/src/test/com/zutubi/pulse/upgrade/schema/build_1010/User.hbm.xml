@@ -38,7 +38,7 @@
             <element type="string" column="ALIAS" not-null="true"/>
         </bag>
 
-        <bag name="projects" lazy="true">
+        <bag name="hiddenProjects" lazy="true">
             <key column="USER_ID"/>
             <one-to-many class="com.zutubi.pulse.model.Project"/>
         </bag>

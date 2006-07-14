@@ -32,6 +32,8 @@
                 <ref local="relativePath"/>
                 <ref local="retainWorkingCopy"/>
                 <ref local="triggerForce"/>
+                <ref local="schemaUpgrade0101002"/>
+                <ref local="dashboardProjects"/>
             </list>
         </property>
     </bean>
@@ -149,4 +151,17 @@
         <property name="buildNumber" value="101000002"/>
     </bean>
 
+    <bean id="schemaUpgrade0101002" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="101001001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0101001001/Project.hbm.xml</value>
+                <value>com/zutubi/pulse/upgrade/schema/build_0101001001/User.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="dashboardProjects" class="com.zutubi.pulse.upgrade.tasks.DashboardProjectsUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="101001002"/>
+    </bean>
 </beans>

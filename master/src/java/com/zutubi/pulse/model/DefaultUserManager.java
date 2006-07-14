@@ -9,6 +9,7 @@ import org.acegisecurity.userdetails.UsernameNotFoundException;
 import org.springframework.dao.DataAccessException;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 
@@ -41,9 +42,9 @@ public class DefaultUserManager implements UserManager
         contactPointDao.save(contact);
     }
 
-    public List<Project> getDashboardProjects(User user)
+    public Set<Project> getHiddenProjects(User user)
     {
-        return userDao.getProjects(user);
+        return userDao.getHiddenProjects(user);
     }
 
     public void addUser(User newUser, boolean grantAdminPermissions)

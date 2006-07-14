@@ -1,7 +1,61 @@
-    #recentBuilds($projects false "configure.dashboard.projects" "/user/configureDashboardProjects!input.action" "pencil.gif")
+<a style="float: right" href="/user/configureDashboardProjects!input.action">
+    <img alt=configure" src="/images/pencil.gif"/> #wwtext("name=configure.dashboard.projects")
+</a>
+<h2 class="section">#wwtext("name=my.projects")</h2>
+
+    <table id="$id" class="content">
+#foreach($project in $projects)
+    #set($index = $velocityCount - 1)
+    #set($recentBuilds = $latestBuilds.get($index))
+        <tr>
+            <th class="heading" colspan="11">
+                <span class="action">
+                    <a href="/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
+                </span>
+                <a href="/currentBuild.action?id=$project.id" class="unadorned">
+                    <img alt="home" src="/images/house.gif">
+                </a>
+                $!webwork.htmlEncode($project.name)
+            </th>
+        </tr>
+        <tr>
+            #contentHeading("build.id" 1)
+            #contentHeading("build.spec" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.reason" 1)
+            #contentHeading("build.tests" 1)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
+            #contentHeading("actions" 2)
+        </tr>
+    #if($recentBuilds.size() > 0)
+        #foreach($buildResult in $recentBuilds)
+        <tr>
+            #set($cssClass = $buildResult.state.string)
+
+            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
+            #classCell($buildResult.buildSpecification)
+            #statusCell($buildResult)
+            #classCell($buildResult.reason.summary)
+            #testResultsCell($buildResult false $buildResult)
+            #dateClassCell($buildResult)
+            #classCell($buildResult.stamps.prettyElapsed)
+            #viewCell($project $buildResult)
+            #changesCell($project $buildResult)
+        </tr>
+        #end
+    #else
+        <tr>
+            <td class="content" colspan="11">#wwtext("name=never.built")</td>
+        </tr>
+    #end
+#end
+    </table>
+
+<h2 class="section">#wwtext("name=my.changes")</h2>
 
     <table class="content">
-        #headingRow("my.changes" 5)
+        #headingRow("my.latest.changes" 5)
         <tr>
             #contentHeading("change.revision" 1)
             #contentHeading("change.when" 1)

@@ -13,23 +13,35 @@ import java.util.*;
  */
 public class ConfigureDashboardProjectsAction extends UserActionSupport
 {
-    private boolean enableSelection = false;
+    private int buildCount;
     private Map<Long, String> allProjects;
     private List<Long> projects;
     private ProjectManager projectManager;
 
-    public boolean isEnableSelection()
+    public int getBuildCount()
     {
-        return enableSelection;
+        return buildCount;
     }
 
-    public void setEnableSelection(boolean enableSelection)
+    public void setBuildCount(int buildCount)
     {
-        this.enableSelection = enableSelection;
+        this.buildCount = buildCount;
     }
 
     public Map<Long, String> getAllProjects()
     {
+        if(allProjects == null)
+        {
+            List<Project> all = projectManager.getAllProjects();
+            Collections.sort(all, new NamedEntityComparator());
+            allProjects = new LinkedHashMap<Long, String>();
+
+            for(Project p: all)
+            {
+                allProjects.put(p.getId(), p.getName());
+            }
+        }
+
         return allProjects;
     }
 
@@ -61,18 +73,13 @@ public class ConfigureDashboardProjectsAction extends UserActionSupport
             return ERROR;
         }
 
-        enableSelection = !user.getShowAllProjects();
+        buildCount = user.getDashboardBuildCount();
+
         List<Project> all = projectManager.getAllProjects();
-        Collections.sort(all, new NamedEntityComparator());
-        allProjects = new LinkedHashMap<Long, String>();
-
-        for(Project p: all)
-        {
-            allProjects.put(p.getId(), p.getName());
-        }
-
+        Set<Project> hidden = user.getHiddenProjects();
+        all.removeAll(hidden);
         projects = new LinkedList<Long>();
-        for(Project p: getUserManager().getDashboardProjects(user))
+        for(Project p: all)
         {
             projects.add(p.getId());
         }
@@ -91,25 +98,17 @@ public class ConfigureDashboardProjectsAction extends UserActionSupport
         setUserLogin(login);
 
         User user = getUser();
-        user.setShowAllProjects(!enableSelection);
+
+        user.setDashboardBuildCount(buildCount);
         user.clearProjects();
-        if(enableSelection)
+
+        List<Project> all = projectManager.getAllProjects();
+        for(Project p: all)
         {
-            if(projects != null)
+            if(projects == null || !projects.contains(p.getId()))
             {
-                for(Long id: projects)
-                {
-                    Project p = projectManager.getProject(id);
-                    if(p != null)
-                    {
-                        user.addProject(p);
-                    }
-                }
+                user.addHiddenProject(p);
             }
-        }
-        else
-        {
-            user.setShowAllProjects(true);
         }
 
         getUserManager().save(user);

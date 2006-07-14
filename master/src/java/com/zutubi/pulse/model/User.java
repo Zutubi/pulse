@@ -4,10 +4,7 @@ import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.web.DefaultAction;
 import org.acegisecurity.userdetails.UserDetails;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 
@@ -17,6 +14,7 @@ public class User extends Entity implements UserDetails
 {
     public static int REFRESH_DISABLED = 0;
 
+    private static final String PROPERTY_DASHBOARD_BUILD_COUNT = "user.dashboardBuildCount";
     private static final String PROPERTY_LDAP_AUTHENTICATION = "user.ldapAuthentication";
 
     /**
@@ -45,9 +43,9 @@ public class User extends Entity implements UserDetails
     private List<ContactPoint> contactPoints;
 
     /**
-     * List of projects the user wants to display on their dashboard.
+     * List of projects the user wants to hide from their dashboard.
      */
-    private List<Project> projects = new LinkedList<Project>();
+    private Set<Project> hiddenProjects = new HashSet<Project>();
 
     private List<GrantedAuthority> authorities;
 
@@ -58,7 +56,6 @@ public class User extends Entity implements UserDetails
      * may be interacting with (e.g. SCMs).
      */
     private List<String> aliases;
-
 
     public User()
     {
@@ -328,24 +325,24 @@ public class User extends Entity implements UserDetails
         return aliases.contains(alias);
     }
 
-    public List<Project> getProjects()
+    public Set<Project> getHiddenProjects()
     {
-        return projects;
+        return hiddenProjects;
     }
 
-    public void setProjects(List<Project> projects)
+    public void setHiddenProjects(Set<Project> hiddenProjects)
     {
-        this.projects = projects;
+        this.hiddenProjects = hiddenProjects;
     }
 
-    public void addProject(Project p)
+    public void addHiddenProject(Project p)
     {
-        projects.add(p);
+        hiddenProjects.add(p);
     }
 
     public void clearProjects()
     {
-        projects = new LinkedList<Project>();
+        hiddenProjects.clear();
     }
 
     public void setProperties(Map<String, String> props)
@@ -397,23 +394,6 @@ public class User extends Entity implements UserDetails
     }
 
     /**
-     * If true, show all projects on the user's dashboard.
-     */
-    public boolean getShowAllProjects()
-    {
-        if (hasProperty("user.showAllProjects"))
-        {
-            return Boolean.valueOf(getProperty("user.showAllProjects"));
-        }
-        return true;
-    }
-
-    public void setShowAllProjects(boolean showAllProjects)
-    {
-        setProperty("user.showAllProjects", Boolean.toString(showAllProjects));
-    }
-
-    /**
      * Number of seconds between refreshes of "live" content, or 0 if the
      * user disables refreshing.
      */
@@ -429,6 +409,20 @@ public class User extends Entity implements UserDetails
     public void setRefreshInterval(int refreshInterval)
     {
         setProperty("user.refreshInterval", Integer.toString(refreshInterval));
+    }
+
+    public int getDashboardBuildCount()
+    {
+        if (hasProperty(PROPERTY_DASHBOARD_BUILD_COUNT))
+        {
+            return Integer.valueOf(getProperty(PROPERTY_DASHBOARD_BUILD_COUNT));
+        }
+        return 2;
+    }
+
+    public void setDashboardBuildCount(int buildCount)
+    {
+        setProperty(PROPERTY_DASHBOARD_BUILD_COUNT, Integer.toString(buildCount));
     }
 
     public boolean getLdapAuthentication()

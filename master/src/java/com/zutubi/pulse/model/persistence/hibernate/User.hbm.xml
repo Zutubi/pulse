@@ -21,8 +21,6 @@
 
         <property name="refreshInterval" type="int"/>
 
-        <property name="showAllProjects" type="boolean"/>
-        
         <map name="properties" table="USER_PROPS">
             <key column="USER_ID"/>
             <index column="KEY" type="string" length="1000"/>
@@ -44,10 +42,10 @@
             <element type="string" column="ALIAS" not-null="true"/>
         </bag>
 
-        <bag name="projects" lazy="true">
+        <set name="hiddenProjects" table="USER_HIDDEN_PROJECTS" lazy="true" cascade="save-update">
             <key column="USER_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.Project"/>
-        </bag>
+            <many-to-many class="com.zutubi.pulse.model.Project" column="PROJECT_ID"/>
+        </set>
     </class>
 
     <class name="com.zutubi.pulse.model.GrantedAuthority" table="AUTHORITIES" lazy="false">

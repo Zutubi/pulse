@@ -3,6 +3,7 @@ package com.zutubi.pulse.model;
 import org.acegisecurity.userdetails.UserDetailsService;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 
@@ -56,13 +57,13 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
     int getUserCount();
 
     /**
-     * Returns a list of projects configured by the user to show on their
+     * Returns a list of projects configured by the user to hide from their
      * dashboard.
      *
      * @param user user to get the projects for
-     * @return the user's projects
+     * @return the user's hidden projects
      */
-    List<Project> getDashboardProjects(User user);
+    Set<Project> getHiddenProjects(User user);
 
     void setPassword(User user, String rawPassword);
 

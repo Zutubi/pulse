@@ -11,15 +11,11 @@
 
 #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=configureDashboardProjects.action" "heading=%{getText('dashboard.projects')}" "width=400px" "id=dashboard.projects" "method=post")
-    #wwccheckbox("name=enableSelection" "label=%{getText('dashboard.projects.selection')}" "fieldValue=true" "onclick=setEnableState('dashboard.projects_projects', 'dashboard.projects_enableSelection')" "tabindex=1")
-    #wwselect("name=projects" "label=%{getText('dashboard.projects.projects')}" "cssStyle=width: 100%" "labelposition=top" "list=allProjects" "multiple=true" "size=20" "width=200" "tabindex=2")
+#wwcform("action=configureDashboardProjects.action" "heading=%{getText('dashboard.projects')}" "id=dashboard.projects" "method=post")
+    #wwtextfield("name=buildCount" "label=%{getText('dashboard.build.count')}" "size=4" "tabindex=1")
+    #wwcheckboxlist("name=projects" "label=%{getText('dashboard.projects.projects')}" "labelposition=top" "list=allProjects" "multirow=true" "multiple=true" "tabindex=2")
     #saveCancel(3)
 #end
-
-    <script type="text/javascript">
-        setEnableState('dashboard.projects_projects', 'dashboard.projects_enableSelection');
-    </script>
 
     #tabEnd()
 </body>

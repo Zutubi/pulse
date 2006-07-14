@@ -18,7 +18,7 @@ public class DashboardAction extends ActionSupport
 {
     private User user;
     private List<Project> projects;
-    private List<BuildResult> latestBuilds;
+    private List<List<BuildResult>> latestBuilds;
     private List<Changelist> changelists;
 
     private ProjectManager projectManager;
@@ -36,7 +36,7 @@ public class DashboardAction extends ActionSupport
         return projects;
     }
 
-    public List<BuildResult> getLatestBuilds()
+    public List<List<BuildResult>> getLatestBuilds()
     {
         return latestBuilds;
     }
@@ -59,29 +59,16 @@ public class DashboardAction extends ActionSupport
             return ERROR;
         }
 
-        if(user.getShowAllProjects())
-        {
-            projects = projectManager.getAllProjects();
-        }
-        else
-        {
-            projects = userManager.getDashboardProjects(user);
-        }
-        
-        Collections.sort(projects, new NamedEntityComparator());
-        latestBuilds = new LinkedList<BuildResult>();
+        projects = projectManager.getAllProjects();
+        projects.removeAll(userManager.getHiddenProjects(user));
 
+        Collections.sort(projects, new NamedEntityComparator());
+        latestBuilds = new LinkedList<List<BuildResult>>();
+
+        int buildCount = user.getDashboardBuildCount();
         for (Project p : projects)
         {
-            List<BuildResult> build = buildManager.getLatestBuildResultsForProject(p, 1);
-            if (build.size() == 0)
-            {
-                latestBuilds.add(null);
-            }
-            else
-            {
-                latestBuilds.add(build.get(0));
-            }
+            latestBuilds.add(buildManager.getLatestBuildResultsForProject(p, buildCount));
         }
 
         changelists = buildManager.getLatestChangesForUser(user, 10);

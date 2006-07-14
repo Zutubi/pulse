@@ -1,15 +1,18 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.UserDao;
-import org.hibernate.*;
-import org.hibernate.criterion.Projections;
+import com.zutubi.pulse.util.logging.Logger;
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import java.util.List;
-import com.zutubi.pulse.util.logging.Logger;
+import java.util.Set;
 
 /**
  * 
@@ -64,12 +67,12 @@ public class HibernateUserDao extends HibernateEntityDao<User> implements UserDa
         });
     }
 
-    public List<Project> getProjects(final User user)
+    public Set<Project> getHiddenProjects(final User user)
     {
         User u = (User) getHibernateTemplate().execute(new HibernateCallback(){
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from User user left join fetch user.projects where user.id = :id");
+                Query queryObject = session.createQuery("from User user left join fetch user.hiddenProjects where user.id = :id");
                 queryObject.setParameter("id", user.getId());
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
@@ -78,6 +81,6 @@ public class HibernateUserDao extends HibernateEntityDao<User> implements UserDa
             }
         });
 
-        return u.getProjects();
+        return u.getHiddenProjects();
     }
 }
