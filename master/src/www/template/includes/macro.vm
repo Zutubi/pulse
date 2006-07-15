@@ -825,7 +825,7 @@
 ##
 #macro(viewCell $project $result)
     <td class="content">
-        <a href="viewBuild.action?id=$result.id">#wwtext("name=view")</a>
+        <a href="viewBuild.action?id=$result.id" class="unadorned" title="view summary"><img alt="view summary" src="/images/arrow_45.gif"/></a>
     </td>
 #end
 
@@ -834,7 +834,7 @@
 ##
 #macro(logCell $project $result)
     <td class="content">
-        <a href="viewCommandLog.action?id=$result.id">#wwtext("name=detailed.view")</a>
+        <a href="viewCommandLog.action?id=$result.id" class="unadorned" title="view details"><img alt="view details" src="/images/magnifier.gif"/></a>
     </td>
 #end
 
@@ -843,25 +843,7 @@
 ##
 #macro(changesCell $project $result)
     <td class="content">
-        <a href="viewChanges.action?id=$result.id">#wwtext("name=changes")</a>
-    </td>
-#end
-
-##
-## Outputs an action cell for viewing tests for a build
-##
-#macro(testsCell $project $result)
-    <td class="content">
-        <a href="viewTests.action?id=$result.id">#wwtext("name=tests")</a>
-    </td>
-#end
-
-##
-## Outputs an action cell for viewing the build file for a build
-##
-#macro(buildFileCell $project $result)
-    <td class="content">
-        <a href="viewBuildFile.action?id=$result.id">#wwtext("name=pulse.file")</a>
+        <a href="viewChanges.action?id=$result.id" class="unadorned" title="view changes"><img alt="view changes" src="/images/page_code.gif"/></a>
     </td>
 #end
 
@@ -870,7 +852,7 @@
 ##
 #macro(artifactsCell $project $result)
     <td class="content">
-        <a href="viewBuildArtifacts.action?id=$result.id">#wwtext("name=artifacts")</a>
+        <a href="viewBuildArtifacts.action?id=$result.id" class="unadorned" title="view artifacts"><img alt="view artifacts" src="/images/folder_page.gif"/></a>
     </td>
 #end
 
@@ -879,7 +861,7 @@
 ##
 #macro(workingCopyCell $project $result)
     <td class="content">
-        <a href="browseProjectDir.action?buildId=$result.id&amp;recipeId=$result.root.children.get(0).result.id">#wwtext("name=working.copy")</a>
+        <a href="browseProjectDir.action?buildId=$result.id" class="unadorned" title="working copy"><img alt="view working copy" src="/images/page_gear.gif"/></a>
     </td>
 #end
 
@@ -1159,7 +1141,9 @@
         #testResultsCell($build $recipe $recipe)
         #dateClassCell($recipe)
         #classCell($recipe.stamps.prettyElapsed)
-        #linkCell("stage.log" "tailRecipeLog.action?id=$id&amp;buildId=$build.id")
+        <td class="content">
+            <a href="tailRecipeLog.action?id=$id&amp;buildId=$build.id" class="unadorned" title="view log""><img alt="view log" src="/images/script.gif"/> #wwtext("name=log")  </a>
+        </td>
     </tr>
 #end
 
@@ -1576,7 +1560,7 @@
 ##
 #macro(showBuild $buildResult $showActions $detailedView)
     <table class="content">
-        #headingRow("build.summary" 10)
+        #headingRow("build.summary" 13)
         <tr>
             #contentHeading("build.id" 1)
             #contentHeading("build.spec" 1)
@@ -1586,7 +1570,7 @@
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
     #if($showActions)
-            #contentHeading("actions" 2)
+            #contentHeading("actions" 5)
     #end
         </tr>
         <tr>
@@ -1600,11 +1584,16 @@
             #classCell($buildResult.stamps.prettyElapsed)
     #if($showActions)
             #viewCell($project $buildResult)
+            #logCell($project $buildResult)
             #changesCell($project $buildResult)
+            #artifactsCell($project $buildResult)
+        #acl("domainObject=project" "hasPermission=4,1")
+            #workingCopyCell($project $buildResult)
+        #end
     #end
         </tr>
     #if($detailedView)
-        #directMessages($buildResult 10)
+        #directMessages($buildResult 13)
     #end
     </table>
 
@@ -1653,7 +1642,7 @@
 #
 #macro(projectRecentBuilds $id $key $recentBuilds)
     <table id="$id" class="content">
-        #headingRow($key 10)
+        #headingRow($key 13)
         <tr>
             #contentHeading("build.id" 1)
             #contentHeading("build.spec" 1)
@@ -1662,7 +1651,7 @@
             #contentHeading("build.tests" 1)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 2)
+            #contentHeading("actions" 5)
         </tr>
 
     #foreach($buildResult in $recentBuilds)
@@ -1677,7 +1666,12 @@
             #dateClassCell($buildResult)
             #classCell($buildResult.stamps.prettyElapsed)
             #viewCell($project $buildResult)
+            #logCell($project $buildResult)
             #changesCell($project $buildResult)
+            #artifactsCell($project $buildResult)
+#acl("domainObject=project" "hasPermission=4,1")
+            #workingCopyCell($project $buildResult)
+#end
         </tr>
     #end
     </table>

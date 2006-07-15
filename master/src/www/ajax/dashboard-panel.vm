@@ -8,7 +8,7 @@
     #set($index = $velocityCount - 1)
     #set($recentBuilds = $latestBuilds.get($index))
         <tr>
-            <th class="heading" colspan="11">
+            <th class="heading" colspan="14">
                 <span class="action">
                     <a href="/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
                 </span>
@@ -26,7 +26,7 @@
             #contentHeading("build.tests" 1)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 2)
+            #contentHeading("actions" 5)
         </tr>
     #if($recentBuilds.size() > 0)
         #foreach($buildResult in $recentBuilds)
@@ -41,12 +41,17 @@
             #dateClassCell($buildResult)
             #classCell($buildResult.stamps.prettyElapsed)
             #viewCell($project $buildResult)
+            #logCell($project $buildResult)
             #changesCell($project $buildResult)
+            #artifactsCell($project $buildResult)
+#acl("domainObject=project" "hasPermission=4,1")
+            #workingCopyCell($project $buildResult)
+#end
         </tr>
         #end
     #else
         <tr>
-            <td class="content" colspan="11">#wwtext("name=never.built")</td>
+            <td class="content" colspan="14">#wwtext("name=never.built")</td>
         </tr>
     #end
 #end

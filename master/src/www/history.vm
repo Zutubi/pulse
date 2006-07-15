@@ -28,7 +28,7 @@
             <td>
 
     <table width="100%" class="content">
-        #searchHeadingRow("recent.builds" 14 "searchBuilds.action?projectId=$project.id" "search.builds" "$rssEnabled" "rss.action?projectId=$project.id" "rss.builds" )
+        #searchHeadingRow("recent.builds" 12 "searchBuilds.action?projectId=$project.id" "search.builds" "$rssEnabled" "rss.action?projectId=$project.id" "rss.builds" )
         <tr>
             #contentHeading("build.id" 1)
             #contentHeading("build.status" 2)
@@ -36,7 +36,7 @@
             #contentHeading("build.spec" 1)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 7)
+            #contentHeading("actions" 5)
         </tr>
 #if($history.size() > 0)
     #foreach($buildResult in $history)
@@ -51,8 +51,6 @@
             #viewCell($project $buildResult)
             #logCell($project $buildResult)
             #changesCell($project $buildResult)
-            #testsCell($project $buildResult)
-            #buildFileCell($project $buildResult)
             #artifactsCell($project $buildResult)
 #acl("domainObject=project" "hasPermission=4,1")
             #workingCopyCell($project $buildResult)
