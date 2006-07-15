@@ -19,6 +19,7 @@ import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.MalformedURLException;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -44,6 +45,8 @@ public class DefaultAgentManager implements AgentManager
     private ServerMessagesHandler serverMessagesHandler;
     private ServiceTokenManager serviceTokenManager;
 
+    private ExecutorService pingService = Executors.newCachedThreadPool();
+
     public void init()
     {
         MasterBuildService masterService = new MasterBuildService(masterRecipeProcessor, configurationManager, resourceManager);
@@ -60,11 +63,7 @@ public class DefaultAgentManager implements AgentManager
             slaveAgents = new TreeMap<Long, SlaveAgent>();
             for (Slave slave : slaveManager.getAll())
             {
-                SlaveAgent agent = addSlaveAgent(slave);
-                if(agent != null)
-                {
-                    pingSlave(agent);
-                }
+                addSlaveAgent(slave);
             }
         }
         finally
@@ -73,7 +72,7 @@ public class DefaultAgentManager implements AgentManager
         }
     }
 
-    private SlaveAgent addSlaveAgent(Slave slave)
+    private void addSlaveAgent(Slave slave)
     {
         try
         {
@@ -81,12 +80,11 @@ public class DefaultAgentManager implements AgentManager
             SlaveBuildService buildService = new SlaveBuildService(service, serviceTokenManager, slave, configurationManager, resourceManager);
             SlaveAgent agent = new SlaveAgent(slave, service, serviceTokenManager, buildService);
             slaveAgents.put(slave.getId(), agent);
-            return agent;
+            pingSlave(agent);
         }
         catch (MalformedURLException e)
         {
             LOG.severe("Unable to contact slave '" + slave.getName() + "': " + e.getMessage());
-            return null;
         }
     }
 
@@ -115,34 +113,43 @@ public class DefaultAgentManager implements AgentManager
     {
         if (agent.isEnabled())
         {
-            long currentTime = System.currentTimeMillis();
             Status oldStatus = agent.getStatus();
+
+            FutureTask<SlaveStatus> future = new FutureTask<SlaveStatus>(new Pinger(agent));
+            pingService.execute(future);
+
+            SlaveStatus status;
 
             try
             {
-                int build = agent.getSlaveService().ping();
-                if(build == masterBuildNumber)
-                {
-                    String token = serviceTokenManager.getToken();
-                    SlaveStatus status = agent.getSlaveService().getStatus(token);
-                    agent.pinged(currentTime, status);
-
-                    // If the slave has just come online, run resource
-                    // discovery
-                    if(!oldStatus.isOnline() && status.getStatus().isOnline())
-                    {
-                        List<Resource> resources = agent.getSlaveService().discoverResources(token);
-                        resourceManager.addDiscoveredResources(agent.getSlave(), resources);
-                    }
-                }
-                else
-                {
-                    agent.versionMismatch(currentTime);
-                }
+                status = future.get(10, TimeUnit.SECONDS);
             }
-            catch (Exception e)
+            catch (TimeoutException e)
             {
-                agent.failedPing(currentTime, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
+                status = new SlaveStatus(Status.OFFLINE, "Agent ping timed out");
+            }
+            catch(Exception e)
+            {
+                String message = "Unexpected error pinging agent '" + agent.getName() + "': " + e.getMessage();
+                LOG.warning(message, e);
+                status = new SlaveStatus(Status.OFFLINE, message);
+            }
+
+            agent.updateStatus(status);
+
+            // If the slave has just come online, run resource
+            // discovery
+            if(!oldStatus.isOnline() && status.getStatus().isOnline())
+            {
+                try
+                {
+                    List<Resource> resources = agent.getSlaveService().discoverResources(serviceTokenManager.getToken());
+                    resourceManager.addDiscoveredResources(agent.getSlave(), resources);
+                }
+                catch (Exception e)
+                {
+                    LOG.warning("Unable to discover resource for agent '" + agent.getName() + "': " + e.getMessage(), e);
+                }
             }
 
             if(oldStatus != agent.getStatus())
@@ -152,13 +159,57 @@ public class DefaultAgentManager implements AgentManager
         }
     }
 
+    private class Pinger implements Callable<SlaveStatus>
+    {
+        private SlaveAgent agent;
+
+        public Pinger(SlaveAgent agent)
+        {
+            this.agent = agent;
+        }
+
+        public SlaveStatus call() throws Exception
+        {
+            SlaveStatus status;
+
+            try
+            {
+                int build = agent.getSlaveService().ping();
+                if(build == masterBuildNumber)
+                {
+                    String token = serviceTokenManager.getToken();
+                    status = agent.getSlaveService().getStatus(token);
+                }
+                else
+                {
+                    status = new SlaveStatus(Status.VERSION_MISMATCH);
+                }
+            }
+            catch (Exception e)
+            {
+                status = new SlaveStatus(Status.OFFLINE, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
+            }
+
+            status.setPingTime(System.currentTimeMillis());
+            return status;
+        }
+    }
+
     public List<Agent> getAllAgents()
     {
-        List<Agent> result = new LinkedList<Agent>(slaveAgents.values());
-        Collections.sort(result, new NamedEntityComparator());
+        lock.lock();
+        try
+        {
+            List<Agent> result = new LinkedList<Agent>(slaveAgents.values());
+            Collections.sort(result, new NamedEntityComparator());
 
-        result.add(0, masterAgent);
-        return result;
+            result.add(0, masterAgent);
+            return result;
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     public List<Agent> getOnlineAgents()
@@ -203,6 +254,11 @@ public class DefaultAgentManager implements AgentManager
                 lock.unlock();
             }
         }
+    }
+
+    public void pingSlave(Slave slave)
+    {
+        pingSlave(slaveAgents.get(slave.getId()));
     }
 
     public void slaveAdded(long id)

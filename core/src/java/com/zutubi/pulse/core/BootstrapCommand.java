@@ -18,7 +18,7 @@ import java.util.List;
 public class BootstrapCommand implements Command
 {
     public static final String OUTPUT_NAME = "bootstrap output";
-    public static final String CHANGES_FILE = "changes.txt";
+    public static final String FILES_FILE = "files.txt";
 
     private Bootstrapper bootstrapper;
 

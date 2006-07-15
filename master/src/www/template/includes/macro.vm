@@ -1703,7 +1703,7 @@
 ##
 #macro(recentBuilds $projects $showAdd $actionKey $url $image)
     <table class="content">
-        #actionHeadingRow("latest.builds" 11 $actionKey $url $image "recent.builds")
+        #actionHeadingRow("latest.builds" 14 $actionKey $url $image "recent.builds")
         <tr>
             #contentHeading("project.name" 1)
             #contentHeading("build.id" 1)
@@ -1713,7 +1713,7 @@
             #contentHeading("build.tests" 1)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 2)
+            #contentHeading("actions" 5)
         </tr>
 
     #foreach($project in $projects)
@@ -1734,7 +1734,12 @@
             #dateClassCell($lastResult)
             #classCell($lastResult.stamps.prettyElapsed)
             #viewCell($project $lastResult)
+            #logCell($project $lastResult)
             #changesCell($project $lastResult)
+            #artifactsCell($project $lastResult)
+#acl("domainObject=project" "hasPermission=4,1")
+            #workingCopyCell($project $lastResult)
+#end
         #else
             #contentCell("not.applicable")
             #contentCell("not.applicable")
@@ -1746,12 +1751,15 @@
             #contentCell("not.applicable")
             #contentCell("empty.cell")
             #contentCell("empty.cell")
+            #contentCell("empty.cell")
+            #contentCell("empty.cell")
+            #contentCell("empty.cell")
         #end
         </tr>
     #end
     #if($showAdd)
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-        #addRow("add.project" 11 "addProject!input.action" "project.add")
+        #addRow("add.project" 14 "addProject!input.action" "project.add")
 #end
     #end
         </table>

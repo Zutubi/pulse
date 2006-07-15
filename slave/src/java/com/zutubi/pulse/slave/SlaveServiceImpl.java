@@ -40,6 +40,16 @@ public class SlaveServiceImpl implements SlaveService
 
     public SlaveStatus getStatus(String token)
     {
+        try
+        {
+            serviceTokenManager.validateToken(token);
+        }
+        catch(InvalidTokenException e)
+        {
+            // Respond as status
+            return new SlaveStatus(Status.TOKEN_MISMATCH);
+        }
+
         // Synchronous request
         long recipe = slaveRecipeProcessor.getBuildingRecipe();
         if(recipe != 0)

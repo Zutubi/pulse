@@ -520,7 +520,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private void sendOfflineEvent(Slave slave)
     {
         SlaveAgent a = (SlaveAgent) agentManager.getAgent(slave);
-        a.failedPing(0, "oops");
+        a.updateStatus(new SlaveStatus(Status.OFFLINE, "oops"));
         SlaveAgentRemovedEvent event = new SlaveAgentRemovedEvent(this, a);
         queue.handleEvent(event);
     }
@@ -547,7 +547,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private Agent createAvailableAgent(long type)
     {
         SlaveAgent slaveAgent = new SlaveAgent(createSlave(type), null, null, new MockBuildService(type));
-        slaveAgent.pinged(0, new SlaveStatus(Status.IDLE, 0));
+        slaveAgent.updateStatus(new SlaveStatus(Status.IDLE, 0));
         return slaveAgent;
     }
 
@@ -783,6 +783,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             }
         }
 
+        public void pingSlave(Slave slave)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
         public void pingSlaves()
         {
             throw new RuntimeException("Method not implemented.");
@@ -811,7 +816,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public void addSlave(Slave slave)
         {
             SlaveAgent agent = new SlaveAgent(slave, null, null, new MockBuildService(slave.getId()));
-            agent.pinged(0, new SlaveStatus(Status.IDLE, 0));
+            agent.updateStatus(new SlaveStatus(Status.IDLE, 0));
             onlineAgents.put(slave.getId(), agent);
         }
     }

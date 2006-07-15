@@ -50,7 +50,7 @@ public abstract class ScmBootstrapper implements Bootstrapper
         List<Change> changes = bootstrap(workDir);
         if (changes.size() > 0)
         {
-            writeChanges(changes, new File(outDir, BootstrapCommand.CHANGES_FILE));
+            writeChanges(changes, new File(outDir, BootstrapCommand.FILES_FILE));
         }
 
         try

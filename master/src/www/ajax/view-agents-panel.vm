@@ -1,11 +1,11 @@
 <table class="content">
-    #headingRow("agents" 6)
+    #headingRow("agents" 7)
     <tr>
         #contentHeading("agent.name" 1)
         #contentHeading("agent.location" 1)
         #contentHeading("agent.status" 1)
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-        #contentHeading("actions" 3)
+        #contentHeading("actions" 4)
 #end
     </tr>
 #foreach($agent in $agents)
@@ -19,9 +19,10 @@
     <tr>
         #dynamicLinkCell($agent.name "viewAgentStatus.action${args}")
         #staticCell($agent.location)
-        #staticCell($agent.status.toString().toLowerCase())
+        #staticCell($agent.status.prettyString)
+#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
     #if($agent.isSlave())
-        #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+        #linkCell("agent.ping" "/admin/pingAgent.action?agentId=$agent.id")
         #if($agent.getSlave().isEnabled())
             #linkCell("agent.disable" "/admin/enableAgent.action?agentId=$agent.id&amp;enable=false")
         #else
@@ -29,15 +30,16 @@
         #end
         #editCell("/admin/editAgent!input.action?id=$agent.id" "edit_$!webwork.htmlEncode($agent.name)")
         #deleteCell("delete_$!webwork.htmlEncode($agent.name)" "/admin/deleteAgent.action?id=$agent.id" $confirmMessage)
-        #end
     #else
         #contentCell("empty.cell")
         #contentCell("empty.cell")
         #contentCell("empty.cell")
+        #contentCell("empty.cell")
     #end
+#end
     </tr>
 #end
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-    #addRow("add.agent" 6 "/admin/addAgent!input.action" "agent.add")
+    #addRow("add.agent" 7 "/admin/addAgent!input.action" "agent.add")
 #end
 </table>

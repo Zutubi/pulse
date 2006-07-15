@@ -123,25 +123,6 @@ public class SlaveAgent implements Agent
         lastPingTime = time;
     }
 
-    public void pinged(long time, SlaveStatus slaveStatus)
-    {
-        lastPingTime = time;
-        status = slaveStatus.getStatus();
-    }
-
-    public void versionMismatch(long time)
-    {
-        lastPingTime = time;
-        status = Status.VERSION_MISMATCH;
-    }
-
-    public void failedPing(long time, String message)
-    {
-        lastPingTime = time;
-        pingError = message;
-        status = Status.OFFLINE;
-    }
-
     public String getPingError()
     {
         return pingError;
@@ -160,5 +141,12 @@ public class SlaveAgent implements Agent
     public boolean isAvailable()
     {
         return status == Status.IDLE;
+    }
+
+    public void updateStatus(SlaveStatus status)
+    {
+        lastPingTime = status.getPingTime();
+        this.status = status.getStatus();
+        pingError = status.getMessage();
     }
 }

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.services;
 
+import com.zutubi.pulse.bootstrap.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.bootstrap.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -101,6 +101,26 @@ public class ServiceTokenManagerTest extends PulseTestCase
         assertNull(another.getToken());
         another.init();
         assertEquals(TEST_TOKEN, another.getToken());
+    }
+    
+    public void testTokenRefreshes()
+    {
+        tokenManager.setGenerate(false);
+        tokenManager.init();
+        tokenManager.validateToken(TEST_TOKEN);
+
+        try
+        {
+            tokenManager.validateToken(TEST_TOKEN + "foo");
+            fail();
+        }
+        catch(InvalidTokenException e)
+        {
+        }
+
+        tokenManager.getTokenFile().delete();
+        tokenManager.validateToken(TEST_TOKEN + "foo");
+        assertEquals(TEST_TOKEN + "foo", tokenManager.getToken());
     }
 
     private class MockConfigurationManager implements ConfigurationManager

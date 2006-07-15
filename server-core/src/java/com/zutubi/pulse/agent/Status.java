@@ -38,6 +38,18 @@ public enum Status
                     return false;
                 }
             },
+    TOKEN_MISMATCH
+            {
+                public String getPrettyString()
+                {
+                    return "token mismatch";
+                }
+
+                public boolean isOnline()
+                {
+                    return false;
+                }
+            },
     BUILDING
             {
                 public String getPrettyString()

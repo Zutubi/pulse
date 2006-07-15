@@ -1,9 +1,9 @@
 package com.zutubi.pulse.services;
 
-import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -59,8 +59,29 @@ public class ServiceTokenManager
 
         if(!token.equals(this.token))
         {
+            if(!generate)
+            {
+                // Check if the token file has been remove, we will refresh if so.
+                if(checkRefreshed(token))
+                {
+                    return;
+                }
+            }
             throw new InvalidTokenException();
         }
+    }
+
+    private boolean checkRefreshed(String token)
+    {
+        File tokenFile = getTokenFile();
+        if(!tokenFile.exists())
+        {
+            this.token = token;
+            writeToken();
+            return true;
+        }
+
+        return false;
     }
 
     public String getToken()

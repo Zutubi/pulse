@@ -1126,6 +1126,10 @@
             <result name="success" type="redirect">/viewAgents.action</result>
         </action>
 
+        <action name="pingAgent" class="com.zutubi.pulse.web.agents.PingAgentAction">
+            <result name="success" type="redirect">/viewAgents.action</result>
+        </action>
+
         <action name="deleteAgent" class="com.zutubi.pulse.web.agents.DeleteAgentAction">
             <result name="success" type="redirect">/viewAgents.action</result>
             <result name="error" type="velocity">/generic-error.vm</result>

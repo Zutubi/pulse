@@ -12,11 +12,12 @@ public interface AgentManager
     List<Agent> getOnlineAgents();
     Agent getAgent(Slave slave);
 
-    public void pingSlaves();
+    void pingSlave(Slave slave);
+    void pingSlaves();
 
-    public int getAgentCount();
+    int getAgentCount();
 
-    public void slaveAdded(long id);
-    public void slaveChanged(long id);
-    public void slaveDeleted(long id);
+    void slaveAdded(long id);
+    void slaveChanged(long id);
+    void slaveDeleted(long id);
 }
