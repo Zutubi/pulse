@@ -1,8 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.xwork.spring.SpringObjectFactory;
-import com.zutubi.pulse.license.LicenseException;
-import com.zutubi.pulse.license.LicenseManager;
+import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 
@@ -14,7 +13,6 @@ import java.util.List;
 public class DefaultSetupManager implements SetupManager
 {
     private MasterConfigurationManager configurationManager;
-    private LicenseManager licenseManager;
     private StartupManager startupManager;
     private UserManager userManager;
     private UpgradeManager upgradeManager;
@@ -151,15 +149,8 @@ public class DefaultSetupManager implements SetupManager
 
     private boolean isLicenseRequired()
     {
-        try
-        {
-            // if we are not licensed, then request that a license be provided.
-            return !licenseManager.isLicensed();
-        }
-        catch (LicenseException e)
-        {
-            return true;
-        }
+        // if we are not licensed, then request that a license be provided.
+        return !LicenseHolder.hasAuthorization("canRunPulse");
     }
 
     private boolean isUpgradeRequired()
@@ -210,16 +201,6 @@ public class DefaultSetupManager implements SetupManager
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param licenseManager
-     */
-    public void setLicenseManager(LicenseManager licenseManager)
-    {
-        this.licenseManager = licenseManager;
     }
 
     public void setDaoContexts(List<String> daoContexts)

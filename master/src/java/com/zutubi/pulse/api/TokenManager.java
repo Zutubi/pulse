@@ -31,6 +31,14 @@ public class TokenManager
         return login(username, password, Constants.MINUTE * 30);
     }
 
+    /**
+     * Init method used to initialise any post creation resource requirements.
+     */
+    public void init()
+    {
+
+    }
+
     public synchronized String login(String username, String password, long expiry) throws AuthenticationException
     {
         checkTokenAccessEnabled();

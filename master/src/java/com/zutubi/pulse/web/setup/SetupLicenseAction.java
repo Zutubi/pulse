@@ -1,18 +1,16 @@
 package com.zutubi.pulse.web.setup;
 
-import com.zutubi.pulse.license.LicenseDecoder;
 import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseDecoder;
 import com.zutubi.pulse.license.LicenseException;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-
-import java.io.IOException;
+import com.zutubi.pulse.license.LicenseManager;
 
 /**
  * <class-comment/>
  */
 public class SetupLicenseAction extends SetupActionSupport
 {
-    private MasterConfigurationManager configurationManager;
+    private LicenseManager licenseManager;
 
     private String license;
 
@@ -54,26 +52,18 @@ public class SetupLicenseAction extends SetupActionSupport
     public String execute() throws Exception
     {
         String licenseKey = license.replaceAll("\n", "");
-        try
-        {
-            configurationManager.getData().updateLicenseKey(licenseKey);
-            setupManager.requestLicenseComplete();
-            return SUCCESS;
-        }
-        catch (IOException e)
-        {
-            addActionError(e.getMessage());
-            return INPUT;
-        }
+        licenseManager.updateLicenseKey(licenseKey);
+        setupManager.requestLicenseComplete();
+        return SUCCESS;
     }
 
     /**
      * Required resource.
      *
-     * @param configurationManager
+     * @param licenseManager
      */
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setLicenseManager(LicenseManager licenseManager)
     {
-        this.configurationManager = configurationManager;
+        this.licenseManager = licenseManager;
     }
 }

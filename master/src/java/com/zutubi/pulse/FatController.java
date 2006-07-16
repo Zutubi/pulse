@@ -10,10 +10,7 @@ import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildTerminationRequestEvent;
 import com.zutubi.pulse.events.build.RecipeTimeoutEvent;
-import com.zutubi.pulse.license.License;
-import com.zutubi.pulse.license.LicenseEvent;
-import com.zutubi.pulse.license.LicenseExpiredEvent;
-import com.zutubi.pulse.license.LicenseUpdateEvent;
+import com.zutubi.pulse.license.*;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
@@ -81,14 +78,13 @@ public class FatController implements EventListener, Stoppable
         quartzScheduler.addJob(detail, true);
 
         // check license: enable the fat controller iff the license is valid.
-        License license = configManager.getData().getLicense();
-        if (license == null || license.isExpired())
+        if (LicenseHolder.hasAuthorization("canRunPulse"))
         {
-            disable();
+            enable();
         }
         else
         {
-            enable();
+            disable();
         }
     }
 
@@ -203,27 +199,21 @@ public class FatController implements EventListener, Stoppable
 
     private void handleLicenseEvent(LicenseEvent event)
     {
-        if (event instanceof LicenseExpiredEvent)
+        // the type or detail of the license event does not matter at this stage.
+        if (LicenseHolder.hasAuthorization("canRunPulse"))
+        {
+            enable();
+        }
+        else
         {
             disable();
-        }
-        else if (event instanceof LicenseUpdateEvent)
-        {
-            if (event.getLicense().isExpired())
-            {
-                disable();
-            }
-            else
-            {
-                enable();
-            }
         }
     }
 
 
     private void handleBuildRequest(BuildRequestEvent event)
     {
-        // we are disabled, so we ignore incoming build requests.
+        // if we are disabled, we ignore incoming build requests.
         if (isDisabled())
         {
             return;

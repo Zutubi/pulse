@@ -3,6 +3,8 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.model.persistence.ContactPointDao;
 import com.zutubi.pulse.model.persistence.UserDao;
 import com.zutubi.pulse.web.DefaultAction;
+import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
+import com.zutubi.pulse.license.LicenseManager;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
@@ -19,17 +21,16 @@ public class DefaultUserManager implements UserManager
 {
     private UserDao userDao;
     private ContactPointDao contactPointDao;
-
     private PasswordEncoder passwordEncoder;
 
-    public void setUserDao(UserDao userDao)
-    {
-        this.userDao = userDao;
-    }
+    private LicenseManager licenseManager;
 
-    public void setContactPointDao(ContactPointDao contactDao)
+    public void init()
     {
-        this.contactPointDao = contactDao;
+        // register the canAddUser license authorisation
+        AddUserAuthorisation addUserAuthorisation = new AddUserAuthorisation();
+        addUserAuthorisation.setUserManager(this);
+        licenseManager.addAuthorisation(addUserAuthorisation);
     }
 
     public void save(User user)
@@ -68,6 +69,8 @@ public class DefaultUserManager implements UserManager
         // upon the users id.
         setPassword(newUser, newUser.getPassword());
         save(newUser);
+
+        licenseManager.refreshAuthorisations();
     }
 
     public User getUser(String login)
@@ -98,6 +101,8 @@ public class DefaultUserManager implements UserManager
     public void delete(User user)
     {
         userDao.delete(user);
+
+        licenseManager.refreshAuthorisations();
     }
 
     public void delete(ContactPoint contact)
@@ -141,5 +146,20 @@ public class DefaultUserManager implements UserManager
     public void setPasswordEncoder(PasswordEncoder passwordEncoder)
     {
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public void setUserDao(UserDao userDao)
+    {
+        this.userDao = userDao;
+    }
+
+    public void setContactPointDao(ContactPointDao contactDao)
+    {
+        this.contactPointDao = contactDao;
+    }
+
+    public void setLicenseManager(LicenseManager licenseManager)
+    {
+        this.licenseManager = licenseManager;
     }
 }

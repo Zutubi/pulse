@@ -189,6 +189,23 @@ public abstract class BaseForm
         }
     }
 
+    public void assertFormReset()
+    {
+        assertFormElements(getDefaultValues());
+    }
+
+    public String[] getDefaultValues()
+    {
+        int[] types = getFieldTypes();
+
+        String[] defaultValues = new String[types.length];
+        for (int i = 0; i < types.length; i++)
+        {
+            defaultValues[i] = "";
+        }
+        return defaultValues;
+    }
+
     public void assertMultiValues(String name, String ...values)
     {
         String[] gotValues = tester.getDialog().getForm().getParameterValues(name);
@@ -246,6 +263,16 @@ public abstract class BaseForm
         {
             tester.assertFormElementEquals(name, null);
         }
+    }
+
+    public void assertCheckboxChecked(String name)
+    {
+        assertCheckboxChecked(name, true);
+    }
+
+    public void assertCheckboxNotChecked(String name)
+    {
+        assertCheckboxChecked(name, false);
     }
 
 }

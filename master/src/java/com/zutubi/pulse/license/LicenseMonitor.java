@@ -17,8 +17,6 @@ public class LicenseMonitor implements Task
      */
     private static final Logger LOG = Logger.getLogger(LicenseMonitor.class);
 
-    private LicenseProvider licenseProvider;
-
     /**
      * Used to deliver the LicenseExpiredEvent when necessary.
      */
@@ -28,6 +26,8 @@ public class LicenseMonitor implements Task
      * The systems scheduler, required so that this monitor can schedule itself during startup.
      */
     private Scheduler scheduler;
+
+    private LicenseManager licenseManager;
 
     /**
      * Required resource.
@@ -50,16 +50,6 @@ public class LicenseMonitor implements Task
     }
 
     /**
-     * Required resource.
-     * 
-     * @param licenseProvider
-     */
-    public void setLicenseProvider(LicenseProvider licenseProvider)
-    {
-        this.licenseProvider = licenseProvider;
-    }
-
-    /**
      * The execution of this task is to check whether or not the license is expired. If the
      * installed license is expired, then generate an appropriate LicenseEvent.
      *
@@ -67,9 +57,11 @@ public class LicenseMonitor implements Task
      */
     public void execute(TaskExecutionContext context)
     {
-        License license = licenseProvider.getLicense();
+        License license = LicenseHolder.getLicense();
         if (license.isExpired())
         {
+            // trigger a refresh of authoristions.
+            licenseManager.refreshAuthorisations();
             eventManager.publish(new LicenseExpiredEvent(license));
         }
     }
@@ -104,5 +96,10 @@ public class LicenseMonitor implements Task
             // be run. Should the system startup continue?
             LOG.severe(e);
         }
+    }
+
+    public void setLicenseManager(LicenseManager licenseManager)
+    {
+        this.licenseManager = licenseManager;
     }
 }

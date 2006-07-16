@@ -1,18 +1,14 @@
 package com.zutubi.pulse.velocity;
 
 import com.zutubi.pulse.security.AcegiUtils;
-import junit.framework.TestCase;
 import org.acegisecurity.GrantedAuthority;
 import org.acegisecurity.userdetails.UserDetails;
-import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-
-import java.io.StringWriter;
 
 /**
  * <class-comment/>
  */
-public class AuthorizeDirectiveTest extends TestCase
+public class AuthorizeDirectiveTest extends VelocityDirectiveTestCase
 {
     private VelocityEngine velocity;
 
@@ -21,21 +17,9 @@ public class AuthorizeDirectiveTest extends TestCase
         super(testName);
     }
 
-    public void setUp() throws Exception
+    public String[] getUserDirectives()
     {
-        super.setUp();
-
-        // initialise velocity.
-        velocity = new VelocityEngine();
-        velocity.addProperty("userdirective", "com.zutubi.pulse.velocity.AuthorizeDirective");
-        velocity.init();
-    }
-
-    public void tearDown() throws Exception
-    {
-        // add tear down code here.
-
-        super.tearDown();
+        return new String[]{"com.zutubi.pulse.velocity.AuthorizeDirective"};
     }
 
     public void testIfAllGranted() throws Exception
@@ -70,14 +54,6 @@ public class AuthorizeDirectiveTest extends TestCase
         assertEquals("Authorized", evaluate("#authorize(\"ifNotGranted=ROLE_B\")Authorized#end"));
         assertEquals("Authorized", evaluate("#authorize(\"ifNotGranted=ROLE_B,ROLE_C\")Authorized#end"));
         assertEquals("", evaluate("#authorize(\"ifNotGranted=ROLE_A,ROLE_B\")Authorized#end"));
-    }
-
-
-    private String evaluate(String template) throws Exception
-    {
-        StringWriter writer = new StringWriter();
-        velocity.evaluate(new VelocityContext(), writer, "", template);
-        return writer.toString();
     }
 
     private class UserDetailsAdapter implements UserDetails

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.LicenseEditForm;
-import com.zutubi.pulse.util.RandomUtils;
-import com.zutubi.pulse.test.LicenseHelper;
 import com.zutubi.pulse.license.LicenseType;
+import com.zutubi.pulse.test.LicenseHelper;
+import com.zutubi.pulse.util.RandomUtils;
 
 /**
  * <class-comment/>
@@ -65,7 +65,24 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
         // the form should be blank initially.
         form.assertFormElements("");
 
-        // ensure that correct validation is carried out.
+        // a valid license is accepted
+        form.saveFormElements(newLicenseKey);
+        form.assertFormNotPresent();
+
+        assertTablePresent("license.info");
+        assertTextPresent(newLicenseHolder);
+    }
+
+    public void testUpdateLicenseValidation()
+    {
+        clickLink("license.edit");
+
+        LicenseEditForm form = new LicenseEditForm(tester);
+        form.assertFormPresent();
+
+        // the form should be blank initially.
+        form.assertFormElements("");
+
         // a) a blank form.
         form.saveFormElements("");
         form.assertFormPresent();
@@ -76,13 +93,6 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
         form.assertFormPresent();
         form.assertFormElements(invalidLicenseKey);
         assertTextPresent("invalid");
-
-        // c) a valid license is accepted
-        form.saveFormElements(newLicenseKey);
-        form.assertFormNotPresent();
-
-        assertTablePresent("license.info");
-        assertTextPresent(newLicenseHolder);
     }
 
     public void testCancelLicenseEdit()

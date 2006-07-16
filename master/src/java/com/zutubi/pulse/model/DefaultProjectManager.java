@@ -17,6 +17,8 @@ import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.license.LicenseManager;
+import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
 import org.acegisecurity.annotation.Secured;
 
 import java.util.List;
@@ -38,6 +40,8 @@ public class DefaultProjectManager implements ProjectManager
     private SubscriptionManager subscriptionManager;
     private EventManager eventManager;
     private ChangelistIsolator changelistIsolator;
+
+    private LicenseManager licenseManager;
 
     public void save(Project project)
     {
@@ -215,6 +219,11 @@ public class DefaultProjectManager implements ProjectManager
     public void initialise()
     {
         changelistIsolator = new ChangelistIsolator(buildManager);
+
+        // register the canAddProject authorisation with the license manager.
+        AddProjectAuthorisation addProjectAuthorisation = new AddProjectAuthorisation();
+        addProjectAuthorisation.setProjectManager(this);
+        licenseManager.addAuthorisation(addProjectAuthorisation);
     }
 
     public void deleteBuildSpecification(Project project, long specId)
@@ -415,5 +424,10 @@ public class DefaultProjectManager implements ProjectManager
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void setLicenseManager(LicenseManager licenseManager)
+    {
+        this.licenseManager = licenseManager;
     }
 }

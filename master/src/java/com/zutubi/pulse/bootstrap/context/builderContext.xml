@@ -169,11 +169,7 @@
     if we had a way to just define a list of tasks that need to be scheduled on startup. Since we dont have
     one, this will have to do.
     -->
-    <bean id="licenseMonitor" class="com.zutubi.pulse.license.LicenseMonitor" autowire="byName" init-method="init">
-        <property name="licenseProvider">
-            <ref bean="licenseManager"/>
-        </property>
-    </bean>
+    <bean id="licenseMonitor" class="com.zutubi.pulse.license.LicenseMonitor" autowire="byName" init-method="init"/>
 
     <bean id="postProcessorManager" class="com.zutubi.pulse.PostProcessorManager" autowire="byName"/>
 

@@ -7,6 +7,7 @@ import com.zutubi.pulse.model.persistence.UserDao;
 import com.zutubi.pulse.model.persistence.mock.MockUserDao;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.license.LicenseManager;
 import org.acegisecurity.providers.encoding.PlaintextPasswordEncoder;
 
 /**
@@ -26,6 +27,7 @@ public class TokenManagerTest extends PulseTestCase
 
         userManager = new DefaultUserManager();
         userManager.setUserDao(userDao);
+        userManager.setLicenseManager(new LicenseManager());
 
         tokenManager = new TokenManager();
         tokenManager.setUserManager(userManager);

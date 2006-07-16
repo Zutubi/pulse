@@ -18,6 +18,7 @@ public class AcceptanceTestSuite
         suite.addTestSuite(AdminXmlRpcAcceptanceTest.class);
         suite.addTestSuite(AnonymousAccessAcceptanceTest.class);
         suite.addTestSuite(GeneralConfigurationAcceptanceTest.class);
+        suite.addTestSuite(LicenseAuthorisationAcceptanceTest.class);
         suite.addTestSuite(LicenseManagementAcceptanceTest.class);
         suite.addTestSuite(ProjectAcceptanceTest.class);
         suite.addTestSuite(ProjectArtifactsAcceptanceTest.class);

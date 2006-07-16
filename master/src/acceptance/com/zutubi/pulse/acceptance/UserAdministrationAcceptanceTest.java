@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.EditPasswordForm;
+import com.zutubi.pulse.acceptance.forms.CreateUserForm;
 import com.zutubi.pulse.util.RandomUtils;
 
 /**
@@ -95,21 +96,23 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
         String login = RandomUtils.randomString(10);
 
         // check validation - login is required.
-        submitCreateUserForm("", login, login, login, false);
+        CreateUserForm form = new CreateUserForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements("", login, Boolean.toString(false), login, login, Boolean.toString(false));
 
         // should get an error message.
         assertTextPresent("required");
         assertLinkNotPresentWithText(login);
-        assertFormElementEmpty(USER_CREATE_LOGIN);
-        assertFormElementEquals(USER_CREATE_NAME, login);
+
+        form.assertFormElements("", login, Boolean.toString(false), "", "", Boolean.toString(false));
+
 
         // check validation - password and confirmation mismatch
-        submitCreateUserForm(login, login, login, "something not very random", false);
+        form.saveFormElements(login, login, Boolean.toString(false), login, "something not very random", Boolean.toString(false));
 
         assertTextPresent("does not match");
         assertLinkNotPresentWithText(login);
-        assertFormElementEquals(USER_CREATE_LOGIN, login);
-        assertFormElementEquals(USER_CREATE_NAME, login);
+        form.assertFormElements(login, login, Boolean.toString(false), "", "", Boolean.toString(false));
     }
 
     public void testDeleteUser()
@@ -215,11 +218,8 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
 
     private void assertFormReset()
     {
-        assertFormElementEmpty(USER_CREATE_LOGIN);
-        assertFormElementEmpty(USER_CREATE_NAME);
-        assertFormElementEmpty(USER_CREATE_PASSWORD);
-        assertFormElementEmpty(USER_CREATE_CONFIRM);
-        assertCheckboxNotSelected(USER_CREATE_ADMIN);
+        CreateUserForm form = new CreateUserForm(tester);
+        form.assertFormReset();
     }
 
     private void assertUserExists(String login)

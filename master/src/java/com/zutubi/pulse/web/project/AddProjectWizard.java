@@ -18,6 +18,7 @@ import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
 import com.zutubi.pulse.web.wizard.WizardCompleteState;
+import com.zutubi.pulse.license.Licensed;
 import org.acegisecurity.AccessDeniedException;
 
 import java.io.ByteArrayInputStream;
@@ -25,7 +26,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
+ *
  */
+@Licensed("canAddProject")
 public class AddProjectWizard extends BaseWizard
 {
     private static final Logger LOG = Logger.getLogger(AddProjectWizard.class);

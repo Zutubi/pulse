@@ -40,6 +40,8 @@
     </tr>
 #end
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-    #addRow("add.agent" 7 "/admin/addAgent!input.action" "agent.add")
+    #licensed("require=canAddAgent")
+        #addRow("add.agent" 7 "/admin/addAgent!input.action" "agent.add")
+    #end
 #end
 </table>

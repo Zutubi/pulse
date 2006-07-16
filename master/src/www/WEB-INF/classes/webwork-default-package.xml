@@ -42,6 +42,7 @@
             <interceptor name="ajax" class="com.zutubi.pulse.xwork.interceptor.AjaxInterceptor"/>
             <interceptor name="errorHanding" class="com.zutubi.pulse.xwork.interceptor.ErrorHandlingInterceptor"/>
             <interceptor name="hibernateSession" class="com.zutubi.pulse.xwork.interceptor.HibernateSessionInterceptor"/>
+            <interceptor name="licensed" class="com.zutubi.pulse.xwork.interceptor.LicensedInterceptor"/>
 
             <!-- Basic stack -->
             <interceptor-stack name="defaultStack">
@@ -50,38 +51,13 @@
                 <interceptor-ref name="prepare"/>
                 <interceptor-ref name="static-params"/>
                 <interceptor-ref name="params"/>
+                <interceptor-ref name="licensed"/>
                 <interceptor-ref name="cancel"/>
                 <interceptor-ref name="conversionError"/>
                 <interceptor-ref name="errorHanding"/>
             </interceptor-stack>
 
-            <!-- Sample validation and workflow stack -->
-            <interceptor-stack name="validationWorkflowStack">
-                <interceptor-ref name="defaultStack"/>
-                <interceptor-ref name="cancel"/>
-                <interceptor-ref name="validation"/>
-                <interceptor-ref name="workflow"/>
-            </interceptor-stack>
-
-            <!-- Sample file upload stack -->
-            <interceptor-stack name="fileUploadStack">
-                <interceptor-ref name="fileUpload"/>
-                <interceptor-ref name="defaultStack"/>
-            </interceptor-stack>
-
-            <!-- Sample model-driven stack  -->
-            <interceptor-stack name="modelDrivenStack">
-                <interceptor-ref name="model-driven"/>
-                <interceptor-ref name="defaultStack"/>
-            </interceptor-stack>
-
-            <!-- Sample action chaining stack -->
-            <interceptor-stack name="chainStack">
-                <interceptor-ref name="chain"/>
-                <interceptor-ref name="defaultStack"/>
-            </interceptor-stack>
-
-            <!-- Sample execute and wait stack.
+            <!-- Execute and wait stack.
                  Note: execAndWait should always be the *last* interceptor. -->
             <interceptor-stack name="executeAndWaitStack">
                 <interceptor-ref name="defaultStack"/>
@@ -104,6 +80,7 @@
                 <interceptor-ref name="fileUpload"/>
                 <interceptor-ref name="static-params"/>
                 <interceptor-ref name="params"/>
+                <interceptor-ref name="licensed"/>
                 <interceptor-ref name="cancel"/>
                 <interceptor-ref name="conversionError"/>
                 <interceptor-ref name="validation">
@@ -124,6 +101,7 @@
                 <interceptor-ref name="fileUpload"/>
                 <interceptor-ref name="static-params"/>
                 <interceptor-ref name="params"/>
+                <interceptor-ref name="licensed"/>
                 <interceptor-ref name="cancel"/>
                 <interceptor-ref name="conversionError"/>
                 <interceptor-ref name="validation">
@@ -136,6 +114,7 @@
             </interceptor-stack>
 
             <interceptor-stack name="wizardStack">
+                <interceptor-ref name="hibernateSession"/>
                 <interceptor-ref name="prepare"/>
                 <interceptor-ref name="servlet-config"/>
                 <interceptor-ref name="chain"/>
@@ -144,6 +123,7 @@
                 <interceptor-ref name="static-params"/>
                 <interceptor-ref name="wizard"/>
                 <interceptor-ref name="params"/>
+                <interceptor-ref name="licensed"/>
                 <interceptor-ref name="cancel"/>
                 <interceptor-ref name="conversionError"/>
                 <interceptor-ref name="validation">

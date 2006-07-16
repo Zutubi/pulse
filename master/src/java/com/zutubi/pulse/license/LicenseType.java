@@ -33,6 +33,13 @@ public enum LicenseType
         {
             return "p";
         }
+    },
+    CUSTOM
+    {
+        public final String getCode()
+        {
+            return "u";
+        }
     };
 
     public static LicenseType valueBy(String code)

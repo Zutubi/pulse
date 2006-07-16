@@ -5,6 +5,7 @@ import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.license.LicenseHolder;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.ldap.DefaultInitialDirContextFactory;
 import org.acegisecurity.ldap.search.FilterBasedLdapUserSearch;
@@ -138,7 +139,7 @@ public class AcegiLdapManager implements LdapManager
 
     public boolean canAutoAdd()
     {
-        return enabled && initialised && autoAdd;
+        return enabled && initialised && autoAdd && LicenseHolder.hasAuthorization("canAddUser");
     }
 
     private DefaultInitialDirContextFactory createContextFactory(String hostUrl, String baseDn, String managerDn, String managerPassword)

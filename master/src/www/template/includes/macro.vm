@@ -1759,7 +1759,9 @@
     #end
     #if($showAdd)
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+    #licensed("require=canAddProject")
         #addRow("add.project" 14 "addProject!input.action" "project.add")
+    #end
 #end
     #end
         </table>

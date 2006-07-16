@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.HttpException;
 import com.meterware.httpunit.HttpNotFoundException;
 import org.xml.sax.SAXException;
@@ -41,8 +40,7 @@ public class WebAppAcceptanceTest extends BaseAcceptanceTest
 
             // request the page via the httpunit component so that we get the
             // full response details.
-            String url = createUrl("/admin/");
-            tester.getDialog().getWebClient().getResponse(new GetMethodWebRequest(url));
+            goTo("/admin/");
         }
         catch (HttpException e)
         {
@@ -59,24 +57,12 @@ public class WebAppAcceptanceTest extends BaseAcceptanceTest
         try
         {
             beginAt("/");
-
-            String url = createUrl("/" + badAction + ".action");
-            tester.getDialog().getWebClient().getResponse(new GetMethodWebRequest(url));
+            goTo("/" + badAction + ".action");
         }
         catch (HttpNotFoundException e)
         {
             assertEquals(404, e.getResponseCode());
             assertTrue(e.getMessage().indexOf(badAction) != -1);
         }
-    }
-
-    private String createUrl(String relativeUrl)
-    {
-        String baseUrl = getTestContext().getBaseUrl();
-        if (baseUrl.endsWith("/") && relativeUrl.startsWith("/"))
-        {
-            return baseUrl + relativeUrl.substring(1);
-        }
-        return baseUrl + relativeUrl;
     }
 }

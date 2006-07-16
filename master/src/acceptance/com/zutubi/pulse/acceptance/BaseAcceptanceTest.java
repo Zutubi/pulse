@@ -1,11 +1,15 @@
 package com.zutubi.pulse.acceptance;
 
 import com.meterware.httpunit.WebClient;
+import com.meterware.httpunit.HttpException;
+import com.meterware.httpunit.GetMethodWebRequest;
+import com.zutubi.pulse.acceptance.forms.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.CvsForm;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
-import com.zutubi.pulse.acceptance.forms.AddProjectWizard;
+import com.zutubi.pulse.acceptance.forms.CreateUserForm;
 import junit.framework.Assert;
 import org.apache.xmlrpc.XmlRpcClient;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -18,14 +22,6 @@ import java.util.Vector;
 public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
 {
     protected static final String TEST_CVSROOT = ":pserver:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
-
-    //---( administrations create user form )---
-    private static final String FO_USER_CREATE = "newUser.create";
-    protected static final String USER_CREATE_LOGIN = "newUser.login";
-    protected static final String USER_CREATE_NAME = "newUser.name";
-    protected static final String USER_CREATE_PASSWORD = "newUser.password";
-    protected static final String USER_CREATE_CONFIRM = "confirm";
-    protected static final String USER_CREATE_ADMIN = "admin";
 
     //---( add project wizard forms )---
     protected static final String FO_ANT_SETUP = "ant.setup";
@@ -73,6 +69,17 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
         beginAt("/login.action");
         LoginForm loginForm = new LoginForm(tester);
         loginForm.loginFormElements("admin", "admin", "false");
+    }
+
+    protected void logout()
+    {
+        beginAt("/");
+        clickLink("logout");
+    }
+
+    protected boolean hasLinkWithText(String text) throws Exception
+    {
+        return tester.getDialog().getResponse().getLinkWith(text) != null;
     }
 
     protected Object callRemoteApi(String function, Object... args) throws Exception
@@ -132,20 +139,9 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
 
     protected void submitCreateUserForm(String login, String name, String password, String confirm, boolean admin)
     {
-        setWorkingForm(FO_USER_CREATE);
-        setFormElement(USER_CREATE_LOGIN, login);
-        setFormElement(USER_CREATE_NAME, name);
-        setFormElement(USER_CREATE_PASSWORD, password);
-        setFormElement(USER_CREATE_CONFIRM, confirm);
-        if (admin)
-        {
-            checkCheckbox(USER_CREATE_ADMIN, "true");
-        }
-        else
-        {
-            uncheckCheckbox(USER_CREATE_ADMIN);
-        }
-        submit("save");
+        CreateUserForm form = new CreateUserForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements(login, name, Boolean.toString(false), password, confirm, Boolean.toString(admin));
     }
 
     protected void navigateToUserAdministration()
@@ -225,7 +221,7 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
      * @param row
      * @param expectedValues
      */
-    public void assertTableRowEqual(String tableSummaryOrId, int row, String[] expectedValues)
+    protected void assertTableRowEqual(String tableSummaryOrId, int row, String[] expectedValues)
     {
         assertTablePresent(tableSummaryOrId);
         String[][] sparseTableCellValues = tester.getDialog().getSparseTableBySummaryOrId(tableSummaryOrId);
@@ -241,5 +237,22 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
             Assert.assertEquals("Expected " + tableSummaryOrId + " value at [" + row + "," + j + "] not found.",
                     expectedString, tester.getTestContext().toEncodedString(sparseTableCellValues[row][j].trim()));
         }
+    }
+
+    protected void goTo(String relativeUrl) throws HttpException, IOException, SAXException
+    {
+        String baseUrl = getTestContext().getBaseUrl();
+
+        String targetUrl = "";
+        if (baseUrl.endsWith("/") && relativeUrl.startsWith("/"))
+        {
+            targetUrl = baseUrl + relativeUrl.substring(1);
+        }
+        else
+        {
+            targetUrl = baseUrl + relativeUrl;
+        }
+
+        tester.getDialog().getWebClient().getResponse(new GetMethodWebRequest(targetUrl));
     }
 }

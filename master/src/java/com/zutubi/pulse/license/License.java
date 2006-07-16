@@ -26,6 +26,11 @@ public class License
 
     private int supportedAgents = UNRESTRICTED;
 
+    public License(LicenseType type, String holder)
+    {
+        this(type, holder, null);
+    }
+
     public License(LicenseType type, String holder, Date expiry)
     {
         this.type = type;
@@ -33,26 +38,30 @@ public class License
         this.expiryDate = expiry;
     }
 
-    public void setSupported(int agents, int projects, int users)
+    public License setSupported(int agents, int projects, int users)
     {
         setSupportedAgents(agents);
         setSupportedProjects(projects);
         setSupportedUsers(users);
+        return this;
     }
 
-    public void setSupportedAgents(int agents)
+    public License setSupportedAgents(int agents)
     {
         this.supportedAgents = agents;
+        return this;
     }
 
-    public void setSupportedProjects(int projects)
+    public License setSupportedProjects(int projects)
     {
         this.supportedProjects = projects;
+        return this;
     }
 
-    public void setSupportedUsers(int users)
+    public License setSupportedUsers(int users)
     {
         this.supportedUsers = users;
+        return this;
     }
 
     /**

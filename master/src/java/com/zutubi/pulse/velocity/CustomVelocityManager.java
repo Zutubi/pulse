@@ -3,10 +3,10 @@ package com.zutubi.pulse.velocity;
 import com.opensymphony.webwork.views.velocity.VelocityManager;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.Data;
+import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.security.AcegiUtils;
@@ -47,13 +47,11 @@ public class CustomVelocityManager extends VelocityManager
         context.put("build_date", v.getBuildDate());
         context.put("build_number", v.getBuildNumber());
 
-        Data data = configManager.getData();
-        if (data != null)
-            context.put("license", data.getLicense());
+        context.put("license", LicenseHolder.getLicense());
 
         MasterApplicationConfiguration appConfig = configManager.getAppConfig();
         context.put("rssEnabled", appConfig.getRssEnabled());
-        
+
         return context;
     }
 
@@ -74,6 +72,11 @@ public class CustomVelocityManager extends VelocityManager
         return userManager;
     }
 
+    /**
+     * Required resource.
+     *
+     * @param userManager
+     */
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;

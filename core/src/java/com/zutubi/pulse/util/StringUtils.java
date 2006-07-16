@@ -62,7 +62,7 @@ public class StringUtils
     {
         if (prefix != null && prefix.length() >= lineLength - 1)
         {
-            throw new IllegalArgumentException("prefic length must be less than line length -1");
+            throw new IllegalArgumentException("prefix length must be less than line length -1");
         }
 
         // Short circuit a common case

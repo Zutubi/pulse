@@ -1,6 +1,7 @@
 package com.zutubi.pulse.test;
 
 import com.zutubi.pulse.license.*;
+import com.zutubi.pulse.util.StringUtils;
 
 import java.util.Date;
 import java.util.Calendar;
@@ -68,11 +69,16 @@ public class LicenseHelper
      */
     public static String newLicenseKey(LicenseType type, String holder, Date expiry) throws LicenseException
     {
-        byte[] licenseKey = getKeyFactory().encode(new License(type, holder, expiry));
+        return newLicenseKey(new License(type, holder, expiry));
+    }
+
+    public static String newLicenseKey(License license) throws LicenseException
+    {
+        byte[] licenseKey = getKeyFactory().encode(license);
 
         // insert '\n' characters at regular intervals so that the resulting string is
         // the same in format as those pasted via the UI.
-        return LicenseUtils.print(licenseKey);
+        return StringUtils.wrapString(new String(licenseKey), 80, null);
     }
 
 }

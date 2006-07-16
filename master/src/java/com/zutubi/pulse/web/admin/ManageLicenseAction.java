@@ -79,7 +79,7 @@ public class ManageLicenseAction extends ActionSupport
 
         // todo: move this into the business logic layer.. will need to move the updating license
         // todo: into a system license store / manager object..
-        eventManager.publish(new LicenseUpdateEvent(licenseManager.getLicense()));
+        eventManager.publish(new LicenseUpdateEvent(LicenseHolder.getLicense()));
         return SUCCESS;
     }
 

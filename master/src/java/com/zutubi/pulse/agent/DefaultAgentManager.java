@@ -1,6 +1,8 @@
 package com.zutubi.pulse.agent;
 
 import com.zutubi.pulse.*;
+import com.zutubi.pulse.license.LicenseManager;
+import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.model.Resource;
@@ -19,8 +21,9 @@ import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.MalformedURLException;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 /**
  */
@@ -45,6 +48,7 @@ public class DefaultAgentManager implements AgentManager
     private ServerMessagesHandler serverMessagesHandler;
     private ServiceTokenManager serviceTokenManager;
 
+    private LicenseManager licenseManager;
     private ExecutorService pingService = Executors.newCachedThreadPool();
 
     public void init()
@@ -53,6 +57,11 @@ public class DefaultAgentManager implements AgentManager
         masterAgent = new MasterAgent(masterService,configurationManager, startupManager, serverMessagesHandler);
 
         refreshSlaveAgents();
+
+        // register the canAddAgent license authorisation.
+        AddAgentAuthorisation addAgentAuthorisation = new AddAgentAuthorisation();
+        addAgentAuthorisation.setAgentManager(this);
+        licenseManager.addAuthorisation(addAgentAuthorisation);
     }
 
     private void refreshSlaveAgents()
@@ -358,5 +367,10 @@ public class DefaultAgentManager implements AgentManager
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
         this.serviceTokenManager = serviceTokenManager;
+    }
+
+    public void setLicenseManager(LicenseManager licenseManager)
+    {
+        this.licenseManager = licenseManager;
     }
 }

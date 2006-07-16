@@ -55,6 +55,7 @@ public class RemoteApi
 
     public Vector<String> getAllProjectNames(String token) throws AuthenticationException
     {
+        //@Secured({"ROLE_USER"})
         tokenManager.verifyUser(token);
 
         List<Project> projects = projectManager.getAllProjects();

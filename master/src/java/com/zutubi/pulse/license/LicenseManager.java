@@ -1,77 +1,64 @@
 package com.zutubi.pulse.license;
 
 import com.zutubi.pulse.bootstrap.DataResolver;
-import com.zutubi.pulse.core.ObjectFactory;
-import com.zutubi.pulse.license.authorisation.*;
+import com.zutubi.pulse.bootstrap.Data;
+import com.zutubi.pulse.license.authorisation.Authorisation;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Arrays;
 
 /**
  *
  *
  */
-public class LicenseManager implements LicenseProvider
+public class LicenseManager
 {
     private DataResolver resolver;
 
-    private ObjectFactory objectFactory;
-
-    public License getLicense()
-    {
-        return resolver.getData().getLicense();
-    }
-
-    public LicenseAuthorisation getAuthorisation() throws LicenseException
-    {
-        try
-        {
-            License license = this.getLicense();
-            if (license == null)
-            {
-                return objectFactory.buildBean(NoAuthorisation.class);
-            }
-
-            if (license.getType() == LicenseType.EVALUATION)
-            {
-                return objectFactory.buildBean(EvaluationLicenseAuthorisation.class);
-            }
-            else if (license.getType() == LicenseType.COMMERCIAL)
-            {
-                return objectFactory.buildBean(CommercialLicenseAuthorisation.class);
-            }
-            else if (license.getType() == LicenseType.NON_PROFIT)
-            {
-                return objectFactory.buildBean(CustomLicenseAuthorisation.class);
-            }
-            else if (license.getType() == LicenseType.PERSONAL)
-            {
-                return objectFactory.buildBean(CustomLicenseAuthorisation.class);
-            }
-
-            return objectFactory.buildBean(NoAuthorisation.class);
-        }
-        catch (Exception e)
-        {
-            throw new LicenseException(e);
-        }
-    }
-
-    public boolean isLicensed() throws LicenseException
-    {
-        return getAuthorisation().canRunPulse();
-    }
+    private List<Authorisation> authorisations = new LinkedList<Authorisation>();
 
     public void updateLicenseKey(String newKey) throws LicenseException
     {
         try
         {
-            resolver.getData().updateLicenseKey(newKey);
+            Data data = resolver.getData();
+            data.updateLicenseKey(newKey);
+
+            // refresh the authorisations, now that we have a new license.
+            LicenseHolder.setLicense(data.getLicense());
+            refreshAuthorisations();
         }
         catch (IOException e)
         {
             throw new LicenseException("Failed to update license key. Cause: " + e.getClass().getName() +
                     "; " + e.getMessage(), e);
         }
+    }
+
+    public void init()
+    {
+        // load the license from disk.
+        Data data = resolver.getData();
+        if (data != null)
+        {
+            LicenseHolder.setLicense(data.getLicense());
+        }
+
+        // refresh the supported authorisations.
+        refreshAuthorisations();
+    }
+
+    public void refreshAuthorisations()
+    {
+        License license = LicenseHolder.getLicense();
+        List<String> newAuths = new LinkedList<String>();
+        for (Authorisation auth : authorisations)
+        {
+            newAuths.addAll(Arrays.asList(auth.getAuthorisation(license)));
+        }
+        LicenseHolder.setAuthorizations(newAuths);
     }
 
     /**
@@ -84,13 +71,14 @@ public class LicenseManager implements LicenseProvider
         this.resolver = resolver;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param objectFactory
-     */
-    public void setObjectFactory(ObjectFactory objectFactory)
+    public void setAuthorisations(List<Authorisation> a)
     {
-        this.objectFactory = objectFactory;
+        this.authorisations = a;
+    }
+
+    public void addAuthorisation(Authorisation auth)
+    {
+        this.authorisations.add(auth);
+        refreshAuthorisations();
     }
 }
