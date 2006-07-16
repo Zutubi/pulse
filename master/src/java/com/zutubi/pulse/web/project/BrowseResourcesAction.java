@@ -91,7 +91,7 @@ public class BrowseResourcesAction extends ActionSupport
         Slave slave = resource.getSlave();
         if(slave == null)
         {
-            return "[master]";
+            return "master";
         }
         else
         {

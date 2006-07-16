@@ -392,7 +392,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createComplexCommand());
         recipeResult.complete();
         RecipeResultNode node = new RecipeResultNode(name + " stage", recipeResult);
-        node.setHost("[master]");
+        node.setHost("master");
 
         return node;
     }
@@ -441,7 +441,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createFailedCommand());
         recipeResult.complete();
         RecipeResultNode node = new RecipeResultNode("command failed stage", recipeResult);
-        node.setHost("[master]");
+        node.setHost("master");
 
         return node;
     }
@@ -456,7 +456,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createComplexCommand());
         recipeResult.complete();
         RecipeResultNode node = new RecipeResultNode("warnfeat stage", recipeResult);
-        node.setHost("[master]");
+        node.setHost("master");
 
         return node;
     }
@@ -473,7 +473,7 @@ public class SetupDummyBuilds implements Runnable
         recipeResult.add(createErrorFeaturesCommand(4, recipeDir));
         recipeResult.complete();
         RecipeResultNode node = new RecipeResultNode("errfeat stage", recipeResult);
-        node.setHost("[master]");
+        node.setHost("master");
 
         return node;
     }

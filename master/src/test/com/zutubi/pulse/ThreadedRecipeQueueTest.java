@@ -654,12 +654,12 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
+        public Revision checkout(String id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public String checkout(long id, Revision revision, String file) throws SCMException
+        public String checkout(Revision revision, String file) throws SCMException
         {
             throw new RuntimeException("Method not implemented.");
         }
@@ -701,7 +701,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void update(File workDir, Revision rev, List<Change> changes) throws SCMException
+        public void update(String id, File workDir, Revision rev, List<Change> changes) throws SCMException
         {
             throw new RuntimeException("Method not implemented.");
         }

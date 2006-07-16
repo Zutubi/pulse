@@ -69,6 +69,6 @@ public class MasterAgent implements Agent
 
     public String getName()
     {
-        return "[master]";
+        return "master";
     }
 }

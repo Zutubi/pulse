@@ -15,9 +15,12 @@ import java.util.List;
  */
 public class CheckoutBootstrapper extends ScmBootstrapper
 {
-    public CheckoutBootstrapper(Scm scm, BuildRevision revision)
+    private boolean persist;
+
+    public CheckoutBootstrapper(String project, String spec, Scm scm, BuildRevision revision, boolean persist)
     {
-        super(scm, revision);
+        super(project, spec, scm, revision);
+        this.persist = persist;
     }
 
     List<Change> bootstrap(File workDir)
@@ -25,10 +28,13 @@ public class CheckoutBootstrapper extends ScmBootstrapper
         List<Change> changes = new LinkedList<Change>();
         try
         {
-            // the recipe id is not used by any of the scm servers, and is a detail they should
-            // not need to be aware of.
-            int recipeId = 0;
-            scm.createServer().checkout(recipeId, workDir, revision.getRevision(), changes);
+            String id = null;
+            if(persist)
+            {
+                id = getId();
+            }
+
+            scm.createServer().checkout(id, workDir, revision.getRevision(), changes);
             return changes;
         }
         catch (SCMException e)

@@ -36,7 +36,7 @@ public class RemoteScmFileSystem implements FileSystem
     {
         try
         {
-            return new ByteArrayInputStream(server.checkout(1, null, path).getBytes());
+            return new ByteArrayInputStream(server.checkout(null, path).getBytes());
         }
         catch (SCMException e)
         {

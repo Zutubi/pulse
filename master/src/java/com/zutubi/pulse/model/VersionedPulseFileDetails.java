@@ -53,7 +53,7 @@ public class VersionedPulseFileDetails extends PulseFileDetails
 
         try
         {
-            return scm.createServer().checkout(id, revision, pulseFileName);
+            return scm.createServer().checkout(revision, pulseFileName);
         }
         catch (SCMException e)
         {

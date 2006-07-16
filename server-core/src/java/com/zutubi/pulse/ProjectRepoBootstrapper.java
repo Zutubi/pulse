@@ -14,12 +14,15 @@ import java.io.IOException;
 public class ProjectRepoBootstrapper implements Bootstrapper
 {
     private final String projectName;
+    private final String specName;
     private final Scm scm;
     private BuildRevision revision;
+    private String agent;
 
-    public ProjectRepoBootstrapper(String projectName, Scm scm, BuildRevision revision)
+    public ProjectRepoBootstrapper(String projectName, String specName, Scm scm, BuildRevision revision)
     {
         this.projectName = projectName;
+        this.specName = specName;
         this.scm = scm;
         this.revision = revision;
     }
@@ -33,10 +36,12 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         }
 
         File reposDir = new File(paths.getPersistentWorkDir(), "repos");
-        final File localDir = new File(reposDir, projectName);
+        final File localDir = new File(reposDir, FileSystemUtils.composeFilename(projectName, specName));
 
         // run the scm bootstrapper on the local directory,
         ScmBootstrapper bootstrapper = selectBootstrapper(localDir);
+        bootstrapper.prepare(agent);
+        
         bootstrapper.bootstrap(new CommandContext(new RecipePaths()
         {
             public File getPersistentWorkDir()
@@ -71,6 +76,11 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         }
     }
 
+    public void prepare(String agent)
+    {
+        this.agent = agent;
+    }
+
     private ScmBootstrapper selectBootstrapper(final File localDir)
     {
         if (!localDir.exists() && !localDir.mkdirs())
@@ -81,11 +91,11 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         // else we can update.
         if (localDir.list().length == 0)
         {
-            return new CheckoutBootstrapper(scm, revision);
+            return new CheckoutBootstrapper(projectName, specName, scm, revision, true);
         }
         else
         {
-            return new UpdateBootstrapper(scm, revision);
+            return new UpdateBootstrapper(projectName, specName, scm, revision);
         }
     }
 }

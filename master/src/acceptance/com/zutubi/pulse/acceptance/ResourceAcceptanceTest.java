@@ -24,7 +24,7 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTest
 
         login("admin", "admin");
         clickLinkWithText("agents");
-        clickLinkWithText("[master]");
+        clickLinkWithText("master");
         clickLinkWithText("resources");
     }
 

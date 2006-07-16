@@ -20,6 +20,6 @@ public class MasterBuildHostRequirements extends AbstractBuildHostRequirements
 
     public String getSummary()
     {
-        return "[master]";
+        return "master";
     }
 }

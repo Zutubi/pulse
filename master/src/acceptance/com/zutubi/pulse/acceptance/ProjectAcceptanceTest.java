@@ -337,7 +337,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     {
         addSpec(SPEC_NAME);
 
-        assertBuildSpecification(SPEC_NAME, true, true, true, 100, new String[] { STAGE_NAME, RECIPE_NAME, "[master]"});
+        assertBuildSpecification(SPEC_NAME, true, true, true, 100, new String[] { STAGE_NAME, RECIPE_NAME, "master"});
 
         // Check back on the configuration tab: ensure spec appears
         clickLinkWithText("configuration");
@@ -450,7 +450,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         addSpec(SPEC_NAME);
         addStage("new-stage");
 
-        assertBuildStage("new-stage", NEW_RECIPE, "[master]");
+        assertBuildStage("new-stage", NEW_RECIPE, "master");
     }
 
     private void addStage(String name)

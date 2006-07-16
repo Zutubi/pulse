@@ -272,9 +272,9 @@ public class SVNServer implements SCMServer
     }
 
     /**
-     * @see SCMServer#checkout(long, File, Revision, List<Change>)
+     * @see SCMServer#checkout(String, File, Revision, List<Change>)
      */
-    public Revision checkout(long id, File toDirectory, Revision revision, final List<Change> changes) throws SCMException
+    public Revision checkout(String id, File toDirectory, Revision revision, final List<Change> changes) throws SCMException
     {
         SVNRevision svnRevision;
         SVNUpdateClient updateClient = new SVNUpdateClient(repository.getAuthenticationManager(), null);
@@ -305,7 +305,7 @@ public class SVNServer implements SCMServer
         return new NumericalRevision(svnRevision.getNumber());
     }
 
-    public String checkout(long id, Revision revision, String file) throws SCMException
+    public String checkout(Revision revision, String file) throws SCMException
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
 
@@ -484,7 +484,7 @@ public class SVNServer implements SCMServer
         return result;
     }
 
-    public void update(File workDir, Revision rev, List<Change> changes) throws SCMException
+    public void update(String id, File workDir, Revision rev, List<Change> changes) throws SCMException
     {
         SVNUpdateClient client = new SVNUpdateClient(authenticationManager, null);
 

@@ -1,6 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.BootstrapperSupport;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.CommandContext;
 
@@ -10,7 +11,7 @@ import java.util.List;
 
 /**
  */
-public class ChainBootstrapper implements Bootstrapper
+public class ChainBootstrapper extends BootstrapperSupport
 {
     private List<Bootstrapper> bootstrappers = new LinkedList<Bootstrapper>();
 

@@ -63,7 +63,7 @@ public class P4ServerTest extends PulseTestCase
     {
         getServer("depot-client");
         List<Change> changes = new LinkedList<Change>();
-        NumericalRevision revision = (NumericalRevision) server.checkout(randomInt(), workDir, null, changes);
+        NumericalRevision revision = (NumericalRevision) server.checkout(null, workDir, null, changes);
         assertEquals(8, revision.getRevisionNumber());
 
         assertEquals(10, changes.size());
@@ -96,7 +96,7 @@ public class P4ServerTest extends PulseTestCase
     public void testCheckoutRevision() throws Exception
     {
         getServer("depot-client");
-        NumericalRevision revision = (NumericalRevision) server.checkout(randomInt(), workDir, new NumericalRevision(1), null);
+        NumericalRevision revision = (NumericalRevision) server.checkout(null, workDir, new NumericalRevision(1), null);
         assertEquals(1, revision.getRevisionNumber());
         checkDirectory("checkoutRevision");
     }
@@ -104,14 +104,14 @@ public class P4ServerTest extends PulseTestCase
     public void testCheckoutFile() throws SCMException
     {
         getServer("depot-client");
-        String content = server.checkout(1, null, FileSystemUtils.composeFilename("depot", "file2"));
+        String content = server.checkout(null, FileSystemUtils.composeFilename("depot", "file2"));
         assertEquals("content of file2: edited at the same time as file2 in depot2.\n", content);
     }
 
     public void testCheckoutFileRevision() throws SCMException
     {
         getServer("depot-client");
-        String content = server.checkout(1, new NumericalRevision(2), FileSystemUtils.composeFilename("depot", "file2"));
+        String content = server.checkout(new NumericalRevision(2), FileSystemUtils.composeFilename("depot", "file2"));
         assertEquals("content of file2\n", content);
     }
 
@@ -329,6 +329,50 @@ public class P4ServerTest extends PulseTestCase
         getServer("test-client");
         List<Revision> revisions = server.getRevisionsSince(new NumericalRevision(7));
         assertEquals(0, revisions.size());
+    }
+
+    public void testCheckoutThenUpdate() throws SCMException, IOException
+    {
+        getServer("depot-client");
+        NumericalRevision coRevision = new NumericalRevision(1);
+        NumericalRevision got = (NumericalRevision) server.checkout("my-id", workDir, coRevision, null);
+        assertEquals(1, got.getRevisionNumber());
+        checkDirectory("checkoutRevision");
+
+        NumericalRevision updateRevision = new NumericalRevision(8);
+        List<Change> changes = new LinkedList<Change>();
+        server.update("my-id", workDir, updateRevision, changes);
+        checkDirectory("checkoutHead");
+        assertEquals(1, changes.size());
+        Change change = changes.get(0);
+        assertEquals("//depot/file2", change.getFilename());
+        assertEquals(Change.Action.EDIT, change.getAction());
+    }
+
+    public void testUpdateSameRevision() throws SCMException, IOException
+    {
+        getServer("depot-client");
+        server.checkout("my-id", workDir, null, null);
+
+        List<Change> changes = new LinkedList<Change>();
+        server.update("my-id", workDir, null, changes);
+        checkDirectory("checkoutHead");
+        assertEquals(0, changes.size());
+    }
+
+    public void testMultiUpdates() throws SCMException, IOException
+    {
+        getServer("test-client");
+
+        NumericalRevision coRevision = new NumericalRevision(1);
+        server.checkout("my-id", workDir, coRevision, null);
+
+        for(int i = 2; i <= 8; i++)
+        {
+            NumericalRevision updateRevision = new NumericalRevision(i);
+            List<Change> changes = new LinkedList<Change>();
+            server.update("my-id", workDir, updateRevision, changes);
+        }
     }
 
     private void getServer(String client)

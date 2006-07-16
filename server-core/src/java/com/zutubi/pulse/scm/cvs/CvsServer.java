@@ -159,7 +159,7 @@ public class CvsServer extends CachingSCMServer
      * @param rev
      * @param changes
      */
-    public void update(File workingDirectory, Revision rev, List<Change> changes) throws SCMException
+    public void update(String id, File workingDirectory, Revision rev, List<Change> changes) throws SCMException
     {
         assertRevisionArgValid(rev);
         cvs.update(workingDirectory, (CvsRevision) rev, changes);
@@ -204,7 +204,7 @@ public class CvsServer extends CachingSCMServer
         }
     }
 
-    public Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
+    public Revision checkout(String id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
     {
         assertRevisionArgValid(revision);
 
@@ -213,7 +213,7 @@ public class CvsServer extends CachingSCMServer
         return revision;
     }
 
-    public String checkout(long id, Revision revision, String file) throws SCMException
+    public String checkout(Revision revision, String file) throws SCMException
     {
         if (!TextUtils.stringSet(file))
         {

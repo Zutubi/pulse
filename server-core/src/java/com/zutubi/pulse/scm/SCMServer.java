@@ -51,7 +51,9 @@ public interface SCMServer
     /**
      * Checks out a new working copy to the specified directory.
      *
-     * @param id          a unique identifier for this checkout
+     * @param id          an identifier for this checkout used to identify related
+     *                    checkout/update operations.  May be null to indicate no
+     *                    relationship.
      * @param toDirectory root directory to check the copy out to
      * @param revision    the revision to check out, or null for most recent (HEAD)
      * @param changes     if not null, receives a list of change objects
@@ -60,18 +62,17 @@ public interface SCMServer
      * @return the revision actually checked out
      * @throws SCMException if an error occurs communicating with the server
      */
-    Revision checkout(long id, File toDirectory, Revision revision, List<Change> changes) throws SCMException;
+    Revision checkout(String id, File toDirectory, Revision revision, List<Change> changes) throws SCMException;
 
     /**
      * Checkout the specified file.
      *
-     * @param id       a unique identifier for this checkout
      * @param revision the revision be checked out
      * @param file     the path of the file relative to the configured scms checkout path
      * @return the contents of the requested file
      * @throws SCMException
      */
-    String checkout(long id, Revision revision, String file) throws SCMException;
+    String checkout(Revision revision, String file) throws SCMException;
 
     /**
      * Returns a list of changelists occuring in between the given revisions.
@@ -137,15 +138,18 @@ public interface SCMServer
     /**
      * Update the working directory to the specified revision.
      *
+     * @param id      an identifier for this update used to identify related
+     *                checkout/update operations.  May be null to indicate no
+     *                relationship.
      * @param workDir contains a local copy (checkout) of the module.
-     * @param rev to to which the local copy will be updated.
-     * @param changes     if not null, receives a list of change objects
-     *                    indicating the files that were checked out (the
-     *                    action will be ADD)
+     * @param rev     revision to which the local copy will be updated.
+     * @param changes if not null, receives a list of change objects
+     *                indicating the files that were checked out (the
+     *                action will be ADD)
      *
      * @throws SCMException
      */
-    void update(File workDir, Revision rev, List<Change> changes) throws SCMException;
+    void update(String id, File workDir, Revision rev, List<Change> changes) throws SCMException;
 
     /**
      * Allows the scm server to indicate whether or not it supports the update

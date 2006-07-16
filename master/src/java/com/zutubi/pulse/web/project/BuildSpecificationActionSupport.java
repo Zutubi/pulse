@@ -120,7 +120,7 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
 
             buildHosts = new LinkedHashMap<Long, String>();
             buildHosts.put(0L, "[any]");
-            buildHosts.put(1L, "[master]");
+            buildHosts.put(1L, "master");
 
             for (Slave slave : slaves)
             {

@@ -173,7 +173,7 @@ public class SVNServerTest extends PulseTestCase
         assertEquals("bfolder", files.get(1).getName());
         assertEquals("foo", files.get(2).getName());
 
-        String foo = confirmServer.checkout(0, null, "foo");
+        String foo = confirmServer.checkout(null, "foo");
         assertEquals("", foo);
     }
 
@@ -190,7 +190,7 @@ public class SVNServerTest extends PulseTestCase
         assertEquals("bfolder", files.get(1).getName());
         assertEquals("foo", files.get(2).getName());
 
-        String foo = confirmServer.checkout(0, null, "foo");
+        String foo = confirmServer.checkout(null, "foo");
         assertEquals("hello\n", foo);
     }
 
@@ -246,22 +246,22 @@ public class SVNServerTest extends PulseTestCase
 
     public void testCheckout() throws SCMException, IOException
     {
-        server.checkout(0, gotDir, new NumericalRevision(1), null);
+        server.checkout(null, gotDir, new NumericalRevision(1), null);
         assertRevision(gotDir, 1);
     }
 
     public void testUpdate() throws SCMException, IOException
     {
-        server.checkout(0, gotDir, new NumericalRevision(1), null);
-        server.update(gotDir, new NumericalRevision(4), null);
+        server.checkout(null, gotDir, new NumericalRevision(1), null);
+        server.update(null, gotDir, new NumericalRevision(4), null);
         assertRevision(gotDir, 4);
     }
 
     public void testMultiUpdate() throws SCMException, IOException
     {
-        server.checkout(0, gotDir, new NumericalRevision(1), null);
-        server.update(gotDir, new NumericalRevision(4), null);
-        server.update(gotDir, new NumericalRevision(8), null);
+        server.checkout(null, gotDir, new NumericalRevision(1), null);
+        server.update(null, gotDir, new NumericalRevision(4), null);
+        server.update(null, gotDir, new NumericalRevision(8), null);
         assertRevision(gotDir, 8);
     }
 

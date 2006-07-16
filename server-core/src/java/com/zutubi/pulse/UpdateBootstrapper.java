@@ -15,9 +15,9 @@ import java.util.List;
  */
 public class UpdateBootstrapper extends ScmBootstrapper
 {
-    public UpdateBootstrapper(Scm scm, BuildRevision revision)
+    public UpdateBootstrapper(String project, String spec, Scm scm, BuildRevision revision)
     {
-        super(scm, revision);
+        super(project, spec, scm, revision);
     }
 
     List<Change> bootstrap(File workDir)
@@ -25,7 +25,7 @@ public class UpdateBootstrapper extends ScmBootstrapper
         List<Change> changes = new LinkedList<Change>();
         try
         {
-            scm.createServer().update(workDir, revision.getRevision(), changes);
+            scm.createServer().update(getId(), workDir, revision.getRevision(), changes);
             return changes;
         }
         catch (SCMException e)

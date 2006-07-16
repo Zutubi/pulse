@@ -469,6 +469,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
         try
         {
+            request.getRequest().prepare(agent.getName());
             if (agent.getBuildService().build(request.getRequest()))
             {
                 dispatchedRequests.add(request);

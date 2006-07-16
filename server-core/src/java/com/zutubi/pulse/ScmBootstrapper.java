@@ -22,13 +22,23 @@ public abstract class ScmBootstrapper implements Bootstrapper
 {
     private static final Logger LOG = Logger.getLogger(ScmBootstrapper.class);
 
+    protected String agent;
+    protected String project;
+    protected String spec;
     protected Scm scm;
     protected BuildRevision revision;
 
-    public ScmBootstrapper(Scm scm, BuildRevision revision)
+    public ScmBootstrapper(String project, String spec, Scm scm, BuildRevision revision)
     {
+        this.project = project;
+        this.spec = spec;
         this.scm = scm;
         this.revision = revision;
+    }
+
+    public void prepare(String agent)
+    {
+        this.agent = agent;
     }
 
     public void bootstrap(CommandContext context)
@@ -93,6 +103,11 @@ public abstract class ScmBootstrapper implements Bootstrapper
         }
 
         writer.println(change.getFilename() + revision + " - " + change.getAction().toString());
+    }
+
+    protected String getId()
+    {
+        return project + "-" + spec + "-" + agent;
     }
 
     abstract List<Change> bootstrap(File workDir);

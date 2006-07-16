@@ -206,11 +206,11 @@ public class BuildController implements EventListener
         boolean checkoutOnly = project.getCheckoutScheme() == Project.CheckoutScheme.CHECKOUT_ONLY;
         if (checkoutOnly)
         {
-            initialBootstrapper = new CheckoutBootstrapper(project.getScm(), revision);
+            initialBootstrapper = new CheckoutBootstrapper(project.getName(), specification.getName(), project.getScm(), revision, false);
         }
         else
         {
-            initialBootstrapper = new ProjectRepoBootstrapper(project.getName(), project.getScm(), revision);
+            initialBootstrapper = new ProjectRepoBootstrapper(project.getName(), specification.getName(), project.getScm(), revision);
         }
         PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
         ComponentContext.autowire(pulseFileDetails);

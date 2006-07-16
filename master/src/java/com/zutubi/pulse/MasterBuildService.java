@@ -82,7 +82,7 @@ public class MasterBuildService implements BuildService
 
     public String getHostName()
     {
-        return "[master]";
+        return "master";
     }
 
     public void setMasterRecipeProcessor(MasterRecipeProcessor masterRecipeProcessor)

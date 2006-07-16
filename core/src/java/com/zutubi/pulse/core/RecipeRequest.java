@@ -1,8 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.PulseException;
-import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.model.ResourceRequirement;
 
 import java.util.List;
@@ -99,5 +96,10 @@ public class RecipeRequest
     public void setResourceRequirements(List<ResourceRequirement> resourceRequirements)
     {
         this.resourceRequirements = resourceRequirements;
+    }
+
+    public void prepare(String agent)
+    {
+        bootstrapper.prepare(agent);
     }
 }
