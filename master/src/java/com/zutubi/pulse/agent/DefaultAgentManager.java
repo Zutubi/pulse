@@ -22,8 +22,7 @@ import com.zutubi.pulse.util.logging.Logger;
 import java.net.MalformedURLException;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.*;
 
 /**
  */
