@@ -4,11 +4,13 @@ import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.license.Licensed;
 
 /**
  * 
  *
  */
+@Licensed("canAddAgent")
 public class AddAgentAction extends ActionSupport
 {
     private Slave slave = new Slave();
