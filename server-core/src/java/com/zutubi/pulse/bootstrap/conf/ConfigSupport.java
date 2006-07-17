@@ -1,7 +1,5 @@
 package com.zutubi.pulse.bootstrap.conf;
 
-import java.io.File;
-
 /**
  * <class-comment/>
  */
@@ -50,38 +48,47 @@ public class ConfigSupport implements Config
         }
     }
 
-    public int getInt(String key)
+    public boolean isWriteable()
     {
-        return Integer.parseInt(getProperty(key));
-    }
-
-    public int getInt(String key, int defaultValue)
-    {
-        if(hasProperty(key))
-        {
-            return getInt(key);
-        }
-        else
-        {
-            return defaultValue;
-        }
-    }
-
-    public void setInt(String key, int value)
-    {
-        setProperty(key, Integer.toString(value));
+        return config.isWriteable();
     }
 
     public Integer getInteger(String key)
     {
+        return getInteger(key, null);
+    }
+
+    public Integer getInteger(String key, Integer defaultValue)
+    {
         if (hasProperty(key))
         {
-            return new Integer(getProperty(key));
+            return Integer.valueOf(getProperty(key));
+        }
+        return defaultValue;
+    }
+
+    public void setInteger(String key, Integer value)
+    {
+        if (value != null)
+        {
+            setProperty(key, Integer.toString(value));
+        }
+        else
+        {
+            removeProperty(key);
+        }
+    }
+
+    public Long getLong(String key)
+    {
+        if (hasProperty(key))
+        {
+            return Long.valueOf(getProperty(key));
         }
         return null;
     }
 
-    public void setInteger(String key, Integer value)
+    public void setLong(String key, Long value)
     {
         if (value != null)
         {
@@ -91,27 +98,6 @@ public class ConfigSupport implements Config
         {
             removeProperty(key);
         }
-    }
-
-    public void setFile(String key, File value)
-    {
-        if (value != null)
-        {
-            setProperty(key, value.getAbsolutePath());
-        }
-        else
-        {
-            removeProperty(key);
-        }
-    }
-
-    public File getFile(String key)
-    {
-        if (hasProperty(key))
-        {
-            return new File(getProperty(key));
-        }
-        return null;
     }
 
     public Boolean getBooleanProperty(String key, Boolean defaultValue)
@@ -134,5 +120,4 @@ public class ConfigSupport implements Config
             removeProperty(key);
         }
     }
-
 }

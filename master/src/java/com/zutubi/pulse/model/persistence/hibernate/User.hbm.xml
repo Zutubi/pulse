@@ -9,7 +9,7 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="login" column="LOGIN" type="string" not-null="false" length="255"/>
+        <property name="login" column="LOGIN" type="string" length="255"/>
 
         <property name="name" column="NAME" type="string" not-null="false" length="255"/>
 

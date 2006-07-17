@@ -22,7 +22,7 @@ public class MasterApplicationConfigurationSupport implements MasterApplicationC
 
     public int getServerPort()
     {
-        return config.getInt(WEBAPP_PORT);
+        return config.getInteger(WEBAPP_PORT);
     }
 
     public String getAdminLogin()
@@ -227,12 +227,12 @@ public class MasterApplicationConfigurationSupport implements MasterApplicationC
 
     public int getJabberPort()
     {
-        return config.getInt(JABBER_PORT, JABBER_PORT_DEFAULT);
+        return config.getInteger(JABBER_PORT, JABBER_PORT_DEFAULT);
     }
 
     public void setJabberPort(int port)
     {
-        config.setInt(JABBER_PORT, port);
+        config.setInteger(JABBER_PORT, port);
     }
 
     public String getJabberUsername()

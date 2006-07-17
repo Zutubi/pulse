@@ -17,18 +17,23 @@ public class ReadOnlyConfig implements Config
         return delegate.getProperty(key);
     }
 
-    public void setProperty(String key, String value)
-    {
-        throw new UnsupportedOperationException();
-    }
-
     public boolean hasProperty(String key)
     {
         return delegate.hasProperty(key);
     }
 
+    public void setProperty(String key, String value)
+    {
+        throw new UnsupportedOperationException();
+    }
+
     public void removeProperty(String key)
     {
         throw new UnsupportedOperationException();
+    }
+
+    public boolean isWriteable()
+    {
+        return false;
     }
 }

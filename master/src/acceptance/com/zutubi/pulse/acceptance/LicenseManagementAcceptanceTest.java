@@ -2,6 +2,8 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.LicenseEditForm;
 import com.zutubi.pulse.license.LicenseType;
+import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.test.LicenseHelper;
 import com.zutubi.pulse.util.RandomUtils;
 
@@ -44,15 +46,11 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
     protected void tearDown() throws Exception
     {
         newLicenseKey = null;
+        expiredLicenseKey = null;
+        invalidLicenseKey = null;
+        newLicenseHolder = null;
 
         super.tearDown();
-    }
-
-    public void testLicenseDetails()
-    {
-        assertTablePresent("license.info");
-        // this is a little difficult since we dont know exactly what the
-        // details of the installed license are...
     }
 
     public void testUpdateLicense()
@@ -127,8 +125,33 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
         assertTextPresent("expired");
     }
 
-    public void testEditLicenseLinkOnlyAvailableToAdmin()
-    {
+    //---( Now lets check the license information display )---
 
+    public void testLicenseDetails() throws LicenseException
+    {
+        License newLicense = new License(LicenseType.CUSTOM, "local tester").setSupportedUsers(200);
+
+        // set the new license
+        clickLink("license.edit");
+
+        LicenseEditForm form = new LicenseEditForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements(LicenseHelper.newLicenseKey(newLicense));
+        form.assertFormNotPresent();
+
+        // validate the details of the license.
+        assertTablePresent("license.info");
+        assertTableRowsEqual("license.info", 1, new String[][]{
+                {"license type", "Custom"},
+                {"licensee", "local tester"},
+                {"expiry date", "Never"},
+                {"agent restriction", "unrestricted"},
+                {"project restriction", "unrestricted"},
+                {"user restriction", "1 of 200"}
+        });
+        // assuming that we only have a single user...
     }
+
+
+
 }

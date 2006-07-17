@@ -5,22 +5,13 @@ import java.util.Properties;
 /**
  * <class-comment/>
  */
-public class PropertiesConfig implements Config
+public class VolatileReadOnlyConfig implements Config
 {
-    private final Properties props;
+    private Properties props = new Properties();
 
-    public PropertiesConfig()
+    public VolatileReadOnlyConfig(Properties sysProps)
     {
-        this(null);
-    }
-
-    public PropertiesConfig(Properties props)
-    {
-        if (props == null)
-        {
-            props = new Properties();
-        }
-        this.props = props;
+        this.props.putAll(sysProps);
     }
 
     public String getProperty(String key)
@@ -30,7 +21,7 @@ public class PropertiesConfig implements Config
 
     public void setProperty(String key, String value)
     {
-        props.setProperty(key, value);
+        removeProperty(key);
     }
 
     public boolean hasProperty(String key)

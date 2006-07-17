@@ -169,6 +169,16 @@ public class IOUtils
         }
     }
 
+    public static void joinStreams(InputStream input, OutputStream output, boolean close) throws IOException
+    {
+        joinStreams(input, output);
+        if (close)
+        {
+            close(input);
+            close(output);
+        }
+    }
+
     public static void joinReaderToWriter(Reader reader, Writer writer) throws IOException
     {
         char[] buffer = new char[1024];

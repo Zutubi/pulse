@@ -4,6 +4,7 @@ import com.zutubi.pulse.scheduling.CronTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
 
 /**
+ * 
  */
 public class EditCronTriggerAction extends AbstractEditTriggerAction
 {

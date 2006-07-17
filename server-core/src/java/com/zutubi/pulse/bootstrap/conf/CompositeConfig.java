@@ -26,7 +26,14 @@ public class CompositeConfig implements Config
 
     public void setProperty(String key, String value)
     {
-        delegates[0].setProperty(key, value);
+        for (Config config: delegates)
+        {
+            if (!config.isWriteable())
+            {
+                return;
+            }
+            config.setProperty(key, value);
+        }
     }
 
     public boolean hasProperty(String key)
@@ -45,18 +52,24 @@ public class CompositeConfig implements Config
     {
         for (Config config: delegates)
         {
-            if (config.hasProperty(key))
+            if (!config.isWriteable())
             {
-                try
-                {
-                    config.removeProperty(key);
-                }
-                catch (UnsupportedOperationException e)
-                {
-                    // noop. read only config.
-                }
                 return;
             }
+            if (config.hasProperty(key))
+            {
+                config.removeProperty(key);
+            }
         }
+    }
+
+    /**
+     * If the first delegate is writable, this composite is also considered writable.
+     *
+     * @return true if this composite is writable.
+     */
+    public boolean isWriteable()
+    {
+        return delegates[0].isWriteable();
     }
 }

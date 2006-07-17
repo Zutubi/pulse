@@ -93,4 +93,8 @@ public class FileConfig implements Config
         return props;
     }
 
+    public boolean isWriteable()
+    {
+        return true;
+    }
 }

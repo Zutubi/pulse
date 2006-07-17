@@ -13,27 +13,12 @@
     <table class="columns" width="90%">
         <tr>
             <td class="columns" width="40%">
-                <table class="fill-content" id="license.info">
-                    #restrictedHeadingRow("license.info" 2 "ROLE_ADMINISTRATOR" "edit" "/admin/editLicense!input.action" "pencil.gif" "license.edit")
-                    <tr>
-                        #contentRowHeading("license.name.field")
-                        #contentCell("license.type.$license.type")
-                    </tr>
-                    #dynamicRow("license.holder.field" $license.holder)
-                    #dynamicRow("license.expiry.field" $expiryDate)
-                </table>
-
                 <table id="general.config" class="fill-content">
                     #adminHeadingRow("general.config" "/admin/editGeneral!input.action" "general.edit" "/admin/general!reset.action" "general.reset")
                     #dynamicRow("general.host" $config.hostName)
                     #dynamicRow("general.help.url" $config.helpUrl)
                     #enabledDisabledRow("general.rss.enabled" $config.rssEnabled)
                     #enabledDisabledRow("general.anonymous" $config.anonymousAccessEnabled)
-                </table>
-
-                <table id="logging.config" class="fill-content">
-                    #adminHeadingRow("logging.config" "/admin/editLogConfig!input.action" "logging.edit" "/admin/logConfig!reset.action" "logging.reset")
-                    #dynamicRow("logging.level" $config.logConfig)
                 </table>
 
                 <table id="commit.message.links" class="fill-content">
@@ -57,6 +42,31 @@
                     #contentRow("commit.message.links.none" 4)
 #end
                     #addRow("commit.message.link.add" 4 "addCommitMessageLink!input.action" "commit.message.link.add")
+                </table>
+
+                <table id="logging.config" class="fill-content">
+                    #adminHeadingRow("logging.config" "/admin/editLogConfig!input.action" "logging.edit" "/admin/logConfig!reset.action" "logging.reset")
+                    #dynamicRow("logging.level" $config.logConfig)
+                </table>
+
+                <table class="fill-content" id="license.info">
+                    #restrictedHeadingRow("license.info" 2 "ROLE_ADMINISTRATOR" "edit" "/admin/editLicense!input.action" "pencil.gif" "license.edit")
+                    <tr>
+                        #contentRowHeading("license.name.field")
+                        #contentCell("license.type.$license.type")
+                    </tr>
+                    #dynamicRow("license.holder.field" $license.holder)
+                    #dynamicRow("license.expiry.field" $expiryDate)
+
+                    #foreach($res in $restrictions)
+                        #if($res.supported == -1)
+                            #set($t = "$unrestricted")
+                        #else
+                            #set($t = "$res.inUse of $res.supported")
+                        #end
+                    #dynamicRow("license.restriction.$res.entity" $t)
+                    #end
+
                 </table>
             </td>
             <td class="columns" width="40%">

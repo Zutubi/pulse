@@ -3,6 +3,7 @@ package com.zutubi.pulse.bootstrap;
 import java.io.File;
 
 /**
+ * 
  */
 public abstract class AbstractConfigurationManager implements ConfigurationManager
 {
