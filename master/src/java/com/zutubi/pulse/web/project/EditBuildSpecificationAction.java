@@ -8,6 +8,8 @@ import com.zutubi.pulse.xwork.interceptor.Preparable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  */
@@ -20,8 +22,10 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
     private boolean isolateChangelists;
     private boolean retainWorkingCopy;
     private boolean timeoutEnabled;
+    private String checkoutSchemeName;
     private int timeout = 60;
     private static final List<String> PREPARE_PARAMS = Arrays.asList("id", "projectId");
+    private Map<String, String> checkoutSchemes;
 
     public void setId(long id)
     {
@@ -58,6 +62,16 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
         this.retainWorkingCopy = retainWorkingCopy;
     }
 
+    public String getCheckoutSchemeName()
+    {
+        return checkoutSchemeName;
+    }
+
+    public void setCheckoutSchemeName(String checkoutSchemeName)
+    {
+        this.checkoutSchemeName = checkoutSchemeName;
+    }
+
     public boolean isTimeoutEnabled()
     {
         return timeoutEnabled;
@@ -87,6 +101,32 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
         }
 
         return false;
+    }
+
+    public Map<String, String> getCheckoutSchemes()
+    {
+        if(checkoutSchemes == null)
+        {
+            checkoutSchemes = new TreeMap<String, String>();
+            if(project != null && !project.getScm().supportsUpdate())
+            {
+                checkoutSchemes.put(BuildSpecification.CheckoutScheme.CLEAN_CHECKOUT.toString(), getName(BuildSpecification.CheckoutScheme.CLEAN_CHECKOUT));
+            }
+            else
+            {
+                for(BuildSpecification.CheckoutScheme scheme: BuildSpecification.CheckoutScheme.values())
+                {
+                    checkoutSchemes.put(scheme.toString(), getName(scheme));
+                }
+            }
+        }
+
+        return checkoutSchemes;
+    }
+
+    private String getName(BuildSpecification.CheckoutScheme scheme)
+    {
+        return getText("buildspec.checkout.scheme." + scheme.toString());
     }
 
     public List<String> getPrepareParameterNames()
@@ -122,6 +162,19 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
             }
         }
 
+        try
+        {
+            BuildSpecification.CheckoutScheme scheme = BuildSpecification.CheckoutScheme.valueOf(checkoutSchemeName);
+            if(scheme != BuildSpecification.CheckoutScheme.CLEAN_CHECKOUT && !project.getScm().supportsUpdate())
+            {
+                addFieldError("checkoutSchemeName", "Invalid checkout scheme for this project (the SCM does not support updating)");
+            }
+        }
+        catch(IllegalArgumentException e)
+        {
+            addFieldError("checkoutSchemeName", "Invalid checkout scheme");
+        }
+
         if (timeoutEnabled)
         {
             if (timeout <= 0)
@@ -140,6 +193,7 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
 
         isolateChangelists = spec.getIsolateChangelists();
         retainWorkingCopy = spec.getRetainWorkingCopy();
+        checkoutSchemeName = spec.getCheckoutScheme().toString();
 
         timeoutEnabled = spec.getTimeout() != BuildSpecification.TIMEOUT_NEVER;
         if (timeoutEnabled)
@@ -158,6 +212,12 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
     {
         spec.setIsolateChangelists(isolateChangelists);
         spec.setRetainWorkingCopy(retainWorkingCopy);
+        BuildSpecification.CheckoutScheme newScheme = BuildSpecification.CheckoutScheme.valueOf(checkoutSchemeName);
+        if(newScheme != spec.getCheckoutScheme())
+        {
+            spec.setForceClean(true);
+            spec.setCheckoutScheme(newScheme);
+        }
 
         if (timeoutEnabled)
         {

@@ -10,11 +10,36 @@ public class BuildSpecification extends Entity implements NamedEntity
 {
     public static final int TIMEOUT_NEVER = 0;
 
+    /**
+     * The checkout scheme defines the maner in which a projects source is bootstrapped.
+     */
+    public enum CheckoutScheme
+    {
+        /**
+         * Always checkout a fresh copy of the project to the base directory.
+         */
+        CLEAN_CHECKOUT,
+
+        /**
+         * Keep a local copy of the project, update it to the required
+         * revision and copy to a clean base directory to build.
+         */
+        CLEAN_UPDATE,
+
+        /**
+         * Keep a copy of the project, update to the required revision and
+         * build in place.
+         */
+        INCREMENTAL_UPDATE
+    }
+
     private String name;
     private boolean isolateChangelists = false;
     private boolean retainWorkingCopy = false;
     private int timeout = TIMEOUT_NEVER;
+    private CheckoutScheme checkoutScheme = CheckoutScheme.CLEAN_CHECKOUT;
     private BuildSpecificationNode root = new BuildSpecificationNode(null);
+    private boolean forceClean;
 
     public BuildSpecification()
     {
@@ -31,6 +56,7 @@ public class BuildSpecification extends Entity implements NamedEntity
         BuildSpecification copy = new BuildSpecification(name);
         copy.timeout = timeout;
         copy.isolateChangelists = isolateChangelists;
+        copy.checkoutScheme = checkoutScheme;
         copy.root = root.copy();
         return copy;
     }
@@ -92,6 +118,32 @@ public class BuildSpecification extends Entity implements NamedEntity
         this.timeout = timeout;
     }
 
+    public CheckoutScheme getCheckoutScheme()
+    {
+        return checkoutScheme;
+    }
+
+    public void setCheckoutScheme(CheckoutScheme checkoutScheme)
+    {
+        this.checkoutScheme = checkoutScheme;
+    }
+
+    /**
+     * Used by hibernate to persist the checkout scheme value.
+     */
+    private String getCheckoutSchemeName()
+    {
+        return checkoutScheme.toString();
+    }
+
+    /**
+     * Used by hibernate to persist the checkout scheme value.
+     */
+    private void setCheckoutSchemeName(String str)
+    {
+        checkoutScheme = CheckoutScheme.valueOf(str);
+    }
+
     public BuildSpecificationNode getRoot()
     {
         return root;
@@ -110,5 +162,15 @@ public class BuildSpecification extends Entity implements NamedEntity
     public BuildSpecificationNode getNodeByStageName(String name)
     {
         return root.getNodeByStageName(name);
+    }
+
+    public boolean getForceClean()
+    {
+        return forceClean;
+    }
+
+    public void setForceClean(boolean forceClean)
+    {
+        this.forceClean = forceClean;
     }
 }

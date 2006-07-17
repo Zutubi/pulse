@@ -54,9 +54,9 @@ public class RecipeControllerTest extends PulseTestCase
         childNode.setId(103);
         rootNode.addChild(childNode);
 
-        recipeRequest = new RecipeRequest(rootResult.getId(), rootResult.getRecipeName());
+        recipeRequest = new RecipeRequest("project", "spec", rootResult.getId(), rootResult.getRecipeName(), false);
         dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null);
-        recipeController = new RecipeController(rootNode, dispatchRequest, logger, resultCollector, recipeQueue, buildManager, null);
+        recipeController = new RecipeController(rootNode, dispatchRequest, false, logger, resultCollector, recipeQueue, buildManager, null);
     }
 
     protected void tearDown() throws Exception
@@ -87,7 +87,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
-        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest(rootResult.getId(), "test"), new MockAgent(buildService));
+        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest("project", "spec", rootResult.getId(), "test", false), new MockAgent(buildService));
         assertTrue(recipeController.handleRecipeEvent(event));
         assertEquals(buildService.getHostName(), rootNode.getHost());
 
@@ -260,12 +260,12 @@ public class RecipeControllerTest extends PulseTestCase
             preparedRecipes.add(recipeId);
         }
 
-        public void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, BuildService buildService)
+        public void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, boolean incremental, BuildService buildService)
         {
             collectedRecipes.put(recipeId, buildService);
         }
 
-        public void cleanup(BuildResult result, long recipeId, BuildService buildService)
+        public void cleanup(BuildResult result, long recipeId, boolean incremental, BuildService buildService)
         {
             cleanedRecipes.put(recipeId, buildService);
         }
@@ -398,12 +398,12 @@ public class RecipeControllerTest extends PulseTestCase
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void collectResults(long recipeId, File outputDest, File workDest)
+        public void collectResults(String project, String spec, long recipeId, boolean incremental, File outputDest, File workDest)
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void cleanup(long recipeId)
+        public void cleanup(String project, String spec, long recipeId, boolean incremental)
         {
             throw new RuntimeException("Method not implemented.");
         }

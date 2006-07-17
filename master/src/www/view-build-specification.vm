@@ -42,6 +42,14 @@
 <body>
     #projectTabs("configuration")
 
+    <span class="action">
+        <a href="triggerBuild.action?id=$specification.id&amp;projectId=$project.id"><img alt="trigger" src="/images/lightning.gif"/> #wwtext("name=buildspec.trigger")</a>
+#if($specification.forceClean)
+        [ #wwtext("name=buildspec.forced.clean") ]
+#else
+        [ <a href="forceCleanBuild.action?id=$specification.id&amp;projectId=$project.id">#wwtext("name=buildspec.force.clean")</a> ]
+#end
+    </span>
     <h2 class="section">#wwtext("name=buildspec") $!webwork.htmlEncode($specification.name)</h2>
 
     <table id="spec.basics" class="content">
@@ -49,6 +57,7 @@
         #dynamicRow("buildspec.name" $specification.name)
         #dynamicRow("buildspec.isolate.changelists" $specification.isolateChangelists)
         #dynamicRow("buildspec.retain.working.copy" $specification.retainWorkingCopy)
+        #dynamicRow("buildspec.checkout.scheme" $action.getText("buildspec.checkout.scheme.$specification.checkoutScheme.toString()"))
         #dynamicRow("buildspec.timeout" $specification.prettyTimeout)
     </table>
 

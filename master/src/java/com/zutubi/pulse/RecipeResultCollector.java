@@ -8,8 +8,8 @@ public interface RecipeResultCollector
 {
     void prepare(BuildResult result, long recipeId);
 
-    void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, BuildService buildService);
+    void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, boolean incremental, BuildService buildService);
 
-    void cleanup(BuildResult result, long recipeId, BuildService buildService);
+    void cleanup(BuildResult result, long recipeId, boolean incremental, BuildService buildService);
 
 }

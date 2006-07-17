@@ -30,7 +30,7 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
         }
     }
 
-    public void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, BuildService buildService)
+    public void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, boolean incremental, BuildService buildService)
     {
         if (buildService != null)
         {
@@ -50,15 +50,15 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
                 }
             }
 
-            buildService.collectResults(recipeId, outputDest, workDest);
+            buildService.collectResults(result.getProject().getName(), result.getBuildSpecification(), recipeId, incremental, outputDest, workDest);
         }
     }
 
-    public void cleanup(BuildResult result, long recipeId, BuildService buildService)
+    public void cleanup(BuildResult result, long recipeId, boolean incremental, BuildService buildService)
     {
         if (buildService != null)
         {
-            buildService.cleanup(recipeId);
+            buildService.cleanup(result.getProject().getName(), result.getBuildSpecification(), recipeId, incremental);
         }
     }
 

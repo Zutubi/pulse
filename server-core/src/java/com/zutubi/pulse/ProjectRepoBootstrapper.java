@@ -8,8 +8,10 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * The Project Repo Bootstrapper checks out a project into a the project-root/project-name/repo
- * directory and then runs an update when necessary, copying the results into the build directory.
+ * The Project Repo Bootstrapper checks out a project into the:
+ *    work/project-name/spec-name
+ * directory and then runs an update when necessary, copying the results into
+ * the base directory when it differs from the checkout directory.
  */
 public class ProjectRepoBootstrapper implements Bootstrapper
 {
@@ -18,13 +20,15 @@ public class ProjectRepoBootstrapper implements Bootstrapper
     private final Scm scm;
     private BuildRevision revision;
     private String agent;
+    private boolean forceClean;
 
-    public ProjectRepoBootstrapper(String projectName, String specName, Scm scm, BuildRevision revision)
+    public ProjectRepoBootstrapper(String projectName, String specName, Scm scm, BuildRevision revision, boolean forceClean)
     {
         this.projectName = projectName;
         this.specName = specName;
         this.scm = scm;
         this.revision = revision;
+        this.forceClean = forceClean;
     }
 
     public void bootstrap(final CommandContext context) throws BuildException
@@ -35,11 +39,8 @@ public class ProjectRepoBootstrapper implements Bootstrapper
             throw new BuildException("Attempt to use update bootstrapping when no persistent working directory is available.");
         }
 
-        File reposDir = new File(paths.getPersistentWorkDir(), "repos");
-        final File localDir = new File(reposDir, FileSystemUtils.composeFilename(projectName, specName));
-
         // run the scm bootstrapper on the local directory,
-        ScmBootstrapper bootstrapper = selectBootstrapper(localDir);
+        ScmBootstrapper bootstrapper = selectBootstrapper(paths.getPersistentWorkDir());
         bootstrapper.prepare(agent);
         
         bootstrapper.bootstrap(new CommandContext(new RecipePaths()
@@ -51,28 +52,26 @@ public class ProjectRepoBootstrapper implements Bootstrapper
 
             public File getBaseDir()
             {
-                return localDir;
+                return paths.getPersistentWorkDir();
             }
 
             public File getOutputDir()
             {
-                return null;
+                return paths.getOutputDir();
             }
         }, context.getOutputDir()));
 
-        // copy these details to the base directory.
-        File baseDir = paths.getBaseDir();
-        if (baseDir.exists() && !baseDir.delete())
+        // If the checkout and base differ, then we need to copy over to the base.
+        if(!paths.getBaseDir().equals(paths.getPersistentWorkDir()))
         {
-            throw new BuildException("Unable to bootstrap " + baseDir);
-        }
-        try
-        {
-            FileSystemUtils.copyRecursively(localDir, baseDir);
-        }
-        catch (IOException e)
-        {
-            throw new BuildException(e);
+            try
+            {
+                FileSystemUtils.copyRecursively(paths.getPersistentWorkDir(), paths.getBaseDir());
+            }
+            catch (IOException e)
+            {
+                throw new BuildException(e);
+            }
         }
     }
 
@@ -83,6 +82,14 @@ public class ProjectRepoBootstrapper implements Bootstrapper
 
     private ScmBootstrapper selectBootstrapper(final File localDir)
     {
+        if(forceClean && localDir.exists())
+        {
+            if(!FileSystemUtils.removeDirectory(localDir))
+            {
+                throw new BuildException("Unable to remove local scm directory: " + localDir.getAbsolutePath());
+            }
+        }
+
         if (!localDir.exists() && !localDir.mkdirs())
         {
             throw new BuildException("Failed to initialise local scm directory: " + localDir.getAbsolutePath());

@@ -16,6 +16,10 @@
 
         <property name="timeout" column="TIMEOUT" type="int"/>
 
+        <property name="checkoutSchemeName" column="CHECKOUT_SCHEME" type="string" length="50"/>
+
+        <property name="forceClean" column="FORCE_CLEAN" type="boolean"/>
+
         <many-to-one name="root" class="com.zutubi.pulse.model.BuildSpecificationNode"
                      column="ROOT_ID" cascade="all" lazy="false"/>
 

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.model;
 
-import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.Entity;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
@@ -35,23 +34,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         PAUSING
     }
 
-    /**
-     * The checkout scheme defines the maner in which a projects source is bootstrapped.
-     *
-     */
-    public enum CheckoutScheme
-    {
-        /**
-         * Always checkout a fresh copy of the project
-         */
-        CHECKOUT_ONLY,
-
-        /**
-         * Keep a local copy of the project and update it to the required revision.
-         */
-        CHECKOUT_AND_UPDATE
-    }
-
     public static final int DEFAULT_WORK_DIR_BUILDS = 10;
 
     private String name;
@@ -63,8 +45,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private Scm scm;
     private State state = State.IDLE;
     private long nextBuildNumber = 1;
-
-    private CheckoutScheme checkoutScheme = CheckoutScheme.CHECKOUT_ONLY;
 
     private List<BuildSpecification> buildSpecifications;
 
@@ -111,7 +91,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         }
 
         copy.scm = scm.copy();
-        copy.checkoutScheme = checkoutScheme;
         copy.buildSpecifications = new LinkedList<BuildSpecification>();
         for(BuildSpecification spec: buildSpecifications)
         {
@@ -418,74 +397,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
             case PAUSING:
                 state = State.BUILDING;
                 break;
-        }
-    }
-
-
-    /**
-     * The checkout scheme defines the maner in which this project is bootstrapped. The
-     * default checkout scheme is CHECKOUT_ONLY.
-     *
-     * @return this projects configured checkout scheme.
-     *
-     * @see CheckoutScheme#CHECKOUT_AND_UPDATE
-     * @see CheckoutScheme#CHECKOUT_ONLY
-     */
-    public CheckoutScheme getCheckoutScheme()
-    {
-        if (checkoutScheme == null)
-        {
-            checkoutScheme = CheckoutScheme.CHECKOUT_ONLY;
-        }
-        return checkoutScheme;
-    }
-
-    /**
-     *
-     * @param scheme
-     *
-     * @throws IllegalArgumentException if you set the scheme to be CHECKOUT_AND_UPDATE
-     * when the configured SCM does not support the update operation. Be sure to check
-     * the SCM.
-     */
-    public void setCheckoutScheme(CheckoutScheme scheme)
-    {
-        if (scheme == null)
-        {
-            throw new IllegalArgumentException("Checkout scheme can not be null.");
-        }
-        // ensure that if the checkout scheme is update, that it is supported
-        // by the configured scm.
-        if (scheme == CheckoutScheme.CHECKOUT_AND_UPDATE && !getScm().supportsUpdate())
-        {
-            throw new IllegalArgumentException("Checkout and Update scheme not supported " +
-                    "by the scm of this project.");
-        }
-
-        this.checkoutScheme = scheme;
-    }
-
-    /**
-     * Used by hibernate to persist the checkout scheme value.
-     */
-    private String getCheckoutSchemeName()
-    {
-        return checkoutScheme.toString();
-    }
-
-    /**
-     * Used by hibernate to persist the checkout scheme value.
-     */
-    private void setCheckoutSchemeName(String str)
-    {
-        // need to handle nulls in the database.
-        if (TextUtils.stringSet(str))
-        {
-            checkoutScheme = CheckoutScheme.valueOf(str);
-        }
-        else
-        {
-            checkoutScheme = CheckoutScheme.CHECKOUT_ONLY;
         }
     }
 

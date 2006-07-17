@@ -1,5 +1,6 @@
 package com.zutubi.pulse.web.project;
 
+import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
@@ -59,6 +60,12 @@ public abstract class AbstractEditScmAction extends ProjectActionSupport impleme
     {
         getScm().setMonitor(monitor);
         getScmManager().save(getScm());
+        project = getProjectManager().getProject(projectId);
+        for(BuildSpecification spec: project.getBuildSpecifications())
+        {
+            spec.setForceClean(true);
+            getProjectManager().save(spec);
+        }
         return SUCCESS;
     }
 

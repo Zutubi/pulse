@@ -552,7 +552,7 @@ public class FileSystemUtils
     {
         if(from.isDirectory())
         {
-            if(!to.mkdirs())
+            if(!to.isDirectory() && !to.mkdirs())
             {
                 throw new IOException("Unable to create destination directory '" + to.getAbsolutePath() + "'");
             }

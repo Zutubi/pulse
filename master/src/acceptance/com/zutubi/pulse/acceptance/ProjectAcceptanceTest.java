@@ -103,21 +103,6 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertTextPresent("select a different project");
     }
 
-    public void testEditCheckoutScheme()
-    {
-        // the default should be CHECOUT_ONLY.
-        assertTextPresent("checkout only");
-
-        clickLink("project.checkout.edit");
-
-        EditCheckoutSchemeForm form = new EditCheckoutSchemeForm(tester);
-        form.assertFormPresent();
-        form.saveFormElements("CHECKOUT_AND_UPDATE");
-        form.assertFormNotPresent();
-
-        assertTextPresent("checkout and update");
-    }
-
     public void testEditScm()
     {
         CvsForm.Edit form = new CvsForm.Edit(tester);
@@ -268,7 +253,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         // using the index of the link is brittle, but since the links id
         // contains a reference to the id of the object (which we do not know)
         // there are not many options available.
-        clickLinkWithText("edit", 7);
+        clickLinkWithText("edit", 6);
 
         form.assertFormElements(null, null, "10", "builds");
         assertOptionsEqual(CleanupRuleForm.WORK_DIR_ONLY, new String[]{ "whole build results", "working directories only" });
@@ -284,7 +269,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertProjectCleanupTable(new String[][] { getCleanupRow(false, "error, success", "2 days") });
 
         // Check form is correctly populated again
-        clickLinkWithText("edit", 7);
+        clickLinkWithText("edit", 6);
 
         form.assertFormElements(null, null, "2", "days");
         assertSelectionValues(CleanupRuleForm.WORK_DIR_ONLY, new String[]{ "false" });
@@ -300,7 +285,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         // using the index of the link is brittle, but since the links id
         // contains a reference to the id of the object (which we do not know)
         // there are not many options available.
-        clickLinkWithText("edit", 7);
+        clickLinkWithText("edit", 6);
 
         form.assertFormElements(null, null, "10", "builds");
         tester.selectOption(CleanupRuleForm.WORK_DIR_ONLY, "whole build results");
@@ -319,7 +304,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         // using the index of the link is brittle, but since the links id
         // contains a reference to the id of the object (which we do not know)
         // there are not many options available.
-        clickLinkWithText("edit", 7);
+        clickLinkWithText("edit", 6);
 
         form.saveFormElements(null, null, "0", "days");
         form.assertFormPresent();
@@ -337,7 +322,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     {
         addSpec(SPEC_NAME);
 
-        assertBuildSpecification(SPEC_NAME, true, true, true, 100, new String[] { STAGE_NAME, RECIPE_NAME, "master"});
+        assertBuildSpecification(SPEC_NAME, true, true, "clean checkout", true, 100, new String[] { STAGE_NAME, RECIPE_NAME, "master"});
 
         // Check back on the configuration tab: ensure spec appears
         clickLinkWithText("configuration");
@@ -393,10 +378,10 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         EditBuildSpecForm form = new EditBuildSpecForm(tester);
         form.assertFormPresent();
-        form.assertFormElements(SPEC_NAME, "true", "true", "true", "100");
-        form.saveFormElements(SPEC_NAME + "_edited", "false", "false", null, null);
+        form.assertFormElements(SPEC_NAME, "true", "true", "CLEAN_CHECKOUT", "true", "100");
+        form.saveFormElements(SPEC_NAME + "_edited", "false", "false", "INCREMENTAL_UPDATE", null, null);
 
-        assertBuildSpecification(SPEC_NAME + "_edited", false, false, false, 0);
+        assertBuildSpecification(SPEC_NAME + "_edited", false, false, "incremental update", false, 0);
 
         clickLinkWithText("configuration");
         assertProjectBuildSpecTable(new String[][]{
@@ -412,7 +397,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         EditBuildSpecForm form = new EditBuildSpecForm(tester);
         form.assertFormPresent();
-        form.saveFormElements("", "true", "true", "true", "-100");
+        form.saveFormElements("", "true", "true", "INCREMENTAL_UPDATE", "true", "-100");
         form.assertFormPresent();
 
         assertTextPresent("name is required");
@@ -426,7 +411,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         EditBuildSpecForm form = new EditBuildSpecForm(tester);
         form.assertFormPresent();
-        form.saveFormElements("default", "true", "true", "true", "100");
+        form.saveFormElements("default", "true", "true", "INCREMENTAL_UPDATE", "true", "100");
         form.assertFormPresent();
 
         assertTextPresent("'default' already exists");
@@ -1263,7 +1248,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertTableRowsEqual("project.buildspecs", 2, rows);
     }
 
-    private void assertBuildSpecification(String specName, boolean isolateChangelists, boolean retainWorkingCopy, boolean timeoutEnabled, int timeout, String[]... stages)
+    private void assertBuildSpecification(String specName, boolean isolateChangelists, boolean retainWorkingCopy, String checkoutScheme, boolean timeoutEnabled, int timeout, String[]... stages)
     {
         String timeoutText = "[never]";
 
@@ -1276,6 +1261,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
                 new String[]{ "name", specName },
                 new String[]{ "isolate changelists", Boolean.toString(isolateChangelists) },
                 new String[]{ "retain working copy", Boolean.toString(retainWorkingCopy) },
+                new String[]{ "checkout scheme", checkoutScheme },
                 new String[]{ "timeout", timeoutText }
         });
 

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.web.project;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.Project;
@@ -7,7 +8,6 @@ import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.ScmManager;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.web.ActionSupport;
-import com.opensymphony.util.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -172,5 +172,18 @@ public class ProjectActionSupport extends ActionSupport
         }
 
         return p;
+    }
+
+    public boolean canWrite(Project project)
+    {
+        try
+        {
+            getProjectManager().checkWrite(project);
+            return true;
+        }
+        catch(Exception e)
+        {
+            return false;
+        }
     }
 }

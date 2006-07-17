@@ -180,6 +180,11 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="forceCleanBuild" class="com.zutubi.pulse.web.project.ForceCleanBuildAction">
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${id}&amp;projectId=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="viewArtifact" class="com.zutubi.pulse.web.project.ViewArtifactAction">
             <result name="success" type="velocity">view-artifact.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
@@ -725,13 +730,6 @@
         </action>
 
         <action name="deleteCleanupRule" class="com.zutubi.pulse.web.project.DeleteCleanupRuleAction">
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
-        <action name="editCheckoutScheme" class="com.zutubi.pulse.web.project.EditProjectCheckoutSchemeAction">
-            <result name="input" type="velocity">edit-checkout-scheme.vm</result>
-            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>

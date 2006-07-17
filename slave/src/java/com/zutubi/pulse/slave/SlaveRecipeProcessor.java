@@ -63,7 +63,7 @@ public class SlaveRecipeProcessor
         {
             EventListener listener = registerMasterListener(masterProxy, request.getId());
             ResourceRepository repo = new RemoteResourceRepository(slaveId, masterProxy, serviceTokenManager);
-            ServerRecipePaths processorPaths = new ServerRecipePaths(request.getId(), configurationManager.getUserPaths().getData());
+            ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getSpec(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
             request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), request.getBootstrapper()));
 
             try

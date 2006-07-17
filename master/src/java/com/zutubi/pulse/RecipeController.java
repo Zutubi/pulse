@@ -21,6 +21,7 @@ public class RecipeController
     private RecipeResultNode recipeResultNode;
     private RecipeResult recipeResult;
     private RecipeDispatchRequest dispatchRequest;
+    private boolean incremental;
     private RecipeLogger logger;
     private RecipeResultCollector collector;
     private BuildManager buildManager;
@@ -30,11 +31,12 @@ public class RecipeController
     private RecipeQueue queue;
     private BuildService buildService;
 
-    public RecipeController(RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, RecipeLogger logger, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager, ServiceTokenManager serviceTokenManager)
+    public RecipeController(RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, boolean incremental, RecipeLogger logger, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager, ServiceTokenManager serviceTokenManager)
     {
         this.recipeResultNode = recipeResultNode;
         this.recipeResult = recipeResultNode.getResult();
         this.dispatchRequest = dispatchRequest;
+        this.incremental = incremental;
         this.logger = logger;
         this.collector = collector;
         this.queue = queue;
@@ -200,7 +202,7 @@ public class RecipeController
     {
         try
         {
-            collector.collect(buildResult, recipeResult.getId(), collectWorkingCopy, buildService);
+            collector.collect(buildResult, recipeResult.getId(), collectWorkingCopy, incremental, buildService);
         }
         catch (BuildException e)
         {
@@ -216,7 +218,7 @@ public class RecipeController
     {
         try
         {
-            collector.cleanup(buildResult, recipeResult.getId(), buildService);
+            collector.cleanup(buildResult, recipeResult.getId(), incremental, buildService);
         }
         catch (Exception e)
         {

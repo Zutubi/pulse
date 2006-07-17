@@ -1,6 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 
@@ -16,11 +17,17 @@ public class ServerRecipePaths implements RecipePaths
 {
     private long id;
     private File dataDir;
+    private String project;
+    private String spec;
+    private boolean incremental;
 
-    public ServerRecipePaths(long id, File dataDir)
+    public ServerRecipePaths(String project, String spec, long id, File dataDir, boolean incremental)
     {
+        this.project = project;
+        this.spec = spec;
         this.id = id;
         this.dataDir = dataDir;
+        this.incremental = incremental;
     }
 
     private File getRecipesRoot()
@@ -35,12 +42,19 @@ public class ServerRecipePaths implements RecipePaths
 
     public File getPersistentWorkDir()
     {
-        return new File(dataDir, "work");
+        return new File(dataDir, FileSystemUtils.composeFilename("work", project, spec));
     }
 
     public File getBaseDir()
     {
-        return new File(getRecipeRoot(), "base");
+        if(incremental)
+        {
+            return getPersistentWorkDir();
+        }
+        else
+        {
+            return new File(getRecipeRoot(), "base");
+        }
     }
 
     public File getOutputDir()

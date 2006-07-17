@@ -10,6 +10,7 @@ import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import org.mortbay.util.UrlEncoded;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,16 +63,16 @@ public class SlaveBuildService implements BuildService
         }
     }
 
-    public void collectResults(long recipeId, File outputDest, File workDest)
+    public void collectResults(String project, String spec, long recipeId, boolean incremental, File outputDest, File workDest)
     {
-        collect(recipeId, true, outputDest);
+        collect(project, spec, recipeId, incremental, true, outputDest);
         if (workDest != null)
         {
-            collect(recipeId, false, workDest);
+            collect(project, spec, recipeId, incremental, false, workDest);
         }
     }
 
-    private void collect(long recipeId, boolean output, File destination)
+    private void collect(String project, String spec, long recipeId, boolean incremental, boolean output, File destination)
     {
         ZipInputStream zis = null;
         FileInputStream fis = null;
@@ -79,7 +80,7 @@ public class SlaveBuildService implements BuildService
 
         try
         {
-            URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&output=" + output + "&recipe=" + recipeId);
+            URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&project=" + UrlEncoded.encodeString(project) + "&spec=" + UrlEncoded.encodeString(spec) + "&incremental=" + incremental + "&output=" + output + "&recipe=" + recipeId);
             URLConnection urlConnection = resultUrl.openConnection();
 
             // originally the zip stream was unzipped as read from the
@@ -118,11 +119,11 @@ public class SlaveBuildService implements BuildService
         }
     }
 
-    public void cleanup(long recipeId)
+    public void cleanup(String project, String spec, long recipeId, boolean incremental)
     {
         try
         {
-            service.cleanupRecipe(serviceTokenManager.getToken(), recipeId);
+            service.cleanupRecipe(serviceTokenManager.getToken(), project, spec, recipeId, incremental);
         }
         catch (Exception e)
         {

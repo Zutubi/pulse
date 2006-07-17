@@ -58,6 +58,7 @@ public class BuildController implements EventListener
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private Scheduler quartzScheduler;
     private ServiceTokenManager serviceTokenManager;
+    private boolean forceClean;
 
     public BuildController(BuildRequestEvent event, BuildSpecification specification, EventManager eventManager, ProjectManager projectManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager, ServiceTokenManager serviceTokenManager)
     {
@@ -125,10 +126,11 @@ public class BuildController implements EventListener
             File recipeOutputDir = paths.getOutputDir(project, buildResult, recipeResult.getId());
             recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
 
-            RecipeRequest recipeRequest = new RecipeRequest(recipeResult.getId(), stage.getRecipe(), getResourceRequirements(specification, node));
+            boolean incremental = specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.INCREMENTAL_UPDATE;
+            RecipeRequest recipeRequest = new RecipeRequest(project.getName(), specification.getName(), recipeResult.getId(), stage.getRecipe(), incremental, getResourceRequirements(specification, node));
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), revision, recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(project, buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
-            RecipeController rc = new RecipeController(childResultNode, dispatchRequest, logger, collector, queue, buildManager, serviceTokenManager);
+            RecipeController rc = new RecipeController(childResultNode, dispatchRequest, incremental, logger, collector, queue, buildManager, serviceTokenManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
             configure(child, childResultNode, specification, node);
@@ -203,14 +205,14 @@ public class BuildController implements EventListener
 
         // check project configuration to determine which bootstrap configuration should be used.
         Bootstrapper initialBootstrapper;
-        boolean checkoutOnly = project.getCheckoutScheme() == Project.CheckoutScheme.CHECKOUT_ONLY;
+        boolean checkoutOnly = specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.CLEAN_CHECKOUT;
         if (checkoutOnly)
         {
             initialBootstrapper = new CheckoutBootstrapper(project.getName(), specification.getName(), project.getScm(), revision, false);
         }
         else
         {
-            initialBootstrapper = new ProjectRepoBootstrapper(project.getName(), specification.getName(), project.getScm(), revision);
+            initialBootstrapper = new ProjectRepoBootstrapper(project.getName(), specification.getName(), project.getScm(), revision, specification.getForceClean());
         }
         PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
         ComponentContext.autowire(pulseFileDetails);
@@ -460,6 +462,12 @@ public class BuildController implements EventListener
 
     private void completeBuild()
     {
+        if(specification.getForceClean())
+        {
+            specification.setForceClean(false);
+            projectManager.save(specification);
+        }
+
         buildResult.abortUnfinishedRecipes();
         tree.cleanup(buildResult);
         buildResult.setHasWorkDir(specification.getRetainWorkingCopy());

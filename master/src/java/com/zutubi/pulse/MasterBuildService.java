@@ -8,6 +8,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * <class-comment/>
@@ -43,9 +44,9 @@ public class MasterBuildService implements BuildService
         return true;
     }
 
-    public void collectResults(long recipeId, File outputDest, File workDest)
+    public void collectResults(String project, String spec, long recipeId, boolean incremental, File outputDest, File workDest)
     {
-        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager.getUserPaths().getData());
+        ServerRecipePaths recipePaths = new ServerRecipePaths(project, spec, recipeId, configurationManager.getUserPaths().getData(), incremental);
         File outputDir = recipePaths.getOutputDir();
 
         if (!FileSystemUtils.rename(outputDir, outputDest, true))
@@ -56,17 +57,31 @@ public class MasterBuildService implements BuildService
         if (workDest != null)
         {
             File workDir = recipePaths.getBaseDir();
-            if (!FileSystemUtils.rename(workDir, workDest, true))
+            if(incremental)
             {
-                throw new BuildException("Unable to rename work directory '" + workDir.getAbsolutePath() + "' to '" + workDest.getAbsolutePath() + "'");
+                try
+                {
+                    FileSystemUtils.copyRecursively(workDir, workDest);
+                }
+                catch(IOException e)
+                {
+                    throw new BuildException("Unable to rename work directory '" + workDir.getAbsolutePath() + "' to '" + workDest.getAbsolutePath() + "': " + e.getMessage());
+                }
+            }
+            else
+            {
+                if (!FileSystemUtils.rename(workDir, workDest, true))
+                {
+                    throw new BuildException("Unable to rename work directory '" + workDir.getAbsolutePath() + "' to '" + workDest.getAbsolutePath() + "'");
+                }
             }
         }
     }
 
-    public void cleanup(long recipeId)
+    public void cleanup(String project, String spec, long recipeId, boolean incremental)
     {
         // We rename the output dir, so no need to remove it.
-        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeId, configurationManager.getUserPaths().getData());
+        ServerRecipePaths recipePaths = new ServerRecipePaths(project, spec, recipeId, configurationManager.getUserPaths().getData(), incremental);
         File recipeRoot = recipePaths.getRecipeRoot();
 
         if (!FileSystemUtils.removeDirectory(recipeRoot))

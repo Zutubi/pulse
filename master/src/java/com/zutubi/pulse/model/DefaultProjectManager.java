@@ -7,6 +7,8 @@ import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
+import com.zutubi.pulse.license.LicenseManager;
+import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.CommitMessageTransformerDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
@@ -17,8 +19,6 @@ import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.license.LicenseManager;
-import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
 import org.acegisecurity.annotation.Secured;
 
 import java.util.List;
@@ -76,6 +76,11 @@ public class DefaultProjectManager implements ProjectManager
     public int getProjectCount()
     {
         return projectDao.count();
+    }
+
+    public void save(BuildSpecification specification)
+    {
+        buildSpecificationDao.save(specification);
     }
 
     private void deleteProject(Project entity)

@@ -28,7 +28,10 @@ public class DownloadResultsServlet extends HttpServlet
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
     {
+        String project = request.getParameter("project");
+        String spec = request.getParameter("spec");
         String id = request.getParameter("recipe");
+        boolean incremental = Boolean.parseBoolean(request.getParameter("incremental"));
 
         try
         {
@@ -46,7 +49,7 @@ public class DownloadResultsServlet extends HttpServlet
             boolean output = Boolean.parseBoolean(request.getParameter("output"));
 
             // lookup the recipe location, zip it up and write to output.
-            ServerRecipePaths paths = new ServerRecipePaths(recipeId, getConfigurationManager().getUserPaths().getData());
+            ServerRecipePaths paths = new ServerRecipePaths(project, spec, recipeId, getConfigurationManager().getUserPaths().getData(), incremental);
             File dir;
             File zipFile;
 

@@ -1737,7 +1737,7 @@
             #logCell($project $lastResult)
             #changesCell($project $lastResult)
             #artifactsCell($project $lastResult)
-#acl("domainObject=project" "hasPermission=4,1")
+#if($action.canWrite($project))
             #workingCopyCell($project $lastResult)
 #end
         #else
@@ -1753,7 +1753,9 @@
             #contentCell("empty.cell")
             #contentCell("empty.cell")
             #contentCell("empty.cell")
+#if($action.canWrite($project))
             #contentCell("empty.cell")
+#end
         #end
         </tr>
     #end

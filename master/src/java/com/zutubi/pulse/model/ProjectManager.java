@@ -30,6 +30,8 @@ public interface ProjectManager extends EntityManager<Project>
 
     int getProjectCount();
 
+    void save(BuildSpecification specification);
+
     /**
      * Deletes a build specification *and* all triggers that refer to it.
      *

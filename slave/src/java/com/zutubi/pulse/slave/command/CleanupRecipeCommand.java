@@ -13,17 +13,23 @@ public class CleanupRecipeCommand implements Runnable
 {
     private static final Logger LOG = Logger.getLogger(CleanupRecipeCommand.class);
 
+    private String project;
+    private String spec;
     private long recipeId;
+    private boolean incremental;
     private ConfigurationManager configurationManager;
 
-    public CleanupRecipeCommand(long recipeId)
+    public CleanupRecipeCommand(String project, String spec, long recipeId, boolean incremental)
     {
+        this.project = project;
+        this.spec = spec;
         this.recipeId = recipeId;
+        this.incremental = incremental;
     }
 
     public void run()
     {
-        ServerRecipePaths recipeProcessorPaths = new ServerRecipePaths(recipeId, configurationManager.getUserPaths().getData());
+        ServerRecipePaths recipeProcessorPaths = new ServerRecipePaths(project, spec, recipeId, configurationManager.getUserPaths().getData(), incremental);
         File recipeRoot = recipeProcessorPaths.getRecipeRoot();
         if (!FileSystemUtils.removeDirectory(recipeRoot))
         {

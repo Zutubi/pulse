@@ -1,14 +1,13 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.Project.CheckoutScheme;
 import com.zutubi.pulse.model.ProjectAclEntry;
-import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.scheduling.Trigger;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -37,19 +36,6 @@ public class ConfigureProjectAction extends ProjectActionSupport
     public List<Trigger> getTriggers()
     {
         return triggers;
-    }
-
-    public String getCheckoutSchemeName()
-    {
-        CheckoutScheme scheme = project.getCheckoutScheme();
-        if (scheme == CheckoutScheme.CHECKOUT_AND_UPDATE)
-        {
-            return getText("project.checkoutAndUpdate");
-        }
-        else
-        {
-            return getText("project.checkoutOnly");
-        }
     }
 
     public List<User> getProjectAdmins()

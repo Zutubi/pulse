@@ -31,9 +31,9 @@ public interface BuildService extends RemoteService
      * @param workDest   local directory to receive the working copy, or null
      *                   if the working copy should not be collected
      */
-    void collectResults(long recipeId, File outputDest, File workDest);
+    void collectResults(String project, String spec, long recipeId, boolean incremental, File outputDest, File workDest);
 
-    void cleanup(long recipeId);
+    void cleanup(String project, String spec, long recipeId, boolean incremental);
 
     /**
      * Terminates the given recipe if it is still running.  This method may

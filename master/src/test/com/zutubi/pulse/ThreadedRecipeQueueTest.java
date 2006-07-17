@@ -562,7 +562,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         project.setScm(scm);
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, "spec", 100);
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
-        RecipeRequest request = new RecipeRequest(id, null);
+        RecipeRequest request = new RecipeRequest("project", "spec", id, null, false);
         request.setBootstrapper(new ChainBootstrapper());
         return new RecipeDispatchRequest(requirements, new BuildRevision(), request, result);
     }
@@ -842,11 +842,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             return acceptBuild;
         }
 
-        public void collectResults(long recipeId, File outputDest, File workDest)
+        public void collectResults(String project, String spec, long recipeId, boolean incremental, File outputDest, File workDest)
         {
         }
 
-        public void cleanup(long recipeId)
+        public void cleanup(String project, String spec, long recipeId, boolean incremental)
         {
         }
 
