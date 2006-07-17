@@ -2,12 +2,15 @@ package com.zutubi.pulse.web.admin.user;
 
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.web.user.UserActionSupport;
+import com.zutubi.pulse.license.Licensed;
 
 import java.util.Arrays;
 
 /**
  * <class-comment/>
+ * 
  */
+@Licensed("canAddUser")
 public class CreateUserAction extends UserActionSupport
 {
     private User newUser = new User();
