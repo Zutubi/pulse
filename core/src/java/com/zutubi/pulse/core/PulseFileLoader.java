@@ -24,6 +24,7 @@ public class PulseFileLoader extends FileLoader
         register("cppunit.pp", CppUnitReportPostProcessor.class);
         register("junit.pp", JUnitReportPostProcessor.class);
         register("junit.summary.pp", JUnitSummaryPostProcessor.class);
+        register("ocunit.pp", OCUnitReportPostProcessor.class);
         register("make.pp", MakePostProcessor.class);
         register("maven.pp", MavenPostProcessor.class);
         register("maven2.pp", Maven2PostProcessor.class);

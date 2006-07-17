@@ -19,9 +19,9 @@ import java.util.Properties;
  * The data directory is layed out as follows:
  * <p/>
  * data/
- * config/: user configuration files
- * database/: the embedded HSQL database
- * projects/: build artifacts
+ *     config/: user configuration files
+ *     database/: the embedded HSQL database
+ *     projects/: build artifacts
  * <p/>
  * pulse.config.properties: core configuration properties, contain version and license details amongst other things
  */
@@ -41,6 +41,7 @@ public class Data implements MasterUserPaths
     private Properties config = null;
     private String licenseKey;
     private License license;
+    private static final String LICENSE_KEY = "license.key";
 
     protected Data(File dataDir)
     {
@@ -122,7 +123,7 @@ public class Data implements MasterUserPaths
 
     public void updateLicenseKey(String key) throws IOException
     {
-        getConfig().setProperty("license.key", key);
+        getConfig().setProperty(LICENSE_KEY, key);
         IOUtils.write(getConfig(), getConfigFile());
     }
 
@@ -130,7 +131,7 @@ public class Data implements MasterUserPaths
     {
         if (licenseKey == null)
         {
-            licenseKey = getConfig().getProperty("license.key");
+            licenseKey = getConfig().getProperty(LICENSE_KEY);
         }
         return licenseKey;
     }

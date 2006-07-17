@@ -24,7 +24,7 @@ public class DataConfiguration implements DataResolver
     /**
      * The data property.
      */
-    private static final String DATA_PROPERTY_NAME = "pulse.data";
+    private static final String PULSE_DATA = "pulse.data";
 
     public Data getData()
     {
@@ -39,20 +39,20 @@ public class DataConfiguration implements DataResolver
     public void setDataDirectory(File f)
     {
         Config init = getInitProps();
-        init.setProperty(DATA_PROPERTY_NAME, f.getAbsolutePath());
+        init.setProperty(PULSE_DATA, f.getAbsolutePath());
     }
 
     public File getDataDirectory()
     {
         Config sys = getSystemProps();
-        if (sys.hasProperty(DATA_PROPERTY_NAME))
+        if (sys.hasProperty(PULSE_DATA))
         {
-            return new File(sys.getProperty(DATA_PROPERTY_NAME));
+            return new File(sys.getProperty(PULSE_DATA));
         }
         Config init = getInitProps();
-        if (init.hasProperty(DATA_PROPERTY_NAME))
+        if (init.hasProperty(PULSE_DATA))
         {
-            return new File(init.getProperty(DATA_PROPERTY_NAME));
+            return new File(init.getProperty(PULSE_DATA));
         }
         return null;
     }
