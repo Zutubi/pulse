@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class ViewChangesAction extends ProjectActionSupport
 {
+    private long id = 0;
     private long sinceBuild = 0;
     private long toBuild;
     private Project project;
@@ -24,6 +25,11 @@ public class ViewChangesAction extends ProjectActionSupport
     private BuildResult result;
     private List<Changelist> changelists;
     private CommitMessageHelper commitMessageHelper;
+
+    public void setId(long id)
+    {
+        this.id = id;
+    }
 
     public long getSinceBuild()
     {
@@ -77,17 +83,34 @@ public class ViewChangesAction extends ProjectActionSupport
 
     public void validate()
     {
-        project = getProject();
-        if(project == null)
+        if(id == 0)
         {
-            addActionError("Unknown project [" + projectId + "]");
-            return;
-        }
+            project = getProject();
+            if(project == null)
+            {
+                addActionError("Unknown project [" + projectId + "]");
+                return;
+            }
 
-        result = getBuildManager().getByProjectAndNumber(project, toBuild);
-        if(result == null)
+            result = getBuildManager().getByProjectAndNumber(project, toBuild);
+            if(result == null)
+            {
+                addActionError("No such build [" + toBuild + "]");
+                return;
+            }
+        }
+        else
         {
-            addActionError("No such build [" + toBuild + "]");
+            result = getBuildManager().getBuildResult(id);
+            if(result == null)
+            {
+                addActionError("Unknown build [" + id + "]");
+                return;
+            }
+
+            toBuild = result.getNumber();
+            project = result.getProject();
+            projectId = project.getId();
         }
 
         previous = getPrevious(ResultState.getCompletedStates());
@@ -125,7 +148,7 @@ public class ViewChangesAction extends ProjectActionSupport
         {
             return null;
         }
-        
+
         List<BuildResult> previousResults = getBuildManager().querySpecificationBuilds(project, result.getBuildSpecification(), states, -1, toBuild - 1, 0, 1, true);
         if(previousResults.size() > 0)
         {
