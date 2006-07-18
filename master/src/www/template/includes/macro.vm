@@ -1865,7 +1865,7 @@
 ##
 ## Shows a single test with any nested tests (if it is a suite).
 ##
-#macro(showTest $test $indent $showPassed $parent)
+#macro(showTest $recipe $test $indent $showPassed $parent)
     #if($showPassed || $test.hasBrokenTests())
         #if($test.hasBrokenTests())
             #set($cssClass = "test-failure")
@@ -1875,7 +1875,7 @@
         #set($rowId = "test${parent}_${test.id}")
         <tr id="$rowId"
         #if($test.isSuite() && $showPassed)
-            class="suite" onmouseover="getElement('$rowId').className = 'suite-hover';" onmouseout="getElement('$rowId').className = 'suite';" onclick="toggleTests('$rowId');"
+            class="suite" onmouseover="getElement('$rowId').className = 'suite-hover';" onmouseout="getElement('$rowId').className = 'suite';" onclick="toggleTests('$rowId', successfulShowing['$recipe.id']);"
         #end
         >
             <td
@@ -1906,7 +1906,7 @@
 
         #if($test.isSuite())
             #foreach($child in $test.children)
-                #showTest($child "$indent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" $showPassed "${parent}_${test.id}")
+                #showTest($recipe $child "$indent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" $showPassed "${parent}_${test.id}")
             #end
         #end
     #end
@@ -1917,7 +1917,7 @@
 ##
 #macro(showRecipeTests $recipe $showPassed)
     #foreach($test in $recipe.allTestResults)
-        #showTest($test "" $showPassed "")
+        #showTest($recipe $test "" $showPassed "")
     #end
 #end
 

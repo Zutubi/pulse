@@ -127,7 +127,7 @@ function toggleElementDisplay(element)
 
 function toggleDisplay(id)
 {
-    toggleElementDisplay(getElement(id));
+    Element.toggle(getElement(id));
 }
 
 // Toggles the display of a nested list and switched the correcsponding image
@@ -232,34 +232,45 @@ function hideChildren(id)
 */
 }
 
+function isSuccessfulRow(row)
+{
+    var cells = row.getElementsByTagName("td");
+    return cells.length > 0 && cells[0].className.indexOf('success') == 0;
+}
+
+function setTestRowDisplay(row, successfulShowing)
+{
+    var success = isSuccessfulRow(row);
+    var suite = row.className.indexOf('suite') == 0;
+    var visible = (suite || !row.collapsed) && (successfulShowing || !success);
+    row.style.display = visible ? '' : 'none';
+}
+
 // Toggle display for all rows under the given table with a first cell of the given class
-function toggleRowsWithClass(tableId, className, visible)
+function toggleSuccessfulTestRows(tableId, successfulShowing)
 {
     var table = getElement(tableId);
     var rows = table.getElementsByTagName("tr");
 
     for(var i = 0; i < rows.length; i++)
     {
-        var row = rows[i];
-        var cells = row.getElementsByTagName("td");
-
-        if(!row.collapsed && cells.length > 0 && cells[0].className.indexOf(className) == 0)
+        if(rows[i].id)
         {
-            row.style.display = visible ? '' : 'none';
+            setTestRowDisplay(rows[i], successfulShowing);
         }
     }
 }
 
-function toggleTests(id)
+function toggleTests(id, successfulShowing)
 {
     var row = getElement(id);
     if(row)
     {
-        expandCollapseSuite(row, row.childrenCollapsed);
+        expandCollapseSuite(row, row.childrenCollapsed, successfulShowing);
     }
 }
 
-function expandCollapseSuite(row, expand)
+function expandCollapseSuite(row, expand, successfulShowing)
 {
     var cells = row.getElementsByTagName('td');
 
@@ -289,18 +300,7 @@ function expandCollapseSuite(row, expand)
                     if(cells.length > 0)
                     {
                         sibling.collapsed = !expand;
-
-                        if(successfulShowing || (cells[0].className.indexOf('success') < 0))
-                        {
-                            if(expand)
-                            {
-                                sibling.style.display = '';
-                            }
-                            else
-                            {
-                                sibling.style.display = 'none';
-                            }
-                        }
+                        setTestRowDisplay(sibling, successfulShowing);
                     }
                 }
                 else
@@ -314,7 +314,7 @@ function expandCollapseSuite(row, expand)
     }
 }
 
-function toggleAllTests(tableId, expand)
+function toggleAllTests(tableId, expand, successfulShowing)
 {
     var table = getElement(tableId);
     var rows = table.getElementsByTagName('tr');
@@ -323,7 +323,7 @@ function toggleAllTests(tableId, expand)
     {
         if(rows[i].id && rows[i].className && rows[i].className.indexOf('suite') == 0)
         {
-            expandCollapseSuite(rows[i], expand);
+            expandCollapseSuite(rows[i], expand, successfulShowing);
         }
     }
 }

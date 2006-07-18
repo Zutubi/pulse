@@ -7,13 +7,13 @@
     <script type="text/javascript">
         var successfulShowing = {
 #foreach($node in $result.root.children)
-            "$node.result.id": true,
+            "$node.result.id": true #if($velocityCount != $result.root.children.size()) , #end
 #end
         };
 
-        var allShowing = {
+        var expanded = {
 #foreach($node in $result.root.children)
-            "$node.result.id": true,
+            "$node.result.id": true #if($velocityCount != $result.root.children.size()) , #end
 #end
         };
 
@@ -30,24 +30,24 @@
                 successfulShowing[id] = true;
             }
 
-            toggleRowsWithClass('test-results_' + id, 'success', successfulShowing[id]);
+            toggleSuccessfulTestRows('test-results_' + id, successfulShowing[id]);
             setText("success_toggle_" + id, text);
         }
 
         function toggleAll(id)
         {
-            if(allShowing[id])
+            if(expanded[id])
             {
-                text ="#wwtext("name=tests.expand.all")";
-                allShowing[id] = false;
+                text = "#wwtext("name=tests.expand.all")";
+                expanded[id] = false;
             }
             else
             {
-                text ="#wwtext("name=tests.collapse.all")";
-                allShowing[id] = true;
+                text = "#wwtext("name=tests.collapse.all")";
+                expanded[id] = true;
             }
 
-            toggleAllTests("test-results_" + id, allShowing[id]);
+            toggleAllTests("test-results_" + id, expanded[id], successfulShowing[id]);
             setText("all_toggle_" + id, text);
         }
 
