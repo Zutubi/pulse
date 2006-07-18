@@ -12,7 +12,7 @@
 
         <action name="404" class="com.zutubi.pulse.web.FourOhFourAction">
             <result name="404" type="velocity">404.vm</result>
-            <result name="starting" type="velocity">404-starting.vm</result>
+            <result name="success" type="redirect">/startup/starting.action</result>
         </action>
 
 <!--
