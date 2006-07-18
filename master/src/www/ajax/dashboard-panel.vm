@@ -35,7 +35,7 @@
 
             <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
             #classCell($buildResult.buildSpecification)
-            #statusCell($buildResult)
+            #statusCell($buildResult true)
             #classCell($buildResult.reason.summary)
             #testResultsCell($buildResult false $buildResult)
             #dateClassCell($buildResult)

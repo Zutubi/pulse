@@ -43,7 +43,7 @@
 
             <td class="content-right"><a href="viewBuild.action?id=$result.id">$result.number</a></td>
             #classCell($result.buildSpecification)
-            #statusCell($result)
+            #statusCell($result true)
         </tr>
 #end
 

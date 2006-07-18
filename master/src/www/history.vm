@@ -43,7 +43,7 @@
             #set($cssClass = $buildResult.state.string)
         <tr>
             <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
-            #statusCell($buildResult)
+            #statusCell($buildResult true)
             #testResultsCell($buildResult false $buildResult)
             #classCell($buildResult.buildSpecification)
             #dateClassCell($buildResult)

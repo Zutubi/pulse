@@ -711,20 +711,24 @@
 ##
 ## Outputs a build/project status cell
 ##
-#macro(statusCell $result)
+#macro(statusCell $result $showAnimated)
     <td class="$result.state.string">
-        #statusImage($result)
+        #statusImage($result $showAnimated)
     </td>
     <td class="$result.state.string">
         $result.state.prettyString
     </td>
 #end
 
-#macro(statusImage $result)
+#macro(statusImage $result $showAnimated)
     #if($result.succeeded())
         <img alt="success" src="/images/accept.gif"/>
     #elseif($result.inProgress())
-        <img alt="in progress" src="/images/inprogress.gif"/>
+        #if($showAnimated)
+            <img alt="in progress" src="/images/inprogress.gif"/>
+        #else
+            <img alt="in progress" src="/images/cog.gif"/>
+        #end
     #elseif($result.terminating())
         <img alt="terminating" src="/images/stop.gif"/>
     #elseif($result.pending())
@@ -787,7 +791,7 @@
                 #set($cssClass = $result.state.string)
                 <td class="content-right"><a href="viewBuild.action?id=$result.id">$result.number</a></td>
                 #classCell($result.buildSpecification)
-                #statusCell($result)
+                #statusCell($result true)
             </tr>
         #end
         </table>
@@ -1121,7 +1125,7 @@
 ##
 ## Shows a summary for a recipe result
 ##
-#macro(recipeSummary $resultNode $build $detailedView)
+#macro(recipeSummary $resultNode $build $detailedView $showAnimated)
     <tr>
         #set($id = $resultNode.id)
         #set($recipe = $resultNode.result)
@@ -1137,7 +1141,7 @@
     #end
         #dynamicCell($recipe.recipeNameSafe)
         #dynamicCell($resultNode.hostSafe)
-        #statusCell($recipe)
+        #statusCell($recipe $showAnimated)
         #testResultsCell($build $recipe $recipe)
         #dateClassCell($recipe)
         #classCell($recipe.stamps.prettyElapsed)
@@ -1170,7 +1174,7 @@
                     $!webwork.htmlEncode($command.commandName)
                 </a>
             </td>
-            #statusCell($command)
+            #statusCell($command true)
             #testResultsCell($build $recipe $command)
             #dateClassCell($command)
             #classCell($command.stamps.prettyElapsed)
@@ -1577,7 +1581,7 @@
             #set($cssClass = $buildResult.state.string)
             #rightCell($buildResult.number)
             #classCell($buildResult.buildSpecification)
-            #statusCell($buildResult)
+            #statusCell($buildResult false)
             #classCell($buildResult.reason.summary)
             #testResultsCell($buildResult false $buildResult)
             #dateClassCell($buildResult)
@@ -1602,7 +1606,7 @@
         #headingRow("build.stages" 9)
         #recipeSummaryHeader()
         #foreach($recipeNode in $buildResult.root.children)
-        #recipeSummary($recipeNode $buildResult $detailedView)
+        #recipeSummary($recipeNode $buildResult $detailedView true)
         #end
     </table>
     #end
@@ -1660,7 +1664,7 @@
 
             <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
             #classCell($buildResult.buildSpecification)
-            #statusCell($buildResult)
+            #statusCell($buildResult true)
             #classCell($buildResult.reason.summary)
             #testResultsCell($buildResult false $buildResult)
             #dateClassCell($buildResult)
@@ -1728,7 +1732,7 @@
 
             <td class="content-right"><a href="viewBuild.action?id=$lastResult.id">$lastResult.number</a></td>
             #classCell($lastResult.buildSpecification)
-            #statusCell($lastResult)
+            #statusCell($lastResult true)
             #classCell($lastResult.reason.summary)
             #testResultsCell($lastResult false $lastResult)
             #dateClassCell($lastResult)
