@@ -17,7 +17,8 @@ import java.util.Date;
  */
 public class DefaultRecipeLogger implements RecipeLogger
 {
-    private static final String RULE = "================================================================================";
+    private static final String PRE_RULE = "============================[ command output below ]============================";
+    private static final String POST_RULE = "============================[ command output above ]============================";
     private static final DateFormat FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
 
     private File logFile = null;
@@ -45,23 +46,17 @@ public class DefaultRecipeLogger implements RecipeLogger
         logMarker("Recipe dispatched to agent " + event.getAgent().getName(), System.currentTimeMillis());
     }
 
-    public void log(RecipeCommencedEvent event)
+    public void log(RecipeCommencedEvent event, RecipeResult result)
     {
-        String name = event.getName();
-        if(name == null)
-        {
-            name = "[default]";
-        }
-        
-        logMarker("Recipe '" + name + "' commenced", event.getStartTime());
+        logMarker("Recipe '" + result.getRecipeNameSafe() + "' commenced", result.getStamps().getStartTime());
     }
 
-    public void log(CommandCommencedEvent event)
+    public void log(CommandCommencedEvent event, CommandResult result)
     {
-        logMarker("Command '" + event.getName() + "' commenced", event.getStartTime());
+        logMarker("Command '" + result.getCommandName() + "' commenced", result.getStamps().getStartTime());
         if (writer != null)
         {
-            writer.println(RULE);
+            writer.println(PRE_RULE);
             writer.flush();
         }
     }
@@ -75,31 +70,30 @@ public class DefaultRecipeLogger implements RecipeLogger
         }
     }
 
-    public void log(CommandCompletedEvent event)
+    public void log(CommandCompletedEvent event, CommandResult result)
     {
         if (writer != null)
         {
-            writer.println(RULE);
+            writer.println(POST_RULE);
             writer.flush();
         }
 
-        CommandResult result = event.getResult();
         logMarker("Command '" + result.getCommandName() + "' completed with status " + result.getState().getPrettyString(), result.getStamps().getEndTime());
     }
 
-    public void log(RecipeCompletedEvent event)
+    public void log(RecipeCompletedEvent event, RecipeResult result)
     {
-        RecipeResult result = event.getResult();
-        logMarker("Recipe '" + result.getRecipeNameSafe() + "' completed with status " + result.getState().getPrettyString(), result.getStamps().getEndTime());
+        // Do nothing: completion message comes from complete
     }
 
-    public void log(RecipeErrorEvent event)
+    public void log(RecipeErrorEvent event, RecipeResult result)
     {
         logMarker("Recipe terminated with an error: " + event.getErrorMessage(), System.currentTimeMillis());
     }
 
-    public void complete()
+    public void complete(RecipeResult result)
     {
+        logMarker("Recipe '" + result.getRecipeNameSafe() + "' completed with status " + result.getState().getPrettyString(), result.getStamps().getEndTime());
         IOUtils.close(writer);
     }
 

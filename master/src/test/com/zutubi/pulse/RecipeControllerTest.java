@@ -430,11 +430,11 @@ public class RecipeControllerTest extends PulseTestCase
         {
         }
 
-        public void log(RecipeCommencedEvent event)
+        public void log(RecipeCommencedEvent event, RecipeResult result)
         {
         }
 
-        public void log(CommandCommencedEvent event)
+        public void log(CommandCommencedEvent event, CommandResult result)
         {
         }
 
@@ -442,15 +442,15 @@ public class RecipeControllerTest extends PulseTestCase
         {
         }
 
-        public void log(CommandCompletedEvent event)
+        public void log(CommandCompletedEvent event, CommandResult result)
         {
         }
 
-        public void log(RecipeCompletedEvent event)
+        public void log(RecipeCompletedEvent event, RecipeResult result)
         {
         }
 
-        public void log(RecipeErrorEvent event)
+        public void log(RecipeErrorEvent event, RecipeResult result)
         {
         }
 
@@ -458,7 +458,7 @@ public class RecipeControllerTest extends PulseTestCase
         {
         }
 
-        public void complete()
+        public void complete(RecipeResult result)
         {
         }
     }

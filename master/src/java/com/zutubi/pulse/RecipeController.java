@@ -134,7 +134,6 @@ public class RecipeController
 
     private void handleRecipeCommenced(RecipeCommencedEvent event)
     {
-        logger.log(event);
         recipeResult.commence(event.getName(), System.currentTimeMillis());
         if (recipeResult.terminating())
         {
@@ -143,15 +142,16 @@ public class RecipeController
             buildService.terminateRecipe(recipeResult.getId());
         }
         buildManager.save(recipeResult);
+        logger.log(event, recipeResult);
     }
 
     private void handleCommandCommenced(CommandCommencedEvent event)
     {
-        logger.log(event);
         CommandResult result = new CommandResult(event.getName());
         result.commence(System.currentTimeMillis());
         recipeResult.add(result);
         buildManager.save(recipeResult);
+        logger.log(event, result);
     }
 
     private void handleCommandOutput(CommandOutputEvent event)
@@ -161,35 +161,35 @@ public class RecipeController
 
     private void handleCommandCompleted(CommandCompletedEvent event)
     {
-        logger.log(event);
         CommandResult result = event.getResult();
         result.getStamps().setEndTime(System.currentTimeMillis());
         recipeResult.update(result);
         buildManager.save(recipeResult);
+        logger.log(event, result);
     }
 
     private void handleRecipeCompleted(RecipeCompletedEvent event)
     {
-        logger.log(event);
         RecipeResult result = event.getResult();
         result.getStamps().setEndTime(System.currentTimeMillis());
         recipeResult.update(event.getResult());
+        logger.log(event, recipeResult);
         complete();
     }
 
     private void handleRecipeError(RecipeErrorEvent event)
     {
-        logger.log(event);
         recipeResult.error(event.getErrorMessage());
+        logger.log(event, recipeResult);
         complete();
     }
 
     private void complete()
     {
-        logger.complete();
         recipeResult.complete();
         recipeResult.abortUnfinishedCommands();
         buildManager.save(recipeResult);
+        logger.complete(recipeResult);
         finished = true;
     }
 
