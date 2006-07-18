@@ -7,7 +7,7 @@
     <div id="pagecontent">
         <h1 style="color: #c04040">:: HTTP ERROR: $action.errorStatusCode ::</h1>
 
-        <p>The resource '$action.errorRequestUri' was not be found and resulted in the following error message:</p>
+        <p>The resource '$action.errorRequestUri' was not found and resulted in the following error message:</p>
         <p class="error">
             $action.errorMessage
         </p>
@@ -18,7 +18,6 @@
             <ul>
                 <li><a href="/dashboard.action">dashboard</a></li>
                 <li><a href="/viewProjects.action">projects</a></li>
-                <li><a href="/admin/serverSettings.action">administration</a></li>
             </ul>
         </p>
     </div>
