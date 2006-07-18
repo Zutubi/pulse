@@ -2,7 +2,7 @@ package com.zutubi.pulse.xwork.interceptor;
 
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.xwork.ActionInvocation;
-import com.opensymphony.xwork.interceptor.AroundInterceptor;
+import com.opensymphony.xwork.interceptor.Interceptor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
@@ -13,9 +13,35 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  */
-public class HibernateSessionInterceptor extends AroundInterceptor
+public class HibernateSessionInterceptor implements Interceptor
 {
     private SessionFactory sessionFactory;
+
+    public void destroy()
+    {
+
+    }
+
+    public void init()
+    {
+
+    }
+
+    public String intercept(ActionInvocation invocation) throws Exception {
+        String result = null;
+
+        before(invocation);
+        try
+        {
+            result = invocation.invoke();
+        }
+        finally
+        {
+            after(invocation, result);
+        }
+
+        return result;
+    }
 
     protected void before(ActionInvocation invocation) throws Exception
     {
