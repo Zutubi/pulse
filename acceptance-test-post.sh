@@ -18,7 +18,4 @@ do
 done
 sleep 10
 
-# Clean up
-rm -rf pulse-accept
-
 exit 0

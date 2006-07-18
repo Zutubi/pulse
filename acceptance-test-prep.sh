@@ -25,7 +25,6 @@ fi
 tmpDir=pulse-accept
 rm -rf $tmpDir
 mkdir $tmpDir
-trap "rm -rf $tmpDir" ERR
 
 # Unpack that shiny new package
 extension="${package##*.}"
@@ -46,7 +45,7 @@ mv $properties.$$ $properties
 
 # Fire it up!
 export PULSE_HOME="$(pwd)"
-$(pwd)/bin/startup.sh
+$(pwd)/bin/startup.sh > ../stdout.txt 2> ../stderr.txt
 
 trap ERR
 
