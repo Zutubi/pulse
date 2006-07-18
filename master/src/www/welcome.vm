@@ -26,17 +26,17 @@
                 <a href="addProject!input.action">add new projects</a> :: using the add project wizard (projects &gt; add new project)
             </li>
             <li class="task">
-                <a href="admin/userSettings.action">add new users</a> :: at the users view (administration &gt; users tab )
+                <a href="admin/userSettings.action">add new users</a> :: at the users view (administration &gt; users tab)
+            </li>
+            <li class="task">
+                <a href="admin/addAgent!input.action">add new agents</a> :: using the add agent form (agents &gt; add new agent)
             </li>
             <li class="task">
                 <a href="admin/serverSettings.action">configure server settings</a> :: at the server settings view (administration &gt; settings tab)
             </li>
-            <li class="task">
-                <a href="viewResources.action">add new resources</a> :: at the server resources view (server &gt; resources tab)
-            </li>
             #end
             <li class="task">
-                <a href="preferences.action">configure your preferences</a> :: at the preferences view (dashboard &gt; preferences)
+                <a href="preferences.action">configure your preferences</a> :: at the preferences view (dashboard &gt; preferences tab)
             </li>
         </ul>
     </div>
@@ -51,7 +51,10 @@
                <a href="viewProjects.action">view all projects</a> :: at the projects view (projects)
            </li>
            <li class="explore">
-               <a href="viewServerStatus.action">view server activity</a> :: at the server status view (server &gt; status )
+               <a href="viewServerQueues.action">view server queues</a> :: at the server queues view (queues)
+           </li>
+           <li class="explore">
+               <a href="viewAgents.action">view all agents</a> :: at the agents view (agents)
            </li>
        </ul>
     </div>
