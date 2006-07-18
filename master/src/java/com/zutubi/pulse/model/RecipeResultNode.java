@@ -1,9 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.model.TestResultSummary;
+import com.zutubi.pulse.core.model.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -189,5 +186,20 @@ public class RecipeResultNode extends Entity
         }
 
         return null;
+    }
+
+    public ResultState getWorstState(ResultState worst)
+    {
+        if(result != null)
+        {
+            worst = ResultState.getWorseState(worst, result.getState());
+        }
+
+        for(RecipeResultNode child: children)
+        {
+            worst = child.getWorstState(worst);
+        }
+
+        return worst;
     }
 }

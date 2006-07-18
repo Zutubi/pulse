@@ -177,4 +177,16 @@ public class BuildResult extends Result implements AclObjectIdentityAware
     {
         return root.findNode(id);
     }
+
+    public void complete()
+    {
+        if(state == ResultState.IN_PROGRESS)
+        {
+            // Check the recipe results, if there are any failures/errors
+            // then take on the worst result.
+            state = root.getWorstState(ResultState.SUCCESS);
+        }
+
+        super.complete();
+    }
 }

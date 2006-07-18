@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
@@ -58,7 +59,6 @@ public class BuildController implements EventListener
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private Scheduler quartzScheduler;
     private ServiceTokenManager serviceTokenManager;
-    private boolean forceClean;
 
     public BuildController(BuildRequestEvent event, BuildSpecification specification, EventManager eventManager, ProjectManager projectManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager, ServiceTokenManager serviceTokenManager)
     {
@@ -300,7 +300,8 @@ public class BuildController implements EventListener
                     scheduleTimeout(e.getRecipeId());
                 }
             }
-            else if (e instanceof RecipeCompletedEvent)
+
+            if (e instanceof RecipeCompletedEvent || e instanceof RecipeErrorEvent)
             {
                 try
                 {
@@ -330,8 +331,6 @@ public class BuildController implements EventListener
     {
         RecipeDispatchRequest dispatchRequest = controller.getDispatchRequest();
         RecipeRequest request = dispatchRequest.getRequest();
-
-        // can retreive the revision from the dispatch request here
 
         try
         {
@@ -444,11 +443,11 @@ public class BuildController implements EventListener
             }
             else if (result.failed())
             {
-                buildResult.failure("Recipe " + result.getRecipeNameSafe() + " failed");
+                buildResult.addFeature(Feature.Level.ERROR, "Recipe " + result.getRecipeNameSafe() + " failed");
             }
             else if (result.errored())
             {
-                buildResult.error("Error executing recipe " + result.getRecipeNameSafe());
+                buildResult.addFeature(Feature.Level.ERROR, "Error executing recipe " + result.getRecipeNameSafe());
             }
 
             buildManager.save(buildResult);

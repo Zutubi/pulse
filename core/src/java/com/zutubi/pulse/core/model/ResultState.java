@@ -184,4 +184,20 @@ public enum ResultState
         return states;
     }
 
+    public static ResultState getWorseState(ResultState s1, ResultState s2)
+    {
+        if(s1 == ERROR || s2 == ERROR)
+        {
+            return ERROR;
+        }
+        else if(s1 == FAILURE || s2 == FAILURE)
+        {
+            return FAILURE;
+        }
+        else
+        {
+            return SUCCESS;
+        }
+    }
+
 }
