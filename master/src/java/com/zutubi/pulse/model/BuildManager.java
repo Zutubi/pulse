@@ -32,6 +32,8 @@ public interface BuildManager
 
     List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
 
+    List<BuildResult> querySpecificationBuilds(Project project, String spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst);
+
     List<BuildResult> getLatestBuildResultsForProject(Project project, int max);
 
     public int getBuildCount(Project project, ResultState[] states, String spec);

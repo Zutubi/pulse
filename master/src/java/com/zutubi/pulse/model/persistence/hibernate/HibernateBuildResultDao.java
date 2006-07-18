@@ -267,7 +267,43 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 {
                     criteria.setMaxResults(max);
                 }
-                
+
+                if(mostRecentFirst)
+                {
+                    criteria.addOrder(Order.desc("number"));
+                }
+                else
+                {
+                    criteria.addOrder(Order.asc("number"));
+                }
+
+                return criteria.list();
+            }
+        });
+    }
+
+    public List<BuildResult> querySpecificationBuilds(final Project project, final String spec, final ResultState[] states, final long lowestNumber, final long highestNumber, final int first, final int max, final boolean mostRecentFirst)
+    {
+        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = session.createCriteria(BuildResult.class);
+                criteria.add(Expression.eq("project", project));
+                criteria.add(Expression.eq("buildSpecification", spec));
+                addStatesToCriteria(states, criteria);
+                addNumbersToCriteria(lowestNumber, highestNumber, criteria);
+
+                if(first >= 0)
+                {
+                    criteria.setFirstResult(first);
+                }
+
+                if(max >= 0)
+                {
+                    criteria.setMaxResults(max);
+                }
+
                 if(mostRecentFirst)
                 {
                     criteria.addOrder(Order.desc("number"));
@@ -340,6 +376,19 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             // CIB-446: Don't accept timestamps that are uninitialised
             criteria.add(Expression.ge("stamps.startTime", 0L));
             criteria.add(Expression.le("stamps.startTime", latestStartTime));
+        }
+    }
+
+    private void addNumbersToCriteria(long lowestNumber, long highestNumber, Criteria criteria)
+    {
+        if(lowestNumber > 0)
+        {
+            criteria.add(Expression.ge("number", lowestNumber));
+        }
+
+        if(highestNumber > 0)
+        {
+            criteria.add(Expression.le("number", highestNumber));
         }
     }
 

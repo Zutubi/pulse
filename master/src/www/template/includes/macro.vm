@@ -843,7 +843,7 @@
 ##
 #macro(changesCell $project $result)
     <td class="content">
-        <a href="viewChanges.action?id=$result.id" class="unadorned" title="view changes"><img alt="view changes" src="/images/page_code.gif"/></a>
+        <a href="viewChanges.action?projectId=$project.id&amp;toBuild=$result.number" class="unadorned" title="view changes"><img alt="view changes" src="/images/page_code.gif"/></a>
     </td>
 #end
 

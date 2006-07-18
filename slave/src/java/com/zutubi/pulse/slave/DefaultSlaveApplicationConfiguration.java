@@ -1,10 +1,10 @@
 package com.zutubi.pulse.slave;
 
+import com.zutubi.pulse.bootstrap.SystemPaths;
+import com.zutubi.pulse.bootstrap.UserPaths;
+import com.zutubi.pulse.bootstrap.conf.CompositeConfig;
 import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
 import com.zutubi.pulse.bootstrap.conf.FileConfig;
-import com.zutubi.pulse.bootstrap.conf.CompositeConfig;
-import com.zutubi.pulse.bootstrap.UserPaths;
-import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
@@ -39,7 +39,7 @@ public class DefaultSlaveApplicationConfiguration implements SlaveApplicationCon
 
     public int getServerPort()
     {
-        return config.getInt(WEBAPP_PORT, 8090);
+        return config.getInteger(WEBAPP_PORT, 8090);
     }
 
     public String getLogConfig()

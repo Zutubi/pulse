@@ -83,6 +83,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public List<BuildResult> querySpecificationBuilds(Project project, String spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public List<BuildResult> getLatestBuildResultsForProject(Project project, int max)
     {
         throw new RuntimeException("Method not implemented.");

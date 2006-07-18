@@ -8,16 +8,45 @@
 <body>
     #buildTabs($result "changes")
 
-    <table class="content">
-#set($title = "$action.getText('changes') $!webwork.htmlEncode($result.buildSpecification)")
-        #headingRow($title 5)
-#set($scmDetails = $result.scmDetails)
-#if($scmDetails.revision)
-        <tr>
-            <td class="content" colspan="5">#wwtext("name=changes.checkedout") $scmDetails.revision</td>
-        </tr>
+    #parse("/template/includes/actionerrors.vm")
+
+#macro(revisionCell $key $build $showLink)
+    #if($build)
+        #set($revision = "build $build.number")
+        #if($build.scmDetails.revision)
+            #set($revision = "$revision: revision $build.scmDetails.revision")
+        #else
+            #set($revision = "$revision: no revision")
+        #end
+        #if($showLink)
+            #set($revision = "$revision [<a href='/viewChanges.action?projectId=$projectId&amp;toBuild=$result.number&amp;sinceBuild=$build.number'>changes since</a>]")
+        #end
+    #else
+        #set($revision = "no build")
+    #end
+
+    <tr>
+        #contentRowHeading($key)
+        #contentCell($revision)
+    </tr>
 #end
+
+    <table class="content">
+        #headingRow("changes.revisions" 2)
+        #revisionCell("changes.build.revision" $result false)
+        #revisionCell("changes.previous.revision" $previous true)
+        #revisionCell("changes.previous.successful.revision" $previousSuccessful true)
+        #revisionCell("changes.previous.unsuccessful.revision" $previousUnsuccessful true)
+    </table>
+
 #if($changelists.size() > 0)
+    #if($sinceResult)
+        #set($title = $action.getText("changes.between", [$sinceResult.number, $result.number]))
+    #else
+        #set($title = $action.getText("changes.in.build", [$result.number]))
+    #end
+    <table class="content">
+        #headingRow($title 5)
     #foreach($change in $changelists)
         <tr>
             #contentHeading("change.revision" 1)
@@ -57,12 +86,12 @@
         </tr>
         #end
     #end
-#else
-        <tr>
-            <td class="content" colspan="5">#wwtext("name=changes.none")</td>
-        </tr>
-#end
     </table>
+#else
+    <p>
+        <td class="content" colspan="5">#wwtext("name=changes.none")</td>
+    </p>
+#end
 
     #tabEnd()
 </html>

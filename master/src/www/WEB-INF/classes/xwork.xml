@@ -104,8 +104,9 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewChanges" class="com.zutubi.pulse.web.project.ViewBuildAction">
+        <action name="viewChanges" class="com.zutubi.pulse.web.project.ViewChangesAction">
             <result name="success" type="velocity">view-changes.vm</result>
+            <result name="input" type="velocity">view-changes.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 

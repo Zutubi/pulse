@@ -194,6 +194,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.queryBuilds(projects, states, specs, earliestStartTime, latestStartTime, hasWorkDir, first, max, mostRecentFirst);
     }
 
+    public List<BuildResult> querySpecificationBuilds(Project project, String spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst)
+    {
+        return buildResultDao.querySpecificationBuilds(project, spec, states, lowestNumber, highestNumber, first, max, mostRecentFirst);
+    }
+
     public void cleanupBuilds()
     {
         // Lookup project cleanup info, query for old builds, cleanup where necessary
