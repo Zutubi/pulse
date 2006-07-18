@@ -23,7 +23,7 @@ public class RemoteApi
         // before this request is complete and the client gets an error :-|.
         if(tokenManager.checkAdminToken(token))
         {
-            shutdownManager.delayedShutdown(force);
+            shutdownManager.delayedShutdown(force, true);
         }
         else
         {

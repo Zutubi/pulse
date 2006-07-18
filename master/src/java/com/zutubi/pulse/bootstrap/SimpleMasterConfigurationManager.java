@@ -1,9 +1,6 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.zutubi.pulse.bootstrap.conf.CompositeConfig;
-import com.zutubi.pulse.bootstrap.conf.Config;
-import com.zutubi.pulse.bootstrap.conf.FileConfig;
-import com.zutubi.pulse.bootstrap.conf.ReadOnlyConfig;
+import com.zutubi.pulse.bootstrap.conf.*;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
@@ -22,15 +19,18 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
         MasterUserPaths paths = getUserPaths();
         if (paths != null)
         {
+            Config system = new VolatileReadOnlyConfig(System.getProperties());
             Config user = new FileConfig(new File(paths.getUserConfigRoot(), "pulse.properties"));
             Config defaults = new FileConfig(new File(getSystemPaths().getConfigRoot(), "pulse-defaults.properties"));
-            Config composite = new CompositeConfig(user, new ReadOnlyConfig(defaults));
+            Config composite = new CompositeConfig(system, user, new ReadOnlyConfig(defaults));
             return new MasterApplicationConfigurationSupport(composite);
         }
         else
         {
+            Config system = new VolatileReadOnlyConfig(System.getProperties());
             Config defaults = new FileConfig(new File(getSystemPaths().getConfigRoot(), "pulse-defaults.properties"));
-            return new MasterApplicationConfigurationSupport(new ReadOnlyConfig(defaults));
+            Config composite = new CompositeConfig(system, new ReadOnlyConfig(defaults));
+            return new MasterApplicationConfigurationSupport(composite);
         }
     }
 

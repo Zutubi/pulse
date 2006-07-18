@@ -1,17 +1,17 @@
 package com.zutubi.pulse.command;
 
-import org.apache.xmlrpc.XmlRpcClient;
-import org.apache.xmlrpc.XmlRpcException;
+import com.zutubi.pulse.api.AdminTokenManager;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
-import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.api.AdminTokenManager;
 import com.zutubi.pulse.util.IOUtils;
+import org.apache.xmlrpc.XmlRpcClient;
+import org.apache.xmlrpc.XmlRpcException;
 
-import java.io.IOException;
 import java.io.File;
-import java.net.URL;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * The abstract base command for commands that are run on the same host as the
@@ -31,6 +31,8 @@ public abstract class AdminCommand implements Command
      */
     protected String adminToken;
 
+    private int port = -1;
+
     private String loadAdminToken(ConfigurationManager configurationManager) throws IOException
     {
         File tokenFile = AdminTokenManager.getAdminTokenFilename(configurationManager.getSystemPaths().getConfigRoot());
@@ -39,6 +41,11 @@ public abstract class AdminCommand implements Command
             return IOUtils.fileToString(tokenFile);
         }
         return null;
+    }
+
+    public void setPort(int port)
+    {
+        this.port = port;
     }
 
     public int execute()
@@ -56,6 +63,10 @@ public abstract class AdminCommand implements Command
         try
         {
             int webPort = configurationManager.getAppConfig().getServerPort();
+            if (port != -1)
+            {
+                webPort = port;
+            }
             url = new URL("http", "127.0.0.1", webPort, "/xmlrpc");
         }
         catch (MalformedURLException e)

@@ -17,18 +17,22 @@ public class ShutdownManager
      *
      * @param force if true, forcibly terminate active tasks
      */
-    public void shutdown(boolean force)
+    public void shutdown(boolean force, boolean exitJvm)
     {
         for (Stoppable stoppable : stoppables)
         {
             stoppable.stop(force);
         }
-        System.exit(0);
+        if (exitJvm)
+        {
+            // why exit? because some external packages do not clean up all of there threads... 
+            System.exit(0);
+        }
     }
 
-    public void delayedShutdown(boolean force)
+    public void delayedShutdown(boolean force, boolean exitJvm)
     {
-        ShutdownRunner runner = new ShutdownRunner(force);
+        ShutdownRunner runner = new ShutdownRunner(force, exitJvm);
         new Thread(runner).start();
     }
 
@@ -40,10 +44,12 @@ public class ShutdownManager
     private class ShutdownRunner implements Runnable
     {
         private boolean force;
+        private boolean exitJvm;
 
-        public ShutdownRunner(boolean force)
+        public ShutdownRunner(boolean force, boolean exitJvm)
         {
             this.force = force;
+            this.exitJvm = exitJvm;
         }
 
         public void run()
@@ -51,13 +57,15 @@ public class ShutdownManager
             // Oh my, is this ever dodgy...
             try
             {
+                //TODO: work out a way to shutdown jetty where by it stops accepting inbound requests
+                // and then shuts itself down after it has finished processing the final active request.
                 Thread.sleep(500);
             }
             catch (InterruptedException e)
             {
                 // Empty
             }
-            shutdown(force);
+            shutdown(force, exitJvm);
         }
     }
 }

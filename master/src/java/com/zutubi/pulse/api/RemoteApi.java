@@ -188,7 +188,7 @@ public class RemoteApi
         }
     }
 
-    public boolean shutdown(String token, boolean force) throws AuthenticationException
+    public boolean shutdown(String token, boolean force, boolean exitJvm) throws AuthenticationException
     {
         // check the tokenmanager. If we have one, then lets us it. If not, then its very early in
         // the setup process, so fallback to the admin token manager.
@@ -203,7 +203,7 @@ public class RemoteApi
 
         // Sigh ... this is tricky, because if we shutdown here Jetty dies
         // before this request is complete and the client gets an error :-|.
-        shutdownManager.delayedShutdown(force);
+        shutdownManager.delayedShutdown(force, exitJvm);
         return true;
     }
 
