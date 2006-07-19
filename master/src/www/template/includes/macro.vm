@@ -504,7 +504,15 @@
 ## should be escaped, with a link to somewhere...
 ##
 #macro(dynamicLinkCell $content $url)
-    <td class="content"><a href="$url">$!webwork.htmlEncode($content)</a></td>
+    <td class="content">
+    #if($url)
+        <a href="$url">
+    #end
+            $!webwork.htmlEncode($content)
+    #if($url)
+        </a>
+    #end
+     </td>
 #end
 
 ##

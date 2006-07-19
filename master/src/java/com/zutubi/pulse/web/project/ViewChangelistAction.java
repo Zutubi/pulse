@@ -54,6 +54,16 @@ public class ViewChangelistAction extends ActionSupport
         return changelist;
     }
 
+    public String getChangeUrl()
+    {
+        if(buildResult != null)
+        {
+            return buildResult.getProject().getScm().getChangeUrl(changelist.getRevision());
+        }
+
+        return null;
+    }
+
     public void setChangelist(Changelist changelist)
     {
         this.changelist = changelist;

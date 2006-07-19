@@ -14,7 +14,7 @@
 
     <table class="content">
         #headingRow("changelist.details" 2)
-        #dynamicRow("changelist.revision" $changelist.revision)
+        #dynamicLinkRow("changelist.revision" $changelist.revision $action.getChangeUrl($changelist))
         #dynamicRow("changelist.who" $changelist.user)
         <tr>
             #contentRowHeading("changelist.when")

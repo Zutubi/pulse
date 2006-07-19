@@ -11,7 +11,7 @@ import java.util.Date;
  */
 public class CvsRevision extends Revision
 {
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
 
     public static final CvsRevision HEAD = new CvsRevision(null, null, null, null);
 

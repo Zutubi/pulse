@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.user;
 
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
@@ -135,5 +136,24 @@ public class DashboardAction extends ActionSupport
         }
 
         return commitMessageHelper.applyTransforms(changelist, 60);
+    }
+
+    public String getChangeUrl(Changelist changelist)
+    {
+        Revision revision = changelist.getRevision();
+        for(long id: changelist.getProjectIds())
+        {
+            Project p = projectManager.getProject(id);
+            if(p != null)
+            {
+                String url = p.getScm().getChangeUrl(revision);
+                if(url != null)
+                {
+                    return url;
+                }
+            }
+        }
+
+        return null;
     }
 }

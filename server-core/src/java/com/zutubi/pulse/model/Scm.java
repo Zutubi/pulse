@@ -1,13 +1,22 @@
 package com.zutubi.pulse.model;
 
+import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.Scope;
+import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.util.logging.Logger;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.LinkedList;
-import java.util.Enumeration;
 
 /**
  * 
@@ -15,6 +24,11 @@ import java.util.Enumeration;
  */
 public abstract class Scm extends Entity implements Cloneable
 {
+    private static final Logger LOG = Logger.getLogger(Scm.class);
+
+    private static final DateFormat PULSE_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
+    private static final DateFormat FISHEYE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
+
     private String path;
     private Properties properties;
 
@@ -22,6 +36,12 @@ public abstract class Scm extends Entity implements Cloneable
      * The active status of this SCM.
      */
     private boolean monitor;
+    private static final String CHANGE_VIEWER_URL = "change.viewer.url";
+    private static final String PROPERTY_REVISION = "revision";
+    private static final String PROPERTY_AUTHOR = "author";
+    private static final String PROPERTY_BRANCH = "branch";
+    private static final String PROPERTY_TIMESTAMP_PULSE = "time.pulse";
+    private static final String PROPERTY_TIMESTAMP_FISHEYE = "time.fisheye";
 
     public abstract SCMServer createServer() throws SCMException;
 
@@ -59,6 +79,16 @@ public abstract class Scm extends Entity implements Cloneable
     public void setPath(String path)
     {
         this.path = path;
+    }
+
+    public String getChangeViewerUrl()
+    {
+        return (String) properties.get(CHANGE_VIEWER_URL);
+    }
+
+    public void setChangeViewerUrl(String url)
+    {
+        properties.put(CHANGE_VIEWER_URL, url);
     }
 
     /**
@@ -161,6 +191,51 @@ public abstract class Scm extends Entity implements Cloneable
         catch (CloneNotSupportedException e)
         {
             // Never happens
+        }
+
+        return null;
+    }
+
+    public static void validateChangeViewerURL(String url)
+    {
+        Scope scope = new Scope();
+        scope.add(new Property(PROPERTY_REVISION, ""));
+        scope.add(new Property(PROPERTY_AUTHOR, ""));
+        scope.add(new Property(PROPERTY_BRANCH, ""));
+        scope.add(new Property(PROPERTY_TIMESTAMP_FISHEYE, ""));
+        scope.add(new Property(PROPERTY_TIMESTAMP_PULSE, ""));
+
+        try
+        {
+            VariableHelper.replaceVariables(url, true, scope);
+        }
+        catch (FileLoadException e)
+        {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
+    }
+
+    public String getChangeUrl(Revision revision)
+    {
+        String url = getChangeViewerUrl();
+        if(TextUtils.stringSet(url))
+        {
+            Scope scope = new Scope();
+            scope.add(new Property(PROPERTY_REVISION, revision.getRevisionString()));
+            scope.add(new Property(PROPERTY_AUTHOR, revision.getAuthor()));
+            scope.add(new Property(PROPERTY_BRANCH, revision.getBranch()));
+            scope.add(new Property(PROPERTY_TIMESTAMP_PULSE, PULSE_DATE_FORMAT.format(revision.getDate())));
+            scope.add(new Property(PROPERTY_TIMESTAMP_FISHEYE, FISHEYE_DATE_FORMAT.format(revision.getDate())));
+
+            try
+            {
+                return VariableHelper.replaceVariables(url, true, scope);
+            }
+            catch (FileLoadException e)
+            {
+
+                LOG.warning("Unable to replace variables in change viewer url: " + e.getMessage(), e);
+            }
         }
 
         return null;

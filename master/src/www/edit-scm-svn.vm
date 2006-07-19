@@ -25,11 +25,13 @@
     #inlineHelp("svn.passphrase.help")
     #wwtextfield("name=svn.path" "label=%{getText('scm.path')}" "size=60" "tabindex='6'")
     #inlineHelp("scm.path.help")
-    #wwcheckbox("name=monitor" "label=%{getText('scm.monitor')}" "tabindex=7")
+    #wwtextfield("name=svn.changeViewerUrl" "label=%{getText('scm.change.viewer.url')}" "size=60" "tabindex=7" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("scm.change.viewer.url.help")
+    #wwcheckbox("name=monitor" "label=%{getText('scm.monitor')}" "tabindex=8")
 
     #testSettingsRow()
 
-    #saveCancel(8)
+    #saveCancel(9)
  #end
 
      #tabEnd()

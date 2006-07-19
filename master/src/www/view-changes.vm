@@ -55,8 +55,17 @@
             #contentHeading("change.comment" 1)
             #contentHeading("actions" 1)
         </tr>
+        #set($url = $action.getChangeUrl($project, $change.revision))
         <tr>
-            #rightCell($change.revision)
+            <td class="content-right">
+        #if($url)
+                <a href="$url">
+        #end
+                    $change.revision
+        #if($url)
+                </a>
+        #end
+             </td>
             #dynamicCell($change.user)
             #dateCell($change)
             #contentCell($action.transformComment($change))

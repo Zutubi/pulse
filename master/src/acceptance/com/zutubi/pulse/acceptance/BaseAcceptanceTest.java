@@ -1,12 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
-import com.meterware.httpunit.WebClient;
-import com.meterware.httpunit.HttpException;
 import com.meterware.httpunit.GetMethodWebRequest;
+import com.meterware.httpunit.HttpException;
+import com.meterware.httpunit.WebClient;
 import com.zutubi.pulse.acceptance.forms.AddProjectWizard;
+import com.zutubi.pulse.acceptance.forms.CreateUserForm;
 import com.zutubi.pulse.acceptance.forms.CvsForm;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
-import com.zutubi.pulse.acceptance.forms.CreateUserForm;
 import junit.framework.Assert;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.xml.sax.SAXException;
@@ -170,7 +170,7 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
     {
         CvsForm.Create form = new CvsForm.Create(tester);
         form.assertFormPresent();
-        form.nextFormElements(root, module, password, "", "", "");
+        form.nextFormElements(root, module, password, "", "", "", "");
     }
 
     protected void submitProjectBasicsForm(String projectName, String description, String url, String scm, String type)

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.forms.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.CustomDetailsForm;
 import com.zutubi.pulse.acceptance.forms.Maven2DetailsForm;
 import com.zutubi.pulse.acceptance.forms.SubversionForm;
-import com.zutubi.pulse.acceptance.forms.AddProjectWizard;
 import com.zutubi.pulse.util.RandomUtils;
 
 import java.util.Map;
@@ -191,7 +191,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
         SubversionForm.Create svnForm = new SubversionForm.Create(tester);
         svnForm.assertFormPresent();
         String location = "http://url";
-        svnForm.nextFormElements("username", "password", location, null, null);
+        svnForm.nextFormElements("username", "password", location, null, null, null);
         return location;
     }
 

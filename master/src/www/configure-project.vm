@@ -27,7 +27,10 @@
                 <table id="project.scm" class="fill-content">
                     #aclEditHeadingRow("project.scm" 2 "editScm!input.action?id=$project.scm.id&amp;projectId=$project.id" "project.scm.edit" "project")
                     #scmRow($project)
-                    #dynamicRow("scm.location" "$project.scm.createServer().location")
+                    #dynamicRow("scm.location" $project.scm.createServer().location)
+#if($project.scm.changeViewerUrl && $project.scm.changeViewerUrl.length() > 0)
+                    #dynamicRow("scm.change.viewer.url" $project.scm.changeViewerUrl)
+#end
                     #dynamicRow("scm.monitor" "$project.scm.monitor")
                     #enabledDisabledRow("scm.filters" $project.scm.filterEnabled)
 #acl("domainObject=project" "hasPermission=4,1")

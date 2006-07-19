@@ -122,12 +122,19 @@ function openResourceBrowser(resourceId, versionId)
 // @deprecated. Use the Prototype function Element.toggle instead.
 function toggleElementDisplay(element)
 {
-    Element.toggle(element);
+    if(element.style.display == 'none')
+    {
+        element.style.display = '';
+    }
+    else
+    {
+        element.style.display = 'none';
+    }
 }
 
 function toggleDisplay(id)
 {
-    Element.toggle(getElement(id));
+    toggleElementDisplay(getElement(id));
 }
 
 // Toggles the display of a nested list and switched the correcsponding image

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.Cvs;
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.model.Cvs;
 
 /**
  *
@@ -31,6 +31,8 @@ public class EditCvsAction extends AbstractEditScmAction
 
     public void prepare() throws Exception
     {
+        super.prepare();
+
         scm = (Cvs) getScmManager().getScm(getId());
 
         minutes = scm.getQuietPeriodMinutes();

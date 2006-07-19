@@ -27,6 +27,7 @@ public class EditP4Action extends AbstractEditScmAction
 
     public void prepare() throws Exception
     {
+        super.prepare();
         scm = (P4) getScmManager().getScm(getId());
     }
 }

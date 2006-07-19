@@ -32,12 +32,12 @@ public abstract class CvsForm extends BaseForm
 
         public String[] getFieldNames()
         {
-            return new String[]{"cvs.root", "cvs.module", "cvs.password", "cvs.branch", "minutes", "seconds"};
+            return new String[]{"cvs.root", "cvs.module", "cvs.password", "cvs.branch", "minutes", "seconds", "cvs.changeViewerUrl"};
         }
 
         public int[] getFieldTypes()
         {
-            return new int[]{TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD};
+            return new int[]{TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD};
         }
     }
 
@@ -58,12 +58,12 @@ public abstract class CvsForm extends BaseForm
 
         public String[] getFieldNames()
         {
-            return new String[]{"cvs.root", "cvs.module", "cvs.password", "cvs.branch", "minutes", "seconds", "monitor"};
+            return new String[]{"cvs.root", "cvs.module", "cvs.password", "cvs.branch", "minutes", "seconds", "cvs.changeViewerUrl", "monitor"};
         }
 
         public int[] getFieldTypes()
         {
-            return new int[]{TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, CHECKBOX};
+            return new int[]{TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, CHECKBOX};
         }
     }
 }

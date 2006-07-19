@@ -71,8 +71,17 @@
 #if($changelists.size() > 0)
     #foreach($changelist in $changelists)
         #set($index = $velocityCount - 1)
+        #set($url = $action.getChangeUrl($changelist))
         <tr>
-            #rightCell($changelist.revision)
+            <td class="content-right">
+        #if($url)
+                <a href="$url">
+        #end
+                    $changelist.revision
+        #if($url)
+                </a>
+        #end
+             </td>
             #dateCell($changelist)
             #contentCell($action.transformComment($changelist))
             #aggregateResultCell($changelist)

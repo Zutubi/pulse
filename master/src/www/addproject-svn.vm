@@ -25,9 +25,12 @@
     #wwpassword("name=svn.passphrase" "label=%{getText('svn.passphrase')}" "tabindex=5" "showPassword=true""onkeypress=return submitenter(this,event)")
     #inlineHelp("svn.passphrase.help")
 
+    #wwtextfield("name=svn.changeViewerUrl" "label=%{getText('scm.change.viewer.url')}" "size=60" "tabindex=6" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("scm.change.viewer.url.help")
+
     #testSettingsRow()
 
-    #previousNextCancel(6)
+    #previousNextCancel(7)
 #end
 
     </div>

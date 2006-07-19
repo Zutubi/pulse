@@ -16,7 +16,7 @@ public abstract class AbstractEditScmAction extends ProjectActionSupport impleme
 {
     private long id;
     private Project project;
-    private static final List<String> ID_PARAMS = Arrays.asList("id");
+    private static final List<String> ID_PARAMS = Arrays.asList("id", "projectId");
     private boolean monitor;
 
     public long getId()
@@ -49,9 +49,13 @@ public abstract class AbstractEditScmAction extends ProjectActionSupport impleme
         return ID_PARAMS;
     }
 
-    public String doInput()
+    public void prepare() throws Exception
     {
         project = getProjectManager().getProject(projectId);
+    }
+
+    public String doInput()
+    {
         monitor = project.getScm().isMonitor();
         return INPUT;
     }

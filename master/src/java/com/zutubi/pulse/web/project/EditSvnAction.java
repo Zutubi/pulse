@@ -25,6 +25,7 @@ public class EditSvnAction extends AbstractEditScmAction
 
     public void prepare() throws Exception
     {
+        super.prepare();
         scm = (Svn) getScmManager().getScm(getId());
     }
 }
