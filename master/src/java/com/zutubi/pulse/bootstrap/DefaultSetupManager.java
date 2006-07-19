@@ -52,12 +52,12 @@ public class DefaultSetupManager implements SetupManager
         if (!promptShown)
         {
             // let the user know that they should continue / complete the setup process via the Web UI.
-            int serverPort = configurationManager.getAppConfig().getServerPort();
+            MasterApplicationConfiguration appConfig = configurationManager.getAppConfig();
 
             //TODO: I18N this message - note, this also only works if the user is installing on the local
             //TODO: machine. We need to provide a better (widely applicable) URL.
 
-            System.err.println("Now go to http://localhost:"+serverPort+" and follow the prompts.");
+            System.err.println("Now go to http://localhost:"+appConfig.getServerPort() + appConfig.getContextPath() + " and follow the prompts.");
             promptShown = true;
         }
     }

@@ -11,6 +11,8 @@ public interface MasterApplicationConfiguration extends ApplicationConfiguration
 
     public static final String HOST_NAME = "host.name";
 
+    public static final String CONTEXT_PATH = "webapp.contextPath";
+
     //---( help configuration )---
     public static final String HELP_URL = "help.url";
 
@@ -64,6 +66,10 @@ public interface MasterApplicationConfiguration extends ApplicationConfiguration
     String getHostName();
 
     void setHostName(String host);
+
+    String getContextPath();
+
+    void setContextPath(String path);
 
     String getHelpUrl();
 

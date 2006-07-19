@@ -45,6 +45,16 @@ public class MasterApplicationConfigurationSupport implements MasterApplicationC
         config.setProperty(HOST_NAME, host);
     }
 
+    public String getContextPath()
+    {
+        return config.getProperty(CONTEXT_PATH);
+    }
+
+    public void setContextPath(String path)
+    {
+        config.setProperty(CONTEXT_PATH, path);
+    }
+
     public String getHelpUrl()
     {
         return config.getProperty(HELP_URL);

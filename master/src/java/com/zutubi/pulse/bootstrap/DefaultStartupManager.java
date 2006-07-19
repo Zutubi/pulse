@@ -179,10 +179,10 @@ public class DefaultStartupManager implements StartupManager
         eventManager.publish(new SystemStartedEvent(this));
 
         // let the user know that the system is now up and running.
-        int serverPort = configurationManager.getAppConfig().getServerPort();
+        MasterApplicationConfiguration appConfig = configurationManager.getAppConfig();
 
         //TODO: I18N this message.
-        System.err.println("The server is now available at http://localhost:"+serverPort+".");
+        System.err.println("The server is now available at http://localhost:"+appConfig.getServerPort()+ appConfig.getContextPath());
     }
 
     private void runStartupTasks()

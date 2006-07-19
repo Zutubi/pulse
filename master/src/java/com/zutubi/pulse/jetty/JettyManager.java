@@ -25,11 +25,6 @@ public class JettyManager implements Stoppable
     private WebApplicationContext appContext;
 
     /**
-     * The context path under which the applications Web UI is deployed.
-     */
-    private String contextPath = "/";
-
-    /**
      * Required resource.
      *
      * @param server
@@ -67,7 +62,7 @@ public class JettyManager implements Stoppable
 
         try
         {
-            appContext = server.addWebApplication(contextPath, wwwRoot.getAbsolutePath());
+            appContext = server.addWebApplication(getContextPath(), wwwRoot.getAbsolutePath());
             appContext.setDefaultsDescriptor(null);
             server.start();
         }
@@ -141,8 +136,13 @@ public class JettyManager implements Stoppable
     {
         if (server.isStarted())
         {
-            return ((WebApplicationHandler)server.getContext(contextPath).getHandlers()[0]);
+            return ((WebApplicationHandler)server.getContext(getContextPath()).getHandlers()[0]);
         }
         return null;
+    }
+
+    protected String getContextPath()
+    {
+        return configurationManager.getAppConfig().getContextPath();
     }
 }
