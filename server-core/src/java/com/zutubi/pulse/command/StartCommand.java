@@ -24,6 +24,7 @@ public class StartCommand implements Command
      * The pulse data directory
      */
     private String data;
+    private static final String ENV_PULSE_DATA = "PULSE_DATA";
 
     /**
      * Specify the port to which pulse will bind its web user interface.
@@ -86,6 +87,10 @@ public class StartCommand implements Command
             if (TextUtils.stringSet(data))
             {
                 System.setProperty("pulse.data", data);
+            }
+            else if(System.getenv(ENV_PULSE_DATA) != null)
+            {
+                System.setProperty("pulse.data", System.getenv(ENV_PULSE_DATA));
             }
 
             SystemBootstrapManager bootstrap = new SystemBootstrapManager();

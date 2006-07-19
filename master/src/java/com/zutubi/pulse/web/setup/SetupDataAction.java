@@ -61,16 +61,6 @@ public class SetupDataAction extends SetupActionSupport
     {
         File home = new File(this.data);
         configurationManager.setPulseData(home);
-
-        // If this is the first time this directory is being used as a data directory, then we need
-        // to ensure that it is initialised. If we are working with an already existing directory,
-        // then it will have been initialised and no re-initialisation is required (or allowed).
-        Data d = configurationManager.getData();
-        if (!d.isInitialised())
-        {
-            configurationManager.getData().init();
-        }
-
         setupManager.requestDataComplete();
         
         return SUCCESS;

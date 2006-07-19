@@ -6,6 +6,7 @@ import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 
 import java.util.List;
+import java.io.IOException;
 
 /**
  * <class-comment/>
@@ -39,19 +40,17 @@ public class DefaultSetupManager implements SetupManager
 
     private SetupState state;
 
+    private boolean promptShown = false;
+
     public SetupState getCurrentState()
     {
         return state;
     }
 
-    public void startSetupWorkflow()
+    private void showPrompt()
     {
-        state = SetupState.STARTING;
-        if (isDataRequired())
+        if (!promptShown)
         {
-            // request data input.
-            state = SetupState.DATA;
-
             // let the user know that they should continue / complete the setup process via the Web UI.
             int serverPort = configurationManager.getAppConfig().getServerPort();
 
@@ -59,20 +58,41 @@ public class DefaultSetupManager implements SetupManager
             //TODO: machine. We need to provide a better (widely applicable) URL.
 
             System.err.println("Now go to http://localhost:"+serverPort+" and follow the prompts.");
+            promptShown = true;
+        }
+    }
 
+    public void startSetupWorkflow() throws IOException
+    {
+        state = SetupState.STARTING;
+        if (isDataRequired())
+        {
+            // request data input.
+            state = SetupState.DATA;
+            showPrompt();
             return;
         }
         requestDataComplete();
     }
 
-    public void requestDataComplete()
+    public void requestDataComplete() throws IOException
     {
+        // If this is the first time this directory is being used as a data directory, then we need
+        // to ensure that it is initialised. If we are working with an already existing directory,
+        // then it will have been initialised and no re-initialisation is required (or allowed).
+        Data d = configurationManager.getData();
+        if (!d.isInitialised())
+        {
+            configurationManager.getData().init();
+        }
+
         state = SetupState.STARTING;
         if (isLicenseRequired())
         {
             //TODO: we need to provide some feedback to the user about what / why there current license
             //TODO: if one exists is not sufficient.
             state = SetupState.LICENSE;
+            showPrompt();
             return;
         }
         requestLicenseComplete();
@@ -96,8 +116,8 @@ public class DefaultSetupManager implements SetupManager
 
         if (isUpgradeRequired())
         {
-
             state = SetupState.UPGRADE;
+            showPrompt();
             return;
         }
 

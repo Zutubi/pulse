@@ -6,6 +6,10 @@
 
     <property file="build.properties"/>
 
+    <condition property="on.windows">
+        <os family="windows"/>
+    </condition>
+
     <target name="clean">
         <delete dir="build"/>
     </target>
@@ -168,10 +172,10 @@
             <include name="**/*.in"/>
         </replace>
 
-        <copy todir="${package.root}/bin">
+        <move todir="${package.root}/bin">
             <fileset dir="${package.root}/bin"/>
             <mapper type="glob" from="*.in" to="*"/>
-        </copy>
+        </move>
 
         <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
         <exec executable="zip" dir="${package.root}/..">
@@ -187,9 +191,11 @@
                 <exclude name="${package.name}/bin/*"/>
             </tarfileset>
         </tar>
+
+        <antcall target="nsis.master"/>
     </target>
 
-    <target name="nsis.master">
+    <target name="nsis.master" if="on.windows">
         <property name="package.name" value="pulse-${pulse.version}"/>
         <property name="package.root" value="build/package/${package.name}"/>
 
@@ -338,9 +344,11 @@
                 <exclude name="${package.name}/bin/*"/>
             </tarfileset>
         </tar>
+
+        <antcall target="nsis.slave"/>
     </target>
 
-    <target name="nsis.slave">
+    <target name="nsis.slave" if="on.windows">
         <property name="package.name" value="pulse-agent-${pulse.version}"/>
         <property name="package.root" value="build/package/${package.name}"/>
 
