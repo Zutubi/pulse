@@ -1,5 +1,5 @@
 #macro(refLink $page)
-    <a href="$helpUrl/$action.escapeSpaces($page)" onclick="window.open('$helpUrl/$action.escapeSpaces($page)', 'Reference', 'width=600,height=500,scrollbars=yes,resizable=yes'); return false;" target="_blank" title="$page">$page</a>
+    <a href="$helpUrl/$page" onclick="window.open('$helpUrl/$page', 'Reference', 'width=600,height=500,scrollbars=yes,resizable=yes'); return false;" target="_blank" title="$page">$page</a>
 #end
 <div id="reference">
     <table class="fill-content">
@@ -7,7 +7,7 @@
         <td class="content">
             <ul>
                 <li>
-                    #refLink("pulse Files")
+                    <a href="$helpUrl/pulse+Files" onclick="window.open('$helpUrl/pulse+Files', 'Reference', 'width=600,height=500,scrollbars=yes,resizable=yes'); return false;" target="_blank" title="pulse Files">pulse Files</a>
                     <ul>
                         <li>
                             #refLink("ant.pp")
@@ -89,6 +89,9 @@
                                 <li>
                                     #refLink("resource")
                                 </li>
+                                <li>
+                                    #refLink("xcodebuild")
+                                </li>
                             </ul>
                         </li>
                         <li>#refLink("regex.pp")
@@ -102,6 +105,9 @@
                                     </ul>
                                 </li>
                             </ul>
+                        </li>
+                        <li>
+                            #refLink("xcodebuild.pp")
                         </li>
                     </ul>
                 </li>

@@ -73,6 +73,7 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         Scope scope = new Scope();
         scope.add(new Property("project", result.getProject().getName()));
         scope.add(new Property("number", Long.toString(result.getNumber())));
+        scope.add(new Property("specification", result.getBuildSpecification()));
         scope.add(new Property("status", result.getState().getString()));
 
         for(String arg: args)
@@ -108,6 +109,7 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         Scope scope = new Scope();
         scope.add(new Property("project", "project"));
         scope.add(new Property("number", "number"));
+        scope.add(new Property("specification", "specification"));
         scope.add(new Property("status", "status"));
 
         for(String arg: args)

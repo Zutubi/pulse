@@ -1,0 +1,9 @@
+<div id="reference">
+    <table class="fill-content">
+        #headingRow("post.build.action.available.variables" 2)
+        #docRow("post.build.action.variable.number" "post.build.action.variable.number.help")
+        #docRow("post.build.action.variable.project" "post.build.action.variable.project.help")
+        #docRow("post.build.action.variable.specification" "post.build.action.variable.specification.help")
+        #docRow("post.build.action.variable.status" "post.build.action.variable.status.help")
+    </table>
+</div>

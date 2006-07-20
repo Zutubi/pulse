@@ -8,6 +8,9 @@
 <body>
     #projectTabs("configuration")
 
+<table class="columns">
+    <tr><td class="columns">
+
     #parse("/template/includes/actionerrors.vm")
 
 #wwcform("action=addPostBuildAction.action" "id=post.build.action.exe" "heading=%{getText('post.build.action.exe.step')}" "method=post")
@@ -21,6 +24,13 @@
 
     #previousFinishCancel(3)
 #end
+
+    </td><td class="columns">
+
+    #parse("/template/includes/post-build-action-variables.vm")
+
+    </td>
+</table>
 
     #tabEnd()
 </body>

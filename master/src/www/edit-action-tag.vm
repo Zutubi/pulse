@@ -8,6 +8,9 @@
 <body>
     #projectTabs("configuration")
 
+<table class="columns">
+    <tr><td class="columns">
+
     #parse("/template/includes/actionerrors.vm")
 
 #wwcform("action=editTagAction.action" "id=edit.tag.post.build.action" "heading=%{getText('edit.tag.post.build.action')}" "method=post")
@@ -33,6 +36,13 @@
     #saveCancel(7)
 
 #end
+
+    </td><td class="columns">
+
+    #parse("/template/includes/post-build-action-variables.vm")
+
+    </td>
+</table>
 
     #tabEnd()
 </body>

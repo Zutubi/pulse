@@ -536,6 +536,16 @@
 #end
 
 ##
+## Outputs a content row with two-keyed values, the second allowed to wrap
+##
+#macro(docRow $nameKey $descKey)
+    <tr>
+        #contentRowHeading($nameKey)
+        #staticWrapCell($descKey)
+    </tr>
+#end
+
+##
 ## Outputs an enabled:disabled row based on the boolean value of the property.
 ## ie: true is translated to enabled, false to disabled.
 ##
