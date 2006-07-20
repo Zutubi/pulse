@@ -1,4 +1,4 @@
-#helpTag("Stage+Log+View")
+#helpTag("Build+Stage+Log+View")
 #authorisationTags($principle)
 #stageTags($buildResult $resultNode)
 <html>
