@@ -74,9 +74,9 @@
                     <li>
                         <a href="#" id="nav_$node.result.id" onclick="selectNode('$node.result.id'); return false;">
             #if($summary.allPassed())
-                            <img src="/images/accept.gif"/>
+                            <img src="$base/images/accept.gif"/>
             #else
-                            <img src="/images/exclamation.gif"/>
+                            <img src="$base/images/exclamation.gif"/>
             #end
                             $!webwork.htmlEncode($node.stage)
             #if($summary.allPassed())

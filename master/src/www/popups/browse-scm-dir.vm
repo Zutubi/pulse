@@ -2,7 +2,7 @@
 <head>
     <title>$!webwork.htmlEncode($path)</title>
     <link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"/>
-    <script type="text/javascript" src="/js/prototype.js"></script>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
         function selectFile(value)
         {

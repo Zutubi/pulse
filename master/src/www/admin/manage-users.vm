@@ -4,7 +4,7 @@
 <html>
   <head>
     <title>users</title>
-    <link href="/css/build.css" rel="stylesheet" type="text/css">
+    <link href="$base/css/build.css" rel="stylesheet" type="text/css">
   </head>
   <body>
       #adminTabs("users")

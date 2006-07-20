@@ -73,9 +73,9 @@
     <table class="fill-content">
 
 #if($recipeQueueRunning)
-        #restrictedHeadingRow("recipe.queue" 4 "ROLE_ADMINISTRATOR" "queue.pause" "/admin/toggleRecipeQueue.action" "control_pause_blue.gif" false)
+        #restrictedHeadingRow("recipe.queue" 4 "ROLE_ADMINISTRATOR" "queue.pause" "$base/admin/toggleRecipeQueue.action" "control_pause_blue.gif" false)
 #else
-        #restrictedHeadingRow("recipe.queue" 4 "ROLE_ADMINISTRATOR" "queue.resume" "/admin/toggleRecipeQueue.action" "control_play_blue.gif" false)
+        #restrictedHeadingRow("recipe.queue" 4 "ROLE_ADMINISTRATOR" "queue.resume" "$base/admin/toggleRecipeQueue.action" "control_play_blue.gif" false)
         #noteRow("queue.paused" 4)
 #end
         <tr>

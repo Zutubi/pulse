@@ -1,3 +1,4 @@
+/*
 h1.build-log {
     font-size: x-large;
     margin-top: 0.3em;
@@ -176,6 +177,7 @@ li.recipe-tree {
 /*background: url( /images/arrow.png ) no-repeat 0 8px;*/
 /*border-left: solid;*/
 /*border-color: #d4d4d4;*/
+/*
 }
 
 li.error, li.warning, li.info {
@@ -184,15 +186,15 @@ li.error, li.warning, li.info {
 }
 
 li.error {
-    background: url( /images/forbidden_16.gif ) no-repeat 0 0;
+    background: url( ../images/forbidden_16.gif ) no-repeat 0 0;
 }
 
 li.warning {
-    background: url( /images/warning_16.gif ) no-repeat 0 0;
+    background: url( ../images/warning_16.gif ) no-repeat 0 0;
 }
 
 li.info {
-    background: url( /images/info_16.gif ) no-repeat 0 0;
+    background: url( ../images/info_16.gif ) no-repeat 0 0;
 }
 
 ul.artifact {
@@ -202,7 +204,7 @@ ul.artifact {
 
 li.artifact {
     padding-left: 20px;
-    background: url( /images/gnome-mime-text.png ) no-repeat 0 0;
+    background: url( ../images/gnome-mime-text.png ) no-repeat 0 0;
 }
 
 ul.recipe-summary {
@@ -235,4 +237,4 @@ li.build-spec {
 li.header {
     font-weight: bold;
     list-style: none;
-}
+}*/

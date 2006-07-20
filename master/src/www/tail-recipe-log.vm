@@ -4,10 +4,10 @@
 <html>
 <head>
     <title>#wwtext("name=build") $buildResult.number :: #wwtext("name=build.stage") $resultNode.stage</title>
-    <script type="text/javascript" src="/js/prototype.js"></script>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
         <!--
-        #updater("/ajax/tailRecipeLogPanel.action?id=$resultNode.id&buildId=$buildResult.id&maxLines=$maxLines&refreshInterval=$refreshInterval" "panel" $principle)
+        #updater("$base/ajax/tailRecipeLogPanel.action?id=$resultNode.id&buildId=$buildResult.id&maxLines=$maxLines&refreshInterval=$refreshInterval" "panel" $principle)
         -->
     </script>
 </head>
@@ -25,7 +25,7 @@
         </tr>
     #end
 
-    <h3 class="heading">#wwtext("name=stage.tail.box") &nbsp;<a href="viewRecipeLog.action?id=$resultNode.id&amp;buildId=$buildResult.id"><img alt="down" src="/images/arrow_down.gif"/>#wwtext("name=stage.full.log")</a></h3>
+    <h3 class="heading">#wwtext("name=stage.tail.box") &nbsp;<a href="viewRecipeLog.action?id=$resultNode.id&amp;buildId=$buildResult.id"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=stage.full.log")</a></h3>
     <div class="box">
         <div id="panel">
             #parse("ajax/tail-recipe-log-panel.vm")

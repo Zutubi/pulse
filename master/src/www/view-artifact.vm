@@ -1,6 +1,6 @@
 #macro(breadcrumbs)
     <div style="margin: 10px">
-        :: <a href="/default.action">pulse</a> ::
+        :: <a href="$base/default.action">pulse</a> ::
         <a href="currentBuild.action?id=$buildResult.project.id">$!webwork.htmlEncode($buildResult.project.name)</a> ::
         <a href="viewBuild.action?id=$buildResult.id">#wwtext("name=build") $buildResult.number</a> ::
         <a href="viewBuildArtifacts.action?id=$buildResult.id">all artifacts</a>

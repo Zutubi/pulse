@@ -4,14 +4,14 @@
 <head>
     <title>$!webwork.htmlEncode($path)</title>
 
-    <link rel="stylesheet" type="text/css" href="/css/treeview/tree.css"/>
+    <link rel="stylesheet" type="text/css" href="$base/css/treeview/tree.css"/>
 
-    <script type="text/javascript" src="/js/prototype.js"></script>
-    <script type="text/javascript" src="/js/zutubi.js"></script>
-    <script type="text/javascript" src="/js/yahoo/yahoo.js"></script>
-    <script type="text/javascript" src="/js/yahoo/treeview.js"></script>
-    <script type="text/javascript" src="/js/widget/treeview.js"></script>
-    <script type="text/javascript" src="/js/main.js"></script>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript" src="$base/js/zutubi.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/yahoo.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/treeview.js"></script>
+    <script type="text/javascript" src="$base/js/widget/treeview.js"></script>
+    <script type="text/javascript" src="$base/js/main.js"></script>
     <script type="text/javascript">
 
         window.onload = initialize;
@@ -52,7 +52,7 @@
             var p = node.tree.getIdPath(node);
 
             var ajax = new Ajax.Request(
-                "/lsProjDir.action",
+                "$base/lsProjDir.action",
                 {
                     method: 'get',
                     onComplete: lsResponse(node, onCompleteCallback),

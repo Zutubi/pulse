@@ -11,5 +11,5 @@
     #end
     </ul>
 #else
-    <img src="/images/accept.gif"/> #wwtext("name=settings.ok")
+    <img src="$base/images/accept.gif"/> #wwtext("name=settings.ok")
 #end

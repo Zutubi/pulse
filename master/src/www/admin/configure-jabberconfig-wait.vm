@@ -9,7 +9,7 @@
     #adminTabs("settings")
 
     <p>
-        <img alt="waiting..." src="/images/inprogress.gif"/> #wwtext("name=jabber.applying")
+        <img alt="waiting..." src="$base/images/inprogress.gif"/> #wwtext("name=jabber.applying")
     </p>
 
     #tabEnd()

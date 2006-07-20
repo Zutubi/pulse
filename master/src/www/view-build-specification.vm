@@ -43,7 +43,7 @@
     #projectTabs("configuration")
 
     <span class="action">
-        <a href="triggerBuild.action?id=$specification.id&amp;projectId=$project.id"><img alt="trigger" src="/images/lightning.gif"/> #wwtext("name=buildspec.trigger")</a>
+        <a href="triggerBuild.action?id=$specification.id&amp;projectId=$project.id"><img alt="trigger" src="$base/images/lightning.gif"/> #wwtext("name=buildspec.trigger")</a>
 #if($specification.forceClean)
         [ #wwtext("name=buildspec.forced.clean") ]
 #else
@@ -83,7 +83,7 @@
 #acl("domainObject=project" "hasPermission=4,1")
                 <p>
                     <a id="stage.add" href="createBuildStage!input.action?projectId=$projectId&specId=$specification.id">
-                        <img alt="add" src="/images/add.gif"/> #wwtext("name=buildspec.stage.add")
+                        <img alt="add" src="$base/images/add.gif"/> #wwtext("name=buildspec.stage.add")
                     </a>
                 </p>
 #end
@@ -102,7 +102,7 @@
                         #nodeResources($node)
         #acl("domainObject=project" "hasPermission=4,1")
                         <a href="#" id="delete_$!webwork.htmlEncode($node.stage.name)" onclick="confirmUrl('$confirmMessage', 'deleteBuildStage.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id')">
-                            <img alt="$action.getText('delete')" src="/images/delete.gif"/> #wwtext("name=buildspec.stage.delete")
+                            <img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=buildspec.stage.delete")
                         </a>
         #end
                     </div>

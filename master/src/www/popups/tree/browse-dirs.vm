@@ -3,18 +3,18 @@
 <head>
     <title>Select directory</title>
 
-    <link rel="stylesheet" type="text/css" href="/css/treeview/tree.css"/>
+    <link rel="stylesheet" type="text/css" href="$base/css/treeview/tree.css"/>
 
-    <script type="text/javascript" src="/js/prototype.js"></script>
-    <script type="text/javascript" src="/js/zutubi.js"></script>
-    <script type="text/javascript" src="/js/yahoo/yahoo.js"></script>
-    <script type="text/javascript" src="/js/yahoo/treeview.js"></script>
-    <script type="text/javascript" src="/js/yahoo/animation.js"></script>
-    <script type="text/javascript" src="/js/yahoo/event.js"></script>
-    <script type="text/javascript" src="/js/yahoo/dom.js"></script>
-    <script type="text/javascript" src="/js/widget/treeview.js"></script>
-    <script type="text/javascript" src="/js/widget/toolbar.js"></script>
-    <script type="text/javascript" src="/js/main.js"></script>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript" src="$base/js/zutubi.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/yahoo.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/treeview.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/animation.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/event.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/dom.js"></script>
+    <script type="text/javascript" src="$base/js/widget/treeview.js"></script>
+    <script type="text/javascript" src="$base/js/widget/toolbar.js"></script>
+    <script type="text/javascript" src="$base/js/main.js"></script>
     <script type="text/javascript">
         <!--
             // define the init properties that control the tree.
@@ -203,7 +203,7 @@
                 var p = node.getPath();
 
                 var ajax = new Ajax.Request(
-                    "/ajax/ls.action",
+                    "$base/ajax/ls.action",
                     {
                         method: 'get',
                         onComplete: lsResponse(node, onCompleteCallback),
@@ -262,7 +262,7 @@
                 var p = node.getPath();
 
                 var ajax = new Ajax.Request(
-                    "/ajax/mkdir.action",
+                    "$base/ajax/mkdir.action",
                     {
                         method: 'get',
                         onComplete: mkdirResponse(node, name),
@@ -313,7 +313,7 @@
                 var p = node.getPath();
 
                 var ajax = new Ajax.Request(
-                    "/ajax/rmdir.action",
+                    "$base/ajax/rmdir.action",
                     {
                         method: 'get',
                         onComplete: rmdirResponse(node),
@@ -377,7 +377,7 @@
             <br/>
             All pulse data files will be stored in this directory.
         </div>
-        <div id="loading" style="float:right;display:none;"><img src="/images/treeview/loading.gif" alt="loading..."/></div>
+        <div id="loading" style="float:right;display:none;"><img src="$base/images/treeview/loading.gif" alt="loading..."/></div>
         <div style="clear:both;"></div>
     </div>
 

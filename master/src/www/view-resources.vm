@@ -39,8 +39,8 @@
                 #if($firstRow)
                     #set($firstRow = false)
                     #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-                        #editCellSpan("/viewResource.action?resourceId=$resource.id" "edit_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
-                        #deleteCellSpan($confirmMessage "/admin/deleteResource.action?id=$resource.id" "delete_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
+                        #editCellSpan("$base/viewResource.action?resourceId=$resource.id" "edit_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
+                        #deleteCellSpan($confirmMessage "$base/admin/deleteResource.action?id=$resource.id" "delete_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
                     #end
                 #end
         </tr>
@@ -52,8 +52,8 @@
                     #contentCell("empty.cell")
                     #contentCell("empty.cell")
                     #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-                        #editCellSpan("/viewResource.action?resourceId=$resource.id" "edit_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
-                        #deleteCellSpan($confirmMessage "/admin/deleteResource.action?id=$resource.id" "delete_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
+                        #editCellSpan("$base/viewResource.action?resourceId=$resource.id" "edit_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
+                        #deleteCellSpan($confirmMessage "$base/admin/deleteResource.action?id=$resource.id" "delete_$!webwork.htmlEncode($resource.name)" $totalPropertyCount)
                     #end
         </tr>
         #end
@@ -91,7 +91,7 @@
         #set($args = "")
     #end
 
-        #addRow("resource.add" 6 "/admin/createResource!input.action${args}" "resource.add")
+        #addRow("resource.add" 6 "$base/admin/createResource!input.action${args}" "resource.add")
 #end
     </table>
 

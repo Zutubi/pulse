@@ -21,11 +21,11 @@
         #dynamicCell($property.value)
         #dynamicCell($property.addToEnvironment)
         #dynamicCell($property.addToPath)
-        #editCell("/admin/editProperty!input.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)" "edit_$!webwork.htmlEncode($property.name)")
-        #deleteCell("delete_$!webwork.htmlEncode($property.name)" "/admin/deleteProperty.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)" $confirmMessage )
+        #editCell("$base/admin/editProperty!input.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)" "edit_$!webwork.htmlEncode($property.name)")
+        #deleteCell("delete_$!webwork.htmlEncode($property.name)" "$base/admin/deleteProperty.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)" $confirmMessage )
     <tr>
     #end
-    #addRow("property.add" 6 "/admin/createProperty!input.action?resourceId=$resource.id$versionLink" "property.add_$!webwork.htmlEncode($version.value)")
+    #addRow("property.add" 6 "$base/admin/createProperty!input.action?resourceId=$resource.id$versionLink" "property.add_$!webwork.htmlEncode($version.value)")
 #end
 
 <html>
@@ -67,8 +67,8 @@
     #end
                 </ul>
                 <p>
-                    <a id="version.add" href="/admin/createResourceVersion!input.action?resourceId=$resource.id">
-                        <img alt="add" src="/images/add.gif"/> #wwtext("name=version.add")
+                    <a id="version.add" href="$base/admin/createResourceVersion!input.action?resourceId=$resource.id">
+                        <img alt="add" src="$base/images/add.gif"/> #wwtext("name=version.add")
                     </a>
                 </p>
             </td>

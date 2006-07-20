@@ -22,14 +22,14 @@
         #staticCell($agent.status.prettyString)
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
     #if($agent.isSlave())
-        #linkCell("agent.ping" "/admin/pingAgent.action?agentId=$agent.id")
+        #linkCell("agent.ping" "$base/admin/pingAgent.action?agentId=$agent.id")
         #if($agent.getSlave().isEnabled())
-            #linkCell("agent.disable" "/admin/enableAgent.action?agentId=$agent.id&amp;enable=false")
+            #linkCell("agent.disable" "$base/admin/enableAgent.action?agentId=$agent.id&amp;enable=false")
         #else
-            #linkCell("agent.enable" "/admin/enableAgent.action?agentId=$agent.id&amp;enable=true")
+            #linkCell("agent.enable" "$base/admin/enableAgent.action?agentId=$agent.id&amp;enable=true")
         #end
-        #editCell("/admin/editAgent!input.action?id=$agent.id" "edit_$!webwork.htmlEncode($agent.name)")
-        #deleteCell("delete_$!webwork.htmlEncode($agent.name)" "/admin/deleteAgent.action?id=$agent.id" $confirmMessage)
+        #editCell("$base/admin/editAgent!input.action?id=$agent.id" "edit_$!webwork.htmlEncode($agent.name)")
+        #deleteCell("delete_$!webwork.htmlEncode($agent.name)" "$base/admin/deleteAgent.action?id=$agent.id" $confirmMessage)
     #else
         #contentCell("empty.cell")
         #contentCell("empty.cell")
@@ -41,7 +41,7 @@
 #end
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
     #licensed("require=canAddAgent")
-        #addRow("add.agent" 7 "/admin/addAgent!input.action" "agent.add")
+        #addRow("add.agent" 7 "$base/admin/addAgent!input.action" "agent.add")
     #end
 #end
 </table>

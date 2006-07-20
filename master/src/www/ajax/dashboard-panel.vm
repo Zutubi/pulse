@@ -1,5 +1,5 @@
-<a style="float: right" href="/user/configureDashboardProjects!input.action">
-    <img alt=configure" src="/images/pencil.gif"/> #wwtext("name=configure.dashboard.projects")
+<a style="float: right" href="$base/user/configureDashboardProjects!input.action">
+    <img alt=configure" src="$base/images/pencil.gif"/> #wwtext("name=configure.dashboard.projects")
 </a>
 <h2 class="section">#wwtext("name=my.projects")</h2>
 
@@ -10,10 +10,10 @@
         <tr>
             <th class="heading" colspan="14">
                 <span class="action">
-                    <a href="/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
+                    <a href="$base/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
                 </span>
-                <a href="/currentBuild.action?id=$project.id" class="unadorned">
-                    <img alt="home" src="/images/house.gif">
+                <a href="$base/currentBuild.action?id=$project.id" class="unadorned">
+                    <img alt="home" src="$base/images/house.gif">
                 </a>
                 $!webwork.htmlEncode($project.name)
             </th>

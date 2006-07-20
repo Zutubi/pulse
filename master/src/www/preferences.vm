@@ -14,7 +14,7 @@
         <tr>
             <td class="columns" width="40%">
                 <table id="user" class="fill-content">
-                    #editHeadingRow("user" 2 "/user/editUser!input.action?userId=$user.id" "user.edit")
+                    #editHeadingRow("user" 2 "$base/user/editUser!input.action?userId=$user.id" "user.edit")
                     #dynamicRow("user.login" $user.login)
                     #dynamicRow("user.name" $user.name)
                 </table>
@@ -28,10 +28,10 @@
     #set($confirmMessage = $action.getText("alias.delete.confirm", [$!webwork.htmlEncode($alias)]))
                     <tr>
                         #dynamicCell($alias)
-                        #deleteCell("deleteAlias$velocityCount" "/user/deleteAlias.action?userId=$user.id&index=$velocityCount" $confirmMessage)
+                        #deleteCell("deleteAlias$velocityCount" "$base/user/deleteAlias.action?userId=$user.id&index=$velocityCount" $confirmMessage)
                     </tr>
 #end
-                    #addRow("alias.add" 2 "/user/addAlias!input.action?userId=$user.id" "alias.add")
+                    #addRow("alias.add" 2 "$base/user/addAlias!input.action?userId=$user.id" "alias.add")
                 </table>
                 <table id="settings" class="fill-content">
                     #editHeadingRow("settings" 2 "user/editUserSettings!input.action?userId=$user.id" "user.settings")
@@ -53,11 +53,11 @@
     #set($confirmMessage = $action.getText("contact.delete.confirm", [$contact.name]))
                         #dynamicCell($contact.name)
                         #dynamicCell($contact.uid)
-                        #editCell("/user/editContactPoint!default.action?id=$contact.id&userId=$user.id" "edit_$!webwork.htmlEncode($contact.name)")
-                        #deleteCell("delete_$!webwork.htmlEncode($contact.name)" "/user/deleteContactPoint.action?id=$contact.id&userId=$user.id" $confirmMessage)
+                        #editCell("$base/user/editContactPoint!default.action?id=$contact.id&userId=$user.id" "edit_$!webwork.htmlEncode($contact.name)")
+                        #deleteCell("delete_$!webwork.htmlEncode($contact.name)" "$base/user/deleteContactPoint.action?id=$contact.id&userId=$user.id" $confirmMessage)
                     </tr>
 #end
-                    #addRow("contact.create" 4 "/user/contactWizard.action?userId=$user.id" "contact.create")
+                    #addRow("contact.create" 4 "$base/user/contactWizard.action?userId=$user.id" "contact.create")
                 </table>
                 <table id="subscriptions" class="fill-content">
                     #headingRow("subscriptions" 5)
@@ -76,8 +76,8 @@
                         #dynamicCell($project.name)
                         #dynamicCell($contact.name)
                         #dynamicCell($subscription.condition)
-                        #editCell("/user/editSubscription!input.action?id=$subscription.id" "edit_sub_$subscription.id")
-                        #deleteCell("delete_$!webwork.htmlEncode($project.name)_$!webwork.htmlEncode($contact.uid)" "/user/deleteSubscription.action?id=$subscription.id&login=$user.login" $confirmMessage)
+                        #editCell("$base/user/editSubscription!input.action?id=$subscription.id" "edit_sub_$subscription.id")
+                        #deleteCell("delete_$!webwork.htmlEncode($project.name)_$!webwork.htmlEncode($contact.uid)" "$base/user/deleteSubscription.action?id=$subscription.id&login=$user.login" $confirmMessage)
                     </tr>
 #end
                 <!--
@@ -85,7 +85,7 @@
                  the user AND the user has configured contact points.
                 -->
 #if($user.contactPoints.size() > 0)
-                    #addRow("subscription.create" 5 "/user/createSubscription!input.action?userId=$user.id" "subscription.create")
+                    #addRow("subscription.create" 5 "$base/user/createSubscription!input.action?userId=$user.id" "subscription.create")
 #else
                     <td class="content" colspan="5">#wwtext("name=subscription.requires.contact")</td>
 #end

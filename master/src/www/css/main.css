@@ -23,7 +23,7 @@ body {
 
 #header {
     padding-bottom: 4px;
-    background: #3e4e6a url(/images/header.gif) top left repeat-x;
+    background: #3e4e6a url(../images/header.gif) top left repeat-x;
     margin: 0;
     font-size: 14px;
 }
@@ -407,11 +407,11 @@ td.expand, td.collapse {
 }
 
 td.expand {
-    background-image: url(/images/bullet_toggle_plus.gif);
+    background-image: url(../images/bullet_toggle_plus.gif);
 }
 
 td.collapse {
-    background-image: url(/images/bullet_toggle_minus.gif);
+    background-image: url(../images/bullet_toggle_minus.gif);
 }
 
 tr.suite-hover td {
@@ -507,31 +507,31 @@ li.error, li.warning, li.info, li.artifact {
 }
 
 li.error {
-    background: url( /images/exclamation.gif ) no-repeat 0 0;
+    background: url( ../images/exclamation.gif ) no-repeat 0 0;
 }
 
 li.warning {
-    background: url( /images/error.gif ) no-repeat 0 0;
+    background: url( ../images/error.gif ) no-repeat 0 0;
 }
 
 li.info {
-    background: url( /images/information.gif ) no-repeat 0 0;
+    background: url( ../images/information.gif ) no-repeat 0 0;
 }
 
 li.task {
-    background: url( /images/accept.gif ) no-repeat 0 0;
+    background: url( ../images/accept.gif ) no-repeat 0 0;
 }
 
 li.explore {
-    background: url( /images/zoom.gif ) no-repeat 0 0;
+    background: url( ../images/zoom.gif ) no-repeat 0 0;
 }
 
 li.file-artifact {
-    background: url( /images/page.gif ) no-repeat 0 0;
+    background: url( ../images/page.gif ) no-repeat 0 0;
 }
 
 li.report-artifact {
-    background: url( /images/page_world.gif ) no-repeat 0 0;
+    background: url( ../images/page_world.gif ) no-repeat 0 0;
 }
 
 li.header {

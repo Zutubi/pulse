@@ -14,7 +14,7 @@
         <tr>
             <td class="columns" width="40%">
                 <table id="general.config" class="fill-content">
-                    #adminHeadingRow("general.config" "/admin/editGeneral!input.action" "general.edit" "/admin/general!reset.action" "general.reset")
+                    #adminHeadingRow("general.config" "$base/admin/editGeneral!input.action" "general.edit" "$base/admin/general!reset.action" "general.reset")
                     #dynamicRow("general.host" $config.hostName)
                     #dynamicRow("general.help.url" $config.helpUrl)
                     #enabledDisabledRow("general.rss.enabled" $config.rssEnabled)
@@ -45,12 +45,12 @@
                 </table>
 
                 <table id="logging.config" class="fill-content">
-                    #adminHeadingRow("logging.config" "/admin/editLogConfig!input.action" "logging.edit" "/admin/logConfig!reset.action" "logging.reset")
+                    #adminHeadingRow("logging.config" "$base/admin/editLogConfig!input.action" "logging.edit" "$base/admin/logConfig!reset.action" "logging.reset")
                     #dynamicRow("logging.level" $config.logConfig)
                 </table>
 
                 <table class="fill-content" id="license.info">
-                    #restrictedHeadingRow("license.info" 2 "ROLE_ADMINISTRATOR" "edit" "/admin/editLicense!input.action" "pencil.gif" "license.edit")
+                    #restrictedHeadingRow("license.info" 2 "ROLE_ADMINISTRATOR" "edit" "$base/admin/editLicense!input.action" "pencil.gif" "license.edit")
                     <tr>
                         #contentRowHeading("license.name.field")
                         #contentCell("license.type.$license.type")
@@ -71,7 +71,7 @@
             </td>
             <td class="columns" width="40%">
                 <table id="smtp.config" class="fill-content">
-                    #adminHeadingRow("smtp.config" "/admin/editSmtp!input.action" "smtp.edit" "/admin/smtp!reset.action" "smtp.reset")
+                    #adminHeadingRow("smtp.config" "$base/admin/editSmtp!input.action" "smtp.edit" "$base/admin/smtp!reset.action" "smtp.reset")
                     #dynamicRow("smtp.host" $config.smtpHost)
                     #dynamicRow("smtp.prefix" $config.smtpPrefix)
                     #dynamicRow("smtp.from" $config.smtpFrom)
@@ -80,7 +80,7 @@
                 </table>
 
                 <table id="jabber.config" class="fill-content">
-                    #adminHeadingRow("jabber.config" "/admin/editJabber!input.action" "jabber.edit" "/admin/jabber!reset.action" "jabber.reset")
+                    #adminHeadingRow("jabber.config" "$base/admin/editJabber!input.action" "jabber.edit" "$base/admin/jabber!reset.action" "jabber.reset")
 #if($jabberStatus)
                     <tr>
                         <th class="note" colspan="2">$!webwork.htmlEncode($jabberStatus)</th>
@@ -94,7 +94,7 @@
                 </table>
 
                 <table id="ldap.config" class="fill-content">
-                    #adminHeadingRow("ldap.config" "/admin/editLdap!input.action" "ldap.edit" "/admin/ldap!reset.action" "ldap.reset")
+                    #adminHeadingRow("ldap.config" "$base/admin/editLdap!input.action" "ldap.edit" "$base/admin/ldap!reset.action" "ldap.reset")
 #if($ldapStatus)
                     <tr>
                         <th class="note" colspan="2">$!webwork.htmlEncode($ldapStatus)</th>

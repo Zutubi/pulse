@@ -38,7 +38,7 @@
                             #wwtextfield("theme=simple" "template=ctext" "name=excludedPath" "size=60" "tabindex=1")
                         </td>
                         <td  class="content">
-                            <a id="add" href="#" onclick="document.forms[0].submit(); return false;"><img alt="add" src="/images/add.gif"/> #wwtext("name=add.name")</a>
+                            <a id="add" href="#" onclick="document.forms[0].submit(); return false;"><img alt="add" src="$base/images/add.gif"/> #wwtext("name=add.name")</a>
                         </td>
 
                         </form>

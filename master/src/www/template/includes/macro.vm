@@ -68,7 +68,7 @@
 ## Outputs a project heading
 ##        
 #macro(projectName $project)
-    :: <a href="/currentBuild.action?id=${project.id}">$!webwork.htmlEncode($project.name)</a> ::
+    :: <a href="$base/currentBuild.action?id=${project.id}">$!webwork.htmlEncode($project.name)</a> ::
 #end
 
 ##
@@ -260,10 +260,10 @@
 ##
 #macro(agentTabs $selected)
     #openTabs()
-        #agentTab("status" "/viewAgentStatus" $selected)
-        #agentTab("resources" "/viewResources" $selected)
-        #agentTab("server-messages" "/serverMessages" $selected)
-        #agentTab("server-info" "/viewSystemInfo" $selected)
+        #agentTab("status" "$base/viewAgentStatus" $selected)
+        #agentTab("resources" "$base/viewResources" $selected)
+        #agentTab("server-messages" "$base/serverMessages" $selected)
+        #agentTab("server-info" "$base/viewSystemInfo" $selected)
     #closeTabs()
 #end
 
@@ -279,8 +279,8 @@
 ##
 #macro(adminTabs $selected)
     #openTabs()
-        #adminTab("settings" "/admin/serverSettings" $selected)
-        #adminTab("users" "/admin/userSettings" $selected)
+        #adminTab("settings" "$base/admin/serverSettings" $selected)
+        #adminTab("users" "$base/admin/userSettings" $selected)
     #closeTabs()
 #end
 
@@ -296,8 +296,8 @@
 ##
 #macro(dashboardTabs $selected)
     #openTabs()
-        #dashboardTab("homepage" "/dashboard" $selected)
-        #dashboardTab("preferences" "/preferences" $selected)
+        #dashboardTab("homepage" "$base/dashboard" $selected)
+        #dashboardTab("preferences" "$base/preferences" $selected)
     #closeTabs()
 #end
 
@@ -316,7 +316,7 @@
         <th class="heading" colspan="$span">
     #if($actionKey)
             <span class="action">
-                <a #if($id != "")id="$id"#end href="$url"><img alt="$action.getText($actionKey)" src="/images/$image"/>#wwtext("name=$actionKey")</a>
+                <a #if($id != "")id="$id"#end href="$url"><img alt="$action.getText($actionKey)" src="$base/images/$image"/>#wwtext("name=$actionKey")</a>
             </span>
     #end
             #wwtext("name=$key")
@@ -332,7 +332,7 @@
         <th class="heading" colspan="$span">
     #authorize("ifAllGranted=$roles")
             <span class="action">
-                <a #if($id != "")id="$id"#end href="$url"><img alt="$action.getText($actionKey)" src="/images/$image"/>#wwtext("name=$actionKey")</a>
+                <a #if($id != "")id="$id"#end href="$url"><img alt="$action.getText($actionKey)" src="$base/images/$image"/>#wwtext("name=$actionKey")</a>
             </span>
     #end
             #wwtext("name=$key")
@@ -349,7 +349,7 @@
         <th class="heading" colspan="$span">
     #acl("domainObject=$domainObject" "hasPermission=4,1")
             <span class="action">
-                <a #if($id != "")id="$id"#end href="$url"><img alt="$action.getText($actionKey)" src="/images/$image"/>#wwtext("name=$actionKey")</a>
+                <a #if($id != "")id="$id"#end href="$url"><img alt="$action.getText($actionKey)" src="$base/images/$image"/>#wwtext("name=$actionKey")</a>
             </span>
     #end
             #wwtext("name=$key")
@@ -396,10 +396,10 @@
         <th class="heading" colspan="2">
             <span class="action">
             #if($editUrl)
-                <a #if($editId != "")id="$editId"#end href="$editUrl"><img alt="$action.getText('edit')" src="/images/pencil.gif"/>#wwtext("name=edit")</a>
+                <a #if($editId != "")id="$editId"#end href="$editUrl"><img alt="$action.getText('edit')" src="$base/images/pencil.gif"/>#wwtext("name=edit")</a>
             #end
             #if($resetUrl)
-                <a #if($resetId != "")id="$resetId"#end href="$resetUrl"><img alt="$action.getText('reset')" src="/images/arrow_rotate_anticlockwise.gif"/>#wwtext("name=reset")</a>
+                <a #if($resetId != "")id="$resetId"#end href="$resetUrl"><img alt="$action.getText('reset')" src="$base/images/arrow_rotate_anticlockwise.gif"/>#wwtext("name=reset")</a>
             #end
             </span>
             #wwtext("name=$key")
@@ -415,7 +415,7 @@
         <th class="heading" colspan="$span">
             <span class="action">
             #if($rssEnabled == "true")
-                <a class="unadorned" #if($rssId != "")id="$rssId"#end href="$rssUrl"><img alt="$action.getText('rss')" src="/images/rss.gif"/></a>
+                <a class="unadorned" #if($rssId != "")id="$rssId"#end href="$rssUrl"><img alt="$action.getText('rss')" src="$base/images/rss.gif"/></a>
             #end
             </span>
             #wwtext("name=$key")
@@ -581,7 +581,7 @@
            id="$id"
 #end
         >
-            <img alt="$action.getText($actionKey)" src="/images/$image"/>
+            <img alt="$action.getText($actionKey)" src="$base/images/$image"/>
             #wwtext("name=$actionKey")
         </a>
     </td>
@@ -634,9 +634,9 @@
 #macro(deleteCell $id $url $message)
     <td class="content">
         #if ($message && $message.length() > 0)
-        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="/images/delete.gif"/> #wwtext("name=delete")</a>
+        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=delete")</a>
         #else
-        <a href="$url" id="$id"><img alt="$action.getText('delete')" src="/images/delete.gif"/> #wwtext("name=delete")</a>
+        <a href="$url" id="$id"><img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=delete")</a>
         #end
     </td>
 #end
@@ -646,7 +646,7 @@
 ##
 #macro(removeCell $message $url $id)
     <td class="content">
-        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('remove')" src="/images/delete.gif"/> #wwtext("name=remove")</a>
+        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('remove')" src="$base/images/delete.gif"/> #wwtext("name=remove")</a>
     </td>
 #end
 
@@ -656,7 +656,7 @@
 ##
 #macro(deleteCellSpan $message $url $id $span)
     <td class="content" rowspan="$span">
-        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="/images/delete.gif"/> #wwtext("name=delete")</a>
+        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=delete")</a>
     </td>
 #end
 
@@ -721,7 +721,7 @@
 #macro(addRow $key $span $url $id)
     <tr>
         <td class="add" colspan="$span">
-            <a #if($id != "") id="$id"#end href="$url"><img alt="add" src="/images/add.gif"/> #wwtext("name=$key")</a>
+            <a #if($id != "") id="$id"#end href="$url"><img alt="add" src="$base/images/add.gif"/> #wwtext("name=$key")</a>
         </td>
     </tr>
 #end
@@ -740,19 +740,19 @@
 
 #macro(statusImage $result $showAnimated)
     #if($result.succeeded())
-        <img alt="success" src="/images/accept.gif"/>
+        <img alt="success" src="$base/images/accept.gif"/>
     #elseif($result.inProgress())
         #if($showAnimated)
-            <img alt="in progress" src="/images/inprogress.gif"/>
+            <img alt="in progress" src="$base/images/inprogress.gif"/>
         #else
-            <img alt="in progress" src="/images/cog.gif"/>
+            <img alt="in progress" src="$base/images/cog.gif"/>
         #end
     #elseif($result.terminating())
-        <img alt="terminating" src="/images/stop.gif"/>
+        <img alt="terminating" src="$base/images/stop.gif"/>
     #elseif($result.pending())
-        <img alt="pending" src="/images/hourglass.gif"/>
+        <img alt="pending" src="$base/images/hourglass.gif"/>
     #elseif($result.errored() || $result.failed())
-        <img alt="failure" src="/images/exclamation.gif"/>
+        <img alt="failure" src="$base/images/exclamation.gif"/>
     #else
         &nbsp;
     #end
@@ -772,15 +772,15 @@
 
     <td id="${changelist.id}_cell" class="$selectedResult.state.string">
         #if($selectedResult.succeeded())
-            <img alt="success" src="/images/accept.gif"/>
+            <img alt="success" src="$base/images/accept.gif"/>
         #elseif($selectedResult.inProgress())
-            <img alt="in progress" src="/images/inprogress.gif"/>
+            <img alt="in progress" src="$base/images/inprogress.gif"/>
         #elseif($selectedResult.terminating())
-            <img alt="terminating" src="/images/stop.gif"/>
+            <img alt="terminating" src="$base/images/stop.gif"/>
         #elseif($selectedResult.pending())
-            <img alt="pending" src="/images/hourglass.gif"/>
+            <img alt="pending" src="$base/images/hourglass.gif"/>
         #elseif($selectedResult.errored() || $selectedResult.failed())
-            <img alt="failure" src="/images/exclamation.gif"/>
+            <img alt="failure" src="$base/images/exclamation.gif"/>
         #else
             &nbsp;
         #end
@@ -791,7 +791,7 @@
             <tr>
                 <th class="heading" colspan="5">
                     <span class="action">
-                        <a href="#" onclick="showHideBuildsFloat('$changelist.id'); return false;"><img alt="$action.getText('close')" src="/images/delete.gif"/>#wwtext("name=close")</a>
+                        <a href="#" onclick="showHideBuildsFloat('$changelist.id'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
                     </span>
                     #wwtext("name=build.results")
                 </th>
@@ -847,7 +847,7 @@
 ##
 #macro(viewCell $project $result)
     <td class="content">
-        <a href="viewBuild.action?id=$result.id" class="unadorned" title="view summary"><img alt="view summary" src="/images/arrow_45.gif"/></a>
+        <a href="viewBuild.action?id=$result.id" class="unadorned" title="view summary"><img alt="view summary" src="$base/images/arrow_45.gif"/></a>
     </td>
 #end
 
@@ -856,7 +856,7 @@
 ##
 #macro(logCell $project $result)
     <td class="content">
-        <a href="viewCommandLog.action?id=$result.id" class="unadorned" title="view details"><img alt="view details" src="/images/magnifier.gif"/></a>
+        <a href="viewCommandLog.action?id=$result.id" class="unadorned" title="view details"><img alt="view details" src="$base/images/magnifier.gif"/></a>
     </td>
 #end
 
@@ -865,7 +865,7 @@
 ##
 #macro(changesCell $project $result)
     <td class="content">
-        <a href="viewChanges.action?projectId=$project.id&amp;toBuild=$result.number" class="unadorned" title="view changes"><img alt="view changes" src="/images/page_code.gif"/></a>
+        <a href="viewChanges.action?projectId=$project.id&amp;toBuild=$result.number" class="unadorned" title="view changes"><img alt="view changes" src="$base/images/page_code.gif"/></a>
     </td>
 #end
 
@@ -874,7 +874,7 @@
 ##
 #macro(artifactsCell $project $result)
     <td class="content">
-        <a href="viewBuildArtifacts.action?id=$result.id" class="unadorned" title="view artifacts"><img alt="view artifacts" src="/images/folder_page.gif"/></a>
+        <a href="viewBuildArtifacts.action?id=$result.id" class="unadorned" title="view artifacts"><img alt="view artifacts" src="$base/images/folder_page.gif"/></a>
     </td>
 #end
 
@@ -883,7 +883,7 @@
 ##
 #macro(workingCopyCell $project $result)
     <td class="content">
-        <a href="browseProjectDir.action?buildId=$result.id" class="unadorned" title="working copy"><img alt="view working copy" src="/images/page_gear.gif"/></a>
+        <a href="browseProjectDir.action?buildId=$result.id" class="unadorned" title="working copy"><img alt="view working copy" src="$base/images/page_gear.gif"/></a>
     </td>
 #end
 
@@ -892,9 +892,9 @@
 ## Expands to the icon for the given type of SCM.
 ##
 #macro(scmIcon $scm)
-    #if ($scm.class.name == 'com.zutubi.pulse.model.Svn')<img alt="svn" src="/images/svn_16.png"/>#end
-    #if ($scm.class.name == 'com.zutubi.pulse.model.Cvs')<img alt="cvs" src="/images/cvs_16.png"/>#end
-    #if ($scm.class.name == 'com.zutubi.pulse.model.P4')<img alt="p4" src="/images/p4_16.png"/>#end
+    #if ($scm.class.name == 'com.zutubi.pulse.model.Svn')<img alt="svn" src="$base/images/svn_16.png"/>#end
+    #if ($scm.class.name == 'com.zutubi.pulse.model.Cvs')<img alt="cvs" src="$base/images/cvs_16.png"/>#end
+    #if ($scm.class.name == 'com.zutubi.pulse.model.P4')<img alt="p4" src="$base/images/p4_16.png"/>#end
 #end
 
 ##
@@ -1155,7 +1155,7 @@
             </a>
         </td>
     #else
-        #dynamicLinkCell($resultNode.stage "/viewCommandLog.action?id=$build.id&amp;selectedNode=$resultNode.id")
+        #dynamicLinkCell($resultNode.stage "$base/viewCommandLog.action?id=$build.id&amp;selectedNode=$resultNode.id")
     #end
         #dynamicCell($recipe.recipeNameSafe)
         #dynamicCell($resultNode.hostSafe)
@@ -1164,7 +1164,7 @@
         #dateClassCell($recipe)
         #classCell($recipe.stamps.prettyElapsed)
         <td class="content">
-            <a href="tailRecipeLog.action?id=$id&amp;buildId=$build.id" class="unadorned" title="view log""><img alt="view log" src="/images/script.gif"/> #wwtext("name=log")  </a>
+            <a href="tailRecipeLog.action?id=$id&amp;buildId=$build.id" class="unadorned" title="view log""><img alt="view log" src="$base/images/script.gif"/> #wwtext("name=log")  </a>
         </td>
     </tr>
 #end
@@ -1229,7 +1229,7 @@
                 $action.plainToHtml($feature.summary)
             #if($feature.isPlain())
                 <a class="unadorned" href="viewArtifact.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id#$feature.firstLine">
-                    <br/><span class="small">#wwtext("name=jump.to")</span> <img src="/images/go_small.gif"/>
+                    <br/><span class="small">#wwtext("name=jump.to")</span> <img src="$base/images/go_small.gif"/>
                 </a>
             #end
             </li>
@@ -1453,7 +1453,7 @@
     <li class="file-artifact">
     #set($trimmedPath = $artifact.trimmedPath($fileArtifact))
     #if($showArtifactLink)
-        <a href="/view/$result.id/$artifact.id/$action.escapeSpaces($fileArtifact.path)">$trimmedPath</a>
+        <a href="$base/view/$result.id/$artifact.id/$action.escapeSpaces($fileArtifact.path)">$trimmedPath</a>
         #if($fileArtifact.canDecorate())
             [<a href="viewArtifact.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$result.id">decorated</a>]
         #end
@@ -1481,10 +1481,10 @@
     #if($hasIndex)
         <li class="report-artifact">
     #else
-        <li class="dir-artifact"><span onclick="toggleFolderList('art_${artifact.id}');"><img alt="toggle" id="art_${artifact.id}_image" src="/images/treeview/o.gif"/>
+        <li class="dir-artifact"><span onclick="toggleFolderList('art_${artifact.id}');"><img alt="toggle" id="art_${artifact.id}_image" src="$base/images/treeview/o.gif"/>
     #end
     #if($hasIndex && $showArtifactLink)
-        <a href="/view/$result.id/$artifact.id/$action.escapeSpaces($artifact.name)/">
+        <a href="$base/view/$result.id/$artifact.id/$action.escapeSpaces($artifact.name)/">
     #end
             $!webwork.htmlEncode($artifact.name)
     #if($hasIndex && $showArtifactLink)
@@ -1494,7 +1494,7 @@
     #end
 
     #if($showArtifactLink)
-        <a class="unadorned" href="downloadDirectoryArtifact.action?commandId=$result.id&amp;id=$artifact.id"><img alt="archive" src="/images/compress.gif"></a>
+        <a class="unadorned" href="downloadDirectoryArtifact.action?commandId=$result.id&amp;id=$artifact.id"><img alt="archive" src="$base/images/compress.gif"></a>
     #end
 
     #if(!$hasIndex)
@@ -1528,7 +1528,7 @@
         #end
         #foreach($commandResult in $result.commandResults)
             #if($commandResult.hasArtifacts())
-        <li class="artifact"><span onclick="toggleList('${commandResult.id}_artifacts');"><img alt="toggle" id="${commandResult.id}_artifacts_image" src="/images/resultset_down.gif"/> #wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)</span>
+        <li class="artifact"><span onclick="toggleList('${commandResult.id}_artifacts');"><img alt="toggle" id="${commandResult.id}_artifacts_image" src="$base/images/resultset_down.gif"/> #wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)</span>
             #commandArtifacts($build $commandResult false $result.completed())
         </li>
             #end
@@ -1548,7 +1548,7 @@
 ##
 #macro(recipeNodeArtifacts $build $node)
     #if($node.hasArtifacts())
-        <li class="artifact"><span onclick="toggleList('${node.result.id}_artifacts');"><img alt="toggle" id="${node.result.id}_artifacts_image" src="/images/resultset_down.gif"/> #wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stage) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.hostSafe")</span>
+        <li class="artifact"><span onclick="toggleList('${node.result.id}_artifacts');"><img alt="toggle" id="${node.result.id}_artifacts_image" src="$base/images/resultset_down.gif"/> #wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stage) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.hostSafe")</span>
             <ul class="artifact" id="${node.result.id}_artifacts">
             #recipeArtifacts($build $node.result false)
             #foreach($child in $node.children)
@@ -1700,8 +1700,8 @@
 #end
 
 #macro( contactPointIcon $contact)
-    #if ($contact.class.name == 'com.zutubi.pulse.model.EmailContactPoint')<img alt="email" src="/images/email_16.png"/>#end
-    #if ($contact.class.name == 'com.zutubi.pulse.model.YahooContactPoint')<img alt="jabber" src="/images/yahoo_16.png"/>#end
+    #if ($contact.class.name == 'com.zutubi.pulse.model.EmailContactPoint')<img alt="email" src="$base/images/email_16.png"/>#end
+    #if ($contact.class.name == 'com.zutubi.pulse.model.YahooContactPoint')<img alt="jabber" src="$base/images/yahoo_16.png"/>#end
 #end
 
 <!--- quartz trigger state -->
@@ -1805,7 +1805,7 @@
         #if($pager.startPage > 0)
                         <a href="${url}startPage=0" class="unadorned">
         #end
-                            #image("/images/resultset_first.gif" "page.latest") #wwtext("name=page.latest")
+                            #image("$base/images/resultset_first.gif" "page.latest") #wwtext("name=page.latest")
         #if($pager.startPage > 0)
                         </a>
         #end
@@ -1814,7 +1814,7 @@
         #if($pager.startPage > 0)
                         <a href="${url}startPage=$previousPage" class="unadorned">
         #end
-                            #image("/images/resultset_previous.gif" "page.newer") #wwtext("name=page.newer")
+                            #image("$base/images/resultset_previous.gif" "page.newer") #wwtext("name=page.newer")
         #if($pager.startPage > 0)
                         </a>
         #end
@@ -1834,7 +1834,7 @@
         #if($pager.startPage < $lastPage)
                         <a href="${url}startPage=$nextPage" class="unadorned">
         #end
-                            #wwtext("name=page.older") #image("/images/resultset_next.gif" "page.older")
+                            #wwtext("name=page.older") #image("$base/images/resultset_next.gif" "page.older")
         #if($pager.startPage < $lastPage)
                         </a>
         #end
@@ -1843,7 +1843,7 @@
         #if($pager.startPage < $lastPage)
                         <a href="${url}startPage=$lastPage" class="unadorned">
         #end
-                            #wwtext("name=page.oldest") #image("/images/resultset_last.gif" "page.oldest")
+                            #wwtext("name=page.oldest") #image("$base/images/resultset_last.gif" "page.oldest")
         #if($pager.startPage < $lastPage)
                         </a>
         #end
@@ -1858,21 +1858,21 @@
 #macro(testStatusCell $test)
     #if($test.errors > 0)
     <td class="test-failure">
-        <img alt="failure" src="/images/exclamation.gif"/>
+        <img alt="failure" src="$base/images/exclamation.gif"/>
     </td>
     <td class="test-failure">
         #wwtext("name=test.error")
     </td>
     #elseif($test.failures > 0)
     <td class="test-failure">
-        <img alt="failure" src="/images/exclamation.gif"/>
+        <img alt="failure" src="$base/images/exclamation.gif"/>
     </td>
     <td class="test-failure">
         #wwtext("name=test.failure")
     </td>
     #else
     <td class="success">
-        <img alt="success" src="/images/accept.gif"/>
+        <img alt="success" src="$base/images/accept.gif"/>
     </td>
     <td class="success">
         #wwtext("name=test.passed")
@@ -1980,13 +1980,13 @@
         <tr>
     #if($entry.isDirectory())
             <td class="image">
-                <img src="/images/folder.gif"/>
+                <img src="$base/images/folder.gif"/>
             </td>
             #dynamicLinkCell($entry.name "${url}path=$entry.path")
             #contentCell($entry.mimeType)
     #elseif(!$dirAction)
             <td class="image">
-                <img src="/images/page.gif"/>
+                <img src="$base/images/page.gif"/>
             </td>
         #if($fileAction)
             #dynamicCell($!webwork.htmlEncode($entry.name))
@@ -2163,7 +2163,7 @@
     #end
         <tr>
             <td class="$cssClass" width="26%">$action.getPrettyDate($record.millis) ($action.getPrettyTime($record.millis))</td>
-            <td class="$cssClass" width="9%"><img alt="failure" src="/images/${image}.gif"/> $record.level.toString().toLowerCase()</td>
+            <td class="$cssClass" width="9%"><img alt="failure" src="$base/images/${image}.gif"/> $record.level.toString().toLowerCase()</td>
             <td class="$cssClass" width="9%">#wwtext("name=count") :: $record.count</td>
             <td class="$cssClass">$!webwork.htmlEncode("$record.sourceClassName :: $record.sourceMethodName")</td>
         </tr>
