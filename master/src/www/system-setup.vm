@@ -1,6 +1,6 @@
 <html>
 <head>
-    <meta http-equiv="refresh" content='1;url='/>
+    <meta http-equiv="refresh" content='5;url=#wwurl("includeParams=all")'/>
     <title>#wwtext("name=setup.processing.heading")</title>
 </head>
 
