@@ -17,6 +17,7 @@ public class ViewChangelistAction extends ActionSupport
     private Changelist changelist;
     private ChangelistDao changelistDao;
     private BuildManager buildManager;
+    private ProjectManager projectManager;
     private CommitMessageHelper commitMessageHelper;
     private long buildId;
     /** This is the build result we have drilled down from, if any. */
@@ -59,6 +60,21 @@ public class ViewChangelistAction extends ActionSupport
         if(buildResult != null)
         {
             return buildResult.getProject().getScm().getChangeUrl(changelist.getRevision());
+        }
+        else
+        {
+            for(long id: changelist.getProjectIds())
+            {
+                Project p = projectManager.getProject(id);
+                if(p != null)
+                {
+                    String url = p.getScm().getChangeUrl(changelist.getRevision());
+                    if(url != null)
+                    {
+                        return url;
+                    }
+                }
+            }
         }
 
         return null;
@@ -128,6 +144,7 @@ public class ViewChangelistAction extends ActionSupport
 
     public void setProjectManager(ProjectManager projectManager)
     {
+        this.projectManager = projectManager;
         commitMessageHelper = new CommitMessageHelper(projectManager.getCommitMessageTransformers());
     }
 }
