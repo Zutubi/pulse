@@ -11,6 +11,8 @@
     #parse("/template/includes/actionerrors.vm")
 
 #wwcform("action=addCommitMessageLink.action" "heading=%{getText('add.commit.message.link')}" "method=post" "id=add.commit.message.link")
+    #wwhidden("name=projectId")
+    
     #wwtextfield("name=transformer.name" "label=%{getText('commit.message.link.name')}" "required=true" "tabindex=1")
     #wwtextfield("name=transformer.expression" "label=%{getText('commit.message.link.expression')}" "required=true" "size=60" "tabindex=2")
     #inlineHelp("commit.message.link.expression.help")

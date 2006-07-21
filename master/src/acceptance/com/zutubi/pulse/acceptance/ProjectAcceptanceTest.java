@@ -1189,6 +1189,28 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertTextNotPresent("deadtag");
     }
 
+    public void testAddCommitMessageLink() throws Exception
+    {
+        callRemoteApi("deleteAllCommitMessageLinks");
+
+        clickLink("commit.message.link.add");
+        CommitMessageLinkForm form = new CommitMessageLinkForm(tester, true);
+        form.saveFormElements("mylink", "expr", "repl", null);
+
+        // Make sure we come back to the project config page
+        assertProjectBasicsTable(projectName, DESCRIPTION, URL);
+    }
+
+    public void testCancelCommitMessageLink()
+    {
+        clickLink("commit.message.link.add");
+        CommitMessageLinkForm form = new CommitMessageLinkForm(tester, true);
+        form.cancelFormElements("mylink", "expr", "repl", null);
+
+        // Make sure we come back to the project config page
+        assertProjectBasicsTable(projectName, DESCRIPTION, URL);
+    }
+
     private String nukeIds(String text)
     {
         text = text.replaceAll("href=\"[^\"]*\"", "");

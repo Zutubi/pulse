@@ -1136,9 +1136,15 @@
 
         <action name="addCommitMessageLink" class="com.zutubi.pulse.web.admin.CreateCommitMessageLinkAction">
             <result name="input" type="velocity">/admin/create-commit-message-link.vm</result>
-            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="cancel" type="chain">commitMessageRedirect</result>
             <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="chain">commitMessageRedirect</result>
+        </action>
+
+        <action name="commitMessageRedirect" class="com.zutubi.pulse.web.admin.CreateCommitMessageLinkAction" method="redirect">
+            <interceptor-ref name="paramsStack"/>
+            <result name="project" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="settings" type="redirect">/admin/serverSettings.action</result>
         </action>
 
         <action name="editCommitMessageLink" class="com.zutubi.pulse.web.admin.EditCommitMessageLinkAction">

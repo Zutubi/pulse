@@ -44,6 +44,15 @@ public class CommitMessageLinkAcceptanceTest extends BaseAcceptanceTest
         editForm.assertFormPresent();
         editForm.assertFormElements("mylink", "expr", "repl", id);
     }
+    
+    public void testCancelAddCommitLink() throws Exception
+    {
+        assertCommitLinks(null);
+        clickLink("commit.message.link.add");
+        CommitMessageLinkForm form = new CommitMessageLinkForm(tester, true);
+        form.cancelFormElements("link", "expr", "repl", null);
+        assertCommitLinks(null);
+    }
 
     public void testAddCommitLinkNoProjects() throws Exception
     {
