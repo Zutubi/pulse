@@ -508,15 +508,30 @@ public class SVNServer implements SCMServer
         return true;
     }
 
+    boolean pathExists(Revision revision, SVNURL path) throws SVNException
+    {
+        SVNRepository repo = SVNRepositoryFactory.create(path);
+        repo.setAuthenticationManager(authenticationManager);
+        repo.testConnection();
+        SVNDirEntry dir;
+        try
+        {
+            dir = repo.info("", SVNRevision.HEAD.getNumber());
+            return dir != null;
+        }
+        catch (SVNException e)
+        {
+            return false;
+        }
+    }
+
     public void tag(Revision revision, String name, boolean moveExisting) throws SCMException
     {
         try
         {
             SVNURL svnUrl = SVNURL.parseURIEncoded(name);
-            SVNRepository repo = SVNRepositoryFactory.create(svnUrl);
-            repo.setAuthenticationManager(authenticationManager);
-            SVNDirEntry dir = repo.info("", SVNRevision.HEAD.getNumber());
-            if(dir != null)
+
+            if(pathExists(revision, svnUrl))
             {
                 if(moveExisting)
                 {

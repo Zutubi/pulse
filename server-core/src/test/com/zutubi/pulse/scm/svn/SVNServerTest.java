@@ -8,6 +8,7 @@ import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import org.tmatesoft.svn.core.SVNURL;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -181,7 +182,17 @@ public class SVNServerTest extends PulseTestCase
     {
         server.tag(new NumericalRevision(1), TAG_PATH, false);
         server.tag(new NumericalRevision(8), TAG_PATH, true);
+        assertTaggedRev8();
+    }
 
+    public void testMoveTagNonExistant() throws SCMException
+    {
+        server.tag(new NumericalRevision(8), TAG_PATH, true);
+        assertTaggedRev8();
+    }
+
+    private void assertTaggedRev8() throws SCMException
+    {
         SVNServer confirmServer = new SVNServer(TAG_PATH, "jsankey", "password");
         List<RemoteFile> files = getSortedListing(confirmServer);
 
@@ -263,6 +274,12 @@ public class SVNServerTest extends PulseTestCase
         server.update(null, gotDir, new NumericalRevision(4), null);
         server.update(null, gotDir, new NumericalRevision(8), null);
         assertRevision(gotDir, 8);
+    }
+
+    public void testCheckNonExistantPathHTTP() throws Exception
+    {
+        SVNServer server = new SVNServer("https://svn.apache.org/repos/asf", "anonymous", "");
+        assertFalse(server.pathExists(new NumericalRevision(1), SVNURL.parseURIEncoded("https://svn.apache.org/repos/asf/nosuchpath/")));
     }
 
     private void assertRevision(File dir, int revision) throws IOException
