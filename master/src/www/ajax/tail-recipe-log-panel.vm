@@ -1,1 +1,5 @@
+#if($logExists)
 <pre>$!webwork.htmlEncode($tail)</pre>
+#else
+#wwtext("name=stage.tail.does.not.exist")
+#end

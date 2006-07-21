@@ -28,6 +28,7 @@ public class TailRecipeLogAction extends ProjectActionSupport
     private String tail = "";
     private MasterConfigurationManager configurationManager;
     private UserManager userManager;
+    private boolean logExists;
 
     public long getId()
     {
@@ -84,6 +85,11 @@ public class TailRecipeLogAction extends ProjectActionSupport
         this.refreshInterval = refreshInterval;
     }
 
+    public boolean getLogExists()
+    {
+        return logExists;
+    }
+
     public String execute() throws Exception
     {
         if(maxLines <= 0)
@@ -114,6 +120,7 @@ public class TailRecipeLogAction extends ProjectActionSupport
         File recipeLog = new File(paths.getRecipeDir(buildResult.getProject(), buildResult, resultNode.getResult().getId()), RecipeResult.RECIPE_LOG);
         if(recipeLog.exists())
         {
+            logExists = true;
             RandomAccessFile file = null;
 
             try
@@ -161,6 +168,10 @@ public class TailRecipeLogAction extends ProjectActionSupport
                     file.close();
                 }
             }
+        }
+        else
+        {
+            logExists = false;
         }
 
         return SUCCESS;

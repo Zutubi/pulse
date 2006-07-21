@@ -87,6 +87,11 @@ public class ViewRecipeLogAction extends ProjectActionSupport
                 return ERROR;
             }
         }
+        else
+        {
+            addActionError("Recipe log '" + recipeLog.getAbsolutePath() + "' does not exist");
+            return ERROR;
+        }
 
         return SUCCESS;
     }

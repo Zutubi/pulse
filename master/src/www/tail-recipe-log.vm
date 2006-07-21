@@ -25,7 +25,7 @@
         </tr>
     #end
 
-    <h3 class="heading">#wwtext("name=stage.tail.box") &nbsp;<a href="viewRecipeLog.action?id=$resultNode.id&amp;buildId=$buildResult.id"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=stage.full.log")</a></h3>
+    <h3 class="heading">#wwtext("name=stage.tail.box") #if($logExists) &nbsp;<a href="viewRecipeLog.action?id=$resultNode.id&amp;buildId=$buildResult.id"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=stage.full.log")</a> #end </h3>
     <div class="box">
         <div id="panel">
             #parse("ajax/tail-recipe-log-panel.vm")
