@@ -23,8 +23,8 @@
         </property>
         <property name="interceptorNames">
             <list>
-                <value>transactionInterceptor</value>
                 <value>securityInterceptor</value>
+                <value>transactionInterceptor</value>
             </list>
         </property>
     </bean>
@@ -37,8 +37,8 @@
         </property>
         <property name="interceptorNames">
             <list>
-                <value>transactionInterceptor</value>
                 <value>securityInterceptor</value>
+                <value>transactionInterceptor</value>
             </list>
         </property>
     </bean>
