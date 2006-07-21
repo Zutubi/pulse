@@ -16,11 +16,12 @@ public class AcceptanceTestSuite
 
         // now we can run the rest of the tests.
         suite.addTestSuite(AdminXmlRpcAcceptanceTest.class);
-        suite.addTestSuite(AnonymousAccessAcceptanceTest.class);
         suite.addTestSuite(GeneralConfigurationAcceptanceTest.class);
         suite.addTestSuite(LicenseAuthorisationAcceptanceTest.class);
         suite.addTestSuite(LicenseManagementAcceptanceTest.class);
         suite.addTestSuite(ProjectAcceptanceTest.class);
+        // AnonymousAccessAcceptanceTest needs some projects, so order it here for now.
+        suite.addTestSuite(AnonymousAccessAcceptanceTest.class);
         suite.addTestSuite(ProjectArtifactsAcceptanceTest.class);
         suite.addTestSuite(ProjectWizardAcceptanceTest.class);
         suite.addTestSuite(RssAcceptanceTest.class);

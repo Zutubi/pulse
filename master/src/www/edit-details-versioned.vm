@@ -9,7 +9,7 @@
     <!--
     	function openFileWindow()
     	{
-    	    openBrowseWindow(false, "versioned.edit_details_pulseFileName", "&id=$project.id");
+    	    openBrowseWindow('$base', false, "versioned.edit_details_pulseFileName", "&id=$project.id");
     	}
     -->
     </script>

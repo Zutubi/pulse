@@ -9,12 +9,12 @@
     <!--
     	function openDirWindow()
     	{
-    	    openBrowseWindow(true, "addProject_details_workingDir", "");
+    	    openBrowseWindow('$base', true, "make.setup_details_workingDir", "");
     	}
 
     	function openFileWindow()
     	{
-    	    openBrowseWindow(false, "addProject_details_makefile", "&prefix=" + $F("addProject_details_workingDir"));
+    	    openBrowseWindow('$base', false, "make.setup_details_makefile", "&prefix=" + $F("make.setup_details_workingDir"));
     	}
     -->
     </script>
@@ -25,7 +25,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=addProject.action" "heading=%{getText('make.setup')}" "method=post")
+#wwcform("action=addProject.action" "id=make.setup" "heading=%{getText('make.setup')}" "method=post")
     #wwhidden("name=state")
     #wwhidden("name=submit")
 

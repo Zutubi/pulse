@@ -9,12 +9,12 @@
     <!--
     	function openDirWindow()
     	{
-    	    openBrowseWindow(true, "editMakeDetails_details_workingDir", "&id=$project.id");
+    	    openBrowseWindow('$base', true, "editMakeDetails_details_workingDir", "&id=$project.id");
     	}
 
     	function openFileWindow()
     	{
-    	    openBrowseWindow(false, "editMakeDetails_details_makefile", "&id=$project.id&prefix=" + $F("editMakeDetails_details_workingDir"));
+    	    openBrowseWindow('$base', false, "editMakeDetails_details_makefile", "&id=$project.id&prefix=" + $F("editMakeDetails_details_workingDir"));
     	}
     -->
     </script>

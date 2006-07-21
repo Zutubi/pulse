@@ -16,8 +16,11 @@ public class AnonymousAccessAcceptanceTest extends BaseAcceptanceTest
 
     public void testEnableDisableAccess()
     {
+        // @Requires("project")
+        // TODO: ensure that a project has been created before this test is executed.
+
         loginAsAdmin();
-        clickLinkWithText("administration");
+        clickLink("tab.administration");
         clickLink("general.edit");
 
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
@@ -25,11 +28,11 @@ public class AnonymousAccessAcceptanceTest extends BaseAcceptanceTest
         form.saveFormElements(null, null, null, "true");
 
         clickLink("logout");
-        assertTextPresent("projects");
+        assertLinkPresent("tab.projects");
         assertLinkPresent("login");
 
         loginAsAdmin();
-        clickLinkWithText("administration");
+        clickLink("tab.administration");
         clickLink("general.edit");
 
         form.assertFormPresent();

@@ -9,7 +9,7 @@
     <!--
     	function openFileWindow()
     	{
-    	    openBrowseWindow(false, "versioned.setup_details_pulseFileName", "");
+    	    openBrowseWindow('$base', false, "versioned.setup_details_pulseFileName", "");
     	}
     -->
     </script>

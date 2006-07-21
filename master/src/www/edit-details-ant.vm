@@ -9,12 +9,12 @@
     <!--
     	function openDirWindow()
     	{
-    	    openBrowseWindow(true, "editAntDetails_details_workingDir", "&id=$project.id");
+    	    openBrowseWindow('$base', true, "editAntDetails_details_workingDir", "&id=$project.id");
     	}
 
     	function openFileWindow()
     	{
-    	    openBrowseWindow(false, "editAntDetails_details_buildFile", "&id=$project.id&prefix=" + $F("editAntDetails_details_workingDir"));
+    	    openBrowseWindow('$base', false, "editAntDetails_details_buildFile", "&id=$project.id&prefix=" + $F("editAntDetails_details_workingDir"));
     	}
     -->
     </script>

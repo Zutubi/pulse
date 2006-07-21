@@ -8,7 +8,7 @@
     <!--
     	function openResourceWindow()
     	{
-    	    openResourceBrowser("addBuildStageResource_resourceRequirement_resource", "addBuildStageResource_resourceRequirement_version");
+    	    openResourceBrowser('$base', "addBuildStageResource_resourceRequirement_resource", "addBuildStageResource_resourceRequirement_version");
     	}
     -->
     </script>

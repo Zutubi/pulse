@@ -6,7 +6,7 @@
         function openPopup()
         {
             var formElement = document.forms['setup.data'].elements['data'];
-            window.open('/popups/browse-dirs.action?formname=setup.data&fieldname=data&initPath=' + formElement.value, 'browse_popup', 'width=400, height=550, resizable=yes', false);
+            window.open('$base/popups/browse-dirs.action?formname=setup.data&fieldname=data&initPath=' + formElement.value, 'browse_popup', 'width=400, height=550, resizable=yes', false);
             return false
         }
         //-->

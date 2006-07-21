@@ -113,7 +113,7 @@
                 createFolder.onClick = function()
                 {
                     // open popup requesting the new folder name.
-                    window.open('/popups/mkdir.action', 'create_folder', 'width=400, height=150, resizable=yes', false);
+                    window.open('$base/popups/mkdir.action', 'create_folder', 'width=400, height=150, resizable=yes', false);
                     return false;
                 };
 */

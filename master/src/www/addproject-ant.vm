@@ -9,12 +9,12 @@
     <!--
     	function openDirWindow()
     	{
-    	    openBrowseWindow(true, "addProject_details_workingDir", "");
+    	    openBrowseWindow('$base', true, "ant.setup_details_workingDir", "");
     	}
 
     	function openFileWindow()
     	{
-    	    openBrowseWindow(false, "addProject_details_buildFile", "&prefix=" + $F("addProject_details_workingDir"));
+    	    openBrowseWindow('$base', false, "ant.setup_details_buildFile", "&prefix=" + $F("ant.setup_details_workingDir"));
     	}
     -->
     </script>
