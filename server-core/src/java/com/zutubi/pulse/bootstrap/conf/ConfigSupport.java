@@ -5,7 +5,7 @@ package com.zutubi.pulse.bootstrap.conf;
  */
 public class ConfigSupport implements Config
 {
-    private Config config;
+    protected Config config;
 
     public ConfigSupport(Config config)
     {

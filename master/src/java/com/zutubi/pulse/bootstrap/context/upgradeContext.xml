@@ -35,6 +35,7 @@
                 <ref local="schemaUpgrade0101002"/>
                 <ref local="dashboardProjects"/>
                 <ref local="incrementalBuild"/>
+                <ref local="renameHostNameToBaseUrl"/>
             </list>
         </property>
     </bean>
@@ -170,4 +171,10 @@
     <bean id="incrementalBuild" class="com.zutubi.pulse.upgrade.tasks.IncrementalBuildUpgradeTask" autowire="byName">
         <property name="buildNumber" value="101001002"/>
     </bean>
+
+    <bean id="renameHostNameToBaseUrl" class="com.zutubi.pulse.upgrade.tasks.RenameHostNamePropertyUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="101002001"/>
+    </bean>
+
+
 </beans>
