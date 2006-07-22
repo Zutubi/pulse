@@ -98,4 +98,6 @@ public interface BuildManager
     Changelist getChangelistByRevision(String serverUid, Revision revision);
 
     void delete(BuildResult result);
+
+    void abortUnfinishedBuilds(Project project, String message);
 }

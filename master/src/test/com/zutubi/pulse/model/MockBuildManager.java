@@ -193,4 +193,9 @@ public class MockBuildManager implements BuildManager
     {
         buildResults.remove(result.getId());
     }
+
+    public void abortUnfinishedBuilds(Project project, String message)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
 }

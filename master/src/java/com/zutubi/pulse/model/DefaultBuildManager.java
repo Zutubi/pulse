@@ -258,6 +258,18 @@ public class DefaultBuildManager implements BuildManager, EventListener
         cleanupResult(result.getProject(), result);
     }
 
+    public void abortUnfinishedBuilds(Project project, String message)
+    {
+        BuildResult lastBuild = getLatestBuildResult(project);
+        if (lastBuild != null && !lastBuild.completed())
+        {
+            lastBuild.abortUnfinishedRecipes();
+            lastBuild.error(message);
+            lastBuild.complete();
+            save(lastBuild);
+        }
+    }
+
     public BuildResult getPreviousBuildResult(BuildResult result)
     {
         return buildResultDao.findPreviousBuildResult(result);

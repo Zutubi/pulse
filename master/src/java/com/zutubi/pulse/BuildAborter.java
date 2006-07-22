@@ -1,7 +1,6 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 
@@ -19,15 +18,7 @@ public class BuildAborter implements Runnable
         List<Project> projects = projectManager.getAllProjects();
         for (Project project : projects)
         {
-            BuildResult lastBuild = buildManager.getLatestBuildResult(project);
-            if (lastBuild != null && !lastBuild.completed())
-            {
-                lastBuild.abortUnfinishedRecipes();
-                lastBuild.error("Server shut down while build in progress");
-                lastBuild.complete();
-                buildManager.save(lastBuild);
-            }
-
+            buildManager.abortUnfinishedBuilds(project, "Server shut down while build in progress");
             if(project.getState() == Project.State.BUILDING || project.getState() == Project.State.PAUSING)
             {
                 project.buildCompleted();
