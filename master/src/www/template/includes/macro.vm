@@ -847,7 +847,7 @@
 ##
 #macro(viewCell $project $result)
     <td class="content">
-        <a href="viewBuild.action?id=$result.id" class="unadorned" title="view summary"><img alt="view summary" src="$base/images/arrow_45.gif"/></a>
+        <a href="viewBuild.action?id=$result.id" class="unadorned" title="view summary"><img alt="view summary" src="$base/images/information.gif"/></a>
     </td>
 #end
 
