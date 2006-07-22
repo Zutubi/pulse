@@ -21,8 +21,7 @@ public class BuildAborter implements Runnable
             buildManager.abortUnfinishedBuilds(project, "Server shut down while build in progress");
             if(project.getState() == Project.State.BUILDING || project.getState() == Project.State.PAUSING)
             {
-                project.buildCompleted();
-                projectManager.save(project);
+                projectManager.buildCompleted(project.getId());
             }
         }
     }
