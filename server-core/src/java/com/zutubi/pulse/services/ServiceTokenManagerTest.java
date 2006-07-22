@@ -3,6 +3,8 @@ package com.zutubi.pulse.services;
 import com.zutubi.pulse.bootstrap.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.mockobjects.dynamic.Mock;
+import com.mockobjects.dynamic.C;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +18,8 @@ public class ServiceTokenManagerTest extends PulseTestCase
     private File tempDir;
     private ServiceTokenManager tokenManager;
 
+    private ConfigurationManager configManager;
+
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -23,7 +27,12 @@ public class ServiceTokenManagerTest extends PulseTestCase
         tokenManager = new ServiceTokenManager();
         DefaultSystemPaths paths = new DefaultSystemPaths(tempDir);
         paths.getConfigRoot().mkdirs();
-        tokenManager.setConfigurationManager(new MockConfigurationManager(paths));
+
+        Mock mockConfigurationManager = new Mock(ConfigurationManager.class);
+        mockConfigurationManager.matchAndReturn("getSystemPaths", C.ANY_ARGS, paths);
+        configManager = (ConfigurationManager) mockConfigurationManager.proxy();
+
+        tokenManager.setConfigurationManager(configManager);
     }
 
     protected void tearDown() throws Exception
@@ -84,7 +93,7 @@ public class ServiceTokenManagerTest extends PulseTestCase
         String token = tokenManager.getToken();
 
         ServiceTokenManager another = new ServiceTokenManager();
-        another.setConfigurationManager(new MockConfigurationManager(new DefaultSystemPaths(tempDir)));
+        another.setConfigurationManager(configManager);
         assertNull(another.getToken());
         another.init();
         assertEquals(token, another.getToken());
@@ -97,12 +106,12 @@ public class ServiceTokenManagerTest extends PulseTestCase
         tokenManager.validateToken(TEST_TOKEN);
 
         ServiceTokenManager another = new ServiceTokenManager();
-        another.setConfigurationManager(new MockConfigurationManager(new DefaultSystemPaths(tempDir)));
+        another.setConfigurationManager(configManager);
         assertNull(another.getToken());
         another.init();
         assertEquals(TEST_TOKEN, another.getToken());
     }
-    
+
     public void testTokenRefreshes()
     {
         tokenManager.setGenerate(false);
@@ -121,30 +130,5 @@ public class ServiceTokenManagerTest extends PulseTestCase
         tokenManager.getTokenFile().delete();
         tokenManager.validateToken(TEST_TOKEN + "foo");
         assertEquals(TEST_TOKEN + "foo", tokenManager.getToken());
-    }
-
-    private class MockConfigurationManager implements ConfigurationManager
-    {
-        private SystemPaths paths;
-
-        public MockConfigurationManager(SystemPaths paths)
-        {
-            this.paths = paths;
-        }
-
-        public ApplicationConfiguration getAppConfig()
-        {
-            return null;
-        }
-
-        public UserPaths getUserPaths()
-        {
-            return null;
-        }
-
-        public SystemPaths getSystemPaths()
-        {
-            return paths;
-        }
     }
 }
