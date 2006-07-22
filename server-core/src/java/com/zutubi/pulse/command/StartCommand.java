@@ -15,10 +15,12 @@ public class StartCommand implements Command
 {
     private static final Logger LOG = Logger.getLogger(StartCommand.class);
 
+    private static final int UNSPECIFIED = -1;
+
     /**
      * The port to which pulse will bind its web user interface.
      */
-    private int port = -1;
+    private int port = UNSPECIFIED;
 
     /**
      * The pulse data directory
@@ -79,7 +81,7 @@ public class StartCommand implements Command
         try
         {
             // update the system properties
-            if (port != -1)
+            if (port != UNSPECIFIED)
             {
                 System.setProperty(ApplicationConfiguration.WEBAPP_PORT, Integer.toString(port));
             }
@@ -88,7 +90,7 @@ public class StartCommand implements Command
             {
                 System.setProperty("pulse.data", data);
             }
-            else if(System.getenv(ENV_PULSE_DATA) != null)
+            else if(TextUtils.stringSet(System.getenv(ENV_PULSE_DATA)))
             {
                 System.setProperty("pulse.data", System.getenv(ENV_PULSE_DATA));
             }

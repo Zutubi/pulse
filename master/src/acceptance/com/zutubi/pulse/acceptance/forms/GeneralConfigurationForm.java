@@ -19,7 +19,7 @@ public class GeneralConfigurationForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"hostName", "helpUrl", "rssEnabled", "anonEnabled"};
+        return new String[]{"baseUrl", "helpUrl", "rssEnabled", "anonEnabled"};
     }
 
     public int[] getFieldTypes()

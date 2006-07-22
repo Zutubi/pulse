@@ -204,7 +204,7 @@ list.
         [#list artifact.getFeatures(level) as feature]
         <li class="${level?lower_case}"><pre class="feature">${feature.summary?html}</pre>
             [#if feature.isPlain()]
-                <a class="unadorned" href="http://${hostname}/viewArtifact.action?id=${artifact.id?c}&amp;buildId=${result.id?c}&amp;commandId=${command.id?c}#${feature.firstLine?c}">
+                <a class="unadorned" href="${baseUrl}/viewArtifact.action?id=${artifact.id?c}&amp;buildId=${result.id?c}&amp;commandId=${command.id?c}#${feature.firstLine?c}">
                     <span class="small">jump to &gt;&gt;</span>
                 </a>
             [/#if]

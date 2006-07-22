@@ -68,7 +68,7 @@ public class SetupWizard extends BaseWizard
         userManager.save(admin);
 
         // apply the settings
-        config.setHostName(serverSettingsState.getHostname());
+        config.setBaseUrl(serverSettingsState.getBaseUrl());
         config.setSmtpFrom(serverSettingsState.getFromAddress());
         config.setSmtpHost(serverSettingsState.getSmtpHost());
         config.setSmtpUsername(serverSettingsState.getUsername());
@@ -190,7 +190,7 @@ public class SetupWizard extends BaseWizard
 
     public class ServerSettingsState extends BaseWizardState implements Validateable
     {
-        private String hostname;
+        private String baseUrl;
         private String fromAddress;
         private String smtpHost;
         private String username;
@@ -207,7 +207,12 @@ public class SetupWizard extends BaseWizard
             try
             {
                 InetAddress address = InetAddress.getLocalHost();
-                hostname = address.getCanonicalHostName() + ":" + configurationManager.getAppConfig().getServerPort();
+                MasterApplicationConfiguration appConfig = configurationManager.getAppConfig();
+                baseUrl = "http://" + address.getCanonicalHostName() + ":" + appConfig.getServerPort() + appConfig.getContextPath();
+                if (baseUrl.endsWith("/"))
+                {
+                    baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+                }
             }
             catch (UnknownHostException e)
             {
@@ -220,14 +225,14 @@ public class SetupWizard extends BaseWizard
             return "success";
         }
 
-        public String getHostname()
+        public String getBaseUrl()
         {
-            return hostname;
+            return baseUrl;
         }
 
-        public void setHostname(String hostname)
+        public void setBaseUrl(String baseUrl)
         {
-            this.hostname = hostname;
+            this.baseUrl = baseUrl;
         }
 
         public String getFromAddress()

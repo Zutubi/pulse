@@ -17,5 +17,5 @@ public interface BuildResultRenderer
     public static final String TYPE_PLAIN = "plain";
     public static final String TYPE_HTML = "html";
 
-    public void render(String hostUrl, BuildResult result, List<Changelist> changelists, String type, Writer writer);
+    public void render(String baseUrl, BuildResult result, List<Changelist> changelists, String type, Writer writer);
 }

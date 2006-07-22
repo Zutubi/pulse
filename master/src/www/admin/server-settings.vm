@@ -15,7 +15,7 @@
             <td class="columns" width="40%">
                 <table id="general.config" class="fill-content">
                     #adminHeadingRow("general.config" "$base/admin/editGeneral!input.action" "general.edit" "$base/admin/general!reset.action" "general.reset")
-                    #dynamicRow("general.host" $config.hostName)
+                    #dynamicRow("general.base.url" $config.baseUrl)
                     #dynamicRow("general.help.url" $config.helpUrl)
                     #enabledDisabledRow("general.rss.enabled" $config.rssEnabled)
                     #enabledDisabledRow("general.anonymous" $config.anonymousAccessEnabled)

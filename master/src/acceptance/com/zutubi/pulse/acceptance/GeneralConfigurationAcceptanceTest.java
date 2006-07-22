@@ -33,7 +33,6 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
         navigateToGeneralConfiguration();
 
         clickLinkWithText("reset");
-        assertTextPresent("localhost:" + port);
         assertTextPresent("http://confluence.zutubi.com/display/");
     }
 
@@ -41,7 +40,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
     {
         navigateToGeneralConfiguration();
         // ensure that we are not starting with the email address we using for this test.
-        assertTextNotPresent("saved.host.net");
+        assertTextNotPresent("http://saved.base.url.net");
         assertTextNotPresent("saved.help.url");
 
         clickLink("general.edit");
@@ -49,17 +48,17 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
 
         form.assertFormPresent();
-        form.saveFormElements("saved.host.net", "saved.help.url", "true", "true");
+        form.saveFormElements("http://saved.base.url.net", "saved.help.url", "true", "true");
 
         form.assertFormNotPresent();
 
-        assertTextPresent("saved.host.net");
+        assertTextPresent("http://saved.base.url.net");
         assertTextPresent("saved.help.url");
 
         clickLink("general.edit");
         form.assertFormPresent();
-        form.assertFormElements("saved.host.net", "saved.help.url", "true", "true");
-        form.saveFormElements("saved.host.net", "saved.help.url", "true", "false");
+        form.assertFormElements("http://saved.base.url.net", "saved.help.url", "true", "true");
+        form.saveFormElements("http://saved.base.url.net", "saved.help.url", "true", "false");
     }
 
     public void testCancel() throws Exception
@@ -73,13 +72,29 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
         form.assertFormPresent();
 
-        form.cancelFormElements("cancelled.host.net", "cancelled.help.url", "true", "true");
+        form.cancelFormElements("http://cancelled.base.url.net", "cancelled.help.url", "true", "true");
         form.assertFormNotPresent();
 
-        assertTextNotPresent("cancelled.host.com");
+        assertTextNotPresent("http://cancelled.base.url.net");
         assertTextNotPresent("cancelled.help.url");
     }
 
+    public void testValidation() throws Exception
+    {
+        navigateToGeneralConfiguration();
+        clickLink("general.edit");
+
+        GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
+        form.assertFormPresent();
+
+        // check that the base url is validated.
+        form.saveFormElements("not.a.url", "some.help.url", "true", "false");
+        form.assertFormPresent();
+        form.assertFormElements("not.a.url", "some.help.url", "true", "false");
+
+        form.saveFormElements("", "some.help.url", "true", "false");
+        form.assertFormPresent();
+    }
 
     private void navigateToGeneralConfiguration()
     {

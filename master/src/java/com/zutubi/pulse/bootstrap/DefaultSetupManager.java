@@ -1,12 +1,15 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.xwork.spring.SpringObjectFactory;
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 
 import java.util.List;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * <class-comment/>
@@ -57,7 +60,20 @@ public class DefaultSetupManager implements SetupManager
             //TODO: I18N this message - note, this also only works if the user is installing on the local
             //TODO: machine. We need to provide a better (widely applicable) URL.
 
-            System.err.println("Now go to http://localhost:"+appConfig.getServerPort() + appConfig.getContextPath() + " and follow the prompts.");
+            String baseUrl = appConfig.getBaseUrl();
+            if (!TextUtils.stringSet(baseUrl))
+            {
+                try
+                {
+                    InetAddress address = InetAddress.getLocalHost();
+                    baseUrl = "http://" + address.getCanonicalHostName() + ":" + appConfig.getServerPort() + appConfig.getContextPath();
+                }
+                catch (UnknownHostException e)
+                {
+                    baseUrl = "http://localhost" + ":" + appConfig.getServerPort() + appConfig.getContextPath();
+                }
+            }
+            System.err.println("Now go to " + baseUrl + " and follow the prompts.");
             promptShown = true;
         }
     }

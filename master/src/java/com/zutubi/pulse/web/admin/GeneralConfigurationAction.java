@@ -13,7 +13,7 @@ public class GeneralConfigurationAction extends ActionSupport
     private MasterConfigurationManager configurationManager;
     private GuestAccessManager guestAccessManager;
 
-    private String hostName;
+    private String baseUrl;
     private String helpUrl;
     private boolean rssEnabled;
     private boolean anonEnabled;
@@ -47,14 +47,14 @@ public class GeneralConfigurationAction extends ActionSupport
         return SUCCESS;
     }
 
-    public String getHostName()
+    public String getBaseUrl()
     {
-        return hostName;
+        return baseUrl;
     }
 
-    public void setHostName(String hostName)
+    public void setBaseUrl(String baseUrl)
     {
-        this.hostName = hostName;
+        this.baseUrl = baseUrl;
     }
 
     public String getHelpUrl()
@@ -90,7 +90,7 @@ public class GeneralConfigurationAction extends ActionSupport
     private void resetConfig()
     {
         MasterApplicationConfiguration config = configurationManager.getAppConfig();
-        config.setHostName(null);
+        config.setBaseUrl(null);
         config.setHelpUrl(null);
         config.setRssEnabled(null);
         config.setAnonymousAccessEnabled(null);
@@ -100,7 +100,7 @@ public class GeneralConfigurationAction extends ActionSupport
     private void saveConfig()
     {
         MasterApplicationConfiguration config = configurationManager.getAppConfig();
-        config.setHostName(hostName);
+        config.setBaseUrl(baseUrl);
         config.setHelpUrl(helpUrl);
         config.setRssEnabled(rssEnabled);
         config.setAnonymousAccessEnabled(anonEnabled);
@@ -110,7 +110,7 @@ public class GeneralConfigurationAction extends ActionSupport
     private void loadConfig()
     {
         MasterApplicationConfiguration config = configurationManager.getAppConfig();
-        hostName = config.getHostName();
+        baseUrl = config.getBaseUrl();
         helpUrl = config.getHelpUrl();
         rssEnabled = config.getRssEnabled();
         anonEnabled = config.getAnonymousAccessEnabled();

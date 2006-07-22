@@ -74,7 +74,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         // set Title, Description and Link
         feed.setTitle("Pulse build results for " + project.getName());
         feed.setDescription("This feed contains the latest pulse build results for the " + project.getName() + " project.");
-        feed.setLink("http://" + configurationManager.getAppConfig().getHostName() +"/currentBuild.action?id=" + project.getId());
+        feed.setLink(configurationManager.getAppConfig().getBaseUrl() +"/currentBuild.action?id=" + project.getId());
 
         List<SyndEntry> entries = new LinkedList<SyndEntry>();
         for (BuildResult result : query.list())
@@ -104,7 +104,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
             // NOTES:
             // calling setLink is effectively setting guid without a isPermaLink reference.
             // calling setUri() is equivalent to guid isPermaLink=false - refer to ConverterForRSS094.java
-            String permalink = "http://" + configurationManager.getAppConfig().getHostName() +"/viewBuild.action?id=" + result.getId();
+            String permalink = configurationManager.getAppConfig().getBaseUrl() +"/viewBuild.action?id=" + result.getId();
             entry.setLink(permalink);
             entry.setPublishedDate(new Date(result.getStamps().getEndTime()));
             entries.add(entry);
@@ -128,8 +128,8 @@ public class BuildResultsRssAction extends ProjectActionSupport
         // set Title, Description and Link
         feed.setTitle("Pulse build results");
         feed.setDescription("This feed contains the latest pulse build results.");
-        String hostName = configurationManager.getAppConfig().getHostName();
-        feed.setLink("http://" + hostName +"/viewProjects.action");
+        String baseUrl = configurationManager.getAppConfig().getBaseUrl();
+        feed.setLink(baseUrl +"/viewProjects.action");
 
         List<SyndEntry> entries = new LinkedList<SyndEntry>();
         for (BuildResult result : query.list())
@@ -161,7 +161,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
             // NOTES:
             // calling setLink is effectively setting guid without a isPermaLink reference.
             // calling setUri() is equivalent to guid isPermaLink=false - refer to ConverterForRSS094.java
-            String permalink = "http://" + hostName +"/viewBuild.action?id=" + result.getId();
+            String permalink = baseUrl +"/viewBuild.action?id=" + result.getId();
             entry.setLink(permalink);
             entry.setPublishedDate(new Date(result.getStamps().getEndTime()));
             entries.add(entry);
@@ -182,7 +182,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
     private String renderResult(BuildResult result)
     {
         StringWriter w = new StringWriter();
-        buildResultRenderer.render(configurationManager.getAppConfig().getHostName(),
+        buildResultRenderer.render(configurationManager.getAppConfig().getBaseUrl(),
                 result,
                 getBuildManager().getChangesForBuild(result),
                 BuildResultRenderer.TYPE_HTML , w);

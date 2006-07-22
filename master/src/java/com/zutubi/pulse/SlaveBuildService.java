@@ -55,7 +55,7 @@ public class SlaveBuildService implements BuildService
     {
         try
         {
-            return service.build(serviceTokenManager.getToken(), configurationManager.getAppConfig().getHostName(), slave.getId(), request);
+            return service.build(serviceTokenManager.getToken(), configurationManager.getAppConfig().getBaseUrl(), slave.getId(), request);
         }
         catch (RuntimeException e)
         {

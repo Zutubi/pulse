@@ -2,6 +2,7 @@ package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.bootstrap.conf.Config;
 import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
+import com.opensymphony.util.TextUtils;
 
 /**
  * <class-comment/>
@@ -35,14 +36,19 @@ public class MasterApplicationConfigurationSupport implements MasterApplicationC
         config.setProperty(ADMIN_LOGIN, login);
     }
 
-    public String getHostName()
+    public String getBaseUrl()
     {
-        return config.getProperty(HOST_NAME);
+        return config.getProperty(BASE_URL);
     }
 
-    public void setHostName(String host)
+    public void setBaseUrl(String host)
     {
-        config.setProperty(HOST_NAME, host);
+        // munge the url a little. We assume that there is no trailing '/' when using this property.
+        if (TextUtils.stringSet(host) && host.endsWith("/"))
+        {
+            host = host.substring(0, host.length() - 1);
+        }
+        config.setProperty(BASE_URL, host);
     }
 
     public String getContextPath()

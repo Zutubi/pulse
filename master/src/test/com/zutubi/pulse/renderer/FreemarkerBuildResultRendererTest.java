@@ -42,7 +42,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testBasicSuccess() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
-        createAndVerify("basic", "test.url:8080", result, new LinkedList<Changelist>());
+        createAndVerify("basic", "http://test.url:8080", result, new LinkedList<Changelist>());
     }
 
     public void testWithChanges() throws Exception
@@ -50,7 +50,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         List<Changelist> changes = getChanges();
         BuildResult result = createBuildWithChanges(changes);
 
-        createAndVerify("changes", "another.url", result, changes);
+        createAndVerify("changes", "http://another.url", result, changes);
     }
 
     public void testWithErrors() throws Exception
@@ -109,7 +109,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         secondResult.add(command);
 
-        createAndVerify("errors", type, "another.url", result, changes);
+        createAndVerify("errors", type, "http://another.url", result, changes);
     }
 
     private void failuresHelper(String type) throws Exception
@@ -158,7 +158,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         secondResult.add(command);
 
-        createAndVerify("failures", type, "host.url", result);
+        createAndVerify("failures", type, "http://host.url", result);
     }
 
     private BuildResult createBuildWithChanges(List<Changelist> changes)
@@ -213,17 +213,17 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         return result;
     }
 
-    protected void createAndVerify(String expectedName, String hostUrl, BuildResult result, List<Changelist> changelists) throws IOException
+    protected void createAndVerify(String expectedName, String baseUrl, BuildResult result, List<Changelist> changelists) throws IOException
     {
-        createAndVerify(expectedName, "plain", hostUrl, result, changelists);
+        createAndVerify(expectedName, "plain", baseUrl, result, changelists);
     }
 
-    protected void createAndVerify(String expectedName, String type, String hostUrl, BuildResult result) throws IOException, URISyntaxException
+    protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result) throws IOException, URISyntaxException
     {
-        createAndVerify(expectedName, type, hostUrl, result, new LinkedList<Changelist>());
+        createAndVerify(expectedName, type, baseUrl, result, new LinkedList<Changelist>());
     }
 
-    protected void createAndVerify(String expectedName, String type, String hostUrl, BuildResult result, List<Changelist> changelists) throws IOException
+    protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result, List<Changelist> changelists) throws IOException
     {
         String extension = "txt";
         if (type.equals("html"))
@@ -241,7 +241,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
             {
                 outStream = new FileOutputStream(expected);
                 writer = new OutputStreamWriter(outStream);
-                renderer.render(hostUrl, result, changelists, type, writer);
+                renderer.render(baseUrl, result, changelists, type, writer);
             }
             finally
             {
@@ -258,7 +258,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
                 expectedStream = getInput(expectedName, extension);
 
                 StringWriter writer = new StringWriter();
-                renderer.render(hostUrl, result, changelists, type, writer);
+                renderer.render(baseUrl, result, changelists, type, writer);
                 String got = replaceTimestamps(writer.getBuffer().toString());
                 String expected = replaceTimestamps(IOUtils.inputStreamToString(expectedStream));
                 assertEquals(expected, got);

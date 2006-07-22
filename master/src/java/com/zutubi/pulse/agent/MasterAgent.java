@@ -59,7 +59,7 @@ public class MasterAgent implements Agent
 
     public String getLocation()
     {
-        return configurationManager.getAppConfig().getHostName();
+        return configurationManager.getAppConfig().getBaseUrl();
     }
 
     public boolean isSlave()

@@ -9,7 +9,7 @@ public interface MasterApplicationConfiguration extends ApplicationConfiguration
     //---( server configuration )---
     public static final String ADMIN_LOGIN = "admin.login";
 
-    public static final String HOST_NAME = "host.name";
+    public static final String BASE_URL = "webapp.base.url";
 
     public static final String CONTEXT_PATH = "webapp.contextPath";
 
@@ -63,9 +63,9 @@ public interface MasterApplicationConfiguration extends ApplicationConfiguration
 
     void setAdminLogin(String login);
 
-    String getHostName();
+    String getBaseUrl();
 
-    void setHostName(String host);
+    void setBaseUrl(String host);
 
     String getContextPath();
 

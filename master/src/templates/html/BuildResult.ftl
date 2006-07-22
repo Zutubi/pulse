@@ -123,8 +123,8 @@ pre.feature {
 <body>
     <h1 style="font-size: 150%">
         project ::
-        <a href="http://${hostname}/currentBuild.action?id=${result.project.id?c}">${result.project.name?html}</a> ::
-        <a href="http://${hostname}/viewBuild.action?id=${result.id?c}">build ${result.number?c}</a>
+        <a href="${baseUrl}/currentBuild.action?id=${result.project.id?c}">${result.project.name?html}</a> ::
+        <a href="${baseUrl}/viewBuild.action?id=${result.id?c}">build ${result.number?c}</a>
     </h1>
 <table>
 <tr><td>
@@ -151,9 +151,9 @@ pre.feature {
             [@classCell cc=result.reason.summary/]
             [@classCell cc=result.stamps.prettyStartTime/]
             [@classCell cc=result.stamps.prettyElapsed/]
-            [@linkCell cc="view" url="http://${hostname}/viewBuild.action?id=${result.id?c}"/]
-            [@linkCell cc="artifacts" url="http://${hostname}/viewBuildArtifacts.action?id=${result.id?c}"/]
-            [@linkCell cc="tests" url="http://${hostname}/viewTests.action?id=${result.id?c}"/]
+            [@linkCell cc="view" url="${baseUrl}/viewBuild.action?id=${result.id?c}"/]
+            [@linkCell cc="artifacts" url="${baseUrl}/viewBuildArtifacts.action?id=${result.id?c}"/]
+            [@linkCell cc="tests" url="${baseUrl}/viewTests.action?id=${result.id?c}"/]
         </tr>
     </table>
 </td></tr>
@@ -182,7 +182,7 @@ pre.feature {
             [@classCell cc=child.result.stateName?lower_case/]
             [@classCell cc=child.result.stamps.prettyStartTime/]
             [@classCell cc=child.result.stamps.prettyElapsed/]
-            [@linkCell cc="view" url="http://${hostname}/commandLog.action?id=${result.id?c}&amp;selectedNode=${child.id?c}"/]
+            [@linkCell cc="view" url="${baseUrl}/commandLog.action?id=${result.id?c}&amp;selectedNode=${child.id?c}"/]
         </tr>
 [/#list]
     </table>
@@ -207,7 +207,7 @@ pre.feature {
             [@dynamicCell cc=change.user/]
             [@dynamicCell cc=change.prettyTime/]
             [@dynamicCell cc=renderer.trimmedString(change.comment, 60)/]
-            [@linkCell cc="view" url="http://${hostname}/viewChangelist.action?id=${change.id?c}&amp;buildId=${result.id?c}"/]
+            [@linkCell cc="view" url="${baseUrl}/viewChangelist.action?id=${change.id?c}&amp;buildId=${result.id?c}"/]
         </tr>
         [/#list]
     [#else]

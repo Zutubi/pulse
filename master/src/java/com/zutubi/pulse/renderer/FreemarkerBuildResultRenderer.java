@@ -22,13 +22,13 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 
     private Configuration freemarkerConfiguration;
 
-    public void render(String hostUrl, BuildResult result, List<Changelist> changelists, String type, Writer writer)
+    public void render(String baseUrl, BuildResult result, List<Changelist> changelists, String type, Writer writer)
     {
         Map<String, Object> dataMap = new HashMap<String, Object>();
 
         dataMap.put("renderer", this);
         dataMap.put("type", type);
-        dataMap.put("hostname", hostUrl);
+        dataMap.put("baseUrl", baseUrl);
         dataMap.put("result", result);
         dataMap.put("changelists", changelists);
         dataMap.put("model", result);

@@ -30,7 +30,7 @@ public class MasterBuildService implements BuildService
 
     public String getUrl()
     {
-        return configurationManager.getAppConfig().getHostName();
+        return configurationManager.getAppConfig().getBaseUrl();
     }
 
     public boolean hasResource(String resource, String version)

@@ -35,7 +35,7 @@ public class CopyBootstrapper extends BootstrapperSupport
         try
         {
             // Pull down the result from the slave then explode to dir
-            URL resultUrl = new URL("http://" + url + "/download?token=" + token + "&output=false&recipe=" + previousRecipeId);
+            URL resultUrl = new URL(url + "/download?token=" + token + "&output=false&recipe=" + previousRecipeId);
             URLConnection urlConnection = resultUrl.openConnection();
 
             // take url connection input stream and write contents to directory.

@@ -85,7 +85,7 @@ public class EmailContactPoint extends ContactPoint
         BuildResultRenderer renderer = (BuildResultRenderer) ComponentContext.getBean("buildResultRenderer");
         BuildManager buildManager = (BuildManager) ComponentContext.getBean("buildManager");
         MasterConfigurationManager configManager = lookupConfigManager();
-        renderer.render(configManager.getAppConfig().getHostName(), result, buildManager.getChangesForBuild(result), getType(), w);
+        renderer.render(configManager.getAppConfig().getBaseUrl(), result, buildManager.getChangesForBuild(result), getType(), w);
         return w.toString();
     }
 

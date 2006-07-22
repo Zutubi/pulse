@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.pulse.acceptance.forms.GeneralConfigurationForm;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
@@ -66,6 +67,9 @@ public class RssAcceptanceTest extends BaseAcceptanceTest
 
     public void testRssFeedGenerationSuccessful() throws IOException, FeedException
     {
+        // ensure that the rss feed is enabled.
+        enableRss();
+
         // directly request the build feed for this project.
         beginAt("rss.action?projectName=" + projectName);
 
@@ -73,14 +77,30 @@ public class RssAcceptanceTest extends BaseAcceptanceTest
         assertNotNull(feed);
     }
 
+    private void enableRss()
+    {
+        beginAt("/");
+        clickLinkWithText("Administration");
+        clickLink("general.edit");
+        GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
+        form.saveFormElements(null, null, "true", null);
+    }
+
     private SyndFeed readResponseAsFeed() throws FeedException, IOException
     {
         // validate the response using Rome.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        dumpResponse(new PrintStream(baos));
+        try
+        {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            dumpResponse(new PrintStream(baos));
 
-        SyndFeedInput input = new SyndFeedInput();
-        return input.build(new XmlReader(new ByteArrayInputStream(baos.toByteArray())));
+            SyndFeedInput input = new SyndFeedInput();
+            return input.build(new XmlReader(new ByteArrayInputStream(baos.toByteArray())));
+        }
+        finally
+        {
+            dumpResponse(System.out);
+        }
     }
 
 }

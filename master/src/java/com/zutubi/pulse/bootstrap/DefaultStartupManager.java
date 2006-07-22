@@ -182,7 +182,7 @@ public class DefaultStartupManager implements StartupManager
         MasterApplicationConfiguration appConfig = configurationManager.getAppConfig();
 
         //TODO: I18N this message.
-        System.err.println("The server is now available at http://localhost:"+appConfig.getServerPort()+ appConfig.getContextPath());
+        System.err.println("The server is now available at " + appConfig.getBaseUrl());
     }
 
     private void runStartupTasks()

@@ -6,7 +6,7 @@ Build ${result.number?c} has completed with status '${result.state.prettyString}
 
 You can view the full build result at:
 
-http://${hostname}/viewBuild.action?id=${result.id?c}
+${baseUrl}/viewBuild.action?id=${result.id?c}
 
 [#if result.reason?exists]
 Build reason: ${result.reason.summary}.

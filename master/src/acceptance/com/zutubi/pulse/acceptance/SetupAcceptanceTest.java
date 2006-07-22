@@ -96,12 +96,12 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         settingsForm.assertFormElements("localhost:8080", "some.smtp.host.com", "", "", "", "");
         assertTextPresent("required");
 
-        // smtp from must be valid ??.
-//        settingsForm.nextFormElements("localhost:8080", "some.smtp.host.com", "invalid from address", "", "");
-//        settingsForm.assertFormElements("localhost:8080", "some.smtp.host.com", "invalid from address", "", "");
-//        assertTextPresent("required");
+        // ensure that the base url setting is a valid url.
+        settingsForm.nextFormElements("localhost:8080", "", "", "", "", "");
+        settingsForm.assertFormElements("localhost:8080", "", "", "", "", "");
+        assertTextPresent("valid");
 
-        settingsForm.nextFormElements("localhost:8080", "some.smtp.host.com", "from@some.host.com", "username", "password", "prefix");
+        settingsForm.nextFormElements("http://localhost:8080", "some.smtp.host.com", "from@some.host.com", "username", "password", "prefix");
     }
 
     private void checkLicenseDetails()

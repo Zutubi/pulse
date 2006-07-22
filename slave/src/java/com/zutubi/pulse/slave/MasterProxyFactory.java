@@ -13,7 +13,7 @@ public class MasterProxyFactory
 
     public MasterService createProxy(String master) throws MalformedURLException
     {
-        String url = "http://" + master + "/hessian";
+        String url = master + "/hessian";
         return (MasterService) hessianProxyFactory.create(MasterService.class, url);
     }
 
