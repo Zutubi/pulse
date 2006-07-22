@@ -538,6 +538,26 @@ li.header {
     font-weight: bold;
 }
 
+span.expanded-list, span.collapsed-list, span.open-folder, span.closed-folder {
+    padding-left: 20px;
+}
+
+span.expanded-list {
+    background: url( ../images/resultset_down.gif ) no-repeat 0 0;
+}
+
+span.collapsed-list {
+    background: url( ../images/resultset_next.gif ) no-repeat 0 0;
+}
+
+span.open-folder {
+    background: url( ../images/open-folder.gif ) no-repeat 0 0;
+}
+
+span.closed-folder {
+    background: url( ../images/closed-folder.gif ) no-repeat 0 0;
+}
+
     /*------------------------------
     Decorated artifacts
     */

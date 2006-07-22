@@ -146,39 +146,39 @@ function toggleDisplay(id)
 function toggleList(id)
 {
     var element = getElement(id);
-    var image = getElement(id + '_image');
+    var header = getElement(id + '_header');
 
     if(!element.style.display)
     {
-        var closedImage = '/images/resultset_next.gif';
+        var closedClass = 'collapsed-list';
         if(arguments.length > 1)
         {
-            closedImage = arguments[1];
+            closedClass = arguments[1];
         }
 
         element.style.display = 'none';
-        image.src = closedImage;
+        header.className = closedClass;
     }
     else
     {
-        var openImage = '/images/resultset_down.gif';
+        var openClass = 'expanded-list';
         if(arguments.length > 2)
         {
-            openImage = arguments[2];
+            openClass = arguments[2];
         }
 
         element.style.display = '';
-        image.src = openImage;
+        header.className = openClass;
     }
 }
 
 function toggleFolderList(id)
 {
-    toggleList(id, 'images/treeview/c.gif', 'images/treeview/o.gif');
+    toggleList(id, 'closed-folder', 'open-folder');
 }
 
 // Changes display style for all lists under the given node
-function styleAllLists(id, style, imageSource)
+function styleAllLists(id, style, headerClass)
 {
     var node = getElement(id);
     var childLists = node.getElementsByTagName("ul");
@@ -188,10 +188,10 @@ function styleAllLists(id, style, imageSource)
         if(childLists[i].id != '')
         {
             childLists[i].style.display = style;
-            var image = getElement(childLists[i].id + '_image');
-            if(image)
+            var header = getElement(childLists[i].id + '_header');
+            if(header)
             {
-                image.src = imageSource(childLists[i]);
+                header.className = headerClass(childLists[i]);
             }
         }
     }
@@ -200,13 +200,13 @@ function styleAllLists(id, style, imageSource)
 // Expands all lists under the given node
 function expandAllLists(id)
 {
-    styleAllLists(id, '', function(element) { if(element.parentNode.className == "dir-artifact") { return '/images/treeview/o.gif'; } else { return '/images/resultset_down.gif'; } });
+    styleAllLists(id, '', function(element) { if(element.parentNode.className == "dir-artifact") { return 'open-folder'; } else { return 'expanded-list'; } });
 }
 
 // Collapses all lists under the given node
 function collapseAllLists(id)
 {
-    styleAllLists(id, 'none', function(element) { if(element.parentNode.className == "dir-artifact") { return '/images/treeview/c.gif'; } else { return '/images/resultset_next.gif'; } });
+    styleAllLists(id, 'none', function(element) { if(element.parentNode.className == "dir-artifact") { return 'closed-folder'; } else { return 'collapsed-list'; } });
 }
 
 // Hides all children of the element with the given id

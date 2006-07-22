@@ -1481,7 +1481,7 @@
     #if($hasIndex)
         <li class="report-artifact">
     #else
-        <li class="dir-artifact"><span onclick="toggleFolderList('art_${artifact.id}');"><img alt="toggle" id="art_${artifact.id}_image" src="$base/images/treeview/o.gif"/>
+        <li class="dir-artifact"><span class="open-folder" id="art_${artifact.id}_header" onclick="toggleFolderList('art_${artifact.id}');">
     #end
     #if($hasIndex && $showArtifactLink)
         <a href="$base/view/$result.id/$artifact.id/$action.escapeSpaces($artifact.name)/">
@@ -1528,7 +1528,7 @@
         #end
         #foreach($commandResult in $result.commandResults)
             #if($commandResult.hasArtifacts())
-        <li class="artifact"><span onclick="toggleList('${commandResult.id}_artifacts');"><img alt="toggle" id="${commandResult.id}_artifacts_image" src="$base/images/resultset_down.gif"/> #wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)</span>
+        <li class="artifact"><span class="expanded-list" id="${commandResult.id}_artifacts_header" onclick="toggleList('${commandResult.id}_artifacts');">#wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)</span>
             #commandArtifacts($build $commandResult false $result.completed())
         </li>
             #end
@@ -1548,7 +1548,7 @@
 ##
 #macro(recipeNodeArtifacts $build $node)
     #if($node.hasArtifacts())
-        <li class="artifact"><span onclick="toggleList('${node.result.id}_artifacts');"><img alt="toggle" id="${node.result.id}_artifacts_image" src="$base/images/resultset_down.gif"/> #wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stage) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.hostSafe")</span>
+        <li class="artifact"><span class="expanded-list" id="${node.result.id}_artifacts_header" onclick="toggleList('${node.result.id}_artifacts');">#wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stage) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.hostSafe")</span>
             <ul class="artifact" id="${node.result.id}_artifacts">
             #recipeArtifacts($build $node.result false)
             #foreach($child in $node.children)
