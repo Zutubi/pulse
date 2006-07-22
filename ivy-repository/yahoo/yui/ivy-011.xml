@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.1">
+    <info organisation="yahoo" module="yui" revision="0.11" status="release">
+        <license name="bsd"/>
+
+        <description homepage="http://developer.yahoo.com/yui/">
+	        The Yahoo! User Interface (YUI) Library is a set of utilities and controls, written in JavaScript, for
+            building richly interactive web applications using techniques such as DOM scripting, DHTML and AJAX.
+        </description>
+    </info>
+
+</ivy-module>
