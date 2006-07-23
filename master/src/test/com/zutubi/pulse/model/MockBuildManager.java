@@ -196,6 +196,11 @@ public class MockBuildManager implements BuildManager
 
     public void abortUnfinishedBuilds(Project project, String message)
     {
-        throw new RuntimeException("Method not implemented.");
+        BuildResult result = getLatestBuildResult(project);
+        if(result != null && result.inProgress())
+        {
+            result.error(message);
+            result.complete();
+        }
     }
 }
