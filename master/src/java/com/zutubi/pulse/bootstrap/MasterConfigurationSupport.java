@@ -2,21 +2,27 @@ package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.bootstrap.conf.Config;
 import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
+import com.zutubi.pulse.bootstrap.conf.CompositeConfig;
 import com.opensymphony.util.TextUtils;
 
 /**
  * <class-comment/>
  */
-public class MasterApplicationConfigurationSupport extends ConfigSupport implements MasterApplicationConfiguration
+public class MasterConfigurationSupport extends ConfigSupport implements MasterConfiguration
 {
-    public MasterApplicationConfigurationSupport(Config config)
+    public MasterConfigurationSupport(Config... config)
     {
-        super(config);
+        super(new CompositeConfig(config));
     }
 
-    public int getServerPort()
+    public String getLoggingLevel()
     {
-        return getInteger(WEBAPP_PORT);
+        return getProperty(LOGGING_CONFIG, "default");
+    }
+
+    public void setLoggingLevel(String logConfig)
+    {
+        setProperty(LOGGING_CONFIG, logConfig);
     }
 
     public String getAdminLogin()
@@ -44,19 +50,9 @@ public class MasterApplicationConfigurationSupport extends ConfigSupport impleme
         setProperty(BASE_URL, host);
     }
 
-    public String getContextPath()
-    {
-        return getProperty(CONTEXT_PATH);
-    }
-
-    public void setContextPath(String path)
-    {
-        setProperty(CONTEXT_PATH, path);
-    }
-
     public String getHelpUrl()
     {
-        return getProperty(HELP_URL);
+        return getProperty(HELP_URL, "http://confluence.zutubi.com/display/pulse0101");
     }
 
     public void setHelpUrl(String helpUrl)
@@ -94,16 +90,6 @@ public class MasterApplicationConfigurationSupport extends ConfigSupport impleme
         setProperty(SMTP_PASSWORD, password);
     }
 
-    public String getLogConfig()
-    {
-        return getProperty(LOGGING_CONFIG);
-    }
-
-    public void setLogConfig(String logConfig)
-    {
-        setProperty(LOGGING_CONFIG, logConfig);
-    }
-
     public Boolean getJabberForceSSL()
     {
         return getBooleanProperty(JABBER_FORCE_SSL, Boolean.FALSE);
@@ -116,7 +102,7 @@ public class MasterApplicationConfigurationSupport extends ConfigSupport impleme
 
     public Boolean getRssEnabled()
     {
-        return getBooleanProperty(RSS_ENABLED, Boolean.FALSE);
+        return getBooleanProperty(RSS_ENABLED, Boolean.TRUE);
     }
 
     public void setRssEnabled(Boolean rssEnabled)

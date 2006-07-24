@@ -4,7 +4,9 @@ import com.zutubi.pulse.api.AdminTokenManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.util.IOUtils;
+import com.opensymphony.util.TextUtils;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcException;
 
@@ -33,6 +35,8 @@ public abstract class AdminCommand implements Command
 
     private int port = -1;
 
+    private String contextPath;
+
     private String loadAdminToken(ConfigurationManager configurationManager) throws IOException
     {
         File tokenFile = AdminTokenManager.getAdminTokenFilename(configurationManager.getSystemPaths().getConfigRoot());
@@ -46,6 +50,11 @@ public abstract class AdminCommand implements Command
     public void setPort(int port)
     {
         this.port = port;
+    }
+
+    public void setContextPath(String contextPath)
+    {
+        this.contextPath = contextPath;
     }
 
     public int execute()
@@ -62,12 +71,32 @@ public abstract class AdminCommand implements Command
         URL url;
         try
         {
-            int webPort = configurationManager.getAppConfig().getServerPort();
+            SystemConfiguration sysConfig = configurationManager.getSystemConfig();
+            int webPort = sysConfig.getServerPort();
             if (port != -1)
             {
                 webPort = port;
             }
-            url = new URL("http", "127.0.0.1", webPort, "/xmlrpc");
+
+            String path = sysConfig.getContextPath();
+            if (TextUtils.stringSet(contextPath))
+            {
+                path = contextPath;
+            }
+
+            StringBuffer remoteApiPath = new StringBuffer();
+            if (!path.startsWith("/"))
+            {
+                remoteApiPath.append("/");
+            }
+            remoteApiPath.append(path);
+            if (!path.endsWith("/"))
+            {
+                remoteApiPath.append("/");
+            }
+            remoteApiPath.append("xmlrpc");
+
+            url = new URL("http", "127.0.0.1", webPort, remoteApiPath.toString());
         }
         catch (MalformedURLException e)
         {

@@ -39,6 +39,11 @@ public class ShutdownCommand extends AdminCommand
                 .hasArg()
                 .withDescription("the port to be used by the pulse web interface.")
                 .create('p'));
+        options.addOption(OptionBuilder.withLongOpt("contextpath")
+                .withArgName("contextpath")
+                .hasArg()
+                .withDescription("the webapps context path.")
+                .create('c'));
 
         CommandLineParser parser = new PosixParser();
         CommandLine commandLine = parser.parse(options, argv, true);
@@ -48,6 +53,10 @@ public class ShutdownCommand extends AdminCommand
         if (commandLine.hasOption('p'))
         {
             setPort(Integer.parseInt(commandLine.getOptionValue('p')));
+        }
+        if (commandLine.hasOption('c'))
+        {
+            setContextPath(commandLine.getOptionValue('c'));
         }
     }
 

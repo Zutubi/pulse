@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.admin;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.security.ldap.LdapManager;
 import com.zutubi.pulse.web.ActionSupport;
@@ -74,7 +74,7 @@ public class LdapConfigurationAction extends ActionSupport
 
     private void resetConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterConfiguration config = configurationManager.getAppConfig();
         config.setLdapEnabled(false);
         config.setLdapHostUrl("");
         config.setLdapBaseDn("");
@@ -87,7 +87,7 @@ public class LdapConfigurationAction extends ActionSupport
 
     private void saveConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterConfiguration config = configurationManager.getAppConfig();
         config.setLdapEnabled(ldap.getEnabled());
         config.setLdapHostUrl(ldap.getHost());
         config.setLdapBaseDn(ldap.getBaseDn());
@@ -105,7 +105,7 @@ public class LdapConfigurationAction extends ActionSupport
 
     private void loadConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterConfiguration config = configurationManager.getAppConfig();
         ldap.setEnabled(config.getLdapEnabled());
         ldap.setHost(config.getLdapHostUrl());
         ldap.setBaseDn(config.getLdapBaseDn());

@@ -33,7 +33,7 @@ public class SlaveStartupManager implements Startup, Stoppable
         runStartupRunnables();
 
         jettyServer = new Server();
-        int port = configurationManager.getAppConfig().getServerPort();
+        int port = configurationManager.getSystemConfig().getServerPort();
         SocketListener listener = new SocketListener(new InetAddrPort(port));
         jettyServer.addListener(listener);
         try

@@ -4,7 +4,7 @@ import com.opensymphony.webwork.views.velocity.VelocityManager;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.User;
@@ -31,8 +31,9 @@ public class CustomVelocityManager extends VelocityManager
     public Context createContext(OgnlValueStack stack, HttpServletRequest req, HttpServletResponse res)
     {
         Context context = super.createContext(stack, req, res);
-        MasterApplicationConfiguration config = configManager.getAppConfig();
+        MasterConfiguration config = configManager.getAppConfig();
         context.put("helpUrl", config.getHelpUrl());
+        context.put("rssEnabled", config.getRssEnabled());
 
         String login = AcegiUtils.getLoggedInUser();
         if (login != null && getUserManager() != null)
@@ -48,9 +49,6 @@ public class CustomVelocityManager extends VelocityManager
         context.put("build_number", v.getBuildNumber());
 
         context.put("license", LicenseHolder.getLicense());
-
-        MasterApplicationConfiguration appConfig = configManager.getAppConfig();
-        context.put("rssEnabled", appConfig.getRssEnabled());
 
         return context;
     }

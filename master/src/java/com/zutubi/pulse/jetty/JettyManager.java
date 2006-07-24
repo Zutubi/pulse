@@ -143,6 +143,6 @@ public class JettyManager implements Stoppable
 
     protected String getContextPath()
     {
-        return configurationManager.getAppConfig().getContextPath();
+        return configurationManager.getSystemConfig().getContextPath();
     }
 }

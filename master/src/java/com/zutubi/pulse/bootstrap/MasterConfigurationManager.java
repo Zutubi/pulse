@@ -12,7 +12,7 @@ public interface MasterConfigurationManager extends ConfigurationManager, DataRe
      * 
      * @return system configuration.
      */
-    MasterApplicationConfiguration getAppConfig();
+    MasterConfiguration getAppConfig();
 
     MasterUserPaths getUserPaths();
 

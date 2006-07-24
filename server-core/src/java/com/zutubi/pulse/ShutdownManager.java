@@ -1,6 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 
 import java.util.List;
 
@@ -27,6 +28,11 @@ public class ShutdownManager
         {
             // why exit? because some external packages do not clean up all of there threads... 
             System.exit(0);
+        }
+        else
+        {
+            // cleanout the component context.
+            ComponentContext.closeAll();
         }
     }
 

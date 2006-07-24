@@ -9,7 +9,7 @@ public class CompositeConfig implements Config
 
     public CompositeConfig(Config... configs)
     {
-        this.delegates = configs;
+        this.delegates = (configs != null ? configs : new Config[0]);
     }
 
     public String getProperty(String key)
@@ -70,6 +70,10 @@ public class CompositeConfig implements Config
      */
     public boolean isWriteable()
     {
-        return delegates[0].isWriteable();
+        if (delegates.length > 0)
+        {
+            return delegates[0].isWriteable();
+        }
+        return false;
     }
 }

@@ -24,7 +24,7 @@ public class ViewAgentsAction extends ActionSupport
 
     public int getServerPort()
     {
-        return configurationManager.getAppConfig().getServerPort();
+        return configurationManager.getSystemConfig().getServerPort();
     }
 
     public String execute() throws Exception

@@ -9,7 +9,7 @@ then
 fi
 
 version=$1
-./pulse-accept/pulse-${version}/bin/shutdown.sh
+./pulse-accept/pulse-${version}/bin/shutdown.sh -p 8889
 
 # Wait for it to shut down
 while netstat -a | grep 8889 > /dev/null

@@ -240,6 +240,7 @@
 
         <junit printsummary="yes" fork="on" failureProperty="test.failed" errorProperty="test.failed">
             <sysproperty key="pulse.port" value="8889"/>
+            <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
             <classpath>
                 <pathelement location="${build.dir}/classes"/>
                 <pathelement location="${build.dir}/test.classes"/>

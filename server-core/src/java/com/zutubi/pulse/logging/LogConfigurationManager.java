@@ -1,16 +1,16 @@
 package com.zutubi.pulse.logging;
 
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Enumeration;
-import java.util.logging.LogManager;
 import java.util.logging.Filter;
+import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 
 /**
@@ -20,11 +20,15 @@ import java.util.logging.LogRecord;
 public class LogConfigurationManager
 {
     private File logConfigDir;
-    private ConfigurationManager configurationManager;
+
+    /**
+     *
+     */
+    private LogConfiguration logConfig;
 
     public void init()
     {
-        updateConfiguration(configurationManager.getAppConfig().getLogConfig());
+        updateConfiguration(logConfig.getLoggingLevel());
     }
 
     public List<String> getAvailableConfigurations()
@@ -94,16 +98,20 @@ public class LogConfigurationManager
         }
     }
 
+    public void setSystemPaths(SystemPaths paths)
+    {
+        File configDirectory = paths.getConfigRoot();
+        logConfigDir = new File(configDirectory, "logging");
+    }
+
     /**
      * Required resource.
      *
-     * @param configurationManager
+     * @param config
      */
-    public void setConfigurationManager(ConfigurationManager configurationManager)
+    public void setLogConfiguration(LogConfiguration config)
     {
-        this.configurationManager = configurationManager;
-        File configDirectory = this.configurationManager.getSystemPaths().getConfigRoot();
-        logConfigDir = new File(configDirectory, "logging");
+        this.logConfig = config;
     }
 
     static class BlockingFilter implements Filter

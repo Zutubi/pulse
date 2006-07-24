@@ -2,7 +2,7 @@ package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
 
 /**
  * <class-comment/>
@@ -49,7 +49,7 @@ public class SmtpConfigurationAction extends ActionSupport
 
     private void resetConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterConfiguration config = configurationManager.getAppConfig();
         config.setSmtpPrefix(null);
         config.setSmtpFrom(null);
         config.setSmtpHost(null);
@@ -59,7 +59,7 @@ public class SmtpConfigurationAction extends ActionSupport
 
     private void saveConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterConfiguration config = configurationManager.getAppConfig();
         config.setSmtpPrefix(smtp.getPrefix());
         config.setSmtpFrom(smtp.getFrom());
         config.setSmtpHost(smtp.getHost());
@@ -69,7 +69,7 @@ public class SmtpConfigurationAction extends ActionSupport
 
     private void loadConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterConfiguration config = configurationManager.getAppConfig();
         smtp.setPrefix(config.getSmtpPrefix());
         smtp.setFrom(config.getSmtpFrom());
         smtp.setHost(config.getSmtpHost());

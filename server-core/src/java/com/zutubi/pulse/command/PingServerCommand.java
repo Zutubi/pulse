@@ -15,28 +15,16 @@ import java.util.Vector;
  */
 public class PingServerCommand implements Command
 {
-    private String host;
-
-    private int port = 8080;
+    private String baseUrl;
 
     /**
-     * The host address.
+     * Required argument.
      *
-     * @param host
+     * @param baseUrl
      */
-    public void setHost(String host)
+    public void setBaseUrl(String baseUrl)
     {
-        this.host = host;
-    }
-
-    /**
-     * The port.
-     *
-     * @param port
-     */
-    public void setPort(int port)
-    {
-        this.port = port;
+        this.baseUrl = baseUrl;
     }
 
     public void parse(String... argv) throws Exception
@@ -48,24 +36,28 @@ public class PingServerCommand implements Command
         // TODO: is there some way that the following requirement can be handled by the parser?
         // the left over args are the host to ping.
         String[] args = cl.getArgs();
-        if (args.length == 0)
+        if (args.length != 1)
         {
             throw new ParseException("Expected one argument.");
         }
-        
-        setHost(args[0]);
-        if (args.length > 1)
-        {
-            setPort(Integer.parseInt(args[1]));
-        }
+
+        setBaseUrl(args[0]);
     }
 
     public int execute()
     {
-        // ping each of these urls.
         try
         {
-            URL url = new URL("http", host, port, "/xmlrpc");
+            // construct the remote api path.
+            StringBuffer remoteApiUrl = new StringBuffer();
+            remoteApiUrl.append(baseUrl);
+            if (!baseUrl.endsWith("/"))
+            {
+                remoteApiUrl.append("/");
+            }
+            remoteApiUrl.append("xmlrpc");
+
+            URL url = new URL(remoteApiUrl.toString());
             XmlRpcClient client = new XmlRpcClient(url);
             client.execute("RemoteApi.ping", new Vector<Object>());
             return 0;
@@ -83,6 +75,7 @@ public class PingServerCommand implements Command
         catch (XmlRpcException e)
         {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            e.printStackTrace(System.err);
             return 3;
         }
     }

@@ -50,18 +50,18 @@ public class LogConfigurationAction extends ActionSupport
 
     private void saveConfig()
     {
-        configurationManager.getAppConfig().setLogConfig(config);
+        configurationManager.getAppConfig().setLoggingLevel(config);
     }
 
     private void loadConfig()
     {
         configs = logConfigurationManager.getAvailableConfigurations();
-        config = configurationManager.getAppConfig().getLogConfig();
+        config = configurationManager.getAppConfig().getLoggingLevel();
     }
 
     private void resetConfig()
     {
-        configurationManager.getAppConfig().setLogConfig(null);
+        configurationManager.getAppConfig().setLoggingLevel(null);
     }
 
     public List<String> getConfigs()

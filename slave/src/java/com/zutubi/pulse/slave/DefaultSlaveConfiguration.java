@@ -2,6 +2,7 @@ package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.bootstrap.UserPaths;
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.conf.CompositeConfig;
 import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
 import com.zutubi.pulse.bootstrap.conf.FileConfig;
@@ -11,9 +12,9 @@ import java.io.File;
 
 /**
  */
-public class DefaultSlaveApplicationConfiguration implements SlaveApplicationConfiguration
+public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConfiguration
 {
-    private static final Logger LOG = Logger.getLogger(DefaultSlaveApplicationConfiguration.class);
+    private static final Logger LOG = Logger.getLogger(DefaultSlaveConfiguration.class);
 
     private static final String PROPERTIES_FILE = "pulse-agent.properties";
 
@@ -21,7 +22,7 @@ public class DefaultSlaveApplicationConfiguration implements SlaveApplicationCon
     private UserPaths userPaths;
     private SystemPaths systemPaths;
 
-    public DefaultSlaveApplicationConfiguration(UserPaths userPaths, SystemPaths systemPaths)
+    public DefaultSlaveConfiguration(UserPaths userPaths, SystemPaths systemPaths)
     {
         this.userPaths = userPaths;
         this.systemPaths = systemPaths;
@@ -42,8 +43,18 @@ public class DefaultSlaveApplicationConfiguration implements SlaveApplicationCon
         return config.getInteger(WEBAPP_PORT, 8090);
     }
 
-    public String getLogConfig()
+    public String getLoggingLevel()
     {
         return config.getProperty(LOGGING_CONFIG, "default");
+    }
+
+    public String getContextPath()
+    {
+        return config.getProperty(CONTEXT_PATH, "/");
+    }
+
+    public void setLoggingLevel(String c)
+    {
+        config.setProperty(LOGGING_CONFIG, c);
     }
 }

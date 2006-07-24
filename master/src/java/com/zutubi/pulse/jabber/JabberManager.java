@@ -1,7 +1,7 @@
 package com.zutubi.pulse.jabber;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.util.logging.Logger;
@@ -31,7 +31,7 @@ public class JabberManager implements Stoppable, PacketListener
     public void init()
     {
         statusMessage = null;
-        MasterApplicationConfiguration appConfig = configurationManager.getAppConfig();
+        MasterConfiguration appConfig = configurationManager.getAppConfig();
         if (TextUtils.stringSet(appConfig.getJabberHost()))
         {
             LOG.info("Initialising Jabber");
@@ -64,7 +64,7 @@ public class JabberManager implements Stoppable, PacketListener
         }
     }
 
-    private void openConnection(MasterApplicationConfiguration appConfig)
+    private void openConnection(MasterConfiguration appConfig)
             throws XMPPException
     {
         connection = openConnection(appConfig.getJabberHost(), appConfig.getJabberPort(), appConfig.getJabberUsername(), appConfig.getJabberPassword(), appConfig.getJabberForceSSL());

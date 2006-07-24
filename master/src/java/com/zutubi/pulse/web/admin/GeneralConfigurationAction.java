@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.GuestAccessManager;
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -89,7 +89,7 @@ public class GeneralConfigurationAction extends ActionSupport
 
     private void resetConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterConfiguration config = configurationManager.getAppConfig();
         config.setBaseUrl(null);
         config.setHelpUrl(null);
         config.setRssEnabled(null);
@@ -99,7 +99,7 @@ public class GeneralConfigurationAction extends ActionSupport
 
     private void saveConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterConfiguration config = configurationManager.getAppConfig();
         config.setBaseUrl(baseUrl);
         config.setHelpUrl(helpUrl);
         config.setRssEnabled(rssEnabled);
@@ -109,7 +109,7 @@ public class GeneralConfigurationAction extends ActionSupport
 
     private void loadConfig()
     {
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterConfiguration config = configurationManager.getAppConfig();
         baseUrl = config.getBaseUrl();
         helpUrl = config.getHelpUrl();
         rssEnabled = config.getRssEnabled();

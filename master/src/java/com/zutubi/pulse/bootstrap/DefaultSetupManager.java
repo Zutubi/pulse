@@ -55,23 +55,30 @@ public class DefaultSetupManager implements SetupManager
         if (!promptShown)
         {
             // let the user know that they should continue / complete the setup process via the Web UI.
-            MasterApplicationConfiguration appConfig = configurationManager.getAppConfig();
+            SystemConfiguration systemConfig = configurationManager.getSystemConfig();
 
             //TODO: I18N this message - note, this also only works if the user is installing on the local
             //TODO: machine. We need to provide a better (widely applicable) URL.
 
-            String baseUrl = appConfig.getBaseUrl();
+            String baseUrl = configurationManager.getAppConfig().getBaseUrl();
             if (!TextUtils.stringSet(baseUrl))
             {
+                String hostname = "localhost";
                 try
                 {
                     InetAddress address = InetAddress.getLocalHost();
-                    baseUrl = "http://" + address.getCanonicalHostName() + ":" + appConfig.getServerPort() + appConfig.getContextPath();
+                    hostname = address.getCanonicalHostName();
                 }
                 catch (UnknownHostException e)
                 {
-                    baseUrl = "http://localhost" + ":" + appConfig.getServerPort() + appConfig.getContextPath();
+                    // noop.
                 }
+                baseUrl = "http://" + hostname + ":" + systemConfig.getServerPort();
+                if (!systemConfig.getContextPath().startsWith("/"))
+                {
+                    baseUrl = baseUrl + "/";
+                }
+                baseUrl = baseUrl + systemConfig.getContextPath();
             }
             System.err.println("Now go to " + baseUrl + " and follow the prompts.");
             promptShown = true;

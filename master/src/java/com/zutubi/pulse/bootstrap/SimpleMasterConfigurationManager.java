@@ -14,24 +14,37 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
 
     private DataConfiguration dataConfig;
 
-    public MasterApplicationConfiguration getAppConfig()
+    public SystemConfiguration getSystemConfig()
+    {
+        // system.
+        Config system = new VolatileReadOnlyConfig(System.getProperties());
+
+        // user home properties.
+        String userHome = System.getProperty("user.home");
+        File userProps = new File(new File(new File(userHome), ".pulse"), "pulse.properties");
+
+        // defaults.
+        if (userProps.isFile())
+        {
+            Config user = new FileConfig(userProps);
+            return new SystemConfigurationSupport(system, user);
+        }
+        else
+        {
+            return new SystemConfigurationSupport(system);
+        }
+    }
+
+    public MasterConfiguration getAppConfig()
     {
         MasterUserPaths paths = getUserPaths();
         if (paths != null)
         {
-            Config system = new VolatileReadOnlyConfig(System.getProperties());
             Config user = new FileConfig(new File(paths.getUserConfigRoot(), "pulse.properties"));
-            Config defaults = new FileConfig(new File(getSystemPaths().getConfigRoot(), "pulse-defaults.properties"));
-            Config composite = new CompositeConfig(system, user, new ReadOnlyConfig(defaults));
-            return new MasterApplicationConfigurationSupport(composite);
+            return new MasterConfigurationSupport(user);
         }
-        else
-        {
-            Config system = new VolatileReadOnlyConfig(System.getProperties());
-            Config defaults = new FileConfig(new File(getSystemPaths().getConfigRoot(), "pulse-defaults.properties"));
-            Config composite = new CompositeConfig(system, new ReadOnlyConfig(defaults));
-            return new MasterApplicationConfigurationSupport(composite);
-        }
+        // default values only.
+        return new MasterConfigurationSupport();
     }
 
     public MasterUserPaths getUserPaths()

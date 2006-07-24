@@ -2,7 +2,7 @@ package com.zutubi.pulse.command;
 
 import org.apache.commons.cli.*;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
-import com.zutubi.pulse.bootstrap.ApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 
@@ -28,6 +28,8 @@ public class StartCommand implements Command
     private String data;
     private static final String ENV_PULSE_DATA = "PULSE_DATA";
 
+    private String contextPath;
+
     /**
      * Specify the port to which pulse will bind its web user interface.
      *
@@ -36,6 +38,11 @@ public class StartCommand implements Command
     public void setPort(int port)
     {
         this.port = port;
+    }
+
+    public void setContextPath(String contextPath)
+    {
+        this.contextPath = contextPath;
     }
 
     /**
@@ -63,6 +70,12 @@ public class StartCommand implements Command
                 .withDescription("the pulse data directory.")
                 .create('d'));
 
+        options.addOption(OptionBuilder.withLongOpt("contextpath")
+                .withArgName("contextpath")
+                .hasArg()
+                .withDescription("the webapps context path.")
+                .create('c'));
+
         CommandLineParser parser = new PosixParser();
         CommandLine commandLine = parser.parse(options, argv, true);
 
@@ -74,6 +87,10 @@ public class StartCommand implements Command
         {
             setData(commandLine.getOptionValue('d'));
         }
+        if (commandLine.hasOption('c'))
+        {
+            setContextPath(commandLine.getOptionValue('c'));
+        }
     }
 
     public int execute()
@@ -83,7 +100,7 @@ public class StartCommand implements Command
             // update the system properties
             if (port != UNSPECIFIED)
             {
-                System.setProperty(ApplicationConfiguration.WEBAPP_PORT, Integer.toString(port));
+                System.setProperty(SystemConfiguration.WEBAPP_PORT, Integer.toString(port));
             }
 
             if (TextUtils.stringSet(data))
@@ -93,6 +110,11 @@ public class StartCommand implements Command
             else if(TextUtils.stringSet(System.getenv(ENV_PULSE_DATA)))
             {
                 System.setProperty("pulse.data", System.getenv(ENV_PULSE_DATA));
+            }
+
+            if (TextUtils.stringSet(contextPath))
+            {
+                System.setProperty(SystemConfiguration.CONTEXT_PATH, contextPath);
             }
 
             SystemBootstrapManager bootstrap = new SystemBootstrapManager();

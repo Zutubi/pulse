@@ -1,7 +1,7 @@
 package com.zutubi.pulse.security.ldap;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.util.logging.Logger;
@@ -34,7 +34,7 @@ public class AcegiLdapManager implements LdapManager
     {
         initialised = false;
         statusMessage = null;
-        MasterApplicationConfiguration appConfig = configurationManager.getAppConfig();
+        MasterConfiguration appConfig = configurationManager.getAppConfig();
         enabled = appConfig.getLdapEnabled();
         autoAdd = appConfig.getLdapAutoAdd();
 
@@ -73,7 +73,7 @@ public class AcegiLdapManager implements LdapManager
         initialised = true;
     }
 
-    private String convertFilter(MasterApplicationConfiguration appConfig)
+    private String convertFilter(MasterConfiguration appConfig)
     {
         return appConfig.getLdapUserFilter().replace("${login}", "{0}");
     }

@@ -46,7 +46,7 @@
 
                 <table id="logging.config" class="fill-content">
                     #adminHeadingRow("logging.config" "$base/admin/editLogConfig!input.action" "logging.edit" "$base/admin/logConfig!reset.action" "logging.reset")
-                    #dynamicRow("logging.level" $config.logConfig)
+                    #dynamicRow("logging.level" $config.loggingLevel)
                 </table>
 
                 <table class="fill-content" id="license.info">

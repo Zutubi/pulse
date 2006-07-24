@@ -14,7 +14,7 @@ public class JettyServerFactoryBean implements FactoryBean
 {
     private static final Logger LOG = Logger.getLogger(JettyServerFactoryBean.class);
 
-    private static Server instance;
+    private Server instance;
 
     private MasterConfigurationManager configManager = null;
 
@@ -30,7 +30,7 @@ public class JettyServerFactoryBean implements FactoryBean
 
                     // configuration of the server depends upon the configmanager.
                     SocketListener listener = new SocketListener();
-                    listener.setPort(configManager.getAppConfig().getServerPort());
+                    listener.setPort(configManager.getSystemConfig().getServerPort());
                     instance.addListener(listener);
                 }
             }

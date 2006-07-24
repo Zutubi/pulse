@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.admin;
 
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.license.License;
@@ -24,7 +24,7 @@ public class ServerSettingsAction extends ActionSupport
 {
     private MasterConfigurationManager configurationManager;
     private JabberManager jabberManager;
-    private MasterApplicationConfiguration config;
+    private MasterConfiguration config;
     private DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
     private LdapManager ldapManager;
     private List<CommitMessageTransformer> commitMessageTransformers;
@@ -39,7 +39,7 @@ public class ServerSettingsAction extends ActionSupport
     private long noProjects;
     private long noUsers;
 
-    public MasterApplicationConfiguration getConfig()
+    public MasterConfiguration getConfig()
     {
         return config;
     }

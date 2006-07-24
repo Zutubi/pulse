@@ -4,7 +4,7 @@ package com.zutubi.pulse.bootstrap;
  */
 public interface ConfigurationManager
 {
-    ApplicationConfiguration getAppConfig();
+    SystemConfiguration getSystemConfig();
     UserPaths getUserPaths();
     SystemPaths getSystemPaths();
 }

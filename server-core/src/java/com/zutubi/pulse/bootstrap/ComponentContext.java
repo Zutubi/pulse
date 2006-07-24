@@ -77,7 +77,12 @@ public class ComponentContext
     {
         if (getContext() != null)
         {
-            context.close();
+            ConfigurableApplicationContext ctx = context;
+            while (ctx != null)
+            {
+                ctx.close();
+                ctx = (ConfigurableApplicationContext) ctx.getParent();
+            }
         }
     }
 }

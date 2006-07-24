@@ -2,9 +2,10 @@ package com.zutubi.pulse.web.setup;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
@@ -49,7 +50,7 @@ public class SetupWizard extends BaseWizard
     {
         super.process();
 
-        MasterApplicationConfiguration config = configurationManager.getAppConfig();
+        MasterConfiguration config = configurationManager.getAppConfig();
 
         // create the admin user.
         User admin = createAdminState.getAdmin();
@@ -207,7 +208,7 @@ public class SetupWizard extends BaseWizard
             try
             {
                 InetAddress address = InetAddress.getLocalHost();
-                MasterApplicationConfiguration appConfig = configurationManager.getAppConfig();
+                SystemConfiguration appConfig = configurationManager.getSystemConfig();
                 baseUrl = "http://" + address.getCanonicalHostName() + ":" + appConfig.getServerPort() + appConfig.getContextPath();
                 if (baseUrl.endsWith("/"))
                 {

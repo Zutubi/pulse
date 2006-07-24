@@ -179,7 +179,7 @@ public class DefaultStartupManager implements StartupManager
         eventManager.publish(new SystemStartedEvent(this));
 
         // let the user know that the system is now up and running.
-        MasterApplicationConfiguration appConfig = configurationManager.getAppConfig();
+        MasterConfiguration appConfig = configurationManager.getAppConfig();
 
         //TODO: I18N this message.
         System.err.println("The server is now available at " + appConfig.getBaseUrl());

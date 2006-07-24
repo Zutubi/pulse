@@ -36,16 +36,12 @@ else
     unzip -d $tmpDir "$package"
 fi
 
-# Set the webapp port to something less clashworthy
 packageName="$(basename $package .$extension)"
 pushd "$tmpDir/$packageName"
-properties=system/config/pulse-defaults.properties
-sed -e 's/8080/8889/g' $properties > $properties.$$
-mv $properties.$$ $properties
 
 # Fire it up!
 export PULSE_HOME="$(pwd)"
-$(pwd)/bin/startup.sh > ../stdout.txt 2> ../stderr.txt
+$(pwd)/bin/startup.sh -p 8889 > ../stdout.txt 2> ../stderr.txt
 
 trap ERR
 

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.bootstrap.MasterApplicationConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.Properties;
 
 /**
- * 
+ *
  *
  */
 public class EmailContactPoint extends ContactPoint
@@ -63,7 +63,7 @@ public class EmailContactPoint extends ContactPoint
     */
     public void notify(BuildResult result)
     {
-        MasterApplicationConfiguration config = lookupConfigManager().getAppConfig();
+        MasterConfiguration config = lookupConfigManager().getAppConfig();
         String prefix = config.getSmtpPrefix();
 
         if (prefix == null)
@@ -94,7 +94,7 @@ public class EmailContactPoint extends ContactPoint
         return (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
     }
 
-    private void sendMail(String subject, String body, final MasterApplicationConfiguration config)
+    private void sendMail(String subject, String body, final MasterConfiguration config)
     {
         if (!TextUtils.stringSet(config.getSmtpHost()))
         {

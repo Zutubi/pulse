@@ -1,17 +1,17 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.zutubi.pulse.logging.LogConfiguration;
+
 /**
  * 
  *
  */
-public interface MasterApplicationConfiguration extends ApplicationConfiguration
+public interface MasterConfiguration extends LogConfiguration
 {
     //---( server configuration )---
     public static final String ADMIN_LOGIN = "admin.login";
 
     public static final String BASE_URL = "webapp.base.url";
-
-    public static final String CONTEXT_PATH = "webapp.contextPath";
 
     //---( help configuration )---
     public static final String HELP_URL = "help.url";
@@ -42,7 +42,7 @@ public interface MasterApplicationConfiguration extends ApplicationConfiguration
     public static final String JABBER_FORCE_SSL = "jabber.force.ssl";
 
     //---( rss configuration )---
-    
+
     public static final String RSS_ENABLED = "rss.enabled";
 
     //---( anonymous access )---
@@ -66,10 +66,6 @@ public interface MasterApplicationConfiguration extends ApplicationConfiguration
     String getBaseUrl();
 
     void setBaseUrl(String host);
-
-    String getContextPath();
-
-    void setContextPath(String path);
 
     String getHelpUrl();
 
@@ -110,8 +106,6 @@ public interface MasterApplicationConfiguration extends ApplicationConfiguration
     String getJabberPassword();
 
     void setJabberPassword(String password);
-
-    void setLogConfig(String config);
 
     Boolean getJabberForceSSL();
 

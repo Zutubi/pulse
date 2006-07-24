@@ -65,12 +65,6 @@
 
         <dependency org="jwebunit" name="jwebunit" rev="1.2" conf="external,build->default"/>
 
-        <dependency org="mockobjects" name="mockobjects-core" rev="0.09" conf="external,build->default"/>
-        <dependency org="mockobjects" name="mockobjects-jdk1.4" rev="0.09" conf="external,build->default"/>
-        <dependency org="mockobjects" name="mockobjects-jdk1.4-j2ee1.3" rev="0.09" conf="external,build->default"/>
-        <dependency org="mockobjects" name="mockobjects-alt-jdk1.4" rev="0.09" conf="external,build->default"/>
-        <dependency org="mockobjects" name="mockobjects-alt-jdk1.4-j2ee1.3" rev="0.09" conf="external,build->default"/>
-
     </dependencies>
 
 </ivy-module>

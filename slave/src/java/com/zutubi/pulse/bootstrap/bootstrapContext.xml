@@ -8,10 +8,6 @@
                 <value>com/zutubi/pulse/bootstrap/applicationContext.xml</value>
             </list>
         </property>
-        <property name="startupRunnables">
-            <list>
-            </list>
-        </property>
         <property name="configurationManager">
             <ref local="configurationManager"/>
         </property>
