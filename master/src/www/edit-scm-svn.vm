@@ -16,7 +16,7 @@
     #wwhidden("name=id")
     #wwhidden("name=projectId")
 
-    #wwtextfield("name=svn.username" "label=%{getText('svn.username')}" "required=true" "tabindex=1")
+    #wwtextfield("name=svn.username" "label=%{getText('svn.username')}" "tabindex=1")
     #wwpassword("name=svn.password" "label=%{getText('svn.password')}" "showPassword=true" "tabindex=2")
     #wwtextfield("name=svn.url" "label=%{getText('svn.url')}" "required=true" "size=60" "tabindex=3")
     #wwtextfield("name=svn.keyfile" "label=%{getText('svn.keyfile')}" "size=60" "tabindex=4")

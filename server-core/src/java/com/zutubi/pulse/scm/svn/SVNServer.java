@@ -153,6 +153,17 @@ public class SVNServer implements SCMServer
     //=======================================================================
 
     /**
+     * Creates a new SVNServer using the given location and default credentials.
+     *
+     * @param url
+     */
+    public SVNServer(String url) throws SCMException
+    {
+        authenticationManager = SVNWCUtil.createDefaultAuthenticationManager();
+        initialiseRepository(url);
+    }
+
+    /**
      * Creates a new SVNServer using the given location and credentials to
      * connect to the server.
      *

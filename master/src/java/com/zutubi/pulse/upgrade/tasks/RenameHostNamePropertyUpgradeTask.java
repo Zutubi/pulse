@@ -23,12 +23,12 @@ public class RenameHostNamePropertyUpgradeTask implements UpgradeTask, Configura
 
     public String getName()
     {
-        return "Rename hostname property.";
+        return "Rename hostname property";
     }
 
     public String getDescription()
     {
-        return "Rename and upgrade the hostname property to the new base url property.";
+        return "Rename and upgrade the hostname property to the new base url property";
     }
 
     public int getBuildNumber()

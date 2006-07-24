@@ -17,7 +17,7 @@
     #wwhidden("name=state")
     #wwhidden("name=submit")
 
-    #wwtextfield("name=svn.username" "label=%{getText('svn.username')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=svn.username" "label=%{getText('svn.username')}" "tabindex=1" "onkeypress=return submitenter(this,event)")
     #wwpassword("name=svn.password" "label=%{getText('svn.password')}" "tabindex=2" "showPassword=true""onkeypress=return submitenter(this,event)")
     #wwtextfield("name=svn.url" "label=%{getText('svn.url')}" "required=true" "size=60" "tabindex=3" "onkeypress=return submitenter(this,event)")
     #wwtextfield("name=svn.keyfile" "label=%{getText('svn.keyfile')}" "size=60" "tabindex=4" "onkeypress=return submitenter(this,event)")

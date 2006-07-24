@@ -3,6 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.scm.svn.SVNServer;
+import com.opensymphony.util.TextUtils;
 
 /**
  * 
@@ -20,19 +21,26 @@ public class Svn extends Scm
     public SCMServer createServer() throws SCMException
     {
         SVNServer server;
-        if (getKeyfile() == null || getKeyfile().length() == 0)
+        if (!TextUtils.stringSet(getKeyfile()))
         {
-            server = new SVNServer(getUrl(), getUsername(), getPassword());
-        }
-        else
-        {
-            if (getPassphrase() == null || getPassphrase().length() == 0)
+            if (TextUtils.stringSet(getUsername()))
             {
-                server = new SVNServer(getUrl(), getUsername(), getPassword(), getKeyfile());
+                server = new SVNServer(getUrl(), getUsername(), getPassword());
             }
             else
             {
+                server = new SVNServer(getUrl());
+            }
+        }
+        else
+        {
+            if (TextUtils.stringSet(getPassphrase()))
+            {
                 server = new SVNServer(getUrl(), getUsername(), getPassword(), getKeyfile(), getPassphrase());
+            }
+            else
+            {
+                server = new SVNServer(getUrl(), getUsername(), getPassword(), getKeyfile());
             }
         }
         server.setExcludedPaths(this.getFilteredPaths());

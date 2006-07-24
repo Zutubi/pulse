@@ -61,7 +61,7 @@ following places:
 
 The Pulse Documentation:
     
-    http://confluence.zutubi.com/display/pulse/Getting+Started+Guide
+    http://confluence.zutubi.com/display/pulse0101/Getting+Started+Guide
 
 The Pulse Support Forums:
     
