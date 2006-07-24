@@ -182,7 +182,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware
     {
         // Check the recipe results, if there are any failures/errors
         // then take on the worst result.
-        state = root.getWorstState(ResultState.SUCCESS);
+        state = root.getWorstState(state);
 
         super.complete();
     }
