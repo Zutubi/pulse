@@ -2,10 +2,10 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.RecipeProcessor;
-import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.concurrent.ExecutorService;
@@ -21,7 +21,7 @@ public class MasterRecipeProcessor implements Stoppable
     private RecipeProcessor recipeProcessor;
     private MasterConfigurationManager configurationManager;
     private EventManager eventManager;
-    private ResourceRepository resourceRepository;
+    private ResourceManager resourceManager;
 
     public MasterRecipeProcessor()
     {
@@ -30,7 +30,7 @@ public class MasterRecipeProcessor implements Stoppable
 
     public void processRecipe(RecipeRequest request)
     {
-        executor.execute(new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager, resourceRepository));
+        executor.execute(new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager, resourceManager.getMasterRepository()));
     }
 
     public void setRecipeProcessor(RecipeProcessor recipeProcessor)
@@ -67,8 +67,8 @@ public class MasterRecipeProcessor implements Stoppable
         executor.shutdownNow();
     }
 
-    public void setResourceRepository(ResourceRepository resourceRepository)
+    public void setResourceManager(ResourceManager resourceManager)
     {
-        this.resourceRepository = resourceRepository;
+        this.resourceManager = resourceManager;
     }
 }
