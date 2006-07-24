@@ -8,7 +8,7 @@ import com.zutubi.pulse.bootstrap.SystemConfiguration;
  */
 public class SlaveConfigurationManager extends AbstractConfigurationManager
 {
-    private SystemConfiguration appConfig;
+    private DefaultSlaveConfiguration appConfig;
     private SlaveUserPaths userPaths;
 
     public SlaveConfigurationManager()
@@ -23,6 +23,11 @@ public class SlaveConfigurationManager extends AbstractConfigurationManager
     }
 
     public SystemConfiguration getSystemConfig()
+    {
+        return appConfig;
+    }
+
+    public SlaveConfiguration getAppConfig()
     {
         return appConfig;
     }
