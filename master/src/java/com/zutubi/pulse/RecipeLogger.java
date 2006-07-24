@@ -20,4 +20,7 @@ public interface RecipeLogger
     void log(RecipeErrorEvent event, RecipeResult result);
 
     void complete(RecipeResult result);
+
+    void collecting(RecipeResult recipeResult, boolean collectWorkingCopy);
+    void collectionComplete();
 }

@@ -461,5 +461,13 @@ public class RecipeControllerTest extends PulseTestCase
         public void complete(RecipeResult result)
         {
         }
+
+        public void collecting(RecipeResult recipeResult, boolean collectWorkingCopy)
+        {
+        }
+
+        public void collectionComplete()
+        {
+        }
     }
 }

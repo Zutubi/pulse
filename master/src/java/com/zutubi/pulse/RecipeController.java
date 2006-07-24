@@ -202,6 +202,7 @@ public class RecipeController
     {
         try
         {
+            logger.collecting(recipeResult, collectWorkingCopy);
             collector.collect(buildResult, recipeResult.getId(), collectWorkingCopy, incremental, buildService);
         }
         catch (BuildException e)
@@ -211,6 +212,10 @@ public class RecipeController
         catch (Exception e)
         {
             handleUnexpectedException(e);
+        }
+        finally
+        {
+            logger.collectionComplete();
         }
     }
 

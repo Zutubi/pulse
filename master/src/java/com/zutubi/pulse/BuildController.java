@@ -468,7 +468,6 @@ public class BuildController implements EventListener
         }
 
         buildResult.abortUnfinishedRecipes();
-        tree.cleanup(buildResult);
         buildResult.setHasWorkDir(specification.getRetainWorkingCopy());
         buildResult.complete();
 
@@ -478,6 +477,9 @@ public class BuildController implements EventListener
         }
 
         buildManager.save(buildResult);
+
+        tree.cleanup(buildResult);
+
         eventManager.unregister(asyncListener);
         eventManager.publish(new BuildCompletedEvent(this, buildResult));
         asyncListener.stop(true);

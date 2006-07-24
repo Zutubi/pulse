@@ -94,7 +94,22 @@ public class DefaultRecipeLogger implements RecipeLogger
     public void complete(RecipeResult result)
     {
         logMarker("Recipe '" + result.getRecipeNameSafe() + "' completed with status " + result.getState().getPrettyString(), result.getStamps().getEndTime());
+    }
+
+    public void collecting(RecipeResult recipeResult, boolean collectWorkingCopy)
+    {
+        logMarker("Collecting recipe artifacts" + (collectWorkingCopy ? " and working copy..." : "..."));
+    }
+
+    public void collectionComplete()
+    {
+        logMarker("Collection complete");
         IOUtils.close(writer);
+    }
+
+    private void logMarker(String message)
+    {
+        logMarker(message, System.currentTimeMillis());
     }
 
     private void logMarker(String message, long time)
