@@ -116,9 +116,9 @@ public class LicenseEncoder implements LicenseKeyFactory
         {
             SimpleDateFormat expiryFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-            String code = "c";
-            String name = "me";
-            String expiryStr = "";//argv[2];
+            String code = argv[0];
+            String name = argv[1];
+            String expiryStr = argv[2];
 
             // Validation:
             LicenseType type = LicenseType.valueBy(code);
@@ -132,7 +132,7 @@ public class LicenseEncoder implements LicenseKeyFactory
                 throw new IllegalArgumentException("The name of the license holder is required.");
             }
 
-            Date expiry = null;// expiryFormat.parse(expiryStr);
+            Date expiry = expiryFormat.parse(expiryStr);
 
             License license = new License(type, name, expiry);
 
