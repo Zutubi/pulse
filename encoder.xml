@@ -87,4 +87,50 @@
 
     <target name="package" depends="prepare, jar, check"/>
 
+    <!-- Dependency management. -->
+<!--
+    <target name="dep-init" description="Initializes some properties">
+
+        <mkdir dir="${user.home}/.maven/repository"/>
+        <condition property="noget">
+            <equals arg1="${build.sysclasspath}" arg2="only"/>
+        </condition>
+
+        <available property="Junit.present" classname="junit.framework.Test"/>
+
+        <condition property="useProxy">
+            <and>
+                <isset property="proxy.host"/>
+                <not>
+                    <equals trim="true" arg1="${proxy.host}" arg2=""/>
+                </not>
+            </and>
+        </condition>
+    </target>
+
+    <target name="setProxy" if="useProxy" depends="init">
+        <echo>Proxy used :</echo>
+        <echo>Proxy host [${proxy.host}]</echo>
+        <echo>Proxy port [${proxy.port}]</echo>
+        <echo>Proxy user [${proxy.username}]</echo>
+        <setproxy proxyuser="${proxy.username}" proxyport="${proxy.port}" proxypassword="${proxy.password}" proxyhost="${proxy.host}"/>
+    </target>
+
+    <target name="noProxy" unless="useProxy" depends="init">
+        <echo>Proxy not used.</echo>
+    </target>
+
+    <target name="get-deps" unless="noget" depends="get-dep-commons-codec.jar"/>
+
+    <target name="get-dep-commons-codec.jar" description="Download the dependency : commons-codec.jar" unless="commons-codec.jar" depends="dep-init, setProxy, noProxy, get-custom-dep-commons-codec.jar">
+        <mkdir dir="${user.home}/.maven/repository/commons-codec/jars/"/>
+        <get dest="${user.home}/.maven/repository/commons-codec/jars/commons-codec-1.3.jar" usetimestamp="true" ignoreerrors="true" src="http://www.ibiblio.org/maven/commons-codec/jars/commons-codec-1.3.jar"/>
+    </target>
+
+    <target name="get-custom-dep-commons-codec.jar" if="commons-codec.jar" depends="dep-init, setProxy, noProxy">
+        <mkdir dir="${user.home}/.maven/repository/commons-codec/jars/"/>
+        <get dest="${user.home}/.maven/repository/commons-codec/jars/commons-codec-1.3.jar" usetimestamp="true" ignoreerrors="true" src="${commons-codec.jar}"/>
+    </target>
+-->
+
 </project>
