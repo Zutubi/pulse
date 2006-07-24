@@ -239,6 +239,9 @@ public class SetupFeatureTour implements Runnable
         build = new BuildResult(new TriggerBuildReason("scm trigger"), project, "default", ++buildNumber);
         buildResultDao.save(build);
 
+        project.setNextBuildNumber(buildNumber);
+        projectDao.save(project);
+
         BuildSpecification spec = project.getBuildSpecifications().get(0);
         int i = 0;
         recipes = new RecipeResult[spec.getRoot().getChildren().size()];
@@ -252,6 +255,7 @@ public class SetupFeatureTour implements Runnable
             recipes[i].commence();
             recipes[i].setAbsoluteOutputDir(configManager.getDataDirectory(), recipeDir);
             RecipeResultNode node = new RecipeResultNode(specNode.getStage().getName(), recipes[i]);
+            node.setHost(specNode.getStage().getHostRequirements().getSummary());
             build.getRoot().addChild(node);
             i++;
         }
