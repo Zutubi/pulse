@@ -319,7 +319,7 @@
         </copy>
         
         <copy todir="${package.root}/lib">
-            <fileset dir="master/etc" includes="*.xml"/>
+            <fileset dir="slave/etc" includes="*.xml"/>
         </copy>
 
         <replace dir="${package.root}/bin" replacefilterfile="slave/subst.properties">
