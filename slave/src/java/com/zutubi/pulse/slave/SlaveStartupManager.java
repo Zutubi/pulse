@@ -11,6 +11,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 import org.mortbay.util.InetAddrPort;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public class SlaveStartupManager implements Startup, Stoppable
     private static final Logger LOG = Logger.getLogger(SlaveStartupManager.class);
 
     private List<String> systemContexts;
-    private List<String> startupRunnables;
+    private List<String> startupRunnables = new LinkedList<String>();
     private ObjectFactory objectFactory;
     private Server jettyServer;
     private SlaveConfigurationManager configurationManager;
