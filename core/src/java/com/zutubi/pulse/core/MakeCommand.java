@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.model.CommandResult;
  */
 public class MakeCommand extends ExecutableCommand
 {
-    private Scope scope;
     private String makefile;
     private String targets;
 
@@ -14,6 +13,7 @@ public class MakeCommand extends ExecutableCommand
     {
         if (getExe() == null)
         {
+            Scope scope = getScope();
             if (scope != null)
             {
                 Reference ref = scope.getReference("make.bin");
@@ -71,7 +71,7 @@ public class MakeCommand extends ExecutableCommand
 
     public void setScope(Scope scope)
     {
-        this.scope = scope;
+        super.setScope(scope);
         checkExe();
     }
 

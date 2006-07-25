@@ -195,6 +195,11 @@ public class ExecutableCommand implements Command, ScopeAware
         }
     }
 
+    protected Scope getScope()
+    {
+        return scope;
+    }
+
     public List<String> getArtifactNames()
     {
         return Arrays.asList(OUTPUT_NAME);

@@ -8,8 +8,6 @@ import com.zutubi.pulse.core.model.CommandResult;
  */
 public class XCodeCommand extends ExecutableCommand
 {
-    private Scope scope;
-
     private String target;
     private String config;
     private String project;
@@ -21,6 +19,7 @@ public class XCodeCommand extends ExecutableCommand
     {
         if (getExe() == null)
         {
+            Scope scope = getScope();
             if (scope != null)
             {
                 Reference ref = scope.getReference("xcode.bin");
@@ -104,7 +103,7 @@ public class XCodeCommand extends ExecutableCommand
 
     public void setScope(Scope scope)
     {
-        this.scope = scope;
+        super.setScope(scope);
         checkExe();
     }
 }

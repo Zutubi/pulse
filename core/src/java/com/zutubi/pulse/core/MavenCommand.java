@@ -8,13 +8,14 @@ import com.zutubi.pulse.util.SystemUtils;
  */
 public class MavenCommand extends ExecutableCommand
 {
-    private Scope scope;
     private String targets;
 
     private void checkExe()
     {
         if (getExe() == null)
         {
+            Scope scope = getScope();
+
             if (scope != null)
             {
                 Reference ref = scope.getReference("maven.bin");
@@ -67,7 +68,7 @@ public class MavenCommand extends ExecutableCommand
 
     public void setScope(Scope scope)
     {
-        this.scope = scope;
+        super.setScope(scope);
         checkExe();
     }
 }

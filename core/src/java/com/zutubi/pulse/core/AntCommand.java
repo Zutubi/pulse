@@ -7,7 +7,6 @@ import com.zutubi.pulse.util.SystemUtils;
  */
 public class AntCommand extends ExecutableCommand
 {
-    private Scope scope;
     private String buildFile;
     private String targets;
 
@@ -15,6 +14,7 @@ public class AntCommand extends ExecutableCommand
     {
         if (getExe() == null)
         {
+            Scope scope = getScope();
             if (scope != null)
             {
                 Reference ref = scope.getReference("ant.bin");
@@ -82,7 +82,7 @@ public class AntCommand extends ExecutableCommand
 
     public void setScope(Scope scope)
     {
-        this.scope = scope;
+        super.setScope(scope);
         checkExe();
     }
 }
