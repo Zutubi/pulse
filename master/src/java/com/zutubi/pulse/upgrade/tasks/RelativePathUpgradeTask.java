@@ -54,27 +54,26 @@ public class RelativePathUpgradeTask extends DatabaseUpgradeTask
 
     private void relativisePath(Connection con, String table, Long id, String path, String dataPath) throws SQLException
     {
-        if(path.startsWith(dataPath))
+        if(path != null && path.startsWith(dataPath))
         {
             path = path.substring(dataPath.length());
             if(path.startsWith(File.separator) || path.startsWith("/"))
             {
                 path = path.substring(1);
             }
-        }
 
-
-        CallableStatement stmt = null;
-        try
-        {
-            stmt = con.prepareCall("UPDATE " + table + " SET outputdir = ? WHERE id = ?");
-            stmt.setString(1, path);
-            stmt.setLong(2, id);
-            stmt.executeUpdate();
-        }
-        finally
-        {
-            JDBCUtils.close(stmt);
+            CallableStatement stmt = null;
+            try
+            {
+                stmt = con.prepareCall("UPDATE " + table + " SET outputdir = ? WHERE id = ?");
+                stmt.setString(1, path);
+                stmt.setLong(2, id);
+                stmt.executeUpdate();
+            }
+            finally
+            {
+                JDBCUtils.close(stmt);
+            }
         }
     }
 
