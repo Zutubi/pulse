@@ -1,10 +1,7 @@
 package com.zutubi.pulse.web.admin;
 
-import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.model.persistence.ResourceDao;
 import com.zutubi.pulse.model.PersistentResource;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.web.agents.AgentActionSupport;
 
 /**
@@ -35,9 +32,14 @@ public class DeleteResourceAction extends AgentActionSupport
             return ERROR;
         }
 
-        slave = resource.getSlave();
-        setAgentId(slave.getId());
         resourceManager.delete(resource);
+
+        slave = resource.getSlave();
+        if(slave != null)
+        {
+            setAgentId(slave.getId());
+        }
+
         return SUCCESS;
     }
 

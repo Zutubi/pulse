@@ -62,15 +62,14 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTest
         assertTextPresent("A resource with name '" + resourceName + "' already exists");
     }
 
-    // HTTPUnit barfs on javascript confirm...
-//    public void testDeleteResource()
-//    {
-//        addResource(resourceName);
-//        clickLinkWithText("resources");
-//        assertTextPresent(resourceName);
-//        clickLink("delete_" + resourceName);
-//        assertTextNotPresent(resourceName);
-//    }
+    public void testDeleteResource()
+    {
+        addResource(resourceName);
+        clickLinkWithText("resources");
+        assertTextPresent(resourceName);
+        clickLink("delete_" + resourceName);
+        assertTextNotPresent(resourceName);
+    }
 
     public void testAddResourceProperty()
     {
