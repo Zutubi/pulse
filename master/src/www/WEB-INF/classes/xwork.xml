@@ -1057,7 +1057,7 @@
 
         <action name="createResource" class="com.zutubi.pulse.web.admin.CreateResourceAction">
             <result name="input" type="velocity">create-resource.vm</result>
-            <result name="cancel" type="redirect">/viewResources.action</result>
+            <result name="cancel" type="redirect">/viewResources.action?agentId=${agentId}</result>
             <result name="error" type="velocity">/generic-error.vm</result>
             <result name="success" type="redirect">/viewResource.action?resourceId=${resource.id}</result>
         </action>

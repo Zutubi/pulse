@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.SlaveForm;
+import com.zutubi.pulse.acceptance.forms.ResourceForm;
 import com.zutubi.pulse.util.RandomUtils;
 
 /**
@@ -106,6 +107,66 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTest
         assertTextNotPresent(slaveName);
     }
 
+    /**
+     * CIB-519
+     */
+    // @Required(agent)
+    public void testCanDeleteAgentWithAssociatedResource()
+    {
+        addAgent(slaveName);
+        clickLinkWithText(slaveName);
+
+        // add resource - need to be on the agent page.
+        addResource("some resource");
+
+        clickLinkWithText("agents");
+        assertTextPresent(slaveName);
+        clickLink("delete_" + slaveName);
+        assertTextNotPresent(slaveName);
+    }
+
+    // @Required(agent)
+    public void testAddResource()
+    {
+        addAgent(slaveName);
+        clickLinkWithText(slaveName);
+
+        clickLinkWithText("resources");
+        clickLink("resource.add");
+
+        ResourceForm form = new ResourceForm(tester);
+        assertResourceValidation(form);
+
+        form.saveFormElements("resource name");
+        form.assertFormNotPresent();
+    }
+
+    private void assertResourceValidation(ResourceForm form)
+    {
+        form.assertFormPresent();
+        form.saveFormElements("");
+        form.assertFormPresent();
+        assertTextPresent("required");
+    }
+
+    // @Required(agent)
+    public void testDeleteResource()
+    {
+
+    }
+
+    // @Required(agent)
+    public void testCancelEditResource()
+    {
+
+    }
+
+    // @Required(agent)
+    public void testEditResource()
+    {
+
+    }
+
     private void assertSlaveDuplicate(SlaveForm form)
     {
         form.saveFormElements(slaveName, "localhost", "");
@@ -136,5 +197,16 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTest
         SlaveForm form = new SlaveForm(tester, true);
         form.assertFormPresent();
         form.saveFormElements(name, SLAVE_HOST, SLAVE_PORT);
+    }
+
+    private void addResource(String name)
+    {
+        clickLinkWithText("resources");
+        clickLink("resource.add");
+
+        ResourceForm form = new ResourceForm(tester);
+        assertResourceValidation(form);
+        form.saveFormElements(name);
+        form.assertFormNotPresent();
     }
 }
