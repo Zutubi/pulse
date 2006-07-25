@@ -1,11 +1,10 @@
 package com.zutubi.pulse.web.fs;
 
 import com.zutubi.pulse.web.ActionSupport;
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;
 import java.util.StringTokenizer;
-
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * <class-comment/>
@@ -27,11 +26,7 @@ public class RmdirAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        File f = decodePath(pid);
-        if (f == null)
-        {
-            return ERROR;
-        }
+        File f = new File(pid);
 
         // check whether or not the directory f is empty.
         if (!f.isDirectory())

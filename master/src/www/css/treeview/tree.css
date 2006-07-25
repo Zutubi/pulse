@@ -112,9 +112,14 @@
     height:26px;
     background-color:black;
 
+    position:relative;
+    top:5px;
+
     border-width:2px;
     border-style:solid;
     border-color:white;
+
+    float:left;
 }
 
 .create {

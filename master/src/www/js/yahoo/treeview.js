@@ -372,7 +372,7 @@ YAHOO.widget.TreeView.prototype = {
         node.childrenRendered = false;
         node.dynamicLoadComplete = false;
         // node.collapse();
-        node.expand();
+//        node.expand();
         node.collapse();
     },
 

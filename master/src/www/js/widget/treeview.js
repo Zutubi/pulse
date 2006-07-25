@@ -74,6 +74,7 @@ YAHOO.widget.TreeView.prototype.expandTo = function(requestPath)
     var sep = this.separator;
     requestPath = requestPath.split(sep);
 
+    var p = null; // previous node.
     for (var i = 0; i < requestPath.length; i++)
     {
         var path = requestPath[i];
@@ -97,8 +98,14 @@ YAHOO.widget.TreeView.prototype.expandTo = function(requestPath)
             });
             if (!node)
             {
+                // select the parent.
+                if (p)
+                {
+                    this.select(p);
+                }
                 return 1; // path does not exist.
             }
+            p = node;
         }
         else
         {

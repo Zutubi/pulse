@@ -3,9 +3,6 @@ package com.zutubi.pulse.web.fs;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.io.File;
-import java.util.StringTokenizer;
-
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * <class-comment/>
@@ -35,8 +32,8 @@ public class MkdirAction extends ActionSupport
     public String execute() throws Exception
     {
         // convert path to location on file system.
-        File path = decodePath(this.path);
-        if (path == null)
+        File path = new File(this.path);
+        if (!path.isDirectory())
         {
             return ERROR;
         }
@@ -45,37 +42,11 @@ public class MkdirAction extends ActionSupport
         File newFolder = new File(path, name);
 
         // return success / error response.
-/*
         if (!newFolder.mkdirs())
         {
             return ERROR;
         }
-*/
 
         return SUCCESS;
-    }
-
-    protected File decodePath(String pid)
-    {
-        File file = null;
-        StringTokenizer tokens = new StringTokenizer(pid, "/", false);
-        while (tokens.hasMoreTokens())
-        {
-            String t = tokens.nextToken();
-            if (file == null)
-            {
-                file = new File(decode(t));
-            }
-            else
-            {
-                file = new File(file, decode(t));
-            }
-        }
-        return file;
-    }
-
-    private String decode(String encodedUid)
-    {
-        return new String(Base64.decodeBase64(encodedUid.getBytes()));
     }
 }

@@ -107,7 +107,6 @@
                     YAHOO.widget.TreeView.getTree('browseTree').expandToPath('$!pulseHome');
                 };
 
-/*
                 var createFolder = new ZUTUBI.widget.ToolbarItem('create');
                 createFolder.setTooltip('Create folder');
                 createFolder.onClick = function()
@@ -116,9 +115,7 @@
                     window.open('$base/popups/mkdir.action', 'create_folder', 'width=400, height=150, resizable=yes', false);
                     return false;
                 };
-*/
 
-/*
                 var deleteFolder = new ZUTUBI.widget.ToolbarItem('delete');
                 deleteFolder.setTooltip('Delete folder');
                 deleteFolder.onClick = function()
@@ -127,19 +124,39 @@
                     var n = tree.selected;
                     if (n)
                     {
-                        rmdir();
+                        // make sure the user wants to do this.
+                        if (confirm('Are you sure you want to delete the selected directory?'))
+                        {
+                            rmdir();
+                        }
                     }
                 };
-*/
+
+                var refreshFolder = new ZUTUBI.widget.ToolbarItem('refresh');
+                refreshFolder.onClick = function()
+                {
+                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
+                    var selectedNode = tree.selected;
+                    if (selectedNode)
+                    {
+                        // collapse.
+                        if (selectedNode.expanded)
+                        {
+                            selectedNode.toggle();
+                        }
+                        selectedNode.childrenRendered = false;
+                        tree.removeChildren(selectedNode);
+                    }
+                };
 
                 // construct the toolbar.
                 var toolbar = new ZUTUBI.widget.Toolbar('toolbar');
                 toolbar.add(goToHome);
                 toolbar.add(goToPulseHome);
-/*
                 toolbar.add(new ZUTUBI.widget.ToolbarSeparator());
                 toolbar.add(createFolder);
-*/
+                toolbar.add(deleteFolder);
+                toolbar.add(refreshFolder);
                 toolbar.draw();
 
                 // construct the directory browser.
@@ -319,7 +336,7 @@
                         onComplete: rmdirResponse(node),
                         onFailure: handleFailure,
                         onException: handleException,
-                        parameters: "path=" + p
+                        parameters: "pid=" + p
                     }
                 );
             }
