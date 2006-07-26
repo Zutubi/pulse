@@ -13,6 +13,7 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTest
     private static final String SLAVE_PORT = "7777";
 
     private String slaveName;
+    private String resourceName;
 
     public SlaveAcceptanceTest()
     {
@@ -22,6 +23,7 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTest
     {
         super(name);
         slaveName = "slave-" + RandomUtils.randomString(5);
+        resourceName = "resource-" + RandomUtils.randomString(5);
     }
 
     protected void setUp() throws Exception
@@ -107,6 +109,8 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTest
         assertTextNotPresent(slaveName);
     }
 
+    //---( Agent/Slave Resources )---
+
     /**
      * CIB-519
      */
@@ -117,7 +121,7 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTest
         clickLinkWithText(slaveName);
 
         // add resource - need to be on the agent page.
-        addResource("some resource");
+        addResource(resourceName);
 
         clickLinkWithText("agents");
         assertTextPresent(slaveName);
@@ -137,8 +141,19 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTest
         ResourceForm form = new ResourceForm(tester);
         assertResourceValidation(form);
 
-        form.saveFormElements("resource name");
+        form.saveFormElements(resourceName);
         form.assertFormNotPresent();
+    }
+
+    // @Required(agent)
+    public void testDeleteResource()
+    {
+        addAgent(slaveName);
+        clickLinkWithText(slaveName);
+        addResource(resourceName);
+        assertTextPresent(resourceName);
+        clickLink("delete_" + resourceName);
+        assertTextNotPresent(resourceName);
     }
 
     private void assertResourceValidation(ResourceForm form)
@@ -147,24 +162,6 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTest
         form.saveFormElements("");
         form.assertFormPresent();
         assertTextPresent("required");
-    }
-
-    // @Required(agent)
-    public void testDeleteResource()
-    {
-
-    }
-
-    // @Required(agent)
-    public void testCancelEditResource()
-    {
-
-    }
-
-    // @Required(agent)
-    public void testEditResource()
-    {
-
     }
 
     private void assertSlaveDuplicate(SlaveForm form)
@@ -199,6 +196,11 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTest
         form.saveFormElements(name, SLAVE_HOST, SLAVE_PORT);
     }
 
+    /**
+     * Add resource workflow.
+     * Start: the agent page
+     * Finish: the agents resources page.
+     */
     private void addResource(String name)
     {
         clickLinkWithText("resources");
@@ -208,5 +210,8 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTest
         assertResourceValidation(form);
         form.saveFormElements(name);
         form.assertFormNotPresent();
+
+        // return to the resources view.
+        clickLinkWithText("resources");
     }
 }
