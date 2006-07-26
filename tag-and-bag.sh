@@ -56,12 +56,12 @@ fi
 svnBase="svn+ssh://${user}www.cinnamonbob.com/usr/local/svn-repo/pulse"
 svnTag="$svnBase/tags/$version"
 
-if svn info "$svnTag" > /dev/null 2>& 1
-then
-    yesNo "Tag $version already exists.  Use existing [yN]? "
-else
+#if svn info "$svnTag" > /dev/null 2>& 1
+#then
+#    yesNo "Tag $version already exists.  Use existing [yN]? "
+#else
     svn copy -m "Tagging release $version" "$svnBase/trunk" "$svnTag"
-fi
+#fi
 
 tmpDir=checkout.$$
 

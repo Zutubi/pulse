@@ -21,7 +21,7 @@ do
         tag=${tag#*\"}
         tag=${tag%\"*}
 
-        wget -O $tmpFile "http://confluence.zutubi.com/display/pulse/$tag" -o /dev/null
+        wget -O $tmpFile "http://confluence.zutubi.com/display/pulse0101/$tag" -o /dev/null
         if grep "Page Not Found" $tmpFile > /dev/null
         then
             failed=$((failed + 1))
