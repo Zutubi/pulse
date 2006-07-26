@@ -380,7 +380,7 @@ public class FileSystemUtils
 
             if (entry.isDirectory())
             {
-                file.mkdir();
+                file.mkdirs();
             }
             else
             {
