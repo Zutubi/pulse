@@ -203,6 +203,11 @@ public class BuildController implements EventListener
             throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
         }
 
+        if(!buildManager.isSpaceAvailableForBuild())
+        {
+            throw new BuildException("Insufficient database space to run build.  Consider adding more cleanup rules to remove old build information");
+        }
+
         // check project configuration to determine which bootstrap configuration should be used.
         Bootstrapper initialBootstrapper;
         boolean checkoutOnly = specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.CLEAN_CHECKOUT;

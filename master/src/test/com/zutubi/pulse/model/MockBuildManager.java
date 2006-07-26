@@ -203,4 +203,9 @@ public class MockBuildManager implements BuildManager
             result.complete();
         }
     }
+
+    public boolean isSpaceAvailableForBuild()
+    {
+        return true;
+    }
 }

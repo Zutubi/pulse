@@ -100,4 +100,6 @@ public interface BuildManager
     void delete(BuildResult result);
 
     void abortUnfinishedBuilds(Project project, String message);
+
+    boolean isSpaceAvailableForBuild();
 }

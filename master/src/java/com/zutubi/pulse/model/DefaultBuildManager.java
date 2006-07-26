@@ -207,6 +207,12 @@ public class DefaultBuildManager implements BuildManager, EventListener
         {
             cleanupBuilds(project);
         }
+
+        // Now check the database is not too close to full
+        if(databaseBootstrap.getDatabaseUsagePercent() > 95.0)
+        {
+            LOG.warning("The internal database is close to reaching its size limit.  Consider adding more cleanup rules to remove old build information.");
+        }
     }
 
     public List<Changelist> getLatestChangesForUser(User user, int max)
@@ -268,6 +274,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
             lastBuild.complete();
             save(lastBuild);
         }
+    }
+
+    public boolean isSpaceAvailableForBuild()
+    {
+        return databaseBootstrap.getDatabaseUsagePercent() < 99.5;
     }
 
     public BuildResult getPreviousBuildResult(BuildResult result)

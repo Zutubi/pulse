@@ -9,6 +9,9 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -25,6 +28,7 @@ public class DatabaseBootstrap implements ApplicationContextAware, Stoppable
     private String schemaTestTable = DEFAULT_SCHEMA_TEST_TABLE;
 
     private ApplicationContext context;
+    private static final long TOTAL_DB_SPACE = (long)Integer.MAX_VALUE * 8;
 
     public DatabaseBootstrap()
     {
@@ -37,6 +41,7 @@ public class DatabaseBootstrap implements ApplicationContextAware, Stoppable
             try
             {
                 JDBCUtils.execute(dataSource, "SET PROPERTY \"hsqldb.default_table_type\" 'cached'");
+                JDBCUtils.execute(dataSource, "SET PROPERTY \"hsqldb.cache_file_scale\" 8");
             }
             catch (SQLException e)
             {
@@ -114,5 +119,39 @@ public class DatabaseBootstrap implements ApplicationContextAware, Stoppable
         {
             LOG.error(e);
         }
+    }
+
+    public double getDatabaseUsagePercent()
+    {
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try
+        {
+            con = dataSource.getConnection();
+            stmt = con.prepareCall("SELECT file_free_pos FROM information_schema.system_cacheinfo");
+            rs = stmt.executeQuery();
+            if(rs.next())
+            {
+                Long freePos = JDBCUtils.getLong(rs, "file_free_pos");
+                if(freePos != null)
+                {
+                    return freePos * 100.0 / TOTAL_DB_SPACE;
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            LOG.severe(e);
+        }
+        finally
+        {
+            JDBCUtils.close(rs);
+            JDBCUtils.close(stmt);
+            JDBCUtils.close(con);
+        }
+
+        return -1.0;
     }
 }
