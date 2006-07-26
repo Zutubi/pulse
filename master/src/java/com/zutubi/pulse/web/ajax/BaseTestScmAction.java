@@ -1,12 +1,14 @@
 package com.zutubi.pulse.web.ajax;
 
+import com.opensymphony.xwork.validator.DefaultActionValidatorManager;
+import com.opensymphony.xwork.validator.DelegatingValidatorContext;
+import com.opensymphony.xwork.validator.ValidationException;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.web.ActionSupport;
-import com.opensymphony.xwork.validator.DefaultActionValidatorManager;
-import com.opensymphony.xwork.validator.DelegatingValidatorContext;
-import com.opensymphony.xwork.validator.ValidationException;
+
+import java.util.concurrent.*;
 
 /**
  * <class-comment/>
@@ -48,12 +50,23 @@ public abstract class BaseTestScmAction extends ActionSupport
             return SUCCESS;
         }
 
+        FutureTask<String> task = new FutureTask<String>(new Tester(scm));
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.execute(task);
+
         try
         {
-            SCMServer server = scm.createServer();
-            server.testConnection();
+            String error = task.get(30, TimeUnit.SECONDS);
+            if(error != null)
+            {
+                addActionError(error);
+            }
         }
-        catch (SCMException e)
+        catch (TimeoutException e)
+        {
+            addActionError("Connection test timed out (after 30 seconds)");
+        }
+        catch (Exception e)
         {
             addActionError(e.getMessage());
         }
@@ -61,4 +74,27 @@ public abstract class BaseTestScmAction extends ActionSupport
         return SUCCESS;
     }
 
+    private class Tester implements Callable<String>
+    {
+        private Scm scm;
+
+        public Tester(Scm scm)
+        {
+            this.scm = scm;
+        }
+
+        public String call() throws Exception
+        {
+            try
+            {
+                SCMServer server = scm.createServer();
+                server.testConnection();
+                return null;
+            }
+            catch (SCMException e)
+            {
+                return e.getMessage();
+            }
+        }
+    }
 }
