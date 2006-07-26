@@ -384,6 +384,11 @@ public class FileSystemUtils
             }
             else
             {
+                // ensure that the files parents already exist.
+                if (!file.getParentFile().isDirectory())
+                {
+                    file.getParentFile().mkdirs();
+                }
                 unzip(zin, file);
 //                String octalPermissions = new String(entry.getExtra());
 //                int permissions = Integer.parseInt(octalPermissions, 8);

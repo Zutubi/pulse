@@ -11,6 +11,22 @@ import java.util.zip.ZipInputStream;
  */
 public class FileSystemUtilsTest extends PulseTestCase
 {
+    private File tmpDir;
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+
+        tmpDir = FileSystemUtils.createTempDirectory("FileSystemUtilsTest", getName());
+    }
+
+    protected void tearDown() throws Exception
+    {
+        removeDirectory(tmpDir);
+
+        super.tearDown();
+    }
+
     public void testGetPermissions()
     {
         if (System.getProperty("os.name").equals("Linux"))
@@ -33,32 +49,51 @@ public class FileSystemUtilsTest extends PulseTestCase
     }
 
     //@Required(tmpDir)
-    public void testExtractZip() throws Exception
+    public void testExtractEmptyFile() throws Exception
     {
-        File tmpDir = FileSystemUtils.createTempDirectory("FileSystemUtilsTest", getName());
+        extractTestZipToTmp();
+
+        // ensure that the expected directories exist.
+        assertTrue(new File(tmpDir, "dir").isDirectory());
+        assertTrue(new File(tmpDir, asPath("dir", "subdirectory")).isDirectory());
+        assertTrue(new File(tmpDir, asPath("dir", "subdirectory", "emptyfile")).isFile());
+    }
+
+    public void testExtractNonEmptyFiles() throws Exception
+    {
+        extractTestZipToTmp();
+
+        // ensure that the expected directories exist.
+        assertTrue(new File(tmpDir, asPath("config")).isDirectory());
+        assertTrue(new File(tmpDir, asPath("pulse.config.properties")).isFile());
+        assertTrue(new File(tmpDir, asPath("config", "pulse.properties")).isFile());
+    }
+
+    public String asPath(String... pathElements)
+    {
+        StringBuffer buff = new StringBuffer();
+        String sep = "";
+        for (String pathElement : pathElements)
+        {
+            buff.append(sep);
+            buff.append(pathElement);
+            sep = File.separator;
+        }
+        return buff.toString();
+    }
+
+    private void extractTestZipToTmp() throws IOException
+    {
+        InputStream is = null;
         try
         {
-            InputStream is = null;
-            try
-            {
-                is = getClass().getResourceAsStream("FileSystemUtils.testExtractZip.zip");
-                assertNotNull(is);
-
-                FileSystemUtils.extractZip(new ZipInputStream(is), tmpDir);
-
-                // ensure that the expected directories exist.
-                assertTrue(new File(tmpDir, "dir").isDirectory());
-                assertTrue(new File(tmpDir, "dir" + File.separator + "subdirectory").isDirectory());
-                assertTrue(new File(tmpDir, "dir" + File.separator + "subdirectory" + File.separator + "emptyfile").isFile());
-            }
-            finally
-            {
-                IOUtils.close(is);
-            }
+            is = getClass().getResourceAsStream("FileSystemUtils."+getName()+".zip");
+            assertNotNull(is);
+            FileSystemUtils.extractZip(new ZipInputStream(is), tmpDir);
         }
         finally
         {
-            assertTrue(FileSystemUtils.removeDirectory(tmpDir));
+            IOUtils.close(is);
         }
     }
 }
