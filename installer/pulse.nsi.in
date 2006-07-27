@@ -14,14 +14,14 @@
 ;General
 
   ;Name and file
-  Name "Zutubi __SERVICE_NAME__"
+  Name "Zutubi __SERVICE_NAME__ __VERSION__"
   OutFile "..\__PACKAGE_NAME__.exe"
 
   ;Default installation folder
-  InstallDir "$PROGRAMFILES\Zutubi\__SERVICE_NAME__"
+  InstallDir "$PROGRAMFILES\Zutubi\__SERVICE_NAME__ __VERSION__"
   
   ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\Zutubi\__SERVICE_NAME__" ""
+  InstallDirRegKey HKCU "Software\Zutubi\__SERVICE_NAME__ __VERSION__" ""
 
 ;--------------------------------
 ;Interface Settings
@@ -41,7 +41,7 @@
   !insertmacro MUI_PAGE_DIRECTORY
 
   !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU" 
-  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Zutubi\__SERVICE_NAME__" 
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Zutubi\__SERVICE_NAME__ __VERSION__"
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
   
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
@@ -109,7 +109,7 @@ Section "Pulse" SecMain
   Exec '"$INSTDIR\bin\install-service.bat"'
 
   ;Store installation folder
-  WriteRegStr HKCU "Software\Zutubi\__SERVICE_NAME__" "" $INSTDIR
+  WriteRegStr HKCU "Software\Zutubi\__SERVICE_NAME__ __VERSION__" "" $INSTDIR
   
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
@@ -154,6 +154,6 @@ Section "un.Uninstall"
 
   RMDir /r "$INSTDIR"
 
-  DeleteRegKey /ifempty HKCU "Software\Zutubi\__SERVICE_NAME__"
+  DeleteRegKey /ifempty HKCU "Software\Zutubi\__SERVICE_NAME__ __VERSION__"
 
 SectionEnd

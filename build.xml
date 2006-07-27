@@ -205,6 +205,7 @@
 
         <replace file="${package.root}/pulse.nsi" replacefilterfile="master/subst.properties">
             <replacefilter token="__PACKAGE_NAME__" value="${package.name}"/>
+            <replacefilter token="__VERSION__" value="${pulse.version}"/>
         </replace>
 
         <exec executable="makensis" dir="${package.root}">
@@ -359,6 +360,7 @@
 
         <replace file="${package.root}/pulse.nsi" replacefilterfile="slave/subst.properties">
             <replacefilter token="__PACKAGE_NAME__" value="${package.name}"/>
+            <replacefilter token="__VERSION__" value="${pulse.version}"/>
         </replace>
 
         <exec executable="makensis" dir="${package.root}">
