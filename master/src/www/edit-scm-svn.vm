@@ -23,8 +23,6 @@
     #inlineHelp("svn.keyfile.help")
     #wwpassword("name=svn.passphrase" "label=%{getText('svn.passphrase')}" "showPassword=true" "tabindex=5")
     #inlineHelp("svn.passphrase.help")
-    #wwtextfield("name=svn.path" "label=%{getText('scm.path')}" "size=60" "tabindex='6'")
-    #inlineHelp("scm.path.help")
     #wwtextfield("name=svn.changeViewerUrl" "label=%{getText('scm.change.viewer.url')}" "size=60" "tabindex=7" "onkeypress=return submitenter(this,event)")
     #inlineHelp("scm.change.viewer.url.help")
     #wwcheckbox("name=monitor" "label=%{getText('scm.monitor')}" "tabindex=8")
