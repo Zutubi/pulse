@@ -106,7 +106,9 @@ Section "Pulse" SecMain
 
   File /r /x pulse.nsi /x env.nsh *
   
-  Exec '"$INSTDIR\bin\install-service.bat"'
+  nsExec::Exec '"$INSTDIR\bin\stop-service.bat"'
+  nsExec::Exec '"$INSTDIR\bin\uninstall-service.bat"'
+  nsExec::Exec '"$INSTDIR\bin\install-service.bat"'
 
   ;Store installation folder
   WriteRegStr HKCU "Software\Zutubi\__SERVICE_NAME__ __VERSION__" "" $INSTDIR
@@ -142,7 +144,7 @@ Section "un.Uninstall"
   Push "PULSE_HOME"
   Call un.DeleteEnvStr
 
-  Exec '"$INSTDIR\bin\uninstall-service.bat"'
+  nsExec::Exec '"$INSTDIR\bin\uninstall-service.bat"'
 
   !insertmacro MUI_STARTMENU_GETFOLDER Application $STARTMENU_FOLDER
   DetailPrint "$STARTMENU_FOLDER"
