@@ -19,9 +19,9 @@ import java.util.Properties;
  * The data directory is layed out as follows:
  * <p/>
  * data/
- *     config/: user configuration files
- *     database/: the embedded HSQL database
- *     projects/: build artifacts
+ * config/: user configuration files
+ * database/: the embedded HSQL database
+ * projects/: build artifacts
  * <p/>
  * pulse.config.properties: core configuration properties, contain version and license details amongst other things
  */
@@ -43,7 +43,7 @@ public class Data implements MasterUserPaths
     private License license;
     private static final String LICENSE_KEY = "license.key";
 
-    protected Data(File dataDir)
+    public Data(File dataDir)
     {
         this.pulseData = dataDir;
     }
@@ -98,6 +98,26 @@ public class Data implements MasterUserPaths
     {
         version.write(getConfig());
         IOUtils.write(getConfig(), getConfigFile());
+    }
+
+    public int getBuildNumber()
+    {
+        return getVersion().getBuildNumberAsInt();
+    }
+
+    public void setBuildNumber(int i)
+    {
+        try
+        {
+            Properties config = getConfig();
+            config.put("build.number", Integer.toString(i));
+            IOUtils.write(getConfig(), getConfigFile());
+            dataVersion = null;
+        }
+        catch (IOException e)
+        {
+            LOG.severe("Failed to record build number to the config. Cause:" + e.getMessage(), e);
+        }
     }
 
     /**

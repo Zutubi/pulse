@@ -1,12 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
-import com.meterware.httpunit.GetMethodWebRequest;
-import com.meterware.httpunit.HttpException;
-import com.meterware.httpunit.WebClient;
+import com.meterware.httpunit.*;
 import com.zutubi.pulse.acceptance.forms.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.CreateUserForm;
 import com.zutubi.pulse.acceptance.forms.CvsForm;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
+import com.zutubi.pulse.util.Constants;
 import junit.framework.Assert;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.xml.sax.SAXException;
@@ -19,7 +18,7 @@ import java.util.Vector;
 /**
  * <class-comment/>
  */
-public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
+public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
 {
     protected static final String TEST_CVSROOT = ":pserver:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
 
@@ -30,11 +29,11 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
 
     protected String port;
 
-    public BaseAcceptanceTest()
+    public BaseAcceptanceTestCase()
     {
     }
 
-    public BaseAcceptanceTest(String name)
+    public BaseAcceptanceTestCase(String name)
     {
         super(name);
     }
@@ -254,5 +253,16 @@ public abstract class BaseAcceptanceTest extends ExtendedWebTestCase
         }
 
         tester.getDialog().getWebClient().getResponse(new GetMethodWebRequest(targetUrl));
+    }
+
+    protected void pauseWhileMetaRefreshActive() throws InterruptedException, IOException, SAXException
+    {
+        int delay = 0;
+        while ((delay = tester.getDialog().getResponse().getRefreshDelay()) > 0)
+        {
+            Thread.sleep(delay * Constants.SECOND);
+            WebRequest req = tester.getDialog().getResponse().getRefreshRequest();
+            WebResponse resp = tester.getDialog().getWebClient().getResponse(req);
+        }
     }
 }

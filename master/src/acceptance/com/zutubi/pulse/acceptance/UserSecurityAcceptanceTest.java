@@ -6,7 +6,7 @@ import org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices;
 /**
  * <class-comment/>
  */
-public class UserSecurityAcceptanceTest extends BaseAcceptanceTest
+public class UserSecurityAcceptanceTest extends BaseAcceptanceTestCase
 {
     public UserSecurityAcceptanceTest()
     {

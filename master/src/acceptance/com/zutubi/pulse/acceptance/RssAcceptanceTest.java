@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  * <class-comment/>
  */
-public class RssAcceptanceTest extends BaseAcceptanceTest
+public class RssAcceptanceTest extends BaseAcceptanceTestCase
 {
     private String projectName;
 

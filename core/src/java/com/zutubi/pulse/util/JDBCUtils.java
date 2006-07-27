@@ -183,6 +183,38 @@ public class JDBCUtils
         return null;
     }
 
+    public static String[] getSchemaColumnNames(Connection con, String table)
+    {
+        try
+        {
+            List<String> columnNames = new LinkedList<String>();
+
+            DatabaseMetaData meta = con.getMetaData();
+
+            ResultSet rs = null;
+            try
+            {
+                rs = meta.getColumns(null, null, table, "%");
+
+                while (rs.next())
+                {
+                    String columnName = rs.getString("COLUMN_NAME");
+                    columnNames.add(columnName);
+                }
+                return columnNames.toArray(new String[columnNames.size()]);
+
+            }
+            finally
+            {
+                close(rs);
+            }
+        }
+        catch (SQLException e)
+        {
+            LOG.severe(e);
+        }
+        return null;
+    }
 
     public static void close(Statement stmt)
     {

@@ -3,7 +3,7 @@ package com.zutubi.pulse.acceptance;
 /**
  * <class-comment/>
  */
-public class SmtpConfigurationAcceptanceTest extends BaseAcceptanceTest
+public class SmtpConfigurationAcceptanceTest extends BaseAcceptanceTestCase
 {
     public SmtpConfigurationAcceptanceTest()
     {

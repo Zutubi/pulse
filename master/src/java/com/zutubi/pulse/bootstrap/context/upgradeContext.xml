@@ -124,7 +124,7 @@
     </bean>
 
     <bean id="schemaUpgrade0101001" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="101000001"/>
+        <property name="buildNumber" value="101000002"/>
         <property name="mappings">
             <list>
                 <value>com/zutubi/pulse/upgrade/schema/build_0101000001/BuildSpecification.hbm.xml</value>
@@ -134,23 +134,23 @@
     </bean>
 
     <bean id="adminUser" class="com.zutubi.pulse.upgrade.tasks.AdminUserUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="101000002"/>
+        <property name="buildNumber" value="101000003"/>
     </bean>
 
     <bean id="buildNumber" class="com.zutubi.pulse.upgrade.tasks.BuildNumberUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="101000002"/>
+        <property name="buildNumber" value="101000004"/>
     </bean>
 
     <bean id="relativePath" class="com.zutubi.pulse.upgrade.tasks.RelativePathUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="101000002"/>
+        <property name="buildNumber" value="101000005"/>
     </bean>
 
     <bean id="retainWorkingCopy" class="com.zutubi.pulse.upgrade.tasks.RetainWorkingCopyUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="101000002"/>
+        <property name="buildNumber" value="101000006"/>
     </bean>
 
     <bean id="triggerForce" class="com.zutubi.pulse.upgrade.tasks.TriggerForceUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="101000002"/>
+        <property name="buildNumber" value="101000007"/>
     </bean>
 
     <bean id="schemaUpgrade0101002" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
@@ -169,12 +169,11 @@
     </bean>
 
     <bean id="incrementalBuild" class="com.zutubi.pulse.upgrade.tasks.IncrementalBuildUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="101001002"/>
+        <property name="buildNumber" value="101001003"/>
     </bean>
 
     <bean id="renameHostNameToBaseUrl" class="com.zutubi.pulse.upgrade.tasks.RenameHostNamePropertyUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="101002001"/>
+        <property name="buildNumber" value="101002004"/>
     </bean>
-
 
 </beans>

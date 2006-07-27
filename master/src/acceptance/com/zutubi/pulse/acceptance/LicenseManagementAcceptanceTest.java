@@ -10,7 +10,7 @@ import com.zutubi.pulse.util.RandomUtils;
 /**
  * <class-comment/>
  */
-public class LicenseManagementAcceptanceTest extends BaseAcceptanceTest
+public class LicenseManagementAcceptanceTest extends BaseAcceptanceTestCase
 {
     // we use two dummy licenses for testing, alternating between them to
     // ensure that the details are updated correctly.

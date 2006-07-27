@@ -1,14 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
 import com.zutubi.pulse.acceptance.forms.setup.CreateAdminForm;
 import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
 import com.zutubi.pulse.acceptance.forms.setup.ServerSettingsForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
-import com.zutubi.pulse.test.LicenseHelper;
-import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.license.LicenseType;
+import com.zutubi.pulse.test.LicenseHelper;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -21,7 +18,7 @@ import java.io.IOException;
  * having multiple test methods, there is one testSetupProcess method that is breaks up the setup
  * process and handles all of the validation testing as it goes.
  */
-public class SetupAcceptanceTest extends BaseAcceptanceTest
+public class SetupAcceptanceTest extends BaseAcceptanceTestCase
 {
     public String licenseKey;
     public String expiredLicenseKey;
@@ -62,14 +59,8 @@ public class SetupAcceptanceTest extends BaseAcceptanceTest
         checkServerSettings();
 
         // step five. setup in progress - simulate the auto refresh of the browser.
-        int delay = 0;
-        while ((delay = tester.getDialog().getResponse().getRefreshDelay()) > 0)
-        {
-            assertTextPresent("system setup");
-            Thread.sleep(delay * Constants.SECOND);
-            WebRequest req = tester.getDialog().getResponse().getRefreshRequest();
-            WebResponse resp = tester.getDialog().getWebClient().getResponse(req);
-        }
+        assertTextPresent("system setup");
+        pauseWhileMetaRefreshActive();
 
         // one complete, we should see the home page, and it should contain the following:
         assertTextPresent(":: welcome ::");

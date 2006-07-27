@@ -7,7 +7,7 @@ import com.zutubi.pulse.util.RandomUtils;
 /**
  * <class-comment/>
  */
-public class SlaveAcceptanceTest extends BaseAcceptanceTest
+public class SlaveAcceptanceTest extends BaseAcceptanceTestCase
 {
     private static final String SLAVE_HOST = "localhost";
     private static final String SLAVE_PORT = "7777";

@@ -5,7 +5,7 @@ import com.zutubi.pulse.acceptance.forms.JabberConfigurationForm;
 /**
  * <class-comment/>
  */
-public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTest
+public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTestCase
 {
     public JabberConfigurationAcceptanceTest()
     {

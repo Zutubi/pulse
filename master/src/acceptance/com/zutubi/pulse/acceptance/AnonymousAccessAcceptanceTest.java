@@ -5,7 +5,7 @@ import com.zutubi.pulse.acceptance.forms.LoginForm;
 
 /**
  */
-public class AnonymousAccessAcceptanceTest extends BaseAcceptanceTest
+public class AnonymousAccessAcceptanceTest extends BaseAcceptanceTestCase
 {
     public void testDisabledByDefault()
     {

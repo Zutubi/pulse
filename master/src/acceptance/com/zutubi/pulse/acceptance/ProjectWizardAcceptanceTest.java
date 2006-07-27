@@ -12,7 +12,7 @@ import java.util.Properties;
 /**
  * <class-comment/>
  */
-public class ProjectWizardAcceptanceTest extends BaseAcceptanceTest
+public class ProjectWizardAcceptanceTest extends BaseAcceptanceTestCase
 {
     private static final String TEST_CVSROOT = ":pserver:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
 

@@ -1,16 +1,14 @@
 package com.zutubi.pulse.upgrade;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.util.logging.Logger;
 
-import javax.sql.DataSource;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * <class-comment/>
@@ -58,69 +56,75 @@ public class DefaultUpgradeManager implements UpgradeManager
     }
 
     /**
-     * Determine if an upgrade is required between the specified versions.
+     * Set the full list of upgrade tasks. This new set of tasks will override any existing
+     * registered tasks.
      *
-     * @param fromVersion
-     * @param toVersion
+     * @param tasks
+     */
+    public void setTasks(UpgradeTask... tasks)
+    {
+        this.upgradeTasks = Arrays.asList(tasks);
+    }
+
+    /**
+     * Determine if an upgrade is required between the specified build numbers.
+     *
+     * @param fromBuildNumber
+     * @param toBuildNumber
      *
      * @return true if an upgrade is required, false otherwise.
      */
-    public boolean isUpgradeRequired(Version fromVersion, Version toVersion)
+    public boolean isUpgradeRequired(int fromBuildNumber, int toBuildNumber)
     {
-        return fromVersion.compareTo(toVersion) < 0;
+        // If we do not understand what version we are upgrading to, we assume that the build number
+        // if the latest available, and hence need to upgrade. If our guess is incorrect, then no
+        // actual upgrade tasks will be executed, so there is no harm. When is this likely to occur?
+        // During development, thats when.
+        if (toBuildNumber == Version.INVALID)
+        {
+            return true;
+        }
+
+        return fromBuildNumber < toBuildNumber;
     }
 
-    public List<UpgradeTask> previewUpgrade(Version fromVersion, Version toVersion)
+    public List<UpgradeTask> previewUpgrade(int fromBuildNumber, int toBuildNumber)
     {
-        return determineRequiredUpgradeTasks(fromVersion, toVersion);
+        return determineRequiredUpgradeTasks(fromBuildNumber, toBuildNumber);
     }
 
     /**
      * Determine which upgrade tasks need to be executed during an upgrade between the
      * indicated versions.
      *
-     * @param fromVersion specifies the lower version and is not included in the determination.
-     * @param toVersion specified the upper version and is included in the determination.
+     * @param fromBuildNumber specifies the lower build number and is not included in the determination.
+     * @param toBuildNumber specified the upper build number and is included in the determination.
      *
      * @return a list of upgrade tasks that are required.
      */
-    protected List<UpgradeTask> determineRequiredUpgradeTasks(Version fromVersion, Version toVersion)
+    protected List<UpgradeTask> determineRequiredUpgradeTasks(int fromBuildNumber, int toBuildNumber)
     {
         List<UpgradeTask> requiredTasks = new LinkedList<UpgradeTask>();
 
-        // if either build versions are invalid, then we do not attempt an upgrade.
-        if (!checkVersions(fromVersion, toVersion))
+        // do not attempt an upgrade if we do not know the version of the data being upgraded.
+        if (fromBuildNumber == Version.INVALID)
         {
             return requiredTasks;
         }
 
-        int from = fromVersion.getBuildNumberAsInt();
-        int to = toVersion.getBuildNumberAsInt();
-
         for (UpgradeTask task : upgradeTasks)
         {
-            if (from < task.getBuildNumber() && task.getBuildNumber() <= to)
+            if (fromBuildNumber < task.getBuildNumber())
             {
-                requiredTasks.add(task);
+                if (toBuildNumber == Version.INVALID || task.getBuildNumber() <= toBuildNumber)
+                {
+                    requiredTasks.add(task);
+                }
             }
         }
+
         Collections.sort(requiredTasks, new UpgradeTaskComparator());
         return requiredTasks;
-    }
-
-    private boolean checkVersions(Version from, Version to)
-    {
-        if (from.getBuildNumberAsInt() == Version.INVALID)
-        {
-            LOG.warning("invalid from version build number detected: '"+from.getBuildNumber()+"'");
-            return false;
-        }
-        if (to.getBuildNumberAsInt() == Version.INVALID)
-        {
-            LOG.warning("invalid 'to' version build number detected: '"+to.getBuildNumber()+"'");
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -138,7 +142,7 @@ public class DefaultUpgradeManager implements UpgradeManager
         Version from = data.getVersion();
         Version to = Version.getVersion();
 
-        return isUpgradeRequired(from, to);
+        return isUpgradeRequired(from.getBuildNumberAsInt(), to.getBuildNumberAsInt());
     }
 
     /**
@@ -152,24 +156,15 @@ public class DefaultUpgradeManager implements UpgradeManager
     {
         checkData(data);
 
-        // load the datasource as some tasks require it
-        ComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/bootstrap/context/databaseContext.xml");
-        DataSource dataSource = (DataSource) ComponentContext.getBean("dataSource");
-
         // ensure that
         // a) upgrade is not in progress.
 
         Version from = data.getVersion();
         Version to = Version.getVersion();
 
-        List<UpgradeTask> tasks = determineRequiredUpgradeTasks(from, to);
+        List<UpgradeTask> tasks = determineRequiredUpgradeTasks(from.getBuildNumberAsInt(), to.getBuildNumberAsInt());
         for(UpgradeTask task: tasks)
         {
-            if(DataSourceAware.class.isAssignableFrom(task.getClass()))
-            {
-                ((DataSourceAware)task).setDataSource(dataSource);
-            }
-            
             if(ConfigurationAware.class.isAssignableFrom(task.getClass()))
             {
                 ((ConfigurationAware)task).setConfigurationManager(configurationManager);
@@ -224,13 +219,27 @@ public class DefaultUpgradeManager implements UpgradeManager
                 if (!abort)
                 {
                     monitor.start(task);
-                    task.execute(context);
+                    try
+                    {
+                        task.execute(context);
+                    }
+                    catch (UpgradeException e)
+                    {
+                        throw e;
+                    }
+                    catch (Throwable t)
+                    {
+                        throw new UpgradeException(t);
+                    }
+
                     if (task.hasFailed())
                     {
                         // use an exception to break out to the task failure handling.
                         throw new UpgradeException();
                     }
                     monitor.complete(task);
+                    // record task completion, to ensure that it is not run a second time.
+                    upgradeTarget.setBuildNumber(task.getBuildNumber());
                 }
                 else
                 {
@@ -244,24 +253,9 @@ public class DefaultUpgradeManager implements UpgradeManager
                 {
                     abort = true;
                 }
+                // TODO: propogate this error to the UI via the monitor object.
+                LOG.severe(e);
             }
-        }
-
-        monitor.setPercentageComplete(99);
-
-        // TODO: improve UI feedback for abort situation so that the user knows what is going on.
-        // if upgrade aborted due to a failure, then the user will need to go back to there backup
-        // of the data directory and upgrade again once the problem has been sorted out.
-
-        // commit the upgrade by updating the data version details.
-        try
-        {
-            upgradeTarget.updateVersion(context.getTo());
-        }
-        catch (IOException e)
-        {
-            // record this error for the user...
-            LOG.severe(e);
         }
 
         monitor.setPercentageComplete(100);

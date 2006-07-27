@@ -10,7 +10,7 @@ import java.io.IOException;
  * A set of acceptance tests that ensure the correct behaviour of the web application.
  * ie: no directory browsing is allowed.
  */
-public class WebAppAcceptanceTest extends BaseAcceptanceTest
+public class WebAppAcceptanceTest extends BaseAcceptanceTestCase
 {
     public WebAppAcceptanceTest()
     {

@@ -14,7 +14,7 @@ import net.sourceforge.jwebunit.WebTester;
 /**
  * <class-comment/>
  */
-public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTest
+public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
 {
     public static Test suite()
     {

@@ -7,7 +7,7 @@ import com.zutubi.pulse.util.RandomUtils;
 /**
  * <class-comment/>
  */
-public class UserAdministrationAcceptanceTest extends BaseAcceptanceTest
+public class UserAdministrationAcceptanceTest extends BaseAcceptanceTestCase
 {
 
     public UserAdministrationAcceptanceTest()

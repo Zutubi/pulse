@@ -4,7 +4,7 @@ import com.zutubi.pulse.util.RandomUtils;
 
 /**
  */
-public class ProjectAcceptanceTestBase extends BaseAcceptanceTest
+public class ProjectAcceptanceTestBase extends BaseAcceptanceTestCase
 {
     protected enum Type
     {

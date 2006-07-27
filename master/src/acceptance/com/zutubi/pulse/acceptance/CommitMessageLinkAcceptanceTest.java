@@ -5,7 +5,7 @@ import com.zutubi.pulse.acceptance.forms.CommitMessageLinkForm;
 /**
  * <class-comment/>
  */
-public class CommitMessageLinkAcceptanceTest extends BaseAcceptanceTest
+public class CommitMessageLinkAcceptanceTest extends BaseAcceptanceTestCase
 {
     public CommitMessageLinkAcceptanceTest()
     {

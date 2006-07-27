@@ -5,7 +5,7 @@ import com.zutubi.pulse.acceptance.forms.LdapConfigurationForm;
 /**
  * <class-comment/>
  */
-public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTest
+public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
 {
     public LdapConfigurationAcceptanceTest()
     {

@@ -5,7 +5,7 @@ import com.zutubi.pulse.acceptance.forms.GeneralConfigurationForm;
 /**
  * <class-comment/>
  */
-public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTest
+public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
 {
     public GeneralConfigurationAcceptanceTest()
     {

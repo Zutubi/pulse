@@ -4,7 +4,7 @@ import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -13,14 +13,24 @@ import java.util.List;
 public class MockUpgradeTask implements UpgradeTask
 {
     private int buildNumber;
+    private boolean haltOnFailure;
+
+    protected List<String> errors = new LinkedList<String>();
 
     public MockUpgradeTask()
     {
+        this(-1);
     }
 
     public MockUpgradeTask(int version)
     {
+        this(version, false);
+    }
+
+    public MockUpgradeTask(int version, boolean haltOnFailure)
+    {
         this.buildNumber = version;
+        this.haltOnFailure = haltOnFailure;
     }
 
     public int getBuildNumber()
@@ -45,7 +55,7 @@ public class MockUpgradeTask implements UpgradeTask
 
     public List<String> getErrors()
     {
-        return Collections.EMPTY_LIST;
+        return errors;
     }
 
     public boolean hasFailed()
@@ -55,6 +65,6 @@ public class MockUpgradeTask implements UpgradeTask
 
     public boolean haltOnFailure()
     {
-        return false;
+        return haltOnFailure;
     }
 }

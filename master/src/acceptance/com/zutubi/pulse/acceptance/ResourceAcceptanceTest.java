@@ -8,7 +8,7 @@ import com.zutubi.pulse.util.RandomUtils;
 
 /**
  */
-public class ResourceAcceptanceTest extends BaseAcceptanceTest
+public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
 {
     private String resourceName;
     private String versionName;

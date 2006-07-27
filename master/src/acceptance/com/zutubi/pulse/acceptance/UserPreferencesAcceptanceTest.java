@@ -9,7 +9,7 @@ import net.sourceforge.jwebunit.ExpectedTable;
  *
  *
  */
-public class UserPreferencesAcceptanceTest extends BaseAcceptanceTest
+public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
 {
     private String login;
     private static final String CONTACT_CREATE_TYPE = "contact";
