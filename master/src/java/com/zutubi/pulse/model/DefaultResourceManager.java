@@ -32,6 +32,13 @@ public class DefaultResourceManager implements ResourceManager
 
     public void delete(PersistentResource entity)
     {
+        // if the resource is associated with a slave, remove it manually.
+        Slave slave = entity.getSlave();
+        if (slave != null)
+        {
+            slave.getResources().remove(entity);
+        }
+        // now that we have removed the associations, we can delete the entity.
         resourceDao.delete(entity);
     }
 
