@@ -55,6 +55,7 @@
             <include name="**/*.html"/>
             <include name="**/*.xml"/>
             <include name="**/*.txt"/>
+            <include name="**/*.zip"/>
         </patternset>
 
         <patternset id="release.excludes">

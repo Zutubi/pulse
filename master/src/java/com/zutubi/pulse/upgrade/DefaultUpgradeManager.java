@@ -80,12 +80,21 @@ public class DefaultUpgradeManager implements UpgradeManager
         // if the latest available, and hence need to upgrade. If our guess is incorrect, then no
         // actual upgrade tasks will be executed, so there is no harm. When is this likely to occur?
         // During development, thats when.
+        boolean required = false;
         if (toBuildNumber == Version.INVALID)
         {
-            return true;
+            required = true;
+        }
+        else
+        {
+            required = fromBuildNumber < toBuildNumber;
         }
 
-        return fromBuildNumber < toBuildNumber;
+        if (required)
+        {
+            return determineRequiredUpgradeTasks(fromBuildNumber, toBuildNumber).size() > 0;
+        }
+        return false;
     }
 
     public List<UpgradeTask> previewUpgrade(int fromBuildNumber, int toBuildNumber)
