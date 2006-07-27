@@ -1,9 +1,8 @@
 package com.zutubi.pulse.web.setup;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
-import com.zutubi.pulse.bootstrap.Data;
 
 import java.io.File;
 
@@ -41,14 +40,14 @@ public class SetupDataAction extends SetupActionSupport
     public String doInput() throws Exception
     {
         // set the default.
-        String data = System.getProperty(SimpleMasterConfigurationManager.PULSE_HOME);
-        if (data == null)
+        String userHome = System.getProperty("user.home");
+        if (TextUtils.stringSet(userHome))
         {
-            this.data = "data";
+            this.data = userHome + File.separatorChar + ".pulse" + File.separatorChar + "data";
         }
         else
         {
-            this.data = data + File.separatorChar + "data";
+            this.data = "data";
         }
 
         // make the path the shortest possible.

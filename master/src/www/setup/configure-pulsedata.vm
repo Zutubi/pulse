@@ -16,7 +16,7 @@
 
 <body>
     <h1>:: #wwtext("name=data.setup") ::</h1>
-
+<p>&nbsp;</p>
     #parse("/template/includes/actionerrors.vm")
 
 #wwcform("action=setupData.action" "heading=%{getText('data.setup')}" "name=setup.data" "method=post")
@@ -29,6 +29,11 @@
 
     #next(2)
 #end
+
+<div style="text-align:left;width:70%">
+    #wwtext("name=data.directory.what.is.it")
+    #wwtext("name=data.directory.where.should.it.go")
+</div>
 
 </body>
 </html>
