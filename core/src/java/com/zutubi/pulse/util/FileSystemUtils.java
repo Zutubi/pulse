@@ -552,24 +552,64 @@ public class FileSystemUtils
         }
     }
 
-    // WARNING: will not handle recursive symlinks
     public static void copyRecursively(File from, File to) throws IOException
+    {
+        if(!SystemUtils.isWindows() && SystemUtils.findInPath("cp") != null)
+        {
+            // Use the Unix cp command because it:
+            //   - preserves permissions; and
+            //   - is likely to be faster when it matters (i.e. large copy)
+            String flags = "-p";
+            if(from.isDirectory())
+            {
+                ensureDirectory(to);
+                flags += "rT";
+            }
+
+            Process child = Runtime.getRuntime().exec(new String[] { "cp", flags, from.getAbsolutePath(), to.getAbsolutePath() });
+            try
+            {
+                int exit = child.waitFor();
+                if(exit != 0)
+                {
+                    // Attempt to copy ourselves.
+                    LOG.info("Copy using cp from '" + from.getAbsolutePath() + "' to '" + to.getAbsolutePath() + "' failed, trying internal copy");
+                    removeDirectory(to);
+                    internalCopy(from, to);
+                }
+            }
+            catch (InterruptedException e)
+            {
+                IOException ioe = new IOException("Interrupted while copying from '" + from.getAbsolutePath() + "' to '" + to.getAbsolutePath() + "'");
+                ioe.initCause(e);
+                throw ioe;
+            }
+        }
+    }
+
+    // WARNING: will not handle recursive symlinks
+    private static void internalCopy(File from, File to) throws IOException
     {
         if(from.isDirectory())
         {
-            if(!to.isDirectory() && !to.mkdirs())
-            {
-                throw new IOException("Unable to create destination directory '" + to.getAbsolutePath() + "'");
-            }
+            ensureDirectory(to);
 
             for(String file: from.list())
             {
-                copyRecursively(new File(from, file), new File(to, file));
+                internalCopy(new File(from, file), new File(to, file));
             }
         }
         else
         {
             IOUtils.copyFile(from, to);
+        }
+    }
+
+    private static void ensureDirectory(File to) throws IOException
+    {
+        if(!to.isDirectory() && !to.mkdirs())
+        {
+            throw new IOException("Unable to create destination directory '" + to.getAbsolutePath() + "'");
         }
     }
 

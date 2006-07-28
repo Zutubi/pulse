@@ -69,6 +69,51 @@ public class FileSystemUtilsTest extends PulseTestCase
         assertTrue(new File(tmpDir, asPath("config", "pulse.properties")).isFile());
     }
 
+    public void testCopyFileToFile() throws Exception
+    {
+        File from = new File(tmpDir, "from");
+        File to = new File(tmpDir, "to");
+
+        FileSystemUtils.createFile(from, "test");
+        FileSystemUtils.copyRecursively(from, to);
+        assertFilesEqual(from, to);
+    }
+
+    public void testCopyDirectoryToDirectory() throws Exception
+    {
+        File fromDir = new File(tmpDir, "from");
+        File toDir = new File(tmpDir, "to");
+        File f1 = new File(fromDir, "f1");
+        File dir = new File(fromDir, "dir");
+        File f2 = new File(dir, "f2");
+        File f3 = new File(dir, "f3");
+        File nested = new File(dir, "nested");
+        File f4 = new File(nested, "f4");
+
+        assertTrue(nested.mkdirs());
+        FileSystemUtils.createFile(f1, "test f1");
+        FileSystemUtils.createFile(f2, "test f2");
+        FileSystemUtils.createFile(f3, "test f3");
+        FileSystemUtils.createFile(f4, "test f4");
+
+        FileSystemUtils.copyRecursively(fromDir, toDir);
+        assertDirectoriesEqual(fromDir, toDir);
+    }
+
+    public void testRecursiveCopyPreservesPermissions() throws Exception
+    {
+        if(SystemUtils.isLinux())
+        {
+            File from = new File(tmpDir, "from");
+            File to = new File(tmpDir, "to");
+
+            FileSystemUtils.createFile(from, "test");
+            FileSystemUtils.setPermissions(from, 777);
+            FileSystemUtils.copyRecursively(from, to);
+            assertEquals(777, FileSystemUtils.getPermissions(to));
+        }
+    }
+
     public String asPath(String... pathElements)
     {
         StringBuffer buff = new StringBuffer();
