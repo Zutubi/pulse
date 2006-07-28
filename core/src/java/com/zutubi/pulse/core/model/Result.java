@@ -64,9 +64,7 @@ public abstract class Result extends Entity
 
     public void commence()
     {
-        state = ResultState.IN_PROGRESS;
-        stamps = new TimeStamps();
-        stamps.setStartTime(System.currentTimeMillis());
+        commence(System.currentTimeMillis());
     }
 
     public void commence(long startTime)

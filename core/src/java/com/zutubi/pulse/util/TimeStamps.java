@@ -15,10 +15,15 @@ public class TimeStamps
     private long startTime;
     private long endTime;
 
+    // Transient fields below
+
+    private long estimatedRunningTime;
+
     public TimeStamps()
     {
         queueTime = UNINITIALISED_TIME;
         startTime = UNINITIALISED_TIME;
+        estimatedRunningTime = UNINITIALISED_TIME;
         endTime = UNINITIALISED_TIME;
     }
 
@@ -70,6 +75,67 @@ public class TimeStamps
     public long getEndTime()
     {
         return endTime;
+    }
+
+    private boolean hasEndTime()
+    {
+        return endTime != UNINITIALISED_TIME;
+    }
+
+    public long getEstimatedEndTime()
+    {
+        return startTime + estimatedRunningTime;
+    }
+
+    public boolean hasEstimatedEndTime()
+    {
+        return estimatedRunningTime != UNINITIALISED_TIME;
+    }
+
+    public boolean hasEstimatedTimeRemaining()
+    {
+        return hasEstimatedEndTime() && !hasEndTime();
+    }
+
+    public long getEstimatedTimeRemaining()
+    {
+        long currentTime = System.currentTimeMillis();
+        long estimatedEndTime = getEstimatedEndTime();
+        if(currentTime < estimatedEndTime)
+        {
+            return estimatedEndTime - currentTime;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    public String getPrettyEstimatedTimeRemaining()
+    {
+        if(hasEstimatedTimeRemaining())
+        {
+
+            return getPrettyElapsed(getEstimatedTimeRemaining());
+        }
+        else
+        {
+            return "n/a";
+        }
+    }
+
+    public int getEstimatedPercentComplete()
+    {
+        long remaining = getEstimatedTimeRemaining();
+        if(hasEstimatedTimeRemaining() && remaining > 0)
+        {
+            double percentRemaining = 100.0 * remaining / estimatedRunningTime;
+            return (int)(100.0 - percentRemaining);
+        }
+        else
+        {
+            return 100;
+        }
     }
 
     public void setEndTime(long t)
