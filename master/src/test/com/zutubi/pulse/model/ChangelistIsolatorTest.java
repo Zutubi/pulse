@@ -47,9 +47,8 @@ public class ChangelistIsolatorTest extends PulseTestCase
 
     public void testNeverBuilt() throws SCMException
     {
-        mockBuildManager.expectAndReturn("queryBuilds", C.ANY_ARGS, new LinkedList<BuildResult>());
-        NumericalRevision rev = new NumericalRevision(10);
-        mockScm.expectAndReturn("getLatestRevision", C.ANY_ARGS, rev);
+        returnNoMoreBuilds();
+        returnLatestBuild(10);
         setupIsolator();
         expectRevisions(true, 10);
     }
@@ -88,11 +87,64 @@ public class ChangelistIsolatorTest extends PulseTestCase
         expectRevisions(true, 105);
     }
 
-    private void returnBuild(long revision)
+    public void testNullRevision() throws SCMException
+    {
+        returnNullDetails();
+        returnNoMoreBuilds();
+        returnLatestBuild(22);
+        setupIsolator();
+        expectRevisions(true, 22);
+    }
+
+    public void testSearchesBeyondNullRevision() throws SCMException
+    {
+        returnNullDetails();
+        returnNullDetails();
+        returnBuild(9);
+        returnNoMoreBuilds();
+        returnRevisions(9, 10, 11, 13);
+        setupIsolator();
+        expectRevisions(true, 10, 11, 13);
+    }
+
+    public void testReturnsDifferentRevisionObject() throws SCMException
+    {
+        Revision rev = returnBuild(10);
+        returnRevisions(10);
+        setupIsolator();
+
+        List<Revision> gotRevisions = isolator.getRevisionsToRequest(project, buildSpecification, true);
+        assertEquals(1, gotRevisions.size());
+        Revision got = gotRevisions.get(0);
+        assertEquals(rev.getRevisionString(), got.getRevisionString());
+        assertNotSame(rev, got);
+    }
+
+    private Revision returnLatestBuild(long revision)
+    {
+        NumericalRevision rev = new NumericalRevision(revision);
+        mockScm.expectAndReturn("getLatestRevision", C.ANY_ARGS, rev);
+        return rev;
+    }
+
+    private void returnNoMoreBuilds()
+    {
+        mockBuildManager.expectAndReturn("queryBuilds", C.ANY_ARGS, new LinkedList<BuildResult>());
+    }
+
+    private void returnNullDetails()
     {
         BuildResult result = new BuildResult();
-        result.setScmDetails(new BuildScmDetails(new NumericalRevision(revision)));
+        mockBuildManager.expectAndReturn("queryBuilds", C.ANY_ARGS, Arrays.asList(new BuildResult[] { result }));
+    }
+
+    private Revision returnBuild(long revision)
+    {
+        BuildResult result = new BuildResult();
+        NumericalRevision rev = new NumericalRevision(revision);
+        result.setScmDetails(new BuildScmDetails(rev));
         mockBuildManager.expectAndReturn("queryBuilds", C.ANY_ARGS, Arrays.asList(new BuildResult[]{ result }));
+        return rev;
     }
 
     private void returnRevisions(long since, long... revisions)

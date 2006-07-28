@@ -37,6 +37,13 @@ public class CvsRevision extends Revision
         setRevisionString(buffer.toString());
     }
 
+    public Revision copy()
+    {
+        CvsRevision copy = new CvsRevision();
+        copyCommon(copy);
+        return copy;
+    }
+
     public boolean isHead()
     {
         return getAuthor() == null && getBranch() == null && getComment() == null && getDate() == null;

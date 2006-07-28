@@ -27,6 +27,22 @@ public class Revision extends Entity implements Comparable<Revision>
         this.revisionString = revisionString;
     }
 
+    protected void copyCommon(Revision copy)
+    {
+        copy.author = author;
+        copy.comment = comment;
+        copy.branch = branch;
+        copy.time = time;
+        copy.revisionString = revisionString;
+    }
+
+    public Revision copy()
+    {
+        Revision copy = new Revision();
+        copyCommon(copy);
+        return copy;
+    }
+
     /**
      * The author of change
      */

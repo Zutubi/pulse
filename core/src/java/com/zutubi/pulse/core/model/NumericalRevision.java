@@ -28,6 +28,13 @@ public class NumericalRevision extends Revision
         }
     }
 
+    public Revision copy()
+    {
+        NumericalRevision copy = new NumericalRevision();
+        copyCommon(copy);
+        return copy;
+    }
+
     public boolean isHead()
     {
         return false;

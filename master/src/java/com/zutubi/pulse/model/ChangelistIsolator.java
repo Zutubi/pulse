@@ -25,7 +25,7 @@ public class ChangelistIsolator
         List<Revision> result;
         Revision latestBuiltRevision = null;
 
-        if(latestRequestedRevisions.containsKey(specification.getId()))
+        if (latestRequestedRevisions.containsKey(specification.getId()))
         {
             latestBuiltRevision = latestRequestedRevisions.get(specification.getId());
         }
@@ -35,17 +35,17 @@ public class ChangelistIsolator
             // Find out what the last revision built of this specification
             // was (if any).
             latestBuiltRevision = getLatestBuiltRevision(project, specification);
-            if(latestBuiltRevision != null)
+            if (latestBuiltRevision != null)
             {
                 latestRequestedRevisions.put(specification.getId(), latestBuiltRevision);
             }
         }
 
-        if(latestBuiltRevision == null)
+        if (latestBuiltRevision == null)
         {
             // The spec has never been built or even requested.  Just build
             // the latest (we need to start somewhere!).
-            result = Arrays.asList(new Revision[] { project.getScm().createServer().getLatestRevision() });
+            result = Arrays.asList(new Revision[]{project.getScm().createServer().getLatestRevision()});
         }
         else
         {
@@ -54,15 +54,16 @@ public class ChangelistIsolator
             result = project.getScm().createServer().getRevisionsSince(latestBuiltRevision);
         }
 
-        if(result.size() > 0)
+        if (result.size() > 0)
         {
             // Remember the new latest
             latestRequestedRevisions.put(specification.getId(), result.get(result.size() - 1));
         }
-        else if(force)
+        else if (force)
         {
             // Force a build of the latest revision anyway
-            result = Arrays.asList(new Revision[] { latestBuiltRevision} );
+            // We need to copy the revision as they are unique in the BUILD_SCM table!
+            result = Arrays.asList(new Revision[]{ latestBuiltRevision.copy() });
         }
 
         return result;
@@ -70,14 +71,21 @@ public class ChangelistIsolator
 
     private Revision getLatestBuiltRevision(Project project, BuildSpecification specification)
     {
-        List<BuildResult> latest = buildManager.queryBuilds(new Project[] { project }, null, new String[] { specification.getName() }, -1, -1, null, 0, 1, true);
-        if(latest.size() > 0)
+        for (int first = 0; /* forever */; first++)
         {
-            return latest.get(0).getScmDetails().getRevision();
-        }
-        else
-        {
-            return null;
+            List<BuildResult> latest = buildManager.queryBuilds(new Project[]{project}, null, new String[]{specification.getName()}, -1, -1, null, first, 1, true);
+            if (latest.size() > 0)
+            {
+                BuildScmDetails scmDetails = latest.get(0).getScmDetails();
+                if(scmDetails != null)
+                {
+                    return scmDetails.getRevision();
+                }
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 
