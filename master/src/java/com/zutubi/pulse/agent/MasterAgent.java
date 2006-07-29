@@ -54,7 +54,14 @@ public class MasterAgent implements Agent
 
     public Status getStatus()
     {
-        return Status.IDLE;
+        if(service.getBuildingRecipe() == 0)
+        {
+            return Status.IDLE;
+        }
+        else
+        {
+            return Status.BUILDING;
+        }
     }
 
     public String getLocation()

@@ -44,6 +44,11 @@ public class MasterBuildService implements BuildService
         return true;
     }
 
+    public long getBuildingRecipe()
+    {
+        return masterRecipeProcessor.getBuildingRecipe();
+    }
+
     public void collectResults(String project, String spec, long recipeId, boolean incremental, File outputDest, File workDest)
     {
         ServerRecipePaths recipePaths = new ServerRecipePaths(project, spec, recipeId, configurationManager.getUserPaths().getData(), incremental);

@@ -1,14 +1,14 @@
 package com.zutubi.pulse.agent;
 
 import com.zutubi.pulse.*;
-import com.zutubi.pulse.license.LicenseManager;
-import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.SlaveAgentRemovedEvent;
 import com.zutubi.pulse.events.SlaveStatusEvent;
+import com.zutubi.pulse.license.LicenseManager;
+import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.model.NamedEntityComparator;
 import com.zutubi.pulse.model.ResourceManager;
@@ -21,8 +21,8 @@ import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.MalformedURLException;
 import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  */
@@ -53,7 +53,7 @@ public class DefaultAgentManager implements AgentManager
     public void init()
     {
         MasterBuildService masterService = new MasterBuildService(masterRecipeProcessor, configurationManager, resourceManager);
-        masterAgent = new MasterAgent(masterService,configurationManager, startupManager, serverMessagesHandler);
+        masterAgent = new MasterAgent(masterService, configurationManager, startupManager, serverMessagesHandler);
 
         refreshSlaveAgents();
 

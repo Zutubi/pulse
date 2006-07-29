@@ -71,4 +71,9 @@ public class MasterRecipeProcessor implements Stoppable
     {
         this.resourceManager = resourceManager;
     }
+
+    public long getBuildingRecipe()
+    {
+        return recipeProcessor.getBuildingRecipe(); 
+    }
 }
