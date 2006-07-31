@@ -87,7 +87,7 @@ public class AcegiLdapManager implements LdapManager
         }
         catch(Exception e)
         {
-            LOG.error("Unable to connect to LDAP server: " + e.getMessage(), e);
+            LOG.warning("Unable to connect to LDAP server: " + e.getMessage());
             statusMessage = e.getMessage();
         }
     }
@@ -129,7 +129,7 @@ public class AcegiLdapManager implements LdapManager
             }
             catch(Exception e)
             {
-                LOG.warning("Error contacting LDAP server: " + e.getMessage(), e);
+                LOG.warning("Error contacting LDAP server: " + e.getMessage());
                 statusMessage = e.getMessage();
             }
         }

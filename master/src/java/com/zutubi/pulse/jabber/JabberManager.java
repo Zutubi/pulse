@@ -53,7 +53,7 @@ public class JabberManager implements Stoppable, PacketListener
                 {
                     stop(true);
                     statusMessage = "Could not initialise Jabber: " + nesty.getMessage();
-                    LOG.error(statusMessage, nesty);
+                    LOG.warning(statusMessage);
                 }
             }
         }
