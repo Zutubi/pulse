@@ -35,7 +35,7 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
     {
         super.setUp();
 
-        tmpDir = FileSystemUtils.createTempDirectory("xcode-test-pp-test", null);
+        tmpDir = FileSystemUtils.createTempDirectory("OCUnitReportPostProcessorTest", getName());
 
         artifact = prepareArtifact(this.getName());
 
@@ -135,6 +135,22 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
         assertEquals(0, suite.getErrors());
         assertEquals(3, suite.getFailures());
         assertEquals(583, suite.getTotal());
+    }
+
+    public void testExtendedSampleBuild()
+    {
+        OCUnitReportPostProcessor pp = new OCUnitReportPostProcessor();
+        pp.process(tmpDir, artifact, result);
+
+        List<TestResult> tests = artifact.getTests();
+        assertEquals(1, tests.size());
+        TestSuiteResult suite = (TestSuiteResult) tests.get(0);
+        assertEquals("/opt/pulse/pulse-data/recipes/2555916/base/build/Release/UnitTests.octest(Tests)", suite.getName());
+        assertEquals(3, suite.getDuration());
+        assertEquals(0, suite.getErrors());
+        assertEquals(0, suite.getFailures());
+        assertEquals(11, suite.getTotal());
+
     }
 
     public void testMultipleNestedSuites()
