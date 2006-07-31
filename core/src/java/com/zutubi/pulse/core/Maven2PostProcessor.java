@@ -1,9 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.util.SystemUtils;
-
-import java.util.regex.Pattern;
 
 /**
  * A post-processor for maven 2 output.  Attempts to capture features from Maven
@@ -11,6 +8,15 @@ import java.util.regex.Pattern;
  */
 public class Maven2PostProcessor extends PostProcessorGroup
 {
+    private static final String[] errorRegexps = new String[]{
+            "^\\[ERROR\\]"
+    };
+
+    private static final String[] warningRegexps = new String[]{
+            "^\\[WARNING\\]"
+    };
+
+
     public Maven2PostProcessor()
     {
         this(null);
@@ -26,14 +32,8 @@ public class Maven2PostProcessor extends PostProcessorGroup
 
         // Regex for error patterns from maven itself
         RegexPostProcessor maven = new RegexPostProcessor();
-
-        RegexPattern pattern = maven.createPattern();
-        pattern.setPattern(Pattern.compile("^\\[ERROR\\]"));
-        pattern.setCategory(Feature.Level.ERROR);
-
-        pattern = maven.createPattern();
-        pattern.setPattern(Pattern.compile("^\\[WARNING\\]"));
-        pattern.setCategory(Feature.Level.WARNING);
+        maven.addErrorRegexs(errorRegexps);
+        maven.addWarningRegexs(warningRegexps);
 
         if (!SystemUtils.isWindows())
         {

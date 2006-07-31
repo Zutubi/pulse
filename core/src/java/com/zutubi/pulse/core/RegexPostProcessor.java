@@ -13,6 +13,7 @@ import com.opensymphony.xwork.validator.ValidatorContext;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 
 /**
@@ -347,4 +348,23 @@ public class RegexPostProcessor implements PostProcessor, Validateable
         }
     }
 
+    protected void addErrorRegexs(String[] errorRegexs)
+    {
+        for (String errorRegex : errorRegexs)
+        {
+            RegexPattern pattern = createPattern();
+            pattern.setPattern(Pattern.compile(errorRegex));
+            pattern.setCategory(Feature.Level.ERROR);
+        }
+    }
+
+    protected void addWarningRegexs(String[] warningRegexs)
+    {
+        for (String warningRegex : warningRegexs)
+        {
+            RegexPattern pattern = createPattern();
+            pattern.setPattern(Pattern.compile(warningRegex));
+            pattern.setCategory(Feature.Level.WARNING);
+        }
+    }
 }

@@ -1,9 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.Feature;
-
-import java.util.regex.Pattern;
-
 /**
  * <class-comment/>
  */
@@ -35,19 +31,8 @@ public class XCodePostProcessor extends PostProcessorGroup
         // Regex for error patterns from xcode itself
         RegexPostProcessor xcode = new RegexPostProcessor();
 
-        for (String errorRegex : errorRegexs)
-        {
-            RegexPattern pattern = xcode.createPattern();
-            pattern.setPattern(Pattern.compile(errorRegex));
-            pattern.setCategory(Feature.Level.ERROR);
-        }
-
-        for (String warnRegex : warningRegexs)
-        {
-            RegexPattern pattern = xcode.createPattern();
-            pattern.setPattern(Pattern.compile(warnRegex));
-            pattern.setCategory(Feature.Level.WARNING);
-        }
+        xcode.addErrorRegexs(errorRegexs);
+        xcode.addWarningRegexs(warningRegexs);
 
         xcode.setLeadingContext(1);
         xcode.setTrailingContext(6);

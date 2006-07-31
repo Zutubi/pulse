@@ -1,15 +1,18 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.util.SystemUtils;
-
-import java.util.regex.Pattern;
 
 /**
  * <class-comment/>
  */
 public class MavenPostProcessor extends PostProcessorGroup
 {
+    private static final String[] errorRegexs = new String[]{
+            ".*BUILD FAILED.*",
+            "Basedir.*does not exist",
+            ".*The build cannot continue because of the following unsatisfied dependencies:.*"
+    };
+
     public MavenPostProcessor()
     {
         this(null);
@@ -25,14 +28,7 @@ public class MavenPostProcessor extends PostProcessorGroup
 
         // Regex for error patterns from maven itself
         RegexPostProcessor maven = new RegexPostProcessor();
-
-        RegexPattern pattern = maven.createPattern();
-        pattern.setPattern(Pattern.compile(".*BUILD FAILED.*"));
-        pattern.setCategory(Feature.Level.ERROR);
-
-        pattern = maven.createPattern();
-        pattern.setPattern(Pattern.compile("Basedir.*does not exist"));
-        pattern.setCategory(Feature.Level.ERROR);
+        maven.addErrorRegexs(errorRegexs);
 
         if (!SystemUtils.isWindows())
         {
