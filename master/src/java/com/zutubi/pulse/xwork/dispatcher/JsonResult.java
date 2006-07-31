@@ -65,6 +65,8 @@ public class JsonResult extends WebWorkResultSupport
         Element root = doc.getDocumentElement();
         handleObject(root, jw, stack);
 
+        response.setContentType("application/json"); // opera does not like this...
+
         writer.flush();
     }
 
