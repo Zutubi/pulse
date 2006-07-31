@@ -585,6 +585,10 @@ public class FileSystemUtils
                 throw ioe;
             }
         }
+        else
+        {
+            internalCopy(from, to);
+        }
     }
 
     // WARNING: will not handle recursive symlinks
