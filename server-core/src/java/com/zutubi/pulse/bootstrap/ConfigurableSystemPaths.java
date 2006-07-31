@@ -2,6 +2,7 @@ package com.zutubi.pulse.bootstrap;
 
 import java.io.File;
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  * A convenience object that allows for the System and User paths to be specified
@@ -45,33 +46,37 @@ public class ConfigurableSystemPaths implements SystemPaths
         return tmpRoot;
     }
 
-    public void setTemplateRoots(List<File> templateRoots)
+    public void setTemplateRootStrings(List<String> roots)
     {
-        this.templateRoots = templateRoots;
+        templateRoots = new LinkedList<File>();
+        for (String root : roots)
+        {
+            templateRoots.add(new File(root));
+        }
     }
 
-    public void setSystemRoot(File systemRoot)
+    public void setSystemRootString(String systemRoot)
     {
-        this.systemRoot = systemRoot;
+        this.systemRoot = new File(systemRoot);
     }
 
-    public void setContentRoot(File contentRoot)
+    public void setContentRootString(String contentRoot)
     {
-        this.contentRoot = contentRoot;
+        this.contentRoot = new File(contentRoot);
     }
 
-    public void setConfigRoot(File configRoot)
+    public void setConfigRootString(String configRoot)
     {
-        this.configRoot = configRoot;
+        this.configRoot = new File(configRoot);
     }
 
-    public void setLogRoot(File logRoot)
+    public void setLogRootString(String logRoot)
     {
-        this.logRoot = logRoot;
+        this.logRoot = new File(logRoot);
     }
 
-    public void setTmpRoot(File tmpRoot)
+    public void setTmpRootString(String tmpRoot)
     {
-        this.tmpRoot = tmpRoot;
+        this.tmpRoot = new File(tmpRoot);
     }
 }

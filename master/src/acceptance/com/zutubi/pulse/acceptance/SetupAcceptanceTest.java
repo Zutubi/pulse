@@ -173,7 +173,7 @@ public class SetupAcceptanceTest extends BaseAcceptanceTestCase
         // check validation - an invalid pulse data value.
 
         // enter valid pulse data that does not exist.
-        dataForm.nextFormElements(defaultData);
+        dataForm.nextFormElements("data");
 
         // it should prompt for confirmation to create the directory....
     }
