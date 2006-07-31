@@ -1,10 +1,13 @@
 package com.zutubi.pulse.xwork.interceptor;
 
-import com.opensymphony.xwork.interceptor.Interceptor;
-import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.ActionInvocation;
+import com.opensymphony.xwork.ValidationAware;
+import com.opensymphony.xwork.interceptor.Interceptor;
 import com.opensymphony.xwork.util.LocalizedTextUtil;
-import com.zutubi.pulse.license.*;
+import com.zutubi.pulse.license.LicenseAnnotationAttributes;
+import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.web.wizard.WizardAction;
 
 import java.lang.reflect.Method;
@@ -61,6 +64,7 @@ public class LicensedInterceptor implements Interceptor
                 // noop.
             }
         }
+
         if (method != null)
         {
             instanceAttribs.addAll(attributes.getAttributes(method));
@@ -68,20 +72,25 @@ public class LicensedInterceptor implements Interceptor
         // else there will be problems further down the road.
 
         // check that all of the requested license attributes validate.
-        checkAuthorised(instanceAttribs);
+        if (!checkAuthorised(instanceAttribs))
+        {
+            ((ValidationAware)target).addActionError(getTextMessage("not.licensed"));
+            return "notlicensed";
+        }
 
         return invocation.invoke();
     }
 
-    private void checkAuthorised(Collection<String> attribs) throws LicenseException
+    private boolean checkAuthorised(Collection<String> attribs) throws LicenseException
     {
         for (String attrib : attribs)
         {
             if (!LicenseHolder.hasAuthorization(attrib))
             {
-                throw new LicenseException(getTextMessage("not.licensed"));
+                return false;
             }
         }
+        return true;
     }
 
     private String doXxxMethodName(String methodName)

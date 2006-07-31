@@ -1,12 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.forms.CreateUserForm;
 import com.zutubi.pulse.acceptance.forms.LicenseEditForm;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
-import com.zutubi.pulse.acceptance.forms.CreateUserForm;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseType;
 import com.zutubi.pulse.test.LicenseHelper;
-import com.meterware.httpunit.HttpException;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.sourceforge.jwebunit.WebTester;
@@ -44,14 +43,8 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
         assertLinkNotPresentWithText("add new project");
 
         // verify that add project wizard action can not be triggered directly.
-        try
-        {
-            goTo("/addProject!input.action");
-        }
-        catch (HttpException e)
-        {
-            assertEquals(500, e.getResponseCode());
-        }
+        goTo("/addProject!input.action");
+        assertTextPresent("Not licensed");
     }
 
     public void testCreateUserFormOnlyAvailableWhenLicensed() throws Exception
@@ -72,14 +65,8 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
         form.assertFormNotPresent();
 
         // verify that we can not post directly to the create user action.
-        try
-        {
-            goTo("/admin/createUser.action");
-        }
-        catch (HttpException e)
-        {
-            assertEquals(500, e.getResponseCode());
-        }
+        goTo("/admin/createUser.action");
+        assertTextPresent("Not licensed");
     }
 
     public void testAddAgentLinkOnlyAvailableWhenLicensed() throws Exception
@@ -96,14 +83,8 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
         assertLinkNotPresentWithText("add new agent");
 
         // verify that we can not post directly to the add agent action.
-        try
-        {
-            goTo("/admin/addAgent.action");
-        }
-        catch (HttpException e)
-        {
-            assertEquals(500, e.getResponseCode());
-        }
+        goTo("/admin/addAgent.action");
+        assertTextPresent("Not licensed");
     }
 
     private static void installLicense(WebTester tester, License l) throws Exception

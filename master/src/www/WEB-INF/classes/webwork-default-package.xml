@@ -151,6 +151,8 @@
             <result type="rss" name="rss">
                 <param name="location">rss_2.0</param>
             </result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="notlicensed" type="velocity">/generic-error.vm</result>
         </global-results>
 
     </package>
