@@ -7,7 +7,7 @@ public class XCodePostProcessor extends PostProcessorGroup
 {
     private String[] errorRegexs = new String[]
     {
-            ".*error:.*",
+            ".*[\\d]+: error:.*",
             ".*Assertion failure.*",
             ".*No such file or directory.*",
             ".*Undefined symbols.*",
