@@ -778,22 +778,39 @@ Test Suite 'TestNSFileManagerAdditions' finished at 2006-07-27 22:39:53 +1000.
 Executed 4 tests, with 0 failures (0 unexpected) in 0.002 (0.003) seconds
 
 Test Suite 'TestNSArrayAdditions' started at 2006-07-27 22:39:53 +1000
+
 Test Case '-[TestNSArrayAdditions testCommonElementsInArray]' passed (0.000 seconds).
+
 Test Case '-[TestNSArrayAdditions testReversedArray]' passed (0.000 seconds).
+
 Test Case '-[TestNSArrayAdditions testReversedArrayWithThreeElements]' passed (0.000 seconds).
+
 Test Case '-[TestNSArrayAdditions testSmartStringWithOneElement]' passed (0.000 seconds).
+
 Test Case '-[TestNSArrayAdditions testSmartStringWithThreeElements]' passed (0.000 seconds).
+
 Test Case '-[TestNSArrayAdditions testSmartStringWithTwoElements]' passed (0.000 seconds).
+
 Test Suite 'TestNSArrayAdditions' finished at 2006-07-27 22:39:53 +1000.
+
 Executed 6 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
 
+
+
 Test Suite 'NSDictionaryAdditionsTest' started at 2006-07-27 22:39:53 +1000
+
 Test Case '-[NSDictionaryAdditionsTest testContainsStringEqualTo]' passed (0.001 seconds).
+
 Test Suite 'NSDictionaryAdditionsTest' finished at 2006-07-27 22:39:53 +1000.
+
 Executed 1 test, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
 
+
+
 Test Suite '/opt/pulse/pulse-data/recipes/2555916/base/build/Release/UnitTests.octest(Tests)' finished at 2006-07-27 22:39:53 +1000.
+
 Executed 11 tests, with 0 failures (0 unexpected) in 0.003 (0.007) seconds
+
 
 
 Touch /opt/pulse/pulse-data/recipes/2555916/base/./build/Release/UnitTests.octest

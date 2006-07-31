@@ -106,51 +106,62 @@ public class OCUnitReportPostProcessor implements PostProcessor
 
     private TestSuiteResult processSuite() throws IOException
     {
-        // Test Suite 'SenInterfaceTestCase' started at 2006-07-13 23:22:58 +1000
-
-        // process the test suite started line.
+        // varify that we have a start suite here.
         Matcher m = START_SUITE_PATTERN.matcher(currentLine);
         if (!m.matches())
         {
-//            // programming error,
             throw new IllegalStateException();
         }
 
+        // start the suite.
         TestSuiteResult suite = new TestSuiteResult(m.group(1));
 
         currentLine = nextLine();
 
-        // options.
-        // a) a test suite.
-        if (START_SUITE_PATTERN.matcher(currentLine).matches())
+        // now we are in the suite, looking for the end suite...
+        String caseOutput = "";
+        while (!END_SUITE_PATTERN.matcher(currentLine).matches())
         {
-            while (START_SUITE_PATTERN.matcher(currentLine).matches())
+            // if new suite, then recurse.
+            if (START_SUITE_PATTERN.matcher(currentLine).matches())
             {
                 suite.add(processSuite());
             }
-        }
-        else
-        {
-            // b) a test case. NOTE: These suites may be empty.
-            TestCaseResult child = processCase();
-            while (child != null)
+            // if test case, then create it.
+            else if (CASE_SUMMARY_PATTERN.matcher(currentLine).matches())
             {
-                suite.add(child);
-                child = processCase();
+                Matcher caseMatch = CASE_SUMMARY_PATTERN.matcher(currentLine);
+                caseMatch.matches();
+
+                TestCaseResult result = new TestCaseResult(caseMatch.group(2));
+                result.setMessage(caseOutput);
+
+                String statusString = caseMatch.group(3);
+                if (statusString.compareTo("passed") == 0)
+                {
+                    result.setStatus(TestCaseResult.Status.PASS);
+                }
+                else if (statusString.compareTo("failed") == 0)
+                {
+                    result.setStatus(TestCaseResult.Status.FAILURE);
+                }
+                result.setDuration((long) (Double.parseDouble(caseMatch.group(4)) * 1000));
+                suite.add(result);
+                caseOutput = "";
             }
+            else
+            {
+                // else, add to text.
+                caseOutput = caseOutput + currentLine;
+            }
+            currentLine = nextLine();
         }
 
-        // Test Suite 'SenInterfaceTestCase' finished at 2006-07-13 23:22:58 +1000.
+        // verify that we are reading the end suite here.
         m = END_SUITE_PATTERN.matcher(currentLine);
         if (!m.matches())
         {
-            // step forward one line.
-            currentLine = nextLine();
-            m = END_SUITE_PATTERN.matcher(currentLine);
-            if (!m.matches())
-            {
-                throw new IllegalStateException();
-            }
+            throw new IllegalStateException();
         }
 
         if (m.group(1).compareTo(suite.getName()) != 0)
@@ -162,57 +173,15 @@ public class OCUnitReportPostProcessor implements PostProcessor
 
         // Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
         m = SUITE_SUMMARY_PATTERN.matcher(currentLine);
-        if (!m.matches())
+        while (!m.matches())
         {
-            throw new IllegalStateException();
+            currentLine = nextLine();
+            m = SUITE_SUMMARY_PATTERN.matcher(currentLine);
         }
 
         suite.setDuration((long) (Double.parseDouble(m.group(4)) * 1000));
 
-        // next line is empty.
-        currentLine = nextLine();
-        currentLine = nextLine();
-
         return suite;
-    }
-
-    private TestCaseResult processCase() throws IOException
-    {
-        if (END_SUITE_PATTERN.matcher(currentLine).matches())
-        {
-            return null;
-        }
-
-        String caseOutput = "";
-        Matcher m = CASE_SUMMARY_PATTERN.matcher(currentLine);
-        while (!m.matches())
-        {
-            caseOutput = caseOutput + currentLine;
-            currentLine = nextLine();
-            if (currentLine == null)
-            {
-                // end of file, end silently..
-                return null;
-            }
-            m = CASE_SUMMARY_PATTERN.matcher(currentLine);
-        }
-
-        TestCaseResult result = new TestCaseResult(m.group(2));
-        result.setMessage(caseOutput);
-
-        String statusString = m.group(3);
-        if (statusString.compareTo("passed") == 0)
-        {
-            result.setStatus(TestCaseResult.Status.PASS);
-        }
-        else if (statusString.compareTo("failed") == 0)
-        {
-            result.setStatus(TestCaseResult.Status.FAILURE);
-        }
-        result.setDuration((long) (Double.parseDouble(m.group(4)) * 1000));
-
-        currentLine = nextLine();
-        return result;
     }
 
     private String nextLine() throws IOException
