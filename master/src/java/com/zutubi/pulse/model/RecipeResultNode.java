@@ -188,6 +188,25 @@ public class RecipeResultNode extends Entity
         return null;
     }
 
+    public RecipeResultNode findNode(String stage)
+    {
+        if(stage.equals(this.stage))
+        {
+            return this;
+        }
+
+        for(RecipeResultNode child: children)
+        {
+            RecipeResultNode found = child.findNode(stage);
+            if(found != null)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
     public ResultState getWorstState(ResultState worst)
     {
         if(result != null)
@@ -202,4 +221,5 @@ public class RecipeResultNode extends Entity
 
         return worst;
     }
+
 }

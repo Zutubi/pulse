@@ -7,11 +7,13 @@ import com.zutubi.pulse.core.model.TestResultSummary;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
  */
-public class BuildResult extends Result implements AclObjectIdentityAware
+public class BuildResult extends Result implements AclObjectIdentityAware, Iterable<RecipeResultNode>
 {
     public static final String PULSE_FILE = "pulse.xml";
 
@@ -178,6 +180,11 @@ public class BuildResult extends Result implements AclObjectIdentityAware
         return root.findNode(id);
     }
 
+    public RecipeResultNode findResultNode(String stage)
+    {
+        return root.findNode(stage);
+    }
+
     public void complete()
     {
         // Check the recipe results, if there are any failures/errors
@@ -185,5 +192,37 @@ public class BuildResult extends Result implements AclObjectIdentityAware
         state = root.getWorstState(state);
 
         super.complete();
+    }
+
+    public Iterator<RecipeResultNode> iterator()
+    {
+        return new ResultIterator();
+    }
+
+    private class ResultIterator implements Iterator<RecipeResultNode>
+    {
+        List<RecipeResultNode> remaining;
+
+        public ResultIterator()
+        {
+            remaining = new LinkedList<RecipeResultNode>(root.getChildren());
+        }
+
+        public boolean hasNext()
+        {
+            return remaining.size() > 0;
+        }
+
+        public RecipeResultNode next()
+        {
+            RecipeResultNode next = remaining.remove(0);
+            remaining.addAll(next.getChildren());
+            return next;
+        }
+
+        public void remove()
+        {
+            throw new UnsupportedOperationException("Build result may not have recipes removed");
+        }
     }
 }

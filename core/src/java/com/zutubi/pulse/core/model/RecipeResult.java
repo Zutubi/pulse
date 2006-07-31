@@ -213,4 +213,17 @@ public class RecipeResult extends Result
 
         return tests;
     }
+
+    public CommandResult getCommandResult(String name)
+    {
+        for(CommandResult r: results)
+        {
+            if(name.equals(r.getCommandName()))
+            {
+                return r;
+            }
+        }
+
+        return null;
+    }
 }

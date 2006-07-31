@@ -1,8 +1,6 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
@@ -282,9 +280,9 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public List<BuildResult> querySpecificationBuilds(final Project project, final String spec, final ResultState[] states, final long lowestNumber, final long highestNumber, final int first, final int max, final boolean mostRecentFirst)
+    public List<BuildResult> querySpecificationBuilds(final Project project, final String spec, final ResultState[] states, final long lowestNumber, final long highestNumber, final int first, final int max, final boolean mostRecentFirst, boolean initialise)
     {
-        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        List<BuildResult> results =  (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -316,6 +314,38 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 return criteria.list();
             }
         });
+
+        if(initialise)
+        {
+            for(BuildResult result: results)
+            {
+                intialise(result);
+            }
+        }
+
+        return results;
+    }
+
+    private void intialise(BuildResult result)
+    {
+        Hibernate.initialize(result.getFeatures());
+        for(RecipeResultNode node: result)
+        {
+            RecipeResult recipe = node.getResult();
+            Hibernate.initialize(recipe.getFeatures());
+            for(CommandResult command: recipe.getCommandResults())
+            {
+                Hibernate.initialize(command.getFeatures());
+                for(StoredArtifact artifact: command.getArtifacts())
+                {
+                    for(StoredFileArtifact file: artifact.getChildren())
+                    {
+                        Hibernate.initialize(file.getFeatures());
+                        Hibernate.initialize(file.getTests());
+                    }
+                }
+            }
+        }
     }
 
     private Criteria getBuildResultCriteria(Session session, Project project, ResultState[] states, String spec)

@@ -1,12 +1,16 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.util.TreeNode;
 import com.zutubi.pulse.util.TreeNodeOperation;
-import com.zutubi.pulse.model.BuildResult;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
-public class BuildTree
+public class BuildTree implements Iterable<RecipeController>
 {
     private TreeNode<RecipeController> root;
 
@@ -24,7 +28,6 @@ public class BuildTree
     {
         apply(new TreeNodeOperation<RecipeController>()
         {
-
             public void apply(TreeNode<RecipeController> node)
             {
                 node.getData().prepare(buildResult);
@@ -36,7 +39,6 @@ public class BuildTree
     {
         apply(new TreeNodeOperation<RecipeController>()
         {
-
             public void apply(TreeNode<RecipeController> node)
             {
                 node.getData().cleanup(buildResult);
@@ -58,4 +60,25 @@ public class BuildTree
         }
     }
 
+    public Iterator<RecipeController> iterator()
+    {
+        ControllerAccumulator accumulator = new ControllerAccumulator();
+        apply(accumulator);
+        return accumulator.getControllers().iterator();
+    }
+
+    private class ControllerAccumulator implements TreeNodeOperation<RecipeController>
+    {
+        private List<RecipeController> controllers = new LinkedList<RecipeController>();
+
+        public List<RecipeController> getControllers()
+        {
+            return controllers;
+        }
+
+        public void apply(TreeNode<RecipeController> node)
+        {
+            controllers.add(node.getData());
+        }
+    }
 }

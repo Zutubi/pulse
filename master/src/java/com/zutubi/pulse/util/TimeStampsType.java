@@ -1,6 +1,5 @@
 package com.zutubi.pulse.util;
 
-import com.zutubi.pulse.util.TimeStamps;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.SessionImplementor;
@@ -15,7 +14,7 @@ import java.sql.SQLException;
 
 public class TimeStampsType implements CompositeUserType
 {
-    private static final int[] TYPES = new int[]{Types.BIGINT, Types.BIGINT, Types.BIGINT};
+    private static final int[] TYPES = new int[]{Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.BIGINT};
 
     public int[] sqlTypes()
     {
@@ -51,8 +50,7 @@ public class TimeStampsType implements CompositeUserType
         {
             return null;
         }
-        TimeStamps result = new TimeStamps((TimeStamps) x);
-        return result;
+        return new TimeStamps((TimeStamps) x);
     }
 
     public boolean isMutable()
@@ -67,8 +65,9 @@ public class TimeStampsType implements CompositeUserType
         Long queueTime = (Long) Hibernate.LONG.nullSafeGet(rs, names[0]);
         Long startTime = (Long) Hibernate.LONG.nullSafeGet(rs, names[1]);
         Long endTime = (Long) Hibernate.LONG.nullSafeGet(rs, names[2]);
+        Long estimatedRunningTime = (Long) Hibernate.LONG.nullSafeGet(rs, names[3]);
 
-        return new TimeStamps((queueTime != null) ? queueTime : -1, (startTime != null) ? startTime : -1, (endTime != null) ? endTime : -1);
+        return new TimeStamps((queueTime != null) ? queueTime : -1, (startTime != null) ? startTime : -1, (endTime != null) ? endTime : -1, (estimatedRunningTime != null) ? estimatedRunningTime : -1);
     }
 
     public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor session)
@@ -82,23 +81,25 @@ public class TimeStampsType implements CompositeUserType
             Hibernate.LONG.nullSafeSet(st, stamps.getQueueTime(), index);
             Hibernate.LONG.nullSafeSet(st, stamps.getStartTime(), index + 1);
             Hibernate.LONG.nullSafeSet(st, stamps.getEndTime(), index + 2);
+            Hibernate.LONG.nullSafeSet(st, stamps.getEstimatedRunningTime(), index + 3);
         }
         else
         {
             Hibernate.LONG.nullSafeSet(st, null, index);
             Hibernate.LONG.nullSafeSet(st, null, index + 1);
             Hibernate.LONG.nullSafeSet(st, null, index + 2);
+            Hibernate.LONG.nullSafeSet(st, null, index + 3);
         }
     }
 
     public String[] getPropertyNames()
     {
-        return new String[]{"queueTime", "startTime", "endTime"};
+        return new String[]{"queueTime", "startTime", "endTime", "estimatedRunningTime"};
     }
 
     public Type[] getPropertyTypes()
     {
-        return new Type[]{Hibernate.LONG, Hibernate.LONG, Hibernate.LONG};
+        return new Type[]{Hibernate.LONG, Hibernate.LONG, Hibernate.LONG, Hibernate.LONG};
     }
 
     public Object getPropertyValue(Object component, int property)
@@ -112,9 +113,13 @@ public class TimeStampsType implements CompositeUserType
         {
             return stamps.getStartTime();
         }
-        else
+        else if (property == 2)
         {
             return stamps.getEndTime();
+        }
+        else
+        {
+            return stamps.getEstimatedRunningTime();
         }
     }
 
@@ -132,9 +137,13 @@ public class TimeStampsType implements CompositeUserType
         {
             stamps.setStartTime((Long) value);
         }
-        else
+        else if(property == 2)
         {
             stamps.setEndTime((Long) value);
+        }
+        else
+        {
+            stamps.setEstimatedRunningTime((Long) value);
         }
     }
 

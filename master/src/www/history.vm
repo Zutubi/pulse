@@ -47,7 +47,7 @@
             #testResultsCell($buildResult false $buildResult)
             #classCell($buildResult.buildSpecification)
             #dateClassCell($buildResult)
-            #classCell($buildResult.stamps.prettyElapsed)
+            #elapsedCell($buildResult)
             #viewCell($project $buildResult)
             #logCell($project $buildResult)
             #changesCell($project $buildResult)

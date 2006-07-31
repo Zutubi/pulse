@@ -843,6 +843,22 @@
 #end
 
 ##
+## Outputs an elapsed cell for a result, with progress bar if there is an
+## estimated time remaining.
+##
+#macro(elapsedCell $result)
+    #if($result.stamps.hasEstimatedTimeRemaining())
+        #set($percentComplete = $result.stamps.estimatedPercentComplete)
+        #set($percentRemaining = 100 - $percentComplete)
+        <td class="content">
+            #if($percentComplete > 0)<img class="centre" title="$result.stamps.prettyElapsed (${percentComplete}%) elapsed" src="$base/images/box-elapsed.gif" height="10" width="$percentComplete"/>#end#if($percentRemaining > 0)<img class="centre" title="$result.stamps.prettyEstimatedTimeRemaining (${percentRemaining}%) remaining" src="$base/images/box-remaining.gif" height="10" width="$percentRemaining"/>#end
+        </td>
+    #else
+        #classCell($result.stamps.prettyElapsed)
+    #end
+#end
+
+##
 ## Outputs an action cell for viewing a build result
 ##
 #macro(viewCell $project $result)
@@ -1077,26 +1093,6 @@
 #end
 
 ##
-## Outputs table rows with a summary of the given result.
-##
-#macro(resultsummary $result)
-  #classset($result)
-
-  <tr>
-    <th class="command-detail">commenced</th>
-    <th class="command-detail">completed</th>
-    <th class="command-detail">elapsed</th>
-    <th class="command-detail">status</th>
-  </tr>
-  <tr>
-    <td class="build-$class">$result.stamps.prettyStartTime</td>
-    <td class="build-$class">$result.stamps.prettyEndTime</td>
-    <td class="build-$class">$result.stamps.prettyElapsed</td>
-    <td class="build-$class">$result.state.prettyString</td>
-  <tr>
-#end
-
-##
 ## Header row for recipe summary
 ##
 #macro(recipeSummaryHeader)
@@ -1162,7 +1158,7 @@
         #statusCell($recipe $showAnimated)
         #testResultsCell($build $recipe $recipe)
         #dateClassCell($recipe)
-        #classCell($recipe.stamps.prettyElapsed)
+        #elapsedCell($recipe)
         <td class="content">
             <a href="tailRecipeLog.action?id=$id&amp;buildId=$build.id" class="unadorned" title="view log""><img alt="view log" src="$base/images/script.gif"/> #wwtext("name=log")  </a>
         </td>
@@ -1195,7 +1191,7 @@
             #statusCell($command true)
             #testResultsCell($build $recipe $command)
             #dateClassCell($command)
-            #classCell($command.stamps.prettyElapsed)
+            #elapsedCell($command)
         </tr>
     #end
     </table>
@@ -1603,7 +1599,7 @@
             #classCell($buildResult.reason.summary)
             #testResultsCell($buildResult false $buildResult)
             #dateClassCell($buildResult)
-            #classCell($buildResult.stamps.prettyElapsed)
+            #elapsedCell($buildResult)
     #if($showActions)
             #viewCell($project $buildResult)
             #logCell($project $buildResult)
@@ -1686,7 +1682,7 @@
             #classCell($buildResult.reason.summary)
             #testResultsCell($buildResult false $buildResult)
             #dateClassCell($buildResult)
-            #classCell($buildResult.stamps.prettyElapsed)
+            #elapsedCell($buildResult)
             #viewCell($project $buildResult)
             #logCell($project $buildResult)
             #changesCell($project $buildResult)
@@ -1754,7 +1750,7 @@
             #classCell($lastResult.reason.summary)
             #testResultsCell($lastResult false $lastResult)
             #dateClassCell($lastResult)
-            #classCell($lastResult.stamps.prettyElapsed)
+            #elapsedCell($lastResult)
             #viewCell($project $lastResult)
             #logCell($project $lastResult)
             #changesCell($project $lastResult)

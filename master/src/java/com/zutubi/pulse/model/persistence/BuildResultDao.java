@@ -49,5 +49,5 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     List<String> findAllSpecificationsForProjects(Project[] projects);
 
-    List<BuildResult> querySpecificationBuilds(Project project, String spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst);
+    List<BuildResult> querySpecificationBuilds(Project project, String spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise);
 }

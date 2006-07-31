@@ -6,10 +6,7 @@ import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
@@ -22,6 +19,7 @@ import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.util.TreeNode;
 import com.zutubi.pulse.util.logging.Logger;
 import org.quartz.Scheduler;
@@ -57,8 +55,10 @@ public class BuildController implements EventListener
     private BuildResult buildResult;
     private AsynchronousDelegatingListener asyncListener;
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
+    private int pendingRecipes = 0;
     private Scheduler quartzScheduler;
     private ServiceTokenManager serviceTokenManager;
+    private BuildResult previousSuccessful;
 
     public BuildController(BuildRequestEvent event, BuildSpecification specification, EventManager eventManager, ProjectManager projectManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager, ServiceTokenManager serviceTokenManager)
     {
@@ -107,9 +107,21 @@ public class BuildController implements EventListener
         TreeNode<RecipeController> root = tree.getRoot();
         buildResult = new BuildResult(reason, project, specification.getName(), projectManager.getNextBuildNumber(project));
         buildManager.save(buildResult);
+        previousSuccessful = getPreviousSuccessfulBuild();
         configure(root, buildResult.getRoot(), specification, specification.getRoot());
 
         return tree;
+    }
+
+    private BuildResult getPreviousSuccessfulBuild()
+    {
+        BuildResult previousSuccessful = null;
+        List<BuildResult> previousSuccess = buildManager.querySpecificationBuilds(project, specification.getName(), new ResultState[] { ResultState.SUCCESS }, -1, -1, 0, 1, true, true);
+        if(previousSuccess.size() > 0)
+        {
+            previousSuccessful = previousSuccess.get(0);
+        }
+        return previousSuccessful;
     }
 
     private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode, BuildSpecification specification, BuildSpecificationNode specNode)
@@ -130,9 +142,11 @@ public class BuildController implements EventListener
             RecipeRequest recipeRequest = new RecipeRequest(project.getName(), specification.getName(), recipeResult.getId(), stage.getRecipe(), incremental, getResourceRequirements(specification, node));
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), revision, recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(project, buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
-            RecipeController rc = new RecipeController(childResultNode, dispatchRequest, incremental, logger, collector, queue, buildManager, serviceTokenManager);
+            RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNode(stage.getName());
+            RecipeController rc = new RecipeController(childResultNode, dispatchRequest, incremental, previousRecipe, logger, collector, queue, buildManager, serviceTokenManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
+            pendingRecipes++;
             configure(child, childResultNode, specification, node);
         }
     }
@@ -295,9 +309,16 @@ public class BuildController implements EventListener
             // recipes.
             if (e instanceof RecipeCommencedEvent)
             {
+                pendingRecipes--;
+
                 if (!buildResult.commenced())
                 {
                     handleFirstCommenced(foundNode.getData());
+                }
+
+                if(pendingRecipes == 0)
+                {
+                    handleLastCommenced();
                 }
 
                 if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
@@ -327,6 +348,33 @@ public class BuildController implements EventListener
         }
     }
 
+    private void handleLastCommenced()
+    {
+        // We can now make a more accurate estimate of our remaining running
+        // time, as there are no more queued recipes.
+        long longestRemaining = 0;
+
+        for(RecipeController controller: tree)
+        {
+            TimeStamps stamps = controller.getResult().getStamps();
+            if(stamps.hasEstimatedEndTime())
+            {
+                long remaining = stamps.getEstimatedTimeRemaining();
+                if(remaining > longestRemaining)
+                {
+                    longestRemaining = remaining;
+                }
+            }
+        }
+
+        TimeStamps buildStamps = buildResult.getStamps();
+        long estimatedEnd = System.currentTimeMillis() + longestRemaining;
+        if(estimatedEnd > buildStamps.getStartTime())
+        {
+            buildStamps.setEstimatedRunningTime(estimatedEnd - buildStamps.getStartTime());
+        }
+    }
+
     /**
      * Called when the first recipe for this build is successfully
      * commenced.  It is at this point that the build is said to have
@@ -348,6 +396,10 @@ public class BuildController implements EventListener
 
         getChanges(dispatchRequest.getRevision());
         buildResult.commence(controller.getResult().getStamps().getStartTime());
+        if(previousSuccessful != null)
+        {
+            buildResult.getStamps().setEstimatedRunningTime(previousSuccessful.getStamps().getElapsed());
+        }
         buildManager.save(buildResult);
     }
 

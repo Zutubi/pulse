@@ -14,16 +14,12 @@ public class TimeStamps
     private long queueTime;
     private long startTime;
     private long endTime;
-
-    // Transient fields below
-
-    private long estimatedRunningTime;
+    private long estimatedRunningTime = UNINITIALISED_TIME;
 
     public TimeStamps()
     {
         queueTime = UNINITIALISED_TIME;
         startTime = UNINITIALISED_TIME;
-        estimatedRunningTime = UNINITIALISED_TIME;
         endTime = UNINITIALISED_TIME;
     }
 
@@ -34,11 +30,20 @@ public class TimeStamps
         this.endTime = endTime;
     }
 
+    public TimeStamps(long queueTime, long startTime, long endTime, long estimatedRunningTime)
+    {
+        this.queueTime = queueTime;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.estimatedRunningTime = estimatedRunningTime;
+    }
+
     public TimeStamps(TimeStamps other)
     {
         this.queueTime = other.queueTime;
         this.startTime = other.startTime;
         this.endTime = other.endTime;
+        this.estimatedRunningTime = other.estimatedRunningTime;
     }
 
     public void end()
@@ -141,6 +146,16 @@ public class TimeStamps
     public void setEndTime(long t)
     {
         endTime = t;
+    }
+
+    public long getEstimatedRunningTime()
+    {
+        return estimatedRunningTime;
+    }
+
+    public void setEstimatedRunningTime(long estimatedRunningTime)
+    {
+        this.estimatedRunningTime = estimatedRunningTime;
     }
 
     public long getElapsed()

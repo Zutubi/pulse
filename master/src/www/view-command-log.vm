@@ -95,7 +95,7 @@
                                 #statusCell($commandResult true)
                                 #testResultsCell($result  $recipeResult $commandResult)
                                 #dateClassCell($commandResult)
-                                #classCell($commandResult.stamps.prettyElapsed)
+                                #elapsedCell($commandResult)
                             </tr>
                             #directMessages($commandResult 6)
                         </table>

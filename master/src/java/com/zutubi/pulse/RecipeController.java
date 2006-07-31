@@ -22,6 +22,7 @@ public class RecipeController
     private RecipeResult recipeResult;
     private RecipeDispatchRequest dispatchRequest;
     private boolean incremental;
+    private RecipeResultNode previousSuccessful;
     private RecipeLogger logger;
     private RecipeResultCollector collector;
     private BuildManager buildManager;
@@ -31,12 +32,13 @@ public class RecipeController
     private RecipeQueue queue;
     private BuildService buildService;
 
-    public RecipeController(RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, boolean incremental, RecipeLogger logger, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager, ServiceTokenManager serviceTokenManager)
+    public RecipeController(RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, boolean incremental, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager, ServiceTokenManager serviceTokenManager)
     {
         this.recipeResultNode = recipeResultNode;
         this.recipeResult = recipeResultNode.getResult();
         this.dispatchRequest = dispatchRequest;
         this.incremental = incremental;
+        this.previousSuccessful = previousSuccessful;
         this.logger = logger;
         this.collector = collector;
         this.queue = queue;
@@ -135,6 +137,15 @@ public class RecipeController
     private void handleRecipeCommenced(RecipeCommencedEvent event)
     {
         recipeResult.commence(event.getName(), System.currentTimeMillis());
+        if(previousSuccessful != null)
+        {
+            RecipeResult result = previousSuccessful.getResult();
+            if(result != null)
+            {
+                recipeResult.getStamps().setEstimatedRunningTime(result.getStamps().getElapsed());
+            }
+        }
+
         if (recipeResult.terminating())
         {
             // This terminate must have come in before the recipe commenced.
@@ -148,6 +159,18 @@ public class RecipeController
     private void handleCommandCommenced(CommandCommencedEvent event)
     {
         CommandResult result = new CommandResult(event.getName());
+        if(previousSuccessful != null)
+        {
+            RecipeResult previousResult = previousSuccessful.getResult();
+            if(previousResult != null)
+            {
+                CommandResult previousCommand = previousResult.getCommandResult(event.getName());
+                if(previousCommand != null)
+                {
+                    result.getStamps().setEstimatedRunningTime(previousCommand.getStamps().getElapsed());
+                }
+            }
+        }
         result.commence(System.currentTimeMillis());
         recipeResult.add(result);
         buildManager.save(recipeResult);
