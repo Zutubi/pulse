@@ -82,6 +82,31 @@ public class PlainFeature extends Feature
         return true;
     }
 
+    public boolean hasLeadingContext()
+    {
+        return lineNumber > firstLine;
+    }
+
+    public boolean hasTrailingContext()
+    {
+        return lineNumber < lastLine;
+    }
+
+    public boolean hasContext()
+    {
+        return hasLeadingContext() || hasTrailingContext();
+    }
+
+    public int lineOffset()
+    {
+        return (int) (lineNumber - firstLine + 1);
+    }
+
+    public String[] getSummaryLines()
+    {
+        return getSummary().split("\n");
+    }
+
     public boolean equals(Object o)
     {
         if (o instanceof PlainFeature)

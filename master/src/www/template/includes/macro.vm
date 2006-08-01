@@ -1222,11 +1222,25 @@
         <ul>
         #foreach($feature in $fileArtifact.getFeatures($level))
             <li class="$level.toString().toLowerCase()">
-                $action.plainToHtml($feature.summary)
-            #if($feature.isPlain())
-                <a class="unadorned" href="viewArtifact.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id#$feature.firstLine">
-                    <br/><span class="small">#wwtext("name=jump.to")</span> <img src="$base/images/go_small.gif"/>
+            #if($feature.isPlain() && $feature.hasContext())
+                <span class="context">
+                #foreach($line in $feature.summaryLines)
+                    #if($velocityCount == $feature.lineOffset())
+                </span>
+                <span class="feature">
+                    $action.plainToHtml($line)<br/>
+                </span>
+                <span class="context">
+                    #else
+                $action.plainToHtml($line)<br/>
+                    #end
+                #end
+                </span>
+                <a class="unadorned" href="viewArtifact.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id#$feature.lineNumber">
+                    <span class="small">#wwtext("name=jump.to")</span> <img src="$base/images/go_small.gif"/>
                 </a>
+            #else
+                $action.plainToHtml($feature.summary)
             #end
             </li>
         #end

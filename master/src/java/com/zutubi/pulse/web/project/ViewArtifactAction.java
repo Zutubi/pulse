@@ -94,10 +94,7 @@ public class ViewArtifactAction extends ProjectActionSupport
             if(f instanceof PlainFeature)
             {
                 PlainFeature p = (PlainFeature) f;
-                for(long n = p.getFirstLine(); n <= p.getLastLine(); n++)
-                {
-                    updateLevel(n, p.getLevel());
-                }
+                updateLevel(p.getLineNumber(), p.getLevel());
             }
         }
     }

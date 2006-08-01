@@ -480,6 +480,14 @@ ul.info {
     background-color: #eeeeff;
 }
 
+span.context {
+    color: #555;
+}
+
+span.feature {
+    font-weight: bold;
+}
+
 #reference ul {
     list-style: disc;
 }
