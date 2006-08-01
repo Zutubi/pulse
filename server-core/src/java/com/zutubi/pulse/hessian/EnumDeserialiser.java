@@ -22,6 +22,7 @@ public class EnumDeserialiser extends AbstractDeserializer
             clazz = in.readString();
             value = in.readString();
         }
+        String r = clazz;
         in.readMapEnd();
 
         if (clazz == null)
@@ -38,7 +39,12 @@ public class EnumDeserialiser extends AbstractDeserializer
         int index = clazz.lastIndexOf('$');
         if(index != -1)
         {
-            clazz = clazz.substring(0, index);
+            // Check the remainder of the string is digits
+            String remainder = clazz.substring(index + 1);
+            if(remainder.matches("[0-9]+"))
+            {
+                clazz = clazz.substring(0, index);
+            }
         }
 
         Class enumClazz = null;

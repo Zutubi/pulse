@@ -19,13 +19,13 @@
     <bean id="configurationManager" class="com.zutubi.pulse.slave.SlaveConfigurationManager" init-method="init">
         <property name="systemPaths">
             <bean id="paths" class="com.zutubi.pulse.bootstrap.ConfigurableSystemPaths">
-                <property name="systemRoot">
+                <property name="systemRootString">
                     <value>slave/system</value>
                 </property>
-                <property name="contentRoot">
+                <property name="contentRootString">
                     <value>slave/src/www</value>
                 </property>
-                <property name="configRoot">
+                <property name="configRootString">
                     <value>slave/etc</value>
                 </property>
             </bean>
