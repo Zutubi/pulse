@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -273,6 +273,27 @@ public class RegexPostProcessorTest extends PulseTestCase
         RegexPostProcessor pp = createPostProcessor("xxx abc");
         pp.setTrailingContext(2);
         simpleErrors(pp, "xxx abc\nabc xxx\nabc xxx abc");
+    }
+
+    public void testOverlappingDifferentLevels() throws FileLoadException
+    {
+        RegexPostProcessor pp = new RegexPostProcessor("test");
+        RegexPattern pattern = pp.createPattern();
+        pattern.setCategory(Feature.Level.WARNING);
+        pattern.setExpression("^xxx abc$");
+        pp.setTrailingContext(1);
+
+        pattern = pp.createPattern();
+        pattern.setCategory(Feature.Level.ERROR);
+        pattern.setExpression("^abc xxx$");
+        pp.setLeadingContext(1);
+
+        CommandResult result = new CommandResult("test");
+        pp.process(tempDir, artifact, result);
+        List<Feature> features = artifact.getFeatures();
+        assertEquals(2, features.size());
+        assertEquals(Feature.Level.WARNING, features.get(0).getLevel());
+        assertEquals(Feature.Level.ERROR, features.get(1).getLevel());
     }
 
     private void contextHelper(int leading, int trailing)

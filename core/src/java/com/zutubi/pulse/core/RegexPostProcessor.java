@@ -1,14 +1,14 @@
 package com.zutubi.pulse.core;
 
+import com.opensymphony.xwork.validator.ValidatorContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.PlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.core.validation.Validateable;
 import com.zutubi.pulse.util.CircularBuffer;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
-import com.opensymphony.xwork.validator.ValidatorContext;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -198,7 +198,7 @@ public class RegexPostProcessor implements PostProcessor, Validateable
 
     private void addFeature(List<PlainFeature> features, PlainFeature feature)
     {
-        if(joinOverlapping && features.size() > 0 && features.get(features.size() - 1).getLastLine() >= feature.getFirstLine())
+        if(canJoin(features, feature))
         {
             // Join with previous
             PlainFeature previous = features.get(features.size() - 1);
@@ -211,6 +211,17 @@ public class RegexPostProcessor implements PostProcessor, Validateable
         {
             features.add(feature);
         }
+    }
+
+    private boolean canJoin(List<PlainFeature> features, PlainFeature feature)
+    {
+        if(joinOverlapping && features.size() > 0)
+        {
+            PlainFeature previous = features.get(features.size() - 1);
+            return previous.getLevel() == feature.getLevel() && previous.getLastLine() >= feature.getFirstLine();
+        }
+        
+        return false;
     }
 
     private String getRemainingSummary(String summary, long overlappingLines)
