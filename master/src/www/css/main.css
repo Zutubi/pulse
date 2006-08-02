@@ -357,7 +357,7 @@ h3.heading, th.heading {
     white-space: normal;
 }
 
-td.content {
+td.content, td.content-nowrap {
     white-space: nowrap;
 }
 

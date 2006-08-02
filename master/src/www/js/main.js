@@ -246,11 +246,27 @@ function isSuccessfulRow(row)
     return cells.length > 0 && cells[0].className.indexOf('success') == 0;
 }
 
+function isCollapsed(row)
+{
+    if(row.collapsed !== undefined)
+    {
+        for(var property in row.collapsed)
+        {
+            if(row.collapsed[property])
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 function setTestRowDisplay(row, successfulShowing)
 {
     var success = isSuccessfulRow(row);
     var suite = row.className.indexOf('suite') == 0;
-    var visible = (suite || !row.collapsed) && (successfulShowing || !success);
+    var visible = !isCollapsed(row) && (successfulShowing || !success);
     row.style.display = visible ? '' : 'none';
 }
 
@@ -307,7 +323,11 @@ function expandCollapseSuite(row, expand, successfulShowing)
 
                     if(cells.length > 0)
                     {
-                        sibling.collapsed = !expand;
+                        if(sibling.collapsed === undefined)
+                        {
+                            sibling.collapsed = {};
+                        }
+                        sibling.collapsed[row.id] = !expand;
                         setTestRowDisplay(sibling, successfulShowing);
                     }
                 }

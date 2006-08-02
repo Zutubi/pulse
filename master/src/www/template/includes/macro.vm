@@ -1908,9 +1908,9 @@
         >
             <td
         #if($test.isSuite() && $showPassed)
-                class="$cssClass collapse"
+                class="$cssClass content-nowrap collapse"
         #else
-                class="$cssClass"
+                class="$cssClass content-nowrap"
         #end
             >
                  ${indent}$!webwork.htmlEncode($test.name)
@@ -1933,8 +1933,9 @@
         </tr>
 
         #if($test.isSuite())
+            #set($newparent = "${parent}_${test.id}")
             #foreach($child in $test.children)
-                #showTest($recipe $child "$indent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" $showPassed "${parent}_${test.id}")
+                #showTest($recipe $child "$indent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" $showPassed "$newparent")
             #end
         #end
     #end
