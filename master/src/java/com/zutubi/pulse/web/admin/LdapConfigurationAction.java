@@ -81,6 +81,7 @@ public class LdapConfigurationAction extends ActionSupport
         config.setLdapManagerDn("");
         config.setLdapManagerPassword("");
         config.setLdapUserFilter("");
+        config.setLdapEmailAttribute("");
         config.setLdapAutoAdd(false);
         ldapManager.init();
     }
@@ -95,6 +96,7 @@ public class LdapConfigurationAction extends ActionSupport
         config.setLdapManagerPassword(ldap.getManagerPassword());
         config.setLdapUserFilter(ldap.getUserFilter());
         config.setLdapAutoAdd(ldap.getAutoAdd());
+        config.setLdapEmailAttribute(ldap.getEmailAttribute());
         ldapManager.init();
         if(ldap.getEnabled())
         {
@@ -113,6 +115,7 @@ public class LdapConfigurationAction extends ActionSupport
         ldap.setManagerPassword(config.getLdapManagerPassword());
         ldap.setUserFilter(config.getLdapUserFilter());
         ldap.setAutoAdd(config.getLdapAutoAdd());
+        ldap.setEmailAttribute(config.getLdapEmailAttribute());
     }
 
     /**
@@ -142,6 +145,7 @@ public class LdapConfigurationAction extends ActionSupport
         private String managerPassword;
         private String userFilter;
         private Boolean autoAdd = false;
+        private String emailAttribute;
 
         public Boolean getEnabled()
         {
@@ -211,6 +215,16 @@ public class LdapConfigurationAction extends ActionSupport
         public void setAutoAdd(Boolean autoAdd)
         {
             this.autoAdd = autoAdd;
+        }
+
+        public String getEmailAttribute()
+        {
+            return emailAttribute;
+        }
+
+        public void setEmailAttribute(String emailAttribute)
+        {
+            this.emailAttribute = emailAttribute;
         }
     }
 }

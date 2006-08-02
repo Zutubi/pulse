@@ -240,6 +240,16 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
         setBooleanProperty(LDAP_AUTO_ADD, autoAdd);
     }
 
+    public String getLdapEmailAttribute()
+    {
+        return getProperty(LDAP_EMAIL_ATTRIBUTE);
+    }
+
+    public void setLdapEmailAttribute(String attribute)
+    {
+        setProperty(LDAP_EMAIL_ATTRIBUTE, attribute);
+    }
+
     public String getSmtpPrefix()
     {
         return getProperty(SMTP_PREFIX);

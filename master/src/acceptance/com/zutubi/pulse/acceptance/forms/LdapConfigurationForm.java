@@ -19,11 +19,11 @@ public class LdapConfigurationForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"ldap.enabled", "ldap.host", "ldap.baseDn", "ldap.managerDn", "ldap.managerPassword", "ldap.userFilter", "ldap.autoAdd"};
+        return new String[]{"ldap.enabled", "ldap.host", "ldap.baseDn", "ldap.managerDn", "ldap.managerPassword", "ldap.userFilter", "ldap.autoAdd", "ldap.emailAttribute"};
     }
 
     public int[] getFieldTypes()
     {
-        return new int[]{CHECKBOX, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, CHECKBOX};
+        return new int[]{CHECKBOX, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, CHECKBOX, TEXTFIELD};
     }
 }

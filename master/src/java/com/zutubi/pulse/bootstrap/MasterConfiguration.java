@@ -60,6 +60,7 @@ public interface MasterConfiguration extends LogConfiguration
     public static final String LDAP_MANAGER_PASSWORD = "ldap.manager.password";
     public static final String LDAP_USER_FILTER = "ldap.user.filter";
     public static final String LDAP_AUTO_ADD = "ldap.auto.add";
+    public static final String LDAP_EMAIL_ATTRIBUTE = "ldap.email.attribute";
 
     String getAdminLogin();
 
@@ -152,4 +153,8 @@ public interface MasterConfiguration extends LogConfiguration
     Boolean getLdapAutoAdd();
 
     void setLdapAutoAdd(Boolean autoAdd);
+
+    String getLdapEmailAttribute();
+
+    void setLdapEmailAttribute(String attribute);
 }

@@ -3,9 +3,10 @@ package com.zutubi.pulse.security.ldap;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.model.EmailContactPoint;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.license.LicenseHolder;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.ldap.DefaultInitialDirContextFactory;
 import org.acegisecurity.ldap.search.FilterBasedLdapUserSearch;
@@ -29,6 +30,7 @@ public class AcegiLdapManager implements LdapManager
     private BindAuthenticator authenticator;
     private boolean autoAdd = false;
     private String statusMessage = null;
+    private String emailAttribute = null;
 
     public void init()
     {
@@ -37,6 +39,7 @@ public class AcegiLdapManager implements LdapManager
         MasterConfiguration appConfig = configurationManager.getAppConfig();
         enabled = appConfig.getLdapEnabled();
         autoAdd = appConfig.getLdapAutoAdd();
+        emailAttribute = appConfig.getLdapEmailAttribute();
 
         if(enabled)
         {
@@ -99,29 +102,20 @@ public class AcegiLdapManager implements LdapManager
             try
             {
                 LdapUserDetails details = authenticator.authenticate(username, password);
-                String name = username;
-                Attribute commonName = details.getAttributes().get("cn");
-                if(commonName != null)
+                String name = getStringAttribute(details, "cn", username);
+                if(name == null)
                 {
-                    try
-                    {
-                        Object value = commonName.get();
-                        if(value instanceof String)
-                        {
-                            name = (String) value;
-                        }
-                    }
-                    catch (NamingException e)
-                    {
-                        LOG.debug("Unable to get common name for user '" + username + "': " + e.getMessage(),  e);
-                    }
-                }
-                else
-                {
-                    LOG.debug("User '" + username + "' has no common name (cn) attribute");
+                    name = username;
                 }
 
-                return new User(username, name);
+                User user = new User(username, name);
+
+                if(TextUtils.stringSet(emailAttribute))
+                {
+                    addContact(user, details);
+                }
+
+                return user;
             }
             catch(BadCredentialsException e)
             {
@@ -132,6 +126,43 @@ public class AcegiLdapManager implements LdapManager
                 LOG.warning("Error contacting LDAP server: " + e.getMessage());
                 statusMessage = e.getMessage();
             }
+        }
+
+        return null;
+    }
+
+    private void addContact(User user, LdapUserDetails details)
+    {
+        String email = getStringAttribute(details, emailAttribute, user.getLogin());
+        if(email != null)
+        {
+            EmailContactPoint point = new EmailContactPoint(email);
+            point.setName("LDAP email");
+            user.add(point);
+        }
+    }
+
+    private String getStringAttribute(LdapUserDetails details, String attribute, String username)
+    {
+        Attribute att = details.getAttributes().get(attribute);
+        if(att != null)
+        {
+            try
+            {
+                Object value = att.get();
+                if(value instanceof String)
+                {
+                    return (String) value;
+                }
+            }
+            catch (NamingException e)
+            {
+                LOG.debug("Unable to get attribute '" + attribute + "' for user '" + username + "': " + e.getMessage(),  e);
+            }
+        }
+        else
+        {
+            LOG.debug("User '" + username + "' has no common name (cn) attribute");
         }
 
         return null;

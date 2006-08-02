@@ -107,6 +107,7 @@
                     <!-- Probably best we don't show the password -->
                     #dynamicRow("ldap.user.filter" $config.ldapUserFilter)
                     #dynamicRow("ldap.auto.add" $config.ldapAutoAdd.toString().toLowerCase())
+                    #dynamicRow("ldap.email.attribute" $config.ldapEmailAttribute)
                 </table>
             </td>
         </tr>
