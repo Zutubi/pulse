@@ -14,16 +14,10 @@
                 }
             }
 
-/*
-            window.onunload = function()
+            window.onload = function()
             {
-                alert('action %s' + action);
-                if (action == 'submit')
-                {
-                    addNewFolder();
-                }
-            };
-*/
+                document.forms['newfolder'].elements['newfolder'].select();
+            }
         //-->
     </script>
 </head>
