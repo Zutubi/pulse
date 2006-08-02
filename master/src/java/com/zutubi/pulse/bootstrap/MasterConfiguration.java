@@ -13,6 +13,8 @@ public interface MasterConfiguration extends LogConfiguration
 
     public static final String BASE_URL = "webapp.base.url";
 
+    public static final String AGENT_HOST = "agent.url";
+
     //---( help configuration )---
     public static final String HELP_URL = "help.url";
 
@@ -66,6 +68,10 @@ public interface MasterConfiguration extends LogConfiguration
     String getBaseUrl();
 
     void setBaseUrl(String host);
+
+    String getAgentHost();
+
+    void setAgentHost(String url);
 
     String getHelpUrl();
 

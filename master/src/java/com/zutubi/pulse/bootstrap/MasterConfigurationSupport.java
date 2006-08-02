@@ -1,9 +1,14 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.bootstrap.conf.CompositeConfig;
 import com.zutubi.pulse.bootstrap.conf.Config;
 import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
-import com.zutubi.pulse.bootstrap.conf.CompositeConfig;
-import com.opensymphony.util.TextUtils;
+
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
 
 /**
  * <class-comment/>
@@ -48,6 +53,51 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
             host = host.substring(0, host.length() - 1);
         }
         setProperty(BASE_URL, host);
+    }
+
+    public String getAgentHost()
+    {
+        String host = getProperty(AGENT_HOST);
+        if(host == null)
+        {
+            // Base it on the base URL
+            String base = getBaseUrl();
+            if(base != null)
+            {
+                // Pull out just the host part
+                try
+                {
+                    URL url = new URL(getBaseUrl());
+                    host = url.getHost();
+                }
+                catch (MalformedURLException e)
+                {
+                    // Nice try
+                }
+            }
+
+            if(host == null)
+            {
+                // So much for that plan...let's try and get the host name
+                try
+                {
+                    InetAddress address = InetAddress.getLocalHost();
+                    host = address.getCanonicalHostName();
+                }
+                catch (UnknownHostException e)
+                {
+                    // Oh well, we tried
+                    host = "localhost";
+                }
+            }
+        }
+
+        return host;
+    }
+
+    public void setAgentHost(String url)
+    {
+        setProperty(AGENT_HOST, url);
     }
 
     public String getHelpUrl()

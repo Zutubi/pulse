@@ -1,6 +1,8 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.model.ResourceManager;
@@ -30,7 +32,9 @@ public class MasterBuildService implements BuildService
 
     public String getUrl()
     {
-        return configurationManager.getAppConfig().getBaseUrl();
+        MasterConfiguration appConfig = configurationManager.getAppConfig();
+        SystemConfiguration systemConfig = configurationManager.getSystemConfig();
+        return "http://" + appConfig.getAgentHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
     }
 
     public boolean hasResource(String resource, String version)

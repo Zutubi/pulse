@@ -33,7 +33,7 @@
     #else
         #contentCell("empty.cell")
         #contentCell("empty.cell")
-        #contentCell("empty.cell")
+        #editCell("$base/admin/editMasterAgent!input.action" "edit_$!webwork.htmlEncode($agent.name)")
         #contentCell("empty.cell")
     #end
 #end

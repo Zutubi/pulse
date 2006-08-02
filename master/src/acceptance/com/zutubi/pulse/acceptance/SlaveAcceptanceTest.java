@@ -1,7 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.forms.SlaveForm;
+import com.zutubi.pulse.acceptance.forms.MasterAgentForm;
 import com.zutubi.pulse.acceptance.forms.ResourceForm;
+import com.zutubi.pulse.acceptance.forms.SlaveForm;
 import com.zutubi.pulse.util.RandomUtils;
 
 /**
@@ -39,6 +40,33 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTestCase
     {
         super.tearDown();
     }
+
+    // Master agent location
+
+    public void testEditMasterLocation()
+    {
+        clickLink("edit_master");
+        MasterAgentForm form = new MasterAgentForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements("newhost");
+        assertTextPresent("newhost:" + port);
+
+        clickLink("edit_master");
+        form.assertFormPresent();
+        form.assertFormElements("newhost");
+    }
+
+    public void testEditMasterLocationValidation()
+    {
+        clickLink("edit_master");
+        MasterAgentForm form = new MasterAgentForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements("");
+        form.assertFormPresent();
+        assertTextPresent("host is required");
+    }
+
+    // Slave basics
 
     public void testAddSlave()
     {

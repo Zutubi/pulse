@@ -1,6 +1,8 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.model.ResourceManager;
@@ -53,9 +55,13 @@ public class SlaveBuildService implements BuildService
 
     public boolean build(RecipeRequest request)
     {
+        MasterConfiguration appConfig = configurationManager.getAppConfig();
+        SystemConfiguration systemConfig = configurationManager.getSystemConfig();
+        String masterUrl = "http://" + appConfig.getAgentHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
+
         try
         {
-            return service.build(serviceTokenManager.getToken(), configurationManager.getAppConfig().getBaseUrl(), slave.getId(), request);
+            return service.build(serviceTokenManager.getToken(), masterUrl, slave.getId(), request);
         }
         catch (RuntimeException e)
         {

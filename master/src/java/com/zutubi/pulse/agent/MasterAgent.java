@@ -5,6 +5,7 @@ import com.zutubi.pulse.MasterBuildService;
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 
@@ -66,7 +67,8 @@ public class MasterAgent implements Agent
 
     public String getLocation()
     {
-        return configurationManager.getAppConfig().getBaseUrl();
+        SystemConfiguration systemConfig = configurationManager.getSystemConfig();
+        return configurationManager.getAppConfig().getAgentHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
     }
 
     public boolean isSlave()
