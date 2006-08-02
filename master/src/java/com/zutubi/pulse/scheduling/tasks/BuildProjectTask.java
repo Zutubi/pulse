@@ -18,7 +18,6 @@ import java.util.Map;
 public class BuildProjectTask implements Task
 {
     public static final String PARAM_SPEC = "spec";
-    public static final String PARAM_PROJECT = "project";
     public static final String PARAM_FORCE = "force";
 
     private static final Logger LOG = Logger.getLogger(BuildProjectTask.class);
@@ -30,7 +29,7 @@ public class BuildProjectTask implements Task
         Trigger trigger = context.getTrigger();
         Map<Serializable, Serializable> dataMap = trigger.getDataMap();
         String spec = (String) dataMap.get(PARAM_SPEC);
-        long projectId = (Long)dataMap.get(PARAM_PROJECT);
+        long projectId = trigger.getProject();
         boolean force = dataMap.containsKey(PARAM_FORCE);
 
         Project project = projectManager.getProject(projectId);

@@ -94,7 +94,6 @@ public class AddTriggerWizard extends BaseWizard
 
         trigger.setProject(project.getId());
         trigger.setTaskClass(BuildProjectTask.class);
-        trigger.getDataMap().put(BuildProjectTask.PARAM_PROJECT, project.getId());
         trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, selectState.getSpec());
         if(force)
         {
