@@ -35,9 +35,6 @@ public class ServerSettingsAction extends ActionSupport
     //---( License details )---
     private License license;
     private List<LicenseRestriction> restrictions;
-    private long noAgents;
-    private long noProjects;
-    private long noUsers;
 
     public MasterConfiguration getConfig()
     {
@@ -159,7 +156,7 @@ public class ServerSettingsAction extends ActionSupport
         this.userManager = userManager;
     }
 
-    public class LicenseRestriction
+    public static class LicenseRestriction
     {
         private String entity;
         private int supported;

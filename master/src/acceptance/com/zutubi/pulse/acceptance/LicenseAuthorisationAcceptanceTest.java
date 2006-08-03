@@ -44,7 +44,7 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
 
         // verify that add project wizard action can not be triggered directly.
         goTo("/addProject!input.action");
-        assertTextPresent("Not licensed");
+        assertTextPresent("not licensed to execute the requested action");
     }
 
     public void testCreateUserFormOnlyAvailableWhenLicensed() throws Exception
@@ -66,7 +66,7 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
 
         // verify that we can not post directly to the create user action.
         goTo("/admin/createUser.action");
-        assertTextPresent("Not licensed");
+        assertTextPresent("not licensed to execute the requested action");
     }
 
     public void testAddAgentLinkOnlyAvailableWhenLicensed() throws Exception
@@ -84,7 +84,7 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
 
         // verify that we can not post directly to the add agent action.
         goTo("/admin/addAgent.action");
-        assertTextPresent("Not licensed");
+        assertTextPresent("not licensed to execute the requested action");
     }
 
     private static void installLicense(WebTester tester, License l) throws Exception

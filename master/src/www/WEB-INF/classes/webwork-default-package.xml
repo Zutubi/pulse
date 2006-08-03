@@ -152,8 +152,13 @@
                 <param name="location">rss_2.0</param>
             </result>
             <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="notlicensed" type="velocity">/generic-error.vm</result>
+            <result name="notlicensed" type="chain">notlicensed</result>
         </global-results>
+
+        <action name="notlicensed" class="com.zutubi.pulse.web.NotLicensedErrorAction">
+            <result name="success" type="velocity">/not-licensed-error.vm</result>
+            <result name="input" type="velocity">/not-licensed-error.vm</result>
+        </action>
 
     </package>
 </xwork>
