@@ -776,9 +776,9 @@
     <package name="user" namespace="/user" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="configureDashboardProjects" class="com.zutubi.pulse.web.user.ConfigureDashboardProjectsAction">
-            <result name="input" type="velocity">configure-dashboard-projects.vm</result>
-            <result name="error" type="velocity">configure-dashboard-projects.vm</result>
+        <action name="configureDashboard" class="com.zutubi.pulse.web.user.ConfigureDashboardAction">
+            <result name="input" type="velocity">configure-dashboard.vm</result>
+            <result name="error" type="velocity">configure-dashboard.vm</result>
             <result name="cancel" type="redirect">/dashboard.action</result>
             <result name="success" type="redirect">/dashboard.action</result>
         </action>

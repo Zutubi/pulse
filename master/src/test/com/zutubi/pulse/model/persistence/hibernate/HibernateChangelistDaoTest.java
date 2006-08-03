@@ -71,6 +71,67 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         assertEquals("1", changes.get(2).getRevision().getRevisionString());
     }
 
+    public void testLatestForProjects()
+    {
+        changelistDao.save(createChangelist(1, 1, "login1"));
+        changelistDao.save(createChangelist(1, 2, "login2"));
+        changelistDao.save(createChangelist(2, 3, "login1"));
+        changelistDao.save(createChangelist(1, 4, "login1"));
+        changelistDao.save(createChangelist(2, 5, "login2"));
+        changelistDao.save(createChangelist(3, 6, "login2"));
+        changelistDao.save(createChangelist(3, 7, "login2"));
+        changelistDao.save(createChangelist(2, 8, "login2"));
+
+        commitAndRefreshTransaction();
+        Project p1 = new Project();
+        p1.setId(1);
+        Project p3 = new Project();
+        p3.setId(3);
+
+        List<Changelist> changes = changelistDao.findLatestByProjects(new Project[] {p1, p3}, 4);
+        assertEquals(4, changes.size());
+        assertEquals("7", changes.get(0).getRevision().getRevisionString());
+        assertEquals("6", changes.get(1).getRevision().getRevisionString());
+        assertEquals("4", changes.get(2).getRevision().getRevisionString());
+        assertEquals("2", changes.get(3).getRevision().getRevisionString());
+    }
+
+    public void testLatestForProjectsOverlapping()
+    {
+        Changelist change = createChangelist(1, 1, "login1");
+        change.addProjectId(3);
+        changelistDao.save(change);
+        commitAndRefreshTransaction();
+
+        Project p1 = new Project();
+        p1.setId(1);
+        Project p3 = new Project();
+        p3.setId(3);
+
+        List<Changelist> changes = changelistDao.findLatestByProjects(new Project[] {p1, p3}, 10);
+        assertEquals(1, changes.size());
+        assertEquals("1", changes.get(0).getRevision().getRevisionString());
+    }
+
+    public void testLatestForProjectsOverlappingStillGetMax()
+    {
+        Changelist change = createChangelist(1, 1, "login1");
+        change.addProjectId(3);
+        changelistDao.save(change);
+        changelistDao.save(createChangelist(1, 2, "login1"));
+        commitAndRefreshTransaction();
+
+        Project p1 = new Project();
+        p1.setId(1);
+        Project p3 = new Project();
+        p3.setId(3);
+
+        List<Changelist> changes = changelistDao.findLatestByProjects(new Project[] {p1, p3}, 10);
+        assertEquals(2, changes.size());
+        assertEquals("2", changes.get(0).getRevision().getRevisionString());
+        assertEquals("1", changes.get(1).getRevision().getRevisionString());
+    }
+
     public void testLatestByUser()
     {
         changelistDao.save(createChangelist(1, "login1"));

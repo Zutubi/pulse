@@ -42,6 +42,8 @@ public class UserActionSupport extends ActionSupport
      */
     private String userLogin = null;
 
+    private User user = null;
+
     /**
      * Required resource.
      *
@@ -98,6 +100,11 @@ public class UserActionSupport extends ActionSupport
 
     public User getUser()
     {
+        if(user != null)
+        {
+            return user;
+        }
+        
         if (userId != NONE_SPECIFIED)
         {
             return getUser(userId);

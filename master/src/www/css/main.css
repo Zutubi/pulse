@@ -320,9 +320,13 @@ th {
     white-space: nowrap;
 }
 
-th.heading, th.note, th.content, th.content-row, td.content, td.content-wrap, td.content-large, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add {
+th.form, th.heading, th.note, th.content, th.content-row, td.content, td.content-wrap, td.content-large, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add {
     text-align: left;
     vertical-align: top;
+}
+
+th.form {
+    padding: 5px;
 }
 
 td.content-centre {

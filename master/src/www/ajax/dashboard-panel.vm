@@ -1,5 +1,49 @@
-<a style="float: right" href="$base/user/configureDashboardProjects!input.action">
-    <img alt="configure" src="$base/images/pencil.gif"/> #wwtext("name=configure.dashboard.projects")
+#macro(changesTable $titleKey $changelists $showWho)
+    <table class="content">
+        #headingRow($titleKey 6)
+        <tr>
+            #contentHeading("change.revision" 1)
+    #if($showWho)
+            #contentHeading("change.who" 1)
+    #end
+            #contentHeading("change.when" 1)
+            #contentHeading("change.comment" 1)
+            #contentHeading("build.results" 1)
+            #contentHeading("actions" 1)
+        </tr>
+    #if($changelists.size() > 0)
+        #foreach($changelist in $changelists)
+            #set($index = $velocityCount - 1)
+            #set($url = $action.getChangeUrl($changelist))
+        <tr>
+            <td class="content-right">
+            #if($url)
+                <a href="$url">
+            #end
+                    $changelist.revision
+            #if($url)
+                </a>
+            #end
+             </td>
+    #if($showWho)
+            #dynamicCell($changelist.revision.author)
+    #end
+            #dateCell($changelist)
+            #contentCell($action.transformComment($changelist))
+            #aggregateResultCell($changelist)
+            #linkCell("view" "viewChangelist.action?id=$changelist.id")
+        </tr>
+        #end
+    #else
+        <tr>
+            <td class="content" colspan="6">#wwtext("name=no.changes")</td>
+        </tr>
+    #end
+    </table>
+#end
+
+<a style="float: right" href="$base/user/configureDashboard!input.action">
+    <img alt="configure" src="$base/images/pencil.gif"/> #wwtext("name=configure.dashboard")
 </a>
 <h2 class="section">#wwtext("name=my.projects")</h2>
 
@@ -57,40 +101,12 @@
 #end
     </table>
 
-<h2 class="section">#wwtext("name=my.changes")</h2>
-
-    <table class="content">
-        #headingRow("my.latest.changes" 5)
-        <tr>
-            #contentHeading("change.revision" 1)
-            #contentHeading("change.when" 1)
-            #contentHeading("change.comment" 1)
-            #contentHeading("build.results" 1)
-            #contentHeading("actions" 1)
-        </tr>
-#if($changelists.size() > 0)
-    #foreach($changelist in $changelists)
-        #set($index = $velocityCount - 1)
-        #set($url = $action.getChangeUrl($changelist))
-        <tr>
-            <td class="content-right">
-        #if($url)
-                <a href="$url">
-        #end
-                    $changelist.revision
-        #if($url)
-                </a>
-        #end
-             </td>
-            #dateCell($changelist)
-            #contentCell($action.transformComment($changelist))
-            #aggregateResultCell($changelist)
-            #linkCell("view" "viewChangelist.action?id=$changelist.id")
-        </tr>
-    #end
-#else
-        <tr>
-            <td class="content" colspan="5">#wwtext("name=no.changes")</td>
-        </tr>
+#if($user.showMyChanges)
+    <h2 class="section">#wwtext("name=my.changes")</h2>
+    #changesTable("my.latest.changes" $changelists false)
 #end
-    </table>
+
+#if($user.showProjectChanges)
+    <h2 class="section">#wwtext("name=project.changes")</h2>
+    #changesTable("my.project.changes" $projectChangelists true)
+#end

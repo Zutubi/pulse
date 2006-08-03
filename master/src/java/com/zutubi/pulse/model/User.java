@@ -16,6 +16,10 @@ public class User extends Entity implements UserDetails
 
     private static final String PROPERTY_DASHBOARD_BUILD_COUNT = "user.dashboardBuildCount";
     private static final String PROPERTY_LDAP_AUTHENTICATION = "user.ldapAuthentication";
+    private static final String PROPERTY_SHOW_MY_CHANGES = "show.my.changes";
+    private static final String PROPERTY_MY_CHANGES_COUNT = "my.changes.count";
+    private static final String PROPERTY_SHOW_PROJECT_CHANGES = "show.project.changes";
+    private static final String PROPERTY_PROJECT_CHANGES_COUNT = "project.changes.count";
 
     /**
      * The login name is used to identify this user.
@@ -427,17 +431,52 @@ public class User extends Entity implements UserDetails
 
     public boolean getLdapAuthentication()
     {
-        if (hasProperty(PROPERTY_LDAP_AUTHENTICATION))
-        {
-            return Boolean.valueOf(getProperty(PROPERTY_LDAP_AUTHENTICATION));
-        }
-
-        return false;
+        return getBooleanProperty(PROPERTY_LDAP_AUTHENTICATION, false);
     }
 
     public void setLdapAuthentication(boolean useLdap)
     {
-        setProperty(PROPERTY_LDAP_AUTHENTICATION, Boolean.toString(useLdap));
+        setBooleanProperty(PROPERTY_LDAP_AUTHENTICATION, useLdap);
+    }
+
+    public boolean getShowMyChanges()
+    {
+        return getBooleanProperty(PROPERTY_SHOW_MY_CHANGES, true);
+    }
+
+    public void setShowMyChanges(boolean show)
+    {
+        setBooleanProperty(PROPERTY_SHOW_MY_CHANGES, show);
+    }
+
+    public int getMyChangesCount()
+    {
+        return getIntProperty(PROPERTY_MY_CHANGES_COUNT, 10);
+    }
+
+    public void setMyChangesCount(int count)
+    {
+        setIntProperty(PROPERTY_MY_CHANGES_COUNT, count);
+    }
+
+    public boolean getShowProjectChanges()
+    {
+        return getBooleanProperty(PROPERTY_SHOW_PROJECT_CHANGES, false);
+    }
+
+    public void setShowProjectChanges(boolean show)
+    {
+        setBooleanProperty(PROPERTY_SHOW_PROJECT_CHANGES, show);
+    }
+
+    public int getProjectChangesCount()
+    {
+        return getIntProperty(PROPERTY_PROJECT_CHANGES_COUNT, 10);
+    }
+
+    public void setProjectChangesCount(int count)
+    {
+        setIntProperty(PROPERTY_PROJECT_CHANGES_COUNT, count);
     }
 
     public boolean equals(Object other)
@@ -453,5 +492,35 @@ public class User extends Entity implements UserDetails
     public int hashCode()
     {
         return login.hashCode();
+    }
+
+    private boolean getBooleanProperty(String property, boolean defaultValue)
+    {
+        if(hasProperty(property))
+        {
+            return Boolean.valueOf(getProperty(property));
+        }
+
+        return defaultValue;
+    }
+
+    private void setBooleanProperty(String property, boolean value)
+    {
+        setProperty(property, Boolean.toString(value));
+    }
+
+    private int getIntProperty(String property, int defaultValue)
+    {
+        if(hasProperty(property))
+        {
+            return Integer.parseInt(getProperty(property));
+        }
+
+        return defaultValue;
+    }
+
+    private void setIntProperty(String property, int value)
+    {
+        setProperty(property, Integer.toString(value));
     }
 }

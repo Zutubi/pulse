@@ -11,12 +11,14 @@ import java.util.*;
 /**
  * Action allowing a user to configure which projects appear on their dashboard.
  */
-public class ConfigureDashboardProjectsAction extends UserActionSupport
+public class ConfigureDashboardAction extends UserActionSupport
 {
     private int buildCount;
     private Map<Long, String> allProjects;
     private List<Long> projects;
     private ProjectManager projectManager;
+    private boolean showMyChanges = false;
+    private boolean showProjectChanges = false;
 
     public int getBuildCount()
     {
@@ -26,6 +28,26 @@ public class ConfigureDashboardProjectsAction extends UserActionSupport
     public void setBuildCount(int buildCount)
     {
         this.buildCount = buildCount;
+    }
+
+    public boolean isShowMyChanges()
+    {
+        return showMyChanges;
+    }
+
+    public void setShowMyChanges(boolean showMyChanges)
+    {
+        this.showMyChanges = showMyChanges;
+    }
+
+    public boolean isShowProjectChanges()
+    {
+        return showProjectChanges;
+    }
+
+    public void setShowProjectChanges(boolean showProjectChanges)
+    {
+        this.showProjectChanges = showProjectChanges;
     }
 
     public Map<Long, String> getAllProjects()
@@ -84,6 +106,9 @@ public class ConfigureDashboardProjectsAction extends UserActionSupport
             projects.add(p.getId());
         }
 
+        showMyChanges = user.getShowMyChanges();
+        showProjectChanges = user.getShowProjectChanges();
+
         return super.doInput();
     }
 
@@ -111,6 +136,9 @@ public class ConfigureDashboardProjectsAction extends UserActionSupport
             }
         }
 
+        user.setShowMyChanges(showMyChanges);
+        user.setShowProjectChanges(showProjectChanges);
+        
         getUserManager().save(user);
 
         return SUCCESS;

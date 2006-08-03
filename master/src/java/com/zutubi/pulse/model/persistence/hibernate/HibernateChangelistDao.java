@@ -11,6 +11,8 @@ import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,6 +61,54 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
                 return queryObject.list();
             }
         });
+    }
+
+    public List<Changelist> findLatestByProjects(Project[] projects, final int max)
+    {
+        final Long[] projectIds = new Long[projects.length];
+        for(int i = 0; i < projects.length; i++)
+        {
+            projectIds[i] = projects[i].getId();
+        }
+
+        LinkedHashSet<Changelist> results = new LinkedHashSet<Changelist>();
+        final int[] offset = { 0 };
+
+        while(results.size() < max)
+        {
+            List<Changelist> changelists = (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
+            {
+                public Object doInHibernate(Session session) throws HibernateException
+                {
+                    Query queryObject = session.createQuery("from Changelist model join model.projectIds project where project in (:projectIds) order by model.revision.time desc");
+                    queryObject.setParameterList("projectIds", projectIds);
+                    queryObject.setFirstResult(offset[0]);
+                    queryObject.setMaxResults(max);
+
+                    SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                    return queryObject.list();
+                }
+            });
+
+            if(changelists.size() == 0)
+            {
+                break;
+            }
+
+            results.addAll(changelists);
+            offset[0] = offset[0] + max;
+        }
+
+        // We can actually get up to max - 1 extra entries if multiple queries
+        // were run, so discard any after max (better than shrinking query max
+        // as we go as then we may execute many queries).
+        ArrayList<Changelist> changes = new ArrayList<Changelist>(results);
+        while(changes.size() > max)
+        {
+            changes.remove(changes.size() - 1);
+        }
+        return changes;
     }
 
     public Changelist findByRevision(final String serverUid, final Revision revision)

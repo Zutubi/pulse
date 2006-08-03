@@ -91,6 +91,8 @@ public interface BuildManager
 
     List<Changelist> getLatestChangesForProject(Project project, int max);
 
+    List<Changelist> getLatestChangesForProjects(Project[] projects, int max);
+
     List<Changelist> getChangesForBuild(BuildResult result);
 
     void deleteAllBuilds(Project project);
@@ -102,4 +104,5 @@ public interface BuildManager
     void abortUnfinishedBuilds(Project project, String message);
 
     boolean isSpaceAvailableForBuild();
+
 }

@@ -166,6 +166,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public List<Changelist> getLatestChangesForProjects(Project[] projects, int max)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public List<Changelist> getChangesForBuild(BuildResult result)
     {
         List<Changelist> lists = new LinkedList<Changelist>();

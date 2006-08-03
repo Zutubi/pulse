@@ -225,6 +225,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return changelistDao.findLatestByProject(project, max);
     }
 
+    public List<Changelist> getLatestChangesForProjects(Project[] projects, int max)
+    {
+        return changelistDao.findLatestByProjects(projects, max);
+    }
+
     public List<Changelist> getChangesForBuild(BuildResult result)
     {
         return changelistDao.findByResult(result.getId());
