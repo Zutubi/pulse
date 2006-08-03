@@ -42,6 +42,9 @@
 <body>
     #agentTabs("resources")
 
+    <a style="float: right" href="$base/admin/editResource!input.action?resourceId=$resource.id">
+        <img alt="$action.getText('edit')" src="$base/images/pencil.gif"/> #wwtext("name=resource.edit")
+    </a>
     <h2 class="section">#wwtext("name=resource") $!webwork.htmlEncode($resource.name)</h2>
 
     <table id="properties_" class="content">
@@ -83,8 +86,12 @@
                             #headingRow("resource.version.properties" 6)
                             #showProperties($version.properties $version)
                         </table>
-                        <a href="#" class="unadorned" onclick="confirmUrl('$confirmMessage', '/admin/deleteResourceVersion.action?versionId=$version.id&amp;resourceId=$resource.id')">
-                            <img alt="$action.getText('delete')" class="unadorned" src="images/delete.gif"/>
+                        <a href="$base/admin/editResourceVersion!input.action?versionId=$version.id&amp;resourceId=$resource.id" id="edit_$version.value" class="unadorned">
+                            <img alt="$action.getText('edit')" class="unadorned" src="$base/images/pencil.gif"/>
+                            #wwtext("name=version.edit")
+                        </a>
+                        <a href="#" class="unadorned" onclick="confirmUrl('$confirmMessage', '$base/admin/deleteResourceVersion.action?versionId=$version.id&amp;resourceId=$resource.id')">
+                            <img alt="$action.getText('delete')" class="unadorned" src="$base/images/delete.gif"/>
                             #wwtext("name=version.delete")
                         </a>
                     </div>

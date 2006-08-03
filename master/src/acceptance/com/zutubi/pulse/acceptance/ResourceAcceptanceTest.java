@@ -1,9 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.forms.CreateResourcePropertyForm;
-import com.zutubi.pulse.acceptance.forms.EditResourcePropertyForm;
-import com.zutubi.pulse.acceptance.forms.ResourceForm;
-import com.zutubi.pulse.acceptance.forms.ResourceVersionForm;
+import com.zutubi.pulse.acceptance.forms.*;
 import com.zutubi.pulse.util.RandomUtils;
 
 /**
@@ -60,6 +57,43 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
         form.saveFormElements(resourceName);
         form.assertFormPresent();
         assertTextPresent("A resource with name '" + resourceName + "' already exists");
+    }
+
+    public void testEditResource()
+    {
+        addResource(resourceName);
+        clickLinkWithText("edit resource");
+        EditResourceForm form = new EditResourceForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements(resourceName + "_edited");
+        assertTextPresent("resource " + resourceName + "_edited");
+        clickLinkWithText("edit resource");
+        form.assertFormPresent();
+        form.assertFormElements(resourceName + "_edited");
+    }
+
+    public void testEditResourceValidation()
+    {
+        addResource(resourceName);
+        clickLinkWithText("edit resource");
+        EditResourceForm form = new EditResourceForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements("");
+        form.assertFormPresent();
+        assertTextPresent("name is required");
+    }
+
+    public void testEditResourceDuplicate()
+    {
+        addResource(resourceName);
+        clickLinkWithText("resources");
+        addResource(resourceName + "2");
+        clickLinkWithText("edit resource");
+        EditResourceForm form = new EditResourceForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements(resourceName);
+        form.assertFormPresent();
+        assertTextPresent("this agent already has a resource with name '" + resourceName + "'");
     }
 
     public void testDeleteResource()
@@ -229,6 +263,43 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
         addVersion(versionName);
         clickLink("version.add");
         ResourceVersionForm form = new ResourceVersionForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements(versionName);
+        form.assertFormPresent();
+        assertTextPresent("this resource already has a version '" + versionName + "'");
+    }
+
+    public void testEditResourceVersion()
+    {
+        addResource(resourceName);
+        addVersion(versionName);
+        clickLink("edit_" + versionName);
+        EditResourceVersionForm form = new EditResourceVersionForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements(versionName + "_edited");
+        assertTextPresent(versionName + "_edited");
+        assertTablePresent("properties_" + versionName + "_edited");
+    }
+
+    public void testEditResourceVersionValidation()
+    {
+        addResource(resourceName);
+        addVersion(versionName);
+        clickLink("edit_" + versionName);
+        EditResourceVersionForm form = new EditResourceVersionForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements("");
+        form.assertFormPresent();
+        assertTextPresent("version is required");
+    }
+
+    public void testEditResourceVersionDuplicate()
+    {
+        addResource(resourceName);
+        addVersion(versionName);
+        addVersion(versionName + "2");
+        clickLink("edit_" + versionName + "2");
+        EditResourceVersionForm form = new EditResourceVersionForm(tester);
         form.assertFormPresent();
         form.saveFormElements(versionName);
         form.assertFormPresent();

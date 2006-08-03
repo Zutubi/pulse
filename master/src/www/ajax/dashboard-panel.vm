@@ -1,5 +1,5 @@
 <a style="float: right" href="$base/user/configureDashboardProjects!input.action">
-    <img alt=configure" src="$base/images/pencil.gif"/> #wwtext("name=configure.dashboard.projects")
+    <img alt="configure" src="$base/images/pencil.gif"/> #wwtext("name=configure.dashboard.projects")
 </a>
 <h2 class="section">#wwtext("name=my.projects")</h2>
 

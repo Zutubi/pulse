@@ -1062,6 +1062,13 @@
             <result name="success" type="redirect">/viewResource.action?resourceId=${resource.id}</result>
         </action>
 
+        <action name="editResource" class="com.zutubi.pulse.web.admin.EditResourceAction">
+            <result name="input" type="velocity">edit-resource.vm</result>
+            <result name="cancel" type="redirect">/viewResource.action?resourceId=${resourceId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resource.id}</result>
+        </action>
+
         <action name="deleteResource" class="com.zutubi.pulse.web.admin.DeleteResourceAction">
             <result name="error" type="velocity">/generic-error.vm</result>
             <result name="success" type="redirect">/viewResources.action?agentId=${agentId}</result>
@@ -1070,6 +1077,14 @@
         <action name="createResourceVersion" class="com.zutubi.pulse.web.admin.CreateResourceVersionAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">create-resource-version.vm</result>
+            <result name="cancel" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
+        </action>
+
+        <action name="editResourceVersion" class="com.zutubi.pulse.web.admin.EditResourceVersionAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-resource-version.vm</result>
             <result name="cancel" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
             <result name="error" type="velocity">/generic-error.vm</result>
             <result name="success" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
