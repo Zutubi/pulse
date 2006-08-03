@@ -221,23 +221,6 @@ function hideChildren(id)
             Element.hide(child);
         }
     });
-/* use prototype.js support.
-    for(var i = 0; i < element.childNodes.length; i++)
-    {
-        var child = element.childNodes[i];
-        if(child.nodeType == 1)
-        {
-            if(child.style.display == '')
-            {
-                child.style.display = 'none';
-            }
-            else
-            {
-                child.style.display = '';
-            }
-        }
-    }
-*/
 }
 
 function isSuccessfulRow(row)

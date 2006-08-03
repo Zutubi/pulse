@@ -123,15 +123,15 @@
 }
 
 .create {
-    background-image: url(../../images/folder_add.png);
+    background-image: url(../../images/folder_add.gif);
 }
 
 .delete {
-    background-image: url(../../images/folder_delete.png);
+    background-image: url(../../images/folder_delete.gif);
 }
 
 .refresh {
-    background-image: url(../../images/arrow_refresh.png);
+    background-image: url(../../images/arrow_refresh.gif);
 }
 
 .up {

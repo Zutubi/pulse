@@ -194,7 +194,7 @@ ZUTUBI.widget.ToolbarItem.prototype = {
         sb[sb.length] = '<div';
         sb[sb.length] = ' id="' + this.getToolElId() + '"';
         sb[sb.length] = ' class="' + this.getToolStyle() + '"';
-        sb[sb.length] = ' onclick="javascript:' + getTool + '.onClick();"';
+        sb[sb.length] = ' onclick="javascript:' + getTool + '.onClick('+getTool+');"';
         sb[sb.length] = ' onmouseover="javascript:' + getTool + '.onMouseOver('+getTool+');" ';
         sb[sb.length] = ' onmouseout="javascript:' + getTool + '.onMouseOut('+getTool+');" ';
         sb[sb.length] = '>';

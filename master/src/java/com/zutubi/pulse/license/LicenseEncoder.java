@@ -138,21 +138,21 @@ public class LicenseEncoder implements LicenseKeyFactory
 
             // setup some default supported entity values until they are added to the interface and we want to be
             // able to vary them.
-            if (type == LicenseType.EVALUATION)
+            if (license.getType() == LicenseType.EVALUATION)
             {
                 // keep default values of License.UNDEFINED.
                 license.setSupported(License.UNRESTRICTED, License.UNRESTRICTED, License.UNRESTRICTED);
             }
-            else if (type == LicenseType.COMMERCIAL)
+            else if (license.getType() == LicenseType.COMMERCIAL)
             {
                 // keep default values of License.UNDEFINED.
                 license.setSupported(License.UNRESTRICTED, License.UNRESTRICTED, License.UNRESTRICTED);
             }
-            else if (type == LicenseType.NON_PROFIT)
+            else if (license.getType() == LicenseType.NON_PROFIT)
             {
                 license.setSupported(5, 10, License.UNRESTRICTED);
             }
-            else if (type == LicenseType.PERSONAL)
+            else if (license.getType() == LicenseType.PERSONAL)
             {
                 license.setSupported(1, 3, 1);
             }

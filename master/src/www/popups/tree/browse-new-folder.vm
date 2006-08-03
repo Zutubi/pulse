@@ -22,21 +22,21 @@
     </script>
 </head>
 <body>
-<p>Please enter the name of the new folder:</p>
-<table>
-    <form id="newfolder" action="" onSubmit="window.close();">
-    <tr>
-        <td>
-            <input type="text" name="newfolder" value="New folder" size="40"/>
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <input type="submit" value="okay" onclick="addNewFolder(); return true;"/>
-            <input type="submit" value="cancel"/>
-        </td>
-    </tr>
-    </form>
-</table>
+    <div>Please&nbsp;enter&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;new&nbsp;folder:</div>
+    <table>
+        <form id="newfolder" action="" onSubmit="window.close();">
+        <tr>
+            <td>
+                <input type="text" name="newfolder" value="New folder" size="40"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="submit" value="okay" onclick="addNewFolder(); return true;"/>
+                <input type="submit" value="cancel"/>
+            </td>
+        </tr>
+        </form>
+    </table>
 </body>
 </html>
