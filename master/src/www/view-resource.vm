@@ -42,10 +42,12 @@
 <body>
     #agentTabs("resources")
 
-    <a style="float: right" href="$base/admin/editResource!input.action?resourceId=$resource.id">
-        <img alt="$action.getText('edit')" src="$base/images/pencil.gif"/> #wwtext("name=resource.edit")
-    </a>
-    <h2 class="section">#wwtext("name=resource") $!webwork.htmlEncode($resource.name)</h2>
+    <p style="text-align: right; margin-bottom: 0">
+        <a href="$base/admin/editResource!input.action?resourceId=$resource.id">
+            <img alt="$action.getText('edit')" src="$base/images/pencil.gif"/> #wwtext("name=resource.edit")
+        </a>
+    </p>
+    <h2 style="margin-top: 0" class="section">#wwtext("name=resource") $!webwork.htmlEncode($resource.name)</h2>
 
     <table id="properties_" class="content">
         #headingRow("resource.default.properties" 6)
