@@ -4,6 +4,9 @@ import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
 import com.zutubi.pulse.bootstrap.conf.Config;
 import com.zutubi.pulse.bootstrap.conf.CompositeConfig;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 /**
  * <class-comment/>
  */
@@ -22,5 +25,35 @@ public class SystemConfigurationSupport extends ConfigSupport implements SystemC
     public String getContextPath()
     {
         return getProperty(CONTEXT_PATH, "/");
+    }
+
+    public void setDataPath(String path)
+    {
+        setProperty(PULSE_DATA, path);
+    }
+
+    public String getDataPath()
+    {
+        return getProperty(PULSE_DATA);
+    }
+
+    public String getHostUrl()
+    {
+        String hostname = "localhost";
+        try
+        {
+            InetAddress address = InetAddress.getLocalHost();
+            hostname = address.getCanonicalHostName();
+        }
+        catch (UnknownHostException e)
+        {
+            // noop.
+        }
+        String hostUrl = "http://" + hostname + ":" + getServerPort();
+        if (!getContextPath().startsWith("/"))
+        {
+            hostUrl = hostUrl + "/";
+        }
+        return hostUrl + getContextPath();
     }
 }

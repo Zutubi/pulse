@@ -5,7 +5,7 @@ import com.opensymphony.xwork.Validateable;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
-import com.zutubi.pulse.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.bootstrap.SystemConfigurationSupport;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
@@ -17,8 +17,6 @@ import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
 import com.zutubi.pulse.web.wizard.WizardCompleteState;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.concurrent.Executors;
 
 /**
@@ -205,20 +203,8 @@ public class SetupWizard extends BaseWizard
 
         public void initialise()
         {
-            try
-            {
-                InetAddress address = InetAddress.getLocalHost();
-                SystemConfiguration appConfig = configurationManager.getSystemConfig();
-                baseUrl = "http://" + address.getCanonicalHostName() + ":" + appConfig.getServerPort() + appConfig.getContextPath();
-                if (baseUrl.endsWith("/"))
-                {
-                    baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
-                }
-            }
-            catch (UnknownHostException e)
-            {
-                // Oh well, we tried
-            }
+            SystemConfigurationSupport systemConfig = (SystemConfigurationSupport) configurationManager.getSystemConfig();
+            baseUrl = systemConfig.getHostUrl();
         }
 
         public String getNextStateName()

@@ -1,15 +1,15 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.bootstrap.conf.Config;
+import com.zutubi.pulse.bootstrap.conf.FileConfig;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseDecoder;
 import com.zutubi.pulse.license.LicenseException;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -38,7 +38,7 @@ public class Data implements MasterUserPaths
 
     public static final String CONFIG_FILE_NAME = "pulse.config.properties";
 
-    private Properties config = null;
+    private Config config = null;
     private String licenseKey;
     private License license;
     private static final String LICENSE_KEY = "license.key";
@@ -68,9 +68,8 @@ public class Data implements MasterUserPaths
      * Initialise the data directory. This will ensure that the necessary directories
      * and configuration files are setup.
      *
-     * @throws IOException
      */
-    public void init() throws IOException
+    public void init()
     {
         if (isInitialised())
         {
@@ -92,12 +91,15 @@ public class Data implements MasterUserPaths
      * Update the version recorded in the data directory.
      *
      * @param version
-     * @throws IOException
      */
-    public void updateVersion(Version version) throws IOException
+    public void updateVersion(Version version)
     {
-        version.write(getConfig());
-        IOUtils.write(getConfig(), getConfigFile());
+        // we are messing around writing to a properties object first because the Config interface is
+        // not available in the pulse core.
+        getConfig().setProperty(Version.BUILD_DATE, version.getBuildDate());
+        getConfig().setProperty(Version.BUILD_NUMBER, version.getBuildNumber());
+        getConfig().setProperty(Version.RELEASE_DATE, version.getReleaseDate());
+        getConfig().setProperty(Version.VERSION_NUMBER, version.getVersionNumber());
     }
 
     public int getBuildNumber()
@@ -107,17 +109,9 @@ public class Data implements MasterUserPaths
 
     public void setBuildNumber(int i)
     {
-        try
-        {
-            Properties config = getConfig();
-            config.put("build.number", Integer.toString(i));
-            IOUtils.write(getConfig(), getConfigFile());
-            dataVersion = null;
-        }
-        catch (IOException e)
-        {
-            LOG.severe("Failed to record build number to the config. Cause:" + e.getMessage(), e);
-        }
+        Config config = getConfig();
+        config.setProperty(Version.BUILD_NUMBER, Integer.toString(i));
+        dataVersion = null;
     }
 
     /**
@@ -129,25 +123,24 @@ public class Data implements MasterUserPaths
     {
         if (dataVersion == null)
         {
-            try
-            {
-                dataVersion = Version.read(getConfig());
-            }
-            catch (IOException e)
-            {
-                LOG.severe("Failed to load the config. Cause: " + e.getMessage(), e);
-            }
+            Properties prop = new Properties();
+            prop.setProperty(Version.BUILD_DATE, getConfig().getProperty(Version.BUILD_DATE));
+            prop.setProperty(Version.BUILD_NUMBER, getConfig().getProperty(Version.BUILD_NUMBER));
+            prop.setProperty(Version.RELEASE_DATE, getConfig().getProperty(Version.RELEASE_DATE));
+            prop.setProperty(Version.VERSION_NUMBER, getConfig().getProperty(Version.VERSION_NUMBER));
+            dataVersion = Version.read(prop);
         }
         return dataVersion;
     }
 
-    public void updateLicenseKey(String key) throws IOException
+    public void updateLicenseKey(String key)
     {
         getConfig().setProperty(LICENSE_KEY, key);
-        IOUtils.write(getConfig(), getConfigFile());
+        licenseKey = null;
+        license = null;
     }
 
-    public String getLicenseKey() throws IOException
+    public String getLicenseKey()
     {
         if (licenseKey == null)
         {
@@ -172,11 +165,6 @@ public class Data implements MasterUserPaths
             catch (LicenseException e)
             {
                 LOG.severe("Failed to decode the license.", e);
-                return null;
-            }
-            catch (IOException e)
-            {
-                LOG.severe("Failed to retrieve the license key.", e);
                 return null;
             }
         }
@@ -229,18 +217,11 @@ public class Data implements MasterUserPaths
         return projectRoot;
     }
 
-    private Properties getConfig() throws IOException
+    private Config getConfig()
     {
         if (config == null)
         {
-            if (getConfigFile().exists())
-            {
-                config = IOUtils.read(getConfigFile());
-            }
-            else
-            {
-                config = new Properties();
-            }
+            config = new FileConfig(getConfigFile());
         }
         return config;
     }

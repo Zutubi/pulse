@@ -1,7 +1,10 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.zutubi.pulse.bootstrap.conf.*;
-import com.zutubi.pulse.util.logging.Logger;
+import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.bootstrap.conf.Config;
+import com.zutubi.pulse.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.bootstrap.conf.FileConfig;
+import com.zutubi.pulse.bootstrap.conf.VolatileReadOnlyConfig;
 
 import java.io.File;
 
@@ -10,63 +13,71 @@ import java.io.File;
  */
 public class SimpleMasterConfigurationManager extends AbstractConfigurationManager implements MasterConfigurationManager
 {
-    private static final Logger LOG = Logger.getLogger(SimpleMasterConfigurationManager.class);
+    private SystemConfiguration sysConfig;
 
-    private DataConfiguration dataConfig;
+    private MasterConfiguration appConfig;
+
+    private Data data;
 
     public SystemConfiguration getSystemConfig()
     {
-        // system.
-        Config system = new VolatileReadOnlyConfig(System.getProperties());
-
-        // user home properties.
-        String userHome = System.getProperty("user.home");
-        File userProps = new File(new File(new File(userHome), ".pulse"), "pulse.properties");
-
-        // defaults.
-        if (userProps.isFile())
+        if (sysConfig == null)
         {
+            EnvConfig envConfig = getEnvConfig();
+
+            // command line configuration only.
+            Config system = new VolatileReadOnlyConfig(System.getProperties());
+
+            // look for the external user configuration file.
+            String configPath = envConfig.getDefaultPulseConfig();
+            if (envConfig.hasPulseConfig())
+            {
+                configPath = envConfig.getPulseConfig();
+            }
+
+            File userProps = new File(configPath);
+            if (!userProps.isFile())
+            {
+                // user config not yet available, so just use the defaults for now.
+                return new SystemConfigurationSupport(system);
+            }
             Config user = new FileConfig(userProps);
-            return new SystemConfigurationSupport(system, user);
+            sysConfig = new SystemConfigurationSupport(system, user);
         }
-        else
-        {
-            return new SystemConfigurationSupport(system);
-        }
+        return sysConfig;
     }
 
     public MasterConfiguration getAppConfig()
     {
-        MasterUserPaths paths = getUserPaths();
-        if (paths != null)
+        if (appConfig == null)
         {
+            MasterUserPaths paths = getUserPaths();
+            if (paths == null)
+            {
+                // default values only.
+                return new MasterConfigurationSupport();
+            }
             Config user = new FileConfig(new File(paths.getUserConfigRoot(), "pulse.properties"));
-            return new MasterConfigurationSupport(user);
+            appConfig = new MasterConfigurationSupport(user);
         }
-        // default values only.
-        return new MasterConfigurationSupport();
+        return appConfig;
     }
 
     public MasterUserPaths getUserPaths()
     {
-        File pulseHome = getDataDirectory();
-        if (pulseHome != null)
-        {
-            return new Data(pulseHome);
-        }
-        return null;
+        return getData();
     }
 
     public File getDataDirectory()
     {
-        return getDataConfig().getDataDirectory();
+        return new File(getSystemConfig().getDataPath());
     }
 
     public File getHomeDirectory()
     {
-        if (System.getProperties().containsKey(PULSE_HOME))
+        if (envConfig.hasPulseHome())
         {
-            return new File(System.getProperty(PULSE_HOME));
+            return new File(envConfig.getPulseHome());
         }
         // this is expected in a dev environment.
         return null;
@@ -74,23 +85,22 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
 
     public Data getData()
     {
-        return getDataConfig().getData();
-    }
-
-    private DataConfiguration getDataConfig()
-    {
-        if (dataConfig == null)
+        if (data == null)
         {
-            dataConfig = new DataConfiguration();
-            dataConfig.setConfigurationManager(this);
+            if (!TextUtils.stringSet(getSystemConfig().getDataPath()))
+            {
+                return null;
+            }
+            data = new Data(new File(getSystemConfig().getDataPath()));
         }
-        return dataConfig;
+        return data;
     }
 
     public void setPulseData(File f)
     {
-        DataConfiguration dataConfig = getDataConfig();
-        dataConfig.setDataDirectory(f);
-    }
+        getSystemConfig().setDataPath(f.getAbsolutePath());
 
+        // refresh the data instance.
+        data = null;
+    }
 }

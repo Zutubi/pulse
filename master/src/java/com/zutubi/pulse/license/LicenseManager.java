@@ -1,13 +1,12 @@
 package com.zutubi.pulse.license;
 
-import com.zutubi.pulse.bootstrap.DataResolver;
 import com.zutubi.pulse.bootstrap.Data;
+import com.zutubi.pulse.bootstrap.DataResolver;
 import com.zutubi.pulse.license.authorisation.Authorisation;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -21,20 +20,12 @@ public class LicenseManager
 
     public void updateLicenseKey(String newKey) throws LicenseException
     {
-        try
-        {
-            Data data = resolver.getData();
-            data.updateLicenseKey(newKey);
+        Data data = resolver.getData();
+        data.updateLicenseKey(newKey);
 
-            // refresh the authorisations, now that we have a new license.
-            LicenseHolder.setLicense(data.getLicense());
-            refreshAuthorisations();
-        }
-        catch (IOException e)
-        {
-            throw new LicenseException("Failed to update license key. Cause: " + e.getClass().getName() +
-                    "; " + e.getMessage(), e);
-        }
+        // refresh the authorisations, now that we have a new license.
+        LicenseHolder.setLicense(data.getLicense());
+        refreshAuthorisations();
     }
 
     public void init()

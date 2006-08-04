@@ -5,6 +5,7 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.util.IOUtils;
 import com.opensymphony.util.TextUtils;
 import org.apache.xmlrpc.XmlRpcClient;
@@ -37,6 +38,10 @@ public abstract class AdminCommand implements Command
 
     private String contextPath;
 
+    private static final String ENV_PULSE_CONFIG = "PULSE_CONFIG";
+
+    private String pulseConfig;
+
     private String loadAdminToken(ConfigurationManager configurationManager) throws IOException
     {
         File tokenFile = AdminTokenManager.getAdminTokenFilename(configurationManager.getSystemPaths().getConfigRoot());
@@ -57,15 +62,29 @@ public abstract class AdminCommand implements Command
         this.contextPath = contextPath;
     }
 
+    public void setConfig(String path)
+    {
+        this.pulseConfig = path;
+    }
+
     public int execute()
     {
         // initialise the necessary resources
         // a) the xml rpc client
         // b) the admin token.
 
+        if (TextUtils.stringSet(pulseConfig))
+        {
+            System.setProperty(EnvConfig.PULSE_CONFIG, pulseConfig);
+        }
+        else if (TextUtils.stringSet(System.getenv(ENV_PULSE_CONFIG)))
+        {
+            System.setProperty(EnvConfig.PULSE_CONFIG, System.getenv(ENV_PULSE_CONFIG));
+        }
+
         SystemBootstrapManager sbm = new SystemBootstrapManager();
         sbm.loadBootstrapContext();
-        
+
         ConfigurationManager configurationManager = (ConfigurationManager) ComponentContext.getBean("configurationManager");
 
         URL url;

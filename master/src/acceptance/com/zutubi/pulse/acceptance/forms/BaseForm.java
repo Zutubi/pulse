@@ -88,6 +88,11 @@ public abstract class BaseForm
         tester.submit("next");
     }
 
+    public void next()
+    {
+        tester.submit("next");
+    }
+
     public void cancelFormElements(String... args)
     {
         setFormElements(args);
@@ -204,6 +209,18 @@ public abstract class BaseForm
             defaultValues[i] = "";
         }
         return defaultValues;
+    }
+
+    public String[] getFormValues()
+    {
+        String[] fieldNames = getFieldNames();
+        String[] formValues = new String[fieldNames.length];
+        for (int i = 0; i < fieldNames.length; i++)
+        {
+            String fieldName = fieldNames[i];
+            formValues[i] = tester.getDialog().getFormParameterValue(fieldName);
+        }
+        return formValues;
     }
 
     public void assertMultiValues(String name, String ...values)

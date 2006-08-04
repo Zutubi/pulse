@@ -3,6 +3,7 @@ package com.zutubi.pulse.command;
 import org.apache.commons.cli.*;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 
@@ -18,6 +19,14 @@ public class StartCommand implements Command
     private static final int UNSPECIFIED = -1;
 
     /**
+     * @deprecated the property should be taken from the command line OR the config file. Using the ENV variable
+     * is discouraged.
+     */
+    private static final String ENV_PULSE_DATA = "PULSE_DATA";
+
+    private static final String ENV_PULSE_CONFIG = "PULSE_CONFIG";
+
+    /**
      * The port to which pulse will bind its web user interface.
      */
     private int port = UNSPECIFIED;
@@ -25,10 +34,11 @@ public class StartCommand implements Command
     /**
      * The pulse data directory
      */
-    private String data;
-    private static final String ENV_PULSE_DATA = "PULSE_DATA";
+    private String pulseData = null;
 
-    private String contextPath;
+    private String contextPath = null;
+
+    private String pulseConfig = null;
 
     /**
      * Specify the port to which pulse will bind its web user interface.
@@ -51,7 +61,12 @@ public class StartCommand implements Command
      */
     public void setData(String data)
     {
-        this.data = data;
+        this.pulseData = data;
+    }
+
+    public void setConfig(String path)
+    {
+        this.pulseConfig = path;
     }
 
     @SuppressWarnings({"ACCESS_STATIC_VIA_INSTANCE"})
@@ -69,6 +84,12 @@ public class StartCommand implements Command
                 .hasArg()
                 .withDescription("the pulse data directory.")
                 .create('d'));
+
+        options.addOption(OptionBuilder.withLongOpt("config")
+                .withArgName("config")
+                .hasArg()
+                .withDescription("the pulse config file location.")
+                .create('f'));
 
         options.addOption(OptionBuilder.withLongOpt("contextpath")
                 .withArgName("contextpath")
@@ -91,6 +112,10 @@ public class StartCommand implements Command
         {
             setContextPath(commandLine.getOptionValue('c'));
         }
+        if (commandLine.hasOption('f'))
+        {
+            setConfig(commandLine.getOptionValue('f'));
+        }
     }
 
     public int execute()
@@ -98,18 +123,27 @@ public class StartCommand implements Command
         try
         {
             // update the system properties
-            if (port != UNSPECIFIED)
+            if (TextUtils.stringSet(pulseData))
             {
-                System.setProperty(SystemConfiguration.WEBAPP_PORT, Integer.toString(port));
-            }
-
-            if (TextUtils.stringSet(data))
-            {
-                System.setProperty("pulse.data", data);
+                System.setProperty(SystemConfiguration.PULSE_DATA, pulseData);
             }
             else if(TextUtils.stringSet(System.getenv(ENV_PULSE_DATA)))
             {
-                System.setProperty("pulse.data", System.getenv(ENV_PULSE_DATA));
+                System.setProperty(SystemConfiguration.PULSE_DATA, System.getenv(ENV_PULSE_DATA));
+            }
+
+            if (TextUtils.stringSet(pulseConfig))
+            {
+                System.setProperty(EnvConfig.PULSE_CONFIG, pulseConfig);
+            }
+            else if (TextUtils.stringSet(System.getenv(ENV_PULSE_CONFIG)))
+            {
+                System.setProperty(EnvConfig.PULSE_CONFIG, System.getenv(ENV_PULSE_CONFIG));
+            }
+
+            if (port != UNSPECIFIED)
+            {
+                System.setProperty(SystemConfiguration.WEBAPP_PORT, Integer.toString(port));
             }
 
             if (TextUtils.stringSet(contextPath))

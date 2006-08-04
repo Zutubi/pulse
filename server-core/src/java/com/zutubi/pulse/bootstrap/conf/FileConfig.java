@@ -17,7 +17,6 @@ public class FileConfig implements Config
     private final File file;
 
     private Properties props;
-    private long lastModified;
 
     public FileConfig(File file)
     {
@@ -39,16 +38,19 @@ public class FileConfig implements Config
     {
         try
         {
-            if (!file.exists())
+            if (!file.isFile())
             {
-                if (!file.getParentFile().mkdirs() && !file.createNewFile())
+                if (!file.getParentFile().isDirectory() && !file.getParentFile().mkdirs())
                 {
                     throw new IOException();
                 }
-                lastModified = file.lastModified();
+                if (!file.createNewFile())
+                {
+                    throw new IOException();
+                }
             }
-            IOUtils.write(getProperties(), file);
-            lastModified = file.lastModified();
+            PropertiesWriter writer = new PropertiesWriter();
+            writer.write(file, getProperties());
         }
         catch (IOException e)
         {
@@ -69,13 +71,12 @@ public class FileConfig implements Config
 
     private Properties getProperties()
     {
-        if (props == null || file.lastModified() != lastModified)
+        if (props == null)
         {
             try
             {
-                if (file.exists())
+                if (file.isFile())
                 {
-                    lastModified = file.lastModified();
                     props = IOUtils.read(file);
                 }
                 else

@@ -1,15 +1,18 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
+import com.zutubi.pulse.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.bootstrap.conf.PropertiesWriter;
+import com.zutubi.pulse.util.IOUtils;
 
-import java.util.List;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.io.File;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * <class-comment/>
@@ -55,7 +58,7 @@ public class DefaultSetupManager implements SetupManager
         if (!promptShown)
         {
             // let the user know that they should continue / complete the setup process via the Web UI.
-            SystemConfiguration systemConfig = configurationManager.getSystemConfig();
+            SystemConfigurationSupport systemConfig = (SystemConfigurationSupport) configurationManager.getSystemConfig();
 
             //TODO: I18N this message - note, this also only works if the user is installing on the local
             //TODO: machine. We need to provide a better (widely applicable) URL.
@@ -63,22 +66,7 @@ public class DefaultSetupManager implements SetupManager
             String baseUrl = configurationManager.getAppConfig().getBaseUrl();
             if (!TextUtils.stringSet(baseUrl))
             {
-                String hostname = "localhost";
-                try
-                {
-                    InetAddress address = InetAddress.getLocalHost();
-                    hostname = address.getCanonicalHostName();
-                }
-                catch (UnknownHostException e)
-                {
-                    // noop.
-                }
-                baseUrl = "http://" + hostname + ":" + systemConfig.getServerPort();
-                if (!systemConfig.getContextPath().startsWith("/"))
-                {
-                    baseUrl = baseUrl + "/";
-                }
-                baseUrl = baseUrl + systemConfig.getContextPath();
+                baseUrl = systemConfig.getHostUrl();
             }
             System.err.println("Now go to " + baseUrl + " and follow the prompts.");
             promptShown = true;
@@ -88,14 +76,58 @@ public class DefaultSetupManager implements SetupManager
     public void startSetupWorkflow() throws IOException
     {
         state = SetupState.STARTING;
+
+        createExternalConfigFileIfRequired();
+
         if (isDataRequired())
         {
             // request data input.
             state = SetupState.DATA;
+
             showPrompt();
             return;
         }
         requestDataComplete();
+    }
+
+    private void createExternalConfigFileIfRequired() throws IOException
+    {
+        // If the user configuration file does not exist, create it now.
+        EnvConfig envConfig = configurationManager.getEnvConfig();
+        SystemConfiguration sysConfig = configurationManager.getSystemConfig();
+
+        String externalConfig = envConfig.getPulseConfig();
+        if (!TextUtils.stringSet(externalConfig))
+        {
+            externalConfig = envConfig.getDefaultPulseConfig();
+        }
+        File f = new File(externalConfig);
+        if (!f.isFile())
+        {
+            // copy the template file into the config location.
+            SystemPaths paths = configurationManager.getSystemPaths();
+            File configTemplate = new File(paths.getConfigRoot(), "config.properties");
+            if (!f.getParentFile().isDirectory() && !f.getParentFile().mkdirs())
+            {
+                throw new IOException();
+            }
+            if (!f.createNewFile())
+            {
+                throw new IOException();
+            }
+            IOUtils.copyFile(configTemplate, f);
+
+            // write the default configuration to this template file.
+            // There needs to be a way to do this without duplicating the default configuration data.
+            // Unfortunately, the defaults are currently hidden by any system properties that over ride them...
+            Properties props = new Properties();
+            props.setProperty(SystemConfiguration.CONTEXT_PATH, "/");
+            props.setProperty(SystemConfiguration.WEBAPP_PORT, "8080");
+            props.setProperty(SystemConfiguration.PULSE_DATA, (sysConfig.getDataPath() != null ? sysConfig.getDataPath() : ""));
+
+            PropertiesWriter writer = new PropertiesWriter();
+            writer.write(f, props);
+        }
     }
 
     public void requestDataComplete() throws IOException

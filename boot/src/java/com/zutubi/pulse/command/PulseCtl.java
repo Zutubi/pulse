@@ -17,7 +17,7 @@ import java.net.URLClassLoader;
  */
 public class PulseCtl
 {
-    private static final String PULSE_HOME = "pulse.home";
+    public static final String PULSE_HOME = "pulse.home";
 
     private static final String DEBUG = "debug";
 

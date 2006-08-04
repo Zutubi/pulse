@@ -1,5 +1,7 @@
 package com.zutubi.pulse.logging;
 
+import com.zutubi.pulse.command.PulseCtl;
+
 import java.io.IOException;
 import java.io.File;
 import java.util.logging.FileHandler;
@@ -16,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class FileConfig
 {
-    private static final String PULSE_HOME = "pulse.home";
+    private static final String PULSE_HOME = PulseCtl.PULSE_HOME;
 
     private static final String FILE_NAME = "pulse%u.%g.log";
 

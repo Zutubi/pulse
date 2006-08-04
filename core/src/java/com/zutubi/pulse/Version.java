@@ -23,22 +23,22 @@ public class Version implements Comparable
     /**
      * The version number property name.
      */
-    private static final String VERSION_NUMBER = "version.number";
+    public static final String VERSION_NUMBER = "version.number";
 
     /**
      * The build date property name.
      */
-    private static final String BUILD_DATE = "build.date";
+    public static final String BUILD_DATE = "build.date";
 
     /**
      * The build number property name.
      */
-    private static final String BUILD_NUMBER = "build.number";
+    public static final String BUILD_NUMBER = "build.number";
 
     /**
      * The release date property name.
      */
-    private static final String RELEASE_DATE = "release.date";
+    public static final String RELEASE_DATE = "release.date";
 
     public static final int INVALID = -1;
 

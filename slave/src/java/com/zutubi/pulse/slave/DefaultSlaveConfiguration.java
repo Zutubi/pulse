@@ -53,6 +53,17 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
         return config.getProperty(CONTEXT_PATH, "/");
     }
 
+    public void setDataPath(String path)
+    {
+        // n/a
+    }
+
+    public String getDataPath()
+    {
+        // n/a
+        return null;
+    }
+
     public void setLoggingLevel(String c)
     {
         config.setProperty(LOGGING_CONFIG, c);

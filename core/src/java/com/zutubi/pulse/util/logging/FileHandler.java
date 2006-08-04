@@ -1,5 +1,7 @@
 package com.zutubi.pulse.util.logging;
 
+import com.zutubi.pulse.command.PulseCtl;
+
 import java.io.IOException;
 
 /**
@@ -43,13 +45,13 @@ public class FileHandler extends java.util.logging.FileHandler
         }
 
         // only handle substitution if pulse.home is set.
-        if (!System.getProperties().contains("pulse.home"))
+        if (!System.getProperties().contains(PulseCtl.PULSE_HOME))
         {
             return pattern;
         }
 
         // WARNING: The following implementation does not support the escaping of the '%' character.
-        String pulseHome = System.getProperty("pulse.home");
+        String pulseHome = System.getProperty(PulseCtl.PULSE_HOME);
 
         int index = pattern.indexOf("%b");
         while (index != -1)
