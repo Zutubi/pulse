@@ -108,6 +108,10 @@
             <result name="success" type="json">rmdir.xml</result>
         </action>
 
+        <action name="requestEvaluation" class="com.zutubi.pulse.web.ajax.RequestEvaluationAction">
+            <result name="success" type="json">license.xml</result>
+        </action>
+
     </package>
 
     <package name="popups" namespace="/popups" extends="webwork-default-package">

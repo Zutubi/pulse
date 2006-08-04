@@ -2039,7 +2039,7 @@
 ## Shows a testing message in the div with the given id
 ##
 #macro(testInProgress $divid)
-    $("$divid").innerHTML = "<img src='/images/inprogress.gif'/> $action.getText('testing')";
+    $("$divid").innerHTML = "<img src='$base/images/inprogress.gif'/> $action.getText('testing')";
 #end
 
 ##
