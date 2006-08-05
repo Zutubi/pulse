@@ -4,11 +4,11 @@ import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 
-import java.util.Properties;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 /**
  * <class-comment/>
@@ -71,8 +71,8 @@ public class PropertiesWriterTest extends PulseTestCase
         //for the paranoid: verify that the when reading the config we end up with the same content as we set.
     }
 
-    public void testUpdateExistingMultilineProperties() throws IOException
-    {
-        //TODO:
-    }
+//    public void testUpdateExistingMultilineProperties() throws IOException
+//    {
+//        //TODO:
+//    }
 }

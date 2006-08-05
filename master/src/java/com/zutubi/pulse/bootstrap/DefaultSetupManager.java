@@ -2,15 +2,15 @@ package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.spring.SpringObjectFactory;
+import com.zutubi.pulse.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.bootstrap.conf.PropertiesWriter;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
-import com.zutubi.pulse.bootstrap.conf.EnvConfig;
-import com.zutubi.pulse.bootstrap.conf.PropertiesWriter;
 import com.zutubi.pulse.util.IOUtils;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -77,7 +77,14 @@ public class DefaultSetupManager implements SetupManager
     {
         state = SetupState.STARTING;
 
-        createExternalConfigFileIfRequired();
+        try
+        {
+            createExternalConfigFileIfRequired();
+        }
+        catch (IOException e)
+        {
+            System.err.println("WARNING: " + e.getMessage());
+        }
 
         if (isDataRequired())
         {
@@ -107,13 +114,14 @@ public class DefaultSetupManager implements SetupManager
             // copy the template file into the config location.
             SystemPaths paths = configurationManager.getSystemPaths();
             File configTemplate = new File(paths.getConfigRoot(), "config.properties");
-            if (!f.getParentFile().isDirectory() && !f.getParentFile().mkdirs())
+            File parentFile = f.getParentFile();
+            if (!parentFile.isDirectory() && !f.getParentFile().mkdirs())
             {
-                throw new IOException();
+                throw new IOException("Unable to create parent directory '" + parentFile.getAbsolutePath() + "' for config file");
             }
             if (!f.createNewFile())
             {
-                throw new IOException();
+                throw new IOException("Unable to create config file '" + f.getAbsolutePath() + "'");
             }
             IOUtils.copyFile(configTemplate, f);
 

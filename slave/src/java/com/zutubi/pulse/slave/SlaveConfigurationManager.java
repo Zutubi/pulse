@@ -1,8 +1,8 @@
 package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.bootstrap.AbstractConfigurationManager;
-import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.bootstrap.SystemPaths;
 
 /**
  */
@@ -19,7 +19,7 @@ public class SlaveConfigurationManager extends AbstractConfigurationManager
     {
         SystemPaths systemPaths = getSystemPaths();
         userPaths = new SlaveUserPaths(systemPaths);
-        appConfig = new DefaultSlaveConfiguration(userPaths, systemPaths);
+        appConfig = new DefaultSlaveConfiguration(userPaths, systemPaths, getEnvConfig());
     }
 
     public SystemConfiguration getSystemConfig()

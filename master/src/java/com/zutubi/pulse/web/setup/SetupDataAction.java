@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.setup;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
+import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 
 import java.io.File;
 
@@ -15,6 +16,7 @@ public class SetupDataAction extends SetupActionSupport
     private SetupManager setupManager;
 
     private String data;
+    private File pulseConfig;
 
     public String getData()
     {
@@ -24,6 +26,16 @@ public class SetupDataAction extends SetupActionSupport
     public void setData(String data)
     {
         this.data = data;
+    }
+
+    public String getPulseConfigPath()
+    {
+        return pulseConfig.getAbsolutePath();
+    }
+
+    public boolean getPulseConfigExists()
+    {
+        return pulseConfig.isFile();
     }
 
     public void validate()
@@ -52,6 +64,16 @@ public class SetupDataAction extends SetupActionSupport
 
         // make the path the shortest possible.
         this.data = new File(this.data).getCanonicalPath();
+
+        EnvConfig envConfig = configurationManager.getEnvConfig();
+        if(envConfig.hasPulseConfig())
+        {
+            pulseConfig = new File(envConfig.getPulseConfig());
+        }
+        else
+        {
+            pulseConfig = new File(envConfig.getDefaultPulseConfig());
+        }
 
         return INPUT;
     }

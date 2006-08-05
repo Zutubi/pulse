@@ -29,7 +29,14 @@
 
     #next(2)
 #end
-
+<p>
+    <img alt="info" src="$base/images/information.gif"/> $action.getText("data.using.config", [$pulseConfigPath])
+</p>
+#if(!$pulseConfigExists)
+<p>
+    <img alt="error" src="$base/images/exclamation.gif"/> #wwtext("name=data.config.missing")
+</p>
+#end
 <div style="text-align:left;width:70%">
     #wwtext("name=data.directory.what.is.it")
     #wwtext("name=data.directory.where.should.it.go")

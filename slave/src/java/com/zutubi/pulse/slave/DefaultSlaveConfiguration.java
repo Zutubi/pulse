@@ -1,11 +1,9 @@
 package com.zutubi.pulse.slave;
 
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.bootstrap.UserPaths;
-import com.zutubi.pulse.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.bootstrap.conf.CompositeConfig;
-import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
-import com.zutubi.pulse.bootstrap.conf.FileConfig;
+import com.zutubi.pulse.bootstrap.conf.*;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
@@ -22,20 +20,28 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
     private UserPaths userPaths;
     private SystemPaths systemPaths;
 
-    public DefaultSlaveConfiguration(UserPaths userPaths, SystemPaths systemPaths)
+    public DefaultSlaveConfiguration(UserPaths userPaths, SystemPaths systemPaths, EnvConfig env)
     {
         this.userPaths = userPaths;
         this.systemPaths = systemPaths;
-        init();
+        init(env);
     }
 
-    public void init()
+    public void init(EnvConfig env)
     {
-        File userProperties = new File(userPaths.getUserConfigRoot(), PROPERTIES_FILE);
-        FileConfig userConfig = new FileConfig(userProperties);
-        File systemProperties = new File(systemPaths.getConfigRoot(), PROPERTIES_FILE);
-        FileConfig systemConfig = new FileConfig(systemProperties);
-        config = new ConfigSupport(new CompositeConfig(userConfig, systemConfig));
+        Config commandLineAndSystemProperties = new VolatileReadOnlyConfig(System.getProperties());
+
+        File pulseConfigProperties = new File(userPaths.getUserConfigRoot(), PROPERTIES_FILE);
+        if (env.hasPulseConfig())
+        {
+            pulseConfigProperties = new File(env.getPulseConfig());
+        }
+        FileConfig userConfig = new FileConfig(pulseConfigProperties);
+
+        File systemConfigProperties = new File(systemPaths.getConfigRoot(), PROPERTIES_FILE);
+        FileConfig systemConfig = new FileConfig(systemConfigProperties);
+
+        config = new ConfigSupport(new CompositeConfig(commandLineAndSystemProperties, userConfig, systemConfig));
     }
 
     public int getServerPort()
