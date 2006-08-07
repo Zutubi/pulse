@@ -91,17 +91,17 @@ public class TokenManager
         verifyRoleIn(token, GrantedAuthority.ADMINISTRATOR);
     }
 
-    public void verifyUser(String token) throws AuthenticationException
+    public User verifyUser(String token) throws AuthenticationException
     {
-        verifyRoleIn(token, GrantedAuthority.USER);
+        return verifyRoleIn(token, GrantedAuthority.USER);
     }
 
-    public void verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException
+    public User verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException
     {
         // if the token is the admin token, then we are happy.
         if(checkAdminToken(token))
         {
-            return;
+            return null;
         }
 
         User user = verifyToken(token);
@@ -111,7 +111,7 @@ public class TokenManager
             {
                 if (authority.getAuthority().equals(allowedAuthority))
                 {
-                    return;
+                    return user;
                 }
             }
         }

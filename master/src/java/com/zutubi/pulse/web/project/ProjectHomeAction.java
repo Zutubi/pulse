@@ -13,6 +13,7 @@ import java.util.List;
 public class ProjectHomeAction extends ProjectActionSupport
 {
     private long id;
+    private String projectName;
     private Project project;
     private int totalBuilds;
     private int successfulBuilds;
@@ -111,7 +112,15 @@ public class ProjectHomeAction extends ProjectActionSupport
 
     public String execute()
     {
-        project = getProjectManager().getProject(id);
+        if(id != 0)
+        {
+            project = getProjectManager().getProject(id);
+        }
+        else
+        {
+            project = getProjectManager().getProject(projectName);
+        }
+
         if (project != null)
         {
             BuildManager buildManager = getBuildManager();
@@ -128,7 +137,7 @@ public class ProjectHomeAction extends ProjectActionSupport
         }
         else
         {
-            addActionError("Unknown project [" + id + "]");
+            addActionError("Unknown project [" + id + "] " + projectName);
             return ERROR;
         }
 
@@ -145,4 +154,8 @@ public class ProjectHomeAction extends ProjectActionSupport
         return commitMessageHelper.applyTransforms(changelist, 60);
     }
 
+    public void setProjectName(String projectName)
+    {
+        this.projectName = projectName;
+    }
 }

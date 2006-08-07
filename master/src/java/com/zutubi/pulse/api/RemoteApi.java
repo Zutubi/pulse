@@ -68,6 +68,41 @@ public class RemoteApi
         return result;
     }
 
+    public Vector<String> getMyProjectNames(String token) throws AuthenticationException
+    {
+        User user = tokenManager.verifyUser(token);
+        List<Project> projects = projectManager.getAllProjects();
+
+        if(user != null)
+        {
+            projects.removeAll(userManager.getHiddenProjects(user));
+        }
+        
+        Vector<String> result = new Vector<String>(projects.size());
+        for(Project p: projects)
+        {
+            result.add(p.getName());
+        }
+
+        return result;
+    }
+
+    public Vector<Hashtable<String, Object>> getBuild(String token, String projectName, int id) throws AuthenticationException
+    {
+        Vector<Hashtable<String,  Object>> result = new Vector<Hashtable<String, Object>>(1);
+
+        tokenManager.verifyUser(token);
+        Project project = getProject(projectName);
+        BuildResult build = buildManager.getByProjectAndNumber(project, id);
+        if(build == null)
+        {
+            return result;
+        }
+
+        result.add(convertResult(build));
+        return result;
+    }
+
     public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, String projectName, String buildSpecification, boolean completedOnly, int maxResults) throws AuthenticationException
     {
         tokenManager.verifyUser(token);
@@ -82,38 +117,36 @@ public class RemoteApi
         ResultState[] states = null;
         if(completedOnly)
         {
-            states = new ResultState[] { ResultState.ERROR, ResultState.FAILURE, ResultState.SUCCESS };
+            states = ResultState.getCompletedStates();
         }
 
         List<BuildResult> builds = buildManager.queryBuilds(new Project[]{project}, states, specs, -1, -1, null, 0, maxResults, true);
         Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
         for(BuildResult build: builds)
         {
-            Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
-            buildDetails.put("id", (int)build.getNumber());
-            buildDetails.put("specification", build.getBuildSpecification());
-            buildDetails.put("status", build.getState().getPrettyString());
-            buildDetails.put("completed", build.completed());
-            buildDetails.put("succeeded", build.succeeded());
-            buildDetails.put("startTime", new Date(build.getStamps().getStartTime()));
-            buildDetails.put("endTime", new Date(build.getStamps().getEndTime()));
+            Hashtable<String, Object> buildDetails = convertResult(build);
             result.add(buildDetails);
         }
 
         return result;
     }
 
-    public Hashtable<String, Object> getLatestBuildForProject(String token, String projectName, String buildSpecification, boolean completedOnly) throws AuthenticationException
+    public Vector<Hashtable<String,Object>> getLatestBuildForProject(String token, String projectName, String buildSpecification, boolean completedOnly) throws AuthenticationException
     {
-        Vector<Hashtable<String, Object>> latest = getLatestBuildsForProject(token, projectName, buildSpecification, completedOnly, 1);
-        if(latest.size() > 0)
-        {
-            return latest.get(0);
-        }
-        else
-        {
-            return null;
-        }
+        return getLatestBuildsForProject(token, projectName, buildSpecification, completedOnly, 1);
+    }
+
+    private Hashtable<String, Object> convertResult(BuildResult build)
+    {
+        Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
+        buildDetails.put("id", (int)build.getNumber());
+        buildDetails.put("specification", build.getBuildSpecification());
+        buildDetails.put("status", build.getState().getPrettyString());
+        buildDetails.put("completed", build.completed());
+        buildDetails.put("succeeded", build.succeeded());
+        buildDetails.put("startTime", new Date(build.getStamps().getStartTime()));
+        buildDetails.put("endTime", new Date(build.getStamps().getEndTime()));
+        return buildDetails;
     }
 
     public boolean triggerBuild(String token, String projectName, String buildSpecification) throws AuthenticationException
