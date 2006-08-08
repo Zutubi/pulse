@@ -6,53 +6,11 @@ package com.zutubi.pulse.license;
  */
 public enum LicenseType
 {
-    EVALUATION
-    {
-        public final String getCode()
-        {
-            return "e";
-        }
-    },
-    COMMERCIAL
-    {
-        public final String getCode()
-        {
-            return "c";
-        }
-    },
-    NON_PROFIT
-    {
-        public final String getCode()
-        {
-            return "n";
-        }
-    },
-    PERSONAL
-    {
-        public final String getCode()
-        {
-            return "p";
-        }
-    },
+    ENTERPRISE,
+    EVALUATION,
+    NON_PROFIT,
+    PROFESSIONAL,
+    SMALL_TEAM,
+    STANDARD,
     CUSTOM
-    {
-        public final String getCode()
-        {
-            return "u";
-        }
-    };
-
-    public static LicenseType valueBy(String code)
-    {
-        for (LicenseType type : LicenseType.values())
-        {
-            if (type.getCode().equals(code))
-            {
-                return type;
-            }
-        }
-        return null;
-    }
-
-    public abstract String getCode();
 }

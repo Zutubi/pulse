@@ -85,6 +85,12 @@ public class LicenseDecoder
             String projects = reader.readLine();
             String users = reader.readLine();
 
+            // Support old 1-letter codes
+            if(code != null && code.length() == 1)
+            {
+                code = mapCode(code);
+            }
+
             // verify that all of the expected fields where available.
             if (!TextUtils.stringSet(code) ||
                     !TextUtils.stringSet(holder) ||
@@ -93,7 +99,8 @@ public class LicenseDecoder
                 return null;
             }
 
-            LicenseType type = LicenseType.valueBy(code);
+
+            LicenseType type = LicenseType.valueOf(code);
             if (type == null)
             {
                 return null;
@@ -116,6 +123,18 @@ public class LicenseDecoder
         catch (ParseException e)
         {
             throw new LicenseException(e);
+        }
+    }
+
+    private String mapCode(String code)
+    {
+        if(code.equals("e"))
+        {
+            return "EVALUATION";
+        }
+        else
+        {
+            return "CUSTOM";
         }
     }
 

@@ -44,7 +44,7 @@ public class LicenseTest extends PulseTestCase
     {
         License a = new License(LicenseType.EVALUATION, "holder", null);
         License b = new License(LicenseType.EVALUATION, "holder", null);
-        License c = new License(LicenseType.COMMERCIAL, "holder", null);
+        License c = new License(LicenseType.STANDARD, "holder", null);
 
         assertTrue(a.equals(b));
         assertFalse(a.equals(c));

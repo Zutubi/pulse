@@ -67,7 +67,7 @@ public class LicenseEncoder implements LicenseKeyFactory
         // format:
         StringBuffer buffer = new StringBuffer();
         // 1) license type.
-        writeLineTo(buffer, license.getType().getCode());
+        writeLineTo(buffer, license.getType().toString());
         // 2) holder name.
         writeLineTo(buffer, license.getHolder());
         // 3) expiry date.
@@ -114,14 +114,19 @@ public class LicenseEncoder implements LicenseKeyFactory
     {
         try
         {
-            SimpleDateFormat expiryFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
             String code = argv[0];
             String name = argv[1];
-            String expiryStr = argv[2];
+            Date expiry = null;
+
+            if(argv.length > 2)
+            {
+                SimpleDateFormat expiryFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                expiry = expiryFormat.parse(argv[2]);
+            }
 
             // Validation:
-            LicenseType type = LicenseType.valueBy(code);
+            LicenseType type = LicenseType.valueOf(code);
             if (type == null)
             {
                 throw new IllegalArgumentException("Unknown license type "+ code +".");
@@ -132,18 +137,15 @@ public class LicenseEncoder implements LicenseKeyFactory
                 throw new IllegalArgumentException("The name of the license holder is required.");
             }
 
-            Date expiry = expiryFormat.parse(expiryStr);
-
             License license = new License(type, name, expiry);
 
             // setup some default supported entity values until they are added to the interface and we want to be
             // able to vary them.
-            if (license.getType() == LicenseType.EVALUATION)
+            if (license.getType() == LicenseType.ENTERPRISE)
             {
-                // keep default values of License.UNDEFINED.
-                license.setSupported(License.UNRESTRICTED, License.UNRESTRICTED, License.UNRESTRICTED);
+                license.setSupported(16, License.UNRESTRICTED, License.UNRESTRICTED);
             }
-            else if (license.getType() == LicenseType.COMMERCIAL)
+            else if (license.getType() == LicenseType.EVALUATION)
             {
                 // keep default values of License.UNDEFINED.
                 license.setSupported(License.UNRESTRICTED, License.UNRESTRICTED, License.UNRESTRICTED);
@@ -152,9 +154,17 @@ public class LicenseEncoder implements LicenseKeyFactory
             {
                 license.setSupported(5, 10, License.UNRESTRICTED);
             }
-            else if (license.getType() == LicenseType.PERSONAL)
+            else if (license.getType() == LicenseType.PROFESSIONAL)
             {
-                license.setSupported(1, 3, 1);
+                license.setSupported(6, License.UNRESTRICTED, License.UNRESTRICTED);
+            }
+            else if (license.getType() == LicenseType.SMALL_TEAM)
+            {
+                license.setSupported(1, 2, 2);
+            }
+            else if (license.getType() == LicenseType.STANDARD)
+            {
+                license.setSupported(2, License.UNRESTRICTED, License.UNRESTRICTED);
             }
 
             LicenseEncoder encoder = new LicenseEncoder();

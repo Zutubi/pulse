@@ -42,7 +42,7 @@ public class LicenseEncodeDecodeTest extends PulseTestCase
     {
         License e = new License(LicenseType.EVALUATION, "S. O MeBody", null);
         assertEquals(e, decoder.decode(encoder.encode(e)));
-        License c = new License(LicenseType.COMMERCIAL, "Nob. Ody", null);
+        License c = new License(LicenseType.STANDARD, "Nob. Ody", null);
         assertEquals(c, decoder.decode(encoder.encode(c)));
         License n = new License(LicenseType.NON_PROFIT, "S. O MeBody", null);
         assertEquals(n, decoder.decode(encoder.encode(n)));
