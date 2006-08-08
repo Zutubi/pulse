@@ -53,7 +53,7 @@ then
     user="${user}@"
 fi
 
-svnBase="svn+ssh://${user}www.cinnamonbob.com/usr/local/svn-repo/pulse"
+svnBase="svn+ssh://${user}cinnamonbob.com/svnroot/pulse"
 svnTag="$svnBase/tags/$version"
 
 #if svn info "$svnTag" > /dev/null 2>& 1
