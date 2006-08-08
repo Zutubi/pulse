@@ -23,9 +23,9 @@
         <delete dir="master/system"/>
         <delete file="master/etc/admin.token"/>
         <delete file="master/etc/pulse-init.properties"/>
-        <mkdir dir="master/system"/>
-        <mkdir dir="master/system/log"/>
-        <mkdir dir="master/system/tmp"/>
+        
+        <!-- clean out the user.home/.pulse/* directory -->
+        <delete dir="${user.home}/.pulse"/>
     </target>
 
     <target name="build.boot">
