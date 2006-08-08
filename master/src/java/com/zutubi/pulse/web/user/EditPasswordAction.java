@@ -57,7 +57,7 @@ public class EditPasswordAction extends UserActionSupport
 
         if (!passwordEncoder.isPasswordValid(user.getPassword(), current, null))
         {
-            addFieldError("password", getText("password.current.mismatch"));
+            addFieldError("current", getText("password.current.mismatch"));
         }
 
         // ensure that the new password and the confirmation match
