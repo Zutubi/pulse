@@ -4,6 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 
@@ -30,16 +31,22 @@ public class SetupDataAction extends SetupActionSupport
 
     public String getPulseConfigPath()
     {
-        return pulseConfig.getAbsolutePath();
+        return getPulseConfig().getAbsolutePath();
     }
 
     public boolean getPulseConfigExists()
     {
-        return pulseConfig.isFile();
+        return getPulseConfig().isFile();
     }
 
     public void validate()
     {
+        // if we already have validation errors, then do not continue.
+        if (hasErrors())
+        {
+            return;
+        }
+
         // attempt to create the data directory. If this fails, we need to ask the
         // user for another directory.
         File data = new File(this.data);
@@ -49,13 +56,30 @@ public class SetupDataAction extends SetupActionSupport
         }
     }
 
+    public File getPulseConfig()
+    {
+        if (pulseConfig == null)
+        {
+            EnvConfig envConfig = configurationManager.getEnvConfig();
+            if(envConfig.hasPulseConfig())
+            {
+                pulseConfig = new File(envConfig.getPulseConfig());
+            }
+            else
+            {
+                pulseConfig = new File(envConfig.getDefaultPulseConfig());
+            }
+        }
+        return pulseConfig;
+    }
+
     public String doInput() throws Exception
     {
         // set the default.
         String userHome = System.getProperty("user.home");
         if (TextUtils.stringSet(userHome))
         {
-            this.data = userHome + File.separatorChar + ".pulse" + File.separatorChar + "data";
+            this.data = FileSystemUtils.composeFilename(userHome, ".pulse", "data");
         }
         else
         {
@@ -65,16 +89,6 @@ public class SetupDataAction extends SetupActionSupport
         // make the path the shortest possible.
         this.data = new File(this.data).getCanonicalPath();
 
-        EnvConfig envConfig = configurationManager.getEnvConfig();
-        if(envConfig.hasPulseConfig())
-        {
-            pulseConfig = new File(envConfig.getPulseConfig());
-        }
-        else
-        {
-            pulseConfig = new File(envConfig.getDefaultPulseConfig());
-        }
-
         return INPUT;
     }
 
@@ -83,7 +97,7 @@ public class SetupDataAction extends SetupActionSupport
         File home = new File(this.data);
         configurationManager.setPulseData(home);
         setupManager.requestDataComplete();
-        
+
         return SUCCESS;
     }
 
