@@ -68,10 +68,7 @@ public class EditResourceVersionAction extends ResourceActionSupport
 
     public String execute()
     {
-        resource.deleteVersion(version);
-        version.setValue(newValue);
-        resource.add(version);
-        getResourceManager().save(resource);
+        getResourceManager().renameResourceVersion(resource, version.getValue(), newValue);
         return SUCCESS;
     }
 }

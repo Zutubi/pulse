@@ -56,8 +56,7 @@ public class EditResourceAction extends ResourceActionSupport
 
     public String execute()
     {
-        resource.setName(newName);
-        getResourceManager().save(resource);
+        getResourceManager().renameResource(resource, newName);
         return SUCCESS;
     }
 }

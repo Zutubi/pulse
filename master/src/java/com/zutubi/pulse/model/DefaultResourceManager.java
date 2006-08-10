@@ -2,6 +2,8 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.ResourceDiscoverer;
 import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.model.ResourceVersion;
+import com.zutubi.pulse.model.persistence.BuildSpecificationNodeDao;
 import com.zutubi.pulse.model.persistence.ResourceDao;
 
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.TreeMap;
 public class DefaultResourceManager implements ResourceManager
 {
     private ResourceDao resourceDao;
+    private BuildSpecificationNodeDao buildSpecificationNodeDao;
     private DatabaseResourceRepository masterResourceRepository;
     private Map<Long, DatabaseResourceRepository> slaveRepositories = new TreeMap<Long, DatabaseResourceRepository>();
 
@@ -94,6 +97,49 @@ public class DefaultResourceManager implements ResourceManager
         return resourceDao.findAll();
     }
 
+    public void renameResource(PersistentResource resource, String newName)
+    {
+        List<BuildSpecificationNode> nodes = buildSpecificationNodeDao.findByResourceRequirement(resource.getName());
+        for(BuildSpecificationNode node: nodes)
+        {
+            for(ResourceRequirement r: node.getResourceRequirements())
+            {
+                if(r.getResource().equals(resource.getName()))
+                {
+                    r.setResource(newName);
+                }
+            }
+
+            buildSpecificationNodeDao.save(node);
+        }
+
+        resource.setName(newName);
+        resourceDao.save(resource);
+    }
+
+    public void renameResourceVersion(PersistentResource resource, String value, String newValue)
+    {
+        List<BuildSpecificationNode> nodes = buildSpecificationNodeDao.findByResourceRequirement(resource.getName());
+        for(BuildSpecificationNode node: nodes)
+        {
+            for(ResourceRequirement r: node.getResourceRequirements())
+            {
+                if(r.getResource().equals(resource.getName()) && value.equals(r.getVersion()))
+                {
+                    r.setVersion(newValue);
+                }
+            }
+
+            buildSpecificationNodeDao.save(node);
+        }
+
+        ResourceVersion version = resource.getVersion(value);
+        resource.deleteVersion(version);
+        version.setValue(newValue);
+        resource.add(version);
+        resourceDao.save(resource);
+    }
+
     public List<PersistentResource> findBySlave(Slave slave)
     {
         return resourceDao.findAllBySlave(slave);
@@ -114,5 +160,10 @@ public class DefaultResourceManager implements ResourceManager
     public void setResourceDao(ResourceDao resourceDao)
     {
         this.resourceDao = resourceDao;
+    }
+
+    public void setBuildSpecificationNodeDao(BuildSpecificationNodeDao buildSpecificationNodeDao)
+    {
+        this.buildSpecificationNodeDao = buildSpecificationNodeDao;
     }
 }
