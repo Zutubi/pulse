@@ -37,7 +37,6 @@
 
 ;  !insertmacro MUI_PAGE_LICENSE "${NSISDIR}\Docs\Modern UI\License.txt"
 ;  !insertmacro MUI_PAGE_COMPONENTS
-  Page custom EnsureJRE
   !insertmacro MUI_PAGE_DIRECTORY
 
   !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU" 
@@ -45,7 +44,6 @@
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
   
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
-
   !insertmacro MUI_PAGE_INSTFILES
   
   !insertmacro MUI_UNPAGE_CONFIRM
@@ -82,14 +80,18 @@ RunInstall:
 Error:
   Pop $2
   MessageBox MB_OK "Unable to install Java runtime: $2"
-  Quit
 Exit:
 FunctionEnd
 
 Function EnsureJRE
-  ReadEnvStr $0 JAVA_HOME
-  StrCmp $0 "" 0 Exit
-  MessageBox MB_YESNO "No Java runtime installed or JAVA_HOME not set.  Download and install Java now?" IDYES 0 IDNO Exit
+  nsExec::ExecToStack '"$INSTDIR\bin\inserv" check-jvm'
+  Pop $0
+  Pop $1
+  StrCmp $0 "error" 0 CheckExit
+  StrCpy $1 "Unable to run JVM locator."
+CheckExit:
+  StrCmp $0 "0" Exit 0
+  MessageBox MB_YESNO "Could not find a JVM: $1.$\n$\nDownload and install Java now?" IDYES 0 IDNO Exit
   Call InstallJRE
 Exit:
 FunctionEnd
@@ -105,11 +107,22 @@ Section "Pulse" SecMain
   Call WriteEnvStr
 
   File /r /x pulse.nsi /x env.nsh *
+
+  Call EnsureJre
   
   nsExec::Exec '"$INSTDIR\bin\stop-service.bat"'
-  nsExec::Exec '"$INSTDIR\bin\uninstall-service.bat"'
-  nsExec::Exec '"$INSTDIR\bin\install-service.bat"'
-
+  nsExec::Exec '"$INSTDIR\bin\unserv" "__SERVICE_NAME__"'
+  nsExec::ExecToStack '"$INSTDIR\bin\inserv" "__SERVICE_NAME__" "__SERVICE_DESCRIPTION__"'
+  Pop $0
+  Pop $1
+  StrCmp $0 "error" 0 CheckExit
+  StrCpy $1 "Could not run service installer"
+  Goto ServiceFailed
+CheckExit:
+  StrCmp $0 "0" ServiceOK 0
+ServiceFailed:
+  MessageBox MB_OK "Unable to install pulse service: $1.$\n$\nTry installing manually using $INSTDIR\bin\install-service.bat.  Shortcuts will not work until the service is installed."
+ServiceOK:
   ;Store installation folder
   WriteRegStr HKCU "Software\Zutubi\__SERVICE_NAME__ __VERSION__" "" $INSTDIR
   
