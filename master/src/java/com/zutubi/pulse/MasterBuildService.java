@@ -1,5 +1,6 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.agent.MasterAgent;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
@@ -34,7 +35,7 @@ public class MasterBuildService implements BuildService
     {
         MasterConfiguration appConfig = configurationManager.getAppConfig();
         SystemConfiguration systemConfig = configurationManager.getSystemConfig();
-        return "http://" + appConfig.getAgentHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
+        return MasterAgent.constructMasterLocation(appConfig, systemConfig);
     }
 
     public boolean hasResource(String resource, String version)

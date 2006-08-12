@@ -344,24 +344,45 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertRecipeError(1000, "No online agent is capable of executing the build stage");
     }
 
-    public void testAgentRejectsBuild() throws Exception
+//    public void testAgentRejectsBuild() throws Exception
+//    {
+//        Agent agent = createAvailableAgent(0);
+//        queue.online(agent);
+//        MockBuildService service = (MockBuildService) agent.getBuildService();
+//
+//        service.setAcceptBuild(false);
+//        queue.enqueue(createDispatchRequest(0));
+//        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
+//
+//        // Still not dispatched
+//        assertEquals(1, queue.length());
+//
+//        service.setAcceptBuild(true);
+//        sendOnlineEvent(slave1000);
+//        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
+//
+//        // Now dispatched
+//        assertEquals(0, queue.length());
+//    }
+
+    public void testAgentErrorOnBuild() throws Exception
     {
         Agent agent = createAvailableAgent(0);
         queue.online(agent);
         MockBuildService service = (MockBuildService) agent.getBuildService();
 
-        service.setAcceptBuild(false);
+        service.setThrowError(true);
+        queue.enqueue(createDispatchRequest(0));
+        assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
+        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
+        assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
+        assertEquals("Unable to dispatch recipe: Error during dispatch", recipeError.getErrorMessage());
+        assertEquals(0, queue.length());
+
+        // Make sure we can dispatch another afterwards
+        service.setThrowError(false);
         queue.enqueue(createDispatchRequest(0));
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
-
-        // Still not dispatched
-        assertEquals(1, queue.length());
-
-        service.setAcceptBuild(true);
-        sendOnlineEvent(slave1000);
-        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
-
-        // Now dispatched
         assertEquals(0, queue.length());
     }
 
@@ -825,6 +846,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     {
         private long type;
         private boolean acceptBuild = true;
+        private boolean throwError = false;
 
         public MockBuildService(long type)
         {
@@ -839,6 +861,10 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public boolean build(RecipeRequest request)
         {
             semaphore.release();
+            if(throwError)
+            {
+                throw new RuntimeException("Error during dispatch");
+            }
             return acceptBuild;
         }
 
@@ -873,6 +899,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public void setAcceptBuild(boolean acceptBuild)
         {
             this.acceptBuild = acceptBuild;
+        }
+
+        public void setThrowError(boolean throwError)
+        {
+            this.throwError = throwError;
         }
     }
 

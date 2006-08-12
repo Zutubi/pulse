@@ -1,5 +1,6 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.agent.MasterAgent;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
@@ -57,7 +58,7 @@ public class SlaveBuildService implements BuildService
     {
         MasterConfiguration appConfig = configurationManager.getAppConfig();
         SystemConfiguration systemConfig = configurationManager.getSystemConfig();
-        String masterUrl = "http://" + appConfig.getAgentHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
+        String masterUrl = "http://" + MasterAgent.constructMasterLocation(appConfig, systemConfig);
 
         try
         {

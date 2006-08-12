@@ -467,28 +467,28 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         request.getRevision().apply(request.getRequest());
 
+        request.getRequest().prepare(agent.getName());
+        // TODO: this code cannot handle an agent rejecting the build
+        // (the handling was backed outdue to CIB-553 and the fact that
+        // agents do not currently reject builds)
+        eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest(), agent));
+        dispatchedRequests.add(request);
+        // We can no longer update the revision once we have dispatched a request.
+        request.getRevision().fix();
+
         try
         {
-            request.getRequest().prepare(agent.getName());
-            if (agent.getBuildService().build(request.getRequest()))
-            {
-                dispatchedRequests.add(request);
-                unavailableAgents.add(agent);
-
-                // We can no longer update the revision once we have dispatched a request.
-                request.getRevision().fix();
-                executingAgents.put(request.getRequest().getId(), agent);
-
-                eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest(), agent));
-                return true;
-            }
+            agent.getBuildService().build(request.getRequest());
+            unavailableAgents.add(agent);
+            executingAgents.put(request.getRequest().getId(), agent);
         }
         catch (Exception e)
         {
             LOG.warning("Unable to dispatch recipe: " + e.getMessage(), e);
+            eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), "Unable to dispatch recipe: " + e.getMessage()));
         }
 
-        return false;
+        return true;
     }
 
     public void stop(boolean force)
