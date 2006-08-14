@@ -162,6 +162,7 @@
         <copy todir="${package.root}/system/config">
             <fileset dir="master/etc" includes="pulse-defaults.properties,logging.properties"/>
             <fileset dir="master/etc" includes="logging/*.properties"/>
+            <fileset dir="master/etc" includes="config.properties"/>
         </copy>
 
         <copy todir="${package.root}/lib">
