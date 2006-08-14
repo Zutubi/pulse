@@ -109,13 +109,21 @@ public class DefaultSetupManager implements SetupManager
             externalConfig = envConfig.getDefaultPulseConfig();
         }
         File f = new File(externalConfig);
+        if (!f.isAbsolute())
+        {
+            f = f.getCanonicalFile();
+        }
         if (!f.isFile())
         {
             // copy the template file into the config location.
             SystemPaths paths = configurationManager.getSystemPaths();
             File configTemplate = new File(paths.getConfigRoot(), "config.properties");
             File parentFile = f.getParentFile();
-            if (!parentFile.isDirectory() && !f.getParentFile().mkdirs())
+/*
+            System.out.println("File: " + f);
+            System.out.println("ParentFile: " + parentFile);
+*/
+            if (!parentFile.isDirectory() && !parentFile.mkdirs())
             {
                 throw new IOException("Unable to create parent directory '" + parentFile.getAbsolutePath() + "' for config file");
             }
