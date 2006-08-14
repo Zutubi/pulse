@@ -44,7 +44,7 @@ pushd "$tmpDir/$packageName"
 #echo $PULSE_CONFIG
 #
 export PULSE_HOME="$(pwd)"
-$(pwd)/bin/startup.sh -p 8889 > ../stdout.txt 2> ../stderr.txt
+$(pwd)/bin/startup.sh -p 8889 -f $tmpDir/config.properties > ../stdout.txt 2> ../stderr.txt
 
 trap ERR
 
