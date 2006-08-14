@@ -38,7 +38,7 @@ public class Md5PasswordEncoderTest extends PulseTestCase
      */
     public void testI18NPasswordEncoding()
     {
-        String password = "Iñtërnâtiônàlizætiøn";
+        String password = "IÃ±tÃ«rnÃ¢tiÃ´nÃ lizÃ¦tiÃ¸n";
         String encodedPassword = encoder.encodePassword(password, null);
         assertTrue(encoder.isPasswordValid(encodedPassword, password, null));
     }
