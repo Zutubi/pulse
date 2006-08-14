@@ -5,7 +5,7 @@
 <head>
     <title>#wwtext("name=add.project")</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
-    #svnTestScript("addProject")
+    #svnTestScript("svn.setup")
 </head>
 <body>
     <div id="pagecontent">
