@@ -37,7 +37,7 @@ public class ServerMessagesHandler extends Handler
                     if(nullSafeEquals(previous.getMessage(), record.getMessage()) &&
                        nullSafeEquals(previous.getStackTrace(), CustomLogRecord.getStackTrace(record)))
                     {
-                        previous.repeated();
+                        previous.repeated(record);
                         return;
                     }
                 }

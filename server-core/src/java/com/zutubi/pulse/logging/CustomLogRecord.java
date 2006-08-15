@@ -1,10 +1,9 @@
 package com.zutubi.pulse.logging;
 
-import java.util.ResourceBundle;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.io.StringWriter;
-import java.io.PrintWriter;
 
 /**
  */
@@ -109,8 +108,9 @@ public class CustomLogRecord
         this.count = count;
     }
 
-    public void repeated()
+    public void repeated(LogRecord record)
     {
+        this.millis = record.getMillis();
         count++;
     }
 }
