@@ -40,11 +40,8 @@ packageName="$(basename $package .$extension)"
 pushd "$tmpDir/$packageName"
 
 # Fire it up!
-#export PULSE_CONFIG=`cygpath --path --windows "$(pwd/config.properties)"`
-#echo $PULSE_CONFIG
-#
-export PULSE_HOME="$(pwd)"
-$(pwd)/bin/startup.sh -p 8889 -f $tmpDir/config.properties > ../stdout.txt 2> ../stderr.txt
+export PULSE_HOME=
+$(pwd)/bin/startup.sh -p 8889 -f config.properties > ../stdout.txt 2> ../stderr.txt
 
 trap ERR
 

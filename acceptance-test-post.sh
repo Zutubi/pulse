@@ -9,6 +9,7 @@ then
 fi
 
 version=$1
+export PULSE_HOME=
 ./pulse-accept/pulse-${version}/bin/shutdown.sh -p 8889
 
 # Wait for it to shut down
