@@ -5,6 +5,7 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.util.CircularBuffer;
 
@@ -96,11 +97,8 @@ public class TailRecipeLogAction extends ProjectActionSupport
         {
             maxLines = LINE_COUNT;
         }
-        
-        if(refreshInterval <= 0)
-        {
-            refreshInterval = getUserInterval();
-        }
+
+        initialiseRefreshInterval();
 
         buildResult = getBuildManager().getBuildResult(buildId);
         if(buildResult == null)
@@ -177,16 +175,30 @@ public class TailRecipeLogAction extends ProjectActionSupport
         return SUCCESS;
     }
 
-    private int getUserInterval()
+    private void initialiseRefreshInterval()
     {
         Object principle = getPrinciple();
         if(principle != null)
         {
-            return userManager.getUser((String) principle).getRefreshInterval();
+            User user = userManager.getUser((String) principle);
+            if (user != null)
+            {
+                if(refreshInterval <= 0)
+                {
+                    refreshInterval = user.getTailRefreshInterval();
+                }
+                else if(refreshInterval != user.getTailRefreshInterval())
+                {
+                    user.setTailRefreshInterval(refreshInterval);
+                    userManager.save(user);
+                }
+            }
         }
-        else
+
+        // Just in case the user couldn't be found
+        if(refreshInterval <= 0)
         {
-            return 60;
+            refreshInterval = 60;
         }
     }
 

@@ -37,6 +37,7 @@
                     #editHeadingRow("settings" 2 "user/editUserSettings!input.action?userId=$user.id" "user.settings")
                     #dynamicRow("user.default.page" $user.defaultAction)
                     #dynamicRow("user.refresh.live.content" $refreshInterval)
+                    #dynamicRow("user.refresh.recipe.tail" $tailRefreshInterval)
                 </table>
             </td>
             <td class="columns" width="40%">

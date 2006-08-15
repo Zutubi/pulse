@@ -3,6 +3,8 @@ package com.zutubi.pulse.web.user;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.security.AcegiUtils;
 
+import java.util.Arrays;
+
 /**
  * <class-comment/>
  */
@@ -13,12 +15,17 @@ public class PreferencesAction extends UserActionSupport
         long refreshInterval = getUser().getRefreshInterval();
         if (refreshInterval == User.REFRESH_DISABLED)
         {
-            return "never";
+            return getText("user.refresh.never", "never");
         }
         else
         {
-            return "every " + refreshInterval + " seconds";
+            return getText("user.refresh.every", Arrays.asList(new Object [] { getUser().getRefreshInterval() } ));
         }
+    }
+
+    public String getTailRefreshInterval()
+    {
+        return getText("user.refresh.every", Arrays.asList(new Object [] { getUser().getTailRefreshInterval() } ));
     }
 
     public String doInput() throws Exception

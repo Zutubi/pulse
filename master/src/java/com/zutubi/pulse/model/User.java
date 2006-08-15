@@ -15,11 +15,14 @@ public class User extends Entity implements UserDetails
     public static int REFRESH_DISABLED = 0;
 
     private static final String PROPERTY_DASHBOARD_BUILD_COUNT = "user.dashboardBuildCount";
+    private static final String PROPERTY_DEFAULT_ACTION = "user.defaultAction";
     private static final String PROPERTY_LDAP_AUTHENTICATION = "user.ldapAuthentication";
     private static final String PROPERTY_SHOW_MY_CHANGES = "show.my.changes";
     private static final String PROPERTY_MY_CHANGES_COUNT = "my.changes.count";
     private static final String PROPERTY_SHOW_PROJECT_CHANGES = "show.project.changes";
     private static final String PROPERTY_PROJECT_CHANGES_COUNT = "project.changes.count";
+    private static final String PROPERTY_REFRESH_INTERVAL = "user.refreshInterval";
+    private static final String PROPERTY_TAIL_REFRESH_INTERVAL = "tail.refresh.interval";
 
     /**
      * The login name is used to identify this user.
@@ -385,16 +388,16 @@ public class User extends Entity implements UserDetails
      */
     public String getDefaultAction()
     {
-        if (hasProperty("user.defaultAction"))
+        if (hasProperty(PROPERTY_DEFAULT_ACTION))
         {
-            return getProperty("user.defaultAction");
+            return getProperty(PROPERTY_DEFAULT_ACTION);
         }
         return DefaultAction.DASHBOARD_ACTION;
     }
 
     public void setDefaultAction(String defaultAction)
     {
-        setProperty("user.defaultAction", defaultAction);
+        setProperty(PROPERTY_DEFAULT_ACTION, defaultAction);
     }
 
     /**
@@ -403,16 +406,26 @@ public class User extends Entity implements UserDetails
      */
     public int getRefreshInterval()
     {
-        if (hasProperty("user.refreshInterval"))
+        if (hasProperty(PROPERTY_REFRESH_INTERVAL))
         {
-            return Integer.valueOf(getProperty("user.refreshInterval"));
+            return Integer.valueOf(getProperty(PROPERTY_REFRESH_INTERVAL));
         }
         return 60;
     }
 
     public void setRefreshInterval(int refreshInterval)
     {
-        setProperty("user.refreshInterval", Integer.toString(refreshInterval));
+        setProperty(PROPERTY_REFRESH_INTERVAL, Integer.toString(refreshInterval));
+    }
+
+    public int getTailRefreshInterval()
+    {
+        return getIntProperty(PROPERTY_TAIL_REFRESH_INTERVAL, 60);
+    }
+
+    public void setTailRefreshInterval(int interval)
+    {
+        setIntProperty(PROPERTY_TAIL_REFRESH_INTERVAL, interval);
     }
 
     public int getDashboardBuildCount()

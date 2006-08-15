@@ -15,6 +15,7 @@ public class EditUserSettingsAction extends UserActionSupport
     private String defaultAction;
     private boolean refreshEnabled = false;
     private int refreshInterval;
+    private int tailInterval;
 
     public List<String> getDefaultActions()
     {
@@ -58,6 +59,16 @@ public class EditUserSettingsAction extends UserActionSupport
         this.refreshInterval = refreshInterval;
     }
 
+    public int getTailInterval()
+    {
+        return tailInterval;
+    }
+
+    public void setTailInterval(int tailInterval)
+    {
+        this.tailInterval = tailInterval;
+    }
+
     public String doInput() throws Exception
     {
         // load user details.
@@ -68,6 +79,7 @@ public class EditUserSettingsAction extends UserActionSupport
             refreshInterval = 60;
         }
 
+        tailInterval = getUser().getTailRefreshInterval();
         defaultAction = getUser().getDefaultAction();
 
         return super.doInput();
@@ -99,6 +111,7 @@ public class EditUserSettingsAction extends UserActionSupport
             persistentUser.setRefreshInterval(User.REFRESH_DISABLED);
         }
 
+        persistentUser.setTailRefreshInterval(tailInterval);
         persistentUser.setDefaultAction(defaultAction);
         getUserManager().save(persistentUser);
         return SUCCESS;
