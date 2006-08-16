@@ -2,7 +2,8 @@ package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.license.Licensed;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildSpecificationNodeDao;
 import com.zutubi.pulse.scheduling.EventTrigger;
@@ -12,16 +13,13 @@ import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.security.AcegiUtils;
-import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
 import com.zutubi.pulse.web.wizard.WizardCompleteState;
-import com.zutubi.pulse.license.Licensed;
 import org.acegisecurity.AccessDeniedException;
 
-import java.io.ByteArrayInputStream;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -595,33 +593,7 @@ public class AddProjectWizard extends BaseWizard
 
         public void validate()
         {
-            if(!TextUtils.stringSet(details.getPulseFile()))
-            {
-                addFieldError("details.pulseFile", "pulse file is required");
-                return;
-            }
-
-            try
-            {
-                PulseFileLoader loader = new PulseFileLoader(new ObjectFactory());
-                loader.load(new ByteArrayInputStream(details.getPulseFile().getBytes()), new PulseFile(), new Scope(), resourceRepository, new CustomProjectValidationPredicate());
-            }
-            catch(ParseException pe)
-            {
-                addActionError(pe.getMessage());
-                if(pe.getLine() > 0)
-                {
-                    String line = StringUtils.getLine(details.getPulseFile(), pe.getLine());
-                    if(line != null)
-                    {
-                        addActionError("First line of offending element: " + line);
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                addActionError(e.getMessage());
-            }
+            CustomDetailsHelper.validate(getWizard(), details.getPulseFile(), resourceRepository);
         }
 
         public void setResourceRepository(ResourceRepository resourceRepository)

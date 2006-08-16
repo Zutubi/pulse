@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.model.CustomPulseFileDetails;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.PulseFileDetails;
@@ -13,6 +14,7 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
     private long id;
     private CustomPulseFileDetails details = new CustomPulseFileDetails();
     private Project project;
+    private ResourceRepository resourceRepository;
 
     public long getId()
     {
@@ -53,6 +55,12 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
     public void validate()
     {
         project = lookupProject(id);
+        if(hasErrors())
+        {
+            return;
+        }
+
+        CustomDetailsHelper.validate(this, details.getPulseFile(), resourceRepository);
     }
 
     public String execute()
@@ -61,5 +69,10 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
         getProjectManager().save(project);
 
         return SUCCESS;
+    }
+
+    public void setResourceRepository(ResourceRepository resourceRepository)
+    {
+        this.resourceRepository = resourceRepository;
     }
 }
