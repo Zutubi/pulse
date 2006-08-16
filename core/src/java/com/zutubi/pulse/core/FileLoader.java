@@ -216,6 +216,10 @@ public class FileLoader
 
             throw createParseException(name, e, t);
         }
+        catch (ParseException ex)
+        {
+            throw ex;
+        }
         catch (Exception ex)
         {
             throw createParseException(name, e, ex);
