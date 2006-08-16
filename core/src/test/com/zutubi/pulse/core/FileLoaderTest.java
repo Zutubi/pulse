@@ -130,7 +130,7 @@ public class FileLoaderTest extends FileLoaderTestBase
 
     public void testMacroExpandError() throws Exception
     {
-        errorHelper("testMacroExpandError", "Processing element 'recipe': starting at line 8 column 5: Processing element 'macro-ref': starting at line 9 column 9: While expanding macro defined at line 4 column 5: Processing element 'no-such-type': starting at line 5 column 9: Undefined type 'no-such-type'");
+        errorHelper("testMacroExpandError", "While expanding macro defined at line 4 column 5: Processing element 'no-such-type': starting at line 5 column 9: Undefined type 'no-such-type'");
     }
 
     public void testMacroNoName() throws Exception
