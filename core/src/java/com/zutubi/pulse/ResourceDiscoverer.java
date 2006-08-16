@@ -2,6 +2,7 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;
@@ -25,7 +26,7 @@ public class ResourceDiscoverer
     private void discoverAnt(List<Resource> resources)
     {
         String home = System.getenv("ANT_HOME");
-        if (home != null)
+        if (FileSystemUtils.isDirectory(home))
         {
             Resource antResource = new Resource("ant");
             antResource.addProperty(new ResourceProperty("ANT_HOME", home, true, false));
@@ -89,32 +90,34 @@ public class ResourceDiscoverer
         // TODO: look for java on the path.
         // look for JAVA_HOME in the environment.
         String home = System.getenv("JAVA_HOME");
-
-        Resource javaResource = new Resource("java");
-        javaResource.addProperty(new ResourceProperty("JAVA_HOME", home, true, false));
-
-        File binDir = new File(home, "bin");
-        if (binDir.isDirectory())
+        if (FileSystemUtils.isDirectory(home))
         {
-            javaResource.addProperty(new ResourceProperty("java.bin.dir", binDir.getAbsolutePath(), false, true));
+            Resource javaResource = new Resource("java");
+            javaResource.addProperty(new ResourceProperty("JAVA_HOME", home, true, false));
 
-            File bin;
-            if(SystemUtils.isWindows())
+            File binDir = new File(home, "bin");
+            if (binDir.isDirectory())
             {
-                bin = new File("java.exe");
-            }
-            else
-            {
-                bin = new File(binDir, "java");
+                javaResource.addProperty(new ResourceProperty("java.bin.dir", binDir.getAbsolutePath(), false, true));
+
+                File bin;
+                if(SystemUtils.isWindows())
+                {
+                    bin = new File("java.exe");
+                }
+                else
+                {
+                    bin = new File(binDir, "java");
+                }
+
+                if(bin.isFile())
+                {
+                    javaResource.addProperty(new ResourceProperty("java.bin", bin.getAbsolutePath(), false, false));
+                }
+
             }
 
-            if(bin.isFile())
-            {
-                javaResource.addProperty(new ResourceProperty("java.bin", bin.getAbsolutePath(), false, false));
-            }
-
+            resources.add(javaResource);
         }
-
-        resources.add(javaResource);
     }
 }

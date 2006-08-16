@@ -1,5 +1,6 @@
 package com.zutubi.pulse.util;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
@@ -624,5 +625,39 @@ public class FileSystemUtils
     public static boolean isRoot(File f)
     {
         return f.getParentFile() == null;
+    }
+
+    /**
+     * Returns true iff the given path is set and refers to a directory.
+     *
+     * @param path the path to test (may be null)
+     * @return true iff path is a directory
+     */
+    public static boolean isDirectory(String path)
+    {
+        if(TextUtils.stringSet(path))
+        {
+            File f = new File(path);
+            return f.isDirectory();
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true iff the given path is set and refers to a regular file.
+     *
+     * @param path the path to test (may be null)
+     * @return true iff path is a regular file
+     */
+    public static boolean isFile(String path)
+    {
+        if(TextUtils.stringSet(path))
+        {
+            File f = new File(path);
+            return f.isFile();
+        }
+
+        return false;
     }
 }
