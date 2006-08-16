@@ -197,6 +197,51 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         assertPropertyEquals(list, otherList);
     }
 
+    public void testFindByResult()
+    {
+        Changelist list = new Changelist("uid", new NumericalRevision(1));
+        list.addResultId(12);
+        changelistDao.save(list);
+        commitAndRefreshTransaction();
+
+        List<Changelist> found = changelistDao.findByResult(1);
+        assertEquals(0, found.size());
+        found = changelistDao.findByResult(12);
+        assertEquals(1, found.size());
+        assertEquals(list, found.get(0));
+    }
+
+    public void testFindByResultDistinct()
+    {
+        NumericalRevision r1 = new NumericalRevision(1);
+        r1.setDate(new Date(System.currentTimeMillis() - 1000));
+        Changelist l1 = new Changelist("uid", r1);
+        l1.addResultId(12);
+        l1.addResultId(13);
+        l1.addResultId(14);
+        l1.addChange(new Change("file1", "rev", Change.Action.ADD));
+        l1.addChange(new Change("file2", "rev", Change.Action.ADD));
+        l1.addChange(new Change("file3", "rev", Change.Action.ADD));
+        changelistDao.save(l1);
+
+        NumericalRevision r2 = new NumericalRevision(100);
+        r2.setDate(new Date(System.currentTimeMillis()));
+        Changelist l2 = new Changelist("uid", r2);
+        l2.addResultId(13);
+        l2.addResultId(14);
+        l2.addResultId(15);
+        l2.addChange(new Change("file1", "rev", Change.Action.ADD));
+        l2.addChange(new Change("file2", "rev", Change.Action.ADD));
+        l2.addChange(new Change("file3", "rev", Change.Action.ADD));
+        changelistDao.save(l2);
+        commitAndRefreshTransaction();
+
+        List<Changelist> found = changelistDao.findByResult(13);
+        assertEquals(2, found.size());
+        assertEquals(l2, found.get(0));
+        assertEquals(l1, found.get(1));
+    }
+
     private Changelist createChangelist(long project, long number, String login)
     {
         NumericalRevision revision = new NumericalRevision(number);

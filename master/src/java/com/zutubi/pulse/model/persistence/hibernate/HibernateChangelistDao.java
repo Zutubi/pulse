@@ -130,7 +130,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
 
     public List<Changelist> findByResult(final long id)
     {
-        return (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
+        List<Changelist> all = (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -142,5 +142,9 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
                 return queryObject.list();
             }
         });
+
+        // Using the fetch join means we no longer get distinct results!
+        LinkedHashSet<Changelist> set = new LinkedHashSet<Changelist>(all);
+        return new LinkedList<Changelist>(set);
     }
 }
