@@ -19,7 +19,8 @@
             #set($revision = "$revision: no revision")
         #end
         #if($showLink)
-            #set($revision = "$revision [<a href='/viewChanges.action?projectId=$projectId&amp;toBuild=$result.number&amp;sinceBuild=$build.number'>changes since</a>]")
+            #set($linkText = $action.getText("changes.since"))
+            #set($revision = "$revision [<a href='$base/viewChanges.action?projectId=$projectId&amp;toBuild=$result.number&amp;sinceBuild=$build.number'>$linkText</a>]")
         #end
     #else
         #set($revision = "no build")
