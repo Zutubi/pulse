@@ -16,14 +16,12 @@
 
     <target name="clean.all" depends="clean">
         <foreach target="clean"/>
-    </target>
-
-    <target name="clean.dev">
         <delete dir="data"/>
+        
         <delete dir="master/system"/>
         <delete file="master/etc/admin.token"/>
         <delete file="master/etc/pulse-init.properties"/>
-        
+
         <!-- clean out the user.home/.pulse/* directory -->
         <delete dir="${user.home}/.pulse"/>
     </target>
