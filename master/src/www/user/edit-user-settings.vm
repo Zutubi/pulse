@@ -16,9 +16,11 @@
         #wwcheckbox("name=refreshEnabled" "label=%{getText('user.refresh.enabled')}" "fieldValue=true" "onclick=setEnableState('user.settings.edit_refreshInterval', 'user.settings.edit_refreshEnabled')" "tabindex=2")
         #wwtextfield("name=refreshInterval" "label=%{getText('user.refresh.interval')}" "after= $action.getText('seconds')" "size=6" "required=true" "tabindex=3")
         #inlineHelp("user.refresh.interval.help")
-        #wwtextfield("name=tailInterval" "label=%{getText('user.tail.refresh.interval')}" "after= $action.getText('seconds')" "size=6" "required=true" "tabindex=4")
+        #wwtextfield("name=tailLines" "label=%{getText('user.tail.lines')}" "size=6" "required=true" "tabindex=4")
+        #inlineHelp("user.tail.lines.help")
+        #wwtextfield("name=tailInterval" "label=%{getText('user.tail.refresh.interval')}" "after= $action.getText('seconds')" "size=6" "required=true" "tabindex=5")
         #inlineHelp("user.tail.refresh.interval.help")
-        #saveCancel(5)
+        #saveCancel(6)
     #end
 
     <script type="text/javascript">

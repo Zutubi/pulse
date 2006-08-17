@@ -22,7 +22,7 @@ public class TailRecipeLogAction extends ProjectActionSupport
 
     private long id;
     private long buildId;
-    private int maxLines = LINE_COUNT;
+    private int maxLines = -1;
     private int refreshInterval = -1;
     private BuildResult buildResult;
     private RecipeResultNode resultNode;
@@ -93,12 +93,7 @@ public class TailRecipeLogAction extends ProjectActionSupport
 
     public String execute() throws Exception
     {
-        if(maxLines <= 0)
-        {
-            maxLines = LINE_COUNT;
-        }
-
-        initialiseRefreshInterval();
+        initialiseProperties();
 
         buildResult = getBuildManager().getBuildResult(buildId);
         if(buildResult == null)
@@ -175,7 +170,7 @@ public class TailRecipeLogAction extends ProjectActionSupport
         return SUCCESS;
     }
 
-    private void initialiseRefreshInterval()
+    private void initialiseProperties()
     {
         Object principle = getPrinciple();
         if(principle != null)
@@ -183,6 +178,8 @@ public class TailRecipeLogAction extends ProjectActionSupport
             User user = userManager.getUser((String) principle);
             if (user != null)
             {
+                boolean changed = false;
+
                 if(refreshInterval <= 0)
                 {
                     refreshInterval = user.getTailRefreshInterval();
@@ -190,6 +187,21 @@ public class TailRecipeLogAction extends ProjectActionSupport
                 else if(refreshInterval != user.getTailRefreshInterval())
                 {
                     user.setTailRefreshInterval(refreshInterval);
+                    changed = true;
+                }
+
+                if(maxLines <= 0)
+                {
+                    maxLines = user.getTailLines();
+                }
+                else if(maxLines != user.getTailLines())
+                {
+                    user.setTailLines(maxLines);
+                    changed = true;
+                }
+
+                if(changed)
+                {
                     userManager.save(user);
                 }
             }
@@ -199,6 +211,11 @@ public class TailRecipeLogAction extends ProjectActionSupport
         if(refreshInterval <= 0)
         {
             refreshInterval = 60;
+        }
+
+        if(maxLines <= 0)
+        {
+            maxLines = LINE_COUNT;
         }
     }
 

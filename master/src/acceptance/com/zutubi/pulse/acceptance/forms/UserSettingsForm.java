@@ -19,12 +19,12 @@ public class UserSettingsForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"defaultAction", "refreshEnabled", "refreshInterval", "tailInterval"};
+        return new String[]{"defaultAction", "refreshEnabled", "refreshInterval", "tailLines", "tailInterval"};
     }
 
     public int[] getFieldTypes()
     {
-        return new int[]{SELECT, CHECKBOX, TEXTFIELD, TEXTFIELD};
+        return new int[]{SELECT, CHECKBOX, TEXTFIELD, TEXTFIELD, TEXTFIELD};
     }
 
     public String[] getSelectOptions(String name)

@@ -22,6 +22,7 @@ public class User extends Entity implements UserDetails
     private static final String PROPERTY_SHOW_PROJECT_CHANGES = "show.project.changes";
     private static final String PROPERTY_PROJECT_CHANGES_COUNT = "project.changes.count";
     private static final String PROPERTY_REFRESH_INTERVAL = "user.refreshInterval";
+    private static final String PROPERTY_TAIL_LINES = "tail.lines";
     private static final String PROPERTY_TAIL_REFRESH_INTERVAL = "tail.refresh.interval";
 
     /**
@@ -165,8 +166,6 @@ public class User extends Entity implements UserDetails
         return contactPoints;
     }
 
-    //TODO: may want to look into using hibernate to store a map of
-    //TODO: name -> contactpoint.
     public ContactPoint getContactPoint(String name)
     {
         for (ContactPoint cp : contactPoints)
@@ -426,6 +425,16 @@ public class User extends Entity implements UserDetails
     public void setTailRefreshInterval(int interval)
     {
         setIntProperty(PROPERTY_TAIL_REFRESH_INTERVAL, interval);
+    }
+
+    public int getTailLines()
+    {
+        return getIntProperty(PROPERTY_TAIL_LINES, 30);
+    }
+
+    public void setTailLines(int lines)
+    {
+        setIntProperty(PROPERTY_TAIL_LINES, lines);
     }
 
     public int getDashboardBuildCount()
