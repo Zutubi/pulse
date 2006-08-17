@@ -140,6 +140,7 @@ public class RecipeResult extends Result
             if (!result.completed())
             {
                 result.error("Build aborted");
+                result.complete();
             }
         }
     }
