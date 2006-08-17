@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <project default-recipe="default">
+    <junit.pp name="junit.pp"/>
+
     <macro name="ant-build">
         <command name="build">
             <ant name="build" targets="${targets}"/>
@@ -8,6 +10,10 @@
             <dir-artifact name="server-core junit" base="server-core/build/reports/junit/html" fail-if-not-present="false"/>
             <dir-artifact name="master junit" base="master/build/reports/junit/html" fail-if-not-present="false"/>
             <dir-artifact name="local junit" base="local/build/reports/junit/html" fail-if-not-present="false"/>
+            <dir-artifact name="junit xml reports">
+                <include pattern="**/build/reports/junit/xml/*.xml"/>
+                <process processor="${junit.pp}"/>
+            </dir-artifact>
         </command>
     </macro>
 
