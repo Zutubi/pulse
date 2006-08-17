@@ -39,7 +39,7 @@ public class ResourceDiscoverer
                 File bin;
                 if(SystemUtils.isWindows())
                 {
-                    bin = new File("ant.bat");
+                    bin = new File(binDir, "ant.bat");
                 }
                 else
                 {
@@ -103,7 +103,7 @@ public class ResourceDiscoverer
                 File bin;
                 if(SystemUtils.isWindows())
                 {
-                    bin = new File("java.exe");
+                    bin = new File(binDir, "java.exe");
                 }
                 else
                 {
