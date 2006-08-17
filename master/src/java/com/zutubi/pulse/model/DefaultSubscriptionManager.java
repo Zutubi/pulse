@@ -36,11 +36,23 @@ public class DefaultSubscriptionManager implements SubscriptionManager
 
     public List<Subscription> getSubscriptions(Project project)
     {
-        return subscriptionDao.findByProject(project);
+        List<Subscription> subscriptions = subscriptionDao.findByProject(project);
+        subscriptions.addAll(subscriptionDao.findByNoProject());
+        return subscriptions;
     }
 
     public void deleteAllSubscriptions(Project project)
     {
-        subscriptionDao.deleteByProject(project);
+        List<Subscription> suscriptions = subscriptionDao.findByProject(project);
+        for(Subscription s: suscriptions)
+        {
+            List<Project> projects = s.getProjects();
+            projects.remove(project);
+            if(projects.size() == 0)
+            {
+                // This subscription is no longer useful.
+                subscriptionDao.delete(s);
+            }
+        }
     }
 }

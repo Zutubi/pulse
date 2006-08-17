@@ -38,17 +38,17 @@ public class HibernateSubscriptionDao extends HibernateEntityDao<Subscription> i
         });
     }
 
-    public int deleteByProject(final Project project)
+    public List<Subscription> findByNoProject()
     {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        return (List<Subscription>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.getNamedQuery("subscription.deleteByProject");
-                queryObject.setParameter("project", project);
+                Query queryObject = session.createQuery("from Subscription model where size(model.projects) = 0");
+                queryObject.setCacheable(true);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.executeUpdate();
+                return queryObject.list();
             }
         });
     }

@@ -34,7 +34,7 @@ public class EditSubscriptionAction extends SubscriptionActionSupport
             return ERROR;
         }
 
-        projectId = subscription.getProject().getId();
+        populateProjects(subscription);
         contactPointId = subscription.getContactPoint().getId();
         condition = subscription.getCondition();
 
@@ -60,7 +60,7 @@ public class EditSubscriptionAction extends SubscriptionActionSupport
 
     public String execute()
     {
-        subscription.setProject(project);
+        updateProjects(subscription);
         subscription.setContactPoint(contactPoint);
         subscription.setCondition(condition);
         getSubscriptionManager().save(subscription);

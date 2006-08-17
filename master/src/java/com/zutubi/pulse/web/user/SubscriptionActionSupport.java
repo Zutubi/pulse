@@ -19,28 +19,18 @@ public class SubscriptionActionSupport extends UserActionSupport
 {
     private ProjectManager projectManager;
 
-    protected long projectId;
     protected long contactPointId;
     protected String condition = "true";
 
     protected Map<String, String> conditions;
-    protected List<Project> projects;
+    protected Map<Long, String> allProjects;
     protected Map<Long, String> contactPoints;
 
     protected User user;
-    protected Project project;
     protected ContactPoint contactPoint;
+    protected List<Long> projects = new LinkedList<Long>();
+;
     private NotifyConditionFactory notifyConditionFactory;
-
-    public long getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(long projectId)
-    {
-        this.projectId = projectId;
-    }
 
     public long getContactPointId()
     {
@@ -50,6 +40,16 @@ public class SubscriptionActionSupport extends UserActionSupport
     public void setContactPointId(long contactPointId)
     {
         this.contactPointId = contactPointId;
+    }
+
+    public List<Long> getProjects()
+    {
+        return projects;
+    }
+
+    public void setProjects(List<Long> projects)
+    {
+        this.projects = projects;
     }
 
     public String getCondition()
@@ -82,16 +82,6 @@ public class SubscriptionActionSupport extends UserActionSupport
         return conditions;
     }
 
-    public List<Project> getProjects()
-    {
-        if(projects == null)
-        {
-            projects = projectManager.getAllProjects();
-            Collections.sort(projects, new NamedEntityComparator());
-        }
-        return projects;
-    }
-
     public Map<Long, String> getContactPoints()
     {
         if(contactPoints == null)
@@ -104,6 +94,21 @@ public class SubscriptionActionSupport extends UserActionSupport
         }
         
         return contactPoints;
+    }
+
+    public Map<Long, String> getAllProjects()
+    {
+        if(allProjects == null)
+        {
+            allProjects = new LinkedHashMap<Long, String>();
+            List<Project> all = projectManager.getAllProjects();
+            Collections.sort(all, new NamedEntityComparator());
+            for(Project p: all)
+            {
+                allProjects.put(p.getId(), p.getName());
+            }
+        }
+        return allProjects;
     }
 
     public void setup()
@@ -135,13 +140,6 @@ public class SubscriptionActionSupport extends UserActionSupport
         if (user == null)
         {
             addUnknownUserActionError();
-            return;
-        }
-
-        project = projectManager.getProject(projectId);
-        if (project == null)
-        {
-            addActionError("Unknown project [" + projectId + "]");
             return;
         }
 
@@ -179,6 +177,28 @@ public class SubscriptionActionSupport extends UserActionSupport
         catch (Exception e)
         {
             addFieldError("condition", e.toString());
+        }
+    }
+
+    protected void populateProjects(Subscription subscription)
+    {
+        for(Project p: subscription.getProjects())
+        {
+            projects.add(p.getId());
+        }
+    }
+
+    protected void updateProjects(Subscription subscription)
+    {
+        List<Project> subscriptionProjects = subscription.getProjects();
+        subscriptionProjects.clear();
+        for(Long id: projects)
+        {
+            Project p = projectManager.getProject(id);
+            if(p != null)
+            {
+                subscriptionProjects.add(p);
+            }
         }
     }
 

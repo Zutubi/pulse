@@ -5,6 +5,8 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.*;
 import com.opensymphony.util.TextUtils;
 
+import java.util.LinkedList;
+
 /**
  *
  *
@@ -22,7 +24,7 @@ public class CreateSubscriptionAction extends SubscriptionActionSupport
             return ERROR;
         }
 
-        if (getProjects().size() == 0)
+        if (getAllProjects().size() == 0)
         {
             addActionError("No projects available.  Please configure a project before creating a subscription.");
             return ERROR;
@@ -47,7 +49,8 @@ public class CreateSubscriptionAction extends SubscriptionActionSupport
 
     public String execute()
     {
-        Subscription subscription = new Subscription(project, contactPoint);
+        Subscription subscription = new Subscription(contactPoint);
+        updateProjects(subscription);
         subscription.setCondition(condition);
         getSubscriptionManager().save(subscription);
         return SUCCESS;

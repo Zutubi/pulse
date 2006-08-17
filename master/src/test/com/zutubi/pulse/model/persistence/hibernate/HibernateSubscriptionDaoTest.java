@@ -9,6 +9,7 @@ import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.SubscriptionDao;
 
 import java.util.List;
+import java.util.LinkedList;
 
 
 /**
@@ -53,22 +54,61 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
     {
         ContactPoint contactPoint = new EmailContactPoint();
         Project project = new Project();
-        Subscription subscription = new Subscription(project, contactPoint);
+        List<Project> projects = new LinkedList<Project>();
+        projects.add(project);
+        Subscription subscription = new Subscription(projects, contactPoint);
         save(contactPoint, project, subscription);
 
         List<Subscription> subscriptions = subDao.findByProject(project);
         assertNotNull(subscriptions);
         assertEquals(1, subscriptions.size());
         Subscription otherSubscription = subscriptions.get(0);
-        assertEquals(project, otherSubscription.getProject());
+        assertEquals(projects.get(0), otherSubscription.getProjects().get(0));
         assertEquals(contactPoint, otherSubscription.getContactPoint());
+    }
+
+    public void testFindByNoProject()
+    {
+        ContactPoint contactPoint = new EmailContactPoint();
+        Project project = new Project();
+        Subscription subscription = new Subscription(contactPoint);
+        save(contactPoint, project, subscription);
+
+        List<Subscription> subscriptions = subDao.findByNoProject();
+        assertNotNull(subscriptions);
+        assertEquals(1, subscriptions.size());
+        Subscription otherSubscription = subscriptions.get(0);
+        assertEquals(0, otherSubscription.getProjects().size());
+        assertEquals(contactPoint, otherSubscription.getContactPoint());
+    }
+
+    public void testFindByNoProjectMultiple()
+    {
+        ContactPoint contactPoint = new EmailContactPoint();
+        Project project = new Project();
+        List<Project> projects = new LinkedList<Project>();
+        projects.add(project);
+        Subscription subWithProject = new Subscription(projects, contactPoint);
+        save(contactPoint, project, subWithProject);
+
+        Subscription subWithoutProject = new Subscription(contactPoint);
+        save(subWithoutProject);
+        
+        List<Subscription> subscriptions = subDao.findByNoProject();
+        assertNotNull(subscriptions);
+        assertEquals(1, subscriptions.size());
+        Subscription otherSubscription = subscriptions.get(0);
+        assertEquals(0, otherSubscription.getProjects().size());
+        assertEquals(subWithoutProject, otherSubscription);
     }
 
     public void testDeleteSubscription()
     {
         ContactPoint contactPoint = new EmailContactPoint();
         Project project = new Project();
-        Subscription subscription = new Subscription(project, contactPoint);
+        List<Project> projects = new LinkedList<Project>();
+        projects.add(project);
+        Subscription subscription = new Subscription(projects, contactPoint);
         save(contactPoint, project, subscription);
 
         subDao.delete(subscription);
@@ -77,23 +117,6 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
         assertNotNull(contactDao.findById(contactPoint.getId()));
         assertNotNull(projectDao.findById(project.getId()));
         assertNull(subDao.findById(subscription.getId()));
-    }
-
-    public void testDeleteByProject()
-    {
-        ContactPoint contactPoint = new EmailContactPoint();
-        Project project = new Project();
-        Subscription subscription = new Subscription(project, contactPoint);
-        save(contactPoint, project, subscription);
-
-        Subscription subscriptionB = new Subscription(project, contactPoint);
-        save(subscriptionB);
-
-        assertEquals(2, subDao.deleteByProject(project));
-        commitAndRefreshTransaction();
-
-        assertNull(subDao.findById(subscription.getId()));
-        assertNull(subDao.findById(subscriptionB.getId()));
     }
 
     private void save(ContactPoint c, Project p, Subscription s)

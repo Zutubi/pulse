@@ -17,8 +17,9 @@
     #wwcform("action=createSubscription.action" "id=subscription.create" "heading=%{getText('subscription.create')}" "method=post")
         #wwhidden("name=userId")
 
-        #wwselect("name=projectId" "label=%{getText('subscription.project')}" "list=projects" "listKey=id" "listValue=name" "required=true" "tabindex=1")
-        #wwselect("name=contactPointId" "label=%{getText('subscription.contact')}" "list=contactPoints" "required=true" "tabindex=2")
+        #wwselect("name=contactPointId" "label=%{getText('subscription.contact')}" "list=contactPoints" "required=true" "tabindex=1")
+        #wwselect("name=projects" "label=%{getText('subscription.projects')}" "list=allProjects" "multiple=true" "tabindex=2")
+        #inlineHelp("subscription.projects.help")
         #wwcombobox("name=condition" "list=conditions" "listKey=key" "listValue=value" "size=50" "label=%{getText('subscription.condition')}" "tabindex=3")
         #inlineHelp("condition.help")
         #saveCancel(4)

@@ -4,6 +4,7 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.Subscription;
 
 import java.util.List;
+import java.util.Collection;
 
 /**
  * 
@@ -13,12 +14,5 @@ public interface SubscriptionDao extends EntityDao<Subscription>
 {
     List<Subscription> findByProject(Project project);
 
-    /**
-     * Delete all of the subscriptions associated with the specified project.
-     *
-     * @param project
-     *
-     * @return the number of subscriptions deleted.
-     */
-    int deleteByProject(Project project);
+    List<Subscription> findByNoProject();
 }

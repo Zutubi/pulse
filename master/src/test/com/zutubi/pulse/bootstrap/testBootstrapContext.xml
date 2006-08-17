@@ -17,4 +17,32 @@
         </property>
     </bean>
 
+    <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager">
+        <property name="systemPaths">
+            <bean class="com.zutubi.pulse.bootstrap.ConfigurableSystemPaths">
+                <property name="systemRootString">
+                    <value>master/system</value>
+                </property>
+                <property name="contentRootString">
+                    <value>master/src/www</value>
+                </property>
+                <property name="configRootString">
+                    <value>master/etc</value>
+                </property>
+                <property name="logRootString">
+                    <value>master/system/log</value>
+                </property>
+                <property name="tmpRootString">
+                    <value>master/system/tmp</value>
+                </property>
+                <property name="templateRootStrings">
+                    <list>
+                        <value>master/src/templates</value>
+                        <value>master/src/www</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
 </beans>

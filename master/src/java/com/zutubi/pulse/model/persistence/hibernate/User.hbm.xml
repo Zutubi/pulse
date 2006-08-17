@@ -120,8 +120,10 @@
 
         <property name="condition" column="CONDITION" type="string" length="255"/>
 
-        <many-to-one name="project" column="PROJECT_ID" class="com.zutubi.pulse.model.Project" insert="true"
-                     lazy="false"/>
+        <bag name="projects" table="SUBSCRIPTION_PROJECTS" cascade="none" lazy="false">
+            <key column="SUBSCRIPTION_ID"/>
+            <many-to-many class="com.zutubi.pulse.model.Project" column="PROJECT_ID"/>
+        </bag>
 
         <many-to-one name="contactPoint" column="CONTACT_ID" class="com.zutubi.pulse.model.ContactPoint" insert="true"
                      lazy="false"/>
@@ -130,12 +132,7 @@
 
     <query name="subscription.findByProject"><![CDATA[
         from Subscription s
-        where s.project = :project
-    ]]></query>
-
-    <query name="subscription.deleteByProject"><![CDATA[
-        delete Subscription
-        where project = :project
+        where :project in elements(s.projects)
     ]]></query>
 
 </hibernate-mapping>

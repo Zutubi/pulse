@@ -15,6 +15,8 @@ import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
 import java.util.Date;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  */
@@ -163,7 +165,9 @@ public class SetupDummyBuilds implements Runnable
 
         ContactPoint contactPoint = new EmailContactPoint("jsankey@gmail.com");
         contactPoint.setName("gmail");
-        Subscription subscription = new Subscription(project, contactPoint);
+        List<Project> projects = new LinkedList<Project>();
+        projects.add(project);
+        Subscription subscription = new Subscription(projects, contactPoint);
         contactPoint.add(subscription);
         user.add(contactPoint);
         userDao.save(user);

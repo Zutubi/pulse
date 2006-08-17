@@ -178,14 +178,18 @@ public class SetupFeatureTour implements Runnable
 
         ContactPoint contactPoint = new EmailContactPoint("jason@zutubi.com");
         contactPoint.setName("zutubi mail");
-        Subscription subscription = new Subscription(project, contactPoint);
+        List<Project> projects = new LinkedList<Project>();
+        projects.add(project);
+        Subscription subscription = new Subscription(projects, contactPoint);
         contactPoint.add(subscription);
         user.add(contactPoint);
 
         JabberContactPoint jabber = new JabberContactPoint();
         jabber.setName("jabber");
         jabber.setUsername("jason@jabber");
-        subscription = new Subscription(project, contactPoint);
+        projects = new LinkedList<Project>();
+        projects.add(project);
+        subscription = new Subscription(projects, contactPoint);
         subscription.setCondition("all changed or failed");
         contactPoint.add(subscription);
         user.add(contactPoint);

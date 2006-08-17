@@ -8,6 +8,8 @@ import com.zutubi.pulse.condition.antlr.NotifyConditionTreeParser;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.StringReader;
+import java.util.List;
+import java.util.LinkedList;
 
 import antlr.collections.AST;
 
@@ -32,9 +34,10 @@ public class Subscription extends Entity
     private String condition;
 
     /**
-     * The project to which this subscription is associated
+     * The projects to which this subscription is associated.  If empty,
+     * the subscription is associated with all projects.
      */
-    private Project project;
+    private List<Project> projects = new LinkedList<Project>();
 
     private NotifyCondition notifyCondition = null;
 
@@ -62,9 +65,22 @@ public class Subscription extends Entity
      *
      * @param contactPoint the contact point to notify on the event
      */
-    public Subscription(Project project, ContactPoint contactPoint)
+    public Subscription(ContactPoint contactPoint)
     {
-        this.project = project;
+        this.contactPoint = contactPoint;
+        this.condition = NotifyConditionFactory.TRUE;
+        this.contactPoint.add(this);
+    }
+
+    /**
+     * Constructs a new subscription connection the given event with the given
+     * contact point.
+     *
+     * @param contactPoint the contact point to notify on the event
+     */
+    public Subscription(List<Project> projects, ContactPoint contactPoint)
+    {
+        this.projects = projects;
         this.contactPoint = contactPoint;
         this.condition = NotifyConditionFactory.TRUE;
 
@@ -91,14 +107,14 @@ public class Subscription extends Entity
         this.contactPoint = contactPoint;
     }
 
-    public Project getProject()
+    public List<Project> getProjects()
     {
-        return project;
+        return projects;
     }
 
-    public void setProject(Project project)
+    public void setProjects(List<Project> projects)
     {
-        this.project = project;
+        this.projects = projects;
     }
 
     /**

@@ -63,22 +63,30 @@
                 <table id="subscriptions" class="fill-content">
                     #headingRow("subscriptions" 5)
                     <tr>
-                        #contentHeading("subscription.project" 1)
                         #contentHeading("subscription.contact" 1)
+                        #contentHeading("subscription.projects" 1)
                         #contentHeading("subscription.condition" 1)
                         #contentHeading("actions" 2)
                     </tr>
 
 #foreach ($subscription in $user.subscriptions)
     #set($contact = $subscription.contactPoint)
-    #set($project = $subscription.project)
+    #set($projects = $subscription.projects)
     #set($confirmMessage = $action.getText("subscription.delete.confirm", [$project.name]))
                     <tr>
-                        #dynamicCell($project.name)
                         #dynamicCell($contact.name)
+                        <td class="content">
+    #if($projects.size() > 0)
+        #foreach($project in $projects)
+                            $!webwork.htmlEncode($project.name)<br/>
+        #end
+    #else
+                            #wwtext("name=subscription.projects.all")
+    #end
+                        </td>
                         #dynamicCell($subscription.condition)
                         #editCell("$base/user/editSubscription!input.action?id=$subscription.id" "edit_sub_$subscription.id")
-                        #deleteCell("delete_$!webwork.htmlEncode($project.name)_$!webwork.htmlEncode($contact.uid)" "$base/user/deleteSubscription.action?id=$subscription.id&login=$user.login" $confirmMessage)
+                        #deleteCell("delete_$subscription.id" "$base/user/deleteSubscription.action?id=$subscription.id&login=$user.login" $confirmMessage)
                     </tr>
 #end
                 <!--

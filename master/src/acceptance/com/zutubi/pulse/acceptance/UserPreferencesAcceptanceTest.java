@@ -70,7 +70,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
 
         assertTablePresent("subscriptions");
         assertTableRowsEqual("subscriptions", 1, new String[][]{
-                new String[]{"project", CONTACT_CREATE_TYPE, "condition", "actions"},
+                new String[]{"contact", "projects", "condition", "actions"},
                 new String[]{CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED}
         });
 
@@ -362,7 +362,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
 
         assertTablePresent("subscriptions");
         assertTableRowsEqual("subscriptions", 1, new String[][]{
-                new String[]{"project", CONTACT_CREATE_TYPE, "condition", "actions"},
+                new String[]{"contact", "projects", "condition", "actions"},
                 new String[]{CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED}
         });
     }
@@ -495,13 +495,27 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         clickLink("subscription.create");
         SubscriptionForm form = new SubscriptionForm(tester, true);
         form.assertFormPresent();
-        String projectId = tester.getDialog().getOptionValuesFor("projectId")[0];
-        String projectName = tester.getDialog().getOptionsFor("projectId")[0];
+        String projectId = tester.getDialog().getOptionValuesFor("projects")[0];
+        String projectName = tester.getDialog().getOptionsFor("projects")[0];
         String contactId = tester.getDialog().getOptionValuesFor("contactPointId")[0];
         String contactName = tester.getDialog().getOptionsFor("contactPointId")[0];
-        form.saveFormElements(projectId, contactId, "changed");
+        form.saveFormElements(contactId, projectId, "changed");
 
         assertSubscriptionsTable(projectName, contactName, "changed");
+    }
+
+    public void testCreateSubscriptionAllProjects()
+    {
+        addJabber("jabbier");
+
+        clickLink("subscription.create");
+        SubscriptionForm form = new SubscriptionForm(tester, true);
+        form.assertFormPresent();
+        String contactId = tester.getDialog().getOptionValuesFor("contactPointId")[0];
+        String contactName = tester.getDialog().getOptionsFor("contactPointId")[0];
+        form.saveFormElements(contactId, "", "changed");
+
+        assertSubscriptionsTable("[all]", contactName, "changed");
     }
 
     public void testEditSubscription()
@@ -513,11 +527,11 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         SubscriptionForm form = new SubscriptionForm(tester, false);
         form.assertFormPresent();
 
-        String projectId = tester.getDialog().getOptionValuesFor("projectId")[1];
-        String projectName = tester.getDialog().getOptionsFor("projectId")[1];
+        String projectId = tester.getDialog().getOptionValuesFor("projects")[1];
+        String projectName = tester.getDialog().getOptionsFor("projects")[1];
         String contactId = tester.getDialog().getOptionValuesFor("contactPointId")[1];
         String contactName = tester.getDialog().getOptionsFor("contactPointId")[1];
-        form.saveFormElements(projectId, contactId, "true");
+        form.saveFormElements(contactId, projectId, "true");
 
         assertSubscriptionsTable(projectName, contactName, "true");
     }
@@ -533,8 +547,8 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
     private void assertSubscriptionsTable(String project, String contact, String condition)
     {
         ExpectedTable expectedTable = new ExpectedTable();
-        expectedTable.appendRow(new ExpectedRow(new String[]{"project", "contact", "condition", "actions", "actions"}));
-        expectedTable.appendRow(new ExpectedRow(new String[]{project, contact, condition, "edit", "delete"}));
+        expectedTable.appendRow(new ExpectedRow(new String[]{"contact", "projects", "condition", "actions", "actions"}));
+        expectedTable.appendRow(new ExpectedRow(new String[]{contact, project, condition, "edit", "delete"}));
         assertTableRowsEqual("subscriptions", 1, expectedTable);
     }
 
