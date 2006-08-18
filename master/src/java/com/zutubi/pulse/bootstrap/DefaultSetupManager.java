@@ -44,7 +44,7 @@ public class DefaultSetupManager implements SetupManager
      */
     private List<String> startupContexts;
 
-    private SetupState state;
+    private SetupState state = SetupState.STARTING;;
 
     private boolean promptShown = false;
 

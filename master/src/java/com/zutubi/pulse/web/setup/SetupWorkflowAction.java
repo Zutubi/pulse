@@ -34,6 +34,11 @@ public class SetupWorkflowAction extends SetupActionSupport
             return "upgrade";
         }
 
+        if (s == SetupState.STARTING)
+        {
+            return "starting";
+        }
+        
         return SUCCESS;
     }
 

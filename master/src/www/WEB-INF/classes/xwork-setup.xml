@@ -34,6 +34,7 @@
             <result name="setup" type="redirect">/setup/setupWizard.action</result>
             <result name="license" type="redirect">/setup/setupLicense!input.action</result>
             <result name="upgrade" type="redirect">/upgrade/preview.action</result>
+            <result name="starting" type="redirect">/startup/starting.action</result>
             <result name="success" type="redirect">/</result>
         </action>
 
