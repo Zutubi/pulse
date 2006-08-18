@@ -36,7 +36,7 @@
                     <value>master/etc</value>
                 </property>
                 <property name="logRootString">
-                    <value>master/system/log</value>
+                    <value>master/system/logs</value>
                 </property>
                 <property name="tmpRootString">
                     <value>master/system/tmp</value>

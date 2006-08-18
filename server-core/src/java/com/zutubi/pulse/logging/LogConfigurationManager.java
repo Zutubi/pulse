@@ -1,17 +1,17 @@
 package com.zutubi.pulse.logging;
 
 import com.zutubi.pulse.bootstrap.SystemPaths;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.events.AllEventListener;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.io.*;
-import java.util.Enumeration;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
-import java.util.logging.Filter;
-import java.util.logging.LogManager;
-import java.util.logging.LogRecord;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 
 /**
  * The Log Configuration Manager handles the systems logging configuration.
@@ -21,6 +21,12 @@ public class LogConfigurationManager
 {
     private File logConfigDir;
 
+    private File configDir;
+
+    private LogManager logManager;
+
+    private EventManager eventManager;
+
     /**
      *
      */
@@ -28,7 +34,47 @@ public class LogConfigurationManager
 
     public void init()
     {
+        logManager.reset();
+
+        // load default configuration.
+        logManager.configure(new File(configDir, "logging.properties"));
+
+        // load the default level configuration.
         updateConfiguration(logConfig.getLoggingLevel());
+
+        final Logger evtLogger = Loggers.getEventLogger();
+        eventManager.register(new AllEventListener()
+        {
+            public void handleEvent(Event evt)
+            {
+                evtLogger.info(evt.toString());
+            }
+        });
+    }
+
+    public boolean isEventLoggingEnabled()
+    {
+        Logger evtLogger = Loggers.getEventLogger();
+        Handler[] handlers = evtLogger.getDelegate().getHandlers();
+        for (Handler h : handlers)
+        {
+            if (h.getLevel() != Level.OFF)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void setEventLoggingEnabled(boolean b)
+    {
+        Logger evtLogger = Loggers.getEventLogger();
+        Handler[] handlers = evtLogger.getDelegate().getHandlers();
+        Level handlerLevel = (b)? Level.ALL : Level.OFF;
+        for (Handler h : handlers)
+        {
+            h.setLevel(handlerLevel);
+        }
     }
 
     public List<String> getAvailableConfigurations()
@@ -57,51 +103,19 @@ public class LogConfigurationManager
     {
         // load requested file.
         File configFile = new File(logConfigDir, "logging." + config + ".properties");
-        if (!configFile.exists() || !configFile.canRead())
+        if (!configFile.isFile() || !configFile.canRead())
         {
-            throw new IllegalArgumentException("invalid logging configuration '"+config+"'");
+            return;
         }
 
-        InputStream in = null;
-        try
-        {
-            in = new FileInputStream(configFile);
-            LogManager.getLogManager().readConfiguration(in);
-            IOUtils.close(in);
-            in = new FileInputStream(configFile);
-
-            // the loaded configurations are only applied to pre-existing loggers. Therefore,
-            // if we want 'virtual' .level configurations to work, we need to ensure that those
-            // loggers exist.
-            Properties props = new Properties();
-            props.load(in);
-            Enumeration propertyNames = props.propertyNames();
-            while (propertyNames.hasMoreElements())
-            {
-                String propertyName = (String) propertyNames.nextElement();
-                if (propertyName.endsWith(".level"))
-                {
-                    // warm up the logger.
-                    Logger.getLogger(propertyName.substring(0, propertyName.length() - 6));
-                }
-            }
-
-        }
-        catch (IOException e)
-        {
-            // failed to update the logging
-            e.printStackTrace();
-        }
-        finally
-        {
-            IOUtils.close(in);
-        }
+        logManager.resetLevels();
+        logManager.configure(configFile);
     }
 
     public void setSystemPaths(SystemPaths paths)
     {
-        File configDirectory = paths.getConfigRoot();
-        logConfigDir = new File(configDirectory, "logging");
+        configDir = paths.getConfigRoot();
+        logConfigDir = new File(configDir, "logging");
     }
 
     /**
@@ -114,11 +128,13 @@ public class LogConfigurationManager
         this.logConfig = config;
     }
 
-    static class BlockingFilter implements Filter
+    public void setLogManager(LogManager logManager)
     {
-        public boolean isLoggable(LogRecord record)
-        {
-            return false;
-        }
+        this.logManager = logManager;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }

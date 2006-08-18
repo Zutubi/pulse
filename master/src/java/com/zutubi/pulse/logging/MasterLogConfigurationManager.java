@@ -5,6 +5,7 @@ import com.opensymphony.webwork.dispatcher.VelocityResult;
 import com.opensymphony.webwork.dispatcher.DispatcherUtils;
 
 /**
+ * @deprecated Use the configuration file to turn off logging where required.
  */
 public class MasterLogConfigurationManager extends LogConfigurationManager
 {

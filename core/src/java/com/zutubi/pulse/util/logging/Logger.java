@@ -5,6 +5,7 @@ import java.util.logging.Filter;
 
 /**
  * Simple wrapper around the java.util.logging.Logger to provide some utility methods.
+ *
  */
 public class Logger
 {
@@ -28,14 +29,9 @@ public class Logger
         return new Logger(java.util.logging.Logger.getLogger(name));
     }
 
-    public void severe(String msg, Throwable t)
+    public void setUseParentHandlers(boolean b)
     {
-        if (!isLoggable(Level.SEVERE))
-        {
-            return;
-        }
-        inferCaller();
-        delegate.logp(Level.SEVERE, sourceClass, sourceMethod, msg, t);
+        delegate.setUseParentHandlers(b);
     }
 
     public void severe(Throwable t)
@@ -48,14 +44,14 @@ public class Logger
         severe(msg, null);
     }
 
-    public void info(String msg, Throwable t)
+    public void severe(String msg, Throwable t)
     {
-        if (!isLoggable(Level.INFO))
+        if (!isLoggable(Level.SEVERE))
         {
             return;
         }
         inferCaller();
-        delegate.logp(Level.INFO, sourceClass, sourceMethod, msg, t);
+        delegate.logp(Level.SEVERE, sourceClass, sourceMethod, msg, t);
     }
 
     public void info(Throwable t)
@@ -68,14 +64,14 @@ public class Logger
         info(msg, null);
     }
 
-    public void warning(String msg, Throwable t)
+    public void info(String msg, Throwable t)
     {
-        if (!isLoggable(Level.WARNING))
+        if (!isLoggable(Level.INFO))
         {
             return;
         }
         inferCaller();
-        delegate.logp(Level.WARNING, sourceClass, sourceMethod, msg, t);
+        delegate.logp(Level.INFO, sourceClass, sourceMethod, msg, t);
     }
 
     public void warning(Throwable t)
@@ -86,6 +82,21 @@ public class Logger
     public void warning(String msg)
     {
         warning(msg, null);
+    }
+
+    public void warning(String msg, Throwable t)
+    {
+        if (!isLoggable(Level.WARNING))
+        {
+            return;
+        }
+        inferCaller();
+        delegate.logp(Level.WARNING, sourceClass, sourceMethod, msg, t);
+    }
+
+    public void fine(Throwable t)
+    {
+        fine(t.getMessage(), t);
     }
 
     public void fine(String msg)
@@ -101,6 +112,11 @@ public class Logger
         }
         inferCaller();
         delegate.logp(Level.FINE, sourceClass, sourceMethod, msg, t);
+    }
+
+    public void finer(Throwable t)
+    {
+        finer(t.getMessage(), t);
     }
 
     public void finer(String msg)
@@ -214,7 +230,7 @@ public class Logger
     }
 
     /**
-     * This inferCaller is taken from the LogRecord object. We need to reproduce it here
+     * This inferCaller method is taken from the LogRecord object. We need to reproduce it here
      * since by wrapping the Logger we break this method.
      *
      */
@@ -226,23 +242,25 @@ public class Logger
         // Get the stack trace.
         StackTraceElement stack[] = (new Throwable()).getStackTrace();
         // First, search back to a method in the Logger class.
+        String myClassName = getClass().getName();
         int ix = 0;
         while (ix < stack.length)
         {
             StackTraceElement frame = stack[ix];
             String cname = frame.getClassName();
-            if (cname.equals("com.zutubi.pulse.util.logging.Logger"))
+            if (cname.equals(myClassName))
             {
                 break;
             }
             ix++;
         }
+
         // Now search for the first frame before the "Logger" class.
         while (ix < stack.length)
         {
             StackTraceElement frame = stack[ix];
             String cname = frame.getClassName();
-            if (!cname.equals("com.zutubi.pulse.util.logging.Logger"))
+            if (!cname.equals(myClassName))
             {
                 // We've found the relevant frame.
                 sourceClass = cname;
@@ -258,5 +276,10 @@ public class Logger
     public void setFilter(Filter filter)
     {
         delegate.setFilter(filter);
+    }
+
+    public java.util.logging.Logger getDelegate()
+    {
+        return delegate;
     }
 }

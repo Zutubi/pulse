@@ -66,16 +66,6 @@ public class ServerMessagesHandler extends Handler
         return records.takeSnapshot();
     }
 
-    private boolean nullSafeEquals(Throwable t1, Throwable t2)
-    {
-        if(t1 == null)
-        {
-            return t2 == null;
-        }
-
-        return t1.getClass() == t2.getClass() && nullSafeEquals(t1.getMessage(), t2.getMessage());
-    }
-
     private boolean nullSafeEquals(String s1, String s2)
     {
         if(s1 == null)

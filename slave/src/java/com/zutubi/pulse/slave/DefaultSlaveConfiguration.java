@@ -74,4 +74,14 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
     {
         config.setProperty(LOGGING_CONFIG, c);
     }
+
+    public boolean isEventLoggingEnabled()
+    {
+        return config.getBooleanProperty(LOG_EVENTS, false);
+    }
+
+    public void setEventLoggingEnabled(boolean b)
+    {
+        config.setBooleanProperty(LOG_EVENTS, b);
+    }
 }

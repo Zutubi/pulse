@@ -13,6 +13,7 @@
 #wwcform("action=logConfig!save.action" "heading=%{getText('logging.config')}" "method=post")
 
     #wwselect("name=config" "label=%{getText('logging.level')}" "list=configs" "required=true" "tabindex=1")
+    #wwcheckbox("name=eventLoggingEnabled" "label=%{getText('enable.event.logging')}" "tabindex=2")
 
     #saveCancel("5")
 #end

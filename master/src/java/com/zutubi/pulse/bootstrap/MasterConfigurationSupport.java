@@ -20,6 +20,16 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
         super(new CompositeConfig(config));
     }
 
+    public boolean isEventLoggingEnabled()
+    {
+        return getBooleanProperty(LOG_EVENTS, false);
+    }
+
+    public void setEventLoggingEnabled(boolean b)
+    {
+        setBooleanProperty(LOG_EVENTS, b);
+    }
+
     public String getLoggingLevel()
     {
         return getProperty(LOGGING_CONFIG, "default");
