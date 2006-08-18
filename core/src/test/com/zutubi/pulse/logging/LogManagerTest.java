@@ -3,6 +3,8 @@ package com.zutubi.pulse.logging;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.Properties;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.logging.*;
 
 /**
@@ -18,7 +20,11 @@ public class LogManagerTest extends PulseTestCase
     {
         super.setUp();
 
+        Map<String, HandlerFactory> factories = new HashMap<String, HandlerFactory>();
+        factories.put("ConsoleHandler", new ConsoleHandlerFactory());
+                
         logManager = new LogManager();
+        logManager.setFactories(factories);
         instanceCount = 0;
     }
 
