@@ -40,8 +40,10 @@
             };
 
             // load the root nodes for the file system, then draw the tree.
+            Element.show($('loading'));
             ls(tree.getRoot(), function()
             {
+                Element.hide($('loading'));
                 tree.draw();
             });
         }
@@ -114,6 +116,7 @@
     #buildTabs($buildResult "working-dir")
 
 #if($buildResult.completed())
+    <div id="loading" style="display:none;"><img src="$base/images/treeview/loading.gif" alt="loading..."/></div>
     <div id="browseTree"></div>
 #else
     <p>
