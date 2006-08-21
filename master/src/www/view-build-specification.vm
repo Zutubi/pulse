@@ -42,6 +42,8 @@
 <body>
     #projectTabs("configuration")
 
+    #parse("/template/includes/actionerrors.vm")
+
     <span class="action">
         <a href="triggerBuild.action?id=$specification.id&amp;projectId=$project.id"><img alt="trigger" src="$base/images/lightning.gif"/> #wwtext("name=buildspec.trigger")</a>
 #if($specification.forceClean)

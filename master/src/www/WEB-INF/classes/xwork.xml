@@ -691,6 +691,7 @@
 
         <action name="deleteBuildStage" class="com.zutubi.pulse.web.project.DeleteBuildStageAction">
             <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="input" type="velocity">view-build-specification.vm</result>
             <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
         </action>
 
