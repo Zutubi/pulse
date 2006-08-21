@@ -51,7 +51,7 @@ Installation
    
    
 For an extended description of the installation process, please see the Getting
-Started Guide http://confluence.zutubi.com/display/pulse/Getting+Started+Guide
+Started Guide http://confluence.zutubi.com/display/pulse0101/Getting+Started+Guide
    
 Problems?
 ---------
