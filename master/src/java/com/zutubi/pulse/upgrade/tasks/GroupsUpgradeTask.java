@@ -4,10 +4,13 @@ import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.*;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -338,12 +341,20 @@ public class GroupsUpgradeTask extends DatabaseUpgradeTask
     {
         long groupId = nextId++;
         PreparedStatement stmt = null;
-
         try
         {
             stmt = con.prepareStatement("INSERT INTO groups (id, name, admin_all_projects) VALUES (?, ?, false)");
             stmt.setLong(1, groupId);
-            stmt.setString(2, project.name + " administrators");
+            String groupName;
+            if(project.name.equals("project"))
+            {
+                groupName = "project admins";
+            }
+            else
+            {
+                groupName = project.name + " administrators";
+            }
+            stmt.setString(2, groupName);
             stmt.executeUpdate();
             JDBCUtils.close(stmt);
         }
