@@ -42,6 +42,12 @@ public class JabberConfigurationAction extends ActionSupport
         return INPUT;
     }
 
+    public String doRefresh()
+    {
+        jabberManager.refresh();
+        return SUCCESS;
+    }
+
     public String execute()
     {
         // default action, load the config details.
@@ -58,7 +64,6 @@ public class JabberConfigurationAction extends ActionSupport
         config.setJabberUsername(null);
         config.setJabberPassword(null);
         config.setJabberForceSSL(Boolean.FALSE);
-        jabberManager.refresh();
     }
 
     private void saveConfig()
@@ -69,8 +74,6 @@ public class JabberConfigurationAction extends ActionSupport
         config.setJabberUsername(jabber.getUsername());
         config.setJabberPassword(jabber.getPassword());
         config.setJabberForceSSL(jabber.getForceSSL());
-
-        jabberManager.refresh();
     }
 
     private void loadConfig()

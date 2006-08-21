@@ -15,11 +15,13 @@
     </target>
 
     <target name="clean.all" depends="clean">
+        <!-- trigger a clean for each module. -->
         <foreach target="clean"/>
+
         <delete dir="data"/>
-        
         <delete dir="master/system"/>
         <delete file="master/etc/admin.token"/>
+        <delete file="master/etc/service.token"/>
         <delete file="master/etc/pulse-init.properties"/>
 
         <!-- clean out the user.home/.pulse/* directory -->

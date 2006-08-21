@@ -2,7 +2,7 @@
 <content tag="selectedTab">administration</content>
 <html>
 <head>
-    <meta http-equiv="refresh" content='5;#wwurl("includeParams=all")'/>
+    <meta http-equiv="refresh" content='5;#wwurl()'/>
     <title>#wwtext("name=jabber.config")</title>
 </head>
 <body>

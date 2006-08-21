@@ -986,6 +986,14 @@
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
+        <action name="refreshJabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction" method="doRefresh">
+            <interceptor-ref name="defaultStack"/>
+            <interceptor-ref name="execAndWait"/>
+            <result name="wait" type="velocity">configure-jabberconfig-wait.vm</result>
+            <result name="error" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
         <action name="editJabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">configure-jabberconfig.vm</result>
@@ -996,12 +1004,10 @@
 
         <action name="saveJabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction">
             <interceptor-ref name="crudStack"/>
-            <interceptor-ref name="execAndWait"/>
-            <result name="wait" type="velocity">configure-jabberconfig-wait.vm</result>
             <result name="input" type="velocity">configure-jabberconfig.vm</result>
             <result name="error" type="redirect">/admin/serverSettings.action</result>
             <result name="cancel" type="redirect">/admin/serverSettings.action</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/refreshJabber.action</result>
         </action>
 
         <action name="ldap" class="com.zutubi.pulse.web.admin.LdapConfigurationAction">
