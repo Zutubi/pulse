@@ -76,7 +76,11 @@ public class JabberManager implements Stoppable, PacketListener
     {
         XMPPConnection connection = null;
 
-        if(forceSSL)
+        if (host.endsWith("google.com"))
+        {
+            connection = new GoogleTalkConnection();
+        }
+        else if(forceSSL)
         {
             connection = new SSLXMPPConnection(host, port);
         }
