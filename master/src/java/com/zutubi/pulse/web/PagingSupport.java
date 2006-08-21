@@ -118,4 +118,17 @@ public class PagingSupport
 
         return offset;
     }
+
+    public void clampStartPage()
+    {
+        if(startPage * itemsPerPage >= totalItems)
+        {
+            startPage = getPageCount() - 1;
+        }
+
+        if(startPage < 0)
+        {
+            startPage = 0;
+        }
+    }
 }

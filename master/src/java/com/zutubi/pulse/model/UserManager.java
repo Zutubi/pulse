@@ -11,10 +11,16 @@ import java.util.Set;
  */
 public interface UserManager extends EntityManager<User>, UserDetailsService
 {
-    String ANONYMOUS_LOGIN = "anonymous";
-
-    void addUser(User newUser, boolean grantAdminPermissions);
-    void addUser(User newUser, boolean grantAdminPermissions, boolean useLdapAuthencation);
+    /**
+     * Adds a new user to the server.
+     *
+     * @param newUser the user to add
+     * @param grantAdminPermissions if true, the user will be granted admin
+     *                              permissions directly
+     * @param useLdapAuthentication if true, the user will be authenticated
+     *                              via LDAP
+     */
+    void addUser(User newUser, boolean grantAdminPermissions, boolean useLdapAuthentication);
 
     /**
      * Retrieve an instance of the user identified by the login name
@@ -71,4 +77,16 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
     void save(ContactPoint contact);
     ContactPoint getContactPoint(long id);
     void delete(ContactPoint contact);
+
+    List<Group> getAllGroups();
+    List<Group> getAdminAllProjectGroups();
+    Group getGroup(long id);
+    Group getGroup(String name);
+
+    void addGroup(Group group);
+    void save(Group group);
+    void renameGroup(Group group, String newName);
+    void delete(Group group, ProjectManager projectManager);
+
+    List<User> getUsersNotInGroup(Group group);
 }

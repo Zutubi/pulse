@@ -136,11 +136,11 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
         assertNull(client.getCookieValue(cookieName));
     }
 
-    protected void submitCreateUserForm(String login, String name, String password, String confirm, boolean admin)
+    protected void submitCreateUserForm(String login, String name, String password, String confirm)
     {
         CreateUserForm form = new CreateUserForm(tester);
         form.assertFormPresent();
-        form.saveFormElements(login, name, Boolean.toString(false), password, confirm, Boolean.toString(admin));
+        form.saveFormElements(login, name, Boolean.toString(false), password, confirm);
     }
 
     protected void navigateToUserAdministration()
@@ -177,6 +177,17 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
         AddProjectWizard.Select form = new AddProjectWizard.Select(tester);
         form.assertFormPresent();
         form.nextFormElements(projectName, description, url, scm, type);
+    }
+
+    protected void ensureUser(String login) throws Exception
+    {
+        Vector<String> users = (Vector<String>) callRemoteApi("getAllUserLogins");
+        if(!users.contains(login))
+        {
+            clickLinkWithText("administration");
+            clickLinkWithText("users");
+            submitCreateUserForm(login, login, login, login);
+        }
     }
 
     protected void ensureProject(String name) throws Exception

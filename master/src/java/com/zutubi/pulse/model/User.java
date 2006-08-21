@@ -55,7 +55,16 @@ public class User extends Entity implements UserDetails
      */
     private Set<Project> hiddenProjects = new HashSet<Project>();
 
-    private List<GrantedAuthority> authorities;
+    /**
+     * Authorities granted directly to this user.  Authorities may also be
+     * granted via the user's groups.
+     */
+    private List<String> authorities;
+
+    /**
+     * Groups this user is a member of.
+     */
+    private Set<Group> groups = new HashSet<Group>();
 
     private Map<String, String> properties;
 
@@ -81,11 +90,7 @@ public class User extends Entity implements UserDetails
     {
         this(login, name);
         this.password = password;
-        this.authorities = new LinkedList<GrantedAuthority>();
-        for (String authority : authorities)
-        {
-            this.authorities.add(new GrantedAuthority(this, authority));
-        }
+        this.authorities = Arrays.asList(authorities);
     }
 
     public String getLogin()
@@ -215,19 +220,42 @@ public class User extends Entity implements UserDetails
 
     public GrantedAuthority[] getAuthorities()
     {
-        return getGrantedAuthorities().toArray(new GrantedAuthority[getGrantedAuthorities().size()]);
+        List<String> directAuthorities = getGrantedAuthorities();
+        int total = directAuthorities.size();
+
+        for(Group g: groups)
+        {
+            total += g.getAuthorityCount();
+        }
+
+        GrantedAuthority[] result = new GrantedAuthority[total];
+        int i = 0;
+        for(String authority: directAuthorities)
+        {
+            result[i++] = new GrantedAuthority(authority);
+        }
+
+        for(Group g: groups)
+        {
+            for(GrantedAuthority authority: g.getAuthorities())
+            {
+                result[i++] = authority;
+            }
+        }
+
+        return result;
     }
 
-    public List<GrantedAuthority> getGrantedAuthorities()
+    public List<String> getGrantedAuthorities()
     {
         if (authorities == null)
         {
-            authorities = new LinkedList<GrantedAuthority>();
+            authorities = new ArrayList<String>();
         }
         return authorities;
     }
 
-    private void setGrantedAuthorities(List<GrantedAuthority> authorities)
+    private void setGrantedAuthorities(List<String> authorities)
     {
         this.authorities = authorities;
     }
@@ -236,37 +264,20 @@ public class User extends Entity implements UserDetails
     {
         if (!hasAuthority(authority))
         {
-            GrantedAuthority grantedAuthority = new GrantedAuthority(this, authority);
-            getGrantedAuthorities().add(grantedAuthority);
+            getGrantedAuthorities().add(authority);
         }
     }
 
     public void remove(String authority)
     {
-        GrantedAuthority authorityToBeRemoved = null;
-        for (GrantedAuthority grantedAuthority : getGrantedAuthorities())
-        {
-            if (grantedAuthority.getAuthority().equals(authority))
-            {
-                authorityToBeRemoved = grantedAuthority;
-                break;
-            }
-        }
         // for this to actually delete the authority, we require cascade delete-orphan.
         // otherwise the reference from the authority to the user will keep it alive.
-        getGrantedAuthorities().remove(authorityToBeRemoved);
+        getGrantedAuthorities().remove(authority);
     }
 
     public boolean hasAuthority(String authority)
     {
-        for (GrantedAuthority grantedAuth : getGrantedAuthorities())
-        {
-            if (grantedAuth.getAuthority().equals(authority))
-            {
-                return true;
-            }
-        }
-        return false;
+        return getGrantedAuthorities().contains(authority);
     }
 
     public String getUsername()
@@ -544,5 +555,37 @@ public class User extends Entity implements UserDetails
     private void setIntProperty(String property, int value)
     {
         setProperty(property, Integer.toString(value));
+    }
+
+    public Set<Group> getGroups()
+    {
+        return groups;
+    }
+
+    private void setGroups(Set<Group> groups)
+    {
+        this.groups = groups;
+    }
+
+    /**
+     * Add a group that this user has become a member of.  Package local:
+     * edit this association from the group side!
+     *
+     * @param group the group to add
+     */
+    void addGroup(Group group)
+    {
+        groups.add(group);
+    }
+
+    /**
+     * Remove a group that this user is no longer a member of.  Package local:
+     * edit this association from the group side!
+     *
+     * @param group the group to remove
+     */
+    void removeGroup(Group group)
+    {
+        groups.remove(group);
     }
 }

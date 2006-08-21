@@ -58,11 +58,14 @@ public interface ProjectManager extends EntityManager<Project>
     @Secured({"ACL_PROJECT_WRITE"})
     void resumeProject(Project project);
 
-    @Secured({"ROLE_ADMINISTRATOR", "ACL_PROJECT_WRITE"})
-    void save(Project project);
+    @Secured({"ROLE_ADMINISTRATOR"})
+    void create(Project project);
 
     @Secured({"ROLE_ADMINISTRATOR"})
     void delete(Project project);
+
+    @Secured({"ROLE_ADMINISTRATOR", "ACL_PROJECT_WRITE"})
+    void save(Project project);
 
     @Secured({"ACL_PROJECT_WRITE"})
     void checkWrite(Project project);
@@ -89,6 +92,39 @@ public interface ProjectManager extends EntityManager<Project>
      */
     @Secured({"ACL_PROJECT_WRITE"})
     void updateProjectDetails(Project project, String name, String description, String url) throws SchedulingException;
+
+    /**
+     * Returns a list of all projects that allow administration by the given
+     * authority.
+     *
+     * @param authority authority to search by
+     * @return the projects that may be administered by principles with the
+     *         given authority
+     */
+    @Secured({"ROLE_ADMINISTRATOR"})
+    List<Project> getProjectsWithAdmin(String authority);
+
+    /**
+     * Updates the projects that allow administration by principles with the
+     * given authority.
+     *
+     * @param authority authority to update
+     * @param restrictToProjects if null, allow the authority to administer
+     *                           all projects, otherwise, restrict the
+     *                           authority to only administer the given
+     *                           projects
+     */
+    @Secured({"ROLE_ADMINISTRATOR"})
+    void updateProjectAdmins(String authority, List<Long> restrictToProjects);
+
+    /**
+     * Deletes all project ACL entries that are granted to the given
+     * authority.
+     *
+     * @param authority the authority to remove all ACLs for
+     */
+    @Secured({"ROLE_ADMINISTRATOR"})
+    void removeAcls(String authority);
 
     /**
      * Triggers a build of the given specification of the given project by

@@ -146,7 +146,7 @@ public class AddProjectWizard extends BaseWizard
         BuildSpecification buildSpec = new BuildSpecification("default");
         project.addBuildSpecification(buildSpec);
 
-        projectManager.save(project);
+        projectManager.create(project);
         projectId = project.getId();
 
         // TODO: All of this should be done within a manager.

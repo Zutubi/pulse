@@ -27,11 +27,19 @@
             <element column="VALUE" type="string" length="4000"/>
         </map>
 
-        <bag name="grantedAuthorities" inverse="true" cascade="all,delete-orphan" lazy="false">
+        <idbag name="grantedAuthorities" table="USER_AUTHORITIES" cascade="all,delete-orphan" lazy="false">
+            <collection-id column="ID" type="long">
+                <generator class="hilo"/>
+            </collection-id>
             <key column="USER_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.GrantedAuthority"/>
-        </bag>
+            <element type="string" column="AUTHORITY" not-null="true"/>
+        </idbag>
 
+        <set name="groups" table="GROUP_USERS" lazy="false" inverse="true" cascade="none">
+            <key column="USER_ID"/>
+            <many-to-many class="com.zutubi.pulse.model.Group" column="GROUP_ID"/>
+        </set>
+        
         <bag name="contactPoints" inverse="true" cascade="all" lazy="false">
             <key column="USER_ID"/>
             <one-to-many class="com.zutubi.pulse.model.ContactPoint"/>
@@ -46,18 +54,6 @@
             <key column="USER_ID"/>
             <many-to-many class="com.zutubi.pulse.model.Project" column="PROJECT_ID"/>
         </set>
-    </class>
-
-    <class name="com.zutubi.pulse.model.GrantedAuthority" table="AUTHORITIES" lazy="false">
-
-        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
-            <generator class="hilo"/>
-        </id>
-
-        <many-to-one name="user" column="USER_ID" class="com.zutubi.pulse.model.User" insert="true" lazy="false"/>
-
-        <property name="authority" column="AUTHORITY" type="string" not-null="true" length="255"/>
-
     </class>
 
     <!--

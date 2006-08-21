@@ -69,8 +69,7 @@
                           #wwcheckbox("name=ldapAuthentication" "label=%{getText('user.ldap.authentication')}" "tabindex=3" "onclick=setEnableState('createUser_newUser_password', 'createUser_ldapAuthentication', true); setEnableState('createUser_confirm', 'createUser_ldapAuthentication', true);")
                           #wwpassword("name=newUser.password" "label=%{getText('user.password')}" "tabindex=4")
                           #wwpassword("name=confirm" "label=%{getText('user.confirm')}" "tabindex=5")
-                          #wwcheckbox("name=admin" "label=%{getText('user.admin')}" "tabindex=6")
-                          #saveCancel(7)
+                          #saveCancel(6)
                       #end
                   #end
               </td>

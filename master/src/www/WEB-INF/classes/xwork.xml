@@ -738,18 +738,6 @@
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
-        <action name="addProjectAdmins" class="com.zutubi.pulse.web.project.AddProjectAdminsAction">
-            <result name="input" type="velocity">add-project-admins.vm</result>
-            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
-        <action name="deleteProjectAdmin" class="com.zutubi.pulse.web.project.DeleteProjectAdminAction">
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
         <action name="convertToCustomProject" class="com.zutubi.pulse.web.project.ConvertToCustomProjectAction">
             <result name="input" type="velocity">convert-to-custom-project.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${id}</result>
@@ -965,6 +953,44 @@
             <result name="input" type="velocity">edit-user.vm</result>
             <result name="cancel" type="redirect">viewUsers.action?startPage=${startPage}</result>
             <result name="success" type="redirect">viewUsers.action?startPage=${startPage}</result>
+        </action>
+
+        <action name="viewGroups" class="com.zutubi.pulse.web.admin.user.ViewGroupsAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">manage-groups.vm</result>
+        </action>
+
+        <action name="createGroup" class="com.zutubi.pulse.web.admin.user.CreateGroupAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">create-group.vm</result>
+            <result name="cancel" type="redirect">viewGroups.action?startPage=${startPage}</result>
+            <result name="success" type="redirect">viewGroups.action?startPage=${startPage}</result>
+        </action>
+
+        <action name="deleteGroup" class="com.zutubi.pulse.web.admin.user.DeleteGroupAction">
+            <result name="success" type="redirect">viewGroups.action?startPage=${startPage}</result>
+        </action>
+
+        <action name="editGroup" class="com.zutubi.pulse.web.admin.user.EditGroupAction">
+            <result name="input" type="velocity">edit-group.vm</result>
+            <result name="cancel" type="redirect">viewGroups.action?startPage=${startPage}</result>
+            <result name="success" type="redirect">viewGroups.action?startPage=${startPage}</result>
+        </action>
+
+        <action name="viewGroupMembers" class="com.zutubi.pulse.web.admin.user.ViewGroupMembersAction">
+            <result name="success" type="velocity">view-group-members.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="addGroupMembers" class="com.zutubi.pulse.web.admin.user.AddGroupMembersAction">
+            <result name="input" type="velocity">add-group-members.vm</result>
+            <result name="cancel" type="redirect">viewGroupMembers.action?groupId=${groupId}&amp;startPage=${startPage}</result>
+            <result name="success" type="redirect">viewGroupMembers.action?groupId=${groupId}&amp;startPage=${startPage}</result>
+        </action>
+
+        <action name="removeGroupMember" class="com.zutubi.pulse.web.admin.user.RemoveGroupMemberAction">
+            <result name="success" type="redirect">viewGroupMembers.action?groupId=${groupId}&amp;startPage=${startPage}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="smtp" class="com.zutubi.pulse.web.admin.SmtpConfigurationAction">

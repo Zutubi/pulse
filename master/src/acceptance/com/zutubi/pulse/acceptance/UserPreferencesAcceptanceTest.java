@@ -35,7 +35,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         loginAsAdmin();
         navigateToUserAdministration();
         login = RandomUtils.randomString(7);
-        submitCreateUserForm(login, login, login, login, false);
+        submitCreateUserForm(login, login, login, login);
 
         login(login, login);
 

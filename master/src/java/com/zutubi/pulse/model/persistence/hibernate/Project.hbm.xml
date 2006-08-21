@@ -223,4 +223,12 @@
         where project.scm.id = :scmId
     ]]></query>
 
+    <query name="findByAcl"><![CDATA[
+        select project
+        from Project project
+        join project.aclEntries acl
+        where acl.recipient = :recipient
+    ]]></query>
+
+
 </hibernate-mapping>

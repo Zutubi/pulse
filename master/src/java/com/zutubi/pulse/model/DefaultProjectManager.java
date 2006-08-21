@@ -9,10 +9,7 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
-import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
-import com.zutubi.pulse.model.persistence.CommitMessageTransformerDao;
-import com.zutubi.pulse.model.persistence.ProjectDao;
-import com.zutubi.pulse.model.persistence.TriggerDao;
+import com.zutubi.pulse.model.persistence.*;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
@@ -42,6 +39,7 @@ public class DefaultProjectManager implements ProjectManager
     private ChangelistIsolator changelistIsolator;
 
     private LicenseManager licenseManager;
+    private UserManager userManager;
 
     public void save(Project project)
     {
@@ -221,6 +219,39 @@ public class DefaultProjectManager implements ProjectManager
         projectDao.save(project);
     }
 
+    public List<Project> getProjectsWithAdmin(String authority)
+    {
+        return projectDao.findByAdminAuthority(authority);
+    }
+
+    public void updateProjectAdmins(String authority, List<Long> restrictToProjects)
+    {
+        List<Project> projects = getAllProjects();
+        for(Project p: projects)
+        {
+            if(restrictToProjects == null || restrictToProjects.contains(p.getId()))
+            {
+                p.addAdmin(authority);
+            }
+            else
+            {
+                p.removeAdmin(authority);
+            }
+
+            save(p);
+        }
+    }
+
+    public void removeAcls(String authority)
+    {
+        List<Project> projects = projectDao.findByAdminAuthority(authority);
+        for(Project p: projects)
+        {
+            p.removeAdmin(authority);
+            save(p);
+        }
+    }
+
     public void initialise()
     {
         changelistIsolator = new ChangelistIsolator(buildManager);
@@ -336,6 +367,15 @@ public class DefaultProjectManager implements ProjectManager
         }
     }
 
+    public void create(Project project)
+    {
+        for(Group group: userManager.getAdminAllProjectGroups())
+        {
+            project.addAdmin(group.getDefaultAuthority());
+        }
+        projectDao.save(project);
+    }
+
     public void setProjectDao(ProjectDao dao)
     {
         projectDao = dao;
@@ -434,5 +474,10 @@ public class DefaultProjectManager implements ProjectManager
     public void setLicenseManager(LicenseManager licenseManager)
     {
         this.licenseManager = licenseManager;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 }

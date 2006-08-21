@@ -88,4 +88,9 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
     {
         return  (RunExecutablePostBuildAction) getHibernateTemplate().load(RunExecutablePostBuildAction.class, id);
     }
+
+    public List<Project> findByAdminAuthority(String recipient)
+    {
+        return findByNamedQuery("findByAcl", "recipient", recipient);
+    }
 }

@@ -1,0 +1,29 @@
+#helpTag("Groups")
+#authorisationTags($principle)
+<content tag="selectedTab">administration</content>
+<html>
+<head>
+    <title>#wwtext("name=group.create")</title>
+</head>
+<body>
+    #adminTabs("groups")
+
+    #parse("/template/includes/actionerrors.vm")
+
+    #wwcform("action=createGroup.action" "id=group.create" "heading=%{getText('group.create')}" "method=post")
+        #wwtextfield("name=name" "label=%{getText('group.name')}" "required=true" "tabindex=1")
+        #wwcheckbox("name=admin" "label=%{getText('group.grant.admin')}" "tabindex=2")
+        #wwcheckbox("name=adminAllProjects" "label=%{getText('group.admin.all.projects')}" "tabindex=3" "onclick=setEnableState('group.create_projects', 'group.create_adminAllProjects', true)")
+        #wwselect("name=projects" "label=%{getText('group.admin.selected.projects')}" "list=allProjects" "multiple=true" "tabindex=4")
+        #saveCancel(5)
+    #end
+
+    <script type="text/javascript">
+        <!--
+        setEnableState('group.create_projects', 'group.create_adminAllProjects', true);
+        -->
+    </script>
+    
+    #tabEnd()
+</body>
+</html>

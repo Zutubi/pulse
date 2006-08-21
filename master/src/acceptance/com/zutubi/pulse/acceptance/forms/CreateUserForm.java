@@ -19,11 +19,11 @@ public class CreateUserForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"newUser.login", "newUser.name", "ldapAuthentication", "newUser.password", "confirm", "admin"};
+        return new String[]{"newUser.login", "newUser.name", "ldapAuthentication", "newUser.password", "confirm" };
     }
 
     public int[] getFieldTypes()
     {
-        return new int[]{TEXTFIELD, TEXTFIELD, CHECKBOX, TEXTFIELD, TEXTFIELD, CHECKBOX};
+        return new int[]{TEXTFIELD, TEXTFIELD, CHECKBOX, TEXTFIELD, TEXTFIELD };
     }
 }

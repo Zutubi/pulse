@@ -40,7 +40,7 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTestCase
 
         assertUserNotExists(login);
 
-        submitCreateUserForm(login, login, login, login, false);
+        submitCreateUserForm(login, login, login, login);
 
         // assert user does exist.
         assertUserExists(login);
@@ -61,35 +61,6 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTestCase
         assertLinkNotPresentWithText("administration");
     }
 
-    public void testCreateAdminUser()
-    {
-        // create random login name.
-        String login = RandomUtils.randomString(10);
-
-        assertUserNotExists(login);
-
-        submitCreateUserForm(login, login, login, login, true);
-
-        // assert user does exist.
-        assertUserExists(login);
-
-        // assert form is reset.
-        assertFormReset();
-
-        // check that we can login with this new user.
-        clickLinkWithText("logout");
-
-        login(login, login);
-
-        // if login was successful, should see the welcome page and a logout link.
-        assertTextPresent(":: welcome ::");
-        assertLinkPresentWithText("logout");
-
-        // ensure that this user does not have admin permissions.
-        assertLinkPresentWithText("administration");
-
-    }
-
     public void testCreateUserValidation()
     {
         // create random login name.
@@ -98,28 +69,28 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTestCase
         // check validation - login is required.
         CreateUserForm form = new CreateUserForm(tester);
         form.assertFormPresent();
-        form.saveFormElements("", login, Boolean.toString(false), login, login, Boolean.toString(false));
+        form.saveFormElements("", login, Boolean.toString(false), login, login);
 
         // should get an error message.
         assertTextPresent("required");
         assertLinkNotPresentWithText(login);
 
-        form.assertFormElements("", login, Boolean.toString(false), "", "", Boolean.toString(false));
+        form.assertFormElements("", login, Boolean.toString(false), "", "");
 
 
         // check validation - password and confirmation mismatch
-        form.saveFormElements(login, login, Boolean.toString(false), login, "something not very random", Boolean.toString(false));
+        form.saveFormElements(login, login, Boolean.toString(false), login, "something not very random");
 
         assertTextPresent("does not match");
         assertLinkNotPresentWithText(login);
-        form.assertFormElements(login, login, Boolean.toString(false), "", "", Boolean.toString(false));
+        form.assertFormElements(login, login, Boolean.toString(false), "", "");
     }
 
     public void testDeleteUser()
     {
         // create a user to delete - assume that user creation is successful?
         String login = RandomUtils.randomString(10);
-        submitCreateUserForm(login, login, login, login, false);
+        submitCreateUserForm(login, login, login, login);
         // check that it worked.
         assertLinkPresentWithText(login);
         assertLinkPresent("delete_" + login);
@@ -133,30 +104,11 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTestCase
         assertLinkNotPresentWithText(login);
     }
 
-    public void testCanNotDeleteSelf()
-    {
-        // create a user to delete - assume that user creation is successful?
-        String login = RandomUtils.randomString(10);
-        submitCreateUserForm(login, login, login, login, true);
-
-        // login.
-        login(login, login);
-        navigateToUserAdministration();
-
-        assertLinkPresent("delete_" + login);
-
-        clickLink("delete_" + login);
-
-        // assert that we are still there.
-        assertLinkPresent("delete_" + login);
-        assertTextPresent("can not delete");
-    }
-
     public void testViewUser()
     {
         // create user.
         String login = RandomUtils.randomString(10);
-        submitCreateUserForm(login, login, login, login, false);
+        submitCreateUserForm(login, login, login, login);
 
         // view user
         assertLinkPresentWithText(login);
@@ -176,7 +128,7 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTestCase
     {
         // create a user.
         String login = RandomUtils.randomString(7);
-        submitCreateUserForm(login, login, login, login, false);
+        submitCreateUserForm(login, login, login, login);
 
         assertLinkPresent("edit_" + login);
         clickLink("edit_" + login);
@@ -196,7 +148,7 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTestCase
     {
         // create a user.
         String login = RandomUtils.randomString(7);
-        submitCreateUserForm(login, login, login, login, false);
+        submitCreateUserForm(login, login, login, login);
 
         assertLinkPresent("edit_" + login);
         clickLink("edit_" + login);

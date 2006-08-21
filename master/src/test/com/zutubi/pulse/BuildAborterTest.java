@@ -28,7 +28,7 @@ public class BuildAborterTest extends PulseTestCase
 
     public void testNoBuilds()
     {
-        projectManager.save(new Project("hello", "test project"));
+        projectManager.create(new Project("hello", "test project"));
         aborter.run();
     }
 
@@ -39,7 +39,7 @@ public class BuildAborterTest extends PulseTestCase
         result.commence(10);
         result.complete();
 
-        projectManager.save(project);
+        projectManager.create(project);
         buildManager.save(result);
 
         assertTrue(result.succeeded());
@@ -53,7 +53,7 @@ public class BuildAborterTest extends PulseTestCase
         BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, null, 1);
         result.commence(10);
 
-        projectManager.save(project);
+        projectManager.create(project);
         buildManager.save(result);
 
         assertTrue(result.commenced());

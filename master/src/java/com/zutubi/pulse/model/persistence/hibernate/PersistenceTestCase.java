@@ -14,7 +14,9 @@ import javax.sql.DataSource;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.beans.IntrospectionException;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.Statement;
 
@@ -111,21 +113,41 @@ public abstract class PersistenceTestCase extends PulseTestCase
 
     protected void assertPropertyEquals(Object a, Object b)
     {
+        if(a == null)
+        {
+            assertNull(b);
+        }
+        else
+        {
+            assertNotNull(b);
+        }
+        
+        BeanInfo beanInfo = null;
         try
         {
-            BeanInfo beanInfo = Introspector.getBeanInfo(a.getClass());
-            for (PropertyDescriptor property : beanInfo.getPropertyDescriptors())
+            beanInfo = Introspector.getBeanInfo(a.getClass());
+        }
+        catch (IntrospectionException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        for (PropertyDescriptor property : beanInfo.getPropertyDescriptors())
+        {
+            Method getter = property.getReadMethod();
+            if (getter != null && getter.getDeclaringClass() != Object.class)
             {
-                Method getter = property.getReadMethod();
-                if (getter != null && getter.getDeclaringClass() != Object.class)
+                String getterName = getter.getName();
+
+                try
                 {
                     assertObjectEquals(getter.getName(), getter.invoke(a), getter.invoke(b));
                 }
+                catch (Exception e)
+                {
+                    throw new RuntimeException("Checking property '" + getterName + "': " + e.getMessage(), e);
+                }
             }
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
         }
     }
 }

@@ -3,8 +3,10 @@ package com.zutubi.pulse.model.persistence.hibernate;
 import com.zutubi.pulse.model.EmailContactPoint;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.Group;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.model.persistence.GroupDao;
 
 import java.util.HashSet;
 import java.util.List;
@@ -16,18 +18,22 @@ import java.util.Set;
 public class HibernateUserDaoTest extends MasterPersistenceTestCase
 {
     private UserDao userDao;
+    private GroupDao groupDao;
     private ProjectDao projectDao;
 
     public void setUp() throws Exception
     {
         super.setUp();
         userDao = (UserDao) context.getBean("userDao");
+        groupDao = (GroupDao) context.getBean("groupDao");
         projectDao = (ProjectDao) context.getBean("projectDao");
     }
 
     public void tearDown() throws Exception
     {
         userDao = null;
+        groupDao = null;
+        projectDao = null;
         super.tearDown();
     }
 
@@ -130,6 +136,42 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         assertTrue(user.hasProperty("a"));
         assertEquals("b", user.getProperty("a"));
     }
+
+    public void testFindByNotInGroup()
+    {
+        User u1 = new User("l1", "n1");
+        User u2 = new User("l2", "n2");
+
+        userDao.save(u1);
+        userDao.save(u2);
+
+        Group g1 = new Group("g1");
+        Group g2 = new Group("g2");
+        Group g3 = new Group("g2");
+
+        g2.addUser(u1);
+        g3.addUser(u1);
+        g3.addUser(u2);
+
+        groupDao.save(g1);
+        groupDao.save(g2);
+        groupDao.save(g3);
+
+        commitAndRefreshTransaction();
+
+        List<User> users = userDao.findByNotInGroup(g1);
+        assertEquals(2, users.size());
+        assertEquals(u1, users.get(0));
+        assertEquals(u2, users.get(1));
+
+        users = userDao.findByNotInGroup(g2);
+        assertEquals(1, users.size());
+        assertEquals(u2, users.get(0));
+
+        users = userDao.findByNotInGroup(g3);
+        assertEquals(0, users.size());
+    }
+    
 /*
     public void testGrantedAuthorities()
     {

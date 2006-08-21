@@ -2,6 +2,7 @@ package com.zutubi.pulse.model.persistence.mock;
 
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.Group;
 import com.zutubi.pulse.model.persistence.UserDao;
 
 import java.util.List;
@@ -34,6 +35,11 @@ public class MockUserDao extends MockEntityDao<User> implements UserDao
     }
 
     public Set<Project> getHiddenProjects(User user)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public List<User> findByNotInGroup(Group group)
     {
         throw new RuntimeException("Method not implemented.");
     }

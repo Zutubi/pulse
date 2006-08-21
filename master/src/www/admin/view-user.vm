@@ -25,8 +25,20 @@
                         #dynamicRow("user.login" $user.login)
                         #dynamicRow("user.name" $user.name)
                         #dynamicRow("user.authentication" $authentication)
-                        #dynamicRow("user.granted.admin" $admin)
                         #dynamicRow("user.admin.user" $action.isAdminUser($user))
+#if($user.groups.size() > 0)
+    #foreach($group in $user.groups)
+        #if($groups.length() > 0)
+            #set($groups = "$groups, ")
+        #else
+            #set($groups = "")
+        #end
+        #set($groups = "$groups $!webwork.htmlEncode($group.name)")
+    #end
+#else
+    #set($groups = $action.getText("user.groups.none"))
+#end
+                        #dynamicRow("user.groups" $groups)
                     </table>
 #if($user.contactPoints.size() > 0)
                     <table id="contacts" class="fill-content">

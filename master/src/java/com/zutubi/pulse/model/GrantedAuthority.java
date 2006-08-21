@@ -1,18 +1,15 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Entity;
-
 /**
  * <class-comment/>
  */
-public class GrantedAuthority extends Entity implements org.acegisecurity.GrantedAuthority
+public class GrantedAuthority implements org.acegisecurity.GrantedAuthority
 {
     public static final String ANONYMOUS = "ROLE_ANONYMOUS";
     public static final String GUEST = "ROLE_GUEST";
     public static final String USER = "ROLE_USER";
     public static final String ADMINISTRATOR = "ROLE_ADMINISTRATOR";
 
-    private User user;
     private String authority;
 
     public GrantedAuthority()
@@ -20,10 +17,9 @@ public class GrantedAuthority extends Entity implements org.acegisecurity.Grante
 
     }
 
-    public GrantedAuthority(User user, String authority)
+    public GrantedAuthority(String authority)
     {
         this.authority = authority;
-        this.user = user;
     }
 
     public String getAuthority()
@@ -40,21 +36,6 @@ public class GrantedAuthority extends Entity implements org.acegisecurity.Grante
         this.authority = authority;
     }
 
-    public User getUser()
-    {
-        return user;
-    }
-
-    /**
-     * For hibernate.
-     *
-     * @param user
-     */
-    private void setUser(User user)
-    {
-        this.user = user;
-    }
-
     public boolean equals(Object other)
     {
         if(other instanceof String)
@@ -63,7 +44,18 @@ public class GrantedAuthority extends Entity implements org.acegisecurity.Grante
             // the role string
             return other.equals(authority);
         }
+        else if(other instanceof GrantedAuthority)
+        {
+            return ((GrantedAuthority)other).authority.equals(authority);
+        }
+        else
+        {
+            return false;
+        }
+    }
 
-        return super.equals(other);
+    public int hashCode()
+    {
+        return authority.hashCode();
     }
 }

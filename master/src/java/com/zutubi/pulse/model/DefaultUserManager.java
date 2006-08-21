@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.model.persistence.ContactPointDao;
 import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.model.persistence.GroupDao;
 import com.zutubi.pulse.web.DefaultAction;
 import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.license.LicenseManager;
@@ -21,6 +22,7 @@ public class DefaultUserManager implements UserManager
 {
     private UserDao userDao;
     private ContactPointDao contactPointDao;
+    private GroupDao groupDao;
     private PasswordEncoder passwordEncoder;
 
     private LicenseManager licenseManager;
@@ -46,11 +48,6 @@ public class DefaultUserManager implements UserManager
     public Set<Project> getHiddenProjects(User user)
     {
         return userDao.getHiddenProjects(user);
-    }
-
-    public void addUser(User newUser, boolean grantAdminPermissions)
-    {
-        addUser(newUser, grantAdminPermissions, false);
     }
 
     public void addUser(User newUser, boolean grantAdminPermissions, boolean useLdapAuthencation)
@@ -110,6 +107,54 @@ public class DefaultUserManager implements UserManager
         contactPointDao.delete(contact);
     }
 
+    public List<Group> getAllGroups()
+    {
+        return groupDao.findAll();
+    }
+
+    public List<Group> getAdminAllProjectGroups()
+    {
+        return groupDao.findByAdminAllProjects();
+    }
+
+    public Group getGroup(long id)
+    {
+        return groupDao.findById(id);
+    }
+
+    public Group getGroup(String name)
+    {
+        return groupDao.findByName(name);
+    }
+
+    public void addGroup(Group group)
+    {
+        groupDao.save(group);
+    }
+
+    public void save(Group group)
+    {
+        groupDao.save(group);
+    }
+
+    public void renameGroup(Group group, String newName)
+    {
+        group.setName(newName);
+        groupDao.save(group);
+    }
+
+    public void delete(Group group, ProjectManager projectManager)
+    {
+        // We need to remove all ACLs with this group as a recipient
+        projectManager.removeAcls(group.getDefaultAuthority());
+        groupDao.delete(group);
+    }
+
+    public List<User> getUsersNotInGroup(Group group)
+    {
+        return userDao.findByNotInGroup(group);
+    }
+
     public int getUserCount()
     {
         return userDao.count();
@@ -161,5 +206,10 @@ public class DefaultUserManager implements UserManager
     public void setLicenseManager(LicenseManager licenseManager)
     {
         this.licenseManager = licenseManager;
+    }
+
+    public void setGroupDao(GroupDao groupDao)
+    {
+        this.groupDao = groupDao;
     }
 }

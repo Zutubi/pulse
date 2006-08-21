@@ -7,6 +7,7 @@ import com.zutubi.pulse.model.persistence.ProjectDao;
 
 import java.util.Arrays;
 import java.util.TreeMap;
+import java.util.List;
 
 /**
  * 
@@ -235,6 +236,31 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         // assert that we get the right project back.
         assertNotNull(projectDao.findByScmId(project.getScm().getId()));
         assertEquals(project.getId(), projectDao.findByScmId(project.getScm().getId()).getId());
+    }
+
+    public void testFindByAdminAuthority()
+    {
+        addAdminProject("justA1");
+        addAdminProject("justA1", "A1");
+        addAdminProject("justA2", "A2");
+        addAdminProject("bothA1A2", "A1", "A2");
+
+        commitAndRefreshTransaction();
+        List<Project> projects = projectDao.findByAdminAuthority("A1");
+        assertEquals(2, projects.size());
+        assertEquals("justA1", projects.get(0).getName());
+        assertEquals("bothA1A2", projects.get(1).getName());
+    }
+
+    private Project addAdminProject(String name, String... authorities)
+    {
+        Project p = new Project(name, "test");
+        for(String a: authorities)
+        {
+            p.addAdmin(a);
+        }
+        projectDao.save(p);
+        return p;
     }
 }
 

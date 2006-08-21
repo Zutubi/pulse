@@ -223,6 +223,22 @@ public abstract class BaseForm
         return formValues;
     }
 
+    public String getOptionValue(String field, String option)
+    {
+        return tester.getDialog().getValueForOption(field, option);
+    }
+
+    public void assertOptionNotPresent(String field, String option)
+    {
+        for(String o: tester.getDialog().getOptionsFor(field))
+        {
+            if(o.equals(option))
+            {
+                Assert.fail("Unexpected option '" + option + "' present in field '" + field + "'");
+            }
+        }
+    }
+
     public void assertMultiValues(String name, String ...values)
     {
         String[] gotValues = tester.getDialog().getForm().getParameterValues(name);

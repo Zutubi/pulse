@@ -94,6 +94,11 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public void create(Project project)
+    {
+        save(project);
+    }
+
     public void checkWrite(Project project)
     {
         throw new RuntimeException("Method not implemented.");
@@ -145,6 +150,21 @@ public class MockProjectManager implements ProjectManager
     }
 
     public void updateProjectDetails(Project project, String name, String description, String url)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public List<Project> getProjectsWithAdmin(String authority)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public void updateProjectAdmins(String authority, List<Long> restrictToProjects)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public void removeAcls(String authority)
     {
         throw new RuntimeException("Method not implemented.");
     }

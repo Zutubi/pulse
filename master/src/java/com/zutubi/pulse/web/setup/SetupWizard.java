@@ -9,6 +9,7 @@ import com.zutubi.pulse.bootstrap.SystemConfigurationSupport;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.model.Group;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.web.DefaultAction;
@@ -65,6 +66,16 @@ public class SetupWizard extends BaseWizard
         // since the users id is required. This is a little awkward...
         userManager.setPassword(admin, admin.getPassword());
         userManager.save(admin);
+
+        // create an administrators group (for convenience)
+        Group adminGroup = new Group("administrators");
+        adminGroup.addAdditionalAuthority(GrantedAuthority.ADMINISTRATOR);
+        userManager.addGroup(adminGroup);
+
+        // and a project admins group that has write access to all projects
+        Group projectAdmins = new Group("project administrators");
+        projectAdmins.setAdminAllProjects(true);
+        userManager.addGroup(projectAdmins);
 
         // apply the settings
         config.setBaseUrl(serverSettingsState.getBaseUrl());

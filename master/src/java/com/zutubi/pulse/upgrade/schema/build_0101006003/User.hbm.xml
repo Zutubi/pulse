@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+    <class name="com.zutubi.pulse.model.User" table="USER" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <idbag name="grantedAuthorities" table="USER_AUTHORITIES" cascade="all,delete-orphan" lazy="false">
+            <collection-id column="ID" type="long">
+                <generator class="hilo"/>
+            </collection-id>
+            <key column="USER_ID"/>
+            <element type="string" column="AUTHORITY" not-null="true"/>
+        </idbag>
+
+        <set name="groups" table="GROUP_USERS" lazy="false" inverse="true" cascade="none">
+            <key column="USER_ID"/>
+            <many-to-many class="com.zutubi.pulse.model.Group" column="GROUP_ID"/>
+        </set>
+    </class>
+</hibernate-mapping>

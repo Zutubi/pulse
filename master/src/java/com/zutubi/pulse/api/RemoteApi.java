@@ -53,6 +53,19 @@ public class RemoteApi
         return "pong";
     }
 
+    public Vector<String> getAllUserLogins(String token) throws AuthenticationException
+    {
+        tokenManager.verifyAdmin(token);
+        List<User> users = userManager.getAllUsers();
+        Vector<String> result = new Vector<String>(users.size());
+        for(User user: users)
+        {
+            result.add(user.getLogin());
+        }
+
+        return result;
+    }
+
     public Vector<String> getAllProjectNames(String token) throws AuthenticationException
     {
         //@Secured({"ROLE_USER"})

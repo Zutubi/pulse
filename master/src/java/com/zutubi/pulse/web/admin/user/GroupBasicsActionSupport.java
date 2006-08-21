@@ -1,0 +1,97 @@
+package com.zutubi.pulse.web.admin.user;
+
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.NamedEntityComparator;
+import com.zutubi.pulse.model.Group;
+import com.zutubi.pulse.model.GrantedAuthority;
+
+import java.util.*;
+
+/**
+ */
+public class GroupBasicsActionSupport extends GroupActionSupport
+{
+    private boolean admin;
+    private boolean adminAllProjects;
+    private Map<Long, String> allProjects;
+    private List<Long> projects = new ArrayList<Long>();
+    private int startPage = 0;
+
+    public boolean isAdmin()
+    {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin)
+    {
+        this.admin = admin;
+    }
+
+    public boolean isAdminAllProjects()
+    {
+        return adminAllProjects;
+    }
+
+    public void setAdminAllProjects(boolean adminAllProjects)
+    {
+        this.adminAllProjects = adminAllProjects;
+    }
+
+    public int getStartPage()
+    {
+        return startPage;
+    }
+
+    public void setStartPage(int startPage)
+    {
+        this.startPage = startPage;
+    }
+
+    public Map<Long, String> getAllProjects()
+    {
+        if(allProjects == null)
+        {
+            allProjects = new LinkedHashMap<Long, String>();
+            List<Project> all = getProjectManager().getAllProjects();
+            Collections.sort(all, new NamedEntityComparator());
+            for(Project p: all)
+            {
+                allProjects.put(p.getId(), p.getName());
+            }
+        }
+        return allProjects;
+    }
+
+    public List<Long> getProjects()
+    {
+        return projects;
+    }
+
+    public void setProjects(List<Long> projects)
+    {
+        this.projects = projects;
+    }
+
+
+    protected void setPermissions(Group group)
+    {
+        if(isAdmin())
+        {
+            group.addAdditionalAuthority(GrantedAuthority.ADMINISTRATOR);
+        }
+        else
+        {
+            group.removeAdditionalAuthority(GrantedAuthority.ADMINISTRATOR);
+        }
+
+        group.setAdminAllProjects(isAdminAllProjects());
+
+        getUserManager().save(group);
+        List<Long> projects = null;
+        if(!group.getAdminAllProjects())
+        {
+            projects = getProjects();
+        }
+        getProjectManager().updateProjectAdmins(group.getDefaultAuthority(), projects);
+    }
+}

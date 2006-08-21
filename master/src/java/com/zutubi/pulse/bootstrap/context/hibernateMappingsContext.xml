@@ -19,6 +19,7 @@ This context exports:
                 <value>com/zutubi/pulse/model/persistence/hibernate/CommandResult.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/CommitMessageTransformer.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Feature.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Group.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Project.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Resource.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Revision.hbm.xml</value>

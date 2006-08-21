@@ -16,7 +16,6 @@ public class CreateUserAction extends UserActionSupport
     private User newUser = new User();
     private String confirm;
     private boolean ldapAuthentication = false;
-    private boolean grantAdminPermissions;
     private int startPage = 0;
 
     public User getNewUser()
@@ -42,16 +41,6 @@ public class CreateUserAction extends UserActionSupport
     public void setLdapAuthentication(boolean ldapAuthentication)
     {
         this.ldapAuthentication = ldapAuthentication;
-    }
-
-    public boolean isAdmin()
-    {
-        return grantAdminPermissions;
-    }
-
-    public void setAdmin(boolean admin)
-    {
-        this.grantAdminPermissions = admin;
     }
 
     public int getStartPage()
@@ -87,7 +76,7 @@ public class CreateUserAction extends UserActionSupport
 
     public String execute() throws Exception
     {
-        getUserManager().addUser(newUser, grantAdminPermissions, ldapAuthentication);
+        getUserManager().addUser(newUser, false, ldapAuthentication);
         startPage = getUserStartPage(newUser);
         doReset();
         return SUCCESS;

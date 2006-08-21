@@ -250,34 +250,6 @@
 #end
                 </table>
 
-            <!-- Project administrators -->
-
-                <table id="project.admins" class="fill-content">
-                    #headingRow("project.admins" 2)
-                    <tr>
-                        #contentHeading("project.admin" 1)
-#acl("domainObject=project" "hasPermission=4,1")
-                        #contentHeading("actions" 1)
-#end
-                    </tr>
-#if($projectAdmins.size() > 0)
-    #foreach($admin in $projectAdmins)
-        #set($confirmMessage = $action.getText("project.admin.confirm.delete", [$admin.name]))
-                    <tr>
-                        #dynamicCell($admin.name)
-        #acl("domainObject=project" "hasPermission=4,1")
-                        #removeCell($confirmMessage "deleteProjectAdmin.action?projectId=$project.id&amp;login=$admin.login" "delete_admin_$admin")
-        #end
-                    </tr>
-    #end
-#else
-                    #contentRow("project.admins.none" 2)
-#end
-#acl("domainObject=project" "hasPermission=4,1")
-                    #addRow("project.admin.add" 2 "addProjectAdmins!input.action?projectId=$project.id" "project.admin.add")
-#end
-                </table>
-
             </td>
         </tr>
     </table>

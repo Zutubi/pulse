@@ -35,6 +35,7 @@ public class AcceptanceTestSuite
         suite.addTestSuite(UserAdministrationAcceptanceTest.class);
         suite.addTestSuite(UserPreferencesAcceptanceTest.class);
         suite.addTestSuite(UserSecurityAcceptanceTest.class);
+        suite.addTestSuite(GroupAcceptanceTest.class);
         suite.addTestSuite(WebAppAcceptanceTest.class);
         return suite;
     }

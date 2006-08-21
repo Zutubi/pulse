@@ -2,6 +2,7 @@ package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.Group;
 import com.zutubi.pulse.model.persistence.UserDao;
 import com.zutubi.pulse.util.logging.Logger;
 import org.hibernate.Hibernate;
@@ -82,5 +83,18 @@ public class HibernateUserDao extends HibernateEntityDao<User> implements UserDa
         });
 
         return u.getHiddenProjects();
+    }
+
+    public List<User> findByNotInGroup(final Group group)
+    {
+        return (List<User>) getHibernateTemplate().execute(new HibernateCallback(){
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from User user where :group not in elements(user.groups)");
+                queryObject.setEntity("group", group);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.list();
+            }
+        });
     }
 }

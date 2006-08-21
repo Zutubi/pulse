@@ -428,11 +428,11 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         return false;
     }
 
-    public void addAdmin(String login)
+    public void addAdmin(String recipient)
     {
-        if(!hasAdmin(login))
+        if(!hasAdmin(recipient))
         {
-            aclEntries.add(new ProjectAclEntry(login, this, ProjectAclEntry.WRITE));
+            aclEntries.add(new ProjectAclEntry(recipient, this, ProjectAclEntry.WRITE));
         }
     }
 
