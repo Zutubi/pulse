@@ -361,6 +361,11 @@ h3.heading, th.heading {
     white-space: normal;
 }
 
+p.note {
+    border: dashed 1px #f0c000;
+    padding: 5px;
+}
+
 td.content, td.content-nowrap {
     white-space: nowrap;
 }

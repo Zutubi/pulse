@@ -26,6 +26,7 @@ public class EmailContactPoint extends ContactPoint
     private static final String SMTP_AUTH_PROPERTY = "mail.smtp.auth";
 
     private static final String PROPERTY_TYPE = "type";
+    private static final String NO_SMTP_HOST_ERROR = "Unable to deliver email: SMTP host not configured.";
 
     public EmailContactPoint()
     {
@@ -58,10 +59,7 @@ public class EmailContactPoint extends ContactPoint
         getProperties().put(PROPERTY_TYPE, type);
     }
 
-    /* (non-Javadoc)
-    * @see com.zutubi.pulse.core.ContactPoint#notify(com.zutubi.pulse.core.model.RecipeResult)
-    */
-    public void notify(BuildResult result)
+    public void internalNotify(BuildResult result) throws Exception
     {
         MasterConfiguration config = lookupConfigManager().getAppConfig();
         String prefix = config.getSmtpPrefix();
@@ -94,12 +92,12 @@ public class EmailContactPoint extends ContactPoint
         return (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
     }
 
-    private void sendMail(String subject, String body, final MasterConfiguration config)
+    private void sendMail(String subject, String body, final MasterConfiguration config) throws Exception
     {
         if (!TextUtils.stringSet(config.getSmtpHost()))
         {
-            LOG.severe("Unable to deliver mail to contact point: SMTP host not configured.");
-            return;
+            LOG.severe(NO_SMTP_HOST_ERROR);
+            throw new NotificationException(NO_SMTP_HOST_ERROR);
         }
 
         Properties properties = (Properties) System.getProperties().clone();
@@ -140,7 +138,8 @@ public class EmailContactPoint extends ContactPoint
         }
         catch (Exception e)
         {
-            LOG.warning("Unable to send email", e);
+            LOG.warning("Unable to send email to address '" + getEmail() + "': " + e.getMessage(), e);
+            throw e;
         }
     }
 

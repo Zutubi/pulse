@@ -145,14 +145,9 @@ public class Subscription extends Entity
         return getNotifyCondition().satisfied(result, contactPoint.getUser());
     }
 
-    public void notify(BuildResult result)
-    {
-        getContactPoint().notify(result);
-    }
-
     /**
      * The notify condition factory is a required resource, and used when checking
-     * if the subscriptions 'nofitication condition' has been satisfied.
+     * if the subscription's 'notification condition' has been satisfied.
      *
      * @param notifyFactory
      */

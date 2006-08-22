@@ -27,6 +27,7 @@ public class DashboardAction extends ActionSupport
     private BuildManager buildManager;
     private UserManager userManager;
     private CommitMessageHelper commitMessageHelper;
+    private boolean contactError = false;
 
     public User getUser()
     {
@@ -51,6 +52,11 @@ public class DashboardAction extends ActionSupport
     public List<Changelist> getProjectChangelists()
     {
         return projectChangelists;
+    }
+
+    public boolean isContactError()
+    {
+        return contactError;
     }
 
     public String execute() throws Exception
@@ -84,6 +90,14 @@ public class DashboardAction extends ActionSupport
         if(projects.size() > 0 && user.getShowProjectChanges())
         {
             projectChangelists = buildManager.getLatestChangesForProjects(projects.toArray(new Project[]{}), user.getProjectChangesCount());
+        }
+
+        for(ContactPoint contact: user.getContactPoints())
+        {
+            if(contact.hasError())
+            {
+                contactError = true;
+            }
         }
 
         return SUCCESS;

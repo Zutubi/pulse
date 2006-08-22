@@ -53,11 +53,21 @@
 #foreach ($contact in $user.contactPoints)
                     <tr>
     #set($confirmMessage = $action.getText("contact.delete.confirm", [$contact.name]))
-                        #dynamicCell($contact.name)
+                        <td class="content" #if($contact.lastError) rowspan="2" #end>
+                            $!webwork.htmlEncode($contact.name)
+                        </td>
                         #dynamicCell($contact.uid)
                         #editCell("$base/user/editContactPoint!default.action?id=$contact.id&userId=$user.id" "edit_$!webwork.htmlEncode($contact.name)")
                         #deleteCell("delete_$!webwork.htmlEncode($contact.name)" "$base/user/deleteContactPoint.action?id=$contact.id&userId=$user.id" $confirmMessage)
                     </tr>
+    #if($contact.lastError)
+                    <tr>
+                        <td class="note" colspan="3">
+                            #wwtext("name=contact.error") $!webwork.htmlEncode($contact.lastError)
+                            (<a href="$base/user/clearContactPointError.action?id=$contact.id">#wwtext("name=contact.error.clear")</a>)
+                        </td>
+                    </tr>
+    #end
 #end
                     #addRow("contact.create" 4 "$base/user/contactWizard.action?userId=$user.id" "contact.create")
                 </table>

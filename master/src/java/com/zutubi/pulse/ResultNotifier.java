@@ -5,10 +5,7 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.ContactPoint;
-import com.zutubi.pulse.model.Subscription;
-import com.zutubi.pulse.model.SubscriptionManager;
+import com.zutubi.pulse.model.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -19,25 +16,8 @@ import java.util.Set;
  */
 public class ResultNotifier implements EventListener
 {
-    /**
-     * The systems subscription manager.
-     */
     private SubscriptionManager subscriptionManager;
-
-    public void setEventManager(EventManager eventManager)
-    {
-        eventManager.register(this);
-    }
-
-    /**
-     * The subscription manager used by the result notifier to access subscription details.
-     *
-     * @param subscriptionManager
-     */
-    public void setSubscriptionManager(SubscriptionManager subscriptionManager)
-    {
-        this.subscriptionManager = subscriptionManager;
-    }
+    private UserManager userManager;
 
     public void handleEvent(Event evt)
     {
@@ -67,6 +47,8 @@ public class ResultNotifier implements EventListener
             {
                 notifiedContactPoints.add(contactPoint.getUid());
                 contactPoint.notify(buildResult);
+                // Contact point may be modified: e.g. error may be set.
+                userManager.save(contactPoint);
             }
         }
     }
@@ -74,5 +56,20 @@ public class ResultNotifier implements EventListener
     public Class[] getHandledEvents()
     {
         return new Class[]{BuildCompletedEvent.class};
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        eventManager.register(this);
+    }
+
+    public void setSubscriptionManager(SubscriptionManager subscriptionManager)
+    {
+        this.subscriptionManager = subscriptionManager;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 }

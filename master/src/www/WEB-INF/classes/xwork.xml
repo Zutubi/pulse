@@ -855,6 +855,10 @@
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
+        <action name="clearContactPointError" class="com.zutubi.pulse.web.user.ClearContactPointErrorAction">
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
         <action name="createSubscription" class="com.zutubi.pulse.web.user.CreateSubscriptionAction">
             <result name="input" type="velocity">create-subscription.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>

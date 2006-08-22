@@ -42,6 +42,12 @@
     </table>
 #end
 
+#if($contactError)
+<p class="note">
+    #wwtext("name=contact.errors")
+</p>
+#end
+
 <p style="text-align: right; margin-bottom: 0">
     <a href="$base/user/configureDashboard!input.action">
         <img alt="configure" src="$base/images/pencil.gif"/> #wwtext("name=configure.dashboard")

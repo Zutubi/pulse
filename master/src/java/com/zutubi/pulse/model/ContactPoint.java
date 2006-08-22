@@ -16,6 +16,7 @@ public abstract class ContactPoint extends Entity
     private String uid;
     private User user;
     private List<Subscription> subscriptions;
+    private String lastError;
 
     public void setName(String name)
     {
@@ -66,6 +67,26 @@ public abstract class ContactPoint extends Entity
         this.user = user;
     }
 
+    public String getLastError()
+    {
+        return lastError;
+    }
+
+    public boolean hasError()
+    {
+        return lastError != null;
+    }
+
+    private void setLastError(String lastError)
+    {
+        this.lastError = lastError;
+    }
+
+    public void clearError()
+    {
+        lastError = null;
+    }
+
     public List<Subscription> getSubscriptions()
     {
         if (subscriptions == null)
@@ -103,6 +124,24 @@ public abstract class ContactPoint extends Entity
         this.subscriptions = subscriptions;
     }
 
-    public abstract void notify(BuildResult result);
+    public void notify(BuildResult result)
+    {
+        lastError = null;
+        try
+        {
+            internalNotify(result);
+        }
+        catch(Exception e)
+        {
+            lastError = e.getClass().getName();
+            if(e.getMessage() != null)
+            {
+                lastError += ": " + e.getMessage();
+            }
+        }
+    }
+
+    protected abstract void internalNotify(BuildResult result) throws Exception;
+
 }
 

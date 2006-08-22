@@ -98,6 +98,8 @@
             <one-to-many class="com.zutubi.pulse.model.Subscription"/>
         </bag>
 
+        <property name="lastError" column="LAST_ERROR" type="string" not-null="false" length="1023"/>
+        
         <subclass name="com.zutubi.pulse.model.EmailContactPoint" discriminator-value="EMAIL">
 
         </subclass>
