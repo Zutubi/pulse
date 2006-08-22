@@ -40,6 +40,7 @@ public class CustomVelocityManager extends VelocityManager
         {
             User user = getUserManager().getUser(login);
             context.put("principle", user);
+            context.put("canLogout", AcegiUtils.canLogout());
         }
 
         // add version strings.

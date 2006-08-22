@@ -103,12 +103,22 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="authenticationEntryPoint">
             <ref local="basicProcessingFilterEntryPoint"/>
         </property>
+        <property name="authenticationDetailsSource">
+            <ref local="basicProcessingAuthenticationDetailsSource"/>
+        </property>
     </bean>
 
     <bean id="basicProcessingFilterEntryPoint" class="org.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
         <property name="realmName">
             <value>Pulse Realm</value>
         </property>
+    </bean>
+
+    <!--
+    We override the default details class to aid in detecting HTTP basic authentication.
+    -->
+    <bean id="basicProcessingAuthenticationDetailsSource" class="org.acegisecurity.ui.AuthenticationDetailsSourceImpl">
+        <property name="clazz" value="com.zutubi.pulse.security.BasicAuthenticationDetails"/>
     </bean>
 
     <!--

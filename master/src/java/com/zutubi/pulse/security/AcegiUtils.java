@@ -45,6 +45,36 @@ public class AcegiUtils
     }
 
     /**
+     * Returns true iff a user is currently logged in and is able to log out.
+     * An example of a user that cannot logout is one authenticated via HTTP
+     * basic authentication: in this case their client is logging them in, so
+     * a logout via pulse will have no effect (CIB-545).
+     *
+     * @return true iff there is a logged in user who can log out
+     */
+    public static boolean canLogout()
+    {
+        if (getLoggedInUser() != null)
+        {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if(authentication != null)
+            {
+                Object details = authentication.getDetails();
+                if(details != null && details instanceof BasicAuthenticationDetails)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /**
      * Tests if the logged in user has been granted the given role.
      *
      * @param role the role to test for
