@@ -19,7 +19,7 @@
     #wwhidden("name=submit")
 
     #wwtextfield("name=name" "label=%{getText('project.name')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
-    #wwtextfield("name=description" "label=%{getText('project.description')}" "size=50" "tabindex=2" "onkeypress=return submitenter(this,event)")
+    #wwtextarea("name=description" "label=%{getText('project.description')}" "rows=4" "cols=50" "tabindex=2")
     #wwtextfield("name=url" "label=%{getText('project.url')}" "size=50" "tabindex=4" "onkeypress=return submitenter(this,event)")
     #wwselect("name=scm" "label=%{getText('scm')}" "list=scms" "required=true" "tabindex=5" "onkeypress=return submitenter(this,event)")
     #wwselect("name=type" "label=%{getText('project.type')}" "list=types" "required=true" "tabindex=6" "onkeypress=return submitenter(this,event)")
