@@ -44,7 +44,7 @@
 
             function copySelectedToParentForm()
             {
-                var tree = YAHOO.widget.TreeView.getTree('browseTree');
+                var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
                 if (tree.selected)
                 {
                     setFormValue(tree.selected.getPath());
@@ -54,7 +54,7 @@
 
             function ensureVisible()
             {
-                var tree = YAHOO.widget.TreeView.getTree('browseTree');
+                var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
                 var s = (tree.selected && tree.selected.getLabelEl() || null);
 
                 if (s)
@@ -93,19 +93,8 @@
                 onResize(event);
 
                 // initialise toolbar items.
-                var goToHome = new ZUTUBI.widget.ToolbarItem('home');
-                goToHome.setTooltip('Go to user home');
-                goToHome.onClick = function()
-                {
-                    YAHOO.widget.TreeView.getTree('browseTree').expandToPath('$!userHome');
-                };
-
-                var goToPulseHome = new ZUTUBI.widget.ToolbarItem('pulsehome');
-                goToPulseHome.setTooltip('Go to pulse home');
-                goToPulseHome.onClick = function()
-                {
-                    YAHOO.widget.TreeView.getTree('browseTree').expandToPath('$!pulseHome');
-                };
+                var goToHome = new ZUTUBI.widget.GoToToolbarItem('home', 'Go to user home', 'browseTree', '$!userHome');
+                var goToPulseHome = new ZUTUBI.widget.GoToToolbarItem('pulsehome', 'Go to pulse home', 'browseTree', '$!pulseHome');
 
                 var createFolder = new ZUTUBI.widget.ToolbarItem('create');
                 createFolder.setTooltip('Create folder');
@@ -120,7 +109,7 @@
                 deleteFolder.setTooltip('Delete folder');
                 deleteFolder.onClick = function()
                 {
-                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
+                    var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
                     var n = tree.selected;
                     if (n)
                     {
@@ -135,7 +124,7 @@
                 var refreshFolder = new ZUTUBI.widget.ToolbarItem('refresh');
                 refreshFolder.onClick = function()
                 {
-                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
+                    var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
                     var selectedNode = tree.selected;
                     if (selectedNode)
                     {
@@ -160,7 +149,7 @@
                 toolbar.draw();
 
                 // construct the directory browser.
-                var tree = new YAHOO.widget.TreeView('browseTree');
+                var tree = new ZUTUBI.widget.TreeView('browseTree');
                 tree.setSeparator('$separator');
 
                 // register event handlers and callbacks.
@@ -222,7 +211,7 @@
                 var ajax = new Ajax.Request(
                     "$base/ajax/ls.action",
                     {
-                        method: 'get',
+                        method: 'post',
                         onComplete: lsResponse(node, onCompleteCallback),
                         onFailure: handleFailure,
                         onException: handleException,
@@ -267,7 +256,7 @@
             function mkdir(name)
             {
                 // grab selected file.
-                var node = YAHOO.widget.TreeView.getTree('browseTree').selected;
+                var node = ZUTUBI.widget.TreeView.getTree('browseTree').selected;
                 if (!node)
                 {
                     // should not be getting here... the mkdir toolbar item should not be
@@ -294,7 +283,7 @@
             {
                 return function(response)
                 {
-                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
+                    var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
 
                     // if response indicates success, refresh the folder response.
 
@@ -324,7 +313,7 @@
             function rmdir()
             {
                 // grab selected file.
-                var node = YAHOO.widget.TreeView.getTree('browseTree').selected;
+                var node = ZUTUBI.widget.TreeView.getTree('browseTree').selected;
 
                 // generate id path.
                 var p = node.getPath();
@@ -346,7 +335,7 @@
                 return function(response)
                 {
                     // check response. if success, remove the node from the tree.
-                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
+                    var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
                     tree.removeNode(node, true);
 
                     // if error, present the error to the user.

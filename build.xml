@@ -10,14 +10,13 @@
         <os family="windows"/>
     </condition>
 
-    <target name="clean">
-        <delete dir="build"/>
-    </target>
+    <target name="clean" depends="clean.all"/>
 
-    <target name="clean.all" depends="clean">
+    <target name="clean.all">
         <!-- trigger a clean for each module. -->
         <foreach target="clean"/>
 
+        <delete dir="build"/>
         <delete dir="data"/>
         <delete dir="master/system"/>
         <delete file="master/etc/admin.token"/>

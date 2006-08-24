@@ -204,6 +204,31 @@ ZUTUBI.widget.ToolbarItem.prototype = {
 };
 
 /**
+ * Constructor for the GoToToolbarItem.
+ *
+ *   id: the id of this toolbar item.
+ *   tooltip: the tooltip displayed when the mouse hovers over this toolbar item.
+ *   treeId: the id of the tree on which the path will be expanded.
+ *   path: the path to be expanded when this toolbar item is clicked.
+ */
+ZUTUBI.widget.GoToToolbarItem = function(id, tooltip, treeId, path)
+{
+    this.initialize(id);
+
+    this.path = path;
+    this.treeId = treeId;
+    this.setTooltip(tooltip);
+};
+
+ZUTUBI.widget.GoToToolbarItem.prototype = new ZUTUBI.widget.ToolbarItem();
+
+ZUTUBI.widget.GoToToolbarItem.prototype.onClick = function()
+{
+    ZUTUBI.widget.TreeView.getTree(this.treeId).expandToPath(this.path);
+};
+
+
+/**
  * A toolbar separator is an inactive component in a toolbar used as a
  * separator between groups of related toolbar items.
  *

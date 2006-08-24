@@ -27,19 +27,19 @@
                 var goUpTree = new ToolbarItem('up');
                 goUpTree.onClick = function()
                 {
-                    YAHOO.widget.TreeView.getTree('browseTree').goUp();
+                    ZUTUBI.widget.TreeView.getTree('browseTree').goUp();
                 };
                 var goToHome = new ToolbarItem('home');
                 goToHome.onClick = function()
                 {
-                    YAHOO.widget.TreeView.getTree('browseTree').expandToPath(['C:\\', 'backup', 'SD0033']);
+                    ZUTUBI.widget.TreeView.getTree('browseTree').expandToPath(['C:\\', 'backup', 'SD0033']);
                 }
                 toolbar.add(goUpTree);
                 toolbar.add(goToHome);
                 toolbar.draw();
 
                 // construct the directory browser.
-                var tree = new YAHOO.widget.TreeView('browseTree');
+                var tree = new ZUTUBI.widget.TreeView('browseTree');
                 var dirOnly = false;
 
                 tree.setDynamicLoad(function(node, onCompleteCallback)

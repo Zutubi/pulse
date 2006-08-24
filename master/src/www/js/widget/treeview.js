@@ -1,19 +1,24 @@
+
+ZUTUBI.widget.TreeView = YAHOO.widget.TreeView;
+
+ZUTUBI.widget.TreeView.prototype = new YAHOO.widget.TreeView();
+
 /**
  * Reference to the currently selected node.
  */
-YAHOO.widget.TreeView.prototype.selected = null;
+ZUTUBI.widget.TreeView.prototype.selected = null;
 
 /**
  * Add an on select callback to the treeview.
  */
-YAHOO.widget.TreeView.prototype.onSelect = function(node)
+ZUTUBI.widget.TreeView.prototype.onSelect = function(node)
 {
 };
 
 /**
  * Handle the selection of a tree node.
  */
-YAHOO.widget.TreeView.prototype.select = function(node)
+ZUTUBI.widget.TreeView.prototype.select = function(node)
 {
     if (this.selected)
     {
@@ -27,22 +32,65 @@ YAHOO.widget.TreeView.prototype.select = function(node)
     }
 };
 
-YAHOO.widget.TreeView.prototype.onActivate = function(node)
+// --- (on activate) ---
+
+/**
+ * Callback triggered when a node is 'activated'... ie: double clicked.
+ *
+ * WARNING: STILL TO BE IMPLEMENTED.
+ */
+ZUTUBI.widget.TreeView.prototype.onActivate = function(node)
 {
 
 };
 
-YAHOO.widget.TreeView.prototype.separator = '/';
-YAHOO.widget.TreeView.prototype.setSeparator = function(sep)
+// --- ( path separator ) ---
+
+/**
+ * The separator character is used when node paths are generated.
+ */
+ZUTUBI.widget.TreeView.prototype.separator = '/';
+
+/**
+ * Specify the path separator character.
+ */
+ZUTUBI.widget.TreeView.prototype.setSeparator = function(sep)
 {
     this.separator = sep;
 };
 
 /**
+ * Implement the TreeView onExpand callback handler.
+ *
+ */
+ZUTUBI.widget.TreeView.prototype.onExpand = function(node)
+{
+    // the onexpand callback is triggered before the this.expanded is set to true
+    if (node.getFileEl() && node.data)
+    {
+        node.getFileEl().className = node.data.type + "_o";
+    }
+}
+
+/**
+ * Implement the TreeView onCollapse callback handler.
+ *
+ */
+ZUTUBI.widget.TreeView.prototype.onCollapse = function(node)
+{
+    if (node.getFileEl() && node.data)
+    {
+        node.getFileEl().className = node.data.type;
+    }
+}
+
+// --- ( utility methods. ) ---
+
+/**
  * Select the currently selected nodes parent. If there is no selected node
  * or the node does not have a parent, no change is made.
  */
-YAHOO.widget.TreeView.prototype.goUp = function()
+ZUTUBI.widget.TreeView.prototype.goUp = function()
 {
     // is there a selected node?
     if (this.selected)
@@ -66,7 +114,7 @@ YAHOO.widget.TreeView.prototype.goUp = function()
  * code 1: expansion to the requested path has failed, the path is invalid.
  * code 2: expansion to the request path is in progress. One of the nodes in the path is being loaded.
  */
-YAHOO.widget.TreeView.prototype.expandTo = function(requestPath)
+ZUTUBI.widget.TreeView.prototype.expandTo = function(requestPath)
 {
     var node = this.getRoot();
 
@@ -124,7 +172,7 @@ YAHOO.widget.TreeView.prototype.expandTo = function(requestPath)
     return 0;
 };
 
-YAHOO.widget.TreeView.prototype.expandToPath = function(requestPath)
+ZUTUBI.widget.TreeView.prototype.expandToPath = function(requestPath)
 {
     if (!requestPath)
     {
@@ -154,9 +202,10 @@ YAHOO.widget.TreeView.prototype.expandToPath = function(requestPath)
 };
 
 /**
- * Construct a human readable path that identifies the specified node.
+ * Construct the human readable path that identifies the specified node.
+ *
  */
-YAHOO.widget.TreeView.prototype.getDisplayPath = function(node)
+ZUTUBI.widget.TreeView.prototype.getDisplayPath = function(node)
 {
     return this._getPath(node, function(data)
     {
@@ -164,7 +213,11 @@ YAHOO.widget.TreeView.prototype.getDisplayPath = function(node)
     });
 }
 
-YAHOO.widget.TreeView.prototype.getIdPath = function(node)
+/**
+ * Construct the id path that uniquely identifies the specified node.
+ *
+ */
+ZUTUBI.widget.TreeView.prototype.getIdPath = function(node)
 {
     return this._getPath(node, function(data)
     {
@@ -172,13 +225,19 @@ YAHOO.widget.TreeView.prototype.getIdPath = function(node)
     });
 }
 
-YAHOO.widget.TreeView.prototype._getPath = function(node, getValue)
+/**
+ * Construct a path for the specified node, using the getValue function to define the data
+ * used to construct the path components.
+ */
+ZUTUBI.widget.TreeView.prototype._getPath = function(node, getValue)
 {
     var sep = "";
     var path = "";
 
     while (node)
     {
+        // only traverse nodes that carry the ZUTUBI data packets. This should be all of the
+        // nodes, except maybe the root node itself.
         if (node.data)
         {
             var name = getValue(node.data);
@@ -197,34 +256,28 @@ YAHOO.widget.TreeView.prototype._getPath = function(node, getValue)
     return path;
 }
 
+// ---( ROOT NODE )---
 
-YAHOO.widget.RootNode.prototype.isRoot = function()
+ZUTUBI.widget.RootNode = YAHOO.widget.RootNode;
+
+/**
+ * The root node is a virtual node that is not displayed in the UI.
+ *
+ */
+ZUTUBI.widget.RootNode.prototype = new YAHOO.widget.RootNode();
+
+
+ZUTUBI.widget.RootNode.prototype.isRoot = function()
 {
     return true;
 };
 
-YAHOO.widget.RootNode.prototype.getPath = function()
+ZUTUBI.widget.RootNode.prototype.getPath = function()
 {
     return "";
 };
 
 //---( FILE NODE )---
-
-YAHOO.widget.TreeView.prototype.onExpand = function(node)
-{
-    // the onexpand callback is triggered before the this.expanded is set to true
-    if (node.getFileEl())
-    {
-        node.getFileEl().className = node.data.type + "_o";
-    }
-}
-YAHOO.widget.TreeView.prototype.onCollapse = function(node)
-{
-    if (node.getFileEl())
-    {
-        node.getFileEl().className = node.data.type;
-    }
-}
 
 /**
  * Constructor.
@@ -253,6 +306,11 @@ ZUTUBI.widget.FileNode.prototype.getName = function()
 ZUTUBI.widget.FileNode.prototype.getPath = function()
 {
     return this.tree.getDisplayPath(this);
+};
+
+ZUTUBI.widget.FileNode.prototype.getIdPath = function()
+{
+    return this.tree.getIdPath(this);
 };
 
 /**

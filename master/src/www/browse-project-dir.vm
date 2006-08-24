@@ -25,7 +25,7 @@
                 return;
             }
 
-            var tree = new YAHOO.widget.TreeView('browseTree');
+            var tree = new ZUTUBI.widget.TreeView('browseTree');
             tree.setSeparator('$separator');
             tree.setDynamicLoad(function(node, onCompleteCallback)
             {
