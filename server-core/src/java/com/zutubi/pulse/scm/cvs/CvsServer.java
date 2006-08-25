@@ -1,13 +1,11 @@
 package com.zutubi.pulse.scm.cvs;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
-import com.zutubi.pulse.model.Cvs;
 import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.scm.cvs.client.CvsClient;
 import com.zutubi.pulse.util.Constants;
@@ -47,10 +45,11 @@ public class CvsServer extends CachingSCMServer
         cvs.setPassword(password);
     }
 
-    public CvsServer(Cvs cvs)
+    public CvsServer(String root, String module, String password, String branch, List<String> filteredPaths, File tempDir)
     {
-        this(cvs.getRoot(), cvs.getModule(), cvs.getPassword(), cvs.getBranch());
-        setExcludedPaths(cvs.getFilteredPaths());
+        this(root, module, password, branch);
+        setExcludedPaths(filteredPaths);
+        setTemporarySpace(tempDir);
     }
 
     public void setExcludedPaths(List<String> excluded)
@@ -369,18 +368,6 @@ public class CvsServer extends CachingSCMServer
     public void setTemporarySpace(File file)
     {
         this.tmpSpace = file;
-    }
-
-    /**
-     * The configuration manager is required to provide access to the system temporary root directory.
-     *
-     * @param configurationManager
-     *
-     * @see CvsServer#setTemporarySpace(java.io.File)
-     */
-    public void setConfigurationManager(ConfigurationManager configurationManager)
-    {
-        setTemporarySpace(configurationManager.getSystemPaths().getTmpRoot());
     }
 
     public void populate(SCMFileCache.CacheItem item) throws SCMException
