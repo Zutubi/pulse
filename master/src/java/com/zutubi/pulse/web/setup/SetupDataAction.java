@@ -7,6 +7,7 @@ import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * <class-comment/>
@@ -52,7 +53,31 @@ public class SetupDataAction extends SetupActionSupport
         File data = new File(this.data);
         if (!data.exists() && !data.mkdirs())
         {
-            addFieldError("data", getText("Failed to create the specified data directory."));
+            addFieldError("data", "Failed to create the specified data directory.");
+        }
+
+        // ensure that we have write access to the data directory.
+        checkDirectoryIsWritable(data);
+    }
+
+    private void checkDirectoryIsWritable(File data)
+    {
+        File tmpFile = null;
+        try
+        {
+            tmpFile = File.createTempFile("test", "tmp", data);
+        }
+        catch (IOException e)
+        {
+            addFieldError("data", "Failed to write to the selected data directory. Please ensure that pulse has " +
+                    "permission to write to the specified data directory.");
+        }
+        finally
+        {
+            if (tmpFile != null && tmpFile.isFile())
+            {
+                tmpFile.delete();
+            }
         }
     }
 
