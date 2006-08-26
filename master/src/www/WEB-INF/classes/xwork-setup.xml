@@ -76,6 +76,7 @@
             <result name="wait" type="velocity">status.vm</result>
             <result name="cancel" type="redirect">/setup/setup!input.action</result>
             <result name="success" type="velocity">complete.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="continue" class="com.zutubi.pulse.web.upgrade.PostUpgradeAction">
