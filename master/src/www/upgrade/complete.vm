@@ -34,7 +34,15 @@
             <td class="columns" width="90%">
                 <table id="upgrade.task.details" class="fill-content">
                     #foreach($task in $monitor.taskProgress)
-                    #dynamicRow($task.name $task.status)
+                        #dynamicRow($task.name $task.status)
+                        #if($task.hasFailed())
+                        <tr>
+                            <td colspan="2"><b>Cause of failure:</b> $task.message</td>
+                        </tr>
+                </table>
+
+                <table class="fill-content">
+                        #end
                     #end
                 </table>
             </td>

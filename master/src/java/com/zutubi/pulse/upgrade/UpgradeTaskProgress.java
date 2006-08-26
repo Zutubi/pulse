@@ -15,12 +15,28 @@ public class UpgradeTaskProgress
     private String name;
     private String desc;
     private String status;
+    private String message;
 
     public UpgradeTaskProgress(UpgradeTask task)
     {
         this.name = task.getName();
         this.desc = task.getDescription();
         this.status = PENDING;
+    }
+
+    public boolean hasFailed()
+    {
+        return this.status.equals(FAILED);
+    }
+
+    public String getMessage()
+    {
+        return message;
+    }
+
+    public void setMessage(String message)
+    {
+        this.message = message;
     }
 
     protected void setStatus(String str)
