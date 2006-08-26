@@ -3,12 +3,11 @@ package com.zutubi.pulse.filesystem.local;
 import com.zutubi.pulse.filesystem.FileNotFoundException;
 import com.zutubi.pulse.filesystem.FileSystem;
 import com.zutubi.pulse.filesystem.FileSystemException;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLConnection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -89,25 +88,7 @@ public class LocalFileSystem implements FileSystem
             throw new FileNotFoundException();
         }
 
-        String type = URLConnection.guessContentTypeFromName(file.getName());
-        if (type == null)
-        {
-            try
-            {
-                type = URLConnection.guessContentTypeFromStream(new FileInputStream(file));
-            }
-            catch (IOException e)
-            {
-                // Oh well
-            }
-
-            if (type == null)
-            {
-                type = "text/plain";
-            }
-        }
-
-        return type;
+        return FileSystemUtils.getMimeType(file);
     }
 
     public String getMimeType(com.zutubi.pulse.filesystem.File file) throws FileNotFoundException
