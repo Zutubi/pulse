@@ -51,7 +51,7 @@ public class DefaultSubscriptionManager implements SubscriptionManager
             if(projects.size() == 0)
             {
                 // This subscription is no longer useful.
-                subscriptionDao.delete(s);
+                delete(s);
             }
         }
     }
