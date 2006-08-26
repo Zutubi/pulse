@@ -101,7 +101,16 @@
                 createFolder.onClick = function()
                 {
                     // open popup requesting the new folder name.
-                    window.open('$base/popups/mkdir.action', 'create_folder', 'width=400, height=150, resizable=yes', false);
+                    var width = 400;
+                    var height = 150;
+                    x = (640 - width)/2, y = (480 - height)/2;
+
+                    if (screen) {
+                        y = (screen.availHeight - height)/2;
+                        x = (screen.availWidth - width)/2;
+                    }
+
+                    window.open('$base/popups/mkdir.action', 'create_folder', 'width='+width+', height='+height+',screenX='+x+',screenY='+y+',top='+y+',left='+x+', resizable=yes', false);
                     return false;
                 };
 
