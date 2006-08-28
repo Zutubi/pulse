@@ -86,10 +86,20 @@ public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
             }
 
             // run the schema update.
-            new SchemaUpdate(config, props).execute(true, true);
+            SchemaUpdate schemaUpdate = new SchemaUpdate(config, props);
+            schemaUpdate.execute(true, true);
 
-            //TODO: Somehow we need to monitor the SchemaUpdate to check for failures. Currently, it just
-            //TODO: swallows any exceptions :|
+            List<Exception> exceptions = schemaUpdate.getExceptions();
+            for (Exception e : exceptions)
+            {
+                getErrors().add(e.getClass().getName() + ": Cause: " + e.getMessage());
+            }
+/*
+            Dialect dialect = Dialect.getDialect(props);
+            Connection connection = dataSource.getConnection();
+            DatabaseMetadata meta = new DatabaseMetadata(connection, dialect);
+            String[] createSQL = config.generateSchemaUpdateScript(dialect, meta);
+*/
         }
         catch (IOException e)
         {
