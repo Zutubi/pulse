@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import java.net.URLConnection;
 
 /**
  * Miscellaneous utilities for manipulating the file system.
@@ -659,5 +660,27 @@ public class FileSystemUtils
         }
 
         return false;
+    }
+
+    public static String getMimeType(File file)
+    {
+        String type = URLConnection.guessContentTypeFromName(file.getName());
+        if (type == null)
+        {
+            try
+            {
+                type = URLConnection.guessContentTypeFromStream(new FileInputStream(file));
+            }
+            catch (IOException e)
+            {
+                // Oh well
+            }
+
+            if (type == null)
+            {
+                type = "text/plain";
+            }
+        }
+        return type;
     }
 }

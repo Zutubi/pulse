@@ -202,10 +202,12 @@
             <result name="success" type="json">/ajax/ls.xml</result>
         </action>
 
-        <action name="cat" class="com.zutubi.pulse.web.fs.CatAction">
+        <action name="cat" class="com.zutubi.pulse.web.fs.StreamWorkingCopyFileAction">
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
+                <param name="contentDisposition">filename="${filename}"</param>
             </result>
+            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="browseProjectScm" class="com.zutubi.pulse.web.project.BrowseProjectScmAction">

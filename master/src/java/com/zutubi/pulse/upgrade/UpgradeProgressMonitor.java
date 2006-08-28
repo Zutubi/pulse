@@ -83,7 +83,14 @@ public class UpgradeProgressMonitor
      */
     protected void failed(UpgradeTask task)
     {
-        getTaskProgress(task).setStatus(UpgradeTaskProgress.FAILED);
+        UpgradeTaskProgress taskProgress = getTaskProgress(task);
+        taskProgress.setStatus(UpgradeTaskProgress.FAILED);
+
+        for (String msg : task.getErrors())
+        {
+            taskProgress.setMessage(msg);
+        }
+
         tasksFinishedCount++;
         error = true;
     }
@@ -97,6 +104,11 @@ public class UpgradeProgressMonitor
     {
         getTaskProgress(task).setStatus(UpgradeTaskProgress.ABORTED);
         tasksFinishedCount++;
+    }
+
+    public boolean isStarted()
+    {
+        return startTimestamp != 0;
     }
 
     public boolean isSuccessful()

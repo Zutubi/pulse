@@ -5,8 +5,7 @@
 <h1>Upgrade Preview</h1>
 
 <p>
-    The data directory you have selected contains an existing installation that differs from the version of the
-    new installation.
+    The data directory being used by this installation of pulse contains an existing data directory from an older installation.
     <table class="columns" width="40%">
         <tr>
             <td class="columns" width="45%">
@@ -32,7 +31,7 @@
 
 #if($upgradePreview.size() > 0)
 <p>
-    To use this directory we will need to execute the following upgrade tasks.
+    Before pulse can use this data directory, it will need to run the following upgrade tasks.
     <table class="columns" width="40%">
         <tr>
             <td class="columns" width="90%">
@@ -46,11 +45,12 @@
     </table>
 </p>
 #end
-<p>
-    Do you wish to continue?
+<p style="width:50%">
+    Please be aware that pulse can not continue without running these upgrade tasks.  If you do not wish to continue with
+    this upgrade, shutdown this installation of pulse.  Otherwise, please click continue to run the upgrade.
 </p>
 #wwform("action=execute.action" "method=post")
-#continueCancel(1)
+#continue(1)
 #end
 
 

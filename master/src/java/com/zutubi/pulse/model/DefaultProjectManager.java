@@ -100,29 +100,6 @@ public class DefaultProjectManager implements ProjectManager
     @Secured({"ACL_PROJECT_WRITE"})
     public void checkWrite(Project project)
     {
-//        boolean accessAllowed = false;
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if(authentication != null)
-//        {
-//            AclEntry[] acls = aclManager.getAcls(project, authentication);
-//            for(AclEntry acl: acls)
-//            {
-//                if(acl instanceof BasicAclEntry)
-//                {
-//                    BasicAclEntry basic = (BasicAclEntry) acl;
-//                    if(basic.isPermitted(SimpleAclEntry.WRITE))
-//                    {
-//                        accessAllowed = true;
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//
-//        if(!accessAllowed)
-//        {
-//            throw new AccessDeniedException("Access denied");
-//        }
     }
 
     public Project cloneProject(Project project, String name, String description)

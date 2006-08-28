@@ -31,11 +31,13 @@
             {
                 ls(node, onCompleteCallback, false);
             }, 1);
+
             tree.onActivate = function(node)
             {
                 if (!node.isContainer())
                 {
                     // display the contents of that node..
+                    document.location = node.href;
                 }
             };
 
@@ -82,15 +84,16 @@
                         "container":obj.container
                     };
                     var node = new ZUTUBI.widget.FileNode(data, parentNode, false);
-                    //node.href = "/cat.action?path=" + node.getPath();
+                    if (!node.isContainer())
+                    {
+                        node.href = "/cat.action?buildId=$buildResult.id&path=" + node.getIdPath();
+                    }
 
                     // override the default onclick behaviour to trigger the download.
-/*
                     node.onLabelClick = function(me)
                     {
                         return (!this.isContainer());
                     };
-*/
 
                 });
                 if (callback)
@@ -115,9 +118,17 @@
 <body>
     #buildTabs($buildResult "working-dir")
 
+<h3>#wwtext("name=working.copy")</h3>
+<p>
+    The tree below will allow you to navigate through the working directory for this build.  To download a file, simply
+    click on in.
+</p>
+
 #if($buildResult.completed())
     <div id="loading" style="display:none;"><img src="$base/images/treeview/loading.gif" alt="loading..."/></div>
-    <div id="browseTree"></div>
+    <div id="view">
+        <div id="browseTree"></div>
+    </div>
 #else
     <p>
         #wwtext("name=working.dir.pending")

@@ -14,7 +14,16 @@ public class UpgradeExecuteAction extends UpgradeActionSupport
 
     public String execute()
     {
-        upgradeManager.executeUpgrade();
+        // check if the upgrade is in progress... if a user refreshes the browser on the
+        // execute action, we do not want the upgrade starting again.
+        UpgradeProgressMonitor progress = getMonitor();
+
+        if (!progress.isStarted())
+        {
+            upgradeManager.executeUpgrade();
+        }
+
+        // go to the progress monitor screen.
         return SUCCESS;
     }
 }

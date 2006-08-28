@@ -244,7 +244,7 @@ public class DefaultUpgradeManager implements UpgradeManager
                     if (task.hasFailed())
                     {
                         // use an exception to break out to the task failure handling.
-                        throw new UpgradeException();
+                        throw new UpgradeException("Task "+task.getName()+" has been marked as failed.");
                     }
                     monitor.complete(task);
                     // record task completion, to ensure that it is not run a second time.
