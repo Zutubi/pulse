@@ -97,4 +97,17 @@ public class HibernateUserDao extends HibernateEntityDao<User> implements UserDa
             }
         });
     }
+
+    public List<User> findByHiddenProject(final Project project)
+    {
+        return (List<User>) getHibernateTemplate().execute(new HibernateCallback(){
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from User user where :project in elements(user.hiddenProjects)");
+                queryObject.setEntity("project", project);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.list();
+            }
+        });
+    }
 }

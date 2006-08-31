@@ -10,6 +10,8 @@ import com.zutubi.pulse.util.logging.Logger;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.LinkedList;
 
@@ -76,4 +78,29 @@ public abstract class DatabaseUpgradeTask implements UpgradeTask, DataSourceAwar
     }
 
     public abstract void execute(UpgradeContext context, Connection con) throws SQLException;
+
+    protected List<Long> getAllProjects(Connection con) throws SQLException
+    {
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        List<Long> projects = new LinkedList<Long>();
+
+        try
+        {
+            stmt = con.prepareCall("SELECT id FROM project");
+            rs = stmt.executeQuery();
+            while(rs.next())
+            {
+                projects.add(rs.getLong("id"));
+            }
+
+            return projects;
+        }
+        finally
+        {
+            JDBCUtils.close(rs);
+            JDBCUtils.close(stmt);
+        }
+    }
 }

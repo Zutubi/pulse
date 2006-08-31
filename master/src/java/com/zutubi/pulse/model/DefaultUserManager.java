@@ -155,6 +155,16 @@ public class DefaultUserManager implements UserManager
         return userDao.findByNotInGroup(group);
     }
 
+    public void removeReferencesToProject(Project project)
+    {
+        List<User> users = userDao.findByHiddenProject(project);
+        for(User u: users)
+        {
+            u.getHiddenProjects().remove(project);
+            userDao.save(u);
+        }
+    }
+
     public int getUserCount()
     {
         return userDao.count();

@@ -42,6 +42,7 @@
                 <ref local="schemaUpgrade0101006003"/>
                 <ref local="groups"/>
                 <ref local="schemaUpgrade0101007001"/>
+                <ref local="orphanedTriggers"/>
             </list>
         </property>
     </bean>
@@ -221,5 +222,9 @@
                 <value>com/zutubi/pulse/upgrade/schema/build_0101007001/User.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="orphanedTriggers" class="com.zutubi.pulse.upgrade.tasks.OrphanedTriggerUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="101008001"/>
     </bean>
 </beans>

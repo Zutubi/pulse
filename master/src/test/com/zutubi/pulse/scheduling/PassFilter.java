@@ -10,4 +10,9 @@ public class PassFilter implements EventTriggerFilter
     {
         return true;
     }
+
+    public boolean dependsOnProject(Trigger trigger, long projectId)
+    {
+        return false;
+    }
 }

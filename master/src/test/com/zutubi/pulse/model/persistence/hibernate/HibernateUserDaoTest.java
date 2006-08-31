@@ -171,7 +171,27 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         users = userDao.findByNotInGroup(g3);
         assertEquals(0, users.size());
     }
-    
+
+    public void testFindByHiddenProject()
+    {
+        Set<Project> projects = new HashSet<Project>();
+        Project p1 = new Project("1", "project 1");
+        Project p2 = new Project("2", "project 2");
+        projectDao.save(p1);
+        projectDao.save(p2);
+        projects.add(p1);
+
+        User user = new User();
+        user.setHiddenProjects(projects);
+        userDao.save(user);
+        commitAndRefreshTransaction();
+
+        List<User> users = userDao.findByHiddenProject(p1);
+        assertEquals(1, users.size());
+        users = userDao.findByHiddenProject(p2);
+        assertEquals(0, users.size());
+    }
+
 /*
     public void testGrantedAuthorities()
     {
