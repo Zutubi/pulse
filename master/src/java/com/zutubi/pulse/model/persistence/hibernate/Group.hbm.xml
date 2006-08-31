@@ -25,13 +25,18 @@
     </class>
 
     <query name="findGroupByName"><![CDATA[
-        from Group group
-        where group.name = :name
+        from Group g
+        where g.name = :name
     ]]></query>
 
     <query name="findGroupByAdminAllProjects"><![CDATA[
-        from Group group
-        where group.adminAllProjects = true
+        from Group g
+        where g.adminAllProjects = true
+    ]]></query>
+
+    <query name="findGroupByMember"><![CDATA[
+        from Group g
+        where :member in elements(g.users)
     ]]></query>
 
 </hibernate-mapping>

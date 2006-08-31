@@ -1,11 +1,11 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.model.persistence.ContactPointDao;
-import com.zutubi.pulse.model.persistence.UserDao;
-import com.zutubi.pulse.model.persistence.GroupDao;
-import com.zutubi.pulse.web.DefaultAction;
-import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.license.LicenseManager;
+import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
+import com.zutubi.pulse.model.persistence.ContactPointDao;
+import com.zutubi.pulse.model.persistence.GroupDao;
+import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.web.DefaultAction;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
@@ -97,6 +97,12 @@ public class DefaultUserManager implements UserManager
 
     public void delete(User user)
     {
+        List<Group> groups = groupDao.findByMember(user);
+        for(Group group: groups)
+        {
+            group.getUsers().remove(user);
+            groupDao.save(group);
+        }
         userDao.delete(user);
 
         licenseManager.refreshAuthorisations();
