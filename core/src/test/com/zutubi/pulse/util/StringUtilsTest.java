@@ -229,7 +229,21 @@ public class StringUtilsTest extends PulseTestCase
             assertEquals("Unexpected end of input looking for end of quote (\")", e.getMessage());
         }
     }
-    
+
+    public void testStringEquals()
+    {
+        assertTrue(StringUtils.equals(null, null));
+        assertTrue(StringUtils.equals("", ""));
+        assertTrue(StringUtils.equals("a", "a"));
+        assertTrue(StringUtils.equals("abcde", "abcde"));
+
+        assertFalse(StringUtils.equals("", null));
+        assertFalse(StringUtils.equals("vvv", null));
+        assertFalse(StringUtils.equals(null, ""));
+        assertFalse(StringUtils.equals(null, "aa"));
+        assertFalse(StringUtils.equals("aaa", "bbb"));
+    }
+
     private void splitHelper(String s, String... expected)
     {
         List<String> expectedParts = Arrays.asList(expected);

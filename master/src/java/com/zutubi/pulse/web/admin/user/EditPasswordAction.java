@@ -2,6 +2,7 @@ package com.zutubi.pulse.web.admin.user;
 
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.web.user.UserActionSupport;
 
 /**
@@ -56,7 +57,7 @@ public class EditPasswordAction extends UserActionSupport
             return;
         }
 
-        if (!password.equals(confirm))
+        if (!StringUtils.equals(password, confirm))
         {
             addFieldError("confirm", getText("password.confirm.mismatch"));
         }

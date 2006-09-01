@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.user;
 
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.util.StringUtils;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 
 /**
@@ -55,15 +56,15 @@ public class EditPasswordAction extends UserActionSupport
             return;
         }
 
+        // ensure that the new password and the confirmation match
+        if (!StringUtils.equals(password, confirm))
+        {
+            addFieldError("confirm", getText("password.confirm.mismatch"));
+        }
+
         if (!passwordEncoder.isPasswordValid(user.getPassword(), current, null))
         {
             addFieldError("current", getText("password.current.mismatch"));
-        }
-
-        // ensure that the new password and the confirmation match
-        if (!password.equals(confirm))
-        {
-            addFieldError("confirm", getText("password.confirm.mismatch"));
         }
     }
 
