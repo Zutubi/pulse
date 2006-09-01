@@ -1,9 +1,8 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.BuildSpecification;
 
 import java.io.File;
 
@@ -14,6 +13,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
     private long buildId;
     private BuildResult buildResult;
     private String separator;
+    private BuildSpecification buildSpecification;
 
     public long getBuildId()
     {
@@ -28,6 +28,11 @@ public class BrowseProjectDirAction extends ProjectActionSupport
     public BuildResult getBuildResult()
     {
         return buildResult;
+    }
+
+    public BuildSpecification getBuildSpecification()
+    {
+        return buildSpecification;
     }
 
     public String getSeparator()
@@ -59,6 +64,13 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         // this value is going to be written to the vm template and evaluated by javascript, so
         // we need to ensure that we escape the escape char.
         separator = File.separator.replace("\\", "\\\\");
+
+        // provide some useful feedback on why the working directory is not available.
+
+        // a) the working copy is not being retained.
+        buildSpecification = getProject().getBuildSpecification(buildResult.getBuildSpecification());
+        // b) else, the working directory has been cleaned up by a the projects "cleanup rules" or
+        //    it has been manually deleted or the working directory capture has failed.
 
         return SUCCESS;
     }

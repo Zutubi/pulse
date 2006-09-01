@@ -2,13 +2,13 @@ package com.zutubi.pulse.web.fs;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.FileInputStream;
+import java.io.InputStream;
 
 /**
  * <class-comment/>
@@ -39,6 +39,11 @@ public class StreamWorkingCopyFileAction extends AbstractProjectWorkingCopyActio
     public String execute() throws Exception
     {
         BuildResult buildResult = buildManager.getBuildResult(getBuildId());
+        // no point in displaying any details if the working directory is not available.
+        if (!buildResult.getHasWorkDir())
+        {
+            return ERROR;
+        }
 
         // if build is pending, then there is nothing that we can display.
         Project project = buildResult.getProject();
