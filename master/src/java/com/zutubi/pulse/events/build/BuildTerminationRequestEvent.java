@@ -19,4 +19,9 @@ public class BuildTerminationRequestEvent extends Event
     {
         return timeout;
     }
+
+    public String toString()
+    {
+        return "Build Termination Request Event";
+    }    
 }

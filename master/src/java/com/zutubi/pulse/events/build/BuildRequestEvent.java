@@ -55,4 +55,18 @@ public class BuildRequestEvent extends Event
     {
         return revision;
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("Build Request Event");
+        if (getProject() != null)
+        {
+            buff.append(": ").append(getProject().getName());
+        }
+        if (getReason() != null)
+        {
+            buff.append(": ").append(getReason().getSummary());
+        }
+        return buff.toString();
+    }
 }

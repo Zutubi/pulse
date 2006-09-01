@@ -16,4 +16,11 @@ public class RecipeErrorEvent extends RecipeEvent
     {
         return errorMessage;
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("Recipe Error Event");
+        buff.append(": ").append(getRecipeId()).append(": ").append(errorMessage);
+        return buff.toString();
+    }    
 }

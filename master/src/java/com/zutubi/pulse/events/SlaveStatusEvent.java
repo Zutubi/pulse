@@ -19,4 +19,14 @@ public class SlaveStatusEvent extends SlaveEvent
     {
         return oldStatus;
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("Agent Status Event");
+        if (getAgent() != null)
+        {
+            buff.append(": ").append(getAgent().getName()).append(", ").append(oldStatus);
+        }
+        return buff.toString();
+    }    
 }

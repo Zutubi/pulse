@@ -12,4 +12,9 @@ public abstract class SystemEvent extends Event<Object>
     {
         super(source);
     }
+
+    public String toString()
+    {
+        return "System Event";
+    }
 }

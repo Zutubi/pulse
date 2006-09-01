@@ -10,4 +10,14 @@ public class SlaveAgentRemovedEvent extends SlaveEvent
     {
         super(source, agent);
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("Agent Removed Event");
+        if (getAgent() != null)
+        {
+            buff.append(": ").append(getAgent().getName());
+        }
+        return buff.toString();
+    }
 }

@@ -18,4 +18,11 @@ public class CommandOutputEvent extends RecipeEvent
     {
         return data;
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("Command Output Event: ");
+        buff.append(getRecipeId());
+        return buff.toString();
+    }
 }
