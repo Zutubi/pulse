@@ -21,7 +21,7 @@ public class BuildResultExpressions
         return Expression.eq("buildSpecification", buildSpec);
     }
 
-    public static Criterion statesIn(ResultState[] states)
+    public static Criterion statesIn(ResultState... states)
     {
         // convert to string.
         String[] stateNames = new String[states.length];
@@ -30,6 +30,11 @@ public class BuildResultExpressions
             stateNames[i] = states[i].toString();
         }
         return Expression.in("stateName", stateNames);
+    }
+
+    public static Criterion buildResultCompleted()
+    {
+        return statesIn(ResultState.SUCCESS, ResultState.FAILURE, ResultState.ERROR);
     }
 
     public static Criterion startsAfter(long timestamp)
