@@ -156,12 +156,12 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTestCase
         EditPasswordForm form = new EditPasswordForm(tester);
         form.assertFormElements("", "");
 
-        // check that each field is required.
+        // neither field is required. The only requirement is that both fields match.
         form.saveFormElements("a", "");
-        assertTextPresent("required");
+        assertTextPresent("does not match");
 
         form.saveFormElements("", "b");
-        assertTextPresent("required");
+        assertTextPresent("does not match");
 
         // check that the new password and confirm password are correctly checked.
         form.saveFormElements("a", "b");
