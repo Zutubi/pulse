@@ -10,4 +10,9 @@ public class LicenseExpiredEvent extends LicenseEvent
     {
         super(source);
     }
+
+    public String toString()
+    {
+        return "License Expired Event";
+    }    
 }

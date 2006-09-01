@@ -11,4 +11,14 @@ public class BuildCompletedEvent extends BuildEvent
     {
         super(source, result);
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("Build Completed Event");
+        if (getResult() != null)
+        {
+            buff.append(": ").append(getResult().getId());
+        }
+        return buff.toString();
+    }    
 }

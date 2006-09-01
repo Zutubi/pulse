@@ -18,4 +18,9 @@ public class SlaveEvent extends Event
     {
         return agent;
     }
+
+    public String toString()
+    {
+        return "Agent Event";
+    }    
 }

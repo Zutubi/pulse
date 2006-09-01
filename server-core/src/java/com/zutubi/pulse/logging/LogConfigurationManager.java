@@ -47,7 +47,15 @@ public class LogConfigurationManager
         {
             public void handleEvent(Event evt)
             {
-                evtLogger.info(evt.toString());
+                try
+                {
+                    evtLogger.info(evt.toString());
+                }
+                catch (Throwable t)
+                {
+                    // noop.
+                    evtLogger.info(evt.getClass().getName());
+                }
             }
         });
     }

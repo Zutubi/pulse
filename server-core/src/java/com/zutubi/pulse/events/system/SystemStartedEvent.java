@@ -11,4 +11,9 @@ public class SystemStartedEvent extends SystemEvent
     {
         super(source);
     }
+
+    public String toString()
+    {
+        return "System Started Event";
+    }
 }

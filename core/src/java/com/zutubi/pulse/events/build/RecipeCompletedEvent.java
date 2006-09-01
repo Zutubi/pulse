@@ -25,4 +25,11 @@ public class RecipeCompletedEvent extends RecipeEvent
     {
         return result;
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("Recipe Completed Event");
+        buff.append(": ").append(getRecipeId());
+        return buff.toString();
+    }    
 }

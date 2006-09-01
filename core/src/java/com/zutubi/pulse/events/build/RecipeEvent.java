@@ -18,4 +18,11 @@ public class RecipeEvent extends Event<Object>
     {
         return recipeId;
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("Recipe Event");
+        buff.append(": ").append(getRecipeId());
+        return buff.toString();
+    }    
 }

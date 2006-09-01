@@ -34,4 +34,15 @@ public class RecipeDispatchedEvent extends RecipeEvent
     {
         return agent;
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("Build Recipe Dispatched Event");
+        buff.append(": ").append(getRecipeId());
+        if (getAgent() != null)
+        {
+            buff.append(": ").append(getAgent().getName());
+        }
+        return buff.toString();
+    }    
 }
