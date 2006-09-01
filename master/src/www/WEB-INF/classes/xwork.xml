@@ -200,6 +200,7 @@
 
         <action name="lsProjDir" class="com.zutubi.pulse.web.fs.ListProjectDirectoryAction">
             <result name="success" type="json">/ajax/ls.xml</result>
+            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="cat" class="com.zutubi.pulse.web.fs.StreamWorkingCopyFileAction">

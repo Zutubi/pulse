@@ -32,6 +32,12 @@ public class ListProjectDirectoryAction extends AbstractProjectWorkingCopyAction
     {
         BuildResult buildResult = buildManager.getBuildResult(getBuildId());
 
+        // no point in displaying any details if the working directory is not available.
+        if (!buildResult.getHasWorkDir())
+        {
+            return ERROR;
+        }
+
         // if build is pending, then there is nothing that we can display.
         Project project = buildResult.getProject();
         projectManager.checkWrite(project);
