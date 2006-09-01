@@ -17,8 +17,6 @@ import java.io.IOException;
  */
 public class RssAcceptanceTest extends BaseAcceptanceTestCase
 {
-    private String projectName;
-
     public RssAcceptanceTest()
     {
     }
@@ -34,13 +32,12 @@ public class RssAcceptanceTest extends BaseAcceptanceTestCase
 
         loginAsAdmin();
 
-        projectName = createTestProject();
+        // ensure that the rss feed is enabled.
+        enableRss();
     }
 
     protected void tearDown() throws Exception
     {
-        // setup code here..
-        projectName = null;
 
         super.tearDown();
     }
@@ -59,19 +56,27 @@ public class RssAcceptanceTest extends BaseAcceptanceTestCase
 
         String projectName = "project " + RandomUtils.randomString(5);
         submitProjectBasicsForm(projectName, "test project description", "http://test.project.com", "cvs", "versioned");
-        submitCvsSetupForm(":pserver:tester@test.project.com:/cvsroot", "module", "", "");
+        submitCvsSetupForm(":pserver:cvstester@cinnamonbob.com:/cvsroot", "project", "cvs", "");
         submitVersionedSetupForm("pulse.xml");
         assertTablePresent("project.basics");
         return projectName;
     }
 
-    public void testRssFeedGenerationSuccessful() throws IOException, FeedException
+    public void testProjectRssFeedGenerationSuccessful() throws IOException, FeedException
     {
-        // ensure that the rss feed is enabled.
-        enableRss();
+        String projectName = createTestProject();
 
         // directly request the build feed for this project.
         beginAt("rss.action?projectName=" + projectName);
+
+        SyndFeed feed = readResponseAsFeed();
+        assertNotNull(feed);
+    }
+
+    public void testAllProjectRssFeedGenerationSuccessful() throws FeedException, IOException
+    {
+        // directly request the build feed for this project.
+        beginAt("rss.action");
 
         SyndFeed feed = readResponseAsFeed();
         assertNotNull(feed);
@@ -102,5 +107,4 @@ public class RssAcceptanceTest extends BaseAcceptanceTestCase
             dumpResponse(System.out);
         }
     }
-
 }
