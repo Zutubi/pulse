@@ -79,7 +79,7 @@ public class GroupsUpgradeTask extends DatabaseUpgradeTask
         Map<Long, UserInfo> users = getAllUsers(con);
         addUserAuthorities(con, users);
 
-        Map<Long, ProjectInfo> projects = getAllProjects(con);
+        Map<Long, ProjectInfo> projects = getProjects(con);
 
         clearAcls(con);
 
@@ -216,7 +216,7 @@ public class GroupsUpgradeTask extends DatabaseUpgradeTask
         return result;
     }
 
-    private Map<Long, ProjectInfo> getAllProjects(Connection con) throws SQLException
+    private Map<Long, ProjectInfo> getProjects(Connection con) throws SQLException
     {
         Map<Long, ProjectInfo> result = new HashMap<Long, ProjectInfo>();
 

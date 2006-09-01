@@ -20,6 +20,11 @@ public class SCMChangeEventFilter implements EventTriggerFilter
         return project != null && changeEvent.getScm().getId() == project.getScm().getId();
     }
 
+    public boolean dependsOnProject(Trigger trigger, long projectId)
+    {
+        return false;
+    }
+
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;

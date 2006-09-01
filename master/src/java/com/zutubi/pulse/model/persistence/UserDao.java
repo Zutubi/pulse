@@ -20,4 +20,6 @@ public interface UserDao extends EntityDao<User>
     Set<Project> getHiddenProjects(User user);
 
     List<User> findByNotInGroup(Group group);
+
+    List<User> findByHiddenProject(Project project);
 }

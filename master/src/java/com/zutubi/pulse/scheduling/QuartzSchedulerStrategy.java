@@ -124,5 +124,10 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         this.triggerHandler = handler;
     }
 
+    public boolean dependsOnProject(Trigger trigger, long projectId)
+    {
+        return false;
+    }
+
     protected abstract org.quartz.Trigger createTrigger(Trigger trigger) throws SchedulingException;
 }

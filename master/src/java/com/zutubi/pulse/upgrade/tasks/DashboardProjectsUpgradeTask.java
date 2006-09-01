@@ -100,31 +100,6 @@ public class DashboardProjectsUpgradeTask extends DatabaseUpgradeTask
         }
     }
 
-    private List<Long> getAllProjects(Connection con) throws SQLException
-    {
-        CallableStatement stmt = null;
-        ResultSet rs = null;
-
-        List<Long> projects = new LinkedList<Long>();
-
-        try
-        {
-            stmt = con.prepareCall("SELECT id FROM project");
-            rs = stmt.executeQuery();
-            while(rs.next())
-            {
-                projects.add(rs.getLong("id"));
-            }
-
-            return projects;
-        }
-        finally
-        {
-            JDBCUtils.close(rs);
-            JDBCUtils.close(stmt);
-        }
-    }
-
     private void dropColumns(Connection con) throws SQLException
     {
         CallableStatement stmt = null;
