@@ -8,9 +8,9 @@ import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  */
-public class ProjectQueueTest extends PulseTestCase
+public class BuildQueueTest extends PulseTestCase
 {
-    private ProjectQueue queue = new ProjectQueue();
+    private BuildQueue queue = new BuildQueue();
     private Project p1;
     private Project p2;
 

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
+import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.upgrade.ConfigurationAware;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;

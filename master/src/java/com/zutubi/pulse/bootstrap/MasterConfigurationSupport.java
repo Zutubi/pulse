@@ -1,9 +1,9 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.bootstrap.conf.CompositeConfig;
-import com.zutubi.pulse.bootstrap.conf.Config;
-import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
+import com.zutubi.pulse.config.CompositeConfig;
+import com.zutubi.pulse.config.Config;
+import com.zutubi.pulse.config.ConfigSupport;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;

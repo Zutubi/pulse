@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.util.logging.Logger;
 import org.hibernate.*;
@@ -38,7 +39,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.project = :project order by model.number desc");
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.user = null order by model.number desc");
                 queryObject.setEntity("project", project);
                 queryObject.setFirstResult(first);
                 queryObject.setMaxResults(max);
@@ -56,7 +57,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.number < :number order by model.number desc");
+                Query queryObject = session.createQuery("from BuildResult model where model.user = null and model.project = :project and model.number < :number order by model.number desc");
                 queryObject.setEntity("project", result.getProject());
                 queryObject.setLong("number", result.getNumber());
                 queryObject.setMaxResults(1);
@@ -74,7 +75,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.buildSpecification = :spec and model.stateName != :initial and model.stateName != :inProgress order by model.number desc");
+                Query queryObject = session.createQuery("from BuildResult model where model.user = null and model.project = :project and model.buildSpecification = :spec and model.stateName != :initial and model.stateName != :inProgress order by model.number desc");
                 queryObject.setEntity("project", project);
                 queryObject.setParameter("spec", spec);
                 queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
@@ -114,7 +115,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.stateName != :initial and model.stateName != :inProgress order by model.number asc");
+                Query queryObject = session.createQuery("from BuildResult model where model.user = null and model.project = :project and model.stateName != :initial and model.stateName != :inProgress order by model.number asc");
                 queryObject.setEntity("project", project);
                 queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
                 queryObject.setParameter("inProgress", ResultState.IN_PROGRESS.toString(), Hibernate.STRING);
@@ -134,7 +135,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException, SQLException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.number = :number");
+                Query queryObject = session.createQuery("from BuildResult model where model.user = null and model.project = :project and model.number = :number");
                 queryObject.setEntity("project", project);
                 queryObject.setParameter("number", number, Hibernate.LONG);
 
@@ -246,6 +247,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = session.createCriteria(BuildResult.class);
+                criteria.add(Expression.isNull("user"));
                 addProjectsToCriteria(projects, criteria);
                 addStatesToCriteria(states, criteria);
                 addSpecsToCriteria(specs, criteria);
@@ -287,6 +289,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = session.createCriteria(BuildResult.class);
+                criteria.add(Expression.isNull("user"));
                 criteria.add(Expression.eq("project", project));
                 criteria.add(Expression.eq("buildSpecification", spec));
                 addStatesToCriteria(states, criteria);
@@ -326,6 +329,20 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return results;
     }
 
+    public List<BuildResult> findByUser(final User user)
+    {
+        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from BuildResult model where model.user = :user order by model.number desc");
+                queryObject.setEntity("user", user);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.list();
+            }
+        });
+    }
+
     private void intialise(BuildResult result)
     {
         Hibernate.initialize(result.getFeatures());
@@ -351,6 +368,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     private Criteria getBuildResultCriteria(Session session, Project project, ResultState[] states, String spec)
     {
         Criteria criteria = session.createCriteria(BuildResult.class);
+        criteria.add(Expression.isNull("user"));
         criteria.add(Expression.eq("project", project));
 
         addStatesToCriteria(states, criteria);

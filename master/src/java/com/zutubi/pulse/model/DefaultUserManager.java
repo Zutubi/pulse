@@ -1,11 +1,11 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.model.persistence.ContactPointDao;
-import com.zutubi.pulse.model.persistence.UserDao;
-import com.zutubi.pulse.model.persistence.GroupDao;
-import com.zutubi.pulse.web.DefaultAction;
-import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.license.LicenseManager;
+import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
+import com.zutubi.pulse.model.persistence.ContactPointDao;
+import com.zutubi.pulse.model.persistence.GroupDao;
+import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.web.DefaultAction;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
@@ -153,6 +153,15 @@ public class DefaultUserManager implements UserManager
     public List<User> getUsersNotInGroup(Group group)
     {
         return userDao.findByNotInGroup(group);
+    }
+
+    public long getNextBuildNumber(User user)
+    {
+        user = getUser(user.getId());
+        long number = user.getNextBuildNumber();
+        user.setNextBuildNumber(number + 1);
+        save(user);
+        return number;
     }
 
     public int getUserCount()

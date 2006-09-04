@@ -1,7 +1,7 @@
-package com.zutubi.pulse.bootstrap.conf;
+package com.zutubi.pulse.config;
 
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;

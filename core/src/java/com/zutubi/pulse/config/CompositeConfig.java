@@ -1,15 +1,37 @@
-package com.zutubi.pulse.bootstrap.conf;
+package com.zutubi.pulse.config;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <class-comment/>
  */
 public class CompositeConfig implements Config
 {
-    private final Config[] delegates;
+    private List<Config> delegates;
 
     public CompositeConfig(Config... configs)
     {
-        this.delegates = (configs != null ? configs : new Config[0]);
+        if(configs == null)
+        {
+            delegates = new ArrayList<Config>();
+        }
+        else
+        {
+            delegates = new LinkedList<Config>(Arrays.asList(configs));
+        }
+    }
+
+    public void append(Config config)
+    {
+        delegates.add(config);
+    }
+
+    public void prepend(Config config)
+    {
+        delegates.add(0, config);
     }
 
     public String getProperty(String key)
@@ -70,9 +92,9 @@ public class CompositeConfig implements Config
      */
     public boolean isWriteable()
     {
-        if (delegates.length > 0)
+        if (delegates.size() > 0)
         {
-            return delegates[0].isWriteable();
+            return delegates.get(0).isWriteable();
         }
         return false;
     }

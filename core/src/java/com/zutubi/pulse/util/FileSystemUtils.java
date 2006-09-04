@@ -4,10 +4,10 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
+import java.net.URLConnection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-import java.net.URLConnection;
 
 /**
  * Miscellaneous utilities for manipulating the file system.
@@ -530,6 +530,16 @@ public class FileSystemUtils
         if(File.separatorChar != '/')
         {
             path = path.replace(File.separatorChar, '/');
+        }
+
+        return path;
+    }
+
+    public static String denormaliseSeparators(String path)
+    {
+        if(File.separatorChar != '/')
+        {
+            path = path.replace('/', File.separatorChar);
         }
 
         return path;

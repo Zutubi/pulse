@@ -3,7 +3,12 @@ package com.zutubi.pulse.slave;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.bootstrap.UserPaths;
-import com.zutubi.pulse.bootstrap.conf.*;
+import com.zutubi.pulse.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.bootstrap.conf.VolatileReadOnlyConfig;
+import com.zutubi.pulse.config.CompositeConfig;
+import com.zutubi.pulse.config.Config;
+import com.zutubi.pulse.config.ConfigSupport;
+import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;

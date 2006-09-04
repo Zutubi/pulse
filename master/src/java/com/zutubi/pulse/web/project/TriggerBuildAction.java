@@ -1,6 +1,5 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.Project;
@@ -55,7 +54,7 @@ public class TriggerBuildAction extends ProjectActionSupport
             return ERROR;
         }
 
-        getProjectManager().triggerBuild(project, spec.getName(), new ManualTriggerBuildReason((String)getPrinciple()), new BuildRevision(), true);
+        getProjectManager().triggerBuild(project, spec.getName(), new ManualTriggerBuildReason((String)getPrinciple()), null, true);
 
         try
         {

@@ -1,11 +1,11 @@
-package com.zutubi.pulse.bootstrap.conf;
+package com.zutubi.pulse.config;
 
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.util.IOUtils;
 
 import java.io.*;
-import java.util.Properties;
 import java.util.Enumeration;
+import java.util.Properties;
 
 /**
  * <class-comment/>

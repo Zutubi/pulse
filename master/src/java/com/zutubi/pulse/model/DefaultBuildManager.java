@@ -189,6 +189,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return fileArtifactDao.findById(id);
     }
 
+    public List<BuildResult> getPersonalBuilds(User user)
+    {
+        return buildResultDao.findByUser(user);
+    }
+
     public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)
     {
         return buildResultDao.queryBuilds(projects, states, specs, earliestStartTime, latestStartTime, hasWorkDir, first, max, mostRecentFirst);
@@ -316,7 +321,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
     private void cleanupResult(Project project, BuildResult build)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File buildDir = paths.getBuildDir(project, build);
+        File buildDir = paths.getBuildDir(build);
         if (!FileSystemUtils.removeDirectory(buildDir))
         {
             LOG.warning("Unable to clean up build directory '" + buildDir.getAbsolutePath() + "'");
@@ -350,7 +355,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
     {
         for (RecipeResultNode node : nodes)
         {
-            File workDir = paths.getBaseDir(project, build, node.getResult().getId());
+            File workDir = paths.getBaseDir(build, node.getResult().getId());
             if (!FileSystemUtils.removeDirectory(workDir))
             {
                 LOG.warning("Unable to clean up build directory '" + workDir.getAbsolutePath() + "'");

@@ -56,14 +56,14 @@ public class PostBuildActionTest extends PulseTestCase
 
     private BuildResult testResult(String spec)
     {
-        BuildResult result = new BuildResult(null, null, spec, 1);
+        BuildResult result = new BuildResult(new UnknownBuildReason(), null, spec, 1);
         action.execute(result);
         return result;
     }
 
     private BuildResult testResult(ResultState state)
     {
-        BuildResult result = new BuildResult(null, null, "foo", 1);
+        BuildResult result = new BuildResult(new UnknownBuildReason(), null, "foo", 1);
         result.setState(state);
         action.execute(result);
         return result;

@@ -93,7 +93,8 @@ public class ViewServerQueuesAction extends ActionSupport
     public String execute() throws Exception
     {
         recipeQueueSnapshot = recipeQueue.takeSnapshot();
-        projectQueue = fatController.snapshotProjectQueue();
+        // TODO dev-personal
+        //projectQueue = fatController.snapshotProjectQueue();
         latestBuilds = new HashMap<Project, BuildResult>(projectQueue.size());
         for(Project p: projectQueue.keySet())
         {

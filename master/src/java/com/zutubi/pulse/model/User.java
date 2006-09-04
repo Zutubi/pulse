@@ -73,6 +73,7 @@ public class User extends Entity implements UserDetails
      * may be interacting with (e.g. SCMs).
      */
     private List<String> aliases;
+    private long nextBuildNumber;
 
     public User()
     {
@@ -587,5 +588,15 @@ public class User extends Entity implements UserDetails
     void removeGroup(Group group)
     {
         groups.remove(group);
+    }
+
+    public long getNextBuildNumber()
+    {
+        return nextBuildNumber;
+    }
+
+    public void setNextBuildNumber(long nextBuildNumber)
+    {
+        this.nextBuildNumber = nextBuildNumber;
     }
 }

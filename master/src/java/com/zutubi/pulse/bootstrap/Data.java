@@ -2,8 +2,8 @@ package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.bootstrap.conf.Config;
-import com.zutubi.pulse.bootstrap.conf.FileConfig;
+import com.zutubi.pulse.config.Config;
+import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseDecoder;
 import com.zutubi.pulse.license.LicenseException;
@@ -34,6 +34,7 @@ public class Data implements MasterUserPaths
     private Version dataVersion;
     private File userConfigRoot;
     private File projectRoot;
+    private File userRoot;
     private File databaseRoot;
 
     public static final String CONFIG_FILE_NAME = "pulse.config.properties";
@@ -215,6 +216,15 @@ public class Data implements MasterUserPaths
             projectRoot = new File(pulseData, "projects");
         }
         return projectRoot;
+    }
+
+    public File getUserRoot()
+    {
+        if(userRoot == null)
+        {
+            userRoot = new File(pulseData, "users");
+        }
+        return userRoot;
     }
 
     private Config getConfig()

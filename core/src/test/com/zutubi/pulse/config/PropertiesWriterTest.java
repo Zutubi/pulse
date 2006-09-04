@@ -1,4 +1,4 @@
-package com.zutubi.pulse.bootstrap.conf;
+package com.zutubi.pulse.config;
 
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;

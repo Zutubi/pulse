@@ -2,13 +2,13 @@ package com.zutubi.pulse.web.fs;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.FileInputStream;
+import java.io.InputStream;
 
 /**
  * <class-comment/>
@@ -49,7 +49,7 @@ public class StreamWorkingCopyFileAction extends AbstractProjectWorkingCopyActio
         String remainingPath = getWorkingCopyPathSegment();
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File baseDir = paths.getBaseDir(project, buildResult, Long.valueOf(recipeId));
+        File baseDir = paths.getBaseDir(buildResult, Long.valueOf(recipeId));
 
         File file = baseDir;
         if (TextUtils.stringSet(remainingPath))

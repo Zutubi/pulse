@@ -110,7 +110,7 @@ public class TailRecipeLogAction extends ProjectActionSupport
         }
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File recipeLog = new File(paths.getRecipeDir(buildResult.getProject(), buildResult, resultNode.getResult().getId()), RecipeResult.RECIPE_LOG);
+        File recipeLog = new File(paths.getRecipeDir(buildResult, resultNode.getResult().getId()), RecipeResult.RECIPE_LOG);
         if(recipeLog.exists())
         {
             logExists = true;

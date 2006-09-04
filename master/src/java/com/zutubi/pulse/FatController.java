@@ -2,19 +2,20 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildTerminationRequestEvent;
 import com.zutubi.pulse.events.build.RecipeTimeoutEvent;
-import com.zutubi.pulse.license.*;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildSpecification;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.license.LicenseEvent;
+import com.zutubi.pulse.license.LicenseExpiredEvent;
+import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.license.LicenseUpdateEvent;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.logging.Logger;
@@ -51,10 +52,11 @@ public class FatController implements EventListener, Stoppable
     private ReentrantLock lock = new ReentrantLock();
     private Condition stoppedCondition = lock.newCondition();
     private boolean stopping = false;
-    private ProjectQueue projectQueue = new ProjectQueue();
+    private BuildQueue buildQueue = new BuildQueue();
     private Set<BuildController> runningBuilds = new HashSet<BuildController>();
     private Scheduler quartzScheduler;
     private ProjectManager projectManager;
+    private UserManager userManager;
     private ServiceTokenManager serviceTokenManager;
 
     /**
@@ -179,9 +181,9 @@ public class FatController implements EventListener, Stoppable
      */
     public void handleEvent(Event event)
     {
-        if (event instanceof BuildRequestEvent)
+        if (event instanceof AbstractBuildRequestEvent)
         {
-            handleBuildRequest((BuildRequestEvent) event);
+            handleBuildRequest((AbstractBuildRequestEvent) event);
         }
         else if (event instanceof BuildCompletedEvent)
         {
@@ -211,7 +213,7 @@ public class FatController implements EventListener, Stoppable
     }
 
 
-    private void handleBuildRequest(BuildRequestEvent event)
+    private void handleBuildRequest(AbstractBuildRequestEvent event)
     {
         // if we are disabled, we ignore incoming build requests.
         if (isDisabled())
@@ -219,19 +221,19 @@ public class FatController implements EventListener, Stoppable
             return;
         }
 
-        if (event.getProject().isPaused())
+        if (!event.isPersonal() && event.getProject().isPaused())
         {
             // Ignore build requests while project is paused
             return;
         }
 
-        if (projectQueue.buildRequested(event))
+        if (buildQueue.buildRequested(event))
         {
             startBuild(event);
         }
     }
 
-    private void startBuild(BuildRequestEvent event)
+    private void startBuild(AbstractBuildRequestEvent event)
     {
         final Project project = event.getProject();
         String specName = event.getSpecification();
@@ -242,7 +244,7 @@ public class FatController implements EventListener, Stoppable
             // the build spec was deleted / renamed between the project build request being created and
             // the request triggering a start build.
             LOG.warning("Request to build unknown specification '" + specName + "' for project '" + project.getName() + "'");
-            projectQueue.buildCompleted(project);
+            buildQueue.buildCompleted(project);
             return;
         }
 
@@ -253,7 +255,7 @@ public class FatController implements EventListener, Stoppable
             {
                 projectManager.buildCommenced(project.getId());
                 RecipeResultCollector collector = new DefaultRecipeResultCollector(project, configManager);
-                BuildController controller = new BuildController(event, buildSpec, eventManager, projectManager, buildManager, recipeQueue, collector, quartzScheduler, configManager, serviceTokenManager);
+                BuildController controller = new BuildController(event, buildSpec, eventManager, projectManager, userManager, buildManager, recipeQueue, collector, quartzScheduler, configManager, serviceTokenManager);
                 controller.run();
                 runningBuilds.add(controller);
             }
@@ -325,7 +327,13 @@ public class FatController implements EventListener, Stoppable
 
             if (!stopping)
             {
-                BuildRequestEvent queuedEvent = projectQueue.buildCompleted(project);
+                Entity owner = project;
+                if(event.getResult().getUser() != null)
+                {
+                    owner = event.getResult().getUser();
+                }
+
+                AbstractBuildRequestEvent queuedEvent = buildQueue.buildCompleted(owner);
 
                 if (queuedEvent != null)
                 {
@@ -341,7 +349,7 @@ public class FatController implements EventListener, Stoppable
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildRequestEvent.class,
+        return new Class[]{AbstractBuildRequestEvent.class,
                 BuildCompletedEvent.class,
                 RecipeTimeoutEvent.class,
                 LicenseExpiredEvent.class,
@@ -350,17 +358,17 @@ public class FatController implements EventListener, Stoppable
     }
 
     /**
-     * Retrieve a snapshot of the current project queue.
+     * Retrieve a snapshot of the current build queue.
      *
-     * @return a mapping of projects to queued build request events. These events will be
+     * @return a mapping of owners to queued build request events. These events will be
      * the order that these events will be handled.
      */
-    public Map<Project, List<BuildRequestEvent>> snapshotProjectQueue()
+    public Map<Entity, List<AbstractBuildRequestEvent>> snapshotProjectQueue()
     {
         lock.lock();
         try
         {
-            return projectQueue.takeSnapshot();
+            return buildQueue.takeSnapshot();
         }
         finally
         {
@@ -431,5 +439,10 @@ public class FatController implements EventListener, Stoppable
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
         this.serviceTokenManager = serviceTokenManager;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 }

@@ -89,4 +89,6 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
     void delete(Group group, ProjectManager projectManager);
 
     List<User> getUsersNotInGroup(Group group);
+
+    long getNextBuildNumber(User user);
 }

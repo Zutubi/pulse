@@ -1,29 +1,29 @@
 package com.zutubi.pulse.events.build;
 
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.model.BuildReason;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.model.*;
 
 /**
  */
-public class BuildRequestEvent extends Event
+public class BuildRequestEvent extends AbstractBuildRequestEvent
 {
     private BuildReason reason;
-    private Project project;
-    private String specification;
-    private long queued;
-    private BuildRevision revision;
 
     public BuildRequestEvent(Object source, BuildReason reason, Project project, String specification, BuildRevision revision)
     {
-        super(source);
+        super(source, revision, project, specification);
         this.reason = reason;
-        this.project = project;
-        this.specification = specification;
-        this.revision = revision;
-        queued = System.currentTimeMillis();
+    }
+
+    public Entity getOwner()
+    {
+        return getProject();
+    }
+
+    public boolean isPersonal()
+    {
+        return false;
     }
 
     public BuildReason getReason()
@@ -31,28 +31,8 @@ public class BuildRequestEvent extends Event
         return reason;
     }
 
-    public Project getProject()
+    public BuildResult createResult(ProjectManager projectManager, UserManager userManager)
     {
-        return project;
-    }
-
-    public String getSpecification()
-    {
-        return specification;
-    }
-
-    public long getQueued()
-    {
-        return queued;
-    }
-
-    public String getPrettyQueueTime()
-    {
-        return TimeStamps.getPrettyTime(queued);
-    }
-
-    public BuildRevision getRevision()
-    {
-        return revision;
+        return new BuildResult(reason, getProject(), getSpecification(), projectManager.getNextBuildNumber(getProject()));
     }
 }
