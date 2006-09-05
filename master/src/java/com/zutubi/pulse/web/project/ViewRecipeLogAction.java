@@ -66,6 +66,8 @@ public class ViewRecipeLogAction extends ProjectActionSupport
             return ERROR;
         }
 
+        checkPermissions(buildResult);
+
         resultNode = buildResult.findResultNode(id);
         if(resultNode == null)
         {

@@ -57,4 +57,9 @@ public class WorkingCopyStatus implements Iterable<FileStatus>
 
         return true;
     }
+
+    public List<FileStatus> getChanges()
+    {
+        return changes;
+    }
 }

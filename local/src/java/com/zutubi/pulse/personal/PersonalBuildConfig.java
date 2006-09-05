@@ -37,7 +37,12 @@ public class PersonalBuildConfig
 
     public String getPulseUrl()
     {
-        return config.getProperty(PROPERTY_PULSE_URL);
+        String url = config.getProperty(PROPERTY_PULSE_URL);
+        if(url.endsWith("/"))
+        {
+            url = url.substring(0, url.length() - 1);
+        }
+        return url;
     }
 
     public String getPulseUser()

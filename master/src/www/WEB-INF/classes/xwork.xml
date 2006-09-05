@@ -112,6 +112,11 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="viewPersonalChanges" class="com.zutubi.pulse.web.project.ViewPersonalChangesAction">
+            <result name="success" type="velocity">view-personal-changes.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="viewTests" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-tests.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>

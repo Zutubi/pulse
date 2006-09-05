@@ -45,6 +45,8 @@ public class StreamWorkingCopyFileAction extends AbstractProjectWorkingCopyActio
             return ERROR;
         }
 
+        checkPermissions(buildResult);
+
         // if build is pending, then there is nothing that we can display.
         Project project = buildResult.getProject();
         projectManager.checkWrite(project);

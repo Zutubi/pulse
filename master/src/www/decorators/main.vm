@@ -5,6 +5,9 @@
 #if($page.getProperty("page.projectName"))
     #set ($projectName = $page.getProperty("page.projectName"))
 #end
+#if($page.getProperty("page.personalBuild"))
+    #set ($personalBuild = true)
+#end
 #if($page.getProperty("page.buildId"))
     #set ($buildId = $page.getProperty("page.buildId"))
 #end
@@ -69,6 +72,9 @@
                   :: <a href="$base/default.action">pulse</a> ::
 #if($projectId && $projectId != "0")
                   <a href="$base/currentBuild.action?id=${projectId}">$projectName</a>
+#end
+#if($personalBuild)
+                 <a href="$base/dashboard.action">my builds</a>
 #end
 #if($buildId && $buildId != "0")
                   :: <a href="$base/viewBuild.action?id=${buildId}">build $buildNumber</a>

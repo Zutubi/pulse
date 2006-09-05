@@ -224,9 +224,13 @@ public abstract class Scm extends Entity implements Cloneable
             scope.add(new Property(PROPERTY_REVISION, revision.getRevisionString()));
             scope.add(new Property(PROPERTY_AUTHOR, revision.getAuthor()));
             scope.add(new Property(PROPERTY_BRANCH, revision.getBranch()));
-            scope.add(new Property(PROPERTY_TIMESTAMP_PULSE, PULSE_DATE_FORMAT.format(revision.getDate())));
-            scope.add(new Property(PROPERTY_TIMESTAMP_FISHEYE, FISHEYE_DATE_FORMAT.format(revision.getDate())));
 
+            if(revision.getDate() != null)
+            {
+                scope.add(new Property(PROPERTY_TIMESTAMP_PULSE, PULSE_DATE_FORMAT.format(revision.getDate())));
+                scope.add(new Property(PROPERTY_TIMESTAMP_FISHEYE, FISHEYE_DATE_FORMAT.format(revision.getDate())));
+            }
+            
             try
             {
                 return VariableHelper.replaceVariables(url, true, scope);

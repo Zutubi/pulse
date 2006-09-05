@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.model.Project;
 
 import java.io.File;
 
@@ -59,6 +59,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
             return ERROR;
         }
 
+        checkPermissions(buildResult);
         getProjectManager().checkWrite(buildResult.getProject());
 
         // this value is going to be written to the vm template and evaluated by javascript, so

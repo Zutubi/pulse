@@ -4,14 +4,14 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.web.project.ProjectActionSupport;
 
 import java.io.File;
 
 /**
  * <class-comment/>
  */
-public class AbstractProjectWorkingCopyAction extends ActionSupport
+public class AbstractProjectWorkingCopyAction extends ProjectActionSupport
 {
     /**
      * The id of the build being examined.

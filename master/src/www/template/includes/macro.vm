@@ -25,10 +25,22 @@
 #end
 
 ##
+## Outputs sitemesh content tags for user links on the header bar
+##
+#macro(userTags $user)
+    <content tag="personalBuild">true</content>
+    <content tag="selectedTab">dashboard</content>
+#end
+
+##
 ## Outputs sitemesh content tags for build links on the header bar
 ##
 #macro(buildTags $project $buildResult)
+#if($buildResult.user)
+    #userTags($buildResult.user)
+#else
     #projectTags($project)
+#end
     <content tag="buildId">$buildResult.id</content>
     <content tag="buildNumber">$buildResult.number</content>
 #end
@@ -233,7 +245,11 @@
     #openTabs()
         #buildTab($result "summary" "viewBuild" $selected)
         #buildTab($result "detailed-view" "viewCommandLog" $selected)
+#if($result.personal)
+        #buildTab($result "changes" "viewPersonalChanges" $selected)
+#else
         #buildTab($result "changes" "viewChanges" $selected)
+#end
         #buildTab($result "tests" "viewTests" $selected)
         #buildTab($result "build-file" "viewBuildFile" $selected)
         #buildTab($result "artifacts" "viewBuildArtifacts" $selected)
@@ -881,8 +897,13 @@
 ## Outputs an action cell for viewing changes for a build
 ##
 #macro(changesCell $project $result)
+    #if($result.personal)
+        #set($url = "viewPersonalChanges.action?id=$result.id")
+    #else
+        #set($url = "viewChanges.action?projectId=$project.id&amp;toBuild=$result.number")
+    #end
     <td class="content">
-        <a href="viewChanges.action?projectId=$project.id&amp;toBuild=$result.number" class="unadorned" title="view changes"><img alt="view changes" src="$base/images/page_code.gif"/></a>
+        <a href="$url" class="unadorned" title="view changes"><img alt="view changes" src="$base/images/page_code.gif"/></a>
     </td>
 #end
 

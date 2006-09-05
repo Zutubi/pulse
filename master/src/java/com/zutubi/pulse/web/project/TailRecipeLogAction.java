@@ -101,6 +101,8 @@ public class TailRecipeLogAction extends ProjectActionSupport
             addActionError("Unknown build [" + buildId + "]");
             return ERROR;
         }
+        
+        checkPermissions(buildResult);
 
         resultNode = buildResult.findResultNode(id);
         if(resultNode == null)

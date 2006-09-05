@@ -32,6 +32,8 @@ public class ListProjectDirectoryAction extends AbstractProjectWorkingCopyAction
     {
         BuildResult buildResult = buildManager.getBuildResult(getBuildId());
 
+        checkPermissions(buildResult);
+
         // no point in displaying any details if the working directory is not available.
         if (!buildResult.getHasWorkDir())
         {
