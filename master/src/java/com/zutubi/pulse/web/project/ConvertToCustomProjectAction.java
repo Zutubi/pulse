@@ -46,7 +46,7 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
 
         PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
         ComponentContext.autowire(pulseFileDetails);
-        String pulseFile = pulseFileDetails.getPulseFile(0, project, null);
+        String pulseFile = pulseFileDetails.getPulseFile(0, project, null, null);
         details.setPulseFile(XMLUtils.prettyPrint(pulseFile));
 
         return INPUT;

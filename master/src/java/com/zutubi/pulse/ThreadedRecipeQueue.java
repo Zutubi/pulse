@@ -193,7 +193,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private void updateRevision(RecipeDispatchRequest dispatchRequest, Revision revision) throws BuildException
     {
         Project project = dispatchRequest.getBuild().getProject();
-        String pulseFile = project.getPulseFileDetails().getPulseFile(dispatchRequest.getRequest().getId(), project, revision);
+        String pulseFile = project.getPulseFileDetails().getPulseFile(dispatchRequest.getRequest().getId(), project, revision, null);
         dispatchRequest.getRevision().update(revision, pulseFile);
     }
 

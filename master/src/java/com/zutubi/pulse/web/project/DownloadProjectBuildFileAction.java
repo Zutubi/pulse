@@ -50,7 +50,7 @@ public class DownloadProjectBuildFileAction extends ProjectActionSupport
         {
             PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
             ComponentContext.autowire(pulseFileDetails);
-            String pulseFile = XMLUtils.prettyPrint(pulseFileDetails.getPulseFile(0, project, null));
+            String pulseFile = XMLUtils.prettyPrint(pulseFileDetails.getPulseFile(0, project, null, null));
             inputStream = new StringInputStream(pulseFile);
             contentLength = pulseFile.length();
         }

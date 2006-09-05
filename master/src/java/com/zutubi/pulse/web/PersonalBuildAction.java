@@ -5,7 +5,6 @@ import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
@@ -117,7 +116,7 @@ public class PersonalBuildAction extends ActionSupport
             archive = new PatchArchive(patchFile);
             projectManager.triggerBuild(number, p, spec, user, archive);
         }
-        catch (PulseException e)
+        catch (Exception e)
         {
             LOG.severe(e);
             errorMessage = e.getClass().getName() + ": " + e.getMessage();

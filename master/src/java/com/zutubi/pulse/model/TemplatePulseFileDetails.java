@@ -2,13 +2,17 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.util.FileSystemUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  */
@@ -23,7 +27,7 @@ public abstract class TemplatePulseFileDetails extends PulseFileDetails
         return true;
     }
 
-    public String getPulseFile(long id, Project project, Revision revision)
+    public String getPulseFile(long id, Project project, Revision revision, PatchArchive patch)
     {
         try
         {

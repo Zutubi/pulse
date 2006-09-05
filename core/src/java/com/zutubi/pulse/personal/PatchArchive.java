@@ -250,4 +250,43 @@ public class PatchArchive
 
         return name.substring(FILES_PATH.length());
     }
+
+    public boolean containsPath(String path)
+    {
+        for(FileStatus fs: status)
+        {
+            if(fs.getPath().equals(path) && fs.getState().requiresFile() == true)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public String retrieveFile(String path) throws IOException
+    {
+        path = FILES_PATH + path;
+        
+        ZipInputStream zin = null;
+        try
+        {
+            zin = new ZipInputStream(new FileInputStream(patchFile));
+            ZipEntry entry;
+            while((entry = zin.getNextEntry()) != null)
+            {
+                if(entry.getName().equals(path))
+                {
+                    // This is it
+                    return IOUtils.inputStreamToString(zin);
+                }
+            }
+
+            throw new IOException("Path '" + path + "' not found in archive");
+        }
+        finally
+        {
+            IOUtils.close(zin);
+        }
+    }
 }

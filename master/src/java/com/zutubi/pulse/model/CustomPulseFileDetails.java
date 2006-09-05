@@ -1,8 +1,7 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.personal.PatchArchive;
 
 import java.util.Properties;
 
@@ -42,7 +41,7 @@ public class CustomPulseFileDetails extends PulseFileDetails
         return new Properties();
     }
 
-    public String getPulseFile(long id, Project project, Revision revision)
+    public String getPulseFile(long id, Project project, Revision revision, PatchArchive patch)
     {
         return getPulseFile();
     }

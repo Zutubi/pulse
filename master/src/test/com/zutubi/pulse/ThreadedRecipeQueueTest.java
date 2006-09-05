@@ -15,6 +15,7 @@ import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
@@ -766,7 +767,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public String getPulseFile(long id, Project project, Revision revision)
+        public String getPulseFile(long id, Project project, Revision revision, PatchArchive patch)
         {
             long number = ((NumericalRevision) revision).getRevisionNumber();
             if(number == 0)

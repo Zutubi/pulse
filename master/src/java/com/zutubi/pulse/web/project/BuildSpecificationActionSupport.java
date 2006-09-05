@@ -64,7 +64,7 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
                 {
                     PulseFileDetails details = getProject().getPulseFileDetails();
                     ComponentContext.autowire(details);
-                    String pulseFile = details.getPulseFile(0, project, null);
+                    String pulseFile = details.getPulseFile(0, project, null, null);
 
                     PulseFile file = new PulseFile();
                     fileLoader.load(new ByteArrayInputStream(pulseFile.getBytes()), file, null, resourceRepository, new RecipeListingPredicate());

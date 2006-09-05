@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.WorkingCopy;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
-import org.tmatesoft.svn.core.SVNCancelException;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.wc.*;
@@ -38,7 +37,8 @@ public class SvnWorkingCopy implements WorkingCopy
 
         try
         {
-            clientManager.getStatusClient().doStatus(base, true, false, false, false, false, handler);
+            SVNStatusClient statusClient = clientManager.getStatusClient();
+            statusClient.doStatus(base, true, false, true, false, false, handler);
         }
         catch (SVNException e)
         {
@@ -48,21 +48,9 @@ public class SvnWorkingCopy implements WorkingCopy
         return handler.getStatus();
     }
 
-    private class StatusHandler implements ISVNEventHandler, ISVNStatusHandler
+    private class StatusHandler implements ISVNStatusHandler
     {
         WorkingCopyStatus status = new WorkingCopyStatus();
-
-        public void handleEvent(SVNEvent event, double progress)
-        {
-            if (event.getAction() == SVNEventAction.STATUS_COMPLETED)
-            {
-                status.setRevision(new NumericalRevision(event.getRevision()));
-            }
-        }
-
-        public void checkCancelled() throws SVNCancelException
-        {
-        }
 
         public void handleStatus(SVNStatus svnStatus)
         {
@@ -78,6 +66,14 @@ public class SvnWorkingCopy implements WorkingCopy
             if(path.startsWith("/") || path.startsWith(File.separator))
             {
                 path = path.substring(1);
+            }
+
+            if(path.length() == 0)
+            {
+                // TODO dev-personal: what if nested files are updated to
+                // another revision??
+                // Grab the revision for the base directory
+                status.setRevision(new NumericalRevision(svnStatus.getRevision().getNumber()));
             }
 
             if(contentsStatus == SVNStatusType.STATUS_ADDED)

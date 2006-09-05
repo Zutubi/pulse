@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scheduling.SchedulingException;
@@ -144,7 +145,7 @@ public interface ProjectManager extends EntityManager<Project>
      */
     void triggerBuild(Project project, String specification, BuildReason reason, Revision revision, boolean force);
 
-    void triggerBuild(long number, Project project, BuildSpecification specification, User user, PatchArchive archive);
+    void triggerBuild(long number, Project project, BuildSpecification specification, User user, PatchArchive archive) throws PulseException;
 
     long getNextBuildNumber(Project project);
 

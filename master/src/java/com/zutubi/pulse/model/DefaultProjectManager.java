@@ -3,6 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.EventManager;
@@ -179,13 +180,17 @@ public class DefaultProjectManager implements ProjectManager
         }
     }
 
-    public void triggerBuild(long number, Project project, BuildSpecification specification, User user, PatchArchive archive)
+    public void triggerBuild(long number, Project project, BuildSpecification specification, User user, PatchArchive archive) throws PulseException
     {
         Revision revision = archive.getStatus().getRevision();
-        String pulseFile = getPulseFile(project, revision);
-        if(pulseFile != null)
+        try
         {
+            String pulseFile = getPulseFile(project, revision, archive);
             eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile), user, archive, project, specification.getName()));
+        }
+        catch (BuildException e)
+        {
+            throw new PulseException(e.getMessage(), e);
         }
     }
 
@@ -200,27 +205,27 @@ public class DefaultProjectManager implements ProjectManager
 
     private void requestBuildOfRevision(BuildReason reason, Project project, String specification, Revision revision)
     {
-        String pulseFile = getPulseFile(project, revision);
-        if(pulseFile != null)
-        {
-            eventManager.publish(new BuildRequestEvent(this, reason, project, specification, new BuildRevision(revision, pulseFile)));
-        }
-    }
-
-    private String getPulseFile(Project project, Revision revision)
-    {
         try
         {
-            PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
-            ComponentContext.autowire(pulseFileDetails);
-            String pulseFile = pulseFileDetails.getPulseFile(0, project, revision);
-            return pulseFile;
+            String pulseFile = getPulseFile(project, revision, null);
+            eventManager.publish(new BuildRequestEvent(this, reason, project, specification, new BuildRevision(revision, pulseFile)));
         }
         catch (BuildException e)
         {
-            LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision " + revision.getRevisionString() + ": " + e.getMessage(), e);
-            return null;
+            String message = "Unable to obtain pulse file for project '" + project.getName();
+            if(revision != null)
+            {
+                message += "', revision '" + revision.getRevisionString();
+            }
+            LOG.severe(message + "': " + e.getMessage(), e);
         }
+    }
+
+    private String getPulseFile(Project project, Revision revision, PatchArchive patch) throws BuildException
+    {
+        PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
+        ComponentContext.autowire(pulseFileDetails);
+        return pulseFileDetails.getPulseFile(0, project, revision, patch);
     }
 
     public void updateProjectDetails(Project project, String name, String description, String url) throws SchedulingException
