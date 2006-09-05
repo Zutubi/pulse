@@ -35,7 +35,7 @@ public class PersonalBuildClient
         client.getState().setCredentials(new AuthScope(null, -1), credentials);
         client.getParams().setAuthenticationPreemptive(true);
 
-        PostMethod post = new PostMethod(config.getPulseUrl() + "/personalBuild.action");
+        PostMethod post = new PostMethod(config.getPulseUrl() + "/personal/personalBuild.action");
         post.setDoAuthentication(true);
 
         try
@@ -51,12 +51,13 @@ public class PersonalBuildClient
             int status = client.executeMethod(post);
             if (status == HttpStatus.SC_OK)
             {
-                // That's good ... don't do anything else ATM!
+                // That's good ... now check the response
+                System.out.println(post.getResponseBodyAsString());
             }
             else
             {
                 // Not good
-                throw new PulseException("Pulse server returned error: " + post.getResponseBodyAsString());
+                throw new PulseException("Pulse server returned error code " + status + " (" + HttpStatus.getStatusText(status) + ")");
             }
         }
         catch (IOException e)

@@ -23,6 +23,8 @@ public class PersonalBuildAction extends ActionSupport
     private String project;
     private String specification;
     private String version;
+    private long number;
+    private String errorMessage;
     private EventManager eventManager;
     private ProjectManager projectManager;
     private UserManager userManager;
@@ -43,6 +45,16 @@ public class PersonalBuildAction extends ActionSupport
         this.version = version;
     }
 
+    public long getNumber()
+    {
+        return number;
+    }
+
+    public String getErrorMessage()
+    {
+        return errorMessage;
+    }
+
     public String execute()
     {
         ActionContext ac = ActionContext.getContext();
@@ -50,6 +62,7 @@ public class PersonalBuildAction extends ActionSupport
 
         if (!(request instanceof MultiPartRequestWrapper))
         {
+            errorMessage = "Invalid request: expecting multipart POST";
             return ERROR;
         }
 
@@ -57,19 +70,21 @@ public class PersonalBuildAction extends ActionSupport
         File[] files = mpr.getFiles("patch.zip");
         if(files == null || files.length == 0 || files[0] == null)
         {
-            // No patch??
+            errorMessage = "POST does not contain required file parameter 'patch.zip'";
             return ERROR;
         }
 
         Project p = projectManager.getProject(project);
         if(p == null)
         {
+            errorMessage = "Unknown project '" + project + "'";
             return ERROR;
         }
 
         BuildSpecification spec = p.getBuildSpecification(specification);
         if(spec == null)
         {
+            errorMessage = "Unknown build specification '" + specification + "'";
             return ERROR;
         }
 
@@ -82,10 +97,11 @@ public class PersonalBuildAction extends ActionSupport
 
         if(user == null)
         {
+            errorMessage = "Unable to determine user";
             return ERROR;
         }
 
-        long number = userManager.getNextBuildNumber(user);
+        number = userManager.getNextBuildNumber(user);
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File patchDir = paths.getUserPatchDir(user);
         if(!patchDir.isDirectory())
@@ -99,14 +115,14 @@ public class PersonalBuildAction extends ActionSupport
         try
         {
             archive = new PatchArchive(patchFile);
+            projectManager.triggerBuild(number, p, spec, user, archive);
         }
         catch (PulseException e)
         {
             LOG.severe(e);
+            errorMessage = e.getClass().getName() + ": " + e.getMessage();
             return ERROR;
         }
-
-        projectManager.triggerBuild(number, p, spec, user, archive);
 
         return SUCCESS;
     }

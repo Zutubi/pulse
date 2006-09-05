@@ -763,10 +763,14 @@
         <action name="rss" class="com.zutubi.pulse.web.rss.BuildResultsRssAction">
             <result name="disabled" type="velocity">generic-error.vm</result>
         </action>
+    </package>
+
+    <package name="personal" namespace="/personal" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
 
         <action name="personalBuild" class="com.zutubi.pulse.web.PersonalBuildAction">
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="velocity">generic-error.vm</result>
+            <result name="error" type="velocity">error.vm</result>
+            <result name="success" type="velocity">success.vm</result>
         </action>
     </package>
 
