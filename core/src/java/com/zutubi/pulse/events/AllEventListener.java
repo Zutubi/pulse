@@ -5,7 +5,7 @@ package com.zutubi.pulse.events;
  */
 public abstract class AllEventListener implements EventListener
 {
-    public Class[] getHandledEvents()
+    public final Class[] getHandledEvents()
     {
         return new Class[]{Event.class};
     }
