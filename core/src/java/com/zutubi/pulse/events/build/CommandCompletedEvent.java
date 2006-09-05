@@ -18,4 +18,11 @@ public class CommandCompletedEvent extends RecipeEvent
     {
         return result;
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("Command Completed Event: ");
+        buff.append(getRecipeId());
+        return buff.toString();
+    }
 }

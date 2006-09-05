@@ -64,6 +64,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         // define the query to match the results returned by project build result rss feed.
         SearchQuery<BuildResult> query = queries.getBuildResults();
         query.add(BuildResultExpressions.projectEq(project));
+        query.add(BuildResultExpressions.buildResultCompleted());
         query.setFirstResult(0);
         query.setMaxResults(10);
         query.add(Order.desc("number"));
@@ -118,6 +119,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
     {
         // generate the search query.
         SearchQuery<BuildResult> query = queries.getBuildResults();
+        query.add(BuildResultExpressions.buildResultCompleted());
         query.setFirstResult(0);
         query.setMaxResults(10);
         query.add(Order.desc("number"));

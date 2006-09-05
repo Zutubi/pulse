@@ -75,7 +75,7 @@ public class MasterBuildService implements BuildService
                 }
                 catch(IOException e)
                 {
-                    throw new BuildException("Unable to rename work directory '" + workDir.getAbsolutePath() + "' to '" + workDest.getAbsolutePath() + "': " + e.getMessage());
+                    throw new BuildException("Unable to snapshot work directory '" + workDir.getAbsolutePath() + "' to '" + workDest.getAbsolutePath() + "': " + e.getMessage());
                 }
             }
             else

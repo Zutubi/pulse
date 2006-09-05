@@ -97,6 +97,12 @@ public class DefaultUserManager implements UserManager
 
     public void delete(User user)
     {
+        List<Group> groups = groupDao.findByMember(user);
+        for(Group group: groups)
+        {
+            group.getUsers().remove(user);
+            groupDao.save(group);
+        }
         userDao.delete(user);
 
         licenseManager.refreshAuthorisations();
@@ -162,6 +168,16 @@ public class DefaultUserManager implements UserManager
         user.setNextBuildNumber(number + 1);
         save(user);
         return number;
+    }
+
+    public void removeReferencesToProject(Project project)
+    {
+        List<User> users = userDao.findByHiddenProject(project);
+        for(User u: users)
+        {
+            u.getHiddenProjects().remove(project);
+            userDao.save(u);
+        }
     }
 
     public int getUserCount()

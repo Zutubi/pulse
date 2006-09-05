@@ -39,4 +39,9 @@ public class NoopSchedulerStrategy implements SchedulerStrategy
     {
 
     }
+
+    public boolean dependsOnProject(Trigger trigger, long projectId)
+    {
+        return false;
+    }
 }

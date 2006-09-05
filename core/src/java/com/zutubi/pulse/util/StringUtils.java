@@ -8,6 +8,30 @@ import java.util.List;
 public class StringUtils
 {
     /**
+     * A null safe equals method for strings.
+     *
+     * @param a
+     * @param b
+     *
+     * @return true if the strings are equal, false otherwise.
+     */
+    public static boolean equals(String a, String b)
+    {
+        if (a == null)
+        {
+            return b == null;
+        }
+        else
+        {
+            if (b == null)
+            {
+                return false;
+            }
+        }
+        return a.equals(b);
+    }
+
+    /**
      * Returns the given string, trimmed if necessary to the given maximum
      * length.  Upon trimming, the last 3 characters in the returned string
      * will be "...": and the returned string will be exactly length

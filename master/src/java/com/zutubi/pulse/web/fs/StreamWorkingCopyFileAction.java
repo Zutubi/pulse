@@ -39,6 +39,11 @@ public class StreamWorkingCopyFileAction extends AbstractProjectWorkingCopyActio
     public String execute() throws Exception
     {
         BuildResult buildResult = buildManager.getBuildResult(getBuildId());
+        // no point in displaying any details if the working directory is not available.
+        if (!buildResult.getHasWorkDir())
+        {
+            return ERROR;
+        }
 
         // if build is pending, then there is nothing that we can display.
         Project project = buildResult.getProject();

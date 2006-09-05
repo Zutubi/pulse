@@ -20,4 +20,9 @@ public class LicenseEvent extends Event<License>
     {
         return getSource();
     }
+
+    public String toString()
+    {
+        return "License Event";
+    }    
 }

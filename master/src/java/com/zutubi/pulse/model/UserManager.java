@@ -91,4 +91,5 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
     List<User> getUsersNotInGroup(Group group);
 
     long getNextBuildNumber(User user);
+    void removeReferencesToProject(Project project);
 }

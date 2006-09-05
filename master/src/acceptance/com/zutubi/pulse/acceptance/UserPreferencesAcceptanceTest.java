@@ -12,7 +12,7 @@ import net.sourceforge.jwebunit.ExpectedTable;
 public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
 {
     private String login;
-    private static final String CONTACT_CREATE_TYPE = "contact";
+
     private static final String CREATE_CONTACT_LINK = "create contact";
     //TODO - replace this string with a reference to the properties file.
     private static final String CONTACT_REQUIRED = "you must create a contact point before you can create a subscription";
@@ -219,15 +219,15 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         EditPasswordForm form = new EditPasswordForm(tester);
         form.assertFormElements("", "", "");
 
-        // check that each field is required.
+        // the only requirement is that the fields match. None of the fields are required.
         form.saveFormElements("a", "a", "");
-        assertTextPresent("required");
+        assertTextPresent("does not match");
 
         form.saveFormElements("b", "", "b");
-        assertTextPresent("required");
+        assertTextPresent("does not match");
 
         form.saveFormElements("", "c", "c");
-        assertTextPresent("required");
+        assertTextPresent("does not match");
 
         // check that the current password is correctly checked.
         form.saveFormElements("incorrect", "a", "a");
@@ -236,6 +236,38 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         // check that the new password and confirm password are correctly checked.
         form.saveFormElements(login, "a", "b");
         assertTextPresent("does not match");
+    }
+
+    public void testSetAndEditABlankPassword()
+    {
+        // We have no requirements for passwords, so lets ensure that blank passwords work.
+        assertLinkPresent("user.edit");
+        clickLink("user.edit");
+
+        // change the password to blank.
+        EditPasswordForm form = new EditPasswordForm(tester);
+        form.assertFormElements("", "", "");
+        form.saveFormElements(login, "", "");
+        form.assertFormNotPresent();
+
+        // assert that we are back on the preferences page.
+        assertTablePresent("user");
+        assertLinkPresent("user.edit");
+
+        // now to verify that the password was actually changed.
+        login(login, "");
+        assertTextPresent("welcome");
+
+        // navigate tot he edit password form.
+        navigateToPreferences();
+        assertLinkPresent("user.edit");
+        clickLink("user.edit");
+
+        // change the password fro blank to something.
+        form = new EditPasswordForm(tester);
+        form.assertFormElements("", "", "");
+        form.saveFormElements("", "something", "something");
+        form.assertFormNotPresent();
     }
 
     public void testAddAlias()
@@ -490,6 +522,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         assertTextNotPresent(JABBER_CONTACT);
     }
 
+    // @Requires a project.
     public void testCreateSubscription()
     {
         addJabber("jabbier");
@@ -506,6 +539,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         assertSubscriptionsTable(projectName, contactName, "changed");
     }
 
+    // @Requires a project.
     public void testCreateSubscriptionAllProjects()
     {
         addJabber("jabbier");
@@ -520,6 +554,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         assertSubscriptionsTable("[all]", contactName, "changed");
     }
 
+    // @Requires a project.
     public void testEditSubscription()
     {
         addJabber("zlast");

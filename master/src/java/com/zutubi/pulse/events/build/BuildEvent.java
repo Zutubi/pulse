@@ -19,4 +19,9 @@ public class BuildEvent extends Event<Object>
     {
         return result;
     }
+
+    public String toString()
+    {
+        return "Build Event";
+    }
 }

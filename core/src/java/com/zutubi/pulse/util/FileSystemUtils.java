@@ -574,8 +574,25 @@ public class FileSystemUtils
             String flags = "-p";
             if(from.isDirectory())
             {
-                ensureDirectory(to);
-                flags += "rT";
+                if(to.exists())
+                {
+                    if(to.isDirectory())
+                    {
+                        if(!removeDirectory(to))
+                        {
+                            throw new IOException("Cannot remove existing directory '" + to.getAbsolutePath() + "'");
+                        }
+                    }
+                    else
+                    {
+                        if(!to.delete())
+                        {
+                            throw new IOException("Cannot remove existing file '" + to.getAbsolutePath() + "'");
+                        }
+                    }
+                }
+
+                flags += "r";
             }
 
             Process child = Runtime.getRuntime().exec(new String[] { "cp", flags, from.getAbsolutePath(), to.getAbsolutePath() });

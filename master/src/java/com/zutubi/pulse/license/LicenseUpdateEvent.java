@@ -11,4 +11,9 @@ public class LicenseUpdateEvent extends LicenseEvent
     {
         super(source);
     }
+
+    public String toString()
+    {
+        return "License Update Event";
+    }
 }

@@ -88,6 +88,12 @@ public abstract class Trigger extends Entity implements NamedEntity
         this.group = group;
     }
 
+    /**
+     * Return the type identifier for this type of trigger. This identifier is used to
+     * locate the Scheduler Strategies available to handle this trigger.
+     */
+    public abstract String getType();
+
     public abstract Trigger copy(Project oldProject, Project newProject);
 
     protected void copyCommon(Trigger copy, Project oldProject, Project newProject)
@@ -102,12 +108,6 @@ public abstract class Trigger extends Entity implements NamedEntity
         }
         copy.taskClass = taskClass;
     }
-
-    /**
-     * Return the type identifier for this type of trigger. This identifier is used to
-     * locate the Scheduler Strategies available to handle this trigger.
-     */
-    public abstract String getType();
 
     public String getEditKey()
     {

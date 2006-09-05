@@ -24,4 +24,11 @@ public class RecipeCommencedEvent extends RecipeEvent
     {
         return startTime;
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("Recipe Commenced Event");
+        buff.append(": ").append(getRecipeId());
+        return buff.toString();
+    }    
 }

@@ -29,7 +29,7 @@
 
         <dependency org="apache" name="ant" rev="1.6.5" conf="external,build,release->directoryscanner"/>
 
-        <dependency org="javasvn" name="javasvn" rev="20060828" conf="external,build,release->default"/>
+        <dependency org="javasvn" name="javasvn" rev="20060901" conf="external,build,release->default"/>
 
         <dependency org="junit" name="junit" rev="3.8.1" conf="external,build->default"/>
 

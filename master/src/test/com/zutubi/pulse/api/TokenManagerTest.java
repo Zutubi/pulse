@@ -4,7 +4,9 @@ import com.zutubi.pulse.model.DefaultUserManager;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.model.persistence.GroupDao;
 import com.zutubi.pulse.model.persistence.mock.MockUserDao;
+import com.zutubi.pulse.model.persistence.mock.MockGroupDao;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.license.LicenseManager;
@@ -25,8 +27,11 @@ public class TokenManagerTest extends PulseTestCase
         userDao.save(new User("dan", "Daniel Ostermeier", "insecure", GrantedAuthority.USER));
         userDao.save(new User("anon", "A. Nonymous", "none"));
 
+        GroupDao groupDao = new MockGroupDao();
+
         userManager = new DefaultUserManager();
         userManager.setUserDao(userDao);
+        userManager.setGroupDao(groupDao);
         userManager.setLicenseManager(new LicenseManager());
 
         tokenManager = new TokenManager();

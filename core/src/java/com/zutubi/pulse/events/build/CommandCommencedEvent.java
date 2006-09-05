@@ -23,4 +23,11 @@ public class CommandCommencedEvent extends RecipeEvent
     {
         return startTime;
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("Command Commenced Event: ");
+        buff.append(getRecipeId());
+        return buff.toString();
+    }
 }

@@ -35,4 +35,18 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
     {
         return new BuildResult(reason, getProject(), getSpecification(), projectManager.getNextBuildNumber(getProject()));
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("Build Request Event");
+        if (getProject() != null)
+        {
+            buff.append(": ").append(getProject().getName());
+        }
+        if (getReason() != null)
+        {
+            buff.append(": ").append(getReason().getSummary());
+        }
+        return buff.toString();
+    }
 }

@@ -33,4 +33,15 @@ public class SCMChangeEvent extends Event<Scm>
     {
         return previousRevision;
     }
+
+    public String toString()
+    {
+        StringBuffer buff = new StringBuffer("SCM Change Event");
+        if (getScm() != null)
+        {
+            buff.append(": ").append(getScm().getId());
+        }
+        buff.append(": ").append(getPreviousRevision()).append(" -> ").append(getNewRevision());
+        return buff.toString();
+    }    
 }
