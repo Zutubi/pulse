@@ -194,6 +194,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public void deleteAllBuilds(User user)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public Changelist getChangelistByRevision(String serverUid, Revision revision)
     {
         throw new RuntimeException("Method not implemented.");

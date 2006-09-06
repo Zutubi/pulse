@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.model.persistence.ContactPointDao;
@@ -26,6 +27,11 @@ public class DefaultUserManager implements UserManager
     private PasswordEncoder passwordEncoder;
 
     private LicenseManager licenseManager;
+    /**
+     * Do not access directly, always use getBuildManager().  This dependency
+     * is initialised on demand (not available when this manager is created).
+     */
+    private BuildManager buildManager;
 
     public void init()
     {
@@ -97,6 +103,8 @@ public class DefaultUserManager implements UserManager
 
     public void delete(User user)
     {
+        getBuildManager().deleteAllBuilds(user);
+
         List<Group> groups = groupDao.findByMember(user);
         for(Group group: groups)
         {
@@ -236,5 +244,19 @@ public class DefaultUserManager implements UserManager
     public void setGroupDao(GroupDao groupDao)
     {
         this.groupDao = groupDao;
+    }
+
+    public BuildManager getBuildManager()
+    {
+        if(buildManager == null)
+        {
+            buildManager = (BuildManager) ComponentContext.getBean("buildManager");
+        }
+        return buildManager;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 }

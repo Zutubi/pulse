@@ -264,6 +264,22 @@ public class DefaultBuildManager implements BuildManager, EventListener
         while (results.size() > 0);
     }
 
+    public void deleteAllBuilds(User user)
+    {
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        File userDir = paths.getUserDir(user);
+        if (!FileSystemUtils.removeDirectory(userDir))
+        {
+            LOG.warning("Unable to remove user directory '" + userDir.getAbsolutePath() + "'");
+        }
+
+        List<BuildResult> results = buildResultDao.findByUser(user);
+        for (BuildResult r : results)
+        {
+            buildResultDao.delete(r);
+        }
+    }
+
     public Changelist getChangelistByRevision(String serverUid, Revision revision)
     {
         return changelistDao.findByRevision(serverUid, revision);

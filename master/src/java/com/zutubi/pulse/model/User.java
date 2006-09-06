@@ -73,7 +73,7 @@ public class User extends Entity implements UserDetails
      * may be interacting with (e.g. SCMs).
      */
     private List<String> aliases;
-    private long nextBuildNumber;
+    private long nextBuildNumber = 1;
 
     public User()
     {

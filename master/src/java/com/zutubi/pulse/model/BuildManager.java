@@ -99,6 +99,8 @@ public interface BuildManager
 
     void deleteAllBuilds(Project project);
 
+    void deleteAllBuilds(User user);
+
     Changelist getChangelistByRevision(String serverUid, Revision revision);
 
     void delete(BuildResult result);
