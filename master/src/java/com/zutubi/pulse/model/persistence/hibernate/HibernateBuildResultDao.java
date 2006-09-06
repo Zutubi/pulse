@@ -331,12 +331,21 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public List<BuildResult> findByUser(final User user)
     {
+        return getLatestBuildResultsForUser(user, -1);
+    }
+
+    public List<BuildResult> getLatestBuildResultsForUser(final User user, final int max)
+    {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from BuildResult model where model.user = :user order by model.number desc");
                 queryObject.setEntity("user", user);
+                if(max > 0)
+                {
+                    queryObject.setMaxResults(max);
+                }
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.list();
             }

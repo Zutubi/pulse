@@ -107,6 +107,8 @@ public interface BuildManager
 
     void abortUnfinishedBuilds(Project project, String message);
 
+    void abortUnfinishedBuilds(User user, String message);
+
     boolean isSpaceAvailableForBuild();
 
 }

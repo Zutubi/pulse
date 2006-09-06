@@ -64,6 +64,13 @@ public class JettyManager implements Stoppable
         {
             appContext = server.addWebApplication(getContextPath(), wwwRoot.getAbsolutePath());
             appContext.setDefaultsDescriptor(null);
+            File tmpRoot = configurationManager.getSystemPaths().getTmpRoot();
+            if(!tmpRoot.exists())
+            {
+                tmpRoot.mkdirs();
+            }
+            appContext.setAttribute("javax.servlet.context.tempdir", tmpRoot);
+
             server.start();
         }
         catch(MultiException e)

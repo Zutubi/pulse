@@ -253,7 +253,11 @@ public class FatController implements EventListener, Stoppable
         {
             if (!stopping)
             {
-                projectManager.buildCommenced(project.getId());
+                if(!event.isPersonal())
+                {
+                    projectManager.buildCommenced(project.getId());
+                }
+                
                 RecipeResultCollector collector = new DefaultRecipeResultCollector(project, configManager);
                 BuildController controller = new BuildController(event, buildSpec, eventManager, projectManager, userManager, buildManager, recipeQueue, collector, quartzScheduler, configManager, serviceTokenManager);
                 controller.run();
@@ -312,8 +316,10 @@ public class FatController implements EventListener, Stoppable
         lock.lock();
         try
         {
+            BuildResult result = event.getResult();
+
             // Look up the project to avoid stale data
-            Project project = projectManager.getProject(event.getResult().getProject().getId());
+            Project project = projectManager.getProject(result.getProject().getId());
 
             BuildController controller = (BuildController) event.getSource();
             runningBuilds.remove(controller);
@@ -323,16 +329,14 @@ public class FatController implements EventListener, Stoppable
                 stoppedCondition.signalAll();
             }
 
-            projectManager.buildCompleted(project.getId());
+            if(!result.isPersonal())
+            {
+                projectManager.buildCompleted(project.getId());
+            }
 
             if (!stopping)
             {
-                Entity owner = project;
-                if(event.getResult().getUser() != null)
-                {
-                    owner = event.getResult().getUser();
-                }
-
+                Entity owner = result.getOwner();
                 AbstractBuildRequestEvent queuedEvent = buildQueue.buildCompleted(owner);
 
                 if (queuedEvent != null)

@@ -134,7 +134,7 @@ public class MockBuildManager implements BuildManager
 
         for (BuildResult r : buildResults.values())
         {
-            if (r.getProject().equals(project))
+            if (!r.isPersonal() && r.getProject().equals(project))
             {
                 if (result == null || result.getNumber() < r.getNumber())
                 {
@@ -196,7 +196,6 @@ public class MockBuildManager implements BuildManager
 
     public void deleteAllBuilds(User user)
     {
-        throw new RuntimeException("Method not implemented.");
     }
 
     public Changelist getChangelistByRevision(String serverUid, Revision revision)
@@ -216,6 +215,20 @@ public class MockBuildManager implements BuildManager
         {
             result.error(message);
             result.complete();
+        }
+    }
+
+    public void abortUnfinishedBuilds(User user, String message)
+    {
+        BuildResult result = null;
+
+        for (BuildResult r : buildResults.values())
+        {
+            if (user.equals(r.getOwner()) && r.inProgress())
+            {
+                r.error(message);
+                r.complete();
+            }
         }
     }
 

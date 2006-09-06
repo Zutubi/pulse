@@ -5,8 +5,6 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.io.Serializable;
-
 /**
  * A filter that will only allow triggers for builds that complete in
  * certain states.
@@ -23,7 +21,7 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
     public boolean accept(Trigger trigger, Event event)
     {
         BuildCompletedEvent bce = (BuildCompletedEvent) event;
-        return checkProject(trigger, bce) && checkSpec(trigger, bce) && checkState(trigger, bce);
+        return !bce.getResult().isPersonal() && checkProject(trigger, bce) && checkSpec(trigger, bce) && checkState(trigger, bce);
     }
 
     public boolean dependsOnProject(Trigger trigger, long projectId)

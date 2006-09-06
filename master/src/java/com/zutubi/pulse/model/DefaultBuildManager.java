@@ -293,12 +293,26 @@ public class DefaultBuildManager implements BuildManager, EventListener
     public void abortUnfinishedBuilds(Project project, String message)
     {
         BuildResult lastBuild = getLatestBuildResult(project);
-        if (lastBuild != null && !lastBuild.completed())
+        abortBuild(lastBuild, message);
+    }
+
+    public void abortUnfinishedBuilds(User user, String message)
+    {
+        List<BuildResult> results = buildResultDao.getLatestBuildResultsForUser(user, 1);
+        if(results.size() > 0)
         {
-            lastBuild.abortUnfinishedRecipes();
-            lastBuild.error(message);
-            lastBuild.complete();
-            save(lastBuild);
+            abortBuild(results.get(0), message);
+        }
+    }
+
+    private void abortBuild(BuildResult build, String message)
+    {
+        if (build != null && !build.completed())
+        {
+            build.abortUnfinishedRecipes();
+            build.error(message);
+            build.complete();
+            save(build);
         }
     }
 
@@ -384,7 +398,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
     public void handleEvent(Event evt)
     {
         BuildCompletedEvent completedEvent = (BuildCompletedEvent) evt;
-        cleanupBuilds(completedEvent.getResult().getProject());
+        BuildResult result = completedEvent.getResult();
+        if(!result.isPersonal())
+        {
+            cleanupBuilds(result.getProject());
+        }
     }
 
     public Class[] getHandledEvents()
