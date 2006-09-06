@@ -287,7 +287,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public void delete(BuildResult result)
     {
-        cleanupResult(result.getProject(), result);
+        cleanupResult(result);
     }
 
     public void abortUnfinishedBuilds(Project project, String message)
@@ -342,13 +342,27 @@ public class DefaultBuildManager implements BuildManager, EventListener
                 }
                 else
                 {
-                    cleanupResult(project, build);
+                    cleanupResult(build);
                 }
             }
         }
     }
 
-    private void cleanupResult(Project project, BuildResult build)
+    public void cleanupBuilds(User user)
+    {
+        int count = buildResultDao.getCompletedResultCount(user);
+        int max = user.getMyBuildsCount();
+        if(count > max)
+        {
+            List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, count - max);
+            for(BuildResult result: results)
+            {
+                cleanupResult(result);
+            }
+        }
+    }
+
+    private void cleanupResult(BuildResult build)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File buildDir = paths.getBuildDir(build);
@@ -358,15 +372,23 @@ public class DefaultBuildManager implements BuildManager, EventListener
             return;
         }
 
-        // Remove records of this build from changelists
-        BuildScmDetails scmDetails = build.getScmDetails();
-        if(scmDetails != null)
+        if(build.isPersonal())
         {
-            List<Changelist> changelists = changelistDao.findByResult(build.getId());
-            for(Changelist change: changelists)
+            File patch = paths.getUserPatchFile(build.getUser(), build.getNumber());
+            patch.delete();
+        }
+        else
+        {
+            // Remove records of this build from changelists
+            BuildScmDetails scmDetails = build.getScmDetails();
+            if(scmDetails != null)
             {
-                change.removeResultId(build.getId());
-                changelistDao.save(change);
+                List<Changelist> changelists = changelistDao.findByResult(build.getId());
+                for(Changelist change: changelists)
+                {
+                    change.removeResultId(build.getId());
+                    changelistDao.save(change);
+                }
             }
         }
 
@@ -399,7 +421,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
     {
         BuildCompletedEvent completedEvent = (BuildCompletedEvent) evt;
         BuildResult result = completedEvent.getResult();
-        if(!result.isPersonal())
+        if(result.isPersonal())
+        {
+            cleanupBuilds(result.getUser());
+        }
+        else
         {
             cleanupBuilds(result.getProject());
         }

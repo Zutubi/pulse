@@ -236,4 +236,9 @@ public class MockBuildManager implements BuildManager
     {
         return true;
     }
+
+    public void cleanupBuilds(User user)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
 }

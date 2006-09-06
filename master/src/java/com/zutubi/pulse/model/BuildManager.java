@@ -111,4 +111,5 @@ public interface BuildManager
 
     boolean isSpaceAvailableForBuild();
 
+    void cleanupBuilds(User user);
 }

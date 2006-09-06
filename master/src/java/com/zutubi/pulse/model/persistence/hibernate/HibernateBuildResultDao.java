@@ -352,6 +352,40 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
+    public int getCompletedResultCount(final User user)
+    {
+        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("select count (*) from BuildResult model where model.user = :user and model.stateName in (:stateNames)");
+                queryObject.setEntity("user", user);
+                queryObject.setParameterList("stateNames", ResultState.getCompletedStateNames());
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.uniqueResult();
+            }
+        });
+    }
+
+    public List<BuildResult> getOldestCompletedBuilds(final User user, final int max)
+    {
+        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from BuildResult model where model.user = :user and model.stateName in (:stateNames) order by model.number asc");
+                queryObject.setEntity("user", user);
+                queryObject.setParameterList("stateNames", ResultState.getCompletedStateNames());
+                if(max > 0)
+                {
+                    queryObject.setMaxResults(max);
+                }
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.list();
+            }
+        });
+    }
+
     private void intialise(BuildResult result)
     {
         Hibernate.initialize(result.getFeatures());
