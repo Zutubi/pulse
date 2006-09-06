@@ -4,7 +4,6 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.User;
 
 import java.io.File;
 
@@ -42,9 +41,9 @@ public class MasterBuildPaths
         return new File(projectRoot, getEntityDirName(project));
     }
 
-    public File getUserDir(User user)
+    public File getUserDir(long userId)
     {
-        return new File(userRoot, getEntityDirName(user));
+        return new File(userRoot, Long.toString(userId));
     }
 
     public File getRepoDir(Project project)
@@ -57,9 +56,9 @@ public class MasterBuildPaths
         return new File(getProjectDir(project), "builds");
     }
 
-    public File getBuildsDir(User user)
+    public File getBuildsDir(long userId)
     {
-        return new File(getUserDir(user), "builds");
+        return new File(getUserDir(userId), "builds");
     }
 
     public static String getBuildDirName(BuildResult result)
@@ -76,7 +75,7 @@ public class MasterBuildPaths
         }
         else
         {
-            base = getUserDir(result.getUser());
+            base = getUserDir(result.getUser().getId());
         }
 
         return new File(base, getBuildDirName(result));
@@ -97,13 +96,13 @@ public class MasterBuildPaths
         return new File(getRecipeDir(result, recipeId), "base");
     }
 
-    public File getUserPatchDir(User user)
+    public File getUserPatchDir(long userId)
     {
-        return new File(getUserDir(user), "patches");
+        return new File(getUserDir(userId), "patches");
     }
 
-    public File getUserPatchFile(User user, long number)
+    public File getUserPatchFile(long userId, long number)
     {
-        return new File(getUserPatchDir(user), String.format("%08d", number));
+        return new File(getUserPatchDir(userId), String.format("%08d", number));
     }
 }

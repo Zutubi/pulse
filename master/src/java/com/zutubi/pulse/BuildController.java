@@ -228,7 +228,8 @@ public class BuildController implements EventListener
             initialBootstrapper = new CheckoutBootstrapper(project.getName(), specification.getName(), project.getScm(), request.getRevision(), false);
             if(request.isPersonal())
             {
-                initialBootstrapper = new PatchBootstrapper(initialBootstrapper, ((PersonalBuildRequestEvent)request).getPatch());
+                PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
+                initialBootstrapper = new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber());
             }
         }
         else

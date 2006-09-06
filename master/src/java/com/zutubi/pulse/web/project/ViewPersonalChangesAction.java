@@ -52,7 +52,7 @@ public class ViewPersonalChangesAction extends ProjectActionSupport
         checkPermissions(result);
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File patchFile = paths.getUserPatchFile(getLoggedInUser(), result.getNumber());
+        File patchFile = paths.getUserPatchFile(getLoggedInUser().getId(), result.getNumber());
         if(!patchFile.exists())
         {
             addActionError("Patch file not found");

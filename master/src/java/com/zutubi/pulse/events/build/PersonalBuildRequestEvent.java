@@ -40,4 +40,14 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
     {
         return patch;
     }
+
+    public long getNumber()
+    {
+        return number;
+    }
+
+    public User getUser()
+    {
+        return user;
+    }
 }

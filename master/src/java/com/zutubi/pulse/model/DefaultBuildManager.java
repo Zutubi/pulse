@@ -267,7 +267,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
     public void deleteAllBuilds(User user)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File userDir = paths.getUserDir(user);
+        File userDir = paths.getUserDir(user.getId());
         if (!FileSystemUtils.removeDirectory(userDir))
         {
             LOG.warning("Unable to remove user directory '" + userDir.getAbsolutePath() + "'");
@@ -374,7 +374,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
         if(build.isPersonal())
         {
-            File patch = paths.getUserPatchFile(build.getUser(), build.getNumber());
+            File patch = paths.getUserPatchFile(build.getUser().getId(), build.getNumber());
             patch.delete();
         }
         else

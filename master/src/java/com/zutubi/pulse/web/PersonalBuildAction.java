@@ -102,12 +102,12 @@ public class PersonalBuildAction extends ActionSupport
 
         number = userManager.getNextBuildNumber(user);
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File patchDir = paths.getUserPatchDir(user);
+        File patchDir = paths.getUserPatchDir(user.getId());
         if(!patchDir.isDirectory())
         {
             patchDir.mkdirs();
         }
-        File patchFile = paths.getUserPatchFile(user, number);
+        File patchFile = paths.getUserPatchFile(user.getId(), number);
         files[0].renameTo(patchFile);
 
         PatchArchive archive = null;
