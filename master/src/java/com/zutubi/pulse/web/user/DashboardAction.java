@@ -18,6 +18,7 @@ import java.util.List;
 public class DashboardAction extends ActionSupport
 {
     private User user;
+    private List<BuildResult> myBuilds;
     private List<Project> projects;
     private List<List<BuildResult>> latestBuilds;
     private List<Changelist> changelists;
@@ -32,6 +33,11 @@ public class DashboardAction extends ActionSupport
     public User getUser()
     {
         return user;
+    }
+
+    public List<BuildResult> getMyBuilds()
+    {
+        return myBuilds;
     }
 
     public List<Project> getProjects()
@@ -72,6 +78,8 @@ public class DashboardAction extends ActionSupport
             return ERROR;
         }
 
+        myBuilds = buildManager.getPersonalBuilds(user);
+        
         projects = projectManager.getAllProjects();
         projects.removeAll(userManager.getHiddenProjects(user));
 

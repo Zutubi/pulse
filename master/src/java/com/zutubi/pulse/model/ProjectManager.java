@@ -1,6 +1,8 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import org.acegisecurity.annotation.Secured;
 
@@ -135,13 +137,15 @@ public interface ProjectManager extends EntityManager<Project>
      * @param project       the project to trigger a build of
      * @param specification name of the specification to build
      * @param reason        the reason the build was triggered
-     * @param revision      the revision to build, may be fixed to indicate
-     *                      a specific revision, if not fixed then changelist
-     *                      isolation may result in multiple build requests
+     * @param revision      the revision to build, or null if the revision is
+     *                      not fixed (in which case changelist isolation may
+     *                      result in multiple build requests
      * @param force         if true, force a build to occur even if the
      *                      latest has been built
      */
-    void triggerBuild(Project project, String specification, BuildReason reason, BuildRevision revision, boolean force);
+    void triggerBuild(Project project, String specification, BuildReason reason, Revision revision, boolean force);
+
+    void triggerBuild(long number, Project project, BuildSpecification specification, User user, PatchArchive archive) throws PulseException;
 
     long getNextBuildNumber(Project project);
 

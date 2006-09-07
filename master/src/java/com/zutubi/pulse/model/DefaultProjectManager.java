@@ -3,13 +3,19 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
+import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
-import com.zutubi.pulse.model.persistence.*;
+import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
+import com.zutubi.pulse.model.persistence.CommitMessageTransformerDao;
+import com.zutubi.pulse.model.persistence.ProjectDao;
+import com.zutubi.pulse.model.persistence.TriggerDao;
+import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
@@ -134,7 +140,7 @@ public class DefaultProjectManager implements ProjectManager
         return copy;
     }
 
-    public void triggerBuild(Project project, String specification, BuildReason reason, BuildRevision revision, boolean force)
+    public void triggerBuild(Project project, String specification, BuildReason reason, Revision revision, boolean force)
     {
         BuildSpecification spec = project.getBuildSpecification(specification);
         if(spec == null)
@@ -143,27 +149,48 @@ public class DefaultProjectManager implements ProjectManager
             return;
         }
 
-        if(!revision.isFixed() && spec.getIsolateChangelists())
+        if(revision == null)
         {
-            // In this case we need to check if there are multiple
-            // outstanding revisions and if so create requests for each one.
-            try
+            if(spec.getIsolateChangelists())
             {
-                List<Revision> revisions = changelistIsolator.getRevisionsToRequest(project, spec, force);
-                for(Revision r: revisions)
+                // In this case we need to check if there are multiple
+                // outstanding revisions and if so create requests for each one.
+                try
                 {
-                    requestBuildOfRevision(reason, project, specification, r);
+                    List<Revision> revisions = changelistIsolator.getRevisionsToRequest(project, spec, force);
+                    for(Revision r: revisions)
+                    {
+                        requestBuildOfRevision(reason, project, specification, r);
+                    }
+                }
+                catch (SCMException e)
+                {
+                    LOG.error("Unable to determine revisions to build for project '" + project.getName() + "', specification '" + specification + "': " + e.getMessage(), e);
                 }
             }
-            catch (SCMException e)
+            else
             {
-                LOG.error("Unable to determine revisions to build for project '" + project.getName() + "', specification '" + specification + "': " + e.getMessage(), e);
+                eventManager.publish(new BuildRequestEvent(this, reason, project, specification, new BuildRevision()));
             }
         }
         else
         {
             // Just raise one request.
-            eventManager.publish(new BuildRequestEvent(this, reason, project, specification, revision));
+            requestBuildOfRevision(reason, project, specification, revision);
+        }
+    }
+
+    public void triggerBuild(long number, Project project, BuildSpecification specification, User user, PatchArchive archive) throws PulseException
+    {
+        Revision revision = archive.getStatus().getRevision();
+        try
+        {
+            String pulseFile = getPulseFile(project, revision, archive);
+            eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile), user, archive, project, specification.getName()));
+        }
+        catch (BuildException e)
+        {
+            throw new PulseException(e.getMessage(), e);
         }
     }
 
@@ -180,15 +207,25 @@ public class DefaultProjectManager implements ProjectManager
     {
         try
         {
-            PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
-            ComponentContext.autowire(pulseFileDetails);
-            String pulseFile = pulseFileDetails.getPulseFile(0, project, revision);
+            String pulseFile = getPulseFile(project, revision, null);
             eventManager.publish(new BuildRequestEvent(this, reason, project, specification, new BuildRevision(revision, pulseFile)));
         }
         catch (BuildException e)
         {
-            LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision " + revision.getRevisionString() + ": " + e.getMessage(), e);
+            String message = "Unable to obtain pulse file for project '" + project.getName();
+            if(revision != null)
+            {
+                message += "', revision '" + revision.getRevisionString();
+            }
+            LOG.severe(message + "': " + e.getMessage(), e);
         }
+    }
+
+    private String getPulseFile(Project project, Revision revision, PatchArchive patch) throws BuildException
+    {
+        PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
+        ComponentContext.autowire(pulseFileDetails);
+        return pulseFileDetails.getPulseFile(0, project, revision, patch);
     }
 
     public void updateProjectDetails(Project project, String name, String description, String url) throws SchedulingException

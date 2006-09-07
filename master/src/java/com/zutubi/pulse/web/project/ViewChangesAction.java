@@ -162,6 +162,8 @@ public class ViewChangesAction extends ProjectActionSupport
 
     public String execute()
     {
+        checkPermissions(result);
+
         changelists = new LinkedList<Changelist>();
 
         // Get changes for all results after since, up to and including to.

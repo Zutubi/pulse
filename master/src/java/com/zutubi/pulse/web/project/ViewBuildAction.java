@@ -67,6 +67,8 @@ public class ViewBuildAction extends ProjectActionSupport
             return ERROR;
         }
 
+        checkPermissions(result);
+
         return SUCCESS;
     }
 

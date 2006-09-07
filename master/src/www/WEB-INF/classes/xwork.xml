@@ -112,6 +112,11 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="viewPersonalChanges" class="com.zutubi.pulse.web.project.ViewPersonalChangesAction">
+            <result name="success" type="velocity">view-personal-changes.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="viewTests" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-tests.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
@@ -765,6 +770,15 @@
         </action>
     </package>
 
+    <package name="personal" namespace="/personal" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="personalBuild" class="com.zutubi.pulse.web.PersonalBuildAction">
+            <result name="error" type="velocity">error.vm</result>
+            <result name="success" type="velocity">success.vm</result>
+        </action>
+    </package>
+
     <package name="user" namespace="/user" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
@@ -1259,7 +1273,7 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="serverQueuesPanel" class="com.zutubi.pulse.web.server.ViewServerQueuesAction">
+        <action name="viewServerQueuesPanel" class="com.zutubi.pulse.web.server.ViewServerQueuesAction">
             <result name="success" type="velocity">view-server-queues-panel.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>

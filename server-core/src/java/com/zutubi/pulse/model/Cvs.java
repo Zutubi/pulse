@@ -1,11 +1,14 @@
 package com.zutubi.pulse.model;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.scm.cvs.CvsServer;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.util.Constants;
+
+import java.io.File;
 
 /**
  * The CVS object defines the configuration properties required to communicate with a
@@ -40,9 +43,9 @@ public class Cvs extends Scm
     {
         // use a manual autowire here since this object itself is not wired, and so
         // does not have access to the object factory.
-        CvsServer server = new CvsServer(this);
-        ComponentContext.autowire(server);
-        return server;
+        ConfigurationManager configurationManager = (ConfigurationManager) ComponentContext.getBean("configurationManager");
+        File tmpRoot = configurationManager.getSystemPaths().getTmpRoot();
+        return new CvsServer(getRoot(), getModule(), getPassword(), getBranch(), getFilteredPaths(), tmpRoot);
     }
 
     /**

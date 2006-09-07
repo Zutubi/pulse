@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.model.persistence.ContactPointDao;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 
+ *
  *
  */
 public class DefaultUserManager implements UserManager
@@ -26,6 +27,11 @@ public class DefaultUserManager implements UserManager
     private PasswordEncoder passwordEncoder;
 
     private LicenseManager licenseManager;
+    /**
+     * Do not access directly, always use getBuildManager().  This dependency
+     * is initialised on demand (not available when this manager is created).
+     */
+    private BuildManager buildManager;
 
     public void init()
     {
@@ -97,6 +103,8 @@ public class DefaultUserManager implements UserManager
 
     public void delete(User user)
     {
+        getBuildManager().deleteAllBuilds(user);
+
         List<Group> groups = groupDao.findByMember(user);
         for(Group group: groups)
         {
@@ -159,6 +167,15 @@ public class DefaultUserManager implements UserManager
     public List<User> getUsersNotInGroup(Group group)
     {
         return userDao.findByNotInGroup(group);
+    }
+
+    public long getNextBuildNumber(User user)
+    {
+        user = getUser(user.getId());
+        long number = user.getNextBuildNumber();
+        user.setNextBuildNumber(number + 1);
+        save(user);
+        return number;
     }
 
     public void removeReferencesToProject(Project project)
@@ -227,5 +244,19 @@ public class DefaultUserManager implements UserManager
     public void setGroupDao(GroupDao groupDao)
     {
         this.groupDao = groupDao;
+    }
+
+    public BuildManager getBuildManager()
+    {
+        if(buildManager == null)
+        {
+            buildManager = (BuildManager) ComponentContext.getBean("buildManager");
+        }
+        return buildManager;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 }

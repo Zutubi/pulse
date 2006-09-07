@@ -3,12 +3,10 @@ package com.zutubi.pulse.web.project;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.ScmManager;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.web.ActionSupport;
+import org.acegisecurity.AccessDeniedException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +20,7 @@ public class ProjectActionSupport extends ActionSupport
     private ProjectManager projectManager;
     private BuildManager buildManager;
     private ScmManager scmManager;
+    private UserManager userManager;
     private Scheduler scheduler;
 
     private static final long NONE_SPECIFIED = -1;
@@ -188,6 +187,29 @@ public class ProjectActionSupport extends ActionSupport
         }
     }
 
+    public User getLoggedInUser()
+    {
+        Object principle = getPrinciple();
+        if(principle != null && principle instanceof String)
+        {
+            return userManager.getUser((String)principle);
+        }
+
+        return null;
+    }
+
+    public void checkPermissions(BuildResult result)
+    {
+        if(result.isPersonal())
+        {
+            User user = getLoggedInUser();
+            if(!result.getUser().equals(user))
+            {
+                throw new AccessDeniedException("Only the owner can view a personal build");
+            }
+        }
+    }
+
     public String getChangeUrl(Project project, Revision revision)
     {
         if(project != null)
@@ -196,5 +218,10 @@ public class ProjectActionSupport extends ActionSupport
         }
 
         return null;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 }

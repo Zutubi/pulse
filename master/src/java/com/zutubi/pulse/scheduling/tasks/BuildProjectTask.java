@@ -1,6 +1,5 @@
 package com.zutubi.pulse.scheduling.tasks;
 
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.TriggerBuildReason;
@@ -36,7 +35,7 @@ public class BuildProjectTask implements Task
         if (project != null)
         {
             // generate build request.
-            projectManager.triggerBuild(project, spec, new TriggerBuildReason(trigger.getName()), new BuildRevision(), force);
+            projectManager.triggerBuild(project, spec, new TriggerBuildReason(trigger.getName()), null, force);
         }
         else
         {

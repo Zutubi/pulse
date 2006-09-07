@@ -3,13 +3,12 @@ package com.zutubi.pulse.slave;
 import com.zutubi.pulse.ChainBootstrapper;
 import com.zutubi.pulse.ServerBootstrapper;
 import com.zutubi.pulse.ServerRecipePaths;
-import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.RecipeProcessor;
-import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
+import com.zutubi.pulse.repository.FileRepositoryAware;
+import com.zutubi.pulse.repository.SlaveFileRepository;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.logging.Logger;
@@ -64,7 +63,13 @@ public class SlaveRecipeProcessor
             EventListener listener = registerMasterListener(masterProxy, request.getId());
             ResourceRepository repo = new RemoteResourceRepository(slaveId, masterProxy, serviceTokenManager);
             ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getSpec(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
-            request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), request.getBootstrapper()));
+
+            Bootstrapper requestBootstrapper = request.getBootstrapper();
+            if(requestBootstrapper instanceof FileRepositoryAware)
+            {
+                ((FileRepositoryAware)requestBootstrapper).setFileRepository(new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
+            }
+            request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
 
             try
             {

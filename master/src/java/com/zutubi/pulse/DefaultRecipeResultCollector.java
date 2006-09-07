@@ -23,7 +23,7 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
     public void prepare(BuildResult result, long recipeId)
     {
         // ensure that we have created the necessary directories.
-        File recipeDir = paths.getRecipeDir(project, result, recipeId);
+        File recipeDir = paths.getRecipeDir(result, recipeId);
         if (!recipeDir.mkdirs())
         {
             throw new BuildException("Failed to create the '" + recipeDir + "' directory.");
@@ -34,7 +34,7 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
     {
         if (buildService != null)
         {
-            File outputDest = paths.getOutputDir(project, result, recipeId);
+            File outputDest = paths.getOutputDir(result, recipeId);
             if (!outputDest.mkdirs())
             {
                 throw new BuildException("Unable to create output destination '" + outputDest.getAbsolutePath() + "'");
@@ -43,7 +43,7 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
             File workDest = null;
             if (collectWorkingCopy)
             {
-                workDest = paths.getBaseDir(project, result, recipeId);
+                workDest = paths.getBaseDir(result, recipeId);
                 if (!workDest.mkdirs())
                 {
                     throw new BuildException("Unable to create work destination '" + workDest.getAbsolutePath() + "'");

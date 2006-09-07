@@ -1,9 +1,6 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.model.NamedEntityComparator;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.AcegiUtils;
 
 import java.util.*;
@@ -13,12 +10,24 @@ import java.util.*;
  */
 public class ConfigureDashboardAction extends UserActionSupport
 {
+    private int myBuildsCount;
     private int buildCount;
     private Map<Long, String> allProjects;
     private List<Long> projects;
     private ProjectManager projectManager;
     private boolean showMyChanges = false;
     private boolean showProjectChanges = false;
+    private BuildManager buildManager;
+
+    public int getMyBuildsCount()
+    {
+        return myBuildsCount;
+    }
+
+    public void setMyBuildsCount(int myBuildsCount)
+    {
+        this.myBuildsCount = myBuildsCount;
+    }
 
     public int getBuildCount()
     {
@@ -95,6 +104,8 @@ public class ConfigureDashboardAction extends UserActionSupport
             return ERROR;
         }
 
+        myBuildsCount = user.getMyBuildsCount();
+
         buildCount = user.getDashboardBuildCount();
 
         List<Project> all = projectManager.getAllProjects();
@@ -124,6 +135,9 @@ public class ConfigureDashboardAction extends UserActionSupport
 
         User user = getUser();
 
+        user.setMyBuildsCount(myBuildsCount);
+        buildManager.cleanupBuilds(user);
+
         user.setDashboardBuildCount(buildCount);
         user.clearProjects();
 
@@ -147,5 +161,10 @@ public class ConfigureDashboardAction extends UserActionSupport
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 }

@@ -16,9 +16,12 @@ public interface MasterUserPaths extends UserPaths
     File getDatabaseRoot();
 
     /**
-     * The project root directory. All working files are
+     * The project root directory. All working files are stored under this
+     * root.
      *
      * @return the directory in which project build artifacts are stored.
      */
     File getProjectRoot();
+
+    File getUserRoot();
 }

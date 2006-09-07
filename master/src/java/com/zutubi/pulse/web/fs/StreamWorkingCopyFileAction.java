@@ -45,6 +45,8 @@ public class StreamWorkingCopyFileAction extends AbstractProjectWorkingCopyActio
             return ERROR;
         }
 
+        checkPermissions(buildResult);
+
         // if build is pending, then there is nothing that we can display.
         Project project = buildResult.getProject();
         projectManager.checkWrite(project);
@@ -54,7 +56,7 @@ public class StreamWorkingCopyFileAction extends AbstractProjectWorkingCopyActio
         String remainingPath = getWorkingCopyPathSegment();
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File baseDir = paths.getBaseDir(project, buildResult, Long.valueOf(recipeId));
+        File baseDir = paths.getBaseDir(buildResult, Long.valueOf(recipeId));
 
         File file = baseDir;
         if (TextUtils.stringSet(remainingPath))

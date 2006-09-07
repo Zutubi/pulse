@@ -23,7 +23,7 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
     public boolean accept(Trigger trigger, Event event)
     {
         BuildCompletedEvent bce = (BuildCompletedEvent) event;
-        return checkProject(trigger, bce) && checkSpec(trigger, bce) && checkState(trigger, bce);
+        return !bce.getResult().isPersonal() && checkProject(trigger, bce) && checkSpec(trigger, bce) && checkState(trigger, bce);
     }
 
     public boolean dependsOnProject(Trigger trigger, long projectId)

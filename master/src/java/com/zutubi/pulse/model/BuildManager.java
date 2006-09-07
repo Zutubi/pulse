@@ -30,6 +30,10 @@ public interface BuildManager
 
     StoredFileArtifact getFileArtifact(long id);
 
+    List<BuildResult> getPersonalBuilds(User user);
+
+    BuildResult getLatestBuildResult(User user);
+
     List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
 
     List<BuildResult> querySpecificationBuilds(Project project, String spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise);
@@ -97,12 +101,19 @@ public interface BuildManager
 
     void deleteAllBuilds(Project project);
 
+    void deleteAllBuilds(User user);
+
     Changelist getChangelistByRevision(String serverUid, Revision revision);
 
     void delete(BuildResult result);
 
     void abortUnfinishedBuilds(Project project, String message);
 
+    void abortUnfinishedBuilds(User user, String message);
+
     boolean isSpaceAvailableForBuild();
 
+    void cleanupBuilds(User user);
+
+    boolean canCancel(BuildResult build, User user);
 }

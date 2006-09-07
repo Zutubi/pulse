@@ -132,6 +132,11 @@
         <servlet-class>com.zutubi.pulse.servlet.DownloadResultsServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>patch</servlet-name>
+        <servlet-class>com.zutubi.pulse.servlet.DownloadPatchServlet</servlet-class>
+    </servlet>
+
     <!-- Entry point for xmlrpc services. -->
     <servlet>
         <servlet-name>XmlRpcServlet</servlet-name>
@@ -168,6 +173,11 @@
     <servlet-mapping>
         <servlet-name>download</servlet-name>
         <url-pattern>/download</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>patch</servlet-name>
+        <url-pattern>/patch</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

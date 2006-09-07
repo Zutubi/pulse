@@ -2,9 +2,9 @@ package com.zutubi.pulse.upgrade.tasks;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
-import com.zutubi.pulse.bootstrap.MasterConfigurationSupport;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.conf.PropertiesConfig;
+import com.zutubi.pulse.bootstrap.MasterConfigurationSupport;
+import com.zutubi.pulse.config.PropertiesConfig;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.upgrade.UpgradeException;
 

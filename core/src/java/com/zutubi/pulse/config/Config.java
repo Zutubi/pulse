@@ -1,4 +1,4 @@
-package com.zutubi.pulse.bootstrap.conf;
+package com.zutubi.pulse.config;
 
 /**
  *

@@ -24,6 +24,7 @@ public class User extends Entity implements UserDetails
     private static final String PROPERTY_REFRESH_INTERVAL = "user.refreshInterval";
     private static final String PROPERTY_TAIL_LINES = "tail.lines";
     private static final String PROPERTY_TAIL_REFRESH_INTERVAL = "tail.refresh.interval";
+    private static final String PROPERTY_MY_BUILDS_COUNT = "my.builds.count";
 
     /**
      * The login name is used to identify this user.
@@ -73,6 +74,7 @@ public class User extends Entity implements UserDetails
      * may be interacting with (e.g. SCMs).
      */
     private List<String> aliases;
+    private long nextBuildNumber = 1;
 
     public User()
     {
@@ -512,6 +514,16 @@ public class User extends Entity implements UserDetails
         setIntProperty(PROPERTY_PROJECT_CHANGES_COUNT, count);
     }
 
+    public int getMyBuildsCount()
+    {
+        return getIntProperty(PROPERTY_MY_BUILDS_COUNT, 5);
+    }
+
+    public void setMyBuildsCount(int count)
+    {
+        setIntProperty(PROPERTY_MY_BUILDS_COUNT, count);
+    }
+
     public boolean equals(Object other)
     {
         if(other == null || !(other instanceof User))
@@ -587,5 +599,15 @@ public class User extends Entity implements UserDetails
     void removeGroup(Group group)
     {
         groups.remove(group);
+    }
+
+    public long getNextBuildNumber()
+    {
+        return nextBuildNumber;
+    }
+
+    public void setNextBuildNumber(long nextBuildNumber)
+    {
+        this.nextBuildNumber = nextBuildNumber;
     }
 }
