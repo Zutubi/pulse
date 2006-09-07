@@ -3,31 +3,33 @@ package com.zutubi.pulse.web.server;
 import com.zutubi.pulse.FatController;
 import com.zutubi.pulse.RecipeDispatchRequest;
 import com.zutubi.pulse.RecipeQueue;
-import com.zutubi.pulse.events.build.BuildRequestEvent;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.web.ActionSupport;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
 public class ViewServerQueuesAction extends ActionSupport
 {
+    private List<AbstractBuildRequestEvent> buildQueue;
+    private List<BuildResult> executingBuilds;
+    private List<RecipeDispatchRequest> recipeQueueSnapshot;
     private FatController fatController;
     private RecipeQueue recipeQueue;
     private BuildManager buildManager;
-    private Map<Project, List<BuildRequestEvent>> projectQueue;
-    private Map<Project, BuildResult> latestBuilds;
-    private List<RecipeDispatchRequest> recipeQueueSnapshot;
+    private UserManager userManager;
 
-    public Map<Project, List<BuildRequestEvent>> getProjectQueue()
+    public List<AbstractBuildRequestEvent> getBuildQueue()
     {
-        return projectQueue;
+        return buildQueue;
+    }
+
+    public List<BuildResult> getExecutingBuilds()
+    {
+        return executingBuilds;
     }
 
     public boolean getRecipeQueueRunning()
@@ -40,70 +42,69 @@ public class ViewServerQueuesAction extends ActionSupport
         return recipeQueueSnapshot;
     }
 
-    public boolean hasActiveBuilds()
+    public boolean canCancel(BuildResult build)
     {
-        return hasQueueSized(1);
-    }
-
-    public boolean hasActiveBuild(Project project)
-    {
-        return projectQueue.containsKey(project) && projectQueue.get(project).size() > 0;
-    }
-
-    public boolean hasQueuedRequests()
-    {
-        return hasQueueSized(2);
-    }
-
-    private boolean hasQueueSized(int size)
-    {
-        for (List<BuildRequestEvent> l : projectQueue.values())
+        Object principle = getPrinciple();
+        if(principle != null && principle instanceof String)
         {
-            if (l.size() >= size)
-            {
-                return true;
-            }
+            return buildManager.canCancel(build, userManager.getUser((String)principle));
         }
 
         return false;
     }
 
-    public boolean hasQueuedRequests(Project project)
-    {
-        return projectQueue.containsKey(project) && projectQueue.get(project).size() > 1;
-    }
-
-    public List<BuildRequestEvent> getQueuedRequests(Project project)
-    {
-        List<BuildRequestEvent> result = new LinkedList<BuildRequestEvent>(projectQueue.get(project));
-        result.remove(0);
-        return result;
-    }
-
-    public boolean hasBuild(Project p)
-    {
-        return latestBuilds.containsKey(p);
-    }
-
-    public BuildResult getBuild(Project p)
-    {
-        return latestBuilds.get(p);
-    }
-    
     public String execute() throws Exception
     {
         recipeQueueSnapshot = recipeQueue.takeSnapshot();
-        // TODO dev-personal
-        //projectQueue = fatController.snapshotProjectQueue();
-        latestBuilds = new HashMap<Project, BuildResult>(projectQueue.size());
-        for(Project p: projectQueue.keySet())
+
+        buildQueue = new LinkedList<AbstractBuildRequestEvent>();
+        executingBuilds = new LinkedList<BuildResult>();
+
+        Map<Entity, List<AbstractBuildRequestEvent>> builds = fatController.snapshotProjectQueue();
+        for(Entity entity: builds.keySet())
         {
-            BuildResult result = buildManager.getLatestBuildResult(p);
-            if(result != null && result.inProgress())
+            List<AbstractBuildRequestEvent> events = builds.get(entity);
+            if(events.size() > 0)
             {
-                latestBuilds.put(p, result);
+                AbstractBuildRequestEvent active = events.get(0);
+                BuildResult result;
+                if(active.isPersonal())
+                {
+                    result = buildManager.getLatestBuildResult((User) active.getOwner());
+                }
+                else
+                {
+                    result = buildManager.getLatestBuildResult((Project) active.getOwner());
+                }
+
+                if(result != null && (result.inProgress() || result.terminating()))
+                {
+                    executingBuilds.add(result);
+                }
+
+                if(events.size() > 1)
+                {
+                    buildQueue.addAll(events.subList(1, events.size()));
+                }
             }
         }
+
+        Collections.sort(buildQueue, new Comparator<AbstractBuildRequestEvent>()
+        {
+            public int compare(AbstractBuildRequestEvent o1, AbstractBuildRequestEvent o2)
+            {
+                return (int) (o1.getQueued() - o2.getQueued());
+            }
+        });
+
+        Collections.sort(executingBuilds, new Comparator<BuildResult>()
+        {
+            public int compare(BuildResult o1, BuildResult o2)
+            {
+                return (int) (o1.getStamps().getStartTime() - o2.getStamps().getEndTime());
+            }
+        });
+
         return SUCCESS;
     }
 
@@ -120,5 +121,10 @@ public class ViewServerQueuesAction extends ActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 }

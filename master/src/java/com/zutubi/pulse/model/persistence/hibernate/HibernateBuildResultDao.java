@@ -331,10 +331,10 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public List<BuildResult> findByUser(final User user)
     {
-        return getLatestBuildResultsForUser(user, -1);
+        return getLatestByUser(user, -1);
     }
 
-    public List<BuildResult> getLatestBuildResultsForUser(final User user, final int max)
+    public List<BuildResult> getLatestByUser(final User user, final int max)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {

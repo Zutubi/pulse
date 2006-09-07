@@ -54,7 +54,7 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     List<BuildResult> findByUser(User user);
 
-    List<BuildResult> getLatestBuildResultsForUser(User user, int max);
+    List<BuildResult> getLatestByUser(User user, int max);
 
     int getCompletedResultCount(User user);
 

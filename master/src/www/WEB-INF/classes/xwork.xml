@@ -1273,7 +1273,7 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="serverQueuesPanel" class="com.zutubi.pulse.web.server.ViewServerQueuesAction">
+        <action name="viewServerQueuesPanel" class="com.zutubi.pulse.web.server.ViewServerQueuesAction">
             <result name="success" type="velocity">view-server-queues-panel.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>

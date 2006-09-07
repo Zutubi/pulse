@@ -466,11 +466,11 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> results = buildResultDao.getLatestBuildResultsForUser(u1, 1);
+        List<BuildResult> results = buildResultDao.getLatestByUser(u1, 1);
         assertEquals(1, results.size());
         assertEquals(u1, results.get(0).getUser());
 
-        results = buildResultDao.getLatestBuildResultsForUser(u2, 1);
+        results = buildResultDao.getLatestByUser(u2, 1);
         assertEquals(1, results.size());
         assertEquals(u2, results.get(0).getUser());
         assertEquals(2, results.get(0).getNumber());

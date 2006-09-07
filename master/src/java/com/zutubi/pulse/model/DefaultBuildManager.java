@@ -194,6 +194,19 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findByUser(user);
     }
 
+    public BuildResult getLatestBuildResult(User user)
+    {
+        List<BuildResult> results = buildResultDao.getLatestByUser(user, 1);
+        if(results.size() > 0)
+        {
+            return results.get(0);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)
     {
         return buildResultDao.queryBuilds(projects, states, specs, earliestStartTime, latestStartTime, hasWorkDir, first, max, mostRecentFirst);
@@ -298,7 +311,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public void abortUnfinishedBuilds(User user, String message)
     {
-        List<BuildResult> results = buildResultDao.getLatestBuildResultsForUser(user, 1);
+        List<BuildResult> results = buildResultDao.getLatestByUser(user, 1);
         if(results.size() > 0)
         {
             abortBuild(results.get(0), message);
@@ -358,6 +371,26 @@ public class DefaultBuildManager implements BuildManager, EventListener
             for(BuildResult result: results)
             {
                 cleanupResult(result);
+            }
+        }
+    }
+
+    public boolean canCancel(BuildResult build, User user)
+    {
+        if(build.isPersonal())
+        {
+            return build.getUser().equals(user);
+        }
+        else
+        {
+            try
+            {
+                projectManager.checkWrite(build.getProject());
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
             }
         }
     }
