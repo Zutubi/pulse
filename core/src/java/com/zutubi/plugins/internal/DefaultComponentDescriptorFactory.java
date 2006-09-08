@@ -3,6 +3,7 @@ package com.zutubi.plugins.internal;
 import com.zutubi.plugins.ComponentDescriptor;
 import com.zutubi.plugins.ComponentDescriptorFactory;
 import com.zutubi.plugins.ObjectFactory;
+import com.zutubi.plugins.Plugin;
 import nu.xom.Element;
 
 import java.util.HashMap;
@@ -37,7 +38,7 @@ public class DefaultComponentDescriptorFactory implements ComponentDescriptorFac
         return descriptors.containsKey(type);
     }
 
-    public ComponentDescriptor createComponentDescriptor(String type, Element config)
+    public ComponentDescriptor createComponentDescriptor(String type, Element config, Plugin plugin)
     {
         // create a new instance of the required descriptor.
         if (!supportsComponentDescriptor(type))
@@ -55,7 +56,7 @@ public class DefaultComponentDescriptorFactory implements ComponentDescriptorFac
         {
             throw new RuntimeException("Failed to create descriptor.", e);
         }
-
+        descriptor.setPlugin(plugin);
         descriptor.init(config);
         return descriptor;
     }

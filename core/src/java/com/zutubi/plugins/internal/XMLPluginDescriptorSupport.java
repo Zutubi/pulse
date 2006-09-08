@@ -67,7 +67,7 @@ public class XMLPluginDescriptorSupport
             String name = child.getLocalName();
             if (descriptorFactory.supportsComponentDescriptor(name))
             {
-                ComponentDescriptor descriptorInstance = descriptorFactory.createComponentDescriptor(name, child);
+                ComponentDescriptor descriptorInstance = descriptorFactory.createComponentDescriptor(name, child, plugin);
                 descriptorInstance.setPlugin(plugin);
                 plugin.addComponentDescriptor(descriptorInstance);
             }

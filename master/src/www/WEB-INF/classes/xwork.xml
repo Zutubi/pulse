@@ -1314,4 +1314,25 @@
 
     </package>
 
+    <package name="forms" namespace="/forms" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="jabber" class="com.zutubi.pulse.form.ui.FormAction">
+            <param name="objectKey">jabber.config</param>
+            <result name="input" type="velocity">form.vm</result>
+            <result name="cancel" type="velocity">form.vm</result>
+            <result name="reset" type="velocity">form.vm</result>
+            <result name="save" type="velocity">form.vm</result>
+        </action>
+
+        <action name="x" class="com.zutubi.pulse.form.ui.FormAction">
+            <result name="success" type="velocity">form.vm</result>
+            <result name="input" type="velocity">form.vm</result>
+            <result name="cancel" type="velocity">form.vm</result>
+            <result name="reset" type="velocity">form.vm</result>
+            <result name="save" type="velocity">form.vm</result>
+        </action>
+
+    </package>
+
 </xwork>

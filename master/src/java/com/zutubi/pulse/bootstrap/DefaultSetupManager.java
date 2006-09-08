@@ -44,7 +44,9 @@ public class DefaultSetupManager implements SetupManager
      */
     private List<String> startupContexts;
 
-    private SetupState state = SetupState.STARTING;;
+    private List<String> postStartupContexts;
+
+    private SetupState state = SetupState.STARTING;
 
     private boolean promptShown = false;
 
@@ -216,6 +218,7 @@ public class DefaultSetupManager implements SetupManager
 
         // load the remaining contexts.
         loadContexts(startupContexts);
+        loadContexts(postStartupContexts);
 
         startupManager.continueApplicationStartup();
     }
@@ -307,6 +310,11 @@ public class DefaultSetupManager implements SetupManager
     public void setStartupContexts(List<String> startupContexts)
     {
         this.startupContexts = startupContexts;
+    }
+
+    public void setPostStartupContexts(List<String> postStartupContexts)
+    {
+        this.postStartupContexts = postStartupContexts;
     }
 
     public void setUpgradeContexts(List<String> upgradeContexts)

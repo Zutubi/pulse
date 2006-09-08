@@ -11,6 +11,9 @@
                 <entry key="event-listener">
                     <value type="java.lang.Class">com.zutubi.pulse.plugins.descriptors.EventListenerComponentDescriptor</value>
                 </entry>
+                <entry key="object-descriptor">
+                    <value type="java.lang.Class">com.zutubi.pulse.form.persistence.ObjectRegistryComponentDescriptor</value>
+                </entry>
             </map>
         </property>
         <property name="systemPluginDescriptors">

@@ -19,7 +19,7 @@ public interface ComponentDescriptorFactory
      */
     boolean supportsComponentDescriptor(String type);
 
-    ComponentDescriptor createComponentDescriptor(String type, Element config);
+    ComponentDescriptor createComponentDescriptor(String type, Element config, Plugin plugin);
 
     void addDescriptor(String key, Class<? extends ComponentDescriptor> descriptor);
 

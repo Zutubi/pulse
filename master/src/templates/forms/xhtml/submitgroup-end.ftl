@@ -1,0 +1,1 @@
+<#include "/forms/xhtml/controlfooter.ftl" />

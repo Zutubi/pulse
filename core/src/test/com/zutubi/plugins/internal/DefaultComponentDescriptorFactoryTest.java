@@ -37,7 +37,7 @@ public class DefaultComponentDescriptorFactoryTest extends TestCase
 
     public void testCreate()
     {
-        MockComponentDescriptor descriptor = (MockComponentDescriptor) descriptorFactory.createComponentDescriptor("test-type", null);
+        MockComponentDescriptor descriptor = (MockComponentDescriptor) descriptorFactory.createComponentDescriptor("test-type", null, null);
         assertNotNull(descriptor);
         assertTrue(descriptor.initialised);
     }
