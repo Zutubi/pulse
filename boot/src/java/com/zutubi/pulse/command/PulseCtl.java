@@ -156,7 +156,7 @@ public class PulseCtl
         appendToClasspath(files, ".jar", classpath);
         appendToClasspath(files, ".xml", classpath);
 
-        URL[] urls = classpath.toArray(new URL[0]);
+        URL[] urls = classpath.toArray(new URL[classpath.size()]);
         if (isDebugEnabled())
         {
             // print the classpath to the Std error for debugging.

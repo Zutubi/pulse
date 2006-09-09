@@ -424,20 +424,17 @@
     </tr>
 #end
 
-##
-## Outputs a heading cell for a search table.
-##
-#macro(searchHeadingRow $key $span $searchUrl $searchId $rssEnabled $rssUrl $rssId)
-    <tr>
-        <th class="heading" colspan="$span">
-            <span class="action">
-            #if($rssEnabled == "true")
-                <a class="unadorned" #if($rssId != "")id="$rssId"#end href="$rssUrl"><img alt="$action.getText('rss')" src="$base/images/rss.gif"/></a>
-            #end
-            </span>
-            #wwtext("name=$key")
-        </th>
-    </tr>
+#macro(rssHeadingRow $key $span $rssEnabled $rssUrl $rssId)
+<tr>
+    <th class="heading" #if($span > 1) colspan="$span" #end>
+        <span class="action">
+        #if($rssEnabled == "true")
+            <a class="unadorned" #if($rssId != "")id="$rssId"#end href="$rssUrl"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+        #end
+        </span>
+        #wwtext("name=$key")
+    </th>
+</tr>
 #end
 
 ##
@@ -1703,9 +1700,9 @@
 #
 # Shows a table with recent builds for a project
 #
-#macro(projectRecentBuilds $id $key $recentBuilds)
+#macro(projectRecentBuilds $id $key $recentBuilds $rssEnabled)
     <table id="$id" class="content">
-        #headingRow($key 13)
+        #rssHeadingRow($key 13 "$rssEnabled" "rss.action?projectId=$id" "rss.builds" )
         <tr>
             #contentHeading("build.id" 1)
             #contentHeading("build.spec" 1)
@@ -1763,9 +1760,9 @@
 ##
 ## Shows a list of recent builds for the given list of projects
 ##
-#macro(recentBuilds $projects $showAdd $actionKey $url $image)
+#macro(recentBuilds $projects $showAdd $actionKey $url $image $rssEnabled)
     <table class="content">
-        #actionHeadingRow("latest.builds" 14 $actionKey $url $image "recent.builds")
+        #rssHeadingRow("latest.builds" 14 "$rssEnabled" "rss.action" "rss.builds" )
         <tr>
             #contentHeading("project.name" 1)
             #contentHeading("build.id" 1)
