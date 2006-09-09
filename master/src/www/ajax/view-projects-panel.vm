@@ -1,1 +1,1 @@
-#recentBuilds($projects true false false false)
+#recentBuilds($projects true false false false $rssEnabled)

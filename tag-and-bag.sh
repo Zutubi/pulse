@@ -60,7 +60,7 @@ svnTag="$svnBase/tags/$version"
 #then
 #    yesNo "Tag $version already exists.  Use existing [yN]? "
 #else
-    svn copy -m "Tagging release $version" "$svnBase/trunk" "$svnTag"
+    svn copy -m "Tagging release $version" "$svnBase/branches/1.1.x" "$svnTag"
 #fi
 
 tmpDir=checkout.$$
