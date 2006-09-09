@@ -11,12 +11,8 @@ import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 
@@ -26,8 +22,15 @@ public abstract class Scm extends Entity implements Cloneable
 {
     private static final Logger LOG = Logger.getLogger(Scm.class);
 
-    private static final DateFormat PULSE_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
-    private static final DateFormat FISHEYE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
+    private static final SimpleDateFormat PULSE_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
+    private static final SimpleDateFormat FISHEYE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
+
+    static
+    {
+        // fisheye presents its change set ids using GMT times.  By setting the date format timezone to
+        // GMT, we ensure that local server times are converted into GMT times.
+        FISHEYE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
 
     private String path;
     private Properties properties;
