@@ -64,10 +64,10 @@
                 <span class="action">
                     <a href="$base/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
                 </span>
-                <a href="$base/currentBuild.action?id=$project.id" class="unadorned">
+                <a href="$base/currentBuild.action?id=$project.id">
                     <img alt="home" src="$base/images/house.gif">
+                    $!webwork.htmlEncode($project.name)
                 </a>
-                $!webwork.htmlEncode($project.name)
             </th>
         </tr>
         <tr>
