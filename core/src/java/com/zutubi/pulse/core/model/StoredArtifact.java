@@ -13,11 +13,13 @@ public class StoredArtifact extends Entity
     private static final String[] INDEX_NAMES = {"index.html", "index.htm", "default.html", "default.htm"};
 
     private String name;
+
     /**
      * Files stored as part of this artifact.  A common special case is just
      * a single file.
      */
     List<StoredFileArtifact> children = new LinkedList<StoredFileArtifact>();
+
     /**
      * If not null, the name of the index file in this artifact.  Used for
      * browsing the artifact as a HTML report.
