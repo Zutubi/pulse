@@ -115,6 +115,19 @@ public class FileSystemUtils
         }
     }
 
+    /**
+     * Create a temporary directory using pre-defined prefix and suffix values.  Use this when you really don't
+     * care what the directory is called.
+     *
+     * @return
+     *
+     * @throws IOException
+     */
+    public static File createTempDirectory() throws IOException
+    {
+        return createTempDirectory("dir", null);
+    }
+
     public static File createTempDirectory(String prefix, String suffix) throws IOException
     {
         return createTempDirectory(prefix, suffix, null);

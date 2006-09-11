@@ -23,7 +23,16 @@ package com.zutubi.pulse.core;
  */
 public class Dependency
 {
+    /**
+     * The name of the dependency.  There is no restriction to the names used for dependencies.  Whatever makes the
+     * most sense should be used.
+     */
     private String name;
+
+    /**
+     * The version of the dependency.  As with the dependency name, there is no restriction on the value of the
+     * version.
+     */
     private String version;
 
     public String getName()

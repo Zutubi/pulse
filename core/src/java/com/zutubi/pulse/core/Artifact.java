@@ -12,14 +12,32 @@ import java.util.List;
 import java.util.LinkedList;
 
 /**
+ * An artifact represents a by product of the build process that is considered important enough persist beyond the
+ * lifecycle of a build.
+ *
+ * This Artifact class defines the base class for artifact element definitions that are used within the pulse file.
+ *
+ * For example:  <artifact name='myOutput' fail-if-not-present='false'/>
+ *
+ * The name of the artifact needs to be unique (todo: check the scope of the required uniquness...)
  */
 public abstract class Artifact
 {
-    private String name;
     /**
-     * If true, fail the command of the artifact cannot be captured.
+     * The name of this artifact allows it to be referenced by name.
+     */
+    private String name;
+
+    /**
+     * If true, fail the command if the artifact cannot be captured.
      */
     private boolean failIfNotPresent = true;
+
+    /**
+     * The list of references to processors that will be applied to this artifact.
+     *
+     * These processors will later be responsible for extracting features from the artifact.
+     */
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
 
     public Artifact(String name)
@@ -31,16 +49,31 @@ public abstract class Artifact
     {
     }
 
+    /**
+     * Get the name of this artifact.
+     *
+     * @return the name of the artifact.
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Set the name of this artifact.
+     *
+     * @param name of this artifact.
+     */
     public void setName(String name)
     {
         this.name = name;
     }
 
+    /**
+     * Get the value of the fail if not present property.
+     *
+     * @return true if fail if not present is set to true, false otherwise.
+     */
     public boolean getFailIfNotPresent()
     {
         return failIfNotPresent;
@@ -51,6 +84,13 @@ public abstract class Artifact
         this.failIfNotPresent = failIfNotPresent;
     }
 
+    /**
+     * This is a factory method that allows artifact processors to be associated with the artifact.
+     *
+     * This allows the <process/> child element to be used with artifacts.
+     *
+     * @return the new instance of the processor reference.
+     */
     public ProcessArtifact createProcess()
     {
         ProcessArtifact p = new ProcessArtifact();
@@ -58,6 +98,18 @@ public abstract class Artifact
         return p;
     }
 
+    /**
+     * This method is a utility method available to handle the coping of an artifact into persistent storage and
+     * running its post processors
+     *
+     * @param artifact  is the artifact entity to which the file belongs.
+     * @param fromFile  is the source file. That is, the artifact file in the working directory.
+     * @param path      is the path relative to the output directory to which the fromFile will be copied.
+     * @param outputDir is the output directory into which the artifact (fromFile) will be copied
+     * @param result    is the command result instance to which this artifact belongs. If processing of this artifact
+     * identifies any error features, it is this command result that will be marked as failed.
+     * @param type      is the mime type of the artifact.
+     */
     protected void captureFile(StoredArtifact artifact, File fromFile, String path, File outputDir, CommandResult result, String type)
     {
         File toFile = new File(outputDir, path);
@@ -82,8 +134,7 @@ public abstract class Artifact
     }
 
     /**
-     * Called to actually capture the artifacts from the working to the
-     * output directory.
+     * Called to actually capture the artifacts from the working to the output directory.
      *
      * @param result    command we are capturing artifacts from
      * @param baseDir   base directory for the project checkout
