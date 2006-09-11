@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.logging.Logger;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;

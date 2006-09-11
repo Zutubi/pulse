@@ -497,6 +497,17 @@ public class SVNServer implements SCMServer
 
     public void update(String id, File workDir, Revision rev, List<Change> changes) throws SCMException
     {
+        // CIB-610: cleanup before update in case WC is locked.
+        SVNWCClient wcClient = new SVNWCClient(authenticationManager, null);
+        try
+        {
+            wcClient.doCleanup(workDir);
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
+
         SVNUpdateClient client = new SVNUpdateClient(authenticationManager, null);
 
         if(changes != null)
