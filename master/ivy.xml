@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="pulse-master" status="integration">
+    <info organisation="zutubi" module="pulse-master" status="release" revision="1.1.10">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
             The pulse master module is what is commonly thought of as Pulse. It includes
@@ -23,9 +23,9 @@
 
     <dependencies>
 
-        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="release->release"/>
-        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="external->external"/>
-        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="build->build"/>
+        <dependency org="zutubi" name="pulse-server-core" rev="1.1.10" conf="release->release"/>
+        <dependency org="zutubi" name="pulse-server-core" rev="1.1.10" conf="external->external"/>
+        <dependency org="zutubi" name="pulse-server-core" rev="1.1.10" conf="build->build"/>
 
         <dependency org="acegisecurity" name="acegisecurity" rev="1.0.0" conf="external,build,release->default"/>
 
