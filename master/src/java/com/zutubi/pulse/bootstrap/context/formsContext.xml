@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--
+
+-->
+<beans default-autowire="byName">
+
+    <bean id="descriptorFactory" class="com.zutubi.pulse.form.descriptor.reflection.ReflectionDescriptorFactory">
+        <property name="decorators">
+            <list>
+                <ref local="annotationDecorator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="objectRegistry" class="com.zutubi.pulse.form.persistence.DefaultObjectRegistry"/>
+
+    <bean id="objectStore" class="com.zutubi.pulse.form.persistence.stores.MemoryObjectStore"/>
+
+    <bean id="renderer" class="com.zutubi.pulse.form.ui.renderers.FreemarkerRenderer" autowire="byName" singleton="false"/>
+
+    <bean id="annotationDecorator" class="com.zutubi.pulse.form.descriptor.annotation.AnnotationDecorator"/>
+
+    <bean id="fieldTypeRegistry" class="com.zutubi.pulse.form.DefaultFieldTypeRegistry" init-method="init"/>
+
+</beans>
