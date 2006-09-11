@@ -33,7 +33,7 @@ public class DefaultFieldTypeRegistry implements FieldTypeRegistry
         typeMappings.put(String.class, FieldType.TEXT);
     }
 
-    public String getFieldType(Class type)
+    public String getDefaultFieldType(Class type)
     {
         return typeMappings.get(type);
     }

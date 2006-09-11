@@ -1,7 +1,7 @@
 package com.zutubi.pulse.form.descriptor;
 
 /**
- * <class-comment/>
+ * The Descriptor interface is a tag interface used to mark decriptors.
  */
 public interface Descriptor
 {

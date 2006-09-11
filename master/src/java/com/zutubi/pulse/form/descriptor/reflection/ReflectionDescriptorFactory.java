@@ -75,7 +75,7 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
                 ReflectionFieldDescriptor fd = new ReflectionFieldDescriptor();
                 fd.setName(pd.getName());
                 fd.setType(pd.getPropertyType());
-                fd.setFieldType(fieldTypeRegistry.getFieldType(pd.getPropertyType()));
+                fd.setFieldType(fieldTypeRegistry.getDefaultFieldType(pd.getPropertyType()));
 
                 fieldDescriptors.add(fd);
             }
