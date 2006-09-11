@@ -207,6 +207,16 @@ public class BuildController implements EventListener
 
     private void handleBuildCommenced()
     {
+        // Reload any persistent instances we use, as we are crossing a
+        // thread boundary.  The project can't be deleted while a build is in
+        // progress, but the specification *might*.
+        project = projectManager.getProject(project.getId());
+        specification = project.getBuildSpecification(specification.getId());
+        if(specification == null)
+        {
+            throw new BuildException("Build specification deleted during build");
+        }
+
         // It is important that this directory is created *after* the build
         // result is commenced and saved to the database, so that the
         // database knows of the possibility of some other persistent
