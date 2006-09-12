@@ -12,7 +12,6 @@ public class Jabber implements Copyable
     private String user = "initial user";
     private String password;
 
-    @Field(required = true)
     public String getHost()
     {
         return host;

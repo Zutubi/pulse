@@ -21,6 +21,4 @@
 
     <bean id="annotationDecorator" class="com.zutubi.pulse.form.descriptor.annotation.AnnotationDecorator"/>
 
-    <bean id="fieldTypeRegistry" class="com.zutubi.pulse.form.DefaultFieldTypeRegistry" init-method="init"/>
-
 </beans>

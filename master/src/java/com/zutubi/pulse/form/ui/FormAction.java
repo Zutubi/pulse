@@ -2,8 +2,6 @@ package com.zutubi.pulse.form.ui;
 
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ActionSupport;
-import com.zutubi.pulse.form.bean.BeanException;
-import com.zutubi.pulse.form.bean.BeanSupport;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
 import com.zutubi.pulse.form.descriptor.FormDescriptor;
 import com.zutubi.pulse.form.descriptor.DescriptorFactory;
@@ -12,10 +10,12 @@ import com.zutubi.pulse.form.persistence.Copyable;
 import com.zutubi.pulse.form.persistence.ObjectStore;
 import com.zutubi.pulse.form.squeezer.SqueezeException;
 import com.zutubi.pulse.form.squeezer.TypeSqueezer;
+import com.zutubi.pulse.form.squeezer.Squeezers;
 import com.zutubi.pulse.form.ui.components.FormComponent;
 import com.zutubi.pulse.form.ui.components.Component;
-import com.zutubi.pulse.form.validator.*;
-import com.zutubi.pulse.form.FieldTypeRegistry;
+import com.zutubi.validation.*;
+import com.zutubi.validation.bean.BeanUtils;
+import com.zutubi.validation.bean.BeanException;
 
 import java.util.Map;
 
@@ -44,7 +44,7 @@ public class FormAction extends ActionSupport
      */
     private String objectKey;
 
-    private ValidatorContext validatorContext = new ValidatorContextSupport();
+    private ValidationContext validatorContext = new DelegatingValidationContext(this);
 
     /**
      *
@@ -53,7 +53,7 @@ public class FormAction extends ActionSupport
 
     private DescriptorFactory descriptorFactory;
 
-    private FieldTypeRegistry fieldTypeRegistry;
+    private ValidationManager validationManager;
 
     private Renderer renderer;
 
@@ -89,7 +89,7 @@ public class FormAction extends ActionSupport
         }
     }
 
-    public String doSave()
+    public String doSave() throws ValidationException
     {
         Copyable obj = objectStore.load(objectKey);
 
@@ -99,7 +99,7 @@ public class FormAction extends ActionSupport
         populateObject(obj, validatorContext);
 
         // validate the form input
-        validateObject(obj, validatorContext);
+        validationManager.validate(obj, validatorContext);
 
         if (validatorContext.hasErrors())
         {
@@ -149,21 +149,21 @@ public class FormAction extends ActionSupport
         FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
 
         // build the form.
-        FormComponent form = descriptor.createForm();
+        FormComponent form = new FormFactory().createForm(descriptor);
         populateForm(form, obj);
 
         // render it.
         form.render(renderer);
     }
 
-    private void populateObject(Object obj, ValidatorContext validatorContext)
+    private void populateObject(Object obj, ValidationContext validatorContext)
     {
         FormDescriptor formDescriptor = descriptorFactory.createFormDescriptor(obj.getClass());
         for (FieldDescriptor fieldDescriptor : formDescriptor.getFieldDescriptors())
         {
             String name = fieldDescriptor.getName();
 
-            TypeSqueezer squeezer = fieldTypeRegistry.getSqueezer(fieldDescriptor.getFieldType());
+            TypeSqueezer squeezer = Squeezers.findSqueezer(fieldDescriptor.getType());
 
             String[] paramValue = getParameterValue(name);
             if (paramValue != null)
@@ -171,7 +171,7 @@ public class FormAction extends ActionSupport
                 try
                 {
                     Object value = squeezer.unsqueeze(paramValue);
-                    BeanSupport.setProperty(name, value, obj);
+                    BeanUtils.setProperty(name, value, obj);
                 }
                 catch (SqueezeException e)
                 {
@@ -206,38 +206,6 @@ public class FormAction extends ActionSupport
         return null;
     }
 
-    private void validateObject(Object obj, ValidatorContext validatorContext)
-    {
-        FormDescriptor formDescriptor = descriptorFactory.createFormDescriptor(obj.getClass());
-        for (FieldDescriptor fieldDescriptor : formDescriptor.getFieldDescriptors())
-        {
-            for (Validator validator : fieldTypeRegistry.getValidators(fieldDescriptor.getFieldType()))
-            {
-                validator.setValidatorContext(validatorContext);
-                if (validator instanceof FieldValidator)
-                {
-                    ((FieldValidator)validator).setFieldName(fieldDescriptor.getName());
-                }
-                try
-                {
-                    validator.validate(obj);
-                }
-                catch (ValidationException e)
-                {
-                    validatorContext.addActionError(e.getMessage());
-                }
-            }
-        }
-
-        if (!validatorContext.hasErrors())
-        {
-            if (obj instanceof Validateable)
-            {
-                ((Validateable)obj).validate(validatorContext);
-            }
-        }
-    }
-
     private void populateForm(FormComponent form, Object obj)
     {
         FormDescriptor formDescriptor = descriptorFactory.createFormDescriptor(obj.getClass());
@@ -246,11 +214,11 @@ public class FormAction extends ActionSupport
             try
             {
                 String propertyName = fieldDescriptor.getName();
-                Object propertyValue = BeanSupport.getProperty(propertyName, obj);
+                Object propertyValue = BeanUtils.getProperty(propertyName, obj);
 
                 Component component = form.getNestedComponent(propertyName);
 
-                TypeSqueezer squeezer = fieldTypeRegistry.getSqueezer(fieldDescriptor.getFieldType());
+                TypeSqueezer squeezer = Squeezers.findSqueezer(fieldDescriptor.getType());
                 component.setValue(squeezer.squeeze(propertyValue));
             }
             catch (BeanException e)
@@ -294,13 +262,8 @@ public class FormAction extends ActionSupport
         this.renderer = renderer;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param fieldTypeRegistry
-     */
-    public void setFieldTypeRegistry(FieldTypeRegistry fieldTypeRegistry)
+    public void setValidationManager(ValidationManager validationManager)
     {
-        this.fieldTypeRegistry = fieldTypeRegistry;
+        this.validationManager = validationManager;
     }
 }

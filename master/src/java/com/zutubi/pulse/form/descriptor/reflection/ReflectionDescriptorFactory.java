@@ -1,10 +1,6 @@
 package com.zutubi.pulse.form.descriptor.reflection;
 
-import com.zutubi.pulse.form.descriptor.DescriptorDecorator;
-import com.zutubi.pulse.form.descriptor.DescriptorFactory;
-import com.zutubi.pulse.form.descriptor.FieldDescriptor;
-import com.zutubi.pulse.form.descriptor.FormDescriptor;
-import com.zutubi.pulse.form.FieldTypeRegistry;
+import com.zutubi.pulse.form.descriptor.*;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -20,9 +16,13 @@ import java.util.Map;
  */
 public class ReflectionDescriptorFactory implements DescriptorFactory
 {
-    private final Map<Class, FormDescriptor> formDescriptorCache = new HashMap<Class, FormDescriptor>();
+    private static final Map<Class, String> defaultFieldTypeMapping = new HashMap<Class, String>();
+    static
+    {
+        defaultFieldTypeMapping.put(String.class, "text");
+    }
 
-    private FieldTypeRegistry fieldTypeRegistry;
+    private final Map<Class, FormDescriptor> formDescriptorCache = new HashMap<Class, FormDescriptor>();
 
     private List<DescriptorDecorator> decorators = new LinkedList<DescriptorDecorator>();
 
@@ -33,7 +33,7 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
             return formDescriptorCache.get(type);
         }
 
-        ReflectionFormDescriptor formDescriptor = new ReflectionFormDescriptor();
+        DefaultFormDescriptor formDescriptor = new DefaultFormDescriptor();
         formDescriptor.setType(type);
         formDescriptor.setFieldDescriptors(buildFieldDescriptors(type));
 
@@ -72,11 +72,10 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
 
             for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors())
             {
-                ReflectionFieldDescriptor fd = new ReflectionFieldDescriptor();
+                DefaultFieldDescriptor fd = new DefaultFieldDescriptor();
                 fd.setName(pd.getName());
                 fd.setType(pd.getPropertyType());
-                fd.setFieldType(fieldTypeRegistry.getDefaultFieldType(pd.getPropertyType()));
-
+                fd.setFieldType(defaultFieldTypeMapping.get(pd.getPropertyType()));
                 fieldDescriptors.add(fd);
             }
 
@@ -86,10 +85,5 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
         {
             throw new ReflectionException(e);
         }
-    }
-
-    public void setFieldTypeRegistry(FieldTypeRegistry fieldTypeRegistry)
-    {
-        this.fieldTypeRegistry = fieldTypeRegistry;
     }
 }

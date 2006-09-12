@@ -8,10 +8,9 @@ import java.lang.annotation.Target;
 /**
  * <class-comment/>
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@DescriptorAnnotation(FieldAnnotationHandler.class)
 public @interface Field
 {
-    public boolean required() default false;
+    public String fieldType();
 }

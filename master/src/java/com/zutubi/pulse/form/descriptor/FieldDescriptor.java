@@ -26,6 +26,12 @@ public interface FieldDescriptor extends Descriptor
      */
     void setRequired(boolean b);
 
+    /**
+     * Get the raw class type of this field.  This is the type of object that the contents of this field will
+     * be converted into.   
+     *
+     * @return
+     */
     Class getType();
 
     /**
@@ -37,14 +43,17 @@ public interface FieldDescriptor extends Descriptor
     String getName();
 
     /**
-     * The field type defines the data type and validation rules that are applied to the field. See the FieldType and
-     * FieldTypeRegistry for more information on FieldTypes.
      *
      * @return this fields FieldType
      */
     String getFieldType();
 
-    Map<String, Object> getParameters();
+    /**
+     * Set the field type.
+     *
+     * @param type
+     */
+    void setFieldType(String type);
 
-    Component createField();
+    Map<String, Object> getParameters();
 }

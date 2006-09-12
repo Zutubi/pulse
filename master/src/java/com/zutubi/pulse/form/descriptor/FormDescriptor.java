@@ -61,14 +61,4 @@ public interface FormDescriptor extends Descriptor
      * @return a map of key:value pairs.
      */
     Map<String, Object> getParameters();
-
-    /**
-     * Factory method for creating a form component model based on the details
-     * of this form descriptor.
-     *
-     * @deprecated This method is here for convenience only.  Move it to a more appropriate location.
-     *
-     */
-    FormComponent createForm();
-
 }

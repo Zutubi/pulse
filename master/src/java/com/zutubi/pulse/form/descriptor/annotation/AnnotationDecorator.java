@@ -1,66 +1,82 @@
 package com.zutubi.pulse.form.descriptor.annotation;
 
-import com.zutubi.pulse.form.descriptor.decorators.DecoratorSupport;
 import com.zutubi.pulse.form.descriptor.FormDescriptor;
-import com.zutubi.pulse.form.descriptor.Descriptor;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
-import com.zutubi.pulse.form.bean.BeanSupport;
-import com.zutubi.pulse.form.bean.BeanException;
+import com.zutubi.pulse.form.descriptor.DescriptorDecorator;
+import com.zutubi.pulse.form.descriptor.Descriptor;
+import com.zutubi.validation.bean.BeanUtils;
+import com.zutubi.validation.bean.BeanException;
+import com.zutubi.validation.annotations.Required;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.beans.PropertyDescriptor;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Arrays;
 
 /**
  * <class-comment/>
  */
-public class AnnotationDecorator extends DecoratorSupport
+public class AnnotationDecorator implements DescriptorDecorator
 {
     public FormDescriptor decorate(FormDescriptor descriptor)
     {
-        // decorate using any annotations defined on the class level.
         Annotation[] classAnnotations = descriptor.getType().getAnnotations();
-        FormDescriptor decoratedDescriptor = (FormDescriptor)decorateFromAnnotations(descriptor, classAnnotations);
 
-        // now decorate the fields.
+        // modify the descriptor based on the annotations located at the class level.
 
-        for (FieldDescriptor fd : descriptor.getFieldDescriptors())
+
+        // now to decorate the individual fields.
+        for (FieldDescriptor fieldDescriptor : descriptor.getFieldDescriptors())
         {
-            try
-            {
-                PropertyDescriptor pd = BeanSupport.getPropertyDescriptor(fd.getName(), descriptor.getType());
-                decorateFromAnnotations(fd, pd.getReadMethod().getAnnotations());
-                decorateFromAnnotations(fd, pd.getWriteMethod().getAnnotations());
-            }
-            catch (BeanException e)
-            {
-                e.printStackTrace();
-            }
+            String fieldName = fieldDescriptor.getName();
+
+            // get the annotations for this field.
+            List<Annotation> fieldAnnotations = annotationsFromField(fieldName, descriptor.getType());
+            decorateFromAnnotations(fieldDescriptor, fieldAnnotations);
         }
 
-        return decoratedDescriptor;
-    }
-
-
-    private Descriptor decorateFromAnnotations( Descriptor descriptor, Annotation[] annotations)
-    {
-        for (Annotation annotation : annotations)
-        {
-            // If the annotation type itself has a DescriptorAnnotation, it's one of ours
-            DescriptorAnnotation handlerAnnotation = annotation.annotationType().getAnnotation(DescriptorAnnotation.class);
-            if (handlerAnnotation != null)
-            {
-                try
-                {
-                    DescriptorAnnotationHandler handler = handlerAnnotation.value().newInstance();
-                    descriptor = handler.decorateFromAnnotation(annotation, descriptor);
-                }
-                catch (Exception ex)
-                {
-                    //ex.printStackTrace();
-                }
-            }
-        }
         return descriptor;
     }
 
+    private List<Annotation> annotationsFromField(String fieldName, Class type)
+    {
+        List<Annotation> annotations = new LinkedList<Annotation>();
+        try
+        {
+            PropertyDescriptor property = BeanUtils.getPropertyDescriptor(fieldName, type);
+            Method readMethod = property.getReadMethod();
+            if (readMethod != null)
+            {
+                annotations.addAll(Arrays.asList(readMethod.getAnnotations()));
+            }
+            Method writeMethod = property.getWriteMethod();
+            if (writeMethod != null)
+            {
+                annotations.addAll(Arrays.asList(writeMethod.getAnnotations()));
+            }
+        }
+        catch (BeanException e)
+        {
+            // noops.
+        }
+        return annotations;
+    }
+
+    private void decorateFromAnnotations(FieldDescriptor fieldDescriptor, List<Annotation> fieldAnnotations)
+    {
+        for (Annotation annotation : fieldAnnotations)
+        {
+            if (annotation instanceof Field)
+            {
+                fieldDescriptor.setFieldType(((Field)annotation).fieldType());
+            }
+            if (annotation instanceof Required)
+            {
+                fieldDescriptor.setRequired(true);
+            }
+        }
+    }
 }
+
