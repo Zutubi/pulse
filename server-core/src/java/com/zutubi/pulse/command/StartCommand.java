@@ -162,6 +162,11 @@ public class StartCommand implements Command
         }
     }
 
+    public String getHelp()
+    {
+        return "starts the Pulse server";
+    }
+
     public static void main(String[] args) throws Exception
     {
         Command cmd = new StartCommand();

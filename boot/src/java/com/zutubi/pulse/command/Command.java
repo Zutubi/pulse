@@ -15,7 +15,7 @@ public interface Command
      * @param argv
      *
      */
-    public void parse(String... argv) throws Exception;
+    void parse(String... argv) throws Exception;
 
     /**
      * Execute this command
@@ -23,5 +23,10 @@ public interface Command
      * @return the commands exit code. Return 0 if the command completed successfully,
      * any non-zero number if it not.
      */
-    public int execute();
+    int execute();
+
+    /**
+     * @return a brief help string to display about this command
+     */
+    String getHelp();
 }

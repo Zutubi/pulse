@@ -62,6 +62,11 @@ public class PersonalBuildCommand implements Command
         return 0;
     }
 
+    public String getHelp()
+    {
+        return "request a personal build";
+    }
+
     private void fatal(String message)
     {
         System.err.println("Error: " + message);

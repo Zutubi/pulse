@@ -69,9 +69,15 @@
 
         <property name="package.name.local" value="pulse-local-${pulse.version}"/>
         <property name="package.root.local" value="build/package/${package.name.local}"/>
+        <property name="version.root.local" value="${package.root.local}/${pulse.build}"/>
 
         <delete dir="${package.root.local}"/>
         <mkdir dir="${package.root.local}"/>
+
+        <copy file="core/etc/active-version.txt" todir="${package.root.local}"/>
+        <replace file="${package.root.local}/active-version.txt">
+            <replacefilter token="__BUILD_NUMBER__" value="${pulse.build}"/>
+        </replace>
 
         <copy todir="${package.root.local}/bin">
             <fileset dir="core/src/bin" includes="**/*"/>
@@ -81,14 +87,26 @@
         <fixcrlf srcdir="${package.root.local}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
         <chmod perm="755" dir="${package.root.local}/bin" includes="**/*.sh"/>
 
-        <retrieve.dependencies module="." conf="local" dest="${package.root.local}/lib"/>
+        <retrieve.dependencies module="." conf="local" dest="${version.root.local}/lib"/>
 
-        <copy todir="${package.root.local}/lib">
+        <move tofile="${package.root.local}/boot.jar">
+            <fileset dir="${version.root.local}/lib" includes="boot-*.jar"/>
+        </move>
+
+        <copy todir="${version.root.local}/lib">
             <fileset dir="local/etc" includes="*.xml"/>
         </copy>
 
+        <copy todir="${version.root.local}/commands">
+            <fileset dir="local/etc" includes="*.commands.properties"/>
+        </copy>
+
+        <copy todir="${version.root.local}">
+            <fileset dir="local/etc" includes="classpath.txt"/>
+        </copy>
+        
         <!-- place holder for package documentation -->
-        <!--<copy todir="${package.root.local}/docs">-->
+        <!--<copy todir="${version.root.local}/docs">-->
             <!--<fileset dir="etc" includes="delete-me.txt"/>-->
         <!--</copy>-->
 
@@ -111,33 +129,43 @@
 
         <property name="package.name.slave" value="pulse-agent-${pulse.version}"/>
         <property name="package.root.slave" value="build/package/${package.name.slave}"/>
+        <property name="version.root.slave" value="${package.root.slave}/${pulse.build}"/>
 
         <delete dir="${package.root.slave}"/>
         <mkdir dir="${package.root.slave}"/>
+
+        <copy file="core/etc/active-version.txt" todir="${package.root.slave}"/>
+        <replace file="${package.root.slave}/active-version.txt">
+            <replacefilter token="__BUILD_NUMBER__" value="${pulse.build}"/>
+        </replace>
 
         <copy todir="${package.root.slave}/bin">
             <fileset dir="core/src/bin" includes="**/*"/>
             <fileset dir="server-core/src/bin" includes="**/*"/>
         </copy>
 
-        <copy todir="${package.root.slave}/licenses">
+        <copy todir="${version.root.slave}/licenses">
             <fileset dir="ivy-repository" includes="**/*.txt"/>
         </copy>
 
         <fixcrlf srcdir="${package.root.slave}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
         <chmod perm="755" dir="${package.root.slave}/bin" includes="**/*.sh" verbose="true"/>
 
-        <retrieve.dependencies module="." conf="local" dest="${package.root.slave}/lib"/>
-        <retrieve.dependencies module="." conf="slave" dest="${package.root.slave}/lib"/>
+        <retrieve.dependencies module="." conf="local" dest="${version.root.slave}/lib"/>
+        <retrieve.dependencies module="." conf="slave" dest="${version.root.slave}/lib"/>
+
+        <move tofile="${package.root.slave}/boot.jar">
+            <fileset dir="${version.root.slave}/lib" includes="boot-*.jar"/>
+        </move>
 
         <!-- place holder for package documentation -->
 <!--
-        <copy todir="${package.root.slave}/docs">
+        <copy todir="${version.root.slave}/docs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
 -->
         <!-- place holder for the log directory -->
-        <copy todir="${package.root.slave}/system/logs">
+        <copy todir="${version.root.slave}/system/logs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
 
@@ -146,17 +174,25 @@
             <include name="README.txt"/>
         </replace>
 
-        <copy todir="${package.root.slave}/system/config">
+        <copy todir="${version.root.slave}/system/config">
             <fileset dir="slave/etc" includes="pulse-agent.properties,logging.properties"/>
             <fileset dir="slave/etc" includes="logging/*.properties"/>
         </copy>
 
-        <copy todir="${package.root.slave}/system/www">
+        <copy todir="${version.root.slave}/system/www">
             <fileset dir="slave/src/www" includes="**/*"/>
         </copy>
         
-        <copy todir="${package.root.slave}/lib">
+        <copy todir="${version.root.slave}/lib">
             <fileset dir="slave/etc" includes="*.xml"/>
+        </copy>
+
+        <copy todir="${version.root.slave}/commands">
+            <fileset dir="server-core/etc" includes="*.commands.properties"/>
+        </copy>
+
+        <copy todir="${version.root.slave}">
+            <fileset dir="slave/etc" includes="classpath.txt"/>
         </copy>
 
         <replace dir="${package.root.slave}/bin" replacefilterfile="slave/subst.properties">
@@ -208,9 +244,15 @@
 
         <property name="package.name.master" value="pulse-${pulse.version}"/>
         <property name="package.root.master" value="build/package/${package.name.master}"/>
+        <property name="version.root.master" value="${package.root.master}/${pulse.build}"/>
 
         <delete dir="${package.root.master}"/>
         <mkdir dir="${package.root.master}"/>
+
+        <copy file="core/etc/active-version.txt" todir="${package.root.master}"/>
+        <replace file="${package.root.master}/active-version.txt">
+            <replacefilter token="__BUILD_NUMBER__" value="${pulse.build}"/>
+        </replace>
 
         <copy todir="${package.root.master}/bin">
             <fileset dir="core/src/bin" includes="**/*"/>
@@ -219,30 +261,34 @@
             <fileset dir="master/src/bin" includes="**/*"/>
         </copy>
 
-        <copy todir="${package.root.master}/licenses">
+        <copy todir="${version.root.master}/licenses">
             <fileset dir="ivy-repository" includes="**/*.txt"/>
         </copy>
 
         <fixcrlf srcdir="${package.root.master}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
         <chmod perm="755" dir="${package.root.master}/bin" includes="**/*.sh" verbose="true"/>
 
-        <retrieve.dependencies module="." conf="local" dest="${package.root.master}/lib"/>
-        <retrieve.dependencies module="." conf="master" dest="${package.root.master}/lib"/>
+        <retrieve.dependencies module="." conf="local" dest="${version.root.master}/lib"/>
+        <retrieve.dependencies module="." conf="master" dest="${version.root.master}/lib"/>
+
+        <move tofile="${package.root.master}/boot.jar">
+            <fileset dir="${version.root.master}/lib" includes="boot-*.jar"/>
+        </move>
 
         <!-- place holder for package documentation -->
 <!--
-        <copy todir="${package.root.master}/docs">
+        <copy todir="${version.root.master}/docs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
 -->
-        <copy todir="${package.root.master}/system/templates">
+        <copy todir="${version.root.master}/system/templates">
             <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl **/*.properties"/>
         </copy>
         <!-- place holder for the log directory -->
-        <copy todir="${package.root.master}/system/logs">
+        <copy todir="${version.root.master}/system/logs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
-        <copy todir="${package.root.master}/system/www">
+        <copy todir="${version.root.master}/system/www">
             <fileset dir="master/src/www" includes="**/*"/>
         </copy>
 
@@ -255,14 +301,23 @@
         </replace>
 
         <!-- /config is for user configuration properties -->
-        <copy todir="${package.root.master}/system/config">
+        <copy todir="${version.root.master}/system/config">
             <fileset dir="master/etc" includes="pulse-defaults.properties,logging.properties"/>
             <fileset dir="master/etc" includes="logging/*.properties"/>
             <fileset dir="master/etc" includes="config.properties"/>
         </copy>
 
-        <copy todir="${package.root.master}/lib">
+        <copy todir="${version.root.master}/lib">
             <fileset dir="master/etc" includes="*.xml"/>
+        </copy>
+
+        <copy todir="${version.root.master}/commands">
+            <fileset dir="local/etc" includes="*.commands.properties"/>
+            <fileset dir="server-core/etc" includes="*.commands.properties"/>
+        </copy>
+
+        <copy todir="${version.root.master}">
+            <fileset dir="master/etc" includes="classpath.txt"/>
         </copy>
 
         <replace dir="${package.root.master}/bin" replacefilterfile="master/subst.properties">

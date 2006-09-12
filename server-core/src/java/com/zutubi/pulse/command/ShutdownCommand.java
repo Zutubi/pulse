@@ -69,6 +69,11 @@ public class ShutdownCommand extends AdminCommand
         }
     }
 
+    public String getHelp()
+    {
+        return "sends a shutdown request to the Pulse server";
+    }
+
     public int doExecute() throws XmlRpcException, IOException
     {
         xmlRpcClient.execute("RemoteApi.shutdown", new Vector<Object>(Arrays.asList(new Object[]{adminToken, force, exitJvm})));
