@@ -6,6 +6,7 @@ import com.zutubi.pulse.form.descriptor.DescriptorDecorator;
 import com.zutubi.pulse.form.descriptor.Descriptor;
 import com.zutubi.validation.bean.BeanUtils;
 import com.zutubi.validation.bean.BeanException;
+import com.zutubi.validation.bean.AnnotationUtils;
 import com.zutubi.validation.annotations.Required;
 
 import java.lang.annotation.Annotation;
@@ -70,13 +71,27 @@ public class AnnotationDecorator implements DescriptorDecorator
         {
             if (annotation instanceof Field)
             {
-                fieldDescriptor.setFieldType(((Field)annotation).fieldType());
+                handleFieldAnnotation((Field) annotation, fieldDescriptor);
+            }
+            if (annotation.annotationType().isAnnotationPresent(Field.class))
+            {
+                Field fieldAnnotation = annotation.annotationType().getAnnotation(Field.class);
+                handleFieldAnnotation(fieldAnnotation, fieldDescriptor);
+
+                // process this annotation since it is marked by the Field annotation.
+                fieldDescriptor.getParameters().putAll(AnnotationUtils.collectPropertiesFromAnnotation(annotation));
+
             }
             if (annotation instanceof Required)
             {
                 fieldDescriptor.setRequired(true);
             }
         }
+    }
+
+    private void handleFieldAnnotation(Field annotation, FieldDescriptor descriptor)
+    {
+        descriptor.setFieldType(((Field)annotation).fieldType());
     }
 }
 

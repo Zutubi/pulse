@@ -75,7 +75,17 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
                 DefaultFieldDescriptor fd = new DefaultFieldDescriptor();
                 fd.setName(pd.getName());
                 fd.setType(pd.getPropertyType());
-                fd.setFieldType(defaultFieldTypeMapping.get(pd.getPropertyType()));
+
+                // some little bit of magic, take a guess at any property called password. If we come up with any
+                // other magical cases, then we can refactor this a bit.
+                if (fd.getName().equals("password"))
+                {
+                    fd.setFieldType("password");
+                }
+                else
+                {
+                    fd.setFieldType(defaultFieldTypeMapping.get(pd.getPropertyType()));
+                }
                 fieldDescriptors.add(fd);
             }
 

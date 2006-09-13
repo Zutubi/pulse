@@ -84,10 +84,19 @@ public class FormFactory
             applyParameters(c, descriptor.getParameters());
             return c;
         }
+        else if (FieldType.PASSWORD.equals(descriptor.getFieldType()))
+        {
+            PasswordComponent c = new PasswordComponent();
+            c.setName(descriptor.getName());
+            c.setLabel(descriptor.getName() + ".label");
+            c.setRequired(descriptor.isRequired());
+            applyParameters(c, descriptor.getParameters());
+            return c;
+        }
         throw new RuntimeException("Unsupported field type '" + descriptor.getFieldType() + "'");
     }
 
-    private void applyParameters(TextComponent c, Map<String, Object> parameters)
+    private void applyParameters(FieldComponent c, Map<String, Object> parameters)
     {
         // Sigh, it would be nice if we could treat everything as a string. That way, we just pass
         // the entire parameter map into the component.  That way, if something is defined, it is made
