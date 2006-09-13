@@ -16,7 +16,7 @@ public class RequiredValidator extends FieldValidatorSupport
         Object fieldValue = getFieldValue(getFieldName(), obj);
         if (fieldValue == null)
         {
-            validationContext.addFieldError(getFieldName(), validationContext.getText(getFieldName() + REQUIRED));
+            validationContext.addFieldError(getFieldName(), getRequiredErrorText());
         }
 
         if (fieldValue instanceof String)
@@ -24,8 +24,13 @@ public class RequiredValidator extends FieldValidatorSupport
             String str = ((String)fieldValue);
             if (str.length() == 0)
             {
-                validationContext.addFieldError(getFieldName(), validationContext.getText(getFieldName() + REQUIRED));
+                validationContext.addFieldError(getFieldName(), getRequiredErrorText());
             }
         }
+    }
+
+    private String getRequiredErrorText()
+    {
+        return validationContext.getText(validationContext.getFullFieldName(getFieldName()) + REQUIRED);
     }
 }

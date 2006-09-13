@@ -8,4 +8,5 @@ import com.zutubi.validation.i18n.TextProvider;
  */
 public interface ValidationContext extends ValidationAware, LocaleProvider, TextProvider
 {
+    String getFullFieldName(String fieldName);
 }

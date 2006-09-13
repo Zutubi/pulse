@@ -3,10 +3,12 @@ package com.zutubi.validation.providers;
 import junit.framework.TestCase;
 import com.zutubi.validation.bean.DefaultObjectFactory;
 import com.zutubi.validation.Validator;
-import com.zutubi.validation.providers.mock.MockAnimal;
-import com.zutubi.validation.providers.mock.MockWall;
+import com.zutubi.validation.mock.MockAnimal;
+import com.zutubi.validation.mock.MockWall;
+import com.zutubi.validation.mock.MockHouse;
 import com.zutubi.validation.validators.RequiredValidator;
 import com.zutubi.validation.validators.NumericValidator;
+import com.zutubi.validation.validators.DelegateValidator;
 
 import java.util.List;
 
@@ -53,5 +55,16 @@ public class AnnotationValidatorProviderTest extends TestCase
         NumericValidator n = (NumericValidator) validators.get(0);
         assertEquals("height", n.getFieldName());
         assertEquals(20, n.getMax());
+    }
+
+    public void testNestedValidation()
+    {
+        MockHouse house = new MockHouse();
+        List<Validator> validators = provider.getValidators(house);
+
+        assertEquals(1, validators.size());
+
+        DelegateValidator d = (DelegateValidator) validators.get(0);
+        assertEquals("door", d.getFieldName());
     }
 }

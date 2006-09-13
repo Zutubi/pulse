@@ -31,7 +31,7 @@ public class DelegatingValidationContext implements ValidationContext
         textProvider = makeTextPovider(obj);
     }
 
-    private LocaleProvider makeLocaleProvider(Object obj)
+    public static LocaleProvider makeLocaleProvider(Object obj)
     {
         if (obj instanceof LocaleProvider)
         {
@@ -40,7 +40,7 @@ public class DelegatingValidationContext implements ValidationContext
         return new DefaultLocalProvider();
     }
 
-    private TextProvider makeTextPovider(Object obj)
+    public static TextProvider makeTextPovider(Object obj)
     {
         if (obj instanceof TextProvider)
         {
@@ -49,7 +49,7 @@ public class DelegatingValidationContext implements ValidationContext
         return new NoopTextProvider();
     }
 
-    protected ValidationAware makeValidationAware(Object o)
+    public static ValidationAware makeValidationAware(Object o)
     {
         if (o instanceof ValidationAware)
         {
@@ -101,5 +101,10 @@ public class DelegatingValidationContext implements ValidationContext
     public String getText(String txt)
     {
         return textProvider.getText(txt);
+    }
+
+    public String getFullFieldName(String fieldName)
+    {
+        return fieldName;
     }
 }
