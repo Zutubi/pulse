@@ -1,7 +1,11 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.validation.CommandValidationManager;
+import com.zutubi.pulse.core.validation.CommandValidationException;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.validation.ValidationManager;
+import com.zutubi.validation.DefaultValidationManager;
+import com.zutubi.validation.DelegatingValidationContext;
+import com.zutubi.validation.ValidationException;
 import nu.xom.*;
 
 import java.io.File;
@@ -198,7 +202,8 @@ public class FileLoader
                 }
 
                 // Apply declarative validation
-                CommandValidationManager.validate(type, name);
+                validate(type);
+//                CommandValidationManager.validate(type, name);
             }
         }
         catch (InvocationTargetException ex)
@@ -224,6 +229,18 @@ public class FileLoader
         {
             throw createParseException(name, e, ex);
         }
+    }
+
+    private void validate(Object obj) throws CommandValidationException, ValidationException
+    {
+        ValidationManager validationManager = new DefaultValidationManager();
+        DelegatingValidationContext validationContext = new DelegatingValidationContext(obj);
+        validationManager.validate(obj, validationContext);
+        if (validationContext.hasErrors())
+        {
+            throw new CommandValidationException(validationContext);
+        }
+
     }
 
     private void loadSubElements(Element e, Object type, boolean resolveReferences, Scope scope, IntrospectionHelper typeHelper, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate)

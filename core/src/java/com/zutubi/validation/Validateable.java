@@ -5,5 +5,5 @@ package com.zutubi.validation;
  */
 public interface Validateable
 {
-    void validate();
+    void validate(ValidationContext context);
 }

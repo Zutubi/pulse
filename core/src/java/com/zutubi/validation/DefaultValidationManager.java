@@ -1,6 +1,7 @@
 package com.zutubi.validation;
 
-import com.zutubi.validation.sample.Jabber;
+import com.zutubi.validation.providers.AnnotationValidatorProvider;
+import com.zutubi.validation.providers.ReflectionValidatorProvider;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -11,6 +12,13 @@ import java.util.LinkedList;
 public class DefaultValidationManager implements ValidationManager
 {
     private List<ValidatorProvider> providers = new LinkedList<ValidatorProvider>();
+
+    public DefaultValidationManager()
+    {
+        // configure the default validation provider.
+        providers.add(new AnnotationValidatorProvider());
+        providers.add(new ReflectionValidatorProvider());
+    }
 
     public void validate(Object o) throws ValidationException
     {

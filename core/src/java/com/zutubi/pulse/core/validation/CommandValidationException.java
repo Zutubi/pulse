@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.validation;
 
-import com.opensymphony.xwork.validator.ValidatorContext;
 import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.validation.ValidationContext;
 
 import java.util.List;
 
@@ -9,14 +9,14 @@ import java.util.List;
  */
 public class CommandValidationException extends FileLoadException
 {
-    private ValidatorContext context;
+    private ValidationContext context;
 
-    public CommandValidationException(ValidatorContext context)
+    public CommandValidationException(ValidationContext context)
     {
         this.context = context;
     }
 
-    public ValidatorContext getContext()
+    public ValidationContext getContext()
     {
         return context;
     }
@@ -32,9 +32,9 @@ public class CommandValidationException extends FileLoadException
             builder.append('\n');
         }
 
-        for(Object errorList: context.getFieldErrors().values())
+        for(List<String> errorList: context.getFieldErrors().values())
         {
-            for(Object error: ((List)errorList))
+            for(String error: errorList)
             {
                 builder.append(error);
                 builder.append('\n');

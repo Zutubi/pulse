@@ -32,10 +32,6 @@ public class DelegateValidatorTest extends FieldValidatorTestCase
         super.setUp();
 
         validationManager = new DefaultValidationManager();
-        AnnotationValidatorProvider provider = new AnnotationValidatorProvider();
-        provider.setObjectFactory(new DefaultObjectFactory());
-        validationManager.addValidatorProvider(provider);
-
         ((DelegateValidator)validator).setValidationManager(validationManager);
     }
 
@@ -51,7 +47,7 @@ public class DelegateValidatorTest extends FieldValidatorTestCase
         validator.validate(new FieldProvider(new MockDoor()));
 
         assertTrue(validationAware.hasFieldErrors());
-        assertEquals(Arrays.asList("field.handle.required"), validationAware.getFieldErrors("field.handle"));
+        assertEquals(Arrays.asList("handle.required"), validationAware.getFieldErrors("field.handle"));
     }
 
     public void testDelegationToCollection() throws ValidationException
@@ -59,8 +55,8 @@ public class DelegateValidatorTest extends FieldValidatorTestCase
         validator.validate(new FieldProvider(Arrays.asList(new MockDoor(), new MockDoor(), new MockDoor())));
 
         assertTrue(validationAware.hasFieldErrors());
-        assertEquals(Arrays.asList("field[0].handle.required"), validationAware.getFieldErrors("field[0].handle"));
-        assertEquals(Arrays.asList("field[1].handle.required"), validationAware.getFieldErrors("field[1].handle"));
-        assertEquals(Arrays.asList("field[2].handle.required"), validationAware.getFieldErrors("field[2].handle"));
+        assertEquals(Arrays.asList("handle.required"), validationAware.getFieldErrors("field[0].handle"));
+        assertEquals(Arrays.asList("handle.required"), validationAware.getFieldErrors("field[1].handle"));
+        assertEquals(Arrays.asList("handle.required"), validationAware.getFieldErrors("field[2].handle"));
     }
 }

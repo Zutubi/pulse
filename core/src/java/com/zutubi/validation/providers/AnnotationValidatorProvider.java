@@ -6,6 +6,7 @@ import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.validation.bean.ObjectFactory;
 import com.zutubi.validation.bean.AnnotationUtils;
+import com.zutubi.validation.bean.DefaultObjectFactory;
 
 import java.util.*;
 import java.lang.reflect.Method;
@@ -19,7 +20,9 @@ import java.beans.PropertyDescriptor;
  */
 public class AnnotationValidatorProvider implements ValidatorProvider
 {
-    private ObjectFactory objectFactory;
+    // unless an object factory is specified, use the default. We may not always be in a
+    // happy autowiring context.
+    private ObjectFactory objectFactory = new DefaultObjectFactory();
 
     public void setObjectFactory(ObjectFactory objectFactory)
     {

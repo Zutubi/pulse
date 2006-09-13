@@ -13,7 +13,7 @@ public class ValidateableValidator extends ValidatorSupport
     {
         if (Validateable.class.isAssignableFrom(obj.getClass()))
         {
-            ((Validateable)obj).validate();
+            ((Validateable)obj).validate(getValidationContext());
         }
     }
 }

@@ -1,9 +1,10 @@
 package com.zutubi.pulse.core;
 
 import com.opensymphony.util.TextUtils;
-import com.opensymphony.xwork.validator.ValidatorContext;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.validation.Validateable;
+import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.Validateable;
+import com.zutubi.validation.ValidationContext;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -94,12 +95,12 @@ public class CommandGroup implements Command, Validateable
         return names;
     }
 
-    public Command getCommand()
+    @Required public Command getCommand()
     {
         return command;
     }
 
-    public void validate(ValidatorContext context)
+    public void validate(ValidationContext context)
     {
         // ensure that our artifacts have unique names.
         List<String> artifactNames = getArtifactNames();

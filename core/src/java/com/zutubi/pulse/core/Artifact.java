@@ -5,6 +5,8 @@ import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.annotations.Name;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +33,7 @@ public abstract class Artifact
     {
     }
 
-    public String getName()
+    @Required @Name public String getName()
     {
         return name;
     }

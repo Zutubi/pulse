@@ -53,4 +53,9 @@ public class ValidationAwareSupport implements ValidationAware
     {
         return actionErrors.size() > 0;
     }
+
+    public Map<String, List<String>> getFieldErrors()
+    {
+        return new HashMap<String, List<String>>(fieldErrors);
+    }
 }

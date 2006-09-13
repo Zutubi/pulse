@@ -24,7 +24,6 @@ public class AnnotationValidatorProviderTest extends TestCase
         super.setUp();
 
         provider = new AnnotationValidatorProvider();
-        provider.setObjectFactory(new DefaultObjectFactory());
     }
 
     protected void tearDown() throws Exception

@@ -7,6 +7,7 @@ import com.zutubi.validation.i18n.DefaultLocalProvider;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -91,6 +92,11 @@ public class DelegatingValidationContext implements ValidationContext
     public boolean hasActionErrors()
     {
         return validationAware.hasActionErrors();
+    }
+
+    public Map getFieldErrors()
+    {
+        return validationAware.getFieldErrors();
     }
 
     public Locale getLocale()

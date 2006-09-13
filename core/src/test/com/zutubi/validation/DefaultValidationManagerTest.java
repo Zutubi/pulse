@@ -1,11 +1,11 @@
 package com.zutubi.validation;
 
 import junit.framework.TestCase;
-import com.zutubi.validation.sample.Jabber;
-import com.zutubi.validation.providers.AnnotationValidatorProvider;
-import com.zutubi.validation.bean.DefaultObjectFactory;
+import com.zutubi.validation.mock.MockAnimal;
+import com.zutubi.validation.mock.MockWallet;
 
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * <class-comment/>
@@ -21,10 +21,6 @@ public class DefaultValidationManagerTest extends TestCase
 
         validationManager = new DefaultValidationManager();
         validationContext = new DelegatingValidationContext(this);
-
-        AnnotationValidatorProvider provider = new AnnotationValidatorProvider();
-        provider.setObjectFactory(new DefaultObjectFactory());
-        validationManager.addValidatorProvider(provider);
     }
 
     protected void tearDown() throws Exception
@@ -35,16 +31,31 @@ public class DefaultValidationManagerTest extends TestCase
         super.tearDown();
     }
 
-    public void testValidation() throws ValidationException
+    public void testMockAnimal() throws ValidationException
     {
-        Jabber j = new Jabber();
-        validationManager.validate(j, validationContext);
+        MockAnimal animal = new MockAnimal();
+        validationManager.validate(animal, validationContext);
         assertTrue(validationContext.hasErrors());
         assertTrue(validationContext.hasFieldErrors());
 
-        List<String> fieldErrors = validationContext.getFieldErrors("host");
+        List<String> fieldErrors = validationContext.getFieldErrors("head");
         assertNotNull(fieldErrors);
         assertEquals(1, fieldErrors.size());
-        assertEquals("host.required", fieldErrors.get(0));
+        assertEquals("head.required", fieldErrors.get(0));
+    }
+
+    public void testMockWallet() throws ValidationException
+    {
+        MockWallet wallet = new MockWallet();
+        validationManager.validate(wallet, validationContext);
+
+        assertTrue(validationContext.hasErrors());
+        assertTrue(validationContext.hasFieldErrors());
+
+        List<String> ccErrors = validationContext.getFieldErrors("cc");
+        assertEquals(Arrays.asList("cc.required"), ccErrors);
+
+        List<String> moneyErrors = validationContext.getFieldErrors("money");
+        assertEquals(Arrays.asList("money.min"), moneyErrors);
     }
 }

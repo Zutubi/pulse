@@ -1,6 +1,7 @@
 package com.zutubi.validation;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -20,4 +21,6 @@ public interface ValidationAware
     boolean hasFieldErrors();
 
     boolean hasActionErrors();
+
+    Map<String, List<String>> getFieldErrors();
 }

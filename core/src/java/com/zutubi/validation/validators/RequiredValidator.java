@@ -31,6 +31,6 @@ public class RequiredValidator extends FieldValidatorSupport
 
     private String getRequiredErrorText()
     {
-        return validationContext.getText(validationContext.getFullFieldName(getFieldName()) + REQUIRED);
+        return validationContext.getText(getFieldName() + REQUIRED);
     }
 }

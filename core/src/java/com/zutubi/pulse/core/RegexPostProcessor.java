@@ -1,14 +1,14 @@
 package com.zutubi.pulse.core;
 
-import com.opensymphony.xwork.validator.ValidatorContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.PlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.core.validation.Validateable;
 import com.zutubi.pulse.util.CircularBuffer;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.validation.Validateable;
+import com.zutubi.validation.ValidationContext;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -346,7 +346,7 @@ public class RegexPostProcessor implements PostProcessor, Validateable
         this.joinOverlapping = joinOverlapping;
     }
 
-    public void validate(ValidatorContext context)
+    public void validate(ValidationContext context)
     {
         if (leadingContext < 0)
         {
