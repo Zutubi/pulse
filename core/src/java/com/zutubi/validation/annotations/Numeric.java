@@ -13,8 +13,13 @@ import java.lang.annotation.RetentionPolicy;
 @Constraint(handler = NumericValidator.class)
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Integral
+public @interface Numeric
 {
-    int max() default Integer.MAX_VALUE;
-    int min() default Integer.MIN_VALUE;
+    public static final int DEFAULT_max = Integer.MAX_VALUE;
+
+    public static final int DEFAULT_min = Integer.MIN_VALUE;
+
+    int max() default DEFAULT_max;
+
+    int min() default DEFAULT_min;
 }

@@ -1,6 +1,6 @@
-package com.zutubi.validation.providers;
+package com.zutubi.validation.providers.mock;
 
-import com.zutubi.validation.annotations.Integral;
+import com.zutubi.validation.annotations.Numeric;
 
 /**
  * <class-comment/>
@@ -9,7 +9,7 @@ public class MockWall
 {
     private int height;
 
-    @Integral(max = 20)
+    @Numeric(max = 20)
     public int getHeight()
     {
         return height;

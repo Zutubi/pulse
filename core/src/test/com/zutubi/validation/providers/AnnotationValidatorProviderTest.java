@@ -3,6 +3,8 @@ package com.zutubi.validation.providers;
 import junit.framework.TestCase;
 import com.zutubi.validation.bean.DefaultObjectFactory;
 import com.zutubi.validation.Validator;
+import com.zutubi.validation.providers.mock.MockAnimal;
+import com.zutubi.validation.providers.mock.MockWall;
 import com.zutubi.validation.validators.RequiredValidator;
 import com.zutubi.validation.validators.NumericValidator;
 

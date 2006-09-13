@@ -21,7 +21,7 @@ public class RequiredValidator extends FieldValidatorSupport
 
         if (fieldValue instanceof String)
         {
-            String str = ((String)fieldValue).trim();
+            String str = ((String)fieldValue);
             if (str.length() == 0)
             {
                 validationContext.addFieldError(getFieldName(), validationContext.getText(getFieldName() + REQUIRED));

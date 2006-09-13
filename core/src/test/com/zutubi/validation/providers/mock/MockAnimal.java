@@ -1,4 +1,4 @@
-package com.zutubi.validation.providers;
+package com.zutubi.validation.providers.mock;
 
 import com.zutubi.validation.annotations.Required;
 
