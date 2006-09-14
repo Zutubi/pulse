@@ -13,6 +13,7 @@ public class EnvConfig extends ConfigSupport
     // we are leaving the definition of the PULSE_HOME property in the PulseCtl do that it does
     // not depend on a this class. PulseCtls dependencies need to be kept to a minimum.
     public static final String PULSE_HOME = PulseCtl.PULSE_HOME;
+    public static final String VERSION_HOME = PulseCtl.VERSION_HOME;
 
     public static final String PULSE_CONFIG = "pulse.config";
 
@@ -38,6 +39,16 @@ public class EnvConfig extends ConfigSupport
     public boolean hasPulseHome()
     {
         return hasProperty(EnvConfig.PULSE_HOME);
+    }
+
+    public String getVersionHome()
+    {
+        return getProperty(EnvConfig.VERSION_HOME);
+    }
+
+    public boolean hasVersionHome()
+    {
+        return hasProperty(EnvConfig.VERSION_HOME);
     }
 
     public String getPulseConfig()

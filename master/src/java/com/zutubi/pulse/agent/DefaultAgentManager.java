@@ -4,6 +4,7 @@ import com.zutubi.pulse.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.SlaveAgentRemovedEvent;
 import com.zutubi.pulse.events.SlaveStatusEvent;
@@ -26,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  */
-public class DefaultAgentManager implements AgentManager
+public class DefaultAgentManager implements AgentManager, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(DefaultAgentManager.class);
 
@@ -164,6 +165,18 @@ public class DefaultAgentManager implements AgentManager
             {
                 eventManager.publish(new SlaveStatusEvent(this, oldStatus, agent));
             }
+        }
+    }
+
+    public void stop(boolean force)
+    {
+        if(force)
+        {
+            pingService.shutdownNow();
+        }
+        else
+        {
+            pingService.shutdown();
         }
     }
 

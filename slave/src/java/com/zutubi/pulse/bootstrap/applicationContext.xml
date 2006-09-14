@@ -100,6 +100,7 @@
     <bean id="shutdownManager" class="com.zutubi.pulse.ShutdownManager">
         <property name="stoppables">
             <list>
+                <ref bean="slaveQueue"/>
                 <ref bean="startupManager"/>
             </list>
         </property>

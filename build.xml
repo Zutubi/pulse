@@ -144,6 +144,10 @@
             <fileset dir="server-core/src/bin" includes="**/*"/>
         </copy>
 
+        <copy todir="${package.root.slave}/lib">
+            <fileset dir="server-core/src/lib" includes="**/*"/>
+        </copy>
+
         <copy todir="${version.root.slave}/licenses">
             <fileset dir="ivy-repository" includes="**/*.txt"/>
         </copy>
@@ -261,6 +265,10 @@
             <fileset dir="master/src/bin" includes="**/*"/>
         </copy>
 
+        <copy todir="${package.root.master}/lib">
+            <fileset dir="server-core/src/lib" includes="**/*"/>
+        </copy>
+
         <copy todir="${version.root.master}/licenses">
             <fileset dir="ivy-repository" includes="**/*.txt"/>
         </copy>
@@ -314,6 +322,7 @@
         <copy todir="${version.root.master}/commands">
             <fileset dir="local/etc" includes="*.commands.properties"/>
             <fileset dir="server-core/etc" includes="*.commands.properties"/>
+            <fileset dir="master/etc" includes="*.commands.properties"/>
         </copy>
 
         <copy todir="${version.root.master}">

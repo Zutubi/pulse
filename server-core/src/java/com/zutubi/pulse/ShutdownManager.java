@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 
 import java.util.List;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Manages orderly shutdown of the system.  The order is determined by a list
@@ -20,13 +22,16 @@ public class ShutdownManager
      */
     public void shutdown(boolean force, boolean exitJvm)
     {
-        for (Stoppable stoppable : stoppables)
+        if(checkWrapper(111))
         {
-            stoppable.stop(force);
+            return;
         }
+
+        stop(force);
+
         if (exitJvm)
         {
-            // why exit? because some external packages do not clean up all of there threads... 
+            // why exit? because some external packages do not clean up all of their threads... 
             System.exit(0);
         }
         else
@@ -36,9 +41,49 @@ public class ShutdownManager
         }
     }
 
+    public void stop(boolean force)
+    {
+        for (Stoppable stoppable : stoppables)
+        {
+            stoppable.stop(force);
+        }
+    }
+
+    public boolean checkWrapper(int exitCode)
+    {
+        try
+        {
+            // If we are running under the Java Service Wrapper, stop via it.
+            Class wrapperManagerClass = Class.forName("org.tanukisoftware.wrapper.WrapperManager");
+
+            try
+            {
+                Method stopMethod = wrapperManagerClass.getMethod("stop", int.class);
+                stopMethod.invoke(null, exitCode);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                throw e;
+            }
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public void delayedShutdown(boolean force, boolean exitJvm)
     {
         ShutdownRunner runner = new ShutdownRunner(force, exitJvm);
+        new Thread(runner).start();
+    }
+
+    public void delayedStop()
+    {
+        StopRunner runner = new StopRunner();
         new Thread(runner).start();
     }
 
@@ -72,6 +117,23 @@ public class ShutdownManager
                 // Empty
             }
             shutdown(force, exitJvm);
+        }
+    }
+
+    private class StopRunner implements Runnable
+    {
+        public void run()
+        {
+            try
+            {
+                Thread.sleep(500);
+            }
+            catch(InterruptedException e)
+            {
+                // Nothing
+            }
+
+            stop(true);
         }
     }
 }

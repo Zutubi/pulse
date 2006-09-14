@@ -16,6 +16,7 @@ import java.net.URLClassLoader;
 public class PulseCtl
 {
     public static final String PULSE_HOME = "pulse.home";
+    public static final String VERSION_HOME = "pulse.version.home";
 
     private static final String DEBUG = "debug";
 
@@ -27,12 +28,12 @@ public class PulseCtl
     {
         try
         {
-            File pulseHome = getPulseHome();
-            System.setProperty(PULSE_HOME, pulseHome.getAbsolutePath());
+            File versionHome = getVersionHome();
+            System.setProperty(VERSION_HOME, versionHome.getAbsolutePath());
 
-            ClassLoader classpath = makeClassLoader(pulseHome);
+            ClassLoader classpath = makeClassLoader(versionHome);
 
-            Map<String, Command> commands = loadCommands(pulseHome, classpath);
+            Map<String, Command> commands = loadCommands(versionHome, classpath);
 
             if (argv.length == 0)
             {
@@ -68,7 +69,7 @@ public class PulseCtl
         }
     }
 
-    private File getPulseHome()
+    private File getVersionHome()
     {
         String pulseHomeStr = System.getProperty(PULSE_HOME);
         if(pulseHomeStr == null)
@@ -95,15 +96,15 @@ public class PulseCtl
         try
         {
             String version = fileToString(activeVersion);
-            File actualHome = new File(pulseHome,  version);
+            File versionHome = new File(pulseHome,  version);
 
-            if(!actualHome.exists())
+            if(!versionHome.exists())
             {
-                printError("Active version directory '" + actualHome.getAbsolutePath() + "' does not exist.");
+                printError("Active version directory '" + versionHome.getAbsolutePath() + "' does not exist.");
                 System.exit(CONFIGURATION_ERROR);
             }
 
-            return actualHome;
+            return versionHome;
         }
         catch (IOException e)
         {
@@ -194,7 +195,11 @@ public class PulseCtl
         System.err.println("The following commands are available:");
         for(Map.Entry<String, Command> entry: commands.entrySet())
         {
-            System.err.println("    " + entry.getKey() + ":\t\t" + entry.getValue().getHelp());
+            String help = entry.getValue().getHelp();
+            if(help != null)
+            {
+                System.err.println("    " + entry.getKey() + ":\t\t" + help);
+            }
         }
     }
 

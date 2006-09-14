@@ -92,13 +92,13 @@ public class SetupWizard extends BaseWizard
         {
             // ensure that this runs in a separate thread so that the
             // use can receive appropriate feedback.
-            Executors.newSingleThreadExecutor().execute(new Runnable()
+            new Thread(new Runnable()
             {
                 public void run()
                 {
                     setupManager.requestSetupComplete();
                 }
-            });
+            }).start();
         }
         catch (Exception e)
         {

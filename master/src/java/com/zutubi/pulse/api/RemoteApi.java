@@ -243,12 +243,33 @@ public class RemoteApi
         }
         else
         {
-            adminTokenManager.checkAdminToken(token);
+            if(!adminTokenManager.checkAdminToken(token))
+            {
+                throw new AuthenticationException("Invalid token");
+            }
         }
 
         // Sigh ... this is tricky, because if we shutdown here Jetty dies
         // before this request is complete and the client gets an error :-|.
         shutdownManager.delayedShutdown(force, exitJvm);
+        return true;
+    }
+
+    public boolean stopService(String token) throws AuthenticationException
+    {
+        if (tokenManager != null)
+        {
+            tokenManager.verifyAdmin(token);
+        }
+        else
+        {
+            if(!adminTokenManager.checkAdminToken(token))
+            {
+                throw new AuthenticationException("Invalid token");
+            }
+        }
+
+        shutdownManager.delayedStop();
         return true;
     }
 

@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class FileConfig
 {
-    private static final String PULSE_HOME = PulseCtl.PULSE_HOME;
+    private static final String VERSION_HOME = PulseCtl.VERSION_HOME;
 
     private static final String FILE_NAME = "pulse%u.%g.log";
 
@@ -29,16 +29,16 @@ public class FileConfig
     public FileConfig() throws IOException
     {
         // the default configuration is pulse.home/system/logs
-        if (!System.getProperties().containsKey(PULSE_HOME))
+        if (!System.getProperties().containsKey(VERSION_HOME))
         {
             return;
         }
 
-        String pulseHomeProperty = System.getProperty(PULSE_HOME);
-        File pulseHome = new File(pulseHomeProperty);
+        String versionHomeProperty = System.getProperty(VERSION_HOME);
+        File versionHome = new File(versionHomeProperty);
 
         // log root is just below the pulse home.
-        File logRoot = new File(pulseHome, asPath("system", "logs"));
+        File logRoot = new File(versionHome, asPath("system", "logs"));
 
         if (!logRoot.exists() && !logRoot.mkdirs())
         {

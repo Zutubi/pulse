@@ -40,11 +40,11 @@ set _EXECCMD=start "Pulse" "%_JAVACMD%"
 
 if "%PULSE_OPTS%"=="" set PULSE_OPTS=-Xmx512m
 
+:restart
+
 %_EXECCMD% %JAVA_OPTS% %PULSE_OPTS% -classpath "%PULSE_HOME%\boot.jar" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true %*
 
-rem if "%1" == "start" goto end
-rem if errorlevel 1 pause
-rem goto end
+if errorlevel 111 goto restart
 
 :end
 
